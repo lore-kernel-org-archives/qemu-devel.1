@@ -2,90 +2,93 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D66DC433E5
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4925CC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:59:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F266222D02
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:59:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12D4022B4D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:59:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oXC2moot"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F266222D02
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R9tcab9x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12D4022B4D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxVNv-0007N0-4c
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 08:59:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55826)
+	id 1jxVOX-000097-BH
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 08:59:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxVLQ-0002UE-QG
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:36 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45052)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxVLO-0007JP-GM
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:36 -0400
-Received: by mail-wr1-x444.google.com with SMTP id b6so17720509wrs.11
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 05:56:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=8Xd7zpZsEJU+pgATz/q/VYH7gIksBbBcCoaaOptcJd8=;
- b=oXC2mootWDU1OQHId5gg2jDRKsySzPMcq0gHHiGHOCCKv20Be5SImcwOTdTD7i0lxM
- nB8a+U2pOa+RifTyvA1HXGKfELRARM3A8ijDaGy3zLmSKMMyzDjYZGNHhyihIxbJafeF
- 6H/suCBcKEJmD+Ebm2p3clF9+V5NQkf9MLxMtBuZ3L194eLZg7fSPzqUjzy6271Kgab6
- edC++aoAN2OBaqNH7EgyGcO5Th9yHnRUJ8MUbp3/zNi+ItmYhTlrqyySYE0AvqatZmR1
- lsABLTQl1KtcckTACCDHfKGVyBq/yJbAwvqt9SNmjJllaWOPEv119/FoOapa3Aucl75k
- AOXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=8Xd7zpZsEJU+pgATz/q/VYH7gIksBbBcCoaaOptcJd8=;
- b=qoh4jrRj8ISiXsy5OEv298nI9MlLSdokegFK4sPe1vqVucAv8kU2ClTzqQJFKHjlUt
- kCZkV7a0QKsdvm647aprxwmKc/x+CNANotqkDLFP56dq1LhwIibzOplB84tj9BMVamLz
- Z/qKhdK6kQK+sjVSXxkJWF2W9axEfj08GQVK0XQdCwDywZ1L0ML35dRUgrHNbeQ/fDLp
- z2x25IwQYjU8O0SIeayvQQ6WfGTkCc4icFCpif2Eu305TTuTM8bLYuosJkT/Kmk/4NdA
- KJfZvrxKf3AxWxYAa441u+q5XodTAlDDK3qfzzat+fjmvzgu/OnMlu5LPtQzTqoA3klB
- 4Vbg==
-X-Gm-Message-State: AOAM531x0TPpEU8KWpPApNboDwyXUZZ5xu7f8qNHvFuwMGAZh+k9zLU1
- Q3FRM7rZLEwJtW6zClrsKF+VdS7SBoDhSQ==
-X-Google-Smtp-Source: ABdhPJxN4NCn4xzhpVHUdHgj9StvI9x+mNqFpizcv1uqlKzCMiSkHzGXO2w4PPXnxgF55PA6o3YUYg==
-X-Received: by 2002:adf:fc06:: with SMTP id i6mr3910964wrr.79.1595249792445;
- Mon, 20 Jul 2020 05:56:32 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p29sm34025403wmi.43.2020.07.20.05.56.31
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jul 2020 05:56:31 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 07/12] qdev: Document GPIO related functions
-Date: Mon, 20 Jul 2020 13:56:16 +0100
-Message-Id: <20200720125621.13460-8-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200720125621.13460-1-peter.maydell@linaro.org>
-References: <20200720125621.13460-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jxVMi-0005AF-PK
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:57:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32089
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jxVMe-0007UY-74
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:57:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595249870;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=2jei6jn6+qaZvhntd7P/M/6NH/LCzrWCsrXh5HzAzcA=;
+ b=R9tcab9xuPZRfYlAQl5vEEuDyMpN9Nkm1uRLgHQ81A+GvV0DIvbLh4y0z4UohsLXzrqjBx
+ SADeKp6yns0NJ6jmIdqpVe/s4vc/oXfgzY7XtqZzrUgJqR7rPcWrTe8r+1J5eHAEqcyNWB
+ xEbTeWkOmqeURJ0o6hLwIMOS93sVb54=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-TmKq61NKOW-s9KntribgmQ-1; Mon, 20 Jul 2020 08:57:46 -0400
+X-MC-Unique: TmKq61NKOW-s9KntribgmQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F507100CCC3;
+ Mon, 20 Jul 2020 12:57:45 +0000 (UTC)
+Received: from kaapi (ovpn-112-156.phx2.redhat.com [10.3.112.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6AA1F6FECD;
+ Mon, 20 Jul 2020 12:57:43 +0000 (UTC)
+Date: Mon, 20 Jul 2020 18:27:41 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: Li Qiang <liq3ea@gmail.com>
+Subject: Re: [PATCH] net: check payload length limit for all frames
+In-Reply-To: <CAKXe6SKV8=B2rb6EY72W17r6-oz5nx9VQndH9gSyafubOU4rJg@mail.gmail.com>
+Message-ID: <nycvar.YSQ.7.78.906.2007201822290.4380@xnncv>
+References: <20200716192335.1212638-1-ppandit@redhat.com>
+ <CAKXe6SKL3aNiOKKLEMof6GGNjYLcX9fvfSf-0PBSX48rh4--FQ@mail.gmail.com>
+ <20200717012151.tlfmc6hsfia22f4e@mozz.bu.edu>
+ <4e4909ae-db2f-4a32-ae5c-d52149e80a8c@redhat.com>
+ <nycvar.YSQ.7.78.906.2007171016480.950384@xnncv>
+ <3620abab-a464-8e3c-d5b9-0bd80b35e2f1@redhat.com>
+ <nycvar.YSQ.7.78.906.2007171326100.4380@xnncv>
+ <CAKXe6SJbJaEepRVFtNy=5fhJrw8+Gax=mcwFuhfXrHTgo+wmog@mail.gmail.com>
+ <nycvar.YSQ.7.78.906.2007200752230.4380@xnncv>
+ <20200720033304.sttpqr337xsf4rna@mozz.bu.edu>
+ <CAKXe6SKV8=B2rb6EY72W17r6-oz5nx9VQndH9gSyafubOU4rJg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 03:17:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,246 +103,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Jason Wang <jasowang@redhat.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add documentation comments for the various qdev functions
-related to creating and connecting GPIO lines.
++-- On Mon, 20 Jul 2020, Li Qiang wrote --+
+| This seems is the same issue as LP#1886362 . Look at the free path. Here the 
+| 'e1000e_write_to_rx_buffers' trigger DMA and then go to address space 
+| dispatch. So the DMA is not RAM but a MMIO range. Then we go to another send 
+| path, and in that we frees the 'iov'.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200711142425.16283-4-peter.maydell@linaro.org
----
- include/hw/qdev-core.h | 191 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 189 insertions(+), 2 deletions(-)
+  Cool. Thanks so much for the confirmation Li.
+ 
+| Alex do you tried my patch to solve LP#1886362 ? I have tried it and it 
+| seems no this UAF triggered.
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 1d2bf5f37da..ea3f73a282d 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -424,13 +424,132 @@ void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
- void qdev_machine_creation_done(void);
- bool qdev_machine_modified(void);
- 
-+/**
-+ * qdev_get_gpio_in: Get one of a device's anonymous input GPIO lines
-+ * @dev: Device whose GPIO we want
-+ * @n: Number of the anonymous GPIO line (which must be in range)
-+ *
-+ * Returns the qemu_irq corresponding to an anonymous input GPIO line
-+ * (which the device has set up with qdev_init_gpio_in()). The index
-+ * @n of the GPIO line must be valid (i.e. be at least 0 and less than
-+ * the total number of anonymous input GPIOs the device has); this
-+ * function will assert() if passed an invalid index.
-+ *
-+ * This function is intended to be used by board code or SoC "container"
-+ * device models to wire up the GPIO lines; usually the return value
-+ * will be passed to qdev_connect_gpio_out() or a similar function to
-+ * connect another device's output GPIO line to this input.
-+ *
-+ * For named input GPIO lines, use qdev_get_gpio_in_named().
-+ */
- qemu_irq qdev_get_gpio_in(DeviceState *dev, int n);
-+/**
-+ * qdev_get_gpio_in_named: Get one of a device's named input GPIO lines
-+ * @dev: Device whose GPIO we want
-+ * @name: Name of the input GPIO array
-+ * @n: Number of the GPIO line in that array (which must be in range)
-+ *
-+ * Returns the qemu_irq corresponding to a named input GPIO line
-+ * (which the device has set up with qdev_init_gpio_in_named()).
-+ * The @name string must correspond to an input GPIO array which exists on
-+ * the device, and the index @n of the GPIO line must be valid (i.e.
-+ * be at least 0 and less than the total number of input GPIOs in that
-+ * array); this function will assert() if passed an invalid name or index.
-+ *
-+ * For anonymous input GPIO lines, use qdev_get_gpio_in().
-+ */
- qemu_irq qdev_get_gpio_in_named(DeviceState *dev, const char *name, int n);
- 
-+/**
-+ * qdev_connect_gpio_out: Connect one of a device's anonymous output GPIO lines
-+ * @dev: Device whose GPIO to connect
-+ * @n: Number of the anonymous output GPIO line (which must be in range)
-+ * @pin: qemu_irq to connect the output line to
-+ *
-+ * This function connects an anonymous output GPIO line on a device
-+ * up to an arbitrary qemu_irq, so that when the device asserts that
-+ * output GPIO line, the qemu_irq's callback is invoked.
-+ * The index @n of the GPIO line must be valid (i.e. be at least 0 and
-+ * less than the total number of anonymous output GPIOs the device has
-+ * created with qdev_init_gpio_out()); otherwise this function will assert().
-+ *
-+ * Outbound GPIO lines can be connected to any qemu_irq, but the common
-+ * case is connecting them to another device's inbound GPIO line, using
-+ * the qemu_irq returned by qdev_get_gpio_in() or qdev_get_gpio_in_named().
-+ *
-+ * It is not valid to try to connect one outbound GPIO to multiple
-+ * qemu_irqs at once, or to connect multiple outbound GPIOs to the
-+ * same qemu_irq. (Warning: there is no assertion or other guard to
-+ * catch this error: the model will just not do the right thing.)
-+ * Instead, for fan-out you can use the TYPE_IRQ_SPLIT device: connect
-+ * a device's outbound GPIO to the splitter's input, and connect each
-+ * of the splitter's outputs to a different device.  For fan-in you
-+ * can use the TYPE_OR_IRQ device, which is a model of a logical OR
-+ * gate with multiple inputs and one output.
-+ *
-+ * For named output GPIO lines, use qdev_connect_gpio_out_named().
-+ */
- void qdev_connect_gpio_out(DeviceState *dev, int n, qemu_irq pin);
-+/**
-+ * qdev_connect_gpio_out: Connect one of a device's anonymous output GPIO lines
-+ * @dev: Device whose GPIO to connect
-+ * @name: Name of the output GPIO array
-+ * @n: Number of the anonymous output GPIO line (which must be in range)
-+ * @pin: qemu_irq to connect the output line to
-+ *
-+ * This function connects an anonymous output GPIO line on a device
-+ * up to an arbitrary qemu_irq, so that when the device asserts that
-+ * output GPIO line, the qemu_irq's callback is invoked.
-+ * The @name string must correspond to an output GPIO array which exists on
-+ * the device, and the index @n of the GPIO line must be valid (i.e.
-+ * be at least 0 and less than the total number of input GPIOs in that
-+ * array); this function will assert() if passed an invalid name or index.
-+ *
-+ * Outbound GPIO lines can be connected to any qemu_irq, but the common
-+ * case is connecting them to another device's inbound GPIO line, using
-+ * the qemu_irq returned by qdev_get_gpio_in() or qdev_get_gpio_in_named().
-+ *
-+ * It is not valid to try to connect one outbound GPIO to multiple
-+ * qemu_irqs at once, or to connect multiple outbound GPIOs to the
-+ * same qemu_irq; see qdev_connect_gpio_out() for details.
-+ *
-+ * For named output GPIO lines, use qdev_connect_gpio_out_named().
-+ */
- void qdev_connect_gpio_out_named(DeviceState *dev, const char *name, int n,
-                                  qemu_irq pin);
-+/**
-+ * qdev_get_gpio_out_connector: Get the qemu_irq connected to an output GPIO
-+ * @dev: Device whose output GPIO we are interested in
-+ * @name: Name of the output GPIO array
-+ * @n: Number of the output GPIO line within that array
-+ *
-+ * Returns whatever qemu_irq is currently connected to the specified
-+ * output GPIO line of @dev. This will be NULL if the output GPIO line
-+ * has never been wired up to the anything.  Note that the qemu_irq
-+ * returned does not belong to @dev -- it will be the input GPIO or
-+ * IRQ of whichever device the board code has connected up to @dev's
-+ * output GPIO.
-+ *
-+ * You probably don't need to use this function -- it is used only
-+ * by the platform-bus subsystem.
-+ */
- qemu_irq qdev_get_gpio_out_connector(DeviceState *dev, const char *name, int n);
-+/**
-+ * qdev_intercept_gpio_out: Intercept an existing GPIO connection
-+ * @dev: Device to intercept the outbound GPIO line from
-+ * @icpt: New qemu_irq to connect instead
-+ * @name: Name of the output GPIO array
-+ * @n: Number of the GPIO line in the array
-+ *
-+ * This function is provided only for use by the qtest testing framework
-+ * and is not suitable for use in non-testing parts of QEMU.
-+ *
-+ * This function breaks an existing connection of an outbound GPIO
-+ * line from @dev, and replaces it with the new qemu_irq @icpt, as if
-+ * ``qdev_connect_gpio_out_named(dev, icpt, name, n)`` had been called.
-+ * The previously connected qemu_irq is returned, so it can be restored
-+ * by a second call to qdev_intercept_gpio_out() if desired.
-+ */
- qemu_irq qdev_intercept_gpio_out(DeviceState *dev, qemu_irq icpt,
-                                  const char *name, int n);
- 
-@@ -438,10 +557,59 @@ BusState *qdev_get_child_bus(DeviceState *dev, const char *name);
- 
- /*** Device API.  ***/
- 
--/* Register device properties.  */
--/* GPIO inputs also double as IRQ sinks.  */
-+/**
-+ * qdev_init_gpio_in: create an array of anonymous input GPIO lines
-+ * @dev: Device to create input GPIOs for
-+ * @handler: Function to call when GPIO line value is set
-+ * @n: Number of GPIO lines to create
-+ *
-+ * Devices should use functions in the qdev_init_gpio_in* family in
-+ * their instance_init or realize methods to create any input GPIO
-+ * lines they need. There is no functional difference between
-+ * anonymous and named GPIO lines. Stylistically, named GPIOs are
-+ * preferable (easier to understand at callsites) unless a device
-+ * has exactly one uniform kind of GPIO input whose purpose is obvious.
-+ * Note that input GPIO lines can serve as 'sinks' for IRQ lines.
-+ *
-+ * See qdev_get_gpio_in() for how code that uses such a device can get
-+ * hold of an input GPIO line to manipulate it.
-+ */
- void qdev_init_gpio_in(DeviceState *dev, qemu_irq_handler handler, int n);
-+/**
-+ * qdev_init_gpio_out: create an array of anonymous output GPIO lines
-+ * @dev: Device to create output GPIOs for
-+ * @pins: Pointer to qemu_irq or qemu_irq array for the GPIO lines
-+ * @n: Number of GPIO lines to create
-+ *
-+ * Devices should use functions in the qdev_init_gpio_out* family
-+ * in their instance_init or realize methods to create any output
-+ * GPIO lines they need. There is no functional difference between
-+ * anonymous and named GPIO lines. Stylistically, named GPIOs are
-+ * preferable (easier to understand at callsites) unless a device
-+ * has exactly one uniform kind of GPIO output whose purpose is obvious.
-+ *
-+ * The @pins argument should be a pointer to either a "qemu_irq"
-+ * (if @n == 1) or a "qemu_irq []" array (if @n > 1) in the device's
-+ * state structure. The device implementation can then raise and
-+ * lower the GPIO line by calling qemu_set_irq(). (If anything is
-+ * connected to the other end of the GPIO this will cause the handler
-+ * function for that input GPIO to be called.)
-+ *
-+ * See qdev_connect_gpio_out() for how code that uses such a device
-+ * can connect to one of its output GPIO lines.
-+ */
- void qdev_init_gpio_out(DeviceState *dev, qemu_irq *pins, int n);
-+/**
-+ * qdev_init_gpio_out: create an array of named output GPIO lines
-+ * @dev: Device to create output GPIOs for
-+ * @pins: Pointer to qemu_irq or qemu_irq array for the GPIO lines
-+ * @name: Name to give this array of GPIO lines
-+ * @n: Number of GPIO lines to create
-+ *
-+ * Like qdev_init_gpio_out(), but creates an array of GPIO output lines
-+ * with a name. Code using the device can then connect these GPIO lines
-+ * using qdev_connect_gpio_out_named().
-+ */
- void qdev_init_gpio_out_named(DeviceState *dev, qemu_irq *pins,
-                               const char *name, int n);
- /**
-@@ -473,6 +641,25 @@ static inline void qdev_init_gpio_in_named(DeviceState *dev,
-     qdev_init_gpio_in_named_with_opaque(dev, handler, dev, name, n);
- }
- 
-+/**
-+ * qdev_pass_gpios: create GPIO lines on container which pass through to device
-+ * @dev: Device which has GPIO lines
-+ * @container: Container device which needs to expose them
-+ * @name: Name of GPIO array to pass through (NULL for the anonymous GPIO array)
-+ *
-+ * In QEMU, complicated devices like SoCs are often modelled with a
-+ * "container" QOM device which itself contains other QOM devices and
-+ * which wires them up appropriately. This function allows the container
-+ * to create GPIO arrays on itself which simply pass through to a GPIO
-+ * array of one of its internal devices.
-+ *
-+ * If @dev has both input and output GPIOs named @name then both will
-+ * be passed through. It is not possible to pass a subset of the array
-+ * with this function.
-+ *
-+ * To users of the container device, the GPIO array created on @container
-+ * behaves exactly like any other.
-+ */
- void qdev_pass_gpios(DeviceState *dev, DeviceState *container,
-                      const char *name);
- 
--- 
-2.20.1
+He mentioned that your patch fixes both issues:
+  -> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05367.html
+    ...
+    > On the other hand, I cannot reproduce either issue with Li's patch:
+    > Message-Id: <20200716161453.61295-1-liq3ea@163.com>
+
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
 
 
