@@ -2,126 +2,134 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE45C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9426FC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:18:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBB522080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:15:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F5F82080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:18:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="VsGMyxjL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBB522080D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZq3Siba"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F5F82080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxQxq-0004LK-Sf
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 04:15:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32798)
+	id 1jxR0d-0005N4-KE
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 04:18:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jxQxC-0003s0-Lr
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:15:18 -0400
-Received: from mail-bn8nam11on2059.outbound.protection.outlook.com
- ([40.107.236.59]:13729 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1jxQx9-0000TZ-80
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:15:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k+R3NMG5harHOsF21I9jbk5ba/J/G2H3AZAGSReAYC1uB5vpzL5HISJAmrRjC9wAhlXwPrzHlIqPa8h7LmRPg4obpniHf8yxytdoCQR7opPBjGt72RQDliCfFdKrBE3H66Uj6YGtMJKGESN6eCwivcsxCfYsk8mfX5YgYfhhU2mIJtdZSTa0rx1KXuVA2a5xL0HCSZc0chC2FiqgnvYlrjg+YsvwlW9hr/JqnM0pj63Am5Pp2EzFAesJmTnGNBzsG7wn2hAVjEvDAYpvnT2ydeBGoiW1M0nYxJGKISsXnyvbS2ItNyEZ1Er1EzMncv/qwq3bWPyxOJTZIdI7Q+3XtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9b4noLI96HG6Qkjm2w6FYcJAUiEXGAHqcU8h2IHeumg=;
- b=DsC/dl0RrPE9eREQgL1rFZyuKA9BNB/Q8gC8oJ8f+T+i+nPP5dYjxDBv4STb3bMuSOemtP8y9shSOFR3PnUo/tThBEPPmdpgJ5Xc3oRQzswkINlVWt8juj7bFnHzx4raQhzRGFYP2Xj8/zGvtJ1svCpJIklwFZdap+tWlvmCKQ58sSl8r5gwpbdSIMNKxmyFDV0xhtWmgVGb28JCMT/xBJzS4KzwOORQA00RJEQIY8JRQHUuBatB5z9XbPqyo0mzkgiAVlaKftOO/IPVVDAyTcEC+TjLhNjtMscczsIsRNOREIVFAMgKdF77WKoWw8TaTZ/x0h6rPVTPw88MDh/t8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
- dkim=pass header.d=xilinx.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9b4noLI96HG6Qkjm2w6FYcJAUiEXGAHqcU8h2IHeumg=;
- b=VsGMyxjLxyc+zJFQLDJ8sS+3FkBCpk0qamVTwdTQ4KuPl2BsTr6Z569RfVitPW53BJbOowZ1V2QJyzBM51dXt0xZBlHgQ4EjHpDdqyd5r/2ferfHW7HTGKZ25tNqzihvOgLzFXuZu7QDU7RSv5xdGloOHJS+oY2n/oetabc6cHs=
-Received: from BY5PR02MB6772.namprd02.prod.outlook.com (2603:10b6:a03:206::11)
- by BYAPR02MB4056.namprd02.prod.outlook.com (2603:10b6:a02:fa::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.25; Mon, 20 Jul
- 2020 08:00:08 +0000
-Received: from BY5PR02MB6772.namprd02.prod.outlook.com
- ([fe80::4477:7134:37a6:c828]) by BY5PR02MB6772.namprd02.prod.outlook.com
- ([fe80::4477:7134:37a6:c828%3]) with mapi id 15.20.3195.025; Mon, 20 Jul 2020
- 08:00:08 +0000
-From: Sai Pavan Boddu <saipava@xilinx.com>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Markus
- Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
-Subject: RE: [PATCH v2 2/3] usb/hcd-xhci: Move qemu-xhci device to
- hcd-xhci-pci.c
-Thread-Topic: [PATCH v2 2/3] usb/hcd-xhci: Move qemu-xhci device to
- hcd-xhci-pci.c
-Thread-Index: AQHWSseXs5W1CCwXt0udqNJ08afgVqjo/J0AgCdFE0A=
-Date: Mon, 20 Jul 2020 08:00:08 +0000
-Message-ID: <BY5PR02MB677295286C4193236973EC0ECA7B0@BY5PR02MB6772.namprd02.prod.outlook.com>
-References: <1593008176-9629-1-git-send-email-sai.pavan.boddu@xilinx.com>
- <1593008176-9629-3-git-send-email-sai.pavan.boddu@xilinx.com>
- <87zh8rzi0e.fsf@dusky.pond.sub.org>
- <d8e247a3-5b50-0889-2522-37f2d486fdf9@redhat.com>
-In-Reply-To: <d8e247a3-5b50-0889-2522-37f2d486fdf9@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=xilinx.com;
-x-originating-ip: [183.83.78.46]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: ef1237f5-f456-436d-645a-08d82c82eb99
-x-ms-traffictypediagnostic: BYAPR02MB4056:
-x-microsoft-antispam-prvs: <BYAPR02MB40561B3C31A4526B929B87FFCA7B0@BYAPR02MB4056.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: pFPJaFBqnULhwkkBVFneh8ARU0dHlIzudgZKzj90xKL7HCnC9Hco2DUwPdemFshkVgPZCEkZR09Vj3l7fjAQun4j31G3YAgeVyPofi9jvOZfemQd7wcrcO1sWetoQ7SPxL7EDHKfd8IMIMQYODT1aCSnqJS9Xyh9GkEIAxZ44dpi8DpGhqaUMERKObLKJ1PNeV7RJ3MbY4pQPeEnYFaP6U4fTPUPaHlv3J2IzeFaTuqsSM+CdxRpGZODKuPjXJIefbIu3AM02C21TZuL1LFQkzFn86LTHvtlZIelZD1JhpldRc4pJhxOWEFvZH/WSwfkKM7VIPPvQIt3J2v3NypJMVmyFItVFAnPho3pz98Cx/E5Bsl5kHmr8bgAtE0kCnaxphjPedGSZp8Bn8+Cqwnbpgoq/37e2AYBYMtLjPYMBbMlsE7Eg958pZ5dTb0ugO48RUbHTFMtEdIRg9spcrlUXw==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BY5PR02MB6772.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(396003)(366004)(39860400002)(136003)(346002)(376002)(2906002)(4326008)(186003)(7416002)(33656002)(54906003)(110136005)(316002)(83380400001)(55016002)(8676002)(8936002)(9686003)(7696005)(53546011)(52536014)(86362001)(71200400001)(26005)(6506007)(966005)(76116006)(66556008)(66476007)(66446008)(64756008)(5660300002)(66946007)(478600001)(2004002);
- DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata: 7hiOqfVo+54jha0YQKMNeVUqHYkFmyNLwkT1XamH7xOXHdA0XaUpkubcR+e3X9LCfZAsUrKJKwy4gaDdI3+ddJrUcRQbudbn6GDtLvgJ/64amSxwcoQHvrbvqkNO9tq5w3aGogdt+EUTRFxiouOhVhH9puFOkZAavZUMt6E/ECA1zS4wXOiNJye2+YewUNR16VtnhY4p6absgiGAqGc4Y2i/cjAy+wSWYdKSZvu692VdjHagDlswNrcH358s4mpQsK0hRhow/GIomTPwp+Y0NwdMAhfMlgPKX0bLpB+qL2OrNNKze65CQqKzDUsluMIR+kqyT4lZxbcx7Z1Bw7/fcYilOK6wLzrhyrHkcD9d9L+GxfTUYKWB40Va4/WxDsE1OTaCheYm9iGUviZTgfDXdLPQPHC+Q4voEm5XAu3ud4Hw8hul6aetWvmxjnOfNc1qIjAxBBVPXKFDUNHsHOiIlbDJDyRFc7c4gQVwG0tgFq8=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxR05-0004w0-3a
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:18:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23839
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxR03-0000uD-GD
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:18:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595233094;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=CAFfgy/pGxBoGxRYhzdwu+v3XGLt5zaQYAOTyXsAM3U=;
+ b=BZq3Siba1mTw/+6M1qe0Q6OtLr64uqXqfoWF4cY+DWT9/QoBem/LgNLSQnDSqEP/EKoRu0
+ pl9gk0AF0gjHvpvq9UNpAWsWbYCW+ykIYQipvXFvqdHndMreWK+e/6rLYnaUM3NTBaKQSX
+ ARyJ98RABiqsc6eXPNI4GRkTNI5amOk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-JQIDuOigPAGold_lI1c9XQ-1; Mon, 20 Jul 2020 04:18:11 -0400
+X-MC-Unique: JQIDuOigPAGold_lI1c9XQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 497B1800597;
+ Mon, 20 Jul 2020 08:18:09 +0000 (UTC)
+Received: from [10.36.114.91] (ovpn-114-91.ams2.redhat.com [10.36.114.91])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 38FB172E45;
+ Mon, 20 Jul 2020 08:17:54 +0000 (UTC)
+Subject: Re: [PATCH v4 3/8] s390/sclp: rework sclp boundary and length checks
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <20200624202312.28349-1-walling@linux.ibm.com>
+ <20200624202312.28349-4-walling@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat GmbH
+Message-ID: <89b72ce5-39c7-3080-286a-ab6ed59afb7e@redhat.com>
+Date: Mon, 20 Jul 2020 10:17:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR02MB6772.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef1237f5-f456-436d-645a-08d82c82eb99
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2020 08:00:08.1550 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PNL8M5RMpVED8iwPBf0lq3srIHaAngM6nhrZGkCcTDMYGoXyctXd9fRFO/WJVX9VmRHEjUkFgmyoB8KaBkAu+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB4056
-Received-SPF: pass client-ip=40.107.236.59; envelope-from=saipava@xilinx.com;
- helo=NAM11-BN8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 04:15:12
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200624202312.28349-4-walling@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 03:17:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,75 +142,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ying Fang <fangying1@huawei.com>,
- =?utf-8?B?J01hcmMtQW5kcsOpIEx1cmVhdSc=?= <marcandre.lureau@redhat.com>
+Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
+ pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SEkgUGhpbGlwcGUsDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGhp
-bGlwcGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEByZWRoYXQuY29tPg0KPiBTZW50OiBUaHVyc2Rh
-eSwgSnVuZSAyNSwgMjAyMCAxOjQ4IFBNDQo+IFRvOiBNYXJrdXMgQXJtYnJ1c3RlciA8YXJtYnJ1
-QHJlZGhhdC5jb20+OyBTYWkgUGF2YW4gQm9kZHUNCj4gPHNhaXBhdmFAeGlsaW54LmNvbT47IFRo
-b21hcyBIdXRoIDx0aHV0aEByZWRoYXQuY29tPg0KPiBDYzogR2VyZCBIb2ZmbWFubiA8a3JheGVs
-QHJlZGhhdC5jb20+OyBQZXRlciBNYXlkZWxsDQo+IDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+
-OyBFZHVhcmRvIEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5jb20+Ow0KPiBxZW11LWRldmVsQG5v
-bmdudS5vcmc7IEFsaXN0YWlyIEZyYW5jaXMgPGFsaXN0YWlyLmZyYW5jaXNAd2RjLmNvbT47DQo+
-ICdNYXJjLUFuZHLDqSBMdXJlYXUnIDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+OyBZaW5n
-IEZhbmcNCj4gPGZhbmd5aW5nMUBodWF3ZWkuY29tPjsgUGFvbG8gQm9uemluaSA8cGJvbnppbmlA
-cmVkaGF0LmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAyLzNdIHVzYi9oY2QteGhjaTog
-TW92ZSBxZW11LXhoY2kgZGV2aWNlIHRvIGhjZC0NCj4geGhjaS1wY2kuYw0KPiANCj4gT24gNi8y
-NS8yMCAxMDowNiBBTSwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+ID4gU2FpIFBhdmFuIEJv
-ZGR1IDxzYWkucGF2YW4uYm9kZHVAeGlsaW54LmNvbT4gd3JpdGVzOg0KPiA+DQo+ID4+IE1vdmUg
-cGNpIHNwZWNpZmljIGRldmljZXMgdG8gbmV3IGZpbGUuIFRoaXMgc2V0IHRoZSBlbnZpcm9ubWVu
-dCB0bw0KPiA+PiBtb3ZlIGFsbCBwY2kgc3BlY2lmaWMgaG9va3MgaW4gaGNkLXhoY2kuYyB0byBo
-Y2QteGhjaS1wY2kuYy4NCj4gPj4NCj4gPj4gU2lnbmVkLW9mZi1ieTogU2FpIFBhdmFuIEJvZGR1
-IDxzYWkucGF2YW4uYm9kZHVAeGlsaW54LmNvbT4NCj4gPj4gLS0tDQo+ID4+ICBody91c2IvaGNk
-LXhoY2ktcGNpLmMgfCA2NA0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysNCj4gPj4gIGh3L3VzYi9oY2QteGhjaS5jICAgICB8IDMyICsrLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4+ICBody91c2IvaGNkLXhoY2kuaCAgICAgfCAgMiArKw0K
-PiA+PiAgMyBmaWxlcyBjaGFuZ2VkLCA2OCBpbnNlcnRpb25zKCspLCAzMCBkZWxldGlvbnMoLSkg
-IGNyZWF0ZSBtb2RlDQo+ID4+IDEwMDY0NCBody91c2IvaGNkLXhoY2ktcGNpLmMNCj4gPj4NCj4g
-Pj4gZGlmZiAtLWdpdCBhL2h3L3VzYi9oY2QteGhjaS1wY2kuYyBiL2h3L3VzYi9oY2QteGhjaS1w
-Y2kuYyBuZXcgZmlsZQ0KPiA+PiBtb2RlIDEwMDY0NCBpbmRleCAwMDAwMDAwLi4yNmFmNjgzDQo+
-ID4+IC0tLSAvZGV2L251bGwNCj4gPj4gKysrIGIvaHcvdXNiL2hjZC14aGNpLXBjaS5jDQo+ID4+
-IEBAIC0wLDAgKzEsNjQgQEANCj4gPj4gKy8qDQo+ID4+ICsgKiBVU0IgeEhDSSBjb250cm9sbGVy
-IHdpdGggUENJIHN5c3RlbSBidXMgZW11bGF0aW9uDQo+ID4NCj4gPiBTY3JhdGNoICJzeXN0ZW0i
-Lg0KPiA+DQo+ID4+ICsgKg0KPiA+PiArICogQ29weXJpZ2h0IChjKSAyMDExIFNlY3VyaWZvcmVz
-dA0KPiA+PiArICogRGF0ZTogMjAxMS0wNS0xMSA7ICBBdXRob3I6IEhlY3RvciBNYXJ0aW4gPGhl
-Y3RvckBtYXJjYW5zb2Z0LmNvbT4NCj4gPg0KPiA+IExldCdzIHVzZSB0aGUgb3Bwb3J0dW5pdHkg
-dG8gZHJvcCB0aGUgIkRhdGU6ICIgcGFydCwgYmVjYXVzZSB3ZSBkb24ndA0KPiA+IGhhdmUgaXQg
-YW55d2hlcmUgZWxzZS4NCj4gDQo+IEdvb2Qgb3Bwb3J0dW5pdHkgdG8gc3VnZ2VzdCB0aGUgU1BE
-WCB0YWdzIGFnYWluIDpQDQo+IA0KPiAvKg0KPiAgKiBTUERYLUZpbGVDb3B5cmlnaHRUZXh0OiAy
-MDExIFNlY3VyaWZvcmVzdA0KPiAgKiBTUERYLUZpbGVDb250cmlidXRvcjogSGVjdG9yIE1hcnRp
-biA8aGVjdG9yQG1hcmNhbnNvZnQuY29tPg0KPiAgKiBTUERYLUZpbGVDb3B5cmlnaHRUZXh0OiAy
-MDIwIFhpbGlueCBJbmMuDQo+ICAqIFNQRFgtRmlsZUNvbnRyaWJ1dG9yOiBTYWkgUGF2YW4gQm9k
-ZHUgPHNhaS5wYXZhbi5ib2RkdUB4aWxpbnguY29tPg0KPiAgKiBTUERYLUxpY2Vuc2UtSWRlbnRp
-ZmllcjogR1BMLTIuMC1vci1sYXRlciAgKi8JDQpbU2FpIFBhdmFuIEJvZGR1XSBJIHdvdWxkIGlu
-Y2x1ZGUgdGhpcyBpbiBWNCwgRm9yZ290IHRoZW0gaW4gVjMuDQoNClRoYW5rcywNClNhaSBQYXZh
-bg0KPiANCj4gaHR0cHM6Ly9zcGR4Lm9yZy9yZGYvb250b2xvZ3kvc3BkeC0yLTAtDQo+IHJjL2Rh
-dGFwcm9wZXJ0aWVzL2ZpbGVDb250cmlidXRvcl9fXy0xNjM1NzE3MTcyLmh0bWwNCj4gDQo+ID4N
-Cj4gPj4gKyAqIEJhc2VkIG9uIHVzYi1vaGNpLmMsIGVtdWxhdGVzIFJlbmVzYXMgTkVDIFVTQiAz
-LjANCj4gPj4gKyAqIERhdGU6IDIwMjAtMDMtMDE7IEF1dGhvcjogU2FpIFBhdmFuIEJvZGR1DQo+
-ID4+ICsgPHNhaS5wYXZhbi5ib2RkdUB4aWxpbnguY29tPg0KPiA+DQo+ID4gQW5kIG5vIG5ldyAi
-RGF0ZTogIiBwYXJ0cywgcGxlYXNlLg0KPiA+DQo+ID4+ICsgKiBNb3ZlZCB0aGUgcGNpIHNwZWNp
-ZmljIGNvbnRlbnQgZm9yIGhjZC14aGNpLmMgdG8gaGNkLXhoY2ktcGNpLmMNCj4gPj4gKyAqDQo+
-ID4+ICsgKiBUaGlzIGxpYnJhcnkgaXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiByZWRpc3RyaWJ1
-dGUgaXQgYW5kL29yDQo+ID4+ICsgKiBtb2RpZnkgaXQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBH
-TlUgTGVzc2VyIEdlbmVyYWwgUHVibGljDQo+ID4+ICsgKiBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBi
-eSB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXINCj4gPj4gKyAqIHZlcnNpb24g
-MiBvZiB0aGUgTGljZW5zZSwgb3IgKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lvbi4N
-Cj4gPj4gKyAqDQo+ID4+ICsgKiBUaGlzIGxpYnJhcnkgaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhv
-cGUgdGhhdCBpdCB3aWxsIGJlIHVzZWZ1bCwNCj4gPj4gKyAqIGJ1dCBXSVRIT1VUIEFOWSBXQVJS
-QU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mDQo+ID4+ICsgKiBNRVJD
-SEFOVEFCSUxJVFkgb3IgRklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UuICBTZWUgdGhl
-DQo+IEdOVQ0KPiA+PiArICogTGVzc2VyIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUg
-ZGV0YWlscy4NCj4gPj4gKyAqDQo+ID4+ICsgKiBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBj
-b3B5IG9mIHRoZSBHTlUgTGVzc2VyIEdlbmVyYWwgUHVibGljDQo+ID4+ICsgKiBMaWNlbnNlIGFs
-b25nIHdpdGggdGhpcyBsaWJyYXJ5OyBpZiBub3QsIHNlZQ0KPiA8aHR0cDovL3d3dy5nbnUub3Jn
-L2xpY2Vuc2VzLz4uDQo+ID4+ICsgKi8NCj4gPiBbLi4uXQ0KPiA+DQoNCg==
+On 24.06.20 22:23, Collin Walling wrote:
+> Rework the SCLP boundary check to account for different SCLP commands
+> (eventually) allowing different boundary sizes.
+> 
+> Move the length check code into a separate function, and introduce a
+> new function to determine the length of the read SCP data (i.e. the size
+> from the start of the struct to where the CPU entries should begin).
+> 
+> The format of read CPU info is unlikely to change in the future,
+> so we do not require a separate function to calculate its length.
+> 
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/s390x/sclp.c | 54 ++++++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 44 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 181ce04007..5899c1e3b8 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -49,6 +49,34 @@ static inline bool sclp_command_code_valid(uint32_t code)
+>      return false;
+>  }
+>  
+> +static bool sccb_verify_boundary(uint64_t sccb_addr, uint32_t code,
+> +                                 SCCBHeader *header)
+> +{
+> +    uint64_t sccb_max_addr = sccb_addr + be16_to_cpu(header->length) - 1;
+> +    uint64_t sccb_boundary = (sccb_addr & PAGE_MASK) + PAGE_SIZE;
+> +
+> +    switch (code & SCLP_CMD_CODE_MASK) {
+> +    default:
+> +        if (sccb_max_addr < sccb_boundary) {
+> +            return true;
+> +        }
+> +    }
+
+^ what is that?
+
+    if ((code & SCLP_CMD_CODE_MASK) && sccb_max_addr < sccb_boundary) {
+        return true;
+    }
+
+> +    header->response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
+> +    return false;
+
+So we return "false" on success? At least I consider that weird when
+returning the bool type. Maybe make it clearer what the function indicates
+
+"sccb_boundary_is_invalid"
+
+or leave it named as is and switch from return value "bool" to "int",
+using "0" on success and "-EINVAL" on error.
+
+> +}
+> +
+> +/* Calculates sufficient SCCB length to store a full Read SCP/CPU response */
+> +static bool sccb_verify_length(SCCB *sccb, int num_cpus, int offset_cpu)
+> +{
+> +    int required_len = offset_cpu + num_cpus * sizeof(CPUEntry);
+> +
+> +    if (be16_to_cpu(sccb->h.length) < required_len) {
+> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+> +        return false;
+> +    }
+> +    return true;
+> +}
+> +
+>  static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
+>  {
+>      uint8_t features[SCCB_CPU_FEATURE_LEN] = { 0 };
+> @@ -66,6 +94,11 @@ static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
+>      }
+>  }
+>  
+> +static inline int get_read_scp_info_offset_cpu(void)
+> +{
+> +    return offsetof(ReadInfo, entries);
+> +}
+> +
+>  /* Provide information about the configuration, CPUs and storage */
+>  static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>  {
+> @@ -74,17 +107,16 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>      int cpu_count;
+>      int rnsize, rnmax;
+>      IplParameterBlock *ipib = s390_ipl_get_iplb();
+> +    int offset_cpu = get_read_scp_info_offset_cpu();
+>  
+> -    if (be16_to_cpu(sccb->h.length) <
+> -          (sizeof(ReadInfo) + machine->possible_cpus->len * sizeof(CPUEntry))) {
+> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+> +    if (!sccb_verify_length(sccb, machine->possible_cpus->len, offset_cpu)) {
+>          return;
+>      }
+>  
+>      /* CPU information */
+>      prepare_cpu_entries(machine, read_info->entries, &cpu_count);
+>      read_info->entries_cpu = cpu_to_be16(cpu_count);
+> -    read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
+> +    read_info->offset_cpu = cpu_to_be16(offset_cpu);
+>      read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
+>  
+>      read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+> @@ -133,17 +165,16 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
+>  {
+>      MachineState *machine = MACHINE(qdev_get_machine());
+>      ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
+> +    int offset_cpu = offsetof(ReadCpuInfo, entries);
+>      int cpu_count;
+>  
+> -    if (be16_to_cpu(sccb->h.length) <
+> -          (sizeof(ReadInfo) + machine->possible_cpus->len * sizeof(CPUEntry))) {
+> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+> +    if (!sccb_verify_length(sccb, machine->possible_cpus->len, offset_cpu)) {
+>          return;
+>      }
+>  
+>      prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
+>      cpu_info->nr_configured = cpu_to_be16(cpu_count);
+> -    cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
+> +    cpu_info->offset_configured = cpu_to_be16(offset_cpu);
+>      cpu_info->nr_standby = cpu_to_be16(0);
+>  
+>      /* The standby offset is 16-byte for each CPU */
+> @@ -229,6 +260,10 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
+>          goto out_write;
+>      }
+>  
+> +    if (!sccb_verify_boundary(sccb, code, &work_sccb.h)) {
+> +        goto out_write;
+> +    }
+> +
+>      sclp_c->execute(sclp, &work_sccb, code);
+>  out_write:
+>      s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
+> @@ -274,8 +309,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>          goto out_write;
+>      }
+>  
+> -    if ((sccb + be16_to_cpu(work_sccb.h.length)) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
+> -        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
+> +    if (!sccb_verify_boundary(sccb, code, &work_sccb.h)) {
+>          goto out_write;
+>      }
+>  
+> 
+
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
