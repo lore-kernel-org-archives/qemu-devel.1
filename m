@@ -2,94 +2,90 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 482D9C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 17:30:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 940B9C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 17:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10A2C22482
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 17:30:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 663E520702
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 17:41:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="isuhitgn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10A2C22482
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pNCOfdbw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 663E520702
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxZc9-0007Vs-5E
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 13:30:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49482)
+	id 1jxZnV-0002I1-LB
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 13:41:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jxZbZ-00076F-Ps
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 13:29:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25155
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jxZbX-0004aO-Aa
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 13:29:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595266168;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=E4IsUpO4/YTsqlMmWHLU83KEHpNoOiQBAqSonZuhVZM=;
- b=isuhitgnkge0FQhddFaVWKJwJcByUCinMBN2S7twS+u3R6sR+5LGLJMCOujrKZo7KUlxVx
- kEfO+49W/5EjFiTeAegi4eD+8fVek8U+oiPXWStXrUEEP5SmM+NixyYCDimgfMZ/OQ60yh
- SqHFVeo6F7yfgS03kxMsdFKAId4tcUo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-NBEA9DNXOSyIMsHZ5r3Cbw-1; Mon, 20 Jul 2020 13:29:26 -0400
-X-MC-Unique: NBEA9DNXOSyIMsHZ5r3Cbw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E8A91005504;
- Mon, 20 Jul 2020 17:29:25 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-115-27.ams2.redhat.com
- [10.36.115.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 354697EF87;
- Mon, 20 Jul 2020 17:29:23 +0000 (UTC)
-Subject: Re: [RFC 2/3] x86: cphp: prevent guest crash on CPU hotplug when
- broadcast SMI is in use
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20200710161704.309824-1-imammedo@redhat.com>
- <20200710161704.309824-3-imammedo@redhat.com>
- <e3598f14-2e91-436c-9a8c-c3b3a36b9190@redhat.com>
- <20200717145759.04a4399f@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <494a910a-16a9-5113-d0b5-6634718f279e@redhat.com>
-Date: Mon, 20 Jul 2020 19:29:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jxZmP-0001cv-8Z
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 13:40:45 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41705)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jxZmM-00067V-Vs
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 13:40:44 -0400
+Received: by mail-pl1-x644.google.com with SMTP id d1so8999074plr.8
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 10:40:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=D828gI1JmqlE61S0UJP1FfSeyb47LbCu+2td18hI0V0=;
+ b=pNCOfdbwXBC83zTc+hHfaBfbYlLp5rrXwA1yMz7xHoOKiuW18YGwKM61SrAYxTuMqx
+ RApcz+edduiRRTKt0joyZ5xqCM2Vh1UTs3ZMzh1hxgz+4E4s8EVWWZWfUvVVVF+Lx+L7
+ I8OrlABPy3nXjiu6zrwfgTVkHlonqNJyTH/g92PABfFbkFGGTO1IfyqCW5S7fvPLxalD
+ rajRgLFaG7aqdG6tbub6d8mZguaYwyXvmrlZNOEg0I3tDqBz4uC7OZCSm2JHt9ywneTg
+ yW3v/UmNRx3YcDGI8IoVuR5Xqyr2rCiWhRsGPuOakOoo5+0G3+jW+RIfc2csvOnrSuIz
+ vUgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=D828gI1JmqlE61S0UJP1FfSeyb47LbCu+2td18hI0V0=;
+ b=Nxn/a/6hN+HVrkGIPv3fGIg2a3LNVw9AgpRdaDUUUaTJ0bpb0SmG4kWjtvD5pSNTOn
+ tuCZ6z43O19JeXOOLYB+lzMN33KpNnt3iTjeoYfQpB7xj9BqVRr9j/e8Cyw6UkzQvkhw
+ nCi8axWxNaFb1ZXrWs95n5ALnvhkNa6hmU2Qn3MhBrQv0/g2hMMvA+uWTgKNEy+tgHHr
+ PRUypAe62O9QfrKH4R/xJQojBjwakyYZxYognVcK0FUj5NWwjOPjLz5l3yqF9lWInYns
+ C5x+cyA8eiHUVp+3+FlYjv1o/7+WXp1QI8I8RqxcRkfa6UacxAryu2Ua2odctcjDAptp
+ yT4g==
+X-Gm-Message-State: AOAM532GxhUNyDLbJ8Y6VgHnPRKBcaGx+I/tjcsLeejWW9kmSMl+5UmZ
+ cgsqUsp5LMuLdw9x8dFYsBwpj0flGaA=
+X-Google-Smtp-Source: ABdhPJwUIVeARty0L4ElRaRAPWOEEXgjrUbIHkWDRNGMvloJJujmGebzfDCEeVfmEV4W02sjOFySDA==
+X-Received: by 2002:a17:90a:8545:: with SMTP id a5mr512671pjw.35.1595266841212; 
+ Mon, 20 Jul 2020 10:40:41 -0700 (PDT)
+Received: from localhost.localdomain (216-160-65-90.tukw.qwest.net.
+ [216.160.65.90])
+ by smtp.gmail.com with ESMTPSA id y7sm184650pjy.54.2020.07.20.10.40.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Jul 2020 10:40:40 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for-5.1] target/hppa: Free some temps in do_sub
+Date: Mon, 20 Jul 2020 10:40:39 -0700
+Message-Id: <20200720174039.517902-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200717145759.04a4399f@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:16:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,154 +98,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: boris.ostrovsky@oracle.com, liran.alon@oracle.com, qemu-devel@nongnu.org
+Cc: deller@gmx.de, svens@stackframe.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/17/20 14:57, Igor Mammedov wrote:
-> On Tue, 14 Jul 2020 12:56:50 +0200
-> Laszlo Ersek <lersek@redhat.com> wrote:
-> 
->> On 07/10/20 18:17, Igor Mammedov wrote:
-> [...]
-> 
->>> @@ -1508,6 +1508,17 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->>>          return;
->>>      }
->>>
->>> +    if (pcms->acpi_dev) {
->>> +        Error *local_err = NULL;
->>> +
->>> +        hotplug_handler_pre_plug(HOTPLUG_HANDLER(pcms->acpi_dev), dev,
->>> +                                 &local_err);
->>> +        if (local_err) {
->>> +            error_propagate(errp, local_err);
->>> +            return;
->>> +        }
->>> +    }
->>> +
->>>      init_topo_info(&topo_info, x86ms);
->>>
->>>      env->nr_dies = x86ms->smp_dies;
->>>  
->>
->> (6) This looks sane to me, but I have a question for the *pre-patch*
->> code.
-> 
-> (not so short introduction)
-> 
-> plug callbacks were designed for wiring up hotplugged device, hence
-> it has check for acpi_dev which is one of HW connections needed to make
-> it work. Later on coldplug was consolidated with it, so plug callbacks
-> are also handling coldplugged devices.
-> 
-> then later plug callback was split on pre_ and plug_, where pre_
-> part is called right before device_foo.realize() and plug_ right after.
-> Split was intended to make graceful failure easier, where pre_ is taking
-> care of checking already set properties and optionally setting additional
-> properties and can/should fail without side-effects, and plug_ part
-> should not fail (maybe there is still cleanup to do there) and used to
-> finish wiring after the device had been realized.
-> 
-> 
->>
->> I notice that hotplug_handler_pre_plug() is already called from the
->> (completely unrelated) function pc_memory_pre_plug().
->>
->> In pc_memory_pre_plug(), we have the following snippet:
->>
->>     /*
->>      * When -no-acpi is used with Q35 machine type, no ACPI is built,
->>      * but pcms->acpi_dev is still created. Check !acpi_enabled in
->>      * addition to cover this case.
->>      */
->>     if (!pcms->acpi_dev || !x86_machine_is_acpi_enabled(X86_MACHINE(pcms))) {
->>         error_setg(errp,
->>                    "memory hotplug is not enabled: missing acpi device or acpi disabled");
->>         return;
->>     }
->>
->> Whereas in pc_cpu_pre_plug(), the present patch only adds a
->> "pcms->acpi_dev" nullity check.
->>
->> Should pc_cpu_pre_plug() check for ACPI enablement similarly to
->> pc_memory_pre_plug()?
-> extra check is not must have in pc_memory_pre_plug() as it should not break anything
-> (modulo MMIO memhp interface, which went unnoticed since probably nobody
-> uses MMIO memhp registers directly (i.e. QEMU's ACPI tables is sole user))
->  
->> I'm asking for two reasons:
->>
->> (6a) for the feature at hand (CPU hotplug with SMI), maybe we should
->> write:
->>
->>     if (pcms->acpi_dev && x86_machine_is_acpi_enabled(X86_MACHINE(pcms))) {
-> pretty harmless in the same sense as in pc_memory_pre_plug(),
-> but I'd rather avoid checks that are not must have.
-> 
-> 
->> (6b) or maybe more strictly, copy the check from memory hotplug (just
->> update the error message):
->>
->>     if (!pcms->acpi_dev || !x86_machine_is_acpi_enabled(X86_MACHINE(pcms))) {
->>         error_setg(errp,
->>                    "CPU hotplug is not enabled: missing acpi device or acpi disabled");
-> can't do it as it will break CPU clodplug when -no-cpi is used
-> 
->>         return;
->>     }
->>
->> Because CPU hotplug depends on ACPI too, just like memory hotplug,
->> regardless of firmware, and regardless of guest-SMM. Am I correct to
->> think that?
-> 
-> We have pcms->acpi_dev check in x86 code because isapc/piix4 machines
-> will/might not create the pm device (which implements acpi hw). 
-> 
-> (1) if (pcmc->pci_enabled && x86_machine_is_acpi_enabled(X86_MACHINE(pcms)))
-> 
-> if that weren't the case, calls to acpi_dev would be unconditional
-> 
-> I'm adding check into pre_plug so we can gracefully reject device_add
-> in case firmware is not prepared for handling hotplug SMI. Since
-> the later might crash the guest. It's for the sake of better user
-> experience since QEMU might easily run older firmware.
-> 
-> If we don't care about that, we can drop negotiation and the check,
-> send SMI on hotplug when SMI broadcast is enabled, that might
-> crash guest since it might be not supported by used fw, but that
-> was already the case for quite a while and I've heard only few
-> complaints. (I guess most users have sense not to use something
-> not impl./supported)
-> 
-> 
->> Basically, I'm asking if we should replicate original commit
->> 8cd91acec8df ("pc: fail memory hot-plug/unplug with -no-acpi and Q35
->> machine type", 2018-01-12) for CPU hotplug first (in a separate patch!),
->> before dealing with "lpc->smi_negotiated_features" in this patch.
-> 
-> I'd rather leave hw part decoupled from acpi tables part,
-> nothing prevents users implementing their own fw/os which uses
-> our cpuhp interface directly without ACPI.
-> 
->> Hmm... I'm getting confused. I *do* see similar checks in pc_cpu_plug()
->> and pc_cpu_unplug_request_cb(). But:
->>
->> - I don't understand what determines whether we put the ACPI check in
->> *PRE* plug functions, or the plug functions,
-> I beleive [1] answers that
-> 
->> - and I don't understand why pc_cpu_plug() and
->> pc_cpu_unplug_request_cb() only check "pcms->acpi_dev", and not
->> x86_machine_is_acpi_enabled().
-> 
-> x86_machine_is_acpi_enabled() is not must have in this case as
-> callbacks implement only hw part of cpuhp protocol (QEMU part),
-> what guest uses to handle it (fw tables(qemu generated),
-> or some custom code) is another story.
+Two temps allocated but not freed.  Do enough subtractions
+within a single TB and one can run out of temps entirely.
 
-Thank you for the explanation!
-Laszlo
+Cc: qemu-stable@nongnu.org
+Buglink: https://bugs.launchpad.net/qemu/+bug/1880287
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/hppa/translate.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 52d7bea1ea..4bd22d4820 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -1294,6 +1294,8 @@ static void do_sub(DisasContext *ctx, unsigned rt, TCGv_reg in1,
+     save_or_nullify(ctx, cpu_psw_cb_msb, cb_msb);
+     save_gpr(ctx, rt, dest);
+     tcg_temp_free(dest);
++    tcg_temp_free(cb);
++    tcg_temp_free(cb_msb);
+ 
+     /* Install the new nullification.  */
+     cond_free(&ctx->null_cond);
+-- 
+2.25.1
 
 
