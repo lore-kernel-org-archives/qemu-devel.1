@@ -2,98 +2,91 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FA8C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:40:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2676AC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:57:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0829D2070A
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:40:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E68A722B4D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:57:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LE7Nep21"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0829D2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v3oEPBcG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E68A722B4D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxV5Y-000835-8l
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 08:40:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51562)
+	id 1jxVMG-0003sP-2F
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 08:57:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxV4c-0007Sd-Cy
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:39:14 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38453)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxVLI-0002HB-Cc
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:28 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:42408)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxV4a-0004ov-VH
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:39:14 -0400
-Received: by mail-wm1-x344.google.com with SMTP id f18so24999747wml.3
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 05:39:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=tWVrdZrSQPk8h+iZLMt+1TIsQy4sjcRGHDIr21rMqZU=;
- b=LE7Nep219wWcHdQ7zcIW/nZUFoinvRhnT9RS8uQssRqMXFrAaxx0qH0SGYYYInEfqW
- M0tbWOEZmxGHDGtSphMEoDzmE+yO6ZPc5xwyecOHRVr7CJ0WqYW6xdhE8YAIGf2n2vGP
- VvyIncUdFUUBzUsYbnLh6eqtKhGlEO9paNEs6aCerwqffh6p8xX1DC725Fhe1xfWd6dd
- EXiJyGdYBJNQkL/RxPe8TtDPvf7I+mfRH7+ty2gtStj4FCVl7REhSv0dw/18nFg/7Ill
- VaiQPJBmdzFRConAjIVOhp0god6ykmhQMuvmvUEP/OAi+Ak0cvd4DVqxWl6mWc4wbnn0
- tJ/Q==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxVLG-0007Hn-Iw
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:28 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id o11so17740001wrv.9
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 05:56:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Mp29SHojRqpKy9V+YXlQO41fiUtg5Fxt1q4evYrhW18=;
+ b=v3oEPBcGecUbrSaLDiLHNgRo7mQLOgrVQAGkNq0o1g5gmzyQPSDEICBLE/AoBTdotq
+ LUjRj3xjjTw3bWH474z9Npemz/CPWt6Gmcq/DagkmL/A+3LuWPBNOfgZptVnWgKSItTa
+ fV+UAkrMryU86ljGwYY4rBfDGR0MFrG75YTt2RLjhR8EeqMHqIMHRTM342guTWFFiz6/
+ KuHuSNU5ifWdTTEY7PFzYAYU0T/nGzqkSuMRJLzOjRPi6yXdolGt0XPS/8pTVFFKoozQ
+ RQ5kl/H9RkiglWPCoiPM23SnxE/DlDl+uF9UmUUwiAmO6D4fuLqZl6Qz5t85Dfd49/QT
+ el/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=tWVrdZrSQPk8h+iZLMt+1TIsQy4sjcRGHDIr21rMqZU=;
- b=Dyx+Yhg8znSsnyBDkhuZDbEAwfwqPhZSRlEXg8ibKSvsO4vTcsLU5mKiyNiAavLnkx
- hN3L2JmgVrVREQw7t3+PzJ2Qee+RLL0Ydy6zAe+E/6bg9/9C5RKTz4VL2Q/Gp6bU7RWw
- xeqZ1L8LOX51+3GrpXk8BmR4OlkctPZg3O5xKpsiprbkItCD3+5St2tHIKp9pJ1LMcuE
- Oq051AYUBiRrDhKWr1lUOrn0zlzzOYNT0MgeTlJgolAvWUTuSAYrkdtOdKTUSBVLAGDO
- 4rc7uPpk7vgcOM15r0/lrO5JPA2ki30oA3nWV4U8ZjFY3MXGN7wPR6qib7Y7u1IlfQWh
- qU5Q==
-X-Gm-Message-State: AOAM5307z3NF45U/kfpne+YJM1ePwSRjfxK6bqpBNAOlCY8/OLsDFJvW
- BZ9EQ27wiFakKUbWnP1RahA=
-X-Google-Smtp-Source: ABdhPJypomygsfyc5sHGRDdaBmHa/qIvXFOZpFK95/OhYeVLpiI4GAURs+L9WazcKqVt86gThvDbKg==
-X-Received: by 2002:a1c:9e84:: with SMTP id h126mr20503989wme.61.1595248751079; 
- Mon, 20 Jul 2020 05:39:11 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id o15sm1394949wrh.57.2020.07.20.05.39.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 20 Jul 2020 05:39:10 -0700 (PDT)
-Subject: Re: [PATCH-for-5.1 4/4] hw/avr/boot: Fix memory leak in
- avr_load_firmware()
+ bh=Mp29SHojRqpKy9V+YXlQO41fiUtg5Fxt1q4evYrhW18=;
+ b=CgdzM/jhG8iVLZaaIPNIR6BM3mZDJoI1X73LAKhlMVAt8mcnF0xcNYTpIf/D0sguJB
+ djkWjc1b5/q+AXGW9nGMhUKMDtAjrN1Nr26mDsRaORhRt/Swi2owOVWQP/1wpZ0CgLTZ
+ pezKPJNkJ9/e78lZE15/DGyd0nORVoj/cyPeeE/d83R6yBCElsEkkH9KKcqmYRmPX8Vu
+ F1hW/aVSXGxeoBgbt2zv5Z2bIMQ6WDroXjVvholJTNGGHUmB5nbrRS3EkJ4HF5WiSQsB
+ 7gPBfCnyolAqIWOrQNztBprmBsoEj8cfe+r32NxjU6A8JDYUpw67K7OHCUvguyI6WW8x
+ xEBw==
+X-Gm-Message-State: AOAM531BBOLr+AhP6mdGu/D/05pkXKKgYi0uQKVdOwZp6mNCNSDan6k4
+ XRVahwG/+oFrQDTas3eQDSJhPEKWdB8YAw==
+X-Google-Smtp-Source: ABdhPJxOJaUA2uDfP1Gn6+CYYbUwoq9XaVVZvpb1bCw3OTOWbzInnVGLZKWCd/LuuxKyszVoC/UGyw==
+X-Received: by 2002:adf:bc4b:: with SMTP id a11mr1596058wrh.381.1595249784139; 
+ Mon, 20 Jul 2020 05:56:24 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id p29sm34025403wmi.43.2020.07.20.05.56.22
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Jul 2020 05:56:23 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-References: <20200714164257.23330-1-f4bug@amsat.org>
- <20200714164257.23330-5-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <506604e4-d908-5a28-78c3-a7a12acef999@amsat.org>
-Date: Mon, 20 Jul 2020 14:39:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+Subject: [PULL 00/12] target-arm queue
+Date: Mon, 20 Jul 2020 13:56:09 +0100
+Message-Id: <20200720125621.13460-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200714164257.23330-5-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,40 +99,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Paolo Bonzini <pbonzini@redhat.com>,
- Michael Rolnik <mrolnik@gmail.com>, Stefan Weil <sw@weilnetz.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping?
+Not much here, mostly documentation, but a few bug fixes.
 
-On 7/14/20 6:42 PM, Philippe Mathieu-Daudé wrote:
-> The value returned by qemu_find_file() must be freed.
-> 
-> This fixes Coverity issue CID 1430449, which points out
-> that the memory returned by qemu_find_file() is leaked.
-> 
-> Fixes: Coverity CID 1430449 (RESOURCE_LEAK)
-> Fixes: 7dd8f6fde4 ('hw/avr: Add support for loading ELF/raw binaries')
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  hw/avr/boot.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/avr/boot.c b/hw/avr/boot.c
-> index 6fbcde4061..151734f82d 100644
-> --- a/hw/avr/boot.c
-> +++ b/hw/avr/boot.c
-> @@ -60,7 +60,7 @@ static const char *avr_elf_e_flags_to_cpu_type(uint32_t flags)
->  bool avr_load_firmware(AVRCPU *cpu, MachineState *ms,
->                         MemoryRegion *program_mr, const char *firmware)
->  {
-> -    const char *filename;
-> +    g_autofree char *filename;
->      int bytes_loaded;
->      uint64_t entry;
->      uint32_t e_flags;
-> 
+thanks
+-- PMM
+
+The following changes since commit 873ec69aeb12e24eec7fb317fd0cd8494e8489dd:
+
+  Merge remote-tracking branch 'remotes/cminyard/tags/for-qemu-i2c-5' into staging (2020-07-20 11:03:09 +0100)
+
+are available in the Git repository at:
+
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200720
+
+for you to fetch changes up to 6a0b7505f1fd6769c3f1558fda76464d51e4118a:
+
+  docs/system: Document the arm virt board (2020-07-20 11:35:17 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * virt: Don't enable MTE emulation by default
+ * virt: Diagnose attempts to use MTE with memory-hotplug or KVM
+   (rather than silently not working correctly)
+ * util: Implement qemu_get_thread_id() for OpenBSD
+ * qdev: Add doc comments for qdev_unrealize and GPIO functions,
+   and standardize on doc-comments-in-header-file
+ * hw/arm/armsse: Assert info->num_cpus is in-bounds in armsse_realize()
+ * docs/system: Document canon-a1100, collie, gumstix, virt boards
+
+----------------------------------------------------------------
+David CARLIER (1):
+      util: Implement qemu_get_thread_id() for OpenBSD
+
+Peter Maydell (8):
+      qdev: Move doc comments from qdev.c to qdev-core.h
+      qdev: Document qdev_unrealize()
+      qdev: Document GPIO related functions
+      hw/arm/armsse: Assert info->num_cpus is in-bounds in armsse_realize()
+      docs/system: Briefly document canon-a1100 board
+      docs/system: Briefly document collie board
+      docs/system: Briefly document gumstix boards
+      docs/system: Document the arm virt board
+
+Richard Henderson (3):
+      hw/arm/virt: Enable MTE via a machine property
+      hw/arm/virt: Error for MTE enabled with KVM
+      hw/arm/virt: Disable memory hotplug when MTE is enabled
+
+ docs/system/arm/collie.rst   |  16 +++
+ docs/system/arm/digic.rst    |  11 ++
+ docs/system/arm/gumstix.rst  |  21 ++++
+ docs/system/arm/virt.rst     | 161 ++++++++++++++++++++++++++
+ docs/system/target-arm.rst   |   4 +
+ include/hw/arm/virt.h        |   1 +
+ include/hw/qdev-core.h       | 267 ++++++++++++++++++++++++++++++++++++++++++-
+ include/hw/qdev-properties.h |  13 +++
+ hw/arm/armsse.c              |   2 +
+ hw/arm/virt.c                |  50 +++++++-
+ hw/core/qdev.c               |  33 ------
+ target/arm/cpu.c             |  19 +--
+ target/arm/cpu64.c           |   5 +-
+ util/oslib-posix.c           |   2 +
+ MAINTAINERS                  |   4 +
+ 15 files changed, 559 insertions(+), 50 deletions(-)
+ create mode 100644 docs/system/arm/collie.rst
+ create mode 100644 docs/system/arm/digic.rst
+ create mode 100644 docs/system/arm/gumstix.rst
+ create mode 100644 docs/system/arm/virt.rst
 
