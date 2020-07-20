@@ -2,99 +2,86 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1982C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 856B7C433E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:57:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9661621775
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:54:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9661621775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4DA2B21775
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:57:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PlxPjlKx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DA2B21775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxSVX-0008Ej-UK
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 05:54:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35232)
+	id 1jxSXw-0001DY-J4
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 05:57:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jxSV0-0007pY-D0; Mon, 20 Jul 2020 05:54:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18098)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1jxSUy-0006Yf-JU; Mon, 20 Jul 2020 05:54:18 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06K9XGP0139832; Mon, 20 Jul 2020 05:54:13 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32d6d7n1mf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 20 Jul 2020 05:54:13 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06K9YSAr144714;
- Mon, 20 Jul 2020 05:54:13 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32d6d7n1kt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 20 Jul 2020 05:54:13 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06K9ooF8009800;
- Mon, 20 Jul 2020 09:54:10 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma04ams.nl.ibm.com with ESMTP id 32brq82gt5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 20 Jul 2020 09:54:10 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06K9s8ct64225396
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 20 Jul 2020 09:54:08 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6221552057;
- Mon, 20 Jul 2020 09:54:08 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.181.80])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 01AF75204F;
- Mon, 20 Jul 2020 09:54:07 +0000 (GMT)
-Date: Mon, 20 Jul 2020 11:54:06 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH 0/2] virtio: non-legacy device handling
-Message-ID: <20200720115406.508f2115.pasic@linux.ibm.com>
-In-Reply-To: <20200707105446.677966-1-cohuck@redhat.com>
-References: <20200707105446.677966-1-cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxSX5-0000Zs-9b
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 05:56:27 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41608)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxSX2-0006wN-HS
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 05:56:26 -0400
+Received: by mail-oi1-x243.google.com with SMTP id y22so13928281oie.8
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 02:56:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Igl+SeUa2coVvr0kUZnPl7TcdbXnN/EO0v1zIvH6CxY=;
+ b=PlxPjlKxHoo48Sd5OgeICMu2gCoSftiSn63AZhrA9VyObhTi/03dz+ugKYVqU0481J
+ WshALREvOMIqD3bUELRIOs43tiWqr5z2nh5Iw05Y1E3DPt9GeMBedzADOaF4pOQxrRXl
+ EKl7zVWmF76y+VYukJdAqEMJ7He9n6x1Cht32qlzgXr7ENkTm3Q1FFtJ262SL/jz/5Tb
+ 2YzBMGXs7EVBMgwS0uCUvTf5wFgPYaj2C5HLkOi9oHUeNd9vWjWkAhLD3jVoY1Gv7OfU
+ dFCvW+PqtsyxWX435U6bKbsem8CKTlOWzBdGd4puQmpV97B/efMbE0mb7EWMBMxD54OD
+ ZvEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Igl+SeUa2coVvr0kUZnPl7TcdbXnN/EO0v1zIvH6CxY=;
+ b=Ojm9oMMr4oI9T1Ra6LjXcXAhvlgxtutdUy1eXy6SIyIQZnpQEOvv6qiPOWlswT/WAK
+ j+OKEp5Dl+9EPhz5MwHGSLIa3QwiOnwqRkWHoRnPEoUkE2MlIoF3TNUWQFoTt2fruQkS
+ DqI2Ig+PSbekYZHQiPZDzA1SM7ftC+4Kfz+m5WlN3zuZxSx5CQmkq0fMh+qXmRueLVpB
+ wNryoWYZFX+S5f4AAsy+FTKZHIUhbTrsrr2+AJgqz1M3CuOtQ09Bz1uAwLI3nWeBDcaE
+ D695LMlO8QfecGRsqhBimFs7YHi+TgvpbDrydeHLneXxMxxAFvw07v856zNHuPN4RddO
+ cMsg==
+X-Gm-Message-State: AOAM533NK2qf+kP2AqN8CTAJQdIaJSst7pFvQIDaZMpHF9W+Eob1loMo
+ 176ISP0O/iE9K4e+U8Hz8KhgI5jsCFJfsyCLO/8QMQ==
+X-Google-Smtp-Source: ABdhPJzR3o6HsUQC8cAkr1NtmQjEn+O1UENBYOkihbmCbfkCTliHAZw8kd5Edd1PF94bIJ27PwFvEZLjdFGTtGDRicc=
+X-Received: by 2002:aca:54c9:: with SMTP id
+ i192mr17085614oib.163.1595238983048; 
+ Mon, 20 Jul 2020 02:56:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-20_05:2020-07-17,
- 2020-07-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 spamscore=0
- bulkscore=0 adultscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
- phishscore=0 lowpriorityscore=0 mlxlogscore=999 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007200071
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 05:54:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <159480834629.15819.10175861928294983612.stgit@pasha-ThinkPad-X280>
+ <159480835744.15819.10383908697966018668.stgit@pasha-ThinkPad-X280>
+In-Reply-To: <159480835744.15819.10383908697966018668.stgit@pasha-ThinkPad-X280>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Jul 2020 10:56:11 +0100
+Message-ID: <CAFEAcA9f18nwJQhX5EGtHWeHjw4DbRBmU1xmZm8gCgOkSgP+Mw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/arm: remove exit(1) in case of missing ROM
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,47 +95,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Antony Pavlov <antonynpavlov@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  7 Jul 2020 12:54:44 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+On Wed, 15 Jul 2020 at 11:19, Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> wrote:
+>
+> This patch updates ARM-based machines to allow starting them without ROM.
+> In this case CPU starts to execute instructions from the empty memory,
+> but QEMU allows introspecting the machine configuration.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
 
-> As discussed in "virtio-fs: force virtio 1.x usage", it seems like
-> a good idea to make sure that any new virtio device (which does not
-> support legacy virtio) is indeed a non-transitional device, just to
-> catch accidental misconfigurations. We can easily compile a list
-> of virtio devices with legacy support and have transports verify
-> in their plugged callbacks that legacy support is off for any device
-> not in that list.
-> 
-> Most new virtio devices force non-transitional already, so nothing
-> changes for them. vhost-user-fs-pci even does not allow to configure
-> a non-transitional device, so it is fine as well.
-> 
-> One problematic device, however, is virtio-iommu-pci. It currently
-> offers both the transitional and the non-transitional variety of the
-> device, and does not force anything. I'm unsure whether we should
-> consider transitional virtio-iommu unsupported, or if we should add
-> some compat handling. (The support for legacy or not generally may
-> change based upon the bus, IIUC, so I'm unsure how to come up with
-> something generic.)
-> 
+I guess this makes sense -- this is how most of our machines
+already behave, so consistency and being able to introspect
+the machine config are both worth having. Also these errors
+mostly pre-date the 'generic loader' device, which is another
+way to load guest code that the error-exit prevents. (You could
+even load guest code via the gdbstub if you wanted...)
 
-Both patches look good to me (Acked-by: Halil Pasic
-<pasic@linux.ibm.com>). I tend to agree with Davids comment on how
-this information is coded: the more object oriented way would have
-been to store this at the something like VirtioDeviceClass, but
-Michael's argument stands.
+arm machines affected by this patch:
+ * canon-a1100
+ * connex
+ * verdex
+ * sx1
+ * sx1-v1
+ * cheetah
 
-Another OO option would be to expose this as a virtio property. Would
-enable introspection, and would also give the host admin means to
-force non-legacy for transitional devices. But the juice is probably not
-worth the squeeze.
+none of which are commonly-used anyway.
 
-Regards,
-Halil
+> ---
+>  0 files changed
+>
+> diff --git a/hw/arm/digic_boards.c b/hw/arm/digic_boards.c
+> index b6452d918c..dbad63ffa2 100644
+> --- a/hw/arm/digic_boards.c
+> +++ b/hw/arm/digic_boards.c
+> @@ -102,8 +102,12 @@ static void digic_load_rom(DigicState *s, hwaddr addr,
+>          char *fn = qemu_find_file(QEMU_FILE_TYPE_BIOS, filename);
+>
+>          if (!fn) {
+> -            error_report("Couldn't find rom image '%s'.", filename);
+> -            exit(1);
+> +            if (bios_name) {
+> +                error_report("Couldn't find rom image '%s'.", filename);
+> +                exit(1);
+> +            } else {
+> +                return;
+> +            }
+>          }
+>
+>          rom_size = load_image_targphys(fn, addr, max_size);
+> diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
+> index 3a4bc332c4..a74bb5e27c 100644
+> --- a/hw/arm/gumstix.c
+> +++ b/hw/arm/gumstix.c
+> @@ -60,9 +60,8 @@ static void connex_init(MachineState *machine)
+>
+>      dinfo = drive_get(IF_PFLASH, 0, 0);
+>      if (!dinfo && !qtest_enabled()) {
+> -        error_report("A flash image must be given with the "
+> -                     "'pflash' parameter");
+> -        exit(1);
+> +        warn_report("A flash image must be given with the "
+> +                    "'pflash' parameter");
+
+I think we should just drop the error message. If we will
+start without the flash image, then "A flash image
+must be given" is no longer true.
+
+>      }
+>
+>      if (!pflash_cfi01_register(0x00000000, "connext.rom", connex_rom,
+> @@ -90,9 +89,8 @@ static void verdex_init(MachineState *machine)
+>
+>      dinfo = drive_get(IF_PFLASH, 0, 0);
+>      if (!dinfo && !qtest_enabled()) {
+> -        error_report("A flash image must be given with the "
+> -                     "'pflash' parameter");
+> -        exit(1);
+> +        warn_report("A flash image must be given with the "
+> +                    "'pflash' parameter");
+
+Ditto here.
+
+>      }
+>
+>      if (!pflash_cfi01_register(0x00000000, "verdex.rom", verdex_rom,
+> diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
+> index 57829b3744..c0ed3d93e9 100644
+> --- a/hw/arm/omap_sx1.c
+> +++ b/hw/arm/omap_sx1.c
+> @@ -191,13 +191,12 @@ static void sx1_init(MachineState *machine, const int version)
+>      }
+>
+>      if (!machine->kernel_filename && !fl_idx && !qtest_enabled()) {
+> -        error_report("Kernel or Flash image must be specified");
+> -        exit(1);
+> +        warn_report("Kernel or Flash image must be specified");
+
+And here.
+
+> +    } else {
+> +        /* Load the kernel.  */
+> +        arm_load_kernel(mpu->cpu, machine, &sx1_binfo);
+>      }
+
+Calling arm_load_kernel() must not be conditional -- it is the
+function which makes sure the guest CPU is reset.
+
+(A handful of boards will call arm_load_kernel() only if
+!qtest_enabled(), but most call it unconditionally. We should
+look at why those handful of boards seem to need the conditional
+and either remove it if useless or see if it should be applied
+in other places or if arm_load_kernel() itself could be improved
+to make the check unnecessary for all boards.)
+
+>
+> -    /* Load the kernel.  */
+> -    arm_load_kernel(mpu->cpu, machine, &sx1_binfo);
+> -
+>      /* TODO: fix next line */
+>      //~ qemu_console_resize(ds, 640, 480);
+>  }
+> diff --git a/hw/arm/palm.c b/hw/arm/palm.c
+> index 97ca105d29..d4f4a8d07a 100644
+> --- a/hw/arm/palm.c
+> +++ b/hw/arm/palm.c
+> @@ -257,12 +257,11 @@ static void palmte_init(MachineState *machine)
+>      }
+>
+>      if (!rom_loaded && !machine->kernel_filename && !qtest_enabled()) {
+> -        fprintf(stderr, "Kernel or ROM image must be specified\n");
+> -        exit(1);
+> +        warn_report("Kernel or ROM image must be specified");
+> +    } else {
+> +        /* Load the kernel.  */
+> +        arm_load_kernel(mpu->cpu, machine, &palmte_binfo);
+
+Again, drop the warning, and the call to arm_load_kernel()
+must not be conditional.
+
+>      }
+> -
+> -    /* Load the kernel.  */
+> -    arm_load_kernel(mpu->cpu, machine, &palmte_binfo);
+>  }
+>
+>  static void palmte_machine_init(MachineClass *mc)
+
+thanks
+-- PMM
 
