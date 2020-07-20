@@ -2,92 +2,81 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D41FEC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 15:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ECA4C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 15:27:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F5BC20709
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 15:25:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/grj4Ge"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F5BC20709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 404B922482
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 15:27:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 404B922482
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxXfV-0007qp-Sn
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 11:25:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48438)
+	id 1jxXh2-0000hF-GP
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 11:27:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxXen-0007Ji-JS
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 11:24:45 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57501
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxXek-0004zn-TY
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 11:24:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595258680;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=mjUkemNZt8Ayf3GGfnJ/0jNl6f4HscBFc7YK3mPnJ+I=;
- b=N/grj4GeYDMQ1iAYODt++YuwJP7zM163+Vu0zyyZ/gRlsMLN0x8W+ryEeIHneSix6dicdV
- L5l2kZ7Ywsbb8NkGlHuuZ+e2IsYST3vkDSk1+8HQl8/ifIvfXZBkJQ30mXxDCl8RZhzssb
- PYd9z5E3vIltpuHPW2VCKdpJAeQJPr0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-s_RD4tc2MySB0kdgmKweOg-1; Mon, 20 Jul 2020 11:24:38 -0400
-X-MC-Unique: s_RD4tc2MySB0kdgmKweOg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71B111080;
- Mon, 20 Jul 2020 15:24:37 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D1ED960E3E;
- Mon, 20 Jul 2020 15:24:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 15C771141C54; Mon, 20 Jul 2020 17:24:35 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v4 for-5.2 1/2] spapr: Use error_append_hint() in
- spapr_caps.c
-References: <159491945918.188975.4358645698778061430.stgit@bahia.lan>
- <159491947184.188975.5055299566400098290.stgit@bahia.lan>
-Date: Mon, 20 Jul 2020 17:24:35 +0200
-In-Reply-To: <159491947184.188975.5055299566400098290.stgit@bahia.lan> (Greg
- Kurz's message of "Thu, 16 Jul 2020 19:11:11 +0200")
-Message-ID: <87mu3uciq4.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jxXfo-0008Kt-E1
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 11:25:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53860)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jxXfm-0005I6-Fu
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 11:25:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jxXfk-0000aD-8Z
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 15:25:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1C31E2E80F1
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 15:25:44 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:16:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Jul 2020 15:17:27 -0000
+From: Richard Henderson <1888165@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=rth@twiddle.net; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jmmorlan
+X-Launchpad-Bug-Reporter: Jeffrey (jmmorlan)
+X-Launchpad-Bug-Modifier: Richard Henderson (rth)
+References: <159520414927.8137.962061150870003047.malonedeb@wampee.canonical.com>
+Message-Id: <159525824808.13304.17864642151185423756.launchpad@gac.canonical.com>
+Subject: [Bug 1888165] Re: loopz/loopnz clearing previous instruction's
+ modified flags on cx -> 0
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: cb7d58b67427f82f2d9631486c0570e87f49130a
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 11:25:44
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,43 +85,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-ppc@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1888165 <1888165@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Greg Kurz <groug@kaod.org> writes:
+** Changed in: qemu
+       Status: New =3D> In Progress
 
-> We have a dedicated error API for hints. Use it instead of embedding
-> the hint in the error message, as recommanded in the "qapi/error.h"
-> header file.
->
-> Since spapr_caps_apply() passes &error_fatal, all functions must
-> also call the ERRP_GUARD() macro for error_append_hint() to be
-> functional.
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Richard Henderson (rth)
 
-This isn't a request for change in this patch, just an attempt to squash
-possible misunderstandings.
+-- =
 
-It's true that error_append_hint() without ERRP_GUARD() works as long as
-the caller doesn't pass certain errp arguments.  But the callee should
-work for all possible @errp arguments, not just the ones that get passed
-today.  That's why error.h wants you to guard *all* uses of
-error_append_hint(errp):
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888165
 
- * = Why, when and how to use ERRP_GUARD() =
- *
- * Without ERRP_GUARD(), use of the @errp parameter is restricted:
- * - It must not be dereferenced, because it may be null.
- * - It should not be passed to error_prepend() or
- *   error_append_hint(), because that doesn't work with &error_fatal.
- * ERRP_GUARD() lifts these restrictions.
+Title:
+  loopz/loopnz clearing previous instruction's modified flags on cx -> 0
 
-No need to make an argument involving the possible arguments (pardon the
-pun).
+Status in QEMU:
+  In Progress
 
-[...]
+Bug description:
+  If you run QBasic in qemu, printing a double-type single-digit number
+  will print an extra decimal point (e.g. PRINT CDBL(3) prints "3.")
+  that does not appear when running on a real CPU (or on qemu with
+  -enable-kvm). I tracked this down to the state of the status flags
+  after a loopnz instruction.
 
+  After executing a sequence like this in qemu:
+
+  	mov bx,1
+  	mov cx,1
+  	dec bx    ; sets Z bit in flags
+  A:	loopnz A  ; should not modify flags
+
+  Z is incorrectly clear afterwards. loopz does the same thing (but not
+  plain loop). Interestingly, inserting pushf+popf after dec results in
+  Z set, so loopnz/loopz does not always clear Z itself but is rather
+  interfering with the previous instruction's flag setting.
+
+  Version 5.1.0-rc0, x86-64 host.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888165/+subscriptions
 
