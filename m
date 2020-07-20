@@ -8,80 +8,79 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E891CC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 17:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A43D2C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 17:52:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA9E820709
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 17:52:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 773AF20709
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 17:52:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="URoUCuQB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA9E820709
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8uirNNR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 773AF20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxZxY-0000S0-0B
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 13:52:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54002)
+	id 1jxZxf-0000hy-NF
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 13:52:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
- id 1jxZwd-0007hb-QN
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 13:51:19 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36433)
+ id 1jxZwj-0007rK-Uu
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 13:51:25 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:52934)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alexander.duyck@gmail.com>)
- id 1jxZwc-0007hx-7N
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 13:51:19 -0400
-Received: by mail-pl1-x644.google.com with SMTP id t6so9007056plo.3
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 10:51:17 -0700 (PDT)
+ id 1jxZwi-0007iZ-BO
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 13:51:25 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id gc9so187795pjb.2
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 10:51:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=subject:from:to:cc:date:message-id:in-reply-to:references
  :user-agent:mime-version:content-transfer-encoding;
- bh=8xPqwSKZbL19VmcpEGdAEfQGyxRaLAdfuPGoNzIkPJw=;
- b=URoUCuQBXxHz36riS6Vr3Osyk/spb7yq9gyMDvRCl4embd3rcjUqJFtHjPveQvXRSa
- Z1GCJPf7AxNiY+j5ZrXz7mH6gXPlqzK+nbRL6AUsd+GmrlbrxRK9YbqN8DWXzGAmkBs6
- 6ys9GcCFjsWkMOzG/S3pjq7XVMWvM0lYkHgXA/imFwaKY5g+iJzSQuxfRvp/u0KWMfB5
- RYgZ6mH3MUIQIuLsMJStKMUMnF2yi/UYC7RyMIahE5l2SNIvruEwAhMWX3E8Gz+N6NjB
- hOx6a+DGNoLcwe3/yQZT73eMY7Z5ghfkSggRkJprQXVmU63MuvbaTNxlY2EdKRF5qin9
- 5Qmg==
+ bh=nCKUBraGXRlMO/ENL1FojgjZW4PKZM/+PVsaTrP9Vag=;
+ b=V8uirNNRA5UV1t0s7+TCIyz7WsX+UPn4LHC6d8SaNUkDulrAvhiGM5SZ91iBk6izpW
+ GfyRWVg0h0AI0xVBiNxo8b3/XOYEenMtmpzNxox/lsKdfmZE4E3JRPf7t8evvVdM3R4B
+ ih2kIEQG+PHwiDH0BaRcB89Y5m6g5W6yu6wrXflAK7/kDI3reWPjOa86komoJ5bJFREm
+ iSi8tYKz9fQGhAT/a+et6VEc/FRkcxih6vGdCKOr7qLPZbJ01dpvMELQJe2ZqYJG7h+/
+ +waFQ0ByRbHDX/WmYwnlWLRDNw4CZlLofYsayPl1URFxLVf0E02zZLr01dq5HA0vKCXy
+ SA8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
  :references:user-agent:mime-version:content-transfer-encoding;
- bh=8xPqwSKZbL19VmcpEGdAEfQGyxRaLAdfuPGoNzIkPJw=;
- b=Qy5CkZaTDewWzRRVXMn8humgYbUFNgqH0icwRtGvIh2+sBYESI6ggyxZtAQ1PSEA6n
- EdtOKc2wFl6Co/NWuW7RnKv2neXO7GIjryW5fwZ+u4VVUlheYcehEgZJgamQO6MZLxwR
- T5rex94ji6G9e9RAYwOnPNrXS6BcHXFROIxja+DsuERoLJX52jctvdEZ5owGd/3Ovqx/
- 42I8v6pBoPbiTN8qrCnjJNm8t6mhw0PuavWe6aKqf/Z6DZaWJQ8nDQsqKA6pbyIOm7g3
- thyaNBrZBqXCEnMCIjnmwpBlYphypsa1kk+THmtyprjYhPuKJhKXduwiy986K6AV0OAD
- /pRg==
-X-Gm-Message-State: AOAM531AMjMOqFAXN4o4tY+0FTYFMiwF90Tjxnqm2bfAGjdgl0/O2h9R
- FXsJ/dshG5DHYLzhPjwiQD0=
-X-Google-Smtp-Source: ABdhPJw3QB1td88FSdMZtdbMS0qeAFM5qMvmKDoERxIx9vZ4hzdQ0h/Pxqsk880tA49Ys1MjUBdtWg==
-X-Received: by 2002:a17:90a:ce90:: with SMTP id
- g16mr551128pju.109.1595267476904; 
- Mon, 20 Jul 2020 10:51:16 -0700 (PDT)
+ bh=nCKUBraGXRlMO/ENL1FojgjZW4PKZM/+PVsaTrP9Vag=;
+ b=cHR1dDhnFkPhQI9GeJ8K3ZT4uoOIn2aQKjVhrK+XGFXWHZJKA4G4G6znSXBspgasP2
+ 48nnHlvc8NaRW7UOFjJhbOy2XbeoJxVhukCCa7qBkdOf4oyGgMPlyq0sYC47mCBpzYPT
+ a8l6cp8r63C7nDfSOyjTVlXHRh+6f9hDBiAYyIMxWvmKQAj+m/t0Rxld/FWlKDMUx++Z
+ hEuiXO9kYsQPTaTaMED39g8nIgEyd+6tTjVrNNFyn/Po7GInNv/ZwdgJC78nhRHcZRDL
+ C0bD8X9u8aBgwNHtKV/+2c7hvQ3TV4uW8kOjNRn1f62wTFM88NPfXt/bC8Rwj7P6nEFh
+ cHEw==
+X-Gm-Message-State: AOAM532N0o0VS1t1fq4P7tY5WQbwqx13+0lRdF24vaPwRguqXJwl9yxu
+ YCFX+QPe3gVeKM/5xYqI8yc=
+X-Google-Smtp-Source: ABdhPJxBxMKYWsEEQsVFaX+bDOXBAjSsPcA2rsUjyVGVCJ4chEqcdQEugziEbRXruJCCOmXrSASGhQ==
+X-Received: by 2002:a17:90b:102:: with SMTP id p2mr540561pjz.227.1595267483054; 
+ Mon, 20 Jul 2020 10:51:23 -0700 (PDT)
 Received: from localhost.localdomain ([2001:470:b:9c3:9e5c:8eff:fe4f:f2d0])
- by smtp.gmail.com with ESMTPSA id cv3sm198351pjb.45.2020.07.20.10.51.16
+ by smtp.gmail.com with ESMTPSA id g28sm17087908pfr.70.2020.07.20.10.51.22
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 20 Jul 2020 10:51:16 -0700 (PDT)
-Subject: [PATCH v3 QEMU 1/3] virtio-balloon: Prevent guest from starting a
- report when we didn't request one
+ Mon, 20 Jul 2020 10:51:22 -0700 (PDT)
+Subject: [PATCH v3 QEMU 2/3] virtio-balloon: Add locking to prevent possible
+ race when starting hinting
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: david@redhat.com, mst@redhat.com
-Date: Mon, 20 Jul 2020 10:51:15 -0700
-Message-ID: <20200720175115.21935.99563.stgit@localhost.localdomain>
+Date: Mon, 20 Jul 2020 10:51:22 -0700
+Message-ID: <20200720175122.21935.78013.stgit@localhost.localdomain>
 In-Reply-To: <20200720175030.21935.80052.stgit@localhost.localdomain>
 References: <20200720175030.21935.80052.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=alexander.duyck@gmail.com; helo=mail-pl1-x644.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=alexander.duyck@gmail.com; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,35 +110,44 @@ Sender: "Qemu-devel"
 
 From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-Based on code review it appears possible for the driver to force the device
-out of a stopped state when hinting by repeating the last ID it was
-provided.
+There is already locking in place when we are stopping free page hinting
+but there is not similar protections in place when we start. I can only
+assume this was overlooked as in most cases the page hinting should not be
+occurring when we are starting the hinting, however there is still a chance
+we could be processing hints by the time we get back around to restarting
+the hinting so we are better off making sure to protect the state with the
+mutex lock rather than just updating the value with no protections.
 
-Prevent this by only allowing a transition to the start state when we are
-in the requested state. This way the driver is only allowed to send one
-descriptor that will transition the device into the start state. All others
-will leave it in the stop state once it has finished.
+Based on feedback from Peter Maydell this issue had also been spotted by
+Coverity: CID 1430269
 
-Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
 Acked-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
- hw/virtio/virtio-balloon.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/virtio/virtio-balloon.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index e670f1e59534..ce70adcc6925 100644
+index ce70adcc6925..6e2d1293402f 100644
 --- a/hw/virtio/virtio-balloon.c
 +++ b/hw/virtio/virtio-balloon.c
-@@ -526,7 +526,8 @@ static bool get_free_page_hints(VirtIOBalloon *dev)
-             ret = false;
-             goto out;
-         }
--        if (id == dev->free_page_report_cmd_id) {
-+        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED &&
-+            id == dev->free_page_report_cmd_id) {
-             dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
-         } else {
-             /*
+@@ -592,6 +592,8 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
+         return;
+     }
+ 
++    qemu_mutex_lock(&s->free_page_lock);
++
+     if (s->free_page_report_cmd_id == UINT_MAX) {
+         s->free_page_report_cmd_id =
+                        VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN;
+@@ -600,6 +602,8 @@ static void virtio_balloon_free_page_start(VirtIOBalloon *s)
+     }
+ 
+     s->free_page_report_status = FREE_PAGE_REPORT_S_REQUESTED;
++    qemu_mutex_unlock(&s->free_page_lock);
++
+     virtio_notify_config(vdev);
+ }
+ 
 
 
