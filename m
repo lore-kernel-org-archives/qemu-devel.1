@@ -2,71 +2,88 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EFA5C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD5BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:10:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 140D522B4D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:09:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 140D522B4D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DE6AD20672
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:10:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ht0GlYYw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE6AD20672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxSjc-0003Cc-Bn
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 06:09:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37294)
+	id 1jxSkv-0004Rp-6c
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 06:10:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jxSf1-0006BO-DI; Mon, 20 Jul 2020 06:04:39 -0400
-Resent-Date: Mon, 20 Jul 2020 06:04:39 -0400
-Resent-Message-Id: <E1jxSf1-0006BO-DI@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21749)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1jxSew-0007zd-MC; Mon, 20 Jul 2020 06:04:39 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1595239457; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=HTj68Qrl6bK8O7wgWAKRUuWq2dIALqvNjGAwAUpYlIQKelh2vXdVSgCXjh/qnWCV+H2OTX0SfBZHv/0YivQ6DyS9oPSyZXAt48eft7Ad9HHcTzEimfhTvN5Jeiep4mNP8n9V5RbkyXWS4FzASxlWlH69KQtD1Yv17WrTmaj8oC0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1595239457;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=IyXaQX3rb0F22+dpZPN0ZPk5ZevSyFp59xsY5lrSt+c=; 
- b=lV2hDdVBl6P3aL+j2DV0VrqjT9QM4kJZjItappYYnyTq+1aPa+Pg29f7IcmVgTGCEpZ5+nLJ5dkFSZxr24Fk6/HSw/WPGU4VlXOShmhzACLoW/6sUERrp8v9EKxtq/GmjPOGsPl31FZqCGEp7HsgP5V8ZTK9oPju0QH3b4R8AlI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1595239454275527.9235442465948;
- Mon, 20 Jul 2020 03:04:14 -0700 (PDT)
-Subject: Re: [PATCH-for-5.1] hw/misc/aspeed_sdmc: Fix incorrect memory size
-Message-ID: <159523945359.16283.9417174227252942708@07a7f0d89f7d>
-In-Reply-To: <20200720095829.22839-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxShM-0000f5-W1
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:07:05 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34448)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxShL-0008UP-AJ
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:07:04 -0400
+Received: by mail-oi1-x244.google.com with SMTP id e4so13981933oib.1
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 03:07:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=BvDMHNbDRjvwqT8FF/HAsnszdl1KrqPTdTfCC2mnrYI=;
+ b=Ht0GlYYw7lhd7RJD1JayxniWrxLSw76trUm01ePPfZGHabntSD/15gWA4Ln/PVMqBs
+ 4D4ovbPllTWLk5pPQPFuS5k0b1egPpE/xs5s3KdKsdPzIqatHkgKbuubJDNf6/VEOqMU
+ vSMremEmYbGn9jpCzo8pMx9axO56CtFP7gGjBsDpmC7k+iC+3AvSIWXCDTAECbnkyosJ
+ NwGepqXFzRyur10dZmha515RX+13mAlbgcX1zfex0MaD2IghXpnhz5TAYGsKrA+7mOdZ
+ Uqms+PnEbwV3bYT496kqFUuzqWMjYbq1ELucO+EDyYYZe7Jqm1RzeNiJl38il25OUEIS
+ 9cXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=BvDMHNbDRjvwqT8FF/HAsnszdl1KrqPTdTfCC2mnrYI=;
+ b=BLwQjnm/E/rrPKN++vsQYpIeNQmsyCsvEieDhFZlG0mggylObn2Nof+8cMFyHbHoHz
+ KVjVDPzlSVHceDPmuWofRNe2CEha9Vl890+3zu068KIZhZpQ5zolnv7/fOFdOQdQVLlO
+ dL1WXjaKnoDR0ljmUamGgBdnZyhapFLWIoIk2dw0XA4DmAUOhQcfNldI+gzzqITOnaRR
+ H/wshuprRHg/A66Q+DH+mhMDqp009RKVOTaV+2FTwipVOD2mYGPxR0c63qZMBSoCDtBo
+ wGU/uRrZa6Dk3yM9FbBU7fsKGjtaguNBaIX0aat9aFR1awUM53CP40epMLlf9b/mlKls
+ v6Mw==
+X-Gm-Message-State: AOAM532s10WQOS7lv0B3guR93lK1K6eZNv7jS4063wLr5U3xWoZ7u88f
+ LXERQEkfwRKWMQqx25gP/r8MPHOUMoiG/HddFAK/Fw==
+X-Google-Smtp-Source: ABdhPJzj4GfEy1qxTBc2bH5bzzeaRNI40FeTPVU2j4N1HJ7r72y5TiC9W+T+yIOlM+ZGA+6/x6gKJ7Y8wOeooydMLG0=
+X-Received: by 2002:aca:54c9:: with SMTP id
+ i192mr17113011oib.163.1595239621800; 
+ Mon, 20 Jul 2020 03:07:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: f4bug@amsat.org
-Date: Mon, 20 Jul 2020 03:04:14 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 06:04:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <20200716174900.GL3235@minyard.net>
+In-Reply-To: <20200716174900.GL3235@minyard.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Jul 2020 11:06:51 +0100
+Message-ID: <CAFEAcA80A5tc_G44QPwgcam3VNaR+M7pqJUjNpVzd2QDPQvBhQ@mail.gmail.com>
+Subject: Re: [GIT PULL] I2C updates
+To: Corey Minyard <minyard@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,20 +96,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, andrew@aj.id.au, qemu-devel@nongnu.org,
- f4bug@amsat.org, qemu-arm@nongnu.org, joel@jms.id.au, clg@kaod.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDcyMDA5NTgyOS4yMjgz
-OS0xLWY0YnVnQGFtc2F0Lm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKTi9BLiBJbnRlcm5hbCBlcnJvciB3aGlsZSByZWFkaW5nIGxvZyBmaWxlCgoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA3
-MjAwOTU4MjkuMjI4MzktMS1mNGJ1Z0BhbXNhdC5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+On Thu, 16 Jul 2020 at 18:49, Corey Minyard <minyard@acm.org> wrote:
+>
+> The following changes since commit 45db94cc90c286a9965a285ba19450f448760a=
+09:
+>
+>   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-openbios-20200=
+707' into staging (2020-07-10 16:43:40 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cminyard/qemu.git tags/for-qemu-i2c-5
+>
+> for you to fetch changes up to 73d5f22ecbb76dfc785876779d47787084ff0f42:
+>
+>   hw/i2c: Document the I2C qdev helpers (2020-07-16 12:30:54 -0500)
+>
+> ----------------------------------------------------------------
+> Minor changes to:
+>
+> Add an SMBus config entry
+>
+> Cleanup/simplify/document some I2C interfaces
+>
+> ----------------------------------------------------------------
+> Philippe Mathieu-Daud=C3=A9 (6):
+>       hw/i2c/Kconfig: Add an entry for the SMBus
+>       hw/i2c/aspeed_i2c: Simplify aspeed_i2c_get_bus()
+>       hw/i2c: Rename i2c_try_create_slave() as i2c_slave_new()
+>       hw/i2c: Rename i2c_realize_and_unref() as i2c_slave_realize_and_unr=
+ef()
+>       hw/i2c: Rename i2c_create_slave() as i2c_slave_create_simple()
+>       hw/i2c: Document the I2C qdev helpers
+
+I've applied the Makefile fix and then this merges OK to master.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
+
+-- PMM
 
