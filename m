@@ -2,63 +2,85 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4717CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 15:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EF8C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 15:10:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A5CB206F2
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 15:07:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A5CB206F2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 4D72B2070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 15:10:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C/ajciAX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D72B2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxXOD-0007RF-6K
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 11:07:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42408)
+	id 1jxXQw-0000rt-Kr
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 11:10:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1jxXJD-0003eh-42
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 11:02:27 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:38197)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1jxXJB-0001Dv-6U
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 11:02:26 -0400
-Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
- by isrv.corpit.ru (Postfix) with ESMTP id AFBC740547;
- Mon, 20 Jul 2020 18:02:22 +0300 (MSK)
-Received: from [192.168.177.99] (mjt.vpn.tls.msk.ru [192.168.177.99])
- by tsrv.corpit.ru (Postfix) with ESMTP id BA0B975;
- Mon, 20 Jul 2020 18:02:21 +0300 (MSK)
-Subject: Re: another invalid memory access, now xen: acpi-cnt
-From: Michael Tokarev <mjt@tls.msk.ru>
-To: qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>
-References: <8f1da289-56be-912d-597e-d0fa3c953894@msgid.tls.msk.ru>
-Message-ID: <e13238f7-50ff-9349-9e52-c325b1a06ec1@msgid.tls.msk.ru>
-Date: Mon, 20 Jul 2020 18:02:21 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxXNv-00085j-Gs
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 11:07:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38604
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxXNt-0002IN-T3
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 11:07:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595257637;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+ bh=+zugweuhuM2tST8MPnPp+NCc4GchPSJisId1KOV5NN8=;
+ b=C/ajciAXSLuFaIpnkp45mMgIDOkFhocBwyNayg3eN3Z8N9QEDOtn/OYnpwiEJp/C3SY23A
+ vbmWbZUwrL7lDY8LRTBRW0TWkjo1jhaVZixHvZ/APl3Ksp9DO58UMoFghXHDfTVhRD/2Pc
+ O6ybHCa3HsAF85MH7R6tdJZXuPKmeW4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-322-6yleU_kBOa2V8SgC-m5ZRw-1; Mon, 20 Jul 2020 11:07:13 -0400
+X-MC-Unique: 6yleU_kBOa2V8SgC-m5ZRw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6702F800597;
+ Mon, 20 Jul 2020 15:07:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BC035BAD5;
+ Mon, 20 Jul 2020 15:07:09 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 13E691141C54; Mon, 20 Jul 2020 17:07:08 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: Intended purpose of virtio-rng's QOM link "rng"?
+Date: Mon, 20 Jul 2020 17:07:08 +0200
+Message-ID: <87d04qfco3.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <8f1da289-56be-912d-597e-d0fa3c953894@msgid.tls.msk.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: none client-ip=86.62.121.231; envelope-from=mjt@tls.msk.ru;
- helo=isrv.corpit.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 10:57:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:16:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,42 +93,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.07.2020 17:56, Michael Tokarev wrote:
-> See https://bugs.launchpad.net/qemu/+bug/1886318 , in particular
-> the #13 in there (the patch) - I applied this to qemu which crashes
-> after revert-memory-accept-mismatching-sizes-in-memory_region_access_valid-CVE-2020-13754.patch
-> when run as the device model for Xen HVM domU.  Here's the output:
-> 
-> invalid size: acpi-cnt addr 0 size: 1
-> invalid size: acpi-cnt addr 0 size: 1
-> 
-> after this it just dies.
-> 
-> This is another incarnation of LP#1886318 .
-> What can we do here?
+What is the intended purpose of object_property_set_link() in
 
-This fixes it:
+    static void virtio_rng_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+    {
+        VirtIORngPCI *vrng = VIRTIO_RNG_PCI(vpci_dev);
+        DeviceState *vdev = DEVICE(&vrng->vdev);
 
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index 45cbed49abd..2cfb9bdc177 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -602,7 +602,8 @@ static void acpi_pm_cnt_write(void *opaque, hwaddr addr, uint64_t val,
- static const MemoryRegionOps acpi_pm_cnt_ops = {
-     .read = acpi_pm_cnt_read,
-     .write = acpi_pm_cnt_write,
--    .valid.min_access_size = 2,
-+    .impl.min_access_size = 2,
-+    .valid.min_access_size = 1,
-     .valid.max_access_size = 2,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+        if (!qdev_realize(vdev, BUS(&vpci_dev->bus), errp)) {
+            return;
+        }
 
-But this time it's qemu itself - apparently - who tries to access this register.
+        object_property_set_link(OBJECT(vrng), "rng", OBJECT(vrng->vdev.conf.rng),
+                                 NULL);
+    }
 
-/mjt
+?
+
+I'm asking because the function *always* fails.  I believe it's been
+failing for years.
+
+Similar code in the CCW buddy.  Also virtio-crypto-pci and
+virtio-crypto-ccw link "cryptodev".
+
+I tried moving it before qdev_realize(), where it doesn't fail.  But
+then *I* fail, namely at finding any effect in QOM.
+
+If it's really useless, I'll send a patch to drop it.
+
+If it has a use, tell me more, so I can test my patch to move it.
+
 
