@@ -2,81 +2,76 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A74CEC433FC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C19F8C433F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CF982070A
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:46:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CF982070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 928F7206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:47:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="EpqCcXDw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 928F7206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxYwH-0002Ke-JS
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 12:46:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40478)
+	id 1jxYwm-0002cr-SD
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 12:47:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jxYvQ-0001e8-RH
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:46:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38202)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jxYvO-0007b0-Nd
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:46:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jxYvN-0001B2-EA
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 16:45:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5F3392E810B
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 16:45:57 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jul 2020 16:26:12 -0000
-From: Peter Maydell <1216845@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ilg karl-erik-zimmerman pmaydell
-X-Launchpad-Bug-Reporter: Liviu Ionescu (ilg)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <20130826101205.25802.19011.malonedeb@soybean.canonical.com>
-Message-Id: <159526237257.13569.3719971137946656099.malone@gac.canonical.com>
-Subject: [Bug 1216845] Re: qemu-system-arm semihosting always calls exit(0)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a62a8aab9a6f8716e815031820af0c596ba8fbce
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 11:25:44
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1jxYvZ-0001ik-0s
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:46:09 -0400
+Received: from mail-m971.mail.163.com ([123.126.97.1]:43780)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <liq3ea@163.com>) id 1jxYvP-0007Zf-SL
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:46:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=From:Subject:Date:Message-Id; bh=4tq8ItQDnGgjnTbwdK
+ RPljKtjILylHMFZyFmgvb/pGg=; b=EpqCcXDwzZoDPf0XWD1BJe8kVvTya6zsAo
+ N/ZGkvSWk+TsV8DFE7BkLHLlztIWGYXyJX/6nUFola0Rx37B/4Q0MqiF8utbylya
+ gTs8tv3599JpSaDiOEVW72JQQ5GEJSE4A8FIIky1pc8VlJJxFNf3rLLZ6AL0xI9K
+ AJB6OyjZo=
+Received: from localhost.localdomain (unknown [115.199.195.7])
+ by smtp1 (Coremail) with SMTP id GdxpCgAn4lsxyhVfP3Z_Bg--.566S4;
+ Tue, 21 Jul 2020 00:45:42 +0800 (CST)
+From: Li Qiang <liq3ea@163.com>
+To: dmitry.fleytman@gmail.com,
+	jasowang@redhat.com,
+	pbonzini@redhat.com
+Subject: [PATCH v2] e1000e: using bottom half to send packets
+Date: Mon, 20 Jul 2020 09:45:35 -0700
+Message-Id: <20200720164535.76559-1-liq3ea@163.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: GdxpCgAn4lsxyhVfP3Z_Bg--.566S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxtw4DJr47tw1fGFy8Jr4ruFg_yoW3AF18pa
+ ykGwsxXr15Gry3Ars7Wr15Jr15Jr4xJ3s7Wr4Uu34FqFZ3A34DJr18ta1UZFW3ua9FvrZ5
+ CF45trya9ryDXw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U-18PUUUUU=
+X-Originating-IP: [115.199.195.7]
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBaxlnbVet1SidywABso
+Received-SPF: pass client-ip=123.126.97.1; envelope-from=liq3ea@163.com;
+ helo=mail-m971.mail.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 12:45:46
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,92 +80,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1216845 <1216845@bugs.launchpad.net>
+Cc: alxndr@bu.edu, Li Qiang <liq3ea@163.com>, liq3ea@gmail.com,
+ qemu-devel@nongnu.org, ppandit@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The semihosting v2 support went into QEMU in the 4.2 release, but I
-forgot to close this bug...
+Alexander Bulekov reported a UAF bug related e1000e packets send.
 
+-->https://bugs.launchpad.net/qemu/+bug/1886362
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Released
+This is because the guest trigger a e1000e packet send and set the
+data's address to e1000e's MMIO address. So when the e1000e do DMA
+it will write the MMIO again and trigger re-entrancy and finally
+causes this UAF.
 
--- =
+Paolo suggested to use a bottom half whenever MMIO is doing complicate
+things in here:
+-->https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg03342.html
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1216845
+Reference here:
+'The easiest solution is to delay processing of descriptors to a bottom
+half whenever MMIO is doing something complicated.  This is also better
+for latency because it will free the vCPU thread more quickly and leave
+the work to the I/O thread.'
 
-Title:
-  qemu-system-arm semihosting always calls exit(0)
+This patch fixes this UAF.
 
-Status in QEMU:
-  Fix Released
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+Change since v1:
+Per Jason's review here:
+-- https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05368.html
+1. Cancel and schedule the tx bh when VM is stopped or resume
+2. Add a tx_burst for e1000e configuration to throttle the bh execution
+3. Add a tx_waiting to record whether the bh is pending or not
+Don't use BQL in the tx_bh handler as when tx_bh is executed, the BQL is
+acquired.
 
-Bug description:
-  In my embedded ARM project I have a bunch of unit tests that I run in
-  a POSIX synthetic environment, and, as usual for POSIX processes,
-  these tests return 0 for success and !=3D0 for error.
+ hw/net/e1000e.c      |   6 +++
+ hw/net/e1000e_core.c | 106 ++++++++++++++++++++++++++++++++++---------
+ hw/net/e1000e_core.h |   8 ++++
+ 3 files changed, 98 insertions(+), 22 deletions(-)
 
-  Now I expanded the testing environment to run some of these tests
-  compiled for ARM, under QEMU, with the tracing messages forwarded via
-  the semihosting API.
+diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+index fda34518c9..24e35a78bf 100644
+--- a/hw/net/e1000e.c
++++ b/hw/net/e1000e.c
+@@ -77,10 +77,14 @@ typedef struct E1000EState {
+ 
+     bool disable_vnet;
+ 
++    int32_t tx_burst;
++
+     E1000ECore core;
+ 
+ } E1000EState;
+ 
++#define TX_BURST 256
++
+ #define E1000E_MMIO_IDX     0
+ #define E1000E_FLASH_IDX    1
+ #define E1000E_IO_IDX       2
+@@ -263,6 +267,7 @@ static void e1000e_core_realize(E1000EState *s)
+ {
+     s->core.owner = &s->parent_obj;
+     s->core.owner_nic = s->nic;
++    s->core.tx_burst = s->tx_burst;
+ }
+ 
+ static void
+@@ -665,6 +670,7 @@ static Property e1000e_properties[] = {
+                         e1000e_prop_subsys_ven, uint16_t),
+     DEFINE_PROP_SIGNED("subsys", E1000EState, subsys, 0,
+                         e1000e_prop_subsys, uint16_t),
++    DEFINE_PROP_INT32("x-txburst", E1000EState, tx_burst, TX_BURST),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index bcd186cac5..0a38a50cca 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -909,19 +909,18 @@ e1000e_rx_ring_init(E1000ECore *core, E1000E_RxRing *rxr, int idx)
+     rxr->i      = &i[idx];
+ }
+ 
+-static void
+-e1000e_start_xmit(E1000ECore *core, const E1000E_TxRing *txr)
++static int32_t
++e1000e_start_xmit(struct e1000e_tx *q)
+ {
++    E1000ECore *core = q->core;
+     dma_addr_t base;
+     struct e1000_tx_desc desc;
+-    bool ide = false;
+-    const E1000E_RingInfo *txi = txr->i;
+-    uint32_t cause = E1000_ICS_TXQE;
++    const E1000E_RingInfo *txi;
++    E1000E_TxRing txr;
++    int32_t num_packets = 0;
+ 
+-    if (!(core->mac[TCTL] & E1000_TCTL_EN)) {
+-        trace_e1000e_tx_disabled();
+-        return;
+-    }
++    e1000e_tx_ring_init(core, &txr, q - &core->tx[0]);
++    txi = txr.i;
+ 
+     while (!e1000e_ring_empty(core, txi)) {
+         base = e1000e_ring_head_descr(core, txi);
+@@ -931,15 +930,17 @@ e1000e_start_xmit(E1000ECore *core, const E1000E_TxRing *txr)
+         trace_e1000e_tx_descr((void *)(intptr_t)desc.buffer_addr,
+                               desc.lower.data, desc.upper.data);
+ 
+-        e1000e_process_tx_desc(core, txr->tx, &desc, txi->idx);
+-        cause |= e1000e_txdesc_writeback(core, base, &desc, &ide, txi->idx);
++        e1000e_process_tx_desc(core, txr.tx, &desc, txi->idx);
++        q->cause |= e1000e_txdesc_writeback(core, base, &desc,
++                                            &q->ide, txi->idx);
+ 
+         e1000e_ring_advance(core, txi, 1);
++        if (++num_packets >= core->tx_burst) {
++            break;
++        }
+     }
+ 
+-    if (!ide || !e1000e_intrmgr_delay_tx_causes(core, &cause)) {
+-        e1000e_set_interrupt_cause(core, cause);
+-    }
++    return num_packets;
+ }
+ 
+ static bool
+@@ -2423,32 +2424,41 @@ e1000e_set_dbal(E1000ECore *core, int index, uint32_t val)
+ static void
+ e1000e_set_tctl(E1000ECore *core, int index, uint32_t val)
+ {
+-    E1000E_TxRing txr;
+     core->mac[index] = val;
+ 
+     if (core->mac[TARC0] & E1000_TARC_ENABLE) {
+-        e1000e_tx_ring_init(core, &txr, 0);
+-        e1000e_start_xmit(core, &txr);
++        if (core->tx[0].tx_waiting) {
++            return;
++        }
++        core->tx[0].tx_waiting = 1;
++        if (!core->vm_running) {
++            return;
++        }
++        qemu_bh_schedule(core->tx[0].tx_bh);
+     }
+ 
+     if (core->mac[TARC1] & E1000_TARC_ENABLE) {
+-        e1000e_tx_ring_init(core, &txr, 1);
+-        e1000e_start_xmit(core, &txr);
++        if (core->tx[1].tx_waiting) {
++            return;
++        }
++        core->tx[1].tx_waiting = 1;
++        if (!core->vm_running) {
++            return;
++        }
++        qemu_bh_schedule(core->tx[1].tx_bh);
+     }
+ }
+ 
+ static void
+ e1000e_set_tdt(E1000ECore *core, int index, uint32_t val)
+ {
+-    E1000E_TxRing txr;
+     int qidx = e1000e_mq_queue_idx(TDT, index);
+     uint32_t tarc_reg = (qidx == 0) ? TARC0 : TARC1;
+ 
+     core->mac[index] = val & 0xffff;
+ 
+     if (core->mac[tarc_reg] & E1000_TARC_ENABLE) {
+-        e1000e_tx_ring_init(core, &txr, qidx);
+-        e1000e_start_xmit(core, &txr);
++        qemu_bh_schedule(core->tx[qidx].tx_bh);
+     }
+ }
+ 
+@@ -3315,10 +3325,56 @@ e1000e_vm_state_change(void *opaque, int running, RunState state)
+         trace_e1000e_vm_state_running();
+         e1000e_intrmgr_resume(core);
+         e1000e_autoneg_resume(core);
++        core->vm_running = 1;
++
++        for (int i = 0; i < E1000E_NUM_QUEUES; i++) {
++            qemu_bh_schedule(core->tx[i].tx_bh);
++        }
++
+     } else {
+         trace_e1000e_vm_state_stopped();
++
++        for (int i = 0; i < E1000E_NUM_QUEUES; i++) {
++            qemu_bh_cancel(core->tx[i].tx_bh);
++        }
++
+         e1000e_autoneg_pause(core);
+         e1000e_intrmgr_pause(core);
++        core->vm_running = 0;
++    }
++}
++
++
++static void e1000e_core_tx_bh(void *opaque)
++{
++    struct e1000e_tx *q = opaque;
++    E1000ECore *core = q->core;
++    int32_t ret;
++
++    if (!core->vm_running) {
++        assert(q->tx_waiting);
++        return;
++    }
++
++    q->tx_waiting = 0;
++
++    if (!(core->mac[TCTL] & E1000_TCTL_EN)) {
++        trace_e1000e_tx_disabled();
++        return;
++    }
++
++    q->cause = E1000_ICS_TXQE;
++    q->ide = false;
++
++    ret = e1000e_start_xmit(q);
++    if (ret >= core->tx_burst) {
++        qemu_bh_schedule(q->tx_bh);
++        q->tx_waiting = 1;
++        return;
++    }
++
++    if (!q->ide || !e1000e_intrmgr_delay_tx_causes(core, &q->cause)) {
++        e1000e_set_interrupt_cause(core, q->cause);
+     }
+ }
+ 
+@@ -3334,12 +3390,15 @@ e1000e_core_pci_realize(E1000ECore     *core,
+                                        e1000e_autoneg_timer, core);
+     e1000e_intrmgr_pci_realize(core);
+ 
++    core->vm_running = runstate_is_running();
+     core->vmstate =
+         qemu_add_vm_change_state_handler(e1000e_vm_state_change, core);
+ 
+     for (i = 0; i < E1000E_NUM_QUEUES; i++) {
+         net_tx_pkt_init(&core->tx[i].tx_pkt, core->owner,
+                         E1000E_MAX_TX_FRAGS, core->has_vnet);
++        core->tx[i].core = core;
++        core->tx[i].tx_bh = qemu_bh_new(e1000e_core_tx_bh, &core->tx[i]);
+     }
+ 
+     net_rx_pkt_init(&core->rx_pkt, core->has_vnet);
+@@ -3367,6 +3426,9 @@ e1000e_core_pci_uninit(E1000ECore *core)
+     for (i = 0; i < E1000E_NUM_QUEUES; i++) {
+         net_tx_pkt_reset(core->tx[i].tx_pkt);
+         net_tx_pkt_uninit(core->tx[i].tx_pkt);
++        qemu_bh_cancel(core->tx[i].tx_bh);
++        qemu_bh_delete(core->tx[i].tx_bh);
++        core->tx[i].tx_bh = NULL;
+     }
+ 
+     net_rx_pkt_uninit(core->rx_pkt);
+diff --git a/hw/net/e1000e_core.h b/hw/net/e1000e_core.h
+index aee32f7e48..0c16dce3a6 100644
+--- a/hw/net/e1000e_core.h
++++ b/hw/net/e1000e_core.h
+@@ -77,10 +77,18 @@ struct E1000Core {
+         unsigned char sum_needed;
+         bool cptse;
+         struct NetTxPkt *tx_pkt;
++        QEMUBH *tx_bh;
++        uint32_t tx_waiting;
++        uint32_t cause;
++        bool ide;
++        E1000ECore *core;
+     } tx[E1000E_NUM_QUEUES];
+ 
+     struct NetRxPkt *rx_pkt;
+ 
++    int32_t tx_burst;
++
++    bool vm_running;
+     bool has_vnet;
+     int max_queue_num;
+ 
+-- 
+2.17.1
 
-  Up to now everything is fine with the emulation.
-
-  However I have a problem with passing the failure code back to the
-  operating system, to drive the continuous integration framework.
-
-  I checked the arm-semi.c code and for SYS_EXIT and I discovered that
-  the parameter passed is ignored and it always calls exit(0):
-
-      case SYS_EXIT:
-          gdb_exit(env, 0);
-          exit(0);
-
-  To solve my problem I temporarily made a patch, and for cases that
-  should return non zero codes, I call an unsupported BKPT instruction,
-  which makes QEMU abort, and pass an non zero code (1) back to the
-  operating system.
-
-      qemu: Unsupported SemiHosting SWI 0xf1
-
-  This kludge is more or less functional, but is quite inconvenient.
-
-  After checking the ARM manuals, I discovered that SYS_EXIT is not
-  standard, and the 0x18 code used for it originally was used for
-  angel_SWIreason_ReportException, which has a slightly different
-  purpose.
-
-  Now the question:
-
-  Would it be possible to no longer ignore the code passed to 0x18, and
-  if it is non zero, to call exit() with a different value?
-
-  The suggested rule would be:
-
-  if (code =3D=3D0 || code =3D=3D 0x20026)
-    exit(0);
-  elif (code < 256)
-    exit(code);
-  else
-    exit(1);
-
-  The value 0x20026 means ADP_Stopped_ApplicationExit, and, if I
-  understood it right, it means that the program terminated
-  successfully. If this is not true, it can be removed from the first
-  conditional statement.
-
-  What do you think? Can this be added to arm-semi.c?
-
-  =
-
-  Regards,
-
-  Liviu
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1216845/+subscriptions
 
