@@ -2,86 +2,72 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC13EC433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:05:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C9AC433EB
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB06920672
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:05:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AdyQ6L+b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB06920672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3CA152065E
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:08:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CA152065E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxYIY-0005c2-W5
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 12:05:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58558)
+	id 1jxYLT-0008Eo-HB
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 12:08:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxYFs-00031a-6D
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:03:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26715
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxYFo-0002Ej-Gy
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:03:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595260978;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NkjD66WGtZfhbipYtEcVUAhkxQe/HWyUoUbFUyKqxGU=;
- b=AdyQ6L+bAMHN3ZiHRebNaSMzZYQ3Ytj74+bVTeS4VWMcna+QYp5DWFFfouwu2RLv4TG/b9
- 29tAVx1Hf46yqziU3DGsNiU5BoRhsg8Nlbr0Wf6QaJyojwX/08GUI2EgFjMJoTJ9PACOZP
- q7heM7boMNZ44dbQ0bD/lLx5CuWQIWE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-mQtgWl70PsKVTRxIYoGPIQ-1; Mon, 20 Jul 2020 12:02:56 -0400
-X-MC-Unique: mQtgWl70PsKVTRxIYoGPIQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6ECDF100CC85;
- Mon, 20 Jul 2020 16:02:55 +0000 (UTC)
-Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
- (ovpn-120-206.rdu2.redhat.com [10.10.120.206])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9BE7D5C66E;
- Mon, 20 Jul 2020 16:02:54 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/1] python/machine: Change default timeout to 30 seconds
-Date: Mon, 20 Jul 2020 12:02:52 -0400
-Message-Id: <20200720160252.104139-2-jsnow@redhat.com>
-In-Reply-To: <20200720160252.104139-1-jsnow@redhat.com>
-References: <20200720160252.104139-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jxYKt-0007fO-N3
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:08:15 -0400
+Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:33817)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1jxYKr-0002wp-Q4
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:08:15 -0400
+Received: from player691.ha.ovh.net (unknown [10.110.171.148])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 1BB42173DA9
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 18:08:02 +0200 (CEST)
+Received: from kaod.org (bad36-1-78-202-132-1.fbx.proxad.net [78.202.132.1])
+ (Authenticated sender: clg@kaod.org)
+ by player691.ha.ovh.net (Postfix) with ESMTPSA id 3F9C81498A4D2;
+ Mon, 20 Jul 2020 16:07:55 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-97G0025bee732f-b8c7-4e32-8983-4cc0222cbcde,6196D7FED5334CEB3A8C25BBD62C6C93FB7A110A)
+ smtp.auth=clg@kaod.org
+Subject: Re: [PATCH-for-5.1] hw/misc/aspeed_sdmc: Fix incorrect memory size
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200720095829.22839-1-f4bug@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ed5e6bd0-0962-b182-3348-d3c6655ef35e@kaod.org>
+Date: Mon, 20 Jul 2020 18:07:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200720095829.22839-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 03:17:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Ovh-Tracer-Id: 13934700199559531281
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrgeeggdejfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfeffvddtudegieefudeugffhjefgieegieegleettdehgfeiieevueeihfegfefgnecukfhppedtrddtrddtrddtpdejkedrvddtvddrudefvddrudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.41.146; envelope-from=clg@kaod.org;
+ helo=1.mo68.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 12:08:03
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,118 +80,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org,
- Eduardo Habkost <ehabkost@redhat.com>, philmd@redhat.com,
- Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-3 seconds is too short for some tests running inside busy VMs. Build it out to
-a rather generous 30 seconds to find out conclusively if there are more severe
-problems in the merge/CI tests.
+On 7/20/20 11:58 AM, Philippe Mathieu-Daudé wrote:
+> The SDRAM Memory Controller has a 32-bit address bus, thus
+> supports up to 4 GiB of DRAM. There is a signed to unsigned
+> conversion error with the AST2600 maximum memory size:
+> 
+>   (uint64_t)(2048 << 20) = (uint64_t)(-2147483648)
+>                          = 0xffffffff40000000
+>                          = 16 EiB - 2 GiB
+> 
+> Fix by using the IEC suffixes which are usually safer, and add
+> a check to verify the memory is valid. This would have catched
+> this bug:
+> 
+>     Unexpected error in aspeed_sdmc_realize() at hw/misc/aspeed_sdmc.c:261:
+>     qemu-system-arm: Invalid RAM size 16 EiB
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- python/qemu/machine.py | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+Indeed :/
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 80c4d4a8b6..51aa255ef9 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -394,15 +394,15 @@ def _hard_shutdown(self) -> None:
-         self._popen.kill()
-         self._popen.wait(timeout=60)
- 
--    def _soft_shutdown(self, has_quit: bool = False,
--                       timeout: Optional[int] = 3) -> None:
-+    def _soft_shutdown(self, timeout: Optional[int],
-+                       has_quit: bool = False) -> None:
-         """
-         Perform early cleanup, attempt to gracefully shut down the VM, and wait
-         for it to terminate.
- 
-+        :param timeout: Timeout in seconds for graceful shutdown.
-+                        A value of None is an infinite wait.
-         :param has_quit: When True, don't attempt to issue 'quit' QMP command
--        :param timeout: Optional timeout in seconds for graceful shutdown.
--                        Default 3 seconds, A value of None is an infinite wait.
- 
-         :raise ConnectionReset: On QMP communication errors
-         :raise subprocess.TimeoutExpired: When timeout is exceeded waiting for
-@@ -418,14 +418,14 @@ def _soft_shutdown(self, has_quit: bool = False,
-         # May raise subprocess.TimeoutExpired
-         self._popen.wait(timeout=timeout)
- 
--    def _do_shutdown(self, has_quit: bool = False,
--                     timeout: Optional[int] = 3) -> None:
-+    def _do_shutdown(self, timeout: Optional[int],
-+                     has_quit: bool = False) -> None:
-         """
-         Attempt to shutdown the VM gracefully; fallback to a hard shutdown.
- 
-+        :param timeout: Timeout in seconds for graceful shutdown.
-+                        A value of None is an infinite wait.
-         :param has_quit: When True, don't attempt to issue 'quit' QMP command
--        :param timeout: Optional timeout in seconds for graceful shutdown.
--                        Default 3 seconds, A value of None is an infinite wait.
- 
-         :raise AbnormalShutdown: When the VM could not be shut down gracefully.
-             The inner exception will likely be ConnectionReset or
-@@ -433,7 +433,7 @@ def _do_shutdown(self, has_quit: bool = False,
-             may result in its own exceptions, likely subprocess.TimeoutExpired.
-         """
-         try:
--            self._soft_shutdown(has_quit, timeout)
-+            self._soft_shutdown(timeout, has_quit)
-         except Exception as exc:
-             self._hard_shutdown()
-             raise AbnormalShutdown("Could not perform graceful shutdown") \
-@@ -441,7 +441,7 @@ def _do_shutdown(self, has_quit: bool = False,
- 
-     def shutdown(self, has_quit: bool = False,
-                  hard: bool = False,
--                 timeout: Optional[int] = 3) -> None:
-+                 timeout: Optional[int] = 30) -> None:
-         """
-         Terminate the VM (gracefully if possible) and perform cleanup.
-         Cleanup will always be performed.
-@@ -453,7 +453,7 @@ def shutdown(self, has_quit: bool = False,
-         :param hard: When true, do not attempt graceful shutdown, and
-                      suppress the SIGKILL warning log message.
-         :param timeout: Optional timeout in seconds for graceful shutdown.
--                        Default 3 seconds, A value of None is an infinite wait.
-+                        Default 30 seconds, A `None` value is an infinite wait.
-         """
-         if not self._launched:
-             return
-@@ -463,7 +463,7 @@ def shutdown(self, has_quit: bool = False,
-                 self._user_killed = True
-                 self._hard_shutdown()
-             else:
--                self._do_shutdown(has_quit, timeout=timeout)
-+                self._do_shutdown(timeout, has_quit)
-         finally:
-             self._post_shutdown()
- 
-@@ -473,12 +473,12 @@ def kill(self):
-         """
-         self.shutdown(hard=True)
- 
--    def wait(self, timeout: Optional[int] = 3) -> None:
-+    def wait(self, timeout: Optional[int] = 30) -> None:
-         """
-         Wait for the VM to power off and perform post-shutdown cleanup.
- 
--        :param timeout: Optional timeout in seconds.
--                        Default 3 seconds, A value of None is an infinite wait.
-+        :param timeout: Optional timeout in seconds. Default 30 seconds.
-+                        A value of `None` is an infinite wait.
-         """
-         self.shutdown(has_quit=True, timeout=timeout)
- 
--- 
-2.26.2
+> 
+> Fixes: 1550d72679 ("aspeed/sdmc: Add AST2600 support")
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/misc/aspeed_sdmc.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+> index 0737d8de81..76dd7e6a20 100644
+> --- a/hw/misc/aspeed_sdmc.c
+> +++ b/hw/misc/aspeed_sdmc.c
+> @@ -256,6 +256,12 @@ static void aspeed_sdmc_realize(DeviceState *dev, Error **errp)
+>      AspeedSDMCClass *asc = ASPEED_SDMC_GET_CLASS(s);
+>  
+>      s->max_ram_size = asc->max_ram_size;
+> +    if (s->max_ram_size >= 4 * GiB) {
+> +        char *szstr = size_to_str(s->max_ram_size);
+> +        error_setg(errp, "Invalid RAM size %s", szstr);
+> +        g_free(szstr);
+> +        return;
+> +    }
+>
+
+I would put an assert() since the max RAM size is not user configurable. 
+
+C.
+
+>      memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_sdmc_ops, s,
+>                            TYPE_ASPEED_SDMC, 0x1000);
+> @@ -341,7 +347,7 @@ static void aspeed_2400_sdmc_class_init(ObjectClass *klass, void *data)
+>      AspeedSDMCClass *asc = ASPEED_SDMC_CLASS(klass);
+>  
+>      dc->desc = "ASPEED 2400 SDRAM Memory Controller";
+> -    asc->max_ram_size = 512 << 20;
+> +    asc->max_ram_size = 512 * MiB;
+>      asc->compute_conf = aspeed_2400_sdmc_compute_conf;
+>      asc->write = aspeed_2400_sdmc_write;
+>      asc->valid_ram_sizes = aspeed_2400_ram_sizes;
+> @@ -408,7 +414,7 @@ static void aspeed_2500_sdmc_class_init(ObjectClass *klass, void *data)
+>      AspeedSDMCClass *asc = ASPEED_SDMC_CLASS(klass);
+>  
+>      dc->desc = "ASPEED 2500 SDRAM Memory Controller";
+> -    asc->max_ram_size = 1024 << 20;
+> +    asc->max_ram_size = 1 * GiB;
+>      asc->compute_conf = aspeed_2500_sdmc_compute_conf;
+>      asc->write = aspeed_2500_sdmc_write;
+>      asc->valid_ram_sizes = aspeed_2500_ram_sizes;
+> @@ -485,7 +491,7 @@ static void aspeed_2600_sdmc_class_init(ObjectClass *klass, void *data)
+>      AspeedSDMCClass *asc = ASPEED_SDMC_CLASS(klass);
+>  
+>      dc->desc = "ASPEED 2600 SDRAM Memory Controller";
+> -    asc->max_ram_size = 2048 << 20;
+> +    asc->max_ram_size = 2 * GiB;
+>      asc->compute_conf = aspeed_2600_sdmc_compute_conf;
+>      asc->write = aspeed_2600_sdmc_write;
+>      asc->valid_ram_sizes = aspeed_2600_ram_sizes;
+> 
 
 
