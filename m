@@ -2,82 +2,88 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA81C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1524C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:08:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 545FD22B4D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:08:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AE0422B4D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:08:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RksbKoPX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 545FD22B4D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fFfqOx7v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AE0422B4D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxSie-0001iS-I2
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 06:08:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37112)
+	id 1jxSis-00023q-Ms
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 06:08:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jxSeR-0005Wk-2U
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:04:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39963
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jxSeO-0007ub-Ju
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:04:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595239439;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=/2UxgP8mnbt9P0VhF2XX/RUSJK6zLk1dgu96asxWrBM=;
- b=RksbKoPX0Much9nXANAb2OcHDgvI1FeVHKJ17+NWHwHG1GvkSUgD0jstDU9DCTrqY1fG/C
- +GylbSbSsXYesqlqbH9YPkiouDwOxsZw8YJKu2RBI8B812HjPtA7UC+A0tMdV4R9avnKyi
- 1sxORVhi6kfQ8/7tFqkDyoSpr3UvH9c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-R5D8sv4wPUKH5xyj6IIM8Q-1; Mon, 20 Jul 2020 06:03:57 -0400
-X-MC-Unique: R5D8sv4wPUKH5xyj6IIM8Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 168EC108A
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 10:03:57 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
- [10.36.115.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CCF566FEF6;
- Mon, 20 Jul 2020 10:03:53 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 0CE819D05; Mon, 20 Jul 2020 12:03:53 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/3] module: silence errors for module_load_qom_all().
-Date: Mon, 20 Jul 2020 12:03:52 +0200
-Message-Id: <20200720100352.2477-4-kraxel@redhat.com>
-In-Reply-To: <20200720100352.2477-1-kraxel@redhat.com>
-References: <20200720100352.2477-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:16:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxShw-00017U-7p
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:07:40 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38204)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxShu-00006n-Iq
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:07:39 -0400
+Received: by mail-ot1-x341.google.com with SMTP id t18so11704798otq.5
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 03:07:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Yy/yAmIohauinqypZy3r8dZZEu29B97c3gh4MR7TDxA=;
+ b=fFfqOx7vSqZ82Evm1N8/VIvTbipeRWQ7lUSQUfFUe96M1kA8MV9QpE59WrUvk+F30o
+ eJ8fWKVxo3VtzDexjSLa40ohQwqzHi2RkSSqcaptr1lHz7/UakJ/vs4S4bpDrI1k9zZF
+ tx5ja800RwxJCCqTx32w/5Npvkm8bvkNYrARP7F7OUun+r6BgvSNcDXgZDkqbejdFMM2
+ +aHQw756+xTYejNnCyjKwSdgNP4sMWHaT4/YXicqP22VUzWm/wJQ+3R3w8GvlpqDO1VP
+ MJ+TNIgXeXFpl+O+eyOp5W5aXlFi8h57ZpmT4JkSojLSnKASTH/UQkrWotm5XIZNFmdU
+ 8+eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Yy/yAmIohauinqypZy3r8dZZEu29B97c3gh4MR7TDxA=;
+ b=J17JZFbjqEgqctzrx0xqtiRyfWpRNYVjdS3TgPC3V3rpdytxPVp2ysfRjWbbWr3wWH
+ og5V3uzc5xqi6N29Tbdxjhpn/fHfweICnH+uyDZw0TdC9/Mjoe34SUYdAE5UNh99CaHb
+ OL04ZVBM94jgsdocf39DZZ0AkG3oe+7a44tG5YcM1WeiHyEy1W6fPLwvH46KW7GAAkEw
+ Q/UOUbrzJlMHfhIv/MYIxed3TyVRq5tqDXa8V7zC0SGrO3X+YFI2LX8Uzr4zdkzZvWI3
+ tahoqv3PR+FmR0JQUtScEiwkEtTzqDqU3yXlzc+UYCo+f2WC59DAa0ppnWU0yvsdX55y
+ dorA==
+X-Gm-Message-State: AOAM532jzyCefrTpsWV9E4A5zTW/8FSQV9PYYGAlepyS7X07u6zRSAb6
+ VMtgwGqi+xGuedE50hlCiHGucduG/IZGwbI77u+jtQ==
+X-Google-Smtp-Source: ABdhPJzrvPVdLAC1SOhfrAEQvi23kJQkqKvmjASC6ilyOSPrsQHTZ6q5GpW5GxMRGEJ4KHj21XIGzcYdR306e6gWbyw=
+X-Received: by 2002:a05:6830:10ce:: with SMTP id
+ z14mr19819674oto.135.1595239656966; 
+ Mon, 20 Jul 2020 03:07:36 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200717152508.10272-1-peter.maydell@linaro.org>
+ <6b2ea83f-2dbb-5ba1-8151-b275b80b3644@redhat.com>
+In-Reply-To: <6b2ea83f-2dbb-5ba1-8151-b275b80b3644@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Jul 2020 11:07:25 +0100
+Message-ID: <CAFEAcA_dgaGsz7rqJXbY--T_Q_bNL+0freRDgPBn_feo+R2AsA@mail.gmail.com>
+Subject: Re: [PATCH for-5.1] Makefile: Remove config-devices.mak on "make
+ clean"
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -91,125 +97,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add mayfail bool parameter to module loading functions.  Set it to true
-for module_load_qom_all() because device modules might not load into all
-system emulation variants.  qemu-system-s390x for example will not load
-qxl because it lacks vga support.  Makes "make check" less chatty.
+On Fri, 17 Jul 2020 at 16:30, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 7/17/20 5:25 PM, Peter Maydell wrote:
+> > The config-devices.mak files are generated by "make", and so they
+> > should be deleted by "make clean".
+> >
+> > (This is different from config-host.mak and config-all-disas.mak,
+> > which are created by "configure" and so only deleted by
+> > "make distclen".)
+>
+> typo "distclean"
+>
+> >
+> > If we don't delete these files on "make clean", then the build
+> > tree is left in a state where it has the config-devices.mak
+> > file but not the config-devices.mak.d file, and make will not
+> > realize that it needs to rebuild config-devices.mak if, for
+> > instance, hw/sd/Kconfig changes.
+> >
+> > NB: config-all-devices.mak is also generated by "make", but we
+> > already remove it on "make clean".
+> >
+>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com> ?
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/qemu/module.h |  8 ++++----
- softmmu/qtest.c       |  2 +-
- util/module.c         | 17 ++++++++++-------
- 3 files changed, 15 insertions(+), 12 deletions(-)
+Applied to master with the commit-message fixes so I could merge
+the i2c pullreq.
 
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 9121a475c1b6..944d403cbd15 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -61,15 +61,15 @@ typedef enum {
- #define fuzz_target_init(function) module_init(function, \
-                                                MODULE_INIT_FUZZ_TARGET)
- #define migration_init(function) module_init(function, MODULE_INIT_MIGRATION)
--#define block_module_load_one(lib) module_load_one("block-", lib)
--#define ui_module_load_one(lib) module_load_one("ui-", lib)
--#define audio_module_load_one(lib) module_load_one("audio-", lib)
-+#define block_module_load_one(lib) module_load_one("block-", lib, false)
-+#define ui_module_load_one(lib) module_load_one("ui-", lib, false)
-+#define audio_module_load_one(lib) module_load_one("audio-", lib, false)
- 
- void register_module_init(void (*fn)(void), module_init_type type);
- void register_dso_module_init(void (*fn)(void), module_init_type type);
- 
- void module_call_init(module_init_type type);
--bool module_load_one(const char *prefix, const char *lib_name);
-+bool module_load_one(const char *prefix, const char *lib_name, bool mayfail);
- void module_load_qom_one(const char *type);
- void module_load_qom_all(void);
- 
-diff --git a/softmmu/qtest.c b/softmmu/qtest.c
-index 5672b75c354b..be81c9b9b83c 100644
---- a/softmmu/qtest.c
-+++ b/softmmu/qtest.c
-@@ -670,7 +670,7 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         g_assert(words[1] && words[2]);
- 
-         qtest_send_prefix(chr);
--        if (module_load_one(words[1], words[2])) {
-+        if (module_load_one(words[1], words[2], false)) {
-             qtest_sendf(chr, "OK\n");
-         } else {
-             qtest_sendf(chr, "FAIL\n");
-diff --git a/util/module.c b/util/module.c
-index 0ab00851f0a4..3c5fbd0bc8c1 100644
---- a/util/module.c
-+++ b/util/module.c
-@@ -109,7 +109,7 @@ void module_call_init(module_init_type type)
- }
- 
- #ifdef CONFIG_MODULES
--static int module_load_file(const char *fname)
-+static int module_load_file(const char *fname, bool mayfail)
- {
-     GModule *g_module;
-     void (*sym)(void);
-@@ -133,8 +133,10 @@ static int module_load_file(const char *fname)
- 
-     g_module = g_module_open(fname, G_MODULE_BIND_LAZY | G_MODULE_BIND_LOCAL);
-     if (!g_module) {
--        fprintf(stderr, "Failed to open module: %s\n",
--                g_module_error());
-+        if (!mayfail) {
-+            fprintf(stderr, "Failed to open module: %s\n",
-+                    g_module_error());
-+        }
-         ret = -EINVAL;
-         goto out;
-     }
-@@ -166,7 +168,7 @@ out:
- }
- #endif
- 
--bool module_load_one(const char *prefix, const char *lib_name)
-+bool module_load_one(const char *prefix, const char *lib_name, bool mayfail)
- {
-     bool success = false;
- 
-@@ -223,7 +225,7 @@ bool module_load_one(const char *prefix, const char *lib_name)
-     for (i = 0; i < n_dirs; i++) {
-         fname = g_strdup_printf("%s/%s%s",
-                 dirs[i], module_name, HOST_DSOSUF);
--        ret = module_load_file(fname);
-+        ret = module_load_file(fname, mayfail);
-         g_free(fname);
-         fname = NULL;
-         /* Try loading until loaded a module file */
-@@ -284,7 +286,8 @@ void module_load_qom_one(const char *type)
-     for (i = 0; i < ARRAY_SIZE(qom_modules); i++) {
-         if (strcmp(qom_modules[i].type, type) == 0) {
-             module_load_one(qom_modules[i].prefix,
--                            qom_modules[i].module);
-+                            qom_modules[i].module,
-+                            false);
-             return;
-         }
-     }
-@@ -305,7 +308,7 @@ void module_load_qom_all(void)
-             /* one module implementing multiple types -> load only once */
-             continue;
-         }
--        module_load_one(qom_modules[i].prefix, qom_modules[i].module);
-+        module_load_one(qom_modules[i].prefix, qom_modules[i].module, true);
-     }
-     module_loaded_qom_all = true;
- }
--- 
-2.18.4
-
+thanks
+-- PMM
 
