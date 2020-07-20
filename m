@@ -2,107 +2,94 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	WEIRD_QUOTING autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7C2C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC62AC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:06:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB46222B4D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:05:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 770E120729
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:06:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="POLsGz10"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB46222B4D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bDBzZS35"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 770E120729
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxVTa-0006Ec-VZ
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 09:05:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58142)
+	id 1jxVUf-0007aE-QG
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 09:06:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jxVSd-0005Kz-S9
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:04:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51134
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jxVSb-0008Ho-58
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:04:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595250238;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Z5ixh/D07TIzG7wEt0bGxXgw4SmlefyXkogjA+IL8OA=;
- b=POLsGz10yoVPSqmSiZS1zJFMrNUVagGfMqF41Bm8qUmy0ByAuMaBqZb7d7PDq+k8Ol8eIz
- vFq1JxRX7sWuGpZIE0dyGF/iAmZQUaUwTafttgXi04Fpws0VSiF9bUSPZyL6qi9sIPR6+N
- /6d68395OLmSSFDtbnhzrXDT9sbCA0c=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-67fkGNftMMOt7S2pW2n1rw-1; Mon, 20 Jul 2020 09:03:50 -0400
-X-MC-Unique: 67fkGNftMMOt7S2pW2n1rw-1
-Received: by mail-qv1-f70.google.com with SMTP id e6so10113691qva.2
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 06:03:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxVLW-0002h8-6t
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:42 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52698)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxVLU-0007KE-3q
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:41 -0400
+Received: by mail-wm1-x344.google.com with SMTP id q15so22181836wmj.2
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 05:56:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=rJ7cE2x8DPLfwJ7CxRfCKU0ZON3qasEBbPNKnMHWUS8=;
+ b=bDBzZS35WqZvQQb9wMjGd4SYzHfl8UTOJxG11qsZgRkzuehrG8HKYhNOt81g3/v/tS
+ R9zaRFoEQSfzdlarb4+gymkB8FtOf7yep6pqxRr1Vadz16eQeaHfB/rh/FxUWa7iOv8Z
+ DwleBfkckoTRF50CTA29qmBWRWPsb9VIsUtJjmtwu7wIRGZNwbWdhfmTTgsNOuQWI2bz
+ lUbl8Hd0D0raTocASvZMAug4CZ/Zo3Y/Uka7U7CfNRiPLY/F+YG6b72euI3UHdirTCzu
+ GmxEC2n2I+Yq03VgRk7ONyFczzoffBKW8crnC7gbkD8bvA+rgq1ORdk0I5sXDJsmgIZ/
+ d10A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Z5ixh/D07TIzG7wEt0bGxXgw4SmlefyXkogjA+IL8OA=;
- b=lWHtQq8rmbsZeqoAMZM1ch0f4+DeyWohknFpEueaMoTxHRqguYwaW0/FKdVyf21XSQ
- v22FruE82jIC3DNWNNAc7t8X8H2l0QJ81qt/rpA1KZjBxZZsdiu1ADCCazuna/aON0pg
- ej7ConPCE3sm0AsCP5+4xIsEh1Vut6EBCBMC7Tww4F4+Yz1K5KLjn83Ds2Wjn+Zhf0jw
- mWU1mqRWuWg58y4tKMH1UFJqOSaUQF3coVbDjr3ocgG5GKJKObsTCxq64FTmwKY/0odU
- 2Al9rLnes5e0bouG7ZWkHtRAHFBTnzcykDSbGM/kPbTQXINQWZ+e/XErQr5SDkHpVSFp
- 1Wpg==
-X-Gm-Message-State: AOAM532p2c7ta7HKNtAbZkV1TCiL4gVzfdWEoHQ1C8Z1efJOXpKmci0A
- qBGftRLbY3abfmKYHwvsrhntnAQd0i7GCQ9jq0ynrgyemKRAnRqp5S8xfWfXlPtr1sv78nATYGs
- DAuj0vyvm2M/R0Qo=
-X-Received: by 2002:ac8:5181:: with SMTP id c1mr24223099qtn.173.1595250229588; 
- Mon, 20 Jul 2020 06:03:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyTxAh4c4tOR9nUXbq1BtoBl19UaL/10CvtC8lUrgEzybAgZ/3eOowvugH6KIXgxglrnz1fQg==
-X-Received: by 2002:ac8:5181:: with SMTP id c1mr24223065qtn.173.1595250229364; 
- Mon, 20 Jul 2020 06:03:49 -0700 (PDT)
-Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
- by smtp.gmail.com with ESMTPSA id f18sm20757035qtc.28.2020.07.20.06.03.47
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=rJ7cE2x8DPLfwJ7CxRfCKU0ZON3qasEBbPNKnMHWUS8=;
+ b=BhQM52niDuo8JI88EnGgV0zODLl1wjgai6wM3OSEdL3EZGYBDga8KMR99RjHdsNdf9
+ 9WM9Ah077HlVQ3GJTd/hsYmh83jfqRZc6BPQiW/Bj86bTVFfGQgXhtoWV6e8xpS/pyu5
+ 4PUWZEckMPh2aIyMFPpF5mxNRMjsf01HFqMP2UFrl+TzRoZPiEdlAfif1wnH2iIP9Jr9
+ cvf3dLLIQHFdpvj2z7L3tL3i4IWmQc6TwPOmu5Db4QBkZs6QvXiyw9hydjkF8d7Skdkt
+ HDaK8kZvtARBeYfUaXoQksdPq2FSGLfAHirIP+XH8lLKIi8TgJkVa2+6IkTKabyMQfo+
+ NWaw==
+X-Gm-Message-State: AOAM5320C3KIYXnZh31G7OttveRaKDUHYeJwJV+nn0+Fb1/wVPmeVHQa
+ puYab9msI/wFRRvngj2LgAqJCmC9SMn1Pw==
+X-Google-Smtp-Source: ABdhPJwtK7z2ZKH0hU1aQbijeIY7lZ8vuNY1ReDU9cWVewUwHWU0Fls/erDhm5uLsn3CO1YMVTcuGA==
+X-Received: by 2002:a05:600c:2949:: with SMTP id
+ n9mr20589095wmd.69.1595249798244; 
+ Mon, 20 Jul 2020 05:56:38 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id p29sm34025403wmi.43.2020.07.20.05.56.37
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jul 2020 06:03:48 -0700 (PDT)
-Date: Mon, 20 Jul 2020 09:03:46 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC v2 1/1] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-Message-ID: <20200720130346.GM535743@xz-x1>
-References: <20200708141657.GA199122@xz-x1>
- <14b1ca26-448d-0feb-7529-6546809aaa59@redhat.com>
- <20200709141037.GF199122@xz-x1>
- <fb2f8d35-3f04-55ac-e0c0-7eeedbaf2429@redhat.com>
- <20200710133005.GL199122@xz-x1>
- <05bb512c-ca0a-e80e-1eed-446e918ad729@redhat.com>
- <20200716010005.GA535743@xz-x1>
- <b0319440-6e53-f274-59ba-6dbc67de69be@redhat.com>
- <20200717141806.GE535743@xz-x1>
- <d772c597-e6a2-ab88-43c5-b35b77d6c84e@redhat.com>
+ Mon, 20 Jul 2020 05:56:37 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 12/12] docs/system: Document the arm virt board
+Date: Mon, 20 Jul 2020 13:56:21 +0100
+Message-Id: <20200720125621.13460-13-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200720125621.13460-1-peter.maydell@linaro.org>
+References: <20200720125621.13460-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <d772c597-e6a2-ab88-43c5-b35b77d6c84e@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=peterx@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 03:17:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ WEIRD_QUOTING=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,23 +102,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 20, 2020 at 12:02:06PM +0800, Jason Wang wrote:
-> Right, so there's no need to deal with unmap in vtd's replay implementation
-> (as what generic one did).
+Document the arm 'virt' board, which has been undocumented
+for far too long given that it is the main recommended board
+type for arm guests.
 
-We don't even for now; see vtd_page_walk_info.notify_unmap.  Thanks,
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 20200713175746.5936-5-peter.maydell@linaro.org
+---
+ docs/system/arm/virt.rst   | 161 +++++++++++++++++++++++++++++++++++++
+ docs/system/target-arm.rst |   1 +
+ MAINTAINERS                |   1 +
+ 3 files changed, 163 insertions(+)
+ create mode 100644 docs/system/arm/virt.rst
 
+diff --git a/docs/system/arm/virt.rst b/docs/system/arm/virt.rst
+new file mode 100644
+index 00000000000..6621ab7205d
+--- /dev/null
++++ b/docs/system/arm/virt.rst
+@@ -0,0 +1,161 @@
++'virt' generic virtual platform (``virt``)
++==========================================
++
++The `virt` board is a platform which does not correspond to any
++real hardware; it is designed for use in virtual machines.
++It is the recommended board type if you simply want to run
++a guest such as Linux and do not care about reproducing the
++idiosyncrasies and limitations of a particular bit of real-world
++hardware.
++
++This is a "versioned" board model, so as well as the ``virt`` machine
++type itself (which may have improvements, bugfixes and other minor
++changes between QEMU versions) a version is provided that guarantees
++to have the same behaviour as that of previous QEMU releases, so
++that VM migration will work between QEMU versions. For instance the
++``virt-5.0`` machine type will behave like the ``virt`` machine from
++the QEMU 5.0 release, and migration should work between ``virt-5.0``
++of the 5.0 release and ``virt-5.0`` of the 5.1 release. Migration
++is not guaranteed to work between different QEMU releases for
++the non-versioned ``virt`` machine type.
++
++Supported devices
++"""""""""""""""""
++
++The virt board supports:
++
++- PCI/PCIe devices
++- Flash memory
++- One PL011 UART
++- An RTC
++- The fw_cfg device that allows a guest to obtain data from QEMU
++- A PL061 GPIO controller
++- An optional SMMUv3 IOMMU
++- hotpluggable DIMMs
++- hotpluggable NVDIMMs
++- An MSI controller (GICv2M or ITS). GICv2M is selected by default along
++  with GICv2. ITS is selected by default with GICv3 (>= virt-2.7). Note
++  that ITS is not modeled in TCG mode.
++- 32 virtio-mmio transport devices
++- running guests using the KVM accelerator on aarch64 hardware
++- large amounts of RAM (at least 255GB, and more if using highmem)
++- many CPUs (up to 512 if using a GICv3 and highmem)
++- Secure-World-only devices if the CPU has TrustZone:
++
++  - A second PL011 UART
++  - A secure flash memory
++  - 16MB of secure RAM
++
++Supported guest CPU types:
++
++- ``cortex-a7`` (32-bit)
++- ``cortex-a15`` (32-bit; the default)
++- ``cortex-a53`` (64-bit)
++- ``cortex-a57`` (64-bit)
++- ``cortex-a72`` (64-bit)
++- ``host`` (with KVM only)
++- ``max`` (same as ``host`` for KVM; best possible emulation with TCG)
++
++Note that the default is ``cortex-a15``, so for an AArch64 guest you must
++specify a CPU type.
++
++Graphics output is available, but unlike the x86 PC machine types
++there is no default display device enabled: you should select one from
++the Display devices section of "-device help". The recommended option
++is ``virtio-gpu-pci``; this is the only one which will work correctly
++with KVM. You may also need to ensure your guest kernel is configured
++with support for this; see below.
++
++Machine-specific options
++""""""""""""""""""""""""
++
++The following machine-specific options are supported:
++
++secure
++  Set ``on``/``off`` to enable/disable emulating a guest CPU which implements the
++  Arm Security Extensions (TrustZone). The default is ``off``.
++
++virtualization
++  Set ``on``/``off`` to enable/disable emulating a guest CPU which implements the
++  Arm Virtualization Extensions. The default is ``off``.
++
++highmem
++  Set ``on``/``off`` to enable/disable placing devices and RAM in physical
++  address space above 32 bits. The default is ``on`` for machine types
++  later than ``virt-2.12``.
++
++gic-version
++  Specify the version of the Generic Interrupt Controller (GIC) to provide.
++  Valid values are:
++
++  ``2``
++    GICv2
++  ``3``
++    GICv3
++  ``host``
++    Use the same GIC version the host provides, when using KVM
++  ``max``
++    Use the best GIC version possible (same as host when using KVM;
++    currently same as ``3``` for TCG, but this may change in future)
++
++its
++  Set ``on``/``off`` to enable/disable ITS instantiation. The default is ``on``
++  for machine types later than ``virt-2.7``.
++
++iommu
++  Set the IOMMU type to create for the guest. Valid values are:
++
++  ``none``
++    Don't create an IOMMU (the default)
++  ``smmuv3``
++    Create an SMMUv3
++
++ras
++  Set ``on``/``off`` to enable/disable reporting host memory errors to a guest
++  using ACPI and guest external abort exceptions. The default is off.
++
++Linux guest kernel configuration
++""""""""""""""""""""""""""""""""
++
++The 'defconfig' for Linux arm and arm64 kernels should include the
++right device drivers for virtio and the PCI controller; however some older
++kernel versions, especially for 32-bit Arm, did not have everything
++enabled by default. If you're not seeing PCI devices that you expect,
++then check that your guest config has::
++
++  CONFIG_PCI=y
++  CONFIG_VIRTIO_PCI=y
++  CONFIG_PCI_HOST_GENERIC=y
++
++If you want to use the ``virtio-gpu-pci`` graphics device you will also
++need::
++
++  CONFIG_DRM=y
++  CONFIG_DRM_VIRTIO_GPU=y
++
++Hardware configuration information for bare-metal programming
++"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
++
++The ``virt`` board automatically generates a device tree blob ("dtb")
++which it passes to the guest. This provides information about the
++addresses, interrupt lines and other configuration of the various devices
++in the system. Guest code can rely on and hard-code the following
++addresses:
++
++- Flash memory starts at address 0x0000_0000
++
++- RAM starts at 0x4000_0000
++
++All other information about device locations may change between
++QEMU versions, so guest code must look in the DTB.
++
++QEMU supports two types of guest image boot for ``virt``, and
++the way for the guest code to locate the dtb binary differs:
++
++- For guests using the Linux kernel boot protocol (this means any
++  non-ELF file passed to the QEMU ``-kernel`` option) the address
++  of the DTB is passed in a register (``r2`` for 32-bit guests,
++  or ``x0`` for 64-bit guests)
++
++- For guests booting as "bare-metal" (any other kind of boot),
++  the DTB is at the start of RAM (0x4000_0000)
+diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+index 163ab915592..4c5b0e4aab8 100644
+--- a/docs/system/target-arm.rst
++++ b/docs/system/target-arm.rst
+@@ -92,6 +92,7 @@ undocumented; you can get a complete list by running
+    arm/collie
+    arm/sx1
+    arm/stellaris
++   arm/virt
+ 
+ Arm CPU features
+ ================
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 935ccb3ab31..5e8616821a5 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -880,6 +880,7 @@ L: qemu-arm@nongnu.org
+ S: Maintained
+ F: hw/arm/virt*
+ F: include/hw/arm/virt.h
++F: docs/system/arm/virt.rst
+ 
+ Xilinx Zynq
+ M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 -- 
-Peter Xu
+2.20.1
 
 
