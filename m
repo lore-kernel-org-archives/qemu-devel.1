@@ -2,120 +2,71 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HTML_FONT_LOW_CONTRAST,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24004C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27AEBC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:25:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2B13208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:21:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=exaleapsemi.onmicrosoft.com header.i=@exaleapsemi.onmicrosoft.com header.b="gafijPXg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B13208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=exaleapsemi.com
+	by mail.kernel.org (Postfix) with ESMTPS id 00109208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:25:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00109208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxaPN-0003w4-Ui
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 14:21:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33632)
+	id 1jxaTf-0005Je-5j
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 14:25:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34626)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Pankaj.VJ@exaleapsemi.com>)
- id 1jxaO9-0003V5-Le
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:19:45 -0400
-Received: from mail-eopbgr1390132.outbound.protection.outlook.com
- ([40.107.139.132]:16190 helo=IND01-BO1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jxaSW-0004os-La
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:24:16 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40754)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Pankaj.VJ@exaleapsemi.com>)
- id 1jxaO6-0003Kd-D5
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:19:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xd+llfATo14cU0R3PbhWtOdbtbiggLjhnecDH8Fhvb3m9YDT7LyncgrS8MlHrmhCrwmanfVsb3fSiWZt5AYU5JvS3idHlGkwpJBDjQzF/P37mr40QK3w+4z3ffP2k3qwKvjZZ/Hw0YXJW77R8XavPa3pc8LB0qIve4jwwYfbfX2Dl1g0FQ+eOxtTG5WpER3nPdW91smLEo5HKr+fEzTSt/Sj5wMZWJMBjjWcBgvzDKL5IW4abXBssPWr/4yFq3YOZ2ttaJo9+uI41rJ1j4EQItjVlQNAZkgYb8JawjimJwTeXbPLqIH4MeRwYTJLZtfFlYFLw+Fd345Iyt0N+XHH3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cDGzS1gEmBM904x0agXAYJiHHX1iIewjMP4oLTfoDLE=;
- b=Cc8JthDqp1WDQNMlahHZ/vs5LzTF1KGxFFhd5wjCII/oGxMVD6NgyW7dqe1MN5ubN2ghstoc/qwdAqNcbY364cf32qHOKeJYF8Terw91lfqDsW+G39TsSeRNfmzuM2FDY0J44hMkiuSAncW7RKMx+yD5HBYJj3DE8WBz9t0PCcmAks6dUSx3mn/sgAuEAxGgD58Y6GWkjbr0jUhtJNruu8HkIVw5UCOenP4EZvwPi/n2lPWr7Jp5u3LTYIDBLEQqIhqiBHplOh6nHnZlE4W9C/Tef0Au5XS7h0V1B6kLhpgbdKujQ25cssdXqjUb2H9jPgJV0FFhuiKRFQZBCNau+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=exaleapsemi.com; dmarc=pass action=none
- header.from=exaleapsemi.com; dkim=pass header.d=exaleapsemi.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=exaleapsemi.onmicrosoft.com; s=selector2-exaleapsemi-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cDGzS1gEmBM904x0agXAYJiHHX1iIewjMP4oLTfoDLE=;
- b=gafijPXgvsmaJg/OJgtwW1VilxW4X0L6egEBWtVLuBmMyR2Le1P44h+BsdUaVzilxhCOzBrKOXoNmIogkJgrlGAV8gXBaAUH9BhZhgAFD7cJP09jbiJuRiSGOTotNDthsaS5ELKAdg6tHwTTAZwqNiP7CKlQZMZCNIGdfalcY00=
-Received: from BMXPR01MB2344.INDPRD01.PROD.OUTLOOK.COM (2603:1096:b00:36::20)
- by BM1PR0101MB1521.INDPRD01.PROD.OUTLOOK.COM (2603:1096:b00:1e::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17; Mon, 20 Jul
- 2020 18:19:36 +0000
-Received: from BMXPR01MB2344.INDPRD01.PROD.OUTLOOK.COM
- ([fe80::adf5:6e2d:b2df:3e72]) by BMXPR01MB2344.INDPRD01.PROD.OUTLOOK.COM
- ([fe80::adf5:6e2d:b2df:3e72%2]) with mapi id 15.20.3195.025; Mon, 20 Jul 2020
- 18:19:36 +0000
-From: "Pankaj  Vinadrao Joshi" <Pankaj.VJ@exaleapsemi.com>
-To: Alistair Francis <alistair23@gmail.com>
-Subject: Re: Replacing existing kernel with new on qemuriscv64
-Thread-Topic: Replacing existing kernel with new on qemuriscv64
-Thread-Index: AQHWXmlvPudUmHc3zkyu85nr5qnBjKkQsVcAgAAU6Ks=
-Date: Mon, 20 Jul 2020 18:19:36 +0000
-Message-ID: <BMXPR01MB2344CFB0D2C0CBD133ACCD0AEE7B0@BMXPR01MB2344.INDPRD01.PROD.OUTLOOK.COM>
-References: <BMXPR01MB2344EC13172300E0384B97B8EE7B0@BMXPR01MB2344.INDPRD01.PROD.OUTLOOK.COM>,
- <CAKmqyKOsS+bTM=R4gEHBaDCGh3Lmo-bKiG=zbnHS30EwP70RoQ@mail.gmail.com>
-In-Reply-To: <CAKmqyKOsS+bTM=R4gEHBaDCGh3Lmo-bKiG=zbnHS30EwP70RoQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=exaleapsemi.com;
-x-originating-ip: [2405:204:9590:b44:e582:8190:55ba:b0a4]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 091797fd-2e09-449d-3974-08d82cd975a3
-x-ms-traffictypediagnostic: BM1PR0101MB1521:
-x-microsoft-antispam-prvs: <BM1PR0101MB15211499457803C2664ABF23EE7B0@BM1PR0101MB1521.INDPRD01.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: dkVVc8cQ4vxZ83K6745dWN58MmyELBQpLSF+/gW+aaOooFsypmoWTn4yBUlCf5dmm0CsvMP9JgEGfZvHeI7KtqGPLGJZPJV9b0VEfbNXc+wa1P/nyMbqHMXCy7c29H8WFZsBNraGgScTny02BuUpvtfAyPSrNDjsBuHTOdjysAai+vXwFVeESxo9X1bvlJnDEv7dupXM0ultCNdAJeA3uaSYj7MrnvVwasL1SGrGx0zJYaORxIMBJe5/EGk3kg25th+Gy/ZwvsWiCFr8WhN6tKKufAKobM8dHC/61quYPf23Q/+ceq1aBH6PmZ1BHjwz+bDaNvEv+rF66ZkuYcNRuA==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BMXPR01MB2344.INDPRD01.PROD.OUTLOOK.COM; PTR:; CAT:NONE;
- SFTY:;
- SFS:(396003)(376002)(39830400003)(366004)(136003)(346002)(4326008)(33656002)(8936002)(52536014)(186003)(2906002)(508600001)(8676002)(316002)(5660300002)(55016002)(83380400001)(66946007)(66556008)(64756008)(66476007)(76116006)(19627405001)(7696005)(66446008)(6506007)(86362001)(6916009)(71200400001)(9686003)(53546011);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: +GmPK+NEJGPvtImOAorVGyj9dHceO1FOKgwxV33NU98xxE0lRWGO/26fywmkDDnTKA7jG5Hq2tUeYMs7NB97IZ57Fp1C6N0kPHPi9AynqzmJ8ZTGrM+8Ly0DC89jodr3jilKvfn44Zep5W6UC3kzAv5jrO8ZupV5Izd0pSwj0vfRlLi092WgRbcYPd26neDjqSk6teIsGKh2ABnrJlebq/2QHMTitxs1HvTgJeNTrIiKEDbsbM2v4IIhTqSuBTFDbERu/ippTIKQQGuwN3ADJJ+jlpSBaxAysaeFc+CfS3KKw8x72zei90EphaQmEX7GDpyJqH98TZMwG+IXln6m6REWyil2iLookhNPwLP0X7/F5L0+UgKVAth17jfBVf/HU+aoZJQGbPoX5nNSMm/+qLOr+YtgGPFcf3w4wLpQXuCdb/nkcY0ZXTqy/nv8a5V0E46KRxYCCoKfK/mHKYBsjV4BotKpW4HGpEphUGRWZbr6/PwSQL28vQ/hsmIuajVadpNvJJY99ZuRuEmtZSr/84+RHWlfLS2DIpVSUF9rXRg=
-x-ms-exchange-transport-forked: True
-Content-Type: multipart/alternative;
- boundary="_000_BMXPR01MB2344CFB0D2C0CBD133ACCD0AEE7B0BMXPR01MB2344INDP_"
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jxaSU-00040d-J3
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:24:16 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id D518DB710;
+ Mon, 20 Jul 2020 18:24:18 +0000 (UTC)
+Subject: Re: migration: broken snapshot saves appear on s390 when small fields
+ in migration stream removed
+From: Claudio Fontana <cfontana@suse.de>
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf
+ <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+References: <8bbafdec-836d-b7de-cab8-7a325b6e238d@suse.de>
+ <55c406cd-b9ca-4e9b-0acd-d33cfe2a70e3@redhat.com>
+ <bf074240-8cc3-96ff-e95e-bd301822b756@suse.de>
+ <ea3b617f-c2ea-534c-06ba-f5f9f43828a7@suse.de>
+ <8125b1ff-373a-aadc-eccf-27c567007a27@redhat.com>
+ <8ff7eeab-bef1-0957-a95c-72819680c431@suse.de>
+ <1db6d502-73d1-5e3d-10d1-796d80ab8f07@suse.de>
+Message-ID: <13728e69-75a5-2edc-9ed3-6e08d94c722d@suse.de>
+Date: Mon, 20 Jul 2020 20:24:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-OriginatorOrg: exaleapsemi.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BMXPR01MB2344.INDPRD01.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 091797fd-2e09-449d-3974-08d82cd975a3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jul 2020 18:19:36.5292 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 34df156e-9bc4-4450-9e80-487c0e7f9471
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WSGpb+pbPHbvd0kV/J1fb1BPGX/9Z16l5vWdU3LxlOdc6zIyRLRkjUi9aNryI03Lk6Dl7kaIracT6KtyDaIzptMESWSRsemjwLTt3xFx68c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BM1PR0101MB1521
-Received-SPF: pass client-ip=40.107.139.132;
- envelope-from=Pankaj.VJ@exaleapsemi.com;
- helo=IND01-BO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 14:19:38
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HTML_FONT_LOW_CONTRAST=0.001, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1db6d502-73d1-5e3d-10d1-796d80ab8f07@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 00:22:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,448 +79,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
+ Liang Yan <lyan@suse.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Bruce Rogers <brogers@suse.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_BMXPR01MB2344CFB0D2C0CBD133ACCD0AEE7B0BMXPR01MB2344INDP_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+I have now been able to reproduce this on X86 as well.
 
-Hi Alistair Francis,
+It happens much more rarely, about once every 10 times.
 
-Thanks for your response.I have same concern for other riscv hardware with =
-custom kernel will same be applicable for it?If no from where i should chan=
-ge my kernel image since there also i am not able to find grub and the clar=
-ification given on web are seems to be very specific to x86 arch where i sh=
-ould look in case of riscv ??
+I will sort out the data and try to make it even more reproducible, then post my findings in detail.
 
-Thanks
+Overall I proceeded as follows:
 
-________________________________
-From: Alistair Francis <alistair23@gmail.com>
-Sent: Monday, July 20, 2020 10:29 PM
-To: Pankaj Vinadrao Joshi <Pankaj.VJ@exaleapsemi.com>
-Cc: qemu-devel@nongnu.org <qemu-devel@nongnu.org>
-Subject: Re: Replacing existing kernel with new on qemuriscv64
+1) hooked the savevm code to skip all fields with the exception of "s390-skeys". So only s390-skeys are actually saved.
 
-On Mon, Jul 20, 2020 at 2:46 AM Pankaj Vinadrao Joshi
-<Pankaj.VJ@exaleapsemi.com> wrote:
->
-> Hi ,
-> I am trying to replace my existing kernel image which is 5.5.6 to 5.5.7 o=
-n qemuriscv64 i would like to mention i have built my qemu image with opene=
-mbedded-core.
->
-> i have tried to build the kernel 5.5.7 natively,i was able to build the k=
-ernel successfully and in my /boot folder i am able to see vmlinux-5.5.7  b=
-ut now i want to install this image..i have tried to do it by make install =
-i didnt got any error with it but when i rebooted my system i am getting
->
-> i have followed the following steps to build kernel
-> $root@qemuriscv64-exaleapsemi-r2:/usr/src/kernel#  make menuconfig arch=
-=3Driscv64
-> $root@qemuriscv64-exaleapsemi-r2:/usr/src/kernel# make -j4
-> $root@qemuriscv64-exaleapsemi-r2:/usr/src/kernel# make modules_install
-> $root@qemuriscv64-exaleapsemi-r2:/usr/src/kernel# make install
-> sh ./arch/riscv/boot/install.sh 5.5.7 \
-> arch/riscv/boot/Image System.map "/boot"
-> Installing normal kernel
->
-> $reboot
-> 13024.451157] printk: systemd-shutdow: 37 output lines suppressed due to =
-ratelimiting
-> [13024.527282] systemd-shutdown[1]: Syncing filesystems and block devices=
-.
-> [13024.668538] systemd-shutdown[1]: Sending SIGTERM to remaining processe=
-s...
-> [13024.719496] systemd-journald[87]: Received SIGTERM from PID 1 (systemd=
--shutdow).
-> [13024.769405] systemd-shutdown[1]: Sending SIGKILL to remaining processe=
-s...
-> [13024.834318] systemd-shutdown[1]: Unmounting file systems.
-> [13024.868285] [13413]: Remounting '/' read-only in with options '(null)'=
-.
-> [13025.228499] EXT4-fs (vda): re-mounted. Opts: (null)
-> [13025.358123] systemd-shutdown[1]: All filesystems unmounted.
-> [13025.358576] systemd-shutdown[1]: Deactivating swaps.
-> [13025.361264] systemd-shutdown[1]: All swaps deactivated.
-> [13025.361727] systemd-shutdown[1]: Detaching loop devices.
-> [13025.420602] systemd-shutdown[1]: All loop devices detached.
-> [13025.421071] systemd-shutdown[1]: Detaching DM devices.
-> [13025.595237] reboot: Restarting system
-> [13046.599875] rcu: INFO: rcu_sched detected stalls on CPUs/tasks:
-> [13046.600329] (detected by 0, t=3D5252 jiffies, g=3D2837145, q=3D17)
-> [13046.600763] rcu: All QSes seen, last rcu_sched kthread activity 5252 (=
-4298153942-4298148690), jiffies_till_next_fqs=3D1, root ->qsmask 0x0
-> [13046.601503] systemd-shutdow R  running task        0     1      0 0x00=
-000008
-> [13046.602053] Call Trace:
-> [13046.602562] [<ffffffe00006d3fc>] walk_stackframe+0x0/0xa4
-> [13046.602890] [<ffffffe00006d5e2>] show_stack+0x2a/0x34
-> [13046.603156] [<ffffffe000091094>] sched_show_task+0x158/0x174
-> [13046.603442] [<ffffffe0000c4dde>] rcu_sched_clock_irq+0x6b2/0x6ec
-> [13046.603740] [<ffffffe0000ccadc>] update_process_times+0x1e/0x44
-> [13046.604009] [<ffffffe0000d79dc>] tick_sched_handle.isra.16+0x30/0x3e
-> [13046.604331] [<ffffffe0000d7a38>] tick_sched_timer+0x4e/0x94
-> [13046.604620] [<ffffffe0000cd44a>] __hrtimer_run_queues+0x10c/0x2de
-> [13046.604928] [<ffffffe0000cdc96>] hrtimer_interrupt+0xcc/0x1d6
-> [13046.605236] [<ffffffe0005d3f7c>] riscv_timer_interrupt+0x32/0x3a
-> [13046.605580] [<ffffffe0007889ce>] do_IRQ+0xae/0xba
-> [13046.605837] [<ffffffe00006bd3c>] ret_from_exception+0x0/0xc
-> [13046.606127] [<ffffffe00006ca58>] machine_restart+0xc/0xe
-> [13046.606508] rcu: rcu_sched kthread starved for 5252 jiffies! g2837145 =
-f0x2 RCU_GP_WAIT_FQS(5) ->state=3D0x0 ->cpu=3D0
-> [13046.606990] rcu: RCU grace-period kthread stack dump:
-> [13046.607257] rcu_sched       R  running task        0    10      2 0x00=
-000000
-> [13046.607610] Call Trace:
-> [13046.607774] [<ffffffe000784258>] __schedule+0x1a8/0x482
-> [13046.608044] [<ffffffe000784592>] schedule+0x60/0xda
-> [13046.608304] [<ffffffe000787a56>] schedule_timeout+0x15c/0x2b2
-> [13046.608602] [<ffffffe0000c2ec8>] rcu_gp_kthread+0x4cc/0x7ec
-> [13046.608889] [<ffffffe00008b0f2>] kthread+0xf0/0x102
-> [13046.609162] [<ffffffe00006bd3c>] ret_from_exception+0x0/0xc
->
-> ..... so on getting continuously......
->
->
-> Can someone help me out how i can replace my kernel to 5.5.7 since i am n=
-ot able to find grub or grub2 on my riscv platform?? i have googled for the=
- solution but most of them seems to be x86 specific where they are trying t=
-o change the grub??Where i should modify for riscv to get my kernel up????
+2) reimplemented "s390-skeys" in a common implementation in cpus.c, used on both x86 and s390, modeling the behaviour of save/load from hw/s390
 
-You won't be able to install a new kernel from the QEMU guest. You
-will need to use OpenEmbedded to build a new kernel and boot that.
+3) ran ./check -qcow2 267 on both x86 and s390.
 
-Alistair
+In the case of s390, failure seems to be reproducible 100% of the times.
+On X86, it is as mentioned failing about 10% of the times.
 
->
->
-> Thanks
-[EXT]
+Ciao,
 
---_000_BMXPR01MB2344CFB0D2C0CBD133ACCD0AEE7B0BMXPR01MB2344INDP_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Claudio
 
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-Hi Alistair Francis,</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-<br>
-</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-Thanks for your response.I have same concern for other riscv hardware with =
-custom kernel will same be applicable for it?If no from where i should chan=
-ge my kernel image since there also i am not able to find grub and the clar=
-ification given on web are seems
- to be very specific to x86 arch where i should look in case of riscv ??</d=
-iv>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-<br>
-</div>
-<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
-: 12pt; color: rgb(0, 0, 0);">
-Thanks</div>
-<div id=3D"appendonsend"></div>
-<div style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12p=
-t; color:rgb(0,0,0)">
-<br>
-</div>
-<hr tabindex=3D"-1" style=3D"display:inline-block; width:98%">
-<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" co=
-lor=3D"#000000" style=3D"font-size:11pt"><b>From:</b> Alistair Francis &lt;=
-alistair23@gmail.com&gt;<br>
-<b>Sent:</b> Monday, July 20, 2020 10:29 PM<br>
-<b>To:</b> Pankaj Vinadrao Joshi &lt;Pankaj.VJ@exaleapsemi.com&gt;<br>
-<b>Cc:</b> qemu-devel@nongnu.org &lt;qemu-devel@nongnu.org&gt;<br>
-<b>Subject:</b> Re: Replacing existing kernel with new on qemuriscv64</font=
->
-<div>&nbsp;</div>
-</div>
-<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt"=
->
-<div class=3D"PlainText"><span style=3D"font-family: calibri, arial, helvet=
-ica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0); background-color: rg=
-ba(0, 0, 0, 0);">On Mon, Jul 20, 2020 at 2:46 AM Pankaj Vinadrao Joshi</spa=
-n><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&lt;Pank=
-aj.VJ@exaleapsemi.com&gt; wrote:</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt;</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; Hi =
-,</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; I a=
-m trying to replace my existing kernel image which is 5.5.6 to 5.5.7 on qem=
-uriscv64 i would like to mention i have
- built my qemu image with openembedded-core.</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt;</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; i h=
-ave tried to build the kernel 5.5.7 natively,i was able to build the kernel=
- successfully and in my /boot folder
- i am able to see vmlinux-5.5.7&nbsp; but now i want to install this image.=
-.i have tried to do it by make install i didnt got any error with it but wh=
-en i rebooted my system i am getting</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt;</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; i h=
-ave followed the following steps to build kernel</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; $ro=
-ot@qemuriscv64-exaleapsemi-r2:/usr/src/kernel#&nbsp; make menuconfig arch=
-=3Driscv64</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; $ro=
-ot@qemuriscv64-exaleapsemi-r2:/usr/src/kernel# make -j4</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; $ro=
-ot@qemuriscv64-exaleapsemi-r2:/usr/src/kernel# make modules_install</span><=
-br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; $ro=
-ot@qemuriscv64-exaleapsemi-r2:/usr/src/kernel# make install</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; sh =
-./arch/riscv/boot/install.sh 5.5.7 \</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; arc=
-h/riscv/boot/Image System.map &quot;/boot&quot;</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; Ins=
-talling normal kernel</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt;</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; $re=
-boot</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; 130=
-24.451157] printk: systemd-shutdow: 37 output lines suppressed due to ratel=
-imiting</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-024.527282] systemd-shutdown[1]: Syncing filesystems and block devices.</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-024.668538] systemd-shutdown[1]: Sending SIGTERM to remaining processes...<=
-/span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-024.719496] systemd-journald[87]: Received SIGTERM from PID 1 (systemd-shut=
-dow).</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-024.769405] systemd-shutdown[1]: Sending SIGKILL to remaining processes...<=
-/span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-024.834318] systemd-shutdown[1]: Unmounting file systems.</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-024.868285] [13413]: Remounting '/' read-only in with options '(null)'.</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-025.228499] EXT4-fs (vda): re-mounted. Opts: (null)</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-025.358123] systemd-shutdown[1]: All filesystems unmounted.</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-025.358576] systemd-shutdown[1]: Deactivating swaps.</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-025.361264] systemd-shutdown[1]: All swaps deactivated.</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-025.361727] systemd-shutdown[1]: Detaching loop devices.</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-025.420602] systemd-shutdown[1]: All loop devices detached.</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-025.421071] systemd-shutdown[1]: Detaching DM devices.</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-025.595237] reboot: Restarting system</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.599875] rcu: INFO: rcu_sched detected stalls on CPUs/tasks:</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.600329] (detected by 0, t=3D5252 jiffies, g=3D2837145, q=3D17)</span><b=
-r>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.600763] rcu: All QSes seen, last rcu_sched kthread activity 5252 (42981=
-53942-4298148690), jiffies_till_next_fqs=3D1,
- root -&gt;qsmask 0x0</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.601503] systemd-shutdow R&nbsp; running task&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0=
- 0x00000008</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.602053] Call Trace:</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.602562] [&lt;ffffffe00006d3fc&gt;] walk_stackframe&#43;0x0/0xa4</span><=
-br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.602890] [&lt;ffffffe00006d5e2&gt;] show_stack&#43;0x2a/0x34</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.603156] [&lt;ffffffe000091094&gt;] sched_show_task&#43;0x158/0x174</spa=
-n><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.603442] [&lt;ffffffe0000c4dde&gt;] rcu_sched_clock_irq&#43;0x6b2/0x6ec<=
-/span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.603740] [&lt;ffffffe0000ccadc&gt;] update_process_times&#43;0x1e/0x44</=
-span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.604009] [&lt;ffffffe0000d79dc&gt;] tick_sched_handle.isra.16&#43;0x30/0=
-x3e</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.604331] [&lt;ffffffe0000d7a38&gt;] tick_sched_timer&#43;0x4e/0x94</span=
-><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.604620] [&lt;ffffffe0000cd44a&gt;] __hrtimer_run_queues&#43;0x10c/0x2de=
-</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.604928] [&lt;ffffffe0000cdc96&gt;] hrtimer_interrupt&#43;0xcc/0x1d6</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.605236] [&lt;ffffffe0005d3f7c&gt;] riscv_timer_interrupt&#43;0x32/0x3a<=
-/span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.605580] [&lt;ffffffe0007889ce&gt;] do_IRQ&#43;0xae/0xba</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.605837] [&lt;ffffffe00006bd3c&gt;] ret_from_exception&#43;0x0/0xc</span=
-><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.606127] [&lt;ffffffe00006ca58&gt;] machine_restart&#43;0xc/0xe</span><b=
-r>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.606508] rcu: rcu_sched kthread starved for 5252 jiffies! g2837145 f0x2 =
-RCU_GP_WAIT_FQS(5) -&gt;state=3D0x0 -&gt;cpu=3D0</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.606990] rcu: RCU grace-period kthread stack dump:</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.607257] rcu_sched&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; R&nbsp; running t=
-ask&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp; 10&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp; 2 0x00000000</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.607610] Call Trace:</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.607774] [&lt;ffffffe000784258&gt;] __schedule&#43;0x1a8/0x482</span><br=
->
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.608044] [&lt;ffffffe000784592&gt;] schedule&#43;0x60/0xda</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.608304] [&lt;ffffffe000787a56&gt;] schedule_timeout&#43;0x15c/0x2b2</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.608602] [&lt;ffffffe0000c2ec8&gt;] rcu_gp_kthread&#43;0x4cc/0x7ec</span=
-><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.608889] [&lt;ffffffe00008b0f2&gt;] kthread&#43;0xf0/0x102</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; [13=
-046.609162] [&lt;ffffffe00006bd3c&gt;] ret_from_exception&#43;0x0/0xc</span=
-><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt;</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; ...=
-.. so on getting continuously......</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt;</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt;</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; Can=
- someone help me out how i can replace my kernel to 5.5.7 since i am not ab=
-le to find grub or grub2 on my riscv
- platform?? i have googled for the solution but most of them seems to be x8=
-6 specific where they are trying to change the grub??Where i should modify =
-for riscv to get my kernel up????</span><br>
-<br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">You won'=
-t be able to install a new kernel from the QEMU guest. You</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">will nee=
-d to use OpenEmbedded to build a new kernel and boot that.</span><br>
-<br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">Alistair=
-</span><br>
-<br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt;</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt;</sp=
-an><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">&gt; Tha=
-nks</span><br>
-<span style=3D"font-family: calibri, arial, helvetica, sans-serif; font-siz=
-e: 12pt; color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0);">[EXT]</s=
-pan><br>
-</div>
-</span></font></div>
-</body>
-</html>
 
---_000_BMXPR01MB2344CFB0D2C0CBD133ACCD0AEE7B0BMXPR01MB2344INDP_--
+On 7/16/20 2:58 PM, Claudio Fontana wrote:
+> Small update on this,
+> 
+> On 7/15/20 1:10 PM, Claudio Fontana wrote:
+>> Hi Thomas,
+>>
+>> On 7/14/20 4:35 PM, Thomas Huth wrote:
+>>> On 14/07/2020 16.29, Claudio Fontana wrote:
+>>>> Hello,
+>>>>
+>>>> I have some tiny progress in narrowing down this issue, possibly a qcow2 issue, still unclear,
+>>>> but involving Kevin Wolf and Max Reitz.
+>>>>
+>>>>
+>>>> The reproducer again:
+>>>>
+>>>>> --------------------------------------------cut-------------------------------------------
+>>>>> diff --git a/cpus.c b/cpus.c
+>>>>> index 41d1c5099f..443b88697a 100644
+>>>>> --- a/cpus.c
+>>>>> +++ b/cpus.c
+>>>>> @@ -643,7 +643,7 @@ static void qemu_account_warp_timer(void)
+>>>>>  
+>>>>>  static bool icount_state_needed(void *opaque)
+>>>>>  {
+>>>>> -    return use_icount;
+>>>>> +    return 0;
+>>>>>  }
+>>>>>  
+>>>>>  static bool warp_timer_state_needed(void *opaque)
+>>>>> --------------------------------------------cut-------------------------------------------
+>>>>
+>>>> This issue for now appears on s390 only:
+>>>>
+>>>> On s390 hardware, test 267 fails (both kvm and tcg) in the qcow2 backing file part, with broken migration stream data in the s390-skeys vmsave (old style).
+>>> [...]
+>>>> If someone has a good idea let me know - first attempts to reproduce on x86 failed, but maybe more work could lead to it.
+>>>
+>>
+>> small update: in the GOOD case (enough padding added) a qcow_merge() is triggered for the last write of 16202 bytes.
+>> In the BAD case (not enough padding added) a qcow_merge() is not triggered for the last write of 16201 bytes.
+>>
+>> Note: manually flushing with qemu_fflush in s390-skeys vmsave also works (maybe got lost in the noise).
+>>
+>>
+>>> Two questions:
+>>>
+>>> 1) Can you also reproduce the issue manually, without running iotest
+>>> 267? ... I tried, but so far I failed.
+>>
+>> Thanks for the suggestion, will try.
+> 
+> Currently trying to reproduce manually an environment similar to that of the test,
+> at the moment I am not able to reproduce the issue manually.
+> 
+> Not very familiar with s390,
+> I've been running with 
+> 
+> export QEMU=/home/cfontana/qemu-build/s390x-softmmu/qemu-system-s390x
+> 
+> $QEMU -nographic -monitor stdio -nodefaults -no-shutdown FILENAME
+> 
+> where FILENAME is the qcow2 produced by the test.
+> 
+> let me know if you have a suggestion on how to setup up something simple properly.
+> 
+> 
+>>
+>>>
+>>> 2) Since all the information so far sounds like the problem could be
+>>> elsewhere in the code, and the skeys just catch it by accident ... have
+>>> you tried running with valgrind? Maybe it catches something useful?
+>>
+>> Nothing yet, but will fiddle with the options a bit more.
+> 
+> Only thing I have seen so far:
+> 
+> 
+> +==33321== 
+> +==33321== Warning: client switching stacks?  SP change: 0x1ffeffe5e8 --> 0x5d9cf60
+> +==33321==          to suppress, use: --max-stackframe=137324009096 or greater
+> +==33321== Warning: client switching stacks?  SP change: 0x5d9cd18 --> 0x1ffeffe5e8
+> +==33321==          to suppress, use: --max-stackframe=137324009680 or greater
+> +==33321== Warning: client switching stacks?  SP change: 0x1ffeffe8b8 --> 0x5d9ce58
+> +==33321==          to suppress, use: --max-stackframe=137324010080 or greater
+> +==33321==          further instances of this message will not be shown.
+> +==33321== Thread 4:
+> +==33321== Conditional jump or move depends on uninitialised value(s)
+> +==33321==    at 0x3AEC70: process_queued_cpu_work (cpus-common.c:331)
+> +==33321==    by 0x2753E1: qemu_wait_io_event_common (cpus.c:1213)
+> +==33321==    by 0x2755CD: qemu_wait_io_event (cpus.c:1253)
+> +==33321==    by 0x27596D: qemu_dummy_cpu_thread_fn (cpus.c:1337)
+> +==33321==    by 0x725C87: qemu_thread_start (qemu-thread-posix.c:521)
+> +==33321==    by 0x4D504E9: start_thread (in /lib64/libpthread-2.26.so)
+> +==33321==    by 0x4E72BBD: ??? (in /lib64/libc-2.26.so)
+> +==33321== 
+> +==33321== Conditional jump or move depends on uninitialised value(s)
+> +==33321==    at 0x3AEC74: process_queued_cpu_work (cpus-common.c:331)
+> +==33321==    by 0x2753E1: qemu_wait_io_event_common (cpus.c:1213)
+> +==33321==    by 0x2755CD: qemu_wait_io_event (cpus.c:1253)
+> +==33321==    by 0x27596D: qemu_dummy_cpu_thread_fn (cpus.c:1337)
+> +==33321==    by 0x725C87: qemu_thread_start (qemu-thread-posix.c:521)
+> +==33321==    by 0x4D504E9: start_thread (in /lib64/libpthread-2.26.so)
+> +==33321==    by 0x4E72BBD: ??? (in /lib64/libc-2.26.so)
+> +==33321== 
+> +==33321== 
+> +==33321== HEAP SUMMARY:
+> +==33321==     in use at exit: 2,138,442 bytes in 13,935 blocks
+> +==33321==   total heap usage: 19,089 allocs, 5,154 frees, 5,187,670 bytes allocated
+> +==33321== 
+> +==33321== LEAK SUMMARY:
+> +==33321==    definitely lost: 0 bytes in 0 blocks
+> +==33321==    indirectly lost: 0 bytes in 0 blocks
+> +==33321==      possibly lost: 7,150 bytes in 111 blocks
+> +==33321==    still reachable: 2,131,292 bytes in 13,824 blocks
+> +==33321==         suppressed: 0 bytes in 0 blocks
+> +==33321== Rerun with --leak-check=full to see details of leaked memory
+> 
+> 
+>>
+>>>
+>>>  Thomas
+>>>
+>>
+>> Ciao,
+>>
+>> Claudio
+>>
+>>
+> 
+> A more interesting update is what follows I think.
+> 
+> I was able to "fix" the problem shown by the reproducer:
+> 
+> @@ -643,7 +643,7 @@ static void qemu_account_warp_tim@@ -643,7 +643,7 @@ static void qemu_account_warp_timer(void)
+>  
+>  static bool icount_state_needed(void *opaque)
+>  {
+> -    return use_icount;
+> +    return 0;
+>  }
+>  
+> by just slowing down qcow2_co_pwritev_task_entry with some tight loops,
+> without changing any fields between runs (other than the reproducer icount field removal).
+> 
+> I tried to insert the same slowdown just in savevm.c at the end of save_snapshot, but that does not work, needs to be in the coroutine.
+> 
+> Thanks,
+> 
+> Claudio
+> 
+> 
+
 
