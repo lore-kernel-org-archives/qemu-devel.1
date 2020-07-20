@@ -2,108 +2,69 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 993ECC433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 11:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C91C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 11:26:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6842C2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 11:10:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5E2C22B4D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 11:26:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="v0RdklsZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6842C2073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XReR5HJ2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5E2C22B4D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxTh9-000174-Jd
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 07:10:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58106)
+	id 1jxTwT-00053o-49
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 07:26:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1jxTgG-0000UG-2M; Mon, 20 Jul 2020 07:10:00 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:44222)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jxTvr-0004XG-SR; Mon, 20 Jul 2020 07:26:07 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:43635 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1jxTgD-000143-U5; Mon, 20 Jul 2020 07:09:59 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
- by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06KB9lZi057594;
- Mon, 20 Jul 2020 11:09:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : in-reply-to : references : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=ZOMzm1Kxvlis28sH8SEJP1cGp6fTHe5i7/HG9cmAgcU=;
- b=v0RdklsZwfPobasxEZoOaB3Ds3l7BJN9ZEd5s+67GJKt3E2XU/w8CcHccRMp/gmp1OZ2
- Gi6dCIPrvae/xfBUWNsXEs5cKLQfcRSJW7GhdcpSFp7qVCSWSPWB+1YpnUPS6tnkNaZk
- +RjhHN8HVNOZRjnNfYEtFnrH6dRfrVYrE4+8f10waA3dLLkAWQEma4VX0p7SK3d0p2n9
- sOdCngyzw6Oo7i7+D0AFJzNfm+rdBgcTHEexwdm7Pkz5ZmxBXD/7q4KwUi7qtBTB02xn
- jY7kCH2EXUet7dNumXvVU6X4J7nMInfOyOyV5aWzJEDBb5BNB70sFLY/yw6+FG3hAB4W gQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2130.oracle.com with ESMTP id 32bpkaxfkg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Mon, 20 Jul 2020 11:09:47 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06KAw6MB167381;
- Mon, 20 Jul 2020 11:07:46 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3020.oracle.com with ESMTP id 32d9wb0p2u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 20 Jul 2020 11:07:46 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06KB7jDA023818;
- Mon, 20 Jul 2020 11:07:45 GMT
-Received: from starbug-mbp.localdomain (/79.97.215.145)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 20 Jul 2020 04:07:45 -0700
-Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id ACB29CEC2C2; Mon, 20 Jul 2020 12:07:47 +0100 (IST)
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-Subject: Re: [RFC PATCH-for-5.1 v2] hw/ide: Avoid #DIV/0! FPU exception by
- setting CD-ROM sector count
-In-Reply-To: <20200717133847.10974-1-f4bug@amsat.org>
-References: <20200717133847.10974-1-f4bug@amsat.org>
-Date: Mon, 20 Jul 2020 12:07:47 +0100
-Message-ID: <m2eep68mws.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jxTvo-0003W0-78; Mon, 20 Jul 2020 07:26:07 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4B9KD56tJHz9sRf; Mon, 20 Jul 2020 21:25:57 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1595244357;
+ bh=cXadi8ggnXTkGx7kvvgkf7phpqLH/qKyNQ/W3TJlC5A=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=XReR5HJ29P5VL3FvhW2Y0k+pFD4DW4QZ8SDAzoRA9PsKr55t/OV3fHgG2hxYH+SWW
+ LMVCQe2xhPHGE7PbghiaIN5Dfn43qwB0LccMcOfoAFpfpuJGg1e+EVx3T2ql1pSNlK
+ wEWXVyIK6eUO7NU84hsi1hfWx7m8aqnhqyJFli2I=
+Date: Mon, 20 Jul 2020 21:25:51 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH for-5.2] spapr: Simplify error handling in
+ spapr_phb_realize()
+Message-ID: <20200720112551.GF215446@umbus.fritz.box>
+References: <159500760539.383731.10928308889360009122.stgit@bahia.lan>
+ <87lfjefsbh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9687
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- mlxlogscore=999 mlxscore=0
- spamscore=0 adultscore=0 bulkscore=0 malwarescore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007200078
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9687
- signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- bulkscore=0
- mlxlogscore=999 mlxscore=0 malwarescore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007200079
-Received-SPF: pass client-ip=141.146.126.79;
- envelope-from=darren.kenny@oracle.com; helo=aserp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 07:09:52
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="lYetfuAxy9ic4HK3"
+Content-Disposition: inline
+In-Reply-To: <87lfjefsbh.fsf@dusky.pond.sub.org>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 07:25:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,72 +77,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Friday, 2020-07-17 at 15:38:47 +02, Philippe Mathieu-Daud=C3=A9 wrote:
-> libFuzzer found an undefined behavior (#DIV/0!) in ide_set_sector()
-> when using a CD-ROM (reproducer available on the BugLink):
->
->   UndefinedBehaviorSanitizer:DEADLYSIGNAL
->   =3D=3D12163=3D=3DERROR: UndefinedBehaviorSanitizer: FPE on unknown addr=
-ess 0x5616279cffdc (pc 0x5616279cffdc bp 0x7ffcdaabae90 sp 0x7ffcdaabae30 T=
-12163)
->
-> Fix by initializing the CD-ROM number of sectors in ide_dev_initfn().
->
-> Reported-by: Alexander Bulekov <alxndr@bu.edu>
-> Fixes: b2df431407 ("ide scsi: Mess with geometry only for hard disk devic=
-es")
-> BugLink: https://bugs.launchpad.net/qemu/+bug/1887309
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-The changes LGTM, presume the 'shrug' is OK to leave in ;)
+--lYetfuAxy9ic4HK3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+On Mon, Jul 20, 2020 at 11:29:06AM +0200, Markus Armbruster wrote:
+> Greg Kurz <groug@kaod.org> writes:
+>=20
+> > The spapr_phb_realize() function has a local_err variable which
+> > is used to:
+> >
+> > 1) check failures of spapr_irq_findone() and spapr_irq_claim()
+> >
+> > 2) prepend extra information to the error message
+> >
+> > Recent work from Markus Armbruster highlighted we get better
+> > code when testing the return value of a function, rather than
+> > setting up all the local_err boiler plate. For similar reasons,
+> > it is now preferred to use ERRP_GUARD() and error_prepend()
+> > rather than error_propagate_prepend().
+> >
+> > Since spapr_irq_findone() and spapr_irq_claim() return negative
+> > values in case of failure, do both changes.
+> >
+> > This is just cleanup, no functional impact.
+> >
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >
+> > Since we add ERRP_GUARD(), we could theoretically check *errp
+> > rather than the return value, and thus avoid the uint32_t to
+> > int32_t change but I personally find it clearer the other way.
+> > ---
+> >  hw/ppc/spapr_pci.c |   16 +++++++---------
+> >  1 file changed, 7 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 21681215d405..b1ce51327db4 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -1796,6 +1796,7 @@ static void spapr_phb_destroy_msi(gpointer opaque)
+> > =20
+> >  static void spapr_phb_realize(DeviceState *dev, Error **errp)
+> >  {
+> > +    ERRP_GUARD();
+> >      /* We don't use SPAPR_MACHINE() in order to exit gracefully if the=
+ user
+> >       * tries to add a sPAPR PHB to a non-pseries machine.
+> >       */
+> > @@ -1813,7 +1814,6 @@ static void spapr_phb_realize(DeviceState *dev, E=
+rror **errp)
+> >      uint64_t msi_window_size =3D 4096;
+> >      SpaprTceTable *tcet;
+> >      const unsigned windows_supported =3D spapr_phb_windows_supported(s=
+phb);
+> > -    Error *local_err =3D NULL;
+> > =20
+> >      if (!spapr) {
+> >          error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries =
+machine");
+> > @@ -1964,13 +1964,12 @@ static void spapr_phb_realize(DeviceState *dev,=
+ Error **errp)
+> > =20
+> >      /* Initialize the LSI table */
+> >      for (i =3D 0; i < PCI_NUM_PINS; i++) {
+> > -        uint32_t irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PIN=
+S + i;
+> > +        int32_t irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS=
+ + i;
+>=20
+> (1)
+>=20
+> > =20
+> >          if (smc->legacy_irq_allocation) {
+> > -            irq =3D spapr_irq_findone(spapr, &local_err);
+> > -            if (local_err) {
+> > -                error_propagate_prepend(errp, local_err,
+> > -                                        "can't allocate LSIs: ");
+> > +            irq =3D spapr_irq_findone(spapr, errp);
+>=20
+> (2)
+>=20
+> > +            if (irq < 0) {
+> > +                error_prepend(errp, "can't allocate LSIs: ");
+> >                  /*
+> >                   * Older machines will never support PHB hotplug, ie, =
+this is an
+> >                   * init only path and QEMU will terminate. No need to =
+rollback.
+> > @@ -1979,9 +1978,8 @@ static void spapr_phb_realize(DeviceState *dev, E=
+rror **errp)
+> >              }
+> >          }
+> > =20
+> > -        spapr_irq_claim(spapr, irq, true, &local_err);
+> > -        if (local_err) {
+> > -            error_propagate_prepend(errp, local_err, "can't allocate L=
+SIs: ");
+> > +        if (spapr_irq_claim(spapr, irq, true, errp) < 0) {
+>=20
+> (3)
+>=20
+> > +            error_prepend(errp, "can't allocate LSIs: ");
+> >              goto unrealize;
+> >          }
+>=20
+>            sphb->lsi_table[i].irq =3D irq;
+>=20
+> (4)
+>=20
+>        }
+>=20
+> The error propagation elimination looks good to me, but I wonder whether
+> int32_t is the best choice for @irq.
+>=20
+> Before the patch:
+>=20
+> (1) The initialization converts unsigned (I think) to uint32_t.
+>=20
+> (2) Converts from int (value of spapr_irq_findone()) to uint32_t.
+>=20
+> (3) spapr_irq_claim() takes int, we convert back to int.
+>=20
+> (4) The assignment does not convert.
+>=20
+> After the patch:
+>=20
+> (1) The initialization converts unsigned (I think) to int32_t.
+>=20
+> (2) Converts from int (value of spapr_irq_findone()) to int32_t.
+>=20
+> (3) spapr_irq_claim() takes int, we convert back to int.
+>=20
+> (4) Converts from int32_t to uint32_t
+>=20
+> I assume the conversions are all safe before and after the patch
+> (spapr_irq_claim() asserts @irq is between 0x1000 and 0x1000 + small
+> change).  Still, too many conversions for my taste.  What about making
+> irq plain int?  Then:
+>=20
+> (1) The initialization converts unsigned (I think) to int.
+>=20
+> (2) Does not convert.
+>=20
+> (3) Does not convert.
+>=20
+> (4) Converts from int to uint32_t.
+>=20
+> Feels neater to me.
 
-Thanks,
+Sounds like a good idea.  Greg, care to post a followup patch?
+>=20
+> Regardless:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>=20
 
-Darren.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> ---
-> Since v1:
-> - Allow zero-sized drive images (not sure why we need them)
->   but display a friendly message that this is unsupported
->
-> Unrelated but interesting:
-> http://www.physics.udel.edu/~watson/scen103/cdsoln.html
-> ---
->  hw/ide/qdev.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-> index 27ff1f7f66..005d73bdb9 100644
-> --- a/hw/ide/qdev.c
-> +++ b/hw/ide/qdev.c
-> @@ -201,6 +201,15 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveK=
-ind kind, Error **errp)
->                                errp)) {
->              return;
->          }
-> +    } else {
-> +        uint64_t nb_sectors;
-> +
-> +        blk_get_geometry(dev->conf.blk, &nb_sectors);
-> +        if (!nb_sectors) {
-> +            warn_report("Drive image of size zero is unsupported for 'id=
-e-cd', "
-> +                        "use at your own risk =C2=AF\\_(=E3=83=84)_/=C2=
-=AF");
-> +        }
-> +        dev->conf.secs =3D nb_sectors;
->      }
->      if (!blkconf_apply_backend_options(&dev->conf, kind =3D=3D IDE_CD,
->                                         kind !=3D IDE_CD, errp)) {
-> --=20
-> 2.21.3
+--lYetfuAxy9ic4HK3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8Vfz0ACgkQbDjKyiDZ
+s5LadxAAyXijUgUMx0z7LKVPQ2SGn60Eihgxl66ChlgAzwWB3mk0tEB6gUOx4ak9
+AvNR2G7vlI75DEGciuhcDG0aILonA+Za1xB2nr2dfLye+DBn/LdKxp+yRxrRXjlG
+J+D+sJQcxT38+Ng3YyTddc+OGSZ2rFv5I8IStAiDeQxIYwI57Vyru8kvVL92KnKe
+koV8ZKx2pbx9/AkuRrLvvZkEM91QfcFCm9TWYg3mhvR3BmFpSsuopmQ1feogLMMt
+PhyLkszbQvOvbZu3ZcEkFlWyMik1DtSgT1y6mNpmX4NQXab1ps2cs+A/mWyRxZYc
+LLqtB1BJ4gHexLa9v0lTKmoI/XVfEhUiFEiBl2BPXRQu1f6lOyhC2mJGSnc+iWAp
+Rt1k362qOARGn+csBHCNV7bPY0Vsxesg9iamEMbL5GhUjZS8/E3sON8eEzdh+iPS
+bO57xtt3rs9k9E6NwSpBd1elw3yOSXobNCLyCyd64bQfZCWuclxNmnWKlL4YHvmF
+sxbjnY9doAyZlaax43/1hmote57kaDSPhAvaZCr0S8p9rbNTljAXULbqkPJ9N1P2
+wKJQn0K0LROQ4rGYuNrAhCRdfzS5ry4I0T4iztCFy4nySB5WJklTsqDjBk2OOc8B
+qkT2X9eYQta0XnYv81wVjuFlpUS0Xi7D2nDgIOSwHeLiC+Lc84k=
+=AfTo
+-----END PGP SIGNATURE-----
+
+--lYetfuAxy9ic4HK3--
 
