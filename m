@@ -3,93 +3,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82DCEC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1256CC433ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:37:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EAF022B4E
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:21:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFE0622BF3
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:37:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XkwsSM9x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EAF022B4E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PFDM5ebV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFE0622BF3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxVji-0005RY-FV
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 09:21:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34914)
+	id 1jxVyy-00010W-3T
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 09:37:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jxVj1-000502-SF
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:20:59 -0400
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:37904)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxVyF-0000Y1-Aj
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:36:43 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:38014)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jxVj0-0002Yp-61
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:20:59 -0400
-Received: by mail-ot1-x334.google.com with SMTP id t18so12127309otq.5
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 06:20:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxVyD-0004aI-N2
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:36:43 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id t18so12171233otq.5
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 06:36:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=6cvrcLMPloJI7battwfXerfrUbUDXKtE35mRQSAjw/4=;
- b=XkwsSM9xkbn+axwQOuhDptNLdZ8M0rLhx0aFUOIlr30dT9Jzv3KPMtegrJqh+C0Qpd
- w/OdivFaZEUCFE9J3URmsNpX/xEzPpfr7sCGCt+BB7nnKDTrb6U2Lj+0KQJECQ9Mwc1R
- a4kCts08ENG7gA2mE1tlt70BwtehH/IBhZIjvO0ltr3tRyUKJk1oMQNE4WEDIYcZOKwa
- WVUWXzKeuJ40H9rhNCgi+nCmdh+SE7bwthLOy6U/T98abebClA4T4L55Xpg1+iYtfMBK
- XF69ts2VLK8qpOc7SSypMMndLDgMSIV/JQn5bpempLacj9bVJ4lLIw3oLmBC6cObufKA
- Mv9g==
+ :cc; bh=0WrRLTEXcopl+mM9Qcvu+50OuqR0QQmhAAjOw/lnh5U=;
+ b=PFDM5ebVQUKQXOkFPHml0Kz3JcZ/fv5eeSlg7UaPrTkTYWJM9SWqTPj2AMCu9jowML
+ HdZYCPM0zHaPIrmuRR+AiyC23bDO5YMMDp/uO8YgZjs8Z2TUgi4UI49gUsFi5VKsE9vd
+ u/SoShnrZ+S3j1W3iNnsUzXTpc1v0PtH2um4VSxNMbALVAO9q4Braz88QnRD6/JBdxAR
+ wO4u9TZ68SGhNZuPG7nSbsVTo3DWwEpynE5+lgI2DDkW2VS6ul5l8ubAu4lQIgbEscAj
+ /Dx71f2qXIHNdI7sRCLuIyEhZc8jDTONkgJoHxp5bc2g6X/i7bRkGkRhs0yXQCG5tITd
+ p6XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=6cvrcLMPloJI7battwfXerfrUbUDXKtE35mRQSAjw/4=;
- b=Of0tUmCfYuBuJQ+/St7nGt2boKk67TN+tHwnzBkcxBhTCh20x7lvL77yj3EyX9qWYl
- z8wVFL7eVCyAZAgytud3mXtEbZczudJ4iGuDQG4gomjtb5yBGbFNr8GyuS+QAoc7v9eh
- NCyYN/uRSASqfC63yoISwQlyGmDqJFnpnlT1cWG7epJ8tbwPtFzCuMnV82msNzPznTeP
- NJbjRSmkDqzrjQe1Dwomi1yduvzmO6vQjvKo1/2KMkMJOLiAsN4IN04EPXZSjJ4DjPdk
- nMRD8c8rjw25j57FJwhJplLWVVFbr8OPcg7xwhqixnCrAnFR1SaipuIb65dj0oqRyazx
- Ox5w==
-X-Gm-Message-State: AOAM532iMpbwZGK4+lGGINCzxvzqeOLlXMgxSjypxFBmBwtkkvUKHr+9
- J4BeP1keErtOLuUP14hR2RfNXlqJ7azV0sbdVvs=
-X-Google-Smtp-Source: ABdhPJzVQ8JJjmOqTdkkJjRDxQfHIJ99B8RrCRbDdNnjzcLWbPbzudhp1Z/Re1oda8/d6M8+VEQ4qbQE0chgvYsjRYg=
-X-Received: by 2002:a9d:787:: with SMTP id 7mr19468874oto.333.1595251256961;
- Mon, 20 Jul 2020 06:20:56 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=0WrRLTEXcopl+mM9Qcvu+50OuqR0QQmhAAjOw/lnh5U=;
+ b=VHMwZapJXqCr84F/BwELCmOFq0f1gRVQr8LF8GzrBzeWzXx8cW2KVoxm9TmoDZDui+
+ TPJGsN4W5N/5XJPSuWNwuI0LfNNnGbbrT6UkBPKVbL2Q7q6J14NZkSdgIO1VumIrjsAx
+ z2jBgzYhqRLf9Lx6zl/FG/wcRyJ5G8PNH12L/suCmXz7fckazeEvXd1gozG+KKkYKEkX
+ KYK8ZVHY8w12rILCpu6gqsYTp7Y6Np1K47NRplHNV2D94dTq2uNdFsfKGMOnfbv9LNl3
+ +b32HzP/RiPUQoymwH0g7hC7VEuULjxkh5y/XUPH0/cpykrFwhrAUzxcWzN/NuqOHq3C
+ mK8A==
+X-Gm-Message-State: AOAM533iyJKhD5b+6co5B/BU4jMt+d4ahysJ7Bdz9WARHFdlWHpWHhol
+ 09HJzC7tpHcwxlQMdM8DqypqeliTKjiO+Fwszt0ATQ==
+X-Google-Smtp-Source: ABdhPJyi/wSVtxxWbXeJafznCSKv3n2QtQH4hRs65zx/6woqA8pTiWX+pjYWvvfApdoWfgY9KO0MTKDrvUh3JEUCjDA=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr19782791ota.91.1595252200203; 
+ Mon, 20 Jul 2020 06:36:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200716192335.1212638-1-ppandit@redhat.com>
- <CAKXe6SKL3aNiOKKLEMof6GGNjYLcX9fvfSf-0PBSX48rh4--FQ@mail.gmail.com>
- <20200717012151.tlfmc6hsfia22f4e@mozz.bu.edu>
- <4e4909ae-db2f-4a32-ae5c-d52149e80a8c@redhat.com>
- <nycvar.YSQ.7.78.906.2007171016480.950384@xnncv>
- <3620abab-a464-8e3c-d5b9-0bd80b35e2f1@redhat.com>
- <nycvar.YSQ.7.78.906.2007171326100.4380@xnncv>
- <CAKXe6SJbJaEepRVFtNy=5fhJrw8+Gax=mcwFuhfXrHTgo+wmog@mail.gmail.com>
- <nycvar.YSQ.7.78.906.2007200752230.4380@xnncv>
- <20200720033304.sttpqr337xsf4rna@mozz.bu.edu>
- <CAKXe6SKV8=B2rb6EY72W17r6-oz5nx9VQndH9gSyafubOU4rJg@mail.gmail.com>
- <nycvar.YSQ.7.78.906.2007201822290.4380@xnncv>
-In-Reply-To: <nycvar.YSQ.7.78.906.2007201822290.4380@xnncv>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 20 Jul 2020 21:20:17 +0800
-Message-ID: <CAKXe6SLxxvCkwekVqZSQP68bAME3=wu0wxzzn1JCmb2UaR0OZA@mail.gmail.com>
-Subject: Re: [PATCH] net: check payload length limit for all frames
-To: P J P <ppandit@redhat.com>
+References: <63109e68.7dc9.1736c073666.Coremail.13824125580@163.com>
+In-Reply-To: <63109e68.7dc9.1736c073666.Coremail.13824125580@163.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Jul 2020 14:36:29 +0100
+Message-ID: <CAFEAcA_CmNdmhFrJOxOpHsKCER2gXvqrq5DcQTdp42V+HLK1cg@mail.gmail.com>
+Subject: Re: What is this mean of the comment?
+To: tugouxp <13824125580@163.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::334;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x334.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::32f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x32f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -104,45 +93,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, Jason Wang <jasowang@redhat.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B47=E6=9C=8820=E6=97=A5=E5=
-=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=888:57=E5=86=99=E9=81=93=EF=BC=9A
->
-> +-- On Mon, 20 Jul 2020, Li Qiang wrote --+
-> | This seems is the same issue as LP#1886362 . Look at the free path. Her=
-e the
-> | 'e1000e_write_to_rx_buffers' trigger DMA and then go to address space
-> | dispatch. So the DMA is not RAM but a MMIO range. Then we go to another=
- send
-> | path, and in that we frees the 'iov'.
->
->   Cool. Thanks so much for the confirmation Li.
->
-> | Alex do you tried my patch to solve LP#1886362 ? I have tried it and it
-> | seems no this UAF triggered.
->
-> He mentioned that your patch fixes both issues:
->   -> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05367.html
+On Mon, 20 Jul 2020 at 12:52, tugouxp <13824125580@163.com> wrote:
+>  in flollowing comment of tcg.h, it says every helper max need 6
+> input argument and 1 output argument,
+> but why here both multiply by 2  in here?
 
-Ok, then let's focus that patch.
+Because arguments might be 64 bits, and on a 32-bit host
+a 64-bit argument has to be passed as 2 separate operands.
 
-Thanks,
-Li Qiang
+> what  is the 14 mean?
 
->     ...
->     > On the other hand, I cannot reproduce either issue with Li's patch:
->     > Message-Id: <20200716161453.61295-1-liq3ea@163.com>
->
->
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
->
+It's the maximum possible number of operands in the
+worst case: six 64-bit input arguments which need to
+be passed as 2 32-bit operands each, and a 64-bit
+return value which also needs to be passed as 2
+32-bit operands. (6 * 2) + 2 == 14.
+The reason we care is described in the next part
+of the comment: we keep one bit of information (liveness)
+about the operands of each TCGop, and because 14 < 16
+we can fit this information into a single 16-bit integer
+per TCG op.
+
+>  520 /* While we limit helpers to 6 arguments, for 32-bit hosts, with padding,
+>  521    this imples a max of 6*2 (64-bit in) + 2 (64-bit out) = 14 operands.
+>  522    There are never more than 2 outputs, which means that we can store all
+>  523    dead + sync data within 16 bits.  */
+
+thanks
+-- PMM
 
