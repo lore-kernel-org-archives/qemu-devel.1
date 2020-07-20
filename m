@@ -2,88 +2,93 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3785C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 198E1C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:28:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55760208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:31:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCC42208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:28:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIvbjWnm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55760208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XhWq9+Ji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCC42208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxaZ1-00084B-AX
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 14:30:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35666)
+	id 1jxaWI-0006iR-6P
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 14:28:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jxaXn-0007SZ-1k
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:29:43 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26943
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jxaXk-0004jU-3O
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:29:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595269778;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=ESC7lHJZEWU8baXjgzf9kEzpgGoBQTa40Od5KbPxuos=;
- b=eIvbjWnmD1GAuxLGkDV3npdE6jxhERBbK+ALWv3lPT1WpgkASDYNaxbCDNxI+SiPPSQG1y
- VkhGMoOU72Kn1/TelIHDH/Va3XjvomshEJ+iO/Ed4nW1TGDpxlIyd9SQSxEyJV4hvH5jD5
- T9rnCwdb0Bjmuol4PD2n4lzT3X57XG8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-SXBfPDZ0NICzTifIysEbYQ-1; Mon, 20 Jul 2020 14:29:33 -0400
-X-MC-Unique: SXBfPDZ0NICzTifIysEbYQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C95C8015F3;
- Mon, 20 Jul 2020 18:29:32 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.53])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 187B45D9D5;
- Mon, 20 Jul 2020 18:29:25 +0000 (UTC)
-Date: Mon, 20 Jul 2020 19:29:23 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 3/4] io/channel-socket: implement non-blocking connect
-Message-ID: <20200720182923.GP643836@redhat.com>
-References: <20200720180715.10521-1-vsementsov@virtuozzo.com>
- <20200720180715.10521-4-vsementsov@virtuozzo.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jxaUU-00061m-Ju
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:26:18 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41738)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jxaUS-0004PL-SY
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:26:18 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z15so18779449wrl.8
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 11:26:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=fiWZ7ZCS7JvebFEZ8o5COLaHhu5Dx6oYVhzVUzG7i6A=;
+ b=XhWq9+Jid9CfTl0ITutQrW3ZLe/HVTGPwK7yukavpCDmqKkirPZDuSEbJnRcWKfhpw
+ 0mG8qf5ZwAQugCAZj4rFiQVLoKNEA0OSJo3JAQWCI9v6yXGYAd6+Fk5hH7YNbjW1IbCa
+ kXETliOgfBTg3WD8OLi9RB1cUyffpIcKMMWJ/iJibCgmSt8mBR4NRr5kMHwfXelYVaKN
+ Tq2Je6NgffnI5dim3gvNwSBivYggpLenhSehFhsX5xA28l1qpGkE6ngJAXDQ5O3c0P68
+ urAFFny1i1WFfZg8kWLN8X2HmKLsnS18GffnfEBh8rJJfgdpVx8VGAfsdJP4we2WqeaP
+ Rm8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=fiWZ7ZCS7JvebFEZ8o5COLaHhu5Dx6oYVhzVUzG7i6A=;
+ b=pfSwvagjWZG+vKWegae2VlcdzdiS7ma3qCS4+ZD/eFOUViREerHBYcl7FoysgAFdH4
+ Nc/Cmys1qBXFtUGZPkOYCVicANjjgQM6f0xfwWA7wpctHapWy9W9kOvD3LJ9Xov6ZPfn
+ LgMxH9tQqFu8JfI3ko4bdwUifT/X13a3rAjKTyx36i7gHLl6Tbqhrrz9IrNYx5EiT75c
+ oam0damGz86C6GpTmIimMe1AkjpdHteK79nUiADxOVf3VcH38ihx7VXaaTHqR4xvcd9d
+ s512jtTLsRkSVyRxciJOdLBFgYYu3tHVtyLePQf4rAtO61LZQoozCfP/pKX988cWmdeK
+ yFXw==
+X-Gm-Message-State: AOAM531Fu59QiW39Rx3fc7a6TMh2Z0UQa/GR3npr6JFsbXGZY6FHAccY
+ qjSMaX2EjNtJGeuiVAqtwEDKVDAoFoQ=
+X-Google-Smtp-Source: ABdhPJxHLsWV0V8GvTy36Ig1Sxeh6sXPC0eYX+24+8lYVJfZ4Bac5puWtzS+ZnbvepPQ3dhpTiwWdg==
+X-Received: by 2002:a5d:650e:: with SMTP id x14mr24410834wru.187.1595269574946; 
+ Mon, 20 Jul 2020 11:26:14 -0700 (PDT)
+Received: from localhost.localdomain
+ (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id 138sm637932wmb.1.2020.07.20.11.26.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Jul 2020 11:26:14 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH-not-for-5.1?] hw/isa/isa-bus: Ensure ISA I/O regions are
+ 8/16/32-bit accessible
+Date: Mon, 20 Jul 2020 20:26:13 +0200
+Message-Id: <20200720182613.10857-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <20200720180715.10521-4-vsementsov@virtuozzo.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/19 21:45:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,161 +101,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, kraxel@redhat.com, den@openvz.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 20, 2020 at 09:07:14PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Utilize new socket API to make a non-blocking connect for inet sockets.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/io/channel-socket.h | 14 +++++++
->  io/channel-socket.c         | 74 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 88 insertions(+)
-> 
-> diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
-> index 777ff5954e..82e868bc02 100644
-> --- a/include/io/channel-socket.h
-> +++ b/include/io/channel-socket.h
-> @@ -94,6 +94,20 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
->                                      SocketAddress *addr,
->                                      Error **errp);
->  
-> +/**
-> + * qio_channel_socket_connect_non_blocking_sync:
-> + * @ioc: the socket channel object
-> + * @addr: the address to connect to
-> + * @errp: pointer to a NULL-initialized error object
-> + *
-> + * Attempt to connect to the address @addr using non-blocking mode of
-> + * the socket. Function is synchronous, but being called from
-> + * coroutine context will yield during connect operation.
-> + */
-> +int qio_channel_socket_connect_non_blocking_sync(QIOChannelSocket *ioc,
-> +                                                 SocketAddress *addr,
-> +                                                 Error **errp);
-> +
->  /**
->   * qio_channel_socket_connect_async:
->   * @ioc: the socket channel object
-> diff --git a/io/channel-socket.c b/io/channel-socket.c
-> index e1b4667087..076de7578a 100644
-> --- a/io/channel-socket.c
-> +++ b/io/channel-socket.c
-> @@ -22,6 +22,7 @@
->  #include "qapi/error.h"
->  #include "qapi/qapi-visit-sockets.h"
->  #include "qemu/module.h"
-> +#include "qemu/sockets.h"
->  #include "io/channel-socket.h"
->  #include "io/channel-watch.h"
->  #include "trace.h"
-> @@ -29,6 +30,8 @@
->  
->  #define SOCKET_MAX_FDS 16
->  
-> +static int qio_channel_socket_close(QIOChannel *ioc, Error **errp);
-> +
->  SocketAddress *
->  qio_channel_socket_get_local_address(QIOChannelSocket *ioc,
->                                       Error **errp)
-> @@ -157,6 +160,77 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
->      return 0;
->  }
->  
-> +static int qio_channel_inet_connect_non_blocking_sync(QIOChannelSocket *ioc,
-> +        InetSocketAddress *addr, Error **errp)
-> +{
-> +    Error *local_err = NULL;
-> +    struct addrinfo *infos, *info;
-> +    int sock = -1;
-> +
-> +    infos = inet_parse_connect_saddr(addr, errp);
-> +    if (!infos) {
-> +        return -1;
-> +    }
+Since commit 5d971f9e67 we don't accept mismatching sizes
+in memory_region_access_valid(). This gives troubles when
+a device is on an ISA bus, because the CPU is free to use
+8/16/32-bit accesses on the bus, regardless what range is
+valid for the device.
 
-This call is blocking since it calls getaddrinfo whose design
-offers no ability todo non-blocking DNS lookups. Given this
-call, ...
+Add a check to ensure devices plugged on the ISA bus can
+accept 8/16/32-bits accesses.
 
-> +
-> +    for (info = infos; info != NULL; info = info->ai_next) {
-> +        bool in_progress;
-> +
-> +        error_free(local_err);
-> +        local_err = NULL;
-> +
-> +        sock = inet_connect_addr(addr, info, false, &in_progress, &local_err);
-> +        if (sock < 0) {
-> +            continue;
-> +        }
-> +
-> +        if (qio_channel_socket_set_fd(ioc, sock, &local_err) < 0) {
-> +            close(sock);
-> +            continue;
-> +        }
-> +
-> +        if (in_progress) {
-> +            if (qemu_in_coroutine()) {
-> +                qio_channel_yield(QIO_CHANNEL(ioc), G_IO_OUT);
-> +            } else {
-> +                qio_channel_wait(QIO_CHANNEL(ioc), G_IO_OUT);
-> +            }
+Related bug reports:
 
-...this is offering false assurances of being non-blocking.
+- https://lore.kernel.org/xen-devel/20200630170913.123646-1-anthony.perard@citrix.com/T/
+- https://bugs.debian.org/964793
+- https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=964247
+- https://bugs.launchpad.net/bugs/1886318
 
-If we don't want the current thread to be blocked then we
-need to be using the existing qio_channel_socket_connect_async
-method or similar. It uses a throw away background thread to
-run the connection attempt, and then reports completion back
-later, thus avoiding the getaddrinfo design flaw for the callers.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+MST: I really don't like this approach, I think the ISA bus
+     should adjust the access.
+---
+ hw/isa/isa-bus.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-I explicitly didn't want to add an method like the impl in this
-patch, because getaddrinfo dooms it and we already had bugs in
-the pre-QIOChannel code where QEMU thought it was non-blocking
-but wasn't due to getaddrinfo lookups.
-
-
-IIUC, the main appeal of this method is that the non-blocking
-nature is hidden from the caller who can continue to treat it
-as a synchronous call and have the coroutine magic happen in
-behind the scenes.
-
-IOW, What's needed is a simple way to run the operation in a
-thread, and sleep for completion while having the coroutine
-yield.
-
-I think this could likely be achieved with QIOTask with an
-alternate impl of the qio_task_wait_thread() method that is
-friendly to coroutines instead of being based on pthread
-condition variable waits.
-
-
-> +            if (socket_check(sock, &local_err) < 0) {
-> +                qio_channel_socket_close(QIO_CHANNEL(ioc), NULL);
-> +                continue;
-> +            }
-> +        }
-> +
-> +        break;
-> +    }
-> +
-> +    freeaddrinfo(infos);
-> +
-> +    error_propagate(errp, local_err);
-> +    return sock;
-> +}
-
-Regards,
-Daniel
+diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
+index 58fde178f9..3d97ad1bdd 100644
+--- a/hw/isa/isa-bus.c
++++ b/hw/isa/isa-bus.c
+@@ -132,6 +132,17 @@ static inline void isa_init_ioport(ISADevice *dev, uint16_t ioport)
+ 
+ void isa_register_ioport(ISADevice *dev, MemoryRegion *io, uint16_t start)
+ {
++    if (io->ops->valid.min_access_size > 1) {
++        /* CPU can always use 8-bit accesses on an ISA bus */
++        error_report("ISA device '%s' requires I/O min_access_size of 1",
++                     object_get_typename(OBJECT(dev)));
++        exit(1);
++    } else if (io->ops->valid.max_access_size < 4) {
++        /* CPU can always use 32-bit accesses on an ISA bus */
++        error_report("ISA device '%s' requires I/O max_access_size of 4",
++                     object_get_typename(OBJECT(dev)));
++        exit(1);
++    }
+     memory_region_add_subregion(isabus->address_space_io, start, io);
+     isa_init_ioport(dev, start);
+ }
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.21.3
 
 
