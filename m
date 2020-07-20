@@ -2,93 +2,88 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C2F8C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2FAC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:30:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3124120684
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:28:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCBF52176B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:30:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S7Ea2DAx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3124120684
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RiU2pnWR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCBF52176B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxS6K-0002jO-FJ
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 05:28:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55368)
+	id 1jxS7o-0003pW-56
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 05:30:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jxS5d-0002B8-HM
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 05:28:05 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27122
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxS6k-0003CO-Lb
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 05:29:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21961
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jxS5b-0002fu-1H
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 05:28:04 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxS6i-0002ol-4F
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 05:29:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595237281;
+ s=mimecast20190719; t=1595237351;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hyw1x2awEfAoxLL/ZtYXL9am0uEB+u+N63WU1r6fGZI=;
- b=S7Ea2DAx9GeSkbnzFWtK9irINvmV4IvyrnUe2uxrEQiqD5vV7qfoO1xXdRsf1Wfk6kwVEk
- Uw75AQm4hjPOQWuVQjFZdEC8+cyirDqJdOZ5iLkvgd8Ok3GgffwmoV0bza9S6AFS1P0Lvj
- oRGU3ok0bizG1ZuZp2O/N++eHhna/QM=
+ bh=J1pEPthk6V7dKIxeoWQjkLbSNzH3B/wQj5BahGPw+Xg=;
+ b=RiU2pnWRk7ka1bPj+JbkV17LVHuyRFLGWs+D9m6iSxwGwRiX6/nKLRry9Xk7t9Ohwz4hHJ
+ mxd4yDMkgh7Z/MUj0UfS6255V0KFZkM9s0XefWVsp+VUMVuxdFmpCOxfq3M1NvzS/zQNX+
+ cr6MARMrrJRew2Q17KlYWppWBYUCqOM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-mIIMRVWqPCOTtXRTcqvpfg-1; Mon, 20 Jul 2020 05:27:59 -0400
-X-MC-Unique: mIIMRVWqPCOTtXRTcqvpfg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-455-ZMFODs4ZNZCytEP-3K3odw-1; Mon, 20 Jul 2020 05:29:09 -0400
+X-MC-Unique: ZMFODs4ZNZCytEP-3K3odw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 022BF18A1DF3;
- Mon, 20 Jul 2020 09:27:58 +0000 (UTC)
-Received: from [10.72.12.53] (ovpn-12-53.pek2.redhat.com [10.72.12.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CC1DD78530;
- Mon, 20 Jul 2020 09:27:49 +0000 (UTC)
-Subject: Re: [PATCH] hw/net/xgmac: Fix buffer overflow in xgmac_enet_send()
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200710091940.641296-1-mcascell@redhat.com>
- <CAFEAcA9XQUcdiy2x18Zr+EYDaJ4hY-1Bd-DgL6-j6sJi5Ow+Gg@mail.gmail.com>
- <df0eae88-2bc8-04fa-feb9-7633ba13d635@redhat.com>
- <CAFEAcA_2zG1E1COPTi78DY2V2-e8sJwc-s0c7cCfm12U2DE00Q@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <727aefd4-8881-4ea5-811a-6d7cd20f4b2c@redhat.com>
-Date: Mon, 20 Jul 2020 17:27:48 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16778108A;
+ Mon, 20 Jul 2020 09:29:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B890787303;
+ Mon, 20 Jul 2020 09:29:07 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 144DE1141C54; Mon, 20 Jul 2020 11:29:06 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH for-5.2] spapr: Simplify error handling in
+ spapr_phb_realize()
+References: <159500760539.383731.10928308889360009122.stgit@bahia.lan>
+Date: Mon, 20 Jul 2020 11:29:06 +0200
+In-Reply-To: <159500760539.383731.10928308889360009122.stgit@bahia.lan> (Greg
+ Kurz's message of "Fri, 17 Jul 2020 19:40:05 +0200")
+Message-ID: <87lfjefsbh.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_2zG1E1COPTi78DY2V2-e8sJwc-s0c7cCfm12U2DE00Q@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/19 21:45:06
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 03:17:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,95 +96,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rob Herring <robh@kernel.org>, Mauro Matteo Cascella <mcascell@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- ziming zhang <ezrakiez@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Greg Kurz <groug@kaod.org> writes:
 
-On 2020/7/20 下午5:14, Peter Maydell wrote:
-> On Tue, 14 Jul 2020 at 10:09, Jason Wang <jasowang@redhat.com> wrote:
->>
->> On 2020/7/10 下午7:07, Peter Maydell wrote:
->>> On Fri, 10 Jul 2020 at 10:20, Mauro Matteo Cascella <mcascell@redhat.com> wrote:
->>>> A buffer overflow issue was reported by Mr. Ziming Zhang, CC'd here. It
->>>> occurs while sending an Ethernet frame due to missing break statements
->>>> and improper checking of the buffer size.
->>>>
->>>> Reported-by: Ziming Zhang <ezrakiez@gmail.com>
->>>> Signed-off-by: Mauro Matteo Cascella <mcascell@redhat.com>
->>>> ---
->>>>    hw/net/xgmac.c | 7 +++++--
->>>>    1 file changed, 5 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/hw/net/xgmac.c b/hw/net/xgmac.c
->>>> index 574dd47b41..b872afbb1a 100644
->>>> --- a/hw/net/xgmac.c
->>>> +++ b/hw/net/xgmac.c
->>>> @@ -224,17 +224,20 @@ static void xgmac_enet_send(XgmacState *s)
->>>>                DEBUGF_BRK("qemu:%s:ERROR...ERROR...ERROR... -- "
->>>>                            "xgmac buffer 1 len on send > 2048 (0x%x)\n",
->>>>                             __func__, bd.buffer1_size & 0xfff);
->>>> +            break;
->>>>            }
->>>>            if ((bd.buffer2_size & 0xfff) != 0) {
->>>>                DEBUGF_BRK("qemu:%s:ERROR...ERROR...ERROR... -- "
->>>>                            "xgmac buffer 2 len on send != 0 (0x%x)\n",
->>>>                            __func__, bd.buffer2_size & 0xfff);
->>>> +            break;
->>>>            }
->>>> -        if (len >= sizeof(frame)) {
->>>> +        if (frame_size + len >= sizeof(frame)) {
->>>>                DEBUGF_BRK("qemu:%s: buffer overflow %d read into %zu "
->>>> -                        "buffer\n" , __func__, len, sizeof(frame));
->>>> +                        "buffer\n" , __func__, frame_size + len, sizeof(frame));
->>>>                DEBUGF_BRK("qemu:%s: buffer1.size=%d; buffer2.size=%d\n",
->>>>                            __func__, bd.buffer1_size, bd.buffer2_size);
->>>> +            break;
->>>>            }
->>>>
->>>>            cpu_physical_memory_read(bd.buffer1_addr, ptr, len);
->>> This is correct in the sense that it avoids the buffer overflow.
->>>
->>> I suspect that we should probably also be reporting the error
->>> back to the guest via some kind of error flag in the descriptor
->>> and/or in a status register. Unfortunately I don't have a copy
->>> of the datasheet and it doesn't seem to be available online :-(
->>> Does anybody have a copy to check ?
->> I tried to download the datasheet from [1] but it's not a programmer
->> manual.
->>
->> I think we can apply this patch first and do follow-up fixes on top?
-> Yes, agreed, since nobody seems to have docs for this device.
-> This is an only-happens-with-malicious-or-buggy-guest case anyway,
-> and the highbank/midway (only users of the device) aren't important
-> or widely used machine types any more.
+> The spapr_phb_realize() function has a local_err variable which
+> is used to:
 >
-> I suppose we could add a comment
-> /*
->   * FIXME: these cases of malformed tx descriptors (bad sizes)
->   * should probably be reported back to the guest somehow
->   * rather than simply silently stopping processing, but we
->   * don't know what the hardware does in this situation.
->   * This will only happen for buggy guests anyway.
->   */
+> 1) check failures of spapr_irq_findone() and spapr_irq_claim()
 >
-> but anyway
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 2) prepend extra information to the error message
 >
-> Were you planning to take this patch, Jason, or should I?
-
-
-I've queued for rc1 this with the above suggested comment.
-
-Thanks
-
-
+> Recent work from Markus Armbruster highlighted we get better
+> code when testing the return value of a function, rather than
+> setting up all the local_err boiler plate. For similar reasons,
+> it is now preferred to use ERRP_GUARD() and error_prepend()
+> rather than error_propagate_prepend().
 >
-> thanks
-> -- PMM
+> Since spapr_irq_findone() and spapr_irq_claim() return negative
+> values in case of failure, do both changes.
 >
+> This is just cleanup, no functional impact.
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>
+> Since we add ERRP_GUARD(), we could theoretically check *errp
+> rather than the return value, and thus avoid the uint32_t to
+> int32_t change but I personally find it clearer the other way.
+> ---
+>  hw/ppc/spapr_pci.c |   16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
+>
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 21681215d405..b1ce51327db4 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1796,6 +1796,7 @@ static void spapr_phb_destroy_msi(gpointer opaque)
+>  
+>  static void spapr_phb_realize(DeviceState *dev, Error **errp)
+>  {
+> +    ERRP_GUARD();
+>      /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
+>       * tries to add a sPAPR PHB to a non-pseries machine.
+>       */
+> @@ -1813,7 +1814,6 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+>      uint64_t msi_window_size = 4096;
+>      SpaprTceTable *tcet;
+>      const unsigned windows_supported = spapr_phb_windows_supported(sphb);
+> -    Error *local_err = NULL;
+>  
+>      if (!spapr) {
+>          error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries machine");
+> @@ -1964,13 +1964,12 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+>  
+>      /* Initialize the LSI table */
+>      for (i = 0; i < PCI_NUM_PINS; i++) {
+> -        uint32_t irq = SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + i;
+> +        int32_t irq = SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + i;
+
+(1)
+
+>  
+>          if (smc->legacy_irq_allocation) {
+> -            irq = spapr_irq_findone(spapr, &local_err);
+> -            if (local_err) {
+> -                error_propagate_prepend(errp, local_err,
+> -                                        "can't allocate LSIs: ");
+> +            irq = spapr_irq_findone(spapr, errp);
+
+(2)
+
+> +            if (irq < 0) {
+> +                error_prepend(errp, "can't allocate LSIs: ");
+>                  /*
+>                   * Older machines will never support PHB hotplug, ie, this is an
+>                   * init only path and QEMU will terminate. No need to rollback.
+> @@ -1979,9 +1978,8 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+>              }
+>          }
+>  
+> -        spapr_irq_claim(spapr, irq, true, &local_err);
+> -        if (local_err) {
+> -            error_propagate_prepend(errp, local_err, "can't allocate LSIs: ");
+> +        if (spapr_irq_claim(spapr, irq, true, errp) < 0) {
+
+(3)
+
+> +            error_prepend(errp, "can't allocate LSIs: ");
+>              goto unrealize;
+>          }
+
+           sphb->lsi_table[i].irq = irq;
+
+(4)
+
+       }
+
+The error propagation elimination looks good to me, but I wonder whether
+int32_t is the best choice for @irq.
+
+Before the patch:
+
+(1) The initialization converts unsigned (I think) to uint32_t.
+
+(2) Converts from int (value of spapr_irq_findone()) to uint32_t.
+
+(3) spapr_irq_claim() takes int, we convert back to int.
+
+(4) The assignment does not convert.
+
+After the patch:
+
+(1) The initialization converts unsigned (I think) to int32_t.
+
+(2) Converts from int (value of spapr_irq_findone()) to int32_t.
+
+(3) spapr_irq_claim() takes int, we convert back to int.
+
+(4) Converts from int32_t to uint32_t
+
+I assume the conversions are all safe before and after the patch
+(spapr_irq_claim() asserts @irq is between 0x1000 and 0x1000 + small
+change).  Still, too many conversions for my taste.  What about making
+irq plain int?  Then:
+
+(1) The initialization converts unsigned (I think) to int.
+
+(2) Does not convert.
+
+(3) Does not convert.
+
+(4) Converts from int to uint32_t.
+
+Feels neater to me.
+
+Regardless:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
 
