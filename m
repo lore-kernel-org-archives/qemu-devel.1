@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3633C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 05:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A32C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 05:43:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A266A208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 05:42:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1DBC20758
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 05:43:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oFp3RE7L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A266A208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NeOIZ56h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1DBC20758
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxOZZ-0006mA-Sk
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 01:42:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48842)
+	id 1jxOad-0008Ra-50
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 01:43:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48844)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jxOYY-0005hi-0Q; Mon, 20 Jul 2020 01:41:42 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58563 helo=ozlabs.org)
+ id 1jxOYY-0005hl-3b; Mon, 20 Jul 2020 01:41:42 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:45213 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jxOYU-0005w2-5r; Mon, 20 Jul 2020 01:41:41 -0400
+ id 1jxOYU-0005w6-5x; Mon, 20 Jul 2020 01:41:41 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4B99Zd6xBfz9sSJ; Mon, 20 Jul 2020 15:41:29 +1000 (AEST)
+ id 4B99Zf1jslz9sR4; Mon, 20 Jul 2020 15:41:29 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1595223689;
- bh=w4FmBXVE0KTHzF/+gsUfXFMNert2KBgkl92U+vdPb5w=;
+ d=gibson.dropbear.id.au; s=201602; t=1595223690;
+ bh=SoFDtUKbMTTP5vpI4nUoVVrIWAOlECjWo0U19O0woHM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=oFp3RE7Ll+jdRdZdRSqfauUkK0TGyf4Qy82V2xGES736WU6gSJDejsaAbHcLx6xNp
- F+sONBO0FeAFQGF8of5ZNTbf3MhA8alQuJKTi/wa/8rWQxOGE8lCB3ogxQbesuzhxb
- qI92qu9P+2rycInp9SNbMHiqYCQjoKGSY3g0K2Bk=
+ b=NeOIZ56hiUSRK6cDTuV5/YJjbP3cAzIhjTDub5V25+AexeqWK4yAZ0liwjyoO6bER
+ ZdLUO/pOiTAymEImz14KmnJj6Gljc8nJIqphc5xfmR6yjkkeP1KBczPjZBXh9nh1cy
+ cCnGt6YtwF/D+Q+6t8xQGng968Pp6ElbhmhlBobo=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 2/4] spapr_pci: Robustify support of PCI bridges
-Date: Mon, 20 Jul 2020 15:41:24 +1000
-Message-Id: <20200720054126.258032-3-david@gibson.dropbear.id.au>
+Subject: [PULL 3/4] spapr: Add a new level of NUMA for GPUs
+Date: Mon, 20 Jul 2020 15:41:25 +1000
+Message-Id: <20200720054126.258032-4-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200720054126.258032-1-david@gibson.dropbear.id.au>
 References: <20200720054126.258032-1-david@gibson.dropbear.id.au>
@@ -74,136 +74,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+Cc: Reza Arbab <arbab@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Reza Arbab <arbab@linux.ibm.com>
 
-Some recent error handling cleanups unveiled issues with our support of
-PCI bridges:
+NUMA nodes corresponding to GPU memory currently have the same
+affinity/distance as normal memory nodes. Add a third NUMA associativity
+reference point enabling us to give GPU nodes more distance.
 
-1) QEMU aborts when using non-standard PCI bridge types,
-   unveiled by commit 7ef1553dac "spapr_pci: Drop some dead error handling"
+This is guest visible information, which shouldn't change under a
+running guest across migration between different qemu versions, so make
+the change effective only in new (pseries > 5.0) machine types.
 
-$ qemu-system-ppc64 -M pseries -device pcie-pci-bridge
-Unexpected error in object_property_find() at qom/object.c:1240:
-qemu-system-ppc64: -device pcie-pci-bridge: Property '.chassis_nr' not found
-Aborted (core dumped)
+Before, `numactl -H` output in a guest with 4 GPUs (nodes 2-5):
 
-This happens because we assume all PCI bridge types to have a "chassis_nr"
-property. This property only exists with the standard PCI bridge type
-"pci-bridge" actually. We could possibly revert 7ef1553dac but it seems
-much simpler to check the presence of "chassis_nr" earlier.
+node distances:
+node   0   1   2   3   4   5
+  0:  10  40  40  40  40  40
+  1:  40  10  40  40  40  40
+  2:  40  40  10  40  40  40
+  3:  40  40  40  10  40  40
+  4:  40  40  40  40  10  40
+  5:  40  40  40  40  40  10
 
-2) QEMU abort if same "chassis_nr" value is used several times,
-   unveiled by commit d2623129a7de "qom: Drop parameter @errp of
-   object_property_add() & friends"
+After:
 
-$ qemu-system-ppc64 -M pseries -device pci-bridge,chassis_nr=1 \
-                        -device pci-bridge,chassis_nr=1
-Unexpected error in object_property_try_add() at qom/object.c:1167:
-qemu-system-ppc64: -device pci-bridge,chassis_nr=1: attempt to add duplicate property '40000100' to object (type 'container')
-Aborted (core dumped)
+node distances:
+node   0   1   2   3   4   5
+  0:  10  40  80  80  80  80
+  1:  40  10  80  80  80  80
+  2:  80  80  10  80  80  80
+  3:  80  80  80  10  80  80
+  4:  80  80  80  80  10  80
+  5:  80  80  80  80  80  10
 
-This happens because we assume that "chassis_nr" values are unique, but
-nobody enforces that and we end up generating duplicate DRC ids. The PCI
-code doesn't really care for duplicate "chassis_nr" properties since it
-is only used to initialize the "Chassis Number Register" of the bridge,
-with no functional impact on QEMU. So, even if passing the same value
-several times might look weird, it never broke anything before, so
-I guess we don't necessarily want to enforce strict checking in the PCI
-code now.
+These are the same distances as on the host, mirroring the change made
+to host firmware in skiboot commit f845a648b8cb ("numa/associativity:
+Add a new level of NUMA for GPU's").
 
-Workaround both issues in the PAPR code: check that the bridge has a
-unique and non null "chassis_nr" when plugging it into its parent bus.
-
-Fixes: 05929a6c5dfe ("spapr: Don't use bus number for building DRC ids")
-Fixes: 7ef1553dac ("spapr_pci: Drop some dead error handling")
-Fixes: d2623129a7de ("qom: Drop parameter @errp of object_property_add() & friends")
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <159431476748.407044.16711294833569014964.stgit@bahia.lan>
-[dwg: Move check slightly to a better place]
+Signed-off-by: Reza Arbab <arbab@linux.ibm.com>
+Message-Id: <20200716225655.24289-1-arbab@linux.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_pci.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+ hw/ppc/spapr.c              | 21 +++++++++++++++++++--
+ hw/ppc/spapr_pci.c          |  2 ++
+ hw/ppc/spapr_pci_nvlink2.c  | 13 ++++++++++---
+ include/hw/pci-host/spapr.h |  1 +
+ include/hw/ppc/spapr.h      |  1 +
+ 5 files changed, 33 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 2a6a48744a..21681215d4 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1480,6 +1480,57 @@ static void spapr_pci_bridge_plug(SpaprPhbState *phb,
-     add_drcs(phb, bus);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 299908cc73..0ae293ec94 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -890,10 +890,16 @@ static int spapr_dt_rng(void *fdt)
+ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+ {
+     MachineState *ms = MACHINE(spapr);
++    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
+     int rtas;
+     GString *hypertas = g_string_sized_new(256);
+     GString *qemu_hypertas = g_string_sized_new(256);
+-    uint32_t refpoints[] = { cpu_to_be32(0x4), cpu_to_be32(0x4) };
++    uint32_t refpoints[] = {
++        cpu_to_be32(0x4),
++        cpu_to_be32(0x4),
++        cpu_to_be32(0x2),
++    };
++    uint32_t nr_refpoints = ARRAY_SIZE(refpoints);
+     uint64_t max_device_addr = MACHINE(spapr)->device_memory->base +
+         memory_region_size(&MACHINE(spapr)->device_memory->mr);
+     uint32_t lrdr_capacity[] = {
+@@ -945,8 +951,12 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+                      qemu_hypertas->str, qemu_hypertas->len));
+     g_string_free(qemu_hypertas, TRUE);
+ 
++    if (smc->pre_5_1_assoc_refpoints) {
++        nr_refpoints = 2;
++    }
++
+     _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
+-                     refpoints, sizeof(refpoints)));
++                     refpoints, nr_refpoints * sizeof(refpoints[0])));
+ 
+     _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
+                      maxdomains, sizeof(maxdomains)));
+@@ -4584,9 +4594,16 @@ DEFINE_SPAPR_MACHINE(5_1, "5.1", true);
+  */
+ static void spapr_machine_5_0_class_options(MachineClass *mc)
+ {
++    SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
++    static GlobalProperty compat[] = {
++        { TYPE_SPAPR_PCI_HOST_BRIDGE, "pre-5.1-associativity", "on" },
++    };
++
+     spapr_machine_5_1_class_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
++    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
+     mc->numa_mem_supported = true;
++    smc->pre_5_1_assoc_refpoints = true;
  }
  
-+/* Returns non-zero if the value of "chassis_nr" is already in use */
-+static int check_chassis_nr(Object *obj, void *opaque)
-+{
-+    int new_chassis_nr =
-+        object_property_get_uint(opaque, "chassis_nr", &error_abort);
-+    int chassis_nr =
-+        object_property_get_uint(obj, "chassis_nr", NULL);
-+
-+    if (!object_dynamic_cast(obj, TYPE_PCI_BRIDGE)) {
-+        return 0;
-+    }
-+
-+    /* Skip unsupported bridge types */
-+    if (!chassis_nr) {
-+        return 0;
-+    }
-+
-+    /* Skip self */
-+    if (obj == opaque) {
-+        return 0;
-+    }
-+
-+    return chassis_nr == new_chassis_nr;
-+}
-+
-+static bool bridge_has_valid_chassis_nr(Object *bridge, Error **errp)
-+{
-+    int chassis_nr =
-+        object_property_get_uint(bridge, "chassis_nr", NULL);
-+
-+    /*
-+     * slotid_cap_init() already ensures that "chassis_nr" isn't null for
-+     * standard PCI bridges, so this really tells if "chassis_nr" is present
-+     * or not.
-+     */
-+    if (!chassis_nr) {
-+        error_setg(errp, "PCI Bridge lacks a \"chassis_nr\" property");
-+        error_append_hint(errp, "Try -device pci-bridge instead.\n");
-+        return false;
-+    }
-+
-+    /* We want unique values for "chassis_nr" */
-+    if (object_child_foreach_recursive(object_get_root(), check_chassis_nr,
-+                                       bridge)) {
-+        error_setg(errp, "Bridge chassis %d already in use", chassis_nr);
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
- static void spapr_pci_plug(HotplugHandler *plug_handler,
-                            DeviceState *plugged_dev, Error **errp)
- {
-@@ -1508,6 +1559,9 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
-     g_assert(drc);
+ DEFINE_SPAPR_MACHINE(5_0, "5.0", false);
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 21681215d4..363cdb3f7b 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2089,6 +2089,8 @@ static Property spapr_phb_properties[] = {
+                      pcie_ecs, true),
+     DEFINE_PROP_UINT64("gpa", SpaprPhbState, nv2_gpa_win_addr, 0),
+     DEFINE_PROP_UINT64("atsd", SpaprPhbState, nv2_atsd_win_addr, 0),
++    DEFINE_PROP_BOOL("pre-5.1-associativity", SpaprPhbState,
++                     pre_5_1_assoc, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-     if (pc->is_bridge) {
-+        if (!bridge_has_valid_chassis_nr(OBJECT(plugged_dev), errp)) {
-+            return;
+diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
+index dd8cd6db96..76ae77ebc8 100644
+--- a/hw/ppc/spapr_pci_nvlink2.c
++++ b/hw/ppc/spapr_pci_nvlink2.c
+@@ -362,9 +362,9 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
+                                                     &error_abort);
+         uint32_t associativity[] = {
+             cpu_to_be32(0x4),
+-            SPAPR_GPU_NUMA_ID,
+-            SPAPR_GPU_NUMA_ID,
+-            SPAPR_GPU_NUMA_ID,
++            cpu_to_be32(nvslot->numa_id),
++            cpu_to_be32(nvslot->numa_id),
++            cpu_to_be32(nvslot->numa_id),
+             cpu_to_be32(nvslot->numa_id)
+         };
+         uint64_t size = object_property_get_uint(nv_mrobj, "size", NULL);
+@@ -375,6 +375,13 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
+         _FDT(off);
+         _FDT((fdt_setprop_string(fdt, off, "device_type", "memory")));
+         _FDT((fdt_setprop(fdt, off, "reg", mem_reg, sizeof(mem_reg))));
++
++        if (sphb->pre_5_1_assoc) {
++            associativity[1] = SPAPR_GPU_NUMA_ID;
++            associativity[2] = SPAPR_GPU_NUMA_ID;
++            associativity[3] = SPAPR_GPU_NUMA_ID;
 +        }
-         spapr_pci_bridge_plug(phb, PCI_BRIDGE(plugged_dev));
-     }
++
+         _FDT((fdt_setprop(fdt, off, "ibm,associativity", associativity,
+                           sizeof(associativity))));
  
+diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+index 8877ff51fb..600eb55c34 100644
+--- a/include/hw/pci-host/spapr.h
++++ b/include/hw/pci-host/spapr.h
+@@ -94,6 +94,7 @@ struct SpaprPhbState {
+     hwaddr nv2_gpa_win_addr;
+     hwaddr nv2_atsd_win_addr;
+     SpaprPhbPciNvGpuConfig *nvgpus;
++    bool pre_5_1_assoc;
+ };
+ 
+ #define SPAPR_PCI_MEM_WIN_BUS_OFFSET 0x80000000ULL
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index c421410e3f..3134d339e8 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -129,6 +129,7 @@ struct SpaprMachineClass {
+     bool linux_pci_probe;
+     bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
+     hwaddr rma_limit;          /* clamp the RMA to this size */
++    bool pre_5_1_assoc_refpoints;
+ 
+     void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
+                           uint64_t *buid, hwaddr *pio, 
 -- 
 2.26.2
 
