@@ -7,61 +7,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 100C3C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E14DDC433E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:19:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0A8920729
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:19:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A76BE20729
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:19:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elkxNzqz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A8920729
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZkSITt2M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A76BE20729
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxVhY-0003Jo-0K
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 09:19:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34344)
+	id 1jxVhb-0003SC-Rn
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 09:19:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxVgd-0001yo-Da
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:18:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29412
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxVgf-00020p-DQ
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:18:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44294
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxVgb-0001yr-UX
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:18:31 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxVgd-0001zD-N8
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 09:18:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595251109;
+ s=mimecast20190719; t=1595251111;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pKcGHN9BiCQRQAAgwMmB3i4OhnaN31yh4S3mMqcJVPM=;
- b=elkxNzqzqTkI96hadefoGHaQsTAIWilVwqKqWsmB8pmOrElx8J+MNa/yWpIWArhUmXLdgP
- TQRhE5jfPdCSj/Ff7WstDWxW0QxKkZoETljP3YhUsZRinQwCW2eFTqd0BdN9BvsbAgqiZT
- c65U94/lsHJnx7yqEGIehjNIzzi6/vM=
+ bh=Y+NxlkH3rhIut/JMt1D7oYh8k9S9q2R+3FMhNB5ptXU=;
+ b=ZkSITt2MtS65wGmLgYlWZ7FjyCCgDaF9oQCkHAyrzg6+NCONUg773YZmhzUnL4xgyREeoF
+ 8NKD1Ah2EghyGg+pAij0I1Iq/Wwm+hsxNkUeB35OLX2U84J8zFqpATA85Q75Hlevr7+k68
+ qGm9ZLcwprCGRCOGIriQvFQtPwEQ8Ak=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-yoLrkeaKMqaM0alVRgOJMQ-1; Mon, 20 Jul 2020 09:18:27 -0400
-X-MC-Unique: yoLrkeaKMqaM0alVRgOJMQ-1
+ us-mta-432-UgGZlyhbMAeK0eQQyO4VzQ-1; Mon, 20 Jul 2020 09:18:28 -0400
+X-MC-Unique: UgGZlyhbMAeK0eQQyO4VzQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B7948064DD;
- Mon, 20 Jul 2020 13:18:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C11918C63C0;
+ Mon, 20 Jul 2020 13:18:28 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-59.ams2.redhat.com [10.36.114.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 82C6B7303C;
- Mon, 20 Jul 2020 13:18:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E35467303C;
+ Mon, 20 Jul 2020 13:18:26 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH for-5.1 1/2] qcow2: Implement v2 zero writes with discard if
- possible
-Date: Mon, 20 Jul 2020 15:18:09 +0200
-Message-Id: <20200720131810.177978-2-kwolf@redhat.com>
+Subject: [PATCH for-5.1 2/2] iotests: Test sparseness for qemu-img convert -n
+Date: Mon, 20 Jul 2020 15:18:10 +0200
+Message-Id: <20200720131810.177978-3-kwolf@redhat.com>
 In-Reply-To: <20200720131810.177978-1-kwolf@redhat.com>
 References: <20200720131810.177978-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -99,43 +98,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qcow2 version 2 images don't support the zero flag for clusters, so for
-write_zeroes requests, we return -ENOTSUP and get explicit zero buffer
-writes. If the image doesn't have a backing file, we can do better: Just
-discard the respective clusters.
-
-This is relevant for 'qemu-img convert -O qcow2 -n', where qemu-img has
-to assume that the existing target image may contain any data, so it has
-to write zeroes. Without this patch, this results in a fully allocated
-target image, even if the source image was empty.
-
-Reported-by: Nir Soffer <nsoffer@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2-cluster.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/122     | 34 ++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/122.out | 17 +++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 4b5fc8c4a7..a677ba9f5c 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1797,8 +1797,15 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
-     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
-            end_offset >= bs->total_sectors << BDRV_SECTOR_BITS);
+diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
+index dfd1cd05d6..1112fc0730 100755
+--- a/tests/qemu-iotests/122
++++ b/tests/qemu-iotests/122
+@@ -281,6 +281,40 @@ $QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
  
--    /* The zero flag is only supported by version 3 and newer */
-+    /*
-+     * The zero flag is only supported by version 3 and newer. However, if we
-+     * have no backing file, we can resort to discard in version 2.
-+     */
-     if (s->qcow_version < 3) {
-+        if (!bs->backing) {
-+            return qcow2_cluster_discard(bs, offset, bytes,
-+                                         QCOW2_DISCARD_REQUEST, false);
-+        }
-         return -ENOTSUP;
-     }
+ $QEMU_IMG compare "$TEST_IMG" "$TEST_IMG".orig
  
++echo
++echo '=== -n to an empty image ==='
++echo
++
++_make_test_img 64M
++
++# Convert with -n, which should not result in a fully allocated image, not even
++# with compat=0.10 (because the target doesn't have a backing file)
++TEST_IMG="$TEST_IMG".orig _make_test_img -o compat=1.1 64M
++$QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
++$QEMU_IMG map --output=json "$TEST_IMG".orig
++
++TEST_IMG="$TEST_IMG".orig _make_test_img -o compat=0.10 64M
++$QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
++$QEMU_IMG map --output=json "$TEST_IMG".orig
++
++echo
++echo '=== -n to an empty image with a backing file ==='
++echo
++
++_make_test_img 64M
++TEST_IMG="$TEST_IMG".base _make_test_img 64M
++
++# Convert with -n, which should still not result in a fully allocated image for
++# compat=1.1 (because it can use zero clusters), but it should be fully
++# allocated with compat=0.10
++TEST_IMG="$TEST_IMG".orig _make_test_img -b "$TEST_IMG".base -F $IMGFMT -o compat=1.1 64M
++$QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
++$QEMU_IMG map --output=json "$TEST_IMG".orig
++
++TEST_IMG="$TEST_IMG".orig _make_test_img -b "$TEST_IMG".base -F $IMGFMT -o compat=0.10 64M
++$QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
++$QEMU_IMG map --output=json "$TEST_IMG".orig
++
+ echo
+ echo '=== -n -B to an image without a backing file ==='
+ echo
+diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
+index f1f195ed77..b8028efb1d 100644
+--- a/tests/qemu-iotests/122.out
++++ b/tests/qemu-iotests/122.out
+@@ -229,6 +229,23 @@ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ Images are identical.
+ 
++=== -n to an empty image ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=IMGFMT size=67108864
++[{ "start": 0, "length": 67108864, "depth": 0, "zero": true, "data": false}]
++Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=IMGFMT size=67108864
++[{ "start": 0, "length": 67108864, "depth": 0, "zero": true, "data": false}]
++
++=== -n to an empty image with a backing file ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
++Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
++[{ "start": 0, "length": 67108864, "depth": 0, "zero": true, "data": false}]
++Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
++[{ "start": 0, "length": 67108864, "depth": 0, "zero": false, "data": true, "offset": 327680}]
++
+ === -n -B to an image without a backing file ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=67108864
 -- 
 2.25.4
 
