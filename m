@@ -3,68 +3,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A5F4C433EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A74CEC433FC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:46:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6FDF2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:42:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6FDF2073A
+	by mail.kernel.org (Postfix) with ESMTPS id 7CF982070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 16:46:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CF982070A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxYs9-0000P3-1w
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 12:42:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39770)
+	id 1jxYwH-0002Ke-JS
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 12:46:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jxYrI-0007yD-BU
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:41:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37478)
+ id 1jxYvQ-0001e8-RH
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:46:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38202)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jxYrF-00078Y-4j
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:41:44 -0400
+ id 1jxYvO-0007b0-Nd
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 12:46:00 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jxYrC-0000W9-TP
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 16:41:38 +0000
+ id 1jxYvN-0001B2-EA
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 16:45:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A2F3F2E8106
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 16:41:38 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 5F3392E810B
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 16:45:57 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jul 2020 16:27:09 -0000
-From: Peter Maydell <1881004@bugs.launchpad.net>
+Date: Mon, 20 Jul 2020 16:26:12 -0000
+From: Peter Maydell <1216845@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
  assignee=None; 
+X-Launchpad-Bug-Tags: arm
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: eblake philmd pmaydell
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
+X-Launchpad-Bug-Commenters: ilg karl-erik-zimmerman pmaydell
+X-Launchpad-Bug-Reporter: Liviu Ionescu (ilg)
 X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <159060681483.5838.13632051970488338647.malonedeb@wampee.canonical.com>
-Message-Id: <159526242974.12636.5421865970779486457.malone@gac.canonical.com>
-Subject: [Bug 1881004] Re: fpu/softfloat.c: error: bitwise negation of a
- boolean expression
+References: <20130826101205.25802.19011.malonedeb@soybean.canonical.com>
+Message-Id: <159526237257.13569.3719971137946656099.malone@gac.canonical.com>
+Subject: [Bug 1216845] Re: qemu-system-arm semihosting always calls exit(0)
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 219bfafac0a46156462f87de7c9659128e90e8cd
+X-Launchpad-Hash: a62a8aab9a6f8716e815031820af0c596ba8fbce
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 11:25:44
@@ -86,95 +85,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1881004 <1881004@bugs.launchpad.net>
+Reply-To: Bug 1216845 <1216845@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fixed in commit 4066288694c3bdd175df8, which will be in 5.1.
+The semihosting v2 support went into QEMU in the 4.2 release, but I
+forgot to close this bug...
 
 
 ** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+       Status: In Progress =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1881004
+https://bugs.launchpad.net/bugs/1216845
 
 Title:
-  fpu/softfloat.c: error: bitwise negation of a boolean expression
+  qemu-system-arm semihosting always calls exit(0)
 
 Status in QEMU:
-  Fix Committed
+  Fix Released
 
 Bug description:
-  Last time I built QEMU was on commit d5c75ec500d96f1d93447f990cd5a4ef5ba2=
-7fae,
-  I just pulled to fea8f3ed739536fca027cf56af7f5576f37ef9cd and now get:
-   =
+  In my embedded ARM project I have a bunch of unit tests that I run in
+  a POSIX synthetic environment, and, as usual for POSIX processes,
+  these tests return 0 for success and !=3D0 for error.
 
-    CC      lm32-softmmu/fpu/softfloat.o
-  fpu/softfloat.c:3365:13: error: bitwise negation of a boolean expression;=
- did you mean logical negation? [-Werror,-Wbool-operation]
-      absZ &=3D ~ ( ( ( roundBits ^ 0x40 ) =3D=3D 0 ) & roundNearestEven );
-              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-              !
-  fpu/softfloat.c:3423:18: error: bitwise negation of a boolean expression;=
- did you mean logical negation? [-Werror,-Wbool-operation]
-          absZ0 &=3D ~ ( ( (uint64_t) ( absZ1<<1 ) =3D=3D 0 ) & roundNeares=
-tEven );
-                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                   !
-  fpu/softfloat.c:3483:18: error: bitwise negation of a boolean expression;=
- did you mean logical negation? [-Werror,-Wbool-operation]
-          absZ0 &=3D ~(((uint64_t)(absZ1<<1) =3D=3D 0) & roundNearestEven);
-                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                   !
-  fpu/softfloat.c:3606:13: error: bitwise negation of a boolean expression;=
- did you mean logical negation? [-Werror,-Wbool-operation]
-      zSig &=3D ~ ( ( ( roundBits ^ 0x40 ) =3D=3D 0 ) & roundNearestEven );
-              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-              !
-  fpu/softfloat.c:3760:13: error: bitwise negation of a boolean expression;=
- did you mean logical negation? [-Werror,-Wbool-operation]
-      zSig &=3D ~ ( ( ( roundBits ^ 0x200 ) =3D=3D 0 ) & roundNearestEven );
-              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-              !
-  fpu/softfloat.c:3987:21: error: bitwise negation of a boolean expression;=
- did you mean logical negation? [-Werror,-Wbool-operation]
-                      ~ ( ( (uint64_t) ( zSig1<<1 ) =3D=3D 0 ) & roundNeare=
-stEven );
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~
-                      !
-  fpu/softfloat.c:4003:22: error: bitwise negation of a boolean expression;=
- did you mean logical negation? [-Werror,-Wbool-operation]
-              zSig0 &=3D ~ ( ( (uint64_t) ( zSig1<<1 ) =3D=3D 0 ) & roundNe=
-arestEven );
-                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~
-                       !
-  fpu/softfloat.c:4273:18: error: bitwise negation of a boolean expression;=
- did you mean logical negation? [-Werror,-Wbool-operation]
-          zSig1 &=3D ~ ( ( zSig2 + zSig2 =3D=3D 0 ) & roundNearestEven );
-                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                   !
-  8 errors generated.
+  Now I expanded the testing environment to run some of these tests
+  compiled for ARM, under QEMU, with the tracing messages forwarded via
+  the semihosting API.
 
-  $ clang -v
-  clang version 10.0.0-4ubuntu1 =
+  Up to now everything is fine with the emulation.
 
-  Target: aarch64-unknown-linux-gnu
+  However I have a problem with passing the failure code back to the
+  operating system, to drive the continuous integration framework.
 
-  $ lsb_release -a
-  No LSB modules are available.
-  Distributor ID: Ubuntu
-  Description:    Ubuntu 20.04 LTS
-  Release:        20.04
-  Codename:       focal
+  I checked the arm-semi.c code and for SYS_EXIT and I discovered that
+  the parameter passed is ignored and it always calls exit(0):
+
+      case SYS_EXIT:
+          gdb_exit(env, 0);
+          exit(0);
+
+  To solve my problem I temporarily made a patch, and for cases that
+  should return non zero codes, I call an unsupported BKPT instruction,
+  which makes QEMU abort, and pass an non zero code (1) back to the
+  operating system.
+
+      qemu: Unsupported SemiHosting SWI 0xf1
+
+  This kludge is more or less functional, but is quite inconvenient.
+
+  After checking the ARM manuals, I discovered that SYS_EXIT is not
+  standard, and the 0x18 code used for it originally was used for
+  angel_SWIreason_ReportException, which has a slightly different
+  purpose.
+
+  Now the question:
+
+  Would it be possible to no longer ignore the code passed to 0x18, and
+  if it is non zero, to call exit() with a different value?
+
+  The suggested rule would be:
+
+  if (code =3D=3D0 || code =3D=3D 0x20026)
+    exit(0);
+  elif (code < 256)
+    exit(code);
+  else
+    exit(1);
+
+  The value 0x20026 means ADP_Stopped_ApplicationExit, and, if I
+  understood it right, it means that the program terminated
+  successfully. If this is not true, it can be removed from the first
+  conditional statement.
+
+  What do you think? Can this be added to arm-semi.c?
+
+  =
+
+  Regards,
+
+  Liviu
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1881004/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1216845/+subscriptions
 
