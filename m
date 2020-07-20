@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92549C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C0FC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:03:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61039207FC
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:01:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4493207FC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 13:03:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qBsI2Ra4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61039207FC
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y5GZAcoH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4493207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxVQa-0002Zc-E0
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 09:01:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55798)
+	id 1jxVRt-0004ey-89
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 09:03:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxVLO-0002P6-MU
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:34 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:53617)
+ id 1jxVLS-0002Ya-KA
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:38 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:45470)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxVLM-0007JD-Tp
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:34 -0400
-Received: by mail-wm1-x333.google.com with SMTP id j18so22172187wmi.3
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 05:56:32 -0700 (PDT)
+ id 1jxVLQ-0007Jj-Jl
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:38 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id s10so17690948wrw.12
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 05:56:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=10LO/QCoMpR7jIRc6OlNm9WJ8aeWJRb66wCBW65n2ZM=;
- b=qBsI2Ra42VlwXp7Kl2gFxtX2bIeSOIuL0xgUxvSkhbKPu9BjvUUAp1JYL2yIGO6ys5
- sjQlpiPSJZp03F/LoViTNm5gToBlaK8P8zWqaZ9RiW7kVBSIJon7AIdthIC81DAL8L8u
- 0x4gNzEwuSkYEx1bVgE0vxLdwFWDGpCmIYdl/zUqIaeu9GazyvLPh3I9WZh8Q3ZTndJ5
- aiU4Kdr8kG3xpVkotYfW8tJdz2OTexWA3VP9Cb06Fq2mBWjppH7QW3VNcnRm6aUV6VJ4
- jTkQlSrO+z2f95VQQmp3D3V4oA0jcXjPdYvSltatfJwI4lKU4dtMMVvrDSBe/pBQl2rm
- blUw==
+ bh=P4gnsXwsGRcRiwGn2A5K5QHmrCzJUCvt2/Zcs5cjl3E=;
+ b=y5GZAcoH9WrQmtqsoxmcJfVed8YL6npKSRyb+TheylAO9gPAMvVsV7cdNZokPaUlr1
+ zg1zKvkmSJ2VbeMbNLAsXy2j6RUFHZs7ma3Uw4QdbcVUpHJaLk2CBonvxUvAOrLqCt5e
+ XX+78Md4wLzDSGTPNyNZYZuBNwaEpxv7yugZ9mMaeyFvhQ7s78sOIWZHMlI9Y9wGDgyM
+ JRyPSzv75AoYalZeHzwy81AtFDFh801PKCpNrN2THfyyWTPpRcxPGJS2JZ8aivSy9etd
+ Ki9uBHBIC42TOD14+w5kgTB5vmmLBF2GImwuDrlrIsWD0bSIIb57EP8/TAgxiHtHhZhr
+ Iu8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=10LO/QCoMpR7jIRc6OlNm9WJ8aeWJRb66wCBW65n2ZM=;
- b=fv7Axyg6ZU322gBzqqTlkxxsKtzs7EIksvD/bmjPsLJyu+ckO530S1fHc/rZxAcwyl
- x3MRum5CmS2FoJAhe0pO1Jy3hpr/1WeIcboHH23DhCjnvvCfFvE4nxOQeRVzU9Rahr9b
- AtTeQcs3gmdl1p4hEIawc8VyCGH/GMFkjn0TUaAH5wl20ysDyj2LUN009+Qd6luUAhhS
- aUoyjILci5oB2t2U0k83fRyCY6GAmLjTPQCDIZwk0Z5w2vxO6nEhQZ+okEdtn87b13W9
- ZKw/Pb6QAYMd3LcFqQW0hawh9NFEcNwOuAma/dXIqF+UFjo5SwxNcB2StdoS6wDwksiJ
- 2DTQ==
-X-Gm-Message-State: AOAM531S2O3pqhe2OQxsx4lt0cs4D2k3BQkFf2NU58QNq0Kt0h5ax6D5
- y4uZrTrSH+GlKCCjiPrnFB4mP/xe49mywg==
-X-Google-Smtp-Source: ABdhPJx4sxD/jRp3i20+IEuQAsXn7R4814Nuv1qyi9DFsMlaaZJ1IjEkMzhir6pFooD7b9V/qUd4DQ==
-X-Received: by 2002:a05:600c:249:: with SMTP id
- 9mr20186415wmj.80.1595249791240; 
- Mon, 20 Jul 2020 05:56:31 -0700 (PDT)
+ bh=P4gnsXwsGRcRiwGn2A5K5QHmrCzJUCvt2/Zcs5cjl3E=;
+ b=Jg0D3BoBvVzX0pe0jX0Qbbd7lb0rM0e+vLf7NGYsLfIdL83SwHh4KbXHTflODeqiTT
+ 3/biD6In6JgOHnh5JTwlNvFq5qzb1eDc66cFbeOX6yadwpCpHV8mV+soTn2L1A6nZ0Sx
+ 8N8b8+eRZfP0tpARK80CygvePxvOgch2FrUJ5wQ0P6mSlbVOgH87sR5CU34fY1Pihdjm
+ nO6XV7rTbe4NiKOdob1iw2gEOeO2zblVekjSH/9m3DSvBBbAviQ1dB9vsfN7YNrzogAg
+ tpfON0t2Cl4s1/AFlnkY8wICKWsO4AKw4UQO0xYi7iROroyHCVwC1IqEa8JlLl/Mdx0k
+ rhLw==
+X-Gm-Message-State: AOAM530m0QFt51cQA82thm0HsPwguhqzKPF3d1OKlKdQad/h9CurtuXh
+ 5TLjxvyz3v0KA35vMewHRUNoSe9Wcswr5g==
+X-Google-Smtp-Source: ABdhPJyeYNaCLPgLC+6x2xaL/bwYyH3rq354upXx1O1KQ7pa17YNhpEL55mZQXU0du2JhuhbYPWr5g==
+X-Received: by 2002:a5d:69c8:: with SMTP id s8mr21757642wrw.405.1595249794899; 
+ Mon, 20 Jul 2020 05:56:34 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p29sm34025403wmi.43.2020.07.20.05.56.29
+ by smtp.gmail.com with ESMTPSA id p29sm34025403wmi.43.2020.07.20.05.56.34
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jul 2020 05:56:30 -0700 (PDT)
+ Mon, 20 Jul 2020 05:56:34 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/12] qdev: Document qdev_unrealize()
-Date: Mon, 20 Jul 2020 13:56:15 +0100
-Message-Id: <20200720125621.13460-7-peter.maydell@linaro.org>
+Subject: [PULL 09/12] docs/system: Briefly document canon-a1100 board
+Date: Mon, 20 Jul 2020 13:56:18 +0100
+Message-Id: <20200720125621.13460-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200720125621.13460-1-peter.maydell@linaro.org>
 References: <20200720125621.13460-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x333.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -87,8 +87,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,46 +105,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a doc comment for qdev_unrealize(), to go with the new
-documentation for the realize part of the qdev lifecycle.
+Add skeletal documentation of the canon-a1100 board.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200711142425.16283-3-peter.maydell@linaro.org
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 20200713175746.5936-2-peter.maydell@linaro.org
 ---
- include/hw/qdev-core.h | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ docs/system/arm/digic.rst  | 11 +++++++++++
+ docs/system/target-arm.rst |  1 +
+ MAINTAINERS                |  1 +
+ 3 files changed, 13 insertions(+)
+ create mode 100644 docs/system/arm/digic.rst
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 2d441d1fb2e..1d2bf5f37da 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -381,6 +381,25 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp);
-  * would be incorrect. For that use case you want qdev_realize().
-  */
- bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp);
-+/**
-+ * qdev_unrealize: Unrealize a device
-+ * @dev: device to unrealize
-+ *
-+ * This function will "unrealize" a device, which is the first phase
-+ * of correctly destroying a device that has been realized. It will:
-+ *
-+ *  - unrealize any child buses by calling qbus_unrealize()
-+ *    (this will recursively unrealize any devices on those buses)
-+ *  - call the the unrealize method of @dev
-+ *
-+ * The device can then be freed by causing its reference count to go
-+ * to zero.
-+ *
-+ * Warning: most devices in QEMU do not expect to be unrealized.  Only
-+ * devices which are hot-unpluggable should be unrealized (as part of
-+ * the unplugging process); all other devices are expected to last for
-+ * the life of the simulation and should not be unrealized and freed.
-+ */
- void qdev_unrealize(DeviceState *dev);
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version);
+diff --git a/docs/system/arm/digic.rst b/docs/system/arm/digic.rst
+new file mode 100644
+index 00000000000..2b3520ff5e1
+--- /dev/null
++++ b/docs/system/arm/digic.rst
+@@ -0,0 +1,11 @@
++Canon A1100 (``canon-a1100``)
++=============================
++
++This machine is a model of the Canon PowerShot A1100 camera, which
++uses the DIGIC SoC. This model is based on reverse engineering efforts
++by the contributors to the `CHDK <http://chdk.wikia.com/>`_ and
++`Magic Lantern <http://www.magiclantern.fm/>`_ projects.
++
++The emulation is incomplete. In particular it can't be used
++to run the original camera firmware, but it can successfully run
++an experimental version of the `barebox bootloader <http://www.barebox.org/>`_.
+diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+index 1bd477a2936..8fa51a22817 100644
+--- a/docs/system/target-arm.rst
++++ b/docs/system/target-arm.rst
+@@ -82,6 +82,7 @@ undocumented; you can get a complete list by running
+    arm/versatile
+    arm/vexpress
+    arm/aspeed
++   arm/digic
+    arm/musicpal
+    arm/nseries
+    arm/orangepi
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5d9c56e441d..9ed36dcf736 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -636,6 +636,7 @@ F: include/hw/arm/digic.h
+ F: hw/*/digic*
+ F: include/hw/*/digic*
+ F: tests/acceptance/machine_arm_canona1100.py
++F: docs/system/arm/digic.rst
+ 
+ Goldfish RTC
+ M: Anup Patel <anup.patel@wdc.com>
 -- 
 2.20.1
 
