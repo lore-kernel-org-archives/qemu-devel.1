@@ -5,66 +5,66 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B2EC43462
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D39FFC433FE
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:10:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 896102068F
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:10:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7A822070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:10:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ajM/SCcc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 896102068F
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="piYvVfaV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7A822070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxaF4-00007N-Sl
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 14:10:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58518)
+	id 1jxaFe-0001Bw-Tf
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 14:10:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jxaCa-0005nZ-AH; Mon, 20 Jul 2020 14:07:48 -0400
+ id 1jxaCV-0005cg-LB; Mon, 20 Jul 2020 14:07:43 -0400
 Received: from mail-eopbgr30115.outbound.protection.outlook.com
  ([40.107.3.115]:44342 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jxaCY-0001VM-DA; Mon, 20 Jul 2020 14:07:47 -0400
+ id 1jxaCT-0001VM-RN; Mon, 20 Jul 2020 14:07:43 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AGDk0loUredwf4zG/YVrNM+RWHDvkLkW/SMaHD62D4h/ySVYcDXA2AyhtXIKmd2y4kr5GXZ1fNO7BKW37idmlENRrO+uwD1qLmLfDs6YAFoB9hwLuuEcM0RUpKJKKnD9yekslHp0uCx4OmDVs7q2ooqX7RYGduN2L4EsZrcWne2HZm8wS0iBhtzuMW+aMXoEdsEXJCMgJ2TrFWEYFoJrDX1su+CQJ8nrDzI4ZibTc7Y82Jt8u7qXKjqAhmJH2HDw8wcA6y0/SpDiCmmCnmqGKFrtuP4Wjj+chzXe8ySSuHYBWAttBmRLxz/5B1nxJ9o61FbcA5zucRvKIYkOJTFZvg==
+ b=cWIGFsPTenXwOkI1rtBjIJOUO9KHi6BTnDUQwd6oOH62v9AGHsR38GQxQFj7Zwny1lhmDx8BgVr/ul5R+wKg2MFo9rhBMXV4lyDNwg/JRKwPf68JTEpvSeKhRIj4RJAnvUYQENbMFCiGcEn3wk7Z4AksVOObN71mDBPtHZLNT865pRktMD4PaMUVHZzgqWfLTF+S34CebqCmn5/NoGPRpF+YxsRow8LZtvnenJoao2jIxQ+QP7OQ81eFlTBYEDfgX0iZqYjcm0MogMYH3EKqaTjfKkLQ9qyqbM+5vm5zCi+nXzo0VKglkgS42pil80Lzuzjxo88LiXZQGps9QuQA1Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ND61QWT6uvaBxQDp6wOnx/rSoXnc5tcaYeX+Zmz2rDs=;
- b=mjfzYqigdYalUGKmNKqcdaoY8MugQfPGrY8/AGySaQ6JgdzD7tF46KQmXAWK8w+GXGX7ZlQ7rrSki05e63IM4P1MrnHFXtGYsajaL2hM9EFYCYYupDI6s7tW6KpELpUp8WMowOcLdkmoswULxoDI3J4U1QEkgl/l0vAh9W7uh1Mnj7zIyc6FwnZ3DaYVl099PZ6hnrWMI8zIyGFCsKQtijaqg6vsX1JivDRvDYjUPfsK9Lzt2RhblH9BpOMlQD+yck+zSkh7824FW3lOdC/wvtm9Lm45KcvU/bZDHTZNyU4fsJ2/IJXHDSXWlz8xLsb4SI6DAQ8T4GX4Y8mYosZ8Hg==
+ bh=foWrUqcfERZ2Cs2I47EltGvGgldT8PFtErWBP/y+hzo=;
+ b=DNnB7SdmVc3ruJVXZ0BtGke/ZdC7tAgThDDXNgrgIybgWL/+3aYE9MXbO4jc9mfJgSSuJzZiT34nRWVmi79qrMZJ6ipb/JkQ7L+MxZV5rjn+o0hen1RwRhCXNCSpXlusq0O42BNXpRMnnpnGT95VAIR89Tn1kP2UV48iC6x1lciML9WqQ1JgChuqF74Kq5feAorvckNXhIXUewSUyF1quqSsVjLoa1TlARxsYuM4uK8PbEocEAzTCJAeWJKmvRihkAudPzLDuC6ebwC4EEFPATwmtOixR1myKsNNPqSHAarrXnFiqyI0hq4fVHxUzcmBVUz245ufnbdILuOZX4LG3g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ND61QWT6uvaBxQDp6wOnx/rSoXnc5tcaYeX+Zmz2rDs=;
- b=ajM/SCccp0XWn6uL6MnGzaQzkA1+MUkMkJeMurFLImIVjVU1eUqcWGaBxzNs1SQGJkQLZ9g7UBQcZiXinIzgckSvxSNfaIW7TJJxOKFP9y8iZMSxNgoC3TMDTEN9xfjjZ5tnU0bgRZxneYo8E0R3lqfSQ4fhnTvD1n4vXTPGSVc=
+ bh=foWrUqcfERZ2Cs2I47EltGvGgldT8PFtErWBP/y+hzo=;
+ b=piYvVfaV55A6gl94maZRUFH9WLQmMwOeXrsQMslzw04ICGaf3hP9OCtL+MA8L7swUzgE/7QYRfIrH3so/PjXn1fSCj5dzHpR4BNT/9KAJ/vy+ZRvcwvt/oEzHWQjMJxWZYO+GqZgF26ThrZxlvCJ4XLnKjZRhQA+UHMoY+fkNKw=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM6PR08MB4342.eurprd08.prod.outlook.com (2603:10a6:20b:b4::22)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17; Mon, 20 Jul
- 2020 18:07:37 +0000
+ 2020 18:07:35 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3195.025; Mon, 20 Jul 2020
- 18:07:37 +0000
+ 18:07:35 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 4/4] block/nbd: use non-blocking connect: fix vm hang on
- connect()
-Date: Mon, 20 Jul 2020 21:07:15 +0300
-Message-Id: <20200720180715.10521-5-vsementsov@virtuozzo.com>
+Subject: [PATCH 2/4] qemu-sockets: implement non-blocking connect interface
+Date: Mon, 20 Jul 2020 21:07:13 +0300
+Message-Id: <20200720180715.10521-3-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200720180715.10521-1-vsementsov@virtuozzo.com>
 References: <20200720180715.10521-1-vsementsov@virtuozzo.com>
@@ -78,33 +78,33 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from localhost.localdomain (185.215.60.171) by
  AM0PR06CA0130.eurprd06.prod.outlook.com (2603:10a6:208:ab::35) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3195.17 via Frontend Transport; Mon, 20 Jul 2020 18:07:36 +0000
+ 15.20.3195.17 via Frontend Transport; Mon, 20 Jul 2020 18:07:34 +0000
 X-Mailer: git-send-email 2.21.0
 X-Originating-IP: [185.215.60.171]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a7b3459a-404d-4791-3be6-08d82cd7c898
+X-MS-Office365-Filtering-Correlation-Id: aa6d474e-326a-42d0-c12b-08d82cd7c7a0
 X-MS-TrafficTypeDiagnostic: AM6PR08MB4342:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB43424D12CF61A423CA23FC74C17B0@AM6PR08MB4342.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:989;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4342E876D51558B296A48BC0C17B0@AM6PR08MB4342.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /EsTH+/XjzkfnJapG4mgj0D4vk6M9UegY480oG4Cek4jjo3ocs5bfnhjB2rd7GAXqbIuHHSncjJZNE1Q7Z6U2TASBxdgpO3aCCHqEg4FDOkhA1xdGZrWs0eCWzvGi5weB33K1KAmtMMV9BednkG1e9A0TW3DlHc8Z7IGbtamiXmQldbYXzB0ACwI4LXnIIeYpvD4M35lnEWxOh6ayq1ff4D2C5w1k/hiZ2Gb73rRJdmjy/jxz53YL3fNQq10DAtkuuRTn6yJ6Au/L4UIvVDveY828pwa+VtdZh0L9QGn5ag4+id3qmcg/AXDXgiLVmqyueFi69o3DY+64KFwthxKbXuL37tiexBpepHVqB//Vf6PrvIhO3DxMfetu9GkqSYO
+X-Microsoft-Antispam-Message-Info: yis8nznOXzVKTrji15rKwVNodm9TaU9UHFtfdfzCKSrGAIJTOQ+ucQdgU6J/gqebR5F2oz75+TowqZz6bGe7/jRC5nPwsOB+JIvuQPvgnj86PKurRg86TDYJxgN0yH9gdxD0ROlaGg3hj3bIX0gPhgxsnDPqI7gUokxDpXjDDRDIuuYqXSMuyRY+qYWcp+jFL4tQ4BETk9uVB3R2OV5c/vacWsK9sUjDr7u2VqA91qZN3gqacouCFontjStfHvpQtRKXw4P5IOVKgy6H8bic/T+KLN0CxeQQ5jnOx6VQuXhMVbgNfK2LUvA0JWXDORXpnqSXcqLYX2t3bcIJCWSCWz8GkFwFsfmDVdSjg6gqIZ73IOe4q5U/ddlIBmX+/e7B
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
  SFS:(4636009)(396003)(136003)(376002)(346002)(366004)(39840400004)(86362001)(4326008)(107886003)(316002)(16526019)(83380400001)(6666004)(2616005)(956004)(6512007)(6916009)(6486002)(2906002)(66556008)(66476007)(66946007)(8676002)(478600001)(186003)(8936002)(52116002)(5660300002)(26005)(36756003)(6506007)(69590400007)(1076003);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: eEFhRD+j34TmYwVeHy+S4xMKoUZ/P5CODiOXZF9sMUALK4hq56Shl+6Y/I4BCOdTLCRO+/ImEM4fJNs1PYyvBRwG/rWSEaCcD0tnHjxm72tauQTw3tAS9QIQBtz3u2+v3rCXkU+hiQD1Zdco51LlqRopoio9g/AE7yUMwOeC/bUhG8CcDumHfYuj+kvVPwrD4qHk+AGEfMy7b3BxBcls6B3NjbDB7uOeLVLSSQckb0fGYJksGkubjnbCVMcYaz8fmSTWjAOoy84VZEbxkbtRUo11EHpEwqtuY9AkgTtoFneJJ7ci55KfKltuHEvGUaEB6EOszHnuxk/QZuFMMw6h4EnhaqwDl055w2RRuHcLy+BObKZDtosxSDCJkyGCHBcnhLpMCma3oLnjzciaI/B01ZnJW3OqgwdiTXincHCGLymJnMgMZs3Rn1NtRQZaQES58CN/oiyLYd1BnYC7qYTBQ4w5y6U79Kl9z47xkRezjdU=
+X-MS-Exchange-AntiSpam-MessageData: dtbsWZU8Vgp5hXiMXRVGjjAcAG3YIyBxDg4Oh9Zd+OSs6LDz241VON+z21B9gF0E2GZnbZkvLipTT6XCo1/h74qRpyrXFFg+oUeAsKBaAQii6Rpe7aFZT4pGd5RJne83ZPawdamgFQx6Iqnuu2gfTUuqGCzFHsZ+gX9ricxn0H+Y2IfWv0gYrNCA1jp74uN+AVvvVceEc1gCJE1Xif4q5mX+oO+/r0gByJkEmzPm9p8cYxi0UEZF3bqvc8qHSThAq4pMrPMLLx4mXtAHQ5erkk7GDivfoFwyY3w8whxUBEUWYQUkHxWfKBvhDEKeGNIwi06NR+0hdrYNicU0H6ZlJsYvMlrZrODA2PZMDr2/oP5pifPmE+LMKDxT11pZbP/htvNXRlTEHV5QiV13WDDTzCOjsHSbRV6u+kAetzrnTWo+RYX3g0Mb68dwDJuE8HLyjq8ja70fVpbMcmxtcm5rwkHQ69ogv3OCMeqJ3M4ec/Q=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7b3459a-404d-4791-3be6-08d82cd7c898
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa6d474e-326a-42d0-c12b-08d82cd7c7a0
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2020 18:07:36.9578 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2020 18:07:35.3379 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Kj6SNexE2wo9sKjiREPK2H0Q4j5YOgak0DgC4hG+YtTwRMWkwZoCnUrajEHE8tkfEfDfgkd5qpZVfuAyW8/siSdFJbJIdi/e7GQ/3t+M9E0=
+X-MS-Exchange-CrossTenant-UserPrincipalName: geIjhmv41rcIkZPkbaH90GptBXD2qmrXb8b2yx/5iflYtDex98WOUcvY24OKs+IBOBCnlA4lY9pE640Z9I3Sgtqv4VEiT4+TgBaAcA5MUrg=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4342
 Received-SPF: pass client-ip=40.107.3.115;
  envelope-from=vsementsov@virtuozzo.com;
@@ -137,109 +137,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This make nbd connection_co to yield during reconnects, so that
-reconnect doesn't hang up the main thread. This is very important in
-case of unavailable nbd server host: connect() call may take a long
-time, blocking the main thread (and due to reconnect, it will hang
-again and again with small gaps of working time during pauses between
-connection attempts).
+We are going to implement non-blocking connect in io/channel-socket.
 
-How to reproduce the bug:
+non-blocking connect includes three phases:
 
-1. Create an image on node1:
-   qemu-img create -f qcow2 xx 100M
+    1. connect() call
+    2. wait until socket is ready
+    3. check result
 
-2. Start NBD server on node1:
-   qemu-nbd xx
+io/channel-socket has wait-on-socket API (qio_channel_yield(),
+qio_channel_wait()), so it's a good place for [2].
 
-3. Start vm with second nbd disk on node2, like this:
+Still, the whole thing is not simple, because socket connect in case of
+inet socket includes several connect() calls, as SocketAddress may be
+parsed into a list of inet addresses. And after each non-blocking
+connect() upper layer should have a possibility to wait on the socket.
 
-  ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -drive \
-    file=/work/images/cent7.qcow2 -drive file=nbd+tcp://192.168.100.2 \
-    -vnc :0 -qmp stdio -m 2G -enable-kvm -vga std
+We may try to implement a kind of abstract list or iterator for
+"sub" addresses of SocketAddress, but all this appears to be too
+complex and not worth doing (as actually, only inet sockets has such a
+"multiple" SocketAddress).
 
-4. Access the vm through vnc (or some other way?), and check that NBD
-   drive works:
-
-   dd if=/dev/sdb of=/dev/null bs=1M count=10
-
-   - the command should succeed.
-
-5. Now, let's trigger nbd-reconnect loop in Qemu process. For this:
-
-5.1 Kill NBD server on node1
-
-5.2 run "dd if=/dev/sdb of=/dev/null bs=1M count=10" in the guest
-    again. The command should fail and a lot of error messages about
-    failing disk may appear as well.
-
-    Now NBD client driver in Qemu tries to reconnect.
-    Still, VM works well.
-
-6. Make node1 unavailable on NBD port, so connect() from node2 will
-   last for a long time:
-
-   On node1 (Note, that 10809 is just a default NBD port):
-
-   sudo iptables -A INPUT -p tcp --dport 10809 -j DROP
-
-   After some time the guest hangs, and you may check in gdb that Qemu
-   hangs in connect() call, issued from the main thread. This is the
-   BUG.
-
-7. Don't forget to drop iptables rule from your node1:
-
-   sudo iptables -D INPUT -p tcp --dport 10809 -j DROP
+So, let's instead make public API for inet sockets themselves, to be
+handled in separate in upper layer, if it needs non-blocking connect.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nbd.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ include/qemu/sockets.h |  6 ++++++
+ util/qemu-sockets.c    | 45 +++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 46 insertions(+), 5 deletions(-)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index d9cde30457..931eadbe6f 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1421,16 +1421,19 @@ static void nbd_client_close(BlockDriverState *bs)
-     nbd_teardown_connection(bs);
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index 7d1f813576..7389d6be55 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -34,6 +34,12 @@ int inet_ai_family_from_address(InetSocketAddress *addr,
+ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp);
+ int inet_connect(const char *str, Error **errp);
+ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp);
++int inet_connect_addr(InetSocketAddress *saddr, struct addrinfo *addr,
++                      bool blocking, bool *in_progress, Error **errp);
++struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
++                                          Error **errp);
++
++int socket_check(int fd, Error **errp);
+ 
+ NetworkAddressFamily inet_netfamily(int family);
+ 
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 8ccf4088c2..a02d00f342 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -354,11 +354,17 @@ listen_ok:
+     ((rc) == -EINPROGRESS)
+ #endif
+ 
+-static int inet_connect_addr(InetSocketAddress *saddr,
+-                             struct addrinfo *addr, Error **errp)
++int inet_connect_addr(InetSocketAddress *saddr, struct addrinfo *addr,
++                      bool blocking, bool *in_progress, Error **errp)
+ {
+     int sock, rc;
+ 
++    assert(blocking == !in_progress);
++
++    if (in_progress) {
++        *in_progress = false;
++    }
++
+     sock = qemu_socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+     if (sock < 0) {
+         error_setg_errno(errp, errno, "Failed to create socket");
+@@ -366,6 +372,10 @@ static int inet_connect_addr(InetSocketAddress *saddr,
+     }
+     socket_set_fast_reuse(sock);
+ 
++    if (!blocking) {
++        qemu_set_nonblock(sock);
++    }
++
+     /* connect to peer */
+     do {
+         rc = 0;
+@@ -374,6 +384,13 @@ static int inet_connect_addr(InetSocketAddress *saddr,
+         }
+     } while (rc == -EINTR);
+ 
++    if (!blocking && rc == -EINPROGRESS) {
++        if (in_progress) {
++            *in_progress = true;
++        }
++        return sock;
++    }
++
+     if (rc < 0) {
+         error_setg_errno(errp, errno, "Failed to connect socket");
+         closesocket(sock);
+@@ -395,8 +412,26 @@ static int inet_connect_addr(InetSocketAddress *saddr,
+     return sock;
  }
  
--static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
-+static QIOChannelSocket *nbd_establish_connection(BlockDriverState *bs,
-+                                                  SocketAddress *saddr,
-                                                   Error **errp)
+-static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
+-                                                 Error **errp)
++int socket_check(int fd, Error **errp)
++{
++    int optval;
++    socklen_t optlen = sizeof(optval);
++    if (qemu_getsockopt(fd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0) {
++        error_setg_errno(errp, errno, "Unable to check connection");
++        return -1;
++    }
++
++    if (optval != 0) {
++        error_setg_errno(errp, errno, "Connection failed");
++        return -1;
++    }
++
++    return 0;
++}
++
++
++struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
++                                          Error **errp)
  {
-     ERRP_GUARD();
-     QIOChannelSocket *sioc;
-+    AioContext *aio_context = bdrv_get_aio_context(bs);
- 
-     sioc = qio_channel_socket_new();
-     qio_channel_set_name(QIO_CHANNEL(sioc), "nbd-client");
- 
--    qio_channel_socket_connect_sync(sioc, saddr, errp);
-+    qio_channel_attach_aio_context(QIO_CHANNEL(sioc), aio_context);
-+    qio_channel_socket_connect_non_blocking_sync(sioc, saddr, errp);
-     if (*errp) {
-         object_unref(OBJECT(sioc));
-         return NULL;
-@@ -1451,7 +1454,7 @@ static int nbd_client_connect(BlockDriverState *bs, Error **errp)
-      * establish TCP connection, return error if it fails
-      * TODO: Configurable retry-until-timeout behaviour.
-      */
--    QIOChannelSocket *sioc = nbd_establish_connection(s->saddr, errp);
-+    QIOChannelSocket *sioc = nbd_establish_connection(bs, s->saddr, errp);
- 
-     if (!sioc) {
-         return -ECONNREFUSED;
-@@ -1461,8 +1464,6 @@ static int nbd_client_connect(BlockDriverState *bs, Error **errp)
- 
-     /* NBD handshake */
-     trace_nbd_client_connect(s->export);
--    qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
--    qio_channel_attach_aio_context(QIO_CHANNEL(sioc), aio_context);
- 
-     s->info.request_sizes = true;
-     s->info.structured_reply = true;
+     struct addrinfo ai, *res;
+     int rc;
+@@ -466,7 +501,7 @@ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
+     for (e = res; e != NULL; e = e->ai_next) {
+         error_free(local_err);
+         local_err = NULL;
+-        sock = inet_connect_addr(saddr, e, &local_err);
++        sock = inet_connect_addr(saddr, e, true, NULL, &local_err);
+         if (sock >= 0) {
+             break;
+         }
 -- 
 2.21.0
 
