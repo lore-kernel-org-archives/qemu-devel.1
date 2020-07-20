@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9426FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:18:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11333C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:20:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F5F82080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:18:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE16220709
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:20:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZq3Siba"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F5F82080D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DBElooxI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE16220709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxR0d-0005N4-KE
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 04:18:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33576)
+	id 1jxR2A-0006Na-3d
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 04:20:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxR05-0004w0-3a
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:18:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23839
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxR1Z-0005sz-Ng
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:19:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31085
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxR03-0000uD-GD
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:18:16 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxR1X-00010b-86
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:19:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595233094;
+ s=mimecast20190719; t=1595233186;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=CAFfgy/pGxBoGxRYhzdwu+v3XGLt5zaQYAOTyXsAM3U=;
- b=BZq3Siba1mTw/+6M1qe0Q6OtLr64uqXqfoWF4cY+DWT9/QoBem/LgNLSQnDSqEP/EKoRu0
- pl9gk0AF0gjHvpvq9UNpAWsWbYCW+ykIYQipvXFvqdHndMreWK+e/6rLYnaUM3NTBaKQSX
- ARyJ98RABiqsc6eXPNI4GRkTNI5amOk=
+ bh=3OlNOx/znAVnZnHnQPxV8B6rb00jhqG6mhxqE/Xzp0A=;
+ b=DBElooxIuR7Bp6Lo+vucHyIlhQ0Z/N0l9izatK/CJpu/3E+dyZ4E/hMp/SLQWBJeTkEORP
+ g6mY7P1oa4hSfv2emcGu0z8IRpED46xRHhFOO+SynhFUMAHcjM+RqyH0eUpG4jnM89wbsr
+ vphuMlLE69yM6iHyQx+NgZw+p//X5vI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-JQIDuOigPAGold_lI1c9XQ-1; Mon, 20 Jul 2020 04:18:11 -0400
-X-MC-Unique: JQIDuOigPAGold_lI1c9XQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-270-QzEHOzK3NTqYePUmjNBUbA-1; Mon, 20 Jul 2020 04:19:45 -0400
+X-MC-Unique: QzEHOzK3NTqYePUmjNBUbA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 497B1800597;
- Mon, 20 Jul 2020 08:18:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 590D78017FB;
+ Mon, 20 Jul 2020 08:19:43 +0000 (UTC)
 Received: from [10.36.114.91] (ovpn-114-91.ams2.redhat.com [10.36.114.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 38FB172E45;
- Mon, 20 Jul 2020 08:17:54 +0000 (UTC)
-Subject: Re: [PATCH v4 3/8] s390/sclp: rework sclp boundary and length checks
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 27FD01A8F7;
+ Mon, 20 Jul 2020 08:19:37 +0000 (UTC)
+Subject: Re: [PATCH v4 4/8] s390/sclp: read sccb from mem based on sccb length
 To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org,
  qemu-s390x@nongnu.org
 References: <20200624202312.28349-1-walling@linux.ibm.com>
- <20200624202312.28349-4-walling@linux.ibm.com>
+ <20200624202312.28349-5-walling@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -107,28 +107,28 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat GmbH
-Message-ID: <89b72ce5-39c7-3080-286a-ab6ed59afb7e@redhat.com>
-Date: Mon, 20 Jul 2020 10:17:54 +0200
+Message-ID: <cf1c33ea-2a2a-8400-a56b-384de356cf05@redhat.com>
+Date: Mon, 20 Jul 2020 10:19:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200624202312.28349-4-walling@linux.ibm.com>
+In-Reply-To: <20200624202312.28349-5-walling@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 03:17:01
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:11:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -150,155 +150,76 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 24.06.20 22:23, Collin Walling wrote:
-> Rework the SCLP boundary check to account for different SCLP commands
-> (eventually) allowing different boundary sizes.
-> 
-> Move the length check code into a separate function, and introduce a
-> new function to determine the length of the read SCP data (i.e. the size
-> from the start of the struct to where the CPU entries should begin).
-> 
-> The format of read CPU info is unlikely to change in the future,
-> so we do not require a separate function to calculate its length.
+> The header of the SCCB contains the actual length of the SCCB. Instead
+> of using a static 4K size, let's allow for a variable size determined
+> by the value set in the header. The proper checks are already in place
+> to ensure the SCCB length is sufficent to store a full response, and
+> that the length does not cross any explicitly-set boundaries.
 > 
 > Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  hw/s390x/sclp.c | 54 ++++++++++++++++++++++++++++++++++++++++---------
->  1 file changed, 44 insertions(+), 10 deletions(-)
+>  hw/s390x/sclp.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
 > 
 > diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index 181ce04007..5899c1e3b8 100644
+> index 5899c1e3b8..1feba6f692 100644
 > --- a/hw/s390x/sclp.c
 > +++ b/hw/s390x/sclp.c
-> @@ -49,6 +49,34 @@ static inline bool sclp_command_code_valid(uint32_t code)
->      return false;
->  }
+> @@ -251,9 +251,8 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
+>      SCLPDevice *sclp = get_sclp_device();
+>      SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
+>      SCCB work_sccb;
+> -    hwaddr sccb_len = sizeof(SCCB);
 >  
-> +static bool sccb_verify_boundary(uint64_t sccb_addr, uint32_t code,
-> +                                 SCCBHeader *header)
-> +{
-> +    uint64_t sccb_max_addr = sccb_addr + be16_to_cpu(header->length) - 1;
-> +    uint64_t sccb_boundary = (sccb_addr & PAGE_MASK) + PAGE_SIZE;
-> +
-> +    switch (code & SCLP_CMD_CODE_MASK) {
-> +    default:
-> +        if (sccb_max_addr < sccb_boundary) {
-> +            return true;
-> +        }
-> +    }
-
-^ what is that?
-
-    if ((code & SCLP_CMD_CODE_MASK) && sccb_max_addr < sccb_boundary) {
-        return true;
-    }
-
-> +    header->response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
-> +    return false;
-
-So we return "false" on success? At least I consider that weird when
-returning the bool type. Maybe make it clearer what the function indicates
-
-"sccb_boundary_is_invalid"
-
-or leave it named as is and switch from return value "bool" to "int",
-using "0" on success and "-EINVAL" on error.
-
-> +}
-> +
-> +/* Calculates sufficient SCCB length to store a full Read SCP/CPU response */
-> +static bool sccb_verify_length(SCCB *sccb, int num_cpus, int offset_cpu)
-> +{
-> +    int required_len = offset_cpu + num_cpus * sizeof(CPUEntry);
-> +
-> +    if (be16_to_cpu(sccb->h.length) < required_len) {
-> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-> +        return false;
-> +    }
-> +    return true;
-> +}
-> +
->  static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
->  {
->      uint8_t features[SCCB_CPU_FEATURE_LEN] = { 0 };
-> @@ -66,6 +94,11 @@ static void prepare_cpu_entries(MachineState *ms, CPUEntry *entry, int *count)
->      }
->  }
+> -    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
+> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sizeof(SCCBHeader));
 >  
-> +static inline int get_read_scp_info_offset_cpu(void)
-> +{
-> +    return offsetof(ReadInfo, entries);
-> +}
-> +
->  /* Provide information about the configuration, CPUs and storage */
->  static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
->  {
-> @@ -74,17 +107,16 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
->      int cpu_count;
->      int rnsize, rnmax;
->      IplParameterBlock *ipib = s390_ipl_get_iplb();
-> +    int offset_cpu = get_read_scp_info_offset_cpu();
->  
-> -    if (be16_to_cpu(sccb->h.length) <
-> -          (sizeof(ReadInfo) + machine->possible_cpus->len * sizeof(CPUEntry))) {
-> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-> +    if (!sccb_verify_length(sccb, machine->possible_cpus->len, offset_cpu)) {
->          return;
->      }
->  
->      /* CPU information */
->      prepare_cpu_entries(machine, read_info->entries, &cpu_count);
->      read_info->entries_cpu = cpu_to_be16(cpu_count);
-> -    read_info->offset_cpu = cpu_to_be16(offsetof(ReadInfo, entries));
-> +    read_info->offset_cpu = cpu_to_be16(offset_cpu);
->      read_info->highest_cpu = cpu_to_be16(machine->smp.max_cpus - 1);
->  
->      read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
-> @@ -133,17 +165,16 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
->  {
->      MachineState *machine = MACHINE(qdev_get_machine());
->      ReadCpuInfo *cpu_info = (ReadCpuInfo *) sccb;
-> +    int offset_cpu = offsetof(ReadCpuInfo, entries);
->      int cpu_count;
->  
-> -    if (be16_to_cpu(sccb->h.length) <
-> -          (sizeof(ReadInfo) + machine->possible_cpus->len * sizeof(CPUEntry))) {
-> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-> +    if (!sccb_verify_length(sccb, machine->possible_cpus->len, offset_cpu)) {
->          return;
->      }
->  
->      prepare_cpu_entries(machine, cpu_info->entries, &cpu_count);
->      cpu_info->nr_configured = cpu_to_be16(cpu_count);
-> -    cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
-> +    cpu_info->offset_configured = cpu_to_be16(offset_cpu);
->      cpu_info->nr_standby = cpu_to_be16(0);
->  
->      /* The standby offset is 16-byte for each CPU */
-> @@ -229,6 +260,10 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
+>      if (!sclp_command_code_valid(code)) {
+>          work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> @@ -264,6 +263,9 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
 >          goto out_write;
 >      }
 >  
-> +    if (!sccb_verify_boundary(sccb, code, &work_sccb.h)) {
-> +        goto out_write;
-> +    }
+> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb,
+> +                         be16_to_cpu(work_sccb.h.length));
 > +
 >      sclp_c->execute(sclp, &work_sccb, code);
 >  out_write:
 >      s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
-> @@ -274,8 +309,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+> @@ -278,8 +280,6 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>      SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
+>      SCCB work_sccb;
+>  
+> -    hwaddr sccb_len = sizeof(SCCB);
+> -
+>      /* first some basic checks on program checks */
+>      if (env->psw.mask & PSW_MASK_PSTATE) {
+>          return -PGM_PRIVILEGED;
+> @@ -297,7 +297,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>       * from playing dirty tricks by modifying the memory content after
+>       * the host has checked the values
+>       */
+> -    cpu_physical_memory_read(sccb, &work_sccb, sccb_len);
+> +    cpu_physical_memory_read(sccb, &work_sccb, sizeof(SCCBHeader));
+>  
+>      /* Valid sccb sizes */
+>      if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
+> @@ -313,6 +313,9 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
 >          goto out_write;
 >      }
 >  
-> -    if ((sccb + be16_to_cpu(work_sccb.h.length)) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
-> -        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
-> +    if (!sccb_verify_boundary(sccb, code, &work_sccb.h)) {
->          goto out_write;
->      }
->  
+> +    /* the header contains the actual length of the sccb */
+> +    cpu_physical_memory_read(sccb, &work_sccb, be16_to_cpu(work_sccb.h.length));
+> +
+>      sclp_c->execute(sclp, &work_sccb, code);
+>  out_write:
+>      cpu_physical_memory_write(sccb, &work_sccb,
 > 
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
