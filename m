@@ -2,82 +2,85 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D331AC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 14:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF97C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 14:19:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B9DC20B1F
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 14:19:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D15F620B1F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 14:19:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G+zUnAvE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B9DC20B1F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bzTV2AEI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D15F620B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxWdU-000669-RZ
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 10:19:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57094)
+	id 1jxWdY-0006Bw-2T
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 10:19:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jxWag-00014A-1i
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 10:16:26 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41343
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jxWbW-0002s8-Hy
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 10:17:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24199
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1jxWad-0002lK-P3
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 10:16:25 -0400
+ (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
+ id 1jxWbG-0002pV-BD
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 10:17:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595254580;
+ s=mimecast20190719; t=1595254621;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=kWWO+U0Yl6qXOS0dWUgXX4dXP2t813TqnyG/SIMCbeg=;
- b=G+zUnAvEdSOWaN1rVKM+P8PlyeFEfWHxQIiryayHzXs1+lev7DTHltbRCR14/Zj9lsdSe/
- GyY6Q14pk6Z13c2GMrzOq0fF6C15c3df0gfP2trLnfHSCXAPhYvnF+jLKOASL/s+XbUHw1
- wvJ4rM8dLuUxXRjYD4odLEgpkhHLq3c=
+ in-reply-to:in-reply-to:references:references;
+ bh=YCwtlwfbDn462d1r/IyFvYkVgG8sFkAb/kcergJIeyk=;
+ b=bzTV2AEIaRF36kNRt7qP9bimqZRG3G5xh366GnhgD6N5GMYvR37GixFE/c5TnaL1JHqKIS
+ AOK7vq2/HqFERA+TAjwKlJ9Aom6mr9r8Q0Sxzk615wIrZGO22weM/GYpRJZIupOZJzXwUu
+ E1bMl++x6FlXfRLdVpxEbL9iMtPPSpg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-hUybhgO9Me-vVzTI3-fpag-1; Mon, 20 Jul 2020 10:16:17 -0400
-X-MC-Unique: hUybhgO9Me-vVzTI3-fpag-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-131-UwvHLOuiOg6hM7EixazEfQ-1; Mon, 20 Jul 2020 10:17:00 -0400
+X-MC-Unique: UwvHLOuiOg6hM7EixazEfQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 125D4106B1CA;
- Mon, 20 Jul 2020 14:16:13 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 39C3E2E021;
- Mon, 20 Jul 2020 14:16:12 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 0/6] x86: fix cpu hotplug with secure boot
-Date: Mon, 20 Jul 2020 10:16:04 -0400
-Message-Id: <20200720141610.574308-1-imammedo@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 106745257D
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 14:16:34 +0000 (UTC)
+Received: from turbo.dinechin.lan (ovpn-114-55.ams2.redhat.com [10.36.114.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3918010027AC;
+ Mon, 20 Jul 2020 14:16:32 +0000 (UTC)
+References: <20200624131045.14512-1-kraxel@redhat.com>
+ <20200624131045.14512-2-kraxel@redhat.com>
+User-agent: mu4e 1.3.9; emacs 26.3
+From: Christophe de Dinechin <dinechin@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v5 01/10] module: qom module support
+In-reply-to: <20200624131045.14512-2-kraxel@redhat.com>
+Date: Mon, 20 Jul 2020 16:16:30 +0200
+Message-ID: <7hlfjemfup.fsf@turbo.dinechin.lan>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/19 21:45:06
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dinechin@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 03:17:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -91,65 +94,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: boris.ostrovsky@oracle.com, lersek@redhat.com
+Cc: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v1:
-  - fix typos and some phrases (Laszlo)
-  - add unplug check (Laszlo)
-  - redo AML scan logic to avoid race when adding multiple CPUs
 
-CPU hotplug with Secure Boot was not really supported and firmware wasn't aware
-of hotplugged CPUs (which might lead to guest crashes). During 4.2 we introduced
-locked SMI handler RAM arrea to make sure that guest OS wasn't able to inject
-its own SMI handler and OVMF added initial CPU hotplug support.
+On 2020-06-24 at 15:10 CEST, Gerd Hoffmann wrote...
+> Add support for qom types provided by modules.  For starters use a
+> manually maintained list which maps qom type to module and prefix.
+>
+> Two load functions are added:  One to load the module for a specific
+> type, and one to load all modules (needed for object/device lists as
+> printed by -- for example -- qemu -device help).
+>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/qemu/module.h |  2 ++
+>  util/module.c         | 55 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 57 insertions(+)
+>
+> diff --git a/include/qemu/module.h b/include/qemu/module.h
+> index 011ae1ae7605..9121a475c1b6 100644
+> --- a/include/qemu/module.h
+> +++ b/include/qemu/module.h
+> @@ -70,5 +70,7 @@ void register_dso_module_init(void (*fn)(void), module_init_type type);
+>
+>  void module_call_init(module_init_type type);
+>  bool module_load_one(const char *prefix, const char *lib_name);
+> +void module_load_qom_one(const char *type);
+> +void module_load_qom_all(void);
+>
+>  #endif
+> diff --git a/util/module.c b/util/module.c
+> index e48d9aacc05a..ee560a4b4269 100644
+> --- a/util/module.c
+> +++ b/util/module.c
+> @@ -245,3 +245,58 @@ bool module_load_one(const char *prefix, const char *lib_name)
+>  #endif
+>      return success;
+>  }
+> +
+> +/*
+> + * Building devices and other qom objects modular is mostly useful in
+> + * case they have dependencies to external shared libraries, so we can
+> + * cut down the core qemu library dependencies.  Which is the case for
+> + * only a very few devices & objects.
+> + *
+> + * So with the expectation that this will be rather the exception than
+> + * to rule and the list will not gain that many entries go with a
 
-This series is QEMU part of that support which lets QMVF tell QEMU that
-CPU hotplug with SMI broadcast enabled is supported so that QEMU would be able
-to prevent hotplug in case it's not supported and trigger SMI on hotplug when
-it's necessary. 
+Nit: Add a comma after "entries"
+
+I would also indicate that this list needs to be sorted by prefix/module
+
+> + * simple manually maintained list for now.
+> + */
+> +static struct {
+> +    const char *type;
+> +    const char *prefix;
+> +    const char *module;
+
+Because of the sorting rule, it is more intuitive to put the module first
+and the type last, for cases where you have
+
+    mod1 prefix1 type1
+    mod1 prefix1 type2
+    mod1 prefix1 type3
+    mod2 prefix2 type1
+
+Visually, I expect the constants to come first.
 
 
-Igor Mammedov (6):
-  x86: lpc9: let firmware negotiate 'CPU hotplug with SMI' features
-  x86: cphp: prevent guest crash on CPU hotplug when broadcast SMI is in
-    use
-  x86: cpuhp: refuse cpu hot-unplug request earlier if not supported
-  tests: acpi: mark to be changed tables in
-    bios-tables-test-allowed-diff
-  x68: acpi: trigger SMI before scanning for hotplugged CPUs
-  tests: acpi: update acpi blobs with new AML
+> +} const qom_modules[] = {
+> +};
+> +
+> +static bool module_loaded_qom_all;
+> +
+> +void module_load_qom_one(const char *type)
+> +{
+> +    int i;
+> +
+> +    if (module_loaded_qom_all) {
+> +        return;
+> +    }
+> +    for (i = 0; i < ARRAY_SIZE(qom_modules); i++) {
+> +        if (strcmp(qom_modules[i].type, type) == 0) {
+> +            module_load_one(qom_modules[i].prefix,
+> +                            qom_modules[i].module);
+> +            return;
+> +        }
+> +    }
+> +}
+> +
+> +void module_load_qom_all(void)
+> +{
+> +    int i;
+> +
+> +    if (module_loaded_qom_all) {
+> +        return;
+> +    }
+> +    for (i = 0; i < ARRAY_SIZE(qom_modules); i++) {
+> +        if (i > 0 && (strcmp(qom_modules[i - 1].module,
+> +                             qom_modules[i].module) == 0 &&
+> +                      strcmp(qom_modules[i - 1].prefix,
+> +                             qom_modules[i].prefix) == 0)) {
+> +            /* one module implementing multiple types -> load only once */
 
- include/hw/acpi/cpu.h             |   1 +
- include/hw/i386/ich9.h            |   4 +++
- hw/acpi/cpu.c                     |  50 ++++++++++++++++++++++++++++--
- hw/acpi/ich9.c                    |  23 +++++++++++++-
- hw/i386/acpi-build.c              |  35 ++++++++++++++++++++-
- hw/i386/pc.c                      |  16 +++++++++-
- hw/isa/lpc_ich9.c                 |  15 +++++++++
- tests/data/acpi/pc/DSDT           | Bin 4934 -> 4973 bytes
- tests/data/acpi/pc/DSDT.acpihmat  | Bin 6258 -> 6297 bytes
- tests/data/acpi/pc/DSDT.bridge    | Bin 6793 -> 6832 bytes
- tests/data/acpi/pc/DSDT.cphp      | Bin 5397 -> 5436 bytes
- tests/data/acpi/pc/DSDT.dimmpxm   | Bin 6587 -> 6626 bytes
- tests/data/acpi/pc/DSDT.ipmikcs   | Bin 5006 -> 5045 bytes
- tests/data/acpi/pc/DSDT.memhp     | Bin 6293 -> 6332 bytes
- tests/data/acpi/pc/DSDT.numamem   | Bin 4940 -> 4979 bytes
- tests/data/acpi/q35/DSDT          | Bin 7678 -> 7717 bytes
- tests/data/acpi/q35/DSDT.acpihmat | Bin 9002 -> 9041 bytes
- tests/data/acpi/q35/DSDT.bridge   | Bin 7695 -> 7734 bytes
- tests/data/acpi/q35/DSDT.cphp     | Bin 8141 -> 8180 bytes
- tests/data/acpi/q35/DSDT.dimmpxm  | Bin 9331 -> 9370 bytes
- tests/data/acpi/q35/DSDT.ipmibt   | Bin 7753 -> 7792 bytes
- tests/data/acpi/q35/DSDT.memhp    | Bin 9037 -> 9076 bytes
- tests/data/acpi/q35/DSDT.mmio64   | Bin 8808 -> 8847 bytes
- tests/data/acpi/q35/DSDT.numamem  | Bin 7684 -> 7723 bytes
- tests/data/acpi/q35/DSDT.tis      | Bin 8283 -> 8322 bytes
- 25 files changed, 139 insertions(+), 5 deletions(-)
+This is the sorting requirement I'm talking about
 
--- 
-2.26.2
+> +            continue;
+> +        }
+> +        module_load_one(qom_modules[i].prefix, qom_modules[i].module);
+> +    }
+> +    module_loaded_qom_all = true;
+> +}
+
+
+--
+Cheers,
+Christophe de Dinechin (IRC c3d)
 
 
