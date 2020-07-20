@@ -2,83 +2,90 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A060C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6239BC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:51:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D965522BF3
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:47:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C1612068F
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 10:51:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HB/BBtdv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D965522BF3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="UAa2CdX5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1612068F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxTKw-00072q-0t
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 06:47:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52524)
+	id 1jxTNx-00088I-CK
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 06:51:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxTJs-0006T9-TH
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:46:52 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25902
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxTJq-0006Oi-Je
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:46:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595242009;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ZLXkagJtGS0tn9UXIGpNizozZ0u3xdUNdTCr/Ln6HdY=;
- b=HB/BBtdvkfY6MKVKYXygMWxiWI0JbpbvNN/8UBp+c4Ldur1Gd315RzKD1qDkvfFxBER0BY
- Y87bTSPu+VobhgGv1nROjDXG93RYbkqSVptLKxNOiER/KDwc8IpoyRaGcNfjAJM3/NCmPR
- G1GevNx7O79/v7YCFOnSfgzRiJp0mdI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-IDhM37VYN3ugOx9v7I5qmw-1; Mon, 20 Jul 2020 06:46:45 -0400
-X-MC-Unique: IDhM37VYN3ugOx9v7I5qmw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jxTNM-0007jG-2L
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:50:28 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:41834 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1jxTNF-0006qq-NZ
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 06:50:27 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 65B684AC44;
+ Mon, 20 Jul 2020 10:50:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-transfer-encoding:content-disposition
+ :content-type:content-type:mime-version:references:message-id
+ :subject:subject:from:from:date:date:received:received:received;
+ s=mta-01; t=1595242216; x=1597056617; bh=1n2ENw8MD4MgJw4mtJV8pz
+ uXCj+SaOHa3VPZT5hM3y0=; b=UAa2CdX5JTCsbf55AY1pS6S5qeaxmtjh59ezd2
+ M0kuhVf8KOR+gBilZM7H8Gh4ejFhSCfABlCFO5RX153ZJ+Hyj6mNyeu8A3xxFRyU
+ s9Mzs89sH0KTXsngIYf41sR1MWWkYSlxn4zi1xfx+TSWUQNCmO/E3RU+SKRaf4/I
+ T9rKg=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id u2JsqkoxJ_F6; Mon, 20 Jul 2020 13:50:16 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02A358005B0;
- Mon, 20 Jul 2020 10:46:44 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-59.ams2.redhat.com [10.36.114.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A20119C58;
- Mon, 20 Jul 2020 10:46:42 +0000 (UTC)
-Date: Mon, 20 Jul 2020 12:46:41 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: various iotests failures apparently due to overly optimistic
- timeout settings
-Message-ID: <20200720104641.GB5541@linux.fritz.box>
-References: <CAFEAcA_dEBT1jNLWeThhmKisFNwbaSUe+vAEEbv5bnVVb+=bjA@mail.gmail.com>
+ by mta-01.yadro.com (Postfix) with ESMTPS id B5432499B7;
+ Mon, 20 Jul 2020 13:50:16 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Mon, 20
+ Jul 2020 13:50:16 +0300
+Date: Mon, 20 Jul 2020 13:50:15 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 1/4] scripts/tracetool: Fix dtrace generation for macOS
+Message-ID: <20200720105015.GA73320@SPB-NB-133.local>
+References: <20200717093517.73397-1-r.bolshakov@yadro.com>
+ <20200717093517.73397-2-r.bolshakov@yadro.com>
+ <34c236c5-e047-6f15-6bb6-d0df65129622@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_dEBT1jNLWeThhmKisFNwbaSUe+vAEEbv5bnVVb+=bjA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:16:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <34c236c5-e047-6f15-6bb6-d0df65129622@redhat.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 06:50:18
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,409 +98,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 19.07.2020 um 14:07 hat Peter Maydell geschrieben:
-> I just had a bunch of iotests fail on a freebsd VM test run.
-> I think the machine the VM runs on is sometimes a bit heavily
-> loaded for I/O, which means the VM can run slowly. This causes
-> various over-optimistic timeouts in the iotest testsuite to
-> spuriously fail. I also saw the 030 failure on the netbsd VM.
+On Sun, Jul 19, 2020 at 03:52:08PM +0200, Philippe Mathieu-Daudé wrote:
+> On 7/17/20 11:35 AM, Roman Bolshakov wrote:
+> > dtrace USDT is fully supported since OS X 10.6. There are a few
+> > peculiarities compared to other dtrace flavors.
+> > 
+> > 1. It doesn't accept empty files.
+> > 2. It doesn't recognize bool type but accepts C99 _Bool.
+> > 3. It converts int8_t * in probe points to char * in
+> >    header files and introduces [-Wpointer-sign] warning.
+> > 
+> > Cc: Cameron Esfahani <dirty@apple.com>
+> > Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> > ---
+> >  scripts/tracetool/format/d.py | 15 ++++++++++++++-
+> >  1 file changed, 14 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/scripts/tracetool/format/d.py b/scripts/tracetool/format/d.py
+> > index 0afb5f3f47..353722f89c 100644
+> > --- a/scripts/tracetool/format/d.py
+> > +++ b/scripts/tracetool/format/d.py
+> > @@ -13,6 +13,7 @@ __email__      = "stefanha@redhat.com"
+> >  
+> >  
+> >  from tracetool import out
+> > +from sys import platform
+> >  
+> >  
+> >  # Reserved keywords from
+> > @@ -34,7 +35,8 @@ def generate(events, backend, group):
+> >  
+> >      # SystemTap's dtrace(1) warns about empty "provider qemu {}" but is happy
+> >      # with an empty file.  Avoid the warning.
+> > -    if not events:
+> > +    # But dtrace on macOS can't deal with empty files.
+> > +    if not events and platform != "darwin":
 > 
-> Can we try to avoid timing-sensitive tests where we can,
-> and make timeouts longer than 3 seconds where we can't, please?
-> This kind of intermittent failure makes my mergetests flaky.
+> or?
 
-John, I think this is a result of your recent python/qemu/ changes that
-make failure of graceful shutdown an error rather than just silently
-falling back to SIGKILL.
+no, the event list is empty for some files where all events are
+disabled (e.g. hppa/trace-events), so it should have an "and" here. This
+limits early exit only on macOS. The precendence looks correct:
 
-Should the default timeout be longer, should iotests override the
-default, or should iotests just always kill their VM instead of trying
-to shut it down gracefully?
+https://docs.python.org/3/reference/expressions.html#operator-precedence
 
-Kevin
-
-> Relevant bits of the log below, there are several different
-> flavours of failure.
 > 
+> >          return
+> >  
+> >      out('/* This file is autogenerated by tracetool, do not edit. */'
+> > @@ -44,6 +46,17 @@ def generate(events, backend, group):
+> >      for e in events:
+> >          args = []
+> >          for type_, name in e.args:
+> > +            if platform == "darwin":
+> > +                # macOS dtrace accepts only C99 _Bool
 > 
->   TEST    iotest-qcow2: 030 [fail]
-> QEMU          --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
-> -nodefaults -display none -machine virt -accel qtest
-> QEMU_IMG      --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-img"
-> QEMU_IO       --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-io"
-> --cache writeback --aio threads -f qcow2
-> QEMU_NBD      --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-nbd"
-> IMGFMT        -- qcow2 (compat=1.1)
-> IMGPROTO      -- file
-> PLATFORM      -- FreeBSD/amd64 freebsd 12.1-RELEASE
-> TEST_DIR      -- /home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/scratch
-> SOCK_DIR      -- /tmp/tmp.JFidXl5N
-> SOCKET_SCM_HELPER --
-> 
-> --- /home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/030.out
-> 2020-07-19 09:29:05.000000000 +0000
-> +++ /home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/030.out.bad
->  2020-07-19 09:52:04.256005000 +0000
-> @@ -1,5 +1,57 @@
-> -...........................
-> +WARNING:qemu.machine:qemu received signal 9; command:
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64
-> -display none -vga none -chardev
-> socket,id=mon,path=/tmp/tmp.JFidXl5N/qemu-24906-monitor.sock -mon
-> chardev=mon,mode=control -qtest
-> unix:path=/tmp/tmp.JFidXl5N/qemu-24906-qtest.sock -accel qtest
-> -nodefaults -display none -machine virt -accel qtest -drive
-> if=virtio,id=drive0,file=blkdebug::/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/scratch/test.img,format=qcow2,cache=writeback,aio=threads"
-> +WARNING:qemu.machine:qemu received signal 9; command:
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64
-> -display none -vga none -chardev
-> socket,id=mon,path=/tmp/tmp.JFidXl5N/qemu-24906-monitor.sock -mon
-> chardev=mon,mode=control -qtest
-> unix:path=/tmp/tmp.JFidXl5N/qemu-24906-qtest.sock -accel qtest
-> -nodefaults -display none -machine virt -accel qtest -drive
-> if=virtio,id=drive0,file=blkdebug::/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/scratch/test.img,format=qcow2,cache=writeback,aio=threads,backing.node-name=mid,backing.backing.node-name=base"
-> +...............E......E....
-> +======================================================================
-> +ERROR: test_set_speed (__main__.TestSetSpeed)
->  ----------------------------------------------------------------------
-> +Traceback (most recent call last):
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 436, in _do_shutdown
-> +    self._soft_shutdown(has_quit, timeout)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 419, in _soft_shutdown
-> +    self._popen.wait(timeout=timeout)
-> +  File "/usr/local/lib/python3.7/subprocess.py", line 1019, in wait
-> +    return self._wait(timeout=timeout)
-> +  File "/usr/local/lib/python3.7/subprocess.py", line 1645, in _wait
-> +    raise TimeoutExpired(self.args, timeout)
-> +subprocess.TimeoutExpired: Command
-> '['/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64',
-> '-display', 'none', '-vga', 'none', '-chardev',
-> 'socket,id=mon,path=/tmp/tmp.JFidXl5N/qemu-24906-monitor.sock',
-> '-mon', 'chardev=mon,mode=control', '-qtest',
-> 'unix:path=/tmp/tmp.JFidXl5N/qemu-24906-qtest.sock', '-accel',
-> 'qtest', '-nodefaults', '-display', 'none', '-machine', 'virt',
-> '-accel', 'qtest', '-drive',
-> 'if=virtio,id=drive0,file=blkdebug::/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/scratch/test.img,format=qcow2,cache=writeback,aio=threads']'
-> timed out after 3 seconds
-> +
-> +The above exception was the direct cause of the following exception:
-> +
-> +Traceback (most recent call last):
-> +  File "030", line 900, in tearDown
-> +    self.vm.shutdown()
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 466, in shutdown
-> +    self._do_shutdown(has_quit, timeout=timeout)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 440, in _do_shutdown
-> +    from exc
-> +qemu.machine.AbnormalShutdown: Could not perform graceful shutdown
-> +
-> +======================================================================
-> +ERROR: test_stream_no_op (__main__.TestSingleDrive)
-> +----------------------------------------------------------------------
-> +Traceback (most recent call last):
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 436, in _do_shutdown
-> +    self._soft_shutdown(has_quit, timeout)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 419, in _soft_shutdown
-> +    self._popen.wait(timeout=timeout)
-> +  File "/usr/local/lib/python3.7/subprocess.py", line 1019, in wait
-> +    return self._wait(timeout=timeout)
-> +  File "/usr/local/lib/python3.7/subprocess.py", line 1645, in _wait
-> +    raise TimeoutExpired(self.args, timeout)
-> +subprocess.TimeoutExpired: Command
-> '['/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64',
-> '-display', 'none', '-vga', 'none', '-chardev',
-> 'socket,id=mon,path=/tmp/tmp.JFidXl5N/qemu-24906-monitor.sock',
-> '-mon', 'chardev=mon,mode=control', '-qtest',
-> 'unix:path=/tmp/tmp.JFidXl5N/qemu-24906-qtest.sock', '-accel',
-> 'qtest', '-nodefaults', '-display', 'none', '-machine', 'virt',
-> '-accel', 'qtest', '-drive',
-> 'if=virtio,id=drive0,file=blkdebug::/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/scratch/test.img,format=qcow2,cache=writeback,aio=threads,backing.node-name=mid,backing.backing.node-name=base']'
-> timed out after 3 seconds
-> +
-> +The above exception was the direct cause of the following exception:
-> +
-> +Traceback (most recent call last):
-> +  File "030", line 131, in test_stream_no_op
-> +    self.vm.shutdown()
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 466, in shutdown
-> +    self._do_shutdown(has_quit, timeout=timeout)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 440, in _do_shutdown
-> +    from exc
-> +qemu.machine.AbnormalShutdown: Could not perform graceful shutdown
-> +
-> +----------------------------------------------------------------------
->  Ran 27 tests
-> 
-> -OK
-> +FAILED (errors=2)
->   TEST    iotest-qcow2: 031
->   TEST    iotest-qcow2: 032
->   TEST    iotest-qcow2: 033
->   TEST    iotest-qcow2: 034 [not run]
->   TEST    iotest-qcow2: 035
->   TEST    iotest-qcow2: 036
->   TEST    iotest-qcow2: 037
->   TEST    iotest-qcow2: 038 [not run]
->   TEST    iotest-qcow2: 039 [not run]
->   TEST    iotest-qcow2: 040 [fail]
-> QEMU          --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
-> -nodefaults -display none -machine virt -accel qtest
-> QEMU_IMG      --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-img"
-> QEMU_IO       --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-io"
-> --cache writeback --aio threads -f qcow2
-> QEMU_NBD      --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-nbd"
-> IMGFMT        -- qcow2 (compat=1.1)
-> IMGPROTO      -- file
-> PLATFORM      -- FreeBSD/amd64 freebsd 12.1-RELEASE
-> TEST_DIR      -- /home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/scratch
-> SOCK_DIR      -- /tmp/tmp.JFidXl5N
-> SOCKET_SCM_HELPER --
-> 
-> --- /home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/040.out
-> 2020-07-19 09:29:05.000000000 +0000
-> +++ /home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/040.out.bad
->  2020-07-19 09:55:10.837942000 +0000
-> @@ -1,5 +1,31 @@
-> -...........................................................
-> +WARNING:qemu.machine:qemu received signal 9; command:
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64
-> -display none -vga none -chardev
-> socket,id=mon,path=/tmp/tmp.JFidXl5N/qemu-27241-monitor.sock -mon
-> chardev=mon,mode=control -qtest
-> unix:path=/tmp/tmp.JFidXl5N/qemu-27241-qtest.sock -accel qtest
-> -nodefaults -display none -machine virt -accel qtest"
-> +...........................E...............................
-> +======================================================================
-> +ERROR: testIntermediateReadErrorStop (__main__.TestErrorHandling)
->  ----------------------------------------------------------------------
-> +Traceback (most recent call last):
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 436, in _do_shutdown
-> +    self._soft_shutdown(has_quit, timeout)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 419, in _soft_shutdown
-> +    self._popen.wait(timeout=timeout)
-> +  File "/usr/local/lib/python3.7/subprocess.py", line 1019, in wait
-> +    return self._wait(timeout=timeout)
-> +  File "/usr/local/lib/python3.7/subprocess.py", line 1645, in _wait
-> +    raise TimeoutExpired(self.args, timeout)
-> +subprocess.TimeoutExpired: Command
-> '['/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64',
-> '-display', 'none', '-vga', 'none', '-chardev',
-> 'socket,id=mon,path=/tmp/tmp.JFidXl5N/qemu-27241-monitor.sock',
-> '-mon', 'chardev=mon,mode=control', '-qtest',
-> 'unix:path=/tmp/tmp.JFidXl5N/qemu-27241-qtest.sock', '-accel',
-> 'qtest', '-nodefaults', '-display', 'none', '-machine', 'virt',
-> '-accel', 'qtest']' timed out after 3 seconds
-> +
-> +The above exception was the direct cause of the following exception:
-> +
-> +Traceback (most recent call last):
-> +  File "040", line 687, in testIntermediateReadErrorStop
-> +    self.vm.shutdown()
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 466, in shutdown
-> +    self._do_shutdown(has_quit, timeout=timeout)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 440, in _do_shutdown
-> +    from exc
-> +qemu.machine.AbnormalShutdown: Could not perform graceful shutdown
-> +
-> +----------------------------------------------------------------------
->  Ran 59 tests
-> 
-> -OK
-> +FAILED (errors=1)
->   TEST    iotest-qcow2: 041 [fail]
-> QEMU          --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
-> -nodefaults -disp
-> lay none -machine virt -accel qtest
-> QEMU_IMG      --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-img"
-> QEMU_IO       --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-io"
-> --cache writeback --aio threads -f qcow2
-> QEMU_NBD      --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-nbd"
-> IMGFMT        -- qcow2 (compat=1.1)
-> IMGPROTO      -- file
-> PLATFORM      -- FreeBSD/amd64 freebsd 12.1-RELEASE
-> TEST_DIR      -- /home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/scratch
-> SOCK_DIR      -- /tmp/tmp.JFidXl5N
-> SOCKET_SCM_HELPER --
-> 
-> --- /home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/041.out
-> 2020-07-19 09:29:05.000000000 +0000
-> +++ /home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/041.out.bad
->  2020-07-19 10:05:09.812434000 +0000
-> @@ -1,5 +1,29 @@
-> -........................................................................................................
-> +...........................................................................E............................
-> +======================================================================
-> +ERROR: test_pause (__main__.TestSingleDrive)
->  ----------------------------------------------------------------------
-> +Traceback (most recent call last):
-> +  File "041", line 109, in test_pause
-> +    self.pause_job('drive0')
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/iotests.py",
-> line 978, in pause_job
-> +    return self.pause_wait(job_id)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/iotests.py",
-> line 964, in pause_wait
-> +    result = self.vm.qmp('query-block-jobs')
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/machine.py",
-> line 511, in qmp
-> +    return self._qmp.cmd(cmd, args=qmp_args)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/qmp.py",
-> line 266, in cmd
-> +    return self.cmd_obj(qmp_cmd)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/qmp.py",
-> line 247, in cmd_obj
-> +    resp = self.__json_read()
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/../../python/qemu/qmp.py",
-> line 137, in __json_read
-> +    data = self.__sockfile.readline()
-> +  File "/usr/local/lib/python3.7/socket.py", line 589, in readinto
-> +    return self._sock.recv_into(b)
-> +  File "/usr/home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/iotests.py",
-> line 416, in timeout
-> +    raise Exception(self.errmsg)
-> +Exception: Timeout waiting for job to pause
-> +
-> +----------------------------------------------------------------------
->  Ran 104 tests
-> 
-> -OK
-> +FAILED (errors=1)
-> 
-> [...]
->   TEST    iotest-qcow2: 156 [fail]
-> QEMU          --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../aarch64-softmmu/qemu-system-aarch64"
-> -nodefaults -disp
-> lay none -machine virt -accel qtest
-> QEMU_IMG      --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-img"
-> QEMU_IO       --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-io"
-> --cache writeback --aio threads -f qcow2
-> QEMU_NBD      --
-> "/home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/../../qemu-nbd"
-> IMGFMT        -- qcow2 (compat=1.1)
-> IMGPROTO      -- file
-> PLATFORM      -- FreeBSD/amd64 freebsd 12.1-RELEASE
-> TEST_DIR      -- /home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/scratch
-> SOCK_DIR      -- /tmp/tmp.JFidXl5N
-> SOCKET_SCM_HELPER --
-> 
-> --- /home/qemu/qemu-test.oJwuyW/src/tests/qemu-iotests/156.out
-> 2020-07-19 09:29:05.000000000 +0000
-> +++ /home/qemu/qemu-test.oJwuyW/build/tests/qemu-iotests/156.out.bad
->  2020-07-19 10:14:48.438647000 +0000
-> @@ -19,48 +19,4 @@
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-> "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id":
-> "source"}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-> "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id":
-> "source"}}
->  {"return": {}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-> "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id":
-> "source"}}
-> -{"timestamp": {fcntl(): Bad file descriptor
-> "seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event":
-> "BLOCK_JOB_READY", "data": {"device": "source", "len": 131072,
-> "offset": 131072, "speed": 0, "type": "mirror"}}
-> -{ 'execute': 'human-monitor-command', 'arguments': { 'command-line':
-> 'qemu-io source "write -P 4 192k 64k"' } }
-> -wrote 65536/65536 bytes at offset 196608
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -{"return": ""}
-> -{ 'execute': 'block-job-complete', 'arguments': { 'device': 'source' } }
-> -{"return": {}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-> "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id":
-> "source"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-> "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id":
-> "source"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-> "event": "BLOCK_JOB_COMPLETED", "data": {"device": "source", "len":
-> 196608, "offset": 196608, "speed": 0, "type": "mirror"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-> "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id":
-> "source"}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-> "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id":
-> "source"}}
-> -
-> -{ 'execute': 'human-monitor-command', 'arguments': { 'command-line':
-> 'qemu-io source "read -P 1 0k 64k"' } }
-> -read 65536/65536 bytes at offset 0
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -{"return": ""}
-> -{ 'execute': 'human-monitor-command', 'arguments': { 'command-line':
-> 'qemu-io source "read -P 2 64k 64k"' } }
-> -read 65536/65536 bytes at offset 65536
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -{"return": ""}
-> -{ 'execute': 'human-monitor-command', 'arguments': { 'command-line':
-> 'qemu-io source "read -P 3 128k 64k"' } }
-> -read 65536/65536 bytes at offset 131072
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -{"return": ""}
-> -{ 'execute': 'human-monitor-command', 'arguments': { 'command-line':
-> 'qemu-io source "read -P 4 192k 64k"' } }
-> -read 65536/65536 bytes at offset 196608
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -{"return": ""}
-> -
-> -{ 'execute': 'quit' }
-> -{"return": {}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP},
-> "event": "SHUTDOWN", "data": {"guest": false, "reason":
-> "host-qmp-quit"}}
-> -
-> -read 65536/65536 bytes at offset 0
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -read 65536/65536 bytes at offset 65536
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -read 65536/65536 bytes at offset 131072
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -read 65536/65536 bytes at offset 196608
-> -64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -
-> -*** done
-> +Timeout waiting for BLOCK_JOB_READY on handle 0
->   TEST    iotest-qcow2: 158
-> 
-> 
-> thanks
-> -- PMM
+> Why not do that for all platforms?
 > 
 
+Because I can only test the changes on darwin :)
+I don't know how other dtrace flavors behave and whether it is an issue
+for dtrace on Linux/Solaris/FreeBSD/etc.
+
+Thanks,
+Roman
+
+> > +                if type_ == 'bool':
+> > +                    type_ = '_Bool'
+> > +                if type_ == 'bool *':
+> > +                    type_ = '_Bool *'
+> > +                # It converts int8_t * in probe points to char * in header
+> > +                # files and introduces [-Wpointer-sign] warning.
+> > +                # Avoid it by changing probe type to signed char * beforehand.
+> > +                if type_ == 'int8_t *':
+> > +                    type_ = 'signed char *'
+> >              if name in RESERVED_WORDS:
+> >                  name += '_'
+> >              args.append(type_ + ' ' + name)
+> > 
+> 
 
