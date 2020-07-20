@@ -2,134 +2,69 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1CF4C433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6429C433FC
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:14:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C79F2080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 916482080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 09:14:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YkXs2v3b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C79F2080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="FixqSNwT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 916482080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxRmw-00062G-OZ
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 05:08:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49152)
+	id 1jxRsZ-0007cr-RK
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 05:14:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxRmM-0005bB-Ee
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 05:08:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56600
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxRmJ-0008Bl-Ug
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 05:08:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595236087;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=0TX8/FdukV1A3I6xe5XuwNMjgFT7ftWaPBwVj2WWonQ=;
- b=YkXs2v3b4Pw4IRgsUxJgum9R0lIxogEz0dkpJmx0WwLfEDATg+E5Ej2dsT1uHBFI1F931v
- N1XnK380uMAHohRI5xBe9NHJdqO8Tydsfahis2zxXhBqgKFLwLypMzwJ3sp+8Dd2vUs+UK
- 2I4+UGJwX67TRG/YkaW5KLuhwmsM2IU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-BVQHdTA7NzmhBp41lVfx-w-1; Mon, 20 Jul 2020 05:08:05 -0400
-X-MC-Unique: BVQHdTA7NzmhBp41lVfx-w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DEF92FD1E;
- Mon, 20 Jul 2020 09:08:04 +0000 (UTC)
-Received: from [10.36.114.91] (ovpn-114-91.ams2.redhat.com [10.36.114.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 81E671A8EC;
- Mon, 20 Jul 2020 09:07:54 +0000 (UTC)
-Subject: Re: [PATCH 0/2] virtio: non-legacy device handling
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200707105446.677966-1-cohuck@redhat.com>
- <51e457ef-106e-1c1a-778d-4d53d9e48d8e@redhat.com>
- <20200720050215-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <4309b9dd-cc94-e183-60f8-67e4ec36c666@redhat.com>
-Date: Mon, 20 Jul 2020 11:07:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jxRs0-00077R-LC; Mon, 20 Jul 2020 05:14:00 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46634)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jxRrw-0000Uq-Ea; Mon, 20 Jul 2020 05:14:00 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 877D4BF5BE;
+ Mon, 20 Jul 2020 09:13:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
+ s=default; t=1595236432;
+ bh=C9EYpa9zTMRY693LTDqVMbcxhcj1z7NXefHr4v4O1eQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=FixqSNwTNb0/hVbnRtkRLpA8paN4UegiRP+HjpmG44vmiXceennacuAxwImjIMqE/
+ w6meGQaUY6hnFNnsGKPNHFt+xTj9luZsZp04MvcaXrkTBtGSQpy3/8OzhVYbRrAICD
+ Zsyk3hcicz4pYskVKg6p5AXEbodkaoOrJMVpB/q4zMYKJW5CwHk0lfOKSHHMKUITZF
+ jbIVJ8CCQPPOfw3YQw7iyixU/oEqMtYiRgDrGvWOXutsy5HX0TmQoAtpiAFZDRogK7
+ Bbd6nPJDL8m+JBqpEafKjNhZ98Syn/5HYLq/PPkmQ6VWnDfVw0Bfp7l7pugCl7Vv76
+ X//lDUFyhd+Qg==
+Date: Mon, 20 Jul 2020 11:13:48 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-block@nongnu.org
+Subject: Re: [PATCH v3 00/18] hw/block/nvme: bump to v1.3
+Message-ID: <20200720091348.GA278838@apples.localdomain>
+References: <20200706061303.246057-1-its@irrelevant.dk>
 MIME-Version: 1.0
-In-Reply-To: <20200720050215-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=david@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:11:17
+Content-Disposition: inline
+In-Reply-To: <20200706061303.246057-1-its@irrelevant.dk>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 05:13:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -142,56 +77,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Auger <eric.auger@redhat.com>,
- qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20.07.20 11:03, Michael S. Tsirkin wrote:
-> On Mon, Jul 20, 2020 at 10:09:57AM +0200, David Hildenbrand wrote:
->> On 07.07.20 12:54, Cornelia Huck wrote:
->>> As discussed in "virtio-fs: force virtio 1.x usage", it seems like
->>> a good idea to make sure that any new virtio device (which does not
->>> support legacy virtio) is indeed a non-transitional device, just to
->>> catch accidental misconfigurations. We can easily compile a list
->>> of virtio devices with legacy support and have transports verify
->>> in their plugged callbacks that legacy support is off for any device
->>> not in that list.
->>>
->>> Most new virtio devices force non-transitional already, so nothing
->>> changes for them. vhost-user-fs-pci even does not allow to configure
->>> a non-transitional device, so it is fine as well.
->>>
->>> One problematic device, however, is virtio-iommu-pci. It currently
->>> offers both the transitional and the non-transitional variety of the
->>> device, and does not force anything. I'm unsure whether we should
->>> consider transitional virtio-iommu unsupported, or if we should add
->>> some compat handling. (The support for legacy or not generally may
->>> change based upon the bus, IIUC, so I'm unsure how to come up with
->>> something generic.)
->>>
->>> Cornelia Huck (2):
->>>   virtio: list legacy-capable devices
->>>   virtio: verify that legacy support is not accidentally on
->>
->> I'd squash both patches. Looking at patch #1, I wonder why we don't
->> store that information along with the device implementation? What was
->> the motivation to define this information separately?
+On Jul  6 08:12, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> Because people seem to cut and paste code, so when one
-> enables it in an old device, it gets pasted into a new one.
-> With a list in a central place, it's easier to figure out
-> what's going on.
+> This adds mandatory features of NVM Express v1.3 to the emulated NVMe
+> device.
+> 
+> 
+> v3:
+>   * hw/block/nvme: additional tracing
+>     - Reverse logic in nvme_cid(). (Philippe)
+>     - Move nvme_cid() and nvme_sqid() to source file. (Philippe)
+>   * hw/block/nvme: fix missing endian conversion
+>     - Move this patch to very early in the series and fix the bug properly as
+>       suggested by Philippe. Then let the change trickle down through
+>       the series. (Philippe)
+>   * hw/block/nvme: add remaining mandatory controller parameters
+>     - Move the nvme_feature_{support,default} arrays to the source file.
+>       (Philippe)
+>     - Add a NVME_FID_MAX constant. (Philippe)
+>   * hw/block/nvme: support the get/set features select and save fields
+>     - Move the nvme_feature_cap array to the source file. (Philippe)
+>   * hw/block/nvme: reject invalid nsid values in active namespace id list
+>     - Rework the condition and add a comment and reference to the spec.
+>       (Philippe)
+>   * hw/block/nvme: provide the mandatory subnqn field
+>     - Change to use strpadcpy(). (Philippe)
+> 
+>   Had to clear some R-b's due to functional changes.
+> 
+>   Missing review: 2, 3, 7, 12, 16, 17
+> 
+> 
+> v2:
+>   * hw/block/nvme: bump spec data structures to v1.3
+>     - Shorten some constants. (Dmitry)
+>   * hw/block/nvme: add temperature threshold feature
+>     - Remove unused temp_thresh member. (Dmitry)
+>   * hw/block/nvme: add support for the get log page command
+>     - Change the temperature field in the NvmeSmartLog struct to be an
+>       uint16_t and handle wierd alignment by adding QEMU_PACKED to the
+>       struct. (Dmitry)
+>   * hw/block/nvme: add remaining mandatory controller parameters
+>     - Fix spelling. (Dmitry)
+>   * hw/block/nvme: support the get/set features select and save fields
+>     - Fix bad logic causing temperature thresholds to always report
+>       defaults. (Dmitry)
+>   * hw/block/nvme: reject invalid nsid values in active namespace id list
+>     - Added patch; reject the 0xfffffffe and 0xffffffff nsid values.
+> 
+> 
+> $ git-backport-diff -u for-master/bump-to-v1.3-v2 -r upstream/master... -S
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream patch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+> 
+> 001/18:[----] [--] 'hw/block/nvme: bump spec data structures to v1.3'
+> 002/18:[0008] [FC] 'hw/block/nvme: fix missing endian conversion'
+> 003/18:[0028] [FC] 'hw/block/nvme: additional tracing'
+> 004/18:[----] [--] 'hw/block/nvme: add support for the abort command'
+> 005/18:[0004] [FC] 'hw/block/nvme: add temperature threshold feature'
+> 006/18:[----] [--] 'hw/block/nvme: mark fw slot 1 as read-only'
+> 007/18:[----] [--] 'hw/block/nvme: add support for the get log page command'
+> 008/18:[0002] [FC] 'hw/block/nvme: add support for the asynchronous event request command'
+> 009/18:[----] [--] 'hw/block/nvme: move NvmeFeatureVal into hw/block/nvme.h'
+> 010/18:[----] [--] 'hw/block/nvme: flush write cache when disabled'
+> 011/18:[0044] [FC] 'hw/block/nvme: add remaining mandatory controller parameters'
+> 012/18:[0024] [FC] 'hw/block/nvme: support the get/set features select and save fields'
+> 013/18:[----] [--] 'hw/block/nvme: make sure ncqr and nsqr is valid'
+> 014/18:[----] [--] 'hw/block/nvme: support identify namespace descriptor list'
+> 015/18:[0008] [FC] 'hw/block/nvme: reject invalid nsid values in active namespace id list'
+> 016/18:[----] [--] 'hw/block/nvme: enforce valid queue creation sequence'
+> 017/18:[0006] [FC] 'hw/block/nvme: provide the mandatory subnqn field'
+> 018/18:[----] [--] 'hw/block/nvme: bump supported version to v1.3'
+> 
+> 
+> Klaus Jensen (18):
+>   hw/block/nvme: bump spec data structures to v1.3
+>   hw/block/nvme: fix missing endian conversion
+>   hw/block/nvme: additional tracing
+>   hw/block/nvme: add support for the abort command
+>   hw/block/nvme: add temperature threshold feature
+>   hw/block/nvme: mark fw slot 1 as read-only
+>   hw/block/nvme: add support for the get log page command
+>   hw/block/nvme: add support for the asynchronous event request command
+>   hw/block/nvme: move NvmeFeatureVal into hw/block/nvme.h
+>   hw/block/nvme: flush write cache when disabled
+>   hw/block/nvme: add remaining mandatory controller parameters
+>   hw/block/nvme: support the get/set features select and save fields
+>   hw/block/nvme: make sure ncqr and nsqr is valid
+>   hw/block/nvme: support identify namespace descriptor list
+>   hw/block/nvme: reject invalid nsid values in active namespace id list
+>   hw/block/nvme: enforce valid queue creation sequence
+>   hw/block/nvme: provide the mandatory subnqn field
+>   hw/block/nvme: bump supported version to v1.3
+> 
+>  block/nvme.c          |  18 +-
+>  hw/block/nvme.c       | 676 ++++++++++++++++++++++++++++++++++++++++--
+>  hw/block/nvme.h       |  22 +-
+>  hw/block/trace-events |  27 +-
+>  include/block/nvme.h  | 225 +++++++++++---
+>  5 files changed, 892 insertions(+), 76 deletions(-)
+> 
+> -- 
+> 2.27.0
+> 
+> 
 
-Makes sense, I suggest adding that to the patch description.
+Thanks for the reviews everyone, applied to nvme-next.
 
-Both patches look sane to me (- squashing them).
 
--- 
-Thanks,
-
-David / dhildenb
-
+Klaus
 
