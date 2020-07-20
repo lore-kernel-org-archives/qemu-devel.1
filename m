@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC92C433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D66DC433E5
 	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:59:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE02A22B4D
+	by mail.kernel.org (Postfix) with ESMTPS id F266222D02
 	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 12:59:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AGKqMuhw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE02A22B4D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oXC2moot"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F266222D02
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxVNv-0007Ng-8E
+	id 1jxVNv-0007N0-4c
 	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 08:59:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55780)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxVLN-0002Mf-R9
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:33 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:51888)
+ id 1jxVLQ-0002UE-QG
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:36 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45052)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxVLL-0007Il-QC
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:33 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id 22so22179954wmg.1
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 05:56:31 -0700 (PDT)
+ id 1jxVLO-0007JP-GM
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 08:56:36 -0400
+Received: by mail-wr1-x444.google.com with SMTP id b6so17720509wrs.11
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 05:56:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=hv/hRwDof3drBWJIx+Z5EldftQ4h6Grha3K0MkRlGTk=;
- b=AGKqMuhw3m4d33q0mUK6W2+UJSssuf59IF9pKdyRQM53j5AFtUNFitVrLz1m54h9th
- pjTiqml6mJWKvFkGLfj0ReJcLiPhR38NJ56AVkNOQzMpheB0iQR6zHuvvD5lYjfu5U8u
- k7UytPz0CDTsXEsvdcZnkaa5VnIZa719RsUwuh6aRRJZWKMZhwQah9jiftvpqE+xGOSK
- FAqU33mwXEHXgKjX40hWtKuC0ZqIFM/Y/JGBkcrNSKagBhSO9zOPHUDzKWwrtqh5QPUF
- ZMOdtfbQsXPAVJjDxToKwNqq7WhN8rNHGcVkDJAbGFmKvLRTrY7H6MwCHEra19s9bFDG
- 7dxA==
+ bh=8Xd7zpZsEJU+pgATz/q/VYH7gIksBbBcCoaaOptcJd8=;
+ b=oXC2mootWDU1OQHId5gg2jDRKsySzPMcq0gHHiGHOCCKv20Be5SImcwOTdTD7i0lxM
+ nB8a+U2pOa+RifTyvA1HXGKfELRARM3A8ijDaGy3zLmSKMMyzDjYZGNHhyihIxbJafeF
+ 6H/suCBcKEJmD+Ebm2p3clF9+V5NQkf9MLxMtBuZ3L194eLZg7fSPzqUjzy6271Kgab6
+ edC++aoAN2OBaqNH7EgyGcO5Th9yHnRUJ8MUbp3/zNi+ItmYhTlrqyySYE0AvqatZmR1
+ lsABLTQl1KtcckTACCDHfKGVyBq/yJbAwvqt9SNmjJllaWOPEv119/FoOapa3Aucl75k
+ AOXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=hv/hRwDof3drBWJIx+Z5EldftQ4h6Grha3K0MkRlGTk=;
- b=d5viOS07EBMdn3PlRJsGlATD6S4mS4LpxRvWbeWKeDKYh9d5GyuUkR6PaNiM4WW4CI
- 9wo//Ef4d5ftxRr2MIm+/tmMNPEzKmcX8hX0O/2rxHB0JvRzHuqDM6qBP6kp/Zi7dJgc
- uLrSPlfBFwLt8G0QzmD0lChpQIliMvHKYzPvpmzAp5M83A0hQsLqqo2jIOJI6lki5PNs
- 7K9I/MsBkiK6FMTCr4X0Bcz1kY9suCdzNU0Zc2ND99V0Ax4/HCkkYL9EFsqWYM/8mYta
- Zn0/qxSS9giE8UoKaEohh5j1yMbfJJAfP3N7MSFStGsYtmhtnCuabZwDfo4Y8Dj4p+xQ
- v0Jw==
-X-Gm-Message-State: AOAM532aB8Q3SSp2+pqFzhIED0XHVC6RGGHK0LHrjeJyDJ30DDFKX+Js
- vSGKlm0yq2xA4BxTQoHd6wvPNTl8GiBNRA==
-X-Google-Smtp-Source: ABdhPJyKPFLjYztcEuk3wCsrdcxbP15F40aeOwOh81wAPXZWc1VXGoLXFklbsoyMaAf2baPJ5bLefg==
-X-Received: by 2002:a1c:d8:: with SMTP id 207mr20722005wma.81.1595249789868;
- Mon, 20 Jul 2020 05:56:29 -0700 (PDT)
+ bh=8Xd7zpZsEJU+pgATz/q/VYH7gIksBbBcCoaaOptcJd8=;
+ b=qoh4jrRj8ISiXsy5OEv298nI9MlLSdokegFK4sPe1vqVucAv8kU2ClTzqQJFKHjlUt
+ kCZkV7a0QKsdvm647aprxwmKc/x+CNANotqkDLFP56dq1LhwIibzOplB84tj9BMVamLz
+ Z/qKhdK6kQK+sjVSXxkJWF2W9axEfj08GQVK0XQdCwDywZ1L0ML35dRUgrHNbeQ/fDLp
+ z2x25IwQYjU8O0SIeayvQQ6WfGTkCc4icFCpif2Eu305TTuTM8bLYuosJkT/Kmk/4NdA
+ KJfZvrxKf3AxWxYAa441u+q5XodTAlDDK3qfzzat+fjmvzgu/OnMlu5LPtQzTqoA3klB
+ 4Vbg==
+X-Gm-Message-State: AOAM531x0TPpEU8KWpPApNboDwyXUZZ5xu7f8qNHvFuwMGAZh+k9zLU1
+ Q3FRM7rZLEwJtW6zClrsKF+VdS7SBoDhSQ==
+X-Google-Smtp-Source: ABdhPJxN4NCn4xzhpVHUdHgj9StvI9x+mNqFpizcv1uqlKzCMiSkHzGXO2w4PPXnxgF55PA6o3YUYg==
+X-Received: by 2002:adf:fc06:: with SMTP id i6mr3910964wrr.79.1595249792445;
+ Mon, 20 Jul 2020 05:56:32 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p29sm34025403wmi.43.2020.07.20.05.56.28
+ by smtp.gmail.com with ESMTPSA id p29sm34025403wmi.43.2020.07.20.05.56.31
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jul 2020 05:56:29 -0700 (PDT)
+ Mon, 20 Jul 2020 05:56:31 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/12] qdev: Move doc comments from qdev.c to qdev-core.h
-Date: Mon, 20 Jul 2020 13:56:14 +0100
-Message-Id: <20200720125621.13460-6-peter.maydell@linaro.org>
+Subject: [PULL 07/12] qdev: Document GPIO related functions
+Date: Mon, 20 Jul 2020 13:56:16 +0100
+Message-Id: <20200720125621.13460-8-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200720125621.13460-1-peter.maydell@linaro.org>
 References: <20200720125621.13460-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,193 +104,241 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The doc-comments which document the qdev API are split between the
-header file and the C source files, because as a project we haven't
-been consistent about where we put them.
-
-Move all the doc-comments in qdev.c to the header files, so that
-users of the APIs don't have to look at the implementation files for
-this information.
-
-In the process, unify them into our doc-comment format and expand on
-them in some cases to clarify expected use cases.
+Add documentation comments for the various qdev functions
+related to creating and connecting GPIO lines.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200711142425.16283-2-peter.maydell@linaro.org
+Message-id: 20200711142425.16283-4-peter.maydell@linaro.org
 ---
- include/hw/qdev-core.h       | 57 ++++++++++++++++++++++++++++++++++++
- include/hw/qdev-properties.h | 13 ++++++++
- hw/core/qdev.c               | 33 ---------------------
- 3 files changed, 70 insertions(+), 33 deletions(-)
+ include/hw/qdev-core.h | 191 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 189 insertions(+), 2 deletions(-)
 
 diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index fe78073c708..2d441d1fb2e 100644
+index 1d2bf5f37da..ea3f73a282d 100644
 --- a/include/hw/qdev-core.h
 +++ b/include/hw/qdev-core.h
-@@ -320,9 +320,66 @@ compat_props_add(GPtrArray *arr,
- 
- /*** Board API.  This should go away once we have a machine config file.  ***/
- 
-+/**
-+ * qdev_new: Create a device on the heap
-+ * @name: device type to create (we assert() that this type exists)
-+ *
-+ * This only allocates the memory and initializes the device state
-+ * structure, ready for the caller to set properties if they wish.
-+ * The device still needs to be realized.
-+ * The returned object has a reference count of 1.
-+ */
- DeviceState *qdev_new(const char *name);
-+/**
-+ * qdev_try_new: Try to create a device on the heap
-+ * @name: device type to create
-+ *
-+ * This is like qdev_new(), except it returns %NULL when type @name
-+ * does not exist, rather than asserting.
-+ */
- DeviceState *qdev_try_new(const char *name);
-+/**
-+ * qdev_realize: Realize @dev.
-+ * @dev: device to realize
-+ * @bus: bus to plug it into (may be NULL)
-+ * @errp: pointer to error object
-+ *
-+ * "Realize" the device, i.e. perform the second phase of device
-+ * initialization.
-+ * @dev must not be plugged into a bus already.
-+ * If @bus, plug @dev into @bus.  This takes a reference to @dev.
-+ * If @dev has no QOM parent, make one up, taking another reference.
-+ * On success, return true.
-+ * On failure, store an error through @errp and return false.
-+ *
-+ * If you created @dev using qdev_new(), you probably want to use
-+ * qdev_realize_and_unref() instead.
-+ */
- bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp);
-+/**
-+ * qdev_realize_and_unref: Realize @dev and drop a reference
-+ * @dev: device to realize
-+ * @bus: bus to plug it into (may be NULL)
-+ * @errp: pointer to error object
-+ *
-+ * Realize @dev and drop a reference.
-+ * This is like qdev_realize(), except the caller must hold a
-+ * (private) reference, which is dropped on return regardless of
-+ * success or failure.  Intended use::
-+ *
-+ *     dev = qdev_new();
-+ *     [...]
-+ *     qdev_realize_and_unref(dev, bus, errp);
-+ *
-+ * Now @dev can go away without further ado.
-+ *
-+ * If you are embedding the device into some other QOM device and
-+ * initialized it via some variant on object_initialize_child() then
-+ * do not use this function, because that family of functions arrange
-+ * for the only reference to the child device to be held by the parent
-+ * via the child<> property, and so the reference-count-drop done here
-+ * would be incorrect. For that use case you want qdev_realize().
-+ */
- bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp);
- void qdev_unrealize(DeviceState *dev);
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 587e5b7d317..8f3a98cba69 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -282,6 +282,19 @@ void error_set_from_qdev_prop_error(Error **errp, int ret, DeviceState *dev,
-  */
- void qdev_property_add_static(DeviceState *dev, Property *prop);
+@@ -424,13 +424,132 @@ void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+ void qdev_machine_creation_done(void);
+ bool qdev_machine_modified(void);
  
 +/**
-+ * qdev_alias_all_properties: Create aliases on source for all target properties
-+ * @target: Device which has properties to be aliased
-+ * @source: Object to add alias properties to
++ * qdev_get_gpio_in: Get one of a device's anonymous input GPIO lines
++ * @dev: Device whose GPIO we want
++ * @n: Number of the anonymous GPIO line (which must be in range)
 + *
-+ * Add alias properties to the @source object for all qdev properties on
-+ * the @target DeviceState.
++ * Returns the qemu_irq corresponding to an anonymous input GPIO line
++ * (which the device has set up with qdev_init_gpio_in()). The index
++ * @n of the GPIO line must be valid (i.e. be at least 0 and less than
++ * the total number of anonymous input GPIOs the device has); this
++ * function will assert() if passed an invalid index.
 + *
-+ * This is useful when @target is an internal implementation object
-+ * owned by @source, and you want to expose all the properties of that
-+ * implementation object as properties on the @source object so that users
-+ * of @source can set them.
++ * This function is intended to be used by board code or SoC "container"
++ * device models to wire up the GPIO lines; usually the return value
++ * will be passed to qdev_connect_gpio_out() or a similar function to
++ * connect another device's output GPIO line to this input.
++ *
++ * For named input GPIO lines, use qdev_get_gpio_in_named().
 + */
- void qdev_alias_all_properties(DeviceState *target, Object *source);
+ qemu_irq qdev_get_gpio_in(DeviceState *dev, int n);
++/**
++ * qdev_get_gpio_in_named: Get one of a device's named input GPIO lines
++ * @dev: Device whose GPIO we want
++ * @name: Name of the input GPIO array
++ * @n: Number of the GPIO line in that array (which must be in range)
++ *
++ * Returns the qemu_irq corresponding to a named input GPIO line
++ * (which the device has set up with qdev_init_gpio_in_named()).
++ * The @name string must correspond to an input GPIO array which exists on
++ * the device, and the index @n of the GPIO line must be valid (i.e.
++ * be at least 0 and less than the total number of input GPIOs in that
++ * array); this function will assert() if passed an invalid name or index.
++ *
++ * For anonymous input GPIO lines, use qdev_get_gpio_in().
++ */
+ qemu_irq qdev_get_gpio_in_named(DeviceState *dev, const char *name, int n);
  
++/**
++ * qdev_connect_gpio_out: Connect one of a device's anonymous output GPIO lines
++ * @dev: Device whose GPIO to connect
++ * @n: Number of the anonymous output GPIO line (which must be in range)
++ * @pin: qemu_irq to connect the output line to
++ *
++ * This function connects an anonymous output GPIO line on a device
++ * up to an arbitrary qemu_irq, so that when the device asserts that
++ * output GPIO line, the qemu_irq's callback is invoked.
++ * The index @n of the GPIO line must be valid (i.e. be at least 0 and
++ * less than the total number of anonymous output GPIOs the device has
++ * created with qdev_init_gpio_out()); otherwise this function will assert().
++ *
++ * Outbound GPIO lines can be connected to any qemu_irq, but the common
++ * case is connecting them to another device's inbound GPIO line, using
++ * the qemu_irq returned by qdev_get_gpio_in() or qdev_get_gpio_in_named().
++ *
++ * It is not valid to try to connect one outbound GPIO to multiple
++ * qemu_irqs at once, or to connect multiple outbound GPIOs to the
++ * same qemu_irq. (Warning: there is no assertion or other guard to
++ * catch this error: the model will just not do the right thing.)
++ * Instead, for fan-out you can use the TYPE_IRQ_SPLIT device: connect
++ * a device's outbound GPIO to the splitter's input, and connect each
++ * of the splitter's outputs to a different device.  For fan-in you
++ * can use the TYPE_OR_IRQ device, which is a model of a logical OR
++ * gate with multiple inputs and one output.
++ *
++ * For named output GPIO lines, use qdev_connect_gpio_out_named().
++ */
+ void qdev_connect_gpio_out(DeviceState *dev, int n, qemu_irq pin);
++/**
++ * qdev_connect_gpio_out: Connect one of a device's anonymous output GPIO lines
++ * @dev: Device whose GPIO to connect
++ * @name: Name of the output GPIO array
++ * @n: Number of the anonymous output GPIO line (which must be in range)
++ * @pin: qemu_irq to connect the output line to
++ *
++ * This function connects an anonymous output GPIO line on a device
++ * up to an arbitrary qemu_irq, so that when the device asserts that
++ * output GPIO line, the qemu_irq's callback is invoked.
++ * The @name string must correspond to an output GPIO array which exists on
++ * the device, and the index @n of the GPIO line must be valid (i.e.
++ * be at least 0 and less than the total number of input GPIOs in that
++ * array); this function will assert() if passed an invalid name or index.
++ *
++ * Outbound GPIO lines can be connected to any qemu_irq, but the common
++ * case is connecting them to another device's inbound GPIO line, using
++ * the qemu_irq returned by qdev_get_gpio_in() or qdev_get_gpio_in_named().
++ *
++ * It is not valid to try to connect one outbound GPIO to multiple
++ * qemu_irqs at once, or to connect multiple outbound GPIOs to the
++ * same qemu_irq; see qdev_connect_gpio_out() for details.
++ *
++ * For named output GPIO lines, use qdev_connect_gpio_out_named().
++ */
+ void qdev_connect_gpio_out_named(DeviceState *dev, const char *name, int n,
+                                  qemu_irq pin);
++/**
++ * qdev_get_gpio_out_connector: Get the qemu_irq connected to an output GPIO
++ * @dev: Device whose output GPIO we are interested in
++ * @name: Name of the output GPIO array
++ * @n: Number of the output GPIO line within that array
++ *
++ * Returns whatever qemu_irq is currently connected to the specified
++ * output GPIO line of @dev. This will be NULL if the output GPIO line
++ * has never been wired up to the anything.  Note that the qemu_irq
++ * returned does not belong to @dev -- it will be the input GPIO or
++ * IRQ of whichever device the board code has connected up to @dev's
++ * output GPIO.
++ *
++ * You probably don't need to use this function -- it is used only
++ * by the platform-bus subsystem.
++ */
+ qemu_irq qdev_get_gpio_out_connector(DeviceState *dev, const char *name, int n);
++/**
++ * qdev_intercept_gpio_out: Intercept an existing GPIO connection
++ * @dev: Device to intercept the outbound GPIO line from
++ * @icpt: New qemu_irq to connect instead
++ * @name: Name of the output GPIO array
++ * @n: Number of the GPIO line in the array
++ *
++ * This function is provided only for use by the qtest testing framework
++ * and is not suitable for use in non-testing parts of QEMU.
++ *
++ * This function breaks an existing connection of an outbound GPIO
++ * line from @dev, and replaces it with the new qemu_irq @icpt, as if
++ * ``qdev_connect_gpio_out_named(dev, icpt, name, n)`` had been called.
++ * The previously connected qemu_irq is returned, so it can be restored
++ * by a second call to qdev_intercept_gpio_out() if desired.
++ */
+ qemu_irq qdev_intercept_gpio_out(DeviceState *dev, qemu_irq icpt,
+                                  const char *name, int n);
+ 
+@@ -438,10 +557,59 @@ BusState *qdev_get_child_bus(DeviceState *dev, const char *name);
+ 
+ /*** Device API.  ***/
+ 
+-/* Register device properties.  */
+-/* GPIO inputs also double as IRQ sinks.  */
++/**
++ * qdev_init_gpio_in: create an array of anonymous input GPIO lines
++ * @dev: Device to create input GPIOs for
++ * @handler: Function to call when GPIO line value is set
++ * @n: Number of GPIO lines to create
++ *
++ * Devices should use functions in the qdev_init_gpio_in* family in
++ * their instance_init or realize methods to create any input GPIO
++ * lines they need. There is no functional difference between
++ * anonymous and named GPIO lines. Stylistically, named GPIOs are
++ * preferable (easier to understand at callsites) unless a device
++ * has exactly one uniform kind of GPIO input whose purpose is obvious.
++ * Note that input GPIO lines can serve as 'sinks' for IRQ lines.
++ *
++ * See qdev_get_gpio_in() for how code that uses such a device can get
++ * hold of an input GPIO line to manipulate it.
++ */
+ void qdev_init_gpio_in(DeviceState *dev, qemu_irq_handler handler, int n);
++/**
++ * qdev_init_gpio_out: create an array of anonymous output GPIO lines
++ * @dev: Device to create output GPIOs for
++ * @pins: Pointer to qemu_irq or qemu_irq array for the GPIO lines
++ * @n: Number of GPIO lines to create
++ *
++ * Devices should use functions in the qdev_init_gpio_out* family
++ * in their instance_init or realize methods to create any output
++ * GPIO lines they need. There is no functional difference between
++ * anonymous and named GPIO lines. Stylistically, named GPIOs are
++ * preferable (easier to understand at callsites) unless a device
++ * has exactly one uniform kind of GPIO output whose purpose is obvious.
++ *
++ * The @pins argument should be a pointer to either a "qemu_irq"
++ * (if @n == 1) or a "qemu_irq []" array (if @n > 1) in the device's
++ * state structure. The device implementation can then raise and
++ * lower the GPIO line by calling qemu_set_irq(). (If anything is
++ * connected to the other end of the GPIO this will cause the handler
++ * function for that input GPIO to be called.)
++ *
++ * See qdev_connect_gpio_out() for how code that uses such a device
++ * can connect to one of its output GPIO lines.
++ */
+ void qdev_init_gpio_out(DeviceState *dev, qemu_irq *pins, int n);
++/**
++ * qdev_init_gpio_out: create an array of named output GPIO lines
++ * @dev: Device to create output GPIOs for
++ * @pins: Pointer to qemu_irq or qemu_irq array for the GPIO lines
++ * @name: Name to give this array of GPIO lines
++ * @n: Number of GPIO lines to create
++ *
++ * Like qdev_init_gpio_out(), but creates an array of GPIO output lines
++ * with a name. Code using the device can then connect these GPIO lines
++ * using qdev_connect_gpio_out_named().
++ */
+ void qdev_init_gpio_out_named(DeviceState *dev, qemu_irq *pins,
+                               const char *name, int n);
  /**
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 01796823b41..96772a15bd5 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -128,13 +128,6 @@ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
-     }
+@@ -473,6 +641,25 @@ static inline void qdev_init_gpio_in_named(DeviceState *dev,
+     qdev_init_gpio_in_named_with_opaque(dev, handler, dev, name, n);
  }
  
--/*
-- * Create a device on the heap.
-- * A type @name must exist.
-- * This only initializes the device state structure and allows
-- * properties to be set.  The device still needs to be realized.  See
-- * qdev-core.h.
-- */
- DeviceState *qdev_new(const char *name)
- {
-     if (!object_class_by_name(name)) {
-@@ -143,11 +136,6 @@ DeviceState *qdev_new(const char *name)
-     return DEVICE(object_new(name));
- }
++/**
++ * qdev_pass_gpios: create GPIO lines on container which pass through to device
++ * @dev: Device which has GPIO lines
++ * @container: Container device which needs to expose them
++ * @name: Name of GPIO array to pass through (NULL for the anonymous GPIO array)
++ *
++ * In QEMU, complicated devices like SoCs are often modelled with a
++ * "container" QOM device which itself contains other QOM devices and
++ * which wires them up appropriately. This function allows the container
++ * to create GPIO arrays on itself which simply pass through to a GPIO
++ * array of one of its internal devices.
++ *
++ * If @dev has both input and output GPIOs named @name then both will
++ * be passed through. It is not possible to pass a subset of the array
++ * with this function.
++ *
++ * To users of the container device, the GPIO array created on @container
++ * behaves exactly like any other.
++ */
+ void qdev_pass_gpios(DeviceState *dev, DeviceState *container,
+                      const char *name);
  
--/*
-- * Try to create a device on the heap.
-- * This is like qdev_new(), except it returns %NULL when type @name
-- * does not exist.
-- */
- DeviceState *qdev_try_new(const char *name)
- {
-     if (!module_object_class_by_name(name)) {
-@@ -378,14 +366,6 @@ void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
-     qdev_unrealize(dev);
- }
- 
--/*
-- * Realize @dev.
-- * @dev must not be plugged into a bus.
-- * If @bus, plug @dev into @bus.  This takes a reference to @dev.
-- * If @dev has no QOM parent, make one up, taking another reference.
-- * On success, return true.
-- * On failure, store an error through @errp and return false.
-- */
- bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
- {
-     assert(!dev->realized && !dev->parent_bus);
-@@ -399,16 +379,6 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
-     return object_property_set_bool(OBJECT(dev), "realized", true, errp);
- }
- 
--/*
-- * Realize @dev and drop a reference.
-- * This is like qdev_realize(), except the caller must hold a
-- * (private) reference, which is dropped on return regardless of
-- * success or failure.  Intended use:
-- *     dev = qdev_new();
-- *     [...]
-- *     qdev_realize_and_unref(dev, bus, errp);
-- * Now @dev can go away without further ado.
-- */
- bool qdev_realize_and_unref(DeviceState *dev, BusState *bus, Error **errp)
- {
-     bool ret;
-@@ -814,9 +784,6 @@ static void qdev_class_add_property(DeviceClass *klass, Property *prop)
-                                           prop->info->description);
- }
- 
--/* @qdev_alias_all_properties - Add alias properties to the source object for
-- * all qdev properties on the target DeviceState.
-- */
- void qdev_alias_all_properties(DeviceState *target, Object *source)
- {
-     ObjectClass *class;
 -- 
 2.20.1
 
