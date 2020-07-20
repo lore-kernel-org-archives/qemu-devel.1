@@ -2,93 +2,92 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E6FC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A727C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 19:13:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC8E722482
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:58:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A3672176B
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 19:13:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o0qIH5ir"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC8E722482
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YoFN2neV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A3672176B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxazn-00014R-Tw
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 14:58:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41956)
+	id 1jxbEc-0005oT-5f
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 15:13:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxazE-0000e7-HB
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:58:04 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52887)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxazC-0000H3-W8
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:58:04 -0400
-Received: by mail-wm1-x343.google.com with SMTP id q15so526934wmj.2
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 11:58:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=CNb0bok8A2GvYk4uLFq3HwZGJ739nczlW4+FlSKYeSo=;
- b=o0qIH5irZhHh1htoa8MO0cDyotelKeyMw3yk5v7fbpRjPXAVxBYHbGauc7MtCSJV5x
- EFWFLJyqLdoOpxEKmUq+APL6RFBdiZg25ODdSf/IPg57s8htO02+ehrXj/L0kASqRtfE
- s6q5VrLHqgptRxYu8U8CDs+amamKXpaejHh70AFWpuInTAMQO+LujidcVu3yWzSDgBhh
- r3q2bzblglyp4v08gEmoM4e0pILCXXmeo7F2xKBHppDOqL9yhBZF7mKFku4QIRWHGh08
- 9/IZP4tv1ODBQ+scZTSsUJvGP+74RFJeP7J+ja9TlsNdoWwCwL7B731zKCg9/SiEVWVy
- Cn8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=CNb0bok8A2GvYk4uLFq3HwZGJ739nczlW4+FlSKYeSo=;
- b=N/CYY9BgRRZzf7V9HH88O7vD77/H5UjE0G1++TyTHgbams61OTg2zq7MKFlnWgs3u6
- N+h4YNRuvlKg4ROGl1Uxp2K/yJ5uWz1lxJk19f4rmYDb1Y42ZAJP+N79b4aAKHyG7mnn
- qGnUpEFc3C8Ox9JTw4Etabl2vDBiXLYpVk8gXKooBUNILWyg/tt0LGmHwQjrQF4YDsHn
- a2QuMjISpw3lfBhg+itdjcJKxjGSY5zEqYtDiqLOcFrBS1vdutULHxtaHGc7/AANidUL
- FAyM1/63fbVtwaeohK0mqYcCOH913qjeZAFYQ45QGcM0VV7+np3LUV8gwucMKFDjOMnM
- dYOQ==
-X-Gm-Message-State: AOAM530kyzpz+hkpHz0mmzc/aFVggKNjVKgoztY+zCEBW1to5OpqpxY6
- hfqNNGjfgn1IZyGyt5aRea223p38tQg=
-X-Google-Smtp-Source: ABdhPJxVaQtYACLXyYSRAlq/31SyzZQsxQnh2AMkwhyDYq9PBDcl+J9HvlrCivV1jdKMehXCht5zbw==
-X-Received: by 2002:a1c:7f0e:: with SMTP id a14mr663334wmd.21.1595271481153;
- Mon, 20 Jul 2020 11:58:01 -0700 (PDT)
-Received: from localhost.localdomain
- (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id 129sm490256wmd.48.2020.07.20.11.57.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 20 Jul 2020 11:58:00 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH-not-for-5.1? v2] hw/isa/isa-bus: Ensure ISA I/O regions
- are 8/16-bit accessible
-Date: Mon, 20 Jul 2020 20:57:58 +0200
-Message-Id: <20200720185758.21280-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jxbDr-0004uJ-4K
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 15:13:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51873
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jxbDo-0002FG-4Q
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 15:13:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595272386;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bSbQqiS0Vsmq0Re04Uq/Tqm2kyVko5fcWCB5Pqi71U0=;
+ b=YoFN2neVC671CniPNbewHzeOzcT9X71gMyikzEi+sc57w0djsojqngbiSnKF1lFWE6CY50
+ SgY/tmoDIVhOlXK1qIHR4pVCCV0m3XqAa9FUOnMmz/oBipBJLrHzZsppqZP4LjWkjLNB1e
+ 4hhS4cbVSBR+Dpd9lKLjqrGHifpF9Z4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-378-D0uezm-2Mgyv6EAdhRmEMQ-1; Mon, 20 Jul 2020 15:13:00 -0400
+X-MC-Unique: D0uezm-2Mgyv6EAdhRmEMQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2559E8005B0;
+ Mon, 20 Jul 2020 19:12:59 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-115-27.ams2.redhat.com
+ [10.36.115.27])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA2E65D9DD;
+ Mon, 20 Jul 2020 19:12:57 +0000 (UTC)
+Subject: Re: [RFC 3/3] x68: acpi: trigger SMI before scanning for hotplugged
+ CPUs
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200710161704.309824-1-imammedo@redhat.com>
+ <20200710161704.309824-4-imammedo@redhat.com>
+ <515cc231-858a-a626-31a9-d74e1f6b4e38@redhat.com>
+ <20200717151321.27e2d849@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <cf887d74-f65d-602a-9629-3d25cef93a69@redhat.com>
+Date: Mon, 20 Jul 2020 21:12:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Firefox/52.0 Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200717151321.27e2d849@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lersek@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:11:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,66 +100,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S . Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: boris.ostrovsky@oracle.com, liran.alon@oracle.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 5d971f9e67 we don't accept mismatching sizes
-in memory_region_access_valid(). This gives troubles when
-a device is on an ISA bus, because the CPU is free to use
-8/16-bit accesses on the bus (or up to 32-bit on EISA bus),
-regardless what range is valid for the device.
+On 07/17/20 15:13, Igor Mammedov wrote:
+> On Tue, 14 Jul 2020 14:28:29 +0200
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+>> (CC'ing Peter Krempa due to virsh setvcpu (singular) / setvcpus (plural)
+>> references)
+>>
+>> On 07/10/20 18:17, Igor Mammedov wrote:
+> [...]
+> 
+>> (3) Just a thought: I wonder if we should reserve both ports (0xB2 and
+>> 0xB3 too). For now we don't have any use for the "data" port, but
+>> arguably it's part of the same register block.
+> 
+> we probably should, might be used for unplug part.
+> 
+> BTW any ideas how we'd like to procceed with unplug?
+> 
+> current flow looks like:
+> 
+> QEMU                       OSPM
+> unplug_req()
+> 1)   =>SCI     --->
+>   -------------------------
+> 2)                   handle_sci()
+>                          scan for events and send
+>                              Notify per removed CPU
+>                              clear rm_evt
+>   -------------------------
+> 3)                   offline cpu
+>   -------------------------
+> 4)                    call _EJ0 to unplug CPU
+>                          write into ej_evt
+>               <-------------
+>   -------------------------
+> 5)  unplug cb
+>  
+> 
+> We probably should modify _EJ0 to send SMI instead of direct access
+> to cpuhp block, the question is how OSPM would tell FW which CPU it
+> ejects.
 
-Add a check to ensure devices plugged on the ISA bus can
-accept 8/16-bits accesses.
+The optimal solution would be DataTableRegion, but of course Windows
+doesn't support that. So the usual replacement is something like below
+(we used a variant of it in "docs/specs/vmgenid.txt"):
 
-Related bug reports:
+- Create a new ACPI data table. See "Appendix O - UEFI ACPI Data Table",
+table 94, in the UEFI 2.8 spec <https://uefi.org/specifications>. In
+this table, set
 
-- https://lore.kernel.org/xen-devel/20200630170913.123646-1-anthony.perard@citrix.com/T/
-- https://bugs.debian.org/964793
-- https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=964247
-- https://bugs.launchpad.net/bugs/1886318
+  Identifier = B055E4C3-B5B5-4948-9D02-A46FCA3B0A3B
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-MST: I really don't like this approach, I think the ISA bus
-     should adjust the access.
+(I just generated this with "uuidgen"). Set DataOffset to 54 decimal.
+Place 4 zeroes at offset 54, for Data.
 
-since v1: only 8/16-bit accesses enforced
----
- hw/isa/isa-bus.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+- Create a SystemMemory Operation Region, 58 bytes in size (for covering
+the entire table), with a single 4-byte Field at offset 54. Use the
+add_pointer command for pointing the OperationRegion opcode to offset 0
+(that is, the very beginning) of the above-created ACPI table.
 
-diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-index 58fde178f9..e142eeef06 100644
---- a/hw/isa/isa-bus.c
-+++ b/hw/isa/isa-bus.c
-@@ -132,6 +132,20 @@ static inline void isa_init_ioport(ISADevice *dev, uint16_t ioport)
- 
- void isa_register_ioport(ISADevice *dev, MemoryRegion *io, uint16_t start)
- {
-+    if (io->ops->valid.min_access_size > 1) {
-+        /*
-+         * To be backward compatible with IBM-PC bus, ISA bus must accept
-+         * 8-bit accesses.
-+         */
-+        error_report("ISA device '%s' requires I/O min_access_size of 1 (byte)",
-+                     object_get_typename(OBJECT(dev)));
-+        exit(1);
-+    } else if (io->ops->valid.max_access_size < 2) {
-+        /* ISA bus must accept 16-bit accesses (EISA accepts 32-bit) */
-+        error_report("ISA device '%s' requires I/O max_access_size of "
-+                     "at least 2 (bytes)", object_get_typename(OBJECT(dev)));
-+        exit(1);
-+    }
-     memory_region_add_subregion(isabus->address_space_io, start, io);
-     isa_init_ioport(dev, start);
- }
--- 
-2.21.3
+(Normally I would suggest creating an Integer object, using add_pointer
+on the Integer object, and then dynamically creating an OperationRegion
+at that Integer address -- but I don't know if Windows can deal with
+dynamically determined OperationRegion addresses.)
+
+- In the CPU hot-unplug ACPI code, write the APIC ID (or the selector I
+guess?) of the CPU being un-plugged to the field at offset 54, before
+raising the SMI
+
+- Raise the SMI with a new command (value 5, I guess)
+
+- in OVMF, the CpuHotplugSmm driver can register an EndOfDxe callback,
+and use EFI_ACPI_SDT_PROTOCOL.GetAcpiTable(), in a loop, for locating
+the data table. Save a pointer (in SMRAM) to offset 54 of that table. At
+runtime, when handling the SMI (command 5) read the APIC ID (or
+selector) from the data field at offset 54.
+
+(The AddTableToList() function in edk2's
+"MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableProtocol.c" file
+makes sure that "UEFI ACPI Data Tables" are allocated in AcpiNVS memory,
+which is permitted for use as an "SMM communication buffer".)
+
+(The difference with VMGENID is that QEMU need not learn of the
+guest-side address of the data table, hence no "write_pointer" command.
+Instead, CpuHotplugSmm needs to learn of the address. That can be done
+with in an EndOfDxe callback, using EFI_ACPI_SDT_PROTOCOL.GetAcpiTable()
+in a loop, but that does require QEMU to produce a real ACPI data table,
+not just a header-less blob placed in AcpiNVS memory.)
+
+Thanks,
+Laszlo
 
 
