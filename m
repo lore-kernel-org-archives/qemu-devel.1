@@ -2,108 +2,92 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 746BAC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 20:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A2BC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 20:07:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4213D2080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 20:07:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4213D2080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 03F172080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 20:07:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IDsnfTmT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03F172080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxc42-0006T8-HG
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 16:07:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56628)
+	id 1jxc4l-0007cG-8N
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 16:07:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jxc3O-0005ck-Gh; Mon, 20 Jul 2020 16:06:26 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4806)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1jxc3M-0000eQ-RM; Mon, 20 Jul 2020 16:06:26 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06KK1AYl047166; Mon, 20 Jul 2020 16:06:23 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32d5k080b3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 20 Jul 2020 16:06:23 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06KK1KZ4047726;
- Mon, 20 Jul 2020 16:06:23 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32d5k080ay-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 20 Jul 2020 16:06:23 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06KK5IXd031454;
- Mon, 20 Jul 2020 20:06:22 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com
- (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
- by ppma05wdc.us.ibm.com with ESMTP id 32brq8bxw5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 20 Jul 2020 20:06:22 +0000
-Received: from b03ledav004.gho.boulder.ibm.com
- (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06KK6I9P24510800
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 20 Jul 2020 20:06:18 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1A86278060;
- Mon, 20 Jul 2020 20:06:21 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CF67278064;
- Mon, 20 Jul 2020 20:06:19 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.191.4])
- by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Mon, 20 Jul 2020 20:06:19 +0000 (GMT)
-Subject: Re: [PATCH v4 4/8] s390/sclp: read sccb from mem based on sccb length
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
-References: <20200624202312.28349-1-walling@linux.ibm.com>
- <20200624202312.28349-5-walling@linux.ibm.com>
- <cf1c33ea-2a2a-8400-a56b-384de356cf05@redhat.com>
-From: Collin Walling <walling@linux.ibm.com>
-Message-ID: <1b552e26-3bce-0aba-0cc4-900e6b31839a@linux.ibm.com>
-Date: Mon, 20 Jul 2020 16:06:18 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxc43-0006kD-K9
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 16:07:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24095
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxc40-0000hT-VE
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 16:07:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595275623;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zIWq4II3CfSPxkPXX/kJLVrXCW4YQke3JXRZtLzRd9s=;
+ b=IDsnfTmTNAgqj7lUIip+IkEgajgeUBKVB40KlKrZ9k74kd4EuBJSHckkpye2fV7iU1wcoU
+ lidK1h1fbi9CwKifJvhvm9M+g0UCDuH/szQ01jUnuXUtg46ZagCBlI7FqhK8Lh7XPVbklE
+ KFX9FzoD1bnJDzriV6bR+p1V7hcgPVo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1-T6I3cwpoOleXusR2m0IsGQ-1; Mon, 20 Jul 2020 16:07:02 -0400
+X-MC-Unique: T6I3cwpoOleXusR2m0IsGQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23BA4107ACCA;
+ Mon, 20 Jul 2020 20:07:01 +0000 (UTC)
+Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
+ (ovpn-120-206.rdu2.redhat.com [10.10.120.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4487610021B3;
+ Mon, 20 Jul 2020 20:07:00 +0000 (UTC)
+Subject: Re: [PATCH 1/1] python/machine: Change default timeout to 30 seconds
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20200720160252.104139-1-jsnow@redhat.com>
+ <20200720160252.104139-2-jsnow@redhat.com>
+ <20200720200137.GY1274972@habkost.net>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <14061c9d-be4f-f8ef-049e-c161274a3d84@redhat.com>
+Date: Mon, 20 Jul 2020 16:06:59 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <cf1c33ea-2a2a-8400-a56b-384de356cf05@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200720200137.GY1274972@habkost.net>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-20_09:2020-07-20,
- 2020-07-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 phishscore=0
- mlxlogscore=999 suspectscore=0 priorityscore=1501 mlxscore=0 clxscore=1015
- lowpriorityscore=0 malwarescore=0 impostorscore=0 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007200131
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
- helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 16:06:09
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 03:17:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,92 +100,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, cohuck@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, svens@linux.ibm.com,
- pbonzini@redhat.com, mihajlov@linux.ibm.com, rth@twiddle.net
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
+ qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/20/20 4:19 AM, David Hildenbrand wrote:
-> On 24.06.20 22:23, Collin Walling wrote:
->> The header of the SCCB contains the actual length of the SCCB. Instead
->> of using a static 4K size, let's allow for a variable size determined
->> by the value set in the header. The proper checks are already in place
->> to ensure the SCCB length is sufficent to store a full response, and
->> that the length does not cross any explicitly-set boundaries.
+On 7/20/20 4:01 PM, Eduardo Habkost wrote:
+> On Mon, Jul 20, 2020 at 12:02:52PM -0400, John Snow wrote:
+>> 3 seconds is too short for some tests running inside busy VMs. Build it out to
+>> a rather generous 30 seconds to find out conclusively if there are more severe
+>> problems in the merge/CI tests.
 >>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
->> ---
->>  hw/s390x/sclp.c | 13 ++++++++-----
->>  1 file changed, 8 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
->> index 5899c1e3b8..1feba6f692 100644
->> --- a/hw/s390x/sclp.c
->> +++ b/hw/s390x/sclp.c
->> @@ -251,9 +251,8 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
->>      SCLPDevice *sclp = get_sclp_device();
->>      SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
->>      SCCB work_sccb;
->> -    hwaddr sccb_len = sizeof(SCCB);
->>  
->> -    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
->> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sizeof(SCCBHeader));
->>  
->>      if (!sclp_command_code_valid(code)) {
->>          work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
->> @@ -264,6 +263,9 @@ int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
->>          goto out_write;
->>      }
->>  
->> +    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb,
->> +                         be16_to_cpu(work_sccb.h.length));
->> +
->>      sclp_c->execute(sclp, &work_sccb, code);
->>  out_write:
->>      s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
->> @@ -278,8 +280,6 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->>      SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
->>      SCCB work_sccb;
->>  
->> -    hwaddr sccb_len = sizeof(SCCB);
->> -
->>      /* first some basic checks on program checks */
->>      if (env->psw.mask & PSW_MASK_PSTATE) {
->>          return -PGM_PRIVILEGED;
->> @@ -297,7 +297,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->>       * from playing dirty tricks by modifying the memory content after
->>       * the host has checked the values
->>       */
->> -    cpu_physical_memory_read(sccb, &work_sccb, sccb_len);
->> +    cpu_physical_memory_read(sccb, &work_sccb, sizeof(SCCBHeader));
->>  
->>      /* Valid sccb sizes */
->>      if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
->> @@ -313,6 +313,9 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->>          goto out_write;
->>      }
->>  
->> +    /* the header contains the actual length of the sccb */
->> +    cpu_physical_memory_read(sccb, &work_sccb, be16_to_cpu(work_sccb.h.length));
->> +
->>      sclp_c->execute(sclp, &work_sccb, code);
->>  out_write:
->>      cpu_physical_memory_write(sccb, &work_sccb,
->>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
 > 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
+> I would send my Reviewed-by to this patch without blinking if it
+> only changed the default value without touching anything else,
+> but this changes argument order and defaults in 4 different
+> methods.
 > 
+> I will still review this, though, and I will probably reply in a
+> few minutes with my Reviewed-by.
 
-Thanks!
+sorry, couldn't help myself ...
 
--- 
-Regards,
-Collin
+Since I changed the default, I thought it was better to remove the 
+default in the inner methods that can't be called by client code anyway.
 
-Stay safe and stay healthy
 
