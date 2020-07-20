@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A72C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 11:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06759C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 11:45:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B5EE2176B
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 11:44:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3E3620702
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 11:45:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="wC7e/eEf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B5EE2176B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="iguoU6nd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3E3620702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxUDi-0000LD-MB
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 07:44:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37402)
+	id 1jxUEk-0001WE-TI
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 07:45:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jxU7k-00081h-VQ; Mon, 20 Jul 2020 07:38:24 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:46898)
+ id 1jxU7Q-0007Kc-E9; Mon, 20 Jul 2020 07:38:04 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:46876)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jxU7j-0005BC-5T; Mon, 20 Jul 2020 07:38:24 -0400
+ id 1jxU7O-0005Ag-8c; Mon, 20 Jul 2020 07:38:04 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 1F09CBF5F1;
- Mon, 20 Jul 2020 11:38:00 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id B27ABBFB1A;
+ Mon, 20 Jul 2020 11:37:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
  s=default; t=1595245080;
- bh=X/wsVqfw1/FsdcK8SaPGwwSq1tr6rlWBwc4HMvRFUpY=;
+ bh=pxIkRiutpkpL1qsTAc8+arXC4N/2rlSIcHTc3apDWyo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=wC7e/eEfv5NsnWKeaqFgCptVe1SS8lOsWWtM+Jd2+EB+P+kkD7iEW5VGU1j8AJ1Gk
- WIuFlqyTXRmC6TmF2PkXxxbf/DCWqw5DrdX2OQwD+6j08eHEFssiUjbRlGFspMjSvx
- ZTcajR6auyADJtsPAkwvpVaqjIi8H/6En5gJG+TpR9bIoVqjvuX5PE0btSPpFnHUZo
- GSfCsi59kCfgHmMYgmH2+KqYpLNNbgM4cMDtOPE0KGA2KLaWB2K0dBXcFgnl/WgWaO
- dbJmCLX9ja/R++ej3KFV9+3Zw+BMeWmQkBG1k4Hrh5PMObn7beBXJKnkyPbFZle7aV
- hOPZblzkI7knw==
+ b=iguoU6nd0rv0akTxBKu1qWvd51UkxwZPOACRDlUK/24aDohspBTN/c/hHOHuYsCBw
+ Wjp2hxo/6Ts5bSS1zwzo2psDCsDG2bryMyhnMpkQCtxJu4H2TyvwAgYU4zjmXR4HQg
+ eAh1uMkrbZ+SHz9KQFxhB076dnLVF0UBuHwakxzMcf3f63S+Spqo5GQ8YhIr3f1k3/
+ IsAdPuFs2RnydevMpQRfmnS3va2aRLf1167t+FLN5W0hXK2C2mKJv/vVkQ1xFj7skC
+ KY45FBM21EI/tBQpiKs+HqM0oFgfnSHqTkUJ71AwZkor4jsJLRv35/vLzFJqeGUP6+
+ 5M5vMLyOsfovA==
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/16] hw/block/nvme: refactor request bounds checking
-Date: Mon, 20 Jul 2020 13:37:41 +0200
-Message-Id: <20200720113748.322965-10-its@irrelevant.dk>
+Subject: [PATCH 08/16] hw/block/nvme: verify validity of prp lists in the cmb
+Date: Mon, 20 Jul 2020 13:37:40 +0200
+Message-Id: <20200720113748.322965-9-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200720113748.322965-1-its@irrelevant.dk>
 References: <20200720113748.322965-1-its@irrelevant.dk>
@@ -88,73 +88,78 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Hoist bounds checking into its own function and check for wrap-around.
+Before this patch the device already supported PRP lists in the CMB, but
+it did not check for the validity of it nor announced the support in the
+Identify Controller data structure LISTS field.
+
+If some of the PRPs in a PRP list are in the CMB, then ALL entries must
+be there. This patch makes sure that requirement is verified as well as
+properly announcing support for PRP lists in the CMB.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+ hw/block/nvme.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 530f5155eac0..35bc1a7b7e21 100644
+index 68c33a11c144..530f5155eac0 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -553,6 +553,18 @@ static void nvme_clear_events(NvmeCtrl *n, uint8_t event_type)
-     }
- }
+@@ -272,6 +272,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
+     trans_len = MIN(len, trans_len);
+     int num_prps = (len >> n->page_bits) + 1;
+     uint16_t status;
++    bool prp_list_in_cmb = false;
  
-+static inline uint16_t nvme_check_bounds(NvmeCtrl *n, NvmeNamespace *ns,
-+                                         uint64_t slba, uint32_t nlb)
-+{
-+    uint64_t nsze = le64_to_cpu(ns->id_ns.nsze);
+     trace_pci_nvme_map_prp(nvme_cid(req), trans_len, len, prp1, prp2,
+                            num_prps);
+@@ -299,11 +300,16 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
+             status = NVME_INVALID_FIELD | NVME_DNR;
+             goto unmap;
+         }
 +
-+    if (unlikely(UINT64_MAX - slba < nlb || slba + nlb > nsze)) {
-+        return NVME_LBA_RANGE | NVME_DNR;
-+    }
+         if (len > n->page_size) {
+             uint64_t prp_list[n->max_prp_ents];
+             uint32_t nents, prp_trans;
+             int i = 0;
+ 
++            if (nvme_addr_is_cmb(n, prp2)) {
++                prp_list_in_cmb = true;
++            }
 +
-+    return NVME_SUCCESS;
-+}
+             nents = (len + n->page_size - 1) >> n->page_bits;
+             prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
+             nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
+@@ -317,6 +323,11 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
+                         goto unmap;
+                     }
+ 
++                    if (prp_list_in_cmb != nvme_addr_is_cmb(n, prp_ent)) {
++                        status = NVME_INVALID_USE_OF_CMB | NVME_DNR;
++                        goto unmap;
++                    }
 +
- static void nvme_rw_cb(void *opaque, int ret)
- {
-     NvmeRequest *req = opaque;
-@@ -600,12 +612,14 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
-     uint64_t offset = slba << data_shift;
-     uint32_t count = nlb << data_shift;
-+    uint16_t status;
+                     i = 0;
+                     nents = (len + n->page_size - 1) >> n->page_bits;
+                     prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
+@@ -336,6 +347,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
+                 if (status) {
+                     goto unmap;
+                 }
++
+                 len -= trans_len;
+                 i++;
+             }
+@@ -2144,7 +2156,7 @@ static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
  
-     trace_pci_nvme_write_zeroes(nvme_cid(req), slba, nlb);
- 
--    if (unlikely(slba + nlb > ns->id_ns.nsze)) {
-+    status = nvme_check_bounds(n, ns, slba, nlb);
-+    if (status) {
-         trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
--        return NVME_LBA_RANGE | NVME_DNR;
-+        return status;
-     }
- 
-     block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
-@@ -628,13 +642,15 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     uint64_t data_offset = slba << data_shift;
-     int is_write = rw->opcode == NVME_CMD_WRITE ? 1 : 0;
-     enum BlockAcctType acct = is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
-+    uint16_t status;
- 
-     trace_pci_nvme_rw(is_write ? "write" : "read", nlb, data_size, slba);
- 
--    if (unlikely((slba + nlb) > ns->id_ns.nsze)) {
--        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
-+    status = nvme_check_bounds(n, ns, slba, nlb);
-+    if (status) {
-         trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
--        return NVME_LBA_RANGE | NVME_DNR;
-+        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
-+        return status;
-     }
- 
-     if (nvme_map(n, cmd, data_size, req)) {
+     NVME_CMBSZ_SET_SQS(n->bar.cmbsz, 1);
+     NVME_CMBSZ_SET_CQS(n->bar.cmbsz, 0);
+-    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 0);
++    NVME_CMBSZ_SET_LISTS(n->bar.cmbsz, 1);
+     NVME_CMBSZ_SET_RDS(n->bar.cmbsz, 1);
+     NVME_CMBSZ_SET_WDS(n->bar.cmbsz, 1);
+     NVME_CMBSZ_SET_SZU(n->bar.cmbsz, 2); /* MBs */
 -- 
 2.27.0
 
