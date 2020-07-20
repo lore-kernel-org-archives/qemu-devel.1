@@ -2,82 +2,77 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 636C3C433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 23:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A09D5C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 23:23:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A2942080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 23:21:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A2282080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 23:23:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MIChtKLs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A2942080D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MudMBVu3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A2282080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxf6b-0002Jx-DU
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 19:21:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46928)
+	id 1jxf7n-0003GX-NT
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 19:23:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jxf60-0001sW-Ab; Mon, 20 Jul 2020 19:21:20 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:45953)
+ id 1jxf7E-0002on-G6; Mon, 20 Jul 2020 19:22:36 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:35492)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jxf5y-0002CL-IU; Mon, 20 Jul 2020 19:21:20 -0400
-Received: by mail-io1-xd41.google.com with SMTP id e64so19425406iof.12;
- Mon, 20 Jul 2020 16:21:17 -0700 (PDT)
+ id 1jxf7D-0002JT-0B; Mon, 20 Jul 2020 19:22:36 -0400
+Received: by mail-io1-xd44.google.com with SMTP id v8so19458046iox.2;
+ Mon, 20 Jul 2020 16:22:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=rFBhgINNlJ6GuKDyOev5puWMRyBRkyz3ArJkP6pxiz8=;
- b=MIChtKLsM4ODl7MituXLFrwnmpE9uurZYIdLn82Q4HmgLpvw+ai3xdm1M+v7nPQ3xU
- kg1gy8uvH0kZH7O1WNDOSFUQzIPZDxBK0yzhmNEmJ5CtK3p6M55cbXuts9WucvmwcQf9
- 8Y3rvCPbNvNZ1QBWvMF8c7IU2vfS9OZiEaWUkvMwiNyN9kJppYwsIS2G3mhFAdfb1Wa9
- UlXg48d/xdJLGBv24285FVPF/QQqvtu9/9OZrjsFeIqZNxRdbzuK166ACy4GqjxQWr2x
- wxtQc4ybYb91O1nFu/3cThTJDDfqsw20mmoR3JhkpUoTlwYqmBS8DJpfiBXjTvlRnNRK
- ODmA==
+ :cc; bh=Ta75hUPSBkV25WbsUkQb5J9+4eYLyyNH3h88+yxf5jM=;
+ b=MudMBVu3oO3qjCanYAUFv3wbF4b6lcqKxdm8QuKZt65kN3fsznjKkO3ZK0vS+j2erE
+ TCR8n4df4v0F66/nDf+NAmfGKA2ZsxCCxBFhane3y6XS6rbpVzQilRcHF/SrXVhU0Hpg
+ aOgK8cV+N3/xDt/m2jPUJ+bjYnHnrZTgX6Szd7poKNlTt3fHslek2I8tBpxqkCHjAdSF
+ IAsq3koWBe9dvDVlSNgCNyQFdwno23i4+iXW6fJm32cr1vdduqnoSvRdQ6i86HwY01ep
+ vvOLoBxLhrRT2Y+h2BxZNCPPcup8KFUT+7y9M/N86XVPT7nAN2GmiaL+SI6AFviRq3tP
+ 2s+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=rFBhgINNlJ6GuKDyOev5puWMRyBRkyz3ArJkP6pxiz8=;
- b=Y3eWthEeBKdX7B0+DQdfPwItja1TQYY4vx8kL+24a1ujgV8yqoXsHIRNQZT+H+dPbT
- Jf4iXVOpOXJR91X9D0ka5maSnc0ma9Tzb7+n7s4hLKSKZOOkBkyqB2DrcVA3/4e/ZTFi
- 37/bCYypW0VV0C0sEri84ogOPRGc+rDSpMFflHeBVlIRkyEolGVIstpO0LbkKerJsluN
- U6nb5gyWWtCMZTfQlJVfHn0qNk8j5i/xAavfupwDxp1HHuMsr/KU89VzpmX6IDdilSVG
- Vx4JiOGJ7TMzPmzr8Q++6XkYY3/bDO5Y/pNJ0iit2Hq4FNp66sOlrFETFnXHNCYzTW8C
- o8ng==
-X-Gm-Message-State: AOAM530f2Fkuf3ddTplpMIT9BJOQBtPpf9fM7Wt7eFBRhUu7HCpr1PES
- 4vyV+pvw1TQq5zc5YGm74Efqe8Kp0DAnRXdqzGs=
-X-Google-Smtp-Source: ABdhPJz+7GtKB8GCkNotLBdaEcYr6D26fZVKplbdsejWPMLiIaZj9XkcCQ6oo0RtyaLMVIZik2vsLwd2kpOEXedykdw=
-X-Received: by 2002:a6b:8dd1:: with SMTP id
- p200mr25230083iod.118.1595287276945; 
- Mon, 20 Jul 2020 16:21:16 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=Ta75hUPSBkV25WbsUkQb5J9+4eYLyyNH3h88+yxf5jM=;
+ b=bFQA9/HyPoD2imn83pSgGh1Arfk0cZeg8XRGa5WLrLMn8XRLXFLNKEI1qtkQcBRleX
+ cp7unVzBkZ8xztep3Zj4XF39Vvo5NBh5qIsHDLsXKle3OQrSpNCNbCn/YK+UDDLQBNWS
+ +R+dXA2Xhx7FUvb4B2okSDkxXyfqITZP9jt6HuDp5CPS2y24YWn+ycq5PEJubfksVa25
+ l4bn18sw8DhmYtdpDWO2wq5o00M2wklyBpxVsSUaQgIPPSfMinOnQLBSSL4cKU5IqLo0
+ 4NX5iGKQ9KfVyvYl3zAoo8zjEY1+sSJ93My9f7+HxLrl9/MOTgZap636NfGBH0LQb/sU
+ V2Kw==
+X-Gm-Message-State: AOAM530SEa3jERZgCJg7nRhkXjFWlMi/9G4mt21kipUVse1k3649o5pp
+ lsKKhZtqQUSMxVyOfmom5QJZ5geVn398aP/z56U=
+X-Google-Smtp-Source: ABdhPJxbNyKtFY+6ELCQpDmUMd8TwWpA9zAhpD46sRv9upHH6zP2ujK3FZVqCOEGXBEhy/TZcTYXrdqOhTeto1vea8w=
+X-Received: by 2002:a5d:97d9:: with SMTP id k25mr25261256ios.42.1595287353228; 
+ Mon, 20 Jul 2020 16:22:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200718002027.82300-1-jrtc27@jrtc27.com>
- <20200718004934.83174-1-jrtc27@jrtc27.com>
- <569659ed-7b03-7440-9167-855e92301f13@amsat.org>
- <92816800-F7B8-45CB-9863-96B8DF526D29@jrtc27.com>
- <CAFEAcA-EHOVEQLGaF_wu3d-LVvC3+bDHo0=xyvzG+769Kus7WQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA-EHOVEQLGaF_wu3d-LVvC3+bDHo0=xyvzG+769Kus7WQ@mail.gmail.com>
+References: <cover.1595234208.git.zong.li@sifive.com>
+ <c01aa428c0b4dc9c3e5b24a3d04040a1253bb3a5.1595234208.git.zong.li@sifive.com>
+In-Reply-To: <c01aa428c0b4dc9c3e5b24a3d04040a1253bb3a5.1595234208.git.zong.li@sifive.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 20 Jul 2020 16:11:11 -0700
-Message-ID: <CAKmqyKNLL+kDtPXOHd_oSXXLi2P7Zemfu6fPtk9DWd4xKDNWbg@mail.gmail.com>
-Subject: Re: [PATCH v2] goldfish_rtc: Fix non-atomic read behaviour of
- TIME_LOW/TIME_HIGH
-To: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Jul 2020 16:12:28 -0700
+Message-ID: <CAKmqyKPi=80Ktf8fKdvAJV396wjpYdd3keBpJTj8+6FDBrturA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] target/riscv: Fix the range of pmpcfg of CSR funcion
+ table
+To: Zong Li <zong.li@sifive.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -100,54 +95,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup Patel <anup.patel@wdc.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
  Alistair Francis <Alistair.Francis@wdc.com>,
- Jessica Clarke <jrtc27@jrtc27.com>
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jul 18, 2020 at 11:09 AM Peter Maydell <peter.maydell@linaro.org> w=
-rote:
+On Mon, Jul 20, 2020 at 2:48 AM Zong Li <zong.li@sifive.com> wrote:
 >
-> On Sat, 18 Jul 2020 at 15:45, Jessica Clarke <jrtc27@jrtc27.com> wrote:
-> > On 18 Jul 2020, at 08:42, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> > > Maybe easier to cache the whole u64, this matches RTC_ALARM_LOW /
-> > > RTC_ALARM_HIGH pattern (goldfish_rtc_vmstate change not included):
-> >
-> > We could, but why waste space storing an extra 32 bits you never need?
-> > I don't think saving all 64 bits makes it any easier to read, I'd
-> > personally even argue it makes it slightly less obvious what's going on=
-.
+> The range of Physical Memory Protection should be from CSR_PMPCFG0
+> to CSR_PMPCFG3, not to CSR_PMPADDR9.
 >
-> You could go either way. (The original Google-written version
-> of this device model went for store-the-whole-u64:
-> https://android.googlesource.com/platform/external/qemu/+/refs/heads/emu-=
-2.0-release/hw/android/goldfish/timer.c
-> but we don't need to follow their implementation.)
-> Since "save the high half" is the version you've written
-> and tested, I vote we go with that :-)
->
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Zong Li <zong.li@sifive.com>
 
-Applied to the RISC-V tree, this looks like a bug worth fixing for 5.1
-so I'll send a PR soon.
-
->
-> NB: this is a migration compatibility break for the risc-v
-> 'virt' board : up to Alistair whether that's OK or if the
-> more awkward compat-maintaining vmstate subsection is worth
-> the effort.
-
-I think it's ok
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+> ---
+>  target/riscv/csr.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> thanks
-> -- PMM
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index ac01c835e1..6a96a01b1c 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -1353,7 +1353,7 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+>      [CSR_MTINST] =              { hmode,   read_mtinst,      write_mtinst     },
+>
+>      /* Physical Memory Protection */
+> -    [CSR_PMPCFG0  ... CSR_PMPADDR9] =  { pmp,   read_pmpcfg,  write_pmpcfg   },
+> +    [CSR_PMPCFG0  ... CSR_PMPCFG3]   = { pmp,   read_pmpcfg,  write_pmpcfg   },
+>      [CSR_PMPADDR0 ... CSR_PMPADDR15] = { pmp,   read_pmpaddr, write_pmpaddr  },
+>
+>      /* Performance Counters */
+> --
+> 2.27.0
+>
 >
 
