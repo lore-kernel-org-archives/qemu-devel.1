@@ -2,97 +2,133 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1224EC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F79AC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:11:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D16CC20709
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:08:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F93B2080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 08:11:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XrGU9+O+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16CC20709
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VdRojDsP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F93B2080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxQqP-00022W-56
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 04:08:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59380)
+	id 1jxQt4-00036a-Db
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 04:11:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxQpq-0001cy-O8
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:07:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60841
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxQsM-0002ey-Ae
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:10:18 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50289
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxQpn-00084W-Rd
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:07:42 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxQsK-0008Lg-NU
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 04:10:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595232458;
+ s=mimecast20190719; t=1595232615;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=AfaGzlHv6BrX/J/vKrbuz501xkfx6B4n+jA7jPX02jE=;
- b=XrGU9+O+/HsAtTIXh6NyLuSDXLhs//rvq6bTMFxEvp+y0HWUoO58n1d6HWQNWRlf2bxoy5
- 0ovW1qhuA0k8P+5uP7RnslP0QLVi3H3x+VdXTCfyrsY/ZJXPRtGNW9Xd+zLANo6Ix8JK9x
- 0KnvMtWyPoehJtsD6BhPO0jRWwE9zg0=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=qmVFgjpjAv2chCY84YdLRdjZ1OPnsPwBEaNGGOF2svQ=;
+ b=VdRojDsPxudEUDNjgxEJTcWCGjj/91HrH53iecVvT3wswcxmvJAvjuG3insG35Ll9DQ4rQ
+ kF8+Bo24s6If/jAsrOnHqFzGJQCX6FlCdQ1wl5h+dM234eZ0FNwB+GilJWFXj0WWzZKMB+
+ XrlCYaJaSgjyfv14I810q75qedHp24Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-yoNJVzDfNiawsoZVHPY-Qw-1; Mon, 20 Jul 2020 04:07:32 -0400
-X-MC-Unique: yoNJVzDfNiawsoZVHPY-Qw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-410-mZMXsDJnP1KDNmIHQ12FKQ-1; Mon, 20 Jul 2020 04:10:13 -0400
+X-MC-Unique: mZMXsDJnP1KDNmIHQ12FKQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCC7510CE785;
- Mon, 20 Jul 2020 08:07:30 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-34.ams2.redhat.com [10.36.112.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CDB9A60E3E;
- Mon, 20 Jul 2020 08:07:21 +0000 (UTC)
-Subject: Re: [PATCH v2 2/3] usb/hcd-xhci: Move qemu-xhci device to
- hcd-xhci-pci.c
-To: Sai Pavan Boddu <saipava@xilinx.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <1593008176-9629-1-git-send-email-sai.pavan.boddu@xilinx.com>
- <1593008176-9629-3-git-send-email-sai.pavan.boddu@xilinx.com>
- <87zh8rzi0e.fsf@dusky.pond.sub.org>
- <d8e247a3-5b50-0889-2522-37f2d486fdf9@redhat.com>
- <BY5PR02MB677295286C4193236973EC0ECA7B0@BY5PR02MB6772.namprd02.prod.outlook.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <b3d4924f-5259-3f55-a52c-9693c532d40b@redhat.com>
-Date: Mon, 20 Jul 2020 10:07:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45C028015F4;
+ Mon, 20 Jul 2020 08:10:12 +0000 (UTC)
+Received: from [10.36.114.91] (ovpn-114-91.ams2.redhat.com [10.36.114.91])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 433D91A914;
+ Mon, 20 Jul 2020 08:10:01 +0000 (UTC)
+Subject: Re: [PATCH 0/2] virtio: non-legacy device handling
+To: Cornelia Huck <cohuck@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+ Halil Pasic <pasic@linux.ibm.com>
+References: <20200707105446.677966-1-cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat GmbH
+Message-ID: <51e457ef-106e-1c1a-778d-4d53d9e48d8e@redhat.com>
+Date: Mon, 20 Jul 2020 10:09:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <BY5PR02MB677295286C4193236973EC0ECA7B0@BY5PR02MB6772.namprd02.prod.outlook.com>
+In-Reply-To: <20200707105446.677966-1-cohuck@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 03:17:01
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 02:16:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,98 +141,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ying Fang <fangying1@huawei.com>,
- =?UTF-8?Q?=27Marc-Andr=c3=a9_Lureau=27?= <marcandre.lureau@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/07/2020 10.00, Sai Pavan Boddu wrote:
-> HI Philippe,
+On 07.07.20 12:54, Cornelia Huck wrote:
+> As discussed in "virtio-fs: force virtio 1.x usage", it seems like
+> a good idea to make sure that any new virtio device (which does not
+> support legacy virtio) is indeed a non-transitional device, just to
+> catch accidental misconfigurations. We can easily compile a list
+> of virtio devices with legacy support and have transports verify
+> in their plugged callbacks that legacy support is off for any device
+> not in that list.
 > 
->> -----Original Message-----
->> From: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Sent: Thursday, June 25, 2020 1:48 PM
->> To: Markus Armbruster <armbru@redhat.com>; Sai Pavan Boddu
->> <saipava@xilinx.com>; Thomas Huth <thuth@redhat.com>
->> Cc: Gerd Hoffmann <kraxel@redhat.com>; Peter Maydell
->> <peter.maydell@linaro.org>; Eduardo Habkost <ehabkost@redhat.com>;
->> qemu-devel@nongnu.org; Alistair Francis <alistair.francis@wdc.com>;
->> 'Marc-André Lureau' <marcandre.lureau@redhat.com>; Ying Fang
->> <fangying1@huawei.com>; Paolo Bonzini <pbonzini@redhat.com>
->> Subject: Re: [PATCH v2 2/3] usb/hcd-xhci: Move qemu-xhci device to hcd-
->> xhci-pci.c
->>
->> On 6/25/20 10:06 AM, Markus Armbruster wrote:
->>> Sai Pavan Boddu <sai.pavan.boddu@xilinx.com> writes:
->>>
->>>> Move pci specific devices to new file. This set the environment to
->>>> move all pci specific hooks in hcd-xhci.c to hcd-xhci-pci.c.
->>>>
->>>> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
->>>> ---
->>>>  hw/usb/hcd-xhci-pci.c | 64
->> +++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>  hw/usb/hcd-xhci.c     | 32 ++------------------------
->>>>  hw/usb/hcd-xhci.h     |  2 ++
->>>>  3 files changed, 68 insertions(+), 30 deletions(-)  create mode
->>>> 100644 hw/usb/hcd-xhci-pci.c
->>>>
->>>> diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c new file
->>>> mode 100644 index 0000000..26af683
->>>> --- /dev/null
->>>> +++ b/hw/usb/hcd-xhci-pci.c
->>>> @@ -0,0 +1,64 @@
->>>> +/*
->>>> + * USB xHCI controller with PCI system bus emulation
->>>
->>> Scratch "system".
->>>
->>>> + *
->>>> + * Copyright (c) 2011 Securiforest
->>>> + * Date: 2011-05-11 ;  Author: Hector Martin <hector@marcansoft.com>
->>>
->>> Let's use the opportunity to drop the "Date: " part, because we don't
->>> have it anywhere else.
->>
->> Good opportunity to suggest the SPDX tags again :P
->>
->> /*
->>  * SPDX-FileCopyrightText: 2011 Securiforest
->>  * SPDX-FileContributor: Hector Martin <hector@marcansoft.com>
->>  * SPDX-FileCopyrightText: 2020 Xilinx Inc.
->>  * SPDX-FileContributor: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
->>  * SPDX-License-Identifier: GPL-2.0-or-later  */	
-> [Sai Pavan Boddu] I would include this in V4, Forgot them in V3.
+> Most new virtio devices force non-transitional already, so nothing
+> changes for them. vhost-user-fs-pci even does not allow to configure
+> a non-transitional device, so it is fine as well.
 > 
-> Thanks,
-> Sai Pavan
->>
->> https://spdx.org/rdf/ontology/spdx-2-0-
->> rc/dataproperties/fileContributor___-1635717172.html
->>
->>>
->>>> + * Based on usb-ohci.c, emulates Renesas NEC USB 3.0
->>>> + * Date: 2020-03-01; Author: Sai Pavan Boddu
->>>> + <sai.pavan.boddu@xilinx.com>
->>>
->>> And no new "Date: " parts, please.
->>>
->>>> + * Moved the pci specific content for hcd-xhci.c to hcd-xhci-pci.c
->>>> + *
->>>> + * This library is free software; you can redistribute it and/or
->>>> + * modify it under the terms of the GNU Lesser General Public
->>>> + * License as published by the Free Software Foundation; either
->>>> + * version 2 of the License, or (at your option) any later version.
+> One problematic device, however, is virtio-iommu-pci. It currently
+> offers both the transitional and the non-transitional variety of the
+> device, and does not force anything. I'm unsure whether we should
+> consider transitional virtio-iommu unsupported, or if we should add
+> some compat handling. (The support for legacy or not generally may
+> change based upon the bus, IIUC, so I'm unsure how to come up with
+> something generic.)
+> 
+> Cornelia Huck (2):
+>   virtio: list legacy-capable devices
+>   virtio: verify that legacy support is not accidentally on
 
-And while you're at it: There was never a "version 2" of the Lesser GPL.
-In version 2.0, it was still called "Library" GPL. So it is quite likely
-that version 2.1 is meant here instead.
+I'd squash both patches. Looking at patch #1, I wonder why we don't
+store that information along with the device implementation? What was
+the motivation to define this information separately?
 
- Thomas
+
+-- 
+Thanks,
+
+David / dhildenb
 
 
