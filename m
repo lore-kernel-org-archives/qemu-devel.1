@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA57C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3633C433DF
 	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 05:42:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6460320758
+	by mail.kernel.org (Postfix) with ESMTPS id A266A208E4
 	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 05:42:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HVjVCybu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6460320758
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oFp3RE7L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A266A208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxOZZ-0006lC-Is
+	id 1jxOZZ-0006mA-Sk
 	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 01:42:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48814)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jxOYW-0005hW-Nn; Mon, 20 Jul 2020 01:41:40 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:35337 helo=ozlabs.org)
+ id 1jxOYY-0005hi-0Q; Mon, 20 Jul 2020 01:41:42 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58563 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jxOYT-0005w3-TO; Mon, 20 Jul 2020 01:41:40 -0400
+ id 1jxOYU-0005w2-5r; Mon, 20 Jul 2020 01:41:41 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4B99Zd5tm9z9sRN; Mon, 20 Jul 2020 15:41:29 +1000 (AEST)
+ id 4B99Zd6xBfz9sSJ; Mon, 20 Jul 2020 15:41:29 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1595223689;
- bh=GRhVhfoQfc+mGBRWEkJexw+nAj42hew1pHivUA4/MQY=;
+ bh=w4FmBXVE0KTHzF/+gsUfXFMNert2KBgkl92U+vdPb5w=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=HVjVCybuClqL3U6/9ekQp/gmLjeRm/lL2srvLJ0qM+vqFxfV9cbREa5sOqxyIaegS
- mMZBQWXh5b+S6j/Smrjv3oq8TFtMWRsCL1EFfQzUXkqNoN0Uv1Wn8wLyq6sx4xmYvG
- hojf7ogAMS3XEtyP0ebOn18eaHoSAu0m6cAdAQS8=
+ b=oFp3RE7Ll+jdRdZdRSqfauUkK0TGyf4Qy82V2xGES736WU6gSJDejsaAbHcLx6xNp
+ F+sONBO0FeAFQGF8of5ZNTbf3MhA8alQuJKTi/wa/8rWQxOGE8lCB3ogxQbesuzhxb
+ qI92qu9P+2rycInp9SNbMHiqYCQjoKGSY3g0K2Bk=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 1/4] ppc/pnv: Make PSI device types not user creatable
-Date: Mon, 20 Jul 2020 15:41:23 +1000
-Message-Id: <20200720054126.258032-2-david@gibson.dropbear.id.au>
+Subject: [PULL 2/4] spapr_pci: Robustify support of PCI bridges
+Date: Mon, 20 Jul 2020 15:41:24 +1000
+Message-Id: <20200720054126.258032-3-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200720054126.258032-1-david@gibson.dropbear.id.au>
 References: <20200720054126.258032-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 01:41:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -82,45 +82,128 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-QEMU aborts with -device pnv-psi-POWER8:
+Some recent error handling cleanups unveiled issues with our support of
+PCI bridges:
 
-$ qemu-system-ppc64 -device pnv-psi-POWER8
-qemu-system-ppc64: hw/intc/xics.c:605: ics_realize: Assertion
-`ics->xics' failed.
+1) QEMU aborts when using non-standard PCI bridge types,
+   unveiled by commit 7ef1553dac "spapr_pci: Drop some dead error handling"
+
+$ qemu-system-ppc64 -M pseries -device pcie-pci-bridge
+Unexpected error in object_property_find() at qom/object.c:1240:
+qemu-system-ppc64: -device pcie-pci-bridge: Property '.chassis_nr' not found
 Aborted (core dumped)
 
-The Processor Service Interface Controller is an internal device.
-It should only be instantiated by the chip, which takes care of
-configuring the link required by the ICS object in the case of
-POWER8. It doesn't make sense for a user to specify it on the
-command line.
+This happens because we assume all PCI bridge types to have a "chassis_nr"
+property. This property only exists with the standard PCI bridge type
+"pci-bridge" actually. We could possibly revert 7ef1553dac but it seems
+much simpler to check the presence of "chassis_nr" earlier.
 
-Note that the PSI model for POWER8 was added 3 yrs ago but the
-devices weren't available on the command line because of a bug
-that was fixed by recent commit 2f35254aa0 ("pnv/psi: Correct
-the pnv-psi* devices not to be sysbus devices").
+2) QEMU abort if same "chassis_nr" value is used several times,
+   unveiled by commit d2623129a7de "qom: Drop parameter @errp of
+   object_property_add() & friends"
 
-Fixes: 54f59d786c ("ppc/pnv: Add cut down PSI bridge model and hookup external interrupt")
+$ qemu-system-ppc64 -M pseries -device pci-bridge,chassis_nr=1 \
+                        -device pci-bridge,chassis_nr=1
+Unexpected error in object_property_try_add() at qom/object.c:1167:
+qemu-system-ppc64: -device pci-bridge,chassis_nr=1: attempt to add duplicate property '40000100' to object (type 'container')
+Aborted (core dumped)
+
+This happens because we assume that "chassis_nr" values are unique, but
+nobody enforces that and we end up generating duplicate DRC ids. The PCI
+code doesn't really care for duplicate "chassis_nr" properties since it
+is only used to initialize the "Chassis Number Register" of the bridge,
+with no functional impact on QEMU. So, even if passing the same value
+several times might look weird, it never broke anything before, so
+I guess we don't necessarily want to enforce strict checking in the PCI
+code now.
+
+Workaround both issues in the PAPR code: check that the bridge has a
+unique and non null "chassis_nr" when plugging it into its parent bus.
+
+Fixes: 05929a6c5dfe ("spapr: Don't use bus number for building DRC ids")
+Fixes: 7ef1553dac ("spapr_pci: Drop some dead error handling")
+Fixes: d2623129a7de ("qom: Drop parameter @errp of object_property_add() & friends")
 Reported-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <159413975752.169116.5808968580649255382.stgit@bahia.lan>
+Message-Id: <159431476748.407044.16711294833569014964.stgit@bahia.lan>
+[dwg: Move check slightly to a better place]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv_psi.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/ppc/spapr_pci.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index 5bdeec700e..6a479cac53 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -929,6 +929,7 @@ static void pnv_psi_class_init(ObjectClass *klass, void *data)
-     dc->desc = "PowerNV PSI Controller";
-     device_class_set_props(dc, pnv_psi_properties);
-     dc->reset = pnv_psi_reset;
-+    dc->user_creatable = false;
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 2a6a48744a..21681215d4 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1480,6 +1480,57 @@ static void spapr_pci_bridge_plug(SpaprPhbState *phb,
+     add_drcs(phb, bus);
  }
  
- static const TypeInfo pnv_psi_info = {
++/* Returns non-zero if the value of "chassis_nr" is already in use */
++static int check_chassis_nr(Object *obj, void *opaque)
++{
++    int new_chassis_nr =
++        object_property_get_uint(opaque, "chassis_nr", &error_abort);
++    int chassis_nr =
++        object_property_get_uint(obj, "chassis_nr", NULL);
++
++    if (!object_dynamic_cast(obj, TYPE_PCI_BRIDGE)) {
++        return 0;
++    }
++
++    /* Skip unsupported bridge types */
++    if (!chassis_nr) {
++        return 0;
++    }
++
++    /* Skip self */
++    if (obj == opaque) {
++        return 0;
++    }
++
++    return chassis_nr == new_chassis_nr;
++}
++
++static bool bridge_has_valid_chassis_nr(Object *bridge, Error **errp)
++{
++    int chassis_nr =
++        object_property_get_uint(bridge, "chassis_nr", NULL);
++
++    /*
++     * slotid_cap_init() already ensures that "chassis_nr" isn't null for
++     * standard PCI bridges, so this really tells if "chassis_nr" is present
++     * or not.
++     */
++    if (!chassis_nr) {
++        error_setg(errp, "PCI Bridge lacks a \"chassis_nr\" property");
++        error_append_hint(errp, "Try -device pci-bridge instead.\n");
++        return false;
++    }
++
++    /* We want unique values for "chassis_nr" */
++    if (object_child_foreach_recursive(object_get_root(), check_chassis_nr,
++                                       bridge)) {
++        error_setg(errp, "Bridge chassis %d already in use", chassis_nr);
++        return false;
++    }
++
++    return true;
++}
++
+ static void spapr_pci_plug(HotplugHandler *plug_handler,
+                            DeviceState *plugged_dev, Error **errp)
+ {
+@@ -1508,6 +1559,9 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+     g_assert(drc);
+ 
+     if (pc->is_bridge) {
++        if (!bridge_has_valid_chassis_nr(OBJECT(plugged_dev), errp)) {
++            return;
++        }
+         spapr_pci_bridge_plug(phb, PCI_BRIDGE(plugged_dev));
+     }
+ 
 -- 
 2.26.2
 
