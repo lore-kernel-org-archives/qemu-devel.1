@@ -2,71 +2,88 @@ Return-Path: <SRS0=C20x=A7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27AEBC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3785C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:31:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00109208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:25:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00109208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 55760208E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 20 Jul 2020 18:31:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIvbjWnm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55760208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxaTf-0005Je-5j
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 14:25:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34626)
+	id 1jxaZ1-00084B-AX
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 14:30:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jxaSW-0004os-La
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:24:16 -0400
-Received: from mx2.suse.de ([195.135.220.15]:40754)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1jxaSU-00040d-J3
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:24:16 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id D518DB710;
- Mon, 20 Jul 2020 18:24:18 +0000 (UTC)
-Subject: Re: migration: broken snapshot saves appear on s390 when small fields
- in migration stream removed
-From: Claudio Fontana <cfontana@suse.de>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf
- <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-References: <8bbafdec-836d-b7de-cab8-7a325b6e238d@suse.de>
- <55c406cd-b9ca-4e9b-0acd-d33cfe2a70e3@redhat.com>
- <bf074240-8cc3-96ff-e95e-bd301822b756@suse.de>
- <ea3b617f-c2ea-534c-06ba-f5f9f43828a7@suse.de>
- <8125b1ff-373a-aadc-eccf-27c567007a27@redhat.com>
- <8ff7eeab-bef1-0957-a95c-72819680c431@suse.de>
- <1db6d502-73d1-5e3d-10d1-796d80ab8f07@suse.de>
-Message-ID: <13728e69-75a5-2edc-9ed3-6e08d94c722d@suse.de>
-Date: Mon, 20 Jul 2020 20:24:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jxaXn-0007SZ-1k
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:29:43 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26943
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jxaXk-0004jU-3O
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 14:29:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595269778;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=ESC7lHJZEWU8baXjgzf9kEzpgGoBQTa40Od5KbPxuos=;
+ b=eIvbjWnmD1GAuxLGkDV3npdE6jxhERBbK+ALWv3lPT1WpgkASDYNaxbCDNxI+SiPPSQG1y
+ VkhGMoOU72Kn1/TelIHDH/Va3XjvomshEJ+iO/Ed4nW1TGDpxlIyd9SQSxEyJV4hvH5jD5
+ T9rnCwdb0Bjmuol4PD2n4lzT3X57XG8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-469-SXBfPDZ0NICzTifIysEbYQ-1; Mon, 20 Jul 2020 14:29:33 -0400
+X-MC-Unique: SXBfPDZ0NICzTifIysEbYQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C95C8015F3;
+ Mon, 20 Jul 2020 18:29:32 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 187B45D9D5;
+ Mon, 20 Jul 2020 18:29:25 +0000 (UTC)
+Date: Mon, 20 Jul 2020 19:29:23 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 3/4] io/channel-socket: implement non-blocking connect
+Message-ID: <20200720182923.GP643836@redhat.com>
+References: <20200720180715.10521-1-vsementsov@virtuozzo.com>
+ <20200720180715.10521-4-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1db6d502-73d1-5e3d-10d1-796d80ab8f07@suse.de>
+In-Reply-To: <20200720180715.10521-4-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 00:22:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/19 21:45:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,187 +96,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J. Herne" <jjherne@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
- Liang Yan <lyan@suse.com>, Peter Maydell <peter.maydell@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Bruce Rogers <brogers@suse.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, kraxel@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I have now been able to reproduce this on X86 as well.
-
-It happens much more rarely, about once every 10 times.
-
-I will sort out the data and try to make it even more reproducible, then post my findings in detail.
-
-Overall I proceeded as follows:
-
-1) hooked the savevm code to skip all fields with the exception of "s390-skeys". So only s390-skeys are actually saved.
-
-2) reimplemented "s390-skeys" in a common implementation in cpus.c, used on both x86 and s390, modeling the behaviour of save/load from hw/s390
-
-3) ran ./check -qcow2 267 on both x86 and s390.
-
-In the case of s390, failure seems to be reproducible 100% of the times.
-On X86, it is as mentioned failing about 10% of the times.
-
-Ciao,
-
-Claudio
-
-
-On 7/16/20 2:58 PM, Claudio Fontana wrote:
-> Small update on this,
+On Mon, Jul 20, 2020 at 09:07:14PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+> Utilize new socket API to make a non-blocking connect for inet sockets.
 > 
-> On 7/15/20 1:10 PM, Claudio Fontana wrote:
->> Hi Thomas,
->>
->> On 7/14/20 4:35 PM, Thomas Huth wrote:
->>> On 14/07/2020 16.29, Claudio Fontana wrote:
->>>> Hello,
->>>>
->>>> I have some tiny progress in narrowing down this issue, possibly a qcow2 issue, still unclear,
->>>> but involving Kevin Wolf and Max Reitz.
->>>>
->>>>
->>>> The reproducer again:
->>>>
->>>>> --------------------------------------------cut-------------------------------------------
->>>>> diff --git a/cpus.c b/cpus.c
->>>>> index 41d1c5099f..443b88697a 100644
->>>>> --- a/cpus.c
->>>>> +++ b/cpus.c
->>>>> @@ -643,7 +643,7 @@ static void qemu_account_warp_timer(void)
->>>>>  
->>>>>  static bool icount_state_needed(void *opaque)
->>>>>  {
->>>>> -    return use_icount;
->>>>> +    return 0;
->>>>>  }
->>>>>  
->>>>>  static bool warp_timer_state_needed(void *opaque)
->>>>> --------------------------------------------cut-------------------------------------------
->>>>
->>>> This issue for now appears on s390 only:
->>>>
->>>> On s390 hardware, test 267 fails (both kvm and tcg) in the qcow2 backing file part, with broken migration stream data in the s390-skeys vmsave (old style).
->>> [...]
->>>> If someone has a good idea let me know - first attempts to reproduce on x86 failed, but maybe more work could lead to it.
->>>
->>
->> small update: in the GOOD case (enough padding added) a qcow_merge() is triggered for the last write of 16202 bytes.
->> In the BAD case (not enough padding added) a qcow_merge() is not triggered for the last write of 16201 bytes.
->>
->> Note: manually flushing with qemu_fflush in s390-skeys vmsave also works (maybe got lost in the noise).
->>
->>
->>> Two questions:
->>>
->>> 1) Can you also reproduce the issue manually, without running iotest
->>> 267? ... I tried, but so far I failed.
->>
->> Thanks for the suggestion, will try.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/io/channel-socket.h | 14 +++++++
+>  io/channel-socket.c         | 74 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 88 insertions(+)
 > 
-> Currently trying to reproduce manually an environment similar to that of the test,
-> at the moment I am not able to reproduce the issue manually.
-> 
-> Not very familiar with s390,
-> I've been running with 
-> 
-> export QEMU=/home/cfontana/qemu-build/s390x-softmmu/qemu-system-s390x
-> 
-> $QEMU -nographic -monitor stdio -nodefaults -no-shutdown FILENAME
-> 
-> where FILENAME is the qcow2 produced by the test.
-> 
-> let me know if you have a suggestion on how to setup up something simple properly.
-> 
-> 
->>
->>>
->>> 2) Since all the information so far sounds like the problem could be
->>> elsewhere in the code, and the skeys just catch it by accident ... have
->>> you tried running with valgrind? Maybe it catches something useful?
->>
->> Nothing yet, but will fiddle with the options a bit more.
-> 
-> Only thing I have seen so far:
-> 
-> 
-> +==33321== 
-> +==33321== Warning: client switching stacks?  SP change: 0x1ffeffe5e8 --> 0x5d9cf60
-> +==33321==          to suppress, use: --max-stackframe=137324009096 or greater
-> +==33321== Warning: client switching stacks?  SP change: 0x5d9cd18 --> 0x1ffeffe5e8
-> +==33321==          to suppress, use: --max-stackframe=137324009680 or greater
-> +==33321== Warning: client switching stacks?  SP change: 0x1ffeffe8b8 --> 0x5d9ce58
-> +==33321==          to suppress, use: --max-stackframe=137324010080 or greater
-> +==33321==          further instances of this message will not be shown.
-> +==33321== Thread 4:
-> +==33321== Conditional jump or move depends on uninitialised value(s)
-> +==33321==    at 0x3AEC70: process_queued_cpu_work (cpus-common.c:331)
-> +==33321==    by 0x2753E1: qemu_wait_io_event_common (cpus.c:1213)
-> +==33321==    by 0x2755CD: qemu_wait_io_event (cpus.c:1253)
-> +==33321==    by 0x27596D: qemu_dummy_cpu_thread_fn (cpus.c:1337)
-> +==33321==    by 0x725C87: qemu_thread_start (qemu-thread-posix.c:521)
-> +==33321==    by 0x4D504E9: start_thread (in /lib64/libpthread-2.26.so)
-> +==33321==    by 0x4E72BBD: ??? (in /lib64/libc-2.26.so)
-> +==33321== 
-> +==33321== Conditional jump or move depends on uninitialised value(s)
-> +==33321==    at 0x3AEC74: process_queued_cpu_work (cpus-common.c:331)
-> +==33321==    by 0x2753E1: qemu_wait_io_event_common (cpus.c:1213)
-> +==33321==    by 0x2755CD: qemu_wait_io_event (cpus.c:1253)
-> +==33321==    by 0x27596D: qemu_dummy_cpu_thread_fn (cpus.c:1337)
-> +==33321==    by 0x725C87: qemu_thread_start (qemu-thread-posix.c:521)
-> +==33321==    by 0x4D504E9: start_thread (in /lib64/libpthread-2.26.so)
-> +==33321==    by 0x4E72BBD: ??? (in /lib64/libc-2.26.so)
-> +==33321== 
-> +==33321== 
-> +==33321== HEAP SUMMARY:
-> +==33321==     in use at exit: 2,138,442 bytes in 13,935 blocks
-> +==33321==   total heap usage: 19,089 allocs, 5,154 frees, 5,187,670 bytes allocated
-> +==33321== 
-> +==33321== LEAK SUMMARY:
-> +==33321==    definitely lost: 0 bytes in 0 blocks
-> +==33321==    indirectly lost: 0 bytes in 0 blocks
-> +==33321==      possibly lost: 7,150 bytes in 111 blocks
-> +==33321==    still reachable: 2,131,292 bytes in 13,824 blocks
-> +==33321==         suppressed: 0 bytes in 0 blocks
-> +==33321== Rerun with --leak-check=full to see details of leaked memory
-> 
-> 
->>
->>>
->>>  Thomas
->>>
->>
->> Ciao,
->>
->> Claudio
->>
->>
-> 
-> A more interesting update is what follows I think.
-> 
-> I was able to "fix" the problem shown by the reproducer:
-> 
-> @@ -643,7 +643,7 @@ static void qemu_account_warp_tim@@ -643,7 +643,7 @@ static void qemu_account_warp_timer(void)
+> diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
+> index 777ff5954e..82e868bc02 100644
+> --- a/include/io/channel-socket.h
+> +++ b/include/io/channel-socket.h
+> @@ -94,6 +94,20 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
+>                                      SocketAddress *addr,
+>                                      Error **errp);
 >  
->  static bool icount_state_needed(void *opaque)
->  {
-> -    return use_icount;
-> +    return 0;
+> +/**
+> + * qio_channel_socket_connect_non_blocking_sync:
+> + * @ioc: the socket channel object
+> + * @addr: the address to connect to
+> + * @errp: pointer to a NULL-initialized error object
+> + *
+> + * Attempt to connect to the address @addr using non-blocking mode of
+> + * the socket. Function is synchronous, but being called from
+> + * coroutine context will yield during connect operation.
+> + */
+> +int qio_channel_socket_connect_non_blocking_sync(QIOChannelSocket *ioc,
+> +                                                 SocketAddress *addr,
+> +                                                 Error **errp);
+> +
+>  /**
+>   * qio_channel_socket_connect_async:
+>   * @ioc: the socket channel object
+> diff --git a/io/channel-socket.c b/io/channel-socket.c
+> index e1b4667087..076de7578a 100644
+> --- a/io/channel-socket.c
+> +++ b/io/channel-socket.c
+> @@ -22,6 +22,7 @@
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-visit-sockets.h"
+>  #include "qemu/module.h"
+> +#include "qemu/sockets.h"
+>  #include "io/channel-socket.h"
+>  #include "io/channel-watch.h"
+>  #include "trace.h"
+> @@ -29,6 +30,8 @@
+>  
+>  #define SOCKET_MAX_FDS 16
+>  
+> +static int qio_channel_socket_close(QIOChannel *ioc, Error **errp);
+> +
+>  SocketAddress *
+>  qio_channel_socket_get_local_address(QIOChannelSocket *ioc,
+>                                       Error **errp)
+> @@ -157,6 +160,77 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
+>      return 0;
 >  }
 >  
-> by just slowing down qcow2_co_pwritev_task_entry with some tight loops,
-> without changing any fields between runs (other than the reproducer icount field removal).
-> 
-> I tried to insert the same slowdown just in savevm.c at the end of save_snapshot, but that does not work, needs to be in the coroutine.
-> 
-> Thanks,
-> 
-> Claudio
-> 
-> 
+> +static int qio_channel_inet_connect_non_blocking_sync(QIOChannelSocket *ioc,
+> +        InetSocketAddress *addr, Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +    struct addrinfo *infos, *info;
+> +    int sock = -1;
+> +
+> +    infos = inet_parse_connect_saddr(addr, errp);
+> +    if (!infos) {
+> +        return -1;
+> +    }
+
+This call is blocking since it calls getaddrinfo whose design
+offers no ability todo non-blocking DNS lookups. Given this
+call, ...
+
+> +
+> +    for (info = infos; info != NULL; info = info->ai_next) {
+> +        bool in_progress;
+> +
+> +        error_free(local_err);
+> +        local_err = NULL;
+> +
+> +        sock = inet_connect_addr(addr, info, false, &in_progress, &local_err);
+> +        if (sock < 0) {
+> +            continue;
+> +        }
+> +
+> +        if (qio_channel_socket_set_fd(ioc, sock, &local_err) < 0) {
+> +            close(sock);
+> +            continue;
+> +        }
+> +
+> +        if (in_progress) {
+> +            if (qemu_in_coroutine()) {
+> +                qio_channel_yield(QIO_CHANNEL(ioc), G_IO_OUT);
+> +            } else {
+> +                qio_channel_wait(QIO_CHANNEL(ioc), G_IO_OUT);
+> +            }
+
+...this is offering false assurances of being non-blocking.
+
+If we don't want the current thread to be blocked then we
+need to be using the existing qio_channel_socket_connect_async
+method or similar. It uses a throw away background thread to
+run the connection attempt, and then reports completion back
+later, thus avoiding the getaddrinfo design flaw for the callers.
+
+I explicitly didn't want to add an method like the impl in this
+patch, because getaddrinfo dooms it and we already had bugs in
+the pre-QIOChannel code where QEMU thought it was non-blocking
+but wasn't due to getaddrinfo lookups.
+
+
+IIUC, the main appeal of this method is that the non-blocking
+nature is hidden from the caller who can continue to treat it
+as a synchronous call and have the coroutine magic happen in
+behind the scenes.
+
+IOW, What's needed is a simple way to run the operation in a
+thread, and sleep for completion while having the coroutine
+yield.
+
+I think this could likely be achieved with QIOTask with an
+alternate impl of the qio_task_wait_thread() method that is
+friendly to coroutines instead of being based on pthread
+condition variable waits.
+
+
+> +            if (socket_check(sock, &local_err) < 0) {
+> +                qio_channel_socket_close(QIO_CHANNEL(ioc), NULL);
+> +                continue;
+> +            }
+> +        }
+> +
+> +        break;
+> +    }
+> +
+> +    freeaddrinfo(infos);
+> +
+> +    error_propagate(errp, local_err);
+> +    return sock;
+> +}
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
