@@ -2,103 +2,89 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B33BC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62FF6C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:57:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23CBA20717
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:54:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D56F206F2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:57:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PjhqxmV4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23CBA20717
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="abKHX2lJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D56F206F2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxwTX-0005u6-E9
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 13:54:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34912)
+	id 1jxwWL-0007vj-9U
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 13:57:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxwSW-0004cH-B0
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:53:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57217
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxwVd-0007UH-29
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:56:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51338
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxwSU-0002Tp-Lc
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:53:44 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxwVb-00038V-FC
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:56:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595354022;
+ s=mimecast20190719; t=1595354214;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PnMt/kb6RDi9HZ5k5HBmZv6efthgbwGgPAUML1KuC88=;
- b=PjhqxmV4FRaQzmLeypEHklIwohZbQeVZX8T/AEM4YmGlTUt2W8bxro3VLeRGWH1eCmdDRl
- J6iUGtcI+0cXToP5u0AeLgJfoKHD0lLrfvGpgrwg2o6dUFJ0+haqut9k/7Ch3CRA5ahQn6
- wXrL99T2d7kVGcJz5V+LDF1oSLR0PfI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-NlkYKMv3PwCI6G3GlZKY2A-1; Tue, 21 Jul 2020 13:53:40 -0400
-X-MC-Unique: NlkYKMv3PwCI6G3GlZKY2A-1
-Received: by mail-wr1-f69.google.com with SMTP id e12so2211453wra.13
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 10:53:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=PnMt/kb6RDi9HZ5k5HBmZv6efthgbwGgPAUML1KuC88=;
- b=kS6eN7Wv6+nyAjs3g3Z6hBH7u2gXB0e9tRf8eQ+XCZXa/t/Ni35u7PZdZhSgRYsYzk
- 9SqwOzi9/AWcoHyBKOE6f9dHSsDc58KlsW1c0NCAIKGIT+7cAsOsDUEFTnztRENpMjKR
- 5l8CR6EzDtN34Yqc9PCPwzfD+Xsl4mOUbQCMo+nc5H9wtn90/y451+yosbs+dD0lg04w
- DF6RnlECRZNZy8m5jH67MIwav81vmzG5ZbhQ4PpegtWG1CRilq00v+gyP6Nw1WIUavcR
- tGgQKV3TICO+tLoEpVAFVXKg5GgGDUxDAGHSp/niMfpf2tcn7Ya9pi6U5x3DpGxIkUua
- nPEQ==
-X-Gm-Message-State: AOAM533C4H4VCZ9Rd7m+1NhdIkuhcPyCbyrt5w0WKJws0OPNbP/hmIwS
- XWhTc5XdRl0giGBt6DPiyVXW/Kx8vLRYWTuSE9swYDu25fuKDtjB5MH+7ZzLxvqqQak0NrvtFWF
- E+hJFEBaybXvnAao=
-X-Received: by 2002:a1c:59c2:: with SMTP id n185mr5312441wmb.104.1595354018851; 
- Tue, 21 Jul 2020 10:53:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzJEqrTOCkY4grjXSos+DUavtCmLyQ/DIefffEX3OlleH8Zw3thA89/pB9sGV4MNi5GbjX7KQ==
-X-Received: by 2002:a1c:59c2:: with SMTP id n185mr5312421wmb.104.1595354018578; 
- Tue, 21 Jul 2020 10:53:38 -0700 (PDT)
-Received: from x1w.redhat.com (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id u20sm4102193wmc.42.2020.07.21.10.53.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jul 2020 10:53:38 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/2] hw/nvram/fw_cfg: Let fw_cfg_add_from_generator() return
- boolean value
-Date: Tue, 21 Jul 2020 19:53:26 +0200
-Message-Id: <20200721175326.8004-3-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200721175326.8004-1-philmd@redhat.com>
-References: <20200721175326.8004-1-philmd@redhat.com>
+ bh=S/04qTr+VBJg2CrmwyfsL+gyfwoiSG3h8c4PeABF6cw=;
+ b=abKHX2lJnC8y9PoH5KYO6Skx4EGSxzT6bCfYCEbShYVCsOWwZ55BBIFonSQcUp5YUkkZNY
+ gTFS/o3XIsP5SgBUBf7ESqmRRm7+ZQsrRokds/w9T3tCPvuBpVNK5WWZZWoZlfMaDiL4JJ
+ vllbUceFyGzsRpkx/swEo1YCWeJJxSs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-JQlSrqKLPA-imZFS4c_VzQ-1; Tue, 21 Jul 2020 13:56:52 -0400
+X-MC-Unique: JQlSrqKLPA-imZFS4c_VzQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5ECEB1005510;
+ Tue, 21 Jul 2020 17:56:51 +0000 (UTC)
+Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
+ (ovpn-120-206.rdu2.redhat.com [10.10.120.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 990E25D9CA;
+ Tue, 21 Jul 2020 17:56:50 +0000 (UTC)
+Subject: Re: [PATCH-for-5.1] hw/ide/ahci: Do not dma_memory_unmap(NULL)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200718072854.7001-1-f4bug@amsat.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c98f64ba-45ad-66be-c2c8-22d1efd4f7bb@redhat.com>
+Date: Tue, 21 Jul 2020 13:56:50 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20200718072854.7001-1-f4bug@amsat.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:20:34
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:58:38
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,131 +97,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Alexander Bulekov <alxndr@bu.edu>, qemu-stable@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commits b6d7e9b66f..a43770df5d simplified the error propagation.
-Similarly to commit 6fd5bef10b "qom: Make functions taking Error**
-return bool, not void", let fw_cfg_add_from_generator() return a
-boolean value, not void.
-This allow to simplify parse_fw_cfg() and fixes the error handling
-issue reported by Coverity (CID 1430396):
+On 7/18/20 3:28 AM, Philippe Mathieu-Daudé wrote:
+> libFuzzer triggered the following assertion:
+> 
+>    cat << EOF | qemu-system-i386 -M pc-q35-5.0 \
+>      -nographic -monitor none -serial none -qtest stdio
+>    outl 0xcf8 0x8000fa24
+>    outl 0xcfc 0xe1068000
+>    outl 0xcf8 0x8000fa04
+>    outw 0xcfc 0x7
+>    outl 0xcf8 0x8000fb20
+>    write 0xe1068304 0x1 0x21
+>    write 0xe1068318 0x1 0x21
+>    write 0xe1068384 0x1 0x21
+>    write 0xe1068398 0x2 0x21
+>    EOF
+>    qemu-system-i386: exec.c:3621: address_space_unmap: Assertion `mr != NULL' failed.
+>    Aborted (core dumped)
+> 
+> This is because we don't check the return value from dma_memory_map()
+> which can return NULL, then we call dma_memory_unmap(NULL) which is
+> illegal. Fix by only unmap if the value is not NULL (and the size is
+> not the expected one).
+> 
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+> Fixes: f6ad2e32f8 ("ahci: add ahci emulation")
+> BugLink: https://bugs.launchpad.net/qemu/+bug/1884693
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>   hw/ide/ahci.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index 009120f88b..4f596cb9ce 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -250,7 +250,7 @@ static void map_page(AddressSpace *as, uint8_t **ptr, uint64_t addr,
+>       }
+>   
+>       *ptr = dma_memory_map(as, addr, &len, DMA_DIRECTION_FROM_DEVICE);
+> -    if (len < wanted) {
+> +    if (len < wanted && *ptr) {
+>           dma_memory_unmap(as, *ptr, len, DMA_DIRECTION_FROM_DEVICE, len);
+>           *ptr = NULL;
+>       }
+> 
 
-  In parse_fw_cfg():
+Staged @ gitlab
 
-    Variable assigned once to a constant guards dead code.
+https://gitlab.com/jsnow/qemu/-/commits/ide
 
-    Local variable local_err is assigned only once, to a constant
-    value, making it effectively constant throughout its scope.
-    If this is not the intent, examine the logic to see if there
-    is a missing assignment that would make local_err not remain
-    constant.
-
-It's the call of fw_cfg_add_from_generator():
-
-        Error *local_err = NULL;
-
-        fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
-        if (local_err) {
-            error_propagate(errp, local_err);
-            return -1;
-        }
-        return 0;
-
-If it fails, parse_fw_cfg() sets an error and returns 0, which is
-wrong. Harmless, because the only caller passes &error_fatal.
-
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Fixes: Coverity CID 1430396: 'Constant' variable guards dead code (DEADCODE)
-Fixes: 6552d87c48 ("softmmu/vl: Let -fw_cfg option take a 'gen_id' argument")
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200721131911.27380-3-philmd@redhat.com>
----
- include/hw/nvram/fw_cfg.h |  4 +++-
- hw/nvram/fw_cfg.c         | 10 ++++++----
- softmmu/vl.c              |  6 +-----
- 3 files changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index bbcf405649..f190c428e8 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -304,8 +304,10 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename, void *data,
-  * will be used; also, a new entry will be added to the file directory
-  * structure residing at key value FW_CFG_FILE_DIR, containing the item name,
-  * data size, and assigned selector key value.
-+ *
-+ * Returns: %true on success, %false on error.
-  */
--void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
-+bool fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
-                                const char *gen_id, Error **errp);
- 
- FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index dfa1f2012a..f3a4728288 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -1032,7 +1032,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
-     return NULL;
- }
- 
--void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
-+bool fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
-                                const char *gen_id, Error **errp)
- {
-     FWCfgDataGeneratorClass *klass;
-@@ -1043,20 +1043,22 @@ void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
-     obj = object_resolve_path_component(object_get_objects_root(), gen_id);
-     if (!obj) {
-         error_setg(errp, "Cannot find object ID '%s'", gen_id);
--        return;
-+        return false;
-     }
-     if (!object_dynamic_cast(obj, TYPE_FW_CFG_DATA_GENERATOR_INTERFACE)) {
-         error_setg(errp, "Object ID '%s' is not a '%s' subclass",
-                    gen_id, TYPE_FW_CFG_DATA_GENERATOR_INTERFACE);
--        return;
-+        return false;
-     }
-     klass = FW_CFG_DATA_GENERATOR_GET_CLASS(obj);
-     array = klass->get_data(obj, errp);
-     if (!array) {
--        return;
-+        return false;
-     }
-     size = array->len;
-     fw_cfg_add_file(s, filename, g_byte_array_free(array, TRUE), size);
-+
-+    return true;
- }
- 
- static void fw_cfg_machine_reset(void *opaque)
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index f476ef89ed..3416241557 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -2070,11 +2070,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *opts, Error **errp)
-         size = strlen(str); /* NUL terminator NOT included in fw_cfg blob */
-         buf = g_memdup(str, size);
-     } else if (nonempty_str(gen_id)) {
--        Error *local_err = NULL;
--
--        fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        if (!fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp)) {
-             return -1;
-         }
-         return 0;
--- 
-2.21.3
 
 
