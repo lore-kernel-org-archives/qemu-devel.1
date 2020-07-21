@@ -2,86 +2,87 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C43C1C433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 22:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E746EC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 23:16:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B9952073A
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 22:44:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B006D20771
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 23:16:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e38JPTg6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B9952073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aQ5IvJ8/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B006D20771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy0zv-0003e0-SI
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 18:44:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41760)
+	id 1jy1VG-0007cO-Tq
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 19:16:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jy0yl-0002mh-Hu
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 18:43:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47791
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jy0yi-0001GU-Lj
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 18:43:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595371394;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IQt7o/tu0J33BtVCH3pQiWNfrbS5094FWCur3ksI/04=;
- b=e38JPTg6lPZfxypSyr6YC8kjBkvJbiZ+PcnXIF0BegufHRwZIcSHi+nZiLmhyjx46XhLaP
- MfZn/rkAufnDuOwknfqgzUvQjEI2Yn1rVCZmC39FDCNioTFMLGWYnineVqSHYu9DmIxuHU
- /xWpkCyUjyZcnR3MuhVgnipChyjlS6s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-1lYjGpvkPquHIeoGx1DyTg-1; Tue, 21 Jul 2020 18:43:10 -0400
-X-MC-Unique: 1lYjGpvkPquHIeoGx1DyTg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51457107ACCA;
- Tue, 21 Jul 2020 22:43:07 +0000 (UTC)
-Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1D8E778547;
- Tue, 21 Jul 2020 22:43:05 +0000 (UTC)
-Date: Tue, 21 Jul 2020 16:43:04 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Xiang Zheng <zhengxiang9@huawei.com>
-Subject: Re: [PATCH Kernel v24 0/8] Add UAPIs to support migration for VFIO
- devices
-Message-ID: <20200721164304.0ce76b2e@x1.home>
-In-Reply-To: <450612c3-2a92-9034-7958-ee7f3c1a8c52@huawei.com>
-References: <1590697854-21364-1-git-send-email-kwankhede@nvidia.com>
- <450612c3-2a92-9034-7958-ee7f3c1a8c52@huawei.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Received-SPF: pass client-ip=207.211.31.120;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 18:43:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jy1UK-0006Xf-Vb
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 19:15:57 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55950)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1jy1UH-0005MT-NO
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 19:15:56 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 9so187685wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 16:15:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=PZ8xnpUkyfVoxxI3UEg26zVpwV6Dtq1mji9MXWXMw3A=;
+ b=aQ5IvJ8/QoT+CPEi2Jx0xKt3uz6UvwtTcc5TTkVKbuVKx1PTvrckBRSZ8wKY6YnSeJ
+ ROY/8+h1SDs1bzFzb0G6curgxpuq1R+TsspZNdP0lRSsJvn4hVHuwGzzcf8EPwZMGo7n
+ Mnv+zq+Lfgvpj3bjPx74KoAEg7jPghv42+UAw3qUIfh4j7TzMLco1qiKsNOs4uKQvDho
+ f+AOL7xZsdZOLGBGK0QY6LEs4u1lO6XFso3NxT/AizH5qrdJPk5Xh3D4ETLORaX0M+y1
+ 5X7CpONTLd4Gk8WGuBcKKF2xgI80CRtpqwVMmk9ca9d9bt3UY09TVJEi2FtqqsZbyAHx
+ m+vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=PZ8xnpUkyfVoxxI3UEg26zVpwV6Dtq1mji9MXWXMw3A=;
+ b=r2mxmr+wOIHJJgkJrB0hI38ufzW2/A2RDylYitMak8yCHktQn5Ru5cCO+TgwmtP0xj
+ 56gST/YPF3WDlrV1hMbfONxqnBfvu30CIP11Szx1Z9ajUxf7sI30qMjoMJqnBD30j8H+
+ Bb2TdfQbsCCTi40B4BSSMqbXe4DZ5JuMnp35BU/9VPmdfd2rrb964OhEHhz73iALTFR1
+ 3xxIejOZqv3Vr9EWMfBmVFgFJhX79zgPS4tNlUyY3bZBaO3oGRzzFydeNeEXT7lBno5A
+ /kPTbkV1TCeiLslGi1cKJN06qJGEP8N/oCkGbEPaJKpCAshPxR6pYM+t4/3hIj6SagsA
+ fdtA==
+X-Gm-Message-State: AOAM531M1M98CiUYfPx5/m+NMEYmgqliRIqB3Gij/tR/x8KYG7xZRlLM
+ hlOuXyw6Cs2SQVveDFtA5qY8GuLT
+X-Google-Smtp-Source: ABdhPJx0gsjQQ/hWNy61V9H5o5Y4lqq2cE5g229R+SC+SI7Rnf6I2EyF4lv90XygKZCcIcR/Zp15mQ==
+X-Received: by 2002:a1c:ab56:: with SMTP id u83mr5825158wme.94.1595373351640; 
+ Tue, 21 Jul 2020 16:15:51 -0700 (PDT)
+Received: from AK-L.domain.name ([41.40.247.212])
+ by smtp.gmail.com with ESMTPSA id l132sm5128412wmf.6.2020.07.21.16.15.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 21 Jul 2020 16:15:51 -0700 (PDT)
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+To: qemu-devel@nongnu.org, aleksandar.qemu.devel@gmail.com, philmd@redhat.com,
+ alex.bennee@linaro.org, eblake@redhat.com, ldoktor@redhat.com,
+ rth@twiddle.net, ehabkost@redhat.com, crosa@redhat.com
+Subject: [PATCH 0/1] Add bisect.py script
+Date: Wed, 22 Jul 2020 01:15:35 +0200
+Message-Id: <20200721231536.21604-1-ahmedkhaledkaraman@gmail.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,61 +95,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, Kirti Wankhede <kwankhede@nvidia.com>,
- eauger@redhat.com, yi.l.liu@intel.com, eskultet@redhat.com,
- ziye.yang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, Wang Haibin <wanghaibin.wang@huawei.com>,
- zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
- dgilbert@redhat.com, changpeng.liu@intel.com, cohuck@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com
+Cc: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jul 2020 10:43:21 +0800
-Xiang Zheng <zhengxiang9@huawei.com> wrote:
+Hi,
 
-> Hi Kirti,
-> 
-> Sorry to disturb you since this patch set has been merged, and I cannot
-> receive the qemu-side emails about this patch set.
-> 
-> We are going to support migration for VFIO devices which support dirty
-> pages tracking.
-> 
-> And we also plan to leverage SMMU HTTU feature to do the dirty pages
-> tracking for the devices which don't support dirty pages tracking.
-> 
-> For the above two cases, which side determines to choose IOMMU driver or
-> vendor driver to do dirty bitmap tracking, Qemu or VFIO?
-> 
-> In brief, if both IOMMU and VFIO devices support dirty pages tracking,
-> we can check the capability and prefer to track dirty pages on device
-> vendor driver which is more efficient.
-> 
-> The qusetion is which side to do the check and selection? In my opinion,
-> Qemu/userspace seems more suitable.
+This series adds the new bisect.py script introduced in report 5 of
+the "TCG Continuous Benchmarking" GSoC project.
 
-Dirty page tracking is consolidated at the vfio container level.
-Userspace has no basis for determining or interface for selecting a
-dirty bitmap provider, so I would disagree that QEMU should play any
-role here.  The container dirty bitmap tries to provide the finest
-granularity available based on the support of all the devices/groups
-managed by the container.  If there are groups attached to the
-container that have not participated in page pinning, then we consider
-all DMA mappings within the container as persistently dirty.  Once all
-of the participants subscribe to page pinning, the dirty scope is
-reduced to the pinned pages.  IOMMU support for dirty page logging would
-introduce finer granularity yet, which we would probably prefer over
-page pinning, but interfaces for this have not been devised.
+The script is used for locating the commit that caused a performance
+degradation or improvement in QEMU using the git bisect command
+(binary search).
 
-Ideally userspace should be unaware of any of this, the benefit would
-be seen transparently by having a more sparsely filled dirty bitmap,
-which more accurately reflects how memory is actually being dirtied.
-Thanks,
+To learn more about how the script works and how it can be used for
+detecting two commits, one that introduced a performance degradation
+in PowerPC targets, and the other introducing a performance
+improvement in MIPS, please check the
+"Finding Commits Affecting QEMU Performance" report.
 
-Alex
+Report link:
+https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05769.html
+
+Best regards,
+Ahmed Karaman
+
+Ahmed Karaman (1):
+  scripts/performance: Add bisect.py script
+
+ scripts/performance/bisect.py | 374 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 374 insertions(+)
+ create mode 100755 scripts/performance/bisect.py
+
+-- 
+2.17.1
 
 
