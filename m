@@ -2,96 +2,100 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DB9C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51811C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:51:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AC4720674
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:49:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b8YkF4Cg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AC4720674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 248052073A
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:51:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 248052073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxpqC-0007c1-B8
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 06:49:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35648)
+	id 1jxpro-0000RV-B7
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 06:51:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jxppe-0007Ba-DP
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:49:10 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:54075)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jxppc-0006Ei-Kq
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:49:10 -0400
-Received: by mail-wm1-x331.google.com with SMTP id j18so2348810wmi.3
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 03:49:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=BwjPlzHMUtPVG0XJ6cyWe/umel7VC/2YOnRDeZNJZF8=;
- b=b8YkF4CgyWzejoHcBbMAHm/ntjlF7NtM9HmxZNVcV7aVXzO5ahQcfo3RWZuifuPVYF
- 2/0NQ+cLlFstL1EvtTbCb696gdkyMfXk+l5v5cPA50fnZkW0M6+gdH1OGYKctfL3EkCa
- R7758mgdkJiAFJMcVxQ6hwOTlLnLXuCyqzzW+aGIbGsNCP9SulthcrviFkZP5P3bNncD
- NMhHGue8hfw2HCXDq/g9/xYh6gY2xkplwXxefogAr9bP9wSbmWKR0WXDilw5F1w0vZbD
- 8bpTL2ebErExsqSvYCxbrQc4POnLR8iOSoBzyL2GMbxQuSIdDJTb27PVspeNBqAiwDZE
- JTZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=BwjPlzHMUtPVG0XJ6cyWe/umel7VC/2YOnRDeZNJZF8=;
- b=a9cC/PeYz47bF2Vop/BnO3pSWz+9SmTdiwSmfkJqknt/4CHgAFDCWNPbTVNxa9r7Ue
- /Zo/46c+rrO+V4VLRGf3dZ6+EslS+o2U0rd2FJLHohlyNREcDw0bXtlJNvvyE44w2yhi
- ViC9TcT0DCx6MPDNxeE+7yALBkzHkbmRQAwHs5fyuCdF3WSmgHenco6eRrA7RCrSIO6y
- A5SowRhmGT62FE/bP6QG7cQpAxkLMoj7azYI33ZS2XaSJTzIUNEqDxw4yqS0oYUvQGFb
- bofhF0q6Y9spKj6Bfqdyjzpqh2gkzVC1a8xc96aKlXBUC3tpkbFemM/Ntk2wfN/uoh2i
- w0Ww==
-X-Gm-Message-State: AOAM5312ZSfUTsFjcmn4UQVDtrYLpNOc9ViLT6moKXIg44d6gayvth17
- 70TA+BFwDY+8Ny1w7ZWefddfAw==
-X-Google-Smtp-Source: ABdhPJzOYUQPu+9u+WdYV7gQrEhOcaf1fAhKgr73grq/S8XnC7DQy5zSNafFz8FD3WON0KCpPTpuxQ==
-X-Received: by 2002:a05:600c:d5:: with SMTP id
- u21mr3367915wmm.156.1595328546908; 
- Tue, 21 Jul 2020 03:49:06 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l15sm35877030wro.33.2020.07.21.03.49.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jul 2020 03:49:05 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 01FAB1FF7E;
- Tue, 21 Jul 2020 11:49:05 +0100 (BST)
-References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
- <20200715112342.GD18817@stefanha-x1.localdomain>
- <CAJSP0QU78mAK-DiOYXvTOEa3=CAEy1rQtyTBe5rrKDs=yfptAg@mail.gmail.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
-In-reply-to: <CAJSP0QU78mAK-DiOYXvTOEa3=CAEy1rQtyTBe5rrKDs=yfptAg@mail.gmail.com>
-Date: Tue, 21 Jul 2020 11:49:04 +0100
-Message-ID: <874kq1w3bz.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <mihajlov@linux.ibm.com>)
+ id 1jxpqa-000862-Kl
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:50:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37354)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mihajlov@linux.ibm.com>)
+ id 1jxpqY-0006Rh-69
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:50:08 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06LAXX5T150076
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 06:50:01 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32dn6xfx32-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 06:50:01 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06LAYvA5022902
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 10:49:59 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com
+ (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+ by ppma04ams.nl.ibm.com with ESMTP id 32brq83sgb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 10:49:59 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06LAnvfg26411202
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 10:49:57 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3785B42041
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 10:49:57 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 15B254203F
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 10:49:57 +0000 (GMT)
+Received: from oc6604088431.ibm.com (unknown [9.145.77.244])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 10:49:56 +0000 (GMT)
+Subject: Re: [PATCH 1/1] s390x/protvirt: allow to IPL secure execution guests
+ with -no-reboot
+To: qemu-devel@nongnu.org
+References: <20200721103202.30610-1-borntraeger@de.ibm.com>
+From: Viktor Mihajlovski <mihajlov@linux.ibm.com>
+Message-ID: <f053d6a2-7791-4f68-0a02-8d4c22f976ee@linux.ibm.com>
+Date: Tue, 21 Jul 2020 12:49:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::331;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x331.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200721103202.30610-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-21_03:2020-07-21,
+ 2020-07-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 clxscore=1011 bulkscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=999 adultscore=0
+ suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007210075
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=mihajlov@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 06:32:08
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,90 +109,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "John G.
- Johnson" <john.g.johnson@oracle.com>, Jag Raman <jag.raman@oracle.com>,
- Andra-Irina Paraschiv <andraprs@amazon.com>, kvm <kvm@vger.kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- Maxime Coquelin <maxime.coquelin@redhat.com>, Alexander Graf <graf@amazon.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- Nikos Dragazis <ndragazis@arrikto.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Stefan Hajnoczi <stefanha@gmail.com> writes:
 
-> Thank you everyone who joined!
->
-> I didn't take notes but two things stood out:
->
-> 1. The ivshmem v2 and virtio-vhost-user use cases are quite different
-> so combining them does not seem realistic. ivshmem v2 needs to be as
-> simple for the hypervisor to implement as possible even if this
-> involves some sacrifices (e.g. not transparent to the Driver VM that
-> is accessing the device, performance). virtio-vhost-user is more aimed
-> at general-purpose device emulation although support for arbitrary
-> devices (e.g. PCI) would be important to serve all use cases.
+On 7/21/20 12:32 PM, Christian Borntraeger wrote:
+> Right now -no-reboot does prevent secure execution guests from running.
+> This is right from an implementation aspect, as we have modeled the
+> transition from non-secure to secure as a program directed IPL.
+>  From a user perspective, this is not the behavior of least surprise.
+> 
+> We should implement the IPL into secure mode similar to the functions
+> that we use for kdump/kexec. In other words we do not stop here when
+> -no-reboot is specified on the command line. Like function 0 or function
+> 1 Function 10 is not a classic reboot. For example it can only be called
+> once. To call it a 2nd time a real reboot/reset must happen in-between.
+> So function code 10 is more or less a state transition reset, but not a
+> "standard" reset or reboot.
+> 
+> Fixes: 4d226deafc44 ("s390x: protvirt: Support unpack facility")
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>   hw/s390x/ipl.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index ce21494c08..e312a35133 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -633,7 +633,8 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+>           }
+>       }
+>       if (reset_type == S390_RESET_MODIFIED_CLEAR ||
+> -        reset_type == S390_RESET_LOAD_NORMAL) {
+> +        reset_type == S390_RESET_LOAD_NORMAL ||
+> +        reset_type == S390_RESET_PV) {
+>           /* ignore -no-reboot, send no event  */
+>           qemu_system_reset_request(SHUTDOWN_CAUSE_SUBSYSTEM_RESET);
+>       } else {
+> 
 
-I believe my phone gave up on the last few minutes of the call so I'll
-just say we are interested in being able to implement arbitrary devices
-in the inter-VM silos. Devices we are looking at:
+I agree that the observable behavior is more logical this way, as the
+transition to secure mode is more like to kexec (transfer control to an
+in-memory kernel) than to the other IPL methods (boot from a device).
 
-  virtio-audio
-  virtio-video
+Acked-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
 
-these are performance sensitive devices which provide a HAL abstraction
-to a common software core.
-
-  virtio-rpmb
-
-this is a secure device where the backend may need to reside in a secure
-virtualised world.
-
-  virtio-scmi
-
-this is a more complex device which allows the guest to make power and
-clock demands from the firmware. Needless to say this starts to become
-complex with multiple moving parts.
-
-The flexibility of vhost-user seems to match up quite well with wanting
-to have a reasonably portable backend that just needs to be fed signals
-and a memory mapping. However we don't want daemons to automatically
-have a full view of the whole of the guests system memory.
-
-> 2. Alexander Graf's idea for a new Linux driver that provides an
-> enforcing software IOMMU. This would be a character device driver that
-> is mmapped by the device emulation process (either vhost-user-style on
-> the host or another VMM for inter-VM device emulation). The Driver VMM
-> can program mappings into the device and the page tables in the device
-> emulation process will be updated. This way the Driver VMM can share
-> memory specific regions of guest RAM with the device emulation process
-> and revoke those mappings later.
-
-I'm wondering if there is enough plumbing on the guest side so a guest
-can use the virtio-iommu to mark out exactly which bits of memory the
-virtual device can have access to? At a minimum the virtqueues need to
-be accessible and for larger transfers maybe a bounce buffer. However
-for speed you want as wide as possible mapping but no more. It would be
-nice for example if a block device could load data directly into the
-guests block cache (zero-copy) but without getting a view of the kernels
-internal data structures.
-
-Another thing that came across in the call was quite a lot of
-assumptions about QEMU and Linux w.r.t virtio. While our project will
-likely have Linux as a guest OS we are looking specifically at enabling
-virtio for Type-1 hypervisors like Xen and the various safety certified
-proprietary ones. It is unlikely that QEMU would be used as the VMM for
-these deployments. We want to work out what sort of common facilities
-hypervisors need to support to enable virtio so the daemons can be
-re-usable and maybe setup with a minimal shim for the particular
-hypervisor in question.
-
-
---=20
-Alex Benn=C3=A9e
+-- 
+Kind Regards,
+    Viktor
 
