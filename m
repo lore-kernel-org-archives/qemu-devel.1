@@ -2,95 +2,150 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6086CC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D10C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:34:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 302C62073A
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:33:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="roGUg0Gw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 302C62073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 238D22073A
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:34:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 238D22073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxrSV-0008PX-EN
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 08:33:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60706)
+	id 1jxrT5-0001EN-Ex
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 08:33:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxrRA-00078o-Sp
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 08:32:00 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54488)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxrR9-0003St-B7
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 08:32:00 -0400
-Received: by mail-wm1-x343.google.com with SMTP id o8so2640945wmh.4
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 05:31:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=75TNpvx2vRfiJZkHz29WviDSGKNpx3q3QnPcdwR4bAg=;
- b=roGUg0GwSG38IQaEk0A5FULH+vj83dR0bBr2Tg2b42GYz0anVbt8CfwR00v5+3AKQo
- EmUjMrILgxE5KR4g8ps8rbVZaHptFxR3BFZubad79jYsKiywg7WY54ns/ok0l9Wb9qpu
- Mc9l47Ejmoy2y514N1UYS/N8ZdRMBm1B6rosySb9G4YhI5wyT9M6FPETt4zf8nwwIsNy
- UpBdieoCaaV8hIuwQqn7Hrie4k8uncli1gOxkEZmyf4U9xKw7b87sy9sHMEcipGLxab9
- nz8H7yUl4rWlNgqbL82p4APW9dXrgAyalztG1WvFiQbaRY7gXO0zYkAbT7q+3TndXFi2
- Ehdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=75TNpvx2vRfiJZkHz29WviDSGKNpx3q3QnPcdwR4bAg=;
- b=g5Zgldv5P1+ZCsfARI/ufCs1aiGuEgTycOqveHruDqPGOvadlknGrpBbAbDNH3o7CW
- zlOHSoZu4mmxkFJfdeR3r14AiEzAdBuouMdUtViHiFMZ3hh5mKRrlY9nE8I5bgBoI0Pd
- G1MxY1O64dMXR4KKHt46JfyC3TyRsky1gI4FDrOc9DJw2GnCJCXZQLi61vgZBO87ip/S
- 1AcV0pBoOEtWQ+VJdtyWDoIafQvx0ECHHqbsD+V7gpm7+h549j9922nfH1Y5e78JPalh
- qFOADJ5ClYDw4MpyQ4w/AXcRmH/PI7jzNpD6/cYpvbrBxG2z1uS7pz8w3Ph9H+POuBES
- 99EQ==
-X-Gm-Message-State: AOAM531yerCJrZDmT7b9GjIIRtuVujinzasGmgtmWtHgNk5F/ExKjWnS
- qxc85iGXzgInJ92Gbc7bLMb6c/Tf+Y4=
-X-Google-Smtp-Source: ABdhPJySH8AagSdJz+PvTb+hWw4QuHNiKilG0A3D+g81S4+YoWWgwWmtmksiBP56VCc83RQ0U11/vg==
-X-Received: by 2002:a1c:6887:: with SMTP id d129mr3756829wmc.179.1595334717602; 
- Tue, 21 Jul 2020 05:31:57 -0700 (PDT)
-Received: from localhost.localdomain
- (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id s15sm3523323wmj.41.2020.07.21.05.31.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jul 2020 05:31:56 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH-for-5.1? v3 1/2] memory: Allow monkey-patching
- MemoryRegion access sizes
-Date: Tue, 21 Jul 2020 14:31:53 +0200
-Message-Id: <20200721123154.5302-2-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200721123154.5302-1-f4bug@amsat.org>
-References: <20200721123154.5302-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jxrQ9-0006ZQ-AD; Tue, 21 Jul 2020 08:30:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61866)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jxrQ6-0003H3-H3; Tue, 21 Jul 2020 08:30:57 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06LC4a7G039699; Tue, 21 Jul 2020 08:30:51 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32d5h8qpt3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jul 2020 08:30:51 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06LCEJLi078678;
+ Tue, 21 Jul 2020 08:30:51 -0400
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.71])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32d5h8qprr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jul 2020 08:30:50 -0400
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+ by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06LCG626001233;
+ Tue, 21 Jul 2020 12:30:48 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma02fra.de.ibm.com with ESMTP id 32brq7uyf7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jul 2020 12:30:48 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 06LCS6iC60752366
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 21 Jul 2020 12:28:06 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8CED9AE045;
+ Tue, 21 Jul 2020 12:29:30 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2058CAE04D;
+ Tue, 21 Jul 2020 12:29:30 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.80.29])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 21 Jul 2020 12:29:30 +0000 (GMT)
+Subject: Re: [PATCH 1/1] s390x/protvirt: allow to IPL secure execution guests
+ with -no-reboot
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>
+References: <20200721103202.30610-1-borntraeger@de.ibm.com>
+ <ecec58d9-4b9c-c677-e2d2-ca3cf0632530@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
+ J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
+ CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
+ 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
+ 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
+ +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
+ T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
+ OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
+ /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
+ IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABzUNDaHJpc3RpYW4g
+ Qm9ybnRyYWVnZXIgKDJuZCBJQk0gYWRkcmVzcykgPGJvcm50cmFlZ2VyQGxpbnV4LmlibS5j
+ b20+wsF5BBMBAgAjBQJdP/hMAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQEXu8
+ gLWmHHy/pA/+JHjpEnd01A0CCyfVnb5fmcOlQ0LdmoKWLWPvU840q65HycCBFTt6V62cDljB
+ kXFFxMNA4y/2wqU0H5/CiL963y3gWIiJsZa4ent+KrHl5GK1nIgbbesfJyA7JqlB0w/E/SuY
+ NRQwIWOo/uEvOgXnk/7+rtvBzNaPGoGiiV1LZzeaxBVWrqLtmdi1iulW/0X/AlQPuF9dD1Px
+ hx+0mPjZ8ClLpdSp5d0yfpwgHtM1B7KMuQPQZGFKMXXTUd3ceBUGGczsgIMipZWJukqMJiJj
+ QIMH0IN7XYErEnhf0GCxJ3xAn/J7iFpPFv8sFZTvukntJXSUssONnwiKuld6ttUaFhSuSoQg
+ OFYR5v7pOfinM0FcScPKTkrRsB5iUvpdthLq5qgwdQjmyINt3cb+5aSvBX2nNN135oGOtlb5
+ tf4dh00kUR8XFHRrFxXx4Dbaw4PKgV3QLIHKEENlqnthH5t0tahDygQPnSucuXbVQEcDZaL9
+ WgJqlRAAj0pG8M6JNU5+2ftTFXoTcoIUbb0KTOibaO9zHVeGegwAvPLLNlKHiHXcgLX1tkjC
+ DrvE2Z0e2/4q7wgZgn1kbvz7ZHQZB76OM2mjkFu7QNHlRJ2VXJA8tMXyTgBX6kq1cYMmd/Hl
+ OhFrAU3QO1SjCsXA2CDk9MM1471mYB3CTXQuKzXckJnxHkHOwU0ETpw8+AEQAJjyNXvMQdJN
+ t07BIPDtbAQk15FfB0hKuyZVs+0lsjPKBZCamAAexNRk11eVGXK/YrqwjChkk60rt3q5i42u
+ PpNMO9aS8cLPOfVft89Y654Qd3Rs1WRFIQq9xLjdLfHh0i0jMq5Ty+aiddSXpZ7oU6E+ud+X
+ Czs3k5RAnOdW6eV3+v10sUjEGiFNZwzN9Udd6PfKET0J70qjnpY3NuWn5Sp1ZEn6lkq2Zm+G
+ 9G3FlBRVClT30OWeiRHCYB6e6j1x1u/rSU4JiNYjPwSJA8EPKnt1s/Eeq37qXXvk+9DYiHdT
+ PcOa3aNCSbIygD3jyjkg6EV9ZLHibE2R/PMMid9FrqhKh/cwcYn9FrT0FE48/2IBW5mfDpAd
+ YvpawQlRz3XJr2rYZJwMUm1y+49+1ZmDclaF3s9dcz2JvuywNq78z/VsUfGz4Sbxy4ShpNpG
+ REojRcz/xOK+FqNuBk+HoWKw6OxgRzfNleDvScVmbY6cQQZfGx/T7xlgZjl5Mu/2z+ofeoxb
+ vWWM1YCJAT91GFvj29Wvm8OAPN/+SJj8LQazd9uGzVMTz6lFjVtH7YkeW/NZrP6znAwv5P1a
+ DdQfiB5F63AX++NlTiyA+GD/ggfRl68LheSskOcxDwgI5TqmaKtX1/8RkrLpnzO3evzkfJb1
+ D5qh3wM1t7PZ+JWTluSX8W25ABEBAAHCwV8EGAECAAkFAk6cPPgCGwwACgkQEXu8gLWmHHz8
+ 2w//VjRlX+tKF3szc0lQi4X0t+pf88uIsvR/a1GRZpppQbn1jgE44hgF559K6/yYemcvTR7r
+ 6Xt7cjWGS4wfaR0+pkWV+2dbw8Xi4DI07/fN00NoVEpYUUnOnupBgychtVpxkGqsplJZQpng
+ v6fauZtyEcUK3dLJH3TdVQDLbUcL4qZpzHbsuUnTWsmNmG4Vi0NsEt1xyd/Wuw+0kM/oFEH1
+ 4BN6X9xZcG8GYUbVUd8+bmio8ao8m0tzo4pseDZFo4ncDmlFWU6hHnAVfkAs4tqA6/fl7RLN
+ JuWBiOL/mP5B6HDQT9JsnaRdzqF73FnU2+WrZPjinHPLeE74istVgjbowvsgUqtzjPIG5pOj
+ cAsKoR0M1womzJVRfYauWhYiW/KeECklci4TPBDNx7YhahSUlexfoftltJA8swRshNA/M90/
+ i9zDo9ySSZHwsGxG06ZOH5/MzG6HpLja7g8NTgA0TD5YaFm/oOnsQVsf2DeAGPS2xNirmknD
+ jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
+ ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <d2d0d040-3fa9-df7b-eb05-8a5906212486@de.ibm.com>
+Date: Tue, 21 Jul 2020 14:29:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <ecec58d9-4b9c-c677-e2d2-ca3cf0632530@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-21_05:2020-07-21,
+ 2020-07-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 phishscore=0
+ mlxlogscore=956 spamscore=0 adultscore=0 clxscore=1015 mlxscore=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007210086
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 06:32:08
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,99 +158,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Michael Tokarev <mjt@tls.msk.ru>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To fixes CVE-2020-13754, commit 5d971f9e67 refuses mismatching
-sizes in memory_region_access_valid(). This gives troubles when
-a device is on an ISA bus, because the CPU is free to use
-8/16-bit accesses on the bus (or up to 32-bit on EISA bus),
-regardless what range is valid for the device.
 
-To allow surgical change for the 5.1 release, allow monkey
-patching of the MemoryRegionOps (by making the MemoryRegion
-field not const). This should be reverted after the release
-and fixed in a more elegant manner.
 
-Fixes: 5d971f9e67 ('memory: Revert "accept mismatching sizes in memory_region_access_valid"')
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/exec/memory.h |  7 ++++++-
- softmmu/memory.c      | 12 ++++++++----
- 2 files changed, 14 insertions(+), 5 deletions(-)
+On 21.07.20 14:25, Janosch Frank wrote:
+> On 7/21/20 12:32 PM, Christian Borntraeger wrote:
+>> Right now -no-reboot does prevent secure execution guests from running.
+> 
+> s/-no-reboot/--no-reboot/
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 307e527835..22028af6b9 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -383,7 +383,12 @@ struct MemoryRegion {
-     RAMBlock *ram_block;
-     Object *owner;
- 
--    const MemoryRegionOps *ops;
-+    /*
-+     * XXX this must be 'const' but to counter side effects of
-+     * CVE-2020-13754, make it non-const to allow monkey patching
-+     * the access sizes. Only allowed for QEMU release v5.1 :(
-+     */
-+    MemoryRegionOps *ops;
-     void *opaque;
-     MemoryRegion *container;
-     Int128 size;
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index 9200b20130..84b5c617e2 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -1218,7 +1218,7 @@ static void memory_region_initfn(Object *obj)
-     MemoryRegion *mr = MEMORY_REGION(obj);
-     ObjectProperty *op;
- 
--    mr->ops = &unassigned_mem_ops;
-+    mr->ops = g_memdup(&unassigned_mem_ops, sizeof(MemoryRegionOps));
-     mr->enabled = true;
-     mr->romd_mode = true;
-     mr->global_locking = true;
-@@ -1485,7 +1485,11 @@ void memory_region_init_io(MemoryRegion *mr,
-                            uint64_t size)
- {
-     memory_region_init(mr, owner, name, size);
--    mr->ops = ops ? ops : &unassigned_mem_ops;
-+    if (ops) {
-+        mr->ops = g_memdup(ops, sizeof(MemoryRegionOps));
-+    } else {
-+        mr->ops = g_memdup(&unassigned_mem_ops, sizeof(MemoryRegionOps));
-+    }
-     mr->opaque = opaque;
-     mr->terminates = true;
- }
-@@ -1622,7 +1626,7 @@ void memory_region_init_ram_device_ptr(MemoryRegion *mr,
-     mr->ram = true;
-     mr->terminates = true;
-     mr->ram_device = true;
--    mr->ops = &ram_device_mem_ops;
-+    mr->ops = g_memdup(&ram_device_mem_ops, sizeof(MemoryRegionOps));
-     mr->opaque = mr;
-     mr->destructor = memory_region_destructor_ram;
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-@@ -1664,7 +1668,7 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
-     Error *err = NULL;
-     assert(ops);
-     memory_region_init(mr, owner, name, size);
--    mr->ops = ops;
-+    mr->ops = g_memdup(ops, sizeof(MemoryRegionOps));
-     mr->opaque = opaque;
-     mr->terminates = true;
-     mr->rom_device = true;
--- 
-2.21.3
+Actually qemu --help gives the parameters with just one "-"
 
+
+Not sure about secure vs protected. Whatever Conny prefers.
 
