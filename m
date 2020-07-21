@@ -2,94 +2,92 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12242C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FAFC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:59:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0E5020720
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:58:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CC492072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:59:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K7xg4qBB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0E5020720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJNKFJ9S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CC492072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxo6q-0007Ug-3b
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:58:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53740)
+	id 1jxo7h-00009e-HF
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:59:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxo67-0006eu-AK
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:58:03 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35834)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxo65-0004Zy-Mk
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:58:03 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 184so2093451wmb.0
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 01:58:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+ZM5rFnLIv7XX6JCDu6MU2+dcdw1FuRLMox2ftXigb8=;
- b=K7xg4qBBUYLL2e/lOIpvoUo/5oEJNM8DO0dqf+1E3IXr7xs00DkVH+tw+x9N8Gz/mk
- d9PZOdMw1nFYHaq09KmgpFdUs7WIXes3eS0xUcTGtBERMREFLZrYqAVyCsFgCVDQaONz
- hPAZV2YYa4EfHrJAs0n2U35i4eGX1hz/ub3ydRkA25BuPnFXcdFP4eHtrGZOWgVEItWw
- doqcmziDtXcvTKyrFpl3NM+0kkFeDW6kOxPRMXUvCt9QAZTIIJEWWb5gRQBYtlDYfxZg
- 6rx21YqFb2UVVygo3bBMAzxxARpYTnr4z+wCbeLiPqrUghxR85p29nGEcDuKiM7Ql1qF
- udSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=+ZM5rFnLIv7XX6JCDu6MU2+dcdw1FuRLMox2ftXigb8=;
- b=nG0h5eLX6asYHepM1kYz+1ACURH05SvJ8mZLZDWtJeunJuOVsL8+3ugkyGMChKHTsT
- RoYBXQ46wDNJUO5Lj+MlFcbCzgNYe54NXKKyOWGHfDNEMhIyjHfMHUZd6r7GiwK5TS/G
- 5TzSMRYEDJGf0cUOK8fGTMc/okxwXu13ndGB6yKWjmV3LPS+nutseff0NjmxH6fesPGD
- mvmhkdu23OFrv+0ffHDVV4vUpq4ZPmb028n9XD4tbDtvt91Zeb1GqF/3SHHqZjBmUKW2
- gof5JeQGZbUSNGgQSarK5MU/y05h2cRzhOTJhRbOqGyNOWLkLsqb5QENV8CcdHh/GCV7
- cysg==
-X-Gm-Message-State: AOAM533LmHj5K2bsyN0hmjvEUnpFwtE9nX7ht2MftK6dlGZteeliHI9H
- A6ppCooSxJg+2+infNxDq9KNpavcFOM=
-X-Google-Smtp-Source: ABdhPJyCAktV5ppT9DBt2zbruEohvR6q0W9qQwSe2zFxwabTf8vPiEgn73VWaht8fuZ87IfxvOifmQ==
-X-Received: by 2002:a7b:cb47:: with SMTP id v7mr2911682wmj.57.1595321879108;
- Tue, 21 Jul 2020 01:57:59 -0700 (PDT)
-Received: from localhost.localdomain
- (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id s203sm2650269wms.32.2020.07.21.01.57.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jul 2020 01:57:58 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH-for-5.1?] tests/tcg/multiarch/linux-test: Skip test if
- nanosleep missing (Travis)
-Date: Tue, 21 Jul 2020 10:57:57 +0200
-Message-Id: <20200721085757.14358-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jxo76-00083z-HW
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:59:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40895
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jxo74-0004ln-U3
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:59:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595321942;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VO78lus+3W76/bnZm0zEl9R1OwD6Io46kJ19XeC1VQM=;
+ b=cJNKFJ9S8vuEGCKkBBjzGZvFoXikm6p/sPeHeuaTjbZyDSZvi4zJmJpmciOjtr7FBYUXbf
+ +aqeVFU2FFWYKrFvkwvvJUAlWgE5S1ADqLGFaTRAxf0fpqdfOnelH6kP/p+amVrNeNjTI+
+ I5Mn4JnnvG3/XlCjro/eL3c4N5qLuWo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-Qw0NyRUMOlyC4Mv0alG-nA-1; Tue, 21 Jul 2020 04:59:00 -0400
+X-MC-Unique: Qw0NyRUMOlyC4Mv0alG-nA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01FF319324A9;
+ Tue, 21 Jul 2020 08:58:59 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A64132DE76;
+ Tue, 21 Jul 2020 08:58:54 +0000 (UTC)
+Date: Tue, 21 Jul 2020 09:58:51 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH for-5.2 3/3] qga/commands-posix: Move the udev code from
+ the pci to the generic function
+Message-ID: <20200721085851.GC843362@redhat.com>
+References: <20200720110133.4366-1-thuth@redhat.com>
+ <20200720110133.4366-4-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200720110133.4366-4-thuth@redhat.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:46:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,55 +100,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
+ qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The time test sometimes fails on Travis-CI [*]:
+On Mon, Jul 20, 2020 at 01:01:33PM +0200, Thomas Huth wrote:
+> The libudev-related code is independent from the other pci-related code
+> and can be re-used for non-pci devices (like ccw devices on s390x). Thus
+> move this part to the generic function.
+> 
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1755075
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  qga/commands-posix.c | 58 ++++++++++++++++++++++----------------------
+>  1 file changed, 29 insertions(+), 29 deletions(-)
 
-    TEST    linux-test on aarch64
-  tests/tcg/multiarch/linux-test.c:237: nanosleep
-  make[2]: *** [run-linux-test] Error 1
-  make: *** [run-tcg-tests-aarch64-linux-user] Error 2
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-As this seems due to a container limitation on Travis-CI,
-simply skip the test there.
 
-[*] https://travis-ci.org/github/qemu/qemu/jobs/710005078#L3706
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-RFC because per Laurent Vivier we are not using the correct libc
-    while cross-linking the test (maybe change in the container
-    packages?)
----
- tests/tcg/multiarch/linux-test.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
-index 8a7c15cd31..c7dfdec9ec 100644
---- a/tests/tcg/multiarch/linux-test.c
-+++ b/tests/tcg/multiarch/linux-test.c
-@@ -233,8 +233,13 @@ static void test_time(void)
-     ts.tv_sec = 0;
-     ts.tv_nsec = 20 * 1000000;
-     chk_error(nanosleep(&ts, &rem));
--    if (rem.tv_sec != 1)
-+    if (rem.tv_sec != 1) {
-+        if (getenv("TRAVIS_ARCH")) {
-+            printf("nanosleep missing? skipping 'time' test\n");
-+            return;
-+        }
-         error("nanosleep");
-+    }
-     chk_error(gettimeofday(&tv2, NULL));
-     ti = tv2.tv_sec - tv.tv_sec;
-     if (ti >= 2)
+Regards,
+Daniel
 -- 
-2.21.3
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
