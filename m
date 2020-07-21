@@ -2,87 +2,75 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FFBFC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 01:02:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E54FFC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 01:03:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF6942080D
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 01:02:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qd4c6RXH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF6942080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B96D12080D
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 01:03:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B96D12080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxgg3-0003RY-0R
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 21:02:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45802)
+	id 1jxggs-0004JH-0x
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 21:03:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jxgfH-000307-TX
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 21:01:51 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38113)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jxgfG-0000IK-D1
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 21:01:51 -0400
-Received: by mail-oi1-x244.google.com with SMTP id r8so15891688oij.5
- for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 18:01:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=QGfl7BU2QippaLviJqv6OeFFHe+fvyXr2T2BfTZb+8c=;
- b=qd4c6RXHuUyNnINFbw06hzBi8iIse6qfFSqlazG32r5YS9tZqOTCJCY+gwUiDsLFHB
- MfrjtZFnHyTUPvDNUP3lWi+X1HbH0k85aRzaXXiPXrPZdu/6usf8enUf469gCsPYCEZx
- 0XD9MvebQfgfIWVJmMjQZN6WKfbgPu8Je9qgwb4SIH49J4dE+y6HC/rJd+6VCfCHr6pK
- NHTynirmK8HJeSFkuLb2vnnczFH+qzUqlIPlIf3uWYc277iiW8GSy/ROFMMdf1Xj8UbG
- wd0xiPKACGyuX/KIm9mbW3/mHP3TIhX0Gaje59rp7gnDXlmp84VHbpIQJJJfZEISfT1s
- h9SQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=QGfl7BU2QippaLviJqv6OeFFHe+fvyXr2T2BfTZb+8c=;
- b=HbsuiuJQ6/48Md+posCbG5jvf/3Eosl9YPvxzNb0Io5vm1O7Xy80KT+uWujFFiHUbI
- ZhxOjdRU2H1r9wq29yrzA8y2T1ED0aPWNn7PX8KTP4PndDQR2/4D6rhTqjeG46AY4QtH
- 9ohOKqV4q96jcLJCvJ3aLRtzqFQcTYQMbHsk7wf2M/UscchogjC9KbVqFdYAd3QLGWhN
- ZkYQad6pljTqyAzSMSHn2yRyDYEEwWVOhlfmFsja6Sps3+AkjVOvqoV+pxYXvpz2iPaM
- 42O0yCPlwJiLm+fV1an8tso2vvdSBfzd5IBX/cKEioDNY9QEnS6C3t3h1VmtAr8fLFjE
- P3Ow==
-X-Gm-Message-State: AOAM530vi/U8E94mer0i5fSAD0kgHJEf99lscVLB6Y2Un+tuRA4s8/3P
- +Y3j9j+YYKzYiQ0GF1ilGzegTz78hwuL0KNRuAw=
-X-Google-Smtp-Source: ABdhPJzcexO0tmSrVmagl6D5So6qckEtnAjdrMBiiw1ZHRYkAJog3FKIUDM2FA5CcHIU2/20q20x3OQ/dVVGwI6VNE8=
-X-Received: by 2002:a05:6808:486:: with SMTP id
- z6mr1507983oid.56.1595293305131; 
- Mon, 20 Jul 2020 18:01:45 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jxgfn-0003K6-D8
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 21:02:23 -0400
+Received: from mga11.intel.com ([192.55.52.93]:48368)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1jxgfi-0000MS-Fc
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 21:02:22 -0400
+IronPort-SDR: tEsVBEAwVAKngxCKLYtAY6zCEG/igAly0ANnTXsPPjWKMqlFm1EsZdygRTuli/HfkdAaL8BHM1
+ H+JrYCnjv3QA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9688"; a="147980137"
+X-IronPort-AV: E=Sophos;i="5.75,375,1589266800"; d="scan'208";a="147980137"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 20 Jul 2020 18:02:14 -0700
+IronPort-SDR: Hi0Ier/KvzEzjHeSvJlfOUyWhGaXqFZ3+zz2qvL2a3c30d2ssVeCpeyzIyinF7dy1V9Y1U8uZ8
+ CpOPxy1z/ErA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,375,1589266800"; d="scan'208";a="283698887"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga003.jf.intel.com with ESMTP; 20 Jul 2020 18:02:08 -0700
+Date: Tue, 21 Jul 2020 08:51:13 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200721005113.GA10502@joy-OptiPlex-7040>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
+ <20200716083230.GA25316@joy-OptiPlex-7040>
+ <20200717101258.65555978@x1.home>
 MIME-Version: 1.0
-References: <20200717123514.15406-1-kentaishiguro@slowstart.org>
-In-Reply-To: <20200717123514.15406-1-kentaishiguro@slowstart.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 21 Jul 2020 09:01:09 +0800
-Message-ID: <CAKXe6SLtUn+3ykbvsM_0MHbz0fPxRehsqK0SvOBRDb42EDxDgA@mail.gmail.com>
-Subject: Re: [PATCH] hw/i386/kvm/ioapic.c: fix typo in error message
-To: Kenta Ishiguro <kentaishiguro@slowstart.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200717101258.65555978@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=192.55.52.93; envelope-from=yan.y.zhao@intel.com;
+ helo=mga11.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 21:02:14
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,41 +83,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu Developers <qemu-devel@nongnu.org>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, eskultet@redhat.com, jian-feng.ding@intel.com,
+ dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+ bao.yumeng@zte.com.cn, smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+ berrange@redhat.com, cohuck@redhat.com, dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kenta Ishiguro <kentaishiguro@slowstart.org> =E4=BA=8E2020=E5=B9=B47=E6=9C=
-=8820=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8A=E5=8D=8811:14=E5=86=99=E9=81=93=
-=EF=BC=9A
->
-> Fix a typo in an error message for KVM_SET_IRQCHIP ioctl:
-> "KVM_GET_IRQCHIP" should be "KVM_SET_IRQCHIP".
->
-> Signed-off-by: Kenta Ishiguro <kentaishiguro@slowstart.org>
+On Fri, Jul 17, 2020 at 10:12:58AM -0600, Alex Williamson wrote:
+<...>
+> > yes, in another reply, Alex proposed to use an interface in json format.
+> > I guess we can define something like
+> > 
+> > { "self" :
+> >   [
+> >     { "pciid" : "8086591d",
+> >       "driver" : "i915",
+> >       "gvt-version" : "v1",
+> >       "mdev_type"   : "i915-GVTg_V5_2",
+> >       "aggregator"  : "1",
+> >       "pv-mode"     : "none",
+> >     }
+> >   ],
+> >   "compatible" :
+> >   [
+> >     { "pciid" : "8086591d",
+> >       "driver" : "i915",
+> >       "gvt-version" : "v1",
+> >       "mdev_type"   : "i915-GVTg_V5_2",
+> >       "aggregator"  : "1"
+> >       "pv-mode"     : "none",
+> >     },
+> >     { "pciid" : "8086591d",
+> >       "driver" : "i915",
+> >       "gvt-version" : "v1",
+> >       "mdev_type"   : "i915-GVTg_V5_4",
+> >       "aggregator"  : "2"
+> >       "pv-mode"     : "none",
+> >     },
+> >     { "pciid" : "8086591d",
+> >       "driver" : "i915",
+> >       "gvt-version" : "v2",
+> >       "mdev_type"   : "i915-GVTg_V5_4",
+> >       "aggregator"  : "2"
+> >       "pv-mode"     : "none, ppgtt, context",
+> >     }
+> >     ...
+> >   ]
+> > }
+> > 
+> > But as those fields are mostly vendor specific, the userspace can
+> > only do simple string comparing, I guess the list would be very long as
+> > it needs to enumerate all possible targets.
+> 
+> 
+> This ignores so much of what I tried to achieve in my example :(
+> 
+sorry, I just was eager to show and confirm the way to list all compatible
+combination of mdev_type and mdev attributes.
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+> 
+> > also, in some fileds like "gvt-version", is there a simple way to express
+> > things like v2+?
+> 
+> 
+> That's not a reasonable thing to express anyway, how can you be certain
+> that v3 won't break compatibility with v2?  Sean proposed a versioning
+> scheme that accounts for this, using an x.y.z version expressing the
+> major, minor, and bugfix versions, where there is no compatibility
+> across major versions, minor versions have forward compatibility (ex. 1
+> -> 2 is ok, 2 -> 1 is not) and bugfix version number indicates some
+> degree of internal improvement that is not visible to the user in terms
+> of features or compatibility, but provides a basis for preferring
+> equally compatible candidates.
+>
+right. if self version is v1, it can't know its compatible version is
+v2. it can only be done in reverse. i.e.
+when self version is v2, it can list its compatible version is v1 and
+v2.
+and maybe later when self version is v3, there's no v1 in its compatible
+list.
 
-> ---
->  hw/i386/kvm/ioapic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/i386/kvm/ioapic.c b/hw/i386/kvm/ioapic.c
-> index 4ba8e47251..c5528df942 100644
-> --- a/hw/i386/kvm/ioapic.c
-> +++ b/hw/i386/kvm/ioapic.c
-> @@ -97,7 +97,7 @@ static void kvm_ioapic_put(IOAPICCommonState *s)
->
->      ret =3D kvm_vm_ioctl(kvm_state, KVM_SET_IRQCHIP, &chip);
->      if (ret < 0) {
-> -        fprintf(stderr, "KVM_GET_IRQCHIP failed: %s\n", strerror(ret));
-> +        fprintf(stderr, "KVM_SET_IRQCHIP failed: %s\n", strerror(ret));
->          abort();
->      }
->  }
-> --
-> 2.17.1
->
->
+In this way, do you think we still need the complex x.y.z versioning scheme?
+
+>  
+> > If the userspace can read this interface both in src and target and
+> > check whether both src and target are in corresponding compatible list, I
+> > think it will work for us.
+> > 
+> > But still, kernel should not rely on userspace's choice, the opaque
+> > compatibility string is still required in kernel. No matter whether
+> > it would be exposed to userspace as an compatibility checking interface,
+> > vendor driver would keep this part of code and embed the string into the
+> > migration stream. so exposing it as an interface to be used by libvirt to
+> > do a safety check before a real live migration is only about enabling
+> > the kernel part of check to happen ahead.
+> 
+> As you indicate, the vendor driver is responsible for checking version
+> information embedded within the migration stream.  Therefore a
+> migration should fail early if the devices are incompatible.  Is it
+but as I know, currently in VFIO migration protocol, we have no way to
+get vendor specific compatibility checking string in migration setup stage
+(i.e. .save_setup stage) before the device is set to _SAVING state.
+In this way, for devices who does not save device data in precopy stage,
+the migration compatibility checking is as late as in stop-and-copy
+stage, which is too late.
+do you think we need to add the getting/checking of vendor specific
+compatibility string early in save_setup stage?
+
+> really libvirt's place to second guess what it has been directed to do?
+if libvirt uses the scheme of reading compatibility string at source and
+writing for checking at the target, it can not be called "a second guess".
+It's not a guess, but a confirmation.
+
+> Why would we even proceed to design a user parse-able version interface
+> if we still have a dependency on an opaque interface?  Thanks,
+one reason is that libvirt can't trust the parsing result from
+openstack.
+Another reason is that libvirt can use this opaque interface easier than
+another parsing by itself, in the fact that it would not introduce more
+burden to kernel who would write this part of code anyway, no matter
+libvirt uses it or not.
+ 
+Thanks
+Yan
 
