@@ -2,82 +2,76 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A48FEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:40:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA6B3C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:43:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73C8E20702
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:40:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74ACE2070A
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:43:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D/by+PCp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73C8E20702
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BjS5Dh1R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74ACE2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxuNE-0005d0-Oj
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 11:40:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55726)
+	id 1jxuQ4-00009V-FL
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 11:43:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxuMc-0005DU-Vu
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:39:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44708
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxuOw-0006pB-6d
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:41:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35664
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxuMb-0008GY-1s
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:39:30 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxuOu-0000Kd-BE
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:41:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595345967;
+ s=mimecast20190719; t=1595346111;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=vHQwlXJMaC5t56+A4IXwt0yItGkf4FCbNQGQtUx7DAY=;
- b=D/by+PCp4TTKyuAiQp10rajqxBDwvQNTL75/FqmfWFP3B9ap1CzyG691uaswK9je0DbYfS
- SUU+UoB1No05kp8UmETaPGROQGyLo4oy+KE43lG6AuSl3tPFl9Vb6UhIbzBuNFJvDMZqdQ
- FLCypJCY2F08VkBjexRO6G2Gpb0tPFg=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=dpLBN90h8xEKXiY5MCjCwLuyZuXs/+p3jcJx1bPulvc=;
+ b=BjS5Dh1R54edBL5mkf8VAVOM9FUEHZoUP6HCuFJ6so1ZzvLNbdN7Iix8ozHv4ryPgGN82j
+ 2lfmDATREI9nsJ+sdXk5y1rrpqq3PNHhFrZ2JFaRErNdcaq0OW/Jl6A0jnDWv5Ws0kqBQe
+ 47qwdrrNRVx5flVn2N/eq2fphqGJxlI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-LgpQ9ssuMq2ozjpyrbcu2A-1; Tue, 21 Jul 2020 11:39:25 -0400
-X-MC-Unique: LgpQ9ssuMq2ozjpyrbcu2A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-488-D8Ilr-FgOkC2iC8znC-3qA-1; Tue, 21 Jul 2020 11:41:49 -0400
+X-MC-Unique: D8Ilr-FgOkC2iC8znC-3qA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 674BF91282;
- Tue, 21 Jul 2020 15:39:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6A341083E85;
+ Tue, 21 Jul 2020 15:41:48 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 185B42B6DB;
- Tue, 21 Jul 2020 15:39:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A63A4610F3;
+ Tue, 21 Jul 2020 15:41:48 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A6669111CA27; Tue, 21 Jul 2020 17:39:20 +0200 (CEST)
+ id 61927111CA27; Tue, 21 Jul 2020 17:41:47 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH for-5.1 5/5] qom: Make info qom-tree sort children more
- efficiently
-References: <20200714160202.3121879-1-armbru@redhat.com>
- <20200714160202.3121879-6-armbru@redhat.com>
- <20200721153214.GB27840@work-vm>
-Date: Tue, 21 Jul 2020 17:39:20 +0200
-In-Reply-To: <20200721153214.GB27840@work-vm> (David Alan Gilbert's message of
- "Tue, 21 Jul 2020 16:32:14 +0100")
-Message-ID: <87k0yw513r.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/3] QOM patches for 2020-07-21
+Date: Tue, 21 Jul 2020 17:41:44 +0200
+Message-Id: <20200721154147.1657100-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:58:38
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:17:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -85,7 +79,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,106 +92,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, berrange@redhat.com,
- ehabkost@redhat.com, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, pbonzini@redhat.com,
- alex.bennee@linaro.org
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+The following changes since commit af3d69058e09bede9900f266a618ed11f76f49f3:
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> Commit e8c9e65816 "qom: Make "info qom-tree" show children sorted"
->> sorts children the simple, stupid, quadratic way.  I thought the
->> number of children would be small enough for this not to matter.  I
->> was wrong: there are outliers with several hundred children, e.g ARM
->> machines nuri and smdkc210 each have a node with 513 children.
->
-> Big Power systems can have thousands.
->
->> While n^2 sorting isn't noticeable in normal, human usage even for
->> n=513, it can be quite noticeable in certain automated tests.  In
->> particular, the sort made device-introspect-test even slower.  Commit
->> 3e7b80f84d "tests: improve performance of device-introspect-test" just
->> fixed that by cutting back its excessive use of "info qom-tree".
->> Sorting more efficiently makes sense regardless, so do it.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  qom/qom-hmp-cmds.c | 25 +++++++++++++------------
->>  1 file changed, 13 insertions(+), 12 deletions(-)
->> 
->> diff --git a/qom/qom-hmp-cmds.c b/qom/qom-hmp-cmds.c
->> index 4032c96089..8861a109d5 100644
->> --- a/qom/qom-hmp-cmds.c
->> +++ b/qom/qom-hmp-cmds.c
->> @@ -94,25 +94,23 @@ typedef struct QOMCompositionState {
->>  
->>  static void print_qom_composition(Monitor *mon, Object *obj, int indent);
->>  
->> -static int qom_composition_compare(const void *a, const void *b, void *ignore)
->> +static int qom_composition_compare(const void *a, const void *b)
->>  {
->> -    return g_strcmp0(object_get_canonical_path_component(a),
->> -                     object_get_canonical_path_component(b));
->> +    return g_strcmp0(object_get_canonical_path_component(*(Object **)a),
->> +                     object_get_canonical_path_component(*(Object **)b));
->>  }
->>  
->>  static int insert_qom_composition_child(Object *obj, void *opaque)
->>  {
->> -    GQueue *children = opaque;
->> -
->> -    g_queue_insert_sorted(children, obj, qom_composition_compare, NULL);
->> +    g_array_append_val(opaque, obj);
->>      return 0;
->>  }
->>  
->>  static void print_qom_composition(Monitor *mon, Object *obj, int indent)
->>  {
->> +    GArray *children = g_array_new(false, false, sizeof(Object *));
->>      const char *name;
->> -    GQueue children;
->> -    Object *child;
->> +    int i;
->>  
->>      if (obj == object_get_root()) {
->>          name = "";
->> @@ -122,11 +120,14 @@ static void print_qom_composition(Monitor *mon, Object *obj, int indent)
->>      monitor_printf(mon, "%*s/%s (%s)\n", indent, "", name,
->>                     object_get_typename(obj));
->>  
->> -    g_queue_init(&children);
->> -    object_child_foreach(obj, insert_qom_composition_child, &children);
->> -    while ((child = g_queue_pop_head(&children))) {
->> -        print_qom_composition(mon, child, indent + 2);
->> +    object_child_foreach(obj, insert_qom_composition_child, children);
->> +    g_array_sort(children, qom_composition_compare);
->> +
->> +    for (i = 0; i < children->len; i++) {
->> +        print_qom_composition(mon, g_array_index(children, Object *, i),
->> +                              indent + 2);
->>      }
->> +    g_array_free(children, TRUE);
->
-> So I think that's OK, so :
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
-> Can you just convince me that 'TRUE' in the array_free?
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200720' into staging (2020-07-20 15:58:07 +0100)
 
-g_array_free(children, TRUE) frees both children and children->data.  It
-returns null.  This is what we want here.
+are available in the Git repository at:
 
-g_array_free(children, FALSE) frees only children, and returns
-children->data.  Occasionally useful.
+  git://repo.or.cz/qemu/armbru.git tags/pull-qom-2020-07-21
 
-https://developer.gnome.org/glib/2.62/glib-Arrays.html#g-array-free
+for you to fetch changes up to 0dde9fd12fd39762ff68fca80d2f0a735d66e7bd:
 
-I definitely would have made this two separate functions.
+  qom: Make info qom-tree sort children more efficiently (2020-07-21 17:39:37 +0200)
 
-Thanks!
+----------------------------------------------------------------
+QOM patches for 2020-07-21
+
+----------------------------------------------------------------
+Markus Armbruster (3):
+      qom: Change object_get_canonical_path_component() not to malloc
+      qom: Document object_get_canonical_path() returns malloced string
+      qom: Make info qom-tree sort children more efficiently
+
+ include/qom/object.h       |  7 ++++---
+ backends/hostmem.c         |  2 +-
+ block/throttle-groups.c    |  2 +-
+ gdbstub.c                  |  2 +-
+ hw/arm/xlnx-zynqmp.c       |  6 ++----
+ hw/block/nvme.c            |  5 ++---
+ hw/core/machine-qmp-cmds.c |  2 +-
+ hw/core/machine.c          |  5 ++---
+ hw/mem/nvdimm.c            |  5 ++---
+ hw/mem/pc-dimm.c           |  5 ++---
+ hw/misc/ivshmem.c          |  5 ++---
+ hw/ppc/spapr_drc.c         |  3 +--
+ hw/virtio/virtio-crypto.c  |  5 ++---
+ hw/virtio/virtio-mem.c     |  6 ++----
+ hw/virtio/virtio-pmem.c    |  5 ++---
+ iothread.c                 |  9 ++++-----
+ net/net.c                  |  6 ++----
+ qom/object.c               |  7 +++----
+ qom/qom-hmp-cmds.c         | 32 +++++++++++++++-----------------
+ scsi/pr-manager-helper.c   |  3 +--
+ scsi/pr-manager.c          |  2 +-
+ softmmu/memory.c           |  2 +-
+ hw/ppc/trace-events        |  2 +-
+ 23 files changed, 55 insertions(+), 73 deletions(-)
+
+-- 
+2.26.2
 
 
