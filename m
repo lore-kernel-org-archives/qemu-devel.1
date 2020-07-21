@@ -2,104 +2,144 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B86BC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 19:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D717C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 19:57:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 133E52072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 19:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A5162072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 19:57:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="slaPH33R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 133E52072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0x9a9f6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A5162072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxyID-0004TC-9s
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 15:51:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32828)
+	id 1jxyOk-0005s1-LG
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 15:57:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jxyHe-00042l-6r
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 15:50:38 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35113)
+ (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
+ id 1jxyO6-0005Kn-Ke; Tue, 21 Jul 2020 15:57:18 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:36029)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jxyHc-0002HM-1V
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 15:50:37 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 184so4062102wmb.0
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:50:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ps7UoK2FoTGRYCdHdEA6qFrx0m1hhz19wdqjjT4pS7g=;
- b=slaPH33RJeI4V+IF7dMoCI+I28y4Dztekc3ZUAHnROSQDRxNsXL+iLbZoBsiNx4Tjb
- tzhb+J01CN++sFpeFVOii1K2Y8fDQDpbbgEm7snDl7QGId5aCaA/tL9VABFTaXtiCDqq
- DPaaApB08k0WFzx5X7T4iQ6w6QanNIgbn36WQIYTUsIkPYQ62+LXmRySmYtCd0+5nhAz
- VVhxarCaBJXvY69pvCVCcr/NrR5Kk/seCsbaEUXeJ2M01yCciXCAkXM0Oo7f1w/lIQWW
- mXqBCgg/QBYyJMUfU6yoLq77CIlOLn4VLkxNSQjNNzYn4aDSlWFC5FrDGC6fHkEgQDpm
- vviw==
+ (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
+ id 1jxyO4-00032q-Mv; Tue, 21 Jul 2020 15:57:18 -0400
+Received: by mail-pl1-x642.google.com with SMTP id t6so10723707plo.3;
+ Tue, 21 Jul 2020 12:57:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=P0Pe0DeXb9TfYmlbzb6kjbHLl+oZJNThgKMeCMjPTmY=;
+ b=Y0x9a9f6GzZMogFAvVnBKElTBTlqMl+RhHZG7T+PdZHMk2Z41AG3OPXvA6651uNLKJ
+ 2pnRhga5kzazRbktbRjm53ulbjgZT3vyCYgC892Zd/Q1/l0heuNlCnujSfQF9NVExFGv
+ wkNJXKPBr9rcoPiyX8VNIqjJOYfO5FR69CWguYNGbiVd9ICR5JXjvRMFmKXdYXUoUqhz
+ XvxogAqrwUgFZDdRInwGLf1xDmuiJMyM8qZVS/OJB91cO+F70/e/EO6IyY6g9QTXjhQB
+ YMKBlGkhGmRa2H2Sit/9qBG7XUAbbdJu9zglin4fe7eMLCSuPYVQWuMuXWg6YiBu02w0
+ /M3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ps7UoK2FoTGRYCdHdEA6qFrx0m1hhz19wdqjjT4pS7g=;
- b=oiC5f3lQi9cUsLNCZwBhjqITzTq15ukiEB15khWpDRSgA6cERr0x3cCQVVEiBj08G1
- ATs5aaPa5DY2C0aSrGj4pzXML+VUlstK3M2uT6kSaPb40aeUIXF5Cc7SLkp9MQYSuNno
- h0ua7IQFg6WyVSpMCRMOkKmrt5a+h5seQSoVmWpHewG4w7emYvbv5ZZeoQ5XDtRT1iQ7
- m5o86CR60nzoTOFMCJd3oC7325vZf8giLVh3yyoEC8Wkq4Hzpl8Xg3N9DaOsAooWKFTm
- uInbC3NFxHzSj4SJ7eU2uy0qL1ghvsXg1LGuO6aoUeWZrwV7iXeR3fVByJaPwkqZfWuR
- Pq9A==
-X-Gm-Message-State: AOAM530/ocGVrLkNg1v7AFpb6NXQWAlWx/MfMU4xJSpMSKGSInNKi9iU
- 1EvMlek8khReduPOMooWqYUaVg==
-X-Google-Smtp-Source: ABdhPJyunpb6gxUxS4UGUBOFalCgCKfmpfPAJcIfItTt4ymhMtdXUqlw6jtkBYnsBB+YWLhFTPJT4A==
-X-Received: by 2002:a1c:5ac3:: with SMTP id o186mr5381401wmb.39.1595361033824; 
- Tue, 21 Jul 2020 12:50:33 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 129sm4573012wmd.48.2020.07.21.12.50.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jul 2020 12:50:32 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A3FE11FF7E;
- Tue, 21 Jul 2020 20:50:30 +0100 (BST)
-References: <20200307010051.97022-1-yuanzi@google.com>
- <CADjx4CKDPY9J7Zr1YTLv78Ku6mQS6zrMu7oX7-ujU3PGxvHA4w@mail.gmail.com>
- <87imizidwc.fsf@linaro.org>
- <CADjx4CJJdQep+K3ibfhjin7Eo6uCEFGQ6R6yVC0OcNo8MsfvJw@mail.gmail.com>
- <87d095u804.fsf@linaro.org>
- <CADjx4CKhoikcZanqYCs11ubGY+6tOeNjToiCgjnp8V_rzZcDHw@mail.gmail.com>
- <87tv25fwvz.fsf@linaro.org>
- <CADjx4CK-NtPP9iRmao_J9A+25y-MUjco=sM+sKwHfpWXzSV_yA@mail.gmail.com>
- <87o8sdf0sl.fsf@linaro.org>
- <CADjx4CJNhZv2guePFckf-ijPz1OYfMofJFfeUvC+bHwjtF4JYg@mail.gmail.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Lirong Yuan <yuanzi@google.com>
-Subject: Re: [PATCH] gdbstub: add support to Xfer:auxv:read: packet
-In-reply-to: <CADjx4CJNhZv2guePFckf-ijPz1OYfMofJFfeUvC+bHwjtF4JYg@mail.gmail.com>
-Date: Tue, 21 Jul 2020 20:50:30 +0100
-Message-ID: <878sfcve9l.fsf@linaro.org>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=P0Pe0DeXb9TfYmlbzb6kjbHLl+oZJNThgKMeCMjPTmY=;
+ b=K6B4A2SjRv2Pf/FdnnpXBMVkYnVRk3ELuTnOc3rCWBOTDbNtgg5bQmsPA1d6wAiu/f
+ m9CDitmZrkVE6E3Wxg/wf8HPX8Re/WV2nHlfzy/FCEUWX7R0VFT8cKWkt+45j/I3LASo
+ M5hv2MkCVtvjAH2fNmM6Yxgzj/rrQ8aUpjai93eEF8EtHyzeBygpKgC5QQhpRQ7Wvs+Z
+ AZmRn7lHhJLUUW/nWtKX8mnjEXdeCSbDFHRp/Li/+/KUPDa3FxNNb4D0/5QQWCIgKMa6
+ AMeR1P+yVIKj2xlcDiuIlETmr//SKrBcKkryomxRdnO2AGYycMcTOqNW4nWOMxRVSdw2
+ Icow==
+X-Gm-Message-State: AOAM531RTD5W6Kolf8qvCOi2FXxcRpc5yTEiCRsw2eGjthItu/sxgpRd
+ M/ke95kTu0HdVJqIR4t+/J4=
+X-Google-Smtp-Source: ABdhPJzYlpPPMZ3OultlyhIiE3br5dluT2IPsul2PmTbmdDlTdu6qzVrGKibO9Pc4ZXNbv9QHFwurQ==
+X-Received: by 2002:a17:90a:20ad:: with SMTP id
+ f42mr6265446pjg.96.1595361434182; 
+ Tue, 21 Jul 2020 12:57:14 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id
+ j8sm21869907pfd.145.2020.07.21.12.57.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 21 Jul 2020 12:57:13 -0700 (PDT)
+Subject: Re: [PATCH v2 2/4] m25p80: Improve command handling for Jedec commands
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Alistair Francis <alistair@alistair23.me>, Kevin Wolf <kwolf@redhat.com>
+References: <20200206183219.3756-1-linux@roeck-us.net>
+ <20200206183219.3756-2-linux@roeck-us.net>
+ <eb21047a-aa9f-eb39-af8a-b5858e01fee5@kaod.org>
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
+Message-ID: <0ae638a0-6e74-c32b-a5bb-6a89ae5b819f@roeck-us.net>
+Date: Tue, 21 Jul 2020 12:57:12 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <eb21047a-aa9f-eb39-af8a-b5858e01fee5@kaod.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=groeck7@gmail.com; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 3
+X-Spam_score: 0.3
+X-Spam_bar: /
+X-Spam_report: (0.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
+ FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,230 +152,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Josh Kunz <jkz@google.com>,
- Philippe =?utf-8?Q?Mathieu-Da?= =?utf-8?Q?ud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Shu-Chun Weng <scw@google.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
+ Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Erik Smit <erik.lucas.smit@gmail.com>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 7/21/20 10:36 AM, Cédric Le Goater wrote:
+> Hello,
+> 
+> On 2/6/20 7:32 PM, Guenter Roeck wrote:
+>> When requesting JEDEC data using the JEDEC_READ command, the Linux kernel
+>> always requests 6 bytes. The current implementation only returns three
+>> bytes, and interprets the remaining three bytes as new commands.
+>> While this does not matter most of the time, it is at the very least
+>> confusing. To avoid the problem, always report up to 6 bytes of JEDEC
+>> data. Fill remaining data with 0.
+>>
+>> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+>> ---
+>> v2: Split patch into two parts; improved decription
+>>
+>>  hw/block/m25p80.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+>> index 5ff8d270c4..53bf63856f 100644
+>> --- a/hw/block/m25p80.c
+>> +++ b/hw/block/m25p80.c
+>> @@ -1040,8 +1040,11 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+>>          for (i = 0; i < s->pi->id_len; i++) {
+>>              s->data[i] = s->pi->id[i];
+>>          }
+>> +        for (; i < SPI_NOR_MAX_ID_LEN; i++) {
+>> +            s->data[i] = 0;
+>> +        }
+> 
+> This is breaking an old firmware (Linux version 2.6.28.9) for a SuperMicro
+> board : 
+> 
+> 	https://www.supermicro.com/en/products/motherboard/X11SSL-F 
+> 
+> which expects the flash ID to repeat. Erik solved the problem with the patch 
+> below and I think it makes sense to wrap around. Anyone knows what should be 
+> the expected behavior ? 
+> 
 
-Lirong Yuan <yuanzi@google.com> writes:
+No idea what the expected behavior is, but I am fine with the code below
+if it works.
 
-> On Tue, Mar 31, 2020 at 12:20 AM Alex Benn=C3=A9e <alex.bennee@linaro.org=
-> wrote:
->>
->>
->> Lirong Yuan <yuanzi@google.com> writes:
->>
->> > On Mon, Mar 30, 2020 at 12:47 PM Alex Benn=C3=A9e <alex.bennee@linaro.=
-org> wrote:
->> >
->> >>
->> >> Lirong Yuan <yuanzi@google.com> writes:
->> >>
->> >> > On Sat, Mar 21, 2020 at 6:56 AM Alex Benn=C3=A9e <alex.bennee@linar=
-o.org>
->> >> wrote:
->> >> >
->> >> >>
->> >> >> Lirong Yuan <yuanzi@google.com> writes:
->> >> >>
->> >> >> > On Fri, Mar 20, 2020 at 2:17 AM Alex Benn=C3=A9e <alex.bennee@li=
-naro.org>
->> >> >> wrote:
->> >> >> <snip>
->> >> >> >>
->> >> >> >> Sorry I missed this on my radar. There was a minor re-factor of
->> >> gdbstub
->> >> >> >> that was just merged which will mean this patch needs a re-base=
- to
->> >> use
->> >> >> >> g_string_* functions to expand stings.
->> >> >> >>
->> >> >> >> Also we have some simple gdbstub tests now - could we come up w=
-ith a
->> >> >> >> multiarch gdbstub test to verify this is working properly?
->> >> >> >>
->> >> >> <snip>
->> >> >> > For sure, I will re-base this patch to use g_string_* functions.
->> >> >> >
->> >> >> > Currently we are using qemu aarch64. I am not sure how to do thi=
-s yet,
->> >> >> but
->> >> >> > I could try to add something to
->> >> >> > https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbst=
-ub
->> >> >>
->> >> >> If the auxv support is appropriate to all linux-user targets you c=
-an
->> >> >> plumb it into the multiarch tests - you can even use the existing
->> >> >> binaries.
->> >> >>
->> >> >> So you need:
->> >> >>
->> >> >>   - a stanza in the makefiles to launch the test (see
->> >> >>     tests/tcg/aarch64/Makefile.target)
->> >> >>
->> >> >>   - a .py test script that manipulates gdbstub to check things are
->> >> working
->> >> >>
->> >> >> So something like:
->> >> >>
->> >> >> .PHONY: gdbstub-foo-binary
->> >> >> run-gdbstub-foo-binary: foo-binary
->> >> >>         $(call run-test, $@, $(GDB_SCRIPT) \
->> >> >>                 --gdb $(HAVE_GDB_BIN) \
->> >> >>                 --qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
->> >> >>                 --bin $< --test $(MULTIARCH_SRC)/gdbstub/test-foo.=
-py, \
->> >> >>         "basic gdbstub FOO support")
->> >> >>
->> >> >>
->> >> >> >
->> >> >> > Does this sound good?
->> >> >>
->> >> >> Hope that helps.
->> >> >>
->> >> >> >
->> >> >> > Thanks!
->> >> >> > Lirong
->> >> >>
->> >> >>
->> >> >> --
->> >> >> Alex Benn=C3=A9e
->> >> >>
->> >> >
->> >> > Hi Alex,
->> >> >
->> >> > Thanks for the instructions, very helpful!
->> >> >
->> >> > I rebased this patch to use g_string_* functions, and the link to
->> >> patchwork
->> >> > is:
->> >> > http://patchwork.ozlabs.org/patch/1264125/
->> >> > Could you help take another look?
->> >> >
->> >> > Regarding testing, I looked at some instructions for running tests,=
- e.g.
->> >> > https://github.com/qemu/qemu/blob/master/docs/devel/testing.rst
->> >> > https://wiki.qemu.org/Testing
->> >> > However I still could not get the tests for aarch64 to run. Do you =
-know
->> >> how
->> >> > to run the aarch64 or multi-arch tests?
->> >>
->> >> The aarch64 ones run with "make run-tcg-tests-aarch64-linux-user" add
->> >> V=3D1 to see the details.
->> >>
->> >> > Also there aren't any existing gdb stub tests that try to read
->> >> > uninterpreted bytes from the target=E2=80=99s special data area ide=
-ntified by a
->> >> > keyword:
->> >> >
->> >> https://sourceware.org/gdb/current/onlinedocs/gdb/General-Query-Packe=
-ts.html#qXfer-auxiliary-vector-read
->> >> > I looked at some other gdb stub tests, but they did not seem to sen=
-d any
->> >> > queries:
->> >> > https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbstub
->> >> > So I am not sure how to set up one for "Xfer:auxv:read:" packets...
->> >> > Are there plans to add more tests for other packets like
->> >> > "Xfer:features:read:"?
->> >> > I'd be happy to add a test if there is an example of how to do it. =
-:)
->> >>
->> >> What would you do from a normal gdb command line. At the very least y=
-ou
->> >> run the same command with gdb.execute(), e.g.:
->> >>
->> >>   gdb.execute("set confirm off")
->> >>
->> >> is the same as typing
->> >>
->> >>   set confirm off
->> >>
->> >> at the gdb command prompt.
->> >>
->> >> >
->> >> > Thanks,
->> >> > Lirong
->> >>
->> >>
->> >> --
->> >> Alex Benn=C3=A9e
->> >>
->> >
->> > Hey Alex,
->> >
->> > I tried to run the test but they were skipped. Do you know if there's =
-any
->> > other flag that needs to be set?
->> >
->> > $ make run-tcg-tests-aarch64-linux-user
->> > make[1]: Entering directory '/usr/local/google/home/yuanzi/qemu/slirp'
->> > make[1]: Nothing to be done for 'all'.
->> > make[1]: Leaving directory '/usr/local/google/home/yuanzi/qemu/slirp'
->> >   BUILD   TCG tests for aarch64-linux-user
->> >   BUILD   aarch64-linux-user guest-tests SKIPPED
->> >   RUN     TCG tests for aarch64-linux-user
->> >   RUN     tests for aarch64-linux-user SKIPPED
->>
->> Ahh you either need to have docker enabled or the aarch64 compilers in
->> your path when you run configure so the test programs can be built. The
->> details are in docs/devel/testing.rst
->>
->> > I don't think any command needs to be run. It should just send the que=
-ry
->> > automatically.
->> > Could we assume that it will work the same in the test?
->>
->> If that is enough to exercise the code. Can we not validate the data som=
-ehow?
->>
->>
->> --
->> Alex Benn=C3=A9e
->
-> Hi Alex,
->
-> Thanks for the suggestions! I just installed docker and ran the tests,
-> but got the following error messages for gdbstub tests:
-> $ make run-tcg-tests-aarch64-linux-user
-> ...
-> TEST    basic gdbstub support
-> warning: while parsing target description (at line 1): Target
-> description specified unknown architecture "aarch64"
-> warning: Could not load XML target description; ignoring
-> Truncated register 37 in remote 'g' packet
-> Traceback (most recent call last):
->   File "/usr/local/google/home/yuanzi/Documents/gdbstub-patch/qemu/tests/=
-tcg/multiarch/gdbstub/sha1.py",
-> line 68, in <module>
->     if gdb.parse_and_eval('$pc') =3D=3D 0:
-> gdb.error: No registers.
->   TEST    basic gdbstub SVE support
-> warning: while parsing target description (at line 1): Target
-> description specified unknown architecture "aarch64"
-> warning: Could not load XML target description; ignoring
-> Truncated register 37 in remote 'g' packet
->
-> I'm not sure if there is any additional setup needed to make those
-> tests pass. Do you know how to fix those errors?
+Thanks,
+Guenter
 
-The error is because the gdb you have installed doesn't understand
-foreign architectures. The test should have skipped in this case so I',
-not sure why it causes it to fail.
-
-You can either ensure you have multiarch capable gdb (this is
-binutils-multiarch on debian for example) or build your own gdb and
-point at it with --gdb in configure.
-
->
 > Thanks,
-> Lirong
+> 
+> C. 
+> 
+> 
+> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+> index 8227088441..5000930800 100644
+> --- a/hw/block/m25p80.c
+> +++ b/hw/block/m25p80.c
+> @@ -1041,7 +1041,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+>              s->data[i] = s->pi->id[i];
+>          }
+>          for (; i < SPI_NOR_MAX_ID_LEN; i++) {
+> -            s->data[i] = 0;
+> +            s->data[i] = s->pi->id[i % s->pi->id_len];
+>          }
+> 
+>          s->len = SPI_NOR_MAX_ID_LEN;
+> 
 
-
---=20
-Alex Benn=C3=A9e
 
