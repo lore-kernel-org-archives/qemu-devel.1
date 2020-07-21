@@ -2,97 +2,106 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73062C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 13:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C608DC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 13:48:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D48020578
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 13:45:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MtvfaGDb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D48020578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9C3772064C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 13:48:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C3772064C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netbsd.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxsaR-0005Vz-Bp
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 09:45:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54552)
+	id 1jxsch-0006t7-Mr
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 09:47:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxsZh-0004zA-9w
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 09:44:53 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41463)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxsZf-0005xw-83
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 09:44:52 -0400
-Received: by mail-ot1-x341.google.com with SMTP id a21so15065976otq.8
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 06:44:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=cwH0eQfXfZXNOrLozsdlWlWjFwPgBN0+LAmx2GMdbsg=;
- b=MtvfaGDbJmYUtgz3ky7JodB0jc8MaWCUsXTNVGdHBCnq+syPIcK5QZs03SES42XSxw
- eCrUIaApvknIJZCuTWFoteeZx2Gc/3/0pSS86rD9PyWLYZGZlTOrnN+6Y/VYK9ihYDMy
- xHagDGLGsGlmKG8qLFUDPTxFxr8CopnBDLRUTdaaYDpk0I9var+cx/KoYzaIwmOWPUtn
- VLjWbs4HQ/QdT8ilHXZ4YtDYJoj82XDHAgmscx9ag48mnreTC9sV5xmFHJ6W6iDZZite
- 2XSdhZ2b9gn9qda/ue/qaiGEag+5g1mzT5Y/6w8ywmR/YYptBTohklh2ontmr0taEIij
- Sm5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=cwH0eQfXfZXNOrLozsdlWlWjFwPgBN0+LAmx2GMdbsg=;
- b=Hy67JokDrXlyVJ1IoN0jZfODzDUizaGSD7A8S11Zb4Daw5FCmUnkYyFUl07oT1Onir
- lU8Ic1vO9QXm8DzvLH/tdMKXt+Y4JT2Btip33rVtbBd9e/GgFgzzyvjZAes3DmgfPa3E
- gvI6BCY+QbKapW2eJ7fXhpF/wlS6KVf7PlMI5SbFmahLQmYAk6pQY3qM6iV8i7pxKVTG
- 9PkiC6QeXYWNtNKlE2/pk8KgjsbhHVGgCR8KmdM/0rHMjL9sioQkvhP9sbMBZQiyXxKh
- mB459f6w4agkbh0brxnKYt3rP7QfCpog2B51feeZ8uBBKQkmc4KwpU7a8r9KvrsEYdzl
- c5bQ==
-X-Gm-Message-State: AOAM533zJrSoK0t6m7bsHfG5dbl+hgkO5lwMmy+3CoYdBBA0+ylsio+3
- wHtWSEm9mgEKywUkTrTON7fuuDZmwdlncWzXZ4GfIw==
-X-Google-Smtp-Source: ABdhPJwDQPA13d2ZzQjtvW/a9CZsKqIECWlMaBkmg5cF3/XcYrT5+8kx/ZgYU7TCnCJNXq2uCr46KkkH/9wOitLl6hA=
-X-Received: by 2002:a05:6830:10ce:: with SMTP id
- z14mr25180370oto.135.1595339089805; 
- Tue, 21 Jul 2020 06:44:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1jxsZT-0004w4-D7
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 09:44:39 -0400
+Received: from mail.netbsd.org ([199.233.217.200]:62225)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1jxsZR-0005wH-9a
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 09:44:39 -0400
+Received: from [IPv6:::1] (localhost [127.0.0.1])
+ by mail.netbsd.org (Postfix) with ESMTP id A511784CEC;
+ Tue, 21 Jul 2020 13:44:31 +0000 (UTC)
+Subject: Re: [PATCH v4 3/4] Introduce the NVMM impl
+To: Maxime Villard <max@m00nbsd.net>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200206115731.13552-1-n54@gmx.com>
+ <20200206213232.1918-1-n54@gmx.com> <20200206213232.1918-4-n54@gmx.com>
+ <e85f03be-60bc-2852-7856-91790ba5958b@redhat.com>
+ <ca1210a3-2ea5-3862-c4fa-bdcd5624fe29@m00nbsd.net>
+ <CABgObfZjnFFV3hosrP+sf5d3KmPPGuFJZo-oY5=u340wtxLYGg@mail.gmail.com>
+ <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
+From: Kamil Rytarowski <kamil@netbsd.org>
+Autocrypt: addr=kamil@netbsd.org; keydata=
+ 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
+Message-ID: <95b2f5d8-4353-469a-9635-2718c6bc6e57@netbsd.org>
+Date: Tue, 21 Jul 2020 15:42:20 +0200
+User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <159400349818.1851.7243060688419202620.malonedeb@wampee.canonical.com>
- <CAKXe6S+J3nARveToQjECbwV224gs66WkqGHybUhfw35t1+V8og@mail.gmail.com>
- <2cbdf822-c74c-1af9-e5e6-7dd71412201e@redhat.com>
- <CAKXe6S+ct7D+ibGmrAMJnqKBBKyUpwVnCem8=d=jB-0tUT-N2Q@mail.gmail.com>
- <e4a34525-dbd1-1f85-475b-b5004885215b@redhat.com>
- <CAKXe6SJb=1YLLGF+TP1fMd95k_WzZd73JeUJv5Sn4EE4m2zP4w@mail.gmail.com>
- <f19f605c-9468-e7eb-f255-60766df2a50c@redhat.com>
- <CAFEAcA-qrpXJtzW=tigyAqQuYFNCBMQK_CZFx6zYkcJa+RuZuw@mail.gmail.com>
- <28d42c0f-99eb-a9c1-e3fc-98f11ee686ab@redhat.com>
-In-Reply-To: <28d42c0f-99eb-a9c1-e3fc-98f11ee686ab@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Jul 2020 14:44:37 +0100
-Message-ID: <CAFEAcA8ECKgRanHLiFZMDS3fd77ASBkba2nfv+iwnjgSLWnbPw@mail.gmail.com>
-Subject: Re: [Bug 1886362] [NEW] Heap use-after-free in lduw_he_p through
- e1000e_write_to_rx_buffers
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <a646f01d-fcf5-5984-d7ea-ccbb9a20ce2b@m00nbsd.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=199.233.217.200; envelope-from=kamil@netbsd.org;
+ helo=mail.netbsd.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 09:44:34
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,53 +114,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Bug 1886362 <1886362@bugs.launchpad.net>, Li Qiang <liq3ea@gmail.com>,
- Qemu Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
+ qemu-devel@nongnu.org, jmcneill@invisible.ca, philmd@redhat.com,
+ rth <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jul 2020 at 14:21, Jason Wang <jasowang@redhat.com> wrote:
-> On 2020/7/21 =E4=B8=8B=E5=8D=888:31, Peter Maydell wrote:
-> > On Wed, 15 Jul 2020 at 09:36, Jason Wang <jasowang@redhat.com> wrote:
-> >> I think the point is to make DMA to MMIO work as real hardware.
-> > I wouldn't care to give a 100% guarantee that asking a real
-> > h/w device to DMA to itself didn't cause it to misbehave :-)
-> > It's more likely to happen-to-work because the DMA engine bit
-> > of a real h/w device is going to be decoupled somewhat from
-> > the respond-to-memory-transactions-for-registers logic, but
-> > it probably wasn't something the designers were actively
-> > thinking about either...
+On 10.03.2020 07:45, Maxime Villard wrote:
+> Le 02/03/2020 à 20:35, Paolo Bonzini a écrit :
+>>
+>>
+>> Il lun 2 mar 2020, 20:28 Maxime Villard <max@m00nbsd.net <mailto:max@m00nbsd.net>> ha scritto:
+>>
+>>
+>>     >> +        nvmm_vcpu_pre_run(cpu);
+>>     >> +
+>>     >> +        if (atomic_read(&cpu->exit_request)) {
+>>     >> +            qemu_cpu_kick_self();
+>>     >> +        }
+>>     >> +
+>>     >
+>>     > This is racy without something like KVM's immediate_exit mechanism.
+>>     > This should be fixed in NVMM.
+>>
+>>     I don't immediately see how this is racy.
+>>
+>>
+>> You can get an IPI signal immediately after reading cpu->exit_request.
+>>
+>>     It reproduces the existing
+>>     logic found in whpx-all.c, and if there is a real problem it can be
+>>     fixed in a future commit along with WHPX.
+>>
+>>
+>> It's buggy there too and it has to be fixed in the hypervisor so it can't be done at the same time I'm both. KVM does it right by having a flag ("immediate_exit") that is set by the signal handler and checked by the hypervisor.
+>>
+>> An earlier version of KVM instead atomically unblocked the signal while executing the guest, and then ate it with a sigwaitinfo after exiting back to userspace.
+>>
+>> You don't have to fix it immediately, but adding a FIXME would be a good idea.
+>>
+>> Paolo
+> 
+> Kamil, please add /* FIXME: possible race here */ before the atomic_read().
+> 
+> Thanks
+> 
 
-> I think some device want such peer to peer transactions:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/D=
-ocumentation/driver-api/pci/p2pdma.rst
+So, is this still considered as a possible race? Were there any other
+changes to be introduced?
 
-That's a device DMAing to another device, not DMAing to *itself*
-(device-to-another-device DMA should work fine in QEMU). And only
-a very few devices will ever be sensible targets of the DMA --
-basically things like nvme that have a looks-like-memory area,
-or special cases like doorbell registers.
-
-> > Yeah, this is the interesting part for QEMU. How should we
-> > structure devices that do DMA so that we can be sure that
-> > the device emulation at least doesn't crash? We could have
-> > a rule that all devices that do DMA must always postpone
-> > all of that DMA to a bottom-half, but that's a lot of
-> > refactoring of a lot of device code...
->
->
-> It looks to me the issue happens only for device with loopback
-
-I think in principle we have a problem for any device that
-(a) has memory mapped registers and (b) does DMA reads
-whose address is guest-controlled. Loopback isn't a
-requirement -- if the guest programs, say, an RX descriptor
-base address to point at the device's own registers, you
-get exactly the same kind of unexpected-reentrancy.
-
-thanks
--- PMM
+Can we see this patchset merged?
 
