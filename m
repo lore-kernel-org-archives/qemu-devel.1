@@ -7,76 +7,80 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 533A7C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1820C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:14:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1893C2068F
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:13:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CE8D2068F
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:14:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VwjbP6nS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1893C2068F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fCykeDdO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CE8D2068F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxnPQ-00043O-9O
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:13:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34528)
+	id 1jxnPW-0004Gg-0m
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:14:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxnMj-0007X9-6u
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:11:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20448
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxnMk-0007b6-K0
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:11:10 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28220
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxnMh-0004K5-HB
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:11:08 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxnMi-0004KI-6y
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:11:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595319066;
+ s=mimecast20190719; t=1595319067;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=ksI6DxVRb9WUjZEjZRxkO2/ukg0emKrzyQcSJLbaae8=;
- b=VwjbP6nSUJ5z8tfwIQC0z2zbJZRZqVr/Ga9bkMwUxgsOS/cBfTRvoG+xq/8ZEBJZtJrZ6n
- nvyKdZIwB7rbkz2rkA+XLxsJPy5CJy1WAh9+2lP73YHPXaJFN9zrXcwm/M9PRgqwTT6z6O
- eb5Az/c908yMRSM+n8lGsxFJiHQdMxg=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NDeCjODWd2sR1PLveUfus8P4jDOiazbulApwjnBgP2k=;
+ b=fCykeDdO5+k6n4OH2asE/nrNLyexU7FH8wU7XM0Q0PsgHfsl8sE1WD8IQ05YBuoF59O/Wz
+ av979rmq7NZA2XzexTvvmExlgW98AAjOqCLpEAtXLMGGw9pNZE6wx4eGm64UeFAfWpb24T
+ wB/C5dHQ0fK685nTq48LfHnfJELe2Qk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-YtDQPfhCMTSOsqtM3wrqKQ-1; Tue, 21 Jul 2020 04:11:02 -0400
-X-MC-Unique: YtDQPfhCMTSOsqtM3wrqKQ-1
+ us-mta-227-6bkaSYZ_OXKlOCF7DYzZ4w-1; Tue, 21 Jul 2020 04:11:05 -0400
+X-MC-Unique: 6bkaSYZ_OXKlOCF7DYzZ4w-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46A6D91270;
- Tue, 21 Jul 2020 08:11:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26A7B18C63C1;
+ Tue, 21 Jul 2020 08:11:04 +0000 (UTC)
 Received: from thuth.com (ovpn-112-102.ams2.redhat.com [10.36.112.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3B0F82DE72;
- Tue, 21 Jul 2020 08:11:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1B2272DE68;
+ Tue, 21 Jul 2020 08:11:02 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 02/10] fuzz: Fix leak when assembling datadir path string
-Date: Tue, 21 Jul 2020 10:10:47 +0200
-Message-Id: <20200721081055.14073-3-thuth@redhat.com>
+Subject: [PULL 04/10] fuzz: build without AddressSanitizer, by default
+Date: Tue, 21 Jul 2020 10:10:49 +0200
+Message-Id: <20200721081055.14073-5-thuth@redhat.com>
 In-Reply-To: <20200721081055.14073-1-thuth@redhat.com>
 References: <20200721081055.14073-1-thuth@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:30:29
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 03:39:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,49 +100,53 @@ Sender: "Qemu-devel"
 
 From: Alexander Bulekov <alxndr@bu.edu>
 
-We freed the string containing the final datadir path, but did not free
-the path to the executable's directory that we get from
-g_path_get_dirname(). Fix that.
+We already have a nice --enable-sanitizers option to enable
+AddressSanitizer. There is no reason to duplicate and force this
+functionality in --enable-fuzzing. In the future, if more sanitizers are
+added to --enable-sanitizers, it might be impossible to build with both
+--enable-sanitizers and --enable-fuzzing, since not all sanitizers are
+compatible with libFuzzer. In that case, we could enable ASAN with
+--extra-cflags="-fsanitize=address"
 
-Reported-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-Message-Id: <20200717163523.1591-1-alxndr@bu.edu>
+Message-Id: <20200706195534.14962-2-alxndr@bu.edu>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+[thuth: Added missing $CFLAGS]
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qtest/fuzz/fuzz.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ configure | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-index 6bc17ef313..031594a686 100644
---- a/tests/qtest/fuzz/fuzz.c
-+++ b/tests/qtest/fuzz/fuzz.c
-@@ -143,7 +143,7 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
- {
- 
-     char *target_name;
--    char *dir;
-+    char *bindir, *datadir;
-     bool serialize = false;
- 
-     /* Initialize qgraph and modules */
-@@ -164,11 +164,13 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-          * location of the executable. Using this we add exec_dir/pc-bios to
-          * the datadirs.
-          */
--        dir = g_build_filename(g_path_get_dirname(**argv), "pc-bios", NULL);
--        if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
--            qemu_add_data_dir(dir);
-+        bindir = g_path_get_dirname(**argv);
-+        datadir = g_build_filename(bindir, "pc-bios", NULL);
-+        g_free(bindir);
-+        if (g_file_test(datadir, G_FILE_TEST_IS_DIR)) {
-+            qemu_add_data_dir(datadir);
-         }
--        g_free(dir);
-+        g_free(datadir);
-     } else if (*argc > 1) {  /* The target is specified as an argument */
-         target_name = (*argv)[1];
-         if (!strstr(target_name, "--fuzz-target=")) {
+diff --git a/configure b/configure
+index 33cee41f9c..4bd80ed507 100755
+--- a/configure
++++ b/configure
+@@ -6337,7 +6337,7 @@ fi
+ # checks for fuzzer
+ if test "$fuzzing" = "yes" ; then
+   write_c_fuzzer_skeleton
+-  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=address,fuzzer" ""; then
++  if compile_prog "$CPU_CFLAGS -Werror -fsanitize=fuzzer" ""; then
+       have_fuzzer=yes
+   fi
+ fi
+@@ -7893,11 +7893,11 @@ if test "$have_mlockall" = "yes" ; then
+ fi
+ if test "$fuzzing" = "yes" ; then
+   if test "$have_fuzzer" = "yes"; then
+-    FUZZ_LDFLAGS=" -fsanitize=address,fuzzer"
+-    FUZZ_CFLAGS=" -fsanitize=address,fuzzer"
+-    CFLAGS="$CFLAGS -fsanitize=address,fuzzer-no-link"
++    FUZZ_LDFLAGS=" -fsanitize=fuzzer"
++    FUZZ_CFLAGS=" -fsanitize=fuzzer"
++    CFLAGS="$CFLAGS -fsanitize=fuzzer-no-link"
+   else
+-    error_exit "Your compiler doesn't support -fsanitize=address,fuzzer"
++    error_exit "Your compiler doesn't support -fsanitize=fuzzer"
+     exit 1
+   fi
+ fi
 -- 
 2.18.1
 
