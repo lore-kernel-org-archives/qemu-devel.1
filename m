@@ -2,95 +2,86 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C847C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 11:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE9DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 11:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47BEC22482
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 11:55:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A20620792
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 11:56:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AHgz42T+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47BEC22482
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VIa4hWkF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A20620792
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxqrn-0002sC-Jy
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 07:55:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51786)
+	id 1jxqsv-0003ym-TM
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 07:56:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jxqr9-0002Qn-34
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 07:54:47 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:36005)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jxqr6-0006pK-Vh
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 07:54:46 -0400
-Received: by mail-wr1-x430.google.com with SMTP id 88so10633741wrh.3
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 04:54:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=w6X2yUdmxT1tqAPVc91KtLNDzOPPe/C1KWZ8Fl9k/98=;
- b=AHgz42T+/QvwxWdDUdz9m1BtICuOAM2f2oO3yW405nv+I9cbx20vu6F3/AYaqLYwmw
- bSd5cdZ7VK2+7p7iZDMSv5vo33/T3Tg+whok8CTfZ0p5/smlIwTguKL/8DwobFDbB9HW
- l0NFUCrFwdCtTp2GhN52Fx27ctGRQRciVvBJy70U3O2ZyziDITYU+6/KYKBJ4QjSuYMx
- +MtqvMcHNfp6YumJsoxBbjGVetH9YZleEcdq7J1r0s0a35tOxvHo3P6PLFwNS8blkfCx
- eeTrNngGlfedsEpqE7PuXYId/MjFGnn27+1Nspnp7JBt+RcOcDttSSRWoo2Ih4LAwMg/
- 5mYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=w6X2yUdmxT1tqAPVc91KtLNDzOPPe/C1KWZ8Fl9k/98=;
- b=s8TzLoVY2JATufyTWqhvJ2lD6baR9bcftbHrHH8z7YV4dZ7l7/DsX9hHChgp46Lh7E
- P6XWB2uFPuS5+kGkCMW+LNZ0L7ALLSAX87wRk7QzBqVJDSFAzvLOJ2D32v6wgNn6jmDk
- /uVJiJx/fIPZQPAQdjj2Dywtpyx7Umnh7CeR6EXiIDDi6DopUMIMvZ5D3XwLXwPEin0D
- /tQeyBiroc+hiMNrCZR8EHJ/60CgiNQg5b3Xer0+iYJ1HLGlC6qhW5wqWUZdRv/kDBCs
- auL2CmZiRbQZ3AI57na2CylsbfVufJ61P07sVqe1QojlJJ2JLNULV2NkiUSqabc5aLOt
- IxvA==
-X-Gm-Message-State: AOAM5333yQOdGjIwI8u2l0QgfVzfBvuvNaEho7N2tXJoUM0q1SVNotoK
- qdvfSNWsd/8GrBtmdkNXLCRQmw==
-X-Google-Smtp-Source: ABdhPJz1WtwWHEziD1QGlx+f8AhlF45hUzOfj8rz9TBAlvtvQlHIpGBcSOiEBqv4Dr2uJOsa1IFqHw==
-X-Received: by 2002:adf:c981:: with SMTP id f1mr5198164wrh.14.1595332483145;
- Tue, 21 Jul 2020 04:54:43 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j145sm3452029wmj.7.2020.07.21.04.54.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jul 2020 04:54:41 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3724C1FF7E;
- Tue, 21 Jul 2020 12:54:41 +0100 (BST)
-References: <CALTWKrVvaA7HWxsHNS+tCygLu+x4FCjSZn=+AP0hnEWOCp8vww@mail.gmail.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#5] Finding
- Commits Affecting QEMU Performance
-In-reply-to: <CALTWKrVvaA7HWxsHNS+tCygLu+x4FCjSZn=+AP0hnEWOCp8vww@mail.gmail.com>
-Date: Tue, 21 Jul 2020 12:54:41 +0100
-Message-ID: <87y2ndulq6.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jxqrK-0002Z3-SD
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 07:54:58 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29949
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jxqrI-0006q9-Jm
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 07:54:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595332495;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=YpDFqCWbp8eOSZd2N34+6/6EiwYtvD567MAiKNWDXJA=;
+ b=VIa4hWkFXukyPHUzen/c7rPXzJwuWMcRUugUAk4h5/TsIQj3DewMkG5cgSmDXIUs58+pPv
+ V3EtYYG2E9p0BxL8EMqCuIPre2iRxdQPthl7JwLuoWCwBijbBrt+etawQQ3CY/6v0R6aQ2
+ a0EzPViqih3Zjx3KY4otroFdazZRVcI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-266-9i7ZFV5XP3qGWRk9lY5TYQ-1; Tue, 21 Jul 2020 07:54:51 -0400
+X-MC-Unique: 9i7ZFV5XP3qGWRk9lY5TYQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E025107BEFA;
+ Tue, 21 Jul 2020 11:54:50 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 929841057F27;
+ Tue, 21 Jul 2020 11:54:47 +0000 (UTC)
+Date: Tue, 21 Jul 2020 12:54:45 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Zhenyu Ye <yezhenyu2@huawei.com>
+Subject: Re: [PATCH v1] migration: tls: unref creds after used
+Message-ID: <20200721115445.GG843362@redhat.com>
+References: <20200717091943.1942-1-yezhenyu2@huawei.com>
 MIME-Version: 1.0
+In-Reply-To: <20200717091943.1942-1-yezhenyu2@huawei.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x430.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:26:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,70 +94,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, luoyonggang@gmail.com,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: xiexiangyou@huawei.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, Jul 17, 2020 at 05:19:43PM +0800, Zhenyu Ye wrote:
+> We add the reference of creds in migration_tls_get_creds(),
+> but there was no place to unref it.  So the OBJECT(creds) will
+> never be freed and result in memory leak.
+> 
+> Unref the creds after creating the tls-channel server/client.
+> 
+> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
+> ---
+>  migration/tls.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/migration/tls.c b/migration/tls.c
+> index 5171afc6c4..0740d02976 100644
+> --- a/migration/tls.c
+> +++ b/migration/tls.c
+> @@ -97,7 +97,7 @@ void migration_tls_channel_process_incoming(MigrationState *s,
+>          s->parameters.tls_authz,
+>          errp);
+>      if (!tioc) {
+> -        return;
+> +        goto cleanup;
+>      }
+>  
+>      trace_migration_tls_incoming_handshake_start();
+> @@ -107,6 +107,9 @@ void migration_tls_channel_process_incoming(MigrationState *s,
+>                                NULL,
+>                                NULL,
+>                                NULL);
+> +
+> +cleanup:
+> +    object_unref(OBJECT(creds));
+>  }
+>  
+>  
+> @@ -146,13 +149,13 @@ void migration_tls_channel_connect(MigrationState *s,
+>      }
+>      if (!hostname) {
+>          error_setg(errp, "No hostname available for TLS");
+> -        return;
+> +        goto cleanup;
+>      }
+>  
+>      tioc = qio_channel_tls_new_client(
+>          ioc, creds, hostname, errp);
+>      if (!tioc) {
+> -        return;
+> +        goto cleanup;
+>      }
+>  
+>      trace_migration_tls_outgoing_handshake_start(hostname);
+> @@ -162,4 +165,7 @@ void migration_tls_channel_connect(MigrationState *s,
+>                                s,
+>                                NULL,
+>                                NULL);
+> +
+> +cleanup:
+> +    object_unref(OBJECT(creds));
+>  }
 
-Ahmed Karaman <ahmedkhaledkaraman@gmail.com> writes:
-
-> Hi,
->
-> The fifth report of the TCG Continuous Benchmarking project concludes
-> a mini-series of three reports that dealt with the performance
-> comparison and analysis of QEMU 5.0 and 5.1-pre-soft-freeze.
->
-> The report presents a new Python script that utilizes "git bisect" for
-> running a binary search within a specified range of commits to
-> automatically detect the commit causing a performance improvement or
-> degradation.
-
-Excellent stuff.
-
-> The new script is then used to find the commit introducing the PowerPC
-> performance degradation as well as that introducing the performance
-> improvement in MIPS. The results obtained for both commits proves the
-> correctness of the conclusions and analyses presented in the two
-> previous reports.
-
-I can certainly envision a mechanism where 0673ec slows things down. I
-wonder if it would come back if instead of inline function calls we
-ended up making concrete flattend versions, e.g.:
-
-bool QEMU_FLATTEN float64_eq(float64 a, float64 b, float_status *s)
-{
-    return float64_compare(a, b, s) =3D=3D float_relation_equal;
-}
-
-PPC is of course more affected by these changes than others because
-HARDFLOAT never gets a chance to kick in. Looking at the objdump of
-f64_compare there should surely be an opportunity to loose some of the
-branches when looking for a certain test result?
-
->
-> Report link:
-> https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/Finding-Commits-A=
-ffecting-QEMU-Performance/
->
-> Previous reports:
-> Report 1 - Measuring Basic Performance Metrics of QEMU:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html
-> Report 2 - Dissecting QEMU Into Three Main Parts:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09441.html
-> Report 3 - QEMU 5.0 and 5.1-pre-soft-freeze Dissect Comparison:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg01978.html
-> Report 4 - Listing QEMU Helpers and Function Callees:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04227.html
->
-> Best regards,
-> Ahmed Karaman
+Simpler to just change  migration_tls_get_creds() to remove the
+object_ref() call, since we're fine to use the borrowed reference
+in these methods.
 
 
---=20
-Alex Benn=C3=A9e
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
