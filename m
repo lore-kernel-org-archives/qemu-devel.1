@@ -2,86 +2,110 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7333C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:41:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E5BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:46:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A39C720792
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:41:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HB/87LgF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A39C720792
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8BC892065E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:46:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BC892065E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxvKO-0004C3-VA
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 12:41:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44754)
+	id 1jxvPW-00062O-Rv
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 12:46:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxvJo-0003mp-Rl
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:40:40 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:39516)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxvJn-0000li-9w
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:40:40 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id w17so17767629oie.6
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 09:40:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=plu2HwQJQZokvM/jWpyBIwtvgf5ckfDp6FWH8McBRrE=;
- b=HB/87LgFwX0xD6e7alFpil/ZBH97KErBNI5ZOTgWJnEvZJu240Jv5V+5kJ/4Xd1DCp
- FKU6a8z40QM8yNg8Jo9UWWls2qrYsxPufaf8eLNHsFs1FYGWpoItVSmTRs8SS0/AlXOw
- eXb5ca+QZuyBOyNV7cpWfhmWTOr1uk7+vaSPHHqexEYf5qQWbEMKftQuYgfMVmesV2BS
- dsGktf+CmqJ7BMPO5gtZEJxFtNJuexRkmrEgAFmOGIls+duRQXGGR0X0RJf+oyUgoJuO
- KV//L1OzuJisMsy51ii2YQTXJwusIpqBsCtYI+S4ii8dGNW8zaLvlw7dj2n7MkJsDeAh
- aspg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=plu2HwQJQZokvM/jWpyBIwtvgf5ckfDp6FWH8McBRrE=;
- b=IoWJVR2JEYy6kP7ARI1CzAxDgEhp6ypJG7IAYG40/xV1NdCsbRpV/yHoDkBlDkQicA
- ukIJMWDr0vTlb3LL/OXaGgC1MkRkaAjT4s9DCyCDYkqksIdQ6RHS4eXCGt5a62IxO1Xv
- kRi1CGJiGTczrcc4f8zPu1+S++tSnhaxs5gh2P4mVmrpzXdkDp38cwG9oiCqFSTO6zhi
- /pTOHunKlvRTrjTYDzUjKkxurUGZX6SMOUKusypTRpWww8sV3OMxL4u1jolkYCQVSXW1
- xMlMv3TQEfeQrIQDpnhbZP8K01LP8qbthuqNG2iQPXHRkHBxa9RBiCOf5zc4vpie88dK
- YNFQ==
-X-Gm-Message-State: AOAM530WGZ2sEc1H0yu8OsgoI94oPnMl45HRdyizcTahcP3L3TqX19dq
- 9/wZxmgQw7NFnOCiNtwXgKrK2rnh3TMIq1i6I2Grv3xwoPY=
-X-Google-Smtp-Source: ABdhPJz1LZD5rL7D2zW2rTfcCSZim5I0GyScVGAMigAEqVAfDhkWHwERbe4sLEPIAvmRo1HDScx4Bpw5srZvf08Aru4=
-X-Received: by 2002:aca:54c9:: with SMTP id i192mr3775621oib.163.1595349638155; 
- Tue, 21 Jul 2020 09:40:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jxvO8-0005R0-34
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:45:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39496)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1jxvO6-0001U4-Cc
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:45:07 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06LGhbxG184174
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:45:03 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32dn6xuga1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:45:03 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06LGi5MW185885
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:45:03 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.102])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32dn6xug8e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jul 2020 12:45:02 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+ by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06LGLic1021954;
+ Tue, 21 Jul 2020 16:45:00 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com
+ (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+ by ppma06ams.nl.ibm.com with ESMTP id 32brbh41fk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jul 2020 16:45:00 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 06LGiwGc62980572
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 21 Jul 2020 16:44:58 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 76FB511C04C;
+ Tue, 21 Jul 2020 16:44:58 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E995411C05C;
+ Tue, 21 Jul 2020 16:44:57 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.95.222])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 21 Jul 2020 16:44:57 +0000 (GMT)
+Date: Tue, 21 Jul 2020 18:44:56 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [RFC v2 2/3] libvhost-user: handle endianness as mandated by
+ the spec
+Message-ID: <20200721184456.1305ca0b.pasic@linux.ibm.com>
+In-Reply-To: <20200721093942-mutt-send-email-mst@kernel.org>
+References: <20200717092929.19453-1-mhartmay@linux.ibm.com>
+ <20200717092929.19453-3-mhartmay@linux.ibm.com>
+ <20200721093942-mutt-send-email-mst@kernel.org>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <8f5a171a-59db-f5d1-477c-1ddf7af45da7@redhat.com>
-In-Reply-To: <8f5a171a-59db-f5d1-477c-1ddf7af45da7@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Jul 2020 17:40:27 +0100
-Message-ID: <CAFEAcA8b3N+oxAAW3JEKGTtsZezXTOFdnu9Hm1MYK=yURTfVsQ@mail.gmail.com>
-Subject: Re: What is TYPE_TPM_TIS_ISA? (Not an ISA Device)
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22f;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-21_09:2020-07-21,
+ 2020-07-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 clxscore=1015 bulkscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=861 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007210114
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 11:41:50
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,55 +118,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>, David Safford <safford@us.ibm.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: "Daniel P. =?UTF-8?B?QmVycmFu?=
+ =?UTF-8?B?Z8Op?=" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Marc Hartmayer <mhartmay@linux.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jul 2020 at 17:07, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Hi Stefan,
->
-> I'm trying to understand what is modelling the
-> TYPE_TPM_TIS_ISA device.
->
-> It inherits from TYPE_ISA_DEVICE, so I expected
-> to see an ISA device, but then I noticed:
->
-> 1/ it doesn't use the ISA I/O space, it directly
-> maps the device in the system memory at a fixed
-> address that is not addressable by the ISA bus:
->
-> #define TPM_TIS_ADDR_BASE           0xFED40000
+On Tue, 21 Jul 2020 09:40:10 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Why do you think this is mapping to the system memory?
-tpm_tis_isa_realizefn() does:
+> On Fri, Jul 17, 2020 at 11:29:28AM +0200, Marc Hartmayer wrote:
+> > Since virtio existed even before it got standardized, the virtio
+> > standard defines the following types of virtio devices:
+> > 
+> >  + legacy device (pre-virtio 1.0)
+> >  + non-legacy or VIRTIO 1.0 device
+> >  + transitional device (which can act both as legacy and non-legacy)
+> > 
+> > Virtio 1.0 defines the fields of the virtqueues as little endian,
+> > while legacy uses guest's native endian [1]. Currently libvhost-user
+> > does not handle virtio endianness at all, i.e. it works only if the
+> > native endianness matches with whatever is actually needed. That means
+> > things break spectacularly on big-endian targets. Let us handle virtio
+> > endianness for non-legacy as required by the virtio specification
+> > [1]. We will fence non-legacy virtio devices with the upcoming patch.
+> > 
+> > [1] https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-210003
+> > 
+> > Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> > 
+> > ---
+> > Note: As we don't support legacy virtio devices  
+> 
+> Who's "we" in this sentence? vhost user supports legacy generally ...
 
-    memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
-                                TPM_TIS_ADDR_BASE, &s->mmio);
+In that sentence "we" is the library "libvhost-user". I would like
+to avoid s390x being an oddball regarding this. Marc's previous
+version made an attempt at correct endianness handling for legacy
+and non-legacy. That spawned a discussion on how we don't want
+legacy devices in this context. This series makes what seemed to be the
+consensus reached in that discussion explicit: namely that libvhost-user
+does not support legacy-virtio.
 
-which puts it into the ISA memory address space.
-
-The weird thing about this is not which AS it's
-going in but the fact that the TPM_TIS_ADDR_BASE
-is way higher than an actual ISA bus can address
-(so for instance it's out of range of the size of
-the ISA memory window on the Jazz board).
-
-> 2/ it is not plugged to an ISA BUS (ISABus*)
-
-Won't it autoplug into the ISA bus if you say "-device tpm-tis",
-the same as any other ISA device ?
-
-> 3/ no machine plug it using isa_register_ioport()
->    (it is not registered to the ISA memory space)
-
-There's no requirement for an ISA device to have IO ports...
-
-thanks
--- PMM
+Regards,
+Halil
 
