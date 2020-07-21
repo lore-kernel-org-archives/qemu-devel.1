@@ -2,101 +2,64 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC41C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 07:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9706DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 07:22:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98BCF208E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 07:15:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="Akv2H60q";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UPJLWkbG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98BCF208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
+	by mail.kernel.org (Postfix) with ESMTPS id 64E642080D
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 07:22:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64E642080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxmUp-0000zS-Tu
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 03:15:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39384)
+	id 1jxmbP-0002qf-LV
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 03:22:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jxmUB-0000Uf-1p
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 03:14:47 -0400
-Received: from wout1-smtp.messagingengine.com ([64.147.123.24]:48145)
+ (Exim 4.90_1) (envelope-from <jan.kiszka@siemens.com>)
+ id 1jxmao-0002Pf-P4
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 03:21:38 -0400
+Received: from gecko.sbs.de ([194.138.37.40]:38424)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jxmU8-0002yL-BB
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 03:14:46 -0400
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
- by mailout.west.internal (Postfix) with ESMTP id C9522132C;
- Tue, 21 Jul 2020 03:14:40 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute2.internal (MEProxy); Tue, 21 Jul 2020 03:14:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=
- from:to:cc:subject:date:message-id:mime-version:content-type; s=
- fm3; bh=QwLAs3azXFARgMPLFmzqSwvsJvVdwGD5zxJrOLs0k2Q=; b=Akv2H60q
- bIpv78buygS54QgUDGNBKiTJnkDUqimZIpVq8AIwtm8RjGn92QO2MzN3T7ly1m6L
- LCHFeimVfJ1AMrKUJh3X0P7ytwUujuwoGpHTWwHnBvzs8s5yQKf5FZNX0KmsfL4D
- l7obPIFH9vhux9vbrMSbKSmhQbdmrLCTg0JIi0jyaThRkLbHfhLB+UeLXMV+Gtkx
- 9DlNuKU61Egwe4Wd8Agf+ffdt7WUhx3KaycTXYBt7S9zP17WlQbuMW4JeoQi2x/+
- t0gQxF12/wLS03ocq52s93NbNiFgzU140rssbe4qY+CF8fdPA3Ab6zgAlDDT2KFO
- 9aLV/k8cJs8OyQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:message-id
- :mime-version:subject:to:x-me-proxy:x-me-proxy:x-me-sender
- :x-me-sender:x-sasl-enc; s=fm3; bh=QwLAs3azXFARgMPLFmzqSwvsJvVdw
- GD5zxJrOLs0k2Q=; b=UPJLWkbG0MG95+Qba9RKJQK870z3AHLAuwKGD0TvDlHuk
- oxDo7ieZIeHq7qkAGXY8hja+XzJJ4VY0WRrHR507NNjbHPvkGN9iSQxtpW1HV95R
- bU1Ec9dogY6dSLhlkg3Kxw5h2iDlzvJH0GM0YjmSXXguQVQhZhpIRmajw2MmdGrv
- M/ljEuTTwd0kc0gyV0lz67lYAASlTyip8gVkkP/57C7T2GMF73kf1oj7bJln9QVf
- 3Z+JwcFoyLna6GBcfiIUO/VRDJphqIVpw8sw0Y1MgDgXU139m6pLVGBtmZBJigOv
- qCPkMy8oiI59vyh0+K5NEkfFKoyWkyBv3vggMoSNw==
-X-ME-Sender: <xms:4JUWX8LYLtrWS6CBAqok9oBhIX1aGKigqwjVuodRh35i1rLyeVX66A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrgeehgdduudeiucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- goufhushhpvggtthffohhmrghinhculdegledmnecujfgurhephffvufffkfggtgesthdt
- redttddttdenucfhrhhomheptehlhihsshgrucftohhsshcuoehhihesrghlhihsshgrrd
- hisheqnecuggftrfgrthhtvghrnhephfffjefhieeiffeihfekueffieekledtuedttdel
- veejtdeggffffefgvdejheffnecuffhomhgrihhnpehqvghmuhdrohhrghdpghhithhhuh
- gsrdhiohdpghhithhhuhgsrdgtohhmpdhqvghmuhdqphhrohhjvggtthdrohhrghenucfk
- phepgeeirdektddrudegvddrkeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
- hmpehmrghilhhfrhhomhephhhisegrlhihshhsrgdrihhs
-X-ME-Proxy: <xmx:4JUWX8KyflNx0CIQZB5m3qSe9qo3mKf-0jytwBM6Q9DGcZyWaYnx6w>
- <xmx:4JUWX8vAxF_O77JXYKKxrOQPj0lkZEKWXqHvCpgKj36JtkuRPWQ0rA>
- <xmx:4JUWX5bkA5bYAbw6LNMuToeeU5WtuF0eob9DKd86BBqSo98TjTOyfw>
- <xmx:4JUWX927KTiODlWNWjw5i0TLRmTwBS55BYfZi8uGpuyME6JpoTNpJQ>
-Received: from x220.qyliss.net (p2e508e53.dip0.t-ipconnect.de [46.80.142.83])
- by mail.messagingengine.com (Postfix) with ESMTPA id C9910328005E;
- Tue, 21 Jul 2020 03:14:39 -0400 (EDT)
-Received: by x220.qyliss.net (Postfix, from userid 1000)
- id 3EB6C2AC; Tue, 21 Jul 2020 07:14:38 +0000 (UTC)
-From: Alyssa Ross <hi@alyssa.is>
-To: Nikos Dragazis <ndragazis@arrikto.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Testing the virtio-vhost-user QEMU patch
-Date: Tue, 21 Jul 2020 07:14:38 +0000
-Message-ID: <87h7u1s5k1.fsf@alyssa.is>
+ (Exim 4.90_1) (envelope-from <jan.kiszka@siemens.com>)
+ id 1jxmaj-0004L8-1r
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 03:21:38 -0400
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+ by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id 06L7LSfE009624
+ (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 09:21:29 +0200
+Received: from [167.87.32.116] ([167.87.32.116])
+ by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 06L7LSou027724
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 09:21:28 +0200
+To: qemu-devel <qemu-devel@nongnu.org>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: aarch64: Crash with qemu master when starting Jailhouse
+Message-ID: <b19e8210-7cac-e1b5-f89b-ae73ec21d8cb@siemens.com>
+Date: Tue, 21 Jul 2020 09:21:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=64.147.123.24; envelope-from=hi@alyssa.is;
- helo=wout1-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 03:14:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=194.138.37.40;
+ envelope-from=jan.kiszka@siemens.com; helo=gecko.sbs.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 03:21:29
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,90 +72,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi -- I hope it's okay me reaching out like this.
+Hi,
 
-I've been trying to test out the virtio-vhost-user implementation that's
-been posted to this list a couple of times, but have been unable to get
-it to boot a kernel following the steps listed either on
-<https://wiki.qemu.org/Features/VirtioVhostUser> or
-<https://ndragazis.github.io/dpdk-vhost-vvu-demo.html>.
+I've seen this first a couple of weeks ago, ignored it, but it's still there today with master:
 
-Specifically, the kernel appears to be unable to write to the
-virtio-vhost-user device's PCI registers.  I've included the full panic
-output from the kernel at the end of this message.  The panic is
-reproducible with two different kernels I tried (with different configs
-and versions).  I tried both versions of the virtio-vhost-user I was
-able to find[1][2], and both exhibited the same behaviour.
+Thread 13 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7f90e2ffd700 (LWP 26883)]
+0x0000560ef0bddda7 in get_phys_addr_lpae (env=<optimized out>, address=address@entry=1095261192, access_type=access_type@entry=MMU_DATA_LOAD, mmu_idx=mmu_idx@entry=ARMMMUIdx_Stage2, s1_is_el0=s1_is_el0@entry=false, 
+    phys_ptr=phys_ptr@entry=0x7f90e2ffc200, txattrs=0x7f90e2ffc1ec, prot=0x7f90e2ffc1f0, page_size_ptr=0x7f90e2ffc1f8, fi=0x7f90e2ffc530, cacheattrs=0x0) at /data/qemu/target/arm/helper.c:11106
+11106           cacheattrs->attrs = convert_stage2_attrs(env, extract32(attrs, 0, 4));
+(gdb) bt
+#0  0x0000560ef0bddda7 in get_phys_addr_lpae
+    (env=<optimized out>, address=address@entry=1095261192, access_type=access_type@entry=MMU_DATA_LOAD, mmu_idx=mmu_idx@entry=ARMMMUIdx_Stage2, s1_is_el0=s1_is_el0@entry=false, phys_ptr=phys_ptr@entry=0x7f90e2ffc200, txattrs=0x7f90e2ffc1ec, prot=0x7f90e2ffc1f0, page_size_ptr=0x7f90e2ffc1f8, fi=0x7f90e2ffc530, cacheattrs=0x0) at /data/qemu/target/arm/helper.c:11106
+#1  0x0000560ef0bde3c6 in S1_ptw_translate (env=env@entry=0x560ef32742b0, mmu_idx=mmu_idx@entry=ARMMMUIdx_Stage1_E1, addr=1095261192, txattrs=..., fi=fi@entry=0x7f90e2ffc530) at /data/qemu/target/arm/helper.c:10218
+#2  0x0000560ef0bdd7f0 in arm_ldq_ptw (fi=0x7f90e2ffc530, mmu_idx=ARMMMUIdx_Stage1_E1, is_secure=false, addr=<optimized out>, cs=0x560ef326ac10) at /data/qemu/target/arm/helper.c:10284
+#3  0x0000560ef0bdd7f0 in get_phys_addr_lpae
+    (env=env@entry=0x560ef32742b0, address=address@entry=18446674270391351284, access_type=access_type@entry=MMU_INST_FETCH, mmu_idx=mmu_idx@entry=ARMMMUIdx_Stage1_E1, s1_is_el0=s1_is_el0@entry=false, phys_ptr=phys_ptr@entry=0x7f90e2ffc490, txattrs=0x7f90e2ffc518, prot=0x7f90e2ffc514, page_size_ptr=0x7f90e2ffc528, fi=0x7f90e2ffc530, cacheattrs=0x7f90e2ffc51c) at /data/qemu/target/arm/helper.c:11014
+#4  0x0000560ef0bdfacb in get_phys_addr (env=env@entry=0x560ef32742b0, address=<optimized out>, address@entry=18446674270391351284, access_type=access_type@entry=MMU_INST_FETCH, mmu_idx=<optimized out>, 
+    mmu_idx@entry=ARMMMUIdx_Stage1_E1, phys_ptr=phys_ptr@entry=0x7f90e2ffc490, attrs=attrs@entry=0x7f90e2ffc518, prot=0x7f90e2ffc514, page_size=0x7f90e2ffc528, fi=0x7f90e2ffc530, cacheattrs=0x7f90e2ffc51c)
+    at /data/qemu/target/arm/helper.c:12115
+#5  0x0000560ef0bdf5ca in get_phys_addr
+    (env=env@entry=0x560ef32742b0, address=address@entry=18446674270391351284, access_type=access_type@entry=MMU_INST_FETCH, mmu_idx=<optimized out>, phys_ptr=phys_ptr@entry=0x7f90e2ffc520, attrs=attrs@entry=0x7f90e2ffc518, prot=0x7f90e2ffc514, page_size=0x7f90e2ffc528, fi=0x7f90e2ffc530, cacheattrs=0x7f90e2ffc51c) at /data/qemu/target/arm/helper.c:11950
+#6  0x0000560ef0bef669 in arm_cpu_tlb_fill (cs=0x560ef326ac10, address=18446674270391351284, size=<optimized out>, access_type=MMU_INST_FETCH, mmu_idx=2, probe=<optimized out>, retaddr=0) at /data/qemu/target/arm/tlb_helper.c:177
+#7  0x0000560ef0adbd85 in tlb_fill (cpu=0x560ef326ac10, addr=18446674270391351284, size=0, access_type=MMU_INST_FETCH, mmu_idx=2, retaddr=0) at /data/qemu/accel/tcg/cputlb.c:1032
+#8  0x0000560ef0adf216 in get_page_addr_code_hostp (env=<optimized out>, addr=addr@entry=18446674270391351284, hostp=hostp@entry=0x0) at /data/qemu/accel/tcg/cputlb.c:1211
+#9  0x0000560ef0adf287 in get_page_addr_code (env=<optimized out>, addr=addr@entry=18446674270391351284) at /data/qemu/accel/tcg/cputlb.c:1243
+#10 0x0000560ef0af21c4 in tb_htable_lookup (cpu=cpu@entry=0x560ef326ac10, pc=18446674270391351284, cs_base=<optimized out>, flags=2182107137, cf_mask=4278714368) at /data/qemu/accel/tcg/cpu-exec.c:337
+#11 0x0000560ef0af2fd6 in tb_lookup__cpu_state (cf_mask=<optimized out>, flags=0x7f90e2ffc718, cs_base=0x7f90e2ffc720, pc=0x7f90e2ffc728, cpu=0x0) at /data/qemu/include/exec/tb-lookup.h:43
+#12 0x0000560ef0af2fd6 in tb_find (cf_mask=524288, tb_exit=0, last_tb=0x0, cpu=0x0) at /data/qemu/accel/tcg/cpu-exec.c:404
+#13 0x0000560ef0af2fd6 in cpu_exec (cpu=cpu@entry=0x560ef326ac10) at /data/qemu/accel/tcg/cpu-exec.c:748
+#14 0x0000560ef0bb779f in tcg_cpu_exec (cpu=0x560ef326ac10) at /data/qemu/softmmu/cpus.c:1356
+#15 0x0000560ef0bb980b in qemu_tcg_cpu_thread_fn (arg=arg@entry=0x560ef326ac10) at /data/qemu/softmmu/cpus.c:1664
+#16 0x0000560ef10aaf76 in qemu_thread_start (args=<optimized out>) at /data/qemu/util/qemu-thread-posix.c:521
+#17 0x00007f919e9434f9 in start_thread () at /lib64/libpthread.so.0
+#18 0x00007f919e67bf2f in clone () at /lib64/libc.so.6
 
-Is this a known issue?  Am I doing something wrong?
+I've reproduced that with a local Jailhouse installation, but I suspect 
+(do not have the time right now to check) that a vanilla jailhouse-
+images [1] build for qemu-arm64 will trigger it as well. Once time 
+permits, I could try to generate and share such an image.
 
-Thanks in advance -- I'm excitedly following the progress of this
-feature.
+qemu 3.1.1.1 of my distro is fine, also f4d8cf148e43.
 
-Alyssa Ross
+Any ideas?
 
-[1]: https://github.com/ndragazis/qemu/commits/virtio-vhost-user
-[2]: https://github.com/stefanha/qemu/commits/virtio-vhost-user
+Jan
 
+[1] https://github.com/siemens/jailhouse-images
 
-[    1.287979] BUG: unable to handle page fault for address: ffffb8ca40025014
-[    1.288311] #PF: supervisor write access in kernel mode
-[    1.288311] #PF: error_code(0x000b) - reserved bit violation
-[    1.288311] PGD 3b128067 P4D 3b128067 PUD 3b129067 PMD 3b12a067 PTE 8000002000000073
-[    1.288311] Oops: 000b [#1] SMP PTI
-[    1.288311] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 5.4.28 #1-NixOS
-[    1.288311] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.11.0-0-g63451fca13-prebuilt.qemu-project.org 04/01/2014
-[    1.288311] RIP: 0010:iowrite8+0xe/0x30
-[    1.288311] Code: fe ff ff 48 c7 c0 ff ff ff ff c3 48 8b 3f 48 89 f8 c3 66 2e 0f 1f 84 00 00 00 00 00 89 f8 48 89 f7 48 81 fe ff ff 3
-[    1.288311] RSP: 0000:ffffb8ca40013cd8 EFLAGS: 00010292
-[    1.288311] RAX: 0000000000000000 RBX: ffffb8ca40013d60 RCX: 0000000000000000
-[    1.288311] RDX: 000000000000002f RSI: ffffb8ca40025014 RDI: ffffb8ca40025014
-[    1.288311] RBP: ffff9c742ea20400 R08: ffff9c742f0a60af R09: 0000000000000000
-[    1.288311] R10: 0000000000000018 R11: ffff9c742f0a60af R12: 0000000000000000
-[    1.288311] R13: ffff9c742ea20410 R14: 0000000000000000 R15: 0000000000000000
-[    1.288311] FS:  0000000000000000(0000) GS:ffff9c743b700000(0000) knlGS:0000000000000000
-[    1.288311] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.288311] CR2: ffffb8ca40025014 CR3: 0000000037a0a001 CR4: 0000000000060ee0
-[    1.288311] Call Trace:
-[    1.288311]  vp_reset+0x1b/0x50
-[    1.288311]  register_virtio_device+0x74/0xe0
-[    1.288311]  virtio_pci_probe+0xaf/0x140
-[    1.288311]  local_pci_probe+0x42/0x80
-[    1.288311]  pci_device_probe+0x104/0x1b0
-[    1.288311]  really_probe+0x147/0x3c0
-[    1.288311]  driver_probe_device+0xb6/0x100
-[    1.288311]  device_driver_attach+0x53/0x60
-[    1.288311]  __driver_attach+0x8a/0x150
-[    1.288311]  ? device_driver_attach+0x60/0x60
-[    1.288311]  bus_for_each_dev+0x78/0xc0
-[    1.288311]  bus_add_driver+0x14d/0x1f0
-[    1.288311]  driver_register+0x6c/0xc0
-[    1.288311]  ? dma_bus_init+0xbf/0xbf
-[    1.288311]  do_one_initcall+0x46/0x1f4
-[    1.288311]  kernel_init_freeable+0x176/0x200
-[    1.288311]  ? rest_init+0xab/0xab
-[    1.288311]  kernel_init+0xa/0x105
-[    1.288311]  ret_from_fork+0x35/0x40
-[    1.288311] Modules linked in:
-[    1.288311] CR2: ffffb8ca40025014
-[    1.288311] ---[ end trace 5164b2fa531e028f ]---
-[    1.288311] RIP: 0010:iowrite8+0xe/0x30
-[    1.288311] Code: fe ff ff 48 c7 c0 ff ff ff ff c3 48 8b 3f 48 89 f8 c3 66 2e 0f 1f 84 00 00 00 00 00 89 f8 48 89 f7 48 81 fe ff ff 3
-[    1.288311] RSP: 0000:ffffb8ca40013cd8 EFLAGS: 00010292
-[    1.288311] RAX: 0000000000000000 RBX: ffffb8ca40013d60 RCX: 0000000000000000
-[    1.288311] RDX: 000000000000002f RSI: ffffb8ca40025014 RDI: ffffb8ca40025014
-[    1.288311] RBP: ffff9c742ea20400 R08: ffff9c742f0a60af R09: 0000000000000000
-[    1.288311] R10: 0000000000000018 R11: ffff9c742f0a60af R12: 0000000000000000
-[    1.288311] R13: ffff9c742ea20410 R14: 0000000000000000 R15: 0000000000000000
-[    1.288311] FS:  0000000000000000(0000) GS:ffff9c743b700000(0000) knlGS:0000000000000000
-[    1.288311] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.288311] CR2: ffffb8ca40025014 CR3: 0000000037a0a001 CR4: 0000000000060ee0
-[    1.288311] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000009
-[    1.288311] Kernel Offset: 0x21200000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[    1.288311] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000009 ]---
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
 
