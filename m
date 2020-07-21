@@ -2,84 +2,61 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7005EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 11:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CEDC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 11:53:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C15B20792
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 11:52:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cHIObmrI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C15B20792
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B6AE20792
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 11:53:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B6AE20792
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxqoi-0000nV-Hj
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 07:52:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50502)
+	id 1jxqq3-0001sm-Kr
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 07:53:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxqm7-0005Un-3j
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 07:49:35 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20125
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxqm4-00064V-5V
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 07:49:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595332171;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LO2o6iouqBBqtiAy+J1nbi0a6TP3rCZ4xkeB4F6aIr0=;
- b=cHIObmrI//RpRqDvtaLcusfCrj27e29ghc87lGhlA/+96MPzYdodu4M7xk5hs6zmQQ8L2Q
- 8rYIFFupcDtOzp/CAAKjnFqpKcRsH0SXTI1jyola3FcIhpgW6EMpH1QzlwvtiucCp/Dqr3
- T44ybBI7m932Y7Xn25/wGYLddjnQP/w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-2Co-EZb5OdiCTmbyd-PKxQ-1; Tue, 21 Jul 2020 07:49:29 -0400
-X-MC-Unique: 2Co-EZb5OdiCTmbyd-PKxQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E0D4100AA44;
- Tue, 21 Jul 2020 11:49:28 +0000 (UTC)
-Received: from localhost (ovpn-113-68.ams2.redhat.com [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B71C1872E6;
- Tue, 21 Jul 2020 11:49:27 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 1/3] block/crypto: disallow write sharing by default
-Date: Tue, 21 Jul 2020 13:49:18 +0200
-Message-Id: <20200721114920.1174149-2-mreitz@redhat.com>
-In-Reply-To: <20200721114920.1174149-1-mreitz@redhat.com>
-References: <20200721114920.1174149-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jxqpR-0001KX-EO
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 07:53:01 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:50866)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jxqpH-0006fb-J1
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 07:53:00 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 06LBqMU4003841
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Tue, 21 Jul 2020 07:52:26 -0400
+Date: Tue, 21 Jul 2020 07:52:22 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] MAINTAINERS: Extend the device fuzzing section
+Message-ID: <20200721115222.u24v3wchaf3ezoqg@mozz.bu.edu>
+References: <20200721053926.17197-1-thuth@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:26:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200721053926.17197-1-thuth@redhat.com>
+User-Agent: NeoMutt/20180716
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 07:52:48
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,43 +69,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Bandan Das <bsd@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+On 200721 0739, Thomas Huth wrote:
+> The file docs/devel/fuzzing.txt should be in this section, too, and add
+> myself as a reviewer (since I often take the fuzzer patches through the
+> qtest-next tree, I should be notified on patches, too).
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-My commit 'block/crypto: implement the encryption key management'
-accidently allowed raw luks images to be shared between different
-qemu processes without share-rw=on explicit override.
-Fix that.
+Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
 
-Fixes: bbfdae91fb ("block/crypto: implement the encryption key management")
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1857490
+Thank you
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Message-Id: <20200719122059.59843-2-mlevitsk@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/crypto.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/crypto.c b/block/crypto.c
-index 8725c1bc02..0807557763 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -881,7 +881,7 @@ block_crypto_child_perms(BlockDriverState *bs, BdrvChild *c,
-      * For backward compatibility, manually share the write
-      * and resize permission
-      */
--    *nshared |= (BLK_PERM_WRITE | BLK_PERM_RESIZE);
-+    *nshared |= shared & (BLK_PERM_WRITE | BLK_PERM_RESIZE);
-     /*
-      * Since we are not fully a format driver, don't always request
-      * the read/resize permission but only when explicitly
--- 
-2.26.2
-
+> ---
+>  MAINTAINERS | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 030faf0249..6118fd0b60 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2445,9 +2445,11 @@ M: Alexander Bulekov <alxndr@bu.edu>
+>  R: Paolo Bonzini <pbonzini@redhat.com>
+>  R: Bandan Das <bsd@redhat.com>
+>  R: Stefan Hajnoczi <stefanha@redhat.com>
+> +R: Thomas Huth <thuth@redhat.com>
+>  S: Maintained
+>  F: tests/qtest/fuzz/
+>  F: scripts/oss-fuzz/
+> +F: docs/devel/fuzzing.txt
+>  
+>  Register API
+>  M: Alistair Francis <alistair@alistair23.me>
+> -- 
+> 2.18.1
+> 
 
