@@ -2,58 +2,99 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 517BEC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 06:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF3DC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 06:21:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 276DE206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 06:16:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 276DE206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 7758F20792
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 06:21:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HHXSJBgg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7758F20792
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxlZw-0008LP-CQ
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 02:16:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47450)
+	id 1jxleD-00027Q-Py
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 02:21:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1jxlYZ-0006zS-Bn
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 02:15:15 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:53694)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1jxlYX-0001fC-CK
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 02:15:15 -0400
-Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 86F7840A92BC;
- Tue, 21 Jul 2020 06:15:11 +0000 (UTC)
-Subject: [PATCH v2 2/2] hw/arm: remove exit(1) in case of missing ROM
-From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-To: qemu-devel@nongnu.org
-Date: Tue, 21 Jul 2020 09:15:11 +0300
-Message-ID: <159531211130.24117.1461702940326067827.stgit@pasha-ThinkPad-X280>
-In-Reply-To: <159531210010.24117.10018704762356020189.stgit@pasha-ThinkPad-X280>
-References: <159531210010.24117.10018704762356020189.stgit@pasha-ThinkPad-X280>
-User-Agent: StGit/0.17.1-dirty
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jxldZ-0001cp-TE
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 02:20:25 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34350
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jxldX-0002PY-Nh
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 02:20:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595312422;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+Q5wnw+A6AkT9T1WqqYqoeFrPLXXUYV7t1gN+K1te5w=;
+ b=HHXSJBggEphCWH0/ZQWxmhMApRq6vYxImxzW8D95DWRkXHoqtFeVT+Wto7QV/GOcf8tGTm
+ WihuSSU7yDL4ZmN2XtqK374IU+Lbj5LCaKrHIPftsk20r4OUs+/aI9V4WRz0AVxdEj6lsg
+ uMnMmGuEZuwgxVzKiL8uvHtKqTuIVFY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410-AhysxfcHOtKAAvpv8ykUUg-1; Tue, 21 Jul 2020 02:20:20 -0400
+X-MC-Unique: AhysxfcHOtKAAvpv8ykUUg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 266C358;
+ Tue, 21 Jul 2020 06:20:19 +0000 (UTC)
+Received: from [10.72.12.202] (ovpn-12-202.pek2.redhat.com [10.72.12.202])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6988E8731A;
+ Tue, 21 Jul 2020 06:20:04 +0000 (UTC)
+Subject: Re: [RFC v2 1/1] memory: Delete assertion in
+ memory_region_unregister_iommu_notifier
+To: Peter Xu <peterx@redhat.com>
+References: <20200708141657.GA199122@xz-x1>
+ <14b1ca26-448d-0feb-7529-6546809aaa59@redhat.com>
+ <20200709141037.GF199122@xz-x1>
+ <fb2f8d35-3f04-55ac-e0c0-7eeedbaf2429@redhat.com>
+ <20200710133005.GL199122@xz-x1>
+ <05bb512c-ca0a-e80e-1eed-446e918ad729@redhat.com>
+ <20200716010005.GA535743@xz-x1>
+ <b0319440-6e53-f274-59ba-6dbc67de69be@redhat.com>
+ <20200717141806.GE535743@xz-x1>
+ <d772c597-e6a2-ab88-43c5-b35b77d6c84e@redhat.com>
+ <20200720130346.GM535743@xz-x1>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <31f7ee27-e649-b547-9cf8-35a88a1aa491@redhat.com>
+Date: Tue, 21 Jul 2020 14:20:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=83.149.199.84;
- envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 02:15:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200720130346.GM535743@xz-x1>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:26:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,127 +108,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, pavel.dovgalyuk@ispras.ru, f4bug@amsat.org,
- aleksandar.qemu.devel@gmail.com, antonynpavlov@gmail.com, chenhc@lemote.com,
- aurelien@aurel32.net
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch updates ARM-based machines to allow starting them without ROM.
-In this case CPU starts to execute instructions from the empty memory,
-but QEMU allows introspecting the machine configuration.
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
+On 2020/7/20 下午9:03, Peter Xu wrote:
+> On Mon, Jul 20, 2020 at 12:02:06PM +0800, Jason Wang wrote:
+>> Right, so there's no need to deal with unmap in vtd's replay implementation
+>> (as what generic one did).
+> We don't even for now; see vtd_page_walk_info.notify_unmap.  Thanks,
 
---
 
-v2:
- - useless error reports were dropped (suggested by Peter Maydell)
----
- hw/arm/digic_boards.c |    8 ++++++--
- hw/arm/gumstix.c      |   12 ------------
- hw/arm/omap_sx1.c     |    5 -----
- hw/arm/palm.c         |    8 +-------
- 4 files changed, 7 insertions(+), 26 deletions(-)
+Right, but I meant the vtd_address_space_unmap() in vtd_iomm_replay(). 
+It looks to me it will trigger UNMAP notifiers.
 
-diff --git a/hw/arm/digic_boards.c b/hw/arm/digic_boards.c
-index d5524d3e72..4f39a001bb 100644
---- a/hw/arm/digic_boards.c
-+++ b/hw/arm/digic_boards.c
-@@ -101,8 +101,12 @@ static void digic_load_rom(DigicState *s, hwaddr addr,
-         char *fn = qemu_find_file(QEMU_FILE_TYPE_BIOS, filename);
- 
-         if (!fn) {
--            error_report("Couldn't find rom image '%s'.", filename);
--            exit(1);
-+            if (bios_name) {
-+                error_report("Couldn't find rom image '%s'.", filename);
-+                exit(1);
-+            } else {
-+                return;
-+            }
-         }
- 
-         rom_size = load_image_targphys(fn, addr, max_size);
-diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
-index 3a4bc332c4..fb9fd6ab9c 100644
---- a/hw/arm/gumstix.c
-+++ b/hw/arm/gumstix.c
-@@ -59,12 +59,6 @@ static void connex_init(MachineState *machine)
-     cpu = pxa255_init(address_space_mem, connex_ram);
- 
-     dinfo = drive_get(IF_PFLASH, 0, 0);
--    if (!dinfo && !qtest_enabled()) {
--        error_report("A flash image must be given with the "
--                     "'pflash' parameter");
--        exit(1);
--    }
--
-     if (!pflash_cfi01_register(0x00000000, "connext.rom", connex_rom,
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-                                sector_len, 2, 0, 0, 0, 0, 0)) {
-@@ -89,12 +83,6 @@ static void verdex_init(MachineState *machine)
-     cpu = pxa270_init(address_space_mem, verdex_ram, machine->cpu_type);
- 
-     dinfo = drive_get(IF_PFLASH, 0, 0);
--    if (!dinfo && !qtest_enabled()) {
--        error_report("A flash image must be given with the "
--                     "'pflash' parameter");
--        exit(1);
--    }
--
-     if (!pflash_cfi01_register(0x00000000, "verdex.rom", verdex_rom,
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
-                                sector_len, 2, 0, 0, 0, 0, 0)) {
-diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
-index 57829b3744..ea3236cfb7 100644
---- a/hw/arm/omap_sx1.c
-+++ b/hw/arm/omap_sx1.c
-@@ -190,11 +190,6 @@ static void sx1_init(MachineState *machine, const int version)
-                                 OMAP_CS1_BASE, &cs[1]);
-     }
- 
--    if (!machine->kernel_filename && !fl_idx && !qtest_enabled()) {
--        error_report("Kernel or Flash image must be specified");
--        exit(1);
--    }
--
-     /* Load the kernel.  */
-     arm_load_kernel(mpu->cpu, machine, &sx1_binfo);
- 
-diff --git a/hw/arm/palm.c b/hw/arm/palm.c
-index e7bc9ea4c6..8225c252c4 100644
---- a/hw/arm/palm.c
-+++ b/hw/arm/palm.c
-@@ -231,7 +231,7 @@ static void palmte_init(MachineState *machine)
-     static uint32_t cs1val = 0x0000e1a0;
-     static uint32_t cs2val = 0x0000e1a0;
-     static uint32_t cs3val = 0xe1a0e1a0;
--    int rom_size, rom_loaded = 0;
-+    int rom_size;
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     MemoryRegion *flash = g_new(MemoryRegion, 1);
-     MemoryRegion *cs = g_new(MemoryRegion, 4);
-@@ -284,7 +284,6 @@ static void palmte_init(MachineState *machine)
-         if (rom_size > 0) {
-             rom_size = load_image_targphys(option_rom[0].name, OMAP_CS0_BASE,
-                                            flash_size);
--            rom_loaded = 1;
-         }
-         if (rom_size < 0) {
-             fprintf(stderr, "%s: error loading '%s'\n",
-@@ -292,11 +291,6 @@ static void palmte_init(MachineState *machine)
-         }
-     }
- 
--    if (!rom_loaded && !machine->kernel_filename && !qtest_enabled()) {
--        fprintf(stderr, "Kernel or ROM image must be specified\n");
--        exit(1);
--    }
--
-     /* Load the kernel.  */
-     arm_load_kernel(mpu->cpu, machine, &palmte_binfo);
- }
+Thanks
+
 
 
