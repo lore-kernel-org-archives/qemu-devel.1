@@ -2,86 +2,83 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58361C43446
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 21:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25981C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 21:55:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 245DB20720
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 21:17:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SzvaOcKi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 245DB20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA967206E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 21:55:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA967206E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxzde-00012D-At
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 17:17:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52104)
+	id 1jy0E7-0002KL-5X
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 17:55:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jxzco-0000ZI-75
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 17:16:34 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56834
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jxzcl-0005w5-O1
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 17:16:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595366189;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=jueRIjz5/bOUCC4Q2ETz6SULnWb5x49O8GBmWhOCz+M=;
- b=SzvaOcKi6osQhMva4wHlSz9EaZxfMQJ0Fnsw79/mav9K6OyPDtqq8yX5EOZoqiHdjvsEMu
- 5tCLXJvYY08Xv04dK5AN5HuEO+C2qznBvmMboIJ1ZgXYQ7fy9qv1ED4W89OAzoepaIlU+G
- g/4ZYjLZ268gvsojcCIw2Qu4XcEe6n4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-xNLwfCx7M2iRNgbW8GraYw-1; Tue, 21 Jul 2020 17:16:28 -0400
-X-MC-Unique: xNLwfCx7M2iRNgbW8GraYw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DBA51005504;
- Tue, 21 Jul 2020 21:16:27 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
- [10.36.115.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D2EB22B6DB;
- Tue, 21 Jul 2020 21:16:26 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 062909D9E; Tue, 21 Jul 2020 23:16:26 +0200 (CEST)
-Date: Tue, 21 Jul 2020 23:16:26 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: please try to avoid sending pullreqs late on release-candidate day
-Message-ID: <20200721211626.3kepsmdi2n6tkigw@sirius.home.kraxel.org>
-References: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jy0DT-0001pL-Jx; Tue, 21 Jul 2020 17:54:27 -0400
+Received: from mga07.intel.com ([134.134.136.100]:37400)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
+ id 1jy0DR-0002XR-Kn; Tue, 21 Jul 2020 17:54:27 -0400
+IronPort-SDR: c1MZZK6+incPX7Zam0SUKWvp4x3c/XRwVcJjJzOeI5QsQb/JKeMMCDXuM3Oqbx9X9lQ+KxtZ/d
+ 8WXrZipC61eQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9689"; a="214882123"
+X-IronPort-AV: E=Sophos;i="5.75,380,1589266800"; d="scan'208";a="214882123"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 21 Jul 2020 14:54:21 -0700
+IronPort-SDR: PwX8xc/4Fq1VKGuvOpwqSNOfdNvUCQPHM2PvwQO6WJzlWG9D87zVNkXclnZ7uSZviLxgglkhG7
+ gq2ZsnSxJrXQ==
+X-IronPort-AV: E=Sophos;i="5.75,380,1589266800"; d="scan'208";a="328020346"
+Received: from ajakowsk-mobl1.amr.corp.intel.com (HELO localhost.localdomain)
+ ([10.212.49.49])
+ by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 21 Jul 2020 14:54:20 -0700
+Subject: Re: [PATCH v4 2/2] nvme: allow cmb and pmr to be enabled on same
+ device
+To: Klaus Jensen <its@irrelevant.dk>
+References: <20200701214858.28515-1-andrzej.jakowski@linux.intel.com>
+ <20200701214858.28515-3-andrzej.jakowski@linux.intel.com>
+ <20200702101318.rmd65uzwfpcmb24n@apples.localdomain>
+ <20200702103127.hoonqkas3bw2v7re@apples.localdomain>
+ <8f871a0d-47f1-1c8a-fcc2-aab2638c70cf@linux.intel.com>
+ <20200702175113.6qtnpxqimpavzx7h@apples.localdomain>
+ <191b39ed-0588-b5db-d352-965efd19128a@linux.intel.com>
+ <20200706071545.md4tivimefffgyi6@apples.localdomain>
+ <16d74d40-bd55-997d-7fd6-e7ec59566a68@linux.intel.com>
+ <20200715080658.GA506302@apples.localdomain>
+From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Message-ID: <9143a543-d32d-f3e7-c37b-b3df7f853952@linux.intel.com>
+Date: Tue, 21 Jul 2020 14:54:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 17:16:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+In-Reply-To: <20200715080658.GA506302@apples.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: none client-ip=134.134.136.100;
+ envelope-from=andrzej.jakowski@linux.intel.com; helo=mga07.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 17:54:21
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,29 +91,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+Cc: kbusch@kernel.org, kwolf@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 21, 2020 at 04:56:25PM +0100, Peter Maydell wrote:
-> It is not helpful if everybody sends their pullrequests late
-> on the Tuesday afternoon, as there just isn't enough time in the
-> day to merge test and apply them all before I have to cut the tag.
-> Please, if you can, try to send pullrequests earlier, eg Monday.
+On 7/15/20 1:06 AM, Klaus Jensen wrote:
+> Hi Andrzej,
+> 
+> I've not been ignoring this, but sorry for not following up earlier.
+> 
+> I'm hesitent to merge anything that very obviously breaks an OS that we
+> know is used a lot to this using this device. Also because the issue has
+> not been analyzed well enough to actually know if this is a QEMU or
+> kernel issue.
 
-I usually try, but it didn't work out this time due to patches coming
-in late ...
+Hi Klaus,
 
-Speaking of testing:  What is the state of gitlab ci?  How much of the
-testing has been migrated over?  I've noticed I can push branches and
-tags to a qemu fork @ gitlab.com and gitlab ci runs a bunch of tests.
+Thx for your response! I understand your hesitance on merging stuff that
+obviously breaks guest OS. 
 
-What is the best way to indicate that the tag did pass gitlab ci
-already?  Maybe simply send a pull request with gitlab.com url?
+> 
+> Now, as far as I can test, having the MSI-X vector table and PBA in BAR
+> 0, PMR in BAR 2 and CMB in BAR 4 seems to make everyone happy
+> (irregardless of IOMMU on/off).
+> 
+> Later, when the issue is better understood, we can add options to set
+> offsets, BIRs etc.
+> 
+> The patch below replaces your "[PATCH v4 2/2] nvme: allow cmb and pmr to
+> be enabled" (but still requires "[PATCH v4 1/2] ...") and applies to
+> git://git.infradead.org/qemu-nvme.git nvme-next branch.
+> 
+> Can you reproduce the issues with that patch? I can't on a stock Arch
+> Linux 5.7.5-arch1-1 kernel.
 
-take care,
-  Gerd
+While I'm happy that approach with MSIX and PBA in BAR0 works fine, I
+feel that investigation part why it works while mine doesn't is
+missing. It looks to me that both patches are basically following same 
+approach: create memory subregion and overlay on top of other memory
+region. Why one works and the other doesn't then?
 
+Having in mind that, I have recently focused on understanding problem.
+I observed that when guest assigns address to BAR4, addr field in
+nvme-bar4 memory region gets populated, but it doesn't get automatically
+populated in ctrl_mem (cmb) memory subregion, so later when nvme_addr_is_cmb() 
+is called address check works incorrectly and as a consequence vmm does dma 
+read instead of memcpy.
+I created a patch that sets correct address on ctrl_mem subregion and guest 
+OS boots up correctly.
+
+When I looked into pci and memory region code I noticed that indeed address
+is only assigned to top level memory region but not to contained subregions.
+I think that because in your approach cmb grabs whole bar exclusively it works
+fine.
+
+Here is my question (perhaps pci folks can help answer :)): if we consider 
+memory region overlapping for pci devices as valid use case should pci 
+code on configuration cycles walk through all contained subregion and
+update addr field accordingly?
+
+Thx!
 
