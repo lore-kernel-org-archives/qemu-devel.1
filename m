@@ -2,101 +2,113 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C2E5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D644DC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8367206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:28:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F0702065F
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:24:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F8vQWG9n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8367206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uo7Hp7da"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F0702065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxuBk-0000ZH-3d
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 11:28:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52442)
+	id 1jxu7p-0005mT-U6
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 11:24:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxu9j-0007Es-9I
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:26:11 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39121)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxu9h-0005t5-Dm
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:26:11 -0400
-Received: by mail-wm1-x341.google.com with SMTP id w3so3287031wmi.4
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 08:26:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+IRi+TkYlJ+zxvgthUkY5dmKfUVwxnbK7eI0LvwU5K4=;
- b=F8vQWG9n5p9cHcUCfdsmI16XlRXw33Lwnxk5DpGLykCxQITm1AudXHeT35CxXW0+6q
- hV/H+w3r7xe4vvAusOLe7LXHgvY9SLlx3MNbro4ueYV9EMe7p5Y4uDb+mP7irlR+wscC
- ov5HU3wMOu2Y7xPXthm5Ij7Rh4L0+RcStwxMYIFkTBhyByjBONsmzazLke6SfrDmNM9x
- lLmSPBGmQ4IsOgk91rAE3vde0BroKS3QZIMmAzB8eIHoPAizXXZQBPg93kV+lQgfP/ux
- ppcCtFDcW6YcdBXaotMZCqBGKSS95fhiqzndVP8dMqvWTqwwK5qFCABCKa5mkhwa/hQJ
- fQIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+IRi+TkYlJ+zxvgthUkY5dmKfUVwxnbK7eI0LvwU5K4=;
- b=oeeI7QMOfUaxQCg3BxMO20DN5Ozm3QQ7Jpqal7ujCrTdIgpYWzkEF7YeS++y9CBkg0
- /xu2pCol1q7t84S7t4wXAnNGEQR4mSKWx1+hFxKHePprCsBwhWTTJTpAkPSfRGe4MeyZ
- CaSigtf8HZZMCjVtTl3dGCKkT9D01QRWRt0r27339GOZMyWoswyMeBotnXlGAuFhyxIo
- 3iTMU6zpZGlvfXAUG04/tbgPraHA+BulV/XuMmMEe6O4+s+GoszLN+zju9TVcPUrimYj
- L3Jc3CAlcCJJPH7k4hehr2iC4vGqxYlxVx9aHFPCuKZiawNaBGt54Ut4hmPyaYywahum
- 1u8Q==
-X-Gm-Message-State: AOAM530J4f7ix6om/+PBnItzxrP7gsooC4u47G8prK7qzTMY/qCz8Pfe
- N7HvsmWiziobRNXUPig5yMQ=
-X-Google-Smtp-Source: ABdhPJyn1iuVOijXtGc1adPJYwTul7gTVmNCSm/W5/6KF4z+YWKtnFwXVys2O/G2m+bKCmnCW0s/6Q==
-X-Received: by 2002:a05:600c:20d3:: with SMTP id
- y19mr4789889wmm.10.1595345167341; 
- Tue, 21 Jul 2020 08:26:07 -0700 (PDT)
-Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id t15sm3931352wmj.14.2020.07.21.08.26.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jul 2020 08:26:06 -0700 (PDT)
-Subject: Re: [RFC PATCH-for-5.1?] tests/tcg/multiarch/linux-test: Skip test if
- nanosleep missing (Travis)
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20200721085757.14358-1-f4bug@amsat.org>
- <5989e383-eade-7112-7c04-336679734e49@vivier.eu>
- <bb745eb2-74bc-f013-36de-4cb8d6f364f1@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <01fefb26-7104-642f-0851-0af7fa1678a2@amsat.org>
-Date: Tue, 21 Jul 2020 17:26:05 +0200
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxu75-0004rr-7z
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:23:27 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37078
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxu72-0005No-Ra
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:23:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595345003;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=cxzp8XNHbWcQ+k7k0nYsYH4pholP5BMFM2X3NlFDMD0=;
+ b=Uo7Hp7da6+BKO+sCBg/unIIS1MCuwVw90ZghGch/GVkoXtOh0PbsWa6MGSUWLgdGZWZ730
+ xVqh2643UAFORrBrogHz7Zn3awewvPbQsMZPoz0gBHg0jd+wTnX0WmWQoSr3XrKge9f+o2
+ ahs4w9WFZC2EocrI+rve8THwzz3H4/w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-248-nGtT-M1dMCKA3guRvfFAig-1; Tue, 21 Jul 2020 11:23:18 -0400
+X-MC-Unique: nGtT-M1dMCKA3guRvfFAig-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 98F30800470;
+ Tue, 21 Jul 2020 15:23:17 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B39AA61463;
+ Tue, 21 Jul 2020 15:23:16 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 v2 2/2] iotests: Test sparseness for qemu-img
+ convert -n
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200721135520.72355-1-kwolf@redhat.com>
+ <20200721135520.72355-3-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <cee0938e-a683-445f-ff90-c3ad674b105c@redhat.com>
+Date: Tue, 21 Jul 2020 17:23:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <bb745eb2-74bc-f013-36de-4cb8d6f364f1@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200721135520.72355-3-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="71M7NGYOUkohCnnegCtsA6mPTr6Bx70I0"
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:17:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,106 +121,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: nsoffer@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/21/20 2:24 PM, Laurent Vivier wrote:
-> Le 21/07/2020 à 13:38, Laurent Vivier a écrit :
->> Le 21/07/2020 à 10:57, Philippe Mathieu-Daudé a écrit :
->>> The time test sometimes fails on Travis-CI [*]:
->>>
->>>     TEST    linux-test on aarch64
->>>   tests/tcg/multiarch/linux-test.c:237: nanosleep
->>>   make[2]: *** [run-linux-test] Error 1
->>>   make: *** [run-tcg-tests-aarch64-linux-user] Error 2
->>>
->>> As this seems due to a container limitation on Travis-CI,
->>> simply skip the test there.
->>>
->>> [*] https://travis-ci.org/github/qemu/qemu/jobs/710005078#L3706
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> ---
->>> RFC because per Laurent Vivier we are not using the correct libc
->>>     while cross-linking the test (maybe change in the container
->>>     packages?)
->>> ---
->>>  tests/tcg/multiarch/linux-test.c | 7 ++++++-
->>>  1 file changed, 6 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
->>> index 8a7c15cd31..c7dfdec9ec 100644
->>> --- a/tests/tcg/multiarch/linux-test.c
->>> +++ b/tests/tcg/multiarch/linux-test.c
->>> @@ -233,8 +233,13 @@ static void test_time(void)
->>>      ts.tv_sec = 0;
->>>      ts.tv_nsec = 20 * 1000000;
->>>      chk_error(nanosleep(&ts, &rem));
->>> -    if (rem.tv_sec != 1)
->>> +    if (rem.tv_sec != 1) {
->>> +        if (getenv("TRAVIS_ARCH")) {
->>> +            printf("nanosleep missing? skipping 'time' test\n");
->>> +            return;
->>> +        }
->>>          error("nanosleep");
->>> +    }
->>>      chk_error(gettimeofday(&tv2, NULL));
->>>      ti = tv2.tv_sec - tv.tv_sec;
->>>      if (ti >= 2)
->>>
->>
->> Well, in the end I think the problem is in linux-user:
->>
->> We copy the "rem" structure even if there is no error, so "1" is
->> overwritten.
->>
->> We don't have the problem on all architectures because some use
->> nanosleep() syscall (that is correct) others use clock_nanosleep()
->> syscall that is not correct.
->>
->> This should fix the problem:
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 1211e759c26c..130005716ece 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -11831,7 +11831,7 @@ static abi_long do_syscall1(void *cpu_env, int
->> num, abi_long arg1,
->>          target_to_host_timespec(&ts, arg3);
->>          ret = get_errno(safe_clock_nanosleep(arg1, arg2,
->>                                               &ts, arg4 ? &ts : NULL));
->> -        if (arg4)
->> +        if (is_error(ret) && arg4)
->>              host_to_target_timespec(arg4, &ts);
->>
->>  #if defined(TARGET_PPC)
-> 
-> According to clock_nanosleep(2) it should be in fact:
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 1211e759c26c..63e7cd8947e5 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -11831,8 +11831,9 @@ static abi_long do_syscall1(void *cpu_env, int
-> num, abi_long arg1,
->          target_to_host_timespec(&ts, arg3);
->          ret = get_errno(safe_clock_nanosleep(arg1, arg2,
->                                               &ts, arg4 ? &ts : NULL));
-> -        if (arg4)
-> +        if (ret == -TARGET_EINTR && arg4 && arg2 != TIMER_ABSTIME) {
->              host_to_target_timespec(arg4, &ts);
-> +        }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--71M7NGYOUkohCnnegCtsA6mPTr6Bx70I0
+Content-Type: multipart/mixed; boundary="SyoUUYXJLSsTFhsQLu9CEcEypDxwRmr9h"
 
-I tested this hunk and couldn't reproduce it on Travis-CI. Since it is
-intermittent, that doesn't mean much, but still if you send a proper
-path you can add "Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>".
+--SyoUUYXJLSsTFhsQLu9CEcEypDxwRmr9h
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
->  #if defined(TARGET_PPC)
->          /* clock_nanosleep is odd in that it returns positive errno values.
-> 
-> 
+On 21.07.20 15:55, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/122     | 30 ++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/122.out | 17 +++++++++++++++++
+>  2 files changed, 47 insertions(+)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--SyoUUYXJLSsTFhsQLu9CEcEypDxwRmr9h--
+
+--71M7NGYOUkohCnnegCtsA6mPTr6Bx70I0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8XCGMACgkQ9AfbAGHV
+z0BvFAgAiqYY/bcIFoSJ04mskv4b9SMlLxTgsgjoguEHYQtDdeU2snJ1VM0I1Hzv
+huAL0ve/VzLUdc04jSVEUVBiFjPiUifEMjXjDUgkR5yItrtfgrj0PxAFqsi15tob
+24yjop8qRXGrXlpHBGVXguk0IvlB2xL2/ajgPd6+El83/wmTh81vVl5v9COdN3H1
+CUHd9G8H65JjyfXXKv8GybLUGEnlK03Jyg9EF31r0PKmnY8R7P2SCluMcL86eMfv
+dyLd58om2DbJ36euvYuOfvmDGhyXbLbLRfD3CcsqD7yt5MIOXfdbiaqUMfYAiGmZ
+Z1Kn2jQ8UJJKZNX9Yk5x+ABvJZ2PQg==
+=BcwQ
+-----END PGP SIGNATURE-----
+
+--71M7NGYOUkohCnnegCtsA6mPTr6Bx70I0--
+
 
