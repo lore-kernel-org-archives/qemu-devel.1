@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE61C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 18:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8AB1C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 18:05:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF04A20720
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 18:03:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF76F20717
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 18:05:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HPSpeOeu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF04A20720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u/hA7gIQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF76F20717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxwbh-0002DE-2l
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 14:03:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37448)
+	id 1jxwdR-00040h-1r
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 14:05:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxwaI-0000ax-GC
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 14:01:46 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:37305)
+ id 1jxwaG-0000ZC-Qi
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 14:01:44 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:51570)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxwaG-0003ut-RK
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 14:01:46 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id y3so4714591wrl.4
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 11:01:44 -0700 (PDT)
+ id 1jxwaF-0003ud-4H
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 14:01:44 -0400
+Received: by mail-wm1-x335.google.com with SMTP id 22so3702435wmg.1
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 11:01:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qgnMWdA6GNo7AWlQMpq/zRkLjbt1h9TvjUdYX6CVScw=;
- b=HPSpeOeu3CjvdDLSOuXfMdGwH300aFkQ4O4JLvYu3bm3amBQTVDyzCBoYT7WECskPA
- bv+RnLbtUoJKfFocGHyNGQM6AyPN7jXVf7VqmhmqK6LL8AiMicnno5ufQgu4yNxYoC4D
- DsHjAO9WEXoFUTjOml4o5nG0R4k0T3gJk1lgiKTkast5ALUqsJcwapAGjMLnl5bNHcso
- +cjXxV4V9W6y09F04mg/Re639awSGFxAB40d1S/PuO2lCN+kFxYnjh+V3QmRqtBjuY/3
- SsJD0gTSZ3KbBzNKs7FqdoZa5S3z2qGemSsLT4O5afaq/RRSwDCiivaM8xIWjrro4a1j
- Wx8Q==
+ bh=50qt2zTom3S53FxupA2rwsdYUf4JqXZBFYgRiKx/yAU=;
+ b=u/hA7gIQkxp8PQdha8T2vV1yc/Jnp8n6LK3DON/TR+TjAFWM+dSV/8T55b0qK5S7f+
+ fmZZrWii6+nfzWPc2DToMGD7fflYaT50X5JgZp8OhuUk3EjGSDk57pp9XBPCcK3XNbeV
+ aJYX9y4OynjHb/ZjHQTViUtYNbuWnM+0d2UGq7ZfMBwyC39P0fCTZmhgrHpVs66DHtVX
+ K0OQL+WI2Q7ojrB847EgB8Ix9jZSTG3PV1sbfg/EJTfKia7L2MezWBVwobDF6LbHa7G3
+ EJrADoZmLbBVIBatNdIUkL3pDtpdCOeR5q3gQD35ilAWG+26m7AnMV5mWSd8s2IBW9GO
+ l/YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=qgnMWdA6GNo7AWlQMpq/zRkLjbt1h9TvjUdYX6CVScw=;
- b=Lnr8c0i+cYHLa3eI6pvIPU5Xrd4246UGGdbWrrilL7mdNJSY5i4JxUavr1itZig0AF
- rifyEoVr7Dvr/5hAHKPABK872z3UG26mvaqVJ3oShtOEMEIRkeoIdB473wcgOUWymtCv
- PqVv09kowUkHpzqxCVTFdxXjMz/p+R9i5fviACgu/IgKqOhvFw5mlcUY2F7I+71T14Gf
- Bk4nTnEf4TwVNj3pt1YJNoN2NjxS6mKquu8jAqTVBIbXF87SsDObuhIfxfWtTBxDeK64
- BSFIMd+lhYpoYrNiySuPMXVKHcjG2BxW95r9HTtkctTk56KATXL1Q8VJd+ZDg72v/OD4
- RD0w==
-X-Gm-Message-State: AOAM531/sKbM5Y+jNfLwwFUlPk6+YhB+YfdjhExY2PUgDV0iiLE1uzmg
- cBOH2eyWd53Spy4nqs3PPtkyg/F2oG8=
-X-Google-Smtp-Source: ABdhPJyjOHL7RbdyGU3qt9khevryKoH6p22/ZHcAiiAvd3lWqhaCpbNMnO8Tql9iGUbqrV/4L7bI6g==
-X-Received: by 2002:adf:ab46:: with SMTP id r6mr27867714wrc.260.1595354502628; 
- Tue, 21 Jul 2020 11:01:42 -0700 (PDT)
+ bh=50qt2zTom3S53FxupA2rwsdYUf4JqXZBFYgRiKx/yAU=;
+ b=rNhnCAZKE/h+WeaHXmlni3bPWJHWD3FSyeldScE/hvsIPspgcmuszwKgq2EJ+qquIF
+ MaqmmaeIazkUD1as+J+4S57pnfcefSTqIm30OThlWBIfLc4kxsoS1nLFEJ3t+kPBBL+w
+ 7pZ684wycZn9fZpc/06x8ehIWsJsas6Q+YqzUyYJIvLqQDzKVypm5VRXNjbGaYP5Qn1D
+ 5Nk3qCEmCmE7SK2XNVd8lyPsZ9d5/Y8rbZdR60Jnsg59CqXopr8rbzdcWpbDzxCFgStO
+ AVtuaMXTt1eL3ojrmtxAj0d3igzA2ooOgiUXDqvHoPPO3t5KYVw5FOI9i1IICM9oROol
+ zr3A==
+X-Gm-Message-State: AOAM531gg0oBimuwu9teRww1Gjk90hOugP7yJdWdjguwx45S3jVZft+2
+ krhrLD77elD3u4w4M9rvdPAWb975JF0=
+X-Google-Smtp-Source: ABdhPJwd/1u+8HtcU+z4Aon9EB+f7/cQIu+B2hgkMXvztEmjJ8/l13kuevGip3E9O7LqMfm1aB3vHw==
+X-Received: by 2002:a05:600c:2219:: with SMTP id
+ z25mr5494805wml.154.1595354501494; 
+ Tue, 21 Jul 2020 11:01:41 -0700 (PDT)
 Received: from x1w.redhat.com (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id t2sm3557249wmb.25.2020.07.21.11.01.41
+ by smtp.gmail.com with ESMTPSA id t2sm3557249wmb.25.2020.07.21.11.01.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jul 2020 11:01:42 -0700 (PDT)
+ Tue, 21 Jul 2020 11:01:40 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/4] qemu-common: Document qemu_find_file()
-Date: Tue, 21 Jul 2020 20:01:36 +0200
-Message-Id: <20200721180137.11136-4-f4bug@amsat.org>
+Subject: [PULL 2/4] qemu/osdep: Reword qemu_get_exec_dir() documentation
+Date: Tue, 21 Jul 2020 20:01:35 +0200
+Message-Id: <20200721180137.11136-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200721180137.11136-1-f4bug@amsat.org>
 References: <20200721180137.11136-1-f4bug@amsat.org>
@@ -79,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x335.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -102,58 +103,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>,
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
  =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Li Qiang <liq3ea@gmail.com>,
+ Stefan Weil <sw@weilnetz.de>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Michael Rolnik <mrolnik@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Document qemu_find_file(), in particular the returned
-value which must be freed.
+This comment is confuse, reword it a bit.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
 Reviewed-by: Michael Rolnik <mrolnik@gmail.com>
 Tested-by: Michael Rolnik <mrolnik@gmail.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200714164257.23330-4-f4bug@amsat.org>
+Message-Id: <20200714164257.23330-3-f4bug@amsat.org>
 ---
- include/qemu-common.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ include/qemu/osdep.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index d0142f29ac..bb9496bd80 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -110,6 +110,23 @@ const char *qemu_get_vm_name(void);
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 4841b5c6b5..45c217aa28 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -588,7 +588,10 @@ char *qemu_get_local_state_pathname(const char *relative_pathname);
+ void qemu_init_exec_dir(const char *argv0);
  
- #define QEMU_FILE_TYPE_BIOS   0
- #define QEMU_FILE_TYPE_KEYMAP 1
-+/**
-+ * qemu_find_file:
-+ * @type: QEMU_FILE_TYPE_BIOS (for BIOS, VGA BIOS)
-+ *        or QEMU_FILE_TYPE_KEYMAP (for keymaps).
-+ * @name: Relative or absolute file name
+ /* Get the saved exec dir.
+- * Caller needs to release the returned string by g_free() */
 + *
-+ * If @name exists on disk as an absolute path, or a path relative
-+ * to the current directory, then returns @name unchanged.
-+ * Otherwise searches for @name file in the data directories, either
-+ * configured at build time (DATADIR) or registered with the -L command
-+ * line option.
-+ *
-+ * The caller must use g_free() to free the returned data when it is
-+ * no longer required.
-+ *
-+ * Returns: a path that can access @name, or NULL if no matching file exists.
++ * The caller is responsible for releasing the value returned with g_free()
++ * after use.
 + */
- char *qemu_find_file(int type, const char *name);
+ char *qemu_get_exec_dir(void);
  
- /* OS specific functions */
+ /**
 -- 
 2.21.3
 
