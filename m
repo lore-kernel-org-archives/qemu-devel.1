@@ -2,149 +2,91 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D10C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20186C433E8
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:34:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 238D22073A
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:34:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 238D22073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E34C82080D
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:34:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WejlhzTB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E34C82080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxrT5-0001EN-Ex
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 08:33:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60194)
+	id 1jxrTd-0002M6-46
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 08:34:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jxrQ9-0006ZQ-AD; Tue, 21 Jul 2020 08:30:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61866)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1jxrQ6-0003H3-H3; Tue, 21 Jul 2020 08:30:57 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06LC4a7G039699; Tue, 21 Jul 2020 08:30:51 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32d5h8qpt3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jul 2020 08:30:51 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06LCEJLi078678;
- Tue, 21 Jul 2020 08:30:51 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.71])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32d5h8qprr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jul 2020 08:30:50 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
- by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06LCG626001233;
- Tue, 21 Jul 2020 12:30:48 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma02fra.de.ibm.com with ESMTP id 32brq7uyf7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jul 2020 12:30:48 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 06LCS6iC60752366
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 21 Jul 2020 12:28:06 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8CED9AE045;
- Tue, 21 Jul 2020 12:29:30 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2058CAE04D;
- Tue, 21 Jul 2020 12:29:30 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.80.29])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 21 Jul 2020 12:29:30 +0000 (GMT)
-Subject: Re: [PATCH 1/1] s390x/protvirt: allow to IPL secure execution guests
- with -no-reboot
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>
-References: <20200721103202.30610-1-borntraeger@de.ibm.com>
- <ecec58d9-4b9c-c677-e2d2-ca3cf0632530@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <d2d0d040-3fa9-df7b-eb05-8a5906212486@de.ibm.com>
-Date: Tue, 21 Jul 2020 14:29:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxrRM-0007HB-Qw
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 08:32:14 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:35277)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxrRK-0003Tp-Sv
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 08:32:12 -0400
+Received: by mail-ot1-x335.google.com with SMTP id d4so14929350otk.2
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 05:32:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=lUjXUHcNC2RKdxH82Y7OBdBYR3gP15O5mHU3+9XCGrU=;
+ b=WejlhzTB05trDUuMLlbVziubchwaApyp7Hm8Y/alst+5K56DbhLRCZUfoGNMd+86hT
+ Don1oaF6E2FixroraZZAYaKlkoYfHlld6nlUC1eAK/fGYtGxKab2thhyxrr51X2uZiCp
+ 5NSpKHCbyiHvKh2Emkr8qBCg8IxuHUASK+btZzSACINbfgc5+WMruXA+9jPmjT7lORKw
+ C/UC7S5uUuZYOwSjGR4giWEKrP6VwU1pH6/XTrAVB+v7nKS9IL9sSOPXHj+kXwhc2mZR
+ x/6sDvdHnb/zN1y5+zqGBhfIe4F9Xce7q20u0MV+17DA6gf6hlTrPUT8N4lGlvXdvxp9
+ LYTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=lUjXUHcNC2RKdxH82Y7OBdBYR3gP15O5mHU3+9XCGrU=;
+ b=i1WmSyCsz/T0RoRALjwHGg2anIltmqoUloTE4GvLXiaRh+8b1cFmEKU6Fzfnu3L7Eo
+ BF4koTddaKVcKFrYjXuXT9xWMUxf5IgeBePex6TsxpfTVpP8YoCTVeSz2eG0uSLpTBIj
+ NSafOqKRTkQ3v6N4T74QBqj1Jihah63nF39toLE7BW0mno2cgbbpFKCVk7U6Xe+cdUwX
+ HalPn/5ZBicWWtLuCNB+2xE6lr9PS5N528PHMijhhc7wrZPUmy7Y4j8wog15671VgGyz
+ 8Cnk+PvicbTwqoztMVwhEAGSdEUhdGLhSXnexUXjrBJfJUGQGDr/L/9nfaBtBzrlij/Y
+ wJ1A==
+X-Gm-Message-State: AOAM530i/TZfhb3DMpBYvrKGfjjcuDbfaJQhQGjX2yhYBlEXIRPIwoWj
+ tIA/o3FKXaNh2kJEu/9gmyevd3BADxj01hzqaymWWQ==
+X-Google-Smtp-Source: ABdhPJy+Q1njas1wAZ7+gF8DjWqz1hOPBACGj9Tk3udQ4kr8O+bhRP9BMcMDfFw9Ib4gvywz+VfJeT1GPLEYO8fIDGs=
+X-Received: by 2002:a05:6830:10ce:: with SMTP id
+ z14mr24913851oto.135.1595334729311; 
+ Tue, 21 Jul 2020 05:32:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ecec58d9-4b9c-c677-e2d2-ca3cf0632530@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-21_05:2020-07-21,
- 2020-07-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0
- mlxlogscore=956 spamscore=0 adultscore=0 clxscore=1015 mlxscore=0
- priorityscore=1501 bulkscore=0 impostorscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007210086
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 06:32:08
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <159400349818.1851.7243060688419202620.malonedeb@wampee.canonical.com>
+ <CAKXe6S+J3nARveToQjECbwV224gs66WkqGHybUhfw35t1+V8og@mail.gmail.com>
+ <2cbdf822-c74c-1af9-e5e6-7dd71412201e@redhat.com>
+ <CAKXe6S+ct7D+ibGmrAMJnqKBBKyUpwVnCem8=d=jB-0tUT-N2Q@mail.gmail.com>
+ <e4a34525-dbd1-1f85-475b-b5004885215b@redhat.com>
+ <CAKXe6SJb=1YLLGF+TP1fMd95k_WzZd73JeUJv5Sn4EE4m2zP4w@mail.gmail.com>
+ <f19f605c-9468-e7eb-f255-60766df2a50c@redhat.com>
+In-Reply-To: <f19f605c-9468-e7eb-f255-60766df2a50c@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Jul 2020 13:31:57 +0100
+Message-ID: <CAFEAcA-qrpXJtzW=tigyAqQuYFNCBMQK_CZFx6zYkcJa+RuZuw@mail.gmail.com>
+Subject: Re: [Bug 1886362] [NEW] Heap use-after-free in lduw_he_p through
+ e1000e_write_to_rx_buffers
+To: Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::335;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x335.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -158,22 +100,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Bug 1886362 <1886362@bugs.launchpad.net>, Li Qiang <liq3ea@gmail.com>,
+ Qemu Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 15 Jul 2020 at 09:36, Jason Wang <jasowang@redhat.com> wrote:
+> I think the point is to make DMA to MMIO work as real hardware.
 
+I wouldn't care to give a 100% guarantee that asking a real
+h/w device to DMA to itself didn't cause it to misbehave :-)
+It's more likely to happen-to-work because the DMA engine bit
+of a real h/w device is going to be decoupled somewhat from
+the respond-to-memory-transactions-for-registers logic, but
+it probably wasn't something the designers were actively
+thinking about either...
 
-On 21.07.20 14:25, Janosch Frank wrote:
-> On 7/21/20 12:32 PM, Christian Borntraeger wrote:
->> Right now -no-reboot does prevent secure execution guests from running.
-> 
-> s/-no-reboot/--no-reboot/
+> For
+> e1000e and other networking devices we need make sure such DMA doesn't
+> break anything.
 
-Actually qemu --help gives the parameters with just one "-"
+Yeah, this is the interesting part for QEMU. How should we
+structure devices that do DMA so that we can be sure that
+the device emulation at least doesn't crash? We could have
+a rule that all devices that do DMA must always postpone
+all of that DMA to a bottom-half, but that's a lot of
+refactoring of a lot of device code...
 
-
-Not sure about secure vs protected. Whatever Conny prefers.
+thanks
+-- PMM
 
