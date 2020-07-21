@@ -2,99 +2,85 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1194C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 14:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 602E2C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 14:46:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACB9520717
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 14:44:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0TFMELz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACB9520717
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2788C20717
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 14:46:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2788C20717
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxtVN-0004m6-0B
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 10:44:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41440)
+	id 1jxtXI-0005rs-Cr
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 10:46:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxtUk-0004E9-Ts; Tue, 21 Jul 2020 10:43:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35392)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jxtWa-0005Q4-Lx
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 10:45:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52406)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jxtUj-000758-Av; Tue, 21 Jul 2020 10:43:50 -0400
-Received: by mail-wr1-x444.google.com with SMTP id z2so21512480wrp.2;
- Tue, 21 Jul 2020 07:43:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=qtsZMzihjfVxDE6BVI9GmuNegO8Us+Pb++4CrjGJ2b0=;
- b=H0TFMELziiJMuqusOYByQF/Z7qLWCiAdvLIm4sXMvAtojR0b4HyKh1rsVcflUxiUtY
- XLO+BfoKtf/JNGU6q9teLz3V2QfqOBjvUmR5BDaOSf0AcZgHH9eZVn7+V70hRDBAMee8
- wR798ymxcDjnM92b19QQUPRt41k+VI5X5+V1ddlaON7OHwWck0VlVar11SKHeJh10mV3
- sU1eEkWD0CoZFsJmZ6y5rYVwvszVIe0+ZlQFe3I/ce2hFQ60ZBb9fi62xl2ToR83N7QZ
- N+kQu5x/cjf8xlVwUXUcVn2gUTlhvu6CfsFoHzJsONgGrp/ZvmOUVDZoNXSUg1smkCyA
- 8CTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qtsZMzihjfVxDE6BVI9GmuNegO8Us+Pb++4CrjGJ2b0=;
- b=QVPagtBPqOlvwXhQoXdNAnBw3U9eKGj+gCMqCrpC18YWIQptVmn8k0OixzquNujbzy
- nbmEXXC13cLOK5dYy5EGmkCY6OYDiGhXIBRITVDa1BKGL63IlgJUjILE87vjhy5rJvon
- Pv8Ma7P401EdgVh3mHCAIMruWg4WqzfhuML3AIoAA4lzwPNGQDzTWVMFAzqZCqB4Jp66
- 01tVY7Of2GuZqcc6bucbetXIgxTUIYmOMQgKd0BW5/XtWV2bkt8iVdLKY2bqBrUC7tkL
- nKj6kYLK6ULWhuLvpOy828ru8mlPCkvN31Y/2IVXO5KACry8PnrcR0gY4xu5S70gnUBE
- yKUw==
-X-Gm-Message-State: AOAM530QIsZtLJerreumYoGwhLaKO2/Sd8QloSHt3T6+d+I4ck7FZcbj
- +AKH89m6dLcLq1OHxTn1pXg=
-X-Google-Smtp-Source: ABdhPJzkX9zVLx1Vqb0gKid72hS+dtaXYBzLTC3xpkJ4oWgj9ABra9j3BN5PQzfK/2N3lTyPyWaxvg==
-X-Received: by 2002:adf:8024:: with SMTP id 33mr29026772wrk.117.1595342627386; 
- Tue, 21 Jul 2020 07:43:47 -0700 (PDT)
-Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id b23sm3958158wmd.37.2020.07.21.07.43.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jul 2020 07:43:46 -0700 (PDT)
-Subject: Re: [PATCH for-5.1] docs/system/arm/virt: Document mte machine option
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200721143556.19484-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bdf110e6-417f-ebc3-9a98-4717c04ede0f@amsat.org>
-Date: Tue, 21 Jul 2020 16:43:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jxtWY-0007NR-18
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 10:45:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jxtWW-0001pM-DF
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 14:45:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5D6BB2E80F0
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 14:45:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200721143556.19484-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 21 Jul 2020 14:37:28 -0000
+From: Alexander Bulekov <1886362@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr jasowang philmd pjps pmaydell
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+References: <159400349818.1851.7243060688419202620.malonedeb@wampee.canonical.com>
+ <f19f605c-9468-e7eb-f255-60766df2a50c@redhat.com>
+ <CAFEAcA-qrpXJtzW=tigyAqQuYFNCBMQK_CZFx6zYkcJa+RuZuw@mail.gmail.com>
+ <28d42c0f-99eb-a9c1-e3fc-98f11ee686ab@redhat.com>
+ <CAFEAcA8ECKgRanHLiFZMDS3fd77ASBkba2nfv+iwnjgSLWnbPw@mail.gmail.com>
+Message-ID: <20200721143723.zegwmuoyn6q75e5u@mozz.bu.edu>
+Subject: Re: [Bug 1886362] [NEW] Heap use-after-free in lduw_he_p through
+ e1000e_write_to_rx_buffers
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9508dd18a828360a479204a70e3c03aace4e1e1e
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:45:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,42 +89,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Reply-To: Bug 1886362 <1886362@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200721143728.rhuU3nvRGTNlPMoNGw-V2uZHzL37w-8MgmWebxxMbw4@z>
 
-On 7/21/20 4:35 PM, Peter Maydell wrote:
-> Commit 6a0b7505f1fd6769c which added documentation of the virt board
-> crossed in the post with commit 6f4e1405b91da0d0 which added a new
-> 'mte' machine option. Update the docs to include the new option.
+On 200721 1444, Peter Maydell wrote:
+> On Tue, 21 Jul 2020 at 14:21, Jason Wang <jasowang@redhat.com> wrote:
+> > On 2020/7/21 =E4=B8=8B=E5=8D=888:31, Peter Maydell wrote:
+> > > On Wed, 15 Jul 2020 at 09:36, Jason Wang <jasowang@redhat.com> wrote:
+> > >> I think the point is to make DMA to MMIO work as real hardware.
+> > > I wouldn't care to give a 100% guarantee that asking a real
+> > > h/w device to DMA to itself didn't cause it to misbehave :-)
+> > > It's more likely to happen-to-work because the DMA engine bit
+> > > of a real h/w device is going to be decoupled somewhat from
+> > > the respond-to-memory-transactions-for-registers logic, but
+> > > it probably wasn't something the designers were actively
+> > > thinking about either...
+>
+I searched around but couldn't find anything talking about this case for
+real hardware. I also looked at some HDL code for FPGAs that do DMA, but
+it seems most of the PCI DMA components are contained in proprietary
+IPs, though maybe I'm missing something (I've never programmed
+a DMA-capable FPGA).
 
-I'd use 'mte' between quotes in the patch subject too.
+> > I think some device want such peer to peer transactions:
+> >
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/Documentation/driver-api/pci/p2pdma.rst
+> =
 
-Regardless:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> That's a device DMAing to another device, not DMAing to *itself*
+> (device-to-another-device DMA should work fine in QEMU). And only
+> a very few devices will ever be sensible targets of the DMA --
+> basically things like nvme that have a looks-like-memory area,
+> or special cases like doorbell registers.
+> =
 
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  docs/system/arm/virt.rst | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/docs/system/arm/virt.rst b/docs/system/arm/virt.rst
-> index 6621ab7205d..32dc5eb22ee 100644
-> --- a/docs/system/arm/virt.rst
-> +++ b/docs/system/arm/virt.rst
-> @@ -79,6 +79,10 @@ virtualization
->    Set ``on``/``off`` to enable/disable emulating a guest CPU which implements the
->    Arm Virtualization Extensions. The default is ``off``.
->  
-> +mte
-> +  Set ``on``/``off`` to enable/disable emulating a guest CPU which implements the
-> +  Arm Memory Tagging Extensions. The default is ``off``.
-> +
->  highmem
->    Set ``on``/``off`` to enable/disable placing devices and RAM in physical
->    address space above 32 bits. The default is ``on`` for machine types
-> 
+> > > Yeah, this is the interesting part for QEMU. How should we
+> > > structure devices that do DMA so that we can be sure that
+> > > the device emulation at least doesn't crash? We could have
+> > > a rule that all devices that do DMA must always postpone
+> > > all of that DMA to a bottom-half, but that's a lot of
+> > > refactoring of a lot of device code...
+> >
+> >
+> > It looks to me the issue happens only for device with loopback
+> =
 
+> I think in principle we have a problem for any device that
+> (a) has memory mapped registers and (b) does DMA reads
+> whose address is guest-controlled. Loopback isn't a
+> requirement -- if the guest programs, say, an RX descriptor
+> base address to point at the device's own registers, you
+> get exactly the same kind of unexpected-reentrancy.
+
+Could this be something that we check for in the
+pci_dma_* functions in hw/pci/pci.h? There we still have context about
+the source device for the dma read/write and could, compare addr against
+the device's PCI BARr's. Not sure about:
+1.) How to do this without the overhead of convering the addr
+to a MemoryRegion, which is normally done, once, at the flatview_write
+stage.
+2.) What to do if we catch such a DMA request? Quietly drop it?
+3.) Non-PCI devices.
+
+I think this still doesn't cover the even crazier case where:
+CPU writes to DEV_A's MMIO
+DEV_A writes to DEV_B's MMIO
+DEV_B writes to DEV_A's MMIO
+and neither DEV_A or DEV_B use BHs...
+
+-Alex
+
+> thanks
+> -- PMM
+>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1886362
+
+Title:
+  Heap use-after-free in lduw_he_p through e1000e_write_to_rx_buffers
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+  This reproducer causes a heap-use-after free. QEMU Built with --enable-sa=
+nitizers:
+  cat << EOF | ./i386-softmmu/qemu-system-i386 -M q35,accel=3Dqtest \
+  -qtest stdio -nographic -monitor none -serial none
+  outl 0xcf8 0x80001010
+  outl 0xcfc 0xe1020000
+  outl 0xcf8 0x80001014
+  outl 0xcf8 0x80001004
+  outw 0xcfc 0x7
+  outl 0xcf8 0x800010a2
+  write 0xe102003b 0x1 0xff
+  write 0xe1020103 0x1e 0xffffff055c5e5c30be4511d084fffffffffffffffffffffff=
+fffffffffff
+  write 0xe1020420 0x4 0xffffffff
+  write 0xe1020424 0x4 0xffffffff
+  write 0xe102042b 0x1 0xff
+  write 0xe1020430 0x4 0x055c5e5c
+  write 0x5c041 0x1 0x04
+  write 0x5c042 0x1 0x02
+  write 0x5c043 0x1 0xe1
+  write 0x5c048 0x1 0x8a
+  write 0x5c04a 0x1 0x31
+  write 0x5c04b 0x1 0xff
+  write 0xe1020403 0x1 0xff
+  EOF
+
+  The Output:
+  =3D=3D22689=3D=3DERROR: AddressSanitizer: heap-use-after-free on address =
+0x62500026800e at pc 0x55b93bb18bfa bp 0x7fffdbe844f0 sp 0x7fffdbe83cb8
+  READ of size 2 at 0x62500026800e thread T0
+      #0  in __asan_memcpy (/build/i386-softmmu/qemu-system-i386+)
+      #1  in lduw_he_p /include/qemu/bswap.h:332:5
+      #2  in ldn_he_p /include/qemu/bswap.h:550:1
+      #3  in flatview_write_continue /exec.c:3145:19
+      #4  in flatview_write /exec.c:3186:14
+      #5  in address_space_write /exec.c:3280:18
+      #6  in address_space_rw /exec.c:3290:16
+      #7  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+      #8  in dma_memory_rw /include/sysemu/dma.h:113:12
+      #9  in pci_dma_rw /include/hw/pci/pci.h:789:5
+      #10  in pci_dma_write /include/hw/pci/pci.h:802:12
+      #11  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+      #12  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+      #13  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+      #14  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+      #15  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+      #16  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+      #17  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+      #18  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
+      #19  in e1000e_process_tx_desc /hw/net/e1000e_core.c:743:17
+      #20  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+      #21  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+      #22  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+      #23  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+      #24  in memory_region_write_accessor /memory.c:483:5
+      #25  in access_with_adjusted_size /memory.c:544:18
+      #26  in memory_region_dispatch_write /memory.c:1476:16
+      #27  in flatview_write_continue /exec.c:3146:23
+      #28  in flatview_write /exec.c:3186:14
+      #29  in address_space_write /exec.c:3280:18
+      #30  in qtest_process_command /qtest.c:567:9
+      #31  in qtest_process_inbuf /qtest.c:710:9
+      #32  in qtest_read /qtest.c:722:5
+      #33  in qemu_chr_be_write_impl /chardev/char.c:188:9
+      #34  in qemu_chr_be_write /chardev/char.c:200:9
+      #35  in fd_chr_read /chardev/char-fd.c:68:9
+      #36  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+      #37  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.=
+0.so.0+)
+      #38  in glib_pollfds_poll /util/main-loop.c:219:9
+      #39  in os_host_main_loop_wait /util/main-loop.c:242:5
+      #40  in main_loop_wait /util/main-loop.c:518:11
+      #41  in qemu_main_loop /softmmu/vl.c:1664:9
+      #42  in main /softmmu/main.c:52:5
+      #43  in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+)
+      #44  in _start (/build/i386-softmmu/qemu-system-i386+)
+
+  0x62500026800e is located 14 bytes inside of 138-byte region [0x625000268=
+000,0x62500026808a)
+  freed by thread T0 here:
+      #0  in free (/build/i386-softmmu/qemu-system-i386+)
+      #1  in qemu_vfree /util/oslib-posix.c:238:5
+      #2  in address_space_unmap /exec.c:3616:5
+      #3  in dma_memory_unmap /include/sysemu/dma.h:148:5
+      #4  in pci_dma_unmap /include/hw/pci/pci.h:839:5
+      #5  in net_tx_pkt_reset /hw/net/net_tx_pkt.c:453:9
+      #6  in e1000e_process_tx_desc /hw/net/e1000e_core.c:749:9
+      #7  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+      #8  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+      #9  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+      #10  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+      #11  in memory_region_write_accessor /memory.c:483:5
+      #12  in access_with_adjusted_size /memory.c:544:18
+      #13  in memory_region_dispatch_write /memory.c:1476:16
+      #14  in flatview_write_continue /exec.c:3146:23
+      #15  in flatview_write /exec.c:3186:14
+      #16  in address_space_write /exec.c:3280:18
+      #17  in address_space_rw /exec.c:3290:16
+      #18  in dma_memory_rw_relaxed /include/sysemu/dma.h:87:18
+      #19  in dma_memory_rw /include/sysemu/dma.h:113:12
+      #20  in pci_dma_rw /include/hw/pci/pci.h:789:5
+      #21  in pci_dma_write /include/hw/pci/pci.h:802:12
+      #22  in e1000e_write_to_rx_buffers /hw/net/e1000e_core.c:1412:9
+      #23  in e1000e_write_packet_to_guest /hw/net/e1000e_core.c:1582:21
+      #24  in e1000e_receive_iov /hw/net/e1000e_core.c:1709:9
+      #25  in e1000e_nc_receive_iov /hw/net/e1000e.c:213:12
+      #26  in net_tx_pkt_sendv /hw/net/net_tx_pkt.c:544:9
+      #27  in net_tx_pkt_send /hw/net/net_tx_pkt.c:620:9
+      #28  in net_tx_pkt_send_loopback /hw/net/net_tx_pkt.c:633:11
+      #29  in e1000e_tx_pkt_send /hw/net/e1000e_core.c:664:16
+
+  previously allocated by thread T0 here:
+      #0  in posix_memalign (/build/i386-softmmu/qemu-system-i386+)
+      #1  in qemu_try_memalign /util/oslib-posix.c:198:11
+      #2  in qemu_memalign /util/oslib-posix.c:214:27
+      #3  in address_space_map /exec.c:3558:25
+      #4  in dma_memory_map /include/sysemu/dma.h:138:9
+      #5  in pci_dma_map /include/hw/pci/pci.h:832:11
+      #6  in net_tx_pkt_add_raw_fragment /hw/net/net_tx_pkt.c:391:24
+      #7  in e1000e_process_tx_desc /hw/net/e1000e_core.c:731:14
+      #8  in e1000e_start_xmit /hw/net/e1000e_core.c:934:9
+      #9  in e1000e_set_tctl /hw/net/e1000e_core.c:2431:9
+      #10  in e1000e_core_write /hw/net/e1000e_core.c:3265:9
+      #11  in e1000e_mmio_write /hw/net/e1000e.c:109:5
+      #12  in memory_region_write_accessor /memory.c:483:5
+      #13  in access_with_adjusted_size /memory.c:544:18
+      #14  in memory_region_dispatch_write /memory.c:1476:16
+      #15  in flatview_write_continue /exec.c:3146:23
+      #16  in flatview_write /exec.c:3186:14
+      #17  in address_space_write /exec.c:3280:18
+      #18  in qtest_process_command /qtest.c:567:9
+      #19  in qtest_process_inbuf /qtest.c:710:9
+      #20  in qtest_read /qtest.c:722:5
+      #21  in qemu_chr_be_write_impl /chardev/char.c:188:9
+      #22  in qemu_chr_be_write /chardev/char.c:200:9
+      #23  in fd_chr_read /chardev/char-fd.c:68:9
+      #24  in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+      #25  in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.=
+0.so.0+)
+
+  -Alex
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1886362/+subscriptions
 
