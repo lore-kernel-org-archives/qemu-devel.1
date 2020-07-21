@@ -2,47 +2,46 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 948F8C433E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 20:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2069AC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 20:11:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5869320684
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 20:11:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5869320684
+	by mail.kernel.org (Postfix) with ESMTPS id ECB2520720
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 20:11:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECB2520720
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxycE-000879-Lp
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 16:11:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37038)
+	id 1jxycG-0008AU-9s
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 16:11:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37054)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jxybQ-0007KC-RY
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 16:11:04 -0400
-Received: from indium.canonical.com ([91.189.90.7]:32964)
+ id 1jxybT-0007Ks-6v
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 16:11:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33126)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jxybO-0004v0-Ex
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 16:11:04 -0400
+ id 1jxybR-0004vH-71
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 16:11:06 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jxybL-0001M1-LB
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 20:10:59 +0000
+ id 1jxybP-0001UW-MZ
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 20:11:03 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 87B2F2E80ED
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 20:10:59 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id A96E82E80ED
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 20:11:03 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Jul 2020 20:02:38 -0000
+Date: Tue, 21 Jul 2020 20:03:20 -0000
 From: Rafael David Tinoco <1805256@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -81,7 +80,7 @@ X-Launchpad-Bug-Commenters: andrew-cloke brian-murray dannf ikepanhc iveskim
 X-Launchpad-Bug-Reporter: dann frazier (dannf)
 X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
 References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <159536175813.19361.12699030388697702605.malone@chaenomeles.canonical.com>
+Message-Id: <159536180035.19308.2470414626562804358.malone@chaenomeles.canonical.com>
 Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
  Aarch64 when converting images
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -90,7 +89,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: aab0ecf79f09dac05e6ca4a7cd595871e09e93f5
+X-Launchpad-Hash: b45cfcea198c47652fca55f711e1e4c410a52f61
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 16:11:00
@@ -117,133 +116,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Status from old attempts to solve same nature issues:
-
-----
-
-Older (2018) merge request from @raharper:
-
-https://github.com/koverstreet/bcache-tools/pull/1
-
-addressing the fact that kernel uevents would not always emit =
-
-CACHED_UUID parameters, making udev to delete (whenever that happens) =
-
-/dev/bcache/{by-uuid,by-label} symlinks.
-
-This last MR pointed to previous related bugs:
-
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D890446
-https://bugs.launchpad.net/curtin/+bug/1728742
-
-And to an upstream kernel patch:
-
-https://lore.kernel.org/patchwork/patch/921298/
-
-to
-
-https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1729145
-
-that wasn't accepted upstream.
-
-Even not being accepted upstream, the SRU was attempted:
-
-LP: #1729145
-
-https://lists.ubuntu.com/archives/kernel-team/2017-December/088680.html
-https://lists.ubuntu.com/archives/kernel-team/2017-December/088679.html
-
-Both were NACKED.
-
-Attempted again:
-
-https://lists.ubuntu.com/archives/kernel-team/2017-December/088682.html
-https://lists.ubuntu.com/archives/kernel-team/2017-December/088683.html
-
-NACKED again.
-
-And a v2 was sent:
-
-https://lists.ubuntu.com/archives/kernel-team/2017-December/088751.html
-https://lists.ubuntu.com/archives/kernel-team/2017-December/088750.html
-https://lists.ubuntu.com/archives/kernel-team/2017-December/088749.html
-
-and acked in January 2018 by Coling:
-
-https://lists.ubuntu.com/archives/kernel-team/2018-January/089492.html
-
-but not upstreamed.
-
-BIONIC contains the fix:
-
-commit ed9333e1b583
-Author: Ryan Harper <ryan.harper@canonical.com>
-Date:   Mon Dec 11 12:12:01 2017
-
-    UBUNTU: SAUCE: (no-up) bcache: decouple emitting a cached_dev CHANGE ue=
-vent
-    =
-
-    BugLink: http://bugs.launchpad.net/bugs/1729145
-    =
-
-    - decouple emitting a cached_dev CHANGE uevent which includes dev.uuid
-      and dev.label from bch_cached_dev_run() which only happens when a
-      bcacheX device is bound to the actual backing block device (bcache0 -=
-> vdb)
-    =
-
-    - update bch_cached_dev_run() to invoke bch_cached_dev_emit_change() as
-      needed; no functional code path changes here
-    =
-
-    - Modify register_bcache to detect a re-registering of a bcache
-      cached_dev, and in that case call bcache_cached_dev_emit_change() to
-    =
-
-    Signed-off-by: Ryan Harper <ryan.harper@canonical.com>
-    Signed-off-by: Joseph Salisbury <joseph.salisbury@canonical.com>
-    Acked-by: Colin Ian King <colin.king@canonical.com>
-    Acked-by: Stefan Bader <stefan.bader@canonical.com>
-    Signed-off-by: Khalid Elmously <khalid.elmously@canonical.com>
-    [ saf: fix incorrect indentation ]
-    Signed-off-by: Seth Forshee <seth.forshee@canonical.com>
-
-FOCAL contains the fix:
-
-commit 67553dcd7905
-Author: Ryan Harper <ryan.harper@canonical.com>
-Date:   Mon Dec 11 12:12:01 2017
-
-    UBUNTU: SAUCE: (no-up) bcache: decouple emitting a cached_dev CHANGE
-uevent
-
-GROOVY contains the fix:
-
-commit 67553dcd7905
-Author: Ryan Harper <ryan.harper@canonical.com>
-Date:   Mon Dec 11 12:12:01 2017
-
-    UBUNTU: SAUCE: (no-up) bcache: decouple emitting a cached_dev CHANGE
-uevent
-
-----
-
-So, the kernel patch wasn't accepted, nor bcache-tools patch by =
-
-@raharper, the bcache-export-cached.
-
-----
-
-New Upstream summary from @raharper:
-
-https://github.com/systemd/systemd/pull/16317#issuecomment-655647313
-
-in the upstream merge request made by @rbalint.
-
-
-** Bug watch added: Debian Bug tracker #890446
-   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D890446
+I've hidden last post as it was posted in the wrong bug.
 
 -- =
 
