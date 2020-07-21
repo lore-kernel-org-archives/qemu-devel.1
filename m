@@ -2,107 +2,85 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 985CFC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7333C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:41:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E15520792
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:39:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E15520792
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id A39C720792
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:41:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HB/87LgF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A39C720792
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxvIi-00037N-OS
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 12:39:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44322)
+	id 1jxvKO-0004C3-VA
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 12:41:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jxvI2-0002XL-3A
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:38:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63090
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jxvHy-0000RS-Lq
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:38:49 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06LGW7Hw151546
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:38:43 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32d98297ut-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:38:43 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06LGYPHv158404
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:38:43 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32d98297ty-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jul 2020 12:38:43 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06LGOrQ9029580;
- Tue, 21 Jul 2020 16:38:42 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma01dal.us.ibm.com with ESMTP id 32brq8kv12-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jul 2020 16:38:42 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06LGcfsb50331968
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 21 Jul 2020 16:38:41 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8B8F728059;
- Tue, 21 Jul 2020 16:38:41 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7D3B62805A;
- Tue, 21 Jul 2020 16:38:41 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue, 21 Jul 2020 16:38:41 +0000 (GMT)
-Subject: Re: What is TYPE_TPM_TIS_ISA? (Not an ISA Device)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>
-References: <8f5a171a-59db-f5d1-477c-1ddf7af45da7@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <76380350-ffaa-d631-c4f5-f362a3b99531@linux.ibm.com>
-Date: Tue, 21 Jul 2020 12:38:41 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxvJo-0003mp-Rl
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:40:40 -0400
+Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:39516)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jxvJn-0000li-9w
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:40:40 -0400
+Received: by mail-oi1-x22f.google.com with SMTP id w17so17767629oie.6
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 09:40:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=plu2HwQJQZokvM/jWpyBIwtvgf5ckfDp6FWH8McBRrE=;
+ b=HB/87LgFwX0xD6e7alFpil/ZBH97KErBNI5ZOTgWJnEvZJu240Jv5V+5kJ/4Xd1DCp
+ FKU6a8z40QM8yNg8Jo9UWWls2qrYsxPufaf8eLNHsFs1FYGWpoItVSmTRs8SS0/AlXOw
+ eXb5ca+QZuyBOyNV7cpWfhmWTOr1uk7+vaSPHHqexEYf5qQWbEMKftQuYgfMVmesV2BS
+ dsGktf+CmqJ7BMPO5gtZEJxFtNJuexRkmrEgAFmOGIls+duRQXGGR0X0RJf+oyUgoJuO
+ KV//L1OzuJisMsy51ii2YQTXJwusIpqBsCtYI+S4ii8dGNW8zaLvlw7dj2n7MkJsDeAh
+ aspg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=plu2HwQJQZokvM/jWpyBIwtvgf5ckfDp6FWH8McBRrE=;
+ b=IoWJVR2JEYy6kP7ARI1CzAxDgEhp6ypJG7IAYG40/xV1NdCsbRpV/yHoDkBlDkQicA
+ ukIJMWDr0vTlb3LL/OXaGgC1MkRkaAjT4s9DCyCDYkqksIdQ6RHS4eXCGt5a62IxO1Xv
+ kRi1CGJiGTczrcc4f8zPu1+S++tSnhaxs5gh2P4mVmrpzXdkDp38cwG9oiCqFSTO6zhi
+ /pTOHunKlvRTrjTYDzUjKkxurUGZX6SMOUKusypTRpWww8sV3OMxL4u1jolkYCQVSXW1
+ xMlMv3TQEfeQrIQDpnhbZP8K01LP8qbthuqNG2iQPXHRkHBxa9RBiCOf5zc4vpie88dK
+ YNFQ==
+X-Gm-Message-State: AOAM530WGZ2sEc1H0yu8OsgoI94oPnMl45HRdyizcTahcP3L3TqX19dq
+ 9/wZxmgQw7NFnOCiNtwXgKrK2rnh3TMIq1i6I2Grv3xwoPY=
+X-Google-Smtp-Source: ABdhPJz1LZD5rL7D2zW2rTfcCSZim5I0GyScVGAMigAEqVAfDhkWHwERbe4sLEPIAvmRo1HDScx4Bpw5srZvf08Aru4=
+X-Received: by 2002:aca:54c9:: with SMTP id i192mr3775621oib.163.1595349638155; 
+ Tue, 21 Jul 2020 09:40:38 -0700 (PDT)
 MIME-Version: 1.0
+References: <8f5a171a-59db-f5d1-477c-1ddf7af45da7@redhat.com>
 In-Reply-To: <8f5a171a-59db-f5d1-477c-1ddf7af45da7@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-21_09:2020-07-21,
- 2020-07-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 clxscore=1015
- phishscore=0 impostorscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0
- priorityscore=1501 bulkscore=0 mlxlogscore=989 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007210113
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:39:54
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Jul 2020 17:40:27 +0100
+Message-ID: <CAFEAcA8b3N+oxAAW3JEKGTtsZezXTOFdnu9Hm1MYK=yURTfVsQ@mail.gmail.com>
+Subject: Re: What is TYPE_TPM_TIS_ISA? (Not an ISA Device)
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::22f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,12 +94,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>, David Safford <safford@us.ibm.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/21/20 12:02 PM, Philippe Mathieu-Daudé wrote:
+On Tue, 21 Jul 2020 at 17:07, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
 > Hi Stefan,
 >
 > I'm trying to understand what is modelling the
@@ -135,37 +118,31 @@ On 7/21/20 12:02 PM, Philippe Mathieu-Daudé wrote:
 > address that is not addressable by the ISA bus:
 >
 > #define TPM_TIS_ADDR_BASE           0xFED40000
->
+
+Why do you think this is mapping to the system memory?
+tpm_tis_isa_realizefn() does:
+
+    memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
+                                TPM_TIS_ADDR_BASE, &s->mmio);
+
+which puts it into the ISA memory address space.
+
+The weird thing about this is not which AS it's
+going in but the fact that the TPM_TIS_ADDR_BASE
+is way higher than an actual ISA bus can address
+(so for instance it's out of range of the size of
+the ISA memory window on the Jazz board).
+
 > 2/ it is not plugged to an ISA BUS (ISABus*)
->
+
+Won't it autoplug into the ISA bus if you say "-device tpm-tis",
+the same as any other ISA device ?
+
 > 3/ no machine plug it using isa_register_ioport()
->     (it is not registered to the ISA memory space)
->
-> 4/ the only thing slightly related to ISA is it
-> checks the IRQ number is < ISA_NUM_IRQS
->
->
-> So it seems this is a plain SysBusDevice. But then
-> there is TYPE_TPM_TIS_SYSBUS... What is the difference?
+>    (it is not registered to the ISA memory space)
 
-The TIS is modeled as an ISA device as an alternative to being connected 
-to the LPC bus, to which it would typically be connected to. I believe 
-we also have the ISA.TPM because of Windows only accepting it. Maybe 
-this was not quite correct, but does it cause issues?
+There's no requirement for an ISA device to have IO ports...
 
-                 } else {
-                     dev = aml_device("ISA.TPM");
-                     aml_append(dev, aml_name_decl("_HID",
-aml_eisaid("PNP0C31")));
-                 }
-
-
-
-
->
-> Thanks,
->
-> Phil.
->
-
+thanks
+-- PMM
 
