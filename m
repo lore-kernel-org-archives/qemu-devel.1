@@ -2,69 +2,87 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE45C433EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 02:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1E4C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 02:47:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 629AC206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 02:44:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 629AC206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id CC07B206E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 02:47:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="i7AiMrL3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC07B206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxiGX-0001mx-Hp
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 22:44:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42298)
+	id 1jxiJ9-0002sL-0s
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 22:47:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengxiang9@huawei.com>)
- id 1jxiFv-0001MG-FH
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 22:43:47 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:44012 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengxiang9@huawei.com>)
- id 1jxiFs-00084k-Fj
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 22:43:47 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 542F3979958F42E55F06;
- Tue, 21 Jul 2020 10:43:33 +0800 (CST)
-Received: from [127.0.0.1] (10.174.187.83) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Tue, 21 Jul 2020
- 10:43:22 +0800
-Subject: Re: [PATCH Kernel v24 0/8] Add UAPIs to support migration for VFIO
- devices
-To: Kirti Wankhede <kwankhede@nvidia.com>, <alex.williamson@redhat.com>,
- <cjia@nvidia.com>
-References: <1590697854-21364-1-git-send-email-kwankhede@nvidia.com>
-From: Xiang Zheng <zhengxiang9@huawei.com>
-Message-ID: <450612c3-2a92-9034-7958-ee7f3c1a8c52@huawei.com>
-Date: Tue, 21 Jul 2020 10:43:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
+ id 1jxiIO-0002Qe-2A
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 22:46:20 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42256)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
+ id 1jxiIM-0000iC-EO
+ for qemu-devel@nongnu.org; Mon, 20 Jul 2020 22:46:19 -0400
+Received: by mail-oi1-x241.google.com with SMTP id t4so16046789oij.9
+ for <qemu-devel@nongnu.org>; Mon, 20 Jul 2020 19:46:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZvtYBtBKpih4QmDpBqfuD7U/hOUtMDyjJ2qtYKxB568=;
+ b=i7AiMrL36RCzMo5/AR2E1Nbopn9ARiUKIdBS0wrikt4n1VW5g5fxOXhDQ93TwuppTe
+ OjDg/JhBg3Vul1conSLIpdlp00I7VoGtGcNQkU3vH3Ux8K34q+xH/qgaatV4BUso+SDA
+ t9Es63E1/lFIfFl84Emru4cay9asbzyJIsk1VkD1Pfs/R0u0c2NXMSpxLYiWPMd8LkVr
+ gAaHthgWXpueU7uVwHHpCmcA+3q9/jZjx880SbcrciedSiCNS7v7kqOoxgR2lhATbdm6
+ 4VcGWp2ozwJrT9t7so/SzCjJAqA+U8xRA+tHsGuhuPzncwN2saBLFvSjUEKRLi05TkVZ
+ r8Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZvtYBtBKpih4QmDpBqfuD7U/hOUtMDyjJ2qtYKxB568=;
+ b=U3vkCLxMn7OA2hR8TayK03DkJwEA+lqnPW1SCddPJRyenJbL+Xn2vFQ0dsAFPJYvS4
+ vbhvjs+vhhIYMwhslfWslo9+8fWaOB7kIN0Xi5xGCkpIpB2Hr8+WTdz9mn0t5lXNdOsd
+ co1CSUITgChS/+cmMH4oXAK9nG7Vhgm2i58gIutHfW+tBCs0oqCMU2Ijcb0tHsQfhO1F
+ cn8BODNZjEtwF8tERE8r348mAmXcNu2+bETO8pOvYxZnphZ14y0+rSK3yeSlwUO7I4B3
+ 1tV5Fl/Xn4cYe3pakXOntBUC0eN0acKsrBp7dSwnO3Fuz9lqTuywCASjfnnLAFwnlCqO
+ HIjQ==
+X-Gm-Message-State: AOAM533U2GZUPCGVl0nI9to2E7iN+IfMDP7/zFymSrZp7YB6CPGUkQNm
+ 30gDFP1dYYKLAU0ShYKS5LXeQiqQfIH7C0fwKEE1AQ==
+X-Google-Smtp-Source: ABdhPJy/t4FSy2xk9r4adOXS9wwLrNXQblEDBrB+S6JFMkdH1iQzpNH3tUlQ5YZwev9K92VzyCeLBA+JGT6CPVLMPaU=
+X-Received: by 2002:aca:d509:: with SMTP id m9mr1534190oig.116.1595299577131; 
+ Mon, 20 Jul 2020 19:46:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1590697854-21364-1-git-send-email-kwankhede@nvidia.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.83]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35;
- envelope-from=zhengxiang9@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 22:43:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <cover.1595234208.git.zong.li@sifive.com>
+ <658e49284fc564d4114307cb559cf23ea3e751fd.1595234208.git.zong.li@sifive.com>
+ <CAEUhbmWz0Afs4YotbQi-t96A-eEcQzxzwkYjHtQ4BZxJ7SCgxw@mail.gmail.com>
+In-Reply-To: <CAEUhbmWz0Afs4YotbQi-t96A-eEcQzxzwkYjHtQ4BZxJ7SCgxw@mail.gmail.com>
+From: Zong Li <zong.li@sifive.com>
+Date: Tue, 21 Jul 2020 10:46:06 +0800
+Message-ID: <CANXhq0pd7LyN4-Ysmss=SWjidBZjui_EGq1d1xrOXDmDNN=KeA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] target/riscv/pmp.c: Fix the index offset on RV64
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=zong.li@sifive.com; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,253 +95,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
- ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
- felipe@nutanix.com, jonathan.davies@nutanix.com,
- Wang Haibin <wanghaibin.wang@huawei.com>, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Kirti,
+On Tue, Jul 21, 2020 at 10:41 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> Hi Zong,
+>
+> On Mon, Jul 20, 2020 at 5:46 PM Zong Li <zong.li@sifive.com> wrote:
+> >
+> > On RV64, the reg_index is 2 (pmpcfg2 CSR) after the seventh pmp
+> > entry, it is not 1 (pmpcfg1 CSR) like RV32. In the original
+> > implementation, the second parameter of pmp_write_cfg is
+> > "reg_index * sizeof(target_ulong)", and we get the the result
+> > which is started from 16 if reg_index is 2, but we expect that
+> > it should be started from 8. Separate the implementation for
+> > RV32 and RV64 respectively.
+> >
+> > Signed-off-by: Zong Li <zong.li@sifive.com>
+> > ---
+> >  target/riscv/pmp.c | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> >
+> > diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+> > index 2a2b9f5363..adcdd411e6 100644
+> > --- a/target/riscv/pmp.c
+> > +++ b/target/riscv/pmp.c
+> > @@ -320,8 +320,13 @@ void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index,
+> >
+> >      for (i = 0; i < sizeof(target_ulong); i++) {
+> >          cfg_val = (val >> 8 * i)  & 0xff;
+> > +#if defined(TARGET_RISCV32)
+> >          pmp_write_cfg(env, (reg_index * sizeof(target_ulong)) + i,
+> >              cfg_val);
+> > +#elif defined(TARGET_RISCV64)
+> > +        pmp_write_cfg(env, ((reg_index >> 1) * sizeof(target_ulong)) + i,
+> > +            cfg_val);
+> > +#endif
+>
+> Can you please simplify this by shifting reg_index outside the for
+> loop for RV64?
+>
 
-Sorry to disturb you since this patch set has been merged, and I cannot
-receive the qemu-side emails about this patch set.
+OK, that would be great. Change it in the next version, thanks.
 
-We are going to support migration for VFIO devices which support dirty
-pages tracking.
-
-And we also plan to leverage SMMU HTTU feature to do the dirty pages
-tracking for the devices which don't support dirty pages tracking.
-
-For the above two cases, which side determines to choose IOMMU driver or
-vendor driver to do dirty bitmap tracking, Qemu or VFIO?
-
-In brief, if both IOMMU and VFIO devices support dirty pages tracking,
-we can check the capability and prefer to track dirty pages on device
-vendor driver which is more efficient.
-
-The qusetion is which side to do the check and selection? In my opinion,
-Qemu/userspace seems more suitable.
-
-
-On 2020/5/29 4:30, Kirti Wankhede wrote:
-> Hi,
-> 
-> This patch set adds:
-> * IOCTL VFIO_IOMMU_DIRTY_PAGES to get dirty pages bitmap with
->   respect to IOMMU container rather than per device. All pages pinned by
->   vendor driver through vfio_pin_pages external API has to be marked as
->   dirty during  migration. When IOMMU capable device is present in the
->   container and all pages are pinned and mapped, then all pages are marked
->   dirty.
->   When there are CPU writes, CPU dirty page tracking can identify dirtied
->   pages, but any page pinned by vendor driver can also be written by
->   device. As of now there is no device which has hardware support for
->   dirty page tracking. So all pages which are pinned should be considered
->   as dirty.
->   This ioctl is also used to start/stop dirty pages tracking for pinned and
->   unpinned pages while migration is active.
-> 
-> * Updated IOCTL VFIO_IOMMU_UNMAP_DMA to get dirty pages bitmap before
->   unmapping IO virtual address range.
->   With vIOMMU, during pre-copy phase of migration, while CPUs are still
->   running, IO virtual address unmap can happen while device still keeping
->   reference of guest pfns. Those pages should be reported as dirty before
->   unmap, so that VFIO user space application can copy content of those
->   pages from source to destination.
-> 
-> * Patch 8 detect if IOMMU capable device driver is smart to report pages
->   to be marked dirty by pinning pages using vfio_pin_pages() API.
-> 
-> 
-> Yet TODO:
-> Since there is no device which has hardware support for system memmory
-> dirty bitmap tracking, right now there is no other API from vendor driver
-> to VFIO IOMMU module to report dirty pages. In future, when such hardware
-> support will be implemented, an API will be required such that vendor
-> driver could report dirty pages to VFIO module during migration phases.
-> 
-> v23 -> v24
-> - Fixed nit picks by Cornelia
-> - Fixed warning reported by test robot.
-> 
-> v22 -> v23
-> - Fixed issue reported by Yan
-> https://lore.kernel.org/kvm/97977ede-3c5b-c5a5-7858-7eecd7dd531c@nvidia.com/
-> - Fixed nit picks suggested by Cornelia
-> 
-> v21 -> v22
-> - Fixed issue raised by Alex :
-> https://lore.kernel.org/kvm/20200515163307.72951dd2@w520.home/
-> 
-> v20 -> v21
-> - Added checkin for GET_BITMAP ioctl for vfio_dma boundaries.
-> - Updated unmap ioctl function - as suggested by Alex.
-> - Updated comments in DIRTY_TRACKING ioctl definition - as suggested by
->   Cornelia.
-> 
-> v19 -> v20
-> - Fixed ioctl to get dirty bitmap to get bitmap of multiple vfio_dmas
-> - Fixed unmap ioctl to get dirty bitmap of multiple vfio_dmas.
-> - Removed flag definition from migration capability.
-> 
-> v18 -> v19
-> - Updated migration capability with supported page sizes bitmap for dirty
->   page tracking and  maximum bitmap size supported by kernel module.
-> - Added patch to calculate and cache pgsize_bitmap when iommu->domain_list
->   is updated.
-> - Removed extra buffers added in previous version for bitmap manipulation
->   and optimised the code.
-> 
-> v17 -> v18
-> - Add migration capability to the capability chain for VFIO_IOMMU_GET_INFO
->   ioctl
-> - Updated UMAP_DMA ioctl to return bitmap of multiple vfio_dma
-> 
-> v16 -> v17
-> - Fixed errors reported by kbuild test robot <lkp@intel.com> on i386
-> 
-> v15 -> v16
-> - Minor edits and nit picks (Auger Eric)
-> - On copying bitmap to user, re-populated bitmap only for pinned pages,
->   excluding unmapped pages and CPU dirtied pages.
-> - Patches are on tag: next-20200318 and 1-3 patches from Yan's series
->   https://lkml.org/lkml/2020/3/12/1255
-> 
-> v14 -> v15
-> - Minor edits and nit picks.
-> - In the verification of user allocated bitmap memory, added check of
->    maximum size.
-> - Patches are on tag: next-20200318 and 1-3 patches from Yan's series
->   https://lkml.org/lkml/2020/3/12/1255
-> 
-> v13 -> v14
-> - Added struct vfio_bitmap to kabi. updated structure
->   vfio_iommu_type1_dirty_bitmap_get and vfio_iommu_type1_dma_unmap.
-> - All small changes suggested by Alex.
-> - Patches are on tag: next-20200318 and 1-3 patches from Yan's series
->   https://lkml.org/lkml/2020/3/12/1255
-> 
-> v12 -> v13
-> - Changed bitmap allocation in vfio_iommu_type1 to per vfio_dma
-> - Changed VFIO_IOMMU_DIRTY_PAGES ioctl behaviour to be per vfio_dma range.
-> - Changed vfio_iommu_type1_dirty_bitmap structure to have separate data
->   field.
-> 
-> v11 -> v12
-> - Changed bitmap allocation in vfio_iommu_type1.
-> - Remove atomicity of ref_count.
-> - Updated comments for migration device state structure about error
->   reporting.
-> - Nit picks from v11 reviews
-> 
-> v10 -> v11
-> - Fix pin pages API to free vpfn if it is marked as unpinned tracking page.
-> - Added proposal to detect if IOMMU capable device calls external pin pages
->   API to mark pages dirty.
-> - Nit picks from v10 reviews
-> 
-> v9 -> v10:
-> - Updated existing VFIO_IOMMU_UNMAP_DMA ioctl to get dirty pages bitmap
->   during unmap while migration is active
-> - Added flag in VFIO_IOMMU_GET_INFO to indicate driver support dirty page
->   tracking.
-> - If iommu_mapped, mark all pages dirty.
-> - Added unpinned pages tracking while migration is active.
-> - Updated comments for migration device state structure with bit
->   combination table and state transition details.
-> 
-> v8 -> v9:
-> - Split patch set in 2 sets, Kernel and QEMU.
-> - Dirty pages bitmap is queried from IOMMU container rather than from
->   vendor driver for per device. Added 2 ioctls to achieve this.
-> 
-> v7 -> v8:
-> - Updated comments for KABI
-> - Added BAR address validation check during PCI device's config space load
->   as suggested by Dr. David Alan Gilbert.
-> - Changed vfio_migration_set_state() to set or clear device state flags.
-> - Some nit fixes.
-> 
-> v6 -> v7:
-> - Fix build failures.
-> 
-> v5 -> v6:
-> - Fix build failure.
-> 
-> v4 -> v5:
-> - Added decriptive comment about the sequence of access of members of
->   structure vfio_device_migration_info to be followed based on Alex's
->   suggestion
-> - Updated get dirty pages sequence.
-> - As per Cornelia Huck's suggestion, added callbacks to VFIODeviceOps to
->   get_object, save_config and load_config.
-> - Fixed multiple nit picks.
-> - Tested live migration with multiple vfio device assigned to a VM.
-> 
-> v3 -> v4:
-> - Added one more bit for _RESUMING flag to be set explicitly.
-> - data_offset field is read-only for user space application.
-> - data_size is read for every iteration before reading data from migration,
->   that is removed assumption that data will be till end of migration
->   region.
-> - If vendor driver supports mappable sparsed region, map those region
->   during setup state of save/load, similarly unmap those from cleanup
->   routines.
-> - Handles race condition that causes data corruption in migration region
->   during save device state by adding mutex and serialiaing save_buffer and
->   get_dirty_pages routines.
-> - Skip called get_dirty_pages routine for mapped MMIO region of device.
-> - Added trace events.
-> - Split into multiple functional patches.
-> 
-> v2 -> v3:
-> - Removed enum of VFIO device states. Defined VFIO device state with 2
->   bits.
-> - Re-structured vfio_device_migration_info to keep it minimal and defined
->   action on read and write access on its members.
-> 
-> v1 -> v2:
-> - Defined MIGRATION region type and sub-type which should be used with
->   region type capability.
-> - Re-structured vfio_device_migration_info. This structure will be placed
->   at 0th offset of migration region.
-> - Replaced ioctl with read/write for trapped part of migration region.
-> - Added both type of access support, trapped or mmapped, for data section
->   of the region.
-> - Moved PCI device functions to pci file.
-> - Added iteration to get dirty page bitmap until bitmap for all requested
->   pages are copied.
-> 
-> Thanks,
-> Kirti
-> 
-> 
-> 
-> Kirti Wankhede (8):
->   vfio: UAPI for migration interface for device state
->   vfio iommu: Remove atomicity of ref_count of pinned pages
->   vfio iommu: Cache pgsize_bitmap in struct vfio_iommu
->   vfio iommu: Add ioctl definition for dirty pages tracking
->   vfio iommu: Implementation of ioctl for dirty pages tracking
->   vfio iommu: Update UNMAP_DMA ioctl to get dirty bitmap before unmap
->   vfio iommu: Add migration capability to report supported features
->   vfio: Selective dirty page tracking if IOMMU backed device pins pages
-> 
->  drivers/vfio/vfio.c             |  13 +-
->  drivers/vfio/vfio_iommu_type1.c | 572 ++++++++++++++++++++++++++++++++++++----
->  include/linux/vfio.h            |   4 +-
->  include/uapi/linux/vfio.h       | 319 ++++++++++++++++++++++
->  4 files changed, 849 insertions(+), 59 deletions(-)
-> 
-
--- 
-Thanks,
-Xiang
-
+> >      }
+> >  }
+> >
+> > @@ -336,7 +341,11 @@ target_ulong pmpcfg_csr_read(CPURISCVState *env, uint32_t reg_index)
+> >      target_ulong val = 0;
+> >
+> >      for (i = 0; i < sizeof(target_ulong); i++) {
+> > +#if defined(TARGET_RISCV32)
+> >          val = pmp_read_cfg(env, (reg_index * sizeof(target_ulong)) + i);
+> > +#elif defined(TARGET_RISCV64)
+> > +        val = pmp_read_cfg(env, ((reg_index >> 1) * sizeof(target_ulong)) + i);
+> > +#endif
+> >          cfg_val |= (val << (i * 8));
+> >      }
+> >      trace_pmpcfg_csr_read(env->mhartid, reg_index, cfg_val);
+>
+> Regards,
+> Bin
 
