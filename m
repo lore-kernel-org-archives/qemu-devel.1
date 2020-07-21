@@ -2,91 +2,108 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AB78C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 985CFC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:39:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06A3C20720
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:38:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="glXhSuxJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A3C20720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6E15520792
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:39:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E15520792
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxvHa-0001tD-Av
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 12:38:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44026)
+	id 1jxvIi-00037N-OS
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 12:39:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxvGq-0001HK-NM
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:37:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52347
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxvGo-0000KJ-BZ
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:37:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595349453;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=eIR4CbSK82CzCUBKxZ5hEDMIxILQxXQSqvgRCuvn1u8=;
- b=glXhSuxJJETf4Mf+o8O90F3dxWPiX6WmLB1oMnZ6Xj6qV0OKW0bZD2xr5EQCZIIrj2cXB1
- zFpMnWa1Q9rt81RN/iInVsfcL3+3gltuw2TuPCbRXYqqzJh/JpSAEFTuxJgM/5lnTlgbUa
- clmYNA7eWs7fNVsmyqxR0aIKcupXWq4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-D5Ke43ZEPcOAwXgMtn8DLQ-1; Tue, 21 Jul 2020 12:37:29 -0400
-X-MC-Unique: D5Ke43ZEPcOAwXgMtn8DLQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 938FC91299;
- Tue, 21 Jul 2020 16:37:28 +0000 (UTC)
-Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
- (ovpn-120-206.rdu2.redhat.com [10.10.120.206])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9E5E7268E;
- Tue, 21 Jul 2020 16:37:24 +0000 (UTC)
-Subject: Re: [RFC PATCH-for-5.1] hw/ide: Do not block for AIO while resetting
- a drive
-To: Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20200717171938.1249-1-f4bug@amsat.org>
- <20200720100246.GA24159@stefanha-x1.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e853fb33-8b6a-1e36-e028-1efc51b01616@redhat.com>
-Date: Tue, 21 Jul 2020 12:37:24 -0400
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jxvI2-0002XL-3A
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:38:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63090
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jxvHy-0000RS-Lq
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:38:49 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06LGW7Hw151546
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:38:43 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32d98297ut-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:38:43 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06LGYPHv158404
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:38:43 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32d98297ty-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jul 2020 12:38:43 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06LGOrQ9029580;
+ Tue, 21 Jul 2020 16:38:42 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma01dal.us.ibm.com with ESMTP id 32brq8kv12-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 21 Jul 2020 16:38:42 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+ [9.57.199.106])
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06LGcfsb50331968
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 21 Jul 2020 16:38:41 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8B8F728059;
+ Tue, 21 Jul 2020 16:38:41 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7D3B62805A;
+ Tue, 21 Jul 2020 16:38:41 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue, 21 Jul 2020 16:38:41 +0000 (GMT)
+Subject: Re: What is TYPE_TPM_TIS_ISA? (Not an ISA Device)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>
+References: <8f5a171a-59db-f5d1-477c-1ddf7af45da7@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <76380350-ffaa-d631-c4f5-f362a3b99531@linux.ibm.com>
+Date: Tue, 21 Jul 2020 12:38:41 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200720100246.GA24159@stefanha-x1.localdomain>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+In-Reply-To: <8f5a171a-59db-f5d1-477c-1ddf7af45da7@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:58:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-21_09:2020-07-21,
+ 2020-07-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 clxscore=1015
+ phishscore=0 impostorscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=989 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007210113
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:39:54
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,51 +116,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/20/20 6:02 AM, Stefan Hajnoczi wrote:
-> On Fri, Jul 17, 2020 at 07:19:38PM +0200, Philippe Mathieu-Daudé wrote:
->> Last minute chat:
->> 19:01 <stefanha> f4bug: use bdrv_aio_cancel_async() if possible because it won't block the current thread.
->> 19:02 <stefanha> f4bug: For example, in device emulation code where the guest has requested to cancel an I/O request it's often possible to use the async version.
->> 19:02 <stefanha> f4bug: But in synchronous code like device reset it may be necessary to use the synchronous (blocking) bdrv_aio_cancel() API instead. :(
->> 19:14 <stefanha> f4bug: The way to decide is: will the current function return to the event loop and is there someone who will handle the request completion callback when cancel finishes?
->> 19:14 <stefanha> f4bug: If the next line of code requires the request to finished then async cancel cannot be used.
->> 19:15 <stefanha> f4bug: On the other hand, if the function can return and it's okay for the request to cancel at some future time then you can use async.
->>
->> So I'll revisit this patch :)
->> ---
->>   hw/ide/core.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/ide/core.c b/hw/ide/core.c
->> index d997a78e47..e3a9ce7d25 100644
->> --- a/hw/ide/core.c
->> +++ b/hw/ide/core.c
->> @@ -1315,7 +1315,8 @@ static void ide_reset(IDEState *s)
->>       trace_ide_reset(s);
->>   
->>       if (s->pio_aiocb) {
->> -        blk_aio_cancel(s->pio_aiocb);
->> +        /* If there is a pending AIO callback, invoke it now. */
->> +        blk_aio_cancel_async(s->pio_aiocb);
-> 
-> This is a place where an async call is not allowed. The completion
-> function must be called right away (synchronously) before we can
-> continue resetting the device.
-> 
-> I sent a patch that allows bdrv_aio_cancel() to find the AioContext so
-> it can call aio_poll().
-> 
-> Stefan
-> 
+On 7/21/20 12:02 PM, Philippe Mathieu-Daudé wrote:
+> Hi Stefan,
+>
+> I'm trying to understand what is modelling the
+> TYPE_TPM_TIS_ISA device.
+>
+> It inherits from TYPE_ISA_DEVICE, so I expected
+> to see an ISA device, but then I noticed:
+>
+> 1/ it doesn't use the ISA I/O space, it directly
+> maps the device in the system memory at a fixed
+> address that is not addressable by the ISA bus:
+>
+> #define TPM_TIS_ADDR_BASE           0xFED40000
+>
+> 2/ it is not plugged to an ISA BUS (ISABus*)
+>
+> 3/ no machine plug it using isa_register_ioport()
+>     (it is not registered to the ISA memory space)
+>
+> 4/ the only thing slightly related to ISA is it
+> checks the IRQ number is < ISA_NUM_IRQS
+>
+>
+> So it seems this is a plain SysBusDevice. But then
+> there is TYPE_TPM_TIS_SYSBUS... What is the difference?
 
-OK, dropping Phil's patch here.
+The TIS is modeled as an ISA device as an alternative to being connected 
+to the LPC bus, to which it would typically be connected to. I believe 
+we also have the ISA.TPM because of Windows only accepting it. Maybe 
+this was not quite correct, but does it cause issues?
 
---js
+                 } else {
+                     dev = aml_device("ISA.TPM");
+                     aml_append(dev, aml_name_decl("_HID",
+aml_eisaid("PNP0C31")));
+                 }
+
+
+
+
+>
+> Thanks,
+>
+> Phil.
+>
 
 
