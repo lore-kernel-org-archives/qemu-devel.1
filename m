@@ -2,64 +2,68 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB77C433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 13:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E64FDC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 13:56:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A361204EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 13:56:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7176204EA
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 13:56:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WEWNNHl9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A361204EA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XiYqy5Vz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7176204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxsl4-0006pE-PT
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 09:56:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56894)
+	id 1jxsl6-0006sO-Vr
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 09:56:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56906)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxsjy-0005Y1-TQ
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 09:55:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48053
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxsk0-0005YE-7a
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 09:55:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52895
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxsjx-0007cs-Cf
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 09:55:30 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1jxsjy-0007dM-Ls
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 09:55:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595339728;
+ s=mimecast20190719; t=1595339729;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=t/1lH67GSKVEEkgQDn6gUPVrDa0GL+Y9hjEDfYstpIM=;
- b=WEWNNHl9ozcWClmcMpkAa2XUFAvZ9i4CJ7FeLJKpazOVQZaHc5R02ujWhvj+gp7olzig8l
- Yg91QhW9YzpKvVAgjMyaR+PB557A3SmOHY2SySJovO1uwrEYroIw1mDo5O2gKeFowwckax
- 67br3nCZzi+yko1iESXHR0XMkmeMtE0=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pKcGHN9BiCQRQAAgwMmB3i4OhnaN31yh4S3mMqcJVPM=;
+ b=XiYqy5VzhglXvBEiaHsB8yX0naNzfVTOFn4DKnOLLtoJSsIYMKANRr332WDBW8j7zA1wb9
+ k7HK8+HM43wKL4IkUs6KTov0nER+5vmBdcrUJO3QNfsTo+ChqrtrokMMKkOlzzEAqeFqGC
+ aa+U4FIGj07UpDYp+0A4g6p9Ntblk2o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-_uEb0YWAOWaPMsfLVmUVCg-1; Tue, 21 Jul 2020 09:55:26 -0400
-X-MC-Unique: _uEb0YWAOWaPMsfLVmUVCg-1
+ us-mta-340-b2QjUC6aMrKwAC7ojI3q1Q-1; Tue, 21 Jul 2020 09:55:28 -0400
+X-MC-Unique: b2QjUC6aMrKwAC7ojI3q1Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED4E99127C;
- Tue, 21 Jul 2020 13:55:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B41F1083FA5;
+ Tue, 21 Jul 2020 13:55:27 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-97.ams2.redhat.com [10.36.113.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D38F170105;
- Tue, 21 Jul 2020 13:55:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 40E7E59;
+ Tue, 21 Jul 2020 13:55:26 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH for-5.1 v2 0/2] qemu-img convert -n: Keep qcow2 v2 target
- sparse
-Date: Tue, 21 Jul 2020 15:55:18 +0200
-Message-Id: <20200721135520.72355-1-kwolf@redhat.com>
+Subject: [PATCH for-5.1 v2 1/2] qcow2: Implement v2 zero writes with discard
+ if possible
+Date: Tue, 21 Jul 2020 15:55:19 +0200
+Message-Id: <20200721135520.72355-2-kwolf@redhat.com>
+In-Reply-To: <20200721135520.72355-1-kwolf@redhat.com>
+References: <20200721135520.72355-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
@@ -95,19 +99,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2:
-- Fixed iotest for IMGOPTS that contains v3-only features [Max]
-- Some code cleanups in the iotest [Nir]
+qcow2 version 2 images don't support the zero flag for clusters, so for
+write_zeroes requests, we return -ENOTSUP and get explicit zero buffer
+writes. If the image doesn't have a backing file, we can do better: Just
+discard the respective clusters.
 
-Kevin Wolf (2):
-  qcow2: Implement v2 zero writes with discard if possible
-  iotests: Test sparseness for qemu-img convert -n
+This is relevant for 'qemu-img convert -O qcow2 -n', where qemu-img has
+to assume that the existing target image may contain any data, so it has
+to write zeroes. Without this patch, this results in a fully allocated
+target image, even if the source image was empty.
 
- block/qcow2-cluster.c      |  9 ++++++++-
- tests/qemu-iotests/122     | 30 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/122.out | 17 +++++++++++++++++
- 3 files changed, 55 insertions(+), 1 deletion(-)
+Reported-by: Nir Soffer <nsoffer@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/qcow2-cluster.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 4b5fc8c4a7..a677ba9f5c 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1797,8 +1797,15 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
+            end_offset >= bs->total_sectors << BDRV_SECTOR_BITS);
+ 
+-    /* The zero flag is only supported by version 3 and newer */
++    /*
++     * The zero flag is only supported by version 3 and newer. However, if we
++     * have no backing file, we can resort to discard in version 2.
++     */
+     if (s->qcow_version < 3) {
++        if (!bs->backing) {
++            return qcow2_cluster_discard(bs, offset, bytes,
++                                         QCOW2_DISCARD_REQUEST, false);
++        }
+         return -ENOTSUP;
+     }
+ 
 -- 
 2.25.4
 
