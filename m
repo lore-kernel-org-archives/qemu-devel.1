@@ -2,88 +2,94 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A07BC433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12242C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:58:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C942120720
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:56:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0E5020720
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:58:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FsQDrFZu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C942120720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K7xg4qBB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0E5020720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxo4t-0005sL-QW
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:56:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52894)
+	id 1jxo6q-0007Ug-3b
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:58:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jxo4J-0005OI-6y
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:56:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49619
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jxo4H-0004ED-DV
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:56:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595321768;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=TII/fgOrGssfx5JRsD2yWOJbn3c6DV++mYvTOBpxmvM=;
- b=FsQDrFZuhKHto0X4n68Y7Siwrd4+oGj2XkT/2oCcXtoI/5KCqIQtJucGMqwfUMjVp0Y8Rb
- X6YgI81xxmpX9GsiSnkM+rhtSQnabd35okQZXO7+fk9XmFQg6gBJVCFgUaa6beiEo2i1Bv
- NZG8Kbzidj2KsraGni04g/j71z49jXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-5S7dGpRyO-qHMyPhHsnHzQ-1; Tue, 21 Jul 2020 04:56:06 -0400
-X-MC-Unique: 5S7dGpRyO-qHMyPhHsnHzQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48322800688;
- Tue, 21 Jul 2020 08:56:05 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9155C5C22A;
- Tue, 21 Jul 2020 08:56:03 +0000 (UTC)
-Date: Tue, 21 Jul 2020 09:56:00 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH for-5.2 2/3] qga/commands-posix: Rework
- build_guest_fsinfo_for_real_device() function
-Message-ID: <20200721085600.GB843362@redhat.com>
-References: <20200720110133.4366-1-thuth@redhat.com>
- <20200720110133.4366-3-thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jxo67-0006eu-AK
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:58:03 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35834)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jxo65-0004Zy-Mk
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:58:03 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 184so2093451wmb.0
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 01:58:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+ZM5rFnLIv7XX6JCDu6MU2+dcdw1FuRLMox2ftXigb8=;
+ b=K7xg4qBBUYLL2e/lOIpvoUo/5oEJNM8DO0dqf+1E3IXr7xs00DkVH+tw+x9N8Gz/mk
+ d9PZOdMw1nFYHaq09KmgpFdUs7WIXes3eS0xUcTGtBERMREFLZrYqAVyCsFgCVDQaONz
+ hPAZV2YYa4EfHrJAs0n2U35i4eGX1hz/ub3ydRkA25BuPnFXcdFP4eHtrGZOWgVEItWw
+ doqcmziDtXcvTKyrFpl3NM+0kkFeDW6kOxPRMXUvCt9QAZTIIJEWWb5gRQBYtlDYfxZg
+ 6rx21YqFb2UVVygo3bBMAzxxARpYTnr4z+wCbeLiPqrUghxR85p29nGEcDuKiM7Ql1qF
+ udSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=+ZM5rFnLIv7XX6JCDu6MU2+dcdw1FuRLMox2ftXigb8=;
+ b=nG0h5eLX6asYHepM1kYz+1ACURH05SvJ8mZLZDWtJeunJuOVsL8+3ugkyGMChKHTsT
+ RoYBXQ46wDNJUO5Lj+MlFcbCzgNYe54NXKKyOWGHfDNEMhIyjHfMHUZd6r7GiwK5TS/G
+ 5TzSMRYEDJGf0cUOK8fGTMc/okxwXu13ndGB6yKWjmV3LPS+nutseff0NjmxH6fesPGD
+ mvmhkdu23OFrv+0ffHDVV4vUpq4ZPmb028n9XD4tbDtvt91Zeb1GqF/3SHHqZjBmUKW2
+ gof5JeQGZbUSNGgQSarK5MU/y05h2cRzhOTJhRbOqGyNOWLkLsqb5QENV8CcdHh/GCV7
+ cysg==
+X-Gm-Message-State: AOAM533LmHj5K2bsyN0hmjvEUnpFwtE9nX7ht2MftK6dlGZteeliHI9H
+ A6ppCooSxJg+2+infNxDq9KNpavcFOM=
+X-Google-Smtp-Source: ABdhPJyCAktV5ppT9DBt2zbruEohvR6q0W9qQwSe2zFxwabTf8vPiEgn73VWaht8fuZ87IfxvOifmQ==
+X-Received: by 2002:a7b:cb47:: with SMTP id v7mr2911682wmj.57.1595321879108;
+ Tue, 21 Jul 2020 01:57:59 -0700 (PDT)
+Received: from localhost.localdomain
+ (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id s203sm2650269wms.32.2020.07.21.01.57.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 21 Jul 2020 01:57:58 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH-for-5.1?] tests/tcg/multiarch/linux-test: Skip test if
+ nanosleep missing (Travis)
+Date: Tue, 21 Jul 2020 10:57:57 +0200
+Message-Id: <20200721085757.14358-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <20200720110133.4366-3-thuth@redhat.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:30:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,165 +102,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
- qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 20, 2020 at 01:01:32PM +0200, Thomas Huth wrote:
-> We are going to support non-PCI devices soon. For this we need to split
-> the generic GuestDiskAddress and GuestDiskAddressList memory allocation
-> and chaining into a separate function first.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  qga/commands-posix.c | 65 ++++++++++++++++++++++++++++----------------
->  1 file changed, 41 insertions(+), 24 deletions(-)
-> 
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 1a62a3a70d..cddbaf5c69 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -861,28 +861,30 @@ static int build_hosts(char const *syspath, char const *host, bool ata,
->      return i;
->  }
->  
-> -/* Store disk device info specified by @sysfs into @fs */
-> -static void build_guest_fsinfo_for_real_device(char const *syspath,
-> -                                               GuestFilesystemInfo *fs,
-> -                                               Error **errp)
-> +/*
-> + * Store disk device info for devices on the PCI bus.
-> + * Returns true if information has been stored, or false for failure.
-> + */
-> +static bool build_guest_fsinfo_for_pci_dev(char const *syspath,
-> +                                           GuestDiskAddress *disk,
-> +                                           GuestPCIAddress *pciaddr,
-> +                                           Error **errp)
->  {
->      unsigned int pci[4], host, hosts[8], tgt[3];
->      int i, nhosts = 0, pcilen;
-> -    GuestDiskAddress *disk;
-> -    GuestPCIAddress *pciaddr;
-> -    GuestDiskAddressList *list = NULL;
->      bool has_ata = false, has_host = false, has_tgt = false;
->      char *p, *q, *driver = NULL;
->  #ifdef CONFIG_LIBUDEV
->      struct udev *udev = NULL;
->      struct udev_device *udevice = NULL;
->  #endif
-> +    bool ret = false;
->  
->      p = strstr(syspath, "/devices/pci");
->      if (!p || sscanf(p + 12, "%*x:%*x/%x:%x:%x.%x%n",
->                       pci, pci + 1, pci + 2, pci + 3, &pcilen) < 4) {
->          g_debug("only pci device is supported: sysfs path '%s'", syspath);
-> -        return;
-> +        return false;
->      }
->  
->      p += 12 + pcilen;
-> @@ -903,7 +905,7 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
->          }
->  
->          g_debug("unsupported driver or sysfs path '%s'", syspath);
-> -        return;
-> +        return false;
->      }
->  
->      p = strstr(syspath, "/target");
-> @@ -929,18 +931,11 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
->          }
->      }
->  
-> -    pciaddr = g_malloc0(sizeof(*pciaddr));
->      pciaddr->domain = pci[0];
->      pciaddr->bus = pci[1];
->      pciaddr->slot = pci[2];
->      pciaddr->function = pci[3];
->  
-> -    disk = g_malloc0(sizeof(*disk));
-> -    disk->pci_controller = pciaddr;
-> -
-> -    list = g_malloc0(sizeof(*list));
-> -    list->value = disk;
-> -
->  #ifdef CONFIG_LIBUDEV
->      udev = udev_new();
->      udevice = udev_device_new_from_syspath(udev, syspath);
-> @@ -1018,21 +1013,43 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
->          goto cleanup;
->      }
->  
-> -    list->next = fs->disk;
-> -    fs->disk = list;
-> -    goto out;
-> +    ret = true;
->  
->  cleanup:
-> -    if (list) {
-> -        qapi_free_GuestDiskAddressList(list);
-> -    }
-> -out:
->      g_free(driver);
->  #ifdef CONFIG_LIBUDEV
->      udev_unref(udev);
->      udev_device_unref(udevice);
->  #endif
-> -    return;
-> +    return ret;
-> +}
-> +
-> +/* Store disk device info specified by @sysfs into @fs */
-> +static void build_guest_fsinfo_for_real_device(char const *syspath,
-> +                                               GuestFilesystemInfo *fs,
-> +                                               Error **errp)
-> +{
-> +    GuestDiskAddress *disk;
-> +    GuestPCIAddress *pciaddr;
-> +    GuestDiskAddressList *list = NULL;
-> +    bool has_pci;
-> +
-> +    pciaddr = g_malloc(sizeof(*pciaddr));
+The time test sometimes fails on Travis-CI [*]:
 
-g_new0 instead of g_malloc and thus kill the sizeof.
+    TEST    linux-test on aarch64
+  tests/tcg/multiarch/linux-test.c:237: nanosleep
+  make[2]: *** [run-linux-test] Error 1
+  make: *** [run-tcg-tests-aarch64-linux-user] Error 2
 
-> +    memset(pciaddr, -1, sizeof(*pciaddr));  /* -1 means field is invalid */
+As this seems due to a container limitation on Travis-CI,
+simply skip the test there.
 
-Each field in GuestPCIAddress is an "int64_t", but memset works on bytes.
+[*] https://travis-ci.org/github/qemu/qemu/jobs/710005078#L3706
 
-So you're not setting the fields to "-1" here, you're setting
-each octet in the "int64_t" to -1.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+RFC because per Laurent Vivier we are not using the correct libc
+    while cross-linking the test (maybe change in the container
+    packages?)
+---
+ tests/tcg/multiarch/linux-test.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-> +
-> +    disk = g_malloc0(sizeof(*disk));
-> +    disk->pci_controller = pciaddr;
-> +
-> +    list = g_malloc0(sizeof(*list));
-> +    list->value = disk;
-
-g_new0 for these too.
-
-(yes, I realize these were all pre-existing bugs)
-
-> +
-> +    has_pci = build_guest_fsinfo_for_pci_dev(syspath, disk, pciaddr, errp);
-> +    if (has_pci) {
-> +        list->next = fs->disk;
-> +        fs->disk = list;
-> +    } else {
-> +        qapi_free_GuestDiskAddressList(list);
-> +    }
->  }
-
-
-Regards,
-Daniel
+diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
+index 8a7c15cd31..c7dfdec9ec 100644
+--- a/tests/tcg/multiarch/linux-test.c
++++ b/tests/tcg/multiarch/linux-test.c
+@@ -233,8 +233,13 @@ static void test_time(void)
+     ts.tv_sec = 0;
+     ts.tv_nsec = 20 * 1000000;
+     chk_error(nanosleep(&ts, &rem));
+-    if (rem.tv_sec != 1)
++    if (rem.tv_sec != 1) {
++        if (getenv("TRAVIS_ARCH")) {
++            printf("nanosleep missing? skipping 'time' test\n");
++            return;
++        }
+         error("nanosleep");
++    }
+     chk_error(gettimeofday(&tv2, NULL));
+     ti = tv2.tv_sec - tv.tv_sec;
+     if (ti >= 2)
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.21.3
 
 
