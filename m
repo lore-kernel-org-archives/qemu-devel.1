@@ -7,69 +7,68 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCBEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72204C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:14:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D0DE2068F
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4127C20720
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:14:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J/MsqyyN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D0DE2068F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYKMCBUC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4127C20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxnPa-0004JR-CO
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:14:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34664)
+	id 1jxnPd-0004Qh-Fq
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:14:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxnMo-0007ks-DT
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:11:14 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37672
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxnMn-0007hO-Ip
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:11:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33248
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxnMm-0004L0-Gu
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:11:14 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jxnMl-0004Kq-Oa
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:11:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1595319071;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=ldZrdFQQGz1Yy1QUIGAAXqyy0sFLWE05aOBnAswqw6M=;
- b=J/MsqyyNaO0urdVqtcjyT038z6oMqDOT9u96D31KGtzNLpGVjj0W3fb8be33ZV/eC1+S20
- gyBx3yEkjeR0PgRwAywm02aip/RZ2mvaf7XDxVYOnkTfGbh+/ToUsynJEQbRzC8dJXVV8D
- T4+wlZ/QspmO8DUjDn+CYpi7wbtzHA4=
+ references:references; bh=Ed8qjShg83j6iJdRGGW66/wVId0nejMjJmWAPtjIA/c=;
+ b=ZYKMCBUCDtX75AMjCv+zTSjkEftzti+V5wfOK+MPLm6dtWanqfFa29xeoa43jCnVIdfRXh
+ tT8Mnb5UMtQV7AgS+9+N+2Sb7iLJaI62TyML2KNdzQYJt9SpM4ZnZKndI2MfrJPhnpWFgo
+ NDm5wy9aXTg2QgdPm6wi8xLZrWTElRc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-IAa5m0N6MwaEzOG1UUA1ZA-1; Tue, 21 Jul 2020 04:11:09 -0400
-X-MC-Unique: IAa5m0N6MwaEzOG1UUA1ZA-1
+ us-mta-198-0VIbiRXROm23p4R5se3Edw-1; Tue, 21 Jul 2020 04:11:08 -0400
+X-MC-Unique: 0VIbiRXROm23p4R5se3Edw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88A4018C63C2;
- Tue, 21 Jul 2020 08:11:08 +0000 (UTC)
-Received: from thuth.com (ovpn-112-102.ams2.redhat.com [10.36.112.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E4DD19C66;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E5F9107ACCA;
  Tue, 21 Jul 2020 08:11:07 +0000 (UTC)
+Received: from thuth.com (ovpn-112-102.ams2.redhat.com [10.36.112.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 137CA2DE68;
+ Tue, 21 Jul 2020 08:11:05 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 07/10] docs/fuzz: add instructions for generating a coverage
- report
-Date: Tue, 21 Jul 2020 10:10:52 +0200
-Message-Id: <20200721081055.14073-8-thuth@redhat.com>
+Subject: [PULL 06/10] docs/fuzz: add information about useful libFuzzer flags
+Date: Tue, 21 Jul 2020 10:10:51 +0200
+Message-Id: <20200721081055.14073-7-thuth@redhat.com>
 In-Reply-To: <20200721081055.14073-1-thuth@redhat.com>
 References: <20200721081055.14073-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:26:46
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:30:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -98,39 +97,56 @@ Sender: "Qemu-devel"
 From: Alexander Bulekov <alxndr@bu.edu>
 
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-Message-Id: <20200706195534.14962-5-alxndr@bu.edu>
-[thuth: Replaced --enable-sanitizers with --enable-fuzzing]
+Message-Id: <20200706195534.14962-4-alxndr@bu.edu>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- docs/devel/fuzzing.txt | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ docs/devel/fuzzing.txt | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 diff --git a/docs/devel/fuzzing.txt b/docs/devel/fuzzing.txt
-index 6d18115239..96d71c94d7 100644
+index 12bf6aa0ca..6d18115239 100644
 --- a/docs/devel/fuzzing.txt
 +++ b/docs/devel/fuzzing.txt
-@@ -85,6 +85,25 @@ better coverage performance, depending on the target.
- Note that libFuzzer's exact behavior will depend on the version of
- clang and libFuzzer used to build the device fuzzers.
+@@ -48,6 +48,43 @@ Information about these is available by passing -help=1
+ Now the only thing left to do is wait for the fuzzer to trigger potential
+ crashes.
  
-+== Generating Coverage Reports ==
-+Code coverage is a crucial metric for evaluating a fuzzer's performance.
-+libFuzzer's output provides a "cov: " column that provides a total number of
-+unique blocks/edges covered. To examine coverage on a line-by-line basis we
-+can use Clang coverage:
++== Useful libFuzzer flags ==
 +
-+ 1. Configure libFuzzer to store a corpus of all interesting inputs (see
-+    CORPUS_DIR above)
-+ 2. ./configure the QEMU build with:
-+    --enable-fuzzing \
-+    --extra-cflags="-fprofile-instr-generate -fcoverage-mapping"
-+ 3. Re-run the fuzzer. Specify $CORPUS_DIR/* as an argument, telling libfuzzer
-+    to execute all of the inputs in $CORPUS_DIR and exit. Once the process
-+    exits, you should find a file, "default.profraw" in the working directory.
-+ 4. Execute these commands to generate a detailed HTML coverage-report:
-+ llvm-profdata merge -output=default.profdata default.profraw
-+ llvm-cov show ./path/to/qemu-fuzz-i386 -instr-profile=default.profdata \
-+ --format html -output-dir=/path/to/output/report
++As mentioned above, libFuzzer accepts some arguments. Passing -help=1 will list
++the available arguments. In particular, these arguments might be helpful:
++
++$CORPUS_DIR/ : Specify a directory as the last argument to libFuzzer. libFuzzer
++stores each "interesting" input in this corpus directory. The next time you run
++libFuzzer, it will read all of the inputs from the corpus, and continue fuzzing
++from there. You can also specify multiple directories. libFuzzer loads existing
++inputs from all specified directories, but will only write new ones to the
++first one specified.
++
++-max_len=4096 : specify the maximum byte-length of the inputs libFuzzer will
++generate.
++
++-close_fd_mask={1,2,3} : close, stderr, or both. Useful for targets that
++trigger many debug/error messages, or create output on the serial console.
++
++-jobs=4 -workers=4 : These arguments configure libFuzzer to run 4 fuzzers in
++parallel (4 fuzzing jobs in 4 worker processes). Alternatively, with only
++-jobs=N, libFuzzer automatically spawns a number of workers less than or equal
++to half the available CPU cores. Replace 4 with a number appropriate for your
++machine. Make sure to specify a $CORPUS_DIR, which will allow the parallel
++fuzzers to share information about the interesting inputs they find.
++
++-use_value_profile=1 : For each comparison operation, libFuzzer computes 
++(caller_pc&4095) | (popcnt(Arg1 ^ Arg2) << 12) and places this in the coverage
++table. Useful for targets with "magic" constants. If Arg1 came from the fuzzer's
++input and Arg2 is a magic constant, then each time the Hamming distance
++between Arg1 and Arg2 decreases, libFuzzer adds the input to the corpus.
++
++-shrink=1 : Tries to make elements of the corpus "smaller". Might lead to
++better coverage performance, depending on the target.
++
++Note that libFuzzer's exact behavior will depend on the version of
++clang and libFuzzer used to build the device fuzzers.
 +
  == Adding a new fuzzer ==
  Coverage over virtual devices can be improved by adding additional fuzzers.
