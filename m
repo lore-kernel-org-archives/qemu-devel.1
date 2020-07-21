@@ -2,121 +2,106 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9F7C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF5DC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:35:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B069D20709
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:35:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D2BA20709
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:35:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LOKxsoOb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B069D20709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9iVrJid"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D2BA20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxnjp-0002k0-02
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:35:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40988)
+	id 1jxnjt-0002sE-P9
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:35:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxniu-0001TW-Jk
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:34:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38449
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxnix-0001Xx-On
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:34:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48122
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxnis-00085P-T6
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:34:04 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxnis-00085A-T1
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:34:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595320440;
+ s=mimecast20190719; t=1595320438;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=0mo9FJd1FFZJhIubUUo9UhweUi0S1u9RMig2Mv3FpQ0=;
- b=LOKxsoObhUl2qcZJ4awPXVP59ksUjvssjLjzf93PQACv8RUeFY6UBVKQh19QvDCSWQ7Up+
- AnSbMpm8YEKM/NyyLKtjl1j5F2A8CcV+FnByq5RscICR5ye/GbyRRXRA7dlFNl1lm+w/we
- KBy2NRVjXuohVAUb6c6xRAJ45++yXOU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-T1VYdZMJPgSnXAsKRfk_rw-1; Tue, 21 Jul 2020 04:33:58 -0400
-X-MC-Unique: T1VYdZMJPgSnXAsKRfk_rw-1
-Received: by mail-wm1-f69.google.com with SMTP id g138so729003wme.7
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 01:33:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=0mo9FJd1FFZJhIubUUo9UhweUi0S1u9RMig2Mv3FpQ0=;
- b=gvqF00q15IvDPOhkrqm9RNUsoiqpK/wchlkRHe/JnwVWeGa2042cPnijbgETgwFGX8
- wsSL8j9iv2Y0qq3fLtHbSqIeIIctyWozEZeCXt4xE34BcBMg9MmJBw83RRMAvODtu4Fi
- 182byfC12gxMWRxbAtO8coovdcxLI/+MQ4kLeJlFLPEDqkvDBiBqpwaY/F6R0p8o0cSS
- aHGAU0u1ZlJg4zB1FpJdfaC7zvi5MBO+BIckMdFBgS9MU8XrqD4jtI3v3A55LXD9I8cc
- RLlJGYj+1lECeVFDm8JmjN2axS8Gtd/zmbPudh6Xoau2SrsUUt8mQpBrMJn87NjFT2/7
- D+vg==
-X-Gm-Message-State: AOAM533KNk6h9FdltIyh6UV5imBruvEuOgYJdSvqFw9IuT3CX/eoSKVy
- 6LtrgyCaBKlUovOo0VoV708EGHTQZRJeABufaeS1fQAdmnSMovO2/atRjuzJDbQZSFN/cKZERWz
- z39ZR7sUWiwOMq+U=
-X-Received: by 2002:a5d:4051:: with SMTP id w17mr24562979wrp.183.1595320437476; 
- Tue, 21 Jul 2020 01:33:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQ6bGlKYh8U1vdqoHmHNRp5ZGHufKWdQLVv9QCpza1zvprjaFndwdY0yiHwaqITtY1XCP3MA==
-X-Received: by 2002:a5d:4051:: with SMTP id w17mr24562961wrp.183.1595320437274; 
- Tue, 21 Jul 2020 01:33:57 -0700 (PDT)
-Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id l14sm37430966wrn.18.2020.07.21.01.33.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jul 2020 01:33:56 -0700 (PDT)
-Subject: Re: [PATCH v2 5/9] nvram: add nrf51_soc flash read method
-To: P J P <ppandit@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-References: <20200624185523.762240-1-ppandit@redhat.com>
- <20200624185523.762240-6-ppandit@redhat.com>
- <CAKXe6SKBYpdouoN=C_NZawLOnDMYjDU2X3c2CsCv7X7rPym1Rg@mail.gmail.com>
- <CAFEAcA8s8-OCmKEJsp6bJXBXH+JiyxrtSbHPiLimCj8+xz3obw@mail.gmail.com>
- <nycvar.YSQ.7.78.906.2007211212380.4380@xnncv>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <03c8f705-9e6c-9369-c547-eb09ede77fc1@redhat.com>
-Date: Tue, 21 Jul 2020 10:33:55 +0200
+ bh=UuoYdkZorYXkhnKiR9Xq3+ANs5FAVavMXp1kkIHJGgw=;
+ b=J9iVrJid5Krxu6pXHiO5vdG4bOJpMOCNmF+fCHC+fSlZ6v+MTK6oWaTUlKOeYQR+Qw9ngj
+ jqsRRG8LuBpVJm1mON2VDRcWgNoE1UXy7KNeXM9oFV2kGZeoTAayBJBh2BPDGFnwx7X38D
+ WQtpLiKtehfvWD/ID7ki4VBKjHDUW8I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-5radf-JdNdeh_IC3YqTPcQ-1; Tue, 21 Jul 2020 04:33:56 -0400
+X-MC-Unique: 5radf-JdNdeh_IC3YqTPcQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4D6080183C;
+ Tue, 21 Jul 2020 08:33:55 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A51F569529;
+ Tue, 21 Jul 2020 08:33:53 +0000 (UTC)
+Subject: Re: [PATCH v2 3/3] iotests: Test node/bitmap aliases during migration
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200716135303.319502-1-mreitz@redhat.com>
+ <20200716135303.319502-4-mreitz@redhat.com>
+ <4cada895-7634-4b15-d03b-9f0f72995895@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d0a1130e-a7fe-9127-822c-54e8a3a051c6@redhat.com>
+Date: Tue, 21 Jul 2020 10:33:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.78.906.2007211212380.4380@xnncv>
-Content-Language: en-US
+In-Reply-To: <4cada895-7634-4b15-d03b-9f0f72995895@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="jzDkL7snG8YQ2MR9WEYsvO0IL25JyVfnr"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:30:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -126,7 +111,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,63 +124,326 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/21/20 8:47 AM, P J P wrote:
-> +-- On Thu, 16 Jul 2020, Peter Maydell wrote --+
-> | > P J P <ppandit@redhat.com> ���2020���6���25��������� ������3:01���������
-> | > > +static uint64_t flash_read(void *opaque, hwaddr offset, unsigned size)
-> | > > +{
-> | > > +    NRF51NVMState *s = NRF51_NVM(opaque);
-> | > > +
-> | > > +    assert(offset + size <= s->flash_size);
-> | > > +    return ldl_le_p(s->storage + offset);
-> | > > +}
-> | >
-> | > The 'flash_ops' is for ROM, though I don't see where it calls 
-> | > 'memory_region_rom_device_set_romd' to ROMD, so this MR is in MMIO mode 
-> | > and it needs a read callback.
-> | 
-> | I think that 'romd mode' (ie reads-go-directly-to-RAM) is the default: 
-> | memory_region_initfn() sets romd_mode to true. So unless the device actively 
-> | calls memory_region_rom_device_set_romd(mr, false) then the read callback 
-> | can't be reached.
-> 
-> So, we go with g_assert_not_reached() ? We seem to have differing opinions 
-> about these callbacks.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jzDkL7snG8YQ2MR9WEYsvO0IL25JyVfnr
+Content-Type: multipart/mixed; boundary="lEN4jft6ojIR7fVbX78PW3XAx7PQC1DoM"
 
-- Callback missing because we neglected to implement the
-  hardware behavior:
+--lEN4jft6ojIR7fVbX78PW3XAx7PQC1DoM
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-  => qemu_log_mask(LOG_UNIMP, ...)
+On 20.07.20 20:02, Vladimir Sementsov-Ogievskiy wrote:
+> 16.07.2020 16:53, Max Reitz wrote:
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 tests/qemu-iotests/300=C2=A0=C2=A0=C2=A0=C2=A0 | 511 ++++++++++++=
++++++++++++++++++++++++++
+>> =C2=A0 tests/qemu-iotests/300.out |=C2=A0=C2=A0 5 +
+>> =C2=A0 tests/qemu-iotests/group=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
+>> =C2=A0 3 files changed, 517 insertions(+)
+>> =C2=A0 create mode 100755 tests/qemu-iotests/300
+>> =C2=A0 create mode 100644 tests/qemu-iotests/300.out
+>>
+>> diff --git a/tests/qemu-iotests/300 b/tests/qemu-iotests/300
+>> new file mode 100755
+>> index 0000000000..68714b7167
+>> --- /dev/null
+>> +++ b/tests/qemu-iotests/300
+>> @@ -0,0 +1,511 @@
+>> +#!/usr/bin/env python3
+>> +#
+>> +# Tests for dirty bitmaps migration with node aliases
+>=20
+> copyright?
 
-- Callback missing because the access is illegal on hardware
-  (write on read-only register, read on write-only register):
+Who needs that.
 
-  => qemu_log_mask(LOG_GUEST_ERROR, ...)
+Will fix. O:)
 
-- Impossible situation unrelated to the hardware/guest behavior
-  (problem in QEMU design)
+[...]
 
-  => g_assert_not_reached()
+>> +class TestDirtyBitmapMigration(iotests.QMPTestCase):
+>> +=C2=A0=C2=A0=C2=A0 src_node_name: str =3D ''
+>> +=C2=A0=C2=A0=C2=A0 dst_node_name: str =3D ''
+>> +=C2=A0=C2=A0=C2=A0 src_bmap_name: str =3D ''
+>> +=C2=A0=C2=A0=C2=A0 dst_bmap_name: str =3D ''
+>=20
+> Hmm, I hope, typing actually not needed with such an obvious initializati=
+on
+
+I think mypy complained for some other variables, so I decided to just
+type everything.  *shrug*
+
+[...]
+
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Dirty some random megabyte=
+s
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for _ in range(9):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mb_o=
+fs =3D random.randrange(1024)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self=
+.vm_a.hmp_qemu_io(self.src_node_name, 'write %dM 1M'
+>> % mb_ofs)
+>=20
+> May be, use f-string for consistency
+
+Ah, sure.
+
+[...]
+
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Wa=
+it until the migration has been cleaned up
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # (O=
+therwise, bdrv_close_all() will abort because the
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # di=
+rty bitmap migration code still holds a reference to
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # th=
+e BDS)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # (U=
+nfortunately, there does not appear to be a nicer way
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # of=
+ waiting until a failed migration has been cleaned up)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 time=
+out_msg =3D 'Timeout waiting for migration to be
+>> cleaned up'
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 with=
+ iotests.Timeout(30, timeout_msg):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 while os.path.exists(mig_sock):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pass
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 # Dropping src_node_name will only work once the
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 # bitmap migration code has released it
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 while 'error' in self.vm_a.qmp('blockdev-del',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
+>> node_name=3Dself.src_node_name):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pass
+>=20
+> Somehow I would feel calmer with s/pass/time.sleep(0.5)/ in such loops.
+
+Why, if you don=E2=80=99t mind me asking?
+
+I=E2=80=99m always afraid of needlessly adding to the runtime of the test. =
+ But
+it=E2=80=99s not like I couldn=E2=80=99t go for e.g. a sleep(0.1).
+
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
+rn
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm_a.wait_for_runstate(=
+'postmigrate')
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm_b.wait_for_runstate(=
+'running')
+>=20
+> Actually, bitmaps migration may continue in postcopy, so more correct
+> would be to wait for completed status for migration on target. Still,
+> shouldn't be a big difference when migrate small bitmap data.
+
+Why not, I can add a wait_for_migration_state() to patch 2 and then use
+that here.
+
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.check_bitmap(bitmap_nam=
+e_valid)
+
+[...]
+
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hmp_=
+mapping: List[str] =3D []
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for =
+line in result['return'].split('\n'):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 line =3D line.rstrip()
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if hmp_mapping =3D=3D []:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if line =3D=3D 'block-bitmap-=
+mapping:':
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hmp_m=
+apping.append(line)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 continue
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if line.startswith('=C2=A0 '):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hmp_mapping.append(line)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 else:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break
+>=20
+> Let me try:
+>=20
+> hmp_mapping =3D re.search(r'^block-bitmap-mapping:.*(\n=C2=A0 .*)*',
+> result['return'], flags=3Dre.MULTILINE)
+
+Nice, thanks!
+
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self=
+.assertEqual('\n'.join(hmp_mapping) + '\n',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 self.to_hmp_mapping(mapping))
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self=
+.assert_qmp(result, 'error/desc', error)
+
+[...]
+
+>> +=C2=A0=C2=A0=C2=A0 def test_migratee_node_is_not_mapped_on_src(self) ->=
+ None:
+>=20
+> is migratee a mistake or an abbreviation for migrate-error ? :)
+
+I meant it as =E2=80=9Cthe node that is being migrated=E2=80=9D.  As in =E2=
+=80=9Cemployee =3D
+someone who=E2=80=99s employed=E2=80=9D or =E2=80=9Ccallee =3D something th=
+at=E2=80=99s being called=E2=80=9D.
+
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.set_mapping(self.vm_a, =
+[])
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Should just ignore all bit=
+maps on unmapped nodes
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.migrate(True, False)
+>> +
+>> +=C2=A0=C2=A0=C2=A0 def test_migratee_node_is_not_mapped_on_dst(self) ->=
+ None:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.set_mapping(self.vm_b, =
+[])
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.migrate(False, False)
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Expect abnormal shutdown o=
+f the destination VM on migration
+>> failure
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 try:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self=
+.vm_b.shutdown()
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 except qemu.machine.Abnormal=
+Shutdown:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pass
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertIn(f"Unknown node=
+ alias '{self.src_node_name}'",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm_b.get_log=
+())
+>> +
+>> +=C2=A0=C2=A0=C2=A0 def test_migratee_bitmap_is_not_mapped_on_src(self) =
+-> None:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mapping: BlockBitmapMapping =
+=3D [{
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'nod=
+e-name': self.src_node_name,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'ali=
+as': self.dst_node_name,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'bit=
+maps': []
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }]
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.set_mapping(self.vm_a, =
+mapping)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Should just ignore all unm=
+apped bitmaps
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.migrate(True, False)
+>> +
+>> +=C2=A0=C2=A0=C2=A0 def test_migratee_bitmap_is_not_mapped_on_dst(self) =
+-> None:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mapping: BlockBitmapMapping =
+=3D [{
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'nod=
+e-name': self.dst_node_name,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'ali=
+as': self.src_node_name,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'bit=
+maps': []
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }]
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.set_mapping(self.vm_b, =
+mapping)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.migrate(False, False)
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Expect abnormal shutdown o=
+f the destination VM on migration
+>> failure
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 try:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self=
+.vm_b.shutdown()
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 except qemu.machine.Abnormal=
+Shutdown:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pass
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertIn(f"Unknown bitm=
+ap alias '{self.src_bmap_name}'
+>> on node " \
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 f"'{self.dst_node=
+_name}' (alias
+>> '{self.src_node_name}')",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm_b.get_log=
+())
+>> +
+
+[...]
+
+>> +=C2=A0=C2=A0=C2=A0 def verify_dest_has_all_bitmaps(self) -> None:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitmaps =3D self.vm_a.query_=
+bitmaps()
+>=20
+> s/vm_a/vm_b/
+>=20
+> Ha! I've already thought, that I'll not find any mistake :)
+
+:)
+
+> With it fixed:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+> (other my notes up to you)
+
+Thanks, I=E2=80=99ll take them to heart.
 
 
-Note, when we runs QEMU with LOG_UNIMP/LOG_GUEST_ERROR enabled,
-we are usually interested in what address the guest is accessing,
-and in the write case, what value is written.
+--lEN4jft6ojIR7fVbX78PW3XAx7PQC1DoM--
 
-> 
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
-> 
+--jzDkL7snG8YQ2MR9WEYsvO0IL25JyVfnr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8WqHAACgkQ9AfbAGHV
+z0AzQgf9HevSoNkRZw3aeI12OAH03Gbk3UOpwTJMe5u1RnXknC7XgViTSSrBnaUT
+LyyAgYQjHa5i0HxKPwqG8xX3V58SSyn1/9Xmf6KMGvjVVzafjWP6NKUWpXsS/SqZ
+44yzxRpQDhCLr3i/gvuWmafB60Q0bA+ZyCn9eZ4HgiiwSZQA2iTfBMW+EOl6bwJQ
+ZwWgQ6aopNBsfrvGQwyXROHhOBsu4YXQLMs+1TqyVcPUcKcffx7cRMgakO4sz3Nz
+cIZYL4GdtdZhdzpW2sgxeZNRD90kLfIg3uRYNTydrN4S92blrYkv/AIBTvLbf8e5
+P7cObsSWpb5Ad/PIKOkW8yblhYoTgQ==
+=dv7I
+-----END PGP SIGNATURE-----
+
+--jzDkL7snG8YQ2MR9WEYsvO0IL25JyVfnr--
 
 
