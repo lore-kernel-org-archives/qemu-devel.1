@@ -2,78 +2,91 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0444AC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE4BC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:43:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B26A72070A
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:45:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B8FA2070A
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:43:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3iUfK/h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B26A72070A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hv+HMTHU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B8FA2070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxuSi-0003YC-00
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 11:45:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56626)
+	id 1jxuQo-0000vj-EC
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 11:43:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxuOy-0006tF-Hf
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:41:56 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54612
+ (Exim 4.90_1) (envelope-from <tgolembi@redhat.com>)
+ id 1jxuOP-0006Kn-M1
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:41:21 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31548
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxuOv-0000Kv-40
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:41:56 -0400
+ (Exim 4.90_1) (envelope-from <tgolembi@redhat.com>)
+ id 1jxuON-00009v-7L
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 11:41:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595346112;
+ s=mimecast20190719; t=1595346078;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=K1jl7GgxzTuUxDpF35nPb8WABrAQ6NBVuaEanr0jAzg=;
- b=V3iUfK/haTG6/II60pzI0rRpFkT2WV494tPd2lohcs2jaMeME1EFU7XdXtfzafJcwfF8gU
- QQztwuvO+9FsPjNG1ZZ9JH1a7S9s1XWHhtvzDYTk8GSDLtynLtXr3S40pTkuZ4IjRVA2MA
- pIgdQyL1mf7awp2n/c0zai9KuO1d+KU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-cvx2-EgTM8-pJpRaiu_hoQ-1; Tue, 21 Jul 2020 11:41:50 -0400
-X-MC-Unique: cvx2-EgTM8-pJpRaiu_hoQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31C76100AA27;
- Tue, 21 Jul 2020 15:41:49 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A92C074F45;
- Tue, 21 Jul 2020 15:41:48 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6462210F5AF1; Tue, 21 Jul 2020 17:41:47 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
+ content-transfer-encoding:content-transfer-encoding;
+ bh=mzQCmOqxa454LuAgpNeFbK0d95FnlBERa0ehc2C5aDE=;
+ b=hv+HMTHU/EPiop5403/53SYQZwSOhnJbTPOtf9PGTy3kip6/KDboRaZ8ATeExIiFTp/KQi
+ Zgh/hRI8Rjzt0yvhMt93sqGH2SdLvIA1RESYmEOYj30lqTU+tadcjZPauXwmOMQQrcuR49
+ NLQ+Fa8DVALUZTWwm80BEikbkMZZk9o=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-qkMlKHbIMEWuf_hVovt82g-1; Tue, 21 Jul 2020 11:40:45 -0400
+X-MC-Unique: qkMlKHbIMEWuf_hVovt82g-1
+Received: by mail-wr1-f71.google.com with SMTP id 5so2135484wrc.17
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 08:40:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=mzQCmOqxa454LuAgpNeFbK0d95FnlBERa0ehc2C5aDE=;
+ b=kwJIwkXsZIh0eCS8QhRFtZIEtQ7UDvo5xA8r1j1u/3KONNHdsqqGoI53C0fIgqLmeg
+ M20YCEfaUvHegIqczoS0xKtCJS/Rrvu+KOha0Uje0aNbEtbsS0fR+OvtvqwjENyFJ3Br
+ S8WUh7om681UKVnRpSBq7bUEO29svlz/n+jxcnoVRrVM5tPhd79uyfamAnJISuM9mPHk
+ 8hhlmvPRd97WPB5otCSdDsz7SFw0JVk85Dou5q6PbdADwCRTTVFThEtqSZNKRzbMx3GO
+ awGWmhCf214st1a8nIous55re8yjxSXBVMTNl6ZsbF6KBq05z9sp2u3WC+gArlC2CULm
+ gjow==
+X-Gm-Message-State: AOAM5335dP7FczB2/aqfknjF6/j/vK/HAOyKH7dQ3ZgH3qMlAY425zeS
+ aE9D6YaFTunaiskozpxjIAv+Drpib9jRQ4sNOQYHsjRpnR8Vd/CW7HqxzhlvN8zeLwObF+06Z8F
+ 3IoykeRXuZdkJIJ0=
+X-Received: by 2002:a1c:4c0a:: with SMTP id z10mr4847243wmf.38.1595346043373; 
+ Tue, 21 Jul 2020 08:40:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzt4A0rpGpJD7gwBgn2LQb480Juo3hFuctBj2GTZPJtHiewbjSx3vk4NhNPeB64Ezvp0Osccg==
+X-Received: by 2002:a1c:4c0a:: with SMTP id z10mr4847214wmf.38.1595346043036; 
+ Tue, 21 Jul 2020 08:40:43 -0700 (PDT)
+Received: from auriga.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+ by smtp.gmail.com with ESMTPSA id
+ u2sm3682925wml.16.2020.07.21.08.40.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 21 Jul 2020 08:40:42 -0700 (PDT)
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/3] qom: Change object_get_canonical_path_component() not to
- malloc
-Date: Tue, 21 Jul 2020 17:41:45 +0200
-Message-Id: <20200721154147.1657100-2-armbru@redhat.com>
-In-Reply-To: <20200721154147.1657100-1-armbru@redhat.com>
-References: <20200721154147.1657100-1-armbru@redhat.com>
+Subject: [PATCH v10] qga: add command guest-get-devices for reporting VirtIO
+ devices
+Date: Tue, 21 Jul 2020 17:40:41 +0200
+Message-Id: <24edfdd5ff980abc0b66889246d88ab25ebee1fa.1595345951.git.tgolembi@redhat.com>
+X-Mailer: git-send-email 2.25.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=tgolembi@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:17:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -83,7 +96,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,503 +109,381 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
- Li Qiang <liq3ea@gmail.com>, pbonzini@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-object_get_canonical_path_component() returns a malloced copy of a
-property name on success, null on failure.
+Add command for reporting devices on Windows guest. The intent is not so
+much to report the devices but more importantly the driver (and its
+version) that is assigned to the device. This gives caller the
+information whether VirtIO drivers are installed and/or whether
+inadequate driver is used on a device (e.g. QXL device with base VGA
+driver).
 
-19 of its 25 callers immediately free the returned copy.
+Example:
+[
+    {
+      "driver-date": "2019-08-12",
+      "driver-name": "Red Hat VirtIO SCSI controller",
+      "driver-version": "100.80.104.17300",
+      "address": {
+        "type": "pci",
+        "data": {
+          "device-id": 4162,
+          "vendor-id": 6900
+        }
+      }
+    },
+    ...
+]
 
-Change object_get_canonical_path_component() to return the property
-name directly.  Since modifying the name would be wrong, adjust the
-return type to const char *.
-
-Drop the free from the 19 callers become simpler, add the g_strdup()
-to the other six.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200714160202.3121879-4-armbru@redhat.com>
+Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
 ---
- include/qom/object.h       |  2 +-
- backends/hostmem.c         |  2 +-
- block/throttle-groups.c    |  2 +-
- gdbstub.c                  |  2 +-
- hw/arm/xlnx-zynqmp.c       |  6 ++----
- hw/block/nvme.c            |  5 ++---
- hw/core/machine-qmp-cmds.c |  2 +-
- hw/core/machine.c          |  5 ++---
- hw/mem/nvdimm.c            |  5 ++---
- hw/mem/pc-dimm.c           |  5 ++---
- hw/misc/ivshmem.c          |  5 ++---
- hw/ppc/spapr_drc.c         |  3 +--
- hw/virtio/virtio-crypto.c  |  5 ++---
- hw/virtio/virtio-mem.c     |  6 ++----
- hw/virtio/virtio-pmem.c    |  5 ++---
- iothread.c                 |  9 ++++-----
- net/net.c                  |  6 ++----
- qom/object.c               |  7 +++----
- qom/qom-hmp-cmds.c         | 11 ++++-------
- scsi/pr-manager-helper.c   |  3 +--
- scsi/pr-manager.c          |  2 +-
- softmmu/memory.c           |  2 +-
- hw/ppc/trace-events        |  2 +-
- 23 files changed, 41 insertions(+), 61 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 79c8f838b6..55d925d2c8 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1462,7 +1462,7 @@ Object *object_get_internal_root(void);
-  * path is the path within the composition tree starting from the root.
-  * %NULL if the object doesn't have a parent (and thus a canonical path).
-  */
--char *object_get_canonical_path_component(const Object *obj);
-+const char *object_get_canonical_path_component(const Object *obj);
+Changes in v10:
+- rebased to current master
+- changed `since` tag in schema to 5.2
+
+ qga/commands-posix.c |   9 ++
+ qga/commands-win32.c | 212 ++++++++++++++++++++++++++++++++++++++++++-
+ qga/qapi-schema.json |  51 +++++++++++
+ 3 files changed, 271 insertions(+), 1 deletion(-)
+
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 1a62a3a70d..f509a1f525 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -2761,6 +2761,8 @@ GList *ga_command_blacklist_init(GList *blacklist)
+     blacklist = g_list_append(blacklist, g_strdup("guest-fstrim"));
+ #endif
  
- /**
-  * object_get_canonical_path:
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index c614f1bdc1..4bde00e8e7 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -33,7 +33,7 @@ char *
- host_memory_backend_get_name(HostMemoryBackend *backend)
- {
-     if (!backend->use_canonical_path) {
--        return object_get_canonical_path_component(OBJECT(backend));
-+        return g_strdup(object_get_canonical_path_component(OBJECT(backend)));
-     }
- 
-     return object_get_canonical_path(OBJECT(backend));
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index 03a53c89ea..98fea7fd47 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -771,7 +771,7 @@ static void throttle_group_obj_complete(UserCreatable *obj, Error **errp)
- 
-     /* set group name to object id if it exists */
-     if (!tg->name && tg->parent_obj.parent) {
--        tg->name = object_get_canonical_path_component(OBJECT(obj));
-+        tg->name = g_strdup(object_get_canonical_path_component(OBJECT(obj)));
-     }
-     /* We must have a group name at this point */
-     assert(tg->name);
-diff --git a/gdbstub.c b/gdbstub.c
-index 6950fd243f..f3a318cd7f 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2059,7 +2059,7 @@ static void handle_query_thread_extra(GdbCmdContext *gdb_ctx, void *user_ctx)
-         /* Print the CPU model and name in multiprocess mode */
-         ObjectClass *oc = object_get_class(OBJECT(cpu));
-         const char *cpu_model = object_class_get_name(oc);
--        g_autofree char *cpu_name =
-+        const char *cpu_name =
-             object_get_canonical_path_component(OBJECT(cpu));
-         g_string_printf(rs, "%s %s [%s]", cpu_model, cpu_name,
-                         cpu->halted ? "halted " : "running");
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 772cfa3771..e14323c991 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -190,7 +190,7 @@ static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
-     qdev_prop_set_uint32(DEVICE(&s->rpu_cluster), "cluster-id", 1);
- 
-     for (i = 0; i < num_rpus; i++) {
--        char *name;
-+        const char *name;
- 
-         object_initialize_child(OBJECT(&s->rpu_cluster), "rpu-cpu[*]",
-                                 &s->rpu_cpu[i],
-@@ -204,7 +204,6 @@ static void xlnx_zynqmp_create_rpu(MachineState *ms, XlnxZynqMPState *s,
-         } else {
-             s->boot_cpu_ptr = &s->rpu_cpu[i];
-         }
--        g_free(name);
- 
-         object_property_set_bool(OBJECT(&s->rpu_cpu[i]), "reset-hivecs", true,
-                                  &error_abort);
-@@ -341,7 +340,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
- 
-     /* Realize APUs before realizing the GIC. KVM requires this.  */
-     for (i = 0; i < num_apus; i++) {
--        char *name;
-+        const char *name;
- 
-         object_property_set_int(OBJECT(&s->apu_cpu[i]), "psci-conduit",
-                                 QEMU_PSCI_CONDUIT_SMC, &error_abort);
-@@ -354,7 +353,6 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-         } else {
-             s->boot_cpu_ptr = &s->apu_cpu[i];
-         }
--        g_free(name);
- 
-         object_property_set_bool(OBJECT(&s->apu_cpu[i]), "has_el3", s->secure,
-                                  NULL);
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 1aee042d4c..3426e17e65 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1397,9 +1397,8 @@ static void nvme_check_constraints(NvmeCtrl *n, Error **errp)
- 
-     if (!n->params.cmb_size_mb && n->pmrdev) {
-         if (host_memory_backend_is_mapped(n->pmrdev)) {
--            char *path = object_get_canonical_path_component(OBJECT(n->pmrdev));
--            error_setg(errp, "can't use already busy memdev: %s", path);
--            g_free(path);
-+            error_setg(errp, "can't use already busy memdev: %s",
-+                       object_get_canonical_path_component(OBJECT(n->pmrdev)));
-             return;
-         }
- 
-diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
-index 2c5da8413d..963088b798 100644
---- a/hw/core/machine-qmp-cmds.c
-+++ b/hw/core/machine-qmp-cmds.c
-@@ -315,7 +315,7 @@ static int query_memdev(Object *obj, void *opaque)
- 
-         m->value = g_malloc0(sizeof(*m->value));
- 
--        m->value->id = object_get_canonical_path_component(obj);
-+        m->value->id = g_strdup(object_get_canonical_path_component(obj));
-         m->value->has_id = !!m->value->id;
- 
-         m->value->size = object_property_get_uint(obj, "size",
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index eb267b828d..2f881d6d75 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -1073,9 +1073,8 @@ MemoryRegion *machine_consume_memdev(MachineState *machine,
-     MemoryRegion *ret = host_memory_backend_get_memory(backend);
- 
-     if (memory_region_is_mapped(ret)) {
--        char *path = object_get_canonical_path_component(OBJECT(backend));
--        error_report("memory backend %s can't be used multiple times.", path);
--        g_free(path);
-+        error_report("memory backend %s can't be used multiple times.",
-+                     object_get_canonical_path_component(OBJECT(backend)));
-         exit(EXIT_FAILURE);
-     }
-     host_memory_backend_set_mapped(backend, true);
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index d0d6e553cf..e1574bc07c 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -137,13 +137,12 @@ static void nvdimm_prepare_memory_region(NVDIMMDevice *nvdimm, Error **errp)
- 
-     if (size <= nvdimm->label_size || !pmem_size) {
-         HostMemoryBackend *hostmem = dimm->hostmem;
--        char *path = object_get_canonical_path_component(OBJECT(hostmem));
- 
-         error_setg(errp, "the size of memdev %s (0x%" PRIx64 ") is too "
-                    "small to contain nvdimm label (0x%" PRIx64 ") and "
-                    "aligned PMEM (0x%" PRIx64 ")",
--                   path, memory_region_size(mr), nvdimm->label_size, align);
--        g_free(path);
-+                   object_get_canonical_path_component(OBJECT(hostmem)),
-+                   memory_region_size(mr), nvdimm->label_size, align);
-         return;
-     }
- 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 9d3f0b9691..c30351070b 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -179,9 +179,8 @@ static void pc_dimm_realize(DeviceState *dev, Error **errp)
-         error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property is not set");
-         return;
-     } else if (host_memory_backend_is_mapped(dimm->hostmem)) {
--        char *path = object_get_canonical_path_component(OBJECT(dimm->hostmem));
--        error_setg(errp, "can't use already busy memdev: %s", path);
--        g_free(path);
-+        error_setg(errp, "can't use already busy memdev: %s",
-+                   object_get_canonical_path_component(OBJECT(dimm->hostmem)));
-         return;
-     }
-     if (((nb_numa_nodes > 0) && (dimm->node >= nb_numa_nodes)) ||
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index fc128b25e2..2b6882face 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -1037,9 +1037,8 @@ static void ivshmem_plain_realize(PCIDevice *dev, Error **errp)
-         error_setg(errp, "You must specify a 'memdev'");
-         return;
-     } else if (host_memory_backend_is_mapped(s->hostmem)) {
--        char *path = object_get_canonical_path_component(OBJECT(s->hostmem));
--        error_setg(errp, "can't use already busy memdev: %s", path);
--        g_free(path);
-+        error_setg(errp, "can't use already busy memdev: %s",
-+                   object_get_canonical_path_component(OBJECT(s->hostmem)));
-         return;
-     }
- 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 43d12bc33a..fe998d8108 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -513,7 +513,7 @@ static void realize(DeviceState *d, Error **errp)
-     SpaprDrc *drc = SPAPR_DR_CONNECTOR(d);
-     Object *root_container;
-     gchar *link_name;
--    char *child_name;
-+    const char *child_name;
- 
-     trace_spapr_drc_realize(spapr_drc_index(drc));
-     /* NOTE: we do this as part of realize/unrealize due to the fact
-@@ -529,7 +529,6 @@ static void realize(DeviceState *d, Error **errp)
-     trace_spapr_drc_realize_child(spapr_drc_index(drc), child_name);
-     object_property_add_alias(root_container, link_name,
-                               drc->owner, child_name);
--    g_free(child_name);
-     g_free(link_name);
-     vmstate_register(VMSTATE_IF(drc), spapr_drc_index(drc), &vmstate_spapr_drc,
-                      drc);
-diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-index bd9165c565..6da12e315f 100644
---- a/hw/virtio/virtio-crypto.c
-+++ b/hw/virtio/virtio-crypto.c
-@@ -786,9 +786,8 @@ static void virtio_crypto_device_realize(DeviceState *dev, Error **errp)
-         error_setg(errp, "'cryptodev' parameter expects a valid object");
-         return;
-     } else if (cryptodev_backend_is_used(vcrypto->cryptodev)) {
--        char *path = object_get_canonical_path_component(OBJECT(vcrypto->conf.cryptodev));
--        error_setg(errp, "can't use already used cryptodev backend: %s", path);
--        g_free(path);
-+        error_setg(errp, "can't use already used cryptodev backend: %s",
-+                   object_get_canonical_path_component(OBJECT(vcrypto->conf.cryptodev)));
-         return;
-     }
- 
-diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index 65850530e7..c12e9f79b0 100644
---- a/hw/virtio/virtio-mem.c
-+++ b/hw/virtio/virtio-mem.c
-@@ -409,11 +409,9 @@ static void virtio_mem_device_realize(DeviceState *dev, Error **errp)
-         error_setg(errp, "'%s' property is not set", VIRTIO_MEM_MEMDEV_PROP);
-         return;
-     } else if (host_memory_backend_is_mapped(vmem->memdev)) {
--        char *path = object_get_canonical_path_component(OBJECT(vmem->memdev));
--
-         error_setg(errp, "'%s' property specifies a busy memdev: %s",
--                   VIRTIO_MEM_MEMDEV_PROP, path);
--        g_free(path);
-+                   VIRTIO_MEM_MEMDEV_PROP,
-+                   object_get_canonical_path_component(OBJECT(vmem->memdev)));
-         return;
-     } else if (!memory_region_is_ram(&vmem->memdev->mr) ||
-         memory_region_is_rom(&vmem->memdev->mr) ||
-diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
-index c3374b2f3f..1e0c137497 100644
---- a/hw/virtio/virtio-pmem.c
-+++ b/hw/virtio/virtio-pmem.c
-@@ -112,9 +112,8 @@ static void virtio_pmem_realize(DeviceState *dev, Error **errp)
-     }
- 
-     if (host_memory_backend_is_mapped(pmem->memdev)) {
--        char *path = object_get_canonical_path_component(OBJECT(pmem->memdev));
--        error_setg(errp, "can't use already busy memdev: %s", path);
--        g_free(path);
-+        error_setg(errp, "can't use already busy memdev: %s",
-+                   object_get_canonical_path_component(OBJECT(pmem->memdev)));
-         return;
-     }
- 
-diff --git a/iothread.c b/iothread.c
-index 0598a6d20d..263ec6e5bc 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -165,7 +165,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
- {
-     Error *local_error = NULL;
-     IOThread *iothread = IOTHREAD(obj);
--    char *name, *thread_name;
-+    char *thread_name;
- 
-     iothread->stopping = false;
-     iothread->running = true;
-@@ -195,12 +195,11 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
-     /* This assumes we are called from a thread with useful CPU affinity for us
-      * to inherit.
-      */
--    name = object_get_canonical_path_component(OBJECT(obj));
--    thread_name = g_strdup_printf("IO %s", name);
-+    thread_name = g_strdup_printf("IO %s",
-+                        object_get_canonical_path_component(OBJECT(obj)));
-     qemu_thread_create(&iothread->thread, thread_name, iothread_run,
-                        iothread, QEMU_THREAD_JOINABLE);
-     g_free(thread_name);
--    g_free(name);
- 
-     /* Wait for initialization to complete */
-     while (iothread->thread_id == -1) {
-@@ -303,7 +302,7 @@ type_init(iothread_register_types)
- 
- char *iothread_get_id(IOThread *iothread)
- {
--    return object_get_canonical_path_component(OBJECT(iothread));
-+    return g_strdup(object_get_canonical_path_component(OBJECT(iothread)));
++    blacklist = g_list_append(blacklist, g_strdup("guest-get-devices"));
++
+     return blacklist;
  }
  
- AioContext *iothread_get_aio_context(IOThread *iothread)
-diff --git a/net/net.c b/net/net.c
-index 7fddcebaa2..bbaedb3c7a 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1185,12 +1185,10 @@ void print_net_client(Monitor *mon, NetClientState *nc)
-         monitor_printf(mon, "filters:\n");
-     }
-     QTAILQ_FOREACH(nf, &nc->filters, next) {
--        char *path = object_get_canonical_path_component(OBJECT(nf));
--
--        monitor_printf(mon, "  - %s: type=%s", path,
-+        monitor_printf(mon, "  - %s: type=%s",
-+                       object_get_canonical_path_component(OBJECT(nf)),
-                        object_get_typename(OBJECT(nf)));
-         netfilter_print_info(mon, nf);
--        g_free(path);
-     }
+@@ -2981,3 +2983,10 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+ 
+     return info;
  }
++
++GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
++{
++    error_setg(errp, QERR_UNSUPPORTED);
++
++    return NULL;
++}
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index aaa71f147b..1302bae9eb 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -21,10 +21,11 @@
+ #ifdef CONFIG_QGA_NTDDSCSI
+ #include <winioctl.h>
+ #include <ntddscsi.h>
++#endif
+ #include <setupapi.h>
+ #include <cfgmgr32.h>
+ #include <initguid.h>
+-#endif
++#include <devpropdef.h>
+ #include <lm.h>
+ #include <wtsapi32.h>
+ #include <wininet.h>
+@@ -39,6 +40,36 @@
+ #include "qemu/base64.h"
+ #include "commands-common.h"
  
-diff --git a/qom/object.c b/qom/object.c
-index 76f5f75239..00fdf89b3b 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -1931,7 +1931,7 @@ object_property_add_const_link(Object *obj, const char *name,
-                                 NULL, OBJ_PROP_LINK_DIRECT);
++/*
++ * The following should be in devpkey.h, but it isn't. The key names were
++ * prefixed to avoid (future) name clashes. Once the definitions get into
++ * mingw the following lines can be removed.
++ */
++DEFINE_DEVPROPKEY(qga_DEVPKEY_NAME, 0xb725f130, 0x47ef, 0x101a, 0xa5,
++    0xf1, 0x02, 0x60, 0x8c, 0x9e, 0xeb, 0xac, 10);
++    /* DEVPROP_TYPE_STRING */
++DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_HardwareIds, 0xa45c254e, 0xdf1c,
++    0x4efd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 3);
++    /* DEVPROP_TYPE_STRING_LIST */
++DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverDate, 0xa8b865dd, 0x2e3d,
++    0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 2);
++    /* DEVPROP_TYPE_FILETIME */
++DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverVersion, 0xa8b865dd, 0x2e3d,
++    0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 3);
++    /* DEVPROP_TYPE_STRING */
++/* The following shoud be in cfgmgr32.h, but it isn't */
++#ifndef CM_Get_DevNode_Property
++CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(
++    DEVINST          dnDevInst,
++    CONST DEVPROPKEY * PropertyKey,
++    DEVPROPTYPE      * PropertyType,
++    PBYTE            PropertyBuffer,
++    PULONG           PropertyBufferSize,
++    ULONG            ulFlags
++);
++#define CM_Get_DevNode_Property CM_Get_DevNode_PropertyW
++#endif
++
+ #ifndef SHTDN_REASON_FLAG_PLANNED
+ #define SHTDN_REASON_FLAG_PLANNED 0x80000000
+ #endif
+@@ -93,6 +124,8 @@ static OpenFlags guest_file_open_modes[] = {
+     g_free(suffix); \
+ } while (0)
+ 
++G_DEFINE_AUTOPTR_CLEANUP_FUNC(GuestDeviceInfo, qapi_free_GuestDeviceInfo)
++
+ static OpenFlags *find_open_flag(const char *mode_str)
+ {
+     int mode;
+@@ -2229,3 +2262,180 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+ 
+     return info;
  }
- 
--char *object_get_canonical_path_component(const Object *obj)
-+const char *object_get_canonical_path_component(const Object *obj)
- {
-     ObjectProperty *prop = NULL;
-     GHashTableIter iter;
-@@ -1947,7 +1947,7 @@ char *object_get_canonical_path_component(const Object *obj)
-         }
- 
-         if (prop->opaque == obj) {
--            return g_strdup(prop->name);
-+            return prop->name;
-         }
-     }
- 
-@@ -1966,7 +1966,7 @@ char *object_get_canonical_path(const Object *obj)
-     }
- 
-     do {
--        char *component = object_get_canonical_path_component(obj);
-+        const char *component = object_get_canonical_path_component(obj);
- 
-         if (!component) {
-             /* A canonical path must be complete, so discard what was
-@@ -1978,7 +1978,6 @@ char *object_get_canonical_path(const Object *obj)
- 
-         newpath = g_strdup_printf("/%s%s", component, path ? path : "");
-         g_free(path);
--        g_free(component);
-         path = newpath;
-         obj = obj->parent;
-     } while (obj != root);
-diff --git a/qom/qom-hmp-cmds.c b/qom/qom-hmp-cmds.c
-index aaacadacca..4032c96089 100644
---- a/qom/qom-hmp-cmds.c
-+++ b/qom/qom-hmp-cmds.c
-@@ -96,10 +96,8 @@ static void print_qom_composition(Monitor *mon, Object *obj, int indent);
- 
- static int qom_composition_compare(const void *a, const void *b, void *ignore)
- {
--    g_autofree char *ac = object_get_canonical_path_component(a);
--    g_autofree char *bc = object_get_canonical_path_component(b);
--
--    return g_strcmp0(ac, bc);
-+    return g_strcmp0(object_get_canonical_path_component(a),
-+                     object_get_canonical_path_component(b));
- }
- 
- static int insert_qom_composition_child(Object *obj, void *opaque)
-@@ -112,18 +110,17 @@ static int insert_qom_composition_child(Object *obj, void *opaque)
- 
- static void print_qom_composition(Monitor *mon, Object *obj, int indent)
- {
--    char *name;
-+    const char *name;
-     GQueue children;
-     Object *child;
- 
-     if (obj == object_get_root()) {
--        name = g_strdup("");
-+        name = "";
-     } else {
-         name = object_get_canonical_path_component(obj);
-     }
-     monitor_printf(mon, "%*s/%s (%s)\n", indent, "", name,
-                    object_get_typename(obj));
--    g_free(name);
- 
-     g_queue_init(&children);
-     object_child_foreach(obj, insert_qom_composition_child, &children);
-diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
-index bf62cbec11..5acccfb4e3 100644
---- a/scsi/pr-manager-helper.c
-+++ b/scsi/pr-manager-helper.c
-@@ -42,11 +42,10 @@ typedef struct PRManagerHelper {
- 
- static void pr_manager_send_status_changed_event(PRManagerHelper *pr_mgr)
- {
--    char *id = object_get_canonical_path_component(OBJECT(pr_mgr));
-+    const char *id = object_get_canonical_path_component(OBJECT(pr_mgr));
- 
-     if (id) {
-         qapi_event_send_pr_manager_status_changed(id, !!pr_mgr->ioc);
--        g_free(id);
-     }
- }
- 
-diff --git a/scsi/pr-manager.c b/scsi/pr-manager.c
-index 0c866e8698..32b9287e68 100644
---- a/scsi/pr-manager.c
-+++ b/scsi/pr-manager.c
-@@ -128,7 +128,7 @@ static int query_one_pr_manager(Object *object, void *opaque)
- 
-     elem = g_new0(PRManagerInfoList, 1);
-     info = g_new0(PRManagerInfo, 1);
--    info->id = object_get_canonical_path_component(object);
-+    info->id = g_strdup(object_get_canonical_path_component(object));
-     info->connected = pr_manager_is_connected(pr_mgr);
-     elem->value = info;
-     elem->next = NULL;
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index 9200b20130..af25987518 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -1764,7 +1764,7 @@ const char *memory_region_name(const MemoryRegion *mr)
- {
-     if (!mr->name) {
-         ((MemoryRegion *)mr)->name =
--            object_get_canonical_path_component(OBJECT(mr));
-+            g_strdup(object_get_canonical_path_component(OBJECT(mr)));
-     }
-     return mr->name;
- }
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index 9ea620f23c..7c0be4102e 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -57,7 +57,7 @@ spapr_drc_detach(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_awaiting_quiesce(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_reset(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_realize(uint32_t index) "drc: 0x%"PRIx32
--spapr_drc_realize_child(uint32_t index, char *childname) "drc: 0x%"PRIx32", child name: %s"
-+spapr_drc_realize_child(uint32_t index, const char *childname) "drc: 0x%"PRIx32", child name: %s"
- spapr_drc_realize_complete(uint32_t index) "drc: 0x%"PRIx32
- spapr_drc_unrealize(uint32_t index) "drc: 0x%"PRIx32
- 
++
++/*
++ * Safely get device property. Returned strings are using wide characters.
++ * Caller is responsible for freeing the buffer.
++ */
++static LPBYTE cm_get_property(DEVINST devInst, const DEVPROPKEY *propName,
++    PDEVPROPTYPE propType)
++{
++    CONFIGRET cr;
++    g_autofree LPBYTE buffer = NULL;
++    ULONG buffer_len = 0;
++
++    /* First query for needed space */
++    cr = CM_Get_DevNode_PropertyW(devInst, propName, propType,
++        buffer, &buffer_len, 0);
++    if (cr != CR_SUCCESS && cr != CR_BUFFER_SMALL) {
++
++        slog("failed to get property size, error=0x%lx", cr);
++        return NULL;
++    }
++    buffer = g_new0(BYTE, buffer_len + 1);
++    cr = CM_Get_DevNode_PropertyW(devInst, propName, propType,
++        buffer, &buffer_len, 0);
++    if (cr != CR_SUCCESS) {
++        slog("failed to get device property, error=0x%lx", cr);
++        return NULL;
++    }
++    return g_steal_pointer(&buffer);
++}
++
++static GStrv ga_get_hardware_ids(DEVINST devInstance)
++{
++    GArray *values = NULL;
++    DEVPROPTYPE cm_type;
++    LPWSTR id;
++    g_autofree LPWSTR property = (LPWSTR)cm_get_property(devInstance,
++        &qga_DEVPKEY_Device_HardwareIds, &cm_type);
++    if (property == NULL) {
++        slog("failed to get hardware IDs");
++        return NULL;
++    }
++    if (*property == '\0') {
++        /* empty list */
++        return NULL;
++    }
++    values = g_array_new(TRUE, TRUE, sizeof(gchar *));
++    for (id = property; '\0' != *id; id += lstrlenW(id) + 1) {
++        gchar *id8 = g_utf16_to_utf8(id, -1, NULL, NULL, NULL);
++        g_array_append_val(values, id8);
++    }
++    return (GStrv)g_array_free(values, FALSE);
++}
++
++/*
++ * https://docs.microsoft.com/en-us/windows-hardware/drivers/install/identifiers-for-pci-devices
++ */
++#define DEVICE_PCI_RE "PCI\\\\VEN_(1AF4|1B36)&DEV_([0-9A-B]{4})(&|$)"
++
++GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
++{
++    GuestDeviceInfoList *head = NULL, *cur_item = NULL, *item = NULL;
++    HDEVINFO dev_info = INVALID_HANDLE_VALUE;
++    SP_DEVINFO_DATA dev_info_data;
++    int i, j;
++    GError *gerr = NULL;
++    g_autoptr(GRegex) device_pci_re = NULL;
++    DEVPROPTYPE cm_type;
++
++    device_pci_re = g_regex_new(DEVICE_PCI_RE,
++        G_REGEX_ANCHORED | G_REGEX_OPTIMIZE, 0,
++        &gerr);
++    g_assert(device_pci_re != NULL);
++
++    dev_info_data.cbSize = sizeof(SP_DEVINFO_DATA);
++    dev_info = SetupDiGetClassDevs(0, 0, 0, DIGCF_PRESENT | DIGCF_ALLCLASSES);
++    if (dev_info == INVALID_HANDLE_VALUE) {
++        error_setg(errp, "failed to get device tree");
++        return NULL;
++    }
++
++    slog("enumerating devices");
++    for (i = 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); i++) {
++        bool skip = true;
++        SYSTEMTIME utc_date;
++        g_autofree LPWSTR name = NULL;
++        g_autofree LPFILETIME date = NULL;
++        g_autofree LPWSTR version = NULL;
++        g_auto(GStrv) hw_ids = NULL;
++        g_autoptr(GuestDeviceInfo) device = g_new0(GuestDeviceInfo, 1);
++        g_autofree char *vendor_id = NULL;
++        g_autofree char *device_id = NULL;
++
++        name = (LPWSTR)cm_get_property(dev_info_data.DevInst,
++            &qga_DEVPKEY_NAME, &cm_type);
++        if (name == NULL) {
++            slog("failed to get device description");
++            continue;
++        }
++        device->driver_name = g_utf16_to_utf8(name, -1, NULL, NULL, NULL);
++        if (device->driver_name == NULL) {
++            error_setg(errp, "conversion to utf8 failed (driver name)");
++            continue;
++        }
++        slog("querying device: %s", device->driver_name);
++        hw_ids = ga_get_hardware_ids(dev_info_data.DevInst);
++        if (hw_ids == NULL) {
++            continue;
++        }
++        for (j = 0; hw_ids[j] != NULL; j++) {
++            GMatchInfo *match_info;
++            GuestDeviceAddressPCI *address;
++            if (!g_regex_match(device_pci_re, hw_ids[j], 0, &match_info)) {
++                continue;
++            }
++            skip = false;
++
++            address = g_new0(GuestDeviceAddressPCI, 1);
++            vendor_id = g_match_info_fetch(match_info, 1);
++            device_id = g_match_info_fetch(match_info, 2);
++            address->vendor_id = g_ascii_strtoull(vendor_id, NULL, 16);
++            address->device_id = g_ascii_strtoull(device_id, NULL, 16);
++
++            device->address = g_new0(GuestDeviceAddress, 1);
++            device->has_address = true;
++            device->address->type = GUEST_DEVICE_ADDRESS_KIND_PCI;
++            device->address->u.pci.data = address;
++
++            g_match_info_free(match_info);
++            break;
++        }
++        if (skip) {
++            continue;
++        }
++
++        version = (LPWSTR)cm_get_property(dev_info_data.DevInst,
++            &qga_DEVPKEY_Device_DriverVersion, &cm_type);
++        if (version == NULL) {
++            slog("failed to get driver version");
++            continue;
++        }
++        device->driver_version = g_utf16_to_utf8(version, -1, NULL,
++            NULL, NULL);
++        if (device->driver_version == NULL) {
++            error_setg(errp, "conversion to utf8 failed (driver version)");
++            continue;
++        }
++        device->has_driver_version = true;
++
++        date = (LPFILETIME)cm_get_property(dev_info_data.DevInst,
++            &qga_DEVPKEY_Device_DriverDate, &cm_type);
++        if (date == NULL) {
++            slog("failed to get driver date");
++            continue;
++        }
++        FileTimeToSystemTime(date, &utc_date);
++        device->driver_date = g_strdup_printf("%04d-%02d-%02d",
++            utc_date.wYear, utc_date.wMonth, utc_date.wDay);
++        device->has_driver_date = true;
++
++        slog("driver: %s\ndriver version: %s,%s\n", device->driver_name,
++            device->driver_date, device->driver_version);
++        item = g_new0(GuestDeviceInfoList, 1);
++        item->value = g_steal_pointer(&device);
++        if (!cur_item) {
++            head = cur_item = item;
++        } else {
++            cur_item->next = item;
++            cur_item = item;
++        }
++        continue;
++    }
++
++    if (dev_info != INVALID_HANDLE_VALUE) {
++        SetupDiDestroyDeviceInfoList(dev_info);
++    }
++    return head;
++}
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index 4be9aad48e..a1ebe1e91b 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -1252,3 +1252,54 @@
+ ##
+ { 'command': 'guest-get-osinfo',
+   'returns': 'GuestOSInfo' }
++
++##
++# @GuestDeviceAddressPCI:
++#
++# @vendor-id: vendor ID
++# @device-id: device ID
++#
++# Since: 5.2
++##
++{ 'struct': 'GuestDeviceAddressPCI',
++  'data': { 'vendor-id': 'uint16', 'device-id': 'uint16' } }
++
++##
++# @GuestDeviceAddress:
++#
++# Address of the device
++# - @pci: address of PCI device, since: 5.2
++#
++# Since: 5.2
++##
++{ 'union': 'GuestDeviceAddress',
++  'data': { 'pci': 'GuestDeviceAddressPCI' } }
++
++##
++# @GuestDeviceInfo:
++#
++# @driver-name: name of the associated driver
++# @driver-date: driver release date in format YYYY-MM-DD
++# @driver-version: driver version
++#
++# Since: 5.2
++##
++{ 'struct': 'GuestDeviceInfo',
++  'data': {
++      'driver-name': 'str',
++      '*driver-date': 'str',
++      '*driver-version': 'str',
++      '*address': 'GuestDeviceAddress'
++  } }
++
++##
++# @guest-get-devices:
++#
++# Retrieve information about device drivers in Windows guest
++#
++# Returns: @GuestDeviceInfo
++#
++# Since: 5.2
++##
++{ 'command': 'guest-get-devices',
++  'returns': ['GuestDeviceInfo'] }
 -- 
-2.26.2
+2.25.0
 
 
