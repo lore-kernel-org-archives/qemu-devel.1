@@ -2,77 +2,77 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB05EC433E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 19:29:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD739C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 19:32:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A39B120720
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 19:29:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7604720717
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 19:32:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aEZs92Gw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A39B120720
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aS8907Ud"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7604720717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxxwt-0005xx-Tu
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 15:29:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56356)
+	id 1jxxzl-0007Cv-Px
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 15:32:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxxwB-0005T4-5k
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 15:28:27 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39849)
+ id 1jxxz2-0006mg-Tu
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 15:31:24 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42794)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxxw9-0007OI-FY
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 15:28:26 -0400
-Received: by mail-ot1-x342.google.com with SMTP id 18so14143otv.6
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:28:24 -0700 (PDT)
+ id 1jxxz1-00086Y-BY
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 15:31:24 -0400
+Received: by mail-ot1-x344.google.com with SMTP id g37so7946otb.9
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 12:31:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TDmq2zgJfLVH46znHIYeN6Cj1t1kDmFzHCLtRfGXMZo=;
- b=aEZs92Gwu1F9wDuP7r+AXIg+j5F7Z09Q9ZdcStNMSn9p3HUfHKiPjepQfqDxdoUtd8
- Cd+HV9kfS5oVG+eDwXxS4pqHVZsJCcKw7Yqa8CkE3XhpVre4Fhv4vfdW4JbAPT9pbPZg
- zmZJkdGfrJrYitTlxsbATZa60OkIsj/ZZuEe0FRq+wPFBfSIZopH3HkAOsgfPNDah5PH
- rRnfFGbgOnNHVeQ1GM19kafIiTF7+gWuRCEQT3x/VfJvH/bp7NNrlv5h1Z37LQB8iNCn
- z/4aPhhTCC/ZK7yy7yZVcj+Z6JT7GtzuYsp6c+/ooc4tmSNbpXYul4PMtwUjMw2NwLHj
- 2vew==
+ :cc; bh=A0ETbU8zA6WcVL7mFmyucrOMg0zcqqnKFX8j+wMFZZM=;
+ b=aS8907UduISoVWVmM/NMDSB57FHCD72rRnKySQB5OGbWdoR1hrjxhc344fpY+rYam1
+ vutS7sz4WHs+RmYGglNgdlnXrjgFgvozDXEhCVgpNJHQmUW5OsNr4Hvi8ST5bpZZt5GT
+ K8qmvGEoCpfbjWw3lh2z17Nq58f+7J7Zw7vgfvU0Yqbt4qt0QQihIzfRY5fDjxPNpR7K
+ UAA9hUCcmePCSCDRBttbgpqNuuNVZx/0weYrKbEUeHZDi3bFFk2fcrzd+ycAimqMLxAC
+ 6GYcUpZ3wff8RUoBuroAQbd+jawqlh+3yQHc9KOyHi5GKvM4PMrOC0WYktCCtTcf79P8
+ 6vNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=TDmq2zgJfLVH46znHIYeN6Cj1t1kDmFzHCLtRfGXMZo=;
- b=dtWWHnoIvHRK/rr6rpO/K+ZZeGMCIJbH+BzBIkPOZGUZVGJDV1hWRT96TAxNekov+9
- QLmq2HbgbqvtItUFQBNSQEhKahxZg8ERaDG9pLSxIXnGLW7eyNNaf9nsrbvGk1519ejp
- BTtFAYgomamkAB0snFgJRiWKQ1pFVq3Y6to9n5u+oN9mHIrDU9bNDwjsIcgGwZAXcY2s
- zan+UcTa3fC8946sbWcVYYU8hWT+PSR3+V0COBdM8VlfWUC8tpEeO4yKqxNulVR9VJXi
- VPNFctm8i+5nSzYS/6sUo+V+ZO3ztWlApAgFy09J0H5sQujiMMZoXk3UlY7/iGItevbu
- f7hQ==
-X-Gm-Message-State: AOAM532+HU90vLXd9JkWnlgS9hM5fPnUb/SXjzsk/TQtAW0cwnVKNoYe
- cEl9tXN4x8XceM/eV3HAvX6UPOw9X2B6NrguNfvz4A==
-X-Google-Smtp-Source: ABdhPJxfYLpRJD9QIdxPumi85gAh0GFTbH1H+DqMz6fKMXPNhaafPrQXDBzIO/OUMplsaLNBD1fdaqLlX8AG61mlp4k=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id
- v19mr25445512ota.91.1595359703725; 
- Tue, 21 Jul 2020 12:28:23 -0700 (PDT)
+ bh=A0ETbU8zA6WcVL7mFmyucrOMg0zcqqnKFX8j+wMFZZM=;
+ b=X5BCVJtKEHPL9rENBWxaJn0kSugo+Zw8vaAbojVst+oZJrs0lbfKTiDasEBdgHCttA
+ 1NQ0mTtjAH0Fx6Jo3qfyVSiuKvZmmimhyrcggY164tnGQnfrAB1AkJfMMJ+ssrlD86vT
+ KdgNTyNlUxe0hX6WZCj1P7JFtWuvVdGwVioa6GVpfQt0X9EgK/IUfVgKhDgQrp+w9aCX
+ U+nxUDrClXn9AVQDlANAIgTT/oa1XUcG1IOwLud0EVj+1mDC0xPNIARynDv3FclwG3lv
+ iIixvywPM7gi8aiBZC1tRHJBIDUurM0bAou9rcW+O9GDmw6XqHoPZIxdmgdogeV5e6zb
+ lFPA==
+X-Gm-Message-State: AOAM533oOV+pcs2PgpvlN7i6c61NeXZ83mliPGiFIUCXYtZJft1FJ5kk
+ 9CPEAdTCELTZT1TynkV7AuhZQTItM+XdHJ+c7jSi5Q==
+X-Google-Smtp-Source: ABdhPJzu8Wfjs38RHbsmWU6jwmaLvryhIxc6UMMITX9eZsVjeL8tZm/qRuxSQIdYhCbFYimG8g8hHQuSEuQAZI7sur8=
+X-Received: by 2002:a05:6830:10ce:: with SMTP id
+ z14mr26470192oto.135.1595359882189; 
+ Tue, 21 Jul 2020 12:31:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200721154637.220022-1-kwolf@redhat.com>
-In-Reply-To: <20200721154637.220022-1-kwolf@redhat.com>
+References: <20200721152521.1578693-1-armbru@redhat.com>
+In-Reply-To: <20200721152521.1578693-1-armbru@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Jul 2020 20:28:12 +0100
-Message-ID: <CAFEAcA8diQuxauqxCOgxXdZ+aK++Q6-OmKqxFCd3y7X45347Lw@mail.gmail.com>
-Subject: Re: [PULL 0/3] Block layer patches for 5.1.0-rc1
-To: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 21 Jul 2020 20:31:11 +0100
+Message-ID: <CAFEAcA8b3ac2HkOXuD2MRr-gS7proHb+PrfPpp7J8G23D1=hhQ@mail.gmail.com>
+Subject: Re: [PULL 0/1] Monitor patches for 2020-07-21
+To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -94,44 +94,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jul 2020 at 16:46, Kevin Wolf <kwolf@redhat.com> wrote:
+On Tue, 21 Jul 2020 at 16:25, Markus Armbruster <armbru@redhat.com> wrote:
 >
-> The following changes since commit 90218a9a393c7925f330e7dcc08658e2a01d3bd4:
+> The following changes since commit af3d69058e09bede9900f266a618ed11f76f49f3:
 >
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-07-21' into staging (2020-07-21 10:24:38 +0100)
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200720' into staging (2020-07-20 15:58:07 +0100)
 >
 > are available in the Git repository at:
 >
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>   git://repo.or.cz/qemu/armbru.git tags/pull-monitor-2020-07-21
 >
-> for you to fetch changes up to 4a01e27ddcb5921efd68820d05d85ba71293fea6:
+> for you to fetch changes up to 029afc4e76041e1a320530d97f99122a1b3d5da2:
 >
->   iotests: Test sparseness for qemu-img convert -n (2020-07-21 17:44:35 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - file-posix: Handle `EINVAL` fallocate return value
-> - qemu-img convert -n: Keep qcow2 v2 target sparse
+>   qdev: Fix device_add DRIVER,help to print to monitor (2020-07-21 17:22:44 +0200)
 >
 > ----------------------------------------------------------------
-> Antoine Damhet (1):
->       file-posix: Handle `EINVAL` fallocate return value
+> Monitor patches for 2020-07-21
 >
-> Kevin Wolf (2):
->       qcow2: Implement v2 zero writes with discard if possible
->       iotests: Test sparseness for qemu-img convert -n
+> ----------------------------------------------------------------
+> Markus Armbruster (1):
+>       qdev: Fix device_add DRIVER,help to print to monitor
+>
+>  qdev-monitor.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+This missed rc1, I'm afraid; will go in for rc2.
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
-
+thanks
 -- PMM
 
