@@ -2,93 +2,80 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF1EFC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A537C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:41:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87CB020792
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:39:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XoLivPSB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87CB020792
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2233620792
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:41:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2233620792
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxwF2-0001F9-T1
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 13:39:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59678)
+	id 1jxwH2-0002KY-Fn
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 13:41:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxwDw-0000Vp-Lz
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:38:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58609
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jxwDs-0000UI-PQ
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:38:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595353115;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2F/kFjvd+0v2DYngMzo1l8K7PY9BdfJKaierYCFYMaE=;
- b=XoLivPSB5OM0ynHPWTkBHD3JcHuFzWdIzmbEUHi6naNl2IC/tSGC5hI/P7gEHGH2AWW3ut
- XAfJ7s2Q3pAv6o6eXs0fVMFLDtRJD5BTrwhxFE4F//N3c9iNvFA7Y0qoTQCuaQaco9p2mG
- rqzgtizVEplp5wLGFHwasJVshQtrZZw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-meG0b1qlMQiN3e7Z-iYx8g-1; Tue, 21 Jul 2020 13:38:29 -0400
-X-MC-Unique: meG0b1qlMQiN3e7Z-iYx8g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FB2880046B;
- Tue, 21 Jul 2020 17:38:27 +0000 (UTC)
-Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
- (ovpn-120-206.rdu2.redhat.com [10.10.120.206])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DE55872686;
- Tue, 21 Jul 2020 17:38:25 +0000 (UTC)
-Subject: Re: [PATCH-for-5.1] hw/ide/ahci: Do not dma_memory_unmap(NULL)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200718072854.7001-1-f4bug@amsat.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <fec57bb7-21c5-8e08-cea4-02c666ac4606@redhat.com>
-Date: Tue, 21 Jul 2020 13:38:25 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jxwG5-0001ov-Em
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:40:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49824)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jxwG3-0000jq-De
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:40:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jxwG1-0006ye-Ei
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 17:40:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5D39F2E80EC
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 17:40:49 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200718072854.7001-1-f4bug@amsat.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:58:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 21 Jul 2020 17:29:26 -0000
+From: Jason <1888417@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: force-stop hangs nvidia pci reboot
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: lightninjay
+X-Launchpad-Bug-Reporter: Jason (lightninjay)
+X-Launchpad-Bug-Modifier: Jason (lightninjay)
+Message-Id: <159535256686.7592.12361820079263274205.malonedeb@wampee.canonical.com>
+Subject: [Bug 1888417] [NEW] Latest QEMU git build on Arch linux causes PCI
+ Passthrough host to hang on guest reboot.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3fa82cc9717a66445bdab20a69eed8540461c4fe
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 13:40:49
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,61 +84,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, qemu-stable@nongnu.org,
- qemu-block@nongnu.org
+Reply-To: Bug 1888417 <1888417@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/18/20 3:28 AM, Philippe Mathieu-Daudé wrote:
-> libFuzzer triggered the following assertion:
-> 
->    cat << EOF | qemu-system-i386 -M pc-q35-5.0 \
->      -nographic -monitor none -serial none -qtest stdio
->    outl 0xcf8 0x8000fa24
->    outl 0xcfc 0xe1068000
->    outl 0xcf8 0x8000fa04
->    outw 0xcfc 0x7
->    outl 0xcf8 0x8000fb20
->    write 0xe1068304 0x1 0x21
->    write 0xe1068318 0x1 0x21
->    write 0xe1068384 0x1 0x21
->    write 0xe1068398 0x2 0x21
->    EOF
->    qemu-system-i386: exec.c:3621: address_space_unmap: Assertion `mr != NULL' failed.
->    Aborted (core dumped)
-> 
-> This is because we don't check the return value from dma_memory_map()
-> which can return NULL, then we call dma_memory_unmap(NULL) which is
-> illegal. Fix by only unmap if the value is not NULL (and the size is
-> not the expected one).
-> 
-> Cc: qemu-stable@nongnu.org
-> Reported-by: Alexander Bulekov <alxndr@bu.edu>
-> Fixes: f6ad2e32f8 ("ahci: add ahci emulation")
-> BugLink: https://bugs.launchpad.net/qemu/+bug/1884693
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->   hw/ide/ahci.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> index 009120f88b..4f596cb9ce 100644
-> --- a/hw/ide/ahci.c
-> +++ b/hw/ide/ahci.c
-> @@ -250,7 +250,7 @@ static void map_page(AddressSpace *as, uint8_t **ptr, uint64_t addr,
->       }
->   
->       *ptr = dma_memory_map(as, addr, &len, DMA_DIRECTION_FROM_DEVICE);
-> -    if (len < wanted) {
-> +    if (len < wanted && *ptr) {
->           dma_memory_unmap(as, *ptr, len, DMA_DIRECTION_FROM_DEVICE, len);
->           *ptr = NULL;
->       }
-> 
+Public bug reported:
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Current Arch linux release, up-to-date as of 7/21/2020.
 
-Thanks! this one wound up being easy.
+Running a windows 7 virtual machine (also happens with windows 10,
+possibly more OSes), with an nvidia GTX 1060 passthrough, if the VM is
+attempted to be restarted, either through the guest interface, or by
+libvirt's gui interface "Virtual Machine Manager", it hangs in a
+"paused" state once the VM shutsdown, and just before the reboot can
+take place.  A force-stop of the VM allows the VM to be properly booted
+without any disk error checks, alluding to a clean shutdown, but failed
+reboot.  The VM can be properly shutdown using the guests shutdown
+function, or the libvirt manager shutdown, without any hangs.  Reverting
+to Arch stable build QEMU 5.0.0-7 fixes the issue.
 
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: force-stop hangs nvidia pci reboot
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888417
+
+Title:
+  Latest QEMU git build on Arch linux causes PCI Passthrough host to
+  hang on guest reboot.
+
+Status in QEMU:
+  New
+
+Bug description:
+  Current Arch linux release, up-to-date as of 7/21/2020.
+
+  Running a windows 7 virtual machine (also happens with windows 10,
+  possibly more OSes), with an nvidia GTX 1060 passthrough, if the VM is
+  attempted to be restarted, either through the guest interface, or by
+  libvirt's gui interface "Virtual Machine Manager", it hangs in a
+  "paused" state once the VM shutsdown, and just before the reboot can
+  take place.  A force-stop of the VM allows the VM to be properly
+  booted without any disk error checks, alluding to a clean shutdown,
+  but failed reboot.  The VM can be properly shutdown using the guests
+  shutdown function, or the libvirt manager shutdown, without any hangs.
+  Reverting to Arch stable build QEMU 5.0.0-7 fixes the issue.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888417/+subscriptions
 
