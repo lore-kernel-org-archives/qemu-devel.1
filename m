@@ -2,91 +2,131 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDC0C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9F7C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:35:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA46820709
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:34:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B069D20709
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:35:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yfiv1PVW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA46820709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LOKxsoOb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B069D20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxnjT-00020T-Uv
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:34:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40884)
+	id 1jxnjp-0002k0-02
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:35:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxniI-000163-Rh
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:33:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23452
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxniu-0001TW-Jk
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:34:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38449
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jxniG-00082G-VA
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:33:26 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxnis-00085P-T6
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:34:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595320404;
+ s=mimecast20190719; t=1595320440;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F3HOz6ox4WfgXzS8uNt+aJRIXq6V4kbf7PA5S7YE9Rg=;
- b=Yfiv1PVWtkwdZJNGsUijdfQtJhtd2WLhqaYQ7VIA3kYOZtbWXyjbohLAwe16MdimjboHr+
- 4TUPuLwbziea+zmR5KwFUQIdDIvK4/cZIeX7nkQUWpW2EybJM0Vz7rWJIFxcRnW9++LGBu
- S/dToCkPU+fpuKCtt0aMYlDv0waMejk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-CzUVAQmtPcCXAiTuxbxXpg-1; Tue, 21 Jul 2020 04:33:21 -0400
-X-MC-Unique: CzUVAQmtPcCXAiTuxbxXpg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE05E1009629;
- Tue, 21 Jul 2020 08:33:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E5DB60BF4;
- Tue, 21 Jul 2020 08:33:17 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2C65D111CA27; Tue, 21 Jul 2020 10:33:16 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH-for-5.1] hw/nvram/fw_cfg: Let fw_cfg_add_from_generator()
- return boolean value
-References: <20200720123521.8135-1-philmd@redhat.com>
- <34e8619f-4301-d746-fe3f-c340040c22c1@redhat.com>
-Date: Tue, 21 Jul 2020 10:33:16 +0200
-In-Reply-To: <34e8619f-4301-d746-fe3f-c340040c22c1@redhat.com> (Laszlo Ersek's
- message of "Mon, 20 Jul 2020 23:57:42 +0200")
-Message-ID: <87r1t59sj7.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=0mo9FJd1FFZJhIubUUo9UhweUi0S1u9RMig2Mv3FpQ0=;
+ b=LOKxsoObhUl2qcZJ4awPXVP59ksUjvssjLjzf93PQACv8RUeFY6UBVKQh19QvDCSWQ7Up+
+ AnSbMpm8YEKM/NyyLKtjl1j5F2A8CcV+FnByq5RscICR5ye/GbyRRXRA7dlFNl1lm+w/we
+ KBy2NRVjXuohVAUb6c6xRAJ45++yXOU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-T1VYdZMJPgSnXAsKRfk_rw-1; Tue, 21 Jul 2020 04:33:58 -0400
+X-MC-Unique: T1VYdZMJPgSnXAsKRfk_rw-1
+Received: by mail-wm1-f69.google.com with SMTP id g138so729003wme.7
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 01:33:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=0mo9FJd1FFZJhIubUUo9UhweUi0S1u9RMig2Mv3FpQ0=;
+ b=gvqF00q15IvDPOhkrqm9RNUsoiqpK/wchlkRHe/JnwVWeGa2042cPnijbgETgwFGX8
+ wsSL8j9iv2Y0qq3fLtHbSqIeIIctyWozEZeCXt4xE34BcBMg9MmJBw83RRMAvODtu4Fi
+ 182byfC12gxMWRxbAtO8coovdcxLI/+MQ4kLeJlFLPEDqkvDBiBqpwaY/F6R0p8o0cSS
+ aHGAU0u1ZlJg4zB1FpJdfaC7zvi5MBO+BIckMdFBgS9MU8XrqD4jtI3v3A55LXD9I8cc
+ RLlJGYj+1lECeVFDm8JmjN2axS8Gtd/zmbPudh6Xoau2SrsUUt8mQpBrMJn87NjFT2/7
+ D+vg==
+X-Gm-Message-State: AOAM533KNk6h9FdltIyh6UV5imBruvEuOgYJdSvqFw9IuT3CX/eoSKVy
+ 6LtrgyCaBKlUovOo0VoV708EGHTQZRJeABufaeS1fQAdmnSMovO2/atRjuzJDbQZSFN/cKZERWz
+ z39ZR7sUWiwOMq+U=
+X-Received: by 2002:a5d:4051:: with SMTP id w17mr24562979wrp.183.1595320437476; 
+ Tue, 21 Jul 2020 01:33:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwQ6bGlKYh8U1vdqoHmHNRp5ZGHufKWdQLVv9QCpza1zvprjaFndwdY0yiHwaqITtY1XCP3MA==
+X-Received: by 2002:a5d:4051:: with SMTP id w17mr24562961wrp.183.1595320437274; 
+ Tue, 21 Jul 2020 01:33:57 -0700 (PDT)
+Received: from [192.168.1.37] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id l14sm37430966wrn.18.2020.07.21.01.33.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 21 Jul 2020 01:33:56 -0700 (PDT)
+Subject: Re: [PATCH v2 5/9] nvram: add nrf51_soc flash read method
+To: P J P <ppandit@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <20200624185523.762240-1-ppandit@redhat.com>
+ <20200624185523.762240-6-ppandit@redhat.com>
+ <CAKXe6SKBYpdouoN=C_NZawLOnDMYjDU2X3c2CsCv7X7rPym1Rg@mail.gmail.com>
+ <CAFEAcA8s8-OCmKEJsp6bJXBXH+JiyxrtSbHPiLimCj8+xz3obw@mail.gmail.com>
+ <nycvar.YSQ.7.78.906.2007211212380.4380@xnncv>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <03c8f705-9e6c-9369-c547-eb09ede77fc1@redhat.com>
+Date: Tue, 21 Jul 2020 10:33:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <nycvar.YSQ.7.78.906.2007211212380.4380@xnncv>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:46:39
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:30:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,220 +139,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+Cc: Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+On 7/21/20 8:47 AM, P J P wrote:
+> +-- On Thu, 16 Jul 2020, Peter Maydell wrote --+
+> | > P J P <ppandit@redhat.com> ���2020���6���25��������� ������3:01���������
+> | > > +static uint64_t flash_read(void *opaque, hwaddr offset, unsigned size)
+> | > > +{
+> | > > +    NRF51NVMState *s = NRF51_NVM(opaque);
+> | > > +
+> | > > +    assert(offset + size <= s->flash_size);
+> | > > +    return ldl_le_p(s->storage + offset);
+> | > > +}
+> | >
+> | > The 'flash_ops' is for ROM, though I don't see where it calls 
+> | > 'memory_region_rom_device_set_romd' to ROMD, so this MR is in MMIO mode 
+> | > and it needs a read callback.
+> | 
+> | I think that 'romd mode' (ie reads-go-directly-to-RAM) is the default: 
+> | memory_region_initfn() sets romd_mode to true. So unless the device actively 
+> | calls memory_region_rom_device_set_romd(mr, false) then the read callback 
+> | can't be reached.
+> 
+> So, we go with g_assert_not_reached() ? We seem to have differing opinions 
+> about these callbacks.
 
-> On 07/20/20 14:35, Philippe Mathieu-Daud=C3=A9 wrote:
->> Commits b6d7e9b66f..a43770df5d simplified the error propagation.
->> Similarly to commit 6fd5bef10b "qom: Make functions taking Error**
->> return bool, not void", let fw_cfg_add_from_generator() return a
->> boolean value, not void.
->> This allow to simplify parse_fw_cfg() and fixes the error handling
->> issue reported by Coverity (CID 1430396):
->>=20
->>   In parse_fw_cfg():
->>=20
->>     Variable assigned once to a constant guards dead code.
->>=20
->>     Local variable local_err is assigned only once, to a constant
->>     value, making it effectively constant throughout its scope.
->>     If this is not the intent, examine the logic to see if there
->>     is a missing assignment that would make local_err not remain
->>     constant.
+- Callback missing because we neglected to implement the
+  hardware behavior:
 
-It's the call of fw_cfg_add_from_generator():
+  => qemu_log_mask(LOG_UNIMP, ...)
 
-        Error *local_err =3D NULL;
+- Callback missing because the access is illegal on hardware
+  (write on read-only register, read on write-only register):
 
-        fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
-        if (local_err) {
-            error_propagate(errp, local_err);
-            return -1;
-        }
-        return 0;
+  => qemu_log_mask(LOG_GUEST_ERROR, ...)
 
-If it fails, parse_fw_cfg() sets an error and returns 0, which is wrong.
-Harmless, because the only caller passes &error_fatal.
+- Impossible situation unrelated to the hardware/guest behavior
+  (problem in QEMU design)
 
-Please work this impact assessment into the commit message.
+  => g_assert_not_reached()
 
->>=20
->> Reported-by: Peter Maydell <peter.maydell@linaro.org>
->> Fixes: Coverity CID 1430396: 'Constant' variable guards dead code (DEADC=
-ODE)
->> Fixes: 6552d87c48 ("softmmu/vl: Let -fw_cfg option take a 'gen_id' argum=
-ent")
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>  include/hw/nvram/fw_cfg.h |  4 +++-
->>  hw/nvram/fw_cfg.c         | 10 ++++++----
->>  softmmu/vl.c              |  6 +-----
->>  3 files changed, 10 insertions(+), 10 deletions(-)
->>=20
->> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
->> index 11feae3177..d90857f092 100644
->> --- a/include/hw/nvram/fw_cfg.h
->> +++ b/include/hw/nvram/fw_cfg.h
->> @@ -302,8 +302,10 @@ void *fw_cfg_modify_file(FWCfgState *s, const char =
-*filename, void *data,
->>   * will be used; also, a new entry will be added to the file directory
->>   * structure residing at key value FW_CFG_FILE_DIR, containing the item=
- name,
->>   * data size, and assigned selector key value.
->> + *
->> + * Returns: %true on success, %false on error.
->>   */
->> -void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
->> +bool fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
->>                                 const char *gen_id, Error **errp);
->> =20
->>  FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
->> index 3b1811d3bf..c88aec4341 100644
->> --- a/hw/nvram/fw_cfg.c
->> +++ b/hw/nvram/fw_cfg.c
->> @@ -1032,7 +1032,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char=
- *filename,
->>      return NULL;
->>  }
->> =20
->> -void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
->> +bool fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
->>                                 const char *gen_id, Error **errp)
->>  {
->>      ERRP_GUARD();
->> @@ -1044,20 +1044,22 @@ void fw_cfg_add_from_generator(FWCfgState *s, co=
-nst char *filename,
->>      obj =3D object_resolve_path_component(object_get_objects_root(), ge=
-n_id);
->>      if (!obj) {
->>          error_setg(errp, "Cannot find object ID '%s'", gen_id);
->> -        return;
->> +        return false;
->>      }
->>      if (!object_dynamic_cast(obj, TYPE_FW_CFG_DATA_GENERATOR_INTERFACE)=
-) {
->>          error_setg(errp, "Object ID '%s' is not a '%s' subclass",
->>                     gen_id, TYPE_FW_CFG_DATA_GENERATOR_INTERFACE);
->> -        return;
->> +        return false;
->>      }
->>      klass =3D FW_CFG_DATA_GENERATOR_GET_CLASS(obj);
->>      array =3D klass->get_data(obj, errp);
->>      if (*errp) {
->> -        return;
->> +        return false;
->>      }
->>      size =3D array->len;
->>      fw_cfg_add_file(s, filename, g_byte_array_free(array, TRUE), size);
->> +
->> +    return true;
->>  }
->> =20
->>  static void fw_cfg_machine_reset(void *opaque)
->> diff --git a/softmmu/vl.c b/softmmu/vl.c
->> index f476ef89ed..3416241557 100644
->> --- a/softmmu/vl.c
->> +++ b/softmmu/vl.c
->> @@ -2070,11 +2070,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *o=
-pts, Error **errp)
->>          size =3D strlen(str); /* NUL terminator NOT included in fw_cfg =
-blob */
->>          buf =3D g_memdup(str, size);
->>      } else if (nonempty_str(gen_id)) {
->> -        Error *local_err =3D NULL;
->> -
->> -        fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
->> -        if (local_err) {
->> -            error_propagate(errp, local_err);
->> +        if (!fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp)) {
->>              return -1;
->>          }
->>          return 0;
 
-The minimally invasive fix would be this one-liner:
+Note, when we runs QEMU with LOG_UNIMP/LOG_GUEST_ERROR enabled,
+we are usually interested in what address the guest is accessing,
+and in the write case, what value is written.
 
-    diff --git a/softmmu/vl.c b/softmmu/vl.c
-    index f476ef89ed..46718c1eea 100644
-    --- a/softmmu/vl.c
-    +++ b/softmmu/vl.c
-    @@ -2072,7 +2072,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts *o=
-pts, Error **errp)
-         } else if (nonempty_str(gen_id)) {
-             Error *local_err =3D NULL;
-
-    -        fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
-    +        fw_cfg_add_from_generator(fw_cfg, name, gen_id, &local_err);
-             if (local_err) {
-                 error_propagate(errp, local_err);
-                 return -1;
-
-I like yours better.  We have a long tail of functions taking the
-conventional Error **errp parameter to convert from returning void to
-bool.
-
-> The retvals seem OK, but I have no idea if this plays nicely with the
-> new ERRP_GUARD (which I'm just noticing in fw_cfg_add_from_generator()).
-
-Return values don't interfere with ERRP_GUARD().
-
-Below the hood, ERRP_GUARD() replaces problematic values of @errp by a
-pointer to a local variable that is automatically propagated to the
-original value.  Why is that useful?  From error.h's big comment:
-
- * Without ERRP_GUARD(), use of the @errp parameter is restricted:
- * - It must not be dereferenced, because it may be null.
- * - It should not be passed to error_prepend() or
- *   error_append_hint(), because that doesn't work with &error_fatal.
- * ERRP_GUARD() lifts these restrictions.
-
-fw_cfg_add_from_generator() dereferences @errp to check for failure of
-klass->get_data().
-
-If ->get_data() returns null on error and non-null on success, we could
-simplify:
-
-  diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-  index 3b1811d3bf..dfa1f2012a 100644
-  --- a/hw/nvram/fw_cfg.c
-  +++ b/hw/nvram/fw_cfg.c
-  @@ -1035,7 +1035,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const char =
-*filename,
-   void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
-                                  const char *gen_id, Error **errp)
-   {
-  -    ERRP_GUARD();
-       FWCfgDataGeneratorClass *klass;
-       GByteArray *array;
-       Object *obj;
-  @@ -1053,7 +1052,7 @@ void fw_cfg_add_from_generator(FWCfgState *s, const=
- char *filename,
-       }
-       klass =3D FW_CFG_DATA_GENERATOR_GET_CLASS(obj);
-       array =3D klass->get_data(obj, errp);
-  -    if (*errp) {
-  +    if (!array) {
-           return;
-       }
-       size =3D array->len;
-
-Clearer now?
-
-> FWIW
->
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->
-> Thanks
-> Laszlo
-
-Preferably with an improved commit message:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> 
+> Thank you.
+> --
+> Prasad J Pandit / Red Hat Product Security Team
+> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+> 
 
 
