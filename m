@@ -2,103 +2,100 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E021C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:05:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A3B0C433FB
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:06:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37CD5206E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:05:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F97A2077D
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 16:06:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="GnXJkpFR";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="R3Tg4X1H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37CD5206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OT2sWL7m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F97A2077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxulY-0000VA-G8
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 12:05:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33582)
+	id 1jxumd-0001il-9A
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 12:06:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jxujC-0006pr-4s
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:02:51 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:40125)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jxuj4-0003Uz-PJ
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:02:49 -0400
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
- by mailout.nyi.internal (Postfix) with ESMTP id 7B5135C00EB;
- Tue, 21 Jul 2020 12:02:41 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute2.internal (MEProxy); Tue, 21 Jul 2020 12:02:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=
- from:to:cc:subject:in-reply-to:references:date:message-id
- :mime-version:content-type; s=fm3; bh=0w1LD0KFP5BTQIS+DKFw60Ddzd
- qtjnSiVyCQNJt8I88=; b=GnXJkpFR9H3L+SLpkGzVT5mIHthLgwQ4lslwUrA0dQ
- Fy2qww2kzHGudduodhA/c+e7fKmRbYqKFQI3BRu9KQfgDuAIRTtesVKjKBbYno5v
- 0d0jmyXK54J/MI4tyc+L4hwcGLm41F4DTIqe0RXMfHRlWYZobKhTEJ2vFznWiQtN
- SQeiq32EOooz8qCdedn21gHkR7kw6IeuEyiezdR+ONA5hRrD+O36OojvxDU5XAhV
- 1J6yPdHPd+FlKoqGiAjxVCm4i03hjEdTdfOxTCttn72C/bfaX+J8ODEcN7oA5nB2
- biqOffbZHZ7ooVvdd0hhy7VKOvpkC0qZF4Z7OTPXcyrg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=0w1LD0
- KFP5BTQIS+DKFw60DdzdqtjnSiVyCQNJt8I88=; b=R3Tg4X1Hl/pdhup3QDD1t7
- VTLybZYQk+NLEeluokdMa7j8aT7cjsCmfh878N2l3CimsZLRK698j0EerLEui2Vc
- B4cC+fSrvW6oUUeiJ6MTbKomgarnOKgjk1T87skalvf79pWcSUDDhf71kz5cdkBM
- i77QVbisyK8nuE62wYWC22ZoItJEaFgGJp838Q3+xLWsDuTfv0a0r3VIhGndjydm
- +zICluzt3Qopc1JnvS9eqJO8574IZ+I1yCqY1hE40PiDepghnRir9kV3XcI58K1j
- dMY63k6FAYjf5ejgGPq79N8XvHijAMJTmELLqL7SWpf0klBixuyA1IvatseuoyDA
- ==
-X-ME-Sender: <xms:oBEXX0pDmPwXfkexuTNHEJXtoadONnSFw7gAMC5zkpIaAwtlt1QUGA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrgeeigdelvdcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenog
- fuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefhvffujghffffkgggtseht
- tdertddttddtnecuhfhrohhmpeetlhihshhsrgcutfhoshhsuceohhhisegrlhihshhsrg
- drihhsqeenucggtffrrghtthgvrhhnpeehgeffhfduhfejheffveelkeettedtleduueff
- ieejtdeuhffhudejffehgeeivdenucffohhmrghinhepqhgvmhhurdhorhhgpdhgihhthh
- husgdrihhopdhkvghrnhgvlhdrohhrghenucfkphepgeeirdektddrudegvddrkeefnecu
- vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhephhhisegrlh
- ihshhsrgdrihhs
-X-ME-Proxy: <xmx:oBEXX6o-d9UX_4c46exreZT-MMscm5IqFC0X7TwNUoJTSvDEcADgTg>
- <xmx:oBEXX5PCKi5EwEoOY_JI0gcPc0UdRN9mcoDTBjfZbGtdHs6mZa_rNA>
- <xmx:oBEXX75WbDG7lGvFNZzf5W9jPWYZ50API-V1aFYYGjNBWGnHAgdR1A>
- <xmx:oREXX8XcoKicmXnhfiRYk-yRCC9iWSRV6s5HEjedpGia6baPUGw61A>
-Received: from x220.qyliss.net (p2e508e53.dip0.t-ipconnect.de [46.80.142.83])
- by mail.messagingengine.com (Postfix) with ESMTPA id 2A523306005F;
- Tue, 21 Jul 2020 12:02:40 -0400 (EDT)
-Received: by x220.qyliss.net (Postfix, from userid 1000)
- id 9541D2E6; Tue, 21 Jul 2020 16:02:38 +0000 (UTC)
-From: Alyssa Ross <hi@alyssa.is>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: Testing the virtio-vhost-user QEMU patch
-In-Reply-To: <20200721083048.GB144170@stefanha-x1.localdomain>
-References: <87h7u1s5k1.fsf@alyssa.is>
- <20200721083048.GB144170@stefanha-x1.localdomain>
-Date: Tue, 21 Jul 2020 16:02:38 +0000
-Message-ID: <87d04osvoh.fsf@alyssa.is>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jxujA-0006pk-Mz
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:02:50 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46394)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jxuj5-0003V4-Hk
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 12:02:48 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r12so21634628wrj.13
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 09:02:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=c5WSna24NYXlpTR8ZC4MX1SjLp4KK09QM1iOPtr7AE4=;
+ b=OT2sWL7mHWyYOUPi68ct/KO56zdyA9TWNXq77sfrrJAy6ke/D87Fbcru6COj05+Jx/
+ Ip41nr+3hf15oWWRW7XOKC3ypDSS53dgvkuldF6Jfh6cPHGo1QtQh6mATeFp1HDW+Kg3
+ Perhv64OtRzFg3g5c02D6pU9sXxHfB3Qr+xVfhdbDB1C+mB9uMODV5eIQexfyybSIcnf
+ E5GF679bEn/mJ4JXHuU40uzMapAjIt4hvJSWluY/jGGGa6HLuOv1TdrvvqV82HicdJcc
+ SvB1Ce9Ze199hP5yNEy6tdxlcrUYRpKSTwunst5xMnFQPzFhNfSg8xXaTxRVsTc8QL6P
+ AQpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=c5WSna24NYXlpTR8ZC4MX1SjLp4KK09QM1iOPtr7AE4=;
+ b=VbyDTtY8Ff4I9XjsniNMp1jhSODSIy1WKCHofQJqCB6BwGDem0ilm0jgqHKb17l/qv
+ 8y1xLtUraqHIn5p+AHRGPrvR5N3cD6Sp9/9rMlzN8Rv+VB0or/r5LWIYF1FYlBB+Y6jv
+ R8yKn2LEEQ+2pMA68xr5y3tqw6yjMJp/XG50swBpMSFVyUJKtyU0saLv/56gLFkgevvM
+ 6lfzM1+e3XkJJ9WbuO78QtCZO06Tj4xoZSA7P8A3AV7oef1kzn5aVpgd+nZhsEozAtsR
+ ASe8oRO9xaduQTEPwhAuNLKfdqrYvi1ZWVSiyRogKBI8qzlkB7/6LgNLExcimxP2kLIA
+ 1Mqg==
+X-Gm-Message-State: AOAM530Bwt9lXNzWrN/wBBmMOVA4ZAod8zMoaMeYv5eTFD8fBuvWOgvl
+ iFcHG28YqYHbnyQgl5PP80h4kQ==
+X-Google-Smtp-Source: ABdhPJz9pMbgoA7dVb8jrwm3AcKywtSB6qD1FJdS6fPnB4f5+sM79kQlV3KRlC1m1uZ4HiDZx/H+5g==
+X-Received: by 2002:a5d:414e:: with SMTP id c14mr1047547wrq.57.1595347361785; 
+ Tue, 21 Jul 2020 09:02:41 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id o9sm38021909wrs.1.2020.07.21.09.02.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 21 Jul 2020 09:02:40 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3631D1FF7E;
+ Tue, 21 Jul 2020 17:02:34 +0100 (BST)
+References: <20200716144251.23004-1-lersek@redhat.com>
+ <a38a3da3-7406-0ba3-ca32-e96a99915c97@redhat.com>
+ <af008780-5207-c156-56f3-dcda95367a5a@redhat.com>
+ <cc685d76-db4c-74bf-34dc-744fdd28add3@redhat.com>
+ <d3686a7e-c949-8111-80d9-45aa506fcf58@redhat.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH] target/i386: floatx80: avoid compound literals in
+ static initializers
+In-reply-to: <d3686a7e-c949-8111-80d9-45aa506fcf58@redhat.com>
+Date: Tue, 21 Jul 2020 17:02:34 +0100
+Message-ID: <87eep4voth.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=66.111.4.27; envelope-from=hi@alyssa.is;
- helo=out3-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 12:02:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,64 +108,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nikos Dragazis <ndragazis@arrikto.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Joseph Myers <joseph@codesourcery.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-> On Tue, Jul 21, 2020 at 07:14:38AM +0000, Alyssa Ross wrote:
->> Hi -- I hope it's okay me reaching out like this.
->> 
->> I've been trying to test out the virtio-vhost-user implementation that's
->> been posted to this list a couple of times, but have been unable to get
->> it to boot a kernel following the steps listed either on
->> <https://wiki.qemu.org/Features/VirtioVhostUser> or
->> <https://ndragazis.github.io/dpdk-vhost-vvu-demo.html>.
->> 
->> Specifically, the kernel appears to be unable to write to the
->> virtio-vhost-user device's PCI registers.  I've included the full panic
->> output from the kernel at the end of this message.  The panic is
->> reproducible with two different kernels I tried (with different configs
->> and versions).  I tried both versions of the virtio-vhost-user I was
->> able to find[1][2], and both exhibited the same behaviour.
->> 
->> Is this a known issue?  Am I doing something wrong?
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> On 7/17/20 6:46 PM, Laszlo Ersek wrote:
+>> On 07/17/20 11:26, Laszlo Ersek wrote:
+>>> On 07/16/20 17:09, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> On 7/16/20 4:42 PM, Laszlo Ersek wrote:
+>>>>> Quoting ISO C99 6.7.8p4, "All the expressions in an initializer for an
+>>>>> object that has static storage duration shall be constant expressions=
+ or
+>>>>> string literals".
+>>>>>
+>>>>> The compound literal produced by the make_floatx80() macro is not suc=
+h a
+>>>>> constant expression, per 6.6p7-9. (An implementation may accept it,
+>>>>> according to 6.6p10, but is not required to.)
+>>>>>
+>>>>> Therefore using "floatx80_zero" and make_floatx80() for initializing
+>>>>> "f2xm1_table" and "fpatan_table" is not portable. And gcc-4.8 in RHEL=
+-7.6
+>>>>> actually chokes on them:
+>>>>>
+>>>>>> target/i386/fpu_helper.c:871:5: error: initializer element is not co=
+nstant
+>>>>>>      { make_floatx80(0xbfff, 0x8000000000000000ULL),
+>>>>>>      ^
+>>>>
+>>>> This reminds me of:
+>>>>
+>>>> commit 6fa9ba09dbf4eb8b52bcb47d6820957f1b77ee0b
+>>>> Author: Kamil Rytarowski <n54@gmx.com>
+>>>> Date:   Mon Sep 4 23:23:06 2017 +0200
+>>>>
+>>>>     target/m68k: Switch fpu_rom from make_floatx80() to make_floatx80_=
+init()
+>>>>
+>>>>     GCC 4.7.2 on SunOS reports that the values assigned to array membe=
+rs
+>>>> are not
+>>>>     real constants:
+>>>>
+>>>>     target/m68k/fpu_helper.c:32:5: error: initializer element is not
+>>>> constant
+>>>>     target/m68k/fpu_helper.c:32:5: error: (near initialization for
+>>>> 'fpu_rom[0]')
+>>>>     rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
+>>>>
+>>>>     Convert the array to make_floatx80_init() to fix it.
+>>>>     Replace floatx80_pi-like constants with make_floatx80_init() as th=
+ey are
+>>>>     defined as make_floatx80().
+>>>>
+>>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>>
+>>>>>
+>>>>> We've had the make_floatx80_init() macro for this purpose since commit
+>>>>> 3bf7e40ab914 ("softfloat: fix for C99", 2012-03-17), so let's use that
+>>>>> macro again.
+>>>>>
+>>>>> Fixes: eca30647fc07
+>>>>> Fixes: ff57bb7b6326
+>>>>> Link: https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06566.=
+html
+>>>>> Link: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04714.=
+html
+>>>>> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>>> Cc: Aurelien Jarno <aurelien@aurel32.net>
+>>>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>>>>> Cc: Joseph Myers <joseph@codesourcery.com>
+>>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>>>> Cc: Richard Henderson <rth@twiddle.net>
+>>>>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+>>>>> ---
+>>>>>
+>>>>> Notes:
+>>>>>     I can see that there are test cases under "tests/tcg/i386", but I=
+ don't
+>>>>>     know how to run them.
+>>>>
+>>>> Yeah it is not easy to figure...
+>>>>
+>>>> Try 'make run-tcg-tests-i386-softmmu'
+>>>> but you need docker :^)
+>>>
+>>> That worked, thanks! Even without Docker: I just had to add
+>>>
+>>>   --cross-cc-i386=3Dgcc
+>>>
+>>> to my ./configure flags.
+>>>
+>>=20
+>> Also -- I meant to, but I forgot to put "for-5.1" in the subject prefix;
+>> sorry about that.
 >
-> Hi,
-> Unfortunately I'm not sure what the issue is. This is an early
-> virtio-pci register access before a driver for any specific device type
-> (net, blk, vhost-user, etc) comes into play.
+> Alex, as Paolo is not available, can this go via your tree?
+
+Ok queued to for-5.1/fixes-for-rc1-v2, thanks.
+
 >
-> Did you test the git trees linked below or did you rebase the commits
-> on top of your own QEMU tree?
+>>=20
+>> Laszlo
+>>=20
 
-I tested the git trees.  For your one I had to make a slight
-modification to delete the memfd syscall wrapper in util/memfd.c, since
-it conflicted with the one that is now provided by Glibc.  Nikos's tree
-I used totally unmodified.
 
-> Is your guest kernel a stock kernel.org/distro kernel or has it been
-> modified (especially with security patches)?
-
-I tried a slightly modified Chromium OS kernel (5.4.23), and a stock
-Ubuntu 18.10 kernel (4.15.0).  I think the most "normal" setup I tried
-was building QEMU on Fedora 32, and then attempting to boot a freshly
-installed Ubuntu Server 18.10 VM with
-
-    -chardev socket,id=chardev0,path=vhost-user.sock,server,nowait \
-    -device virtio-vhost-user-pci,chardev=chardev0
-
-(The crash was reproducible with the full QEMU command lines in the
-write-ups, but these seemed to be the load-bearing bits.)
-
-> If no one else knows what is wrong here then it will be necessary to
-> check the Intel manuals to figure out the exact meaning of
-> "error_code(0x000b) - reserved bit violation" and why Linux triggers it
-> with "PGD 3b128067 P4D 3b128067 PUD 3b129067 PMD 3b12a067 PTE
-> 8000002000000073".
-
-Thanks for your insight.  Now I at least have a place to start if nobody
-else knows what's up. :)
+--=20
+Alex Benn=C3=A9e
 
