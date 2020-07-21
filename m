@@ -7,78 +7,75 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8685BC433ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:52:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A07BC433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:56:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53AD520720
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:52:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C942120720
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 08:56:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LD02Z8YN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53AD520720
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FsQDrFZu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C942120720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxo0q-0004OL-Ij
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:52:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50042)
+	id 1jxo4t-0005sL-QW
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 04:56:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jxo0D-0003t3-9G
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:51:58 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60062
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jxo4J-0005OI-6y
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:56:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49619
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jxo0A-0003LZ-96
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:51:56 -0400
+ id 1jxo4H-0004ED-DV
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 04:56:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595321513;
+ s=mimecast20190719; t=1595321768;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YIpG0bL/Vk9hwg0/bNtGM7jmcH1ViWQcHp6c70efdmE=;
- b=LD02Z8YNP7iP6EVsUlFWjBGDgkB8DeNuhIVAQvZTAVmfCn5NhrPDLk2R6tRq2um8F/ywj2
- hwzildzFQf1Iu7U5PTircW52yBnNiPfrf/LKKO/cgSzRxqRd2Dd1M3mIkyVrY8+sR9pXmi
- pBCFHzfSBQMow4mIq3TtvkXgjLgaLVQ=
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=TII/fgOrGssfx5JRsD2yWOJbn3c6DV++mYvTOBpxmvM=;
+ b=FsQDrFZuhKHto0X4n68Y7Siwrd4+oGj2XkT/2oCcXtoI/5KCqIQtJucGMqwfUMjVp0Y8Rb
+ X6YgI81xxmpX9GsiSnkM+rhtSQnabd35okQZXO7+fk9XmFQg6gBJVCFgUaa6beiEo2i1Bv
+ NZG8Kbzidj2KsraGni04g/j71z49jXM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-gZF6FJVNPlumrteuk7330Q-1; Tue, 21 Jul 2020 04:51:45 -0400
-X-MC-Unique: gZF6FJVNPlumrteuk7330Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-398-5S7dGpRyO-qHMyPhHsnHzQ-1; Tue, 21 Jul 2020 04:56:06 -0400
+X-MC-Unique: 5S7dGpRyO-qHMyPhHsnHzQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11A0C8014D7;
- Tue, 21 Jul 2020 08:51:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48322800688;
+ Tue, 21 Jul 2020 08:56:05 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.110.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B9B157303C;
- Tue, 21 Jul 2020 08:51:42 +0000 (UTC)
-Date: Tue, 21 Jul 2020 09:51:39 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9155C5C22A;
+ Tue, 21 Jul 2020 08:56:03 +0000 (UTC)
+Date: Tue, 21 Jul 2020 09:56:00 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH for-5.2 1/3] qga/qapi-schema: Document -1 for invalid PCI
- address fields
-Message-ID: <20200721085139.GA843362@redhat.com>
+Subject: Re: [PATCH for-5.2 2/3] qga/commands-posix: Rework
+ build_guest_fsinfo_for_real_device() function
+Message-ID: <20200721085600.GB843362@redhat.com>
 References: <20200720110133.4366-1-thuth@redhat.com>
- <20200720110133.4366-2-thuth@redhat.com>
+ <20200720110133.4366-3-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200720110133.4366-2-thuth@redhat.com>
+In-Reply-To: <20200720110133.4366-3-thuth@redhat.com>
 User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:26:46
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:30:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -106,37 +103,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 20, 2020 at 01:01:31PM +0200, Thomas Huth wrote:
-> The "guest-get-fsinfo" could also be used for non-PCI devices in the
-> future. And the code in GuestPCIAddress() in qga/commands-win32.c seems
-> to be using "-1" for fields that it can not determine already. Thus
-> let's properly document "-1" as value for invalid PCI address fields.
-
-Urgh that's a bit of a design flaw - "pci-controller" should have
-been an optional field instead, but we can't fix that without
-breaking compat with existing clients :-(
-
+On Mon, Jul 20, 2020 at 01:01:32PM +0200, Thomas Huth wrote:
+> We are going to support non-PCI devices soon. For this we need to split
+> the generic GuestDiskAddress and GuestDiskAddressList memory allocation
+> and chaining into a separate function first.
 > 
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  qga/qapi-schema.json | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  qga/commands-posix.c | 65 ++++++++++++++++++++++++++++----------------
+>  1 file changed, 41 insertions(+), 24 deletions(-)
 > 
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index 4be9aad48e..408a662ea5 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -846,7 +846,7 @@
->  ##
->  # @GuestDiskAddress:
->  #
-> -# @pci-controller: controller's PCI address
-> +# @pci-controller: controller's PCI address (fields are set to -1 if invalid)
->  # @bus-type: bus type
->  # @bus: bus id
->  # @target: target id
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 1a62a3a70d..cddbaf5c69 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -861,28 +861,30 @@ static int build_hosts(char const *syspath, char const *host, bool ata,
+>      return i;
+>  }
+>  
+> -/* Store disk device info specified by @sysfs into @fs */
+> -static void build_guest_fsinfo_for_real_device(char const *syspath,
+> -                                               GuestFilesystemInfo *fs,
+> -                                               Error **errp)
+> +/*
+> + * Store disk device info for devices on the PCI bus.
+> + * Returns true if information has been stored, or false for failure.
+> + */
+> +static bool build_guest_fsinfo_for_pci_dev(char const *syspath,
+> +                                           GuestDiskAddress *disk,
+> +                                           GuestPCIAddress *pciaddr,
+> +                                           Error **errp)
+>  {
+>      unsigned int pci[4], host, hosts[8], tgt[3];
+>      int i, nhosts = 0, pcilen;
+> -    GuestDiskAddress *disk;
+> -    GuestPCIAddress *pciaddr;
+> -    GuestDiskAddressList *list = NULL;
+>      bool has_ata = false, has_host = false, has_tgt = false;
+>      char *p, *q, *driver = NULL;
+>  #ifdef CONFIG_LIBUDEV
+>      struct udev *udev = NULL;
+>      struct udev_device *udevice = NULL;
+>  #endif
+> +    bool ret = false;
+>  
+>      p = strstr(syspath, "/devices/pci");
+>      if (!p || sscanf(p + 12, "%*x:%*x/%x:%x:%x.%x%n",
+>                       pci, pci + 1, pci + 2, pci + 3, &pcilen) < 4) {
+>          g_debug("only pci device is supported: sysfs path '%s'", syspath);
+> -        return;
+> +        return false;
+>      }
+>  
+>      p += 12 + pcilen;
+> @@ -903,7 +905,7 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+>          }
+>  
+>          g_debug("unsupported driver or sysfs path '%s'", syspath);
+> -        return;
+> +        return false;
+>      }
+>  
+>      p = strstr(syspath, "/target");
+> @@ -929,18 +931,11 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+>          }
+>      }
+>  
+> -    pciaddr = g_malloc0(sizeof(*pciaddr));
+>      pciaddr->domain = pci[0];
+>      pciaddr->bus = pci[1];
+>      pciaddr->slot = pci[2];
+>      pciaddr->function = pci[3];
+>  
+> -    disk = g_malloc0(sizeof(*disk));
+> -    disk->pci_controller = pciaddr;
+> -
+> -    list = g_malloc0(sizeof(*list));
+> -    list->value = disk;
+> -
+>  #ifdef CONFIG_LIBUDEV
+>      udev = udev_new();
+>      udevice = udev_device_new_from_syspath(udev, syspath);
+> @@ -1018,21 +1013,43 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+>          goto cleanup;
+>      }
+>  
+> -    list->next = fs->disk;
+> -    fs->disk = list;
+> -    goto out;
+> +    ret = true;
+>  
+>  cleanup:
+> -    if (list) {
+> -        qapi_free_GuestDiskAddressList(list);
+> -    }
+> -out:
+>      g_free(driver);
+>  #ifdef CONFIG_LIBUDEV
+>      udev_unref(udev);
+>      udev_device_unref(udevice);
+>  #endif
+> -    return;
+> +    return ret;
+> +}
+> +
+> +/* Store disk device info specified by @sysfs into @fs */
+> +static void build_guest_fsinfo_for_real_device(char const *syspath,
+> +                                               GuestFilesystemInfo *fs,
+> +                                               Error **errp)
+> +{
+> +    GuestDiskAddress *disk;
+> +    GuestPCIAddress *pciaddr;
+> +    GuestDiskAddressList *list = NULL;
+> +    bool has_pci;
+> +
+> +    pciaddr = g_malloc(sizeof(*pciaddr));
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+g_new0 instead of g_malloc and thus kill the sizeof.
+
+> +    memset(pciaddr, -1, sizeof(*pciaddr));  /* -1 means field is invalid */
+
+Each field in GuestPCIAddress is an "int64_t", but memset works on bytes.
+
+So you're not setting the fields to "-1" here, you're setting
+each octet in the "int64_t" to -1.
+
+> +
+> +    disk = g_malloc0(sizeof(*disk));
+> +    disk->pci_controller = pciaddr;
+> +
+> +    list = g_malloc0(sizeof(*list));
+> +    list->value = disk;
+
+g_new0 for these too.
+
+(yes, I realize these were all pre-existing bugs)
+
+> +
+> +    has_pci = build_guest_fsinfo_for_pci_dev(syspath, disk, pciaddr, errp);
+> +    if (has_pci) {
+> +        list->next = fs->disk;
+> +        fs->disk = list;
+> +    } else {
+> +        qapi_free_GuestDiskAddressList(list);
+> +    }
+>  }
 
 
 Regards,
