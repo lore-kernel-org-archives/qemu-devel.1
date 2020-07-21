@@ -2,99 +2,102 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DC2C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E14E8C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7D6F20717
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:54:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC39120717
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 17:54:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UF66N88V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D6F20717
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xz1kKg10"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC39120717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxwTD-0005WJ-4u
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 13:54:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34862)
+	id 1jxwTM-0005fy-VO
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 13:54:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxwSP-0004TJ-0n
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:53:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46828
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxwSR-0004Un-9Y
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:53:39 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48755
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxwSM-0002TA-BG
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:53:36 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jxwSP-0002TP-LR
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 13:53:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595354012;
+ s=mimecast20190719; t=1595354016;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=FecxiD2ngj8r8IEXNhAdljr/ccYW5EgTQzGCoazru/o=;
- b=UF66N88VK7M79ISn/bxmxyanTktXHIlLh+UvpIqNmjdx8x8JWwm6W2jMqMDi781MwMsCeZ
- D5KGkgDUuxRA/H341+dVbWFbv2XQqU+su+JMGU0zTBVUhxlA1xIqjnNFdGCnFAshHX5TI6
- I/Coznj8jxb0YPL0Z4cFOCy5WKHIzXk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-rJVjgkUsNuyganKMy2x6ig-1; Tue, 21 Jul 2020 13:53:30 -0400
-X-MC-Unique: rJVjgkUsNuyganKMy2x6ig-1
-Received: by mail-wr1-f69.google.com with SMTP id v4so6161041wrb.2
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 10:53:30 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kjXVC6u9l9tBoWb31yAXqBAn52413X/nF4N+djN625g=;
+ b=Xz1kKg10r8tuYEaKfE+BgUQ5mx9CQzS45XTZlaFhuXffhlVTmgBd4Um0wZ9u7Roh/4Koia
+ pyEI2Gj6oSt2WvbA1AhFXC2bgqC9DnEuFLUrAlzGuioNoa7HI886f3yfJi9gM4CuQNciDU
+ ICvR27sjhItXysXgDPtqA6FpGUvcchc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-YAaFFFruP660qjkgMabwNg-1; Tue, 21 Jul 2020 13:53:35 -0400
+X-MC-Unique: YAaFFFruP660qjkgMabwNg-1
+Received: by mail-wm1-f69.google.com with SMTP id a5so211726wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 10:53:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=FecxiD2ngj8r8IEXNhAdljr/ccYW5EgTQzGCoazru/o=;
- b=GKsWSs5bq3V63Zg8xWOfRTZ6NoSjp0jWtdAYkWfWHUZ7aNyqcj/bcVYtIqZedabyt3
- Uu0G+3UzU1iHsDvbKqStwglFxd9KmrH5gD1/37EtiiXetE+Uw/Zns1Wr6QVE1zC6GRn9
- kcosciCUZb0/oDXQZ3ohypcOecxRpCGxg5A+GJa5w15LfoXojPRL8kUbpM/DaBYAO0m7
- sNxpwYljiOS+f3nFaHnH6PlcWrkypAq48hBPnp6vtIK7Lbb+69yI5pYL0VohrbIVwmBB
- Gb2PYNTnYaWMaVBSP8L6ek6GuPK0l75M0y6lDSAZkBMiPtz2YA6ne1ZGx/vCZ1KjaFII
- uyGg==
-X-Gm-Message-State: AOAM531h/JYFX0t+8fPnfaDF7BluFGn6kF5Wt43TJCdG0KTzkOuwXtlj
- yDDe4DsB5D7OlxyMTzaQ/fGNwMuPHgMSikcs8SxMaezzGgWl7b6kaOVKA2VNoJJQhx51hpitxVz
- FM2/c98eoMLrelrk=
-X-Received: by 2002:a1c:6887:: with SMTP id d129mr4925233wmc.179.1595354009057; 
- Tue, 21 Jul 2020 10:53:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2EZrE+Wu+JmGfkyFwEjUGDkaUS1NbnoDL4TKKz5QtlCjkEuRktJZty06vpoyNvSJR9n9brQ==
-X-Received: by 2002:a1c:6887:: with SMTP id d129mr4925212wmc.179.1595354008791; 
- Tue, 21 Jul 2020 10:53:28 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=kjXVC6u9l9tBoWb31yAXqBAn52413X/nF4N+djN625g=;
+ b=BfElJqAmqbshNMePXldGAgIC4a3EnEnJYP6qMkVKwuY1/Lr6fvOdbqDhvPTTxpKG5Q
+ x/DfyQ+8Ft/NpNHMAzl3iaAZUacbDO8wdt6RRQTsh8U+uRasZyUL327ui21eQmhH3FiR
+ 8Wm4Tqzex9826VZOwF1SmhDR2GbqXmHp8qA6SZoiPuUjS3+/6ArGWldxmCv210P4PccR
+ RViONv4us9+Zhq6yETKuNFsbhbi2TtJHoSY43pfVX83WCXByM9kQEgJTwDuAX5tp3dxO
+ SlKiL2LlU+Et+JWzfQvt5124Ohkz8cCpZ8ao9e+roILacwd0ed0Ds4KUtshYzdcSKzoL
+ XohA==
+X-Gm-Message-State: AOAM530x3vIGrNpRqFNclUr5RpkFfyHRHYK6xrKgWzkkcDkSo1/MFbgq
+ 1poIujIKpu+glMwFSs0UYHzR/skWrKdNARoR0kh+Zu2zD+iMdczmtuHPArgth545yaOWTBpyugh
+ xKeSBSEBbaR6Dnp4=
+X-Received: by 2002:a1c:1d46:: with SMTP id d67mr5455564wmd.152.1595354013813; 
+ Tue, 21 Jul 2020 10:53:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwWb7MwB/N0rFOdyxb3WooFORCVfqMbN1O4cu21KbdEmtYnugMpHPOTTxit+dKjqjN1Wqkw8A==
+X-Received: by 2002:a1c:1d46:: with SMTP id d67mr5455552wmd.152.1595354013625; 
+ Tue, 21 Jul 2020 10:53:33 -0700 (PDT)
 Received: from x1w.redhat.com (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id c194sm4573886wme.8.2020.07.21.10.53.27
+ by smtp.gmail.com with ESMTPSA id d13sm38334886wrn.61.2020.07.21.10.53.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jul 2020 10:53:28 -0700 (PDT)
+ Tue, 21 Jul 2020 10:53:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/2] fw_cfg patches for 2020-07-21
-Date: Tue, 21 Jul 2020 19:53:24 +0200
-Message-Id: <20200721175326.8004-1-philmd@redhat.com>
+Subject: [PULL 1/2] hw/nvram/fw_cfg: Simplify fw_cfg_add_from_generator()
+ error propagation
+Date: Tue, 21 Jul 2020 19:53:25 +0200
+Message-Id: <20200721175326.8004-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200721175326.8004-1-philmd@redhat.com>
+References: <20200721175326.8004-1-philmd@redhat.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:20:34
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 10:15:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,47 +112,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 90218a9a393c7925f330e7dcc08658e2a01d3bd4:
+Document FWCfgDataGeneratorClass::get_data() return NULL
+on error, and non-NULL on success. This allow us to simplify
+fw_cfg_add_from_generator(). Since we don't need a local
+variable to propagate the error, we can remove the ERRP_GUARD()
+macro.
 
-  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-07=
--21' into staging (2020-07-21 10:24:38 +0100)
+Suggested-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20200721131911.27380-2-philmd@redhat.com>
+---
+ include/hw/nvram/fw_cfg.h | 4 +++-
+ hw/nvram/fw_cfg.c         | 3 +--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-are available in the Git repository at:
-
-  https://gitlab.com/philmd/qemu.git tags/fw_cfg-20200721
-
-for you to fetch changes up to 077195187b47d83418e5fb521c89d7881fab3049:
-
-  hw/nvram/fw_cfg: Let fw_cfg_add_from_generator() return boolean value (2020=
--07-21 16:47:54 +0200)
-
-----------------------------------------------------------------
-fw_cfg patches
-
-Fixes the DEADCODE issue reported by Coverity (CID 1430396).
-
-CI jobs result:
-. https://gitlab.com/philmd/qemu/-/pipelines/169086301
-
-----------------------------------------------------------------
-
-Philippe Mathieu-Daud=C3=A9 (2):
-  hw/nvram/fw_cfg: Simplify fw_cfg_add_from_generator() error
-    propagation
-  hw/nvram/fw_cfg: Let fw_cfg_add_from_generator() return boolean value
-
- include/hw/nvram/fw_cfg.h |  8 ++++++--
- hw/nvram/fw_cfg.c         | 13 +++++++------
- softmmu/vl.c              |  6 +-----
- 3 files changed, 14 insertions(+), 13 deletions(-)
-
---=20
+diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+index 11feae3177..bbcf405649 100644
+--- a/include/hw/nvram/fw_cfg.h
++++ b/include/hw/nvram/fw_cfg.h
+@@ -32,7 +32,9 @@ typedef struct FWCfgDataGeneratorClass {
+      * @obj: the object implementing this interface
+      * @errp: pointer to a NULL-initialized error object
+      *
+-     * Returns: reference to a byte array containing the data.
++     * Returns: reference to a byte array containing the data on success,
++     *          or NULL on error.
++     *
+      * The caller should release the reference when no longer
+      * required.
+      */
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 3b1811d3bf..dfa1f2012a 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -1035,7 +1035,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+ void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
+                                const char *gen_id, Error **errp)
+ {
+-    ERRP_GUARD();
+     FWCfgDataGeneratorClass *klass;
+     GByteArray *array;
+     Object *obj;
+@@ -1053,7 +1052,7 @@ void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
+     }
+     klass = FW_CFG_DATA_GENERATOR_GET_CLASS(obj);
+     array = klass->get_data(obj, errp);
+-    if (*errp) {
++    if (!array) {
+         return;
+     }
+     size = array->len;
+-- 
 2.21.3
 
 
