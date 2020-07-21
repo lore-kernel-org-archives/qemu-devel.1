@@ -2,77 +2,88 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D6EC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DB9C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:49:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 940322077D
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:47:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AC4720674
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:49:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HQBRQTSz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 940322077D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b8YkF4Cg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AC4720674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxpnz-0006eR-Tl
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 06:47:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34896)
+	id 1jxpqC-0007c1-B8
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 06:49:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxpn3-00062r-85
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:46:31 -0400
-Received: from mail-oo1-xc43.google.com ([2607:f8b0:4864:20::c43]:40038)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jxppe-0007Ba-DP
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:49:10 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:54075)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxpmz-0005zc-0w
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:46:28 -0400
-Received: by mail-oo1-xc43.google.com with SMTP id p26so3824758oos.7
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 03:46:24 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jxppc-0006Ei-Kq
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:49:10 -0400
+Received: by mail-wm1-x331.google.com with SMTP id j18so2348810wmi.3
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 03:49:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2og3SFbeN6YMGfPfc06lXM9ALGmAvp0vst7R1pqYJ/w=;
- b=HQBRQTSz7++4foz9XXACEBPZWSF8gKkuboQs0aWCskik7A870p44b0UaFJXHmK4KXq
- ELr/dpl9Xl0EPfAFmUDzna+yfZADIYmLD/BjG/Q5+c5TCOD94HjwjGvpZzocjZyL9Cc3
- z01N+r/Pw/jDHLpWy3bGSUxwA6lOUmIzJqnLBRbMSV51NAUJpUWzLe8MIFE1eCh7evYz
- TNtpu6/1XaUBpIl2DZG5uIRrEAqZyMPnRfQVsY0/0JJTzCM/911wqlKSDm/zcRxD2T2P
- uqiefNJx3bP3bWDWdjvhnQleiff16GLdN2ne7HxUnq+irXdpXh8vhymXYKpTkUMCd9RM
- P2fA==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=BwjPlzHMUtPVG0XJ6cyWe/umel7VC/2YOnRDeZNJZF8=;
+ b=b8YkF4CgyWzejoHcBbMAHm/ntjlF7NtM9HmxZNVcV7aVXzO5ahQcfo3RWZuifuPVYF
+ 2/0NQ+cLlFstL1EvtTbCb696gdkyMfXk+l5v5cPA50fnZkW0M6+gdH1OGYKctfL3EkCa
+ R7758mgdkJiAFJMcVxQ6hwOTlLnLXuCyqzzW+aGIbGsNCP9SulthcrviFkZP5P3bNncD
+ NMhHGue8hfw2HCXDq/g9/xYh6gY2xkplwXxefogAr9bP9wSbmWKR0WXDilw5F1w0vZbD
+ 8bpTL2ebErExsqSvYCxbrQc4POnLR8iOSoBzyL2GMbxQuSIdDJTb27PVspeNBqAiwDZE
+ JTZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2og3SFbeN6YMGfPfc06lXM9ALGmAvp0vst7R1pqYJ/w=;
- b=GR9K2TdqcN4qFZzwN2bCwvwyFtbwN8CWZxycfwKc/NQRKUCuzd5jQZUHgQI6Lv+q+3
- VuQ/r+zAZuMadcUfpUXwjsyCV9qmduGeBrYwhVI+o7sRDGHVNQUyw5suiXKo4uy3P057
- DFK+U/7p8LKn3X8N4tXT8DL5DlF2UrVwsYS35V+5DcJxVcWE60+DO7IGOZ2A0jL7Gy+k
- FtXnJQ8oKr+LC3Id761SlQ9kKwJo1Ib0rLvjbANGBsJtfo0tasHcYSfDdl1x0XUjjjXj
- f5Rrs60C3cymGnIeY/sRtvCxIGhxcSfIra1TxT1oHkPymOXpSDfkPbEymO6qdInkJb8Y
- Yzeg==
-X-Gm-Message-State: AOAM533l9DxhhJlQ6nG8xd9larEBdtrpwOIfJ7s/J6ejD3GijbWAo/dN
- CMVY7N1WwQ7cRqvxRxs/BbH5CVsB2qKI9ps1k3v3Iw==
-X-Google-Smtp-Source: ABdhPJwe+75WCi2T9xSOgkKdnlRrn9mdyY+JJA/qmch81YzgMei/e2uxF18LxG4zoffmNiBMQGNu3thi6symQQVpFmM=
-X-Received: by 2002:a4a:a685:: with SMTP id f5mr13394425oom.85.1595328383498; 
- Tue, 21 Jul 2020 03:46:23 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=BwjPlzHMUtPVG0XJ6cyWe/umel7VC/2YOnRDeZNJZF8=;
+ b=a9cC/PeYz47bF2Vop/BnO3pSWz+9SmTdiwSmfkJqknt/4CHgAFDCWNPbTVNxa9r7Ue
+ /Zo/46c+rrO+V4VLRGf3dZ6+EslS+o2U0rd2FJLHohlyNREcDw0bXtlJNvvyE44w2yhi
+ ViC9TcT0DCx6MPDNxeE+7yALBkzHkbmRQAwHs5fyuCdF3WSmgHenco6eRrA7RCrSIO6y
+ A5SowRhmGT62FE/bP6QG7cQpAxkLMoj7azYI33ZS2XaSJTzIUNEqDxw4yqS0oYUvQGFb
+ bofhF0q6Y9spKj6Bfqdyjzpqh2gkzVC1a8xc96aKlXBUC3tpkbFemM/Ntk2wfN/uoh2i
+ w0Ww==
+X-Gm-Message-State: AOAM5312ZSfUTsFjcmn4UQVDtrYLpNOc9ViLT6moKXIg44d6gayvth17
+ 70TA+BFwDY+8Ny1w7ZWefddfAw==
+X-Google-Smtp-Source: ABdhPJzOYUQPu+9u+WdYV7gQrEhOcaf1fAhKgr73grq/S8XnC7DQy5zSNafFz8FD3WON0KCpPTpuxQ==
+X-Received: by 2002:a05:600c:d5:: with SMTP id
+ u21mr3367915wmm.156.1595328546908; 
+ Tue, 21 Jul 2020 03:49:06 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id l15sm35877030wro.33.2020.07.21.03.49.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 21 Jul 2020 03:49:05 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 01FAB1FF7E;
+ Tue, 21 Jul 2020 11:49:05 +0100 (BST)
+References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
+ <20200715112342.GD18817@stefanha-x1.localdomain>
+ <CAJSP0QU78mAK-DiOYXvTOEa3=CAEy1rQtyTBe5rrKDs=yfptAg@mail.gmail.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
+In-reply-to: <CAJSP0QU78mAK-DiOYXvTOEa3=CAEy1rQtyTBe5rrKDs=yfptAg@mail.gmail.com>
+Date: Tue, 21 Jul 2020 11:49:04 +0100
+Message-ID: <874kq1w3bz.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20200711101033.47371-1-drjones@redhat.com>
- <20200711101033.47371-4-drjones@redhat.com>
-In-Reply-To: <20200711101033.47371-4-drjones@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Jul 2020 11:46:12 +0100
-Message-ID: <CAFEAcA_GGVyjV_avxAfrRKnF72mxXEEf=J34aq-L8yMnLndigg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] hw/arm/virt: Implement kvm-steal-time
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c43;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc43.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::331;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x331.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -81,7 +92,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,211 +105,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Beata Michalska <beata.michalska@linaro.org>
+Cc: "John G.
+ Johnson" <john.g.johnson@oracle.com>, Jag Raman <jag.raman@oracle.com>,
+ Andra-Irina Paraschiv <andraprs@amazon.com>, kvm <kvm@vger.kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ Maxime Coquelin <maxime.coquelin@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ Nikos Dragazis <ndragazis@arrikto.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 11 Jul 2020 at 11:10, Andrew Jones <drjones@redhat.com> wrote:
+
+Stefan Hajnoczi <stefanha@gmail.com> writes:
+
+> Thank you everyone who joined!
 >
-> We add the kvm-steal-time CPU property and implement it for machvirt.
-> A tiny bit of refactoring was also done to allow pmu and pvtime to
-> use the same vcpu device helper functions.
+> I didn't take notes but two things stood out:
 >
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  docs/system/arm/cpu-features.rst | 11 +++++
->  hw/arm/virt.c                    | 33 ++++++++++++++-
->  include/hw/arm/virt.h            |  2 +
->  target/arm/cpu.c                 | 10 +++++
->  target/arm/cpu.h                 |  4 ++
->  target/arm/kvm.c                 | 20 +++++++++
->  target/arm/kvm32.c               |  5 +++
->  target/arm/kvm64.c               | 70 +++++++++++++++++++++++++++++---
->  target/arm/kvm_arm.h             | 24 ++++++++++-
->  target/arm/monitor.c             |  2 +-
->  tests/qtest/arm-cpu-features.c   | 25 ++++++++++--
->  11 files changed, 193 insertions(+), 13 deletions(-)
->
-> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-> index 2d5c06cd016b..4e590e6e9f54 100644
-> --- a/docs/system/arm/cpu-features.rst
-> +++ b/docs/system/arm/cpu-features.rst
-> @@ -200,6 +200,17 @@ the list of KVM VCPU features and their descriptions.
->                             adjustment, also restoring the legacy (pre-5.0)
->                             behavior.
->
-> +  kvm-steal-time           Since v5.1, kvm-steal-time is enabled by
-> +                           default when KVM is enabled, the feature is
-> +                           supported, and the guest is 64-bit.
-> +
-> +                           When kvm-steal-time is enabled a 64-bit guest
-> +                           can account for time its CPUs were not running
-> +                           due to the host not scheduling the corresponding
-> +                           VCPU threads.  The accounting statistics may
-> +                           influence the guest scheduler behavior and/or be
-> +                           exposed to the guest userspace.
-> +
->  SVE CPU Properties
->  ==================
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 63ef530933e5..21965a1665ca 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -151,6 +151,7 @@ static const MemMapEntry base_memmap[] = {
->      [VIRT_PCDIMM_ACPI] =        { 0x09070000, MEMORY_HOTPLUG_IO_LEN },
->      [VIRT_ACPI_GED] =           { 0x09080000, ACPI_GED_EVT_SEL_LEN },
->      [VIRT_NVDIMM_ACPI] =        { 0x09090000, NVDIMM_ACPI_IO_LEN},
-> +    [VIRT_PVTIME] =             { 0x090a0000, 0x00010000 },
->      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-> @@ -1663,13 +1664,26 @@ static void finalize_gic_version(VirtMachineState *vms)
->   */
->  static void virt_cpu_post_init(VirtMachineState *vms)
->  {
-> -    bool aarch64, pmu;
-> +    bool aarch64, pmu, steal_time;
->      CPUState *cpu;
->
->      aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
->      pmu = object_property_get_bool(OBJECT(first_cpu), "pmu", NULL);
-> +    steal_time = object_property_get_bool(OBJECT(first_cpu),
-> +                                          "kvm-steal-time", NULL);
->
->      if (kvm_enabled()) {
-> +        hwaddr pvtime_base = vms->memmap[VIRT_PVTIME].base;
-> +        hwaddr pvtime_size = vms->memmap[VIRT_PVTIME].size;
-> +
-> +        if (steal_time) {
-> +            MemoryRegion *pvtime = g_new(MemoryRegion, 1);
-> +
-> +            memory_region_init_ram(pvtime, NULL, "pvtime", pvtime_size, NULL);
-> +            memory_region_add_subregion(get_system_memory(), pvtime_base,
-> +                                        pvtime);
+> 1. The ivshmem v2 and virtio-vhost-user use cases are quite different
+> so combining them does not seem realistic. ivshmem v2 needs to be as
+> simple for the hypervisor to implement as possible even if this
+> involves some sacrifices (e.g. not transparent to the Driver VM that
+> is accessing the device, performance). virtio-vhost-user is more aimed
+> at general-purpose device emulation although support for arbitrary
+> devices (e.g. PCI) would be important to serve all use cases.
 
-I guess when we are looking at how KVM interacts with MemTag
-we'll need to also consider this kind of random-lump-of-ram
-(it will need to have tags)... Same thing with framebuffers etc though.
+I believe my phone gave up on the last few minutes of the call so I'll
+just say we are interested in being able to implement arbitrary devices
+in the inter-VM silos. Devices we are looking at:
 
-Could you avoid get_system_memory() here and instead pass in
-'sysmem' from the caller? The virt board has now 4 different
-address spaces it creates and works with (sysmem, secure_sysmem,
-tag_sysmem, secure_tag_sysmem) and I think it's going to be better
-to aim to consistently have the top level function pass the
-lower level functions the MRs they should be putting the devices
-in rather than having the low level function say in some cases
-"I happen to know that get_system_memory() is the same thing as
-'sysmem'".
+  virtio-audio
+  virtio-video
 
-> +        }
-> +
->          CPU_FOREACH(cpu) {
->              if (pmu) {
->                  assert(arm_feature(&ARM_CPU(cpu)->env, ARM_FEATURE_PMU));
+these are performance sensitive devices which provide a HAL abstraction
+to a common software core.
 
-> @@ -2528,6 +2558,7 @@ static void virt_machine_5_0_options(MachineClass *mc)
->      mc->numa_mem_supported = true;
->      vmc->acpi_expose_flash = true;
->      mc->auto_enable_numa_with_memdev = false;
-> +    vmc->kvm_no_steal_time = true;
+  virtio-rpmb
 
-This will need to move into the 5_1 options, obviously.
+this is a secure device where the backend may need to reside in a secure
+virtualised world.
 
->  }
->  DEFINE_VIRT_MACHINE(5, 0)
+  virtio-scmi
 
-> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-> index 0af46b41c847..d3f3195077fa 100644
-> --- a/target/arm/kvm32.c
-> +++ b/target/arm/kvm32.c
-> @@ -560,6 +560,11 @@ void kvm_arm_pmu_init(CPUState *cs)
->      qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
->  }
->
-> +void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa)
-> +{
-> +    qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
-> +}
+this is a more complex device which allows the guest to make power and
+clock demands from the firmware. Needless to say this starts to become
+complex with multiple moving parts.
 
-kvm32.c is going to be removed once 5.1 is out the door
-(we deprecated it in 5.0 so can remove in 5.2, I think),
-so this is fine.
+The flexibility of vhost-user seems to match up quite well with wanting
+to have a reasonably portable backend that just needs to be fed signals
+and a memory mapping. However we don't want daemons to automatically
+have a full view of the whole of the guests system memory.
 
-> +
->  #define ARM_REG_DFSR  ARM_CP15_REG32(0, 5, 0, 0)
->  #define ARM_REG_TTBCR ARM_CP15_REG32(0, 2, 0, 2)
->  /*
+> 2. Alexander Graf's idea for a new Linux driver that provides an
+> enforcing software IOMMU. This would be a character device driver that
+> is mmapped by the device emulation process (either vhost-user-style on
+> the host or another VMM for inter-VM device emulation). The Driver VMM
+> can program mappings into the device and the page tables in the device
+> emulation process will be updated. This way the Driver VMM can share
+> memory specific regions of guest RAM with the device emulation process
+> and revoke those mappings later.
 
-> +void kvm_arm_steal_time_finalize(ARMCPU *cpu, Error **errp)
-> +{
-> +    static bool has_steal_time;
-> +    static bool probed;
-> +    int fdarray[3];
-> +
-> +    if (!probed) {
-> +        probed = true;
-> +        if (kvm_check_extension(kvm_state, KVM_CAP_VCPU_ATTRIBUTES)) {
-> +            if (!kvm_arm_create_scratch_host_vcpu(NULL, fdarray, NULL)) {
-> +                error_report("Failed to create scratch VCPU");
-> +                abort();
-> +            }
-> +
-> +            has_steal_time = kvm_device_check_attr(fdarray[2],
-> +                                                   KVM_ARM_VCPU_PVTIME_CTRL,
-> +                                                   KVM_ARM_VCPU_PVTIME_IPA);
-> +
-> +            kvm_arm_destroy_scratch_host_vcpu(fdarray);
+I'm wondering if there is enough plumbing on the guest side so a guest
+can use the virtio-iommu to mark out exactly which bits of memory the
+virtual device can have access to? At a minimum the virtqueues need to
+be accessible and for larger transfers maybe a bounce buffer. However
+for speed you want as wide as possible mapping but no more. It would be
+nice for example if a block device could load data directly into the
+guests block cache (zero-copy) but without getting a view of the kernels
+internal data structures.
 
-I was a bit surprised that we create a scratch VCPU here, but
-it looks like we've opted for "create scratch VCPU, check specific
-detail, destroy VCPU" as the usual coding pattern rather than trying
-to coalesce into a single "create scratch VCPU once, cache all
-the info we might need for later". I guess if somebody (a) cares
-about startup performance and (b) finds through profiling that
-creation-and-destruction of the scratch VMs/VCPUs is a significant
-contributor they can write the refactoring themselves :-)
-
-> +        }
-> +    }
-> +
-> +    if (cpu->kvm_steal_time == ON_OFF_AUTO_AUTO) {
-> +        if (!has_steal_time || !arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-> +            cpu->kvm_steal_time = ON_OFF_AUTO_OFF;
-> +        } else {
-> +            cpu->kvm_steal_time = ON_OFF_AUTO_ON;
-> +        }
-> +    } else if (cpu->kvm_steal_time == ON_OFF_AUTO_ON) {
-> +        if (!has_steal_time) {
-> +            error_setg(errp, "'kvm-steal-time' cannot be enabled "
-> +                             "on this host");
-> +            return;
-> +        } else if (!arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-> +            error_setg(errp, "'kvm-steal-time' cannot be enabled "
-> +                             "for AArch32 guests");
-
-Why not? Unlike aarch32-host KVM, aarch32-guest KVM is
-still supported. What's the missing piece for kvm-steal-time
-to work in that setup?
-
-> +            return;
-> +        }
-> +    }
-> +}
-> +
->  bool kvm_arm_aarch32_supported(void)
->  {
->      return kvm_check_extension(kvm_state, KVM_CAP_ARM_EL1_32BIT);
-
->  static inline void kvm_arm_add_vcpu_properties(Object *obj) {}
-> +static inline void kvm_arm_steal_time_finalize(ARMCPU *cpu, Error **errp) {}
-
-Does this stub need to report an error to the caller via errp,
-or is it a "never called but needs to exist to avoid linker errors" ?
+Another thing that came across in the call was quite a lot of
+assumptions about QEMU and Linux w.r.t virtio. While our project will
+likely have Linux as a guest OS we are looking specifically at enabling
+virtio for Type-1 hypervisors like Xen and the various safety certified
+proprietary ones. It is unlikely that QEMU would be used as the VMM for
+these deployments. We want to work out what sort of common facilities
+hypervisors need to support to enable virtio so the daemons can be
+re-usable and maybe setup with a minimal shim for the particular
+hypervisor in question.
 
 
-thanks
--- PMM
+--=20
+Alex Benn=C3=A9e
 
