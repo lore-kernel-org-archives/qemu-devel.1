@@ -2,65 +2,66 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 111A5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:08:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8904FC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:20:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBA0120771
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:08:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53F5E2072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 10:20:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BL3UgyRT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBA0120771
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A0W6aMGK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F5E2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxpBq-00058s-0X
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 06:08:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49446)
+	id 1jxpNc-0007wz-Il
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 06:20:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxpB8-0004ed-I9
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:07:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44344
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxpMu-0007SL-Qg
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:19:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42633
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxpB6-00088E-Rx
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:07:18 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jxpMr-0001Wu-Ri
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 06:19:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595326035;
+ s=mimecast20190719; t=1595326764;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=KtWwOeCMQqgwRV0GkC3CfeWDRxFJF73Lxy4EFy/D6R8=;
- b=BL3UgyRTSIQPbov9N4H7g8VMz1B6vv6RcIPfAtA6WvNjEbHwsDtqzyBkUNvIEcqbAT1LVM
- TQIwb/X6wID9E1Y3Hl25k1tVaEreDWbe67t2LvgiA5CUiB5vBHYM8TYc2OQKDCoZlHATo3
- sScpzk8KUyYQ7K8gUHdnrt2CaJ0eO0E=
+ bh=FXup7xXHhVVFHsknqi0ed/hkySOcmjxVCT0BOvRGMwY=;
+ b=A0W6aMGKLE09YFV+GEYHvFVLqlXWoGZd0e5WJLXeF4mRFYZJ5n8j3Et++AV02VevXzhoWz
+ arP6j+P3nVO3PY1Qb2rb6s/ON48Jx0+XjCpwtancQJMnZvFApYc/rDdg+uzNkGFiyFO9I3
+ VwCSBlpiaewzrcROm1fq4j884pHMBTQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424-Beq4tkEjPb6YdIrEk-cHGQ-1; Tue, 21 Jul 2020 06:07:13 -0400
-X-MC-Unique: Beq4tkEjPb6YdIrEk-cHGQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-168-bbcPlbbnPRydV08MK3Envg-1; Tue, 21 Jul 2020 06:19:21 -0400
+X-MC-Unique: bbcPlbbnPRydV08MK3Envg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2789B107ACCA;
- Tue, 21 Jul 2020 10:07:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7AD2100A621;
+ Tue, 21 Jul 2020 10:19:20 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-68.ams2.redhat.com
  [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A5188731D;
- Tue, 21 Jul 2020 10:07:10 +0000 (UTC)
-Subject: Re: [PATCH for-5.1 1/2] qcow2: Implement v2 zero writes with discard
- if possible
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D879910027AC;
+ Tue, 21 Jul 2020 10:19:19 +0000 (UTC)
+Subject: Re: [PATCH for-5.1 2/2] iotests: Test sparseness for qemu-img convert
+ -n
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200720131810.177978-1-kwolf@redhat.com>
- <20200720131810.177978-2-kwolf@redhat.com>
+ <20200720131810.177978-3-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,18 +87,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ce2aea36-5490-440c-761e-9febd9f7480a@redhat.com>
-Date: Tue, 21 Jul 2020 12:07:09 +0200
+Message-ID: <4197f423-6501-b7d4-9214-6c7979d77bd7@redhat.com>
+Date: Tue, 21 Jul 2020 12:19:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200720131810.177978-2-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200720131810.177978-3-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="TE1OtCX6NollOBc8nD7uYx81Ggw8UHYay"
+ boundary="SFJHRlEpSEod2qcKY9bLoUA5xstqrVsUA"
 Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:30:29
@@ -108,7 +109,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,53 +128,141 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TE1OtCX6NollOBc8nD7uYx81Ggw8UHYay
-Content-Type: multipart/mixed; boundary="OcJXiOZrNTGziiretbAdIDbr5edqzvKm3"
+--SFJHRlEpSEod2qcKY9bLoUA5xstqrVsUA
+Content-Type: multipart/mixed; boundary="hpy6tNE3xOryjxBx9ryyfF2LjZySDFO2P"
 
---OcJXiOZrNTGziiretbAdIDbr5edqzvKm3
+--hpy6tNE3xOryjxBx9ryyfF2LjZySDFO2P
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 20.07.20 15:18, Kevin Wolf wrote:
-> qcow2 version 2 images don't support the zero flag for clusters, so for
-> write_zeroes requests, we return -ENOTSUP and get explicit zero buffer
-> writes. If the image doesn't have a backing file, we can do better: Just
-> discard the respective clusters.
->=20
-> This is relevant for 'qemu-img convert -O qcow2 -n', where qemu-img has
-> to assume that the existing target image may contain any data, so it has
-> to write zeroes. Without this patch, this results in a fully allocated
-> target image, even if the source image was empty.
->=20
-> Reported-by: Nir Soffer <nsoffer@redhat.com>
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/qcow2-cluster.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+>  tests/qemu-iotests/122     | 34 ++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/122.out | 17 +++++++++++++++++
+>  2 files changed, 51 insertions(+)
+>=20
+> diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
+> index dfd1cd05d6..1112fc0730 100755
+> --- a/tests/qemu-iotests/122
+> +++ b/tests/qemu-iotests/122
+> @@ -281,6 +281,40 @@ $QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_I=
+MG".orig
+> =20
+>  $QEMU_IMG compare "$TEST_IMG" "$TEST_IMG".orig
+> =20
+> +echo
+> +echo '=3D=3D=3D -n to an empty image =3D=3D=3D'
+> +echo
+> +
+> +_make_test_img 64M
+> +
+> +# Convert with -n, which should not result in a fully allocated image, n=
+ot even
+> +# with compat=3D0.10 (because the target doesn't have a backing file)
+> +TEST_IMG=3D"$TEST_IMG".orig _make_test_img -o compat=3D1.1 64M
+> +$QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
+> +$QEMU_IMG map --output=3Djson "$TEST_IMG".orig
+> +
+> +TEST_IMG=3D"$TEST_IMG".orig _make_test_img -o compat=3D0.10 64M
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+It=E2=80=99s a shame that with this, the test will no longer pass with
+refcount_bits=3D1.  (Or an external data file.)
+
+But, well.  Maybe we don=E2=80=99t care and then should just put both optio=
+ns
+into _unsupported_imgopts.
+
+Apart from that, the test looks good to me.
+
+Max
+
+> +$QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
+> +$QEMU_IMG map --output=3Djson "$TEST_IMG".orig
+> +
+> +echo
+> +echo '=3D=3D=3D -n to an empty image with a backing file =3D=3D=3D'
+> +echo
+> +
+> +_make_test_img 64M
+> +TEST_IMG=3D"$TEST_IMG".base _make_test_img 64M
+> +
+> +# Convert with -n, which should still not result in a fully allocated im=
+age for
+> +# compat=3D1.1 (because it can use zero clusters), but it should be full=
+y
+> +# allocated with compat=3D0.10
+> +TEST_IMG=3D"$TEST_IMG".orig _make_test_img -b "$TEST_IMG".base -F $IMGFM=
+T -o compat=3D1.1 64M
+> +$QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
+> +$QEMU_IMG map --output=3Djson "$TEST_IMG".orig
+> +
+> +TEST_IMG=3D"$TEST_IMG".orig _make_test_img -b "$TEST_IMG".base -F $IMGFM=
+T -o compat=3D0.10 64M
+> +$QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
+> +$QEMU_IMG map --output=3Djson "$TEST_IMG".orig
+> +
+>  echo
+>  echo '=3D=3D=3D -n -B to an image without a backing file =3D=3D=3D'
+>  echo
+> diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
+> index f1f195ed77..b8028efb1d 100644
+> --- a/tests/qemu-iotests/122.out
+> +++ b/tests/qemu-iotests/122.out
+> @@ -229,6 +229,23 @@ wrote 65536/65536 bytes at offset 0
+>  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  Images are identical.
+> =20
+> +=3D=3D=3D -n to an empty image =3D=3D=3D
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+> +Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864
+> +[{ "start": 0, "length": 67108864, "depth": 0, "zero": true, "data": fal=
+se}]
+> +Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864
+> +[{ "start": 0, "length": 67108864, "depth": 0, "zero": true, "data": fal=
+se}]
+> +
+> +=3D=3D=3D -n to an empty image with a backing file =3D=3D=3D
+> +
+> +Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+> +Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D67108864
+> +Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864 backin=
+g_file=3DTEST_DIR/t.IMGFMT.base backing_fmt=3DIMGFMT
+> +[{ "start": 0, "length": 67108864, "depth": 0, "zero": true, "data": fal=
+se}]
+> +Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D67108864 backin=
+g_file=3DTEST_DIR/t.IMGFMT.base backing_fmt=3DIMGFMT
+> +[{ "start": 0, "length": 67108864, "depth": 0, "zero": false, "data": tr=
+ue, "offset": 327680}]
+> +
+>  =3D=3D=3D -n -B to an image without a backing file =3D=3D=3D
+> =20
+>  Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D67108864
+>=20
 
 
---OcJXiOZrNTGziiretbAdIDbr5edqzvKm3--
 
---TE1OtCX6NollOBc8nD7uYx81Ggw8UHYay
+--hpy6tNE3xOryjxBx9ryyfF2LjZySDFO2P--
+
+--SFJHRlEpSEod2qcKY9bLoUA5xstqrVsUA
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8Wvk0ACgkQ9AfbAGHV
-z0D4bwf/aMDt4jSbXzeiE/tNx9HdMvKCi0APqQ93c1j1nIHg2IKBEz2189SlJNIO
-TaFXJ6JSj8+75Hk0koZOEW00NFJmZUoHPt7+DEE57S70/dml/M1XCjtUHVmB0VJC
-DqbtGrBE+/p/HAFCILmqMzErS7NLWr+jKSOVfiHI2Pl3Mp9lo+sfCzNfu1mCEwAh
-8OKjD7JIoOFnwREXj1/+NHPCsfI6rDjTIDwRd5IiFY+keO7TpxAnV8cE8svL33KI
-iDNdvFXPiQQ6dnnZNAdSxE61OSczEJrRC+/5EHmbZkb3gjikqXU9nfapyQ7SwrWs
-ZCg5j4FzDvSsfOzhQjv9hCIf9rmyng==
-=oIlI
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8WwSYACgkQ9AfbAGHV
+z0Ckzwf+M0aaauPAUf4T2lvc1lF/ONQNb0lzixo13lxAg5MT7T0ivqVMUSPmxh7d
+4tbxb1kxKHzTPCYvbJ/o+UW52A5Z/0fqjEKLLYzHzjnxMdFieedphC6NryQ/tIjN
+OPu90Ln7hPxSCixKoGZ0ieJ1lITvydEiP90UckDQkOq7cd+V9Lsl0VUYkSwo/hFu
+KDVDntn+tNBvfKl5Q1hzHairDaexLnt5IkSmLUYAZhTMxjrmjdJuKnmKs2b5btk8
+ROc2SWjMOhekruhD1lROM2acNghBNDvw49CKAaiJNAOYYqS3vhXf7+LZJPg7KdkL
+/MmkjlHz1lVD6nZuxNr+RXU4WfOl9w==
+=AWqG
 -----END PGP SIGNATURE-----
 
---TE1OtCX6NollOBc8nD7uYx81Ggw8UHYay--
+--SFJHRlEpSEod2qcKY9bLoUA5xstqrVsUA--
 
 
