@@ -2,86 +2,84 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE40C433E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F2DAC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:43:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B5E3206E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:42:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A970206E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 12:43:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="gHhdKItl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B5E3206E3
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="GXw2ZRF8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A970206E3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxrbg-0003nG-Ec
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 08:42:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34978)
+	id 1jxrbv-0003so-Tj
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 08:43:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1jxraB-0002C3-GH
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 08:41:19 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33491)
+ id 1jxra6-0001yf-2t
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 08:41:14 -0400
+Received: from mail-pj1-x1031.google.com ([2607:f8b0:4864:20::1031]:54114)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1jxra5-0004vw-RG
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 08:41:19 -0400
-Received: by mail-pg1-x542.google.com with SMTP id o13so11904309pgf.0
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 05:41:13 -0700 (PDT)
+ id 1jxra4-0004vh-1m
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 08:41:13 -0400
+Received: by mail-pj1-x1031.google.com with SMTP id a9so1519422pjd.3
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 05:41:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=W9alUim2NScoKewf8vVRphcseP9RDIaK8xQN1I3tCFA=;
- b=gHhdKItlqETPHEa9IlqbXOlkddHLNotQU59wayLuMJvdSoEOuLop4AhwLuSo4RcXVx
- cDr4IhvynheMWFGRZOVNVofvEw0xy6drY72+lIpKc5N4ank8VZ0rh2iIrE2R0dTWqNcy
- 7S+i9JQu3uUSpQokrzXg5IQXPMwild/IubTLK+nvyzBc5hQYZorBdBnt40d4VqH33riv
- DsrnlwwC3wI18y5i+95o7EpGh3IqxoeQcZHZ4bmLvYktpof5tjRnwL/uB4L3D8k+h7ht
- qW4xny9ydvnoyFn7n1WlsvBtRe/3vLdoCK3JvRbFtueKlXHCH9D6VH6L964Hs8NsxaEA
- t5Ag==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=OEVnCZhkWrQj+RRpuKVqY29A7QsD2Bci3YBFcgJ2+JI=;
+ b=GXw2ZRF8PUQZ3ySczILQ9GifcbneUCW62LCyCZmx98TNN+VzJhBVJDFNQkDlJv+LJH
+ sRK0CiCOZWP12zypNge4sX7+fQw+wq2YkzU59DQBNg3UlBzI+AqAMPoc1vkxERnXAH36
+ 0SZBG1OEhp9cWnYLgeCVEaj9/xfMVW7Re8japbmm7NU87nGdT9EED590VQA+EDf/w/b5
+ 0znSL/Wf8yla8iWfqzvAl8VNtMPI4Lh996wNuW1oJly4SAxADCbm+bIQEfa3UROVMcDH
+ wUVMSN9FwZMaFCPLNbBS3O3H3NUJjShL2tJfCWUoPHvKYQoqPHJrdCs0ui3CYQ+fyb5E
+ LfzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=W9alUim2NScoKewf8vVRphcseP9RDIaK8xQN1I3tCFA=;
- b=l3M/kQrve8fA7qgZdvTXCkh8pCsHsIV1jeyWPnFzYDkh4KQNBFTXxLcxJZ5KqMvaqp
- NxuCwCZ0QuzslZrWi593HelnKVwuICf9I9YmpFXXK+PMFsGvzFENVJYDistgEcq3Xvnv
- xV7dYNrQYVunykHEGKKiuBP1bqtQR3wZ/B/UxVC29UB81nHFNmBT7mKHQStuMqQb8Erv
- U49tDe0kIGhuDhHyGktRmYnU/SHYcueLF7eL20R+6kTbPjDUuuP963a8GJZHo0HghwvP
- LQrdwsMf7jTqyk/lNGteAz071VAL2RTKEDwxvryx59UmeGgVMbxW4QgcumIsDWA9H4XS
- zSOg==
-X-Gm-Message-State: AOAM531aEByn8Rip9AipDXhgbF97TjJ1DfEcVxZH4JakJ6vXg1AA7cHn
- DXHxrSzz2BSZ4gPHoa7lW39fBQ==
-X-Google-Smtp-Source: ABdhPJx/Qo/bcEqDMsf0Vlwr6ThIhFcZ4ugvB6RyoJCFwn3nWdHvrPiYBL8FQXPim+6oMFAo8X8rjA==
-X-Received: by 2002:a63:1059:: with SMTP id 25mr19989645pgq.302.1595335272379; 
- Tue, 21 Jul 2020 05:41:12 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=OEVnCZhkWrQj+RRpuKVqY29A7QsD2Bci3YBFcgJ2+JI=;
+ b=NHUry54oKHUyOQ+K8Ua/n8pnePJe3/Pt9JI08zjDRX0GSYU8Ojo7d94q6xdxIwrAws
+ uWSUjO0hAWN1MxsBHP22rgUYcz4is2XtIsyDkgf5dqP0R7plWGSSzYOQ7GuHPglOFRMy
+ S5W3eapdLd/Tqq35Aix1bZE+Ysx3Qu3eFihzxOLGShIKLpb2EfUU2PbEfHobmWxNjKq1
+ DA71bL2UUh9D9JB9B5LZbt5Y/CWdvH9NSWSSTy1DXcD7TK1g1VWTNJ3c63BIZjzaY/cX
+ +xA2mN7tnQ9Ex3tE3tjgTb5m2NqdqmnpCP5Jth4sdkkfqyRFl3K/XitOGgF2Xh8Yp/WT
+ 2KwA==
+X-Gm-Message-State: AOAM532Q2r6WRlGwayO1+6n/n5sIlMs1jrayQhnjrRleqFSDsvUd4NFE
+ AhAb5JsI4WYnrv4JzvcQ2inWBA==
+X-Google-Smtp-Source: ABdhPJy93bn39WhyMsgK4b+WiCLpmn63PvJeggfFhbqfMyQWflDJUKtM/7VabufybRDajHPXr8QD1g==
+X-Received: by 2002:a17:90a:304d:: with SMTP id
+ q13mr4555794pjl.73.1595335270206; 
+ Tue, 21 Jul 2020 05:41:10 -0700 (PDT)
 Received: from hsinchu02.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id y20sm19819991pfo.170.2020.07.21.05.41.10
+ by smtp.gmail.com with ESMTPSA id y20sm19819991pfo.170.2020.07.21.05.41.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jul 2020 05:41:12 -0700 (PDT)
+ Tue, 21 Jul 2020 05:41:09 -0700 (PDT)
 From: Zong Li <zong.li@sifive.com>
 To: palmer@dabbelt.com, Alistair.Francis@wdc.com, bmeng.cn@gmail.com,
  sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
  qemu-riscv@nongnu.org, qemu-devel@nongnu.org
-Subject: [PATCH v3 1/3] target/riscv: Fix the range of pmpcfg of CSR funcion
- table
-Date: Tue, 21 Jul 2020 20:40:50 +0800
-Message-Id: <eae49e9252c9596e4f3bdb471772f79235141a87.1595335112.git.zong.li@sifive.com>
+Subject: [PATCH v3 0/3] Fix some PMP implementation
+Date: Tue, 21 Jul 2020 20:40:49 +0800
+Message-Id: <cover.1595335112.git.zong.li@sifive.com>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <cover.1595335112.git.zong.li@sifive.com>
-References: <cover.1595335112.git.zong.li@sifive.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=zong.li@sifive.com; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1031;
+ envelope-from=zong.li@sifive.com; helo=mail-pj1-x1031.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -90,7 +88,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,35 +101,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>, Zong Li <zong.li@sifive.com>
+Cc: Zong Li <zong.li@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The range of Physical Memory Protection should be from CSR_PMPCFG0
-to CSR_PMPCFG3, not to CSR_PMPADDR9.
+This patch set contains the fixes for wrong index of pmpcfg CSR on rv64,
+and the pmp range in CSR function table. After 3rd version of this patch
+series, we also fix the PMP wrong checking problem.
 
-Signed-off-by: Zong Li <zong.li@sifive.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
----
- target/riscv/csr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changed in v3:
+ - Refine the implementation. Suggested by Bin Meng.
+ - Add fix for PMP wrong checking
 
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index ac01c835e1..6a96a01b1c 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -1353,7 +1353,7 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
-     [CSR_MTINST] =              { hmode,   read_mtinst,      write_mtinst     },
- 
-     /* Physical Memory Protection */
--    [CSR_PMPCFG0  ... CSR_PMPADDR9] =  { pmp,   read_pmpcfg,  write_pmpcfg   },
-+    [CSR_PMPCFG0  ... CSR_PMPCFG3]   = { pmp,   read_pmpcfg,  write_pmpcfg   },
-     [CSR_PMPADDR0 ... CSR_PMPADDR15] = { pmp,   read_pmpaddr, write_pmpaddr  },
- 
-     /* Performance Counters */
+Changed in v2:
+ - Move out the shifting operation from loop. Suggested by Bin Meng.
+
+Zong Li (3):
+  target/riscv: Fix the range of pmpcfg of CSR funcion table
+  target/riscv/pmp.c: Fix the index offset on RV64
+  target/riscv: Fix the translation of physical address
+
+ target/riscv/cpu_helper.c | 3 ++-
+ target/riscv/csr.c        | 2 +-
+ target/riscv/pmp.c        | 8 ++++++++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
 -- 
 2.27.0
 
