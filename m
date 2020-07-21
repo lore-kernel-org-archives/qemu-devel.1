@@ -2,79 +2,78 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B89C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 09:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 872C8C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 09:32:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD5F520657
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 09:29:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51A902070A
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 09:32:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HRUqVzYa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD5F520657
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Eo/cpqYU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51A902070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxoaZ-0007nr-0c
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 05:29:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35376)
+	id 1jxodJ-0000e0-Fw
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 05:32:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxoa0-0007N2-VD
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 05:28:57 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36252)
+ id 1jxocT-00005W-RW
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 05:31:29 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35236)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jxoZy-0001JV-WA
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 05:28:56 -0400
-Received: by mail-ot1-x344.google.com with SMTP id 72so14585940otc.3
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 02:28:54 -0700 (PDT)
+ id 1jxocO-0001lO-Q4
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 05:31:29 -0400
+Received: by mail-oi1-x243.google.com with SMTP id k4so16676194oik.2
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 02:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=/nNuwzob98wUjqjH7aYmJs9goOw8pREwSlDUGmskXFI=;
- b=HRUqVzYaC+OM11sMqNHSaTepj+BEA8liperTBiNaK+EsT/oYptFYbiEKoCNtYigJlU
- vb8bDqUBSj9AwJwIL1jcAQMRIU1MjDBUu49ZYLWrvp/Kmgc0sOviYMekrhSaPfSLe6WP
- BK0b051MS20Y0xdnZxoNyWlpadGZkkziCqJO+fbAY8BUV4C+/V7b8YkaKZhpXN510UFn
- N5UqhrEudZ4T06tbsLtFlTHwjaxbRvvimfACJh8l3tRq0QzPizxLDbshUihnaFw3cFqP
- Ztdj0AW3zOQ4pnlyg/NSkAz4hf4wDfnUWKGr2erFpaErfTOKNbdRie7OR+TFx5mEw57L
- V/Ew==
+ :cc; bh=SdjWLQxwJ9lcRVCMyhQG81rCPJgI1Azg9CE+k70h7QE=;
+ b=Eo/cpqYU7r+nGkejYfWD84K4xWpuWUBgWQdXvjIc22C+6Z5lCYaVS6KhXkDZVCXIY2
+ Ldo55oJjS9IJf4SSUYgFXP2FNw4teAnWHqxHb2CJhozXNLkD2gGdYNwsUOHE8V6oxRTI
+ GTVO0xcmulVzkJkx445vRi0Lb1uLTHmFqDuxZz+pc77ZoiUbtodAvPhhcvcbQiK8qatC
+ ao1wSUDdV5eOXf2bRP+fF8+aduZxsSl2w+KXh4wwrBlX/4JJEnGHT6NnVtK9hfhs04CY
+ YEnKOPIfW7L4ajhItPvB68yN/A4LjITg9nUX7LjwsZehe7fpy4vvNjvGlMDfiBfX7APD
+ MXpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=/nNuwzob98wUjqjH7aYmJs9goOw8pREwSlDUGmskXFI=;
- b=CgNF4IWmX59ekruIkH20Wk+QaA0vJVza1X7NiREPmHfpNWxYW8boojGqIZsmsnmoAY
- 2Y6hgzeQ0e/byQt+iY9im4H4Bw2iP9dHmi02ui8QEswPFX7htrT3S8kiPFRtDS89miZ3
- TrgznUkAnH9M9Z3AS55yVrkfIe2ZVrBPvx+nwYuEL5LAufRWPWYNJhzaMGPr7mzUjFHk
- 7NMwHnuPbWrM+bY/nqprUEQ9L8nq8LhhsUTgDfM5bKyNlma9aYqZlZ1n+7O/0LYytW3L
- hN0KqcRc+J4Me9BCV+xar9MjUMuVlmyMfIlcm0xegcEN9VsMYlknnOwCwMObauScVqT1
- eYcg==
-X-Gm-Message-State: AOAM533/ynSxjr5IWPv0fVypk8TKRK/a9PZ8ZsWhytve0JAQhPqrdeDP
- cv6STvI32zmisycJSi9Q0/yICH7saNswdOyOUE88sA==
-X-Google-Smtp-Source: ABdhPJxMFy6MCyRrYcqTit4bUZgttdawTnVFCRQ315HoMC7ISFWicGadtkYLB3ostnvXST6t1VZbc48ejENSDnz04qg=
-X-Received: by 2002:a05:6830:10ce:: with SMTP id
- z14mr24350932oto.135.1595323733571; 
- Tue, 21 Jul 2020 02:28:53 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=SdjWLQxwJ9lcRVCMyhQG81rCPJgI1Azg9CE+k70h7QE=;
+ b=Y/fqBXxp3GF0wU56LGprODdeVVA9OjK6pQVH8xnJgRiOa9YkIyco3AGxbkwdYOFBDL
+ 6Fk6A7bUfzM6YxUjqS5PO7DMGFMB4+V0JkmcobgTlgmGno5JarqPDLf+ad2x2ig/B81t
+ l1SdxU7S3NqZV4UMBv47pBYSDSYtg3IQs3rQ2bZ2VLm2XSLxZPBB1oF1/A5ZDvzsCNPu
+ jTIOP8J+ocKVJIMHrKe96nO2uHo57kRd30I2wQnjuRjxJMYx/uXIf1/MPluvz9bhh5Uy
+ qzuD7/EK676wYjnjfp3oe/pfEQRagr+WvcQVN270mV8pbiA4W7WapiZo1gHRqxq2uJMl
+ dMBw==
+X-Gm-Message-State: AOAM533J6HAFMJp22jGrZD+dq5K7hBwtXmztL2s5TNY31pXwfcQViSwd
+ fPxRhexcZ/ZAqy66cfgTL9UF9blB272pxw1uGLXMRA==
+X-Google-Smtp-Source: ABdhPJx0i0QtE/PVf+pzY/L4tmeASL4BVkD9LdbMDYiRmX5P9ya4daYmce97DEBmCatHdyFn69ms+HvUh4u71qu4/64=
+X-Received: by 2002:aca:1706:: with SMTP id j6mr2206671oii.146.1595323883474; 
+ Tue, 21 Jul 2020 02:31:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <b19e8210-7cac-e1b5-f89b-ae73ec21d8cb@siemens.com>
-In-Reply-To: <b19e8210-7cac-e1b5-f89b-ae73ec21d8cb@siemens.com>
+References: <CA+XhMqwtUrSpCqNGEETBijewzvmpno8OAX_PKSShDP_gUQ-3VQ@mail.gmail.com>
+ <CAFEAcA96mh_4EkKz31HgzfPOEQvhta8VTcvMV=An8Us0+x=NfQ@mail.gmail.com>
+ <20200720191318.GM2642@work-vm>
+ <7b38e1a1-12a2-0158-45ab-8e5d7e287f2f@redhat.com>
+In-Reply-To: <7b38e1a1-12a2-0158-45ab-8e5d7e287f2f@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Jul 2020 10:28:42 +0100
-Message-ID: <CAFEAcA-XwoUG+2wy8e404qnSRgy+LpzGph+BO3KKMbOhgmvECA@mail.gmail.com>
-Subject: Re: aarch64: Crash with qemu master when starting Jailhouse
-To: Jan Kiszka <jan.kiszka@siemens.com>
+Date: Tue, 21 Jul 2020 10:31:12 +0100
+Message-ID: <CAFEAcA_9CozpnhT9GDOQ=t=JXLW-dPLodr5WuXxNaT7Sx7MESA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] exec: posix_madvise usage on SunOS.
+To: David Hildenbrand <david@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -83,7 +82,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,113 +95,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, David CARLIER <devnexen@gmail.com>,
+ David Hildenbrand <dhildenb@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jul 2020 at 08:22, Jan Kiszka <jan.kiszka@siemens.com> wrote:
+On Tue, 21 Jul 2020 at 09:22, David Hildenbrand <david@redhat.com> wrote:
+> virtio-mem depends on Linux (hw/virtio/Kconfig). I guess
+> userfaultfd/postcopy is also not relevant in the context of SunOS. So
+> what remains is virtio-balloon.
 >
-> Hi,
+> virito-balloon ideally wants to discard the actual mapped pages to free
+> up memory. When memory is re-accessed, a fresh page is faulted in (->
+> zero-page under Linux). Now, we already have other cases where it looks
+> like "the balloon works" but it really doesn't. One example is using
+> vfio+virtio-balloon under Linux - inflating the balloon is simply a NOP,
+> no memory is actually discarded.
 >
-> I've seen this first a couple of weeks ago, ignored it, but it's still th=
-ere today with master:
+> I agree that POSIX_MADV_DONTNEED is not a proper match - different
+> guarantees. If SunOS cannot implement ram_block_discard_range() as
+> documented, we should disable it.
 
-Richard, this looks like an issue with your recent rearrangement
-of the cacheattrs handling: we get into get_phys_addr_lpae() with
-a NULL cacheattrs pointer that we weren't expecting.
+Could we also improve the documentation comment to make it clearer
+what ram_block_discard_range() is actually supposed to be doing?
+At the moment I don't think you can figure it out from the comments,
+which are a confusing mix of claiming it unmaps memory and that it
+zeroes it.
 
-> Thread 13 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
-> [Switching to Thread 0x7f90e2ffd700 (LWP 26883)]
-> 0x0000560ef0bddda7 in get_phys_addr_lpae (env=3D<optimized out>, address=
-=3Daddress@entry=3D1095261192, access_type=3Daccess_type@entry=3DMMU_DATA_L=
-OAD, mmu_idx=3Dmmu_idx@entry=3DARMMMUIdx_Stage2, s1_is_el0=3Ds1_is_el0@entr=
-y=3Dfalse,
->     phys_ptr=3Dphys_ptr@entry=3D0x7f90e2ffc200, txattrs=3D0x7f90e2ffc1ec,=
- prot=3D0x7f90e2ffc1f0, page_size_ptr=3D0x7f90e2ffc1f8, fi=3D0x7f90e2ffc530=
-, cacheattrs=3D0x0) at /data/qemu/target/arm/helper.c:11106
-> 11106           cacheattrs->attrs =3D convert_stage2_attrs(env, extract32=
-(attrs, 0, 4));
-> (gdb) bt
-> #0  0x0000560ef0bddda7 in get_phys_addr_lpae
->     (env=3D<optimized out>, address=3Daddress@entry=3D1095261192, access_=
-type=3Daccess_type@entry=3DMMU_DATA_LOAD, mmu_idx=3Dmmu_idx@entry=3DARMMMUI=
-dx_Stage2, s1_is_el0=3Ds1_is_el0@entry=3Dfalse, phys_ptr=3Dphys_ptr@entry=
-=3D0x7f90e2ffc200, txattrs=3D0x7f90e2ffc1ec, prot=3D0x7f90e2ffc1f0, page_si=
-ze_ptr=3D0x7f90e2ffc1f8, fi=3D0x7f90e2ffc530, cacheattrs=3D0x0) at /data/qe=
-mu/target/arm/helper.c:11106
-> #1  0x0000560ef0bde3c6 in S1_ptw_translate (env=3Denv@entry=3D0x560ef3274=
-2b0, mmu_idx=3Dmmu_idx@entry=3DARMMMUIdx_Stage1_E1, addr=3D1095261192, txat=
-trs=3D..., fi=3Dfi@entry=3D0x7f90e2ffc530) at /data/qemu/target/arm/helper.=
-c:10218
-> #2  0x0000560ef0bdd7f0 in arm_ldq_ptw (fi=3D0x7f90e2ffc530, mmu_idx=3DARM=
-MMUIdx_Stage1_E1, is_secure=3Dfalse, addr=3D<optimized out>, cs=3D0x560ef32=
-6ac10) at /data/qemu/target/arm/helper.c:10284
-> #3  0x0000560ef0bdd7f0 in get_phys_addr_lpae
->     (env=3Denv@entry=3D0x560ef32742b0, address=3Daddress@entry=3D18446674=
-270391351284, access_type=3Daccess_type@entry=3DMMU_INST_FETCH, mmu_idx=3Dm=
-mu_idx@entry=3DARMMMUIdx_Stage1_E1, s1_is_el0=3Ds1_is_el0@entry=3Dfalse, ph=
-ys_ptr=3Dphys_ptr@entry=3D0x7f90e2ffc490, txattrs=3D0x7f90e2ffc518, prot=3D=
-0x7f90e2ffc514, page_size_ptr=3D0x7f90e2ffc528, fi=3D0x7f90e2ffc530, cachea=
-ttrs=3D0x7f90e2ffc51c) at /data/qemu/target/arm/helper.c:11014
-> #4  0x0000560ef0bdfacb in get_phys_addr (env=3Denv@entry=3D0x560ef32742b0=
-, address=3D<optimized out>, address@entry=3D18446674270391351284, access_t=
-ype=3Daccess_type@entry=3DMMU_INST_FETCH, mmu_idx=3D<optimized out>,
->     mmu_idx@entry=3DARMMMUIdx_Stage1_E1, phys_ptr=3Dphys_ptr@entry=3D0x7f=
-90e2ffc490, attrs=3Dattrs@entry=3D0x7f90e2ffc518, prot=3D0x7f90e2ffc514, pa=
-ge_size=3D0x7f90e2ffc528, fi=3D0x7f90e2ffc530, cacheattrs=3D0x7f90e2ffc51c)
->     at /data/qemu/target/arm/helper.c:12115
-> #5  0x0000560ef0bdf5ca in get_phys_addr
->     (env=3Denv@entry=3D0x560ef32742b0, address=3Daddress@entry=3D18446674=
-270391351284, access_type=3Daccess_type@entry=3DMMU_INST_FETCH, mmu_idx=3D<=
-optimized out>, phys_ptr=3Dphys_ptr@entry=3D0x7f90e2ffc520, attrs=3Dattrs@e=
-ntry=3D0x7f90e2ffc518, prot=3D0x7f90e2ffc514, page_size=3D0x7f90e2ffc528, f=
-i=3D0x7f90e2ffc530, cacheattrs=3D0x7f90e2ffc51c) at /data/qemu/target/arm/h=
-elper.c:11950
-> #6  0x0000560ef0bef669 in arm_cpu_tlb_fill (cs=3D0x560ef326ac10, address=
-=3D18446674270391351284, size=3D<optimized out>, access_type=3DMMU_INST_FET=
-CH, mmu_idx=3D2, probe=3D<optimized out>, retaddr=3D0) at /data/qemu/target=
-/arm/tlb_helper.c:177
-> #7  0x0000560ef0adbd85 in tlb_fill (cpu=3D0x560ef326ac10, addr=3D18446674=
-270391351284, size=3D0, access_type=3DMMU_INST_FETCH, mmu_idx=3D2, retaddr=
-=3D0) at /data/qemu/accel/tcg/cputlb.c:1032
-> #8  0x0000560ef0adf216 in get_page_addr_code_hostp (env=3D<optimized out>=
-, addr=3Daddr@entry=3D18446674270391351284, hostp=3Dhostp@entry=3D0x0) at /=
-data/qemu/accel/tcg/cputlb.c:1211
-> #9  0x0000560ef0adf287 in get_page_addr_code (env=3D<optimized out>, addr=
-=3Daddr@entry=3D18446674270391351284) at /data/qemu/accel/tcg/cputlb.c:1243
-> #10 0x0000560ef0af21c4 in tb_htable_lookup (cpu=3Dcpu@entry=3D0x560ef326a=
-c10, pc=3D18446674270391351284, cs_base=3D<optimized out>, flags=3D21821071=
-37, cf_mask=3D4278714368) at /data/qemu/accel/tcg/cpu-exec.c:337
-> #11 0x0000560ef0af2fd6 in tb_lookup__cpu_state (cf_mask=3D<optimized out>=
-, flags=3D0x7f90e2ffc718, cs_base=3D0x7f90e2ffc720, pc=3D0x7f90e2ffc728, cp=
-u=3D0x0) at /data/qemu/include/exec/tb-lookup.h:43
-> #12 0x0000560ef0af2fd6 in tb_find (cf_mask=3D524288, tb_exit=3D0, last_tb=
-=3D0x0, cpu=3D0x0) at /data/qemu/accel/tcg/cpu-exec.c:404
-> #13 0x0000560ef0af2fd6 in cpu_exec (cpu=3Dcpu@entry=3D0x560ef326ac10) at =
-/data/qemu/accel/tcg/cpu-exec.c:748
-> #14 0x0000560ef0bb779f in tcg_cpu_exec (cpu=3D0x560ef326ac10) at /data/qe=
-mu/softmmu/cpus.c:1356
-> #15 0x0000560ef0bb980b in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x560=
-ef326ac10) at /data/qemu/softmmu/cpus.c:1664
-> #16 0x0000560ef10aaf76 in qemu_thread_start (args=3D<optimized out>) at /=
-data/qemu/util/qemu-thread-posix.c:521
-> #17 0x00007f919e9434f9 in start_thread () at /lib64/libpthread.so.0
-> #18 0x00007f919e67bf2f in clone () at /lib64/libc.so.6
->
-> I've reproduced that with a local Jailhouse installation, but I suspect
-> (do not have the time right now to check) that a vanilla jailhouse-
-> images [1] build for qemu-arm64 will trigger it as well. Once time
-> permits, I could try to generate and share such an image.
->
-> qemu 3.1.1.1 of my distro is fine, also f4d8cf148e43.
->
-> Any ideas?
->
-> Jan
->
-> [1] https://github.com/siemens/jailhouse-images
+Is the Linux-specific stuff (userfaultfd) a *requirement* for the
+function, or just a "this would be nice" extra and a valid
+implementation would be eg "zero out the memory" ?
 
 thanks
 -- PMM
