@@ -2,80 +2,90 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C23C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 21:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58361C43446
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 21:17:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8C6A20720
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 21:11:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8C6A20720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 245DB20720
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 21:17:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SzvaOcKi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 245DB20720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxzXu-00089Z-3m
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 17:11:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51068)
+	id 1jxzde-00012D-At
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 17:17:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jxzXH-0007ju-4Y
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 17:10:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55472)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jxzXE-00055t-T8
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 17:10:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jxzXC-00037J-SH
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 21:10:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C609F2E80E7
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 21:10:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jxzco-0000ZI-75
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 17:16:34 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56834
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jxzcl-0005w5-O1
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 17:16:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595366189;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=jueRIjz5/bOUCC4Q2ETz6SULnWb5x49O8GBmWhOCz+M=;
+ b=SzvaOcKi6osQhMva4wHlSz9EaZxfMQJ0Fnsw79/mav9K6OyPDtqq8yX5EOZoqiHdjvsEMu
+ 5tCLXJvYY08Xv04dK5AN5HuEO+C2qznBvmMboIJ1ZgXYQ7fy9qv1ED4W89OAzoepaIlU+G
+ g/4ZYjLZ268gvsojcCIw2Qu4XcEe6n4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-xNLwfCx7M2iRNgbW8GraYw-1; Tue, 21 Jul 2020 17:16:28 -0400
+X-MC-Unique: xNLwfCx7M2iRNgbW8GraYw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DBA51005504;
+ Tue, 21 Jul 2020 21:16:27 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
+ [10.36.115.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D2EB22B6DB;
+ Tue, 21 Jul 2020 21:16:26 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 062909D9E; Tue, 21 Jul 2020 23:16:26 +0200 (CEST)
+Date: Tue, 21 Jul 2020 23:16:26 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: please try to avoid sending pullreqs late on release-candidate day
+Message-ID: <20200721211626.3kepsmdi2n6tkigw@sirius.home.kraxel.org>
+References: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Jul 2020 21:04:24 -0000
-From: Robert Ball <1888431@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: build-failed macosx-10.11.6 v5.1.0-rc1
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ebolainfluenza
-X-Launchpad-Bug-Reporter: Robert Ball (ebolainfluenza)
-X-Launchpad-Bug-Modifier: Robert Ball (ebolainfluenza)
-Message-Id: <159536546453.8597.9185320640612954142.malonedeb@wampee.canonical.com>
-Subject: [Bug 1888431] [NEW] v5.1.0-rc1 build fails on Mac OS X 10.11.6 
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1175aeb8bd71642018ef4676e1768f9c54755e03
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 16:11:00
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 17:16:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,155 +94,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1888431 <1888431@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Tue, Jul 21, 2020 at 04:56:25PM +0100, Peter Maydell wrote:
+> It is not helpful if everybody sends their pullrequests late
+> on the Tuesday afternoon, as there just isn't enough time in the
+> day to merge test and apply them all before I have to cut the tag.
+> Please, if you can, try to send pullrequests earlier, eg Monday.
 
-Hi all,
+I usually try, but it didn't work out this time due to patches coming
+in late ...
 
-build of tag v5.1.0-rc1 fails on Mac OS X 10.11.6 (El Capitan) with the
-following error:
+Speaking of testing:  What is the state of gitlab ci?  How much of the
+testing has been migrated over?  I've noticed I can push branches and
+tags to a qemu fork @ gitlab.com and gitlab ci runs a bunch of tests.
 
-git clone https://git.qemu.org/git/qemu.git
-    <output elided, but all OK>
-cd qemu
-git submodule init
-    <output elided, but all OK>
-git submodule update --recursive
-    <output elided, but all OK>
-./configure
-    <output elided, but all OK>
-make
-    <output elided, but all OK up until fail>
+What is the best way to indicate that the tag did pass gitlab ci
+already?  Maybe simply send a pull request with gitlab.com url?
 
-  CC      trace/control.o
-In file included from trace/control.c:29:
-In file included from /Users/rtb/src/qemu/include/monitor/monitor.h:4:
-In file included from /Users/rtb/src/qemu/include/block/block.h:4:
-In file included from /Users/rtb/src/qemu/include/block/aio.h:23:
-/Users/rtb/src/qemu/include/qemu/timer.h:843:9: warning: implicit declarati=
-on of function 'clock_gettime' is invalid in C99
-      [-Wimplicit-function-declaration]
-        clock_gettime(CLOCK_MONOTONIC, &ts);
-        ^
-/Users/rtb/src/qemu/include/qemu/timer.h:843:23: error: use of undeclared i=
-dentifier 'CLOCK_MONOTONIC'
-        clock_gettime(CLOCK_MONOTONIC, &ts);
-                      ^
-1 warning and 1 error generated.
-make: *** [trace/control.o] Error 1
+take care,
+  Gerd
 
-
-rtb:qemu rtb$ git log -n1
-commit c8004fe6bbfc0d9c2e7b942c418a85efb3ac4b00 (HEAD -> master, tag: v5.1.=
-0-rc1, origin/master, origin/HEAD)
-Author: Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue Jul 21 20:28:59 2020 +0100
-
-    Update version for v5.1.0-rc1 release
-    =
-
-    Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-rtb:qemu rtb$ =
-
-
-
-Please find the full output of all the commands (from git clone of the repo=
-, to the make) in the attached file "buildfail.txt".
-
-Thank you!
-
-Best regards,
-
-Robert Ball
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: build-failed macosx-10.11.6 v5.1.0-rc1
-
-** Attachment added: "full output of git clone through make"
-   https://bugs.launchpad.net/bugs/1888431/+attachment/5394703/+files/build=
-fail.txt
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1888431
-
-Title:
-  v5.1.0-rc1 build fails on Mac OS X 10.11.6
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi all,
-
-  build of tag v5.1.0-rc1 fails on Mac OS X 10.11.6 (El Capitan) with
-  the following error:
-
-  git clone https://git.qemu.org/git/qemu.git
-      <output elided, but all OK>
-  cd qemu
-  git submodule init
-      <output elided, but all OK>
-  git submodule update --recursive
-      <output elided, but all OK>
-  ./configure
-      <output elided, but all OK>
-  make
-      <output elided, but all OK up until fail>
-
-    CC      trace/control.o
-  In file included from trace/control.c:29:
-  In file included from /Users/rtb/src/qemu/include/monitor/monitor.h:4:
-  In file included from /Users/rtb/src/qemu/include/block/block.h:4:
-  In file included from /Users/rtb/src/qemu/include/block/aio.h:23:
-  /Users/rtb/src/qemu/include/qemu/timer.h:843:9: warning: implicit declara=
-tion of function 'clock_gettime' is invalid in C99
-        [-Wimplicit-function-declaration]
-          clock_gettime(CLOCK_MONOTONIC, &ts);
-          ^
-  /Users/rtb/src/qemu/include/qemu/timer.h:843:23: error: use of undeclared=
- identifier 'CLOCK_MONOTONIC'
-          clock_gettime(CLOCK_MONOTONIC, &ts);
-                        ^
-  1 warning and 1 error generated.
-  make: *** [trace/control.o] Error 1
-
-  =
-
-  rtb:qemu rtb$ git log -n1
-  commit c8004fe6bbfc0d9c2e7b942c418a85efb3ac4b00 (HEAD -> master, tag: v5.=
-1.0-rc1, origin/master, origin/HEAD)
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Tue Jul 21 20:28:59 2020 +0100
-
-      Update version for v5.1.0-rc1 release
-      =
-
-      Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-  rtb:qemu rtb$ =
-
-
-  =
-
-  Please find the full output of all the commands (from git clone of the re=
-po, to the make) in the attached file "buildfail.txt".
-
-  Thank you!
-
-  Best regards,
-
-  Robert Ball
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1888431/+subscriptions
 
