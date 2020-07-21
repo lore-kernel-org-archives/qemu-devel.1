@@ -8,70 +8,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE88C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84039C433E5
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:23:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14BE52065F
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:22:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 551712077D
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 15:23:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E7pnYrlk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14BE52065F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WnQmO+uO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 551712077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxu5u-0003eK-8p
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 11:22:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51116)
+	id 1jxu7A-0004ky-Iy
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 11:23:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jxu5D-0002tf-BY; Tue, 21 Jul 2020 11:21:31 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:43547)
+ id 1jxu6V-0004Dj-1h; Tue, 21 Jul 2020 11:22:51 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:39216)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1jxu5B-000585-SM; Tue, 21 Jul 2020 11:21:31 -0400
-Received: by mail-io1-xd43.google.com with SMTP id k23so21790658iom.10;
- Tue, 21 Jul 2020 08:21:29 -0700 (PDT)
+ id 1jxu6T-0005Hm-Du; Tue, 21 Jul 2020 11:22:50 -0400
+Received: by mail-io1-xd44.google.com with SMTP id z6so4317739iow.6;
+ Tue, 21 Jul 2020 08:22:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=B/WewGkuED5ZclfNuICMT67tC9Y0KAaeDc8gnr/D54Q=;
- b=E7pnYrlkEXAAhuiMhovn3MPu+81vCx5yCXawGyFNBJC6AiOTDOob7hrIevQUsUmcvS
- pHef+lGT4UrH//JmYGQMmlOsTNBSG78MsFfuqVp+ga8WzLVY9C4RcheOG9wCuT6cjjX6
- DH8zzna46O92mYJz6FInQTVKfuiHbt/xpVztwuMP+O2dJs0IJk2smz3JF9rxj5VBp0DM
- yGVDwVSVaeOnLh7ae08NRLtFBEh/VN+sjAr9n+IFJGk/4XF3Mf0s45TlzuvdYrlcy3SS
- Kw6aAUndCaTNydEvIw0vRYKM82XfIReE7fQFuq2FDyfexqALIaFS2E6gX1QElG3+PMOE
- 3HRA==
+ :cc; bh=dg6ywj0QsHTflwHtlgnpMJUCnmY3aA89oiRMLeeCkVU=;
+ b=WnQmO+uOxBMCf2Qrld2/ZKoWKpxx+hc+mjYLZQgsWMLP7iwHnKQVtwCvyScPSvZIBc
+ EMpgACiOcUFifMDHX/GNzjkQuSt+gPx6vOrK7ZcLuSsvfBohcD8+bGP/+HNgYWcXnkex
+ HbH1ubhKS1eLrJt40llhuZi2zLdAvq/WeIB+gWHpGqfmm9oKPQPvNYhrT0hZHJ1RrRWm
+ WX1NkUEUqSMDsEvsoRqJAsHqmGWukmmN3tTLaN0Plgu0u6IV2SVur9GQB+lyJBGCpjRR
+ zMOvJqik0UPF3ycm+kCAnwkWZqWvl57v1tgCuNuA3vGweie9HtVjybJ/i62jtW/k7UEV
+ +XbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=B/WewGkuED5ZclfNuICMT67tC9Y0KAaeDc8gnr/D54Q=;
- b=tK30jk/6lZba+utNF8QLO7+aRlcdX6+/GcScsrsXQi+Cklw1xCeHhb3xTsnMFBCOFt
- t7U3V5mYC4ScfVkKIsZV8VSSJ2z3d3y0Kun2mbfYd9LkJ2Zx0VEHoDJ1ODiTKxoppu7r
- kWI0oaa+/9odTCUnTpUoZaVJGuaJG+i1aOOgbHVpqIBeL2Gf01800wm7xdx8RfHMsbhY
- 3LtCZbEUXupWFmuv/Apqg7B/Cq6o8VpC22VUeTlD1qB0qRBGtTz7EQ2Cxy1bHRJYl5rb
- M6BwqgrRhvCNL2fGe/EXtynyQpR0JXJd5DfvPivZ+NOrgPoLUkiDunEC7ZW3fJujr7ez
- ZL7A==
-X-Gm-Message-State: AOAM530q6451I8pJiJeKdHbpW8CoeQW3XkieQIxG2p6NYSlhvxQHMrJ7
- SCuv1zw0JVTNJjzBQ5xx6VLNRFGfHFafWSCZNzY=
-X-Google-Smtp-Source: ABdhPJxZTgGDhzLoCe/0QER79v1EQDAhKkC79ytFKTiqBjDzQM3u5B+mr0p4EaUuSpNVUo9osTGtlaoHGhO1MAg+Euw=
-X-Received: by 2002:a02:7092:: with SMTP id f140mr3548254jac.8.1595344888308; 
- Tue, 21 Jul 2020 08:21:28 -0700 (PDT)
+ bh=dg6ywj0QsHTflwHtlgnpMJUCnmY3aA89oiRMLeeCkVU=;
+ b=s1hLAD8tW4bCDAAyWYbJ3F8PFzAr4AfjdnWPhjfd8dA64ySeomuR5ReHBXlYFfXzgm
+ pDz3GAprxVyC+N2QkKywR9tOMGWBPqMZfdjOHCBMOb6kpJNQkJQVuAsDZHPOt3zYzuuq
+ WqGGXnYkOZWMplqjWeTFAU7Z+Po3n4KTSGoub545bh4ROzzUtuyTQc0TZbl/wAYBneYy
+ RgJxHIoHllbUGbLMcoXPhpddfzUkhLzgnCOTL4sXED3yX4pi+5GO4oJZdLPNvSkkNavV
+ Zd5IoLHTn6IWb/d8qMhI9aD9U5tVgDUowSfp9vJxmPKUXMkPiS0s1/WfJCQKI2lGmJwH
+ vB7Q==
+X-Gm-Message-State: AOAM531g5TA1rtko54qS2nylGEjkAKfXwR+USWEvWuxzHgLCLZ9O8oZn
+ IswNr2IyIqNlNA+x8anrGhIb4d65v7PD8CuLilo=
+X-Google-Smtp-Source: ABdhPJyusPRk8SfzFFbnFVCo73IoZ/dyg8Vrrtp9uKeqPr7+Bk5VyNT3Q4sltslhsvVD28hIDXPwJeVKI+ruY7iLUm0=
+X-Received: by 2002:a5d:9306:: with SMTP id l6mr28810280ion.105.1595344967830; 
+ Tue, 21 Jul 2020 08:22:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200721133742.2298-1-zhiwei_liu@c-sky.com>
- <20200721133742.2298-2-zhiwei_liu@c-sky.com>
-In-Reply-To: <20200721133742.2298-2-zhiwei_liu@c-sky.com>
+References: <1594891856-15474-1-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1594891856-15474-1-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 21 Jul 2020 08:11:22 -0700
-Message-ID: <CAKmqyKPVPJDAYdUQrMLS6db8E1dqosGV5bN5Qeoqk7Ox_+G9_w@mail.gmail.com>
-Subject: Re: [PATCH 2/2] target/riscv: fix vector index load/store constraints
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Date: Tue, 21 Jul 2020 08:12:42 -0700
+Message-ID: <CAKmqyKOGVqFxh7azqo95TwPtCyBtVLE34x6UFfmqvmbNZWDDXA@mail.gmail.com>
+Subject: Re: [PATCH] hw/riscv: sifive_e: Correct debug block size
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -94,61 +93,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 21, 2020 at 6:38 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+On Thu, Jul 16, 2020 at 2:31 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> Although not explicitly specified that the the destination
-> vector register groups cannot overlap the source vector register group,
-> it is still necessary.
+> Currently the debug region size is set to 0x100, but according to
+> FE310-G000 and FE310-G002 manuals:
 >
-> And this constraint has been added to the v0.8 spec.
+>   FE310-G000: 0x100 - 0xFFF
+>   FE310-G002: 0x0   - 0xFFF
 >
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> Change the size to 0x1000 that applies to both.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  target/riscv/insn_trans/trans_rvv.inc.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
 >
-> diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-> index 7b4752b911..887c6b8883 100644
-> --- a/target/riscv/insn_trans/trans_rvv.inc.c
-> +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-> @@ -513,13 +513,21 @@ static bool ld_index_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
->      return ldst_index_trans(a->rd, a->rs1, a->rs2, data, fn, s);
->  }
+>  hw/riscv/sifive_e.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> +/*
-> + * For vector indexed segment loads, the destination vector register
-> + * groups cannot overlap the source vector register group (specified by
-> + * `vs2`), else an illegal instruction exception is raised.
-> + */
->  static bool ld_index_check(DisasContext *s, arg_rnfvm* a)
->  {
->      return (vext_check_isa_ill(s) &&
->              vext_check_overlap_mask(s, a->rd, a->vm, false) &&
->              vext_check_reg(s, a->rd, false) &&
->              vext_check_reg(s, a->rs2, false) &&
-> -            vext_check_nf(s, a->nf));
-> +            vext_check_nf(s, a->nf) &&
-> +            ((a->nf == 1) ||
-> +             vext_check_overlap_group(a->rd, a->nf << s->lmul,
-> +                                      a->rs2, 1 << s->lmul)));
->  }
->
->  GEN_VEXT_TRANS(vlxb_v, 0, rnfvm, ld_index_op, ld_index_check)
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 7bb97b4..c8b0604 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -54,7 +54,7 @@ static const struct MemmapEntry {
+>      hwaddr base;
+>      hwaddr size;
+>  } sifive_e_memmap[] = {
+> -    [SIFIVE_E_DEBUG] =    {        0x0,      0x100 },
+> +    [SIFIVE_E_DEBUG] =    {        0x0,     0x1000 },
+>      [SIFIVE_E_MROM] =     {     0x1000,     0x2000 },
+>      [SIFIVE_E_OTP] =      {    0x20000,     0x2000 },
+>      [SIFIVE_E_CLINT] =    {  0x2000000,    0x10000 },
 > --
-> 2.23.0
+> 2.7.4
 >
 >
 
