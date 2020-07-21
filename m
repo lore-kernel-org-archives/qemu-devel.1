@@ -2,93 +2,85 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC394C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 02:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB4BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 02:42:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B67342072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 02:12:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09597206E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 02:42:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HOXcB3/r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B67342072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nof6jWSy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09597206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxhlb-0004d9-0g
-	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 22:12:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35614)
+	id 1jxiES-0008Rw-8w
+	for qemu-devel@archiver.kernel.org; Mon, 20 Jul 2020 22:42:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jxhl3-0004Cm-N8
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 22:11:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60680
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jxhl1-0002EV-N8
- for qemu-devel@nongnu.org; Mon, 20 Jul 2020 22:11:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595297510;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3MGkYyLolwmpjGs18XHJUdlW5jQj9rWopB2tBLoYWfM=;
- b=HOXcB3/rhxynFeQMPGVNC3y8UT6L5HXMGrhWUMy9BGkrt5wl4H6QmuY50M5yWNRSAPCVK2
- 9tSXdSUtjnlmkoQL/LORX12L0AdeTNIEGZ943io3WArNunajjvxghnXDWGDAQsHotArVGE
- AYOPOUk8OTTeCIDtJLtX1hmDm0TYdLM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-LsNWMkKxO_auNxJgu-F5Ig-1; Mon, 20 Jul 2020 22:11:47 -0400
-X-MC-Unique: LsNWMkKxO_auNxJgu-F5Ig-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E46D580046C;
- Tue, 21 Jul 2020 02:11:44 +0000 (UTC)
-Received: from [10.72.13.146] (ovpn-13-146.pek2.redhat.com [10.72.13.146])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 41A436FEE9;
- Tue, 21 Jul 2020 02:11:25 +0000 (UTC)
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-To: Sean Mooney <smooney@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>
-References: <20200713232957.GD5955@joy-OptiPlex-7040>
- <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
- <20200716083230.GA25316@joy-OptiPlex-7040> <20200717101258.65555978@x1.home>
- <95c13c9b-daab-469b-f244-a0f741f1b41d@redhat.com>
- <60d5c1609aaef72f2877aaacff04dc7187e4b3a5.camel@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <22599bc3-cb22-7a62-d463-9a53714def57@redhat.com>
-Date: Tue, 21 Jul 2020 10:11:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jxiDh-0007wz-KU; Mon, 20 Jul 2020 22:41:29 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:45222)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1jxiDf-0007Kz-VK; Mon, 20 Jul 2020 22:41:29 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id y17so9281978ybm.12;
+ Mon, 20 Jul 2020 19:41:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=skdlpQWisCSvavXYO5NtnKlNfgt0dNyO8LrUOpShm8g=;
+ b=nof6jWSymmYFyPBzt+BkvrYKBwkGbxzNO2qYUBraeIuD9PMm3zNVR1TQPv02vnEHVy
+ m2hJjyjX+UofQcWwcNiEmBjsRdg8l7/WGI7ktA6DXLh2vuDMn1wK1s5XHfdnqhT/tkcf
+ 7jNcpTExvbUuwx+9FqGUbzizlkAHww5ga/PMfMGLteYNzKRxx2usnFxC5Q5Glk34JfeY
+ pBBEKetYYr9Nte9H/NGoLxuiI1g19E8vFxpY++mZ2K2sGpkNf8OrSChxmUozee5wumSH
+ 743WRT1Ofk0nLPQAhDTMZUYWhkuV4qWjZtSnNFkDNPkQnP6uMT7MleEVKLZDYUtWAaYc
+ pz9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=skdlpQWisCSvavXYO5NtnKlNfgt0dNyO8LrUOpShm8g=;
+ b=fEwwcneF/aj7GtcAM4kQCM2fnH/uSRl0s8hXDxQmtb7NNrJ85MYaWL08OFjuzQgtXA
+ 3gigcyiMGYHYG9UV3binmJ1W46A3joBryTxZpjSci0LLM1nACFT3JFz8rBEps6Kp8hzi
+ LtW4YO7plQqi/PeboH0cRcoYMv/Gx3ASC3bbcpOK2o3GFmDR1GaioDglNNVgMsvOOOqF
+ fh6W8xVhzcUBlph1XMFqL1CxCEXEMIryJVyp3USRVrng2lTR39e6aU6UmqxlqbXQSzdg
+ RfE9M8Glz7VeGW275BLuw5JNKPyw2F5B26yj0Atpw+9qdnrdm+PE9sxT7DI2CwN5F01P
+ T3Tg==
+X-Gm-Message-State: AOAM531MqUBi+HBkVWYhB8bOzqO76bimyWWnSclmwhPpKg4Kk/NCQsF6
+ NMmXHv9dpG4g20Jei+4/TzqAo7vZPZUyftxnUuo=
+X-Google-Smtp-Source: ABdhPJwR3st8za6kc/TESahH9UQMdzatrfvwg57EnTfrYgs6gNN08/0szFq4t1ugSr2PzmoegXxl83aNXs3tkvmZZ7I=
+X-Received: by 2002:a25:aea5:: with SMTP id b37mr39260336ybj.239.1595299286508; 
+ Mon, 20 Jul 2020 19:41:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <60d5c1609aaef72f2877aaacff04dc7187e4b3a5.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/20 22:11:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <cover.1595234208.git.zong.li@sifive.com>
+ <658e49284fc564d4114307cb559cf23ea3e751fd.1595234208.git.zong.li@sifive.com>
+In-Reply-To: <658e49284fc564d4114307cb559cf23ea3e751fd.1595234208.git.zong.li@sifive.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Tue, 21 Jul 2020 10:41:15 +0800
+Message-ID: <CAEUhbmWz0Afs4YotbQi-t96A-eEcQzxzwkYjHtQ4BZxJ7SCgxw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] target/riscv/pmp.c: Fix the index offset on RV64
+To: Zong Li <zong.li@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,105 +93,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: shaohe.feng@intel.com, corbet@lwn.net, kevin.tian@intel.com,
- cohuck@redhat.com, berrange@redhat.com, kvm@vger.kernel.org, devel@ovirt.org,
- libvir-list@redhat.com, eskultet@redhat.com, jian-feng.ding@intel.com,
- qemu-devel@nongnu.org, zhenyuw@linux.intel.com, dgilbert@redhat.com,
- bao.yumeng@zte.com.cn, kwankhede@nvidia.com,
- openstack-discuss@lists.openstack.org, xin-ran.wang@intel.com,
- dinechin@redhat.com, hejie.xu@intel.com, intel-gvt-dev@lists.freedesktop.org,
- eauger@redhat.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Zong,
 
-On 2020/7/20 下午6:39, Sean Mooney wrote:
-> On Mon, 2020-07-20 at 11:41 +0800, Jason Wang wrote:
->> On 2020/7/18 上午12:12, Alex Williamson wrote:
->>> On Thu, 16 Jul 2020 16:32:30 +0800
->>> Yan Zhao <yan.y.zhao@intel.com> wrote:
->>>
->>>> On Thu, Jul 16, 2020 at 12:16:26PM +0800, Jason Wang wrote:
->>>>> On 2020/7/14 上午7:29, Yan Zhao wrote:
->>>>>> hi folks,
->>>>>> we are defining a device migration compatibility interface that helps upper
->>>>>> layer stack like openstack/ovirt/libvirt to check if two devices are
->>>>>> live migration compatible.
->>>>>> The "devices" here could be MDEVs, physical devices, or hybrid of the two.
->>>>>> e.g. we could use it to check whether
->>>>>> - a src MDEV can migrate to a target MDEV,
->>>>>> - a src VF in SRIOV can migrate to a target VF in SRIOV,
->>>>>> - a src MDEV can migration to a target VF in SRIOV.
->>>>>>      (e.g. SIOV/SRIOV backward compatibility case)
->>>>>>
->>>>>> The upper layer stack could use this interface as the last step to check
->>>>>> if one device is able to migrate to another device before triggering a real
->>>>>> live migration procedure.
->>>>>> we are not sure if this interface is of value or help to you. please don't
->>>>>> hesitate to drop your valuable comments.
->>>>>>
->>>>>>
->>>>>> (1) interface definition
->>>>>> The interface is defined in below way:
->>>>>>
->>>>>>                 __    userspace
->>>>>>                  /\              \
->>>>>>                 /                 \write
->>>>>>                / read              \
->>>>>>       ________/__________       ___\|/_____________
->>>>>>      | migration_version |     | migration_version |-->check migration
->>>>>>      ---------------------     ---------------------   compatibility
->>>>>>         device A                    device B
->>>>>>
->>>>>>
->>>>>> a device attribute named migration_version is defined under each device's
->>>>>> sysfs node. e.g. (/sys/bus/pci/devices/0000\:00\:02.0/$mdev_UUID/migration_version).
->>>>> Are you aware of the devlink based device management interface that is
->>>>> proposed upstream? I think it has many advantages over sysfs, do you
->>>>> consider to switch to that?
->>> Advantages, such as?
->>
->> My understanding for devlink(netlink) over sysfs (some are mentioned at
->> the time of vDPA sysfs mgmt API discussion) are:
-> i tought netlink was used more a as a configuration protocoal to qurry and confire nic and i guess
-> other devices in its devlink form requireint a tool to be witten that can speak the protocal to interact with.
-> the primary advantate of sysfs is that everything is just a file. there are no addtional depleenceis
-> needed
+On Mon, Jul 20, 2020 at 5:46 PM Zong Li <zong.li@sifive.com> wrote:
+>
+> On RV64, the reg_index is 2 (pmpcfg2 CSR) after the seventh pmp
+> entry, it is not 1 (pmpcfg1 CSR) like RV32. In the original
+> implementation, the second parameter of pmp_write_cfg is
+> "reg_index * sizeof(target_ulong)", and we get the the result
+> which is started from 16 if reg_index is 2, but we expect that
+> it should be started from 8. Separate the implementation for
+> RV32 and RV64 respectively.
+>
+> Signed-off-by: Zong Li <zong.li@sifive.com>
+> ---
+>  target/riscv/pmp.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+> index 2a2b9f5363..adcdd411e6 100644
+> --- a/target/riscv/pmp.c
+> +++ b/target/riscv/pmp.c
+> @@ -320,8 +320,13 @@ void pmpcfg_csr_write(CPURISCVState *env, uint32_t reg_index,
+>
+>      for (i = 0; i < sizeof(target_ulong); i++) {
+>          cfg_val = (val >> 8 * i)  & 0xff;
+> +#if defined(TARGET_RISCV32)
+>          pmp_write_cfg(env, (reg_index * sizeof(target_ulong)) + i,
+>              cfg_val);
+> +#elif defined(TARGET_RISCV64)
+> +        pmp_write_cfg(env, ((reg_index >> 1) * sizeof(target_ulong)) + i,
+> +            cfg_val);
+> +#endif
 
+Can you please simplify this by shifting reg_index outside the for
+loop for RV64?
 
-Well, if you try to build logic like introspection on top for a 
-sophisticated hardware, you probably need to have library on top. And 
-it's attribute per file is pretty inefficient.
+>      }
+>  }
+>
+> @@ -336,7 +341,11 @@ target_ulong pmpcfg_csr_read(CPURISCVState *env, uint32_t reg_index)
+>      target_ulong val = 0;
+>
+>      for (i = 0; i < sizeof(target_ulong); i++) {
+> +#if defined(TARGET_RISCV32)
+>          val = pmp_read_cfg(env, (reg_index * sizeof(target_ulong)) + i);
+> +#elif defined(TARGET_RISCV64)
+> +        val = pmp_read_cfg(env, ((reg_index >> 1) * sizeof(target_ulong)) + i);
+> +#endif
+>          cfg_val |= (val << (i * 8));
+>      }
+>      trace_pmpcfg_csr_read(env->mhartid, reg_index, cfg_val);
 
-
->   and unlike netlink there are not interoperatblity issues in a coanitnerised env. if you are using diffrenet
-> version of libc and gcc in the contaienr vs the host my understanding is tools like ethtool from ubuntu deployed
-> in a container on a centos host can have issue communicating with the host kernel.
-
-
-Kernel provides stable ABI for userspace, so it's not something that we 
-can't fix.
-
-
-> if its jsut a file unless
-> the format the data is returnin in chagnes or the layout of sysfs changes its compatiable regardless of what you
-> use to read it.
-
-
-I believe you can't change sysfs layout which is part of uABI. But as I 
-mentioned below, sysfs has several drawbacks. It's not harm to compare 
-between different approach when you start a new device management API.
-
-Thanks
-
-
->> - existing users (NIC, crypto, SCSI, ib), mature and stable
->> - much better error reporting (ext_ack other than string or errno)
->> - namespace aware
->> - do not couple with kobject
->>
->> Thanks
->>
-
+Regards,
+Bin
 
