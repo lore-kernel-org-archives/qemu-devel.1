@@ -2,136 +2,90 @@ Return-Path: <SRS0=zL9l=BA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A79C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 09:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44932C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 09:49:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 001682072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 09:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E33C2072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 Jul 2020 09:49:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ny+2j7Hs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 001682072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+Q5M3WV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E33C2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jxotb-00042l-6a
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 05:49:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41546)
+	id 1jxou2-0004oT-CD
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 05:49:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxosy-0003VB-Ko
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 05:48:32 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26144
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jxotO-0003ys-GE
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 05:48:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38023
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jxosv-0004TO-Qh
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 05:48:32 -0400
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1jxotM-0004W0-RP
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 05:48:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595324908;
+ s=mimecast20190719; t=1595324935;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=zT3nnvLdbaBxiYtuyeYW9BC2q28ZRv3qUMC4yj2z/xM=;
- b=Ny+2j7Hs2mGG4FLeIY40FAMJTtwMIcs6ULd9JpYGs+Yiq2edikG6ZdJKSkWcqXnROmEhsJ
- cG1IKcvVDfh7t8Knqxt2LsnM7udDj90tftyjPMykvag+IB3ZXvgbnu0jRaqfv7oVQ3jL/Q
- OMhKfqx/mdBUWzQJbZJKLFqVoQEyY48=
+ in-reply-to:in-reply-to:references:references;
+ bh=tOJ+oh49DyDuh/999wqe2owLearUGseo9Wje3mkwjOc=;
+ b=h+Q5M3WVgnJsGwz6q+lzD3Iw7N0rsYl0JZqQkrTT3bWzdYb9ISX0OwF13ZNw6MHAU5CaZx
+ 1PlFLzDSeK1/jfgO1VdlwaJ+2tM4+EvcrvKVggAOu5R9XHGO6PZLYVV1z4youEdeybGgcJ
+ q4pMYZzaRuWGPJ9sapjgGr/KFOiAZ4U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-H-rKIw_TOQW2kbNnM5ieAQ-1; Tue, 21 Jul 2020 05:48:24 -0400
-X-MC-Unique: H-rKIw_TOQW2kbNnM5ieAQ-1
+ us-mta-446-DMLxgRkdP9CFdIqVYU2r0g-1; Tue, 21 Jul 2020 05:48:54 -0400
+X-MC-Unique: DMLxgRkdP9CFdIqVYU2r0g-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B70D780183C;
- Tue, 21 Jul 2020 09:48:23 +0000 (UTC)
-Received: from [10.36.113.158] (ovpn-113-158.ams2.redhat.com [10.36.113.158])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DE27819934;
- Tue, 21 Jul 2020 09:48:19 +0000 (UTC)
-Subject: Re: [PATCH 2/3] exec: posix_madvise usage on SunOS.
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <CA+XhMqwtUrSpCqNGEETBijewzvmpno8OAX_PKSShDP_gUQ-3VQ@mail.gmail.com>
- <CAFEAcA96mh_4EkKz31HgzfPOEQvhta8VTcvMV=An8Us0+x=NfQ@mail.gmail.com>
- <20200720191318.GM2642@work-vm>
- <7b38e1a1-12a2-0158-45ab-8e5d7e287f2f@redhat.com>
- <CAFEAcA_9CozpnhT9GDOQ=t=JXLW-dPLodr5WuXxNaT7Sx7MESA@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <695f84b1-cbf0-b66e-ac2b-952f8430ed95@redhat.com>
-Date: Tue, 21 Jul 2020 11:48:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5E898014D4;
+ Tue, 21 Jul 2020 09:48:52 +0000 (UTC)
+Received: from kaapi (unknown [10.33.36.8])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DC2B01A888;
+ Tue, 21 Jul 2020 09:48:45 +0000 (UTC)
+Date: Tue, 21 Jul 2020 15:18:42 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 5/9] nvram: add nrf51_soc flash read method
+In-Reply-To: <03c8f705-9e6c-9369-c547-eb09ede77fc1@redhat.com>
+Message-ID: <nycvar.YSQ.7.78.906.2007211517160.4380@xnncv>
+References: <20200624185523.762240-1-ppandit@redhat.com>
+ <20200624185523.762240-6-ppandit@redhat.com>
+ <CAKXe6SKBYpdouoN=C_NZawLOnDMYjDU2X3c2CsCv7X7rPym1Rg@mail.gmail.com>
+ <CAFEAcA8s8-OCmKEJsp6bJXBXH+JiyxrtSbHPiLimCj8+xz3obw@mail.gmail.com>
+ <nycvar.YSQ.7.78.906.2007211212380.4380@xnncv>
+ <03c8f705-9e6c-9369-c547-eb09ede77fc1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_9CozpnhT9GDOQ=t=JXLW-dPLodr5WuXxNaT7Sx7MESA@mail.gmail.com>
-Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 03:39:19
+Content-Type: multipart/mixed;
+ boundary="-1463810047-1617661618-1595324932=:4380"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 01:30:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -144,72 +98,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, David CARLIER <devnexen@gmail.com>,
- David Hildenbrand <dhildenb@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Li Qiang <liq3ea@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21.07.20 11:31, Peter Maydell wrote:
-> On Tue, 21 Jul 2020 at 09:22, David Hildenbrand <david@redhat.com> wrote:
->> virtio-mem depends on Linux (hw/virtio/Kconfig). I guess
->> userfaultfd/postcopy is also not relevant in the context of SunOS. So
->> what remains is virtio-balloon.
->>
->> virito-balloon ideally wants to discard the actual mapped pages to free
->> up memory. When memory is re-accessed, a fresh page is faulted in (->
->> zero-page under Linux). Now, we already have other cases where it looks
->> like "the balloon works" but it really doesn't. One example is using
->> vfio+virtio-balloon under Linux - inflating the balloon is simply a NOP,
->> no memory is actually discarded.
->>
->> I agree that POSIX_MADV_DONTNEED is not a proper match - different
->> guarantees. If SunOS cannot implement ram_block_discard_range() as
->> documented, we should disable it.
-> 
-> Could we also improve the documentation comment to make it clearer
-> what ram_block_discard_range() is actually supposed to be doing?
-> At the moment I don't think you can figure it out from the comments,
-> which are a confusing mix of claiming it unmaps memory and that it
-> zeroes it.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463810047-1617661618-1595324932=:4380
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-Certainly. It really means (as the name suggests) "Discard the pages
-used for backing the virtual address range, effectively freeing them
-back to the OS. When accessing pages within the virtual address range
-again, populate fresh, zeroed-out pages, just as when accessing memory
-inside a new mmap for the first time.". It really tries to mimic the
-"populate on demand" mechanism used on fresh, anonymous mmaps. If no
-page is populated, a page fault in the OS is triggered and a fresh
-(physical) page is populated. Of course, when only reading, the single
-COW zero page can be used until written to the page.
++-- On Tue, 21 Jul 2020, Philippe Mathieu-Daudé wrote --+
+| On 7/21/20 8:47 AM, P J P wrote:
+| > +-- On Thu, 16 Jul 2020, Peter Maydell wrote --+
+| > | > The 'flash_ops' is for ROM, though I don't see where it calls 
+| > | > 'memory_region_rom_device_set_romd' to ROMD, so this MR is in MMIO 
+| > | > mode and it needs a read callback.
+| > | 
+| > | I think that 'romd mode' (ie reads-go-directly-to-RAM) is the default: 
+| > | memory_region_initfn() sets romd_mode to true. So unless the device 
+| > | actively calls memory_region_rom_device_set_romd(mr, false) then the 
+| > | read callback can't be reached.
+| > 
+| > So, we go with g_assert_not_reached() ? We seem to have differing opinions 
+| > about these callbacks.
+| 
+| - Callback missing because we neglected to implement the
+|   hardware behavior:
+| 
+|   => qemu_log_mask(LOG_UNIMP, ...)
+| 
+| - Callback missing because the access is illegal on hardware
+|   (write on read-only register, read on write-only register):
+| 
+|   => qemu_log_mask(LOG_GUEST_ERROR, ...)
+| 
+| - Impossible situation unrelated to the hardware/guest behavior
+|   (problem in QEMU design)
+| 
+|   => g_assert_not_reached()
+| 
+| Note, when we runs QEMU with LOG_UNIMP/LOG_GUEST_ERROR enabled,
+| we are usually interested in what address the guest is accessing,
+| and in the write case, what value is written.
 
-"Unmap" is a misleading terminology, I agree.
+Okay, preparing a revised patch series.
 
-> 
-> Is the Linux-specific stuff (userfaultfd) a *requirement* for the
-> function, or just a "this would be nice" extra and a valid
-> implementation would be eg "zero out the memory" ?
-
-postcopy/userfaultfd really needs all backing pages for the VMA to be
-gone (discarded/zapped), so that a pagefault will be triggered. As
-postcopy will resolve the pagefault itself, it does not rely on the
-"zeroed" semantics. It will tell the OS which page to place.
-
-Supplying anything not zero already smells like the original request
-(discard the pages) was not properly implemented. Of course, one could
-supply random data to a user space process on a pagefault, when
-populating pages, but that already smells like a severe security issue ...
-
-Simply zeroing out memory is not what this function promises. It does
-not work with all three use cases: postcopy, virito-balloon and
-virtio-mem. We really have to discard.
-
--- 
-Thanks,
-
-David / dhildenb
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+---1463810047-1617661618-1595324932=:4380--
 
 
