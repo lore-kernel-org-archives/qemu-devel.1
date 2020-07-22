@@ -2,131 +2,121 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3205BC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 06:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D65AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 06:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9773206C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 06:54:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c4uGrlbG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9773206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DFBFE206C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 06:51:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFBFE206C1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy8eU-0005Fe-9Q
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 02:54:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47750)
+	id 1jy8b9-0001sX-5j
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 02:51:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jy8dt-0004Zr-1Z
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 02:54:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44060
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jy8dr-0002Ok-Ek
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 02:54:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595400854;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=5uXzey2OTG1f+yg5assNjVI8pL8btjS/UeJPYf8IhZ0=;
- b=c4uGrlbGe/2qiEPloNj825dVB1tX5jtV932Zn8ZNT6vAp8ss3eUsahLISL/iEWTardRGEE
- MzyIpasRLtaATerVac3Vfv5iBBjiz3SOL7h1y81AyKqG5b7qnemkHFu8PJO6GOxXLhiSsR
- KJUOvjZS1rH5VfOjXHs1JbCEPLjhqvo=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-5QxqaMw5MZWrlyZR5s5SJw-1; Wed, 22 Jul 2020 02:54:12 -0400
-X-MC-Unique: 5QxqaMw5MZWrlyZR5s5SJw-1
-Received: by mail-ej1-f69.google.com with SMTP id lg24so615854ejb.11
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 23:54:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=5uXzey2OTG1f+yg5assNjVI8pL8btjS/UeJPYf8IhZ0=;
- b=ogvnNYdtXtp6XP/hPWMQmMEy5ebwu3ykkTPD8BAaT6r3lFDf8cNzM2nCXdd7lyI5Xa
- lbw5TKbluqghsYjqkNg85tSuVwEkdL/+lTBx2RAmFmk4g3RC/LQVgpncvlprO+KPa4tm
- i0IScGvB8wYLMIKcP+mqnvl6cyiHHELU7ZUbVmlzWjW1qA+axZ/ntl/k1/R3mXqhXBkc
- zOR5ihswrz5nSMSPPpmEo9wf0IxzZasSCkuG7HZP5lFLzIgS94kDHEg/xWcf8XIutV8A
- 0LU0GZVgR4J2ins14SpUuuCbQRzNI/dth6E73P4gm3j7wHDgvy8/EK1Hnn8kzKln9zdp
- zv0Q==
-X-Gm-Message-State: AOAM532WxUGGoZWwYvf7fv+GUBhg4niw3PFUyaCKbiGpQA4cCzhugQgR
- qZE1GU6ChS+e4ruuIllGU+SVL6a/phg3WQQkkioyiWkzQgFEdZkDKmoQtKTdZmQKj+8Jc2T2vl6
- 0a57yE6lpT2BZsUU=
-X-Received: by 2002:aa7:d8cf:: with SMTP id k15mr28408246eds.250.1595400851703; 
- Tue, 21 Jul 2020 23:54:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyHvLgkLvdJPEg5VKeSkGla5a28LQQP6A59tbxn6xpryWeRlOPjBjvRK3q5i59zpu1k2lxIzA==
-X-Received: by 2002:aa7:d8cf:: with SMTP id k15mr28408222eds.250.1595400851512; 
- Tue, 21 Jul 2020 23:54:11 -0700 (PDT)
-Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id u13sm18575703eds.10.2020.07.21.23.54.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jul 2020 23:54:10 -0700 (PDT)
-Subject: Re: [PATCH v2 2/9] target/arm: Move setting of CPU halted state to
- generic code
-To: Thiago Jung Bauermann <bauerman@linux.ibm.com>, qemu-ppc@nongnu.org
-References: <20200722035016.469075-1-bauerman@linux.ibm.com>
- <20200722035016.469075-3-bauerman@linux.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <b9301808-87f7-1ba6-bd95-f5a12c95344e@redhat.com>
-Date: Wed, 22 Jul 2020 08:54:08 +0200
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jy8aN-0000gO-38
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 02:50:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:36921)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jy8aL-0001sn-3A
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 02:50:38 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N6Kl7-1kv2h52QJ7-016cdK; Wed, 22 Jul 2020 08:49:58 +0200
+Subject: Re: [PATCH v2 12/12] linux-user: fix clock_nanosleep()
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200722062902.24509-1-alex.bennee@linaro.org>
+ <20200722062902.24509-13-alex.bennee@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <2c1c17a6-9bae-322b-9e28-722d11074405@vivier.eu>
+Date: Wed, 22 Jul 2020 08:49:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200722035016.469075-3-bauerman@linux.ibm.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200722062902.24509-13-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:27:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Provags-ID: V03:K1:pPyML5BIBtO/YIqfvx0jN20WyfAQQAoIOHTVgTBBQ1Zzo24sY6U
+ W+8wo8wldIL6QEDaj4WJNTf+LCO8Ifczd3eAxnaCPOu9dIAsQ2uUoU9GEH5C30OAFuoCXK6
+ JGFhdWrQYobkcg1bTYs24915bw48/NOUQCYATsdyP8GYQ2wAoOTgZxOra3Iw1gZ5NSVjwbJ
+ KUUWo7z0SJoFld5bt0HDA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:tQbNLIZptbM=:hiC2/HBL2bObcF0vPSC9Nc
+ VM1pQxcj5xEGo7Jth54rqJ4Px5iW1oJkCJydk30FUIhJ5upxeyNaJpS60bWJT6aaGCtmR1Geb
+ NmGbf3UDpOrNPW8Bvl/AET0KmNbKb4Io89kLpySyKEGAbEMc9gWJgRiKd+ARigN5ja9yUoQYi
+ U1ybISsg7IDg4+Ss928iPzzQSB+HxlYEnbfPHaizLTx9ZfYlnqaADcesbrVxzO4Isk+OV1jbj
+ ZyRp+hgpwMbCMH5rB84diGQDtgW9dBR3sMml2Fv1RAd2V6XaQyba3tGs7ChgqlOk0NLC063Db
+ awXncowPpYxtPnUx+JMFNQ5WSx8tREGDA2xC5w7AoqzCzeRUhcUJS3kPPv51WlucShXSxcIgT
+ mBc3NMb2vFGttBBuF28mRJtxsYWY9+ggv5l9SNkkA3bJ6zSJszXXdzvEAa/b5p4u1sdUtQzWB
+ IsFf47PP1p2Sc+pMflEqyvlgkuRwaih+TEPS1+WwwOwU8b5DlxXa6h5MAQRqjZL0Z3jqlivqz
+ DALTBMH6WhN0g2bCv3HV8x4SBwwWD4T+UmQIHA35CGbvK19p9+0g7jJ3cOXRgilUhakrOvvHj
+ rZ1cMSUElxxfQhGjCP97IO6sH8MmcX9ZWxqlBMmUfyTgHU63SsUlCyUi3PoDLU3D6VWcqzeFT
+ kdc9Ak90poU/fYenq5aeBFH4IIkPf3ziaQjtMpKVWAA8nfWUJLd/F3MU+OA+atIJfs8zv/DRX
+ A5T2oggee41CuVMXzXu5b4nuDMhhNjl94voQin38T5l6/3NkDobdSVqS0riav4lRYfadNHSMo
+ ulEfVNj9+Vbq13//bs2YAOh10oBd8OUVolNKn6iYDNi0LX4BqVDyXoHn5RPN7v7sW28sb4V
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 02:50:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,31 +129,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
- qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: fam@euphon.net, berrange@redhat.com, richard.henderson@linaro.org,
+ f4bug@amsat.org, cota@braap.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/20 5:50 AM, Thiago Jung Bauermann wrote:
-> This change is in a separate patch because it's not so obvious that it
-> won't cause a regression.
+Le 22/07/2020 à 08:29, Alex Bennée a écrit :
+> From: Laurent Vivier <laurent@vivier.eu>
 > 
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+> If clock_nanosleep() encounters an error, it returns one of the positive
+> error number.
+> 
+> If the call is interrupted by a signal handler, it fails with error EINTR
+> and if "remain" is not NULL and "flags" is not TIMER_ABSTIME, it returns
+> the remaining unslept time in "remain".
+> 
+> Update linux-user to not overwrite the "remain" structure if there is no
+> error.
+> 
+> Found with "make check-tcg", linux-test fails on nanosleep test:
+> 
+>   TEST    linux-test on x86_64
+> .../tests/tcg/multiarch/linux-test.c:242: nanosleep
+> make[2]: *** [../Makefile.target:153: run-linux-test] Error 1
+> make[1]: *** [.../tests/tcg/Makefile.qemu:76: run-guest-tests] Error 2
+> make: *** [.../tests/Makefile.include:857: run-tcg-tests-x86_64-linux-user] Error 2
+> 
+> Reported-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Message-Id: <20200721201754.2731479-1-laurent@vivier.eu>
 > ---
->  hw/core/cpu.c    | 2 +-
->  target/arm/cpu.c | 1 -
->  2 files changed, 1 insertion(+), 2 deletions(-)
+>  linux-user/syscall.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 1211e759c26..caa7cd3cab9 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -11829,10 +11829,19 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>      {
+>          struct timespec ts;
+>          target_to_host_timespec(&ts, arg3);
+> -        ret = get_errno(safe_clock_nanosleep(arg1, arg2,
+> -                                             &ts, arg4 ? &ts : NULL));
+> -        if (arg4)
+> +        /*
+> +         * clock_nanosleep() returns 0 or one of the *positive* error number.
+> +         */
+> +        ret = host_to_target_errno(safe_clock_nanosleep(arg1, arg2, &ts,
+> +                                                        arg4 ? &ts : NULL));
+> +        /*
+> +         * if the call is interrupted by a signal handler, it fails
+> +         * with error TARGET_EINTR and if arg4 is not NULL and arg2 is not
+> +         * TIMER_ABSTIME, it returns the remaining unslept time in arg4.
+> +         */
+> +        if (ret == TARGET_EINTR && arg4 && arg2 != TIMER_ABSTIME) {
+>              host_to_target_timespec(arg4, &ts);
+> +        }
+>  
+>  #if defined(TARGET_PPC)
+>          /* clock_nanosleep is odd in that it returns positive errno values.
+> 
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Wait a little before pushing that: I've made more tests and it seems to
+break something in LTP. I have to analyze.
 
+Thanks,
+Laurent
 
