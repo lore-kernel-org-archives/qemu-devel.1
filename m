@@ -2,85 +2,88 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC13BC433E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 10:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA72AC433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 10:34:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 747FF20729
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 10:21:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95C0220729
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 10:34:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aVYVzBEa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 747FF20729
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jo8MI86K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95C0220729
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyBsC-000296-OQ
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 06:21:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43826)
+	id 1jyC4i-0004yr-OZ
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 06:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jyBr3-0001At-7F
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 06:20:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49301
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jyBr0-0006YJ-1J
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 06:20:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595413200;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=uz8QQ/k9SoG0Bnl6eiw0Ff8YNl1NkDzbY2fOI692GwQ=;
- b=aVYVzBEaC1rPROdiiU0KVWxboCHa3UGcJLqFkaCigcpsNdaqG7UPWPTQtMhwKriVRHWDe2
- wrZtUK0FwvQTb8PythbMoRSwJbdWVnJEDmdbkw07mtZGYN5u3NZPRzQoFsTrEwZp/6ZcAv
- C/jlimBGGLud/5CMtyPASU+ZsRMaIvI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-byIIX2DpO6Wyn3rUiasszQ-1; Wed, 22 Jul 2020 06:19:59 -0400
-X-MC-Unique: byIIX2DpO6Wyn3rUiasszQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59D1057
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 10:19:58 +0000 (UTC)
-Received: from titinator (ovpn-113-160.ams2.redhat.com [10.36.113.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E32D928559;
- Wed, 22 Jul 2020 10:19:45 +0000 (UTC)
-References: <20200722084935.9601-1-kraxel@redhat.com>
- <lytuxzhpnk.fsf@redhat.com>
-User-agent: mu4e 1.5.2; emacs 26.3
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [PATCH] spice: simplify chardev setup
-In-reply-to: <lytuxzhpnk.fsf@redhat.com>
-Date: Wed, 22 Jul 2020 12:19:43 +0200
-Message-ID: <lyr1t3hmww.fsf@redhat.com>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1jyC3o-0004Th-OD
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 06:33:17 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:40913)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1jyC3j-0000bM-Uz
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 06:33:16 -0400
+Received: by mail-lj1-x242.google.com with SMTP id j11so1924221ljo.7
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 03:33:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=Gtv179leUIQJBj92u7fcR0QLBtLLbEp62Q9N6eFkIRI=;
+ b=jo8MI86K45/LnALTI2RO9h/7jj3Q9dg5fPgwnf0L9sq1fNPuL14jmJ8zQ3aCzYxCyG
+ UuwvDdr+Bd+9CZOiKlY1rd0h+5jnmUMEF/6CgHyC2RJBMcXGEhoxx3mQsVzWTGJlhSkB
+ by80+jfHqdRfg0hVNF2YSXF62UyzFeE7u3vO+qbjbwzXYI0qQrahRNhEXV8Yqr0tqZu5
+ HwzK0CCGok8+A7FKUNMKv1vkxJdjDbZ2Z1aQjwoynKsEASfpmpzt4t53IWCzo5J0wvvs
+ 2rEyVCVz2ObQmS1jtbx7AFKwmLoPRKqPmMGdcf3xG23tIA1oHwoknidkQtKKoFJ1bAZk
+ Vwyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=Gtv179leUIQJBj92u7fcR0QLBtLLbEp62Q9N6eFkIRI=;
+ b=FNDQW6g62TyUW1dQL1lUd6pGdypSRV59p654hyyuJZCTbA/fHrM15EuAc2Aq/fbX7W
+ csAywAp0nGc32/PMQDUqGPnU0IjocLcXPQmDsYN9POgmT1MS/AvYKJqQwfW1eLMb3+H2
+ +JLYsjLz1sPnj87agyPiLFVlC0StJoD3iZ9QyMEG6dcErMyhwYAYhLckkCFieYCNj5kH
+ nfWm9W3pNXLavl2PskWJD0lwZ1b3a23wOG95MMneXDvFn+n8rJ1O3LT2P9uO43Jtb7Mv
+ Q/TVY0fFKNdc6He2ADtkUXdlmeGbbEeqfzRCSjfcoRb33333qmzrEAwnfxYnXCXN+zje
+ Wkrg==
+X-Gm-Message-State: AOAM531Ber/1N9kDgyCNsN6Y3wgLdcrXrXFYOln1ArEJvZ6yb1IZBBDo
+ dY3BFH2LklbvNPLLQ97EnJnHgJ4jMROvWyGYFIU=
+X-Google-Smtp-Source: ABdhPJzQqtl20KPUSQq23R5P092qMlEBoIY4p4mIQ4oa6TXpmgatrA+Uc+hVBbcMkkXO9UZdC4lzEawkXqvF6I6V2RQ=
+X-Received: by 2002:a2e:9207:: with SMTP id k7mr14499367ljg.120.1595413989472; 
+ Wed, 22 Jul 2020 03:33:09 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dinechin@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:27:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <20200722062902.24509-1-alex.bennee@linaro.org>
+ <20200722062902.24509-6-alex.bennee@linaro.org>
+In-Reply-To: <20200722062902.24509-6-alex.bennee@linaro.org>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Wed, 22 Jul 2020 18:32:59 +0800
+Message-ID: <CAE2XoE-OiXaZRBqW1PnWQO1QntGtckQXOYD1Nqycp7V73MJ3RA@mail.gmail.com>
+Subject: Re: [PATCH v2 05/12] util/oslib-win32: add qemu_get_host_physmem
+ implementation
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000001cbfb305ab05441e"
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,179 +97,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Reply-To: luoyonggang@gmail.com
+Cc: fam@euphon.net, berrange@redhat.com, Stefan Weil <sw@weilnetz.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ qemu-level <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, cota@braap.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--0000000000001cbfb305ab05441e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2020-07-22 at 11:20 CEST, Christophe de Dinechin wrote...
-> On 2020-07-22 at 10:49 CEST, Gerd Hoffmann wrote...
->> Initialize spice before chardevs.  That allows to register the spice
->> chardevs directly in the init function and removes the need to maintain
->> a linked list of chardevs just for registration.
->>
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+I would suggest use loadLibrary to retrieve the function, if not available,
+then return 0 (For Win Xp and Vista);
+
+On Wed, Jul 22, 2020 at 2:34 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+
+> It seems GetPhysicallyInstalledSystemMemory isn't available in the
+> MinGW headers so we have to declare it ourselves. Compile tested only.
 >
-> Looks good to me, but I still need to test how this integrates with my work
-> on putting SPICE in a module.
-
-That part does not seem to work so well. It looks like with this move, the
-init happens before the module is loaded:
-
-   qemu-system-x86_64 -display spice-app
-   Unexpected error in qemu_chr_open_spice_port() at ui/../chardev/spice.c:307:
-   qemu-system-x86_64: spice not enabled
-
-I'll try to find the correct fix. Any idea how to address this?
-
+> Cc: Stefan Weil <sw@weilnetz.de>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  util/oslib-win32.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
 >
-> Reviewed-by: Christophe de Dinechin <dinechin@redhat.com>
+> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+> index 31030463cc9..f0f94833197 100644
+> --- a/util/oslib-win32.c
+> +++ b/util/oslib-win32.c
+> @@ -43,6 +43,8 @@
+>  /* this must come after including "trace.h" */
+>  #include <shlobj.h>
 >
->> ---
->>  include/chardev/spice.h |  1 -
->>  include/ui/qemu-spice.h |  1 -
->>  chardev/spice.c         | 29 ++++++-----------------------
->>  softmmu/vl.c            |  9 +++++----
->>  ui/spice-core.c         |  2 --
->>  5 files changed, 11 insertions(+), 31 deletions(-)
->>
->> diff --git a/include/chardev/spice.h b/include/chardev/spice.h
->> index 1f7339b649dc..2013255f34fd 100644
->> --- a/include/chardev/spice.h
->> +++ b/include/chardev/spice.h
->> @@ -12,7 +12,6 @@ typedef struct SpiceChardev {
->>      bool                  blocked;
->>      const uint8_t         *datapos;
->>      int                   datalen;
->> -    QLIST_ENTRY(SpiceChardev) next;
->>  } SpiceChardev;
->>
->>  #define TYPE_CHARDEV_SPICE "chardev-spice"
->> diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
->> index 8c23dfe71797..d34cea2e0fcd 100644
->> --- a/include/ui/qemu-spice.h
->> +++ b/include/ui/qemu-spice.h
->> @@ -46,7 +46,6 @@ int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
->>  #else
->>  #define SPICE_NEEDS_SET_MM_TIME 0
->>  #endif
->> -void qemu_spice_register_ports(void);
->>
->>  #else  /* CONFIG_SPICE */
->>
->> diff --git a/chardev/spice.c b/chardev/spice.c
->> index bf7ea1e2940d..9733f0671699 100644
->> --- a/chardev/spice.c
->> +++ b/chardev/spice.c
->> @@ -14,9 +14,6 @@ typedef struct SpiceCharSource {
->>      SpiceChardev       *scd;
->>  } SpiceCharSource;
->>
->> -static QLIST_HEAD(, SpiceChardev) spice_chars =
->> -    QLIST_HEAD_INITIALIZER(spice_chars);
->> -
->>  static int vmc_write(SpiceCharDeviceInstance *sin, const uint8_t *buf, int len)
->>  {
->>      SpiceChardev *scd = container_of(sin, SpiceChardev, sin);
->> @@ -216,8 +213,6 @@ static void char_spice_finalize(Object *obj)
->>
->>      vmc_unregister_interface(s);
->>
->> -    QLIST_SAFE_REMOVE(s, next);
->> -
->>      g_free((char *)s->sin.subtype);
->>      g_free((char *)s->sin.portname);
->>  }
->> @@ -256,8 +251,6 @@ static void chr_open(Chardev *chr, const char *subtype)
->>
->>      s->active = false;
->>      s->sin.subtype = g_strdup(subtype);
->> -
->> -    QLIST_INSERT_HEAD(&spice_chars, s, next);
->>  }
->>
->>  static void qemu_chr_open_spice_vmc(Chardev *chr,
->> @@ -310,28 +303,18 @@ void qemu_chr_open_spice_port(Chardev *chr,
->>          return;
->>      }
->>
->> +    if (!using_spice) {
->> +        error_setg(errp, "spice not enabled");
->> +        return;
->> +    }
->> +
->>      chr_open(chr, "port");
->>
->>      *be_opened = false;
->>      s = SPICE_CHARDEV(chr);
->>      s->sin.portname = g_strdup(name);
->>
->> -    if (using_spice) {
->> -        /* spice server already created */
->> -        vmc_register_interface(s);
->> -    }
->> -}
->> -
->> -void qemu_spice_register_ports(void)
->> -{
->> -    SpiceChardev *s;
->> -
->> -    QLIST_FOREACH(s, &spice_chars, next) {
->> -        if (s->sin.portname == NULL) {
->> -            continue;
->> -        }
->> -        vmc_register_interface(s);
->> -    }
->> +    vmc_register_interface(s);
->>  }
->>
->>  static void qemu_chr_parse_spice_vmc(QemuOpts *opts, ChardevBackend *backend,
->> diff --git a/softmmu/vl.c b/softmmu/vl.c
->> index f476ef89edb7..bc0dcc4f58bd 100644
->> --- a/softmmu/vl.c
->> +++ b/softmmu/vl.c
->> @@ -4125,6 +4125,11 @@ void qemu_init(int argc, char **argv, char **envp)
->>      page_size_init();
->>      socket_init();
->>
->> +    /* spice needs the timers to be initialized by this point */
->> +    /* spice must initialize before audio as it changes the default auiodev */
->> +    /* spice must initialize before chardevs (for spicevmc and spiceport) */
->> +    qemu_spice_init();
->> +
->>      qemu_opts_foreach(qemu_find_opts("object"),
->>                        user_creatable_add_opts_foreach,
->>                        object_create_initial, &error_fatal);
->> @@ -4139,10 +4144,6 @@ void qemu_init(int argc, char **argv, char **envp)
->>                        fsdev_init_func, NULL, &error_fatal);
->>  #endif
->>
->> -    /* spice needs the timers to be initialized by this point */
->> -    /* spice must initialize before audio as it changes the default auiodev */
->> -    qemu_spice_init();
->> -
->>      /*
->>       * Note: we need to create audio and block backends before
->>       * machine_set_property(), so machine properties can refer to
->> diff --git a/ui/spice-core.c b/ui/spice-core.c
->> index ecc2ec2c55c2..37dd68f2aba2 100644
->> --- a/ui/spice-core.c
->> +++ b/ui/spice-core.c
->> @@ -813,8 +813,6 @@ void qemu_spice_init(void)
->>      g_free(x509_cert_file);
->>      g_free(x509_cacert_file);
->>
->> -    qemu_spice_register_ports();
->> -
->>  #ifdef HAVE_SPICE_GL
->>      if (qemu_opt_get_bool(opts, "gl", 0)) {
->>          if ((port != 0) || (tls_port != 0)) {
+> +WINBASEAPI BOOL WINAPI GetPhysicallyInstalledSystemMemory (PULONGLONG);
+> +
+>  void *qemu_oom_check(void *ptr)
+>  {
+>      if (ptr =3D=3D NULL) {
+> @@ -831,6 +833,15 @@ char *qemu_get_host_name(Error **errp)
+>
+>  size_t qemu_get_host_physmem(void)
+>  {
+> -    /* currently unimplemented */
+> -    return 0;
+> +    ULONGLONG mem;
+> +
+> +    if (GetPhysicallyInstalledSystemMemory(&mem)) {
+> +        if (mem > SIZE_MAX) {
+> +            return SIZE_MAX;
+> +        } else {
+> +            return mem;
+> +        }
+> +    } else {
+> +        return 0;
+> +    }
+>  }
+> --
+> 2.20.1
+>
+>
+>
 
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
+--0000000000001cbfb305ab05441e
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+<div dir=3D"ltr">I would suggest use loadLibrary to retrieve the function, =
+if not available, then return 0 (For Win Xp and Vista);</div><br><div class=
+=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Jul 22, 2020=
+ at 2:34 PM Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">=
+alex.bennee@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,2=
+04);padding-left:1ex">It seems GetPhysicallyInstalledSystemMemory isn&#39;t=
+ available in the<br>
+MinGW headers so we have to declare it ourselves. Compile tested only.<br>
+<br>
+Cc: Stefan Weil &lt;<a href=3D"mailto:sw@weilnetz.de" target=3D"_blank">sw@=
+weilnetz.de</a>&gt;<br>
+Signed-off-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.or=
+g" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
+---<br>
+=C2=A0util/oslib-win32.c | 15 +++++++++++++--<br>
+=C2=A01 file changed, 13 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/util/oslib-win32.c b/util/oslib-win32.c<br>
+index 31030463cc9..f0f94833197 100644<br>
+--- a/util/oslib-win32.c<br>
++++ b/util/oslib-win32.c<br>
+@@ -43,6 +43,8 @@<br>
+=C2=A0/* this must come after including &quot;trace.h&quot; */<br>
+=C2=A0#include &lt;shlobj.h&gt;<br>
+<br>
++WINBASEAPI BOOL WINAPI GetPhysicallyInstalledSystemMemory (PULONGLONG);<br=
+>
++<br>
+=C2=A0void *qemu_oom_check(void *ptr)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0if (ptr =3D=3D NULL) {<br>
+@@ -831,6 +833,15 @@ char *qemu_get_host_name(Error **errp)<br>
+<br>
+=C2=A0size_t qemu_get_host_physmem(void)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 /* currently unimplemented */<br>
+-=C2=A0 =C2=A0 return 0;<br>
++=C2=A0 =C2=A0 ULONGLONG mem;<br>
++<br>
++=C2=A0 =C2=A0 if (GetPhysicallyInstalledSystemMemory(&amp;mem)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (mem &gt; SIZE_MAX) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return SIZE_MAX;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return mem;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 } else {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
++=C2=A0 =C2=A0 }<br>
+=C2=A0}<br>
+-- <br>
+2.20.1<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div>
+
+--0000000000001cbfb305ab05441e--
 
