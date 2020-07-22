@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF2BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A584C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:44:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D875720787
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:42:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5F30205CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:44:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eSH7/WKo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D875720787
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IaPa2Sbb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5F30205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyAKi-0005Rs-2E
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:42:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44334)
+	id 1jyAMQ-00080n-48
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:44:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44356)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyAJA-0003mb-Gp
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:41:00 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37659
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyAJC-0003ov-80
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:41:02 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27111
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyAJ7-0000OO-Od
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:41:00 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyAJA-0000P9-63
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:41:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595407256;
+ s=mimecast20190719; t=1595407259;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1AZwKAol2zP3kx72+lN4dzMd1pf+gShLnzFfE9RuXQ4=;
- b=eSH7/WKorpJV+plB1DueSWien6uLUf4Qc4AFgdUcnzXS35WijiaYxZpVfPM+Syx4tsefT3
- aPJ34mf277tdPL2rkH7GAXW2laxa02EpZIOtY5vWfi/H69cKJUSmV14EHOw2bwZKSaduZA
- skwmpN1LaluGi7+90ErcGGHLVRaaXZ0=
+ bh=cZsRHA+6UlTuB0PRoHEFLy2Ee/c0JGlbkBfkb86ChPY=;
+ b=IaPa2SbbnP8/ZmduYnfRzbwljhw0UVjvyGYFBqUsyu+SUOlcH410M0Q1978ThGaFo4J3cO
+ 8li+28N252yTZaqJBZfJOhXrdSCNtKXaQClp7LPL+ZIw9y3QSfuIx1rFA5MNJGNxlILsf9
+ uOPI+oYW51zcGchC3ZNncqCGRC+zgI4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-KySZH7oPODG1FiKe3zZ_WA-1; Wed, 22 Jul 2020 04:40:54 -0400
-X-MC-Unique: KySZH7oPODG1FiKe3zZ_WA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-239-k6OphLYUOrSoZIN3CBiSig-1; Wed, 22 Jul 2020 04:40:57 -0400
+X-MC-Unique: k6OphLYUOrSoZIN3CBiSig-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3419800C64;
- Wed, 22 Jul 2020 08:40:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 813E6801E6A
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 08:40:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EA7B519C4F;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7147E5D9D7;
  Wed, 22 Jul 2020 08:40:50 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 07C8F107F757; Wed, 22 Jul 2020 10:40:49 +0200 (CEST)
+ id 0ECCF10593DD; Wed, 22 Jul 2020 10:40:49 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/4] error: Strip trailing '\n' from error string arguments
+Subject: [PATCH 4/4] error: Use error_fatal to simplify obvious fatal errors
  (again)
-Date: Wed, 22 Jul 2020 10:40:46 +0200
-Message-Id: <20200722084048.1726105-3-armbru@redhat.com>
+Date: Wed, 22 Jul 2020 10:40:48 +0200
+Message-Id: <20200722084048.1726105-5-armbru@redhat.com>
 In-Reply-To: <20200722084048.1726105-1-armbru@redhat.com>
 References: <20200722084048.1726105-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -96,64 +96,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Xu <peterx@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Eric Auger <eric.auger@redhat.com>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tracked down with scripts/coccinelle/err-bad-newline.cocci.
+Patch created mechanically by rerunning:
 
-Cc: Peter Xu <peterx@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
+    $ spatch --in-place --sp-file scripts/coccinelle/use-error_fatal.cocci \
+	     --macro-file scripts/cocci-macro-file.h --use-gitgrep .
+
+Variables now unused dropped manually.
+
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/i386/intel_iommu.c   | 6 +++---
- target/ppc/mmu-hash64.c | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ exec.c                     | 11 +++--------
+ hw/s390x/s390-virtio-ccw.c |  6 +-----
+ hw/virtio/vhost.c          | 10 +++-------
+ 3 files changed, 7 insertions(+), 20 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index c56398e991..8cd9ed8d3b 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2356,7 +2356,7 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
-     if ((inv_desc->lo & VTD_INV_DESC_IOTLB_RSVD_LO) ||
-         (inv_desc->hi & VTD_INV_DESC_IOTLB_RSVD_HI)) {
-         error_report_once("%s: invalid iotlb inv desc: hi=0x%"PRIx64
--                          ", lo=0x%"PRIx64" (reserved bits unzero)\n",
-+                          ", lo=0x%"PRIx64" (reserved bits unzero)",
-                           __func__, inv_desc->hi, inv_desc->lo);
-         return false;
-     }
-@@ -2377,7 +2377,7 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
-         am = VTD_INV_DESC_IOTLB_AM(inv_desc->hi);
-         if (am > VTD_MAMV) {
-             error_report_once("%s: invalid iotlb inv desc: hi=0x%"PRIx64
--                              ", lo=0x%"PRIx64" (am=%u > VTD_MAMV=%u)\n",
-+                              ", lo=0x%"PRIx64" (am=%u > VTD_MAMV=%u)",
-                               __func__, inv_desc->hi, inv_desc->lo,
-                               am, (unsigned)VTD_MAMV);
-             return false;
-@@ -2387,7 +2387,7 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
+diff --git a/exec.c b/exec.c
+index 6f381f98e2..61b46a62f8 100644
+--- a/exec.c
++++ b/exec.c
+@@ -627,8 +627,7 @@ static void tcg_register_iommu_notifier(CPUState *cpu,
+      */
+     MemoryRegion *mr = MEMORY_REGION(iommu_mr);
+     TCGIOMMUNotifier *notifier;
+-    Error *err = NULL;
+-    int i, ret;
++    int i;
  
-     default:
-         error_report_once("%s: invalid iotlb inv desc: hi=0x%"PRIx64
--                          ", lo=0x%"PRIx64" (type mismatch: 0x%llx)\n",
-+                          ", lo=0x%"PRIx64" (type mismatch: 0x%llx)",
-                           __func__, inv_desc->hi, inv_desc->lo,
-                           inv_desc->lo & VTD_INV_DESC_IOTLB_G);
-         return false;
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index e5baabf0e1..c31d21e6a9 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -859,7 +859,7 @@ static int build_vrma_slbe(PowerPCCPU *cpu, ppc_slb_t *slb)
+     for (i = 0; i < cpu->iommu_notifiers->len; i++) {
+         notifier = g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifier *, i);
+@@ -657,12 +656,8 @@ static void tcg_register_iommu_notifier(CPUState *cpu,
+                             0,
+                             HWADDR_MAX,
+                             iommu_idx);
+-        ret = memory_region_register_iommu_notifier(notifier->mr, &notifier->n,
+-                                                    &err);
+-        if (ret) {
+-            error_report_err(err);
+-            exit(1);
+-        }
++        memory_region_register_iommu_notifier(notifier->mr, &notifier->n,
++                                              &error_fatal);
      }
  
-     error_report("Bad page size encoding in LPCR[VRMASD]; LPCR=0x"
--                 TARGET_FMT_lx"\n", lpcr);
-+                 TARGET_FMT_lx, lpcr);
+     if (!notifier->active) {
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 8cc2f25d8a..4fc92559fb 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -170,11 +170,7 @@ static void s390_memory_init(MemoryRegion *ram)
+      * Configure the maximum page size. As no memory devices were created
+      * yet, this is the page size of initial memory only.
+      */
+-    s390_set_max_pagesize(qemu_maxrampagesize(), &local_err);
+-    if (local_err) {
+-        error_report_err(local_err);
+-        exit(EXIT_FAILURE);
+-    }
++    s390_set_max_pagesize(qemu_maxrampagesize(), &error_fatal);
+     /* Initialize storage key device */
+     s390_skeys_init();
+     /* Initialize storage attributes device */
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 1a1384e7a6..cc8c1f89d5 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -712,9 +712,8 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+                                          iommu_listener);
+     struct vhost_iommu *iommu;
+     Int128 end;
+-    int iommu_idx, ret;
++    int iommu_idx;
+     IOMMUMemoryRegion *iommu_mr;
+-    Error *err = NULL;
  
-     return -1;
+     if (!memory_region_is_iommu(section->mr)) {
+         return;
+@@ -737,11 +736,8 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+     iommu->iommu_offset = section->offset_within_address_space -
+                           section->offset_within_region;
+     iommu->hdev = dev;
+-    ret = memory_region_register_iommu_notifier(section->mr, &iommu->n, &err);
+-    if (ret) {
+-        error_report_err(err);
+-        exit(1);
+-    }
++    memory_region_register_iommu_notifier(section->mr, &iommu->n,
++                                          &error_fatal);
+     QLIST_INSERT_HEAD(&dev->iommu_list, iommu, iommu_next);
+     /* TODO: can replay help performance here? */
  }
 -- 
 2.26.2
