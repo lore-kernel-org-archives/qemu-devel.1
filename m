@@ -2,109 +2,86 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7336EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 22:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 573A8C433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 22:08:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4669B20825
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 22:09:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4669B20825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 208A520825
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 22:08:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j6tLRo5o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 208A520825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyMvB-0007GF-Fa
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 18:09:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60724)
+	id 1jyMuo-0006bP-Di
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 18:08:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jyMuG-00067Y-Ml
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 18:08:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13155
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jyMuA-0002LY-Ue
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 18:08:08 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06MM1dmc069100
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 18:08:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32e1vsdb5p-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 18:08:00 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06MM1cWt068950
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 18:07:59 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
- [169.55.91.170])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32e1vsdb5a-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 18:07:59 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
- by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06MM13KH025026;
- Wed, 22 Jul 2020 22:07:59 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma02wdc.us.ibm.com with ESMTP id 32brq9f9fk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 22:07:59 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06MM7wkN52363656
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 22 Jul 2020 22:07:59 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id DF85A2807A;
- Wed, 22 Jul 2020 22:07:58 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A0FD128074;
- Wed, 22 Jul 2020 22:07:58 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 22 Jul 2020 22:07:58 +0000 (GMT)
-Subject: Re: What is TYPE_TPM_TIS_ISA? (Not an ISA Device)
-To: Markus Armbruster <armbru@redhat.com>
-References: <8f5a171a-59db-f5d1-477c-1ddf7af45da7@redhat.com>
- <CAFEAcA8b3N+oxAAW3JEKGTtsZezXTOFdnu9Hm1MYK=yURTfVsQ@mail.gmail.com>
- <87pn8o14cj.fsf@dusky.pond.sub.org>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <e4ad751f-8418-bdd4-6c81-600e68f5c92e@linux.ibm.com>
-Date: Wed, 22 Jul 2020 18:07:58 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jyMtq-0005rv-75
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 18:07:43 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:44151)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1jyMtn-0002KL-D4
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 18:07:41 -0400
+Received: by mail-ej1-x643.google.com with SMTP id ga4so4047986ejb.11
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 15:07:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=qBrXZJ6/gSeaK6MVNPVJEo7XJFc4H+UjC81cMPddkBg=;
+ b=j6tLRo5o6cPNI7oO9RFQeumTbnheyKeXhsnXtt1xL2XZwm8+NUQIiXR7a60zU1F405
+ +UKpe+R6LK+WnlcIhjXcUEP3TuHhIzjXz+luV+vRFvdpM+r63adBTfy1VHZuLV4b6xsC
+ jn2XgW0TbjUmWapXIEBd05ImRhDoh08UDfa/BvrryYx/hmNe5wD0uG8qepJsEwmsGOe0
+ l3vYqUWzVAlwDqcML9OSIjo8hVS6znBQYJ/HQqAtGKLQtSArOjKPokubIcNg/3T7OGr+
+ kCpXZ/AwLEstwteYSegzFdGVI8BuV+pvUQVye4PFS6HDYc4no/NG9/gE0af+rhFqYmsu
+ flNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=qBrXZJ6/gSeaK6MVNPVJEo7XJFc4H+UjC81cMPddkBg=;
+ b=PUMawA3ACM/BAbxTBah55w9I77AxVlMiThgt7XChHO6McN+Wsxzf8VzdpTylnkIUt5
+ HCy/76de2g357Z44WOIExcLnymzwv3ivaRyq++unRIZd4Hac2oj7ezUFvkQhEox11/f5
+ slpoLiZycj/8rnWBe3PFakN+Pmkxxb4OVdrhZmy7Jb2nM2t7/SXUplSycbKHn15c7F5r
+ o/8mUQvsPw9qivY9LShCycERaJ7yfCxtTHv567wimUheSS6CmDiNkGcuGE/PFcO2Ezgt
+ 8SOHC8GLEJZISVIicPisO1CNvHLaI4hdeeuZCPjqx4t8hzv69r49G0pMMGfqjBqfl1fx
+ JRYA==
+X-Gm-Message-State: AOAM530n2IrYPPAAN+CzkpIAOCISrOq+u/jooQ6v8PMoiClFhhSR13wA
+ pxeaSsZ/vaTtAhaL7+R0PGsRtl1wdoo7d+VNEpJ+O0IugDU=
+X-Google-Smtp-Source: ABdhPJy1jfuSxYgXdt6y8Eo0QEtjBRYDZx5eDY9Have+3HbjVib2aoJtiOmDphgMnOIZTRo4zT1GIg15YBKWDg5zNpg=
+X-Received: by 2002:adf:efd2:: with SMTP id i18mr1306408wrp.32.1595455656555; 
+ Wed, 22 Jul 2020 15:07:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87pn8o14cj.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-22_16:2020-07-22,
- 2020-07-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 mlxscore=0
- malwarescore=0 mlxlogscore=999 phishscore=0 spamscore=0 impostorscore=0
- lowpriorityscore=0 adultscore=0 suspectscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007220135
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 18:08:00
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+References: <20200722205316.1405667-1-sw@weilnetz.de>
+In-Reply-To: <20200722205316.1405667-1-sw@weilnetz.de>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 23 Jul 2020 02:07:23 +0400
+Message-ID: <CAJ+F1CKij4XVispRJkfrAi1iNHYTnX2d3Yzeov36JqpyqMGGxA@mail.gmail.com>
+Subject: Re: [PATCH for-5.1] libvhost-user: Add missing GCC_FMT_ATTR and fix
+ format errors
+To: Stefan Weil <sw@weilnetz.de>
+Content-Type: multipart/alternative; boundary="000000000000a9fb5505ab0ef7ca"
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,79 +95,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/20 1:55 AM, Markus Armbruster wrote:
-> pm socket --tpmstate dir=tpm --ctrl type=unixio,path=tpm/swtpm-soc
-> running in another terminal.
+--000000000000a9fb5505ab0ef7ca
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jul 23, 2020 at 12:54 AM Stefan Weil <sw@weilnetz.de> wrote:
+
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
 >
->>> 3/ no machine plug it using isa_register_ioport()
->>>     (it is not registered to the ISA memory space)
->> There's no requirement for an ISA device to have IO ports...
->>
->> thanks
->> -- PMM
-> Thread hijack!  Since I didn't have swtpm installed, I tried to take a
-> shortcut:
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+---
+>  contrib/libvhost-user/libvhost-user.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 >
->      $ qemu-system-x86_64 -nodefaults -S -display none -monitor stdio -chardev null,id=tpm0 -tpmdev emulator,id=tpm0,chardev=chrtpm -device tpm-tis,tpmdev=tpm0
->      qemu-system-x86_64: -tpmdev emulator,id=tpm0,chardev=chrtpm: tpm-emulator: tpm chardev 'chrtpm' not found.
->      qemu-system-x86_64: -tpmdev emulator,id=tpm0,chardev=chrtpm: tpm-emulator: Could not cleanly shutdown the TPM: No such file or directory
->      QEMU 5.0.90 monitor - type 'help' for more information
->      (qemu) qemu-system-x86_64: -device tpm-tis,tpmdev=tpm0: Property 'tpm-tis.tpmdev' can't find value 'tpm0'
->      $ echo $?
->      1
+> diff --git a/contrib/libvhost-user/libvhost-user.c
+> b/contrib/libvhost-user/libvhost-user.c
+> index d315db1396..6e659aff37 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -151,7 +151,7 @@ vu_request_to_string(unsigned int req)
+>      }
+>  }
 >
-> That a null chardev doesn't work is fine.  But the error handling looks
-> broken: QEMU diagnoses and reports the problem, then continues.  The
-> final error message indicates that it continued without creating the
-> backend "tpm0".  That's wrong.
+> -static void
+> +static void GCC_FMT_ATTR(2, 3)
+>  vu_panic(VuDev *dev, const char *msg, ...)
+>  {
+>      char *buf =3D NULL;
+> @@ -2074,7 +2074,7 @@ virtqueue_get_head(VuDev *dev, VuVirtq *vq,
+>
+>      /* If their number is silly, that's a fatal mistake. */
+>      if (*head >=3D vq->vring.num) {
+> -        vu_panic(dev, "Guest says index %u is available", head);
+> +        vu_panic(dev, "Guest says index %u is available", *head);
+>          return false;
+>      }
+>
+> @@ -2133,7 +2133,7 @@ virtqueue_read_next_desc(VuDev *dev, struct
+> vring_desc *desc,
+>      smp_wmb();
+>
+>      if (*next >=3D max) {
+> -        vu_panic(dev, "Desc next is %u", next);
+> +        vu_panic(dev, "Desc next is %u", *next);
+>          return VIRTQUEUE_READ_DESC_ERROR;
+>      }
+>
+> --
+> 2.27.0
+>
+>
 
+--=20
+Marc-Andr=C3=A9 Lureau
 
-This issue can be solve via the following change that then displays this 
-error:
+--000000000000a9fb5505ab0ef7ca
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-$ x86_64-softmmu/qemu-system-x86_64 -nodefaults -S -display none 
--monitor stdio -chardev null,id=tpm0 -tpmdev 
-emulator,id=tpm0,chardev=chrtpm -device tpm-tis,tpmdev=tpm0
-qemu-system-x86_64: -tpmdev emulator,id=tpm0,chardev=chrtpm: 
-tpm-emulator: tpm chardev 'chrtpm' not found.
-qemu-system-x86_64: -tpmdev emulator,id=tpm0,chardev=chrtpm: 
-tpm-emulator: Could not cleanly shutdown the TPM: No such file or directory
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jul 23, 2020 at 12:54 AM Stef=
+an Weil &lt;<a href=3D"mailto:sw@weilnetz.de">sw@weilnetz.de</a>&gt; wrote:=
+<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8=
+ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Signed-off-by: =
+Stefan Weil &lt;<a href=3D"mailto:sw@weilnetz.de" target=3D"_blank">sw@weil=
+netz.de</a>&gt;<br></blockquote><div><br></div><div>Reviewed-by: Marc-Andr=
+=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marcandre.=
+lureau@redhat.com</a>&gt;</div><div> <br></div><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,2=
+04);padding-left:1ex">
+---<br>
+=C2=A0contrib/libvhost-user/libvhost-user.c | 9 +++++----<br>
+=C2=A01 file changed, 5 insertions(+), 4 deletions(-)<br>
+<br>
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/=
+libvhost-user.c<br>
+index d315db1396..6e659aff37 100644<br>
+--- a/contrib/libvhost-user/libvhost-user.c<br>
++++ b/contrib/libvhost-user/libvhost-user.c<br>
+@@ -151,7 +151,7 @@ vu_request_to_string(unsigned int req)<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0}<br>
+<br>
+-static void<br>
++static void GCC_FMT_ATTR(2, 3)<br>
+=C2=A0vu_panic(VuDev *dev, const char *msg, ...)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0char *buf =3D NULL;<br>
+@@ -2074,7 +2074,7 @@ virtqueue_get_head(VuDev *dev, VuVirtq *vq,<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0/* If their number is silly, that&#39;s a fatal mistake=
+. */<br>
+=C2=A0 =C2=A0 =C2=A0if (*head &gt;=3D vq-&gt;vring.num) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_panic(dev, &quot;Guest says index %u is ava=
+ilable&quot;, head);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_panic(dev, &quot;Guest says index %u is ava=
+ilable&quot;, *head);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return false;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+@@ -2133,7 +2133,7 @@ virtqueue_read_next_desc(VuDev *dev, struct vring_des=
+c *desc,<br>
+=C2=A0 =C2=A0 =C2=A0smp_wmb();<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (*next &gt;=3D max) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_panic(dev, &quot;Desc next is %u&quot;, nex=
+t);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_panic(dev, &quot;Desc next is %u&quot;, *ne=
+xt);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return VIRTQUEUE_READ_DESC_ERROR;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-- <br>
+2.27.0<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
 
-
-diff --git a/tpm.c b/tpm.c
-index 358566cb10..857a861e69 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -170,8 +170,10 @@ void tpm_cleanup(void)
-   */
-  void tpm_init(void)
-  {
--    qemu_opts_foreach(qemu_find_opts("tpmdev"),
--                      tpm_init_tpmdev, NULL, &error_fatal);
-+    if (qemu_opts_foreach(qemu_find_opts("tpmdev"),
-+                          tpm_init_tpmdev, NULL, &error_fatal)) {
-+        exit(1);
-+    }
-  }
-
-  /*
-
-We had something like this before this patch here was applied: 
-https://github.com/qemu/qemu/commit/d10e05f15d5c3dd5e5cc59c5dfff460d89d48580#diff-0ec5df49c6751cb2dc9fa18ed5cf9f0e
-
-
-Do we now want to partially revert this patch or call the exit(1) as 
-shown here?
-
-
-    Stefan
-
+--000000000000a9fb5505ab0ef7ca--
 
