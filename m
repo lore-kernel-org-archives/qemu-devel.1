@@ -2,68 +2,86 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BF7C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 20:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28378C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 20:48:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AED7922B3F
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 20:42:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AED7922B3F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id DEC0A207BB
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 20:48:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G+keV0W8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEC0A207BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyLYx-0007pT-07
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 16:42:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37982)
+	id 1jyLfH-00016Z-5L
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 16:48:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefan@weilnetz.de>)
- id 1jyLYG-0007JY-C6
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 16:41:20 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:39882
- helo=v2201612906741603.powersrv.de)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefan@weilnetz.de>)
- id 1jyLYD-0006uC-SC
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 16:41:19 -0400
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 45938DB354E;
- Wed, 22 Jul 2020 22:41:14 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id Gi9U9Lh1lSEe; Wed, 22 Jul 2020 22:41:13 +0200 (CEST)
-Received: from qemu.weilnetz.de (qemu.weilnetz.de [188.68.58.204])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 22933DB2D4A;
- Wed, 22 Jul 2020 22:41:13 +0200 (CEST)
-Received: by qemu.weilnetz.de (Postfix, from userid 1000)
- id 782C1460019; Wed, 22 Jul 2020 22:41:12 +0200 (CEST)
-From: Stefan Weil <sw@weilnetz.de>
-To: qemu-devel@nongnu.org,
-	Michael Walle <michael@walle.cc>
-Subject: [PATCH for-5.1] sd/milkymist-memcard: Fix format string
-Date: Wed, 22 Jul 2020 22:40:54 +0200
-Message-Id: <20200722204054.1400555-1-sw@weilnetz.de>
-X-Mailer: git-send-email 2.27.0
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jyLeO-0000dj-E9
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 16:47:40 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58972
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1jyLeM-0008Ea-2z
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 16:47:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595450855;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=hoeGS2zUUtZylugqOyvRjvvrIzwDUBWru8+dil06ROc=;
+ b=G+keV0W8YAQ4k3LrSkhTINcYu5IFg0ERDmfB5SK2Pu0b7pgO2VJD13aWqOT/016vA6KExH
+ u030eQbQ/Nd0Kb4n5Qsb2/WfB7IUyEafG6ecBOtaRYAVzCjibBeNCITGrRUElnJ8DpO1i0
+ IOG8j4gxH8qhTrmxqhiZ/3q3Ne1LJ1s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-rvQXOkbNOXeAj8w4gGFbuA-1; Wed, 22 Jul 2020 16:47:33 -0400
+X-MC-Unique: rvQXOkbNOXeAj8w4gGFbuA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B82280183C;
+ Wed, 22 Jul 2020 20:47:32 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B484E100EBDB;
+ Wed, 22 Jul 2020 20:47:31 +0000 (UTC)
+Date: Wed, 22 Jul 2020 16:47:31 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: Re: 5.1.0-rc1 regression: reset fails with kvm and -cpu host
+Message-ID: <20200722204731.GP1274972@habkost.net>
+References: <bf007af9-f81e-3542-0237-5ea467f34377@siemens.com>
+ <20200722173513.GO1274972@habkost.net>
+ <7be95bd6-dfc6-2c22-85a1-a1c932d07fdd@siemens.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=37.120.169.71; envelope-from=stefan@weilnetz.de;
- helo=v2201612906741603.powersrv.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 16:41:14
+In-Reply-To: <7be95bd6-dfc6-2c22-85a1-a1c932d07fdd@siemens.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:34:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,30 +94,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
----
- hw/sd/milkymist-memcard.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Jul 22, 2020 at 08:05:01PM +0200, Jan Kiszka wrote:
+> On 22.07.20 19:35, Eduardo Habkost wrote:
+> > Hi Jan,
+> > 
+> > What was the last version where it worked for you?  Does using
+> > "-cpu host,-vmx" help?
+> 
+> Yeah, -vmx does indeed help.
+> 
+> I didn't have the time to bisect yet. Just check my reflog, picked
+> eb6490f544, and that works.
 
-diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-index afdb8aa0c0..11f61294fc 100644
---- a/hw/sd/milkymist-memcard.c
-+++ b/hw/sd/milkymist-memcard.c
-@@ -281,7 +281,7 @@ static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
-     carddev = qdev_new(TYPE_SD_CARD);
-     qdev_prop_set_drive(carddev, "drive", blk);
-     if (!qdev_realize_and_unref(carddev, BUS(&s->sdbus), &err)) {
--        error_propagate_prepend(errp, err, "failed to init SD card: %s");
-+        error_propagate_prepend(errp, err, "failed to init SD card");
-         return;
-     }
-     s->enabled = blk && blk_is_inserted(blk);
+Thanks!
+
+I could reproduce it locally[1], I will bisect it.
+
+The good news is that "-cpu host,+vmx" still works, on commit
+eb6490f544.
+
+[1] Linux 5.6.19-300.fc32.x86_64, Intel Core i7-8665U CPU.
+
 -- 
-2.27.0
+Eduardo
 
 
