@@ -2,91 +2,82 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E7BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 05:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF2E8C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 06:16:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2106920771
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 05:56:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8803120771
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 06:16:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6sUt9gC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2106920771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eSiqkEVL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8803120771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy7jU-0003BH-CD
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 01:56:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34208)
+	id 1jy82z-0005mQ-Pu
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 02:16:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jy7ir-0002hO-Nz
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 01:55:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35932
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jy7ip-0002Wq-WE
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 01:55:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595397318;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UNBO9skmm15YEipEaKquJXRe58UQoDLUWLcRvAFEEHE=;
- b=a6sUt9gCf7ZFJnu+5NRRoSgfwhSKt2NCJTFc05e4m0tXLhAZ0jziQARuAs/b+Pwh0YOdvW
- 129m5d4+e7qqMrcpm/WOtvWFIUlo8trlfTct0nCuqPws6ZD9MXQTKy9UNAkiyjJ3evmvXV
- FqAzWRSyDlJBE0OqweudiCmzYmGSSjE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-3-0BYM2LfkPImVFhSIht8Fyg-1; Wed, 22 Jul 2020 01:55:16 -0400
-X-MC-Unique: 0BYM2LfkPImVFhSIht8Fyg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 835E657;
- Wed, 22 Jul 2020 05:55:15 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 959965BAD5;
- Wed, 22 Jul 2020 05:55:09 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3222910F5AF1; Wed, 22 Jul 2020 07:55:08 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: What is TYPE_TPM_TIS_ISA? (Not an ISA Device)
-References: <8f5a171a-59db-f5d1-477c-1ddf7af45da7@redhat.com>
- <CAFEAcA8b3N+oxAAW3JEKGTtsZezXTOFdnu9Hm1MYK=yURTfVsQ@mail.gmail.com>
-Date: Wed, 22 Jul 2020 07:55:08 +0200
-In-Reply-To: <CAFEAcA8b3N+oxAAW3JEKGTtsZezXTOFdnu9Hm1MYK=yURTfVsQ@mail.gmail.com>
- (Peter Maydell's message of "Tue, 21 Jul 2020 17:40:27 +0100")
-Message-ID: <87pn8o14cj.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <backtogeek@gmail.com>)
+ id 1jy826-0005Jk-S3
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 02:15:14 -0400
+Received: from mail-qv1-xf31.google.com ([2607:f8b0:4864:20::f31]:37505)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <backtogeek@gmail.com>)
+ id 1jy825-0005Fk-Ak
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 02:15:14 -0400
+Received: by mail-qv1-xf31.google.com with SMTP id p7so561587qvl.4
+ for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 23:15:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=WVBmiYHGCp5F9mjjUMWxCWu5O4UUX6Y875vBEkKBca0=;
+ b=eSiqkEVL1QwB45c6psHsMSXCzsmNyTic7uG8Uyd8i29W5gNrjtZnUUdxGzB9bl3Aay
+ jIi+N+m5rpRrCt8TbwjasvQmyO9N9Jw83JVN4NEKjME0GKd9HyoGVlFDSSFDF+aOMDZ8
+ 5wbSA+Tu2Ij0qPKOPcdZSdX4C7+dhQIvcyxCvHp3LOaTwgsiq6l0AhUFmK6l2wA+BjdO
+ Fat3N4J/3XRHNDuz07XZnM8vfX8v1fakpclv7+EREjF+irUfQYPi22vXhYdw7H3xKbcH
+ d1tFEArXG53c/+Hdk3TZNEVG+Dd3dbxD8Yo/glqdKsy+NHygYO58P+OBKKCyJaAqvhqP
+ YeUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=WVBmiYHGCp5F9mjjUMWxCWu5O4UUX6Y875vBEkKBca0=;
+ b=Kff9YZb0vfCqegHvcymp4UKSTVVMxl7dzis5yl1i/pQhGAPyknJUVBdYxJBXujr7VZ
+ qPmldjwlQFwzUbNyBqwWl2FaWLz6JV/G+ChH7cGz0NjWiWNczyg8YrIgAXghIx3SHwaC
+ X3PX80E6DpbOgIr272NheYMYW2O0Ht5EMJG2K1DDF/uURldYCXlf7QaUWmxSRUIXwZgQ
+ JLodn0lQGJKTtfoBaKBThoetugg5mLUIWGZur8hadTNHu/ulz7a70U4JGFa0vfYUaR2d
+ IOiURI/r21vS54CoR52hHWA36J9Jre2r/zk6y436EXMd6Qjcq7f7ayjqEp+1Q+AY8mxR
+ 6Q7A==
+X-Gm-Message-State: AOAM531AXUX/QIZbo93mKd/yu6ab4JXNYogPo7Sb6LLL3iD2Eyln0/qt
+ e/NYmf2HX/r2fHqwRpUZXNZQMSwC1J83SMD99Kb+pAcHsdk=
+X-Google-Smtp-Source: ABdhPJyDv05uu5zcD6r1XwWLnOVGYkw9WHEp4XTES+Vb9xS6MJsoxRWFVbCvxA+HnCj6Lkp/8ZtRXI0oKZ574RI85p0=
+X-Received: by 2002:a0c:cc93:: with SMTP id f19mr30568845qvl.185.1595398511725; 
+ Tue, 21 Jul 2020 23:15:11 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 00:40:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+From: anthony smith <backtogeek@gmail.com>
+Date: Wed, 22 Jul 2020 07:14:59 +0100
+Message-ID: <CAPf-64Wni=_9byuHt9HyFnZ6PwTF3wp17oEMF2ok-Tvk6UG0RQ@mail.gmail.com>
+Subject: Disk cache defaults
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="00000000000091108005ab01a91a"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f31;
+ envelope-from=backtogeek@gmail.com; helo=mail-qv1-xf31.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,117 +90,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Safford <safford@us.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
- Eric Auger <eric.auger@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--00000000000091108005ab01a91a
+Content-Type: text/plain; charset="UTF-8"
 
-> On Tue, 21 Jul 2020 at 17:07, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com> wrote:
->>
->> Hi Stefan,
->>
->> I'm trying to understand what is modelling the
->> TYPE_TPM_TIS_ISA device.
->>
->> It inherits from TYPE_ISA_DEVICE, so I expected
->> to see an ISA device, but then I noticed:
->>
->> 1/ it doesn't use the ISA I/O space, it directly
->> maps the device in the system memory at a fixed
->> address that is not addressable by the ISA bus:
->>
->> #define TPM_TIS_ADDR_BASE           0xFED40000
->
-> Why do you think this is mapping to the system memory?
-> tpm_tis_isa_realizefn() does:
->
->     memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
->                                 TPM_TIS_ADDR_BASE, &s->mmio);
->
-> which puts it into the ISA memory address space.
->
-> The weird thing about this is not which AS it's
-> going in but the fact that the TPM_TIS_ADDR_BASE
-> is way higher than an actual ISA bus can address
-> (so for instance it's out of range of the size of
-> the ISA memory window on the Jazz board).
->
->> 2/ it is not plugged to an ISA BUS (ISABus*)
->
-> Won't it autoplug into the ISA bus if you say "-device tpm-tis",
-> the same as any other ISA device ?
+Having spent a while searching for answers on this I am making a last-ditch
+effort by contacting the devel group.
 
-Yup:
+Could someone let me know if it is possible to change the default disk
+cache setting in qemu globally?
 
-    $ qemu-system-x86_64 -nodefaults -S -display none -monitor stdio -chard=
-ev socket,id=3Dchrtpm,path=3Dtpm/swtpm-sock -tpmdev emulator,id=3Dtpm0,char=
-dev=3Dchrtpm -device tpm-tis,tpmdev=3Dtpm0
-    QEMU 5.0.90 monitor - type 'help' for more information
-    (qemu) info qtree
-    bus: main-system-bus
-      type System
-      [...]
-      dev: i440FX-pcihost, id ""
-        [...]
-        bus: pci.0
-          type PCI
-            [...]
-          dev: PIIX3, id ""
-            [...]
-            bus: isa.0
-              type ISA
-              dev: tpm-tis, id ""
-                irq =3D 5 (0x5)
-                tpmdev =3D "tpm0"
-                ppi =3D true
-                isa irq 5
-              [...]
+Currently it is set to writeback, in many if not most use cases "none" is
+optimal.
 
-This is with
+I am aware I can change it per instance however I really need to find a
+global method so that unless specified otherwise the default becomes
+cache=none
 
-    $ swtpm socket --tpmstate dir=3Dtpm --ctrl type=3Dunixio,path=3Dtpm/swt=
-pm-soc
+It does seem a little strange that options appear to exist:
 
-running in another terminal.
+qemu-img -h | grep writeback
+    options are: 'none', 'writeback' (default, except for convert),
+'writethrough',
 
->> 3/ no machine plug it using isa_register_ioport()
->>    (it is not registered to the ISA memory space)
->
-> There's no requirement for an ISA device to have IO ports...
->
-> thanks
-> -- PMM
+However I can't find any documentation that hints at a method of changing
+the default, rather all documentation provides is a method per use/instance.
 
-Thread hijack!  Since I didn't have swtpm installed, I tried to take a
-shortcut:
+Appreciate any assistance even if the answer is just "Not possible" so I
+can at least drop this search for answers.
 
-    $ qemu-system-x86_64 -nodefaults -S -display none -monitor stdio -chard=
-ev null,id=3Dtpm0 -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm -device tpm-t=
-is,tpmdev=3Dtpm0
-    qemu-system-x86_64: -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm: tpm-em=
-ulator: tpm chardev 'chrtpm' not found.
-    qemu-system-x86_64: -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm: tpm-em=
-ulator: Could not cleanly shutdown the TPM: No such file or directory
-    QEMU 5.0.90 monitor - type 'help' for more information
-    (qemu) qemu-system-x86_64: -device tpm-tis,tpmdev=3Dtpm0: Property 'tpm=
--tis.tpmdev' can't find value 'tpm0'
-    $ echo $?
-    1
+--00000000000091108005ab01a91a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-That a null chardev doesn't work is fine.  But the error handling looks
-broken: QEMU diagnoses and reports the problem, then continues.  The
-final error message indicates that it continued without creating the
-backend "tpm0".  That's wrong.
+<div dir=3D"ltr">Having spent a while searching for answers on this I am ma=
+king a last-ditch effort by contacting the devel=C2=A0group.<div><br></div>=
+<div>Could someone let me know if it is possible to change the default disk=
+ cache setting in qemu globally?</div><div><br></div><div>Currently it is s=
+et to writeback, in many if not most use cases &quot;none&quot; is optimal.=
+</div><div><br></div><div>I am aware I can change it per instance however I=
+ really need to find a global=C2=A0method so that unless specified otherwis=
+e the default becomes cache=3Dnone<br><br>It does seem a little strange tha=
+t options appear=C2=A0to exist:<br><br>qemu-img -h | grep writeback<br>=C2=
+=A0 =C2=A0 options are: &#39;none&#39;, &#39;writeback&#39; (default, excep=
+t for convert), &#39;writethrough&#39;,<br><br>However I can&#39;t=C2=A0fin=
+d any documentation that hints at a method of changing the default, rather =
+all documentation provides is a method per use/instance.<br><br>Appreciate =
+any assistance even if the answer is just &quot;Not possible&quot; so I can=
+ at least drop this search for answers.<br><br><br></div></div>
 
-Different tack: could -tpmdev be made sugar for -object?  I'm asking
-because other kinds of backends use -object instead of their very own
-option.
-
+--00000000000091108005ab01a91a--
 
