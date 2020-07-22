@@ -2,102 +2,91 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B08C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61CB8C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:20:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 890F220792
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:57:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 890F220792
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B34D2064C
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:20:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUFiHEx7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B34D2064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy5sQ-0006qA-S7
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 23:57:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43652)
+	id 1jy6F8-0002x0-9u
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 00:20:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jy5oA-0007cd-Af; Tue, 21 Jul 2020 23:52:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57456)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jy5o8-000445-81; Tue, 21 Jul 2020 23:52:42 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06M3X2LB030452; Tue, 21 Jul 2020 23:52:19 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32e11mw7vu-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jul 2020 23:52:19 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06M3kbui085318;
- Tue, 21 Jul 2020 23:52:19 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32e11mw7vg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jul 2020 23:52:19 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06M3pEOJ018825;
- Wed, 22 Jul 2020 03:52:17 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma03wdc.us.ibm.com with ESMTP id 32brq98t8x-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 03:52:17 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06M3qHGm41615636
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 22 Jul 2020 03:52:17 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4C829AE062;
- Wed, 22 Jul 2020 03:52:17 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 77245AE060;
- Wed, 22 Jul 2020 03:52:11 +0000 (GMT)
-Received: from morokweng.localdomain.com (unknown [9.163.58.88])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 22 Jul 2020 03:52:11 +0000 (GMT)
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: qemu-ppc@nongnu.org
-Subject: [RFC PATCH v2 9/9] target/s390x: Use start-powered-off CPUState
- property
-Date: Wed, 22 Jul 2020 00:50:16 -0300
-Message-Id: <20200722035016.469075-10-bauerman@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200722035016.469075-1-bauerman@linux.ibm.com>
-References: <20200722035016.469075-1-bauerman@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jy6ED-0002LC-8r
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:19:37 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40600
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jy6E9-0007Rf-Ra
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:19:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595391572;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jlp1IodwrnMCR5IvRjRW7MKH00tV6JWdmYvKCqI7JBM=;
+ b=RUFiHEx7Wyd25/nrEtiVAVGXu9dTWoWuZQ1KR4xvGP/GDTg1Tmih5M+EMUHeCYN7G/GcIN
+ 4vwREtXv70wOpG/BhcpfGchijhKIOtr/8zFqC/vJzKJpvZhA7IuobSmscNPfT3ddiSdLae
+ u2MvDlXkyjW4pINA1ZAjI4Kze2wE0L4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-250-2eg8s77qNkSp_4uvZW3mew-1; Wed, 22 Jul 2020 00:19:27 -0400
+X-MC-Unique: 2eg8s77qNkSp_4uvZW3mew-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E27D800460;
+ Wed, 22 Jul 2020 04:19:26 +0000 (UTC)
+Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
+ (ovpn-120-206.rdu2.redhat.com [10.10.120.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 00541BA66;
+ Wed, 22 Jul 2020 04:19:25 +0000 (UTC)
+Subject: Re: [RFC PATCH-for-5.1 v2] hw/ide: Cancel pending DMA requests before
+ setting as inactive
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200717075317.5376-1-f4bug@amsat.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d7ebf46d-a449-6ffc-e71d-423af0accd35@redhat.com>
+Date: Wed, 22 Jul 2020 00:19:25 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20200717075317.5376-1-f4bug@amsat.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-22_01:2020-07-21,
- 2020-07-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=1
- impostorscore=0 phishscore=0 bulkscore=0 mlxlogscore=967
- priorityscore=1501 spamscore=0 malwarescore=0 clxscore=1015 mlxscore=0
- adultscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2007220022
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:51:27
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 21:28:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,46 +99,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thiago Jung Bauermann <bauerman@linux.ibm.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Bulekov <alxndr@bu.edu>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of setting CPUState::halted to 1 in s390_cpu_initfn(), use the
-start-powered-off property which makes cpu_common_reset() initialize it to
-1 in common code.
+On 7/17/20 3:53 AM, Philippe Mathieu-Daudé wrote:
+> libFuzzer found a case where requests are queued for later in the
+> AIO context, but a command set the bus inactive, then when finally
+> the requests are processed by the DMA it aborts because it is
+> inactive:
+> 
+>   include/hw/ide/pci.h:59: IDEState *bmdma_active_if(BMDMAState *): Assertion `bmdma->bus->retry_unit != (uint8_t)-1' failed.
+> 
+> Reproducer available on the BugLink.
+> 
+> Fix by draining the pending DMA requests before inactivating the bus.
+> 
+> BugLink: https://bugs.launchpad.net/qemu/+bug/1887303
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> RFC because I don't have much clue about block drive and IDE,
+> so block-team please be very careful while reviewing this bug.
+> ---
+>   hw/ide/core.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index d997a78e47..f7affafb0c 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -804,7 +804,7 @@ void dma_buf_commit(IDEState *s, uint32_t tx_bytes)
+>   
+>   void ide_set_inactive(IDEState *s, bool more)
+>   {
 
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
----
- target/s390x/cpu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Generally, ide_set_inactive is meant to be used as the normative 
+function to transition to the idle state; not something that performs a 
+cancellation.
 
-NB: I was only able to test that this patch builds. I wasn't able to
-run it.
+(It should probably assert that there are no pending BHs.)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 08eb674d22..d3a14af1d9 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -291,7 +291,8 @@ static void s390_cpu_initfn(Object *obj)
-     S390CPU *cpu = S390_CPU(obj);
- 
-     cpu_set_cpustate_pointers(cpu);
--    cs->halted = 1;
-+    object_property_set_bool(OBJECT(cs), "start-powered-off", true,
-+                             &error_abort);
-     cs->exception_index = EXCP_HLT;
- #if !defined(CONFIG_USER_ONLY)
-     object_property_add(obj, "crash-information", "GuestPanicInformation",
+...Let's run through the reproducer!
+In my annotation here,
+
+0x1F0 - Primary Bus I/O
+0x3F6 - Primary Bus Control
+   [0] Primary Bus, dev0
+   [1] Primary Bus, dev1
+0x170 - Secondary Bus I/O
+0x376 - Secondary Bus Control
+   [2] Secondary Bus, dev0
+   [3] Secondary Bus, dev1
+
+
+ > outw 0x176 0x3538
+
+   [2].select = 0x38 [0011 1000]
+                         ^ select secondary device
+   [3].command = 0x35
+                   ^ WRITE DMA EXT
+
+outw 0x376 0x6007
+
+   [3].control = 0x07 [0000 0111]
+                             ^- +SRST
+   # 0x06 goes into the void?
+
+outw 0x376 0x6b6b
+
+   [3].control = 0x6b; [0110 1011]
+                              ^- -SRST
+   # Oops, this does a Software Reset without cancelling the DMA again.
+   # second write goes into the void?
+
+outw 0x176 0x985c
+
+   [3].select = 0x5c; [0101 1100]
+   [3].command = 0x98; CHECK POWER MODE
+              (Note: Deprecated in ATA4!)
+   # Oops, this command shouldn't start when another one is in-process.
+   # It also has the bad effect of setting the nsector register to 0xff!
+
+outl 0xcf8 0x80000903
+outl 0xcfc 0x2f2931
+outl 0xcf8 0x80000920
+outb 0xcfc 0x6b
+		^- PCI stuff. I'm not as fast at reading hex here.
+                    My brain has adapted to ATA only.
+
+outb 0x68 0x7
+   # Not entirely sure where this goes, but it seems to kick the DMA BH.
+   # ... The pending DMA BH that belongs to WRITE_DMA_EXT.
+
+outw 0x176 0x2530
+
+     [3].select = 0x30 [0011 0000]
+                           ^ select drive1
+     [3].command = 0x25 (READ DMA EXT)
+
+... At this point, it explodes because there's a pending DMA already, 
+and the sector registers are all wrong.
+
+This bug actually seems to have the same root cause as the other one: 
+SRST does not perform the SRST sufficiently.
+
+
+> -    s->bus->dma->aiocb = NULL;
+> +    ide_cancel_dma_sync(s);
+>       ide_clear_retry(s);
+>       if (s->bus->dma->ops->set_inactive) {
+>           s->bus->dma->ops->set_inactive(s->bus->dma, more);
+> 
+
 
