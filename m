@@ -2,94 +2,89 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82108C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BACC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:02:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B70B206F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:02:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BE4E206F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:02:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ltEoMbyI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B70B206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjFJakv0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BE4E206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyI8f-0003Pf-Hp
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:02:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46128)
+	id 1jyI8p-0003jD-Qh
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:02:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=465c3c755=alistair.francis@wdc.com>)
- id 1jyI4j-0005xW-No
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:58:37 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:10279)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=465c3c755=alistair.francis@wdc.com>)
- id 1jyI4h-0002fu-UT
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:58:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1595437115; x=1626973115;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=P/k2D2D4QAIblvv6h3Y5Rw3h3hsa6l5k5jMFvrCStiU=;
- b=ltEoMbyI5THOI4aB5bPIwnB0Lb3BQOXvZCmay2zBHVTkpdQZonjJX05L
- xR2b30fppbkZ0JqqBprOdXTusNSafUHnc9vtI1s1kZJX04+0x+ATQ/HDU
- gqgvBFb5QnyLmbLCPb/Zx/ReoLU7ggjURRbCKaKEfuLxHNef3ZIpoEkFq
- PbKTxfYP8s2eQXrznceDjR00JIImuVSPAtVen+6m1a0kxHbu2JJlo1EBn
- 7dM6y9Fr5qKSB5XBbkAmozf9zXqGkwNFHUI+cBlWBhDH60Iv1VUnZVlC2
- MCwSQjD7fqcmp+YpNZ/0FzIMmmommO7JZqdpcPX+DGlRiYIV9jma8IMlV A==;
-IronPort-SDR: NpYMQFqaM/ip+O/qW9tnzt3RxEUNKi8UPSD8EgBrlb/BUKl4/+JbTFuhOGH29NREekiwWuZOWH
- 8BieRbgX2O8yehfGJtS6w/jfafQHZktZtkAw1mFrakikVv+M38EiL+eEa+hrJ3HnbVncIjxRGI
- aXOmp2ZO6rkX8Qhb/FHrmuHVMILUgTUoG4Xk3HDMjICjM1u8NQ1ngEFTZde3e3izfKbgKm75Lg
- GrPqUF3BjUS3k56qFVwrkAUder7qrcnJa0bzJCsyGoti1/w1pCnMdLztCCNdCBksR1fV3bfjht
- TeQ=
-X-IronPort-AV: E=Sophos;i="5.75,383,1589212800"; d="scan'208";a="252418636"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 23 Jul 2020 00:58:21 +0800
-IronPort-SDR: hTMyhXynS3PWceY5QtaEPQla3z9HDNWfZFMCFb8WQXVxwDAwntC/DhwKTop+FuAlp4Dj/XAPcq
- x4PCbRP7Gci4+blhW4RsbfXIfY8OwtU78=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Jul 2020 09:46:38 -0700
-IronPort-SDR: 4KkGJrx4Q5uTgYlouEphm1GTAmo3xFA9w4OtSEzxFdjHM5yA5crYWvbS9IX8GzpQe/9otaDn4E
- QCQvV2CkzCCw==
-WDCIronportException: Internal
-Received: from usa001575.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.58.115])
- by uls-op-cesaip02.wdc.com with ESMTP; 22 Jul 2020 09:58:22 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 3/5] target/riscv: fix vector index load/store constraints
-Date: Wed, 22 Jul 2020 09:48:36 -0700
-Message-Id: <20200722164838.1591305-4-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200722164838.1591305-1-alistair.francis@wdc.com>
-References: <20200722164838.1591305-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jyI7U-0002Pq-BY
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:01:28 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46806
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1jyI7S-0003M6-BX
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:01:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595437285;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ETa5pJZJJlCGYuqKBcyua+gmoDO+2wOQ6iaGeXOOI9k=;
+ b=SjFJakv0dcTKlEOnTlkJt8w/eOnPpIn9cHBub0RKTbRD/l1pX32CV0qrioQUM81wRsp/Ak
+ kTzxN8y13uqOXs+Yg9Cvv6SjM4JGOi0BxmfR8PqGHn1U/a2Mj1msKu1WZ1E0gz/kTRyhmN
+ w+F4SXDt1V62UQ+tHOPcrEGwIR9P5xU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-380-ZVJIORW3M9CrTNeiszIzuQ-1; Wed, 22 Jul 2020 13:01:22 -0400
+X-MC-Unique: ZVJIORW3M9CrTNeiszIzuQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAB2D800688;
+ Wed, 22 Jul 2020 17:01:21 +0000 (UTC)
+Received: from starship (unknown [10.35.206.82])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 872E65BAD5;
+ Wed, 22 Jul 2020 17:01:20 +0000 (UTC)
+Message-ID: <498fc3712cd3a0cb0f6588331c47b5d12b7eac96.camel@redhat.com>
+Subject: Re: [PATCH for-5.1 1/2] qcow2: Implement v2 zero writes with
+ discard if possible
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Date: Wed, 22 Jul 2020 20:01:19 +0300
+In-Reply-To: <20200720131810.177978-2-kwolf@redhat.com>
+References: <20200720131810.177978-1-kwolf@redhat.com>
+ <20200720131810.177978-2-kwolf@redhat.com>
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=465c3c755=alistair.francis@wdc.com;
- helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 12:58:21
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 21:28:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,56 +97,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+On Mon, 2020-07-20 at 15:18 +0200, Kevin Wolf wrote:
+> qcow2 version 2 images don't support the zero flag for clusters, so for
+> write_zeroes requests, we return -ENOTSUP and get explicit zero buffer
+> writes. If the image doesn't have a backing file, we can do better: Just
+> discard the respective clusters.
+> 
+> This is relevant for 'qemu-img convert -O qcow2 -n', where qemu-img has
+> to assume that the existing target image may contain any data, so it has
+> to write zeroes. Without this patch, this results in a fully allocated
+> target image, even if the source image was empty.
+> 
+> Reported-by: Nir Soffer <nsoffer@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/qcow2-cluster.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index 4b5fc8c4a7..a677ba9f5c 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -1797,8 +1797,15 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
+>      assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
+>             end_offset >= bs->total_sectors << BDRV_SECTOR_BITS);
+>  
+> -    /* The zero flag is only supported by version 3 and newer */
+> +    /*
+> +     * The zero flag is only supported by version 3 and newer. However, if we
+> +     * have no backing file, we can resort to discard in version 2.
+> +     */
+>      if (s->qcow_version < 3) {
+> +        if (!bs->backing) {
+> +            return qcow2_cluster_discard(bs, offset, bytes,
+> +                                         QCOW2_DISCARD_REQUEST, false);
+> +        }
+>          return -ENOTSUP;
+>      }
+>  
 
-Although not explicitly specified that the the destination
-vector register groups cannot overlap the source vector register group,
-it is still necessary.
+From my knowelege of nvme, I remember that discard doesn't have to zero the blocks.
+There is special namespace capability the indicates the contents of the discarded block.
+(Deallocate Logical Block Features)
 
-And this constraint has been added to the v0.8 spec.
+If and only if the discard behavier flag indicates that discarded areas are zero,
+then the write-zero command can have special 'deallocate' flag that hints the controller
+to discard the sectors.
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20200721133742.2298-2-zhiwei_liu@c-sky.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/insn_trans/trans_rvv.inc.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+So woudn't discarding the clusters have theoretical risk of introducing garbage there?
 
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 7b4752b911..887c6b8883 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -513,13 +513,21 @@ static bool ld_index_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
-     return ldst_index_trans(a->rd, a->rs1, a->rs2, data, fn, s);
- }
- 
-+/*
-+ * For vector indexed segment loads, the destination vector register
-+ * groups cannot overlap the source vector register group (specified by
-+ * `vs2`), else an illegal instruction exception is raised.
-+ */
- static bool ld_index_check(DisasContext *s, arg_rnfvm* a)
- {
-     return (vext_check_isa_ill(s) &&
-             vext_check_overlap_mask(s, a->rd, a->vm, false) &&
-             vext_check_reg(s, a->rd, false) &&
-             vext_check_reg(s, a->rs2, false) &&
--            vext_check_nf(s, a->nf));
-+            vext_check_nf(s, a->nf) &&
-+            ((a->nf == 1) ||
-+             vext_check_overlap_group(a->rd, a->nf << s->lmul,
-+                                      a->rs2, 1 << s->lmul)));
- }
- 
- GEN_VEXT_TRANS(vlxb_v, 0, rnfvm, ld_index_op, ld_index_check)
--- 
-2.27.0
+Best regards,
+	Maxim Levitsky
 
 
