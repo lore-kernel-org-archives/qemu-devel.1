@@ -7,77 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD02C433E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B521FC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:43:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 855F7208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:42:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83894208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:43:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WvwTI+WZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 855F7208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anAJrYwk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83894208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy6aH-0004mA-Ou
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 00:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52598)
+	id 1jy6bY-0006pl-SJ
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 00:43:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jy6Yf-0002zr-F7
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:40:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24667
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jy6Yc-0002sh-Lz
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:40:42 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25262
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jy6Yc-0002mp-Ik
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:40:45 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jy6Ya-0002mH-OI
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:40:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595392841;
+ s=mimecast20190719; t=1595392840;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=5uq+UYEuC6nkUqQ+a/hfRkqBNYdVuBxxPe0O7MvBGpg=;
- b=WvwTI+WZh2c5bCGRABNjZ2UpcOTXzUAX28qfPxmNnd8hFwh3RhzmAwf4CaRAy5xsrZlDr6
- 8DcXyN+84Dl0FUWwKqnUvcmaR526Qrc2GIzMEp1IZuQLTdsMYZ4D7x2QKqbE91D+wkWB5e
- ZBlLHg70rhtVElZwB75x2eLVyNalXzA=
+ references:references; bh=MvhamPpwgReB9Sphit1s83rRsQO6ok80fcqjytucDf4=;
+ b=anAJrYwkUVNUAkeVfU0uSaA3yoDp32CJPaF7qt7SesGvSmrniUgnV++52mxYqugtuMroBS
+ UvlREHVTYB9NHTsfln4fKjD7hoyT40mMj4XYH51w8q76LBPNKFtWC76x7FGAREmXF+I8Wy
+ 7IhIsuZgg96O/XQgCTqTmRj+/e7tzPs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-KI7fv8rTMiqNpyg6DOuTdw-1; Wed, 22 Jul 2020 00:40:39 -0400
-X-MC-Unique: KI7fv8rTMiqNpyg6DOuTdw-1
+ us-mta-33-gawb5SmyNG6xbnbpueioKA-1; Wed, 22 Jul 2020 00:40:38 -0400
+X-MC-Unique: gawb5SmyNG6xbnbpueioKA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E32E618C63C0;
- Wed, 22 Jul 2020 04:40:38 +0000 (UTC)
-Received: from thuth.com (ovpn-112-92.ams2.redhat.com [10.36.112.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7461C7268C;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16B4B100A8E7;
  Wed, 22 Jul 2020 04:40:37 +0000 (UTC)
+Received: from thuth.com (ovpn-112-92.ams2.redhat.com [10.36.112.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9A82E7268C;
+ Wed, 22 Jul 2020 04:40:35 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Michael Roth <mdroth@linux.vnet.ibm.com>
-Subject: [PATCH v2 4/4] qga/commands-posix: Support fsinfo for non-PCI virtio
- devices, too
-Date: Wed, 22 Jul 2020 06:40:28 +0200
-Message-Id: <20200722044028.4059-5-thuth@redhat.com>
+Subject: [PATCH v2 3/4] qga/commands-posix: Move the udev code from the pci to
+ the generic function
+Date: Wed, 22 Jul 2020 06:40:27 +0200
+Message-Id: <20200722044028.4059-4-thuth@redhat.com>
 In-Reply-To: <20200722044028.4059-1-thuth@redhat.com>
 References: <20200722044028.4059-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:27:14
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:34:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,75 +99,121 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU on s390x uses virtio via channel I/O instead of PCI by default.
-Add a function to detect and provide information for virtio-scsi and
-virtio-block devices here, too.
+The libudev-related code is independent from the other pci-related code
+and can be re-used for non-pci devices (like ccw devices on s390x). Thus
+move this part to the generic function.
 
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1755075
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- qga/commands-posix.c | 42 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
+ qga/commands-posix.c | 62 +++++++++++++++++++++++---------------------
+ 1 file changed, 33 insertions(+), 29 deletions(-)
 
 diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index e8467ac567..744c2b5a5d 100644
+index 1a42ec8171..e8467ac567 100644
 --- a/qga/commands-posix.c
 +++ b/qga/commands-posix.c
-@@ -996,6 +996,39 @@ cleanup:
+@@ -874,10 +874,6 @@ static bool build_guest_fsinfo_for_pci_dev(char const *syspath,
+     GuestPCIAddress *pciaddr = disk->pci_controller;
+     bool has_ata = false, has_host = false, has_tgt = false;
+     char *p, *q, *driver = NULL;
+-#ifdef CONFIG_LIBUDEV
+-    struct udev *udev = NULL;
+-    struct udev_device *udevice = NULL;
+-#endif
+     bool ret = false;
+ 
+     p = strstr(syspath, "/devices/pci");
+@@ -936,26 +932,6 @@ static bool build_guest_fsinfo_for_pci_dev(char const *syspath,
+     pciaddr->slot = pci[2];
+     pciaddr->function = pci[3];
+ 
+-#ifdef CONFIG_LIBUDEV
+-    udev = udev_new();
+-    udevice = udev_device_new_from_syspath(udev, syspath);
+-    if (udev == NULL || udevice == NULL) {
+-        g_debug("failed to query udev");
+-    } else {
+-        const char *devnode, *serial;
+-        devnode = udev_device_get_devnode(udevice);
+-        if (devnode != NULL) {
+-            disk->dev = g_strdup(devnode);
+-            disk->has_dev = true;
+-        }
+-        serial = udev_device_get_property_value(udevice, "ID_SERIAL");
+-        if (serial != NULL && *serial != 0) {
+-            disk->serial = g_strdup(serial);
+-            disk->has_serial = true;
+-        }
+-    }
+-#endif
+-
+     if (strcmp(driver, "ata_piix") == 0) {
+         /* a host per ide bus, target*:0:<unit>:0 */
+         if (!has_host || !has_tgt) {
+@@ -1017,10 +993,6 @@ static bool build_guest_fsinfo_for_pci_dev(char const *syspath,
+ 
+ cleanup:
+     g_free(driver);
+-#ifdef CONFIG_LIBUDEV
+-    udev_unref(udev);
+-    udev_device_unref(udevice);
+-#endif
      return ret;
  }
  
-+/*
-+ * Store disk device info for non-PCI virtio devices (for example s390x
-+ * channel I/O devices). Returns true if information has been stored, or
-+ * false for failure.
-+ */
-+static bool build_guest_fsinfo_for_nonpci_virtio(char const *syspath,
-+                                                 GuestDiskAddress *disk,
-+                                                 Error **errp)
-+{
-+    unsigned int tgt[3];
-+    char *p;
-+
-+    if (!strstr(syspath, "/virtio") || !strstr(syspath, "/block")) {
-+        g_debug("Unsupported virtio device '%s'", syspath);
-+        return false;
-+    }
-+
-+    p = strstr(syspath, "/target");
-+    if (p && sscanf(p + 7, "%*u:%*u:%*u/%*u:%u:%u:%u",
-+                    &tgt[0], &tgt[1], &tgt[2]) == 3) {
-+        /* virtio-scsi: target*:0:<target>:<unit> */
-+        disk->bus_type = GUEST_DISK_BUS_TYPE_SCSI;
-+        disk->bus = tgt[0];
-+        disk->target = tgt[1];
-+        disk->unit = tgt[2];
-+    } else {
-+        /* virtio-blk: 1 disk per 1 device */
-+        disk->bus_type = GUEST_DISK_BUS_TYPE_VIRTIO;
-+    }
-+
-+    return true;
-+}
-+
- /* Store disk device info specified by @sysfs into @fs */
- static void build_guest_fsinfo_for_real_device(char const *syspath,
-                                                GuestFilesystemInfo *fs,
-@@ -1046,7 +1079,14 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
-     udev_device_unref(udevice);
- #endif
+@@ -1033,18 +1005,50 @@ static void build_guest_fsinfo_for_real_device(char const *syspath,
+     GuestPCIAddress *pciaddr;
+     GuestDiskAddressList *list = NULL;
+     bool has_hwinf;
++#ifdef CONFIG_LIBUDEV
++    struct udev *udev = NULL;
++    struct udev_device *udevice = NULL;
++#endif
  
--    has_hwinf = build_guest_fsinfo_for_pci_dev(syspath, disk, errp);
-+    if (strstr(syspath, "/devices/pci")) {
-+        has_hwinf = build_guest_fsinfo_for_pci_dev(syspath, disk, errp);
-+    } else if (strstr(syspath, "/virtio")) {
-+        has_hwinf = build_guest_fsinfo_for_nonpci_virtio(syspath, disk, errp);
-+    } else {
-+        g_debug("Unsupported device type for '%s'", syspath);
-+        has_hwinf = false;
-+    }
+     pciaddr = g_new0(GuestPCIAddress, 1);
++    pciaddr->domain = -1;                       /* -1 means field is invalid */
++    pciaddr->bus = -1;
++    pciaddr->slot = -1;
++    pciaddr->function = -1;
  
-     if (has_hwinf || disk->has_dev || disk->has_serial) {
+     disk = g_new0(GuestDiskAddress, 1);
+     disk->pci_controller = pciaddr;
++    disk->bus_type = GUEST_DISK_BUS_TYPE_UNKNOWN;
+ 
+     list = g_new0(GuestDiskAddressList, 1);
+     list->value = disk;
+ 
++#ifdef CONFIG_LIBUDEV
++    udev = udev_new();
++    udevice = udev_device_new_from_syspath(udev, syspath);
++    if (udev == NULL || udevice == NULL) {
++        g_debug("failed to query udev");
++    } else {
++        const char *devnode, *serial;
++        devnode = udev_device_get_devnode(udevice);
++        if (devnode != NULL) {
++            disk->dev = g_strdup(devnode);
++            disk->has_dev = true;
++        }
++        serial = udev_device_get_property_value(udevice, "ID_SERIAL");
++        if (serial != NULL && *serial != 0) {
++            disk->serial = g_strdup(serial);
++            disk->has_serial = true;
++        }
++    }
++
++    udev_unref(udev);
++    udev_device_unref(udevice);
++#endif
++
+     has_hwinf = build_guest_fsinfo_for_pci_dev(syspath, disk, errp);
+ 
+-    if (has_hwinf) {
++    if (has_hwinf || disk->has_dev || disk->has_serial) {
          list->next = fs->disk;
+         fs->disk = list;
+     } else {
 -- 
 2.18.1
 
