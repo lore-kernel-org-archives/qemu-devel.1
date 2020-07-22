@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C3A6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DFFC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:42:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4081C2068F
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:42:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80E9D2068F
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:42:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="LtE6qf82"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4081C2068F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="bUe06ltL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80E9D2068F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyBGG-0005HM-FI
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:42:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54806)
+	id 1jyBGM-0005Ya-Lc
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:42:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jyAwB-000566-SQ
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:21:19 -0400
-Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:46554)
+ id 1jyAwq-0006TR-9P
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:22:00 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44040)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jyAwA-00061t-0N
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:21:19 -0400
-Received: by mail-pf1-x42d.google.com with SMTP id a23so850650pfk.13
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:21:17 -0700 (PDT)
+ id 1jyAwo-00068D-Gh
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:22:00 -0400
+Received: by mail-pg1-x543.google.com with SMTP id j19so864116pgm.11
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:21:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=rgRsumD+WyP+g+9ywiEhwYNS2OqBdlvEKjanU4B1RZU=;
- b=LtE6qf826ci3D7L3stHnLZ4IxQdcpNzXYKRjHxlMvlmy0w/BWZKmndqxLcrbOn5HVq
- z6e0pZnvfB2ErKm2AYLU/1yv3EBGifBf8MOBWYK0lwrZ7afkb1hCui08Mp4nloXrPknf
- tsf31SZjQDjYVaJtez8q+OoLMBBHrlkE+I+eU+pH3YnSeRACpkmtakgpoD0QrkMjn1UN
- GNGGyrKUIFz9l3MTabNXCwd6P3nU8N9/sBTs/fqCOqFJwUsDOjJUm2ZPPUQEfu0JItCA
- A6ojSUd8cjYOhQTOVoDuE74vY4SJquFecQWrmzdM9LSBSbccBj6E/6lchEHNz3oANly0
- l4Ig==
+ bh=kgevnvu183fosxsa31Scb7niGRVtkpmcq30ar5EP818=;
+ b=bUe06ltLaIMDmQ9hzJJmGBvHWxL9E6Ga4WqmJoDrv1iugDhw0XF0VXtWetQEYwjqFH
+ f+1zlv73SdAKQJZy6hAUjLPk7egBmX24bm7diaAgwOiN5pqws/HQsNZCazTp/dlbr7rf
+ Ug5qbE/K9+2u0XNzwmmGI1MAZpQkI6WiVqsQJKcC1rHW5/iiLYWANgYCAb2mCQSR8KJx
+ ykkBM+kNGJBYUmxfkGeXJ6apeXq06ri4b94zPrw/YqGhcclgZojr+vD4R+c+txlnafbm
+ yr8GpTsD92Fi3UZCfCugsNW2H2ntPVzEjFMWVn7lXRCNSK3uKT0kPwimiRv4R6VqjM76
+ MIGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=rgRsumD+WyP+g+9ywiEhwYNS2OqBdlvEKjanU4B1RZU=;
- b=HdNsJifTtp3Rr7FEHQD1KsF/EQShYG4hkqSLmBSOleSpJTTbU7koYb7c2PGn2Tm/jU
- lzDRMS5VNdKxVnhBS0yaLAYOfVKFWWfylOG3zmHhBGxW9vLcpGIJjjDnWAb7sQIX0Yuc
- qw4rWP9zSFbNM3WBFzxS+CuulCXuk9wKI7e0jfWBBWgfvv0GJQlkeiwKIklzv3WhMePH
- rovqKU3vGCHFsATC1Z+pGjYRMvHivLvXtwRyI3Ix+bagOBkra/+MC8PhK+PjxMXQMhVp
- a209IogWDRPOK+JPWeNyCMb+Dp8pNT3bPy4nRUCyBFAtB2Bugr5mP+jPr4BImiSRTPHJ
- 1uSA==
-X-Gm-Message-State: AOAM532LP49Kv4VLoWuhVHFM3D/F11nyA/Zeen2qZv6ZANYLXweOSodS
- UPFadLzBMCAnj01m5jnDadUIwPFXQaM=
-X-Google-Smtp-Source: ABdhPJzJAg1FBZ5yz5oMup7bXnqJFltT2P+fmSTrDrZimyZiFP4rPJJmx+/D7S2I3Q6KZ1MpVr91eg==
-X-Received: by 2002:a62:1ad6:: with SMTP id
- a205mr27235306pfa.109.1595409676608; 
- Wed, 22 Jul 2020 02:21:16 -0700 (PDT)
+ bh=kgevnvu183fosxsa31Scb7niGRVtkpmcq30ar5EP818=;
+ b=PnggFuwzECLqyZfN2MxaACpftMkm0DF4SPffHUU2PimFG/iwOzrxXIrLXRRO4cBwoO
+ NroXCO9RJG914pc4l+wQ7AYPgBoKpeDp1vSYBAqeEEcA3on0QgmLUInLgORCZGwmyVhc
+ dyPPMILzJXFMAZu11NgsdIVmMUqS5O8L6nxDO6e6TrcgDwXaHbiGFMxMgIe94tVgUrsM
+ eid/UkzTrBIzXNVcgc3QuEhyhvTdaYIg1crViDgCgHxJDoYAHHSV0yKu+wFl5ePtvEdt
+ 4ICZtLMF3xrZaVAsWzNUEvh8Sb3a5go6o4CX/oYKl11jyWEFAu2YtKHxhSOdBFERC0Vp
+ RAQA==
+X-Gm-Message-State: AOAM533SMI6sKqxC7PW1K4symNg5kEBLas8a69FMKvxAoSig2vFv4/nA
+ 6801ffZ7l5dxLQugJFamIKA3cbroE4Q=
+X-Google-Smtp-Source: ABdhPJyb9rD3sNaA/k2li3wr315NqPjhAPtSfzHkn1hoMOA75t+D29Qt8pG/+BLOgMmHk1ojzAig7A==
+X-Received: by 2002:a65:5c08:: with SMTP id u8mr27180403pgr.184.1595409716806; 
+ Wed, 22 Jul 2020 02:21:56 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.21.14
+ by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.21.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jul 2020 02:21:16 -0700 (PDT)
+ Wed, 22 Jul 2020 02:21:56 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC v2 52/76] fpu: implement full set compare for fp16
-Date: Wed, 22 Jul 2020 17:16:15 +0800
-Message-Id: <20200722091641.8834-53-frank.chang@sifive.com>
+Subject: [RFC v2 62/76] target/riscv: rvv-0.9: single-width floating-point
+ reduction
+Date: Wed, 22 Jul 2020 17:16:25 +0800
+Message-Id: <20200722091641.8834-63-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200722091641.8834-1-frank.chang@sifive.com>
 References: <20200722091641.8834-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42d;
- envelope-from=frank.chang@sifive.com; helo=mail-pf1-x42d.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=frank.chang@sifive.com; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,116 +99,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Frank Chang <frank.chang@sifive.com>, Chih-Min Chao <chihmin.chao@sifive.com>,
- Kito Cheng <kito.cheng@sifive.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Frank Chang <frank.chang@sifive.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kito Cheng <kito.cheng@sifive.com>
+From: Frank Chang <frank.chang@sifive.com>
 
-Signed-off-by: Kito Cheng <kito.cheng@sifive.com>
-Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com>
+Separate the implementation of vfredsum.vs and vfredosum.vs.
+
+Introduce propagate NaN feature for vfredsum.vs as implementations are
+permitted to canonicalize the NaN and, if the NaN is signaling, set
+the invalid exception flag.
+
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- fpu/softfloat.c         | 28 ++++++++++++++++++++++++++++
- include/fpu/softfloat.h | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
+ target/riscv/helper.h                   |   3 +
+ target/riscv/insn32.decode              |   3 +-
+ target/riscv/insn_trans/trans_rvv.inc.c |   1 +
+ target/riscv/vector_helper.c            | 144 +++++++++++++++++++-----
+ 4 files changed, 120 insertions(+), 31 deletions(-)
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 79be4f5840..9c6640862e 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -401,6 +401,34 @@ float64_gen2(float64 xa, float64 xb, float_status *s,
-     return soft(ua.s, ub.s, s);
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 318fe643f4..6957a98237 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1066,6 +1066,9 @@ DEF_HELPER_6(vwredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredsum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredsum_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredosum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredosum_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vfredosum_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredmax_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredmax_vs_w, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vfredmax_vs_d, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index e4b36af89e..0fe46c10c2 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -575,7 +575,8 @@ vredmax_vs      000111 . ..... ..... 010 ..... 1010111 @r_vm
+ vwredsumu_vs    110000 . ..... ..... 000 ..... 1010111 @r_vm
+ vwredsum_vs     110001 . ..... ..... 000 ..... 1010111 @r_vm
+ # Vector ordered and unordered reduction sum
+-vfredsum_vs     0000-1 . ..... ..... 001 ..... 1010111 @r_vm
++vfredsum_vs     000001 . ..... ..... 001 ..... 1010111 @r_vm
++vfredosum_vs    000011 . ..... ..... 001 ..... 1010111 @r_vm
+ vfredmin_vs     000101 . ..... ..... 001 ..... 1010111 @r_vm
+ vfredmax_vs     000111 . ..... ..... 001 ..... 1010111 @r_vm
+ # Vector widening ordered and unordered float reduction sum
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index c1fc168043..37eee6cf97 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -3011,6 +3011,7 @@ GEN_OPIVV_WIDEN_TRANS(vwredsumu_vs, reduction_widen_check)
+ 
+ /* Vector Single-Width Floating-Point Reduction Instructions */
+ GEN_OPFVV_TRANS(vfredsum_vs, reduction_check)
++GEN_OPFVV_TRANS(vfredosum_vs, reduction_check)
+ GEN_OPFVV_TRANS(vfredmax_vs, reduction_check)
+ GEN_OPFVV_TRANS(vfredmin_vs, reduction_check)
+ 
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index bbd3be527c..8465aec94e 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4682,43 +4682,127 @@ GEN_VEXT_RED(vwredsumu_vs_h, uint32_t, uint16_t, H4, H2, DO_ADD)
+ GEN_VEXT_RED(vwredsumu_vs_w, uint64_t, uint32_t, H8, H4, DO_ADD)
+ 
+ /* Vector Single-Width Floating-Point Reduction Instructions */
+-#define GEN_VEXT_FRED(NAME, TD, TS2, HD, HS2, OP, CLEAR_FN)\
+-void HELPER(NAME)(void *vd, void *v0, void *vs1,           \
+-                  void *vs2, CPURISCVState *env,           \
+-                  uint32_t desc)                           \
+-{                                                          \
+-    uint32_t vm = vext_vm(desc);                           \
+-    uint32_t vta = vext_vta(desc);                         \
+-    uint32_t vl = env->vl;                                 \
+-    uint32_t i;                                            \
+-    uint32_t tot = env_archcpu(env)->cfg.vlen / 8;         \
+-    TD s1 =  *((TD *)vs1 + HD(0));                         \
+-                                                           \
+-    for (i = 0; i < vl; i++) {                             \
+-        TS2 s2 = *((TS2 *)vs2 + HS2(i));                   \
+-        if (!vm && !vext_elem_mask(v0, i)) {               \
+-            continue;                                      \
+-        }                                                  \
+-        s1 = OP(s1, (TD)s2, &env->fp_status);              \
+-    }                                                      \
+-    *((TD *)vd + HD(0)) = s1;                              \
+-    CLEAR_FN(vd, vta, 1, sizeof(TD), tot);                 \
++
++/*
++ * If f is NaN, return SEW-bit canonical NaN.
++ * Set the invalid exception flag if f is a sNaN.
++ */
++static uint64_t propagate_nan(uint64_t f, uint32_t sew, float_status *s)
++{
++    target_ulong ret;
++
++    switch (sew) {
++    case 16:
++        ret = fclass_h(f);
++        /* check if f is NaN */
++        if (ret & 0x300) {
++            /* check if f is a sNaN */
++            if (ret & 0x100) {
++                s->float_exception_flags |= float_flag_invalid;
++            }
++            /* return canonical NaN */
++            return float16_default_nan(s);
++        } else {
++            return f;
++        }
++        break;
++    case 32:
++        ret = fclass_s(f);
++        /* check if f is NaN */
++        if (ret & 0x300) {
++            /* check if f is a sNaN */
++            if (ret & 0x100) {
++                s->float_exception_flags |= float_flag_invalid;
++            }
++            /* return canonical NaN */
++            return float32_default_nan(s);
++        } else {
++            return f;
++        }
++        break;
++    case 64:
++        ret = fclass_d(f);
++        /* check if f is NaN */
++        if (ret & 0x300) {
++            /* check if f is a sNaN */
++            if (ret & 0x100) {
++                s->float_exception_flags |= float_flag_invalid;
++            }
++            /* return canonical NaN */
++            return float64_default_nan(s);
++        } else {
++            return f;
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
  }
  
-+/*----------------------------------------------------------------------------
-+| Returns the fraction bits of the half-precision floating-point value `a'.
-+*----------------------------------------------------------------------------*/
-+
-+static inline uint32_t extractFloat16Frac(float16 a)
-+{
-+    return float16_val(a) & 0x3ff;
++#define GEN_VEXT_FRED(NAME, TD, TS2, HD, HS2, PROPAGATE_NAN, OP, CLEAR_FN) \
++void HELPER(NAME)(void *vd, void *v0, void *vs1,                           \
++                  void *vs2, CPURISCVState *env,                           \
++                  uint32_t desc)                                           \
++{                                                                          \
++    uint32_t vm = vext_vm(desc);                                           \
++    uint32_t vta = vext_vta(desc);                                         \
++    uint32_t vl = env->vl;                                                 \
++    uint32_t i;                                                            \
++    uint32_t tot = env_archcpu(env)->cfg.vlen >> 3;                        \
++    bool active = false;                                                   \
++    TD s1 = *((TD *)vs1 + HD(0));                                          \
++                                                                           \
++    for (i = 0; i < vl; i++) {                                             \
++        TS2 s2 = *((TS2 *)vs2 + HS2(i));                                   \
++        if (!vm && !vext_elem_mask(v0, i)) {                               \
++            continue;                                                      \
++        }                                                                  \
++        active = true;                                                     \
++        s1 = OP(s1, (TD)s2, &env->fp_status);                              \
++    }                                                                      \
++                                                                           \
++    if (vl > 0) {                                                          \
++        if (PROPAGATE_NAN && !active) {                                    \
++            *((TD *)vd + HD(0)) = propagate_nan(s1, sizeof(TD) * 8,        \
++                                                &env->fp_status);          \
++        } else {                                                           \
++            *((TD *)vd + HD(0)) = s1;                                      \
++        }                                                                  \
++    }                                                                      \
++    CLEAR_FN(vd, vta, 1, sizeof(TD), tot);                                 \
 +}
 +
-+/*----------------------------------------------------------------------------
-+| Returns the exponent bits of the half-precision floating-point value `a'.
-+*----------------------------------------------------------------------------*/
++/* Ordered sum */
++GEN_VEXT_FRED(vfredosum_vs_h, uint16_t, uint16_t, H2, H2, false,
++              float16_add, clearh)
++GEN_VEXT_FRED(vfredosum_vs_w, uint32_t, uint32_t, H4, H4, false,
++              float32_add, clearl)
++GEN_VEXT_FRED(vfredosum_vs_d, uint64_t, uint64_t, H8, H8, false,
++              float64_add, clearq)
 +
-+static inline int extractFloat16Exp(float16 a)
-+{
-+    return (float16_val(a) >> 10) & 0x1f;
-+}
-+
-+/*----------------------------------------------------------------------------
-+| Returns the sign bit of the half-precision floating-point value `a'.
-+*----------------------------------------------------------------------------*/
-+
-+static inline bool extractFloat16Sign(float16 a)
-+{
-+    return float16_val(a) >> 15;
-+}
-+
-+
- /*----------------------------------------------------------------------------
- | Returns the fraction bits of the single-precision floating-point value `a'.
- *----------------------------------------------------------------------------*/
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index ff4e2605b1..267519cd65 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -285,6 +285,47 @@ static inline float16 float16_set_sign(float16 a, int sign)
-     return make_float16((float16_val(a) & 0x7fff) | (sign << 15));
- }
+ /* Unordered sum */
+-GEN_VEXT_FRED(vfredsum_vs_h, uint16_t, uint16_t, H2, H2, float16_add, clearh)
+-GEN_VEXT_FRED(vfredsum_vs_w, uint32_t, uint32_t, H4, H4, float32_add, clearl)
+-GEN_VEXT_FRED(vfredsum_vs_d, uint64_t, uint64_t, H8, H8, float64_add, clearq)
++GEN_VEXT_FRED(vfredsum_vs_h, uint16_t, uint16_t, H2, H2, true,
++              float16_add, clearh)
++GEN_VEXT_FRED(vfredsum_vs_w, uint32_t, uint32_t, H4, H4, true,
++              float32_add, clearl)
++GEN_VEXT_FRED(vfredsum_vs_d, uint64_t, uint64_t, H8, H8, true,
++              float64_add, clearq)
  
-+static inline bool float16_eq(float16 a, float16 b, float_status *s)
-+{
-+    return float16_compare(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool float16_le(float16 a, float16 b, float_status *s)
-+{
-+    return float16_compare(a, b, s) <= float_relation_equal;
-+}
-+
-+static inline bool float16_lt(float16 a, float16 b, float_status *s)
-+{
-+    return float16_compare(a, b, s) < float_relation_equal;
-+}
-+
-+static inline bool float16_unordered(float16 a, float16 b, float_status *s)
-+{
-+    return float16_compare(a, b, s) == float_relation_unordered;
-+}
-+
-+static inline bool float16_eq_quiet(float16 a, float16 b, float_status *s)
-+{
-+    return float16_compare_quiet(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool float16_le_quiet(float16 a, float16 b, float_status *s)
-+{
-+    return float16_compare_quiet(a, b, s) <= float_relation_equal;
-+}
-+
-+static inline bool float16_lt_quiet(float16 a, float16 b, float_status *s)
-+{
-+    return float16_compare_quiet(a, b, s) < float_relation_equal;
-+}
-+
-+static inline bool float16_unordered_quiet(float16 a, float16 b,
-+                                           float_status *s)
-+{
-+    return float16_compare_quiet(a, b, s) == float_relation_unordered;
-+}
-+
- #define float16_zero make_float16(0)
- #define float16_half make_float16(0x3800)
- #define float16_one make_float16(0x3c00)
+ /* Maximum value */
+-GEN_VEXT_FRED(vfredmax_vs_h, uint16_t, uint16_t, H2, H2, float16_maxnum, clearh)
+-GEN_VEXT_FRED(vfredmax_vs_w, uint32_t, uint32_t, H4, H4, float32_maxnum, clearl)
+-GEN_VEXT_FRED(vfredmax_vs_d, uint64_t, uint64_t, H8, H8, float64_maxnum, clearq)
++GEN_VEXT_FRED(vfredmax_vs_h, uint16_t, uint16_t, H2, H2, false,
++              float16_maxnum_noprop, clearh)
++GEN_VEXT_FRED(vfredmax_vs_w, uint32_t, uint32_t, H4, H4, false,
++              float32_maxnum_noprop, clearl)
++GEN_VEXT_FRED(vfredmax_vs_d, uint64_t, uint64_t, H8, H8, false,
++              float64_maxnum_noprop, clearq)
+ 
+ /* Minimum value */
+-GEN_VEXT_FRED(vfredmin_vs_h, uint16_t, uint16_t, H2, H2, float16_minnum, clearh)
+-GEN_VEXT_FRED(vfredmin_vs_w, uint32_t, uint32_t, H4, H4, float32_minnum, clearl)
+-GEN_VEXT_FRED(vfredmin_vs_d, uint64_t, uint64_t, H8, H8, float64_minnum, clearq)
++GEN_VEXT_FRED(vfredmin_vs_h, uint16_t, uint16_t, H2, H2, false,
++              float16_minnum_noprop, clearh)
++GEN_VEXT_FRED(vfredmin_vs_w, uint32_t, uint32_t, H4, H4, false,
++              float32_minnum_noprop, clearl)
++GEN_VEXT_FRED(vfredmin_vs_d, uint64_t, uint64_t, H8, H8, false,
++              float64_minnum_noprop, clearq)
+ 
+ /* Vector Widening Floating-Point Reduction Instructions */
+ /* Unordered reduce 2*SEW = 2*SEW + sum(promote(SEW)) */
 -- 
 2.17.1
 
