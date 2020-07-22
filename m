@@ -5,81 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E151BC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 06:56:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27812C433EA
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 07:03:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8079206F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 06:56:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E575D20729
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 07:03:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SNgrJkze"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8079206F5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IBfYJl8g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E575D20729
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy8fv-0006UX-UV
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 02:56:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47994)
+	id 1jy8mU-0000aH-7M
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 03:03:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jy8f4-0005jb-CM
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 02:55:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39699
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jy8lg-0008Kd-9m
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 03:02:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46632
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jy8f2-0002bZ-MT
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 02:55:30 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jy8le-0003mO-R5
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 03:02:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595400927;
+ s=mimecast20190719; t=1595401337;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=F6EE/98OqJDs1uHTA88M/+ICntTLO6ujMdXq95SikSA=;
- b=SNgrJkzefZqp5pAbj06UQmY14YZy/q8Umtl6MENcOpERwFl6NTkGTNdnlatjadgaB+LHaj
- Yk3nockbxqPAvopenJ7ghY4WDhBO5KY5AIq5Cjxasrp9FWz4IywGslXzA0lIDpqxI/LuVc
- F5fbfCAQA1xaJOvHJv0LIItoamttREY=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-aDSHwhywOWa3cyB0pl6JQg-1; Wed, 22 Jul 2020 02:55:25 -0400
-X-MC-Unique: aDSHwhywOWa3cyB0pl6JQg-1
-Received: by mail-ej1-f71.google.com with SMTP id dc5so609842ejb.18
- for <qemu-devel@nongnu.org>; Tue, 21 Jul 2020 23:55:25 -0700 (PDT)
+ bh=bzN8EJ6HdV4a9bj8xeyUD+C6wFog/5bueFYT1szyvfU=;
+ b=IBfYJl8gExrzMmO2521+TPwpgGRLut8tSZSGDRQNQJxWnN3nKRIQ8FEB6lxSwIBt6iN4dz
+ CYVGQOPghCexIJaxar8qUOMMOpGJOvTYSvPJ9926tKgh/NbnhrDrKr3RFQgo60Pns36Z54
+ gRVtjUK/lp1yaMm1aAaJyJmSOZKiloY=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-32KzTtxnNzGXyJhn5QDVrA-1; Wed, 22 Jul 2020 03:02:13 -0400
+X-MC-Unique: 32KzTtxnNzGXyJhn5QDVrA-1
+Received: by mail-ej1-f70.google.com with SMTP id gz3so626568ejb.13
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 00:02:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=F6EE/98OqJDs1uHTA88M/+ICntTLO6ujMdXq95SikSA=;
- b=sI1rZCmiqHVM0B/LL7EnyI+iYdBFGzcYQbiRaRJLA3SUK+EOYMpv/JcQ+UTEZ2UITc
- gEEzmboadt1mO9JDRncFgDmwS5MVxf2Ki30gnaiwWRchLYsNkas71BklEDmbxlSmmIBD
- YyVOnEx53BokQDUcixENuLz5J+8FzRpUXExtE+7BuDNUihUNPP7fccIcDcpj65fB7KtH
- YHk8maFBTqb8dcWhf0Fq+G1fOmG8TkfLG4TPRB+7ACC1HLuzGbaKiab6NkaJYcMVqPIo
- CMAScTAdEq72J8JHJLveFH/wPUEajUudkkrrBCzRqNRJDKzkMuJHsVVW35ECYZaT8tso
- rt4g==
-X-Gm-Message-State: AOAM533QRqR9VCkdwPdMptIt6aXVbAICbuHxC110KrPDHMmW44mFjqbs
- APM1cQwQBRPysRg/4sD2HfLC3DFrDgVlS1FzYJzhiRas8lXKoJeelChjDGfGOhjalTCl7eOI/xF
- 9oQuDt+WKEzJekYE=
-X-Received: by 2002:a17:906:f20d:: with SMTP id
- gt13mr29200776ejb.117.1595400924163; 
- Tue, 21 Jul 2020 23:55:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxi4C59JQ8TgKAYnVb1eqZYmoIAkYV81ra5B/bKYcDY1MStwX7pDKNNjZltiRZrGQOHooFFBw==
-X-Received: by 2002:a17:906:f20d:: with SMTP id
- gt13mr29200762ejb.117.1595400923994; 
- Tue, 21 Jul 2020 23:55:23 -0700 (PDT)
+ bh=bzN8EJ6HdV4a9bj8xeyUD+C6wFog/5bueFYT1szyvfU=;
+ b=HoYbmZvVzLt6UdaBalmetuJbkRXBoxXQYqgvqRejqNthzPLvyQwtnMG/xl2SWNVo3A
+ hfhYKEX4k2aiEamM1fZR6U2K+VXwJpJRYHFOIkDXLGePTksYa046oSRtrEULMLaATU8T
+ wBRpeTO+bGkj0gLSClIH8BVLtsN7s87BiyJCu1L8eVK9e4v8LT8O/3+fGQ6texy5ZUy1
+ qoxEc1YnwsTRRYXlg2JMQKEQYZfaTts8AHdMnwApeePd1LUUuA5DupJKvCXrq8WaxmKx
+ 4/FbYhrtxbU47hAlhhc3GGlyrPLxzsm+QtGZmDZ3S6rN2n36UUH0Z3YJrE84cS9Xr+JA
+ wJbA==
+X-Gm-Message-State: AOAM5308ViGdvjGPjB2FCZZrsuehnBgjxtX31sBtqPQFSTpC7oiLWvk3
+ iYdihFbyjSsE5WzPcBDLorc2kHuziJ7Azn6FzFJU5UyCugT7GyTz3UQvXJXVpJpL+M9kvT+SyJK
+ ON7toUuomB3DXQuQ=
+X-Received: by 2002:aa7:dacb:: with SMTP id x11mr27876495eds.280.1595401332622; 
+ Wed, 22 Jul 2020 00:02:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwnOfxJB0m9/v1vJOFXOkWqbOO/VsXe7qOOSSfdOEWGirqp45f6J9mzs9b7QuXlA+93YxzcJQ==
+X-Received: by 2002:aa7:dacb:: with SMTP id x11mr27876466eds.280.1595401332369; 
+ Wed, 22 Jul 2020 00:02:12 -0700 (PDT)
 Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id w18sm18213824ejc.62.2020.07.21.23.55.22
+ by smtp.gmail.com with ESMTPSA id cn16sm18664729edb.86.2020.07.22.00.02.10
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 21 Jul 2020 23:55:23 -0700 (PDT)
-Subject: Re: [PATCH v2 4/9] ppc/e500: Use start-powered-off CPUState property
+ Wed, 22 Jul 2020 00:02:11 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 7/9] sparc/sun4m: Don't set CPUState::halted in
+ cpu_devinit()
 To: Thiago Jung Bauermann <bauerman@linux.ibm.com>, qemu-ppc@nongnu.org
 References: <20200722035016.469075-1-bauerman@linux.ibm.com>
- <20200722035016.469075-5-bauerman@linux.ibm.com>
+ <20200722035016.469075-8-bauerman@linux.ibm.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -104,19 +103,19 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <29a87d12-ce2a-2d48-2578-860e160565e9@redhat.com>
-Date: Wed, 22 Jul 2020 08:55:21 +0200
+Message-ID: <4dc8f2fe-763b-c25d-7049-20d60229d611@redhat.com>
+Date: Wed, 22 Jul 2020 09:02:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200722035016.469075-5-bauerman@linux.ibm.com>
+In-Reply-To: <20200722035016.469075-8-bauerman@linux.ibm.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 00:40:35
@@ -155,46 +154,32 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 7/22/20 5:50 AM, Thiago Jung Bauermann wrote:
-> Instead of setting CPUState::halted to 1 in ppce500_cpu_reset_sec(), use
-> the start-powered-off property which makes cpu_common_reset() initialize it
-> to 1 in common code.
+> Remove setting of cs->halted from cpu_devinit(), which seems out of place
+> when compared to similar code in other architectures (e.g., ppce500_init()
+> in hw/ppc/e500.c).
 > 
 > Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 > ---
->  hw/ppc/e500.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  hw/sparc/sun4m.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
 > NB: I was only able to test that this patch builds. I wasn't able to
 > run it.
 > 
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index ab9884e315..dda71bc05d 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -704,9 +704,6 @@ static void ppce500_cpu_reset_sec(void *opaque)
->  
->      cpu_reset(cs);
->  
-> -    /* Secondary CPU starts in halted state for now. Needs to change when
-> -       implementing non-kernel boot. */
-> -    cs->halted = 1;
->      cs->exception_index = EXCP_HLT;
->  }
->  
-> @@ -897,6 +894,13 @@ void ppce500_init(MachineState *machine)
->          } else {
->              /* Secondary CPUs */
->              qemu_register_reset(ppce500_cpu_reset_sec, cpu);
-> +
-> +            /*
-> +             * Secondary CPU starts in halted state for now. Needs to change
-> +             * when implementing non-kernel boot.
-> +             */
-> +            object_property_set_bool(OBJECT(cs), "start-powered-off", true,
-> +                                     &error_abort);
->          }
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 766e79bb5e..7b3042a801 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -831,7 +831,6 @@ static void cpu_devinit(const char *cpu_type, unsigned int id,
+>      } else {
+>          qemu_register_reset(secondary_cpu_reset, cpu);
+>          cs = CPU(cpu);
+> -        cs->halted = 1;
+>          object_property_set_bool(OBJECT(cs), "start-powered-off", true,
+>                                   &error_abort);
 >      }
+> 
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Why not squash with previous patch?
 
 
