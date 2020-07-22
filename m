@@ -2,116 +2,126 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EFAC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 10:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B1CC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 11:01:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32FE1206F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 10:51:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32FE1206F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id E0B3A206F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 11:01:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="gAuGevL5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B3A206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyCLj-0002wb-Ek
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 06:51:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50970)
+	id 1jyCUy-0005kc-2u
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 07:01:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1jyCL5-0002Ii-Ju
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 06:51:07 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:34534
- helo=v2201612906741603.powersrv.de)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jyCUG-0005KY-DE; Wed, 22 Jul 2020 07:00:36 -0400
+Received: from mail-am6eur05on2139.outbound.protection.outlook.com
+ ([40.107.22.139]:53600 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1jyCL1-00030N-84
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 06:51:07 -0400
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 3EA20DB3554;
- Wed, 22 Jul 2020 12:51:00 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id eZ-5llyH7WJd; Wed, 22 Jul 2020 12:50:59 +0200 (CEST)
-Received: from mobile-150-060.wlan.uni-mannheim.de
- (mobile-150-060.wlan.uni-mannheim.de [134.155.150.60])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits))
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 4A027DB3553;
- Wed, 22 Jul 2020 12:50:59 +0200 (CEST)
-Subject: Re: [PATCH v2 05/12] util/oslib-win32: add qemu_get_host_physmem
- implementation
-To: luoyonggang@gmail.com, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-References: <20200722062902.24509-1-alex.bennee@linaro.org>
- <20200722062902.24509-6-alex.bennee@linaro.org>
- <CAE2XoE-OiXaZRBqW1PnWQO1QntGtckQXOYD1Nqycp7V73MJ3RA@mail.gmail.com>
-From: Stefan Weil <sw@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <8d9ba727-c833-ad4b-619c-e6d845848844@weilnetz.de>
-Date: Wed, 22 Jul 2020 12:50:58 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <CAE2XoE-OiXaZRBqW1PnWQO1QntGtckQXOYD1Nqycp7V73MJ3RA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jyCUC-0004a7-98; Wed, 22 Jul 2020 07:00:35 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=To2jyupzTiNmZJ2XcZPRF2gHAmC179C2x6LcnAUNVDV6DisfFqRcABtSuWmMRrY2wYslGlGpWpRTsOCvludL0eE5vqekVuejEM7tPK2ZIQ8HNX200+sB83RfjbDE6leYhp8KS9r+EqSAwXlUWTtcp7tXlmwLv04jbvXo/9fxWJTYcXHoIxR8YWd96oqmmqIyOa4OEc7TRihA3hW2/rngPPXQB+ER9t9KNgqpbh8ZFVLrN1MLyIySztyrOyLlln77cMcHR0lrKVsVfhmcTFv1xsy/zYBF6c9CH5sYSypfmkbOPfxvtShcy3fXlDocHFpzpp6REzmLjpsS+3wuH3H0Jw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gcBDsMdQg5a+1mIv+bgTyny+wERRCJrHV9ZkLtVF05o=;
+ b=OR+Ex/fs45g3HUA1pAMMGKDKGHhkhnR/L1LLUm5npT3pG6dLQN1YyWA4nuUShrQtzhTrvlON0NcV+SMuqlYYZxNlXATraskYTtjUbCFBgg7PlGorF9btWA2icAXvbOZQG74KLEYxz398fJ2XNZzJFVGqBB7gp6wLItDh7MByeZ8B/idve/1AF/Mz4uH4MrzjwLqRWxCf9qZmzaa+RkvMFrGrS+vqLAKnC40pjvH5Fcl0ELVM3h5uBe24slmIhrdZ/SIhgoHIQ9ylKSSvjrinzCAudoVgmBWV6H1JhGXUCVOi7fFwEIACcwmvWXIzwTkxpIA9H+wBNgeTQpTFdhqmWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gcBDsMdQg5a+1mIv+bgTyny+wERRCJrHV9ZkLtVF05o=;
+ b=gAuGevL577bwJGDuIwuTA26w4YiCpgRiQKe5SVPK1i7CN1dd1XQPkBKHK4wFwQecuzKzdNHKg1m/2nP1dlRC8q5aKj/hG/uPLMcrxlkNCUaHjGpcOrVUCR8Vgj+me9vVyqAdGgySrSi/T/e7tzXKrOjFgTg/pGb23BPOCd6vaUQ=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0801MB1905.eurprd08.prod.outlook.com (2603:10a6:203:43::8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.22; Wed, 22 Jul
+ 2020 11:00:27 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3195.026; Wed, 22 Jul 2020
+ 11:00:27 +0000
+Subject: Re: [PATCH 3/4] io/channel-socket: implement non-blocking connect
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200720180715.10521-1-vsementsov@virtuozzo.com>
+ <20200720180715.10521-4-vsementsov@virtuozzo.com>
+ <20200720182923.GP643836@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <840b762e-1ce1-af25-2ea0-b8cfdedba0d4@virtuozzo.com>
+Date: Wed, 22 Jul 2020 14:00:25 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200720182923.GP643836@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
- helo=v2201612906741603.powersrv.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 06:03:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-ClientProxiedBy: AM0PR03CA0095.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::36) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.154) by
+ AM0PR03CA0095.eurprd03.prod.outlook.com (2603:10a6:208:69::36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3216.23 via Frontend Transport; Wed, 22 Jul 2020 11:00:26 +0000
+X-Originating-IP: [185.215.60.154]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 32e4b2c8-ff4c-431c-0186-08d82e2e7109
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB1905:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB1905FCEACE9EFC10C58945B8C1790@AM5PR0801MB1905.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: MAfvwlaytLtzAM25LrxBoa2HtSPTMtQr+Oczp0SwquIohiZ+OUdnqqMN+zvojkqiBUhis93c0dtc1oziQnKyYzf5qy45K+rrhoYVYIXZsywkdltyN24y4jVS/WV0boKmKiU9tTStQk9maq6SlwXz+x03b2YV28CN8CxiZdFXM8nrDT6hVZvWAy9LKefv1riJaZotenV6RWgRbMcz38NHw38iyyUKkScrcE3mNxnerDE94Uhw6UB822dEWo3rq/xm5S8mwcOFcXnoRkk5wiDvPLXl6NosqCMnvTcMIn1tiyEG2XOVW3zW5U4MGPX0KNdLM6ID7H2zymD/h4i5KNtCFMWoEF+0WFvoxXdF5dCQVINrPqgsdaHXuKXpP9tFZfkM
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(396003)(376002)(136003)(366004)(346002)(39840400004)(107886003)(66556008)(66946007)(66476007)(52116002)(36756003)(2616005)(86362001)(4326008)(956004)(16576012)(31686004)(83380400001)(31696002)(6486002)(8676002)(6916009)(16526019)(186003)(5660300002)(316002)(26005)(2906002)(8936002)(478600001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 9/Gklr3cYA56YL/dOKkzidk/8JduKrB+6MiGMUkeNr37bg8Em1GSLs9qJb1xh/wsJU6uvwexeiPejJFWArGZzRz2Q8IQWQcNXH/yqCTvCfg9oXUVrKnBnZAFSnv0x4DjlQBHQp5WC6T1HYszuMASG0/L7neYRv6WwIg8yVMVJkuVzC3tDZTdUE3wIUaLXpGa+FKwjR2vXuV4aioyqDFSfQL7ZTf3bvwURHr8bvowz55qDqwp9W0mIfAYPGU+x69I4SLCwgvy8glSp6+E9UOMRJKeyFmaclXmV5MvhUfihwWeTHdQepRyLOfl+ZjDe86B4/6LAhoojIKc4rNTX20+a5FnHYJ2JTY9Nx4T8iY6CSasBmmNN0uooc2eG1y90JNlAy1zXH/Kyf27K25DzjbRZNcAqQ88mzMelQOM+qo9xKJwgESblbvE+zsMd1FbpGqp4kaOph22jpxphFPMouGnUNFePuJWs9N2LT0BmdRbH482t8rAwA6tgoFl+EVY972k
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32e4b2c8-ff4c-431c-0186-08d82e2e7109
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2020 11:00:27.4078 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 972iYxAMnxgdO7GWO49coYXaPudgBG6/vk0jC+06REk8s7Yhu7eYXP6ZFtMu/7E3bgHcplOnlTm8V3euSI5L4yukU6Ejutb/mx1CIsW7UnI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1905
+Received-SPF: pass client-ip=40.107.22.139;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 07:00:28
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,28 +134,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, cota@braap.org,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, kraxel@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 22.07.20 um 12:32 schrieb 罗勇刚(Yonggang Luo):
+20.07.2020 21:29, Daniel P. Berrangé wrote:
+> On Mon, Jul 20, 2020 at 09:07:14PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+>> Utilize new socket API to make a non-blocking connect for inet sockets.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   include/io/channel-socket.h | 14 +++++++
+>>   io/channel-socket.c         | 74 +++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 88 insertions(+)
+>>
+>> diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
+>> index 777ff5954e..82e868bc02 100644
+>> --- a/include/io/channel-socket.h
+>> +++ b/include/io/channel-socket.h
+>> @@ -94,6 +94,20 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
+>>                                       SocketAddress *addr,
+>>                                       Error **errp);
+>>   
+>> +/**
+>> + * qio_channel_socket_connect_non_blocking_sync:
+>> + * @ioc: the socket channel object
+>> + * @addr: the address to connect to
+>> + * @errp: pointer to a NULL-initialized error object
+>> + *
+>> + * Attempt to connect to the address @addr using non-blocking mode of
+>> + * the socket. Function is synchronous, but being called from
+>> + * coroutine context will yield during connect operation.
+>> + */
+>> +int qio_channel_socket_connect_non_blocking_sync(QIOChannelSocket *ioc,
+>> +                                                 SocketAddress *addr,
+>> +                                                 Error **errp);
+>> +
+>>   /**
+>>    * qio_channel_socket_connect_async:
+>>    * @ioc: the socket channel object
+>> diff --git a/io/channel-socket.c b/io/channel-socket.c
+>> index e1b4667087..076de7578a 100644
+>> --- a/io/channel-socket.c
+>> +++ b/io/channel-socket.c
+>> @@ -22,6 +22,7 @@
+>>   #include "qapi/error.h"
+>>   #include "qapi/qapi-visit-sockets.h"
+>>   #include "qemu/module.h"
+>> +#include "qemu/sockets.h"
+>>   #include "io/channel-socket.h"
+>>   #include "io/channel-watch.h"
+>>   #include "trace.h"
+>> @@ -29,6 +30,8 @@
+>>   
+>>   #define SOCKET_MAX_FDS 16
+>>   
+>> +static int qio_channel_socket_close(QIOChannel *ioc, Error **errp);
+>> +
+>>   SocketAddress *
+>>   qio_channel_socket_get_local_address(QIOChannelSocket *ioc,
+>>                                        Error **errp)
+>> @@ -157,6 +160,77 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
+>>       return 0;
+>>   }
+>>   
+>> +static int qio_channel_inet_connect_non_blocking_sync(QIOChannelSocket *ioc,
+>> +        InetSocketAddress *addr, Error **errp)
+>> +{
+>> +    Error *local_err = NULL;
+>> +    struct addrinfo *infos, *info;
+>> +    int sock = -1;
+>> +
+>> +    infos = inet_parse_connect_saddr(addr, errp);
+>> +    if (!infos) {
+>> +        return -1;
+>> +    }
+> 
+> This call is blocking since it calls getaddrinfo whose design
+> offers no ability todo non-blocking DNS lookups. Given this
+> call, ...
 
-> I would suggest use loadLibrary to retrieve the function, if not
-> available, then return 0 (For Win Xp and Vista);
+Oh, that's bad, thanks for taking a look on that early stage!
+
+> 
+>> +
+>> +    for (info = infos; info != NULL; info = info->ai_next) {
+>> +        bool in_progress;
+>> +
+>> +        error_free(local_err);
+>> +        local_err = NULL;
+>> +
+>> +        sock = inet_connect_addr(addr, info, false, &in_progress, &local_err);
+>> +        if (sock < 0) {
+>> +            continue;
+>> +        }
+>> +
+>> +        if (qio_channel_socket_set_fd(ioc, sock, &local_err) < 0) {
+>> +            close(sock);
+>> +            continue;
+>> +        }
+>> +
+>> +        if (in_progress) {
+>> +            if (qemu_in_coroutine()) {
+>> +                qio_channel_yield(QIO_CHANNEL(ioc), G_IO_OUT);
+>> +            } else {
+>> +                qio_channel_wait(QIO_CHANNEL(ioc), G_IO_OUT);
+>> +            }
+> 
+> ...this is offering false assurances of being non-blocking.
+> 
+> If we don't want the current thread to be blocked then we
+> need to be using the existing qio_channel_socket_connect_async
+> method or similar. It uses a throw away background thread to
+> run the connection attempt, and then reports completion back
+> later, thus avoiding the getaddrinfo design flaw for the callers.
+> 
+> I explicitly didn't want to add an method like the impl in this
+> patch, because getaddrinfo dooms it and we already had bugs in
+> the pre-QIOChannel code where QEMU thought it was non-blocking
+> but wasn't due to getaddrinfo lookups.
+> 
+> 
+> IIUC, the main appeal of this method is that the non-blocking
+> nature is hidden from the caller who can continue to treat it
+> as a synchronous call and have the coroutine magic happen in
+> behind the scenes.
+> 
+> IOW, What's needed is a simple way to run the operation in a
+> thread, and sleep for completion while having the coroutine
+> yield.
+> 
+> I think this could likely be achieved with QIOTask with an
+> alternate impl of the qio_task_wait_thread() method that is
+> friendly to coroutines instead of being based on pthread
+> condition variable waits.
+
+The most simple thing is just run qio_channel_socket_connect_sync in
+a thread with help of thread_pool_submit_co() which is coroutine-friendly.
+And this don't need any changes in io/channel.
+
+Actually, I've started with such design, but decided that better use
+non-blocking connect to not deal with cancelling the connecting thread
+on shutdown.
+
+I think, I'll resend based on thread_pool_submit_co().
+
+===
+
+Hmm, there is async getaddrinfo_a function.. What do you think of it?
+But seems simpler to use a thread than move to async interfaces everywhere.
+
+> 
+> 
+>> +            if (socket_check(sock, &local_err) < 0) {
+>> +                qio_channel_socket_close(QIO_CHANNEL(ioc), NULL);
+>> +                continue;
+>> +            }
+>> +        }
+>> +
+>> +        break;
+>> +    }
+>> +
+>> +    freeaddrinfo(infos);
+>> +
+>> +    error_propagate(errp, local_err);
+>> +    return sock;
+>> +}
+> 
+> Regards,
+> Daniel
+> 
 
 
-Maybe using GlobalMemoryStatusEx is a better alternative. It is
-available since XP.
-
-Regards,
-
-Stefan
-
-
-||
+-- 
+Best regards,
+Vladimir
 
