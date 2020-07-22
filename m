@@ -2,113 +2,80 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2FA9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 21:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68340C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 21:51:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 939942071A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 21:46:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 939942071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3A2012086A
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 21:51:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A2012086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyMYv-0007vE-Ms
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 17:46:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56080)
+	id 1jyMe3-0002P5-Hn
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 17:51:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jyMXo-0007Lm-4t
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 17:45:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23818)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1jyMXl-0007Zl-Lq
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 17:44:55 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06MLWbUS073887
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 17:44:50 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32bvqx1ch8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 17:44:50 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06MLXGa4074923
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 17:44:49 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32bvqx1ch0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 17:44:49 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06MLiPXI011043;
- Wed, 22 Jul 2020 21:44:48 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma02dal.us.ibm.com with ESMTP id 32brq9ry80-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 21:44:48 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06MLimev36438508
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 22 Jul 2020 21:44:48 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E65AC2805A;
- Wed, 22 Jul 2020 21:44:47 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D955328058;
- Wed, 22 Jul 2020 21:44:47 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 22 Jul 2020 21:44:47 +0000 (GMT)
-Subject: Re: [RFC PATCH-for-5.1 2/2] tpm: List the available TPM backends
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200722112333.29966-1-philmd@redhat.com>
- <20200722112333.29966-3-philmd@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <25d572a7-d899-fb61-f39e-547e36c8f920@linux.ibm.com>
-Date: Wed, 22 Jul 2020 17:44:47 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jyMdJ-0001fB-EG
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 17:50:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48718)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jyMdH-0008Rq-5Q
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 17:50:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jyMdE-0005k8-SF
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 21:50:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A77632E80EF
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 21:50:32 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200722112333.29966-3-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-22_16:2020-07-22,
- 2020-07-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 spamscore=0
- bulkscore=0 impostorscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0
- suspectscore=0 adultscore=0 clxscore=1015 phishscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007220135
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 17:44:50
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 Jul 2020 21:41:26 -0000
+From: Eric Blake <1884831@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: eblake tobias-hunger
+X-Launchpad-Bug-Reporter: TobiasHunger (tobias-hunger)
+X-Launchpad-Bug-Modifier: Eric Blake (eblake)
+References: <159294358125.13789.3860026407311199131.malonedeb@wampee.canonical.com>
+ <159294814773.16548.4367549975584519679.malone@chaenomeles.canonical.com>
+Message-ID: <2be4be2c-bf5b-439c-a436-b6cb61fb13eb@redhat.com>
+Subject: Re: [Bug 1884831] Re: qemu-nbd fails to discard bigger chunks
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="f877c5162b568393e2d07ce948459ba0abc456fe";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1386001f6dadc705e5f536922aabfe67be200537
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 17:50:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -117,25 +84,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Reply-To: Bug 1884831 <1884831@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200722214126.8tiuf3TZpSJltqVLjD8FrBpdio0Kb4hg133P1957h-c@z>
 
-On 7/22/20 7:23 AM, Philippe Mathieu-Daudé wrote:
-> When an incorrect backend is selected, tpm_display_backend_drivers()
-> is supposed to list the available backends. However the error is
-> directly propagated, and we never display the list. The user only
-> gets "Parameter 'type' expects a TPM backend type" error.
->
-> Convert the fprintf(stderr,) calls to error hints propagated with
-> the error.
->
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> RFC because this is now odd in tpm_config_parse():
+On 6/23/20 4:35 PM, Eric Blake wrote:
+> Let's get nbd.ko out of the picture.  The problem can be reproduced in
+> user space (here, where I built qemu-nbd to log trace messages to
+> stderr):
+> =
 
-because it's not using the fprintf anymore ?
+> $ truncate --size=3D3G file
+> $ qemu-nbd -f raw file --trace=3Dnbd_\*
+> $ nbdsh -u nbd://localhost:10810 -c 'h.trim(3*1024*1024*1024,0)'
+
+> nbd.Error: nbd_trim: trim: command failed: Input/output error (EIO)
+> =
 
 
+> =
+
+> so this is definitely a case of qemu as NBD server NOT honoring requests
+> between 2G and 4G.  I'll have a patch posted soon.
+
+https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg06592.html
+
+-- =
+
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1884831
+
+Title:
+  qemu-nbd fails to discard bigger chunks
+
+Status in QEMU:
+  New
+
+Bug description:
+  This report is moved from systemd to here:
+  https://github.com/systemd/systemd/issues/16242
+
+  A qemu-nbd device reports that it can discard a lot of bytes:
+
+  cat /sys/block/nbd0/queue/discard_max_bytes
+  2199023255040
+
+  And indeed, discard works with small images:
+
+  $ qemu-img create -f qcow2 /tmp/image.img 2M
+  $ sudo qemu-nbd --connect=3D/dev/nbd0 /tmp/image.img
+  $ sudo blkdiscard /dev/nbd0
+
+  but not for bigger ones (still smaller than discard_max_bytes):
+
+  $ qemu-img create -f qcow2 /tmp/image.img 5G
+  $ sudo qemu-nbd --connect=3D/dev/nbd0 /tmp/image.img
+  $ sudo blkdiscard /dev/nbd0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1884831/+subscriptions
 
