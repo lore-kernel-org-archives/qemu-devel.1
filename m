@@ -2,114 +2,91 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C2BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:52:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A4F4C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:52:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6994920714
+	by mail.kernel.org (Postfix) with ESMTPS id CA34120714
 	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:52:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EAPX/yp5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6994920714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="N5C50KSw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA34120714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyBQB-0008Mg-KW
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:52:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59232)
+	id 1jyBQC-0008Lo-2q
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:52:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jyBDn-0000zD-I0
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:39:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27214
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jyBDl-0000In-HV
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:39:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595410768;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=AX8zRKCi4pKNwzNVqYofsECCyUfuuSYKa6NsErayM9w=;
- b=EAPX/yp5Rvh14GR1cii4x+svzUkXYsuiEG1gdWxlDNmNrSxe/F/7ixAt13Logu+LRTMC+t
- V/NI+7tv1iSSBdTaoYse19vxzDW+lYs9ksMyEiSH5VZ0QZXcxyB81iUuQig/1mMufP/VdC
- 6nTg30awIhcoBN6RpRvAyibN5vNoNCM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-kerY-8oWOTSPPPmrBk6Qsg-1; Wed, 22 Jul 2020 05:39:25 -0400
-X-MC-Unique: kerY-8oWOTSPPPmrBk6Qsg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26FBFE918;
- Wed, 22 Jul 2020 09:39:24 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-86.ams2.redhat.com
- [10.36.113.86])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E501774F58;
- Wed, 22 Jul 2020 09:39:21 +0000 (UTC)
-Subject: Re: [PATCH v2 06/20] block/block-copy: add max_chunk and max_workers
- parameters
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200601181118.579-1-vsementsov@virtuozzo.com>
- <20200601181118.579-7-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <fa0c148f-5200-8624-b3a1-9f4ec77691f0@redhat.com>
-Date: Wed, 22 Jul 2020 11:39:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200601181118.579-7-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="L6iObLm0kQJOB49LN7tZs6tDurGEQ85t8"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 00:40:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jyAx3-0006sW-IY
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:22:13 -0400
+Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:41178)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jyAx1-0006AL-Il
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:22:13 -0400
+Received: by mail-pf1-x436.google.com with SMTP id w126so702269pfw.8
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:22:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=hZBXTV5hlrVFu7qHkv9AB/jEY5LbpBvJ+tF1Sv4FGBo=;
+ b=N5C50KSwZQwjaukyqcXv4vSPiixk2pEzscSfgnNDSpmyVfUqBA4IL+e+A8YIebVX50
+ /cLZFBpN6Dfzjezl13Iamthkh2sJr6Pr17BSQ6Dqhj21z8NJwERkv89LDOC2EKECsJrp
+ rDNoFWo3kt1bM6x1LqRMNk5hklFoSSyzshK4KBxQEZAk04y1hSqTcrd6EUtxZ3wK4CMW
+ 2FODbLHGKeUbpQlTbPdwIBbMds3yNsj7v30BSqfz3+Wbu4wVdwwHoerMs6bFJFig4R+1
+ L3T2Y2g0+0a7/sNSBX3+fkwtSBKHioEzFfkkBQ1l5BXdPl6Vx+pyioA/opWpIzh5vzZh
+ Gg8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=hZBXTV5hlrVFu7qHkv9AB/jEY5LbpBvJ+tF1Sv4FGBo=;
+ b=sLab7DZRDn8x2O5Cu24e49c46kZDnlR+IdozvXrkQdJLb86ww5tOaXDic/E8R0QjWB
+ KuMOm78ium54mhrWk7Z4hfgXbQNoPA5aeJqFzyDAfL7C1DIg7Ei2dzG5k5obdc0Zox4+
+ aHgyqnIvxOXPbv0EPr9aY33c8Dfdu7rcN4ZY+0qq4Ps/jvvB0jKtXEw8aBq/lPDv0rAa
+ VBxVeXJnjRRnGeUiaKrui9Vs7fe1cuj8H8luSGh/uZBaeaYV+/xXBGokGCD1BPpM2jDz
+ 1lN+X/Ke3AaRh01NSc2CqTHvJFj+9N2wEyaLvfkZW3tGY7PAF1i1G6q9ECZlkjtSefHn
+ tQTQ==
+X-Gm-Message-State: AOAM532IWP0VFMNw0Lja3BznqR2Xxi5S+rXfZvRhTpOi8CfSl6a+ovve
+ zI3/DOkmVfcEmZrCHrm4U1D33neBMcY=
+X-Google-Smtp-Source: ABdhPJy4FuhrNjWZkG2WOrW2QMbmj/AEmxQv4Y+rRwm1y41vDxY8CErrh/biEYBqtc+/QIPXY2An1A==
+X-Received: by 2002:a63:8f51:: with SMTP id r17mr26028335pgn.124.1595409729922; 
+ Wed, 22 Jul 2020 02:22:09 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.22.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Jul 2020 02:22:09 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC v2 65/76] target/riscv: rvv-0.9: remove widening saturating
+ scaled multiply-add
+Date: Wed, 22 Jul 2020 17:16:28 +0800
+Message-Id: <20200722091641.8834-66-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200722091641.8834-1-frank.chang@sifive.com>
+References: <20200722091641.8834-1-frank.chang@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::436;
+ envelope-from=frank.chang@sifive.com; helo=mail-pf1-x436.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,145 +99,314 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com,
- armbru@redhat.com, qemu-devel@nongnu.org, den@openvz.org, jsnow@redhat.com
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Frank Chang <frank.chang@sifive.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---L6iObLm0kQJOB49LN7tZs6tDurGEQ85t8
-Content-Type: multipart/mixed; boundary="UWdXdBiGKCJSupEmI72www5gVaw3aEcU6"
+From: Frank Chang <frank.chang@sifive.com>
 
---UWdXdBiGKCJSupEmI72www5gVaw3aEcU6
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
+---
+ target/riscv/helper.h                   |  22 ---
+ target/riscv/insn32.decode              |   7 -
+ target/riscv/insn_trans/trans_rvv.inc.c |   9 --
+ target/riscv/vector_helper.c            | 205 ------------------------
+ 4 files changed, 243 deletions(-)
 
-On 01.06.20 20:11, Vladimir Sementsov-Ogievskiy wrote:
-> They will be used for backup.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/block-copy.h |  5 +++++
->  block/block-copy.c         | 10 ++++++++--
->  2 files changed, 13 insertions(+), 2 deletions(-)
->=20
-> diff --git a/include/block/block-copy.h b/include/block/block-copy.h
-> index ada0d99566..600984c733 100644
-> --- a/include/block/block-copy.h
-> +++ b/include/block/block-copy.h
-> @@ -47,6 +47,11 @@ int coroutine_fn block_copy(BlockCopyState *s, int64_t=
- offset, int64_t bytes,
->  /*
->   * Run block-copy in a coroutine, return state pointer. If finished earl=
-y
->   * returns NULL (@cb is called anyway).
-> + *
-> + * @max_workers means maximum of parallel coroutines to execute sub-requ=
-ests,
-> + * must be > 0.
-> + *
-> + * @max_chunk means maximum length for one IO operation. Zero means unli=
-mited.
->   */
->  BlockCopyCallState *block_copy_async(BlockCopyState *s,
->                                       int64_t offset, int64_t bytes,
-
-I only just now notice that @max_workers and @max_chunk were already
-added in the previous patch, even though they aren=E2=80=99t used there.  S=
-hould
-we defer adding them until this patch?
-
-> diff --git a/block/block-copy.c b/block/block-copy.c
-> index a0477d90f3..4114d1fd25 100644
-> --- a/block/block-copy.c
-> +++ b/block/block-copy.c
-> @@ -34,6 +34,8 @@ typedef struct BlockCopyCallState {
->      BlockCopyState *s;
->      int64_t offset;
->      int64_t bytes;
-> +    int max_workers;
-> +    int64_t max_chunk;
->      BlockCopyAsyncCallbackFunc cb;
-> =20
->      /* State */
-> @@ -144,10 +146,11 @@ static BlockCopyTask *block_copy_task_create(BlockC=
-opyState *s,
->                                               int64_t offset, int64_t byt=
-es)
->  {
->      BlockCopyTask *task;
-> +    int64_t max_chunk =3D MIN_NON_ZERO(s->copy_size, call_state->max_chu=
-nk);
-> =20
->      if (!bdrv_dirty_bitmap_next_dirty_area(s->copy_bitmap,
->                                             offset, offset + bytes,
-> -                                           s->copy_size, &offset, &bytes=
-))
-> +                                           max_chunk, &offset, &bytes))
->      {
->          return NULL;
->      }
-> @@ -616,7 +619,7 @@ block_copy_dirty_clusters(BlockCopyCallState *call_st=
-ate)
->          bytes =3D end - offset;
-> =20
->          if (!aio && bytes) {
-> -            aio =3D aio_task_pool_new(BLOCK_COPY_MAX_WORKERS);
-> +            aio =3D aio_task_pool_new(call_state->max_workers);
->          }
-> =20
->          ret =3D block_copy_task_run(aio, task);
-> @@ -695,6 +698,7 @@ int coroutine_fn block_copy(BlockCopyState *s, int64_=
-t start, int64_t bytes,
->          .s =3D s,
->          .offset =3D start,
->          .bytes =3D bytes,
-> +        .max_workers =3D BLOCK_COPY_MAX_WORKERS,
->      };
-> =20
->      int ret =3D block_copy_common(&call_state);
-> @@ -726,6 +730,8 @@ BlockCopyCallState *block_copy_async(BlockCopyState *=
-s,
->          .offset =3D offset,
->          .bytes =3D bytes,
->          .cb =3D cb,
-> +        .max_workers =3D max_workers ?: BLOCK_COPY_MAX_WORKERS,
-
-I thought this must be > 0?
-
-> +        .max_chunk =3D max_chunk,
->      };
-> =20
->      qemu_coroutine_enter(co);
->=20
-
-And I now notice that there=E2=80=99s no newline after block_copy_async().
-(Doesn=E2=80=99t concern this patch, of course, but the previous one.)
-
-Max
-
-
---UWdXdBiGKCJSupEmI72www5gVaw3aEcU6--
-
---L6iObLm0kQJOB49LN7tZs6tDurGEQ85t8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8YCUgACgkQ9AfbAGHV
-z0Bd9wf/W4D1Nt5Mt1EI9fbvY5Vv051czX0qTStIbliw5KvOUPMV50J53TO9FtMY
-5IELWIBt5KnQ5LYAiqV6PkrNqI40nc0fVVyhi+Ujfkrli4s5BfnqbYrnGgdF4eTC
-ayox9yDCVbIz0vNvc3vVLsnTAQ+KobpOluxyo+3OCWp327IWWyNpzQOtnTYb1fLU
-dQiO/MTM1chltuZpodx+HEgcj/l0QXk9tVX3KvvMoipW2gSacTJLzV0DeYMJlPeL
-kITNeelacTBNq4Qs3s6WIWavbU2J40Od3hKy8N1CIKjS0KaJ3Q7BGT29gSzBlYtQ
-Obb4IvbjdcTNSxltsgJjoWNdW9pKhw==
-=WWDX
------END PGP SIGNATURE-----
-
---L6iObLm0kQJOB49LN7tZs6tDurGEQ85t8--
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index cfe9baa253..d7f3714ba6 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -729,28 +729,6 @@ DEF_HELPER_6(vsmul_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsmul_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsmul_vx_d, void, ptr, ptr, tl, ptr, env, i32)
+ 
+-DEF_HELPER_6(vwsmaccu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vwsmacc_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vwsmacc_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vwsmacc_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccsu_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccsu_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccsu_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmacc_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmacc_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmacc_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccsu_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccsu_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccsu_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccus_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccus_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vwsmaccus_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+-
+ DEF_HELPER_6(vssrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vssrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vssrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index e32946b1f5..2be673c2c7 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -456,13 +456,6 @@ vasubu_vv       001010 . ..... ..... 010 ..... 1010111 @r_vm
+ vasubu_vx       001010 . ..... ..... 110 ..... 1010111 @r_vm
+ vsmul_vv        100111 . ..... ..... 000 ..... 1010111 @r_vm
+ vsmul_vx        100111 . ..... ..... 100 ..... 1010111 @r_vm
+-vwsmaccu_vv     111100 . ..... ..... 000 ..... 1010111 @r_vm
+-vwsmaccu_vx     111100 . ..... ..... 100 ..... 1010111 @r_vm
+-vwsmacc_vv      111101 . ..... ..... 000 ..... 1010111 @r_vm
+-vwsmacc_vx      111101 . ..... ..... 100 ..... 1010111 @r_vm
+-vwsmaccsu_vv    111110 . ..... ..... 000 ..... 1010111 @r_vm
+-vwsmaccsu_vx    111110 . ..... ..... 100 ..... 1010111 @r_vm
+-vwsmaccus_vx    111111 . ..... ..... 100 ..... 1010111 @r_vm
+ vssrl_vv        101010 . ..... ..... 000 ..... 1010111 @r_vm
+ vssrl_vx        101010 . ..... ..... 100 ..... 1010111 @r_vm
+ vssrl_vi        101010 . ..... ..... 011 ..... 1010111 @r_vm
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index fb8478a456..9480c64971 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2391,15 +2391,6 @@ GEN_OPIVX_TRANS(vasubu_vx,  opivx_check)
+ GEN_OPIVV_TRANS(vsmul_vv, opivv_check)
+ GEN_OPIVX_TRANS(vsmul_vx,  opivx_check)
+ 
+-/* Vector Widening Saturating Scaled Multiply-Add */
+-GEN_OPIVV_WIDEN_TRANS(vwsmaccu_vv, opivv_widen_check)
+-GEN_OPIVV_WIDEN_TRANS(vwsmacc_vv, opivv_widen_check)
+-GEN_OPIVV_WIDEN_TRANS(vwsmaccsu_vv, opivv_widen_check)
+-GEN_OPIVX_WIDEN_TRANS(vwsmaccu_vx)
+-GEN_OPIVX_WIDEN_TRANS(vwsmacc_vx)
+-GEN_OPIVX_WIDEN_TRANS(vwsmaccsu_vx)
+-GEN_OPIVX_WIDEN_TRANS(vwsmaccus_vx)
+-
+ /* Vector Single-Width Scaling Shift Instructions */
+ GEN_OPIVV_TRANS(vssrl_vv, opivv_check)
+ GEN_OPIVV_TRANS(vssra_vv, opivv_check)
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 2b2b1f521f..c5fc61bf76 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -2923,211 +2923,6 @@ GEN_VEXT_VX_RM(vsmul_vx_h, 2, 2, clearh)
+ GEN_VEXT_VX_RM(vsmul_vx_w, 4, 4, clearl)
+ GEN_VEXT_VX_RM(vsmul_vx_d, 8, 8, clearq)
+ 
+-/* Vector Widening Saturating Scaled Multiply-Add */
+-static inline uint16_t
+-vwsmaccu8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b,
+-          uint16_t c)
+-{
+-    uint8_t round;
+-    uint16_t res = (uint16_t)a * b;
+-
+-    round = get_round(vxrm, res, 4);
+-    res   = (res >> 4) + round;
+-    return saddu16(env, vxrm, c, res);
+-}
+-
+-static inline uint32_t
+-vwsmaccu16(CPURISCVState *env, int vxrm, uint16_t a, uint16_t b,
+-           uint32_t c)
+-{
+-    uint8_t round;
+-    uint32_t res = (uint32_t)a * b;
+-
+-    round = get_round(vxrm, res, 8);
+-    res   = (res >> 8) + round;
+-    return saddu32(env, vxrm, c, res);
+-}
+-
+-static inline uint64_t
+-vwsmaccu32(CPURISCVState *env, int vxrm, uint32_t a, uint32_t b,
+-           uint64_t c)
+-{
+-    uint8_t round;
+-    uint64_t res = (uint64_t)a * b;
+-
+-    round = get_round(vxrm, res, 16);
+-    res   = (res >> 16) + round;
+-    return saddu64(env, vxrm, c, res);
+-}
+-
+-#define OPIVV3_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)    \
+-static inline void                                                 \
+-do_##NAME(void *vd, void *vs1, void *vs2, int i,                   \
+-          CPURISCVState *env, int vxrm)                            \
+-{                                                                  \
+-    TX1 s1 = *((T1 *)vs1 + HS1(i));                                \
+-    TX2 s2 = *((T2 *)vs2 + HS2(i));                                \
+-    TD d = *((TD *)vd + HD(i));                                    \
+-    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, s1, d);                \
+-}
+-
+-RVVCALL(OPIVV3_RM, vwsmaccu_vv_b, WOP_UUU_B, H2, H1, H1, vwsmaccu8)
+-RVVCALL(OPIVV3_RM, vwsmaccu_vv_h, WOP_UUU_H, H4, H2, H2, vwsmaccu16)
+-RVVCALL(OPIVV3_RM, vwsmaccu_vv_w, WOP_UUU_W, H8, H4, H4, vwsmaccu32)
+-GEN_VEXT_VV_RM(vwsmaccu_vv_b, 1, 2, clearh)
+-GEN_VEXT_VV_RM(vwsmaccu_vv_h, 2, 4, clearl)
+-GEN_VEXT_VV_RM(vwsmaccu_vv_w, 4, 8, clearq)
+-
+-#define OPIVX3_RM(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)         \
+-static inline void                                                 \
+-do_##NAME(void *vd, target_long s1, void *vs2, int i,              \
+-          CPURISCVState *env, int vxrm)                            \
+-{                                                                  \
+-    TX2 s2 = *((T2 *)vs2 + HS2(i));                                \
+-    TD d = *((TD *)vd + HD(i));                                    \
+-    *((TD *)vd + HD(i)) = OP(env, vxrm, s2, (TX1)(T1)s1, d);       \
+-}
+-
+-RVVCALL(OPIVX3_RM, vwsmaccu_vx_b, WOP_UUU_B, H2, H1, vwsmaccu8)
+-RVVCALL(OPIVX3_RM, vwsmaccu_vx_h, WOP_UUU_H, H4, H2, vwsmaccu16)
+-RVVCALL(OPIVX3_RM, vwsmaccu_vx_w, WOP_UUU_W, H8, H4, vwsmaccu32)
+-GEN_VEXT_VX_RM(vwsmaccu_vx_b, 1, 2, clearh)
+-GEN_VEXT_VX_RM(vwsmaccu_vx_h, 2, 4, clearl)
+-GEN_VEXT_VX_RM(vwsmaccu_vx_w, 4, 8, clearq)
+-
+-static inline int16_t
+-vwsmacc8(CPURISCVState *env, int vxrm, int8_t a, int8_t b, int16_t c)
+-{
+-    uint8_t round;
+-    int16_t res = (int16_t)a * b;
+-
+-    round = get_round(vxrm, res, 4);
+-    res   = (res >> 4) + round;
+-    return sadd16(env, vxrm, c, res);
+-}
+-
+-static inline int32_t
+-vwsmacc16(CPURISCVState *env, int vxrm, int16_t a, int16_t b, int32_t c)
+-{
+-    uint8_t round;
+-    int32_t res = (int32_t)a * b;
+-
+-    round = get_round(vxrm, res, 8);
+-    res   = (res >> 8) + round;
+-    return sadd32(env, vxrm, c, res);
+-
+-}
+-
+-static inline int64_t
+-vwsmacc32(CPURISCVState *env, int vxrm, int32_t a, int32_t b, int64_t c)
+-{
+-    uint8_t round;
+-    int64_t res = (int64_t)a * b;
+-
+-    round = get_round(vxrm, res, 16);
+-    res   = (res >> 16) + round;
+-    return sadd64(env, vxrm, c, res);
+-}
+-
+-RVVCALL(OPIVV3_RM, vwsmacc_vv_b, WOP_SSS_B, H2, H1, H1, vwsmacc8)
+-RVVCALL(OPIVV3_RM, vwsmacc_vv_h, WOP_SSS_H, H4, H2, H2, vwsmacc16)
+-RVVCALL(OPIVV3_RM, vwsmacc_vv_w, WOP_SSS_W, H8, H4, H4, vwsmacc32)
+-GEN_VEXT_VV_RM(vwsmacc_vv_b, 1, 2, clearh)
+-GEN_VEXT_VV_RM(vwsmacc_vv_h, 2, 4, clearl)
+-GEN_VEXT_VV_RM(vwsmacc_vv_w, 4, 8, clearq)
+-RVVCALL(OPIVX3_RM, vwsmacc_vx_b, WOP_SSS_B, H2, H1, vwsmacc8)
+-RVVCALL(OPIVX3_RM, vwsmacc_vx_h, WOP_SSS_H, H4, H2, vwsmacc16)
+-RVVCALL(OPIVX3_RM, vwsmacc_vx_w, WOP_SSS_W, H8, H4, vwsmacc32)
+-GEN_VEXT_VX_RM(vwsmacc_vx_b, 1, 2, clearh)
+-GEN_VEXT_VX_RM(vwsmacc_vx_h, 2, 4, clearl)
+-GEN_VEXT_VX_RM(vwsmacc_vx_w, 4, 8, clearq)
+-
+-static inline int16_t
+-vwsmaccsu8(CPURISCVState *env, int vxrm, uint8_t a, int8_t b, int16_t c)
+-{
+-    uint8_t round;
+-    int16_t res = a * (int16_t)b;
+-
+-    round = get_round(vxrm, res, 4);
+-    res   = (res >> 4) + round;
+-    return ssub16(env, vxrm, c, res);
+-}
+-
+-static inline int32_t
+-vwsmaccsu16(CPURISCVState *env, int vxrm, uint16_t a, int16_t b, uint32_t c)
+-{
+-    uint8_t round;
+-    int32_t res = a * (int32_t)b;
+-
+-    round = get_round(vxrm, res, 8);
+-    res   = (res >> 8) + round;
+-    return ssub32(env, vxrm, c, res);
+-}
+-
+-static inline int64_t
+-vwsmaccsu32(CPURISCVState *env, int vxrm, uint32_t a, int32_t b, int64_t c)
+-{
+-    uint8_t round;
+-    int64_t res = a * (int64_t)b;
+-
+-    round = get_round(vxrm, res, 16);
+-    res   = (res >> 16) + round;
+-    return ssub64(env, vxrm, c, res);
+-}
+-
+-RVVCALL(OPIVV3_RM, vwsmaccsu_vv_b, WOP_SSU_B, H2, H1, H1, vwsmaccsu8)
+-RVVCALL(OPIVV3_RM, vwsmaccsu_vv_h, WOP_SSU_H, H4, H2, H2, vwsmaccsu16)
+-RVVCALL(OPIVV3_RM, vwsmaccsu_vv_w, WOP_SSU_W, H8, H4, H4, vwsmaccsu32)
+-GEN_VEXT_VV_RM(vwsmaccsu_vv_b, 1, 2, clearh)
+-GEN_VEXT_VV_RM(vwsmaccsu_vv_h, 2, 4, clearl)
+-GEN_VEXT_VV_RM(vwsmaccsu_vv_w, 4, 8, clearq)
+-RVVCALL(OPIVX3_RM, vwsmaccsu_vx_b, WOP_SSU_B, H2, H1, vwsmaccsu8)
+-RVVCALL(OPIVX3_RM, vwsmaccsu_vx_h, WOP_SSU_H, H4, H2, vwsmaccsu16)
+-RVVCALL(OPIVX3_RM, vwsmaccsu_vx_w, WOP_SSU_W, H8, H4, vwsmaccsu32)
+-GEN_VEXT_VX_RM(vwsmaccsu_vx_b, 1, 2, clearh)
+-GEN_VEXT_VX_RM(vwsmaccsu_vx_h, 2, 4, clearl)
+-GEN_VEXT_VX_RM(vwsmaccsu_vx_w, 4, 8, clearq)
+-
+-static inline int16_t
+-vwsmaccus8(CPURISCVState *env, int vxrm, int8_t a, uint8_t b, int16_t c)
+-{
+-    uint8_t round;
+-    int16_t res = (int16_t)a * b;
+-
+-    round = get_round(vxrm, res, 4);
+-    res   = (res >> 4) + round;
+-    return ssub16(env, vxrm, c, res);
+-}
+-
+-static inline int32_t
+-vwsmaccus16(CPURISCVState *env, int vxrm, int16_t a, uint16_t b, int32_t c)
+-{
+-    uint8_t round;
+-    int32_t res = (int32_t)a * b;
+-
+-    round = get_round(vxrm, res, 8);
+-    res   = (res >> 8) + round;
+-    return ssub32(env, vxrm, c, res);
+-}
+-
+-static inline int64_t
+-vwsmaccus32(CPURISCVState *env, int vxrm, int32_t a, uint32_t b, int64_t c)
+-{
+-    uint8_t round;
+-    int64_t res = (int64_t)a * b;
+-
+-    round = get_round(vxrm, res, 16);
+-    res   = (res >> 16) + round;
+-    return ssub64(env, vxrm, c, res);
+-}
+-
+-RVVCALL(OPIVX3_RM, vwsmaccus_vx_b, WOP_SUS_B, H2, H1, vwsmaccus8)
+-RVVCALL(OPIVX3_RM, vwsmaccus_vx_h, WOP_SUS_H, H4, H2, vwsmaccus16)
+-RVVCALL(OPIVX3_RM, vwsmaccus_vx_w, WOP_SUS_W, H8, H4, vwsmaccus32)
+-GEN_VEXT_VX_RM(vwsmaccus_vx_b, 1, 2, clearh)
+-GEN_VEXT_VX_RM(vwsmaccus_vx_h, 2, 4, clearl)
+-GEN_VEXT_VX_RM(vwsmaccus_vx_w, 4, 8, clearq)
+-
+ /* Vector Single-Width Scaling Shift Instructions */
+ static inline uint8_t
+ vssrl8(CPURISCVState *env, int vxrm, uint8_t a, uint8_t b)
+-- 
+2.17.1
 
 
