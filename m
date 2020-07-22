@@ -2,87 +2,94 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F047DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D00C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:04:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2E4A206F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:03:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02451206F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:04:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WLLsyVum"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2E4A206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="h0l3U9Bm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02451206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyI9h-0005Yk-0I
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:03:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46744)
+	id 1jyI9y-0005vB-6k
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:04:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46142)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jyI6v-0001jZ-Fc
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:00:53 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59308
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1jyI6s-0003JX-UM
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:00:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595437250;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=GBKL2KDH0DuQCsm41OIUEbJpyWb36ZTlR0ekcnDwbOE=;
- b=WLLsyVum8smFNiaa4GZrWvHoiu0CRoOBA3OM6oXTQGqeH5yJFyTUMEtOfo/h5ye4qQ5o6U
- sweA1riWsa6VhsrHLdUVeOGOox2+HHKYUheyOdvo1TPK6eKkFJC6trptZzCJmRx7P3FDh2
- V1XdZaoX2ezLrfJJM1+QS6QKwIgXCl0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-ckgGDMVAO-yC0EIobFMM0A-1; Wed, 22 Jul 2020 13:00:42 -0400
-X-MC-Unique: ckgGDMVAO-yC0EIobFMM0A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 444E31902EA1;
- Wed, 22 Jul 2020 17:00:40 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4F7FD8BEC6;
- Wed, 22 Jul 2020 17:00:33 +0000 (UTC)
-Date: Wed, 22 Jul 2020 13:00:32 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: Re: [RFC PATCH v2 9/9] target/s390x: Use start-powered-off CPUState
- property
-Message-ID: <20200722170032.GN1274972@habkost.net>
-References: <20200722035016.469075-1-bauerman@linux.ibm.com>
- <20200722035016.469075-10-bauerman@linux.ibm.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=465c3c755=alistair.francis@wdc.com>)
+ id 1jyI4k-0005yV-B8
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:58:38 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:10302)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=465c3c755=alistair.francis@wdc.com>)
+ id 1jyI4i-0002jR-Gs
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:58:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1595437116; x=1626973116;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=wjZgWmbxiWOu+2b26iONQcOU3qvLXTQffE2z6wWEdj8=;
+ b=h0l3U9BmVtHvyrQgFkQQ826Wf8oF5stpcbjn2fYotNN+ukVkcfgKHl5q
+ ZirDBUkDlV59Vx5KFVllS7HaRQqsgB5/rx1udE23xSfDfNJnkQaVqEI0C
+ 5zr8iUCtwMUyXSoXDNRwpRwcMEpsS9he1pHQA8LMp8aW/jwGb4Dojph+0
+ 1cFQioz3wXw+vHa3lQUFmbQDIo+1mMEEOLD2xcK/BqLSqdmfwD6A13oyt
+ 96b++YDgx9aRJOzNf3uwaNJJKODGwut+AmbwDvREInUkAVF9IG/As8vhZ
+ jzH1CjMFQ7Mu1LuOKL1C5Wuvk0kflcV8mJWW6+Q9rj2B45InBKpbL8JXl w==;
+IronPort-SDR: 47UmbFsWVpltXSK67u4vkyGnZLfHLD5/Xp3Cvy4t1goQvsaurwBa4YoQySJn5zuiGggQ2qvDJp
+ MkI/n7Vrxw8QWlOZ+ntmO2GXFZyquc/MzouAlzBP3d88ll39iq1gxpHN4Mj6uh4V8ANwCp1MVy
+ 7dPlYx1G1dIUXZm5asrXbzYJYgcb0UkjsSztJCbu+85f/iQmk8RNIlBBHfYIoYuTQJwiyTQ3ht
+ AJooogJc9Kgfs4WQURJS9J49r+K9fsNznAgUKmWZf0Qu4ssr3AHSY2Zh3I2NNtPwVL+a2aQVqK
+ Qaw=
+X-IronPort-AV: E=Sophos;i="5.75,383,1589212800"; d="scan'208";a="252418637"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 23 Jul 2020 00:58:22 +0800
+IronPort-SDR: Pak/mhMkpKhQd987pBUjTY2yJjYbier79RFYG/8W1TzQa27lwNVoE/3vmDMFVGoGTuFWP66Ded
+ a/5bMVbfBsnc//+yanwaVVNXIIXde0yKY=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Jul 2020 09:46:38 -0700
+IronPort-SDR: 69Cyq7dqMU6gU5W9HJaRjo8woJJr5TB+hhXvxmKAA1GHzYdl5SXY7kQKXsGLFcs6MSJ5I4XXLA
+ tyr21Upibrxg==
+WDCIronportException: Internal
+Received: from usa001575.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.58.115])
+ by uls-op-cesaip02.wdc.com with ESMTP; 22 Jul 2020 09:58:22 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 4/5] hw/riscv: sifive_e: Correct debug block size
+Date: Wed, 22 Jul 2020 09:48:37 -0700
+Message-Id: <20200722164838.1591305-5-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200722164838.1591305-1-alistair.francis@wdc.com>
+References: <20200722164838.1591305-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20200722035016.469075-10-bauerman@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:34:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=465c3c755=alistair.francis@wdc.com;
+ helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 12:58:21
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,55 +102,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 22, 2020 at 12:50:16AM -0300, Thiago Jung Bauermann wrote:
-> Instead of setting CPUState::halted to 1 in s390_cpu_initfn(), use the
-> start-powered-off property which makes cpu_common_reset() initialize it to
-> 1 in common code.
-> 
-> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-> ---
->  target/s390x/cpu.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> NB: I was only able to test that this patch builds. I wasn't able to
-> run it.
-> 
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 08eb674d22..d3a14af1d9 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -291,7 +291,8 @@ static void s390_cpu_initfn(Object *obj)
->      S390CPU *cpu = S390_CPU(obj);
->  
->      cpu_set_cpustate_pointers(cpu);
-> -    cs->halted = 1;
-> +    object_property_set_bool(OBJECT(cs), "start-powered-off", true,
-> +                             &error_abort);
+From: Bin Meng <bmeng.cn@gmail.com>
 
-Is this really OK?  s390 CPUs don't seem to set halted=1 on reset
-today.
+Currently the debug region size is set to 0x100, but according to
+FE310-G000 and FE310-G002 manuals:
 
+  FE310-G000: 0x100 - 0xFFF
+  FE310-G002: 0x0   - 0xFFF
 
->      cs->exception_index = EXCP_HLT;
->  #if !defined(CONFIG_USER_ONLY)
->      object_property_add(obj, "crash-information", "GuestPanicInformation",
-> 
+Change the size to 0x1000 that applies to both.
 
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <1594891856-15474-1-git-send-email-bmeng.cn@gmail.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ hw/riscv/sifive_e.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 7bb97b463d..c8b060486a 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -54,7 +54,7 @@ static const struct MemmapEntry {
+     hwaddr base;
+     hwaddr size;
+ } sifive_e_memmap[] = {
+-    [SIFIVE_E_DEBUG] =    {        0x0,      0x100 },
++    [SIFIVE_E_DEBUG] =    {        0x0,     0x1000 },
+     [SIFIVE_E_MROM] =     {     0x1000,     0x2000 },
+     [SIFIVE_E_OTP] =      {    0x20000,     0x2000 },
+     [SIFIVE_E_CLINT] =    {  0x2000000,    0x10000 },
 -- 
-Eduardo
+2.27.0
 
 
