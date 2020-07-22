@@ -4,84 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0A6C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB18C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:06:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F3C320717
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:06:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7319320717
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:06:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g8WJw50e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F3C320717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7DPxv2d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7319320717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy9lX-0007nj-Ct
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:06:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36526)
+	id 1jy9m1-0000Li-Jj
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:06:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jy9kh-0006af-VL
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:05:24 -0400
-Received: from mail-oo1-xc33.google.com ([2607:f8b0:4864:20::c33]:36335)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jy9kf-0003xZ-U2
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:05:23 -0400
-Received: by mail-oo1-xc33.google.com with SMTP id z127so250310ooa.3
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 01:05:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=+uefHjHTl9whndTKp/BqtMTk7Hk7fys1q/6bzcfD87E=;
- b=g8WJw50eaUMGk3ZjM1DnVrCpkNezfUz5dHHEW4TjD5cQeDdj7ziPnwfn4xGQG81IS7
- huyJNGcE1gsNmnaq7esE5PG2aJjS+5asuQ/bpLjtXI5k1hUMxDz9F6+L+tFY0wzwgzLE
- hehiqQ0cfNMsk3MnolcF6rxtWasBT8JHK9F8atfnwVP1RngelDGVKlb6K9twM746vvzt
- c7mOt1bDMYcYzmFbryWksGUKpCTxaTQes30vlwsTn5c70/U2+H4FQQsnwK/TyllNzTpV
- 77R0VaOnQgodF0fp2cfqk/I/q7P0stPSvBZNycqrKBOoG8grSO7KeLMyogB6Iia74NOw
- +F4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=+uefHjHTl9whndTKp/BqtMTk7Hk7fys1q/6bzcfD87E=;
- b=dPrA1GobzGnur4v6/DAMc/I+hu3g4kjVzzlpYcfT5GWU3HDBnDlb4Jj+SKzGV/OeN2
- tv0Z+rIIckBKmuEhrtu2MpGsWkWJxdoMZ5eQ6FIkG15mJaD5a2ixuPoqxMyVjGWFFrCc
- euxSSekRTlXor/CzznIGamoRcgvvKzccy+qlM+2YLo26mHEWgQuMGeGbNFEIJkylVc70
- /He/OJ8pz3rTm9YZEBPVTqiThQJnenRAAFnuc3+JaEO9LQndvPy+7yR52YOwof3O4IWY
- NAOrfruta9Hf+fXi38+qIALDHRP6d14T5H5h4StwFJLOnZsGgsEjJJZfDv6Q2iB7Z/Vn
- 12qw==
-X-Gm-Message-State: AOAM533eS/cPL3Cxa0FcB9s29PmmbarHROGiFpDNm05/zgdSyxIsQu+y
- EpnLmNpQzbq1O/WTEpVUbHSSuzmoUSKZ4GZrFJlbqQ==
-X-Google-Smtp-Source: ABdhPJz9QxdfI+gnQb+juaffqCQfCmjux8dwUEdGoBE8QKJcoJdjsEBqJKubBxeauLe6VGIgPEZgCubDGRXR5kI8BkM=
-X-Received: by 2002:a4a:8784:: with SMTP id b4mr27394848ooi.69.1595405120102; 
- Wed, 22 Jul 2020 01:05:20 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jy9l2-00078u-AK
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:05:44 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35722
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jy9l0-00046g-KU
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:05:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595405141;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=xJr7dbQ0BK7NBf2M8w9q1tCcmF5IcT+kJIYj1DSPdGw=;
+ b=A7DPxv2d9/qLXWKuUpJd7GOz8qOOgWHqERJzrEeIu70jdfYZnsu5p1NEJN5LlxeSbgHk/X
+ +dwba1sOgpwyYjBEYYigPBY10rFsHJsKBqwQVdPuUs36Qfy8Ket6kR13DMFuscdOnghF3H
+ 5vyt6Fwz0d1mDAo7frsA/zxv4KXsIm4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-180-Ktvt6u2tPzuv73vhwyJm7w-1; Wed, 22 Jul 2020 04:05:20 -0400
+X-MC-Unique: Ktvt6u2tPzuv73vhwyJm7w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24E4419200D7;
+ Wed, 22 Jul 2020 08:05:19 +0000 (UTC)
+Received: from localhost (ovpn-113-86.ams2.redhat.com [10.36.113.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 22A648FA44;
+ Wed, 22 Jul 2020 08:05:17 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH for-5.2 v3 0/3] migration: Add block-bitmap-mapping parameter
+Date: Wed, 22 Jul 2020 10:05:13 +0200
+Message-Id: <20200722080516.126147-1-mreitz@redhat.com>
 MIME-Version: 1.0
-References: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
- <20200721211626.3kepsmdi2n6tkigw@sirius.home.kraxel.org>
-In-Reply-To: <20200721211626.3kepsmdi2n6tkigw@sirius.home.kraxel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 22 Jul 2020 09:05:09 +0100
-Message-ID: <CAFEAcA_WVaAesKiwf8cuGOgG5=RXjjB7obKLfrQVXbAxXRnDMw@mail.gmail.com>
-Subject: Re: please try to avoid sending pullreqs late on release-candidate day
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c33;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc33.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 21:28:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,26 +89,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Peter Krempa <pkrempa@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jul 2020 at 22:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> Speaking of testing:  What is the state of gitlab ci?  How much of the
-> testing has been migrated over?  I've noticed I can push branches and
-> tags to a qemu fork @ gitlab.com and gitlab ci runs a bunch of tests.
+RFC v1: https://lists.nongnu.org/archive/html/qemu-block/2020-05/msg00912.html
+RFC v2: https://lists.nongnu.org/archive/html/qemu-block/2020-05/msg00915.html
+v1: https://lists.nongnu.org/archive/html/qemu-devel/2020-06/msg09792.html
+v2: https://lists.nongnu.org/archive/html/qemu-block/2020-07/msg01179.html
 
-I still need to look at Cleber's most recent patchset which
-has the scripting for this.
+Branch: https://github.com/XanClic/qemu.git migration-bitmap-mapping-v3
+Branch: https://git.xanclic.moe/XanClic/qemu.git migration-bitmap-mapping-v3
 
-> What is the best way to indicate that the tag did pass gitlab ci
-> already?
+Hi,
 
-There's no need to indicate anything, it wouldn't alter my testing
-process.
+This new migration parameter allows mapping block node names and bitmap
+names to aliases for the purpose of block dirty bitmap migration.
 
-thanks
--- PMM
+This way, management tools can use different node names on the source
+and destination and pass the mapping of how bitmaps are to be
+transferred to qemu (on the source, the destination, or even both with
+arbitrary aliases in the migration stream).
+
+
+v3:
+- Patch 1:
+  - Add notes on the fact that the destination won’t ever know about any
+    bitmaps that aren’t sent, so you can freely drop what you want, and
+    you’re completely free in renaming bitmaps and putting them on
+    “other” nodes (whatever “other” node means in the context of
+    migration, because that’s kind of one of the problems this series is
+    trying to solve: The fact that you can’t trivially match nodes
+    between source and destination)
+  - Fix an assertion
+
+- Patch 2: s/pass/time.sleep(0.2)/
+
+- Patch 3:
+  - Add copyright line
+  - Use format string instead of %
+  - s/pass/time.sleep(0.1)/
+  - s/wait_for_runstate/wait_migration/ on the destination to wait for
+    the migration to actually complete
+  - Replace the “info migrate_parameters” parsing code by a multiline
+    regex
+  - Test what happens when the destination has a mapping that isn’t used
+    because there are not bitmaps to be transferred (which breaks the
+    assertion in patch 1 as it was in v2)
+  - Let verify_dest_has_all_bitmaps() actually verify the bitmaps on the
+    destination instead of the source
+
+
+git-backport-diff against v2:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/3:[0014] [FC] 'migration: Add block-bitmap-mapping parameter'
+002/3:[0003] [FC] 'iotests.py: Add wait_for_runstate()'
+003/3:[0046] [FC] 'iotests: Test node/bitmap aliases during migration'
+
+
+Max Reitz (3):
+  migration: Add block-bitmap-mapping parameter
+  iotests.py: Add wait_for_runstate()
+  iotests: Test node/bitmap aliases during migration
+
+ qapi/migration.json            | 104 ++++++-
+ migration/migration.h          |   3 +
+ migration/block-dirty-bitmap.c | 373 ++++++++++++++++++++----
+ migration/migration.c          |  30 ++
+ monitor/hmp-cmds.c             |  30 ++
+ tests/qemu-iotests/300         | 515 +++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/300.out     |   5 +
+ tests/qemu-iotests/group       |   1 +
+ tests/qemu-iotests/iotests.py  |   5 +
+ 9 files changed, 1011 insertions(+), 55 deletions(-)
+ create mode 100755 tests/qemu-iotests/300
+ create mode 100644 tests/qemu-iotests/300.out
+
+-- 
+2.26.2
+
 
