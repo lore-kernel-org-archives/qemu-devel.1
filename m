@@ -2,82 +2,85 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E0CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:36:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E43C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:42:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4BB820792
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:36:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4BB820792
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5C2C0208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:42:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h0ZwU2HT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C2C0208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy6Us-0001cx-Tf
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 00:36:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51556)
+	id 1jy6a8-0004SW-In
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 00:42:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jy6Tb-0000nL-LO
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:35:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50188)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jy6TZ-0001Tn-OZ
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:35:31 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jy6TX-0007Sz-TK
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 04:35:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D9AA32E8055
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 04:35:27 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jy6Ya-0002pu-Cn
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:40:40 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20643
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jy6YW-0002lR-J0
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:40:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595392835;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=gie2xVhUM0ObBNJITOJvdmDagLoNjdICuvMGp+nPAR0=;
+ b=h0ZwU2HToMHH3yoazOi7gFHIhx8i8j3y23osZ5LaoM8RrE3m31oNKxsGEjT2houKtbX2fY
+ Mi65/X3DUNvisEeN55D26j1nsKYsHduoGgX4L40Te5PQuFauhVst3utsPZsdBkEKjDvRlj
+ S6KQuGTWt3xy4lMpsP6pqAWjskj05rU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-489-BpFW5PwQPkuFM1ddC3OnIA-1; Wed, 22 Jul 2020 00:40:32 -0400
+X-MC-Unique: BpFW5PwQPkuFM1ddC3OnIA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8711658;
+ Wed, 22 Jul 2020 04:40:31 +0000 (UTC)
+Received: from thuth.com (ovpn-112-92.ams2.redhat.com [10.36.112.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 139C87268C;
+ Wed, 22 Jul 2020 04:40:29 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Michael Roth <mdroth@linux.vnet.ibm.com>
+Subject: [PATCH v2 0/4] Allow guest-get-fsinfo also for non-PCI devices
+Date: Wed, 22 Jul 2020 06:40:24 +0200
+Message-Id: <20200722044028.4059-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Jul 2020 04:28:21 -0000
-From: Thomas Huth <1888431@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Won't Fix; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: build-failed macosx-10.11.6 v5.1.0-rc1
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ebolainfluenza th-huth
-X-Launchpad-Bug-Reporter: Robert Ball (ebolainfluenza)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <159536546453.8597.9185320640612954142.malonedeb@wampee.canonical.com>
-Message-Id: <159539210177.9184.10767947433920609465.malone@gac.canonical.com>
-Subject: [Bug 1888431] Re: v5.1.0-rc1 build fails on Mac OS X 10.11.6 
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 64c7588291b7520a7913c1f26567cb0e00873a67
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:35:28
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:34:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,92 +89,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1888431 <1888431@bugs.launchpad.net>
+Cc: qemu-s390x@nongnu.org,
+ =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm sorry, but the QEMU project only supports the two most recent
-versions of macOS (see https://www.qemu.org/docs/master/system/build-
-platforms.html#macos ), i.e. everything that is older than macOS 10.14
-is not supported anymore.
+The information that can be retrieved via UDEV is also usable for non-PCI
+devices. So let's allow build_guest_fsinfo_for_real_device() on non-PCI
+devices, too. This is required to fix the bug that CCW devices show up
+without "Target" when running libvirt's "virsh domfsinfo" command (see
+https://bugzilla.redhat.com/show_bug.cgi?id=1755075 for details).
 
-** Changed in: qemu
-       Status: New =3D> Won't Fix
+v2:
+ - Use g_new0 instead of g_malloc0 (as suggested by Daniel)
+ - Init fields to -1 explicitely, not via memset (Daniel)
+ - Add the fourth patch to also fill in virtio information on s390x
 
--- =
+Thomas Huth (4):
+  qga/qapi-schema: Document -1 for invalid PCI address fields
+  qga/commands-posix: Rework build_guest_fsinfo_for_real_device()
+    function
+  qga/commands-posix: Move the udev code from the pci to the generic
+    function
+  qga/commands-posix: Support fsinfo for non-PCI virtio devices, too
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1888431
+ qga/commands-posix.c | 157 ++++++++++++++++++++++++++++++-------------
+ qga/qapi-schema.json |   2 +-
+ 2 files changed, 110 insertions(+), 49 deletions(-)
 
-Title:
-  v5.1.0-rc1 build fails on Mac OS X 10.11.6
+-- 
+2.18.1
 
-Status in QEMU:
-  Won't Fix
-
-Bug description:
-  Hi all,
-
-  build of tag v5.1.0-rc1 fails on Mac OS X 10.11.6 (El Capitan) with
-  the following error:
-
-  git clone https://git.qemu.org/git/qemu.git
-      <output elided, but all OK>
-  cd qemu
-  git submodule init
-      <output elided, but all OK>
-  git submodule update --recursive
-      <output elided, but all OK>
-  ./configure
-      <output elided, but all OK>
-  make
-      <output elided, but all OK up until fail>
-
-    CC      trace/control.o
-  In file included from trace/control.c:29:
-  In file included from /Users/rtb/src/qemu/include/monitor/monitor.h:4:
-  In file included from /Users/rtb/src/qemu/include/block/block.h:4:
-  In file included from /Users/rtb/src/qemu/include/block/aio.h:23:
-  /Users/rtb/src/qemu/include/qemu/timer.h:843:9: warning: implicit declara=
-tion of function 'clock_gettime' is invalid in C99
-        [-Wimplicit-function-declaration]
-          clock_gettime(CLOCK_MONOTONIC, &ts);
-          ^
-  /Users/rtb/src/qemu/include/qemu/timer.h:843:23: error: use of undeclared=
- identifier 'CLOCK_MONOTONIC'
-          clock_gettime(CLOCK_MONOTONIC, &ts);
-                        ^
-  1 warning and 1 error generated.
-  make: *** [trace/control.o] Error 1
-
-  =
-
-  rtb:qemu rtb$ git log -n1
-  commit c8004fe6bbfc0d9c2e7b942c418a85efb3ac4b00 (HEAD -> master, tag: v5.=
-1.0-rc1, origin/master, origin/HEAD)
-  Author: Peter Maydell <peter.maydell@linaro.org>
-  Date:   Tue Jul 21 20:28:59 2020 +0100
-
-      Update version for v5.1.0-rc1 release
-      =
-
-      Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-  rtb:qemu rtb$ =
-
-
-  =
-
-  Please find the full output of all the commands (from git clone of the re=
-po, to the make) in the attached file "buildfail.txt".
-
-  Thank you!
-
-  Best regards,
-
-  Robert Ball
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1888431/+subscriptions
 
