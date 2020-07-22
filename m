@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F459C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:47:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A858C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:48:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65DDB2068F
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:47:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4DC52068F
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:48:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="i9/CwI4d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65DDB2068F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="TbbuQQtX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4DC52068F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyBLo-0008BW-Li
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:47:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54540)
+	id 1jyBMK-0000eM-33
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:48:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jyAvp-0004BQ-Qb
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:20:57 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45828)
+ id 1jyAxl-00006j-PM
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:22:57 -0400
+Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:34520)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jyAvm-0005uS-SC
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:20:57 -0400
-Received: by mail-pf1-x443.google.com with SMTP id z3so853352pfn.12
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:20:54 -0700 (PDT)
+ id 1jyAxj-0006HU-Mv
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:22:57 -0400
+Received: by mail-pg1-x531.google.com with SMTP id t6so888653pgq.1
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:22:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=1G8zWKyeVAzloRYKwSZXE73uroL9SBK5gG0F+v5JF8U=;
- b=i9/CwI4dnj+LmS2HEZ4hqYgKJIm2skkYUFYEMTHswNFapBfDCAHWhyl2UkVzOI2Kpb
- WqS62HFdt+hUH1DYlcd+HWT3Ka3HS4C5UF9wqemsZP0xD6+uKFfBfO4IpA34kdtw+2+A
- nnyzQUEUhMCK/QhiTOFrdTppmPxrEge1qPtdUtCUKNUxnKVLVyZ/8XKymleyZ8/RxHPM
- JcxX9oD/iImGE4rLjs+iFxpApXhqP7Z38cQMyb6c/f9vi0v9Vf3w11t6yQDVB/s7TyNO
- BrMuzS38p3p6knlYc62Nic8QjeIXxZAaec5kUACUIGWuWHMKrFBIAWGFpxKqSTlYw41e
- NQ/g==
+ bh=GIJ/UPBp2WO1BlyJ6/1RakPZrL4gW2QpybA3d/fh+SA=;
+ b=TbbuQQtXZYu2JpdFy8Tdk7LxbOGQyLrthVVvl0wL1MDdvLcXnf3uS2TKeJ0Q7bq+Zw
+ gsLKn/nZC0HA+012QiJ3HEhgYGrTPw1lUo2MM+25qpzxpKK3DOv00HRWA2w+1HMtcIgO
+ eSD9SIWanyGhOF6gKUAGYgcAiEMwCoBUot1MpNLI/fIUh/omnsd3Hay5NNXw5atdbMQC
+ Zp3hrOfevwPqU3dSmiGaeudf6LMN6hy9fm8f4hl8imlwWIDTp94mZ/xAztDhJD2rdH4s
+ 0U5S8GDvYxrQ+sCXNSgStr24wDKE+4XGjE2K3kAGgquuasVC05vh03Q+qnSBE/Bmo+PJ
+ wXPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=1G8zWKyeVAzloRYKwSZXE73uroL9SBK5gG0F+v5JF8U=;
- b=Dgk6YUhfCqHkWbqdBtjoITr02mEQAlHEtLe5QusVDjnUTjdX3R3sbFR7YyJAZvEiL/
- 326SsvTSx75sH+3aF8Yzhu4c5Ocj/KOgrApsZfB/YRuhgIaHZdq4FlmT/XdsSidy1/z3
- S1W/qwcc9ka5gNkuaM4gSuvtkJvFoCrAivN1kcZTOtW4PE26ggM0U5pbPRbuusumqSaa
- H9qDFU+LmZySzdtdyRInakpCjNVjgCavy7yl3Zgkj5q2l53PTF2uPocdPtpSCoPQd37k
- O017oD4CUpxxTxjTqCwP34RV2FlBUXWeAG+Laa2pbyUCDB9j9QRS0YtVjNNGBFTWPu66
- yBpg==
-X-Gm-Message-State: AOAM530Jv/tpVvNMMnQfS10HtgUl1s5CiQ2b7EXyfyyJqZyOBRQYm5Ro
- kYx3v4KgUA4GbwExcWGaCQcwy2nSYqs=
-X-Google-Smtp-Source: ABdhPJxrldAW5G52ywd68BYsVLHUQ6vg6pMeJ5XYaZWKoXDEIS1kcvydPT/a1FCMzRSDj1/5+5rv7A==
-X-Received: by 2002:aa7:92d7:: with SMTP id k23mr29329762pfa.189.1595409653330; 
- Wed, 22 Jul 2020 02:20:53 -0700 (PDT)
+ bh=GIJ/UPBp2WO1BlyJ6/1RakPZrL4gW2QpybA3d/fh+SA=;
+ b=XIMC2e03cQgt2AEpfjgM3w+oguWzcLYnrSY0ZSsabnhyAHUk5B/nu45PLaxDuqHhCy
+ AT0xqB/WW8oF/ei8kh1+BN8+LLfUP3CoEBelLYH8ym5gb7Zli3klA+ot/m5Vzwv1oaUY
+ ldwjO/Fy+LOHdEVmRpYdGT8j1ytPAPNenYbse+RSYDQeRx7XFg9Ua6Ku2ywqX+ch9GAV
+ uf/zz+DzplwsoHbUVwwGihq2S3dtWw7ikz8gfpoqoRt/aytvauGbWcw7WgJFKf9voAbO
+ YVnOVFwXlFkYkIR7td70kXgnWiCCVr23MVzTiex+Y1L4gIgHQvYTInr6YRBe0VzOCA4u
+ TGqQ==
+X-Gm-Message-State: AOAM530CPrvFHQyekI53+axmkFQWj/ftX/5yEgAqZ99DB5YuNQBZyQnA
+ Cl0wX5XquMw5eWxlIk3bjPhXRDSX/no=
+X-Google-Smtp-Source: ABdhPJyHbDRWFvF6iQV+zWgVF8l6wJO3Q5vFAKDFGHWF6yMpzrPehgMV82I6RSBAaCJ0Ht7gF/Nt/w==
+X-Received: by 2002:a65:43c1:: with SMTP id n1mr25240703pgp.67.1595409774369; 
+ Wed, 22 Jul 2020 02:22:54 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.20.51
+ by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.22.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jul 2020 02:20:53 -0700 (PDT)
+ Wed, 22 Jul 2020 02:22:54 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC v2 46/76] target/riscv: rvv-0.9: integer
- add-with-carry/subtract-with-borrow
-Date: Wed, 22 Jul 2020 17:16:09 +0800
-Message-Id: <20200722091641.8834-47-frank.chang@sifive.com>
+Subject: [RFC v2 76/76] target/riscv: gdb: support vector registers for rv32
+Date: Wed, 22 Jul 2020 17:16:39 +0800
+Message-Id: <20200722091641.8834-77-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200722091641.8834-1-frank.chang@sifive.com>
 References: <20200722091641.8834-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=frank.chang@sifive.com; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::531;
+ envelope-from=frank.chang@sifive.com; helo=mail-pg1-x531.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,147 +98,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Frank Chang <frank.chang@sifive.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+Cc: Frank Chang <frank.chang@sifive.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
+ Greentime Hu <greentime.hu@sifive.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+From: Greentime Hu <greentime.hu@sifive.com>
 
-Clear tail elements only if VTA is agnostic.
+This patch adds vector support for rv32 gdb. It allows gdb client to access
+vector registers correctly.
 
+Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- target/riscv/insn32.decode              | 20 +++++-----
- target/riscv/insn_trans/trans_rvv.inc.c |  2 +-
- target/riscv/vector_helper.c            | 50 ++++++++++++++-----------
- 3 files changed, 40 insertions(+), 32 deletions(-)
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 0521ca4ab4..481f909d47 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -324,16 +324,16 @@ vwsubu_wv       110110 . ..... ..... 010 ..... 1010111 @r_vm
- vwsubu_wx       110110 . ..... ..... 110 ..... 1010111 @r_vm
- vwsub_wv        110111 . ..... ..... 010 ..... 1010111 @r_vm
- vwsub_wx        110111 . ..... ..... 110 ..... 1010111 @r_vm
--vadc_vvm        010000 1 ..... ..... 000 ..... 1010111 @r_vm_1
--vadc_vxm        010000 1 ..... ..... 100 ..... 1010111 @r_vm_1
--vadc_vim        010000 1 ..... ..... 011 ..... 1010111 @r_vm_1
--vmadc_vvm       010001 1 ..... ..... 000 ..... 1010111 @r_vm_1
--vmadc_vxm       010001 1 ..... ..... 100 ..... 1010111 @r_vm_1
--vmadc_vim       010001 1 ..... ..... 011 ..... 1010111 @r_vm_1
--vsbc_vvm        010010 1 ..... ..... 000 ..... 1010111 @r_vm_1
--vsbc_vxm        010010 1 ..... ..... 100 ..... 1010111 @r_vm_1
--vmsbc_vvm       010011 1 ..... ..... 000 ..... 1010111 @r_vm_1
--vmsbc_vxm       010011 1 ..... ..... 100 ..... 1010111 @r_vm_1
-+vadc_vvm        010000 0 ..... ..... 000 ..... 1010111 @r_vm_1
-+vadc_vxm        010000 0 ..... ..... 100 ..... 1010111 @r_vm_1
-+vadc_vim        010000 0 ..... ..... 011 ..... 1010111 @r_vm_1
-+vmadc_vvm       010001 . ..... ..... 000 ..... 1010111 @r_vm
-+vmadc_vxm       010001 . ..... ..... 100 ..... 1010111 @r_vm
-+vmadc_vim       010001 . ..... ..... 011 ..... 1010111 @r_vm
-+vsbc_vvm        010010 0 ..... ..... 000 ..... 1010111 @r_vm_1
-+vsbc_vxm        010010 0 ..... ..... 100 ..... 1010111 @r_vm_1
-+vmsbc_vvm       010011 . ..... ..... 000 ..... 1010111 @r_vm
-+vmsbc_vxm       010011 . ..... ..... 100 ..... 1010111 @r_vm
- vand_vv         001001 . ..... ..... 000 ..... 1010111 @r_vm
- vand_vx         001001 . ..... ..... 100 ..... 1010111 @r_vm
- vand_vi         001001 . ..... ..... 011 ..... 1010111 @r_vm
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 3998011ef7..45853812f7 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1806,7 +1806,7 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
- 
- /*
-  * For vadc and vsbc, an illegal instruction exception is raised if the
-- * destination vector register is v0 and LMUL > 1. (Section 12.3)
-+ * destination vector register is v0 and LMUL > 1. (Section 12.4)
-  */
- static bool opivv_vadc_check(DisasContext *s, arg_rmrr *a)
- {
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index aa940080a7..95248238df 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -1316,24 +1316,28 @@ GEN_VEXT_VADC_VXM(vsbc_vxm_d, uint64_t, H8, DO_VSBC, clearq)
-                           (__typeof(N))(N + M) < N)
- #define DO_MSBC(N, M, C) (C ? N <= M : N < M)
- 
--#define GEN_VEXT_VMADC_VVM(NAME, ETYPE, H, DO_OP)             \
--void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
--                  CPURISCVState *env, uint32_t desc)          \
--{                                                             \
--    uint32_t vl = env->vl;                                    \
--    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
--    uint32_t i;                                               \
--                                                              \
--    for (i = 0; i < vl; i++) {                                \
--        ETYPE s1 = *((ETYPE *)vs1 + H(i));                    \
--        ETYPE s2 = *((ETYPE *)vs2 + H(i));                    \
--        uint8_t carry = vext_elem_mask(v0, i);                \
--                                                              \
--        vext_set_elem_mask(vd, i, DO_OP(s2, s1, carry));      \
--    }                                                         \
--    for (; i < vlmax; i++) {                                  \
--        vext_set_elem_mask(vd, i, 0);                         \
--    }                                                         \
-+#define GEN_VEXT_VMADC_VVM(NAME, ETYPE, H, DO_OP)               \
-+void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,     \
-+                  CPURISCVState *env, uint32_t desc)            \
-+{                                                               \
-+    uint32_t vl = env->vl;                                      \
-+    uint32_t vlmax = vext_max_elems(desc, sizeof(ETYPE), false);\
-+    uint32_t vm = vext_vm(desc);                                \
-+    uint32_t vta = vext_vta(desc);                              \
-+    uint32_t i;                                                 \
-+                                                                \
-+    for (i = 0; i < vl; i++) {                                  \
-+        ETYPE s1 = *((ETYPE *)vs1 + H(i));                      \
-+        ETYPE s2 = *((ETYPE *)vs2 + H(i));                      \
-+        uint8_t carry = !vm ? vext_elem_mask(v0, i) : 0;        \
-+                                                                \
-+        vext_set_elem_mask(vd, i, DO_OP(s2, s1, carry));        \
-+    }                                                           \
-+    if (vta == 1) {                                             \
-+        for (; i < vlmax; i++) {                                \
-+            vext_set_elem_mask(vd, i, 1);                       \
-+        }                                                       \
-+    }                                                           \
- }
- 
- GEN_VEXT_VMADC_VVM(vmadc_vvm_b, uint8_t,  H1, DO_MADC)
-@@ -1352,17 +1356,21 @@ void HELPER(NAME)(void *vd, void *v0, target_ulong s1,          \
- {                                                               \
-     uint32_t vl = env->vl;                                      \
-     uint32_t vlmax = vext_max_elems(desc, sizeof(ETYPE), false);\
-+    uint32_t vm = vext_vm(desc);                                \
-+    uint32_t vta = vext_vta(desc);                              \
-     uint32_t i;                                                 \
-                                                                 \
-     for (i = 0; i < vl; i++) {                                  \
-         ETYPE s2 = *((ETYPE *)vs2 + H(i));                      \
--        uint8_t carry = vext_elem_mask(v0, i);                  \
-+        uint8_t carry = !vm ? vext_elem_mask(v0, i) : 0;         \
-                                                                 \
-         vext_set_elem_mask(vd, i,                               \
-                 DO_OP(s2, (ETYPE)(target_long)s1, carry));      \
-     }                                                           \
--    for (; i < vlmax; i++) {                                    \
--        vext_set_elem_mask(vd, i, 0);                           \
-+    if (vta == 1) {                                             \
-+        for (; i < vlmax; i++) {                                \
-+            vext_set_elem_mask(vd, i, 1);                       \
-+        }                                                       \
-     }                                                           \
- }
- 
+diff --git a/configure b/configure
+index 8d69013a97..dbe3c4e4c5 100755
+--- a/configure
++++ b/configure
+@@ -8222,7 +8222,7 @@ case "$target_name" in
+     TARGET_BASE_ARCH=riscv
+     TARGET_ABI_DIR=riscv
+     mttcg=yes
+-    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-32bit-csr.xml riscv-32bit-virtual.xml"
++    gdb_xml_files="riscv-32bit-cpu.xml riscv-32bit-fpu.xml riscv-64bit-fpu.xml riscv-64bit-vector-128b.xml riscv-64bit-vector-256b.xml riscv-64bit-vector-512b.xml riscv-32bit-csr.xml riscv-32bit-virtual.xml"
+   ;;
+   riscv64)
+     TARGET_BASE_ARCH=riscv
 -- 
 2.17.1
 
