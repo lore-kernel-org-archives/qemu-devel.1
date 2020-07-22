@@ -2,92 +2,85 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59973C433F8
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF32C433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 16:48:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2444D207DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 16:45:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4C82206C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 16:48:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I76M78TF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2444D207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CfsvfXy5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4C82206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyHru-0004LD-CI
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 12:45:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42958)
+	id 1jyHux-00067C-4N
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 12:48:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jyHr9-0003VS-RX
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:44:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53898
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jyHr6-0000dt-RB
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:44:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595436271;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DNkbKCo7ER/3+EBd9aXnFB6r+pgSvYJhVH4bCdmcnMA=;
- b=I76M78TFquOVGvI/kRMbpDEwYkvI3C48fJoN5UsgKkgPNGlrDAvrgThHnmPHkMRtEfTcfj
- fdxkBj7iEwT2CT+auTs1ULeYwpaAokazogzrMHvLSfwfYR+5EwQrMgM6NLfcGbb7ZVxGSx
- EMT+9N1Xe7LRnSHt19E5ORISdYzJrH4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-0yM4LlSfPtSxpf3RBS3Wvg-1; Wed, 22 Jul 2020 12:44:17 -0400
-X-MC-Unique: 0yM4LlSfPtSxpf3RBS3Wvg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95F6419253C3;
- Wed, 22 Jul 2020 16:44:14 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A9FA60C05;
- Wed, 22 Jul 2020 16:44:10 +0000 (UTC)
-Date: Wed, 22 Jul 2020 17:44:07 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 06/12] accel/tcg: better handle memory constrained
- systems
-Message-ID: <20200722163722.GS2324845@redhat.com>
-References: <20200722062902.24509-1-alex.bennee@linaro.org>
- <20200722062902.24509-7-alex.bennee@linaro.org>
- <5d26e26f-55f7-5b74-bb9e-b97ea1040c05@linaro.org>
- <87ft9jtsw5.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jyHuI-0005fS-GQ; Wed, 22 Jul 2020 12:47:50 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:39299)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1jyHuG-00014h-W5; Wed, 22 Jul 2020 12:47:50 -0400
+Received: by mail-il1-x144.google.com with SMTP id k6so1885741ili.6;
+ Wed, 22 Jul 2020 09:47:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GuQ4sDegdpnxWj225poLyKadOWZodmsmX0QI/j9lJBQ=;
+ b=CfsvfXy5hiQH/hJdn0/sV50ilsNh1yOT1L/1aaoyPZ3Ix5M3PVQvFsMSnCP3AD8JDS
+ rRD828qXbbaW1h5N5xQtCleRHUCefvtxvOb4zxq8kY3tZUR5Z8WLORDZrnVGSW5VvYnj
+ uv6H5xD04Q+c8mCXpXhSwDkp7SFvKSQzGrAW+mRjo/d+2SBgIgi1EjrP4LO9zJB5SqGp
+ mr0ksIl+/rgasFdTcq85aX7Ym+X7rUoUJlpFloKL2//DvUS7ZFYQuDGIkJiQGM+XIyqg
+ QBK0bdhmwUp/fWe+o3UTevangIQtyBE1wMCpWfiybyYHPXikvup2vJFRCum749HbgkyD
+ 72ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GuQ4sDegdpnxWj225poLyKadOWZodmsmX0QI/j9lJBQ=;
+ b=EkfTx2jyPVVOmJCYiIChFBc9wDwaHlP0qvIagbOssHFJ/GfPkQc5i2PQfFf/r//C47
+ BiVG6qRP5XMMl2hum565A4mfv9PKJrc3LSF4Ar6Qt7Xm+/62xlAVcy5fOgKZHFiSpAqt
+ xzZz8J74J7ZxcAwOPlnH04FmkgWV5rkNqwvTNXCQB1BBbbD+NqTPUVQHC7eVtdrWx0NP
+ PP5ivPPg4eHR/gVnNe6aNUfB1G6Zm6wh8/tc76eAmSIWJOI/qBdD7dmRJvhCNkZ0VCSp
+ hv7dveoVvWG+xJvnq6/u7pmU3NWPxmXVOWYNk/ch5nT0EFXH0/eIUTHhmPgjsPkcDPmf
+ UYQA==
+X-Gm-Message-State: AOAM5304/XhU7faYYtp6+ZOpseUv4cuviM3Cz3P3PUz15MIy2nwWQoIu
+ NybtEc2+zgt1YL+mBXLSSnlRu/9rsLw5XbHiu4g=
+X-Google-Smtp-Source: ABdhPJzbQcQlwhKmjZtjLdYbsTgkt7+Z/HRL5xGG5Gy8aMIe8rNeVzLhmBMH6ySfT1Y5Ibyck/m0P/uW2aTrRVXnDAQ=
+X-Received: by 2002:a92:c213:: with SMTP id j19mr830112ilo.40.1595436466924;
+ Wed, 22 Jul 2020 09:47:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87ft9jtsw5.fsf@linaro.org>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:27:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <20200722091641.8834-1-frank.chang@sifive.com>
+ <20200722091641.8834-2-frank.chang@sifive.com>
+In-Reply-To: <20200722091641.8834-2-frank.chang@sifive.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 22 Jul 2020 09:37:39 -0700
+Message-ID: <CAKmqyKP5CxKRnaL3bwrT5LrGZWS=xUjxnuTRXujgZ2ywKV_D2A@mail.gmail.com>
+Subject: Re: [RFC v2 01/76] target/riscv: drop vector 0.7.1 support
+To: Frank Chang <frank.chang@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,76 +93,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: fam@euphon.net, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- f4bug@amsat.org, cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>,
- aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 22, 2020 at 05:29:46PM +0100, Alex Bennée wrote:
-> 
-> Richard Henderson <richard.henderson@linaro.org> writes:
-> 
-> > On 7/21/20 11:28 PM, Alex Bennée wrote:
-> >> +        size_t phys_mem = qemu_get_host_physmem();
-> >> +        if (phys_mem > 0 && phys_mem < (2 * DEFAULT_CODE_GEN_BUFFER_SIZE)) {
-> >> +            tb_size = phys_mem / 8;
-> >> +        } else {
-> >> +            tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
-> >> +        }
-> >
-> > I don't understand the 2 * DEFAULT part.
-> 
-> I figured once you had at least twice as much memory you could use the
-> full amount but...
-> 
-> 
-> > Does this make more sense as
-> >
-> >     if (phys_mem == 0) {
-> >         tb_size = default;
-> >     } else {
-> >         tb_size = MIN(default, phys_mem / 8);
-> >     }
-> 
-> This is probably a less aggressive tapering off which still doesn't
-> affect my 32gb dev machine ;-)
+On Wed, Jul 22, 2020 at 2:18 AM <frank.chang@sifive.com> wrote:
+>
+> From: Frank Chang <frank.chang@sifive.com>
+>
+> Signed-off-by: Frank Chang <frank.chang@sifive.com>
 
-I still feel like this logic of looking at physmem is doomed, because
-it makes the assumption that all of physical RAM is theoretically
-available to the user, and this isn't the case if running inside a
-container or cgroup with a memory cap set.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-I don't really have any good answer here, but assuming we can use
-1 GB for a cache just doesn't seem like a good idea, especially if
-users are running multiple VMs in parallel.
+Alistair
 
-OpenStack uses TCG in alot of their CI infrastructure for example
-and runs multiple VMs. If there's 4 VMs, that's another 4 GB of
-RAM usage just silently added on top of the explicit -m value.
-
-I wouldn't be surprised if this pushes CI into OOM, even without
-containers or cgroups being involved, as they have plenty of other
-services consuming RAM in the CI VMs.
-
-The commit 600e17b261555c56a048781b8dd5ba3985650013 talks about this
-minimizing codegen cache flushes, but doesn't mention the real world
-performance impact of eliminating those flushes ?
-
-Presumably this makes the guest OS boot faster, but what's the before
-and after time ?  And what's the time like for values in between the
-original 32mb and the new 1 GB ?  Can we get some value that is
-*significantly* smaller than 1 GB but still gives some useful benefit ?
-what would 128 MB be like compared to the original 32mb ?
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+> ---
+>  target/riscv/cpu.c | 24 ++++++------------------
+>  target/riscv/cpu.h |  2 --
+>  2 files changed, 6 insertions(+), 20 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index 228b9bdb5d..2800953e6c 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -106,11 +106,6 @@ static void set_priv_version(CPURISCVState *env, int priv_ver)
+>      env->priv_ver = priv_ver;
+>  }
+>
+> -static void set_vext_version(CPURISCVState *env, int vext_ver)
+> -{
+> -    env->vext_ver = vext_ver;
+> -}
+> -
+>  static void set_feature(CPURISCVState *env, int feature)
+>  {
+>      env->features |= (1ULL << feature);
+> @@ -339,7 +334,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>      CPURISCVState *env = &cpu->env;
+>      RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
+>      int priv_version = PRIV_VERSION_1_11_0;
+> -    int vext_version = VEXT_VERSION_0_07_1;
+>      target_ulong target_misa = 0;
+>      Error *local_err = NULL;
+>
+> @@ -363,7 +357,6 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>      }
+>
+>      set_priv_version(env, priv_version);
+> -    set_vext_version(env, vext_version);
+>
+>      if (cpu->cfg.mmu) {
+>          set_feature(env, RISCV_FEATURE_MMU);
+> @@ -455,19 +448,14 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>                  return;
+>              }
+>              if (cpu->cfg.vext_spec) {
+> -                if (!g_strcmp0(cpu->cfg.vext_spec, "v0.7.1")) {
+> -                    vext_version = VEXT_VERSION_0_07_1;
+> -                } else {
+> -                    error_setg(errp,
+> -                           "Unsupported vector spec version '%s'",
+> -                           cpu->cfg.vext_spec);
+> -                    return;
+> -                }
+> +                error_setg(errp,
+> +                       "Unsupported vector spec version '%s'",
+> +                       cpu->cfg.vext_spec);
+> +                return;
+>              } else {
+> -                qemu_log("vector verison is not specified, "
+> -                        "use the default value v0.7.1\n");
+> +                qemu_log("vector version is not specified\n");
+> +                return;
+>              }
+> -            set_vext_version(env, vext_version);
+>          }
+>
+>          set_misa(env, RVXLEN | target_misa);
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index eef20ca6e5..6766dcd914 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -79,8 +79,6 @@ enum {
+>  #define PRIV_VERSION_1_10_0 0x00011000
+>  #define PRIV_VERSION_1_11_0 0x00011100
+>
+> -#define VEXT_VERSION_0_07_1 0x00000701
+> -
+>  #define TRANSLATE_PMP_FAIL 2
+>  #define TRANSLATE_FAIL 1
+>  #define TRANSLATE_SUCCESS 0
+> --
+> 2.17.1
+>
+>
 
