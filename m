@@ -2,87 +2,122 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92556C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 11:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A513FC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 11:27:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BCE5206E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 11:25:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A0AC20787
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 11:27:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WsKOvgg9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BCE5206E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="V5p//Q0s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A0AC20787
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyCsl-0003nk-Lk
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 07:25:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32880)
+	id 1jyCu5-0005IA-Nh
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 07:27:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jyCrt-0002ph-Sz
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 07:25:01 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38835)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jyCrs-00084g-7H
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 07:25:01 -0400
-Received: by mail-ot1-x344.google.com with SMTP id t18so1481678otq.5
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 04:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=t5KWV1R0LMaaX7K5sOGVepuyHhOZNziyCoYd/ECVp5Q=;
- b=WsKOvgg99Usfvs/e/HtQUtG1eJ1VbHZcmJDSw1ddlsBMthxxB89DelF7KxTpUvuLRb
- i1Pw7+4XNsSfbF2ZLeT/9HjipJEscUUde/mKqnGy8i+bnBkuMAhDNnakZdSLhSH/7pln
- k93InNsvExVliU37BjLxhg8p67hBIFgvWR4BNav9LkBgMBpB8NjOslO+uaSF3tbK6c+r
- 2F9p1eATzPmCLv2yvM8GUm4RXEupeTipFbpLTDNtJlIMlYCyGUL2xl6TcypmBcMl5mL0
- dv6la2PtPzv5G9uHKb5GUgnyvSzqOrRcN8uiwJ6+U4/5drLjq9Jo3I+7mJGWOCHsB+tv
- nI3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=t5KWV1R0LMaaX7K5sOGVepuyHhOZNziyCoYd/ECVp5Q=;
- b=V90utcvNIUyRtRNzIXs4fs/Va0GtW98+zWmcH+5pRbdfroy2qMpUcGdyTPFJmUpHWb
- 8Ic9uQO7O2gHHkLVMXNou/KoVsIFHC5F1VgdiG4E0/JVEut9TMpW0TV4J6eO7ne9cIbn
- jAeGR/6iiONmtQeCIn6qGdSrLaylcrlZB0rnfw41yNNaEfDH7hQCzdxy66LZMW095nYZ
- 4pyIo/lm0Rt3RpKctFGi9sj4ATX1DB4Fi2kYo929hLDpa5rPxhfMOPPMtd8j9paIC7Ve
- I0wtDcpqnmhFa8llc8yJrFHoUuRAZTbVKkctktcWD78DaL655Gi2SNUCCC7CETEC6Ud+
- KphA==
-X-Gm-Message-State: AOAM533DiSUJ4Q6MSS9ULkEl6fVd1nJsxDEWLz63SPvRm+NPt+vmdh3S
- u5i1fmIYD9cKiw14Xgzqc2zND26p5uau+g4GQzU=
-X-Google-Smtp-Source: ABdhPJydGCbrvE/jdzk4ebLO6gARMqb7IyvPfg2JywqUDP1xLL0TScYeGTbtMmTSTvpOWtuchtf9weDE7AYY3fT0KIs=
-X-Received: by 2002:a05:6830:15c3:: with SMTP id
- j3mr25972626otr.353.1595417099027; 
- Wed, 22 Jul 2020 04:24:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jyCse-0003tz-Ne
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 07:25:48 -0400
+Received: from mail-vi1eur05on2137.outbound.protection.outlook.com
+ ([40.107.21.137]:20408 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1jyCsc-0008MN-SP
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 07:25:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZYqYGvjNZ13mo3ImHadn1YaKl0BazEPGerOXFOWY8vn7lQ+Yvkv9kJsXa3oFGJnSnWCh3hDQxopWqwdpMqofTqBbVzfp1qyLn8Fbrj/c5is47C6uTkcnYA9bEMnsPgXRQGkwS56J1DiZFdybWYY0hSmFD4SVP4/vK5tu4AbE31U0cZNfi+TapLfWynA/yFWfrMaM7N0H3l74BayJxVRuwSpvNGvrF+zGagnyoU5vXOks4rKQisrZiJjbcpadgklTvqCy88+qBo5oP+e7wU10Mg0nvDJgN93ku2t1S4BPEeAZcc8Nrz1xRYOMWO6nAh2qmZism0AJAwUEworDsOJo+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uLNeOPLef+yoEaQi+z23UxRR8rMJgY0rDAUgiXIs56o=;
+ b=OH6xHUDSzFrhHyCpPlLazOCYHUnNFUG8gORwqNPV8wpbh9CJiDbUizf+0Hurre7/I0ZGrvqFYlUzxoW2KvZTQDs/UjMXhpZ10u1DM1afR28icjRgMutHNAVDGIcSz663kNgHl7AXAoh4TtbXNE8dtn0yhdcA5IrWxrGJGHSDQo1SpOEpl/FtRGjpV7zrGbNEYo9Grz9eTJDOfEzKyJd93+TQVDBGaFNeMCqevk97vYeHJ7LzkqABDpLpbqeAYcEIaeIyNeRMWZeTOYNXiMZ2jclpttowmSiEKfP8XLqZxCCF46KJhYTWdUZ6vwjrodqmvrDiCWxDcJba8xjgPREl1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
+ dkim=pass header.d=syrmia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uLNeOPLef+yoEaQi+z23UxRR8rMJgY0rDAUgiXIs56o=;
+ b=V5p//Q0s7pvEDr/FcJtStmu4wqfQ/8kVpRbsNuKgSoJQsHRUabf4QZPjhnvJJ+wLKlpumfx0lJ4pJwd1/HNuiuXSMtRFvhZHd8Pgb7b1mk1zWHWxnHAXcuhE9BfkV99sGL8hCb801kE/8oXglZTWA/xsNbE/RcpO0QCLztzz80k=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
+ by AM6PR03MB4838.eurprd03.prod.outlook.com (2603:10a6:20b:81::31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.22; Wed, 22 Jul
+ 2020 11:10:39 +0000
+Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::98f0:b948:78a8:f618]) by AM6PR03MB5233.eurprd03.prod.outlook.com
+ ([fe80::98f0:b948:78a8:f618%7]) with mapi id 15.20.3216.022; Wed, 22 Jul 2020
+ 11:10:39 +0000
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] Adding support for a group of year 2038 safe syscalls
+Date: Wed, 22 Jul 2020 13:10:22 +0200
+Message-Id: <20200722111024.272553-1-Filip.Bozuta@syrmia.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: GV0P278CA0036.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:710:28::23) To AM6PR03MB5233.eurprd03.prod.outlook.com
+ (2603:10a6:20b:d1::19)
 MIME-Version: 1.0
-References: <20200722085747.6514-1-jasowang@redhat.com>
- <20200722085747.6514-2-jasowang@redhat.com>
-In-Reply-To: <20200722085747.6514-2-jasowang@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 22 Jul 2020 19:24:23 +0800
-Message-ID: <CAKXe6SJ2=RFAyun+X44qVPooBT85NC1doa1svT6H4NFQgq2H8A@mail.gmail.com>
-Subject: Re: [PATCH 2/2] e1000e: make TX reentrant
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (147.91.217.239) by
+ GV0P278CA0036.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:28::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3216.21 via Frontend Transport; Wed, 22 Jul 2020 11:10:38 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [147.91.217.239]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fd4b05ac-ded8-4084-9aa0-08d82e2fddd7
+X-MS-TrafficTypeDiagnostic: AM6PR03MB4838:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR03MB4838C2E4D2540B31F89AB83DEB790@AM6PR03MB4838.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SmGrUXFjYqYWyAuZFsZ4d3uT6upEtk2Ax6bVvvZxfxoks+ynPuOqJT1DPKoCb/gZq1UejR50lVACY7dSAgxGTRLGOmLsKuvD/Sk85jGsaRsZTvYzR1MoXl/LdwsBEQWl8aJqCMEw6BjV9hXXhl356ic0wKciPP8NUTyRsaP2ylJFaUyqpaduh0WHslGumo4ROkESN6qNwBxlpVYEcOovSxEXig9t/S241w7M3ZHM+zQ2+OXaPWD/zHStpuKo8tRhFlD5h0i7i86LT55aGHrbhPxal9kqNk+qKbYhEPPpo5Ev3k9vilmF6cQL2d3x4NSGLU6ptDELVappSMiEPIJPo7GY334I52rBKE5rWnE/y355+Dm/zNww0KSW4jx9oeoc
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(39830400003)(376002)(136003)(346002)(396003)(366004)(107886003)(956004)(2616005)(6512007)(66476007)(66556008)(66946007)(1076003)(186003)(26005)(69590400007)(16526019)(4744005)(52116002)(5660300002)(6666004)(54906003)(86362001)(508600001)(6506007)(83380400001)(316002)(6916009)(36756003)(6486002)(8676002)(4326008)(8936002)(2906002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: +sSzH3OvknMFuW8iTg6kWTJF61peFxA8GjLxkQ2JRkgUGaFySAOvxTU48URrNbtUP2Fiv7x51TgFwwVeNNMM6lwiO19df8lwAnXb4zBnMkGgt200jjYVljKzrde9dHCIZYazqW/rzccERMPckDFEoCp3eh+QYOhS2Kp7Zi9BZomXsNE8mGzJAPKES+OShiDgzqsTdsFv/2pZ+bU2Kid6ohQTmXviRRP5zk+te2n69RVwo916oSTC7mCTeteS2WZ6l3bHkS/i4obNMnNpr8QdVsamQmCP1sNw5NG0td5ca4tO+DPJ5U6YkAFlirFVcIVm4W1a0kXIsvQFQ5mPKBWG6C7B001wLI2oVS0w1xS/woByIG4oGpxprT5aVgJBGD9vzS2yzbR8zPQFMYTJAFn1cdM8j6jkREdlWktNPOtmE5sSeCCag2WCbyehwKtd7pKyixl/NWOxefn81pbE1GW4Gl4QU5llIn7Sw2kBHiR6nv4=
+X-OriginatorOrg: syrmia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd4b05ac-ded8-4084-9aa0-08d82e2fddd7
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5233.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2020 11:10:39.5788 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oTxgpAnJtB+ofItvRJl7x8YU2LNk8O2M7GGXV3CgMhRzixRA3G3iXRt7caMVfyStuTDF+LtP8VXj9WACY1IywA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR03MB4838
+Received-SPF: pass client-ip=40.107.21.137;
+ envelope-from=Filip.Bozuta@syrmia.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 07:25:45
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -4
+X-Spam_score: -0.5
+X-Spam_bar: /
+X-Spam_report: (-0.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ RCVD_IN_SBL_CSS=3.335, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,76 +130,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?5p2O5by6?= <liq3ea@163.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Jason Wang <jasowang@redhat.com> =E4=BA=8E2020=E5=B9=B47=E6=9C=8822=E6=97=
-=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=884:58=E5=86=99=E9=81=93=EF=BC=9A
->
-> In loopback mode, e1000e RX can DMA into TX doorbell which requires
-> TX to be reentrant. This patch make e1000e's TX routine reentrant by
-> introducing a per device boolean for recording whether or not a TX
-> rountine is being called and return early.
->
+This two patch series introduces functionality for a group
+of time64 syscalls.
+The list of implemented syscalls and implementation details
+can be found in the second patch of the series which introduces
+the implementation.
+The first patch introduces a little modification to already existing
+converting functions that convert values of 'struct itimerspec'
+between target and host and vice versa. This modification was also
+used in the second patch in similar converting functions which
+convert type 'struct itimerspec64' between target and host.
 
-Could we introduce a per-queue 'sending' variable just like the RX.
-So we can do this in net core layer.
+Testing method:
 
-Thanks,
-Li Qiang
+    The implementation of the implemented syscalls was tested
+    using already existing tests from LTP test suite which
+    was built inside chroot.
 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  hw/net/e1000e_core.c | 8 ++++++++
->  hw/net/e1000e_core.h | 1 +
->  2 files changed, 9 insertions(+)
->
-> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> index bcd186cac5..8126a644a5 100644
-> --- a/hw/net/e1000e_core.c
-> +++ b/hw/net/e1000e_core.c
-> @@ -923,6 +923,12 @@ e1000e_start_xmit(E1000ECore *core, const E1000E_TxR=
-ing *txr)
->          return;
->      }
->
-> +    if (core->sending) {
-> +        return;
-> +    }
-> +
-> +    core->sending =3D true;
-> +
->      while (!e1000e_ring_empty(core, txi)) {
->          base =3D e1000e_ring_head_descr(core, txi);
->
-> @@ -940,6 +946,8 @@ e1000e_start_xmit(E1000ECore *core, const E1000E_TxRi=
-ng *txr)
->      if (!ide || !e1000e_intrmgr_delay_tx_causes(core, &cause)) {
->          e1000e_set_interrupt_cause(core, cause);
->      }
-> +
-> +    core->sending =3D false;
->  }
->
->  static bool
-> diff --git a/hw/net/e1000e_core.h b/hw/net/e1000e_core.h
-> index aee32f7e48..4679c1761f 100644
-> --- a/hw/net/e1000e_core.h
-> +++ b/hw/net/e1000e_core.h
-> @@ -114,6 +114,7 @@ struct E1000Core {
->      void (*owner_start_recv)(PCIDevice *d);
->
->      uint32_t msi_causes_pending;
-> +    bool sending;
->  };
->
->  void
-> --
-> 2.20.1
->
+Filip Bozuta (2):
+  linux-user: Modify 'target_to_host/host_to_target_itimerspec()'
+  linux-user: Add support for a group of 2038 safe syscalls
+
+ linux-user/syscall.c | 166 ++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 141 insertions(+), 25 deletions(-)
+
+-- 
+2.25.1
+
 
