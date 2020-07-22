@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2A8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E86AC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:48:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24C2220787
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:47:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C2220787
+	by mail.kernel.org (Postfix) with ESMTPS id E39AC20787
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:48:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39AC20787
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyIqV-00048x-82
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:47:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56720)
+	id 1jyIrM-0005ET-8P
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:48:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jyIpY-0003I5-IO
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:47:00 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:60593)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jyIpz-0003ew-OU
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:47:27 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:40519)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jyIpW-0000Xp-UR
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:47:00 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1jyIpy-0000ZX-4H
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:47:27 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N7iGi-1ku41m3hMA-014o7F; Wed, 22 Jul 2020 19:46:53 +0200
+ id 1MQvL7-1kDLHe3RSx-00O0ho; Wed, 22 Jul 2020 19:47:18 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/2] linux-user: fix clock_nanosleep()
-Date: Wed, 22 Jul 2020 19:46:11 +0200
-Message-Id: <20200722174612.2917566-2-laurent@vivier.eu>
+Subject: [PATCH v2 2/2] linux-user,
+ ppc: fix clock_nanosleep() for linux-user-ppc
+Date: Wed, 22 Jul 2020 19:46:12 +0200
+Message-Id: <20200722174612.2917566-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200722174612.2917566-1-laurent@vivier.eu>
 References: <20200722174612.2917566-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:4R9z6YS56lzcDW6LoH52kgUgWKQr00fJjGd4dtH65Md43O20aEJ
- nyD1CnzEBF6UeLp8rfyjGj9wL7Qg5jTC3sL8rI00UnYTONqmTw3airRX6oLIK/Q8mVVidZa
- MRHJqAzxN91mneW+gcUFk5XQt7ESX0zcHtqdFQtcd17AMDvZxA7ZfGxxiBbFb49SHk6koAI
- qV8oegazs9M4Ne4fo67Zg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7ccVDHNJKAI=:OpIkbdyU9hMd1sGu1ZHRTk
- cONtWvTiaiT0YVGOvwDe9WnI+rR72fQxXQTTwTdRbxUL9uNAal/gTQzVRRc3aRmusdrbOvs3q
- Z1D/mR/L/YwJraFEjoE8lrphcGwq9oeDz3Z+TdgamZUcHZfkSGIKgPuOKFpDSn0fFWHyurfk6
- KUldxGqZoh9RmZv+orrXO4IC0NpxqyJ8R0AB0T3wFsywyjLB5rxc5E5PhDtxRb9i2/0iem6PP
- A2mbMQneebTeJgdxHISN8SmOqa1cJzNPm8v64hTrdQpjsVgxkosY3876k0GR2eALnNvFRpGWg
- WkyrXaY07tTSVmgM8j22BMjKff/gbVxXLXUENOngpxBCpNvX5tUZ/UdGAwAbjQaIgYMXbgevi
- yoa+MZggYaFTkZPSxSjtZamlv1QpotTcEKw8aA/PP2bmkMrbpcfvr8NlUjGg6px3pghW1dl8v
- TS2rkhSRaSIAkVmHTPOhEv/6czyTe+mjF7mrnpON20TRf6QleoWRNEDoPbkae6qmfSa37RO81
- NdYvqKxhjpWscj/8663mYvNFNfyMA6n115owFWAZS1ksOPEHi3ayboSxyu8jXvEw56F2KRyUh
- tUWN4Nh5KMupYfnax1r8KWxw+QkyESxJMFeOmHM7kfxtW/SoJsfkeyhcrjp+SPvrzLyurTrnX
- cSVyEpmwYzQKhMNmw7xVPE6+P0ZZwsgMNMIjd7XGcRLLAsi7Qgu52JZGCis4vG0Z3DRXOD/4m
- L4ZduK62t0toRKHMVajm1CjaqnrZG0/ymmBFxBRN/Dx0opMKFyhyR7qpshJxUeOnYHDNpGDjw
- /9pJRMDhQfgoyiO2tST13l0Z10iqggZg57JzL4DcQbyEUfdZD98jCUGVf/DB84grzLhonzdr4
- s6F9zVffqOYR1HJKhWPzx2fx9BLpPN3CQwx6uh9kMMHqzGw9dHacn6cySGdQm31EpvlAQ/Ai4
- 6d8xBbSLkhe4hpgL89Y8DPwegUZpwCF4INBtMh2XAcHowCzMgBVvYnXY9bPlwYAMybjQ97smU
- WtkWCWY1re97pxZ6ZdRTNdzmwfuebQ1OETl1NFnARKznPYoIY+6vr4qWapGg7bmeODCz1eaN9
- ww0wKdsYmWZEoGXKYNle3Joq6PNAVwZyheEYVesDZOvIpKL5hxG7rLT3tTIJjEe1b0egRCy4k
- qtKj1msUyT2ioLPheuJGjxQYmiG5lBSsojGdsSQicQd9xptw==
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:qRk3mvJqFrFFsaLxOZzBIQJZ4h4SWGFQegvzr4AVId6zrcJYVCP
+ YLsl2IKIhMR1Kj+SZuHvmixkiKu9xpyzifJa3rQsYPZ9bcYRI+vsxL3rbsKHNjlMnvpnfRe
+ qdXI5h6wfGcCOh4oTHVIKwgg1RT9FaleHn+UOSS6/5ksuZ4WIA8dJs2B0zOaMqPCa2Ppb2m
+ g5fPlqIPM7edgHtBzLM6Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:EWjAxMYpbhg=:zMG6Y5l5WHWLt6tOa4jBLN
+ 1brSIkbJveFkRH858bxf5965BXGr1zpA397ZvQpmAFa+SXHFQKWBnLFaa8BODnv8HcXeIJRcL
+ C1fBJ1MSJYxOvhfgOMEmzLBh5XLcCsbc6f5XWvjFNg69TLi+3lG0DYtr4HRXoVt/25bfN9Nvi
+ /W5hhgPIbPMJ4S5pHkasbgniHA/LOO5VolsZYnyUqphuSS/BaF5upW4rXp4QSZtxZf/Q4z/fX
+ 8ivt9J9NNFxeIPHaj4K6xQrllILGTp6LOhC/Frx5wc4zASBPB60n8Xz+hsOkgUwesSzOOUqZm
+ yd+UboOt6frLCCSbUn0suj7oYwTJMSIsK3pzHrhDDNOWXC6Z5EUZuVrUyV/vpP09A26/YzHWG
+ H/jKTMex530OPYb6qdlsmbzt+yplz/VUtjLOvF/T3np8YedLddUqKnWrlmTiHKtaabEwdXII4
+ iBVM6MCIYGmVmvMdcKYleQuwEIc42cELsI46RHz3YtvzBAAxeSv4jMkb9jAyd4MgnH/m7vaUj
+ NnB8LUOLDNvbbRTO9v+3Ca/evJSDFwczMbixQutpZpSjfkmZBxbi0zaTLuTS4GI8LBRKgvB3d
+ +21FcqZFQ0kWaCe9rGOcmYOIxbbRcKc96y4J1NTCz5eqFcx4zsuTmOphykoqrS7n/hdKfJsyK
+ XGrIzOTZ77KTRlgKUuUW3KLOu/5ynirhA64Fx+Jshr66fkFRxzAlP0m/2HfDLBDqWCW88qUJt
+ eRZrwyebyXSOfkT9Zl2qtpal4L7/uBHaAn6CUq3dO4Mdq2oj+1AgZOjiPITDqYj4Yw8CiPLaH
+ NzqPVhSgQ3e/7LAydgokIkcmbnieRe40wFg2Jcsp3XzpYeEMf8YLUedtZizDzrjI0ZpOsOFqi
+ gCanv+EmIzHB2JSAzVDs+x4tDWASwaw72Eh0869RcfzZEHqPm8tdoz1gMp4tIOl6g4Hrlc8ie
+ Y0YPmqasMYnWcOFbePINbkQ+Elpc1qPryu+ctBZ2fqwmFnHIb6yn3cl3IltStpxm8Gr6iZXQo
+ sB1/Yod2AsKPY5iMEhUEpWKsmFtBoksDru5eUxFXMb7CXut9Zg0MJJvvyF4kSz7/rJ+NXbtSM
+ gGUQLHthbq2B5htXQCMOXiRmEwfWLxv/FduvR68Qv/0PQ5VVkk/cxRscZ+O0qbPEYCkPj877F
+ P20mzdbDz4vKaEHUsHC0YsqyUmgyj7wWv4ed+1yYg82caE2g==
+Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 13:46:57
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 13:46:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -96,49 +96,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the call is interrupted by a signal handler, it fails with error EINTR
-and if "remain" is not NULL and "flags" is not TIMER_ABSTIME, it returns
-the remaining unslept time in "remain".
+Our safe_clock_nanosleep() returns -1 and updates errno.
 
-Update linux-user to not overwrite the "remain" structure if there is no
-error.
+We don't need to update the CRF bit in syscall.c because it will
+be updated in ppc/cpu_loop.c as the return value is negative.
 
-Found with "make check-tcg", linux-test fails on nanosleep test:
-
-  TEST    linux-test on x86_64
-.../tests/tcg/multiarch/linux-test.c:242: nanosleep
-
-Reported-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
 
 Notes:
-    v2: safe_clock_nanosleep() returns -1 and update errno,
-        so we need get_errno()
+    v2: new patch, remove the PPC part as ret is < 0,
+        CRF will be updated in cpu_loop.c
 
- linux-user/syscall.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ linux-user/syscall.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 1211e759c26c..43a6e283961b 100644
+index 43a6e283961b..f5c4f6b95db4 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -11831,8 +11831,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         target_to_host_timespec(&ts, arg3);
-         ret = get_errno(safe_clock_nanosleep(arg1, arg2,
-                                              &ts, arg4 ? &ts : NULL));
--        if (arg4)
-+        /*
-+         * if the call is interrupted by a signal handler, it fails
-+         * with error -TARGET_EINTR and if arg4 is not NULL and arg2 is not
-+         * TIMER_ABSTIME, it returns the remaining unslept time in arg4.
-+         */
-+        if (ret == -TARGET_EINTR && arg4 && arg2 != TIMER_ABSTIME) {
+@@ -11840,13 +11840,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
              host_to_target_timespec(arg4, &ts);
-+        }
+         }
  
- #if defined(TARGET_PPC)
-         /* clock_nanosleep is odd in that it returns positive errno values.
+-#if defined(TARGET_PPC)
+-        /* clock_nanosleep is odd in that it returns positive errno values.
+-         * On PPC, CR0 bit 3 should be set in such a situation. */
+-        if (ret && ret != -TARGET_ERESTARTSYS) {
+-            ((CPUPPCState *)cpu_env)->crf[0] |= 1;
+-        }
+-#endif
+         return ret;
+     }
+ #endif
 -- 
 2.26.2
 
