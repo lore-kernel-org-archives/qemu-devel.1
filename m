@@ -2,80 +2,72 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F58C433E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F889C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:53:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3F8020792
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:51:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F8020792
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 041652077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:53:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=dereferenced.org header.i=@dereferenced.org header.b="oRZyHuZG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 041652077D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=dereferenced.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyATV-0002mY-2O
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:51:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46178)
+	id 1jyAVU-00048K-A1
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:53:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jyASc-00028L-M3
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:50:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60300)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jyASa-0001TL-Fw
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:50:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jyASY-0008Ve-1z
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 08:50:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0CE6A2E80EC
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 08:50:42 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Jul 2020 08:38:53 -0000
-From: Max Reitz <1888467@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <ariadne@dereferenced.org>)
+ id 1jyAUf-0003Kn-S4
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:52:53 -0400
+Received: from out1.migadu.com ([91.121.223.63]:25504)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ariadne@dereferenced.org>)
+ id 1jyAUc-0001lT-C6
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:52:53 -0400
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dereferenced.org;
+ s=default; t=1595407966;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=kLA1D6x0UDRsT4mClI4adYPErZ84V5KksCRyuZba0W4=;
+ b=oRZyHuZGPNn7PVbX4BC8Jw6Qozpv2RoudiG6UxI5lHNvl7V5fq2ac8gigUy0qkUyfYfRm/
+ mH2ssfvZxtEHW5iPErCyJ/KvoU5GeMiv2l6+u56Qeg9Px1HGKr/R6PbM64o7AKazaXPisJ
+ 6Lpu5Vy+fcxOmaAwQW3CdOIKbLPXJ98=
+From: Ariadne Conill <ariadne@dereferenced.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: arrowfeng xanclic
-X-Launchpad-Bug-Reporter: dunfeng zhang (arrowfeng)
-X-Launchpad-Bug-Modifier: Max Reitz (xanclic)
-References: <159540494097.10238.3390638369680947345.malonedeb@gac.canonical.com>
-Message-Id: <159540713337.17235.12127964168471229859.malone@wampee.canonical.com>
-Subject: [Bug 1888467] Re: qemu-img http convert bug
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2c8df87ae647184fb63c6028ec956e3255cffc8c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 04:15:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH-for-5.2 1/2] virtio host input: use safe 64-bit time accessors
+ for input_event
+Date: Wed, 22 Jul 2020 02:52:25 -0600
+Message-Id: <20200722085226.11984-1-ariadne@dereferenced.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=91.121.223.63;
+ envelope-from=ariadne@dereferenced.org; helo=out1.migadu.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 04:52:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,63 +76,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1888467 <1888467@bugs.launchpad.net>
+Cc: Ariadne Conill <ariadne@dereferenced.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On 32-bit systems with 64-bit time_t, input_event.time is not
+directly accessible.  Instead, we must use input_event_sec and
+input_event_usec accessors to set the time values.
 
-What exactly do you mean by =E2=80=9Cfile size=E2=80=9D?  The file length (=
-as reported
-by ls -l) or the bytes used on disk (reported as =E2=80=9Cdisk size=E2=80=
-=9D by qemu-
-img, or by du -B1)?
+Signed-off-by: Ariadne Conill <ariadne@dereferenced.org>
+---
+ hw/input/virtio-input-host.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-You say that qcow2 and vmdk are normal =E2=80=93 do you mean as input or as
-output formats?
+diff --git a/hw/input/virtio-input-host.c b/hw/input/virtio-input-host.c
+index 85daf73f1a..7b81bf09f5 100644
+--- a/hw/input/virtio-input-host.c
++++ b/hw/input/virtio-input-host.c
+@@ -193,13 +193,16 @@ static void virtio_input_host_handle_status(VirtIOInput *vinput,
+ {
+     VirtIOInputHost *vih = VIRTIO_INPUT_HOST(vinput);
+     struct input_event evdev;
++    struct timeval tv;
+     int rc;
+ 
+-    if (gettimeofday(&evdev.time, NULL)) {
++    if (gettimeofday(&tv, NULL)) {
+         perror("virtio_input_host_handle_status: gettimeofday");
+         return;
+     }
+ 
++    evdev.input_event_sec = tv.tv_sec;
++    evdev.input_event_usec = tv.tv_usec;
+     evdev.type = le16_to_cpu(event->type);
+     evdev.code = le16_to_cpu(event->code);
+     evdev.value = le32_to_cpu(event->value);
+-- 
+2.27.0
 
-One thing that comes to my mind is that from http, we have no way of inquir=
-ing about holes in the source file, so we have to scan the file for ranges =
-that are zero, which may not be optimal.  OTOH, the default minimum-zero le=
-ngth is 4 kB, which should basically be the granularity at which filesystem=
-s can record and report holes, too.
-(And if that=E2=80=99s the problem, it should present itself regardless of =
-the output format.)
-
-Can you paste the output for =E2=80=9Cqemu-img map=E2=80=9D on your source =
-file
-somewhere (the local one), or is that too long?
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1888467
-
-Title:
-  qemu-img http convert bug
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello, Why the file sizes of http conversion and local conversion are
-  inconsistent?
-
-  Use the http method of qemu-img for conversion. The size of some formats =
-after conversion is different from the local method of qemu-img. Such as vh=
-d, vdi. qcow2 and vmdk are normal=E3=80=82
-  My image size is 40 G, raw format.
-
-  The source is the same file, but the access method is different
-  http method of qemu-img=EF=BC=9A qemu-img convert -f raw -O vdi http://xx=
-x xxx.vdi=EF=BC=8819G=EF=BC=8Cafter conversion=EF=BC=89
-  local method of qemu-img=EF=BC=9A qemu-img convert -f raw -O vdi xxx.raw =
-xxx.vdi=EF=BC=883G=EF=BC=8Cafter conversion=EF=BC=89
-
-  thank you
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1888467/+subscriptions
 
