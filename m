@@ -2,85 +2,80 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 951A9C433EB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F58C433E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:51:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 570962065E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:50:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f90oFmT7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 570962065E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B3F8020792
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:51:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F8020792
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyASQ-0001oA-L3
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:50:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45940)
+	id 1jyATV-0002mY-2O
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:51:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jyARq-0001MI-ME
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:49:58 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29351
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1jyARp-0001Gs-18
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:49:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595407796;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=3v3Y7uoPERPp6QRCxJvxMJI5PBanPF4I88BepcyJ49s=;
- b=f90oFmT7+B4kUhftumdUSzi1SpC0cW6f9EPCHTHKT/sHXCzDEToOsuYbNk2NzaO6BHpliK
- IOObaxB0hC8QWC+wpmyEyNV66fQvsI7lQl2slx7pmsgQLsqldx2t2ElJ+Wl+sD+J/wdC1G
- AsZ0dYFEK6pZmNjBw2YvdLH00R5tSKY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-NumHX1JYNCaKwv9WY3NWwA-1; Wed, 22 Jul 2020 04:49:52 -0400
-X-MC-Unique: NumHX1JYNCaKwv9WY3NWwA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4713059
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 08:49:51 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
- [10.36.115.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CCF5E5D9DC;
- Wed, 22 Jul 2020 08:49:36 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E9B5B9D9F; Wed, 22 Jul 2020 10:49:35 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jyASc-00028L-M3
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:50:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60300)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jyASa-0001TL-Fw
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:50:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jyASY-0008Ve-1z
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 08:50:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0CE6A2E80EC
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 08:50:42 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 Jul 2020 08:38:53 -0000
+From: Max Reitz <1888467@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] spice: simplify chardev setup
-Date: Wed, 22 Jul 2020 10:49:35 +0200
-Message-Id: <20200722084935.9601-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:34:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: arrowfeng xanclic
+X-Launchpad-Bug-Reporter: dunfeng zhang (arrowfeng)
+X-Launchpad-Bug-Modifier: Max Reitz (xanclic)
+References: <159540494097.10238.3390638369680947345.malonedeb@gac.canonical.com>
+Message-Id: <159540713337.17235.12127964168471229859.malone@wampee.canonical.com>
+Subject: [Bug 1888467] Re: qemu-img http convert bug
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 2c8df87ae647184fb63c6028ec956e3255cffc8c
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 04:15:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,157 +84,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Reply-To: Bug 1888467 <1888467@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Initialize spice before chardevs.  That allows to register the spice
-chardevs directly in the init function and removes the need to maintain
-a linked list of chardevs just for registration.
+Hi,
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/chardev/spice.h |  1 -
- include/ui/qemu-spice.h |  1 -
- chardev/spice.c         | 29 ++++++-----------------------
- softmmu/vl.c            |  9 +++++----
- ui/spice-core.c         |  2 --
- 5 files changed, 11 insertions(+), 31 deletions(-)
+What exactly do you mean by =E2=80=9Cfile size=E2=80=9D?  The file length (=
+as reported
+by ls -l) or the bytes used on disk (reported as =E2=80=9Cdisk size=E2=80=
+=9D by qemu-
+img, or by du -B1)?
 
-diff --git a/include/chardev/spice.h b/include/chardev/spice.h
-index 1f7339b649dc..2013255f34fd 100644
---- a/include/chardev/spice.h
-+++ b/include/chardev/spice.h
-@@ -12,7 +12,6 @@ typedef struct SpiceChardev {
-     bool                  blocked;
-     const uint8_t         *datapos;
-     int                   datalen;
--    QLIST_ENTRY(SpiceChardev) next;
- } SpiceChardev;
- 
- #define TYPE_CHARDEV_SPICE "chardev-spice"
-diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
-index 8c23dfe71797..d34cea2e0fcd 100644
---- a/include/ui/qemu-spice.h
-+++ b/include/ui/qemu-spice.h
-@@ -46,7 +46,6 @@ int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
- #else
- #define SPICE_NEEDS_SET_MM_TIME 0
- #endif
--void qemu_spice_register_ports(void);
- 
- #else  /* CONFIG_SPICE */
- 
-diff --git a/chardev/spice.c b/chardev/spice.c
-index bf7ea1e2940d..9733f0671699 100644
---- a/chardev/spice.c
-+++ b/chardev/spice.c
-@@ -14,9 +14,6 @@ typedef struct SpiceCharSource {
-     SpiceChardev       *scd;
- } SpiceCharSource;
- 
--static QLIST_HEAD(, SpiceChardev) spice_chars =
--    QLIST_HEAD_INITIALIZER(spice_chars);
--
- static int vmc_write(SpiceCharDeviceInstance *sin, const uint8_t *buf, int len)
- {
-     SpiceChardev *scd = container_of(sin, SpiceChardev, sin);
-@@ -216,8 +213,6 @@ static void char_spice_finalize(Object *obj)
- 
-     vmc_unregister_interface(s);
- 
--    QLIST_SAFE_REMOVE(s, next);
--
-     g_free((char *)s->sin.subtype);
-     g_free((char *)s->sin.portname);
- }
-@@ -256,8 +251,6 @@ static void chr_open(Chardev *chr, const char *subtype)
- 
-     s->active = false;
-     s->sin.subtype = g_strdup(subtype);
--
--    QLIST_INSERT_HEAD(&spice_chars, s, next);
- }
- 
- static void qemu_chr_open_spice_vmc(Chardev *chr,
-@@ -310,28 +303,18 @@ void qemu_chr_open_spice_port(Chardev *chr,
-         return;
-     }
- 
-+    if (!using_spice) {
-+        error_setg(errp, "spice not enabled");
-+        return;
-+    }
-+
-     chr_open(chr, "port");
- 
-     *be_opened = false;
-     s = SPICE_CHARDEV(chr);
-     s->sin.portname = g_strdup(name);
- 
--    if (using_spice) {
--        /* spice server already created */
--        vmc_register_interface(s);
--    }
--}
--
--void qemu_spice_register_ports(void)
--{
--    SpiceChardev *s;
--
--    QLIST_FOREACH(s, &spice_chars, next) {
--        if (s->sin.portname == NULL) {
--            continue;
--        }
--        vmc_register_interface(s);
--    }
-+    vmc_register_interface(s);
- }
- 
- static void qemu_chr_parse_spice_vmc(QemuOpts *opts, ChardevBackend *backend,
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index f476ef89edb7..bc0dcc4f58bd 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -4125,6 +4125,11 @@ void qemu_init(int argc, char **argv, char **envp)
-     page_size_init();
-     socket_init();
- 
-+    /* spice needs the timers to be initialized by this point */
-+    /* spice must initialize before audio as it changes the default auiodev */
-+    /* spice must initialize before chardevs (for spicevmc and spiceport) */
-+    qemu_spice_init();
-+
-     qemu_opts_foreach(qemu_find_opts("object"),
-                       user_creatable_add_opts_foreach,
-                       object_create_initial, &error_fatal);
-@@ -4139,10 +4144,6 @@ void qemu_init(int argc, char **argv, char **envp)
-                       fsdev_init_func, NULL, &error_fatal);
- #endif
- 
--    /* spice needs the timers to be initialized by this point */
--    /* spice must initialize before audio as it changes the default auiodev */
--    qemu_spice_init();
--
-     /*
-      * Note: we need to create audio and block backends before
-      * machine_set_property(), so machine properties can refer to
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index ecc2ec2c55c2..37dd68f2aba2 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -813,8 +813,6 @@ void qemu_spice_init(void)
-     g_free(x509_cert_file);
-     g_free(x509_cacert_file);
- 
--    qemu_spice_register_ports();
--
- #ifdef HAVE_SPICE_GL
-     if (qemu_opt_get_bool(opts, "gl", 0)) {
-         if ((port != 0) || (tls_port != 0)) {
--- 
-2.18.4
+You say that qcow2 and vmdk are normal =E2=80=93 do you mean as input or as
+output formats?
 
+One thing that comes to my mind is that from http, we have no way of inquir=
+ing about holes in the source file, so we have to scan the file for ranges =
+that are zero, which may not be optimal.  OTOH, the default minimum-zero le=
+ngth is 4 kB, which should basically be the granularity at which filesystem=
+s can record and report holes, too.
+(And if that=E2=80=99s the problem, it should present itself regardless of =
+the output format.)
+
+Can you paste the output for =E2=80=9Cqemu-img map=E2=80=9D on your source =
+file
+somewhere (the local one), or is that too long?
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888467
+
+Title:
+  qemu-img http convert bug
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello, Why the file sizes of http conversion and local conversion are
+  inconsistent?
+
+  Use the http method of qemu-img for conversion. The size of some formats =
+after conversion is different from the local method of qemu-img. Such as vh=
+d, vdi. qcow2 and vmdk are normal=E3=80=82
+  My image size is 40 G, raw format.
+
+  The source is the same file, but the access method is different
+  http method of qemu-img=EF=BC=9A qemu-img convert -f raw -O vdi http://xx=
+x xxx.vdi=EF=BC=8819G=EF=BC=8Cafter conversion=EF=BC=89
+  local method of qemu-img=EF=BC=9A qemu-img convert -f raw -O vdi xxx.raw =
+xxx.vdi=EF=BC=883G=EF=BC=8Cafter conversion=EF=BC=89
+
+  thank you
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888467/+subscriptions
 
