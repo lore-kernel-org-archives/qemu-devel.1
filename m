@@ -2,101 +2,88 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB66DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 19:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA4CC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 19:04:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73B1620717
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 19:03:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A2DD20717
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 19:04:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xvPYSour"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73B1620717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EETisfe7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A2DD20717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyK1j-0003wt-IK
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 15:03:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47014)
+	id 1jyK2i-0004uJ-Ju
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 15:04:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jyK1B-0003X9-SH
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 15:03:05 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:34927)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jyK1A-0002t5-3F
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 15:03:05 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id f16so1892595pjt.0
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 12:03:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Ue/2ebaCIx/F1wkGkedFCgz6RLwZSyvf7VAJ/9l598A=;
- b=xvPYSourg409J3Wd9NqUEF/nAJTkNI9WwAnpadFovVnn0mjCcCxI8MMfAt+Q7KtMzH
- XdMwsz4n2ixmpwTQGiSPLA+W448XIjHdvzqlJ/xTVfTufU+89jCQEQ04yg1uGohc3TJs
- bDkUHxX+5HUYAfTRzZkF3VcFAUe7+JCht7WncpP65+zx+jR9CfvmiCPd3gO7i6e1ydzH
- J7nhPHIiJofpnGIOEBPoYQWRbYBfy1slwEGoUP9dY5TEHhCE/e4GM1oBLWhQqkXxIaAy
- gO2QvP6sq5iNHaIwnF1l59rU9lx5SkrNE9PsjSmenMp5bAXeAxgJ/8CqyvxXQsq0vWgQ
- /n3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Ue/2ebaCIx/F1wkGkedFCgz6RLwZSyvf7VAJ/9l598A=;
- b=Jzes2Xm9bUST+OMP9C2J3tGXx3FNjzSsgIJZ/MOkKucLJn8+gtBSY2VJNu5e2ZCfur
- mpvbJdNDPACnjrkGHJTAlVvFfzpuIWtJg+HvFRCcYjCWVAq4bJZqmifO1aGAFnyEJUct
- Ifr6XnSVsJzr4iyzXNEWtzP9foCGKmTTjH8NXA0OEgGmB6GkV3AheAcXbKo0tp6a1D+G
- Apall7lP5FIF3r6dYVIZvJfRd9/LIEfWbAaPwdy7JZFRQoANuSQsj3ETyqZDBWJc2Inu
- dLuFeum3pFgrFRxIJdRn8GdD+k7rnE9WL4n2AUvysbp7Tq/s0557MMnqqUsJaIi220vJ
- 5yHw==
-X-Gm-Message-State: AOAM531jNXeSVsU7tpQ+W/BITXoXRzQzmKrdEy9yzybE+ytEM7kpQsqG
- eUlnmFhD6oiVpDXp+Cf4+LrvhQ==
-X-Google-Smtp-Source: ABdhPJxeuTCRZej1ucLC91C1Yr9RkDIQkgdDdwi+P2KeGNgQgvFU45g37IvEbJM8ys2iaVNTT4sLXA==
-X-Received: by 2002:a17:90a:d684:: with SMTP id x4mr773577pju.62.1595444582318; 
- Wed, 22 Jul 2020 12:03:02 -0700 (PDT)
-Received: from [192.168.1.11] (216-160-65-90.tukw.qwest.net. [216.160.65.90])
- by smtp.gmail.com with ESMTPSA id
- f93sm411315pjk.56.2020.07.22.12.03.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Jul 2020 12:03:01 -0700 (PDT)
-Subject: Re: [PATCH v2 06/12] accel/tcg: better handle memory constrained
- systems
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200722062902.24509-1-alex.bennee@linaro.org>
- <20200722062902.24509-7-alex.bennee@linaro.org>
- <5d26e26f-55f7-5b74-bb9e-b97ea1040c05@linaro.org> <87ft9jtsw5.fsf@linaro.org>
- <20200722163722.GS2324845@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0efbcac2-d2f4-de96-63a1-ba7cd485a1e6@linaro.org>
-Date: Wed, 22 Jul 2020 12:02:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jyK1f-00042h-HC
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 15:03:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23816
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jyK1d-0002v8-GB
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 15:03:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595444610;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=xiKhPdu1Tr9mr+435ZY2ZRJVGdpkIR83yqC2ZZIWlug=;
+ b=EETisfe7+RLkoqslgu7OdYJjlqJW+quSOzJf2Z4FnHOpgjtMRVhdXJ1XVQc4WSJlxnokvH
+ AUQDI9mjeAayNr5EpxkmLjnxJs91l2AXaMat/M/IHkZ+y8aZJaYq4TujUhCtQpitG0vr66
+ ZTc16A+5VrMZkkTAg2qY9SHz+8v+PCo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-257-QWnGWIR-PSadYlEvz-8PnA-1; Wed, 22 Jul 2020 15:03:28 -0400
+X-MC-Unique: QWnGWIR-PSadYlEvz-8PnA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA91F59
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 19:03:27 +0000 (UTC)
+Received: from work-vm (ovpn-112-43.ams2.redhat.com [10.36.112.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9ABE81A8EC;
+ Wed, 22 Jul 2020 19:03:20 +0000 (UTC)
+Date: Wed, 22 Jul 2020 20:03:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH for-5.1 2/3] virtiofsd: add container-friendly -o chroot
+ sandboxing option
+Message-ID: <20200722190318.GM2660@work-vm>
+References: <20200722130206.224898-1-stefanha@redhat.com>
+ <20200722130206.224898-3-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200722163722.GS2324845@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200722130206.224898-3-stefanha@redhat.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 00:40:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,45 +96,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>, f4bug@amsat.org,
- cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>, aurelien@aurel32.net,
- Richard Henderson <rth@twiddle.net>
+Cc: virtio-fs@redhat.com, rmohr@redhat.com, qemu-devel@nongnu.org,
+ vromanso@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/20 9:44 AM, Daniel P. Berrangé wrote:
-> OpenStack uses TCG in alot of their CI infrastructure for example
-> and runs multiple VMs. If there's 4 VMs, that's another 4 GB of
-> RAM usage just silently added on top of the explicit -m value.
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> virtiofsd cannot run in an unprivileged container because CAP_SYS_ADMIN
+> is required to create namespaces.
 > 
-> I wouldn't be surprised if this pushes CI into OOM, even without
-> containers or cgroups being involved, as they have plenty of other
-> services consuming RAM in the CI VMs.
-
-I would hope that CI would also supply a -tb_size to go along with that -m
-value.  Because we really can't guess on their behalf.
-
-> The commit 600e17b261555c56a048781b8dd5ba3985650013 talks about this
-> minimizing codegen cache flushes, but doesn't mention the real world
-> performance impact of eliminating those flushes ?
-
-Somewhere on the mailing list was this info.  It was so dreadfully slow it was
-*really* noticable.  Timeouts everywhere.
-
+> Introduce a weaker sandbox that is sufficient in container environments
+> because the container runtime already sets up namespaces. Use chroot to
+> restrict path traversal to the shared directory.
 > 
-> Presumably this makes the guest OS boot faster, but what's the before
-> and after time ?  And what's the time like for values in between the
-> original 32mb and the new 1 GB ?
+> virtiofsd loses the following:
+> 
+> 1. Mount namespace. The process chroots to the shared directory but
+>    leaves the mounts in place. Seccomp rejects mount(2)/umount(2)
+>    syscalls.
+> 
+> 2. Pid namespace. This should be fine because virtiofsd is the only
+>    process running in the container.
+> 
+> 3. Network namespace. This should be fine because seccomp already
+>    rejects the connect(2) syscall, but an additional layer of security
+>    is lost. Container runtime-specific network security policies can be
+>    used drop network traffic (except for the vhost-user UNIX domain
+>    socket).
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tools/virtiofsd/helper.c         |  3 +++
+>  tools/virtiofsd/passthrough_ll.c | 44 ++++++++++++++++++++++++++++++--
+>  2 files changed, 45 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> index 3105b6c23a..7421c9ca1a 100644
+> --- a/tools/virtiofsd/helper.c
+> +++ b/tools/virtiofsd/helper.c
+> @@ -151,6 +151,9 @@ void fuse_cmdline_help(void)
+>             "    -o cache=<mode>            cache mode. could be one of \"auto, "
+>             "always, none\"\n"
+>             "                               default: auto\n"
+> +           "    -o chroot|no_chroot        use container-friendly chroot instead\n"
+> +           "                               of stronger mount namespace sandbox\n"
+> +           "                               default: false\n"
+>             "    -o flock|no_flock          enable/disable flock\n"
+>             "                               default: no_flock\n"
+>             "    -o log_level=<level>       log level, default to \"info\"\n"
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index 50a164a599..990c0a8a70 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -139,6 +139,7 @@ enum {
+>  
+>  struct lo_data {
+>      pthread_mutex_t mutex;
+> +    int chroot; /* 1 - use chroot, 0 - use mount namespace */
+>      int debug;
+>      int writeback;
+>      int flock;
+> @@ -162,6 +163,8 @@ struct lo_data {
+>  };
+>  
+>  static const struct fuse_opt lo_opts[] = {
+> +    { "chroot", offsetof(struct lo_data, chroot), 1 },
+> +    { "no_chroot", offsetof(struct lo_data, chroot), 0 },
+>      { "writeback", offsetof(struct lo_data, writeback), 1 },
+>      { "no_writeback", offsetof(struct lo_data, writeback), 0 },
+>      { "source=%s", offsetof(struct lo_data, source), 0 },
+> @@ -2665,6 +2668,37 @@ static void setup_capabilities(char *modcaps_in)
+>      pthread_mutex_unlock(&cap.mutex);
+>  }
+>  
+> +/*
+> + * Use chroot as a weaker sandbox for environment where the process is launched
+> + * without CAP_SYS_ADMIN.
+> + */
+> +static void setup_chroot(struct lo_data *lo)
+> +{
+> +    lo->proc_self_fd = open("/proc/self/fd", O_PATH);
+> +    if (lo->proc_self_fd == -1) {
+> +        fuse_log(FUSE_LOG_ERR, "open(\"/proc/self/fd\", O_PATH): %m\n");
+> +        exit(1);
+> +    }
+> +
+> +    /*
+> +     * Make the shared directory the file system root so that FUSE_OPEN
+> +     * (lo_open()) cannot escape the shared directory by opening a symlink.
+> +     *
+> +     * It's still possible to escape the chroot via lo->proc_self_fd but that
+> +     * requires gaining control of the process first.
+> +     */
+> +    if (chroot(lo->source) != 0) {
+> +        fuse_log(FUSE_LOG_ERR, "chroot(\"%s\"): %m\n", lo->source);
+> +        exit(1);
+> +    }
 
-But it wasn't "the original 32MB".
-It was the original "ram_size / 4", until that broke due to argument parsing
-ordering.
+I'm seeing suggestions that you should drop CAP_SYS_CHROOT after
+chroot'ing to stop an old escape (where you create another jail inside
+the jail and the kernel then lets you walk outside of the old one).
 
-I don't know what CI usually uses, but I usually use at least -m 4G, sometimes
-more.  What's the libvirt default?
+Dave
 
+> +    /* Move into the chroot */
+> +    if (chdir("/") != 0) {
+> +        fuse_log(FUSE_LOG_ERR, "chdir(\"/\"): %m\n");
+> +        exit(1);
+> +    }
+> +}
+> +
+>  /*
+>   * Lock down this process to prevent access to other processes or files outside
+>   * source directory.  This reduces the impact of arbitrary code execution bugs.
+> @@ -2672,8 +2706,13 @@ static void setup_capabilities(char *modcaps_in)
+>  static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
+>                            bool enable_syslog)
+>  {
+> -    setup_namespaces(lo, se);
+> -    setup_mounts(lo->source);
+> +    if (lo->chroot) {
+> +        setup_chroot(lo);
+> +    } else {
+> +        setup_namespaces(lo, se);
+> +        setup_mounts(lo->source);
+> +    }
+> +
+>      setup_seccomp(enable_syslog);
+>      setup_capabilities(g_strdup(lo->modcaps));
+>  }
+> @@ -2820,6 +2859,7 @@ int main(int argc, char *argv[])
+>      struct fuse_session *se;
+>      struct fuse_cmdline_opts opts;
+>      struct lo_data lo = {
+> +        .chroot = 0,
+>          .debug = 0,
+>          .writeback = 0,
+>          .posix_lock = 1,
+> -- 
+> 2.26.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-r~
 
