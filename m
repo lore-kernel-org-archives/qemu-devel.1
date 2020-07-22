@@ -2,90 +2,93 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD7DFC433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2CEC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:18:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B3AA20729
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8E2A20729
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:18:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aa7FzbtW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B3AA20729
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Kflan8my"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8E2A20729
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyArv-00047e-RU
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:16:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52218)
+	id 1jyAt0-0005rh-W6
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:18:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jyArC-0003EE-SD
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:16:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21838
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jyArB-00054J-4u
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:16:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595409368;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wNxCn/bvdtiZ861UgMIkJ29hcAIO+AEGQEvLAzPm1aA=;
- b=aa7FzbtWXdCOOITNiajb/+CVdSPR+ZvA0I28EPd4fiEXzuMYNYDeI/nWJRfH0bZ+gbYOqN
- 2LSLNUD1bViQ8w6DA5pVYbdnDBipKceGSUFXEqDVykDyZD90UHQgGQ2mpXRTo0tWogc2an
- PXI/fNxEqJhHhsrbpuBlJbdrTtWC44M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-m2D9XlYlOBOSvEuGclMLQw-1; Wed, 22 Jul 2020 05:16:04 -0400
-X-MC-Unique: m2D9XlYlOBOSvEuGclMLQw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E3E9193F561;
- Wed, 22 Jul 2020 09:16:03 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 754037B41E;
- Wed, 22 Jul 2020 09:16:01 +0000 (UTC)
-Date: Wed, 22 Jul 2020 10:15:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Zhenyu Ye <yezhenyu2@huawei.com>
-Subject: Re: [PATCH v1] migration: tls: fix memory leak in
- migration_tls_get_creds
-Message-ID: <20200722091558.GE2323046@redhat.com>
-References: <20200722033228.71-1-yezhenyu2@huawei.com>
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jyAs5-0004XZ-Sz
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:17:06 -0400
+Received: from mail-pj1-x102d.google.com ([2607:f8b0:4864:20::102d]:40498)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jyArz-00059M-VV
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:17:05 -0400
+Received: by mail-pj1-x102d.google.com with SMTP id t15so859791pjq.5
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:16:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=rOp6YSrx5ear3r2vr5z2v8mQ11+Ffd42dKwAlwR1PgQ=;
+ b=Kflan8mymvg8QofwJ/8q7/BxinyP/AY9t67rgcj8+rUR7TyaueouyxmHrCUsYKgZr2
+ 4lKnlmrosC/SnncMwoBA5ciJfxq1vk/HT+d27YZWNcuQVkA5lOHWbeOBs8Fb7MDZBrl5
+ SI7YVF+XocZViG5LiqeWX28ZIULVGl9sSR6U9Q95/KQ6O6rTLh9XiVWxf8Z5OsRt0XZB
+ xytXrtjGBZQ7SDpFzRV6H89hV7hlgXmwKFS7G7yvq+43udvok5s6JEH8wWgrr1OyZmaa
+ Xs93H+eRugEcBHWp8IlHXcx2djemMSM9Er7yN6hDZmv4481KP5fXLF+z1WF7E8nWggQs
+ jmvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=rOp6YSrx5ear3r2vr5z2v8mQ11+Ffd42dKwAlwR1PgQ=;
+ b=mgQ9zty4Yf3Zc0PZqhS5MQStAsjd19Yd4WA2VGsSt+tniArojF7xXwSqvsKGBwsRJX
+ XFyQ2xOE5JobpTllCE//2fea9eYkQAOoIDickF3cYN42dMPwEK0yZBDufHnpDDSqV+05
+ wVqv1yKE3ivQBCGUB34jzF1PX36AYI/ciJj/77gloKG1gtWuoPYDrUldPjSMi8B0vull
+ PNhdU4GxnfKg6w3O8aTuiYle3OQbtPPISHZM0wmYM9IdYxTcizmefmueUSwwhg3t2VmG
+ csyUpzcayMcq9IU3Avvj2hHAMfCTSLC1P77Qv9yB6zF4tFBGPNPzuIBGSCIZ4aXKjoAM
+ +jZA==
+X-Gm-Message-State: AOAM532CzoUHgXBpi6elNwc4bSbyxfQXYf3UA12GuSXN443QR//18ez9
+ 3v8FFAmLcfqyO3VPRvqjb/BJaih8L4I=
+X-Google-Smtp-Source: ABdhPJyyCH2RHjr37GN6PDWvWmGWPCbljsvIQuUHBNBRl69SueAGTmz0OZGYfVT3/iRLM+5MUrk87Q==
+X-Received: by 2002:a17:90a:2562:: with SMTP id
+ j89mr8653303pje.218.1595409417901; 
+ Wed, 22 Jul 2020 02:16:57 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.16.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Jul 2020 02:16:57 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC v2 00/76] target/riscv: support vector extension v0.9
+Date: Wed, 22 Jul 2020 17:15:23 +0800
+Message-Id: <20200722091641.8834-1-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20200722033228.71-1-yezhenyu2@huawei.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:27:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::102d;
+ envelope-from=frank.chang@sifive.com; helo=mail-pj1-x102d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,71 +101,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: xiexiangyou@huawei.com, zhengchuan@huawei.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, quintela@redhat.com
+Cc: Frank Chang <frank.chang@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 22, 2020 at 11:32:28AM +0800, Zhenyu Ye wrote:
-> Currently migration_tls_get_creds() adds the reference of creds
-> but there was no place to unref it.  So the OBJECT(creds) will
-> never be freed and result in memory leak.
-> 
-> The leak stack:
-> Direct leak of 104 byte(s) in 1 object(s) allocated from:
->     #0 0xffffa88bd20b in __interceptor_malloc (/usr/lib64/libasan.so.4+0xd320b)
->     #1 0xffffa7f0cb1b in g_malloc (/usr/lib64/libglib-2.0.so.0+0x58b1b)
->     #2 0x14b58cb in object_new_with_type qom/object.c:634
->     #3 0x14b597b in object_new qom/object.c:645
->     #4 0x14c0e4f in user_creatable_add_type qom/object_interfaces.c:59
->     #5 0x141c78b in qmp_object_add qom/qom-qmp-cmds.c:312
->     #6 0x140e513 in qmp_marshal_object_add qapi/qapi-commands-qom.c:279
->     #7 0x176ba97 in do_qmp_dispatch qapi/qmp-dispatch.c:165
->     #8 0x176bee7 in qmp_dispatch qapi/qmp-dispatch.c:208
->     #9 0x136e337 in monitor_qmp_dispatch monitor/qmp.c:150
->     #10 0x136eae3 in monitor_qmp_bh_dispatcher monitor/qmp.c:239
->     #11 0x1852e93 in aio_bh_call util/async.c:89
->     #12 0x18531b7 in aio_bh_poll util/async.c:117
->     #13 0x18616bf in aio_dispatch util/aio-posix.c:459
->     #14 0x1853f37 in aio_ctx_dispatch util/async.c:268
->     #15 0xffffa7f06a7b in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x52a7b)
-> 
-> Since we're fine to use the borrowed reference when using the creds,
-> so just remove the object_ref() in migration_tls_get_creds().
-> 
-> Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
-> ---
->  migration/tls.c | 1 -
->  1 file changed, 1 deletion(-)
+From: Frank Chang <frank.chang@sifive.com>
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+This patchset implements the vector extension v0.9 for RISC-V on QEMU.
 
+This patchset is sent as RFC because RVV v0.9 is still in draft state.
+However, as RVV v1.0 should be ratified soon and there shouldn't be
+critical changes between RVV v1.0 and RVV v0.9. We would like to have
+the community to review RVV v0.9 implementations. Once RVV v1.0 is
+ratified, we will then upgrade to RVV v1.0.
 
-> 
-> diff --git a/migration/tls.c b/migration/tls.c
-> index 5171afc6c4..7a02ec8656 100644
-> --- a/migration/tls.c
-> +++ b/migration/tls.c
-> @@ -58,7 +58,6 @@ migration_tls_get_creds(MigrationState *s,
->          return NULL;
->      }
->  
-> -    object_ref(OBJECT(ret));
->      return ret;
->  }
->  
-> -- 
-> 2.19.1
-> 
-> 
+You can change the cpu argument: vext_spec to v0.9 (i.e. vext_spec=v0.9)
+to run with RVV v0.9 instructions.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Changelog:
+
+v2
+  * drop v0.7.1 support.
+  * replace invisible return check macros with functions.
+  * move mark_vs_dirty() to translators.
+  * add SSTATUS_VS flag for s-mode.
+  * nan-box scalar fp register for floating-point operations.
+  * add gdbstub files for vector registers to allow system-mode
+    debugging with GDB.
+
+Chih-Min Chao (2):
+  fpu: add api to handle alternative sNaN propagation
+  fpu: fix float16 nan check
+
+Frank Chang (65):
+  target/riscv: drop vector 0.7.1 support
+  target/riscv: rvv-0.9: support vector 0.9
+  target/riscv: fix rsub gvec tcg_assert_listed_vecop assertion
+  target/riscv: correct the gvec IR called in gen_vec_rsub16_i64()
+  target/riscv: fix return value of do_opivx_widen()
+  target/riscv: fix vill bit index in vtype register
+  target/riscv: Use FIELD_EX32() to extract wd field
+  target/riscv: rvv-0.9: remove vxrm and vxsat fields from fcsr register
+  target/riscv: rvv-0.9: remove MLEN calculations
+  target/riscv: rvv-0.9: add fractional LMUL
+  target/riscv: rvv-0.9: add VMA and VTA
+  target/riscv: rvv-0.9: update check functions
+  target/riscv: introduce more imm value modes in translator functions
+  target/riscv: rvv-0.9: add narrower_nanbox_fpr helper
+  target/riscv: rvv-0.9: apply narrower nanbox helper in opfvf_trans
+  target/riscv: rvv-0.9: configure instructions
+  target/riscv: rvv-0.9: stride load and store instructions
+  target/riscv: rvv-0.9: index load and store instructions
+  target/riscv: rvv-0.9: fix address index overflow bug of indexed
+    load/store insns
+  target/riscv: rvv-0.9: fault-only-first unit stride load
+  target/riscv: rvv-0.9: amo operations
+  target/riscv: rvv-0.9: load/store whole register instructions
+  target/riscv: rvv-0.9: update vext_max_elems() for load/store insns
+  target/riscv: rvv-0.9: take fractional LMUL into vector max elements
+    calculation
+  target/riscv: rvv-0.9: floating-point square-root instruction
+  target/riscv: rvv-0.9: floating-point classify instructions
+  target/riscv: rvv-0.9: mask population count instruction
+  target/riscv: rvv-0.9: find-first-set mask bit instruction
+  target/riscv: rvv-0.9: set-X-first mask bit instructions
+  target/riscv: rvv-0.9: iota instruction
+  target/riscv: rvv-0.9: element index instruction
+  target/riscv: rvv-0.9: allow load element with sign-extended
+  target/riscv: rvv-0.9: register gather instructions
+  target/riscv: rvv-0.9: integer scalar move instructions
+  target/riscv: rvv-0.9: floating-point move instruction
+  target/riscv: rvv-0.9: floating-point scalar move instructions
+  target/riscv: rvv-0.9: whole register move instructions
+  target/riscv: rvv-0.9: integer extension instructions
+  target/riscv: rvv-0.9: single-width averaging add and subtract
+    instructions
+  target/riscv: rvv-0.9: single-width bit shift instructions
+  target/riscv: rvv-0.9: integer add-with-carry/subtract-with-borrow
+  target/riscv: rvv-0.9: narrowing integer right shift instructions
+  target/riscv: rvv-0.9: widening integer multiply-add instructions
+  target/riscv: rvv-0.9: quad-widening integer multiply-add instructions
+  target/riscv: rvv-0.9: single-width saturating add and subtract
+    instructions
+  target/riscv: rvv-0.9: integer comparison instructions
+  target/riscv: use softfloat lib float16 comparison functions
+  target/riscv: rvv-0.9: floating-point compare instructions
+  target/riscv: rvv-0.9: single-width integer reduction instructions
+  target/riscv: rvv-0.9: widening integer reduction instructions
+  target/riscv: rvv-0.9: mask-register logical instructions
+  target/riscv: rvv-0.9: slide instructions
+  target/riscv: rvv-0.9: floating-point slide instructions
+  target/riscv: rvv-0.9: narrowing fixed-point clip instructions
+  target/riscv: rvv-0.9: floating-point/integer type-convert
+    instructions
+  target/riscv: rvv-0.9: single-width floating-point reduction
+  target/riscv: rvv-0.9: widening floating-point reduction instructions
+  target/riscv: rvv-0.9: single-width scaling shift instructions
+  target/riscv: rvv-0.9: remove widening saturating scaled multiply-add
+  target/riscv: rvv-0.9: remove vmford.vv and vmford.vf
+  target/riscv: rvv-0.9: remove integer extract instruction
+  target/riscv: rvv-0.9: floating-point min/max instructions
+  softfloat: add fp16 and uint8/int8 interconvert functions
+  target/riscv: rvv-0.9: widening floating-point/integer type-convert
+  target/riscv: rvv-0.9: narrowing floating-point/integer type-convert
+
+Greentime Hu (2):
+  target/riscv: rvv-0.9: add vlenb register
+  target/riscv: gdb: support vector registers for rv32
+
+Hsiangkai Wang (2):
+  target/riscv: gdb: modify gdb csr xml file to align with csr register
+    map
+  target/riscv: gdb: support vector registers for rv64
+
+Kito Cheng (1):
+  fpu: implement full set compare for fp16
+
+LIU Zhiwei (4):
+  target/riscv: rvv-0.9: add mstatus VS field
+  target/riscv: rvv-0.9: add sstatus VS field
+  target/riscv: rvv-0.9: add translation-time vector context status
+  target/riscv: rvv-0.9: add vcsr register
+
+ configure                               |    4 +-
+ fpu/softfloat-specialize.inc.c          |    4 +-
+ fpu/softfloat.c                         |  137 +-
+ gdb-xml/riscv-32bit-csr.xml             |   11 +-
+ gdb-xml/riscv-64bit-csr.xml             |   18 +-
+ gdb-xml/riscv-64bit-vector-128b.xml     |   59 +
+ gdb-xml/riscv-64bit-vector-256b.xml     |   59 +
+ gdb-xml/riscv-64bit-vector-512b.xml     |   59 +
+ include/fpu/softfloat.h                 |   55 +
+ target/riscv/cpu.c                      |   10 +-
+ target/riscv/cpu.h                      |   67 +-
+ target/riscv/cpu_bits.h                 |   10 +
+ target/riscv/cpu_helper.c               |   16 +-
+ target/riscv/csr.c                      |   63 +-
+ target/riscv/gdbstub.c                  |   62 +-
+ target/riscv/helper.h                   |  507 +++--
+ target/riscv/insn32-64.decode           |   18 +-
+ target/riscv/insn32.decode              |  282 +--
+ target/riscv/insn_trans/trans_rvv.inc.c | 2291 +++++++++++++++-------
+ target/riscv/internals.h                |   18 +-
+ target/riscv/translate.c                |   43 +-
+ target/riscv/vector_helper.c            | 2367 +++++++++++++----------
+ 22 files changed, 3993 insertions(+), 2167 deletions(-)
+ create mode 100644 gdb-xml/riscv-64bit-vector-128b.xml
+ create mode 100644 gdb-xml/riscv-64bit-vector-256b.xml
+ create mode 100644 gdb-xml/riscv-64bit-vector-512b.xml
+
+--
+2.17.1
 
 
