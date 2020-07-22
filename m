@@ -2,95 +2,81 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61CB8C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28789C433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:26:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B34D2064C
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:20:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUFiHEx7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B34D2064C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EBDB620714
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 04:26:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBDB620714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy6F8-0002x0-9u
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 00:20:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48440)
+	id 1jy6LJ-0005U9-8J
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 00:26:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jy6ED-0002LC-8r
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:19:37 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40600
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jy6E9-0007Rf-Ra
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:19:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595391572;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jlp1IodwrnMCR5IvRjRW7MKH00tV6JWdmYvKCqI7JBM=;
- b=RUFiHEx7Wyd25/nrEtiVAVGXu9dTWoWuZQ1KR4xvGP/GDTg1Tmih5M+EMUHeCYN7G/GcIN
- 4vwREtXv70wOpG/BhcpfGchijhKIOtr/8zFqC/vJzKJpvZhA7IuobSmscNPfT3ddiSdLae
- u2MvDlXkyjW4pINA1ZAjI4Kze2wE0L4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-2eg8s77qNkSp_4uvZW3mew-1; Wed, 22 Jul 2020 00:19:27 -0400
-X-MC-Unique: 2eg8s77qNkSp_4uvZW3mew-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E27D800460;
- Wed, 22 Jul 2020 04:19:26 +0000 (UTC)
-Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
- (ovpn-120-206.rdu2.redhat.com [10.10.120.206])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 00541BA66;
- Wed, 22 Jul 2020 04:19:25 +0000 (UTC)
-Subject: Re: [RFC PATCH-for-5.1 v2] hw/ide: Cancel pending DMA requests before
- setting as inactive
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200717075317.5376-1-f4bug@amsat.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d7ebf46d-a449-6ffc-e71d-423af0accd35@redhat.com>
-Date: Wed, 22 Jul 2020 00:19:25 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jy6KS-00052W-2t
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:26:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48638)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jy6KQ-0008UR-13
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 00:26:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jy6KM-00066o-R7
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 04:25:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8862E2E8110
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 04:25:58 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200717075317.5376-1-f4bug@amsat.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 21:28:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 Jul 2020 04:17:25 -0000
+From: Launchpad Bug Tracker <1693667@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor paul-whooppee th-huth
+X-Launchpad-Bug-Reporter: Paul Goyette (paul-whooppee)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <149576851455.3442.6872660890935328507.malonedeb@gac.canonical.com>
+Message-Id: <159539144543.13913.1655176529811860512.malone@loganberry.canonical.com>
+Subject: [Bug 1693667] Re: -cpu haswell / broadwell have no MONITOR in
+ features1
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="4809fcb62f445aaa3ae919f7f6c3cc7d156ea57a";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: c186bf847fbf86ec79c84fb0f52b9c2eb1cf73b8
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:35:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,117 +85,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, qemu-block@nongnu.org
+Reply-To: Bug 1693667 <1693667@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/17/20 3:53 AM, Philippe Mathieu-Daudé wrote:
-> libFuzzer found a case where requests are queued for later in the
-> AIO context, but a command set the bus inactive, then when finally
-> the requests are processed by the DMA it aborts because it is
-> inactive:
-> 
->   include/hw/ide/pci.h:59: IDEState *bmdma_active_if(BMDMAState *): Assertion `bmdma->bus->retry_unit != (uint8_t)-1' failed.
-> 
-> Reproducer available on the BugLink.
-> 
-> Fix by draining the pending DMA requests before inactivating the bus.
-> 
-> BugLink: https://bugs.launchpad.net/qemu/+bug/1887303
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
-> RFC because I don't have much clue about block drive and IDE,
-> so block-team please be very careful while reviewing this bug.
-> ---
->   hw/ide/core.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index d997a78e47..f7affafb0c 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -804,7 +804,7 @@ void dma_buf_commit(IDEState *s, uint32_t tx_bytes)
->   
->   void ide_set_inactive(IDEState *s, bool more)
->   {
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Generally, ide_set_inactive is meant to be used as the normative 
-function to transition to the idle state; not something that performs a 
-cancellation.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-(It should probably assert that there are no pending BHs.)
+-- =
 
-...Let's run through the reproducer!
-In my annotation here,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1693667
 
-0x1F0 - Primary Bus I/O
-0x3F6 - Primary Bus Control
-   [0] Primary Bus, dev0
-   [1] Primary Bus, dev1
-0x170 - Secondary Bus I/O
-0x376 - Secondary Bus Control
-   [2] Secondary Bus, dev0
-   [3] Secondary Bus, dev1
+Title:
+  -cpu haswell / broadwell have no MONITOR in features1
 
+Status in QEMU:
+  Expired
 
- > outw 0x176 0x3538
+Bug description:
+  In qemu 2.9.0 if you run
 
-   [2].select = 0x38 [0011 1000]
-                         ^ select secondary device
-   [3].command = 0x35
-                   ^ WRITE DMA EXT
+      qemu-system-x86_64 -cpu Broadwell (or Haswell)
 
-outw 0x376 0x6007
+  then the CPU features1 flag include the SSE3 bit, but do NOT include
+  the MONITOR/MWAIT bit.  This is so even when the host includes the
+  features.
 
-   [3].control = 0x07 [0000 0111]
-                             ^- +SRST
-   # 0x06 goes into the void?
+  =
 
-outw 0x376 0x6b6b
+  Additionally, running qemu in this manner results in several error messag=
+es:
 
-   [3].control = 0x6b; [0110 1011]
-                              ^- -SRST
-   # Oops, this does a Software Reset without cancelling the DMA again.
-   # second write goes into the void?
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.fma [bit 12]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.pcid [bit 1=
+7]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.x2apic [bit=
+ 21]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.tsc-deadlin=
+e [bit 24]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.avx [bit 28]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.f16c [bit 2=
+9]
+  warning: TCG doesn't support requested feature: CPUID.01H:ECX.rdrand [bit=
+ 30]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.hle [bit 4]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.avx2 [bit 5]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.invpcid [bi=
+t 10]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rtm [bit 11]
+  warning: TCG doesn't support requested feature: CPUID.07H:EBX.rdseed [bit=
+ 18]
+  warning: TCG doesn't support requested feature: CPUID.80000001H:ECX.3dnow=
+prefetch
 
-outw 0x176 0x985c
+  =
 
-   [3].select = 0x5c; [0101 1100]
-   [3].command = 0x98; CHECK POWER MODE
-              (Note: Deprecated in ATA4!)
-   # Oops, this command shouldn't start when another one is in-process.
-   # It also has the bad effect of setting the nsector register to 0xff!
+  (Among possible other uses, the lack of the MONITOR feature bit causes Ne=
+tBSD to fall-back on a
+  check-and-pause loop while an application CPU is waiting to be told to pr=
+oceed by the boot CPU.)
 
-outl 0xcf8 0x80000903
-outl 0xcfc 0x2f2931
-outl 0xcf8 0x80000920
-outb 0xcfc 0x6b
-		^- PCI stuff. I'm not as fast at reading hex here.
-                    My brain has adapted to ATA only.
-
-outb 0x68 0x7
-   # Not entirely sure where this goes, but it seems to kick the DMA BH.
-   # ... The pending DMA BH that belongs to WRITE_DMA_EXT.
-
-outw 0x176 0x2530
-
-     [3].select = 0x30 [0011 0000]
-                           ^ select drive1
-     [3].command = 0x25 (READ DMA EXT)
-
-... At this point, it explodes because there's a pending DMA already, 
-and the sector registers are all wrong.
-
-This bug actually seems to have the same root cause as the other one: 
-SRST does not perform the SRST sufficiently.
-
-
-> -    s->bus->dma->aiocb = NULL;
-> +    ide_cancel_dma_sync(s);
->       ide_clear_retry(s);
->       if (s->bus->dma->ops->set_inactive) {
->           s->bus->dma->ops->set_inactive(s->bus->dma, more);
-> 
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1693667/+subscriptions
 
