@@ -7,50 +7,53 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F889C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD9DC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:53:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 041652077D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:53:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06E4C2077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 08:53:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=dereferenced.org header.i=@dereferenced.org header.b="oRZyHuZG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 041652077D
+	dkim=pass (1024-bit key) header.d=dereferenced.org header.i=@dereferenced.org header.b="vduntZ4K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E4C2077D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=dereferenced.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyAVU-00048K-A1
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:53:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46814)
+	id 1jyAVX-0004Ce-9v
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 04:53:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ariadne@dereferenced.org>)
- id 1jyAUf-0003Kn-S4
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:52:53 -0400
-Received: from out1.migadu.com ([91.121.223.63]:25504)
+ id 1jyAUh-0003LA-42
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:52:55 -0400
+Received: from out1.migadu.com ([91.121.223.63]:25548)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ariadne@dereferenced.org>)
- id 1jyAUc-0001lT-C6
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:52:53 -0400
+ id 1jyAUf-0001ly-In
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 04:52:54 -0400
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dereferenced.org;
- s=default; t=1595407966;
+ s=default; t=1595407971;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=kLA1D6x0UDRsT4mClI4adYPErZ84V5KksCRyuZba0W4=;
- b=oRZyHuZGPNn7PVbX4BC8Jw6Qozpv2RoudiG6UxI5lHNvl7V5fq2ac8gigUy0qkUyfYfRm/
- mH2ssfvZxtEHW5iPErCyJ/KvoU5GeMiv2l6+u56Qeg9Px1HGKr/R6PbM64o7AKazaXPisJ
- 6Lpu5Vy+fcxOmaAwQW3CdOIKbLPXJ98=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=weT3kYmrsYvoWEriZOu5ynPm5P7OWsWFaOuOLP0qgGc=;
+ b=vduntZ4KQ5B9/tcZFYmpCnkPrzvZOTr5rli6XEuu529RnnSigG0xRJwN10CCwLD+xlbsLF
+ L2xrV/oVQPV3pMe87LvVe2az9qzdeInKH63HbrvNF7CKOLJy18NKsFdHsUUTeGAhX9lspJ
+ Wz7c5dsoppC9K8OkahvDfGz4xCeg7Zo=
 From: Ariadne Conill <ariadne@dereferenced.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 1/2] virtio host input: use safe 64-bit time accessors
+Subject: [PATCH-for-5.2 2/2] virtio user input: use safe 64-bit time accessors
  for input_event
-Date: Wed, 22 Jul 2020 02:52:25 -0600
-Message-Id: <20200722085226.11984-1-ariadne@dereferenced.org>
+Date: Wed, 22 Jul 2020 02:52:26 -0600
+Message-Id: <20200722085226.11984-2-ariadne@dereferenced.org>
+In-Reply-To: <20200722085226.11984-1-ariadne@dereferenced.org>
+References: <20200722085226.11984-1-ariadne@dereferenced.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=91.121.223.63;
@@ -87,31 +90,31 @@ input_event_usec accessors to set the time values.
 
 Signed-off-by: Ariadne Conill <ariadne@dereferenced.org>
 ---
- hw/input/virtio-input-host.c | 5 ++++-
+ contrib/vhost-user-input/main.c | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/input/virtio-input-host.c b/hw/input/virtio-input-host.c
-index 85daf73f1a..7b81bf09f5 100644
---- a/hw/input/virtio-input-host.c
-+++ b/hw/input/virtio-input-host.c
-@@ -193,13 +193,16 @@ static void virtio_input_host_handle_status(VirtIOInput *vinput,
+diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/main.c
+index 6020c6f33a..4887a6cb44 100644
+--- a/contrib/vhost-user-input/main.c
++++ b/contrib/vhost-user-input/main.c
+@@ -115,13 +115,16 @@ vi_evdev_watch(VuDev *dev, int condition, void *data)
+ static void vi_handle_status(VuInput *vi, virtio_input_event *event)
  {
-     VirtIOInputHost *vih = VIRTIO_INPUT_HOST(vinput);
      struct input_event evdev;
 +    struct timeval tv;
      int rc;
  
 -    if (gettimeofday(&evdev.time, NULL)) {
 +    if (gettimeofday(&tv, NULL)) {
-         perror("virtio_input_host_handle_status: gettimeofday");
+         perror("vi_handle_status: gettimeofday");
          return;
      }
  
 +    evdev.input_event_sec = tv.tv_sec;
 +    evdev.input_event_usec = tv.tv_usec;
-     evdev.type = le16_to_cpu(event->type);
-     evdev.code = le16_to_cpu(event->code);
-     evdev.value = le32_to_cpu(event->value);
+     evdev.type = le16toh(event->type);
+     evdev.code = le16toh(event->code);
+     evdev.value = le32toh(event->value);
 -- 
 2.27.0
 
