@@ -2,89 +2,92 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1271FC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFE8C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:34:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDF14206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:30:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 124F92077D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:34:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrppoD1V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDF14206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="NqUTBCVR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 124F92077D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyB4u-00068b-28
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:30:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53284)
+	id 1jyB9B-0006o6-70
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:34:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54626)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jyAtk-0008E6-9V
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:18:48 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49787
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1jyAti-0005U3-7B
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:18:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595409525;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LE30UYgVnX/l8PS1mVFpuF7rc4Trw+g4OyRPNWbVtpA=;
- b=MrppoD1VxUhrISpGGtAkPTDW33phEOW3D5L8IgISNhDHt1oSynHrmxqRV/Q8HWnu+8O7H5
- Dr67tj8O1yz+GBWgMnU7aSRpv46HMPMP2vCOTN51bh7lguN2qo5MT23diEx7DCMwKqJlF0
- tBM357ZJzeHqSvn9ZRID52Jv27KVpq8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-EZK0XEshPyGAdiphRkQlWA-1; Wed, 22 Jul 2020 05:18:18 -0400
-X-MC-Unique: EZK0XEshPyGAdiphRkQlWA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2168100CCC5;
- Wed, 22 Jul 2020 09:18:17 +0000 (UTC)
-Received: from work-vm (ovpn-112-43.ams2.redhat.com [10.36.112.43])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D5C11001B2C;
- Wed, 22 Jul 2020 09:17:52 +0000 (UTC)
-Date: Wed, 22 Jul 2020 10:17:50 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v2 0/3] migration: Add block-bitmap-mapping parameter
-Message-ID: <20200722091750.GC2660@work-vm>
-References: <20200716135303.319502-1-mreitz@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <20200716135303.319502-1-mreitz@redhat.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:34:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jyAvx-0004Uo-32
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:21:05 -0400
+Received: from mail-pj1-x1031.google.com ([2607:f8b0:4864:20::1031]:37467)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1jyAvu-0005yz-18
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:21:04 -0400
+Received: by mail-pj1-x1031.google.com with SMTP id o22so871795pjw.2
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:21:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=V77vPoxF5wHJpkr1vzvCn6SW3F0N4bm+U02KvfCaIVI=;
+ b=NqUTBCVRXRd+sTcoCU5+MGfTn2sznVrpu6qrvqCL0Oi4fvO20C2HGRCsGGHmElkmw2
+ mUI3sNhnRm3xKTWsk2EV/0pMdXRBAMeI23UiXKRagN3yuIsg/sfRaKyEWZHDdxv8P5DX
+ EYqLTqGBmNKhXU9P9prwVPkTrztAyvdR0HP619wus4BoVIBSKFDKHN1vq+MVx4VsIQz1
+ 9uKRtOF76kdJdcES9Xx49F7uc0YzhQRQPR1v1bpJ2UWeEPk2wpnzKNubOmbDNDMbeklI
+ ifQErwstsxorFLuNupvMume1YeUrBY8LQ2+DEBWIuuIRaVRhR+cr5woltAOLxM9HTCYR
+ nLjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=V77vPoxF5wHJpkr1vzvCn6SW3F0N4bm+U02KvfCaIVI=;
+ b=qZ6PypcTlthb95ihkuSFQRg3RQ5GQQGtC0eY3s9xTz2PkUH5b0dilFZVtldGGK+Z7/
+ efgAjpe9xV9tFbQhd3JfkAfKZ1K/R5CcWlJgKENVfQmWpuJhg3s10L/3H1JR5pCPYquL
+ i3TXBUzuGZ3uTuiq1Nf2gFNf1ooFzo10Nxxp+Us6Z65WD9b+NuzMuBjPUjNZVoKTZEtg
+ yQL4beNDyVVYUFi1kGBVnOVyDH/RVEs04EGgut0UABd1Ugxe2PfVSgTFrlmyS183wOff
+ s7lJtej4q/3BpaqLmOvPpIjzkFdWAeygnAIjKQOHMr6S0SNvCLJHV50D73FO7+R2GrEX
+ lo3w==
+X-Gm-Message-State: AOAM53238glRawdjPZQMDxpYVwDRr8CAAOjtqyf7narRH2yL0hUH9S/h
+ krPfvICidXWy/WSKx5y1mOzS6xPIPTA=
+X-Google-Smtp-Source: ABdhPJw/INe8A2OwpA3e0HysV41P0wQ60wemAi5fO7ATOkcyA8U/1hMvj55DIu9GecdiguT5acwSmQ==
+X-Received: by 2002:a17:90a:1acc:: with SMTP id
+ p70mr9572815pjp.210.1595409660695; 
+ Wed, 22 Jul 2020 02:21:00 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.20.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Jul 2020 02:21:00 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC v2 48/76] target/riscv: rvv-0.9: widening integer multiply-add
+ instructions
+Date: Wed, 22 Jul 2020 17:16:11 +0800
+Message-Id: <20200722091641.8834-49-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200722091641.8834-1-frank.chang@sifive.com>
+References: <20200722091641.8834-1-frank.chang@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1031;
+ envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1031.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,115 +100,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Peter Krempa <pkrempa@redhat.com>
+Cc: Frank Chang <frank.chang@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Max Reitz (mreitz@redhat.com) wrote:
-> RFC v1: https://lists.nongnu.org/archive/html/qemu-block/2020-05/msg00912.html
-> RFC v2: https://lists.nongnu.org/archive/html/qemu-block/2020-05/msg00915.html
-> v1: https://lists.nongnu.org/archive/html/qemu-devel/2020-06/msg09792.html
-> 
-> Branch: https://github.com/XanClic/qemu.git migration-bitmap-mapping-v2
-> Branch: https://git.xanclic.moe/XanClic/qemu.git migration-bitmap-mapping-v2
-> 
-> Based-on: <20200626130658.76498-1-vsementsov@virtuozzo.com>
->           (“migration/block-dirty-bitmap: fix add_bitmaps_to_list”)
-> 
-> 
-> Hi,
-> 
-> This new migration parameter allows mapping block node names and bitmap
-> names to aliases for the purpose of block dirty bitmap migration.
+From: Frank Chang <frank.chang@sifive.com>
 
-One random thought is that you might find these block name aliases turn
-out to be useful in other places, and an alias list may well turn out to
-be generically useful.
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
+---
+ target/riscv/insn32.decode | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Dave
-
-> This way, management tools can use different node names on the source
-> and destination and pass the mapping of how bitmaps are to be
-> transferred to qemu (on the source, the destination, or even both with
-> arbitrary aliases in the migration stream).
-> 
-> 
-> v2:
-> - Dropped what used to be patch 1 (the memleak fix), I see the exact
->   same fix has been sent concurrently and has been merged as
->   9728ebfb77f0159f4
-> 
-> - Patch 1:
->   - Changed documentation to clarify the default behavior
->   - s/5.1/5.2/
->   - Dropped dead assignment
->   - Fixed bitmaps_map memleak
->   - Assert that the bs_name given to add_bitmaps_to_list() must be the
->     BDS’s node name if an alias_map is given
->   - On the source side, unmapped bitmaps are simply dropped without
->     error
->   - On the destination side, unmapped aliases still result in errors
->     (see patch 1 for a short explanation on my reasoning)
->   - Fixed a bug in qmp_query_migrate_parameters(): We have to clone
->     s->parameters.block_bitmap_mapping, not
->     params->block_bitmap_mapping, or the latter will just stay NULL (and
->     so qmp_query_migrate_parameters() won’t return a result for the
->     block-bitmap-mapping)
->   - Emit the mapping through HMP’s “info migrate_parameters”
->   - Return an error when trying to set the mapping through HMP (instead
->     of just crashing because of an “assert(0)” signalling an unhandled
->     migration parameter)
-> 
-> - Patch 3:
->   - Type alias for BlockBitmapMapping
->   - Check the result of “info migrate_parameters” whenever setting the
->     block-bitmap-mapping (just to test the new formatting code)
->   - Catch the qemu.machine.AbnormalShutdown exception on the destination
->     VM whenever the migration is expected to fail
->     (necessary since commit ef5d474472426eda6abf81)
->   - Cases where we don’t set up a mapping for some bitmap on the source
->     are now expected to succeed (without the bitmap being migrated)
-> 
-> 
-> git-backport-diff against v1:
-> 
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream patch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-> 
-> 001/3:[0117] [FC] 'migration: Add block-bitmap-mapping parameter'
-> 002/3:[----] [--] 'iotests.py: Add wait_for_runstate()'
-> 003/3:[0202] [FC] 'iotests: Test node/bitmap aliases during migration'
-> 
-> 
-> Max Reitz (3):
->   migration: Add block-bitmap-mapping parameter
->   iotests.py: Add wait_for_runstate()
->   iotests: Test node/bitmap aliases during migration
-> 
->  qapi/migration.json            |  92 +++++-
->  migration/migration.h          |   3 +
->  migration/block-dirty-bitmap.c | 373 ++++++++++++++++++++----
->  migration/migration.c          |  30 ++
->  monitor/hmp-cmds.c             |  30 ++
->  tests/qemu-iotests/300         | 511 +++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/300.out     |   5 +
->  tests/qemu-iotests/group       |   1 +
->  tests/qemu-iotests/iotests.py  |   4 +
->  9 files changed, 994 insertions(+), 55 deletions(-)
->  create mode 100755 tests/qemu-iotests/300
->  create mode 100644 tests/qemu-iotests/300.out
-> 
-> -- 
-> 2.26.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index bc6c788edf..c6a7145aa5 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -420,9 +420,9 @@ vwmaccu_vv      111100 . ..... ..... 010 ..... 1010111 @r_vm
+ vwmaccu_vx      111100 . ..... ..... 110 ..... 1010111 @r_vm
+ vwmacc_vv       111101 . ..... ..... 010 ..... 1010111 @r_vm
+ vwmacc_vx       111101 . ..... ..... 110 ..... 1010111 @r_vm
+-vwmaccsu_vv     111110 . ..... ..... 010 ..... 1010111 @r_vm
+-vwmaccsu_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
+-vwmaccus_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
++vwmaccsu_vv     111111 . ..... ..... 010 ..... 1010111 @r_vm
++vwmaccsu_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
++vwmaccus_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
+ vmv_v_v         010111 1 00000 ..... 000 ..... 1010111 @r2
+ vmv_v_x         010111 1 00000 ..... 100 ..... 1010111 @r2
+ vmv_v_i         010111 1 00000 ..... 011 ..... 1010111 @r2
+-- 
+2.17.1
 
 
