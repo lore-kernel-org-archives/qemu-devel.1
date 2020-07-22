@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A13C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D38C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:27:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA430206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E19D206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:27:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IjNhmtQk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA430206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wrfbb67h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E19D206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy5P4-0005xV-40
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 23:26:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39184)
+	id 1jy5Q7-0006q0-VC
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 23:27:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jy5O9-0005CO-IX
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:25:49 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60825
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1jy5PZ-0006Pf-J3
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:27:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20082
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jy5O6-0000nk-RB
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:25:48 -0400
+ id 1jy5PX-00019A-M2
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:27:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595388344;
+ s=mimecast20190719; t=1595388434;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5uff2t9rNsye6wexnhA4czHYRNXIpsm69+ZlAvhmnuQ=;
- b=IjNhmtQk5mHmk6zZn8owbchYm9YU8f8AE/I/CSdX3BtFvameyCrn1KiechxYwCSUB4+3Eq
- Q1G6IpcJAlMoa+uJEQtcBPBYpKJhfmrch17+5Yinfq6svqKwCJ68KRBHsYi/7hE2llTc5U
- PtI0LqVMYAP4fgampZjofpny0drC15E=
+ bh=TDGjRndFwv6Q1HT+GwFLs0ltv3RJCb3lHWQYsrVQxiI=;
+ b=Wrfbb67h9LZVEPWoH7hrvKVcgTjcdfD0ic6FMBZYBl0Zy5sr0c7FSQ4ckVOsUyPQ7Cvjhu
+ dmcYI2nWugn2KeW44loYJCJ5eMX8mGka/giIp8j6lmP6rJifa5ODPTJ7ZJpHpTzgij3Llf
+ htCDZkKWjCahaHvTJ0+4opBX6hIwXUc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-oEkaFJuvPD-qRuTLjgUIxg-1; Tue, 21 Jul 2020 23:25:41 -0400
-X-MC-Unique: oEkaFJuvPD-qRuTLjgUIxg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-72-97iLTKrCOb-mwasgird97w-1; Tue, 21 Jul 2020 23:27:12 -0400
+X-MC-Unique: 97iLTKrCOb-mwasgird97w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8891800C64;
- Wed, 22 Jul 2020 03:25:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0630100AA21;
+ Wed, 22 Jul 2020 03:27:11 +0000 (UTC)
 Received: from [10.72.13.156] (ovpn-13-156.pek2.redhat.com [10.72.13.156])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5FD7E69317;
- Wed, 22 Jul 2020 03:25:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ED6CB2B4DA;
+ Wed, 22 Jul 2020 03:27:07 +0000 (UTC)
 Subject: Re: [Bug 1886362] [NEW] Heap use-after-free in lduw_he_p through
  e1000e_write_to_rx_buffers
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Li Qiang <liq3ea@gmail.com>
 References: <159400349818.1851.7243060688419202620.malonedeb@wampee.canonical.com>
  <CAKXe6S+J3nARveToQjECbwV224gs66WkqGHybUhfw35t1+V8og@mail.gmail.com>
  <2cbdf822-c74c-1af9-e5e6-7dd71412201e@redhat.com>
@@ -70,23 +70,25 @@ References: <159400349818.1851.7243060688419202620.malonedeb@wampee.canonical.co
  <f19f605c-9468-e7eb-f255-60766df2a50c@redhat.com>
  <CAFEAcA-qrpXJtzW=tigyAqQuYFNCBMQK_CZFx6zYkcJa+RuZuw@mail.gmail.com>
  <28d42c0f-99eb-a9c1-e3fc-98f11ee686ab@redhat.com>
- <CAFEAcA8ECKgRanHLiFZMDS3fd77ASBkba2nfv+iwnjgSLWnbPw@mail.gmail.com>
+ <CAKXe6SJvrTx=X2kQk6cKOwHczzTM0nocCj22m1eQaNtw-9yOuQ@mail.gmail.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <16092892-9055-1ed9-ea0d-bb2794bb2e6a@redhat.com>
-Date: Wed, 22 Jul 2020 11:25:32 +0800
+Message-ID: <ed905a22-d5bb-7aef-a98c-6897f721b8ea@redhat.com>
+Date: Wed, 22 Jul 2020 11:27:06 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8ECKgRanHLiFZMDS3fd77ASBkba2nfv+iwnjgSLWnbPw@mail.gmail.com>
+In-Reply-To: <CAKXe6SJvrTx=X2kQk6cKOwHczzTM0nocCj22m1eQaNtw-9yOuQ@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 21:28:05
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:27:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -107,16 +109,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Bug 1886362 <1886362@bugs.launchpad.net>, Li Qiang <liq3ea@gmail.com>,
- Qemu Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Bug 1886362 <1886362@bugs.launchpad.net>,
+ Qemu Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020/7/21 下午9:44, Peter Maydell wrote:
-> On Tue, 21 Jul 2020 at 14:21, Jason Wang <jasowang@redhat.com> wrote:
+On 2020/7/21 下午9:46, Li Qiang wrote:
+> Jason Wang <jasowang@redhat.com> 于2020年7月21日周二 下午9:21写道：
+>>
 >> On 2020/7/21 下午8:31, Peter Maydell wrote:
 >>> On Wed, 15 Jul 2020 at 09:36, Jason Wang <jasowang@redhat.com> wrote:
 >>>> I think the point is to make DMA to MMIO work as real hardware.
@@ -127,30 +130,15 @@ On 2020/7/21 下午9:44, Peter Maydell wrote:
 >>> the respond-to-memory-transactions-for-registers logic, but
 >>> it probably wasn't something the designers were actively
 >>> thinking about either...
+>>
 >> I think some device want such peer to peer transactions:
 >>
 >> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/driver-api/pci/p2pdma.rst
-> That's a device DMAing to another device, not DMAing to *itself*
-> (device-to-another-device DMA should work fine in QEMU). And only
-> a very few devices will ever be sensible targets of the DMA --
-> basically things like nvme that have a looks-like-memory area,
-> or special cases like doorbell registers.
-
-
-Well, my understanding is:
-
-- it's not about whether or not we have an actual device that can do DMA 
-into itself but whether it's allowed by PCI spec
-- it's not really matter whether or not it tries to DMA into itself. 
-Devices could be taught to DMA into each other's RX:
-
-e1000e(1) RX DMA to e1000e(2) MMIO (RX)
-e1000e(2) RX DMA to e1000e(1) RX
-
-So we get re-reentrancy again.
-
-
->
+>>
+>>
+>>>> For
+>>>> e1000e and other networking devices we need make sure such DMA doesn't
+>>>> break anything.
 >>> Yeah, this is the interesting part for QEMU. How should we
 >>> structure devices that do DMA so that we can be sure that
 >>> the device emulation at least doesn't crash? We could have
@@ -159,23 +147,38 @@ So we get re-reentrancy again.
 >>> refactoring of a lot of device code...
 >>
 >> It looks to me the issue happens only for device with loopback
-> I think in principle we have a problem for any device that
-> (a) has memory mapped registers and (b) does DMA reads
-> whose address is guest-controlled. Loopback isn't a
-> requirement -- if the guest programs, say, an RX descriptor
-> base address to point at the device's own registers, you
-> get exactly the same kind of unexpected-reentrancy.
+> IMO I think this is not related-loopback.
+>
+> It happens when the guest write the MMIO address to the device's
+> DMA-related registers.
+> The one we see UAF occurs in loopback device because the same
+> structure uses in re-entry.
+> But we can't say there are no issue for non-loopback device.
 
 
-Right, so about the solution, instead of refactoring DMA I wonder we can 
-simply detect and fail the RX by device itself.
+Yes.
 
-Thanks
+
+>> Simply git grep loopback in hw/net tells me we probably need only to
+>> audit dp8393x and rtl8139.
+>>
+>> Qiang, want to help to audit those devices?
+> No problem. Once I finish the e1000e patch I will try to audit those and
+> also try to audit some no-loopback device re-entry issue.
+
+
+Thanks.
 
 
 >
-> thanks
-> -- PMM
+> Thanks,
+> Li Qiang
 >
+>> Thanks
+>>
+>>
+>>> thanks
+>>> -- PMM
+>>>
 
 
