@@ -4,96 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C46C433E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 15:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F92C433E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 15:31:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76FB82071A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 15:23:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 084642068F
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 15:31:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJJCILLq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76FB82071A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gY2dS20s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 084642068F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyGaX-0007DY-Me
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 11:23:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45858)
+	id 1jyGic-0000rg-7f
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 11:31:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jyGZa-0006iA-91
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 11:22:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24291
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jyGhg-0000P5-Nz
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 11:30:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26008
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1jyGZW-0002mp-IE
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 11:22:21 -0400
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jyGhe-00049A-4K
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 11:30:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595431336;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1595431840;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iidGg8wVYGCyFmhtVMElwzQY3Xm1rvtRBT5OoefeyFw=;
- b=iJJCILLqrN1NzWzBjPfrIo/oOAJ/BZW0/699BCW8rD4yVx1/VqfLzfZ40gyDugPpyoqcem
- CQqakjNyXPAgL8sCvD0Q4EMlXf7OY4P6+wsY1Ip3pJGJZIik1PNsjvaHk337z4vPuQl3Ek
- 5lQ/G8cSuSWsNXiwpWyxEZOVcRUQy1E=
+ bh=Z0hJPSlckdr2oQVhtM/HC5rLpYbYLOhq4A3LagGY30M=;
+ b=gY2dS20seXH6enwpQBtboEI/+wqew/Cjs9ZGeauX1T6w+ONi/VHID4Hfsbh+0RNKMkF1zT
+ 6+pKKyVAKpbc1rKCuBlsybb7KodVzeAuI8eN77i9fu+WKly7rngwHqUr9OfTiz22BvzGGu
+ VOt5UYpTS70E/W99amaf7YWB2NxTJNA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-44nOpORWNzWF5z1mklL7Yg-1; Wed, 22 Jul 2020 11:22:12 -0400
-X-MC-Unique: 44nOpORWNzWF5z1mklL7Yg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-455-nCpD_ImgNz2sCjf7k5P3jg-1; Wed, 22 Jul 2020 11:30:39 -0400
+X-MC-Unique: nCpD_ImgNz2sCjf7k5P3jg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D00AA1099AFD;
- Wed, 22 Jul 2020 15:21:45 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADAAA69324;
- Wed, 22 Jul 2020 15:21:43 +0000 (UTC)
-Date: Wed, 22 Jul 2020 16:21:40 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 3/4] io/channel-socket: implement non-blocking connect
-Message-ID: <20200722152140.GO2324845@redhat.com>
-References: <20200720180715.10521-1-vsementsov@virtuozzo.com>
- <20200720180715.10521-4-vsementsov@virtuozzo.com>
- <20200720182923.GP643836@redhat.com>
- <840b762e-1ce1-af25-2ea0-b8cfdedba0d4@virtuozzo.com>
- <20200722112104.GC2324845@redhat.com>
- <cd5058fe-20d4-615e-8489-a30ac54d57de@virtuozzo.com>
- <20200722125303.GI2324845@redhat.com>
- <71bd9b95-6db6-bfaa-729e-df9d1493e5b7@virtuozzo.com>
- <46847ccc-22d0-59b9-6c43-16cb6af4b078@virtuozzo.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 026EB91294;
+ Wed, 22 Jul 2020 15:30:38 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-129.ams2.redhat.com
+ [10.36.113.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C49D388D41;
+ Wed, 22 Jul 2020 15:30:36 +0000 (UTC)
+Subject: Re: [PATCH 5/6] x68: acpi: trigger SMI before scanning for hotplugged
+ CPUs
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20200720141610.574308-1-imammedo@redhat.com>
+ <20200720141610.574308-6-imammedo@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <04b37460-567b-0d33-b5b9-b476ba3c07ff@redhat.com>
+Date: Wed, 22 Jul 2020 17:30:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Firefox/52.0 Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <46847ccc-22d0-59b9-6c43-16cb6af4b078@virtuozzo.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200720141610.574308-6-imammedo@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:34:34
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lersek@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 00:40:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,210 +99,337 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, kraxel@redhat.com, den@openvz.org
+Cc: boris.ostrovsky@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 22, 2020 at 06:04:53PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> 22.07.2020 16:47, Vladimir Sementsov-Ogievskiy wrote:
-> > 22.07.2020 15:53, Daniel P. Berrangé wrote:
-> > > On Wed, Jul 22, 2020 at 03:43:54PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> > > > 22.07.2020 14:21, Daniel P. Berrangé wrote:
-> > > > > On Wed, Jul 22, 2020 at 02:00:25PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> > > > > > 20.07.2020 21:29, Daniel P. Berrangé wrote:
-> > > > > > > On Mon, Jul 20, 2020 at 09:07:14PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> > > > > > > > Utilize new socket API to make a non-blocking connect for inet sockets.
-> > > > > > > > 
-> > > > > > > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > > > > > > > ---
-> > > > > > > >     include/io/channel-socket.h | 14 +++++++
-> > > > > > > >     io/channel-socket.c         | 74 +++++++++++++++++++++++++++++++++++++
-> > > > > > > >     2 files changed, 88 insertions(+)
-> > > > > > > > 
-> > > > > > > > diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
-> > > > > > > > index 777ff5954e..82e868bc02 100644
-> > > > > > > > --- a/include/io/channel-socket.h
-> > > > > > > > +++ b/include/io/channel-socket.h
-> > > > > > > > @@ -94,6 +94,20 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
-> > > > > > > >                                         SocketAddress *addr,
-> > > > > > > >                                         Error **errp);
-> > > > > > > > +/**
-> > > > > > > > + * qio_channel_socket_connect_non_blocking_sync:
-> > > > > > > > + * @ioc: the socket channel object
-> > > > > > > > + * @addr: the address to connect to
-> > > > > > > > + * @errp: pointer to a NULL-initialized error object
-> > > > > > > > + *
-> > > > > > > > + * Attempt to connect to the address @addr using non-blocking mode of
-> > > > > > > > + * the socket. Function is synchronous, but being called from
-> > > > > > > > + * coroutine context will yield during connect operation.
-> > > > > > > > + */
-> > > > > > > > +int qio_channel_socket_connect_non_blocking_sync(QIOChannelSocket *ioc,
-> > > > > > > > +                                                 SocketAddress *addr,
-> > > > > > > > +                                                 Error **errp);
-> > > > > > > > +
-> > > > > > > >     /**
-> > > > > > > >      * qio_channel_socket_connect_async:
-> > > > > > > >      * @ioc: the socket channel object
-> > > > > > > > diff --git a/io/channel-socket.c b/io/channel-socket.c
-> > > > > > > > index e1b4667087..076de7578a 100644
-> > > > > > > > --- a/io/channel-socket.c
-> > > > > > > > +++ b/io/channel-socket.c
-> > > > > > > > @@ -22,6 +22,7 @@
-> > > > > > > >     #include "qapi/error.h"
-> > > > > > > >     #include "qapi/qapi-visit-sockets.h"
-> > > > > > > >     #include "qemu/module.h"
-> > > > > > > > +#include "qemu/sockets.h"
-> > > > > > > >     #include "io/channel-socket.h"
-> > > > > > > >     #include "io/channel-watch.h"
-> > > > > > > >     #include "trace.h"
-> > > > > > > > @@ -29,6 +30,8 @@
-> > > > > > > >     #define SOCKET_MAX_FDS 16
-> > > > > > > > +static int qio_channel_socket_close(QIOChannel *ioc, Error **errp);
-> > > > > > > > +
-> > > > > > > >     SocketAddress *
-> > > > > > > >     qio_channel_socket_get_local_address(QIOChannelSocket *ioc,
-> > > > > > > >                                          Error **errp)
-> > > > > > > > @@ -157,6 +160,77 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
-> > > > > > > >         return 0;
-> > > > > > > >     }
-> > > > > > > > +static int qio_channel_inet_connect_non_blocking_sync(QIOChannelSocket *ioc,
-> > > > > > > > +        InetSocketAddress *addr, Error **errp)
-> > > > > > > > +{
-> > > > > > > > +    Error *local_err = NULL;
-> > > > > > > > +    struct addrinfo *infos, *info;
-> > > > > > > > +    int sock = -1;
-> > > > > > > > +
-> > > > > > > > +    infos = inet_parse_connect_saddr(addr, errp);
-> > > > > > > > +    if (!infos) {
-> > > > > > > > +        return -1;
-> > > > > > > > +    }
-> > > > > > > 
-> > > > > > > This call is blocking since it calls getaddrinfo whose design
-> > > > > > > offers no ability todo non-blocking DNS lookups. Given this
-> > > > > > > call, ...
-> > > > > > 
-> > > > > > Oh, that's bad, thanks for taking a look on that early stage!
-> > > > > > 
-> > > > > > > 
-> > > > > > > > +
-> > > > > > > > +    for (info = infos; info != NULL; info = info->ai_next) {
-> > > > > > > > +        bool in_progress;
-> > > > > > > > +
-> > > > > > > > +        error_free(local_err);
-> > > > > > > > +        local_err = NULL;
-> > > > > > > > +
-> > > > > > > > +        sock = inet_connect_addr(addr, info, false, &in_progress, &local_err);
-> > > > > > > > +        if (sock < 0) {
-> > > > > > > > +            continue;
-> > > > > > > > +        }
-> > > > > > > > +
-> > > > > > > > +        if (qio_channel_socket_set_fd(ioc, sock, &local_err) < 0) {
-> > > > > > > > +            close(sock);
-> > > > > > > > +            continue;
-> > > > > > > > +        }
-> > > > > > > > +
-> > > > > > > > +        if (in_progress) {
-> > > > > > > > +            if (qemu_in_coroutine()) {
-> > > > > > > > +                qio_channel_yield(QIO_CHANNEL(ioc), G_IO_OUT);
-> > > > > > > > +            } else {
-> > > > > > > > +                qio_channel_wait(QIO_CHANNEL(ioc), G_IO_OUT);
-> > > > > > > > +            }
-> > > > > > > 
-> > > > > > > ...this is offering false assurances of being non-blocking.
-> > > > > > > 
-> > > > > > > If we don't want the current thread to be blocked then we
-> > > > > > > need to be using the existing qio_channel_socket_connect_async
-> > > > > > > method or similar. It uses a throw away background thread to
-> > > > > > > run the connection attempt, and then reports completion back
-> > > > > > > later, thus avoiding the getaddrinfo design flaw for the callers.
-> > > > > > > 
-> > > > > > > I explicitly didn't want to add an method like the impl in this
-> > > > > > > patch, because getaddrinfo dooms it and we already had bugs in
-> > > > > > > the pre-QIOChannel code where QEMU thought it was non-blocking
-> > > > > > > but wasn't due to getaddrinfo lookups.
-> > > > > > > 
-> > > > > > > 
-> > > > > > > IIUC, the main appeal of this method is that the non-blocking
-> > > > > > > nature is hidden from the caller who can continue to treat it
-> > > > > > > as a synchronous call and have the coroutine magic happen in
-> > > > > > > behind the scenes.
-> > > > > > > 
-> > > > > > > IOW, What's needed is a simple way to run the operation in a
-> > > > > > > thread, and sleep for completion while having the coroutine
-> > > > > > > yield.
-> > > > > > > 
-> > > > > > > I think this could likely be achieved with QIOTask with an
-> > > > > > > alternate impl of the qio_task_wait_thread() method that is
-> > > > > > > friendly to coroutines instead of being based on pthread
-> > > > > > > condition variable waits.
-> > > > > > 
-> > > > > > The most simple thing is just run qio_channel_socket_connect_sync in
-> > > > > > a thread with help of thread_pool_submit_co() which is coroutine-friendly.
-> > > > > > And this don't need any changes in io/channel.
-> > > > > > 
-> > > > > > Actually, I've started with such design, but decided that better use
-> > > > > > non-blocking connect to not deal with cancelling the connecting thread
-> > > > > > on shutdown.
-> > > > > > 
-> > > > > > I think, I'll resend based on thread_pool_submit_co().
-> > > > > > 
-> > > > > > ===
-> > > > > > 
-> > > > > > Hmm, there is async getaddrinfo_a function.. What do you think of it?
-> > > > > 
-> > > > > It isn't portable, glibc only.
-> > > > > 
-> > > > > > But seems simpler to use a thread than move to async interfaces everywhere.
-> > > > > 
-> > > > > 
-> > > > 
-> > > > Hmm.. Still, on shutdown, how to cancel this connect and getaddrinfo ? I'm not sure
-> > > > how much time may getaddrinfo take, but connect can take about a minute. It's not really
-> > > > good to wait for it on shutdown.
-> > > 
-> > > The intention was that if you don't want to carry on waiting for the
-> > > async operation to complete you just give and pretend it no longer
-> > > exists. Eventually it will fail or complete and the thread will exit.
-> > > The only important thing there is making sure that the callback you
-> > > are passing to the _async() method can cope with the cleanup when the
-> > > work eventually completes, even if you've given up.
-> > > 
-> > 
-> > At least it's not possible with thread_pool_submit_co as I wanted, because underlying
-> > thread pool waits for all its threads to complete on exit.
-> > 
-> > 
-> 
-> 
-> I'm trying to use qio_channel_socket_connect_async().. But callback
-> is not called.
-> 
-> How to make it be executed? In tests/test-io-channel-socket.c it's
-> done by g_main_loop_new .. g_main_loop_run. But I need to yield.
-> socket_start_outgoing_migration uses qio_channel_socket_connect_async
-> as well, but is not doing any magic with g_main_loop. But it works. How?
+On 07/20/20 16:16, Igor Mammedov wrote:
+> In case firmware has negotiated CPU hotplug SMI feature, generate
+> AML to describe SMI IO port region and send SMI to firmware
+> on each CPU hotplug SCI in case new CPUs were htplugged.
 
-The _async() impls uses  qio_task_run_in_thread to spawn the background
-thread. When the thread finishes, it uses g_idle_add to invoke the
-callback so that it runs in the context of the main thread, not the
-background thread. So something needs to be running the main loop
-in QEMU.
+(1) s/htplugged/hotplugged/
 
-If that isn't viable for the scenario you're in, then you can create
-your own async version by spawning the thread yourself and running
-the _sync() function - the _async() function is ajust a convenient
-wrapper combining QIOTask + _sync(), but doesn't always do what 
-everyone might need.   In the char-socket.c for example, I do the
-async bit manually instead of using teh _async() wrapper.
+>
+> Since new CPUs can be hotplugged while CPU_SCAN_METHOD is running
+> we can't send SMI before new CPUs are fetched from QEMU as it
+> could cause sending Notify to a CPU that firmware hasn't seen yet.
+> So fetch new CPUs into local cache first and then send SMI and
+> after that sends Notify events to cached CPUs. This should ensure
+> that Notify is sent only to CPUs which were processed by firmware
+> first.
+> Any CPUs that were hotplugged after caching will be process
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+(2) s/will be process/will be processed/
+
+> by the next CPU_SCAN_METHOD, when pending SCI is handled.
+
+(3) I think that the subject ("trigger SMI before scanning") may no
+longer apply, because we do scan before triggering the SMI.
+
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v1:
+>  - make sure that Notify is sent only to CPUs seen by FW
+>
+>  - (Laszlo Ersek <lersek@redhat.com>)
+>     - use macro instead of x-smi-negotiated-features
+>     - style fixes
+>     - reserve whole SMI block (0xB2, 0xB3)
+> v0:
+>  - s/aml_string/aml_eisaid/
+>    /fixes Windows BSOD, on nonsense value/ (Laszlo Ersek <lersek@redhat.com>)
+>  - put SMI device under PCI0 like the rest of hotplug IO port
+>  - do not generate SMI AML if CPU hotplug SMI feature hasn't been negotiated
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  include/hw/acpi/cpu.h  |  1 +
+>  include/hw/i386/ich9.h |  2 ++
+>  hw/acpi/cpu.c          | 50 ++++++++++++++++++++++++++++++++++++++++--
+>  hw/i386/acpi-build.c   | 35 ++++++++++++++++++++++++++++-
+>  hw/isa/lpc_ich9.c      |  3 +++
+>  5 files changed, 88 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/hw/acpi/cpu.h b/include/hw/acpi/cpu.h
+> index 62f0278ba2..0eeedaa491 100644
+> --- a/include/hw/acpi/cpu.h
+> +++ b/include/hw/acpi/cpu.h
+> @@ -50,6 +50,7 @@ void cpu_hotplug_hw_init(MemoryRegion *as, Object *owner,
+>  typedef struct CPUHotplugFeatures {
+>      bool acpi_1_compatible;
+>      bool has_legacy_cphp;
+> +    const char *smi_path;
+>  } CPUHotplugFeatures;
+>
+>  void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+> diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
+> index d1bb3f7bf0..0f43ef2481 100644
+> --- a/include/hw/i386/ich9.h
+> +++ b/include/hw/i386/ich9.h
+> @@ -245,6 +245,8 @@ typedef struct ICH9LPCState {
+>  #define ICH9_SMB_HST_D1                         0x06
+>  #define ICH9_SMB_HOST_BLOCK_DB                  0x07
+>
+> +#define ICH9_LPC_SMI_NEGOTIATED_FEAT_PROP "x-smi-negotiated-features"
+> +
+>  /* bit positions used in fw_cfg SMI feature negotiation */
+>  #define ICH9_LPC_SMI_F_BROADCAST_BIT            0
+>  #define ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT          1
+> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> index 3d6a500fb7..a6dd6e252a 100644
+> --- a/hw/acpi/cpu.c
+> +++ b/hw/acpi/cpu.c
+> @@ -14,6 +14,8 @@
+>  #define ACPI_CPU_CMD_DATA_OFFSET_RW 8
+>  #define ACPI_CPU_CMD_DATA2_OFFSET_R 0
+>
+> +#define OVMF_CPUHP_SMI_CMD 4
+> +
+>  enum {
+>      CPHP_GET_NEXT_CPU_WITH_EVENT_CMD = 0,
+>      CPHP_OST_EVENT_CMD = 1,
+> @@ -321,6 +323,7 @@ const VMStateDescription vmstate_cpu_hotplug = {
+>  #define CPU_NOTIFY_METHOD "CTFY"
+>  #define CPU_EJECT_METHOD  "CEJ0"
+>  #define CPU_OST_METHOD    "COST"
+> +#define CPU_ADDED_LIST    "CNEW"
+>
+>  #define CPU_ENABLED       "CPEN"
+>  #define CPU_SELECTOR      "CSEL"
+> @@ -471,8 +474,27 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+>              Aml *dev_chk = aml_int(1);
+>              Aml *eject_req = aml_int(3);
+>              Aml *next_cpu_cmd = aml_int(CPHP_GET_NEXT_CPU_WITH_EVENT_CMD);
+> +            Aml *num_added_cpus = aml_local(1);
+> +            Aml *cpu_idx = aml_local(2);
+> +            Aml *new_cpus = aml_name(CPU_ADDED_LIST);
+>
+>              aml_append(method, aml_acquire(ctrl_lock, 0xFFFF));
+> +
+> +            /* use named package as old Windows don't support it in local var */
+> +            if (arch_ids->len <= 256) {
+> +                /* For compatibility with Windows Server 2008 (max 256 cpus),
+> +                 * use ACPI1.0 PackageOp which can cache max 255 elements.
+> +                 * Which is fine for 256 CPUs VM. Max 255 can be hotplugged,
+> +                 * sice at least one CPU must be already present.
+> +                */
+> +                aml_append(method, aml_name_decl(CPU_ADDED_LIST,
+> +                    aml_package(arch_ids->len)));
+> +            } else {
+> +                aml_append(method, aml_name_decl(CPU_ADDED_LIST,
+> +                    aml_varpackage(arch_ids->len)));
+> +            }
+> +
+> +            aml_append(method, aml_store(zero, num_added_cpus));
+>              aml_append(method, aml_store(one, has_event));
+>              while_ctx = aml_while(aml_equal(has_event, one));
+>              {
+> @@ -483,8 +505,10 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+>                   aml_append(while_ctx, aml_store(next_cpu_cmd, cpu_cmd));
+>                   ifctx = aml_if(aml_equal(ins_evt, one));
+>                   {
+> -                     aml_append(ifctx,
+> -                         aml_call2(CPU_NOTIFY_METHOD, cpu_data, dev_chk));
+> +                     /* cache added CPUs to Notify/Wakeup later */
+> +                     aml_append(ifctx, aml_store(cpu_data,
+> +                         aml_index(new_cpus, num_added_cpus)));
+> +                     aml_append(ifctx, aml_increment(num_added_cpus));
+>                       aml_append(ifctx, aml_store(one, ins_evt));
+>                       aml_append(ifctx, aml_store(one, has_event));
+>                   }
+> @@ -501,6 +525,28 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+>                   aml_append(while_ctx, else_ctx);
+>              }
+>              aml_append(method, while_ctx);
+> +
+> +            /* in case FW negotiated ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT,
+> +             * make upcall to FW, so it can pull in new CPUs before
+> +             * OS is notified and wakes them up */
+> +            if (opts.smi_path) {
+> +                ifctx = aml_if(aml_lnot(aml_equal(num_added_cpus, zero)));
+> +                {
+> +                    aml_append(ifctx, aml_store(aml_int(OVMF_CPUHP_SMI_CMD),
+> +                        aml_name("%s", opts.smi_path)));
+> +                }
+> +                aml_append(method, ifctx);
+> +            }
+> +
+> +            aml_append(method, aml_store(zero, cpu_idx));
+> +            while_ctx = aml_while(aml_lless(cpu_idx, num_added_cpus));
+> +            {
+> +                aml_append(while_ctx, aml_call2(CPU_NOTIFY_METHOD,
+> +                    aml_derefof(aml_index(new_cpus, cpu_idx)), dev_chk));
+> +                aml_append(while_ctx, aml_increment(cpu_idx));
+> +            }
+> +            aml_append(method, while_ctx);
+> +
+>              aml_append(method, aml_release(ctrl_lock));
+>          }
+>          aml_append(cpus_dev, method);
+
+(4) This version addresses all my requests from the previous version,
+but the above method changes unfortunately break the hot-plugging of a
+single CPU even.
+
+Here's the decompiled method (using a topology with 4 possible CPUs):
+
+   1  Method (CSCN, 0, Serialized)
+   2  {
+   3      Acquire (\_SB.PCI0.PRES.CPLK, 0xFFFF)
+   4      Name (CNEW, Package (0x04){})
+   5      Local1 = Zero
+   6      Local0 = One
+   7      While ((Local0 == One))
+   8      {
+   9          Local0 = Zero
+  10          \_SB.PCI0.PRES.CCMD = Zero
+  11          If ((\_SB.PCI0.PRES.CINS == One))
+  12          {
+  13              CNEW [Local1] = \_SB.PCI0.PRES.CDAT
+  14              Local1++
+  15              \_SB.PCI0.PRES.CINS = One
+  16              Local0 = One
+  17          }
+  18          ElseIf ((\_SB.PCI0.PRES.CRMV == One))
+  19          {
+  20              CTFY (\_SB.PCI0.PRES.CDAT, 0x03)
+  21              \_SB.PCI0.PRES.CRMV = One
+  22              Local0 = One
+  23          }
+  24      }
+  25
+  26      If ((Local1 != Zero))
+  27      {
+  28          \_SB.PCI0.SMI0.SMIC = 0x04
+  29      }
+  30
+  31      Local2 = Zero
+  32      While ((Local2 < Local1))
+  33      {
+  34          CTFY (DerefOf (CNEW [Local2]), One)
+  35          Local2++
+  36      }
+  37
+  38      Release (\_SB.PCI0.PRES.CPLK)
+  39  }
+
+The problem is on line 15. When you write 1 to \_SB.PCI0.PRES.CINS, the
+following happens (quoting "docs/specs/acpi_cpu_hotplug.txt"):
+
+> write access:
+>     offset:
+> [...]
+>     [0x4] CPU device control fields: (1 byte access)
+>         bits:
+>             0: [...]
+>             1: if set to 1 clears device insert event, set by OSPM
+>                after it has emitted device check event for the
+>                selected CPU device
+
+Because of this, by the time the SMI is raised on line 28, the firmware
+will see no pending events.
+
+The scanning (= collection into the package) has to be implemented such
+that the pending events never change.
+
+This is possible to do; the firmware already does it. The idea is to
+advance the "get next CPU with event" command by manually incrementing
+the CPU selector past the CPU that has a pending event, rather than by
+clearing the events for the currently selected CPU. Here's the
+pseudo-code:
+
+    bool scan;
+    uint32_t current_selector;
+    uint32_t pending_selector;
+    uint32_t event_count;
+    uint32_t plug_count;
+    uint32_t event;
+
+    scan = true;
+    current_selector = 0;
+    event_count = 0;
+    plug_count = 0;
+
+    while (scan) {
+        scan = false;
+
+        /* the "get next CPU with pending event" command starts scanning
+         * at the currently selected CPU, *inclusive*
+         */
+        CSEL = current_selector;
+        CCMD = 0;
+        pending_selector = CDAT;
+
+        /* the "get next CPU with pending event" command may cause the
+         * current selector to wrap around; in which case we're done
+         */
+        if (pending_selector >= current_selector) {
+            current_selector = pending_selector;
+
+            /* if there's no pending event for the currently selected
+             * CPU, we're done
+             */
+            if (CINS) {
+                /* record INSERT event for currently selected CPU, and
+                 * continue scanning
+                 */
+                CNEW[event_count] = current_selector;
+                CEVT[event_count] = 1;
+                event_count++;
+                plug_count++;
+                scan = true;
+            } else if (CRMV) {
+                /* record REMOVE event for currently selected CPU, and
+                 * continue scanning
+                 */
+                CNEW[event_count] = current_selector;
+                CEVT[event_count] = 3;
+                event_count++;
+                scan = true;
+            }
+
+            if (scan) {
+                scan = false;
+                /* advance past this CPU manually (as we must not clear
+                 * events pending for this CPU)
+                 */
+                current_selector++;
+                if (current_selector < possible_cpu_count) {
+                    scan = true;
+                }
+            }
+        }
+    }
+
+    /* raise "hotplug SMI" now if at least one INSERT event has been
+     * collected
+     */
+    if (plug_count > 0) {
+        SMIC = 0x04;
+    }
+
+    /* notify the OS about all events, and clear pending events (same
+     * order as before)
+     */
+    event = 0;
+    while (event < event_count) {
+        CTFY(CNEW[event], CEVT[event]);
+
+        CSEL = CNEW[event];
+        if (CEVT[event] == 1) {
+            CINS = 1;
+        } else if (CEVT[event] == 3) {
+            CRMV = 1;
+        }
+
+        event++;
+    }
+
+
+Thanks
+Laszlo
 
 
