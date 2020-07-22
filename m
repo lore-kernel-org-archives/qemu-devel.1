@@ -2,63 +2,90 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D530C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD55FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:35:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 326B4206E9
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:34:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326B4206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8160B20709
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:35:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYiDNkuZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8160B20709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy5W4-0000c0-HA
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 23:34:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40374)
+	id 1jy5Xe-0001Vl-RP
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 23:35:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yezhenyu2@huawei.com>)
- id 1jy5V2-0008CY-P5
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:32:56 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:39210 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yezhenyu2@huawei.com>)
- id 1jy5V0-0001nB-NU
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:32:56 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 12D0974C484305D92D5B;
- Wed, 22 Jul 2020 11:32:46 +0800 (CST)
-Received: from DESKTOP-KKJBAGG.china.huawei.com (10.174.186.173) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.487.0; Wed, 22 Jul 2020 11:32:40 +0800
-From: Zhenyu Ye <yezhenyu2@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH v1] migration: tls: fix memory leak in migration_tls_get_creds
-Date: Wed, 22 Jul 2020 11:32:28 +0800
-Message-ID: <20200722033228.71-1-yezhenyu2@huawei.com>
-X-Mailer: git-send-email 2.22.0.windows.1
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jy5Wf-000165-86
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:34:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46647
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jy5Wd-0001zO-Jy
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:34:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595388874;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VFn7fpVOPtKVNPpl9CGR6zMyco85Iy+iFeQ0qiLQ3Hw=;
+ b=XYiDNkuZNES0UzV7bHplZduph6tpBP+QSo8ZMFvwfh5RhJfG1KHJhAwBCKCQKHnVfgooXD
+ WlnvduiYnDSVOAA6fNA96wUZn6xsPMLhzNeV4GzNOo/zaoQs7GPGO3o3g84uTsOLoPQ8ky
+ ryLhRTyR/RtESC9P6ZZHO+lEFxNcmYE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-AIzXe7b1MrOyd3YvoXYKHg-1; Tue, 21 Jul 2020 23:34:32 -0400
+X-MC-Unique: AIzXe7b1MrOyd3YvoXYKHg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A87C0100AA27;
+ Wed, 22 Jul 2020 03:34:31 +0000 (UTC)
+Received: from [10.72.13.156] (ovpn-13-156.pek2.redhat.com [10.72.13.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 184DF5D9E2;
+ Wed, 22 Jul 2020 03:34:21 +0000 (UTC)
+Subject: Re: please try to avoid sending pullreqs late on release-candidate day
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+References: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <2fc4ad51-3092-8d63-fe89-e0dee969b78a@redhat.com>
+Date: Wed, 22 Jul 2020 11:34:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.186.173]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=yezhenyu2@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:32:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:34:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,57 +98,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, quintela@redhat.com, yezhenyu2@huawei.com,
- dgilbert@redhat.com, xiexiangyou@huawei.com, zhengchuan@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently migration_tls_get_creds() adds the reference of creds
-but there was no place to unref it.  So the OBJECT(creds) will
-never be freed and result in memory leak.
 
-The leak stack:
-Direct leak of 104 byte(s) in 1 object(s) allocated from:
-    #0 0xffffa88bd20b in __interceptor_malloc (/usr/lib64/libasan.so.4+0xd320b)
-    #1 0xffffa7f0cb1b in g_malloc (/usr/lib64/libglib-2.0.so.0+0x58b1b)
-    #2 0x14b58cb in object_new_with_type qom/object.c:634
-    #3 0x14b597b in object_new qom/object.c:645
-    #4 0x14c0e4f in user_creatable_add_type qom/object_interfaces.c:59
-    #5 0x141c78b in qmp_object_add qom/qom-qmp-cmds.c:312
-    #6 0x140e513 in qmp_marshal_object_add qapi/qapi-commands-qom.c:279
-    #7 0x176ba97 in do_qmp_dispatch qapi/qmp-dispatch.c:165
-    #8 0x176bee7 in qmp_dispatch qapi/qmp-dispatch.c:208
-    #9 0x136e337 in monitor_qmp_dispatch monitor/qmp.c:150
-    #10 0x136eae3 in monitor_qmp_bh_dispatcher monitor/qmp.c:239
-    #11 0x1852e93 in aio_bh_call util/async.c:89
-    #12 0x18531b7 in aio_bh_poll util/async.c:117
-    #13 0x18616bf in aio_dispatch util/aio-posix.c:459
-    #14 0x1853f37 in aio_ctx_dispatch util/async.c:268
-    #15 0xffffa7f06a7b in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x52a7b)
+On 2020/7/21 下午11:56, Peter Maydell wrote:
+> It is not helpful if everybody sends their pullrequests late
+> on the Tuesday afternoon, as there just isn't enough time in the
+> day to merge test and apply them all before I have to cut the tag.
+> Please, if you can, try to send pullrequests earlier, eg Monday.
 
-Since we're fine to use the borrowed reference when using the creds,
-so just remove the object_ref() in migration_tls_get_creds().
 
-Signed-off-by: Zhenyu Ye <yezhenyu2@huawei.com>
----
- migration/tls.c | 1 -
- 1 file changed, 1 deletion(-)
+Ok, will do.
 
-diff --git a/migration/tls.c b/migration/tls.c
-index 5171afc6c4..7a02ec8656 100644
---- a/migration/tls.c
-+++ b/migration/tls.c
-@@ -58,7 +58,6 @@ migration_tls_get_creds(MigrationState *s,
-         return NULL;
-     }
- 
--    object_ref(OBJECT(ret));
-     return ret;
- }
- 
--- 
-2.19.1
+Thanks
 
+
+>
+> thanks
+> -- PMM
+>
 
 
