@@ -2,86 +2,91 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F576C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 11:51:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE4FC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 12:04:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDCDE206F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 11:51:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96D562065E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 12:04:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L4jnb2hU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDCDE206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iNBSbXD6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D562065E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyDHi-0005Ux-9K
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 07:51:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40164)
+	id 1jyDTg-0000Up-Q9
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 08:04:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jyDGc-0004Zs-RR
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 07:50:34 -0400
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:42091)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jyDGb-0003rm-4C
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 07:50:34 -0400
-Received: by mail-ot1-x335.google.com with SMTP id g37so1505553otb.9
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 04:50:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=7c1GKLGh6kUcP0cXnDe1M01HYdzizw4NSpILlqyDRYA=;
- b=L4jnb2hUFm7bWdAQURCT4BedpC/uNzKyjy9GmwmFt8UcCKmRcX9hUSiaFTWeIu52GD
- XrF6Ki/IVbOgv35vLTzR5uiDwK9VZqBXeznW8me/9Afgu2k/e43RwMxBalkbkzFV8kGf
- n7JOfoy3qauV2FBlmONhHhCnW97gN7cGd2gqmnKVHIZKZoX2Xr/4Q1lAkdHmO5yGE49f
- w/bjcz8MdFJKWwzYauFfoH5UQS5d0O4+KnWkad+5ZRBJJ6bRSU4wa1QLTnfxVMR/TLwy
- MJAahsv19q8MYtQYSr8UwWwkg7jxWolVg0Vxjm+Esj8d96TbPUFiDlIt2VdFgsglodu/
- yX6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=7c1GKLGh6kUcP0cXnDe1M01HYdzizw4NSpILlqyDRYA=;
- b=nH17/d5FhLAHOrPGKKR2aJMKuvwmx2K2rGdi2YomqxT0mGFckh7oihnc1D/t09aKfd
- kp9CY2NnC0ZGaiA96TaQsVQwb0e+Qe0Yk8ZKr3ciW/C/0MSe5rStLhmCp9PAZYtln2LI
- mEOTiEpLy2CAKCpDvSc5qQOzuDXWMP4md0cVaqGQvlN1tYJ1IVMKTNNpAbVT+UoQIOL0
- 0oWhn0hy7qf7Sbfb3XNrK7lMHZHbbng3NsfoflIdwXQxivs7RTxU/g8iI+EJr8HEmDm3
- gb/3GVEC0IkXgRzuGdKFMrUX5jPZrSSY/mpK9KPCYy47nt49upWfHftfhe/XBTyG8V2u
- EnKQ==
-X-Gm-Message-State: AOAM5320yQew2sNxcSf9ALcaJnL8vMuMB2ePmTkoRnYiMe/s0cVC+U3k
- 308ZDvUNfDpTGzttNgok0hA+e9bMsaN0x7/uWYbloQ==
-X-Google-Smtp-Source: ABdhPJwugeOWNorb61CBK7IVT2KtpGCb0KUULCPO+GSv3h3iUu5PysMrIWkjxpMhgs+AoicQB+LbgamqXqU5vAvU7Zw=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id
- v19mr27887160ota.91.1595418631798; 
- Wed, 22 Jul 2020 04:50:31 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jyDT3-0008Qm-Vl
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 08:03:25 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60943
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1jyDT2-0005c9-6V
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 08:03:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595419403;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hxHpK3lXFt84bsfK0JPwbmlNcOxaSVImAPYsv5CBMKU=;
+ b=iNBSbXD6USjNck7HV+hpYejNWjCBV7/y4fXzw+8haKHIU+SdB90F0GyNydCeSK+qNlidHE
+ 2+uxtQPbNpivYE+RhrY8HmMjK0BBxn4F25HRsgFGwGHRxf7hyxz2RISImGMVpuIyZLZ7FG
+ N9xr92/35ar9kw5c5rCJfENxLSyjqbU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-ERO-lI8TM_23wOC8ufP_OA-1; Wed, 22 Jul 2020 08:03:21 -0400
+X-MC-Unique: ERO-lI8TM_23wOC8ufP_OA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05DE11DE2;
+ Wed, 22 Jul 2020 12:03:20 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-129.ams2.redhat.com
+ [10.36.113.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EEB6A512FE;
+ Wed, 22 Jul 2020 12:03:18 +0000 (UTC)
+Subject: Re: [PATCH 1/6] x86: lpc9: let firmware negotiate 'CPU hotplug with
+ SMI' features
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20200720141610.574308-1-imammedo@redhat.com>
+ <20200720141610.574308-2-imammedo@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <00b7e32c-36ad-a71a-00da-d1f0d9977e79@redhat.com>
+Date: Wed, 22 Jul 2020 14:03:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Firefox/52.0 Thunderbird/52.9.1
 MIME-Version: 1.0
-References: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
- <20200722093621.GA4838@linux.fritz.box>
-In-Reply-To: <20200722093621.GA4838@linux.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 22 Jul 2020 12:50:20 +0100
-Message-ID: <CAFEAcA93OY0omjoYW7ofH7N6iRFHfboa1DGO1ra3qha0SasVVg@mail.gmail.com>
-Subject: Re: please try to avoid sending pullreqs late on release-candidate day
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::335;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x335.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200720141610.574308-2-imammedo@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=lersek@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:34:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,49 +99,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+Cc: boris.ostrovsky@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 Jul 2020 at 10:36, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> Am 21.07.2020 um 17:56 hat Peter Maydell geschrieben:
-> > It is not helpful if everybody sends their pullrequests late
-> > on the Tuesday afternoon, as there just isn't enough time in the
-> > day to merge test and apply them all before I have to cut the tag.
-> > Please, if you can, try to send pullrequests earlier, eg Monday.
->
-> I sent the majority of my fixes for -rc1 on Friday, not the least to
-> give us some time in case we get a testing failure. However, the earlier
-> you send the pull request, the greater the chance that you get some new
-> patches after the pull request. In this case, the patches were only
-> ready Tuesday afternoon, so even sending on Monday instead of Friday
-> wouldn't have helped.
+On 07/20/20 16:16, Igor Mammedov wrote:
+> It will allow firmware to notify QEMU that firmware requires SMI
+> being triggered on CPU hot[un]plug, so that it would be able to account
+> for hotplugged CPU and relocate it to new SMM base and/or safely remove
+> CPU on unplug.
+> 
+> Using negotiated features, follow up patches will insert SMI upcall
+> into AML code, to make sure that firmware processes hotplug before
+> guest OS would attempt to use new CPU.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  include/hw/i386/ich9.h |  2 ++
+>  hw/i386/pc.c           |  5 ++++-
+>  hw/isa/lpc_ich9.c      | 12 ++++++++++++
+>  3 files changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
+> index a98d10b252..d1bb3f7bf0 100644
+> --- a/include/hw/i386/ich9.h
+> +++ b/include/hw/i386/ich9.h
+> @@ -247,5 +247,7 @@ typedef struct ICH9LPCState {
+>  
+>  /* bit positions used in fw_cfg SMI feature negotiation */
+>  #define ICH9_LPC_SMI_F_BROADCAST_BIT            0
+> +#define ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT          1
+> +#define ICH9_LPC_SMI_F_CPU_HOT_UNPLUG_BIT       2
+>  
+>  #endif /* HW_ICH9_H */
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 3d419d5991..57d50fad6b 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -97,7 +97,10 @@
+>  #include "fw_cfg.h"
+>  #include "trace.h"
+>  
+> -GlobalProperty pc_compat_5_0[] = {};
+> +GlobalProperty pc_compat_5_0[] = {
+> +    { "ICH9-LPC", "x-smi-cpu-hotplug", "off" },
+> +    { "ICH9-LPC", "x-smi-cpu-hotunplug", "off" },
+> +};
+>  const size_t pc_compat_5_0_len = G_N_ELEMENTS(pc_compat_5_0);
+>  
+>  GlobalProperty pc_compat_4_2[] = {
+> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+> index cd6e169d47..c9305080b5 100644
+> --- a/hw/isa/lpc_ich9.c
+> +++ b/hw/isa/lpc_ich9.c
+> @@ -373,6 +373,14 @@ static void smi_features_ok_callback(void *opaque)
+>          /* guest requests invalid features, leave @features_ok at zero */
+>          return;
+>      }
+> +    if (!(guest_features & BIT_ULL(ICH9_LPC_SMI_F_BROADCAST_BIT)) &&
+> +        guest_features & (BIT_ULL(ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT) |
+> +                          BIT_ULL(ICH9_LPC_SMI_F_CPU_HOT_UNPLUG_BIT))) {
+> +        /* cpu hot-[un]plug with SMI requires SMI broadcast,
+> +         * leave @features_ok at zero
+> +         */
+> +        return;
+> +    }
+>  
+>      /* valid feature subset requested, lock it down, report success */
+>      lpc->smi_negotiated_features = guest_features;
+> @@ -747,6 +755,10 @@ static Property ich9_lpc_properties[] = {
+>      DEFINE_PROP_BOOL("noreboot", ICH9LPCState, pin_strap.spkr_hi, true),
+>      DEFINE_PROP_BIT64("x-smi-broadcast", ICH9LPCState, smi_host_features,
+>                        ICH9_LPC_SMI_F_BROADCAST_BIT, true),
+> +    DEFINE_PROP_BIT64("x-smi-cpu-hotplug", ICH9LPCState, smi_host_features,
+> +                      ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT, true),
+> +    DEFINE_PROP_BIT64("x-smi-cpu-hotunplug", ICH9LPCState, smi_host_features,
+> +                      ICH9_LPC_SMI_F_CPU_HOT_UNPLUG_BIT, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> 
 
-Patches that arrive and are only ready Tuesday afternoon are
-naturally at risk of slipping into the next RC. That's OK.
-Though when we get to rc2/rc3 you should warn me when you
-expect that so I can make a decision about whether it's better
-to slip the rc by a day to wait for them.
+(1) I think that, at this time, the default value for
+"x-smi-cpu-hotunplug" should be false. Accordingly, the
+"x-smi-cpu-hotunplug" compat property should be dropped.
 
-> The alternative would have been letting them wait for -rc2. I suppose
-> you can always says "too late" and make that decision for me, but I
-> wouldn't want to unnecessarily move things to a later RC. Do you think
-> we shouldn't send a pull request in case of doubt?
+The reason is that in this series, QEMU won't actually learn to handle
+CPU hot-unplug with SMI. We shouldn't advertize support for it.
 
-Mostly what I mean is "don't assume that because RC day is Tuesday
-that you can send a pullreq on Tuesday and have it get into the RC".
-If it turns out that you have to do that, that's not a big problem.
-What is a problem is if half a dozen submaintainers all send a
-pullreq at once on the Tuesday afternoon. So in the situation where
-you don't anticipate anything much late arriving then send it earlier.
+We should only recognize the feature, so that the QMP command can rely
+on it for rejecting hot-unplug attempts. If (later) we have a more
+advanced OVMF binary with unplug support (so that OVMF would try to
+negotiate unplug), but the user runs it on QEMU-5.1 (or more precisely
+with an 5.1 machine type), which will support plug, but not unplug, then
+QEMU should reject the device_del QMP command.
 
-> Can you test multiple pull requests at once?
+In brief, we need both properties because we want both device_add and
+device_del to fail gracefully, but the default values (and accordingly
+the compat properties) should reflect the actual feature support. So
+unplug should default to false at this point.
 
-I could in theory I guess, but my scripting assumes one at once.
+Thanks,
+Laszlo
 
-thanks
--- PMM
 
