@@ -2,83 +2,83 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23341C433E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C87A0C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:32:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB84020729
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:32:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 937D920729
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:32:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="XXyGIhqr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB84020729
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="G7P1buDV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 937D920729
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyB6m-0001JI-4V
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:32:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53602)
+	id 1jyB6W-0000rd-Pg
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:32:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jyAuE-0000k9-5G
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:19:18 -0400
-Received: from mail-pj1-x102f.google.com ([2607:f8b0:4864:20::102f]:51683)
+ id 1jyAuW-0001XH-4u
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:19:36 -0400
+Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:35190)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jyAuC-0005Xt-M3
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:19:17 -0400
-Received: by mail-pj1-x102f.google.com with SMTP id 8so868463pjj.1
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:19:16 -0700 (PDT)
+ id 1jyAuT-0005bA-0V
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:19:35 -0400
+Received: by mail-pl1-x62f.google.com with SMTP id x9so659460plr.2
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:19:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=t2sySwVAYzBgFbUWGNCph7loGGmEs8LojJHT2BEgias=;
- b=XXyGIhqrBdD6fi+0eDuLGFcejzSU/BUvO8w67CO2ZV+VSjnMxRAC6v1eGRgqsFM3q2
- QfEqlgmhKR0QAyq6QGNguQjZoHqEe6L0Y4CrAtRo6EHJ28JdwTWtJvefYeN/y2CwDTgb
- tISHqjAcOXhp6n0ehXGORwGqyHRvnkoSL6/pj2pCfG8R0LRFKG3DXl/kRDk+mA0xsLq8
- k2Go2c4ct0AySLqPSJmwWJPMh5cMlTg9B1R55xFNEI3XYSJgnBGkYF+0o1AL0dCr/omG
- Yd5a51CMBpxkoW5mVp9BZeiadsgdFz+zqr5a+kK+iez9kM0AOJ3PJOkdQ4JgwqTZHqN7
- ya/w==
+ bh=65H2nOM6Zv+jL3nuWxhgnkDNOjW7kakLBlArAff0dV0=;
+ b=G7P1buDVN0d8pjSI7vqvYDgbTtKzCuY/e1R3o6qruNqUYrz+3OC0gFi80fq2+e+/0c
+ I1NGI7ritFuJY1naPC36Xgtt9twtifwo37RYqnkSGCG2NRsyK6ORjqPsqg3wJWrupOZj
+ B4B6Esufpc3dVY5BLAip8F5xQ1M4opv5cBGrlevCi58Zs+Ki6cN7bPohjIRdo3OHPS7x
+ EyzCLV9CLRfTcqhHfftRAaBnPanGR2yVpaNAxrI0wqPnpd6gbyOE71RtOzbNWzI96Z6+
+ q/CM1+9XHXimeP3Xxg3Lqu2RpHW6U6zk+BYd+p1ahz2XdP08J9WsZFMBmxfwXBD+gEen
+ eHpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=t2sySwVAYzBgFbUWGNCph7loGGmEs8LojJHT2BEgias=;
- b=um9JhcwEzi3g1r8T0nLv1GQTF/gnrM3uAoG6z8iH/v7/4STh5VvXfOqBR+BJKw68bt
- oeS9SH+biyEMWMO5te+po688iMTpVkWxwmuvaIkFZ8FxR995sd7MTcSdXqTkcvd1UsCB
- nFjpOLfqjM69oGCzo6AVAkeb/fxNs7yx1L+WtActg+fl/SK6lzEagzv6Gyd625RN23rE
- heVwtJq9F7Mfpy32tU3DLE5szSpt7ZoFBm1OWFHS7L66FNyLjVEc7o5GVJCku5+sVr02
- V2/z1KTfYmCBb1k1jQFFlD0SG44JTykUS1JXtB2GLnQr1YapGEiadGmjkF/VV/0sYUe9
- UH5w==
-X-Gm-Message-State: AOAM530Ve+kymh7Tqy8ldAv1qInYpVMR1ed/qhsLo1Xaq3fOG+nB93Ae
- on7IcAl1VKckt8IjVxXBs9XolZZirRQ=
-X-Google-Smtp-Source: ABdhPJxs7SuZ07/HcM+uwTVeCJ1zCs2ziXosnUbE1NJq5LdHXr/h1wnk8FFojGZYZO4cOY20cxMBpQ==
-X-Received: by 2002:a17:90a:8c91:: with SMTP id
- b17mr9343086pjo.74.1595409555109; 
- Wed, 22 Jul 2020 02:19:15 -0700 (PDT)
+ bh=65H2nOM6Zv+jL3nuWxhgnkDNOjW7kakLBlArAff0dV0=;
+ b=dfce9RaFnYc9flD0HMbk6udc/2+Lt2ZqLF7/ApIFj/VddaKEUCsp8uc2nKTp54xTdz
+ Z0CbKnjQcbCUVhv+uOGJr7O6u5mRaMbktND+P0a1pW/YU0NYhx4GTcyuwKDi9ksnOT4Y
+ SgLpfE9Fz3FcfJzYdXOtxVfKJXNCdWf7P7zBY0X28hdB1ctD6enkTVvFe6ddinRxYY2T
+ zRD90zBasiJNfzExOth0kNaGpznH5RyjpMpPuaizWG713H1zMICgFJmVgTlQxd7BOfGp
+ /MhZczdVE9LzpWS15xOaUG1eJ0CR5gmRyefHLh+LfDQ5Dx3oNdzzUnWkt8pNInOU+TpT
+ on+g==
+X-Gm-Message-State: AOAM531E4zIJ7XpPdn4YVC9R4KQjq9T5ycMnSXuQ+fMmTa4gWaCEtDw+
+ EY7rsIxwMd+KH5bVBov8uVd6pjouofI=
+X-Google-Smtp-Source: ABdhPJxd/hABcyKYPaLagYppy+5ZBz6tj69h8VJ/Pao3lQ29S8OwK5BGSu0BxL+DdnGrmYbdKPoE/A==
+X-Received: by 2002:a17:902:c211:: with SMTP id
+ 17mr25364314pll.302.1595409571573; 
+ Wed, 22 Jul 2020 02:19:31 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.19.13
+ by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.19.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jul 2020 02:19:14 -0700 (PDT)
+ Wed, 22 Jul 2020 02:19:31 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC v2 24/76] target/riscv: rvv-0.9: fix address index overflow bug
- of indexed load/store insns
-Date: Wed, 22 Jul 2020 17:15:47 +0800
-Message-Id: <20200722091641.8834-25-frank.chang@sifive.com>
+Subject: [RFC v2 27/76] target/riscv: rvv-0.9: load/store whole register
+ instructions
+Date: Wed, 22 Jul 2020 17:15:50 +0800
+Message-Id: <20200722091641.8834-28-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200722091641.8834-1-frank.chang@sifive.com>
 References: <20200722091641.8834-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102f;
- envelope-from=frank.chang@sifive.com; helo=mail-pj1-x102f.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::62f;
+ envelope-from=frank.chang@sifive.com; helo=mail-pl1-x62f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,44 +100,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Frank Chang <frank.chang@sifive.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+ Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Frank Chang <frank.chang@sifive.com>
 
-Replace ETYPE from signed int to unsigned int to prevent index overflow
-issue, which would lead to wrong index address.
+Add the following instructions:
+
+* vl1r.v
+* vs1r.v
 
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- target/riscv/vector_helper.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/riscv/helper.h                   |  3 ++
+ target/riscv/insn32.decode              |  4 ++
+ target/riscv/insn_trans/trans_rvv.inc.c | 61 +++++++++++++++++++++++++
+ target/riscv/vector_helper.c            | 47 +++++++++++++++++++
+ 4 files changed, 115 insertions(+)
 
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 808f88fbeb..8cf5c4c065 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -145,6 +145,9 @@ DEF_HELPER_5(vle16ff_v, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vle32ff_v, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vle64ff_v, void, ptr, ptr, tl, env, i32)
+ 
++DEF_HELPER_4(vl1r_v, void, ptr, tl, env, i32)
++DEF_HELPER_4(vs1r_v, void, ptr, tl, env, i32)
++
+ DEF_HELPER_6(vamoswapei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vamoswapei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vamoswapei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 6a9cf6ad53..e3f0fba912 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -267,6 +267,10 @@ vle16ff_v     ... 000 . 10000 ..... 101 ..... 0000111 @r2_nfvm
+ vle32ff_v     ... 000 . 10000 ..... 110 ..... 0000111 @r2_nfvm
+ vle64ff_v     ... 000 . 10000 ..... 111 ..... 0000111 @r2_nfvm
+ 
++# Vector whole register insns
++vl1r_v        000 000 1 01000 ..... 000 ..... 0000111 @r2
++vs1r_v        000 000 1 01000 ..... 000 ..... 0100111 @r2
++
+ #*** Vector AMO operations are encoded under the standard AMO major opcode ***
+ vamoswapei8_v   00001 . . ..... ..... 000 ..... 0101111 @r_wdvm
+ vamoswapei16_v  00001 . . ..... ..... 101 ..... 0101111 @r_wdvm
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index fb6d092539..4274daf08e 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -1030,6 +1030,67 @@ GEN_VEXT_TRANS(vle16ff_v, 16, 1, r2nfvm, ldff_op, ld_us_check)
+ GEN_VEXT_TRANS(vle32ff_v, 32, 2, r2nfvm, ldff_op, ld_us_check)
+ GEN_VEXT_TRANS(vle64ff_v, 64, 3, r2nfvm, ldff_op, ld_us_check)
+ 
++/*
++ * load and store whole register instructions
++ */
++typedef void gen_helper_ldst_whole(TCGv_ptr, TCGv, TCGv_env, TCGv_i32);
++
++static bool ldst_whole_trans(uint32_t vd, uint32_t rs1, uint32_t data,
++                             gen_helper_ldst_whole *fn, DisasContext *s,
++                             bool is_store)
++{
++    TCGv_ptr dest;
++    TCGv base;
++    TCGv_i32 desc;
++
++    dest = tcg_temp_new_ptr();
++    base = tcg_temp_new();
++    desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
++
++    gen_get_gpr(base, rs1);
++    tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, vd));
++
++    fn(dest, base, cpu_env, desc);
++
++    tcg_temp_free_ptr(dest);
++    tcg_temp_free(base);
++    tcg_temp_free_i32(desc);
++    if (!is_store) {
++        mark_vs_dirty(s);
++    }
++    return true;
++}
++
++/*
++ * load and store whole register instructions ignore vtype and vl setting.
++ * Thus, we don't need to check vill bit. (Section 7.9)
++ */
++#define GEN_LDST_WHOLE_TRANS(NAME, EEW, SEQ, ARGTYPE, ARG_NF, IS_STORE) \
++static bool trans_##NAME(DisasContext *s, arg_##ARGTYPE * a)            \
++{                                                                       \
++    s->eew = EEW;                                                       \
++    s->emul = (float)EEW / (1 << (s->sew + 3)) * s->flmul;              \
++                                                                        \
++    if (!require_rvv(s)) {                                              \
++        return false;                                                   \
++    }                                                                   \
++                                                                        \
++    uint32_t data = 0;                                                  \
++    bool ret;                                                           \
++    data = FIELD_DP32(data, VDATA, LMUL, s->lmul);                      \
++    data = FIELD_DP32(data, VDATA, SEW, s->sew);                        \
++    data = FIELD_DP32(data, VDATA, VTA, s->vta);                        \
++    data = FIELD_DP32(data, VDATA, VMA, s->vma);                        \
++    data = FIELD_DP32(data, VDATA, NF, ARG_NF);                         \
++    ret = ldst_whole_trans(a->rd, a->rs1, data, gen_helper_##NAME,      \
++                           s, IS_STORE);                                \
++    return ret;                                                         \
++}
++
++GEN_LDST_WHOLE_TRANS(vl1r_v, 8, 0, vl1r_v, 1, false)
++
++GEN_LDST_WHOLE_TRANS(vs1r_v, 8, 1, vs1r_v, 1, true)
++
+ /*
+  *** vector atomic operation
+  */
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 13634be66a..1c4aba21c6 100644
+index f49af084ef..995e873549 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -449,10 +449,10 @@ static target_ulong NAME(target_ulong base,            \
-     return (base + *((ETYPE *)vs2 + H(idx)));          \
- }
+@@ -642,6 +642,53 @@ GEN_VEXT_LDFF(vle16ff_v, int16_t, lde_h, clearh)
+ GEN_VEXT_LDFF(vle32ff_v, int32_t, lde_w, clearl)
+ GEN_VEXT_LDFF(vle64ff_v, int64_t, lde_d, clearq)
  
--GEN_VEXT_GET_INDEX_ADDR(idx_b, int8_t,  H1)
--GEN_VEXT_GET_INDEX_ADDR(idx_h, int16_t, H2)
--GEN_VEXT_GET_INDEX_ADDR(idx_w, int32_t, H4)
--GEN_VEXT_GET_INDEX_ADDR(idx_d, int64_t, H8)
-+GEN_VEXT_GET_INDEX_ADDR(idx_b, uint8_t,  H1)
-+GEN_VEXT_GET_INDEX_ADDR(idx_h, uint16_t, H2)
-+GEN_VEXT_GET_INDEX_ADDR(idx_w, uint32_t, H4)
-+GEN_VEXT_GET_INDEX_ADDR(idx_d, uint64_t, H8)
- 
- static inline void
- vext_ldst_index(void *vd, void *v0, target_ulong base,
++/*
++ *** load and store whole register instructions
++ */
++static void
++vext_ldst_whole(void *vd, target_ulong base, CPURISCVState *env, uint32_t desc,
++                vext_ldst_elem_fn *ldst_elem, uint32_t esz, uintptr_t ra,
++                MMUAccessType access_type)
++{
++    uint32_t i, k;
++    uint32_t nf = vext_nf(desc);
++    uint32_t vlmax = vext_maxsz(desc) / esz;
++    uint32_t vlenb = env_archcpu(env)->cfg.vlen >> 3;
++
++    /* probe every access */
++    probe_pages(env, base, vlenb * nf * esz, ra, access_type);
++
++    /* load bytes from guest memory */
++    for (i = 0; i < vlenb; i++) {
++        k = 0;
++        while (k < nf) {
++            target_ulong addr = base + (i * nf + k) * esz;
++            ldst_elem(env, addr, i + k * vlmax, vd, ra);
++            k++;
++        }
++    }
++}
++
++#define GEN_VEXT_LD_WHOLE(NAME, ETYPE, LOAD_FN)             \
++void HELPER(NAME)(void *vd, target_ulong base,              \
++                  CPURISCVState *env, uint32_t desc)        \
++{                                                           \
++    vext_ldst_whole(vd, base, env, desc, LOAD_FN,           \
++                    sizeof(ETYPE), GETPC(), MMU_DATA_LOAD); \
++}
++
++GEN_VEXT_LD_WHOLE(vl1r_v, int8_t, lde_b)
++
++#define GEN_VEXT_ST_WHOLE(NAME, ETYPE, STORE_FN)             \
++void HELPER(NAME)(void *vd, target_ulong base,               \
++                  CPURISCVState *env, uint32_t desc)         \
++{                                                            \
++    vext_ldst_whole(vd, base, env, desc, STORE_FN,           \
++                    sizeof(ETYPE), GETPC(), MMU_DATA_STORE); \
++}
++
++GEN_VEXT_ST_WHOLE(vs1r_v, int8_t, ste_b)
++
+ /*
+  *** Vector AMO Operations (Zvamo)
+  */
 -- 
 2.17.1
 
