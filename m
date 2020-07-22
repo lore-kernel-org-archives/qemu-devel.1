@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CAF8C433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF98C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:54:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DE5220792
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:53:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DE5220792
+	by mail.kernel.org (Postfix) with ESMTPS id C840520792
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:54:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C840520792
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy5ol-00089X-AK
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 23:53:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43444)
+	id 1jy5pf-0001tv-SW
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 23:54:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43508)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jy5nc-0006Pl-Uj; Tue, 21 Jul 2020 23:52:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56332)
+ id 1jy5nt-0006uG-1I; Tue, 21 Jul 2020 23:52:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64714)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jy5na-0003tc-GT; Tue, 21 Jul 2020 23:52:08 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ id 1jy5nr-0003yj-45; Tue, 21 Jul 2020 23:52:24 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06M3XhV1153682; Tue, 21 Jul 2020 23:51:39 -0400
+ 06M3XJtk025231; Tue, 21 Jul 2020 23:52:00 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32e1vrbppe-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32e1xx2c5a-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jul 2020 23:51:39 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06M3kh8A183032;
- Tue, 21 Jul 2020 23:51:39 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32e1vrbpnv-1
+ Tue, 21 Jul 2020 23:52:00 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06M3ZU55033112;
+ Tue, 21 Jul 2020 23:51:59 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32e1xx2c52-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 21 Jul 2020 23:51:39 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06M3oG6F010307;
- Wed, 22 Jul 2020 03:51:38 GMT
+ Tue, 21 Jul 2020 23:51:59 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06M3p8lS008572;
+ Wed, 22 Jul 2020 03:51:58 GMT
 Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
- [9.57.198.28]) by ppma04dal.us.ibm.com with ESMTP id 32d5dq6ncv-1
+ [9.57.198.28]) by ppma01dal.us.ibm.com with ESMTP id 32brq8rx6v-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 03:51:38 +0000
+ Wed, 22 Jul 2020 03:51:58 +0000
 Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
  [9.57.199.110])
  by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06M3pbRi57868566
+ 06M3pwaS18481556
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 22 Jul 2020 03:51:37 GMT
+ Wed, 22 Jul 2020 03:51:58 GMT
 Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5D883AE05F;
- Wed, 22 Jul 2020 03:51:37 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id EA799AE05C;
+ Wed, 22 Jul 2020 03:51:57 +0000 (GMT)
 Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3891EAE05C;
- Wed, 22 Jul 2020 03:51:31 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id ADE70AE064;
+ Wed, 22 Jul 2020 03:51:51 +0000 (GMT)
 Received: from morokweng.localdomain.com (unknown [9.163.58.88])
  by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 22 Jul 2020 03:51:30 +0000 (GMT)
+ Wed, 22 Jul 2020 03:51:51 +0000 (GMT)
 From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 To: qemu-ppc@nongnu.org
-Subject: [PATCH v2 3/9] ppc/spapr: Use start-powered-off CPUState property
-Date: Wed, 22 Jul 2020 00:50:10 -0300
-Message-Id: <20200722035016.469075-4-bauerman@linux.ibm.com>
+Subject: [PATCH v2 6/9] sparc/sun4m: Use start-powered-off CPUState property
+Date: Wed, 22 Jul 2020 00:50:13 -0300
+Message-Id: <20200722035016.469075-7-bauerman@linux.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200722035016.469075-1-bauerman@linux.ibm.com>
 References: <20200722035016.469075-1-bauerman@linux.ibm.com>
@@ -82,15 +82,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-07-22_01:2020-07-21,
  2020-07-21 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 suspectscore=1
- mlxlogscore=999 malwarescore=0 priorityscore=1501 adultscore=0 mlxscore=0
- impostorscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007220020
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=bauerman@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:52:01
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+ spamscore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=999 clxscore=1015 phishscore=0
+ mlxscore=0 lowpriorityscore=0 suspectscore=1 impostorscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007220022
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:51:27
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -125,66 +125,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PowerPC sPAPR CPUs start in the halted state, and spapr_reset_vcpu()
-attempts to implement this by setting CPUState::halted to 1. But that's too
-late for the case of hotplugged CPUs in a machine configure with 2 or more
-threads per core.
+Instead of setting CPUState::halted to 1 in secondary_cpu_reset(), use the
+start-powered-off property which makes cpu_common_reset() initialize it
+to 1 in common code.
 
-By then, other parts of QEMU have already caused the vCPU to run in an
-unitialized state a couple of times. For example, ppc_cpu_reset() calls
-ppc_tlb_invalidate_all(), which ends up calling async_run_on_cpu(). This
-kicks the new vCPU while it has CPUState::halted = 0, causing QEMU to issue
-a KVM_RUN ioctl on the new vCPU before the guest is able to make the
-start-cpu RTAS call to initialize its register state.
-
-This problem doesn't seem to cause visible issues for regular guests, but
-on a secure guest running under the Ultravisor it does. The Ultravisor
-relies on being able to snoop on the start-cpu RTAS call to map vCPUs to
-guests, and this issue causes it to see a stray vCPU that doesn't belong to
-any guest.
-
-Fix by setting the start-powered-off CPUState property in
-spapr_create_vcpu(), which makes cpu_common_reset() initialize
-CPUState::halted to 1 at an earlier moment.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 ---
- hw/ppc/spapr_cpu_core.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ hw/sparc/sun4m.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-NB: Tested on ppc64le pseries KVM guest with two threads per core. 
-Hot-plugging additional cores doesn't cause the bug described above
-anymore.
+NB: I was only able to test that this patch builds. I wasn't able to
+run it.
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c4f47dcc04..09feeb5f8f 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -36,11 +36,6 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 9be930415f..766e79bb5e 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -233,7 +233,6 @@ static void secondary_cpu_reset(void *opaque)
+     CPUState *cs = CPU(cpu);
  
      cpu_reset(cs);
- 
--    /* All CPUs start halted.  CPU0 is unhalted from the machine level
--     * reset code and the rest are explicitly started up by the guest
--     * using an RTAS call */
 -    cs->halted = 1;
--
-     env->spr[SPR_HIOR] = 0;
+ }
  
-     lpcr = env->spr[SPR_LPCR];
-@@ -288,6 +283,13 @@ static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp)
- 
-     cpu->machine_data = g_new0(SpaprCpuState, 1);
- 
-+    /*
-+     * All CPUs start halted. CPU0 is unhalted from the machine level reset code
-+     * and the rest are explicitly started up by the guest using an RTAS call.
-+     */
-+    object_property_set_bool(OBJECT(cs), "start-powered-off", true,
-+                             &error_abort);
-+
-     object_unref(obj);
-     return cpu;
- 
+ static void cpu_halt_signal(void *opaque, int irq, int level)
+@@ -833,6 +832,8 @@ static void cpu_devinit(const char *cpu_type, unsigned int id,
+         qemu_register_reset(secondary_cpu_reset, cpu);
+         cs = CPU(cpu);
+         cs->halted = 1;
++        object_property_set_bool(OBJECT(cs), "start-powered-off", true,
++                                 &error_abort);
+     }
+     *cpu_irqs = qemu_allocate_irqs(cpu_set_irq, cpu, MAX_PILS);
+     env->prom_addr = prom_addr;
 
