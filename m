@@ -2,149 +2,88 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB7E8C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EEB4C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:32:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92F662073A
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:25:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C41D8206E9
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 03:32:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="y6nVkzND"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92F662073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jKS5f4SQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C41D8206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy5OB-00053M-Sa
-	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 23:25:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39014)
+	id 1jy5Ux-0007yP-2L
+	for qemu-devel@archiver.kernel.org; Tue, 21 Jul 2020 23:32:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kevin.tian@intel.com>)
- id 1jy5NE-0004Za-R3
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:24:53 -0400
-Received: from mga02.intel.com ([134.134.136.20]:5591)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kevin.tian@intel.com>)
- id 1jy5NB-0000gG-Px
- for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:24:52 -0400
-IronPort-SDR: j+PUix5y9sB4zqMHTtypiX1h/N3baHmHQvYYfdRkgAXgs8+JZHfc4jBteKukqgPbfisKlqbD12
- vkZRG72OXNYQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9689"; a="138348944"
-X-IronPort-AV: E=Sophos;i="5.75,381,1589266800"; d="scan'208";a="138348944"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 21 Jul 2020 20:24:42 -0700
-IronPort-SDR: E+ObgITDP9dPKS4+6dG+GwbtIHjVtDacLmza+ta3uifuHTUJq3+c2sCbow1m+Yb6G7Etvo+p4F
- G73StCD5G6AQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,381,1589266800"; d="scan'208";a="284084320"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
- by orsmga003.jf.intel.com with ESMTP; 21 Jul 2020 20:24:42 -0700
-Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 21 Jul 2020 20:24:41 -0700
-Received: from FMSEDG001.ED.cps.intel.com (10.1.192.133) by
- FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 21 Jul 2020 20:24:41 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (TLS) id 14.3.439.0; Tue, 21 Jul 2020 20:24:41 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ndD996P6UrSUmlIAx90Z2P9uynrT1bBvVK9orb2q08+r7ymjWlJ62ylyGLClrFcqnK6sfxjygSqbmWWyIMn3eqvdBaCHcZ+PqYdWTadarIE+CALW1PVU08Rfif7kPlghKiAhpiL0NX0JhYdW09aZPBoEkPFxlPtNrN/KkJXvvoBGNyOfARJY3czhaCA52h0vofSQYidt6V+AfvNol95+uVV5wsZtXrbUH08/HVl8JNhHNXZNdAdHF1zOqBKKJG4912O7mLx9nyuG8KWqkRDNqZpmy8sDihsqBnDiSSddhB4aW86R6CzLg1gE+KtpvDBAWMifsuFbaegJ3fPT4IpBHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VJgCtWYGa+JwFR6xg0e8TD8FPlu1X7s3VqD5RabJF/4=;
- b=LeXrchMdm0GZxLou4RUe9gATj30oEkLuE/mQyTK7kXAC4Boh9AVL3/lBd5fMgrvM0v7RbeFgIKIlROUoJgOY+XIoPMt2f9TZ9nzREl7lsUSkQz7HPkaNFdws610CYoE7usPRdDd0E4tNHS52jnv1wgfmiCsTQSI2WY2ru/QgEtjj8Ln+rz5KH7oVWNa0wRRO231q4GLmDTzglZprUZVtl6QQjoodtC3UfYjk2jHrVWTF8Xe1hPgRk4tH2leCabcfshy0i85Uf9yWnfTH3LBbiFOkN2E8oeli+N4dunBqTHxL6q6B0sy1Dju4KpV3F5u4MnULtUgWWJ+BEv/Lsmb/ug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com; 
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VJgCtWYGa+JwFR6xg0e8TD8FPlu1X7s3VqD5RabJF/4=;
- b=y6nVkzNDbUCvouogBZVifiFtFCGIJD7vBkIS87GkooWk+iyQ2iSByX9HRZP+G6FABVxJmYVOsafQXNP0XD5Jo6KL1A5LpBPsbKcUDiJL/WGqcOeHzMIhJ7UdgAmM/7CoM4IsdRlDNdYMQjd1PiGDSMMY44c4xUSzhrOmbA2v+f8=
-Received: from MWHPR11MB1645.namprd11.prod.outlook.com (2603:10b6:301:b::12)
- by MWHPR11MB1391.namprd11.prod.outlook.com (2603:10b6:300:23::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.21; Wed, 22 Jul
- 2020 03:24:39 +0000
-Received: from MWHPR11MB1645.namprd11.prod.outlook.com
- ([fe80::9864:e0cb:af36:6feb]) by MWHPR11MB1645.namprd11.prod.outlook.com
- ([fe80::9864:e0cb:af36:6feb%5]) with mapi id 15.20.3195.028; Wed, 22 Jul 2020
- 03:24:39 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Xiang Zheng <zhengxiang9@huawei.com>, Alex Williamson
- <alex.williamson@redhat.com>
-Subject: RE: [PATCH Kernel v24 0/8] Add UAPIs to support migration for VFIO
- devices
-Thread-Topic: [PATCH Kernel v24 0/8] Add UAPIs to support migration for VFIO
- devices
-Thread-Index: AQHWNTOesMj3oV4z60GHhAB0JXq2KqkRpv2AgAFPMgCAAEajgIAABjAA
-Date: Wed, 22 Jul 2020 03:24:39 +0000
-Message-ID: <MWHPR11MB16454E9D60B5DE71B5FAE4658C790@MWHPR11MB1645.namprd11.prod.outlook.com>
-References: <1590697854-21364-1-git-send-email-kwankhede@nvidia.com>
- <450612c3-2a92-9034-7958-ee7f3c1a8c52@huawei.com>
- <20200721164304.0ce76b2e@x1.home>
- <3351a7d0-4fb1-a902-b902-a638a3d3047a@huawei.com>
-In-Reply-To: <3351a7d0-4fb1-a902-b902-a638a3d3047a@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.2.0.6
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-authentication-results: huawei.com; dkim=none (message not signed)
- header.d=none;huawei.com; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.198.147.198]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 115f56f9-21c8-49e5-7209-08d82deec48c
-x-ms-traffictypediagnostic: MWHPR11MB1391:
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR11MB13912A425EDDBBFD03EBB1FA8C790@MWHPR11MB1391.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: F3LR162t+0WBLB7HohyNsR7yEEQPq0jAdtHaGwFYV2Fh02OvUFJZ+eCCsYxoXSsCxQnDkXem1ImBQM3eUSM2Rp5OLsviyAZ2ydC1fHg0jPkODFtN4hG5i8gpBKWcCxszNqnNvqVEdo+I+rK1+DhxfEe+BONnOQsrPwBxaAo77096xqB/XCTo6X3a+HIHVLlIealjgO+ltWuV06+l4AGbP/o0721D6ma6bqNnK/2L/SaDn+U2inmirEoxd3ZPBKJLGb8/aXH4tarWosaqrJ2nCHlUtn7UTP8IRJbRTvT0VFEZ3CpGf5j8bNwN+BstbSv/EzP2q6V0bxOumcr+zRyC5A==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MWHPR11MB1645.namprd11.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(396003)(39860400002)(376002)(346002)(136003)(366004)(2906002)(186003)(76116006)(71200400001)(66946007)(83380400001)(66556008)(52536014)(33656002)(64756008)(66476007)(66446008)(9686003)(5660300002)(55016002)(53546011)(478600001)(86362001)(6506007)(7696005)(8676002)(8936002)(316002)(54906003)(110136005)(26005)(7416002)(4326008);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: 7UGj+7vPpaBt4RmV29N2IYgSIAsU37We/0IHp/smUdYp27cWOTylA0J+FA1FlLcw2LU61K6ttU2zpLTci5c3gxMO6hFxFMJSJiIsuAk37ZgD/VfEHNnCvJO+p2r7HkzhgqBQkvx5ucewpASa8o5SHj2teMmkcAul27YGX5rY8j1rHK4d9CXEccfxUIJ7LiRIdH2oBQafoW0zWmVcqzn7+0mgPydigLpm6qr4wuhnZNoZ2nrSBL+DIhZKUQjrkstgxqTvUQstLR8yJj+t1CDhAfg11iC69o8hiu+CpV9POT2OB4J5x/Tz0jhE/aNRrVjYKx0gjnC1r2j3bQ1/ICfTci7yaw4As40fH3pU+hrezuPiAghzXBy+tfVcztzr1i9ifnZlykxOek9sXnzQTR1/gr3QrQifo6EUlcBehk/xPASSmPZwODoDI/Nd4kJWFGqzBnoR1/gtH7as1vN+/ntXWo/Appl7PAppK/8yZ+BWYvrrspIVSMUTxkg8YJkPugD8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jy5UO-0007YR-EV
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:32:16 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38385
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1jy5UL-0001kl-Vm
+ for qemu-devel@nongnu.org; Tue, 21 Jul 2020 23:32:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595388733;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ho9MBe51yc6+FomNAHavhyUimKBmQvT3otDzVtDyGpk=;
+ b=jKS5f4SQnBSYdu3v3P4Nn7Jb/Azp0BBJsjksYJxD+qjvV+ukS2RNSKHhUrUKC/iIgRL1kp
+ g6egb+HUhTgUzXko+c3wtEyoUcnQMMi8m5L9PUK0hmYq6oWX1WDo6fck4PPA1fcmOLTJfI
+ y7b2i//p2qtF4TPd+WPCf2PkFR+Lmpw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-9R5IvjLmM9ipdXtL22IGpA-1; Tue, 21 Jul 2020 23:32:09 -0400
+X-MC-Unique: 9R5IvjLmM9ipdXtL22IGpA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF50780183C;
+ Wed, 22 Jul 2020 03:32:07 +0000 (UTC)
+Received: from [10.72.13.156] (ovpn-13-156.pek2.redhat.com [10.72.13.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1B1E876215;
+ Wed, 22 Jul 2020 03:32:03 +0000 (UTC)
+Subject: Re: [PATCH v3] e1000e: using bottom half to send packets
+To: Li Qiang <liq3ea@163.com>, dmitry.fleytman@gmail.com, pbonzini@redhat.com
+References: <20200721151728.112395-1-liq3ea@163.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <307795f9-70bb-b83b-6110-da2c923e4dc2@redhat.com>
+Date: Wed, 22 Jul 2020 11:32:02 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1645.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 115f56f9-21c8-49e5-7209-08d82deec48c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2020 03:24:39.5310 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0+nz0IGuJxxr/qkt8nGcY0/iG+IX9QJB6xbcxE3DouyUFipDGZOcp9faERz64xFQSCrbsdNgQb6lozmKiu25YA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1391
-X-OriginatorOrg: intel.com
-Received-SPF: pass client-ip=134.134.136.20; envelope-from=kevin.tian@intel.com;
- helo=mga02.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:24:43
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+In-Reply-To: <20200721151728.112395-1-liq3ea@163.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 21:28:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -158,79 +97,319 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "Liu, Yi L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>,
- "Yang, Ziye" <ziye.yang@intel.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- Wang Haibin <wanghaibin.wang@huawei.com>, "Wang, 
- Zhi A" <zhi.a.wang@intel.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>
+Cc: alxndr@bu.edu, liq3ea@gmail.com, qemu-devel@nongnu.org, ppandit@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBYaWFuZyBaaGVuZw0KPiBTZW50OiBXZWRuZXNkYXksIEp1bHkgMjIsIDIwMjAgMTA6
-NTYgQU0NCj4gDQo+IEhpIEFsZXgsDQo+IA0KPiBUaGFuayB5b3UgZm9yIHlvdXIgc3VnZ2VzdGlv
-bi4NCj4gDQo+IE9uIDIwMjAvNy8yMiA2OjQzLCBBbGV4IFdpbGxpYW1zb24gd3JvdGU6DQo+ID4g
-T24gVHVlLCAyMSBKdWwgMjAyMCAxMDo0MzoyMSArMDgwMA0KPiA+IFhpYW5nIFpoZW5nIDx6aGVu
-Z3hpYW5nOUBodWF3ZWkuY29tPiB3cm90ZToNCj4gPg0KPiA+PiBIaSBLaXJ0aSwNCj4gPj4NCj4g
-Pj4gU29ycnkgdG8gZGlzdHVyYiB5b3Ugc2luY2UgdGhpcyBwYXRjaCBzZXQgaGFzIGJlZW4gbWVy
-Z2VkLCBhbmQgSSBjYW5ub3QNCj4gPj4gcmVjZWl2ZSB0aGUgcWVtdS1zaWRlIGVtYWlscyBhYm91
-dCB0aGlzIHBhdGNoIHNldC4NCj4gPj4NCj4gPj4gV2UgYXJlIGdvaW5nIHRvIHN1cHBvcnQgbWln
-cmF0aW9uIGZvciBWRklPIGRldmljZXMgd2hpY2ggc3VwcG9ydCBkaXJ0eQ0KPiA+PiBwYWdlcyB0
-cmFja2luZy4NCj4gPj4NCj4gPj4gQW5kIHdlIGFsc28gcGxhbiB0byBsZXZlcmFnZSBTTU1VIEhU
-VFUgZmVhdHVyZSB0byBkbyB0aGUgZGlydHkgcGFnZXMNCj4gPj4gdHJhY2tpbmcgZm9yIHRoZSBk
-ZXZpY2VzIHdoaWNoIGRvbid0IHN1cHBvcnQgZGlydHkgcGFnZXMgdHJhY2tpbmcuDQo+ID4+DQo+
-ID4+IEZvciB0aGUgYWJvdmUgdHdvIGNhc2VzLCB3aGljaCBzaWRlIGRldGVybWluZXMgdG8gY2hv
-b3NlIElPTU1VIGRyaXZlcg0KPiBvcg0KPiA+PiB2ZW5kb3IgZHJpdmVyIHRvIGRvIGRpcnR5IGJp
-dG1hcCB0cmFja2luZywgUWVtdSBvciBWRklPPw0KPiA+Pg0KPiA+PiBJbiBicmllZiwgaWYgYm90
-aCBJT01NVSBhbmQgVkZJTyBkZXZpY2VzIHN1cHBvcnQgZGlydHkgcGFnZXMgdHJhY2tpbmcsDQo+
-ID4+IHdlIGNhbiBjaGVjayB0aGUgY2FwYWJpbGl0eSBhbmQgcHJlZmVyIHRvIHRyYWNrIGRpcnR5
-IHBhZ2VzIG9uIGRldmljZQ0KPiA+PiB2ZW5kb3IgZHJpdmVyIHdoaWNoIGlzIG1vcmUgZWZmaWNp
-ZW50Lg0KPiA+Pg0KPiA+PiBUaGUgcXVzZXRpb24gaXMgd2hpY2ggc2lkZSB0byBkbyB0aGUgY2hl
-Y2sgYW5kIHNlbGVjdGlvbj8gSW4gbXkgb3BpbmlvbiwNCj4gPj4gUWVtdS91c2Vyc3BhY2Ugc2Vl
-bXMgbW9yZSBzdWl0YWJsZS4NCj4gPg0KPiA+IERpcnR5IHBhZ2UgdHJhY2tpbmcgaXMgY29uc29s
-aWRhdGVkIGF0IHRoZSB2ZmlvIGNvbnRhaW5lciBsZXZlbC4NCj4gPiBVc2Vyc3BhY2UgaGFzIG5v
-IGJhc2lzIGZvciBkZXRlcm1pbmluZyBvciBpbnRlcmZhY2UgZm9yIHNlbGVjdGluZyBhDQo+ID4g
-ZGlydHkgYml0bWFwIHByb3ZpZGVyLCBzbyBJIHdvdWxkIGRpc2FncmVlIHRoYXQgUUVNVSBzaG91
-bGQgcGxheSBhbnkNCj4gPiByb2xlIGhlcmUuICBUaGUgY29udGFpbmVyIGRpcnR5IGJpdG1hcCB0
-cmllcyB0byBwcm92aWRlIHRoZSBmaW5lc3QNCj4gPiBncmFudWxhcml0eSBhdmFpbGFibGUgYmFz
-ZWQgb24gdGhlIHN1cHBvcnQgb2YgYWxsIHRoZSBkZXZpY2VzL2dyb3Vwcw0KPiA+IG1hbmFnZWQg
-YnkgdGhlIGNvbnRhaW5lci4gIElmIHRoZXJlIGFyZSBncm91cHMgYXR0YWNoZWQgdG8gdGhlDQo+
-ID4gY29udGFpbmVyIHRoYXQgaGF2ZSBub3QgcGFydGljaXBhdGVkIGluIHBhZ2UgcGlubmluZywg
-dGhlbiB3ZSBjb25zaWRlcg0KPiA+IGFsbCBETUEgbWFwcGluZ3Mgd2l0aGluIHRoZSBjb250YWlu
-ZXIgYXMgcGVyc2lzdGVudGx5IGRpcnR5LiAgT25jZSBhbGwNCj4gPiBvZiB0aGUgcGFydGljaXBh
-bnRzIHN1YnNjcmliZSB0byBwYWdlIHBpbm5pbmcsIHRoZSBkaXJ0eSBzY29wZSBpcw0KPiA+IHJl
-ZHVjZWQgdG8gdGhlIHBpbm5lZCBwYWdlcy4gIElPTU1VIHN1cHBvcnQgZm9yIGRpcnR5IHBhZ2Ug
-bG9nZ2luZyB3b3VsZA0KPiA+IGludHJvZHVjZSBmaW5lciBncmFudWxhcml0eSB5ZXQsIHdoaWNo
-IHdlIHdvdWxkIHByb2JhYmx5IHByZWZlciBvdmVyDQo+ID4gcGFnZSBwaW5uaW5nLCBidXQgaW50
-ZXJmYWNlcyBmb3IgdGhpcyBoYXZlIG5vdCBiZWVuIGRldmlzZWQuDQo+IA0KPiBLZXZpbiBhbmQg
-aGlzIGNvbGxlYWd1ZXMgbWF5IGFkZCB0aGVzZSBBUElzIGluIHRoZSBmdXR1cmUuDQo+IFdlIGFs
-c28gcGxhbiB0byBzdXBwb3J0IHRoZXNlIGludGVyZmFjZXMgb24gU01NVSBkcml2ZXIgYW5kIGFm
-dGVyd2FyZHMgd2UNCj4gY2FuIGhhdmUgYSBmdXJ0aGVyIGRpc2N1c3Npb24uDQoNClllcywgd2Ug
-YXJlIHdvcmtpbmcgb24gdGhhdCBwYXJ0LiBHZW5lcmFsbHkgc3BlYWtpbmcgSSBhZ3JlZSB3aXRo
-IEFsZXgNCnRoYXQgdGhlIGtlcm5lbCBzaG91bGQgZGVjaWRlIGRpcnR5IGJpdG1hcCBwcm92aWRl
-ciBhbmQgSU9NTVUgZGlydHkNCmxvZ2dpbmcgaXMgbGlrZWx5IHByZWZlcnJlZCBvdmVyIHBhZ2Ug
-cGlubmluZy4gUGFnZSBwaW5uaW5nIGVpdGhlciBwcm92aWRlcw0Kb25seSBjb2Fyc2UtZ3JhaW5l
-ZCBkaXJ0eSBpbmZvIChlLmcuIDEwMCdzIE1CIHBpbm5lZCBwYWdlcyBvYnNlcnZlZCBpbg0KdkdQ
-VSBjYXNlKSBvciB3aGVuIHJlYWNoaW5nIGZpbmVyIGdyYW51bGFyaXR5IGl0IG1heSBhZmZlY3Qg
-ZmFzdC1wYXRoIA0KcGVyZm9ybWFuY2UgKGUuZy4gZHJpdmVyIG1heSBoYXZlIHRvIGludGVyY2Vw
-dCBmYXN0LXBhdGggb3BlcmF0aW9ucyB0bw0KdHJhY2sgZGlydGllZCBwYWdlcyBjbG9zZWx5KS4g
-SU9NTVUgcHJvdmlkZXMgYW4gYXJjaGl0ZWN0dXJhbCBhbmQNCmxpZ2h0ZXIgYXBwcm9hY2ggZm9y
-IHRyYWNraW5nIGRpcnR5IHBhZ2VzLg0KDQpUaGFua3MNCktldmluDQoNCj4gDQo+ID4NCj4gPiBJ
-ZGVhbGx5IHVzZXJzcGFjZSBzaG91bGQgYmUgdW5hd2FyZSBvZiBhbnkgb2YgdGhpcywgdGhlIGJl
-bmVmaXQgd291bGQNCj4gPiBiZSBzZWVuIHRyYW5zcGFyZW50bHkgYnkgaGF2aW5nIGEgbW9yZSBz
-cGFyc2VseSBmaWxsZWQgZGlydHkgYml0bWFwLA0KPiA+IHdoaWNoIG1vcmUgYWNjdXJhdGVseSBy
-ZWZsZWN0cyBob3cgbWVtb3J5IGlzIGFjdHVhbGx5IGJlaW5nIGRpcnRpZWQuDQo+IA0KPiBZZXMs
-IGluZGVlZC4NCj4gDQo+IC0tDQo+IFRoYW5rcywNCj4gWGlhbmcNCg0K
+
+On 2020/7/21 下午11:17, Li Qiang wrote:
+> Alexander Bulekov reported a UAF bug related e1000e packets send.
+>
+> -->https://bugs.launchpad.net/qemu/+bug/1886362
+>
+> This is because the guest trigger a e1000e packet send and set the
+> data's address to e1000e's MMIO address. So when the e1000e do DMA
+> it will write the MMIO again and trigger re-entrancy and finally
+> causes this UAF.
+>
+> Paolo suggested to use a bottom half whenever MMIO is doing complicate
+> things in here:
+> -->https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg03342.html
+>
+> Reference here:
+> 'The easiest solution is to delay processing of descriptors to a bottom
+> half whenever MMIO is doing something complicated.  This is also better
+> for latency because it will free the vCPU thread more quickly and leave
+> the work to the I/O thread.'
+>
+> This patch fixes this UAF.
+>
+> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+> Change since v2:
+> 1. Add comments for the tx bh schdule when VM resumes
+> 2. Leave the set ics code in 'e1000e_start_xmit'
+> 3. Cancel the tx bh and reset tx_waiting in e1000e_core_reset
+
+
+So based on our discussion this is probably not sufficient. It solves 
+the issue TX re-entrancy but not RX (e.g RX DMA to RDT?) Or is e1000e's 
+RX is reentrant?
+
+Thanks
+
+
+>
+> Change since v1:
+> Per Jason's review here:
+> -- https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05368.html
+> 1. Cancel and schedule the tx bh when VM is stopped or resume
+> 2. Add a tx_burst for e1000e configuration to throttle the bh execution
+> 3. Add a tx_waiting to record whether the bh is pending or not
+> Don't use BQL in the tx_bh handler as when tx_bh is executed, the BQL is
+> acquired.
+>
+>   hw/net/e1000e.c      |   6 +++
+>   hw/net/e1000e_core.c | 107 +++++++++++++++++++++++++++++++++++--------
+>   hw/net/e1000e_core.h |   8 ++++
+>   3 files changed, 101 insertions(+), 20 deletions(-)
+>
+> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+> index fda34518c9..24e35a78bf 100644
+> --- a/hw/net/e1000e.c
+> +++ b/hw/net/e1000e.c
+> @@ -77,10 +77,14 @@ typedef struct E1000EState {
+>   
+>       bool disable_vnet;
+>   
+> +    int32_t tx_burst;
+> +
+>       E1000ECore core;
+>   
+>   } E1000EState;
+>   
+> +#define TX_BURST 256
+> +
+>   #define E1000E_MMIO_IDX     0
+>   #define E1000E_FLASH_IDX    1
+>   #define E1000E_IO_IDX       2
+> @@ -263,6 +267,7 @@ static void e1000e_core_realize(E1000EState *s)
+>   {
+>       s->core.owner = &s->parent_obj;
+>       s->core.owner_nic = s->nic;
+> +    s->core.tx_burst = s->tx_burst;
+>   }
+>   
+>   static void
+> @@ -665,6 +670,7 @@ static Property e1000e_properties[] = {
+>                           e1000e_prop_subsys_ven, uint16_t),
+>       DEFINE_PROP_SIGNED("subsys", E1000EState, subsys, 0,
+>                           e1000e_prop_subsys, uint16_t),
+> +    DEFINE_PROP_INT32("x-txburst", E1000EState, tx_burst, TX_BURST),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>   
+> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+> index bcd186cac5..2fdfc23204 100644
+> --- a/hw/net/e1000e_core.c
+> +++ b/hw/net/e1000e_core.c
+> @@ -910,18 +910,17 @@ e1000e_rx_ring_init(E1000ECore *core, E1000E_RxRing *rxr, int idx)
+>   }
+>   
+>   static void
+> -e1000e_start_xmit(E1000ECore *core, const E1000E_TxRing *txr)
+> +e1000e_start_xmit(struct e1000e_tx *q)
+>   {
+> +    E1000ECore *core = q->core;
+>       dma_addr_t base;
+>       struct e1000_tx_desc desc;
+> -    bool ide = false;
+> -    const E1000E_RingInfo *txi = txr->i;
+> -    uint32_t cause = E1000_ICS_TXQE;
+> +    const E1000E_RingInfo *txi;
+> +    E1000E_TxRing txr;
+> +    int32_t num_packets = 0;
+>   
+> -    if (!(core->mac[TCTL] & E1000_TCTL_EN)) {
+> -        trace_e1000e_tx_disabled();
+> -        return;
+> -    }
+> +    e1000e_tx_ring_init(core, &txr, q - &core->tx[0]);
+> +    txi = txr.i;
+>   
+>       while (!e1000e_ring_empty(core, txi)) {
+>           base = e1000e_ring_head_descr(core, txi);
+> @@ -931,14 +930,24 @@ e1000e_start_xmit(E1000ECore *core, const E1000E_TxRing *txr)
+>           trace_e1000e_tx_descr((void *)(intptr_t)desc.buffer_addr,
+>                                 desc.lower.data, desc.upper.data);
+>   
+> -        e1000e_process_tx_desc(core, txr->tx, &desc, txi->idx);
+> -        cause |= e1000e_txdesc_writeback(core, base, &desc, &ide, txi->idx);
+> +        e1000e_process_tx_desc(core, txr.tx, &desc, txi->idx);
+> +        q->cause |= e1000e_txdesc_writeback(core, base, &desc,
+> +                                            &q->ide, txi->idx);
+>   
+>           e1000e_ring_advance(core, txi, 1);
+> +        if (++num_packets >= core->tx_burst) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    if (num_packets >= core->tx_burst) {
+> +        qemu_bh_schedule(q->tx_bh);
+> +        q->tx_waiting = 1;
+> +        return;
+>       }
+>   
+> -    if (!ide || !e1000e_intrmgr_delay_tx_causes(core, &cause)) {
+> -        e1000e_set_interrupt_cause(core, cause);
+> +    if (!q->ide || !e1000e_intrmgr_delay_tx_causes(core, &q->cause)) {
+> +        e1000e_set_interrupt_cause(core, q->cause);
+>       }
+>   }
+>   
+> @@ -2423,32 +2432,41 @@ e1000e_set_dbal(E1000ECore *core, int index, uint32_t val)
+>   static void
+>   e1000e_set_tctl(E1000ECore *core, int index, uint32_t val)
+>   {
+> -    E1000E_TxRing txr;
+>       core->mac[index] = val;
+>   
+>       if (core->mac[TARC0] & E1000_TARC_ENABLE) {
+> -        e1000e_tx_ring_init(core, &txr, 0);
+> -        e1000e_start_xmit(core, &txr);
+> +        if (core->tx[0].tx_waiting) {
+> +            return;
+> +        }
+> +        core->tx[0].tx_waiting = 1;
+> +        if (!core->vm_running) {
+> +            return;
+> +        }
+> +        qemu_bh_schedule(core->tx[0].tx_bh);
+>       }
+>   
+>       if (core->mac[TARC1] & E1000_TARC_ENABLE) {
+> -        e1000e_tx_ring_init(core, &txr, 1);
+> -        e1000e_start_xmit(core, &txr);
+> +        if (core->tx[1].tx_waiting) {
+> +            return;
+> +        }
+> +        core->tx[1].tx_waiting = 1;
+> +        if (!core->vm_running) {
+> +            return;
+> +        }
+> +        qemu_bh_schedule(core->tx[1].tx_bh);
+>       }
+>   }
+>   
+>   static void
+>   e1000e_set_tdt(E1000ECore *core, int index, uint32_t val)
+>   {
+> -    E1000E_TxRing txr;
+>       int qidx = e1000e_mq_queue_idx(TDT, index);
+>       uint32_t tarc_reg = (qidx == 0) ? TARC0 : TARC1;
+>   
+>       core->mac[index] = val & 0xffff;
+>   
+>       if (core->mac[tarc_reg] & E1000_TARC_ENABLE) {
+> -        e1000e_tx_ring_init(core, &txr, qidx);
+> -        e1000e_start_xmit(core, &txr);
+> +        qemu_bh_schedule(core->tx[qidx].tx_bh);
+>       }
+>   }
+>   
+> @@ -3315,11 +3333,52 @@ e1000e_vm_state_change(void *opaque, int running, RunState state)
+>           trace_e1000e_vm_state_running();
+>           e1000e_intrmgr_resume(core);
+>           e1000e_autoneg_resume(core);
+> +        core->vm_running = 1;
+> +
+> +        for (int i = 0; i < E1000E_NUM_QUEUES; i++) {
+> +            /*
+> +             * Schedule tx bh unconditionally to make sure
+> +             * tx work after live migration since we don't
+> +             * migrate tx_waiting.
+> +             */
+> +            qemu_bh_schedule(core->tx[i].tx_bh);
+> +        }
+> +
+>       } else {
+>           trace_e1000e_vm_state_stopped();
+> +
+> +        for (int i = 0; i < E1000E_NUM_QUEUES; i++) {
+> +            qemu_bh_cancel(core->tx[i].tx_bh);
+> +        }
+> +
+>           e1000e_autoneg_pause(core);
+>           e1000e_intrmgr_pause(core);
+> +        core->vm_running = 0;
+> +    }
+> +}
+> +
+> +
+> +static void e1000e_core_tx_bh(void *opaque)
+> +{
+> +    struct e1000e_tx *q = opaque;
+> +    E1000ECore *core = q->core;
+> +
+> +    if (!core->vm_running) {
+> +        assert(q->tx_waiting);
+> +        return;
+> +    }
+> +
+> +    q->tx_waiting = 0;
+> +
+> +    if (!(core->mac[TCTL] & E1000_TCTL_EN)) {
+> +        trace_e1000e_tx_disabled();
+> +        return;
+>       }
+> +
+> +    q->cause = E1000_ICS_TXQE;
+> +    q->ide = false;
+> +
+> +    e1000e_start_xmit(q);
+>   }
+>   
+>   void
+> @@ -3334,12 +3393,15 @@ e1000e_core_pci_realize(E1000ECore     *core,
+>                                          e1000e_autoneg_timer, core);
+>       e1000e_intrmgr_pci_realize(core);
+>   
+> +    core->vm_running = runstate_is_running();
+>       core->vmstate =
+>           qemu_add_vm_change_state_handler(e1000e_vm_state_change, core);
+>   
+>       for (i = 0; i < E1000E_NUM_QUEUES; i++) {
+>           net_tx_pkt_init(&core->tx[i].tx_pkt, core->owner,
+>                           E1000E_MAX_TX_FRAGS, core->has_vnet);
+> +        core->tx[i].core = core;
+> +        core->tx[i].tx_bh = qemu_bh_new(e1000e_core_tx_bh, &core->tx[i]);
+>       }
+>   
+>       net_rx_pkt_init(&core->rx_pkt, core->has_vnet);
+> @@ -3367,6 +3429,9 @@ e1000e_core_pci_uninit(E1000ECore *core)
+>       for (i = 0; i < E1000E_NUM_QUEUES; i++) {
+>           net_tx_pkt_reset(core->tx[i].tx_pkt);
+>           net_tx_pkt_uninit(core->tx[i].tx_pkt);
+> +        qemu_bh_cancel(core->tx[i].tx_bh);
+> +        qemu_bh_delete(core->tx[i].tx_bh);
+> +        core->tx[i].tx_bh = NULL;
+>       }
+>   
+>       net_rx_pkt_uninit(core->rx_pkt);
+> @@ -3480,6 +3545,8 @@ e1000e_core_reset(E1000ECore *core)
+>           net_tx_pkt_reset(core->tx[i].tx_pkt);
+>           memset(&core->tx[i].props, 0, sizeof(core->tx[i].props));
+>           core->tx[i].skip_cp = false;
+> +        qemu_bh_cancel(core->tx[i].tx_bh);
+> +        core->tx[i].tx_waiting = 0;
+>       }
+>   }
+>   
+> diff --git a/hw/net/e1000e_core.h b/hw/net/e1000e_core.h
+> index aee32f7e48..0c16dce3a6 100644
+> --- a/hw/net/e1000e_core.h
+> +++ b/hw/net/e1000e_core.h
+> @@ -77,10 +77,18 @@ struct E1000Core {
+>           unsigned char sum_needed;
+>           bool cptse;
+>           struct NetTxPkt *tx_pkt;
+> +        QEMUBH *tx_bh;
+> +        uint32_t tx_waiting;
+> +        uint32_t cause;
+> +        bool ide;
+> +        E1000ECore *core;
+>       } tx[E1000E_NUM_QUEUES];
+>   
+>       struct NetRxPkt *rx_pkt;
+>   
+> +    int32_t tx_burst;
+> +
+> +    bool vm_running;
+>       bool has_vnet;
+>       int max_queue_num;
+>   
+
 
