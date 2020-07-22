@@ -2,80 +2,131 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4031C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 07:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFAEC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 07:51:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B49420714
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 07:43:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94F5420729
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 07:51:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="RJKOUbw7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B49420714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gjx8gMPi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94F5420729
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jy9Pt-0000nO-OM
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 03:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58510)
+	id 1jy9XI-0002Ss-TB
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 03:51:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jy9PH-0000H9-Un; Wed, 22 Jul 2020 03:43:16 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:49950)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1jy9PF-0000WH-4Y; Wed, 22 Jul 2020 03:43:15 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 986E8BF5DD;
- Wed, 22 Jul 2020 07:43:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
- s=default; t=1595403789;
- bh=CBVt9ecvmppdOE6kbqlcPvVOb+qAkPa18J2vN3szI/8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=RJKOUbw72ktZ7fbARqW2fwWJTMYJJcncqsTNZdDfSh3ZTh4XPYmFH8u8bV//GdvIq
- yYPQcJKJ47SlNApeOc4gzxs8FuQmIf2TJtuWumF/kniqDoJWzxHBNoTbXE+D2s0U7H
- LwnPjAoo4DE58TK0lfhLLXbud+9ng93/7G53u8jdpXl7E6Xi5Dx+cL176nBfjNZ9vf
- BJl703S/Mq4KXH9et0O3h+B9kX4saW93Xt/VLdeO4zvKSrI3L/AA8JVSURJC5f7FGs
- nMPbq84qGjTQJKLX2TfhSAbu5cuYcLEvtzIE4aC0P9gdu0w7dW5y5HL6aeakR7canX
- RrmEKnpGc0qGA==
-Date: Wed, 22 Jul 2020 09:43:05 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Subject: Re: [PATCH v4 2/2] nvme: allow cmb and pmr to be enabled on same
- device
-Message-ID: <20200722074305.GA606300@apples.localdomain>
-References: <20200701214858.28515-3-andrzej.jakowski@linux.intel.com>
- <20200702101318.rmd65uzwfpcmb24n@apples.localdomain>
- <20200702103127.hoonqkas3bw2v7re@apples.localdomain>
- <8f871a0d-47f1-1c8a-fcc2-aab2638c70cf@linux.intel.com>
- <20200702175113.6qtnpxqimpavzx7h@apples.localdomain>
- <191b39ed-0588-b5db-d352-965efd19128a@linux.intel.com>
- <20200706071545.md4tivimefffgyi6@apples.localdomain>
- <16d74d40-bd55-997d-7fd6-e7ec59566a68@linux.intel.com>
- <20200715080658.GA506302@apples.localdomain>
- <9143a543-d32d-f3e7-c37b-b3df7f853952@linux.intel.com>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jy9We-0001xy-DJ
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 03:50:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33305
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jy9Wa-00023R-MM
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 03:50:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595404247;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=XZ6mxypqj2AxcjBn/cmNvOwu1WlmcIEjXEFuKPMSxic=;
+ b=gjx8gMPi/2Vc0iq9mOsPZtXiDWRBECYXtcn+wIN0aeVo3Fd06ETUopWVwKhr1XA1hourI2
+ w93KduuOJ2SA6jEDjDeVOAU3HdMJ6k5Ghg3x11b/n5uNC3c+NAe5F68BXICQB66OeGxiye
+ bsuCCdbCPBprd5JSDweX18JIONGNRsI=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56--LYuELK7NMyI5zn53MP4Lg-1; Wed, 22 Jul 2020 03:50:45 -0400
+X-MC-Unique: -LYuELK7NMyI5zn53MP4Lg-1
+Received: by mail-ej1-f71.google.com with SMTP id x15so658784ejj.23
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 00:50:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XZ6mxypqj2AxcjBn/cmNvOwu1WlmcIEjXEFuKPMSxic=;
+ b=R1G54RULmKU4tkReUVbraETtIzCjAj4C10y/ryOcLbU2Dhvv5D7furWa4SWtMMhpDA
+ sr9eF5s2SAJGdtfilHsr3inkl1AXmDZ9uNKItwGzMCINIlnYe7ElPLz53YIR1JCWYv6Y
+ JpOnbuDcq8ihiTd4a76OtSeLGnyJike4Je7Iwawz8EZ+aDpQ77+z5GHQEz4+PCBbtLtT
+ EpU02BbVJeoCsSBlUQEG9locNNEdA95S9fSW2W9fppBCdWNHPc7ZakKBuwTPXObLBsVt
+ IeuJpH2TCYXahWHgV7WX7janLME9Nv5IgyLb2y70rgnDEO6ptNcf0WjJyXfUBYbR8hb3
+ 3l4w==
+X-Gm-Message-State: AOAM531W2X/44+9r3TIcaQn/ROk4b1UbpH2SdgQaGYzrxqBKeVbanLkR
+ YlJaq3eu9SjF76w+Y0n/1Lz10IdFyruJt6fbiaow34ygbIAPE3sMVBjiBU4wU19xGr6Knzz2h2g
+ vdhCxp5wMq3hH6Do=
+X-Received: by 2002:a17:906:c0d9:: with SMTP id
+ bn25mr28405916ejb.176.1595404243444; 
+ Wed, 22 Jul 2020 00:50:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzVJdhioaZGiY9eJokh+PeM3AOIZ+CCvPoxHHsLaJTcBgDj8RwaV+XKQNaPWSMl4u7yTwkxEg==
+X-Received: by 2002:a17:906:c0d9:: with SMTP id
+ bn25mr28405907ejb.176.1595404243247; 
+ Wed, 22 Jul 2020 00:50:43 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id aq25sm18588298ejc.11.2020.07.22.00.50.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 22 Jul 2020 00:50:42 -0700 (PDT)
+Subject: Re: [PATCH] ehci: drop pointless warn_report for guest bugs.
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200722072613.10390-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <4b259c5c-3d23-9dfb-2884-0c1db34d0c68@redhat.com>
+Date: Wed, 22 Jul 2020 09:50:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200722072613.10390-1-kraxel@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9143a543-d32d-f3e7-c37b-b3df7f853952@linux.intel.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 03:43:09
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 23:27:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,100 +139,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbusch@kernel.org, kwolf@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-@keith, please see below - can you comment on the Linux kernel 2 MB
-boundary requirement for the CMB? Or should we hail Stephen (or Logan
-maybe) since this seems to be related to p2pdma?
-
-On Jul 21 14:54, Andrzej Jakowski wrote:
-> On 7/15/20 1:06 AM, Klaus Jensen wrote:
-> > Hi Andrzej,
-> > 
-> > I've not been ignoring this, but sorry for not following up earlier.
-> > 
-> > I'm hesitent to merge anything that very obviously breaks an OS that we
-> > know is used a lot to this using this device. Also because the issue has
-> > not been analyzed well enough to actually know if this is a QEMU or
-> > kernel issue.
+On 7/22/20 9:26 AM, Gerd Hoffmann wrote:
+> We have a tracepoint at the same place which can be enabled if needed.
 > 
-> Hi Klaus,
+> Buglink: https://bugzilla.redhat.com//show_bug.cgi?id=1859236
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/usb/hcd-ehci.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> Thx for your response! I understand your hesitance on merging stuff that
-> obviously breaks guest OS. 
-> 
-> > 
-> > Now, as far as I can test, having the MSI-X vector table and PBA in BAR
-> > 0, PMR in BAR 2 and CMB in BAR 4 seems to make everyone happy
-> > (irregardless of IOMMU on/off).
-> > 
-> > Later, when the issue is better understood, we can add options to set
-> > offsets, BIRs etc.
-> > 
-> > The patch below replaces your "[PATCH v4 2/2] nvme: allow cmb and pmr to
-> > be enabled" (but still requires "[PATCH v4 1/2] ...") and applies to
-> > git://git.infradead.org/qemu-nvme.git nvme-next branch.
-> > 
-> > Can you reproduce the issues with that patch? I can't on a stock Arch
-> > Linux 5.7.5-arch1-1 kernel.
-> 
-> While I'm happy that approach with MSIX and PBA in BAR0 works fine, I
-> feel that investigation part why it works while mine doesn't is
-> missing. It looks to me that both patches are basically following same 
-> approach: create memory subregion and overlay on top of other memory
-> region. Why one works and the other doesn't then?
-> 
-> Having in mind that, I have recently focused on understanding problem.
-> I observed that when guest assigns address to BAR4, addr field in
-> nvme-bar4 memory region gets populated, but it doesn't get automatically
-> populated in ctrl_mem (cmb) memory subregion, so later when nvme_addr_is_cmb() 
-> is called address check works incorrectly and as a consequence vmm does dma 
-> read instead of memcpy.
-> I created a patch that sets correct address on ctrl_mem subregion and guest 
-> OS boots up correctly.
-> 
-> When I looked into pci and memory region code I noticed that indeed address
-> is only assigned to top level memory region but not to contained subregions.
-> I think that because in your approach cmb grabs whole bar exclusively it works
-> fine.
-> 
-> Here is my question (perhaps pci folks can help answer :)): if we consider 
-> memory region overlapping for pci devices as valid use case should pci 
-> code on configuration cycles walk through all contained subregion and
-> update addr field accordingly?
-> 
-> Thx!
+> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+> index 1495e8f7fab1..4266765f8682 100644
+> --- a/hw/usb/hcd-ehci.c
+> +++ b/hw/usb/hcd-ehci.c
+> @@ -352,7 +352,6 @@ static void ehci_trace_sitd(EHCIState *s, hwaddr addr,
+>  static void ehci_trace_guest_bug(EHCIState *s, const char *message)
+>  {
+>      trace_usb_ehci_guest_bug(message);
+> -    warn_report("%s", message);
+>  }
+>  
+>  static inline bool ehci_enabled(EHCIState *s)
 > 
 
-Hi Andrzej,
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Thanks for looking into this. I think your analysis helped me nail this.
-The problem is that we added the use of a subregion and have some
-assumptions that no longer hold.
-
-nvme_addr_is_cmb() assumes that n->ctrl_mem.addr is an absolute address.
-But when the memory region is a subregion, addr holds an offset into the
-parent container instead. Thus, changing all occurances of
-n->ctrl_mem.addr to (n->bar0.addr + n->ctrl_mem.addr) fixes the issue
-(this is required in nvme_addr_is_cmb and nvme_map_prp). I patched that
-in your original patch[1]. The reason my version worked is because there
-was no subregion involved for the CMB, so the existing address
-validation calculations were still correct.
-
-This leaves us with the Linux kernel complaining about not being able to
-register the CMB if it is not on a 2MB boundary - this is probably just
-a constraint in the kernel that we can't do anything about (but I'm no
-kernel hacker...), which can be fixed by either being "nice" towards the
-Linux kernel by forcing a 2 MB alignment in the device or exposing the
-SZU field such that the user can choose 16MiB size units (or higher)
-instead of 1MiB. I'm leaning towards ensuring the 2 MB alignment in the
-device such that we do not have to introduce new cmb_size parameters,
-while also making it easier for the user to configure. But I'm not
-really sure.
-
-  [1]: Message-Id: <20200701214858.28515-3-andrzej.jakowski@linux.intel.com>
 
