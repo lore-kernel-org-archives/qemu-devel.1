@@ -6,92 +6,100 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 423E0C433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 16:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F19C433E8
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 16:33:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AA612065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 16:31:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA6992065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 16:33:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OB3G+paD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AA612065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hOkO3tSl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA6992065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyHe9-0004U6-6b
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 12:31:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38348)
+	id 1jyHgH-000760-6Z
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 12:33:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jyHcu-0003Yh-G9
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:29:52 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51283)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1jyHcs-0006VO-T9
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:29:52 -0400
-Received: by mail-wm1-x341.google.com with SMTP id p14so2099620wmg.1
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 09:29:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=+rG3qvT7ySzAQUCoeVQPFrcWS7ra7WD2Vh84T2cZ9Bs=;
- b=OB3G+paDppI2H/szTjq4diWkRzxzqUBxGTM7lPj8ZdXpNIXmHOt4wn2XcjX2RUDzNE
- vBR/3/du4Qy92DGdVUygAPkYngeAK8WxRCNSb5zRrYcMYUStvNQkF+RZOeeE6BoZXFik
- SIelJQaJHxySkcsRcwpakYQjxphdSnj155+Tvt2QigrOg9MyYuZRJKG/dzYdab1DSotg
- zOoxJ1eNiAQzW5h/BnKECaUmceh56DIyIsSZgWBZMjBQYuOXtAHuCtuinw/gjBapypmb
- c3yDLeZrGyXiv3QHs+2hztHkimpLQWZjJP7V5I372MmbRnLsgLuicU258HRZ/xnzcBxJ
- E08g==
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jyHdN-0003uz-MN
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:30:21 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27897
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1jyHdK-0006bF-SK
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:30:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595435416;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cS/lt1qXDDaTsd2CE87X8FGrpENz2sZrNI+8hcvnVHI=;
+ b=hOkO3tSl6f7F/jKveHfarY55kNfDBahf8qIMzXcdleyhfxlR0OH/K5x4viv8J+ktFr6jnT
+ 4OLGXCLZ8GN2wNydpzu/4CkR2gcJ/WdZzS6vvJWL4u/81xnwRb5UzIooiH8K42j5DoBev4
+ O5OpmNkR1Ro6Aee7G4dfcUWj7DktJEQ=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-z-XXfGHZP3W0rPBn6SRNKw-1; Wed, 22 Jul 2020 12:30:14 -0400
+X-MC-Unique: z-XXfGHZP3W0rPBn6SRNKw-1
+Received: by mail-qv1-f71.google.com with SMTP id ed5so1771405qvb.9
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 09:30:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=+rG3qvT7ySzAQUCoeVQPFrcWS7ra7WD2Vh84T2cZ9Bs=;
- b=nxet8gCgpq7EB5/JjKVi6IuNLroRslEekL/LfulgJPpCeWG8FZuKPraLH1niltmSdn
- T3pCs1PftaE9aM/9VbK293GQ+iM0gvO4CYDJYT88RYhloFk26mJnoNR2MGszkkN337+F
- phjEq3NHVvpBHhSyFDmL4nM2ezWCW6q6YcOy7I1DPsMo3QmNfiCGzrjE4rZ1EFvgju5Y
- 8OQ3TlLfH1DbKt7oCtjoqBIa1g1dZ/TB3rpI6VanQZBgFEMh/e164CCcSHxD0YusNFBm
- 7Rx+GFoen7bfNO5oVAY6tASp9Y187EKJzg9rlqNDcV03NmhxSHP5WsYO46nbhLXaI6wF
- tTXA==
-X-Gm-Message-State: AOAM530E7x2btQbiaNOHXgyZf6LtmKLl7AxP24STf06NxD+1OFiZ9RFR
- lCBdFRLDzSHSENxEyi2XRBMSaA==
-X-Google-Smtp-Source: ABdhPJxZwDuZWDpUWl8yz7lSZcVGjmfBluJqLHGMaHyhcmw/vWFZtg4V1xJjsbzXrN2RTHz+COhKhg==
-X-Received: by 2002:a1c:7416:: with SMTP id p22mr449584wmc.32.1595435388749;
- Wed, 22 Jul 2020 09:29:48 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 129sm208845wmd.48.2020.07.22.09.29.46
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=cS/lt1qXDDaTsd2CE87X8FGrpENz2sZrNI+8hcvnVHI=;
+ b=N9sb5hKoJ1vhv6xvDjDPBXpWPm3ESQM5EVYfap385SwBKzd0sG+hDm/wxDL52skG06
+ QdnL466rs1f7sB7vgPKZxOYSLUQUApyZaYTi19B6+iNIN0Ke5DQymg/LetpjgjBYX2t9
+ bpz86ihdkmjJApmpjCmY1UgJ8ar9/lu3/78WB4T5FFS1FkIMtyvkp3MYICqIlK8ajbFf
+ fy9v9Sb1I5/teyCTKcrl9KJS8QiVapFdjjEtlNX9tAjSKBHFEpAuqprX441Hl2bwpFjF
+ abR66AgHPOo8c4H6DAosNeQShGdF7EM9iEL6xTKGQNqHhs6fGC9yiL4ogs+BtbwcPWOP
+ KcRg==
+X-Gm-Message-State: AOAM531LKVOGzZJ1eh0LK9mHW2+VCCAM9KNUu01vLPCbtZzb8BusjFAB
+ zV5dLoNDUS+ohkF4iI/Jxs/9J/HufzAsX5g06uSs3/iSl6KYq6jIFYBEi/c7y6joyTwg4njaGRq
+ IN2FC0e9/sP8FkWo=
+X-Received: by 2002:a05:6214:a72:: with SMTP id
+ ef18mr818641qvb.166.1595435413395; 
+ Wed, 22 Jul 2020 09:30:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxJEQCMV0nFc2fbws2rEfDhGcfaLW7iaPV5PoiJqXZLNiRJA/3iTOkzPUSEB0qiUoE9nITJZw==
+X-Received: by 2002:a05:6214:a72:: with SMTP id
+ ef18mr818604qvb.166.1595435413114; 
+ Wed, 22 Jul 2020 09:30:13 -0700 (PDT)
+Received: from xz-x1 ([2607:9880:19c8:6f::1f4f])
+ by smtp.gmail.com with ESMTPSA id 94sm115283qtc.88.2020.07.22.09.30.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jul 2020 09:29:47 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 59D071FF7E;
- Wed, 22 Jul 2020 17:29:46 +0100 (BST)
-References: <20200722062902.24509-1-alex.bennee@linaro.org>
- <20200722062902.24509-7-alex.bennee@linaro.org>
- <5d26e26f-55f7-5b74-bb9e-b97ea1040c05@linaro.org>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 06/12] accel/tcg: better handle memory constrained
- systems
-In-reply-to: <5d26e26f-55f7-5b74-bb9e-b97ea1040c05@linaro.org>
-Date: Wed, 22 Jul 2020 17:29:46 +0100
-Message-ID: <87ft9jtsw5.fsf@linaro.org>
+ Wed, 22 Jul 2020 09:30:12 -0700 (PDT)
+Date: Wed, 22 Jul 2020 12:30:09 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Subject: Re: [PATCH v0 0/4] background snapshot
+Message-ID: <20200722163009.GA535743@xz-x1>
+References: <20200722081133.29926-1-dplotnikov@virtuozzo.com>
+ <20200722145034.GZ535743@xz-x1>
+ <8146768f-7804-e239-41a0-3f7997f6b75d@virtuozzo.com>
+ <bf3fd4f4-31a1-9d13-94b0-e3b026edb6b1@virtuozzo.com>
 MIME-Version: 1.0
+In-Reply-To: <bf3fd4f4-31a1-9d13-94b0-e3b026edb6b1@virtuozzo.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/21 21:28:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,43 +113,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>, f4bug@amsat.org,
- cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>, aurelien@aurel32.net,
- Richard Henderson <rth@twiddle.net>
+Cc: quintela@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, den@openvz.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Jul 22, 2020 at 06:47:44PM +0300, Denis Plotnikov wrote:
+> 
+> 
+> On 22.07.2020 18:42, Denis Plotnikov wrote:
+> > 
+> > 
+> > On 22.07.2020 17:50, Peter Xu wrote:
+> > > Hi, Denis,
+> > Hi, Peter
+> > > ...
+> > > > How to use:
+> > > > 1. enable background snapshot capability
+> > > >     virsh qemu-monitor-command vm --hmp migrate_set_capability
+> > > > background-snapshot on
+> > > > 
+> > > > 2. stop the vm
+> > > >     virsh qemu-monitor-command vm --hmp stop
+> > > > 
+> > > > 3. Start the external migration to a file
+> > > >     virsh qemu-monitor-command cent78-bs --hmp migrate exec:'cat
+> > > > > ./vm_state'
+> > > > 
+> > > > 4. Wait for the migration finish and check that the migration
+> > > > has completed state.
+> > > Thanks for continued working on this project! I have two high level
+> > > questions
+> > > before dig into the patches.
+> > > 
+> > > Firstly, is step 2 required?  Can we use a single QMP command to
+> > > take snapshots
+> > > (which can still be a "migrate" command)?
+> > 
+> > With this series it is required, but steps 2 and 3 should be merged into
+> > a single one.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+I'm not sure whether you're talking about the disk snapshot operations, anyway
+yeah it'll be definitely good if we merge them into one in the next version.
 
-> On 7/21/20 11:28 PM, Alex Benn=C3=A9e wrote:
->> +        size_t phys_mem =3D qemu_get_host_physmem();
->> +        if (phys_mem > 0 && phys_mem < (2 * DEFAULT_CODE_GEN_BUFFER_SIZ=
-E)) {
->> +            tb_size =3D phys_mem / 8;
->> +        } else {
->> +            tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
->> +        }
->
-> I don't understand the 2 * DEFAULT part.
+> > > 
+> > > Meanwhile, we might also want to check around the type of backend
+> > > RAM.  E.g.,
+> > > shmem and hugetlbfs are still not supported for uffd-wp (which I'm still
+> > > working on).  I didn't check explicitly whether we'll simply fail
+> > > the migration
+> > > for those cases since the uffd ioctls will fail for those kinds of
+> > > RAM.  It
+> > > would be okay if we handle all the ioctl failures gracefully,
+> > 
+> > The ioctl's result is processed but the patch has a flaw - it ignores
+> > the result of ioctl check. Need to fix it.
+> 
+> It happens here:
+> 
+> +int ram_write_tracking_start(void)
+> +{
+> +    if (page_fault_thread_start()) {
+> +        return -1;
+> +    }
+> +
+> +    ram_block_list_create();
+> +    ram_block_list_set_readonly(); << this returns -1 in case of failure but I just ignore it here
+> +
+> +    return 0;
+> +}
+> 
+> > > or it would be
+> > > even better if we directly fail when we want to enable live snapshot
+> > > capability
+> > > for a guest who contains other types of ram besides private
+> > > anonymous memories.
+> > 
+> > I agree, but to know whether shmem or hugetlbfs are supported by the
+> > current kernel we should
+> > execute the ioctl for all memory regions on the capability enabling.
 
-I figured once you had at least twice as much memory you could use the
-full amount but...
+Yes, that seems to be a better solution, so we don't care about the type of ram
+backend anymore but check directly with the uffd ioctls.  With these checks,
+it'll be even fine to ignore the above retcode, or just assert, because we've
+already checked that before that point.
 
+Thanks,
 
-> Does this make more sense as
->
->     if (phys_mem =3D=3D 0) {
->         tb_size =3D default;
->     } else {
->         tb_size =3D MIN(default, phys_mem / 8);
->     }
+-- 
+Peter Xu
 
-This is probably a less aggressive tapering off which still doesn't
-affect my 32gb dev machine ;-)
-
---=20
-Alex Benn=C3=A9e
 
