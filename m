@@ -2,84 +2,94 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2408C433E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82108C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:02:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93F3C207BB
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:02:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93F3C207BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B70B206F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:02:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ltEoMbyI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B70B206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyI8K-0002qf-RI
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:02:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46656)
+	id 1jyI8f-0003Pf-Hp
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:02:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jyI6n-0001cF-4E; Wed, 22 Jul 2020 13:00:45 -0400
-Received: from mga02.intel.com ([134.134.136.20]:20977)
+ (Exim 4.90_1)
+ (envelope-from <prvs=465c3c755=alistair.francis@wdc.com>)
+ id 1jyI4j-0005xW-No
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:58:37 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:10279)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jyI6j-0003IL-0q; Wed, 22 Jul 2020 13:00:44 -0400
-IronPort-SDR: xurqIrJqKDQ4L7XDiTxs83lQURYVOAmqf2FTdVewAFZIuwaM2HNG4uRa91YuvWZWWPuGgJ3Os8
- ZhwPrqgNwBzg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9690"; a="138460139"
-X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; d="scan'208";a="138460139"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Jul 2020 10:00:33 -0700
-IronPort-SDR: H6Y4IokFQdvCraijod3zeikeFMtRtcK/WtSzzEfu+/BF1n3tAD91zuhXRPSm3vHCSohAnELcv3
- Yk4oB8aR5sYA==
-X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; d="scan'208";a="432440776"
-Received: from ajakowsk-mobl1.amr.corp.intel.com (HELO localhost.localdomain)
- ([10.212.27.19])
- by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Jul 2020 10:00:32 -0700
-Subject: Re: [PATCH v4 2/2] nvme: allow cmb and pmr to be enabled on same
- device
-To: Klaus Jensen <its@irrelevant.dk>
-References: <20200701214858.28515-3-andrzej.jakowski@linux.intel.com>
- <20200702101318.rmd65uzwfpcmb24n@apples.localdomain>
- <20200702103127.hoonqkas3bw2v7re@apples.localdomain>
- <8f871a0d-47f1-1c8a-fcc2-aab2638c70cf@linux.intel.com>
- <20200702175113.6qtnpxqimpavzx7h@apples.localdomain>
- <191b39ed-0588-b5db-d352-965efd19128a@linux.intel.com>
- <20200706071545.md4tivimefffgyi6@apples.localdomain>
- <16d74d40-bd55-997d-7fd6-e7ec59566a68@linux.intel.com>
- <20200715080658.GA506302@apples.localdomain>
- <9143a543-d32d-f3e7-c37b-b3df7f853952@linux.intel.com>
- <20200722074305.GA606300@apples.localdomain>
-From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Message-ID: <63d2e5ed-3c73-4a80-ae45-ce3665b406c8@linux.intel.com>
-Date: Wed, 22 Jul 2020 10:00:30 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1)
+ (envelope-from <prvs=465c3c755=alistair.francis@wdc.com>)
+ id 1jyI4h-0002fu-UT
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 12:58:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1595437115; x=1626973115;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=P/k2D2D4QAIblvv6h3Y5Rw3h3hsa6l5k5jMFvrCStiU=;
+ b=ltEoMbyI5THOI4aB5bPIwnB0Lb3BQOXvZCmay2zBHVTkpdQZonjJX05L
+ xR2b30fppbkZ0JqqBprOdXTusNSafUHnc9vtI1s1kZJX04+0x+ATQ/HDU
+ gqgvBFb5QnyLmbLCPb/Zx/ReoLU7ggjURRbCKaKEfuLxHNef3ZIpoEkFq
+ PbKTxfYP8s2eQXrznceDjR00JIImuVSPAtVen+6m1a0kxHbu2JJlo1EBn
+ 7dM6y9Fr5qKSB5XBbkAmozf9zXqGkwNFHUI+cBlWBhDH60Iv1VUnZVlC2
+ MCwSQjD7fqcmp+YpNZ/0FzIMmmommO7JZqdpcPX+DGlRiYIV9jma8IMlV A==;
+IronPort-SDR: NpYMQFqaM/ip+O/qW9tnzt3RxEUNKi8UPSD8EgBrlb/BUKl4/+JbTFuhOGH29NREekiwWuZOWH
+ 8BieRbgX2O8yehfGJtS6w/jfafQHZktZtkAw1mFrakikVv+M38EiL+eEa+hrJ3HnbVncIjxRGI
+ aXOmp2ZO6rkX8Qhb/FHrmuHVMILUgTUoG4Xk3HDMjICjM1u8NQ1ngEFTZde3e3izfKbgKm75Lg
+ GrPqUF3BjUS3k56qFVwrkAUder7qrcnJa0bzJCsyGoti1/w1pCnMdLztCCNdCBksR1fV3bfjht
+ TeQ=
+X-IronPort-AV: E=Sophos;i="5.75,383,1589212800"; d="scan'208";a="252418636"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 23 Jul 2020 00:58:21 +0800
+IronPort-SDR: hTMyhXynS3PWceY5QtaEPQla3z9HDNWfZFMCFb8WQXVxwDAwntC/DhwKTop+FuAlp4Dj/XAPcq
+ x4PCbRP7Gci4+blhW4RsbfXIfY8OwtU78=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Jul 2020 09:46:38 -0700
+IronPort-SDR: 4KkGJrx4Q5uTgYlouEphm1GTAmo3xFA9w4OtSEzxFdjHM5yA5crYWvbS9IX8GzpQe/9otaDn4E
+ QCQvV2CkzCCw==
+WDCIronportException: Internal
+Received: from usa001575.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.58.115])
+ by uls-op-cesaip02.wdc.com with ESMTP; 22 Jul 2020 09:58:22 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 3/5] target/riscv: fix vector index load/store constraints
+Date: Wed, 22 Jul 2020 09:48:36 -0700
+Message-Id: <20200722164838.1591305-4-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200722164838.1591305-1-alistair.francis@wdc.com>
+References: <20200722164838.1591305-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20200722074305.GA606300@apples.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: none client-ip=134.134.136.20;
- envelope-from=andrzej.jakowski@linux.intel.com; helo=mga02.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 13:00:38
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=465c3c755=alistair.francis@wdc.com;
+ helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 12:58:21
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+X-Spam_score_int: -43
+X-Spam_score: -4.4
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,130 +102,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbusch@kernel.org, kwolf@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/20 12:43 AM, Klaus Jensen wrote:
-> @keith, please see below - can you comment on the Linux kernel 2 MB
-> boundary requirement for the CMB? Or should we hail Stephen (or Logan
-> maybe) since this seems to be related to p2pdma?
-> 
-> On Jul 21 14:54, Andrzej Jakowski wrote:
->> On 7/15/20 1:06 AM, Klaus Jensen wrote:
->>> Hi Andrzej,
->>>
->>> I've not been ignoring this, but sorry for not following up earlier.
->>>
->>> I'm hesitent to merge anything that very obviously breaks an OS that we
->>> know is used a lot to this using this device. Also because the issue has
->>> not been analyzed well enough to actually know if this is a QEMU or
->>> kernel issue.
->>
->> Hi Klaus,
->>
->> Thx for your response! I understand your hesitance on merging stuff that
->> obviously breaks guest OS. 
->>
->>>
->>> Now, as far as I can test, having the MSI-X vector table and PBA in BAR
->>> 0, PMR in BAR 2 and CMB in BAR 4 seems to make everyone happy
->>> (irregardless of IOMMU on/off).
->>>
->>> Later, when the issue is better understood, we can add options to set
->>> offsets, BIRs etc.
->>>
->>> The patch below replaces your "[PATCH v4 2/2] nvme: allow cmb and pmr to
->>> be enabled" (but still requires "[PATCH v4 1/2] ...") and applies to
->>> git://git.infradead.org/qemu-nvme.git nvme-next branch.
->>>
->>> Can you reproduce the issues with that patch? I can't on a stock Arch
->>> Linux 5.7.5-arch1-1 kernel.
->>
->> While I'm happy that approach with MSIX and PBA in BAR0 works fine, I
->> feel that investigation part why it works while mine doesn't is
->> missing. It looks to me that both patches are basically following same 
->> approach: create memory subregion and overlay on top of other memory
->> region. Why one works and the other doesn't then?
->>
->> Having in mind that, I have recently focused on understanding problem.
->> I observed that when guest assigns address to BAR4, addr field in
->> nvme-bar4 memory region gets populated, but it doesn't get automatically
->> populated in ctrl_mem (cmb) memory subregion, so later when nvme_addr_is_cmb() 
->> is called address check works incorrectly and as a consequence vmm does dma 
->> read instead of memcpy.
->> I created a patch that sets correct address on ctrl_mem subregion and guest 
->> OS boots up correctly.
->>
->> When I looked into pci and memory region code I noticed that indeed address
->> is only assigned to top level memory region but not to contained subregions.
->> I think that because in your approach cmb grabs whole bar exclusively it works
->> fine.
->>
->> Here is my question (perhaps pci folks can help answer :)): if we consider 
->> memory region overlapping for pci devices as valid use case should pci 
->> code on configuration cycles walk through all contained subregion and
->> update addr field accordingly?
->>
->> Thx!
->>
-> 
-> Hi Andrzej,
-> 
-> Thanks for looking into this. I think your analysis helped me nail this.
-> The problem is that we added the use of a subregion and have some
-> assumptions that no longer hold.
-> 
-> nvme_addr_is_cmb() assumes that n->ctrl_mem.addr is an absolute address.
-> But when the memory region is a subregion, addr holds an offset into the
-> parent container instead. Thus, changing all occurances of
-> n->ctrl_mem.addr to (n->bar0.addr + n->ctrl_mem.addr) fixes the issue
-> (this is required in nvme_addr_is_cmb and nvme_map_prp). I patched that
-> in your original patch[1]. The reason my version worked is because there
-> was no subregion involved for the CMB, so the existing address
-> validation calculations were still correct.
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
-I'm a little bit concerned with this approach:
-(n->bar0.addr + n->ctrl_mem.addr) and hoping to have some debate. Let me 
-describe my understanding of the problem.
-It looks to me that addr field sometimes contains *absolute* address (when no 
-hierarchy is used) and other times it contains *relative* address (when
-hierarchy is created). From my perspective use of this field is inconsistent
-and thus error-prone.  
-Because of that I think that doing n->bar0.addr + n->ctrl_mem.addr doesn't
-solve root problem and is still prone to the same problem if in the future
-we potentially build even more complicated hierarchy.
-I think that we could solve it by introducing helper function like
+Although not explicitly specified that the the destination
+vector register groups cannot overlap the source vector register group,
+it is still necessary.
 
-hwaddr memory_region_get_abs_addr(MemoryRegion *mr) 
+And this constraint has been added to the v0.8 spec.
 
-to retrieve absolute address and in the documentation indicate that addr field
-can be relative or absolute and it is recommended to use above function to 
-retrieve absolute address.
-What do you think?
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <20200721133742.2298-2-zhiwei_liu@c-sky.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/insn_trans/trans_rvv.inc.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-> 
-> This leaves us with the Linux kernel complaining about not being able to
-> register the CMB if it is not on a 2MB boundary - this is probably just
-> a constraint in the kernel that we can't do anything about (but I'm no
-> kernel hacker...), which can be fixed by either being "nice" towards the
-> Linux kernel by forcing a 2 MB alignment in the device or exposing the
-> SZU field such that the user can choose 16MiB size units (or higher)
-> instead of 1MiB. I'm leaning towards ensuring the 2 MB alignment in the
-> device such that we do not have to introduce new cmb_size parameters,
-> while also making it easier for the user to configure. But I'm not
-> really sure.
-This is kernel limitation that we have to live with. The minimum granularity
-of devm_memremap_pages() is 2MB and it must be 2MB aligned. It used to worse
-at 128MB size+align (section-size), but sub-section memory-hotplug patches 
-adjusted that to a 2MB section. 
-Ensuring 2MiB size and alignment in the device emulation makes sense to me.
-Perhaps we could document that limitations - making user more aware of it.
-
-> 
->   [1]: Message-Id: <20200701214858.28515-3-andrzej.jakowski@linux.intel.com>
-> 
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 7b4752b911..887c6b8883 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -513,13 +513,21 @@ static bool ld_index_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
+     return ldst_index_trans(a->rd, a->rs1, a->rs2, data, fn, s);
+ }
+ 
++/*
++ * For vector indexed segment loads, the destination vector register
++ * groups cannot overlap the source vector register group (specified by
++ * `vs2`), else an illegal instruction exception is raised.
++ */
+ static bool ld_index_check(DisasContext *s, arg_rnfvm* a)
+ {
+     return (vext_check_isa_ill(s) &&
+             vext_check_overlap_mask(s, a->rd, a->vm, false) &&
+             vext_check_reg(s, a->rd, false) &&
+             vext_check_reg(s, a->rs2, false) &&
+-            vext_check_nf(s, a->nf));
++            vext_check_nf(s, a->nf) &&
++            ((a->nf == 1) ||
++             vext_check_overlap_group(a->rd, a->nf << s->lmul,
++                                      a->rs2, 1 << s->lmul)));
+ }
+ 
+ GEN_VEXT_TRANS(vlxb_v, 0, rnfvm, ld_index_op, ld_index_check)
+-- 
+2.27.0
 
 
