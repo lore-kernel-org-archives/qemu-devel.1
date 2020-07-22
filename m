@@ -2,91 +2,80 @@ Return-Path: <SRS0=zezO=BB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D17C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2558C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D09B5206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:16:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D2E720781
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 17:22:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TB/OuRrL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09B5206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="oFslqoZs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D2E720781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyIMA-0005N1-5R
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51180)
+	id 1jyIRg-0006gG-KK
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 13:22:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jyILL-0004Nj-U5
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:15:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23630
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1jyILK-0005O6-4X
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 13:15:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595438145;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vVI1hT2smKITjcwWMdqfE1tMWNVOa+Cx+gvmCKoxX+k=;
- b=TB/OuRrLP2Q9pz/M1HBFTnF4kWymKTdnQor4T7RXTBI/tmpuVmmX77g3g2Ou9t6q4V+iB9
- cU1VAa1KHAPbz5U5Xkr+mybdRwV5C8rTRU8Ctdfde7pOmi1aN/7HMzE5ytSYSqCOwPwov5
- PHCU3h4tYztUl1LB67gPhtLIfgWjJKU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-U2UaKZo0NHe1Xuh-19If3A-1; Wed, 22 Jul 2020 13:15:43 -0400
-X-MC-Unique: U2UaKZo0NHe1Xuh-19If3A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C1491DE1;
- Wed, 22 Jul 2020 17:15:42 +0000 (UTC)
-Received: from starship (unknown [10.35.206.82])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3888188D40;
- Wed, 22 Jul 2020 17:15:41 +0000 (UTC)
-Message-ID: <c4b88728abb423ce5771b0302559e44c3f0aa24b.camel@redhat.com>
-Subject: Re: [PATCH for-5.1 1/2] qcow2: Implement v2 zero writes with
- discard if possible
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 22 Jul 2020 20:15:40 +0300
-In-Reply-To: <20200722171456.GC4838@linux.fritz.box>
-References: <20200720131810.177978-1-kwolf@redhat.com>
- <20200720131810.177978-2-kwolf@redhat.com>
- <498fc3712cd3a0cb0f6588331c47b5d12b7eac96.camel@redhat.com>
- <20200722171456.GC4838@linux.fritz.box>
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jyIR1-0006CT-6D; Wed, 22 Jul 2020 13:21:39 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:50644)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jyIQw-0005yd-LO; Wed, 22 Jul 2020 13:21:38 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 5245DBF5DD;
+ Wed, 22 Jul 2020 17:21:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
+ s=default; t=1595438491;
+ bh=AKnLVFpBxL+7eIVzC6cGNp9HGaiM2taxAdLwBVoiM60=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=oFslqoZs4thx1AL5cs0yLtQMGx/yLq2xswoMSrHAkMgXbcyvShpUPRzOivvGabALf
+ G6GKKLdAJQsFnZC1kdJBBo1dnpkkIKpZIdxPBS3zGYdLV1Vhkc6jss9likoG1qvMMk
+ SW0M7R3ajUmqYGl/zhniPcRMq2GtbK1eip4O/gbYquWtKJj9SWy1f9b0tTrZIcgSP8
+ iDPyP4fNMEekfH5NOO2Np1Jw5cquNQGfs3QYXk1K8Zw8rVe4peptgLmT/TO945d3DT
+ 4JP7FYNxy43uw9RNF3psJPLOSBTuPUfZYWJnyd1m/V+xLvF7ONpAyvvpoG1EKfmNiz
+ Y/L/wUNbm6HLQ==
+Date: Wed, 22 Jul 2020 19:21:27 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+Subject: Re: [PATCH v4 2/2] nvme: allow cmb and pmr to be enabled on same
+ device
+Message-ID: <20200722172127.GA712967@apples.localdomain>
+References: <20200702103127.hoonqkas3bw2v7re@apples.localdomain>
+ <8f871a0d-47f1-1c8a-fcc2-aab2638c70cf@linux.intel.com>
+ <20200702175113.6qtnpxqimpavzx7h@apples.localdomain>
+ <191b39ed-0588-b5db-d352-965efd19128a@linux.intel.com>
+ <20200706071545.md4tivimefffgyi6@apples.localdomain>
+ <16d74d40-bd55-997d-7fd6-e7ec59566a68@linux.intel.com>
+ <20200715080658.GA506302@apples.localdomain>
+ <9143a543-d32d-f3e7-c37b-b3df7f853952@linux.intel.com>
+ <20200722074305.GA606300@apples.localdomain>
+ <63d2e5ed-3c73-4a80-ae45-ce3665b406c8@linux.intel.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 00:40:35
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <63d2e5ed-3c73-4a80-ae45-ce3665b406c8@linux.intel.com>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 13:21:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,72 +88,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: kbusch@kernel.org, kwolf@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2020-07-22 at 19:14 +0200, Kevin Wolf wrote:
-> Am 22.07.2020 um 19:01 hat Maxim Levitsky geschrieben:
-> > On Mon, 2020-07-20 at 15:18 +0200, Kevin Wolf wrote:
-> > > qcow2 version 2 images don't support the zero flag for clusters, so for
-> > > write_zeroes requests, we return -ENOTSUP and get explicit zero buffer
-> > > writes. If the image doesn't have a backing file, we can do better: Just
-> > > discard the respective clusters.
-> > > 
-> > > This is relevant for 'qemu-img convert -O qcow2 -n', where qemu-img has
-> > > to assume that the existing target image may contain any data, so it has
-> > > to write zeroes. Without this patch, this results in a fully allocated
-> > > target image, even if the source image was empty.
-> > > 
-> > > Reported-by: Nir Soffer <nsoffer@redhat.com>
-> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > > ---
-> > >  block/qcow2-cluster.c | 9 ++++++++-
-> > >  1 file changed, 8 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> > > index 4b5fc8c4a7..a677ba9f5c 100644
-> > > --- a/block/qcow2-cluster.c
-> > > +++ b/block/qcow2-cluster.c
-> > > @@ -1797,8 +1797,15 @@ int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
-> > >      assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
-> > >             end_offset >= bs->total_sectors << BDRV_SECTOR_BITS);
-> > >  
-> > > -    /* The zero flag is only supported by version 3 and newer */
-> > > +    /*
-> > > +     * The zero flag is only supported by version 3 and newer. However, if we
-> > > +     * have no backing file, we can resort to discard in version 2.
-> > > +     */
-> > >      if (s->qcow_version < 3) {
-> > > +        if (!bs->backing) {
-> > > +            return qcow2_cluster_discard(bs, offset, bytes,
-> > > +                                         QCOW2_DISCARD_REQUEST, false);
-> > > +        }
-> > >          return -ENOTSUP;
-> > >      }
-> > >  
+On Jul 22 10:00, Andrzej Jakowski wrote:
+> On 7/22/20 12:43 AM, Klaus Jensen wrote:
+> > @keith, please see below - can you comment on the Linux kernel 2 MB
+> > boundary requirement for the CMB? Or should we hail Stephen (or Logan
+> > maybe) since this seems to be related to p2pdma?
 > > 
-> > From my knowelege of nvme, I remember that discard doesn't have to zero the blocks.
-> > There is special namespace capability the indicates the contents of the discarded block.
-> > (Deallocate Logical Block Features)
+> > On Jul 21 14:54, Andrzej Jakowski wrote:
+> >> On 7/15/20 1:06 AM, Klaus Jensen wrote:
+> >>> Hi Andrzej,
+> >>>
+> >>> I've not been ignoring this, but sorry for not following up earlier.
+> >>>
+> >>> I'm hesitent to merge anything that very obviously breaks an OS that we
+> >>> know is used a lot to this using this device. Also because the issue has
+> >>> not been analyzed well enough to actually know if this is a QEMU or
+> >>> kernel issue.
+> >>
+> >> Hi Klaus,
+> >>
+> >> Thx for your response! I understand your hesitance on merging stuff that
+> >> obviously breaks guest OS. 
+> >>
+> >>>
+> >>> Now, as far as I can test, having the MSI-X vector table and PBA in BAR
+> >>> 0, PMR in BAR 2 and CMB in BAR 4 seems to make everyone happy
+> >>> (irregardless of IOMMU on/off).
+> >>>
+> >>> Later, when the issue is better understood, we can add options to set
+> >>> offsets, BIRs etc.
+> >>>
+> >>> The patch below replaces your "[PATCH v4 2/2] nvme: allow cmb and pmr to
+> >>> be enabled" (but still requires "[PATCH v4 1/2] ...") and applies to
+> >>> git://git.infradead.org/qemu-nvme.git nvme-next branch.
+> >>>
+> >>> Can you reproduce the issues with that patch? I can't on a stock Arch
+> >>> Linux 5.7.5-arch1-1 kernel.
+> >>
+> >> While I'm happy that approach with MSIX and PBA in BAR0 works fine, I
+> >> feel that investigation part why it works while mine doesn't is
+> >> missing. It looks to me that both patches are basically following same 
+> >> approach: create memory subregion and overlay on top of other memory
+> >> region. Why one works and the other doesn't then?
+> >>
+> >> Having in mind that, I have recently focused on understanding problem.
+> >> I observed that when guest assigns address to BAR4, addr field in
+> >> nvme-bar4 memory region gets populated, but it doesn't get automatically
+> >> populated in ctrl_mem (cmb) memory subregion, so later when nvme_addr_is_cmb() 
+> >> is called address check works incorrectly and as a consequence vmm does dma 
+> >> read instead of memcpy.
+> >> I created a patch that sets correct address on ctrl_mem subregion and guest 
+> >> OS boots up correctly.
+> >>
+> >> When I looked into pci and memory region code I noticed that indeed address
+> >> is only assigned to top level memory region but not to contained subregions.
+> >> I think that because in your approach cmb grabs whole bar exclusively it works
+> >> fine.
+> >>
+> >> Here is my question (perhaps pci folks can help answer :)): if we consider 
+> >> memory region overlapping for pci devices as valid use case should pci 
+> >> code on configuration cycles walk through all contained subregion and
+> >> update addr field accordingly?
+> >>
+> >> Thx!
+> >>
 > > 
-> > If and only if the discard behavier flag indicates that discarded areas are zero,
-> > then the write-zero command can have special 'deallocate' flag that hints the controller
-> > to discard the sectors.
+> > Hi Andrzej,
 > > 
-> > So woudn't discarding the clusters have theoretical risk of introducing garbage there?
+> > Thanks for looking into this. I think your analysis helped me nail this.
+> > The problem is that we added the use of a subregion and have some
+> > assumptions that no longer hold.
+> > 
+> > nvme_addr_is_cmb() assumes that n->ctrl_mem.addr is an absolute address.
+> > But when the memory region is a subregion, addr holds an offset into the
+> > parent container instead. Thus, changing all occurances of
+> > n->ctrl_mem.addr to (n->bar0.addr + n->ctrl_mem.addr) fixes the issue
+> > (this is required in nvme_addr_is_cmb and nvme_map_prp). I patched that
+> > in your original patch[1]. The reason my version worked is because there
+> > was no subregion involved for the CMB, so the existing address
+> > validation calculations were still correct.
 > 
-> No, qcow2_cluster_discard() has a defined behaviour. For v2 images, it
-> unallocates the cluster in the L2 table (this is only safe without a
-> backing file), for v3 images it converts them to zero clusters.
+> I'm a little bit concerned with this approach:
+> (n->bar0.addr + n->ctrl_mem.addr) and hoping to have some debate. Let me 
+> describe my understanding of the problem.
 
-All right then!
+Oh. In the context of your patch I meant bar4 of course, but anyway.
 
-Best regards,
-	Maxim Levitsky
+> It looks to me that addr field sometimes contains *absolute* address (when no 
+> hierarchy is used) and other times it contains *relative* address (when
+> hierarchy is created). From my perspective use of this field is inconsistent
+> and thus error-prone.  
+> Because of that I think that doing n->bar0.addr + n->ctrl_mem.addr doesn't
+> solve root problem and is still prone to the same problem if in the future
+> we potentially build even more complicated hierarchy.
+> I think that we could solve it by introducing helper function like
 > 
-> Kevin
+> hwaddr memory_region_get_abs_addr(MemoryRegion *mr) 
+> 
+> to retrieve absolute address and in the documentation indicate that addr field
+> can be relative or absolute and it is recommended to use above function to 
+> retrieve absolute address.
+> What do you think?
+> 
 
+I'm all for a helper - I was not gonna cheer for the quick'n'dirty fix I
+did just to convince myself that this was the issue ;)
 
+I think the helper might already be there in memory.c. It's just not
+exported.
+
+   static hwaddr memory_region_to_absolute_addr(MemoryRegion *mr, hwaddr offset)
+
+> > 
+> > This leaves us with the Linux kernel complaining about not being able to
+> > register the CMB if it is not on a 2MB boundary - this is probably just
+> > a constraint in the kernel that we can't do anything about (but I'm no
+> > kernel hacker...), which can be fixed by either being "nice" towards the
+> > Linux kernel by forcing a 2 MB alignment in the device or exposing the
+> > SZU field such that the user can choose 16MiB size units (or higher)
+> > instead of 1MiB. I'm leaning towards ensuring the 2 MB alignment in the
+> > device such that we do not have to introduce new cmb_size parameters,
+> > while also making it easier for the user to configure. But I'm not
+> > really sure.
+> This is kernel limitation that we have to live with. The minimum granularity
+> of devm_memremap_pages() is 2MB and it must be 2MB aligned. It used to worse
+> at 128MB size+align (section-size), but sub-section memory-hotplug patches 
+> adjusted that to a 2MB section. 
+
+Thanks for that explanation!
+
+> Ensuring 2MiB size and alignment in the device emulation makes sense to me.
+> Perhaps we could document that limitations - making user more aware of it.
+> 
+
+Sounds good to me.
 
