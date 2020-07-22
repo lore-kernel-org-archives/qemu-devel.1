@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3443EC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A38AC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:49:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF0E92068F
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:49:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32C3520714
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 Jul 2020 09:49:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="nAMRy9DE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF0E92068F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="VshEqaXT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32C3520714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyBNS-000308-VF
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:49:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55652)
+	id 1jyBNY-0003CK-8S
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 05:49:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jyAxW-0007qd-1t
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:22:42 -0400
-Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:37652)
+ id 1jyAvu-0004Nw-AO
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:21:02 -0400
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:37643)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1jyAxU-0006Fc-1T
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:22:41 -0400
-Received: by mail-pg1-x52f.google.com with SMTP id d4so882314pgk.4
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:22:39 -0700 (PDT)
+ id 1jyAvq-0005xY-U7
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 05:21:01 -0400
+Received: by mail-pg1-x52c.google.com with SMTP id d4so880088pgk.4
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 02:20:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=9XOTESI9eXA/uC1WDkucmt0i6gkmJBujKi7+z0KtGwA=;
- b=nAMRy9DEgjrqVfEGOsO6MGznuW9V8pSK4iqexcjg+yC5cmN8WdXqEjq9n+5DuKMp7g
- TzKXu0P2UScfVnj0s2YctNlancSx8IYq17NylGarogQrtpCu73VWDpEbbhkLctMduMTm
- pxcJvYv33sxhRtzDjIMy454WWuFLN15DG7YyxjYFS94tLD47iovvAiPJD/Gn/Yuhdozq
- G3k9HoIADnpxgAdkMSnpJTRGFdpjENvpt56q0sh3gtx8auub5XtgSYGFMVC3D7z6T7kX
- 7WICg/qaT3coL3jXqyIPr9dLoRelrVbr9K8IANABKyYMOsPc8QqHDC73FCsqKjFgz5qY
- kxlg==
+ bh=eOba8Tk0Biv7SLGf/daURGXR2aaUs/Gp2nVqvWqB5qE=;
+ b=VshEqaXTSjLa8rznLll+sehXT8znnQOkABdCa5MAVDZwsWS/BYDU13vUnqz7+O+FAY
+ +uFeVt40YBjk5O60+AfNwPeowWpQpQOAu2+oXne0mNIHXNv+OxQnWtpBDiAGHj5d85iD
+ Ojq0Szg8CqFEVoJqAgFGrV7SBTkXfX0mejh+4NLgRY+CzTZRYbfRZDX8cN3DNSnCUfZa
+ XU4CJG7K+fT8B/8zApk8HRLL/vnH7gngjjCHSBokNIt8GrFHxLK2rOKcqgD+7aJYzbj8
+ lW9USkjtVWqE1vLwBeLcrtL9J61I0s36TcQIoK94SS+RFekXTCZlVHj3MNaOwyxLbqJa
+ M1XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=9XOTESI9eXA/uC1WDkucmt0i6gkmJBujKi7+z0KtGwA=;
- b=ljBTKbstnsTxhclMRNAZ020Pks48r7ntiTGtl9SyzlSu0lfwFXak96w2Fv+BBssTjU
- DPHQUPheLcH6kbXu/cU+QAKGlQJbiN/BaOC+0lH/I0u2tC4uCJNmDd19iZ0trDhyCkPT
- QAjQax1lqZitUkIIKWRVILM8w21P2q1+JyLybA/xOlHXEjyvdk1atWcCpX2qQS9/VK0I
- E91R7ZEZIl+JFZXsEOC7yBzqpRjmdn7M+LNoF9nwTb4fHUXXM5Ns00iHH4BWRTy6SlgR
- vfr5zetJJ1HXyJ4AtB/RIz0xTp6CBDgPhfiQEnKV+JZtQetoYV33R/TYaAYa260VMheV
- E9gw==
-X-Gm-Message-State: AOAM532d8LuX45sRZk0cAckSpol/J09ZhLFEtQoPPIOCLi0zdF8+x6O8
- mpyRskdWYWrSEEBcfsckWpvT8QfnsBQ=
-X-Google-Smtp-Source: ABdhPJwFditogk5CvmFL5pAeKr51uez7CR4lVqImYSOTfltMyEe+M+JxLKHgPjuFwxiHOWx4Ssu0Og==
-X-Received: by 2002:aa7:9d81:: with SMTP id f1mr27221800pfq.225.1595409758329; 
- Wed, 22 Jul 2020 02:22:38 -0700 (PDT)
+ bh=eOba8Tk0Biv7SLGf/daURGXR2aaUs/Gp2nVqvWqB5qE=;
+ b=euu23PpU1dV5Ca6UAD57i6hwot2BBJbCwxkk1et6h698b/5ey3lCxVdzWWJn9Ek4KJ
+ LRFD+A5ovxBIFtKaQXjPsKJTY73e7c4isMj5Y6PKaim7sVaWBxryppuBX5E8OeDsy3c0
+ Vkcj0Z9NibI8soi7aAPeZkSpdpD2C3xIqvMJpoYN4vNr4SziqmlJ2s3oLt77vNOP41N3
+ 1gQ66ujRwUipL48D6X1fXFiWLrnNJQRaBnkCpG0ODl/L3jLwa2Wn52zRHOIvkZXzyWTZ
+ Dov6ulxWxYsLgV0djKE0ph47EtIYEP9KLdUulMVO7Qd3vu4BHF9iM/wRbElDng/hQpii
+ +5Kw==
+X-Gm-Message-State: AOAM532u8a1wNlIUS2BP0plM/gKCIAfr5qXXdz339QolMOA6JLqnlMpV
+ CKapG3aqqSZ0nhX6otEJ4jd57E679Fg=
+X-Google-Smtp-Source: ABdhPJxaaxTUccG9otJ8a/ExrSi5RIyzdbBpX0YLZP3sC9wMBlJKUlY+ONY/pf6kIgw79SS5QIGWpQ==
+X-Received: by 2002:a63:1408:: with SMTP id u8mr26602455pgl.282.1595409657334; 
+ Wed, 22 Jul 2020 02:20:57 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.22.36
+ by smtp.gmail.com with ESMTPSA id c125sm22301879pfa.119.2020.07.22.02.20.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Jul 2020 02:22:37 -0700 (PDT)
+ Wed, 22 Jul 2020 02:20:56 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC v2 72/76] target/riscv: rvv-0.9: narrowing
- floating-point/integer type-convert
-Date: Wed, 22 Jul 2020 17:16:35 +0800
-Message-Id: <20200722091641.8834-73-frank.chang@sifive.com>
+Subject: [RFC v2 47/76] target/riscv: rvv-0.9: narrowing integer right shift
+ instructions
+Date: Wed, 22 Jul 2020 17:16:10 +0800
+Message-Id: <20200722091641.8834-48-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200722091641.8834-1-frank.chang@sifive.com>
 References: <20200722091641.8834-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
- envelope-from=frank.chang@sifive.com; helo=mail-pg1-x52f.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52c;
+ envelope-from=frank.chang@sifive.com; helo=mail-pg1-x52c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -113,273 +113,189 @@ From: Frank Chang <frank.chang@sifive.com>
 
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- target/riscv/helper.h                   | 30 +++++---
- target/riscv/insn32.decode              | 15 ++--
- target/riscv/insn_trans/trans_rvv.inc.c | 50 +++++++++++--
- target/riscv/vector_helper.c            | 99 ++++++++++++++++++++-----
- 4 files changed, 154 insertions(+), 40 deletions(-)
+ target/riscv/helper.h                   | 24 ++++++++++----------
+ target/riscv/insn32.decode              | 12 +++++-----
+ target/riscv/insn_trans/trans_rvv.inc.c | 30 ++++++++++++-------------
+ target/riscv/vector_helper.c            | 24 ++++++++++----------
+ 4 files changed, 45 insertions(+), 45 deletions(-)
 
 diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 03330fa332..a8260072e6 100644
+index 11048efe7e..02258b42d1 100644
 --- a/target/riscv/helper.h
 +++ b/target/riscv/helper.h
-@@ -990,16 +990,26 @@ DEF_HELPER_5(vfwcvt_rtz_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vfwcvt_rtz_x_f_v_h, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vfwcvt_rtz_x_f_v_w, void, ptr, ptr, ptr, env, i32)
+@@ -379,18 +379,18 @@ DEF_HELPER_6(vsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+ DEF_HELPER_6(vsra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
  
--DEF_HELPER_5(vfncvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
--DEF_HELPER_5(vfncvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
--DEF_HELPER_5(vfncvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
--DEF_HELPER_5(vfncvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
--DEF_HELPER_5(vfncvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
--DEF_HELPER_5(vfncvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
--DEF_HELPER_5(vfncvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
--DEF_HELPER_5(vfncvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
--DEF_HELPER_5(vfncvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
--DEF_HELPER_5(vfncvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_xu_f_w_b, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_xu_f_w_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_xu_f_w_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_x_f_w_b, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_x_f_w_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_x_f_w_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_xu_w_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_xu_w_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_x_w_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_x_w_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_f_w_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_f_f_w_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_rod_f_f_w_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_rod_f_f_w_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_rtz_xu_f_w_b, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_rtz_xu_f_w_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_rtz_xu_f_w_w, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_rtz_x_f_w_b, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_rtz_x_f_w_h, void, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_5(vfncvt_rtz_x_f_w_w, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vnsrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vnsrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vnsrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vnsra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vnsra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vnsra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_6(vnsrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vnsrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vnsrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vnsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vnsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vnsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnsrl_wv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnsrl_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnsrl_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnsra_wv_b, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnsra_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnsra_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
++DEF_HELPER_6(vnsrl_wx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnsrl_wx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnsrl_wx_w, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnsra_wx_b, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnsra_wx_h, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vnsra_wx_w, void, ptr, ptr, tl, ptr, env, i32)
  
- DEF_HELPER_6(vredsum_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vmseq_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vmseq_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 55d7a6f338..17350227c6 100644
+index 481f909d47..bc6c788edf 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -553,11 +553,16 @@ vfwcvt_f_x_v       010010 . ..... 01011 001 ..... 1010111 @r2_vm
- vfwcvt_f_f_v       010010 . ..... 01100 001 ..... 1010111 @r2_vm
- vfwcvt_rtz_xu_f_v  010010 . ..... 01110 001 ..... 1010111 @r2_vm
- vfwcvt_rtz_x_f_v   010010 . ..... 01111 001 ..... 1010111 @r2_vm
--vfncvt_xu_f_v   100010 . ..... 10000 001 ..... 1010111 @r2_vm
--vfncvt_x_f_v    100010 . ..... 10001 001 ..... 1010111 @r2_vm
--vfncvt_f_xu_v   100010 . ..... 10010 001 ..... 1010111 @r2_vm
--vfncvt_f_x_v    100010 . ..... 10011 001 ..... 1010111 @r2_vm
--vfncvt_f_f_v    100010 . ..... 10100 001 ..... 1010111 @r2_vm
-+
-+vfncvt_xu_f_w      010010 . ..... 10000 001 ..... 1010111 @r2_vm
-+vfncvt_x_f_w       010010 . ..... 10001 001 ..... 1010111 @r2_vm
-+vfncvt_f_xu_w      010010 . ..... 10010 001 ..... 1010111 @r2_vm
-+vfncvt_f_x_w       010010 . ..... 10011 001 ..... 1010111 @r2_vm
-+vfncvt_f_f_w       010010 . ..... 10100 001 ..... 1010111 @r2_vm
-+vfncvt_rod_f_f_w   010010 . ..... 10101 001 ..... 1010111 @r2_vm
-+vfncvt_rtz_xu_f_w  010010 . ..... 10110 001 ..... 1010111 @r2_vm
-+vfncvt_rtz_x_f_w   010010 . ..... 10111 001 ..... 1010111 @r2_vm
-+
- vredsum_vs      000000 . ..... ..... 010 ..... 1010111 @r_vm
- vredand_vs      000001 . ..... ..... 010 ..... 1010111 @r_vm
- vredor_vs       000010 . ..... ..... 010 ..... 1010111 @r_vm
+@@ -352,12 +352,12 @@ vsrl_vi         101000 . ..... ..... 011 ..... 1010111 @r_vm
+ vsra_vv         101001 . ..... ..... 000 ..... 1010111 @r_vm
+ vsra_vx         101001 . ..... ..... 100 ..... 1010111 @r_vm
+ vsra_vi         101001 . ..... ..... 011 ..... 1010111 @r_vm
+-vnsrl_vv        101100 . ..... ..... 000 ..... 1010111 @r_vm
+-vnsrl_vx        101100 . ..... ..... 100 ..... 1010111 @r_vm
+-vnsrl_vi        101100 . ..... ..... 011 ..... 1010111 @r_vm
+-vnsra_vv        101101 . ..... ..... 000 ..... 1010111 @r_vm
+-vnsra_vx        101101 . ..... ..... 100 ..... 1010111 @r_vm
+-vnsra_vi        101101 . ..... ..... 011 ..... 1010111 @r_vm
++vnsrl_wv        101100 . ..... ..... 000 ..... 1010111 @r_vm
++vnsrl_wx        101100 . ..... ..... 100 ..... 1010111 @r_vm
++vnsrl_wi        101100 . ..... ..... 011 ..... 1010111 @r_vm
++vnsra_wv        101101 . ..... ..... 000 ..... 1010111 @r_vm
++vnsra_wx        101101 . ..... ..... 100 ..... 1010111 @r_vm
++vnsra_wi        101101 . ..... ..... 011 ..... 1010111 @r_vm
+ vmseq_vv        011000 . ..... ..... 000 ..... 1010111 @r_vm
+ vmseq_vx        011000 . ..... ..... 100 ..... 1010111 @r_vm
+ vmseq_vi        011000 . ..... ..... 011 ..... 1010111 @r_vm
 diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 775811c9f0..7c4f78a065 100644
+index 45853812f7..451931492d 100644
 --- a/target/riscv/insn_trans/trans_rvv.inc.c
 +++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -3000,11 +3000,51 @@ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+@@ -1952,7 +1952,7 @@ GEN_OPIVI_GVEC_TRANS(vsrl_vi, IMM_TRUNC_SEW, vsrl_vx, shri)
+ GEN_OPIVI_GVEC_TRANS(vsra_vi, IMM_TRUNC_SEW, vsra_vx, sari)
+ 
+ /* Vector Narrowing Integer Right Shift Instructions */
+-static bool opivv_narrow_check(DisasContext *s, arg_rmrr *a)
++static bool opiwv_narrow_check(DisasContext *s, arg_rmrr *a)
+ {
+     return require_rvv(s) &&
+            vext_check_isa_ill(s) &&
+@@ -1960,10 +1960,10 @@ static bool opivv_narrow_check(DisasContext *s, arg_rmrr *a)
+ }
+ 
+ /* OPIVV with NARROW */
+-#define GEN_OPIVV_NARROW_TRANS(NAME)                               \
++#define GEN_OPIWV_NARROW_TRANS(NAME)                               \
+ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
+ {                                                                  \
+-    if (opivv_narrow_check(s, a)) {                                \
++    if (opiwv_narrow_check(s, a)) {                                \
+         uint32_t data = 0;                                         \
+         static gen_helper_gvec_4_ptr * const fns[3] = {            \
+             gen_helper_##NAME##_b,                                 \
+@@ -1987,10 +1987,10 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
+     }                                                              \
      return false;                                                  \
  }
+-GEN_OPIVV_NARROW_TRANS(vnsra_vv)
+-GEN_OPIVV_NARROW_TRANS(vnsrl_vv)
++GEN_OPIWV_NARROW_TRANS(vnsra_wv)
++GEN_OPIWV_NARROW_TRANS(vnsrl_wv)
  
--GEN_OPFV_NARROW_TRANS(vfncvt_xu_f_v)
--GEN_OPFV_NARROW_TRANS(vfncvt_x_f_v)
--GEN_OPFV_NARROW_TRANS(vfncvt_f_xu_v)
--GEN_OPFV_NARROW_TRANS(vfncvt_f_x_v)
--GEN_OPFV_NARROW_TRANS(vfncvt_f_f_v)
-+GEN_OPFV_NARROW_TRANS(vfncvt_f_xu_w)
-+GEN_OPFV_NARROW_TRANS(vfncvt_f_x_w)
-+GEN_OPFV_NARROW_TRANS(vfncvt_f_f_w)
-+GEN_OPFV_NARROW_TRANS(vfncvt_rod_f_f_w)
-+
-+static bool opxfv_narrow_check(DisasContext *s, arg_rmr *a)
-+{
-+    return require_rvv(s) &&
-+           vext_check_isa_ill(s) &&
-+           /* OPFV narrowing instructions ignore vs1 check */
-+           vext_check_sds(s, a->rd, 0, a->rs2, a->vm, false);
-+}
-+
-+#define GEN_OPXFV_NARROW_TRANS(NAME)                               \
-+static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
-+{                                                                  \
-+    if (opxfv_narrow_check(s, a)) {                                \
-+        uint32_t data = 0;                                         \
-+        static gen_helper_gvec_3_ptr * const fns[3] = {            \
-+            gen_helper_##NAME##_b,                                 \
-+            gen_helper_##NAME##_h,                                 \
-+            gen_helper_##NAME##_w,                                 \
-+        };                                                         \
-+        TCGLabel *over = gen_new_label();                          \
-+        gen_set_rm(s, 7);                                          \
-+        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
-+                                                                   \
-+        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
-+        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
-+        data = FIELD_DP32(data, VDATA, VTA, s->vta);               \
-+        data = FIELD_DP32(data, VDATA, VMA, s->vma);               \
-+        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
-+                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
-+                           s->vlen / 8, data, fns[s->sew]);        \
-+        mark_vs_dirty(s);                                          \
-+        gen_set_label(over);                                       \
-+        return true;                                               \
-+    }                                                              \
-+    return false;                                                  \
-+}
-+
-+GEN_OPXFV_NARROW_TRANS(vfncvt_xu_f_w)
-+GEN_OPXFV_NARROW_TRANS(vfncvt_x_f_w)
-+GEN_OPXFV_NARROW_TRANS(vfncvt_rtz_xu_f_w)
-+GEN_OPXFV_NARROW_TRANS(vfncvt_rtz_x_f_w)
+-static bool opivx_narrow_check(DisasContext *s, arg_rmrr *a)
++static bool opiwx_narrow_check(DisasContext *s, arg_rmrr *a)
+ {
+     return require_rvv(s) &&
+            vext_check_isa_ill(s) &&
+@@ -1998,10 +1998,10 @@ static bool opivx_narrow_check(DisasContext *s, arg_rmrr *a)
+ }
  
+ /* OPIVX with NARROW */
+-#define GEN_OPIVX_NARROW_TRANS(NAME)                                     \
++#define GEN_OPIWX_NARROW_TRANS(NAME)                                     \
+ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
+ {                                                                        \
+-    if (opivx_narrow_check(s, a)) {                                      \
++    if (opiwx_narrow_check(s, a)) {                                      \
+         static gen_helper_opivx * const fns[3] = {                       \
+             gen_helper_##NAME##_b,                                       \
+             gen_helper_##NAME##_h,                                       \
+@@ -2012,14 +2012,14 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
+     return false;                                                        \
+ }
+ 
+-GEN_OPIVX_NARROW_TRANS(vnsra_vx)
+-GEN_OPIVX_NARROW_TRANS(vnsrl_vx)
++GEN_OPIWX_NARROW_TRANS(vnsra_wx)
++GEN_OPIWX_NARROW_TRANS(vnsrl_wx)
+ 
+-/* OPIVI with NARROW */
+-#define GEN_OPIVI_NARROW_TRANS(NAME, IMM_MODE, OPIVX)                    \
++/* OPIWI with NARROW */
++#define GEN_OPIWI_NARROW_TRANS(NAME, IMM_MODE, OPIVX)                    \
+ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
+ {                                                                        \
+-    if (opivx_narrow_check(s, a)) {                                      \
++    if (opiwx_narrow_check(s, a)) {                                      \
+         static gen_helper_opivx * const fns[3] = {                       \
+             gen_helper_##OPIVX##_b,                                      \
+             gen_helper_##OPIVX##_h,                                      \
+@@ -2031,8 +2031,8 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
+     return false;                                                        \
+ }
+ 
+-GEN_OPIVI_NARROW_TRANS(vnsra_vi, IMM_ZX, vnsra_vx)
+-GEN_OPIVI_NARROW_TRANS(vnsrl_vi, IMM_ZX, vnsrl_vx)
++GEN_OPIWI_NARROW_TRANS(vnsra_wi, IMM_ZX, vnsra_wx)
++GEN_OPIWI_NARROW_TRANS(vnsrl_wi, IMM_ZX, vnsrl_wx)
+ 
+ /* Vector Integer Comparison Instructions */
  /*
-  *** Vector Reduction Operations
 diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 3d12638c4b..d4563e9091 100644
+index 95248238df..7de858d65b 100644
 --- a/target/riscv/vector_helper.c
 +++ b/target/riscv/vector_helper.c
-@@ -4272,6 +4272,16 @@ static DTYPE##_t STYPE##_to_##DTYPE##_rtz(STYPE a, float_status *s) \
-     return result;                                                  \
- }
+@@ -1515,18 +1515,18 @@ GEN_VEXT_SHIFT_VX(vsra_vx_w, int32_t, int32_t, H4, H4, DO_SRL, 0x1f, clearl)
+ GEN_VEXT_SHIFT_VX(vsra_vx_d, int64_t, int64_t, H8, H8, DO_SRL, 0x3f, clearq)
  
-+#define FCVT_ROD_F_F(STYPE, DTYPE)                              \
-+static DTYPE STYPE##_to_##DTYPE##_rod(STYPE a, float_status *s) \
-+{                                                               \
-+    signed char frm = s->float_rounding_mode;                   \
-+    s->float_rounding_mode = float_round_to_odd;                \
-+    DTYPE result = STYPE##_to_##DTYPE(a, s);                    \
-+    s->float_rounding_mode = frm;                               \
-+    return result;                                              \
-+}
-+
- /*
-  * vfcvt.rtz.xu.f.v vd, vs2, vm
-  * Convert float to unsigned integer, truncating.
-@@ -4371,31 +4381,36 @@ GEN_VEXT_V_ENV(vfwcvt_f_f_v_w, 4, 8, clearq)
+ /* Vector Narrowing Integer Right Shift Instructions */
+-GEN_VEXT_SHIFT_VV(vnsrl_vv_b, uint8_t,  uint16_t, H1, H2, DO_SRL, 0xf, clearb)
+-GEN_VEXT_SHIFT_VV(vnsrl_vv_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
+-GEN_VEXT_SHIFT_VV(vnsrl_vv_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
+-GEN_VEXT_SHIFT_VV(vnsra_vv_b, uint8_t,  int16_t, H1, H2, DO_SRL, 0xf, clearb)
+-GEN_VEXT_SHIFT_VV(vnsra_vv_h, uint16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
+-GEN_VEXT_SHIFT_VV(vnsra_vv_w, uint32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
+-GEN_VEXT_SHIFT_VX(vnsrl_vx_b, uint8_t, uint16_t, H1, H2, DO_SRL, 0xf, clearb)
+-GEN_VEXT_SHIFT_VX(vnsrl_vx_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
+-GEN_VEXT_SHIFT_VX(vnsrl_vx_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
+-GEN_VEXT_SHIFT_VX(vnsra_vx_b, int8_t, int16_t, H1, H2, DO_SRL, 0xf, clearb)
+-GEN_VEXT_SHIFT_VX(vnsra_vx_h, int16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
+-GEN_VEXT_SHIFT_VX(vnsra_vx_w, int32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
++GEN_VEXT_SHIFT_VV(vnsrl_wv_b, uint8_t,  uint16_t, H1, H2, DO_SRL, 0xf, clearb)
++GEN_VEXT_SHIFT_VV(vnsrl_wv_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
++GEN_VEXT_SHIFT_VV(vnsrl_wv_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
++GEN_VEXT_SHIFT_VV(vnsra_wv_b, uint8_t,  int16_t, H1, H2, DO_SRL, 0xf, clearb)
++GEN_VEXT_SHIFT_VV(vnsra_wv_h, uint16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
++GEN_VEXT_SHIFT_VV(vnsra_wv_w, uint32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
++GEN_VEXT_SHIFT_VX(vnsrl_wx_b, uint8_t, uint16_t, H1, H2, DO_SRL, 0xf, clearb)
++GEN_VEXT_SHIFT_VX(vnsrl_wx_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f, clearh)
++GEN_VEXT_SHIFT_VX(vnsrl_wx_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f, clearl)
++GEN_VEXT_SHIFT_VX(vnsra_wx_b, int8_t, int16_t, H1, H2, DO_SRL, 0xf, clearb)
++GEN_VEXT_SHIFT_VX(vnsra_wx_h, int16_t, int32_t, H2, H4, DO_SRL, 0x1f, clearh)
++GEN_VEXT_SHIFT_VX(vnsra_wx_w, int32_t, int64_t, H4, H8, DO_SRL, 0x3f, clearl)
  
- /* Narrowing Floating-Point/Integer Type-Convert Instructions */
- /* (TD, T2, TX2) */
-+#define NOP_UU_B uint8_t,  uint16_t, uint32_t
- #define NOP_UU_H uint16_t, uint32_t, uint32_t
- #define NOP_UU_W uint32_t, uint64_t, uint64_t
- /* vfncvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
--RVVCALL(OPFVV1, vfncvt_xu_f_v_h, NOP_UU_H, H2, H4, float32_to_uint16)
--RVVCALL(OPFVV1, vfncvt_xu_f_v_w, NOP_UU_W, H4, H8, float64_to_uint32)
--GEN_VEXT_V_ENV(vfncvt_xu_f_v_h, 2, 2, clearh)
--GEN_VEXT_V_ENV(vfncvt_xu_f_v_w, 4, 4, clearl)
-+RVVCALL(OPFVV1, vfncvt_xu_f_w_b, NOP_UU_B, H1, H2, float16_to_uint8)
-+RVVCALL(OPFVV1, vfncvt_xu_f_w_h, NOP_UU_H, H2, H4, float32_to_uint16)
-+RVVCALL(OPFVV1, vfncvt_xu_f_w_w, NOP_UU_W, H4, H8, float64_to_uint32)
-+GEN_VEXT_V_ENV(vfncvt_xu_f_w_b, 1, 1, clearb)
-+GEN_VEXT_V_ENV(vfncvt_xu_f_w_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_xu_f_w_w, 4, 4, clearl)
- 
- /* vfncvt.x.f.v vd, vs2, vm # Convert double-width float to signed integer. */
--RVVCALL(OPFVV1, vfncvt_x_f_v_h, NOP_UU_H, H2, H4, float32_to_int16)
--RVVCALL(OPFVV1, vfncvt_x_f_v_w, NOP_UU_W, H4, H8, float64_to_int32)
--GEN_VEXT_V_ENV(vfncvt_x_f_v_h, 2, 2, clearh)
--GEN_VEXT_V_ENV(vfncvt_x_f_v_w, 4, 4, clearl)
-+RVVCALL(OPFVV1, vfncvt_x_f_w_b, NOP_UU_B, H1, H2, float16_to_int8)
-+RVVCALL(OPFVV1, vfncvt_x_f_w_h, NOP_UU_H, H2, H4, float32_to_int16)
-+RVVCALL(OPFVV1, vfncvt_x_f_w_w, NOP_UU_W, H4, H8, float64_to_int32)
-+GEN_VEXT_V_ENV(vfncvt_x_f_w_b, 1, 1, clearb)
-+GEN_VEXT_V_ENV(vfncvt_x_f_w_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_x_f_w_w, 4, 4, clearl)
- 
- /* vfncvt.f.xu.v vd, vs2, vm # Convert double-width unsigned integer to float */
--RVVCALL(OPFVV1, vfncvt_f_xu_v_h, NOP_UU_H, H2, H4, uint32_to_float16)
--RVVCALL(OPFVV1, vfncvt_f_xu_v_w, NOP_UU_W, H4, H8, uint64_to_float32)
--GEN_VEXT_V_ENV(vfncvt_f_xu_v_h, 2, 2, clearh)
--GEN_VEXT_V_ENV(vfncvt_f_xu_v_w, 4, 4, clearl)
-+RVVCALL(OPFVV1, vfncvt_f_xu_w_h, NOP_UU_H, H2, H4, uint32_to_float16)
-+RVVCALL(OPFVV1, vfncvt_f_xu_w_w, NOP_UU_W, H4, H8, uint64_to_float32)
-+GEN_VEXT_V_ENV(vfncvt_f_xu_w_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_f_xu_w_w, 4, 4, clearl)
- 
- /* vfncvt.f.x.v vd, vs2, vm # Convert double-width integer to float. */
--RVVCALL(OPFVV1, vfncvt_f_x_v_h, NOP_UU_H, H2, H4, int32_to_float16)
--RVVCALL(OPFVV1, vfncvt_f_x_v_w, NOP_UU_W, H4, H8, int64_to_float32)
--GEN_VEXT_V_ENV(vfncvt_f_x_v_h, 2, 2, clearh)
--GEN_VEXT_V_ENV(vfncvt_f_x_v_w, 4, 4, clearl)
-+RVVCALL(OPFVV1, vfncvt_f_x_w_h, NOP_UU_H, H2, H4, int32_to_float16)
-+RVVCALL(OPFVV1, vfncvt_f_x_w_w, NOP_UU_W, H4, H8, int64_to_float32)
-+GEN_VEXT_V_ENV(vfncvt_f_x_w_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_f_x_w_w, 4, 4, clearl)
- 
- /* vfncvt.f.f.v vd, vs2, vm # Convert double float to single-width float. */
- static uint16_t vfncvtffv16(uint32_t a, float_status *s)
-@@ -4403,10 +4418,54 @@ static uint16_t vfncvtffv16(uint32_t a, float_status *s)
-     return float32_to_float16(a, true, s);
- }
- 
--RVVCALL(OPFVV1, vfncvt_f_f_v_h, NOP_UU_H, H2, H4, vfncvtffv16)
--RVVCALL(OPFVV1, vfncvt_f_f_v_w, NOP_UU_W, H4, H8, float64_to_float32)
--GEN_VEXT_V_ENV(vfncvt_f_f_v_h, 2, 2, clearh)
--GEN_VEXT_V_ENV(vfncvt_f_f_v_w, 4, 4, clearl)
-+RVVCALL(OPFVV1, vfncvt_f_f_w_h, NOP_UU_H, H2, H4, vfncvtffv16)
-+RVVCALL(OPFVV1, vfncvt_f_f_w_w, NOP_UU_W, H4, H8, float64_to_float32)
-+GEN_VEXT_V_ENV(vfncvt_f_f_w_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_f_f_w_w, 4, 4, clearl)
-+
-+/*
-+ * vfncvt.rod.f.f.w vd, vs2, vm
-+ * Convert double-width float to single-width float, rounding towards odd.
-+ */
-+static uint16_t vfncvtffv16_rod(uint32_t a, float_status *s)
-+{
-+    s->float_rounding_mode = float_round_to_odd;
-+    return float32_to_float16(a, true, s);
-+}
-+
-+FCVT_ROD_F_F(float64, float32)
-+RVVCALL(OPFVV1, vfncvt_rod_f_f_w_h, NOP_UU_H, H2, H4, vfncvtffv16_rod)
-+RVVCALL(OPFVV1, vfncvt_rod_f_f_w_w, NOP_UU_W, H4, H8, float64_to_float32_rod)
-+GEN_VEXT_V_ENV(vfncvt_rod_f_f_w_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_rod_f_f_w_w, 4, 4, clearl)
-+
-+/*
-+ * vfncvt.rtz.xu.f.w vd, vs2, vm
-+ * Convert double-width float to unsigned integer, truncating.
-+ */
-+FCVT_RTZ_F_V(float16, uint8)
-+FCVT_RTZ_F_V(float32, uint16)
-+FCVT_RTZ_F_V(float64, uint32)
-+RVVCALL(OPFVV1, vfncvt_rtz_xu_f_w_b, NOP_UU_B, H1, H2, float16_to_uint8_rtz)
-+RVVCALL(OPFVV1, vfncvt_rtz_xu_f_w_h, NOP_UU_H, H2, H4, float32_to_uint16_rtz)
-+RVVCALL(OPFVV1, vfncvt_rtz_xu_f_w_w, NOP_UU_W, H4, H8, float64_to_uint32_rtz)
-+GEN_VEXT_V_ENV(vfncvt_rtz_xu_f_w_b, 1, 1, clearb)
-+GEN_VEXT_V_ENV(vfncvt_rtz_xu_f_w_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_rtz_xu_f_w_w, 4, 4, clearl)
-+
-+/*
-+ * vfncvt.rtz.x.f.w  vd, vs2, vm
-+ * Convert double-width float to signed integer, truncating.
-+ */
-+FCVT_RTZ_F_V(float16, int8)
-+FCVT_RTZ_F_V(float32, int16)
-+FCVT_RTZ_F_V(float64, int32)
-+RVVCALL(OPFVV1, vfncvt_rtz_x_f_w_b, NOP_UU_B, H1, H2, float16_to_int8_rtz)
-+RVVCALL(OPFVV1, vfncvt_rtz_x_f_w_h, NOP_UU_H, H2, H4, float32_to_int16_rtz)
-+RVVCALL(OPFVV1, vfncvt_rtz_x_f_w_w, NOP_UU_W, H4, H8, float64_to_int32_rtz)
-+GEN_VEXT_V_ENV(vfncvt_rtz_x_f_w_b, 1, 1, clearb)
-+GEN_VEXT_V_ENV(vfncvt_rtz_x_f_w_h, 2, 2, clearh)
-+GEN_VEXT_V_ENV(vfncvt_rtz_x_f_w_w, 4, 4, clearl)
- 
- /*
-  *** Vector Reduction Operations
+ /* Vector Integer Comparison Instructions */
+ #define DO_MSEQ(N, M) (N == M)
 -- 
 2.17.1
 
