@@ -2,62 +2,83 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A372EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:39:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5176EC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:39:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 671AA206D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:39:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 671AA206D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 1DDD6206D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:39:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e2AX9oyA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DDD6206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jydJE-0006Fo-M5
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 11:39:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38114)
+	id 1jydK2-0007JM-Dt
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 11:39:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jydIC-00058M-VP
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 11:37:56 -0400
-Received: from relay64.bu.edu ([128.197.228.104]:54862)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jydI7-0003FZ-4x
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 11:37:56 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 06NFbQfg027002
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Thu, 23 Jul 2020 11:37:31 -0400
-Date: Thu, 23 Jul 2020 11:37:26 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Bug 1888606 <1888606@bugs.launchpad.net>
-Subject: Re: [Bug 1888606] [NEW] Heap-use-after-free in
- virtio_gpu_ctrl_response
-Message-ID: <20200723153726.m6eckrxwkoooreh3@mozz.bu.edu>
-References: <159548011952.31456.8249433335836304327.malonedeb@chaenomeles.canonical.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jydJ9-0006Og-AU
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 11:38:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20390
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jydJ6-0003N9-6o
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 11:38:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595518731;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=GqQQZb+c+br3a7neFL4jJ643l9g1YhEcDuj6ADgPkKo=;
+ b=e2AX9oyA0aB2fgbAw/mokiaTk+M7jXA9S+pkVRlu9a/Rdff2tmgM/h3zMSCTUHNsCQzqWL
+ NJekc4gP1uqaUvvFrBov5qIVDPK7Mi135JNHZPBi7e43zV9ViRb/43WDtp3B+s566c/PIH
+ pXSBcTtz6nQZ5WLT5zbvlf41Ts8T27Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-136-G7vQnqt1NMO2gOuR5zI6Ww-1; Thu, 23 Jul 2020 11:38:49 -0400
+X-MC-Unique: G7vQnqt1NMO2gOuR5zI6Ww-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 411BA100CCC1;
+ Thu, 23 Jul 2020 15:38:48 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.36.110.60])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C42F619D7B;
+ Thu, 23 Jul 2020 15:38:46 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] qapi: enable use of g_autoptr with QAPI types
+Date: Thu, 23 Jul 2020 16:38:45 +0100
+Message-Id: <20200723153845.2934357-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <159548011952.31456.8249433335836304327.malonedeb@chaenomeles.canonical.com>
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
- helo=relay64.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 11:37:49
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 06:04:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,310 +91,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CC-ing virtio-gpu Maintainers.
+Currently QAPI generates a type and function for free'ing it:
 
-On 200723 0455, Alexander Bulekov wrote:
-> Public bug reported:
-> 
-> Hello,
-> Here is a reproducer (build with --enable-sanitizers):
-> cat << EOF | ./i386-softmmu/qemu-system-i386 -nographic -M pc -nodefaults -m 512M -device virtio-vga -qtest stdio
-> outl 0xcf8 0x80001018
-> outl 0xcfc 0xe0800000
-> outl 0xcf8 0x80001020
-> outl 0xcf8 0x80001004
-> outw 0xcfc 0x7
-> writeq 0xe0801024 0x10646c00776c6cff
-> writeq 0xe080102d 0xe0801000320000
-> writeq 0xe0801015 0x12b2901ba000000
-> write 0x10646c02 0x1 0x2c
-> write 0x999 0x1 0x25
-> write 0x8 0x1 0x78
-> write 0x2c7 0x1 0x32
-> write 0x2cb 0x1 0xff
-> write 0x2cc 0x1 0x7e
-> writeq 0xe0803000 0xf2b8f0540ff83
-> EOF
-> 
-> The ASAN trace:
-> ==29798==ERROR: AddressSanitizer: heap-use-after-free on address 0x60d0000050e8 at pc 0x560629814761 bp 0x7ffe916eb1e0 sp 0x7ffe916eb1d8
-> READ of size 8 at 0x60d0000050e8 thread T0
->     #0 0x560629814760 in virtio_gpu_ctrl_response /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:181:42
->     #1 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:193:5
->     #2 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:791:9
->     #3 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:820:9
->     #4 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
->     #5 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
->     #6 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
->     #7 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
->     #8 0x56062a919571 in glib_pollfds_poll /home/alxndr/Development/qemu/util/main-loop.c:217:9
->     #9 0x56062a919571 in os_host_main_loop_wait /home/alxndr/Development/qemu/util/main-loop.c:240:5
->     #10 0x56062a919571 in main_loop_wait /home/alxndr/Development/qemu/util/main-loop.c:516:11
->     #11 0x560629094a64 in qemu_main_loop /home/alxndr/Development/qemu/softmmu/vl.c:1676:9
->     #12 0x56062a749ab5 in main /home/alxndr/Development/qemu/softmmu/main.c:49:5
->     #13 0x7f0d5cd55e0a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x26e0a)
->     #14 0x5606288ba889 in _start (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x24d0889)
-> 
-> 0x60d0000050e8 is located 56 bytes inside of 136-byte region [0x60d0000050b0,0x60d000005138)
-> freed by thread T0 here:
->     #0 0x56062893250d in free (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x254850d)
->     #1 0x560629827730 in virtio_gpu_reset /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:1160:9
->     #2 0x560628e81d34 in virtio_reset /home/alxndr/Development/qemu/hw/virtio/virtio.c:1999:9
->     #3 0x560629f08773 in virtio_pci_reset /home/alxndr/Development/qemu/hw/virtio/virtio-pci.c:1841:5
->     #4 0x560629043ab6 in memory_region_write_accessor /home/alxndr/Development/qemu/softmmu/memory.c:483:5
->     #5 0x560629043473 in access_with_adjusted_size /home/alxndr/Development/qemu/softmmu/memory.c:544:18
->     #6 0x560629042c99 in memory_region_dispatch_write /home/alxndr/Development/qemu/softmmu/memory.c
->     #7 0x560628990a37 in flatview_write_continue /home/alxndr/Development/qemu/exec.c:3176:23
->     #8 0x56062899041a in address_space_write_cached_slow /home/alxndr/Development/qemu/exec.c:3789:12
->     #9 0x560628e6f9bb in vring_used_write /home/alxndr/Development/qemu/hw/virtio/virtio.c:347:5
->     #10 0x560628e6f9bb in virtqueue_split_fill /home/alxndr/Development/qemu/hw/virtio/virtio.c:788:5
->     #11 0x560628e6f9bb in virtqueue_fill /home/alxndr/Development/qemu/hw/virtio/virtio.c:852:9
->     #12 0x560628e7205e in virtqueue_push /home/alxndr/Development/qemu/hw/virtio/virtio.c:917:5
->     #13 0x560629814246 in virtio_gpu_ctrl_response /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:180:5
->     #14 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:193:5
->     #15 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:791:9
->     #16 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:820:9
->     #17 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
->     #18 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
->     #19 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
->     #20 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
-> 
-> previously allocated by thread T0 here:
->     #0 0x56062893278d in malloc (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x254878d)
->     #1 0x7f0d5e1d5500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x54500)
->     #2 0x560628e7844b in virtqueue_split_pop /home/alxndr/Development/qemu/hw/virtio/virtio.c:1524:12
->     #3 0x560628e7844b in virtqueue_pop /home/alxndr/Development/qemu/hw/virtio/virtio.c:1693:16
->     #4 0x560629829633 in virtio_gpu_handle_ctrl /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:878:15
->     #5 0x560629829633 in virtio_gpu_ctrl_bh /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:893:5
->     #6 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
->     #7 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
->     #8 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
->     #9 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
-> 
-> 
-> With -trace virtio\* -trace pci\* :
-> [I 1595480025.666147] OPENED
-> 31900@1595480025.706962:virtio_set_status vdev 0x633000019640 val 0
-> 31900@1595480025.710297:virtio_set_status vdev 0x633000019640 val 0
-> [R +0.046276] outl 0xcf8 0x80001018
-> OK
-> [S +0.046313] OK
-> [R +0.046332] outl 0xcfc 0xe0800000
-> 31900@1595480025.712490:pci_cfg_write virtio-vga 02:0 @0x18 <- 0xe0800000
-> OK
-> [S +0.046356] OK
-> [R +0.046365] outl 0xcf8 0x80001020
-> OK
-> [S +0.046370] OK
-> [R +0.046379] outl 0xcf8 0x80001004
-> OK
-> [S +0.046383] OK
-> [R +0.046391] outw 0xcfc 0x7
-> 31900@1595480025.712544:pci_cfg_write virtio-vga 02:0 @0x4 <- 0x7
-> 31900@1595480025.712551:pci_update_mappings_add d=0x633000000800 00:02.0 2,0xe0800000+0x4000
-> OK
-> [S +0.047572] OK
-> [R +0.047597] writeq 0xe0801024 0x10646c00776c6cff
-> OK
-> [S +0.047610] OK
-> [R +0.047619] writeq 0xe080102d 0xe0801000320000
-> OK
-> [S +0.047627] OK
-> [R +0.047636] writeq 0xe0801015 0x12b2901ba000000
-> OK
-> [S +0.047650] OK
-> [R +0.047660] write 0x10646c02 0x1 0x2c
-> OK
-> [S +0.047769] OK
-> [R +0.047782] write 0x999 0x1 0x25
-> OK
-> [S +0.047907] OK
-> [R +0.047920] write 0x8 0x1 0x78
-> OK
-> [S +0.047927] OK
-> [R +0.047935] write 0x2c7 0x1 0x32
-> OK
-> [S +0.047941] OK
-> [R +0.047949] write 0x2cb 0x1 0xff
-> OK
-> [S +0.047954] OK
-> [R +0.047962] write 0x2cc 0x1 0x7e
-> OK
-> [S +0.047967] OK
-> [R +0.047975] writeq 0xe0803000 0xf2b8f0540ff83
-> 31900@1595480025.714133:virtio_queue_notify vdev 0x633000019640 n 0 vq 0x7fe20b13d800
-> OK
-> [S +0.047996] OK
-> 31900@1595480025.714386:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d800
-> 31900@1595480025.714406:virtio_gpu_features virgl 0
-> 31900@1595480025.714413:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d800
-> 31900@1595480025.714421:virtio_set_status vdev 0x633000019640 val 0
-> *CRASH*
-> 
-> Please let me know if I can provide any further info.
-> -Alex
-> 
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
-> 
-> -- 
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1888606
-> 
-> Title:
->   Heap-use-after-free in virtio_gpu_ctrl_response
-> 
-> Status in QEMU:
->   New
-> 
-> Bug description:
->   Hello,
->   Here is a reproducer (build with --enable-sanitizers):
->   cat << EOF | ./i386-softmmu/qemu-system-i386 -nographic -M pc -nodefaults -m 512M -device virtio-vga -qtest stdio
->   outl 0xcf8 0x80001018
->   outl 0xcfc 0xe0800000
->   outl 0xcf8 0x80001020
->   outl 0xcf8 0x80001004
->   outw 0xcfc 0x7
->   writeq 0xe0801024 0x10646c00776c6cff
->   writeq 0xe080102d 0xe0801000320000
->   writeq 0xe0801015 0x12b2901ba000000
->   write 0x10646c02 0x1 0x2c
->   write 0x999 0x1 0x25
->   write 0x8 0x1 0x78
->   write 0x2c7 0x1 0x32
->   write 0x2cb 0x1 0xff
->   write 0x2cc 0x1 0x7e
->   writeq 0xe0803000 0xf2b8f0540ff83
->   EOF
-> 
->   The ASAN trace:
->   ==29798==ERROR: AddressSanitizer: heap-use-after-free on address 0x60d0000050e8 at pc 0x560629814761 bp 0x7ffe916eb1e0 sp 0x7ffe916eb1d8
->   READ of size 8 at 0x60d0000050e8 thread T0
->       #0 0x560629814760 in virtio_gpu_ctrl_response /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:181:42
->       #1 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:193:5
->       #2 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:791:9
->       #3 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:820:9
->       #4 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
->       #5 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
->       #6 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
->       #7 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
->       #8 0x56062a919571 in glib_pollfds_poll /home/alxndr/Development/qemu/util/main-loop.c:217:9
->       #9 0x56062a919571 in os_host_main_loop_wait /home/alxndr/Development/qemu/util/main-loop.c:240:5
->       #10 0x56062a919571 in main_loop_wait /home/alxndr/Development/qemu/util/main-loop.c:516:11
->       #11 0x560629094a64 in qemu_main_loop /home/alxndr/Development/qemu/softmmu/vl.c:1676:9
->       #12 0x56062a749ab5 in main /home/alxndr/Development/qemu/softmmu/main.c:49:5
->       #13 0x7f0d5cd55e0a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x26e0a)
->       #14 0x5606288ba889 in _start (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x24d0889)
-> 
->   0x60d0000050e8 is located 56 bytes inside of 136-byte region [0x60d0000050b0,0x60d000005138)
->   freed by thread T0 here:
->       #0 0x56062893250d in free (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x254850d)
->       #1 0x560629827730 in virtio_gpu_reset /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:1160:9
->       #2 0x560628e81d34 in virtio_reset /home/alxndr/Development/qemu/hw/virtio/virtio.c:1999:9
->       #3 0x560629f08773 in virtio_pci_reset /home/alxndr/Development/qemu/hw/virtio/virtio-pci.c:1841:5
->       #4 0x560629043ab6 in memory_region_write_accessor /home/alxndr/Development/qemu/softmmu/memory.c:483:5
->       #5 0x560629043473 in access_with_adjusted_size /home/alxndr/Development/qemu/softmmu/memory.c:544:18
->       #6 0x560629042c99 in memory_region_dispatch_write /home/alxndr/Development/qemu/softmmu/memory.c
->       #7 0x560628990a37 in flatview_write_continue /home/alxndr/Development/qemu/exec.c:3176:23
->       #8 0x56062899041a in address_space_write_cached_slow /home/alxndr/Development/qemu/exec.c:3789:12
->       #9 0x560628e6f9bb in vring_used_write /home/alxndr/Development/qemu/hw/virtio/virtio.c:347:5
->       #10 0x560628e6f9bb in virtqueue_split_fill /home/alxndr/Development/qemu/hw/virtio/virtio.c:788:5
->       #11 0x560628e6f9bb in virtqueue_fill /home/alxndr/Development/qemu/hw/virtio/virtio.c:852:9
->       #12 0x560628e7205e in virtqueue_push /home/alxndr/Development/qemu/hw/virtio/virtio.c:917:5
->       #13 0x560629814246 in virtio_gpu_ctrl_response /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:180:5
->       #14 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:193:5
->       #15 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:791:9
->       #16 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:820:9
->       #17 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
->       #18 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
->       #19 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
->       #20 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
-> 
->   previously allocated by thread T0 here:
->       #0 0x56062893278d in malloc (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x254878d)
->       #1 0x7f0d5e1d5500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x54500)
->       #2 0x560628e7844b in virtqueue_split_pop /home/alxndr/Development/qemu/hw/virtio/virtio.c:1524:12
->       #3 0x560628e7844b in virtqueue_pop /home/alxndr/Development/qemu/hw/virtio/virtio.c:1693:16
->       #4 0x560629829633 in virtio_gpu_handle_ctrl /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:878:15
->       #5 0x560629829633 in virtio_gpu_ctrl_bh /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:893:5
->       #6 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
->       #7 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
->       #8 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
->       #9 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
-> 
->   
->   With -trace virtio\* -trace pci\* :
->   [I 1595480025.666147] OPENED
->   31900@1595480025.706962:virtio_set_status vdev 0x633000019640 val 0
->   31900@1595480025.710297:virtio_set_status vdev 0x633000019640 val 0
->   [R +0.046276] outl 0xcf8 0x80001018
->   OK
->   [S +0.046313] OK
->   [R +0.046332] outl 0xcfc 0xe0800000
->   31900@1595480025.712490:pci_cfg_write virtio-vga 02:0 @0x18 <- 0xe0800000
->   OK
->   [S +0.046356] OK
->   [R +0.046365] outl 0xcf8 0x80001020
->   OK
->   [S +0.046370] OK
->   [R +0.046379] outl 0xcf8 0x80001004
->   OK
->   [S +0.046383] OK
->   [R +0.046391] outw 0xcfc 0x7
->   31900@1595480025.712544:pci_cfg_write virtio-vga 02:0 @0x4 <- 0x7
->   31900@1595480025.712551:pci_update_mappings_add d=0x633000000800 00:02.0 2,0xe0800000+0x4000
->   OK
->   [S +0.047572] OK
->   [R +0.047597] writeq 0xe0801024 0x10646c00776c6cff
->   OK
->   [S +0.047610] OK
->   [R +0.047619] writeq 0xe080102d 0xe0801000320000
->   OK
->   [S +0.047627] OK
->   [R +0.047636] writeq 0xe0801015 0x12b2901ba000000
->   OK
->   [S +0.047650] OK
->   [R +0.047660] write 0x10646c02 0x1 0x2c
->   OK
->   [S +0.047769] OK
->   [R +0.047782] write 0x999 0x1 0x25
->   OK
->   [S +0.047907] OK
->   [R +0.047920] write 0x8 0x1 0x78
->   OK
->   [S +0.047927] OK
->   [R +0.047935] write 0x2c7 0x1 0x32
->   OK
->   [S +0.047941] OK
->   [R +0.047949] write 0x2cb 0x1 0xff
->   OK
->   [S +0.047954] OK
->   [R +0.047962] write 0x2cc 0x1 0x7e
->   OK
->   [S +0.047967] OK
->   [R +0.047975] writeq 0xe0803000 0xf2b8f0540ff83
->   31900@1595480025.714133:virtio_queue_notify vdev 0x633000019640 n 0 vq 0x7fe20b13d800
->   OK
->   [S +0.047996] OK
->   31900@1595480025.714386:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d800
->   31900@1595480025.714406:virtio_gpu_features virgl 0
->   31900@1595480025.714413:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d800
->   31900@1595480025.714421:virtio_set_status vdev 0x633000019640 val 0
->   *CRASH*
-> 
->   Please let me know if I can provide any further info.
->   -Alex
-> 
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1888606/+subscriptions
-> 
+  typedef struct QCryptoBlockCreateOptions QCryptoBlockCreateOptions;
+  void qapi_free_QCryptoBlockCreateOptions(QCryptoBlockCreateOptions *obj);
+
+This is used in the traditional manner:
+
+  QCryptoBlockCreateOptions *opts = NULL;
+
+  opts = g_new0(QCryptoBlockCreateOptions, 1);
+
+  ....do stuff with opts...
+
+  qapi_free_QCryptoBlockCreateOptions(opts);
+
+Since bumping the min glib to 2.48, QEMU has incrementally adopted the
+use of g_auto/g_autoptr. This allows the compiler to run a function to
+free a variable when it goes out of scope, the benefit being the
+compiler can guarantee it is freed in all possible code ptahs.
+
+This benefit is applicable to QAPI types too, and given the seriously
+long method names for some qapi_free_XXXX() functions, is much less
+typing. This change thus makes the code generator emit:
+
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoBlockCreateOptions,
+                              qapi_free_QCryptoBlockCreateOptions)
+
+The above code example now becomes
+
+  g_autoptr(QCryptoBlockCreateOptions) opts = NULL;
+
+  opts = g_new0(QCryptoBlockCreateOptions, 1);
+
+  ....do stuff with opts...
+
+Note, if the local pointer needs to live beyond the scope holding the
+variable, then g_steal_pointer can be used. This is useful to return the
+pointer to the caller in the success codepath, while letting it be freed
+in all error codepaths.
+
+  return g_steal_pointer(&opts);
+
+The crypto/block.h header needs updating to avoid symbol clash now that
+the g_autoptr support is a standard QAPI feature.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ docs/devel/qapi-code-gen.txt       |  2 ++
+ include/crypto/block.h             |  2 --
+ scripts/qapi/types.py              |  1 +
+ tests/test-qobject-input-visitor.c | 23 +++++++----------------
+ 4 files changed, 10 insertions(+), 18 deletions(-)
+
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 69eede6c28..f3e7ced212 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -1321,6 +1321,7 @@ Example:
+     };
+ 
+     void qapi_free_UserDefOne(UserDefOne *obj);
++    G_DEFINE_AUTOPTR_CLEANUP_FUNC(UserDefOne, qapi_free_UserDefOne)
+ 
+     struct UserDefOneList {
+         UserDefOneList *next;
+@@ -1328,6 +1329,7 @@ Example:
+     };
+ 
+     void qapi_free_UserDefOneList(UserDefOneList *obj);
++    G_DEFINE_AUTOPTR_CLEANUP_FUNC(UserDefOneList, qapi_free_UserDefOneList)
+ 
+     struct q_obj_my_command_arg {
+         UserDefOneList *arg1;
+diff --git a/include/crypto/block.h b/include/crypto/block.h
+index d274819791..7a65e8e402 100644
+--- a/include/crypto/block.h
++++ b/include/crypto/block.h
+@@ -311,7 +311,5 @@ uint64_t qcrypto_block_get_sector_size(QCryptoBlock *block);
+ void qcrypto_block_free(QCryptoBlock *block);
+ 
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoBlock, qcrypto_block_free)
+-G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoBlockCreateOptions,
+-                              qapi_free_QCryptoBlockCreateOptions)
+ 
+ #endif /* QCRYPTO_BLOCK_H */
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index 3ad33af4ee..3640f17cd6 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -213,6 +213,7 @@ def gen_type_cleanup_decl(name):
+     ret = mcgen('''
+ 
+ void qapi_free_%(c_name)s(%(c_name)s *obj);
++G_DEFINE_AUTOPTR_CLEANUP_FUNC(%(c_name)s, qapi_free_%(c_name)s)
+ ''',
+                 c_name=c_name(name))
+     return ret
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index 6bacabf063..e41b91a2a6 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -417,7 +417,7 @@ static void test_visitor_in_struct(TestInputVisitorData *data,
+ static void test_visitor_in_struct_nested(TestInputVisitorData *data,
+                                           const void *unused)
+ {
+-    UserDefTwo *udp = NULL;
++    g_autoptr(UserDefTwo) udp = NULL;
+     Visitor *v;
+ 
+     v = visitor_input_test_init(data, "{ 'string0': 'string0', "
+@@ -433,8 +433,6 @@ static void test_visitor_in_struct_nested(TestInputVisitorData *data,
+     g_assert_cmpstr(udp->dict1->dict2->userdef->string, ==, "string");
+     g_assert_cmpstr(udp->dict1->dict2->string, ==, "string2");
+     g_assert(udp->dict1->has_dict3 == false);
+-
+-    qapi_free_UserDefTwo(udp);
+ }
+ 
+ static void test_visitor_in_list(TestInputVisitorData *data,
+@@ -546,7 +544,7 @@ static void test_visitor_in_union_flat(TestInputVisitorData *data,
+                                        const void *unused)
+ {
+     Visitor *v;
+-    UserDefFlatUnion *tmp;
++    g_autoptr(UserDefFlatUnion) tmp = NULL;
+     UserDefUnionBase *base;
+ 
+     v = visitor_input_test_init(data,
+@@ -563,8 +561,6 @@ static void test_visitor_in_union_flat(TestInputVisitorData *data,
+ 
+     base = qapi_UserDefFlatUnion_base(tmp);
+     g_assert(&base->enum1 == &tmp->enum1);
+-
+-    qapi_free_UserDefFlatUnion(tmp);
+ }
+ 
+ static void test_visitor_in_alternate(TestInputVisitorData *data,
+@@ -690,7 +686,7 @@ static void test_list_union_integer_helper(TestInputVisitorData *data,
+                                            const void *unused,
+                                            UserDefListUnionKind kind)
+ {
+-    UserDefListUnion *cvalue = NULL;
++    g_autoptr(UserDefListUnion) cvalue = NULL;
+     Visitor *v;
+     GString *gstr_list = g_string_new("");
+     GString *gstr_union = g_string_new("");
+@@ -782,7 +778,6 @@ static void test_list_union_integer_helper(TestInputVisitorData *data,
+ 
+     g_string_free(gstr_union, true);
+     g_string_free(gstr_list, true);
+-    qapi_free_UserDefListUnion(cvalue);
+ }
+ 
+ static void test_visitor_in_list_union_int(TestInputVisitorData *data,
+@@ -851,7 +846,7 @@ static void test_visitor_in_list_union_uint64(TestInputVisitorData *data,
+ static void test_visitor_in_list_union_bool(TestInputVisitorData *data,
+                                             const void *unused)
+ {
+-    UserDefListUnion *cvalue = NULL;
++    g_autoptr(UserDefListUnion) cvalue = NULL;
+     boolList *elem = NULL;
+     Visitor *v;
+     GString *gstr_list = g_string_new("");
+@@ -879,13 +874,12 @@ static void test_visitor_in_list_union_bool(TestInputVisitorData *data,
+ 
+     g_string_free(gstr_union, true);
+     g_string_free(gstr_list, true);
+-    qapi_free_UserDefListUnion(cvalue);
+ }
+ 
+ static void test_visitor_in_list_union_string(TestInputVisitorData *data,
+                                               const void *unused)
+ {
+-    UserDefListUnion *cvalue = NULL;
++    g_autoptr(UserDefListUnion) cvalue = NULL;
+     strList *elem = NULL;
+     Visitor *v;
+     GString *gstr_list = g_string_new("");
+@@ -914,7 +908,6 @@ static void test_visitor_in_list_union_string(TestInputVisitorData *data,
+ 
+     g_string_free(gstr_union, true);
+     g_string_free(gstr_list, true);
+-    qapi_free_UserDefListUnion(cvalue);
+ }
+ 
+ #define DOUBLE_STR_MAX 16
+@@ -922,7 +915,7 @@ static void test_visitor_in_list_union_string(TestInputVisitorData *data,
+ static void test_visitor_in_list_union_number(TestInputVisitorData *data,
+                                               const void *unused)
+ {
+-    UserDefListUnion *cvalue = NULL;
++    g_autoptr(UserDefListUnion) cvalue = NULL;
+     numberList *elem = NULL;
+     Visitor *v;
+     GString *gstr_list = g_string_new("");
+@@ -957,7 +950,6 @@ static void test_visitor_in_list_union_number(TestInputVisitorData *data,
+ 
+     g_string_free(gstr_union, true);
+     g_string_free(gstr_list, true);
+-    qapi_free_UserDefListUnion(cvalue);
+ }
+ 
+ static void input_visitor_test_add(const char *testpath,
+@@ -1253,7 +1245,7 @@ static void test_visitor_in_fail_alternate(TestInputVisitorData *data,
+ static void do_test_visitor_in_qmp_introspect(TestInputVisitorData *data,
+                                               const QLitObject *qlit)
+ {
+-    SchemaInfoList *schema = NULL;
++    g_autoptr(SchemaInfoList) schema = NULL;
+     QObject *obj = qobject_from_qlit(qlit);
+     Visitor *v;
+ 
+@@ -1262,7 +1254,6 @@ static void do_test_visitor_in_qmp_introspect(TestInputVisitorData *data,
+     visit_type_SchemaInfoList(v, NULL, &schema, &error_abort);
+     g_assert(schema);
+ 
+-    qapi_free_SchemaInfoList(schema);
+     qobject_unref(obj);
+     visit_free(v);
+ }
+-- 
+2.26.2
+
 
