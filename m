@@ -7,68 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CDEC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 12:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF860C433E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 12:32:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10225206D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 12:32:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D502206D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 12:32:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kt0B7tQJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10225206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jW1cclnj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D502206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyaOX-0003P6-9Y
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 08:32:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33554)
+	id 1jyaP0-0003w3-Rm
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 08:32:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jyaKo-0007aQ-QI
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 08:28:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56010
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jyaLv-00012F-Pl
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 08:29:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41303
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jyaKl-0003MA-F9
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 08:28:26 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1jyaLu-0003SL-01
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 08:29:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595507302;
+ s=mimecast20190719; t=1595507373;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=dSiehSpYL1jKiJ+fFZpVFsgMwK93BY7/XXMuUhaG6wQ=;
- b=Kt0B7tQJekTb4rsV/E0T1v/p7Lie4O89J0JVkw1d1OgeCSrlGsxw05Ew9/KSrD/zRgdZbY
- /qrGXSQMzTHoScyan8Wu93KnsOdDzQ67Q8Tc9DJU4vOZdPV/uWuUOhPRLTLyemGk5GyZcQ
- DlQGqzGVpP/dOHgP+Mq9BeXNLtaudco=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=UNuj0yqfT5LypjnMB0nz+Sodw22E9TDocg2TKZlWStE=;
+ b=jW1cclnjVtVHQUNNl5X6YsRrS4Uf9O5T+UkMJmQokWMFcZbaR4eT4A1Ur2GZDoKMlzXfDb
+ H/l2DcK90/Iw6O9ArI5Lked/KYlZ7wUXFV4gpA3r7nT86tbqhTV/X5IC+aA6WACnqzgsa1
+ IRv2LsUi64AKlr7+mqrGgm+njotdquI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-YfBI50uHN1Sv_tgCwMg5fQ-1; Thu, 23 Jul 2020 08:28:19 -0400
-X-MC-Unique: YfBI50uHN1Sv_tgCwMg5fQ-1
+ us-mta-163-SQ083dTRPOOPURM-6z1-2A-1; Thu, 23 Jul 2020 08:29:30 -0400
+X-MC-Unique: SQ083dTRPOOPURM-6z1-2A-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF890185BDFD;
- Thu, 23 Jul 2020 12:28:17 +0000 (UTC)
-Received: from thuth.com (ovpn-112-87.ams2.redhat.com [10.36.112.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDA3E8BEE4;
- Thu, 23 Jul 2020 12:28:15 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH 4/4] gitlab-ci.yml: Add build-system-debian and
- build-system-centos jobs
-Date: Thu, 23 Jul 2020 14:28:00 +0200
-Message-Id: <20200723122800.723-5-thuth@redhat.com>
-In-Reply-To: <20200723122800.723-1-thuth@redhat.com>
-References: <20200723122800.723-1-thuth@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D46208017FB
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 12:29:29 +0000 (UTC)
+Received: from localhost (ovpn-114-204.ams2.redhat.com [10.36.114.204])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C4E858BED8;
+ Thu, 23 Jul 2020 12:29:25 +0000 (UTC)
+Date: Thu, 23 Jul 2020 13:29:24 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: [Virtio-fs] [PATCH for-5.1 2/3] virtiofsd: add
+ container-friendly -o chroot sandboxing option
+Message-ID: <20200723122924.GJ186372@stefanha-x1.localdomain>
+References: <20200722130206.224898-1-stefanha@redhat.com>
+ <20200722130206.224898-3-stefanha@redhat.com>
+ <20200722181710.GA598987@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20200722181710.GA598987@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="mFHiwr52TKrxpkjc"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:13:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -91,176 +97,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Fam Zheng <fam@euphon.net>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: virtio-fs@redhat.com, vromanso@redhat.com, qemu-devel@nongnu.org,
+ rmohr@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We were missing the two new targets avr-softmmu and rx-softmmu in the
-gitlab-CI so far, and did not add some of the "other endianess" targets
-like sh4eb-softmmu yet.
-Since the current build-system-* jobs run already for a very long time,
-let's do not add these missing targets there, but introduce two new
-additional build jobs, one running with Debian and one running with
-CentOS, and add the new targets there. Also move some targets from
-the old build-system-* jobs to these new targets, to distribute the
-load and reduce the runtime of the CI.
+--mFHiwr52TKrxpkjc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .gitlab-ci.yml | 88 +++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 73 insertions(+), 15 deletions(-)
+On Wed, Jul 22, 2020 at 02:17:10PM -0400, Vivek Goyal wrote:
+> On Wed, Jul 22, 2020 at 02:02:05PM +0100, Stefan Hajnoczi wrote:
+> > virtiofsd cannot run in an unprivileged container because CAP_SYS_ADMIN
+> > is required to create namespaces.
+> >=20
+> > Introduce a weaker sandbox that is sufficient in container environments
+> > because the container runtime already sets up namespaces. Use chroot to
+> > restrict path traversal to the shared directory.
+> >=20
+> > virtiofsd loses the following:
+> >=20
+> > 1. Mount namespace. The process chroots to the shared directory but
+> >    leaves the mounts in place. Seccomp rejects mount(2)/umount(2)
+> >    syscalls.
+> >=20
+> > 2. Pid namespace. This should be fine because virtiofsd is the only
+> >    process running in the container.
+> >=20
+> > 3. Network namespace. This should be fine because seccomp already
+> >    rejects the connect(2) syscall, but an additional layer of security
+> >    is lost. Container runtime-specific network security policies can be
+> >    used drop network traffic (except for the vhost-user UNIX domain
+> >    socket).
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  tools/virtiofsd/helper.c         |  3 +++
+> >  tools/virtiofsd/passthrough_ll.c | 44 ++++++++++++++++++++++++++++++--
+> >  2 files changed, 45 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> > index 3105b6c23a..7421c9ca1a 100644
+> > --- a/tools/virtiofsd/helper.c
+> > +++ b/tools/virtiofsd/helper.c
+> > @@ -151,6 +151,9 @@ void fuse_cmdline_help(void)
+> >             "    -o cache=3D<mode>            cache mode. could be one =
+of \"auto, "
+> >             "always, none\"\n"
+> >             "                               default: auto\n"
+> > +           "    -o chroot|no_chroot        use container-friendly chro=
+ot instead\n"
+> > +           "                               of stronger mount namespace=
+ sandbox\n"
+> > +           "                               default: false\n"
+>=20
+> This option name disabling namespace setup is little confusing to me.
+>=20
+> Will it make sense to provide another option to disable/enable
+> namespaces. "-o no-namespaces" and that disables setting up
+> namespaces.
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 362e5ee755..e96bcd50f8 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -53,68 +53,126 @@ include:
-     - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
-     - du -chs $HOME/avocado/data/cache
- 
--build-system-ubuntu-main:
-+build-system-ubuntu:
-   <<: *native_build_job_definition
-   variables:
-     IMAGE: ubuntu2004
--    TARGETS: aarch64-softmmu alpha-softmmu cris-softmmu hppa-softmmu lm32-softmmu
--      moxie-softmmu microblazeel-softmmu mips64el-softmmu m68k-softmmu ppc-softmmu
--      riscv64-softmmu sparc-softmmu
-+    TARGETS: aarch64-softmmu alpha-softmmu cris-softmmu hppa-softmmu
-+      moxie-softmmu microblazeel-softmmu mips64el-softmmu
-     MAKE_CHECK_ARGS: check-build
-   artifacts:
-     paths:
-       - build
- 
--check-system-ubuntu-main:
-+check-system-ubuntu:
-   <<: *native_test_job_definition
-   needs:
--    - job: build-system-ubuntu-main
-+    - job: build-system-ubuntu
-       artifacts: true
-   variables:
-     IMAGE: ubuntu2004
-     MAKE_CHECK_ARGS: check
- 
--acceptance-system-ubuntu-main:
-+acceptance-system-ubuntu:
-   <<: *native_test_job_definition
-   needs:
--    - job: build-system-ubuntu-main
-+    - job: build-system-ubuntu
-       artifacts: true
-   variables:
-     IMAGE: ubuntu2004
-     MAKE_CHECK_ARGS: check-acceptance
-   <<: *post_acceptance
- 
--build-system-fedora-alt:
-+build-system-debian:
-+  <<: *native_build_job_definition
-+  variables:
-+    IMAGE: debian-amd64
-+    TARGETS: arm-softmmu avr-softmmu i386-softmmu mipsel-softmmu
-+      riscv64-softmmu sh4eb-softmmu sparc-softmmu xtensaeb-softmmu
-+    MAKE_CHECK_ARGS: check-build
-+  artifacts:
-+    paths:
-+      - build
-+
-+check-system-debian:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-system-debian
-+      artifacts: true
-+  variables:
-+    IMAGE: debian-amd64
-+    MAKE_CHECK_ARGS: check
-+
-+acceptance-system-debian:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-system-debian
-+      artifacts: true
-+  variables:
-+    IMAGE: debian-amd64
-+    MAKE_CHECK_ARGS: check-acceptance
-+  <<: *post_acceptance
-+
-+build-system-fedora:
-   <<: *native_build_job_definition
-   variables:
-     IMAGE: fedora
-     TARGETS: tricore-softmmu unicore32-softmmu microblaze-softmmu mips-softmmu
--      riscv32-softmmu s390x-softmmu sh4-softmmu sparc64-softmmu x86_64-softmmu
--      xtensa-softmmu nios2-softmmu or1k-softmmu
-+      xtensa-softmmu m68k-softmmu riscv32-softmmu ppc-softmmu sparc64-softmmu
-     MAKE_CHECK_ARGS: check-build
-   artifacts:
-     paths:
-       - build
- 
--check-system-fedora-alt:
-+check-system-fedora:
-   <<: *native_test_job_definition
-   needs:
--    - job: build-system-fedora-alt
-+    - job: build-system-fedora
-       artifacts: true
-   variables:
-     IMAGE: fedora
-     MAKE_CHECK_ARGS: check
- 
--acceptance-system-fedora-alt:
-+acceptance-system-fedora:
-   <<: *native_test_job_definition
-   needs:
--    - job: build-system-fedora-alt
-+    - job: build-system-fedora
-       artifacts: true
-   variables:
-     IMAGE: fedora
-     MAKE_CHECK_ARGS: check-acceptance
-   <<: *post_acceptance
- 
-+build-system-centos:
-+  <<: *native_build_job_definition
-+  variables:
-+    IMAGE: centos8
-+    TARGETS: ppc64-softmmu lm32-softmmu or1k-softmmu s390x-softmmu
-+      x86_64-softmmu rx-softmmu sh4-softmmu nios2-softmmu
-+    MAKE_CHECK_ARGS: check-build
-+  artifacts:
-+    paths:
-+      - build
-+
-+check-system-centos:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-system-centos
-+      artifacts: true
-+  variables:
-+    IMAGE: centos8
-+    MAKE_CHECK_ARGS: check
-+
-+acceptance-system-centos:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-system-centos
-+      artifacts: true
-+  variables:
-+    IMAGE: centos8
-+    MAKE_CHECK_ARGS: check-acceptance
-+  <<: *post_acceptance
-+
- build-disabled:
-   <<: *native_build_job_definition
-   variables:
--- 
-2.18.1
+Thanks, I'll propose a new syntax.
+
+Stefan
+
+--mFHiwr52TKrxpkjc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8ZgqQACgkQnKSrs4Gr
+c8h2qAgAyLOF3qPM7OoCvAWSwDCEsd0FRWJFZcterUjQ//F5p4gyp3tB0KTJdmpO
+VCs7ileThaahPFtmW9bw1iZAFVh+x9juOk6jusR1k4hE/caBQxpUsiKjnQaIFtWS
+TquT7UD/4DWE3bokfB9NZ7K7fiNR4ZAswCEO+6dXQDCxWVX0YdRaXDnq+s7c7wyq
+ebIYRc5ZidHaF3A+vrETTACycBxI/FjjVrvKi85S0E7ILs1TuuuL3AawaAB9lIGO
+5oCvRhxyVnfK60iI4+iUWo+vIF6pL3Ao//y2yeTkSyBFxwbtb5W7EWt/4Ttwp1Wa
+xfZRxvqJVZKEk6ynPnJlHpHenrEdZw==
+=RCxG
+-----END PGP SIGNATURE-----
+
+--mFHiwr52TKrxpkjc--
 
 
