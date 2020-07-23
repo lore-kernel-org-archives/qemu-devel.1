@@ -8,63 +8,63 @@ X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90AC4C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DDABC433E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:43:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FFC320825
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:43:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B74D20825
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:43:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="q4ZFa6EV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FFC320825
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="aO2ryo2L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B74D20825
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyS8f-00015a-JK
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 23:43:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45964)
+	id 1jyS8e-00015s-Jo
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 23:43:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jyS5z-0004YD-Bx
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:40:35 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jyS5u-0004Tl-LB
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:40:30 -0400
 Received: from mail-mw2nam12on2114.outbound.protection.outlook.com
  ([40.107.244.114]:16939 helo=NAM12-MW2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jyS5w-0002Ew-Up
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:40:34 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jyS5s-0002Ew-SK
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:40:30 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QyTIlUJqN8sMOd7SYN81BUhGI8K/QfgHoAFreQM4m9+wUA6ptndNXeZ1WzR0rF1bynDgUBGLyfTSR2002+u4Gn1APp7O7jB5vW+DlXTSKJhVIh3KbxtQOPe2pjCHJvZdOZuoWdrvlmTkjTJ+a9ogrShAEQjNOuzWzdZra4ym1BnL9Cl3mRZgJzQ3Ntp+nZEiV5Ym2nitVFNVSahjj+Eqh/gEjEsyb8vWoEi/QMAIcxOD1eLyJoaIdDNej/PzTwR9gXaGhpt9GGZyqY7yrwTIpuy7DmICWscyhJpgswKsuXqXtQwd1qZEbYtmtX/5wrcfqR9iz6XFD98qadju2kt21w==
+ b=Jo7UVnzKhEtbLrJ+2lChiQG8CoYlAOD4HoVIgq52smPdPZ41L7QO9B8aewvMljyjCT+5WrBApXHQYsEXNQNO1qL7XX4hF8y055LW/yfRWluvwWbf0jamwuUl+BsKQehUrPcTG82ZRUhjy1ZVYW9/sJJmFIC+W+N13SSPt+G75cWCxjnY8Cy8jWpeHQPMHPWpkcDYGOL00XKv/LfVehxOOM5eB2KaA46SuMwbBUcLOQ26hgtpl0IchDJ1uhGXvRjVjIJHfgxPBNdxIzHosH0QIx1YiyttVdVQ7A0mTpILHGpb0VZ38/HgVE9mKcDJY9p5+uCJ6NiJ3W0vx7lEXZZnrw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NpNZNsG6MAtW9gsCEmHuXJ48bi7crbRDQgLPRi4F5tU=;
- b=nZoBG7OibeI4DIMeWgyAGPJDDQHJUbw7r45JfatF7owpvOQbpP0s0M0mp1wHVu7kGzfjvND28c3SfBASV0i2jYDmVvHIjGfY51o/lkhEdpiSKXYVVqDZLyiwJwjf6DmfwLZXxY5liY/4Qpzwdf7qGvGITiwKAHJSPAXOxUIkxhDtyUgJgLpTB46pA5EGPayXIhCvs6VoMYU8szMnR8bXKUFUSZeQPMMK2x5mM8P1CH+RJNs0bNh4FDyUnYeO3PG6B/Bgv9x/NIcyB5wYWNXVcEr7E+17hrv1kHrXkiGPv9LTN9/bo+bb+Hjh3DTF9OskqQaFnG7UCdh1KjjVux19eg==
+ bh=Ff9MU1Kq13m6LLsmZu6ZkehKiVltjsuKRGgEge+Z9Ys=;
+ b=B1RSc3b3XHtstpKKAy6qXhW+oNwgRKBHqibiuOQFWqlj36BvTGmLVoEfmhcuU7FNO1BVnt+Ay3ILhTyY2tb01li3/n3sbWD5rFpvsU2fc6+xLM5mU+w/PmKkwHAKPaodfYPrcyhm1+UHf1dQrcNyMJddmtc9HctM083KG52wOV0Slr+WPkecOurkeEuk2mXg71JeFK2/s0iKZaKEsEfcJfcRtuZywMESvnSK3IrCnEoDcRCINSPG3Z+VlwsywhwBWIWCGUUQu0R/kv69ylUjWOkCC3hD0CKkiDutARL9YI742IHcQulR4Wn8ZkLmUaLEdiGcUQLdtgpz0nfFJcYcXw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NpNZNsG6MAtW9gsCEmHuXJ48bi7crbRDQgLPRi4F5tU=;
- b=q4ZFa6EVkiRbVMhFP3bVhzLvdGkcOeBxm3v4edyAf3ccToLnSxfb0sOAUxdR4NQ9jgVUrR7ODXPcA+giw3EmM69hxoOd1uemCk3dI7rzFZwi5DYNy8xnhWmpCtJF6PKcrqKnZMW/V+3gk90LXt/ntB+3azUj2Rrofe64jRiXQs4=
+ bh=Ff9MU1Kq13m6LLsmZu6ZkehKiVltjsuKRGgEge+Z9Ys=;
+ b=aO2ryo2L0BS3jKce/G0ue2jfU0cS8evglp2PCO4E+0RLjhNxv5f3EMbIqKM9e8vBl/nCodCggE0VjBWDFvBiDElPvB4IgnZJ+Lfsg5RQf1N47WzPie1vDllNtQvcNenZBjulm7w4VvCmzkdNO1tMDPMTJ3ubvZFsbS3BX4GiGe8=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
  by SN6PR03MB3982.namprd03.prod.outlook.com (2603:10b6:805:67::13)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.22; Thu, 23 Jul
- 2020 03:40:19 +0000
+ 2020 03:40:15 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::8ce:29a6:77be:c35b]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::8ce:29a6:77be:c35b%7]) with mapi id 15.20.3216.024; Thu, 23 Jul 2020
- 03:40:19 +0000
+ 03:40:15 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 08/12] scripts/oss-fuzz: Add general-fuzzer build script
-Date: Wed, 22 Jul 2020 23:39:29 -0400
-Message-Id: <20200723033933.21883-9-alxndr@bu.edu>
+Subject: [PATCH 06/12] fuzz: Add fuzzer callbacks to DMA-read functions
+Date: Wed, 22 Jul 2020 23:39:27 -0400
+Message-Id: <20200723033933.21883-7-alxndr@bu.edu>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200723033933.21883-1-alxndr@bu.edu>
 References: <20200723033933.21883-1-alxndr@bu.edu>
@@ -79,33 +79,33 @@ Received: from mozz.bu.edu (128.197.127.33) by
  MN2PR16CA0057.namprd16.prod.outlook.com (2603:10b6:208:234::26) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23 via Frontend
- Transport; Thu, 23 Jul 2020 03:40:18 +0000
+ Transport; Thu, 23 Jul 2020 03:40:14 +0000
 X-Mailer: git-send-email 2.27.0
 X-Originating-IP: [128.197.127.33]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4a85f9c0-0cd8-4357-8619-08d82eba1ed1
+X-MS-Office365-Filtering-Correlation-Id: 1ee16a09-eec5-451b-c22d-08d82eba1c99
 X-MS-TrafficTypeDiagnostic: SN6PR03MB3982:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR03MB3982612B6D2DDE2AFF7D7489BA760@SN6PR03MB3982.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:849;
+X-Microsoft-Antispam-PRVS: <SN6PR03MB39824AFC8BA83AA08DEDD396BA760@SN6PR03MB3982.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:569;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HoD12aCOA8pZZkC/jrbHzn7mjPs0KGh2rQQZ8gghQnx8hI5TH4uaQIAEvthknwuk1cHDmNwlxWPCkMeXv5BKNkDqZsUc2rpyDFfNfNMWNFYNbNHs4YEd0qaQ4n2lUkn8PwBcnm+L1+CEv5xLpk9rL+oodGyL9akt5tAskVGWWdas+WbbNYC5xxnmhD0fg/mD5eU8VvCWYLkeKNP2FrzXSlL/A6MOE9EWaAoEvk+l5Jn01wBCzKQktb4DtFHjVdKKfbqUlJ85stmnPem1QwJJYArq+n2DtqP0CxqTbq9JrjL8zowfp8xjOHIDUE9Sx2pu6pejE9QiVSventp5lXi2aA==
+X-Microsoft-Antispam-Message-Info: kpjpqtg1x3A0qCYdX3fK/PVsKAFoXRsUnqPIMNU4/EdM6of90zOczHd8IKMlzJ/2sd1l9AfW5Fm1iYWnrAvvVNB8q3gVyrX7Fxq1lJJIdWZoqXTLP6BqOdSOg7y0N9KS3dAtX94lLlf8YrdBos2UbBkO9Y19uYOaAuk2hZZDbuKQ8eEf5sQn5s251Pz+5sWhOU0Guj5/LiMxM9VgEX5fBFzT8Vwykr0pgdqXxzDIUt+LGLiyiTkvEkuw9Qt5FuyPb3De5BuopQGLJC8W+Lo6xdgOERZbpwjFJUfN1dc7v8SuGeHqfos0Wuc0fEhZnxih
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(39860400002)(396003)(346002)(366004)(136003)(376002)(6916009)(4326008)(36756003)(478600001)(5660300002)(2616005)(956004)(6666004)(8936002)(52116002)(7696005)(66946007)(66556008)(66476007)(6486002)(75432002)(26005)(8676002)(16526019)(54906003)(86362001)(186003)(316002)(1076003)(786003)(2906002);
+ SFS:(4636009)(39860400002)(396003)(346002)(366004)(136003)(376002)(6916009)(4326008)(36756003)(478600001)(83380400001)(7416002)(5660300002)(2616005)(956004)(6666004)(8936002)(52116002)(7696005)(66946007)(66556008)(66476007)(6486002)(75432002)(26005)(8676002)(16526019)(54906003)(86362001)(186003)(316002)(1076003)(786003)(2906002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: rSnauaLlq9rIcA2xZu5DDRXFPy7bjffDdP5jK7ord+CTcrC2Qj3gL9Xn6r71PXMe+uvg1IhZ4hxOo7/Fc+epHUbGXNPUNGn5FbLpWZIh8yWziAo+FZwxETaPzzI8W1Smp2bpwVvwTJsYMUx/9YBMZ1ApWgdVPBJ0KXbX3EDY2U0dmYquD/zpiM2TC7nRq0CWg2e1jmvN9duyTY280WdDmf39jCkjc5OHwVovQ2HPEEdDm/QgHbFQnc2QNVLOBqLJjtui81R/rgCcqh4fiord4kD4PRJaOxryi/kyuwO5xT86XXV6jWdRgURi+3J22hMflO9MUlilWC3U3fWufCTUVe5NsIzZlZp090CYtigfjp+guklceIOd04mwid7Lus4f1QXitJiOK25+Blk9XY6a4p5Y3zUYfwV1z83wFkWqvP3jCOBL0UMa0d1UjZ6DQsJ24OjrdN3KMUxhRGDONDlsimXOqxz2ReZlA8ZdHE57X4U=
+X-MS-Exchange-AntiSpam-MessageData: JntkGvadzgpe8A1/d2eFVCZCV6197ISwH6YO+EED6V5mkYeyHRB6LkehtRrNbDzmWIxpsLZUk64cTBHDsxcbzylFr3ZbZ5X7bZJ4QtObP3RAbaVwCBoHjywd0ayngGHzthEZTANvb3CzcV1gz9zpzqYBrgW5qriogOPE3IFqio0eCJ4YhG2OftY7w8OGRm9uctHBWms7bpM2ahGArAZUfM2binaC1i6teo4oFj/aVbfYBL3AEy9F/LfhToqrxa6VSPnaVbr7ZjW81S7FborN/hePJ26zDzCRmo25wWsF8u6k5i7oX0k0ufTJHfFGBQ0myU5+uLeELuxjTmdfUqlhkJXXfFO5K4A9CAeshnBNgxXM9A5Fqj3i3RYDOHwxV0+ZNXT/dgS6OM4C21uIJVXsep/8dR7AKiKyCPin6LlpEsWLmRnk2/10h3DJvgxdyESSg+UJpCgl/oGIIWUyYhZeNOYoYv6v33kBt/Hh9d9oxM8=
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a85f9c0-0cd8-4357-8619-08d82eba1ed1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ee16a09-eec5-451b-c22d-08d82eba1c99
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2020 03:40:19.2205 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2020 03:40:15.3427 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ys1jw2/UQLH0HfboQDHqT0gHt3/aYJ9JLibPlKGrWlYVNBI+56fTQz8IcMuVFwrE
+X-MS-Exchange-CrossTenant-UserPrincipalName: i7zmAL1kbbP7D8BngUNrGDXOBILvE6DnVQIOb0EHv0YwxlY/yn+KiVATdyQFuX0N
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB3982
 Received-SPF: pass client-ip=40.107.244.114; envelope-from=alxndr@bu.edu;
  helo=NAM12-MW2-obe.outbound.protection.outlook.com
@@ -132,91 +132,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: thuth@redhat.com, Alexander Bulekov <alxndr@bu.edu>, f4bug@amsat.org,
  darren.kenny@oracle.com, bsd@redhat.com, dstepanov.src@gmail.com,
- stefanha@redhat.com, andrew@coatesdev.com, Paolo Bonzini <pbonzini@redhat.com>
+ stefanha@redhat.com, andrew@coatesdev.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This parses a yaml file containing general-fuzzer configs and builds a
-separate oss-fuzz wrapper binary for each one, changing some
-preprocessor macros for each configuration. To avoid dealing with
-escaping and stringifying, convert each string into a byte-array
-representation
+We should be careful to not call any functions besides fuzz_dma_read_cb.
+Without --enable-fuzzing, fuzz_dma_read_cb is an empty inlined function.
 
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 ---
- scripts/oss-fuzz/build_general_fuzzers.py | 62 +++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
- create mode 100755 scripts/oss-fuzz/build_general_fuzzers.py
+I'd appreciate another set of eyes on this. Basically, we only care about
+DMA reads to RAM. This is why I assume stuff like "addr" or "cache->xlat
++ addr" is an absolute address.
 
-diff --git a/scripts/oss-fuzz/build_general_fuzzers.py b/scripts/oss-fuzz/build_general_fuzzers.py
-new file mode 100755
-index 0000000000..79f4664117
---- /dev/null
-+++ b/scripts/oss-fuzz/build_general_fuzzers.py
-@@ -0,0 +1,62 @@
-+#!/usr/bin/env python3
-+# -*- coding: utf-8 -*-
-+
-+"""
-+This script creates wrapper binaries that invoke the general-device-fuzzer with
-+configurations specified in a yaml config file.
-+"""
-+import sys
-+import os
-+import yaml
-+import tempfile
-+
-+CC = ""
-+TEMPLATE = ""
-+
-+
-+def usage():
-+    print("Usage: CC=COMPILER {} CONFIG_PATH \
-+OUTPUT_PATH_PREFIX".format(sys.argv[0]))
-+    sys.exit(0)
-+
-+
-+def str_to_c_byte_array(s):
-+    """
-+    Convert strings to byte-arrays so we don't worry about formatting
-+    strings to play nicely with cc -DQEMU_FUZZARGS etc
-+    """
-+    return ','.join('0x{:02x}'.format(ord(x)) for x in s)
-+
-+
-+def compile_wrapper(cfg, path):
-+    os.system('$CC -DQEMU_FUZZ_ARGS="{}" -DQEMU_FUZZ_OBJECTS="{}" \
-+                {} -o {}'.format(
-+                    str_to_c_byte_array(cfg["args"].replace("\n", " ")),
-+                    str_to_c_byte_array(cfg["objects"].replace("\n", " ")),
-+                    TEMPLATE, path))
-+
-+
-+def main():
-+    global CC
-+    global TEMPLATE
-+
-+    if len(sys.argv) != 3:
-+        usage()
-+
-+    cfg_path = sys.argv[1]
-+    out_path = sys.argv[2]
-+
-+    CC = os.getenv("CC")
-+    TEMPLATE = os.path.join(os.path.dirname(__file__), "target.c")
-+
-+    with open(cfg_path, "r") as f:
-+        configs = yaml.load(f)["configs"]
-+    for cfg in configs:
-+        assert "name" in cfg
-+        assert "args" in cfg
-+        assert "objects" in cfg
-+        compile_wrapper(cfg, out_path + cfg["name"])
-+
-+
-+if __name__ == '__main__':
-+    main()
+ exec.c                                | 2 ++
+ include/exec/memory.h                 | 1 +
+ include/exec/memory_ldst_cached.inc.h | 3 +++
+ memory_ldst.inc.c                     | 4 ++++
+ softmmu/memory.c                      | 1 +
+ 5 files changed, 11 insertions(+)
+
+diff --git a/exec.c b/exec.c
+index 6f381f98e2..c81f41514d 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3241,6 +3241,7 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+             stn_he_p(buf, l, val);
+         } else {
+             /* RAM case */
++            fuzz_dma_read_cb(addr, len, mr, false);
+             ram_ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
+             memcpy(buf, ram_ptr, l);
+         }
+@@ -3601,6 +3602,7 @@ void *address_space_map(AddressSpace *as,
+     memory_region_ref(mr);
+     *plen = flatview_extend_translation(fv, addr, len, mr, xlat,
+                                         l, is_write, attrs);
++    fuzz_dma_read_cb(addr, *plen, mr, is_write);
+     ptr = qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
+ 
+     return ptr;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 2ec3b597f1..f8b943521a 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -2444,6 +2444,7 @@ address_space_read_cached(MemoryRegionCache *cache, hwaddr addr,
+                           void *buf, hwaddr len)
+ {
+     assert(addr < cache->len && len <= cache->len - addr);
++    fuzz_dma_read_cb(cache->xlat + addr, len, cache->mrs.mr, false);
+     if (likely(cache->ptr)) {
+         memcpy(buf, cache->ptr + addr, len);
+         return MEMTX_OK;
+diff --git a/include/exec/memory_ldst_cached.inc.h b/include/exec/memory_ldst_cached.inc.h
+index fd4bbb40e7..aff574039f 100644
+--- a/include/exec/memory_ldst_cached.inc.h
++++ b/include/exec/memory_ldst_cached.inc.h
+@@ -28,6 +28,7 @@ static inline uint32_t ADDRESS_SPACE_LD_CACHED(l)(MemoryRegionCache *cache,
+     hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
+ {
+     assert(addr < cache->len && 4 <= cache->len - addr);
++    fuzz_dma_read_cb(cache->xlat + addr, 4, cache->mrs.mr, false);
+     if (likely(cache->ptr)) {
+         return LD_P(l)(cache->ptr + addr);
+     } else {
+@@ -39,6 +40,7 @@ static inline uint64_t ADDRESS_SPACE_LD_CACHED(q)(MemoryRegionCache *cache,
+     hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
+ {
+     assert(addr < cache->len && 8 <= cache->len - addr);
++    fuzz_dma_read_cb(cache->xlat + addr, 8, cache->mrs.mr, false);
+     if (likely(cache->ptr)) {
+         return LD_P(q)(cache->ptr + addr);
+     } else {
+@@ -50,6 +52,7 @@ static inline uint32_t ADDRESS_SPACE_LD_CACHED(uw)(MemoryRegionCache *cache,
+     hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
+ {
+     assert(addr < cache->len && 2 <= cache->len - addr);
++    fuzz_dma_read_cb(cache->xlat + addr, 2, cache->mrs.mr, false);
+     if (likely(cache->ptr)) {
+         return LD_P(uw)(cache->ptr + addr);
+     } else {
+diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
+index c54aee4a95..8d45d2eeff 100644
+--- a/memory_ldst.inc.c
++++ b/memory_ldst.inc.c
+@@ -42,6 +42,7 @@ static inline uint32_t glue(address_space_ldl_internal, SUFFIX)(ARG1_DECL,
+                                         MO_32 | devend_memop(endian), attrs);
+     } else {
+         /* RAM case */
++        fuzz_dma_read_cb(addr, 4, mr, false);
+         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+         switch (endian) {
+         case DEVICE_LITTLE_ENDIAN:
+@@ -110,6 +111,7 @@ static inline uint64_t glue(address_space_ldq_internal, SUFFIX)(ARG1_DECL,
+                                         MO_64 | devend_memop(endian), attrs);
+     } else {
+         /* RAM case */
++        fuzz_dma_read_cb(addr, 8, mr, false);
+         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+         switch (endian) {
+         case DEVICE_LITTLE_ENDIAN:
+@@ -175,6 +177,7 @@ uint32_t glue(address_space_ldub, SUFFIX)(ARG1_DECL,
+         r = memory_region_dispatch_read(mr, addr1, &val, MO_8, attrs);
+     } else {
+         /* RAM case */
++        fuzz_dma_read_cb(addr, 1, mr, false);
+         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+         val = ldub_p(ptr);
+         r = MEMTX_OK;
+@@ -212,6 +215,7 @@ static inline uint32_t glue(address_space_lduw_internal, SUFFIX)(ARG1_DECL,
+                                         MO_16 | devend_memop(endian), attrs);
+     } else {
+         /* RAM case */
++        fuzz_dma_read_cb(addr, 2, mr, false);
+         ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+         switch (endian) {
+         case DEVICE_LITTLE_ENDIAN:
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index b0c2cf2535..be87044641 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1405,6 +1405,7 @@ MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
+     unsigned size = memop_size(op);
+     MemTxResult r;
+ 
++    fuzz_dma_read_cb(addr, size, mr, false);
+     if (!memory_region_access_valid(mr, addr, size, false, attrs)) {
+         *pval = unassigned_mem_read(mr, addr, size);
+         return MEMTX_DECODE_ERROR;
 -- 
 2.27.0
 
