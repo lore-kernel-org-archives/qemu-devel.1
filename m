@@ -2,89 +2,61 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B18C433E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A372EC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:39:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D633206D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:38:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CuqxDtnO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D633206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 671AA206D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:39:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 671AA206D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jydIn-0005PO-KQ
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 11:38:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37846)
+	id 1jydJE-0006Fo-M5
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 11:39:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38114)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jydHH-0004VG-Es
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 11:36:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42273
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1jydHF-00038l-PV
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 11:36:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595518615;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=iLWiDOIXMyWQf5B+S9B5zIYhz/tN7ErzT7y846Y0HcY=;
- b=CuqxDtnO+BHMwQVwMKn/ONfnd9WqQ/hY1rIDCcNgxoxCuPeO31LjXC4iH5lWp/f8iiddDj
- ihR0NkfijjsN3D/D5WvDVlzOn8wAc0HJURcDpfAJ+cWrEUxnTesp/Jz9TlmLyq4awXemwg
- lv+Lq3suTSPefyelT4RJelMpjUk3MpY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-oye9fbXcN0i8dLsZx8aIpg-1; Thu, 23 Jul 2020 11:36:53 -0400
-X-MC-Unique: oye9fbXcN0i8dLsZx8aIpg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5618180046D
- for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 15:36:52 +0000 (UTC)
-Received: from localhost (ovpn-114-204.ams2.redhat.com [10.36.114.204])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 09C347849A;
- Thu, 23 Jul 2020 15:36:48 +0000 (UTC)
-Date: Thu, 23 Jul 2020 16:36:47 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Vivek Goyal <vgoyal@redhat.com>
-Subject: Re: [Virtio-fs] [PATCH for-5.1 2/3] virtiofsd: add
- container-friendly -o chroot sandboxing option
-Message-ID: <20200723153647.GB300121@stefanha-x1.localdomain>
-References: <20200722130206.224898-1-stefanha@redhat.com>
- <20200722130206.224898-3-stefanha@redhat.com>
- <20200722175820.GL2660@work-vm>
- <20200723122850.GI186372@stefanha-x1.localdomain>
- <20200723134733.GA5885@redhat.com>
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jydIC-00058M-VP
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 11:37:56 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:54862)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jydI7-0003FZ-4x
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 11:37:56 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 06NFbQfg027002
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Thu, 23 Jul 2020 11:37:31 -0400
+Date: Thu, 23 Jul 2020 11:37:26 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Bug 1888606 <1888606@bugs.launchpad.net>
+Subject: Re: [Bug 1888606] [NEW] Heap-use-after-free in
+ virtio_gpu_ctrl_response
+Message-ID: <20200723153726.m6eckrxwkoooreh3@mozz.bu.edu>
+References: <159548011952.31456.8249433335836304327.malonedeb@chaenomeles.canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20200723134733.GA5885@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="QTprm0S8XgL7H0Dt"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 06:04:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+In-Reply-To: <159548011952.31456.8249433335836304327.malonedeb@chaenomeles.canonical.com>
+User-Agent: NeoMutt/20180716
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 11:37:49
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,93 +70,310 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, vromanso@redhat.com,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, rmohr@redhat.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---QTprm0S8XgL7H0Dt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+CC-ing virtio-gpu Maintainers.
 
-On Thu, Jul 23, 2020 at 09:47:33AM -0400, Vivek Goyal wrote:
-> On Thu, Jul 23, 2020 at 01:28:50PM +0100, Stefan Hajnoczi wrote:
-> > On Wed, Jul 22, 2020 at 06:58:20PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > > > virtiofsd cannot run in an unprivileged container because CAP_SYS_A=
-DMIN
-> > > > is required to create namespaces.
-> > > >=20
-> > > > Introduce a weaker sandbox that is sufficient in container environm=
-ents
-> > > > because the container runtime already sets up namespaces. Use chroo=
-t to
-> > > > restrict path traversal to the shared directory.
-> > > >=20
-> > > > virtiofsd loses the following:
-> > > >=20
-> > > > 1. Mount namespace. The process chroots to the shared directory but
-> > > >    leaves the mounts in place. Seccomp rejects mount(2)/umount(2)
-> > > >    syscalls.
-> > >=20
-> > > OK, I'm guessing the behaviour of what happens if the host adds anoth=
-er
-> > > mount afterwards might be different?
-> >=20
-> > Running inside a container with -o chroot:
-> >  - The container has its own mount namespace and it is therefore not
-> >    affected, modulo shared subtrees (see mount(8)).
->=20
-> How does virtiofsd inside container gets the directory it wants to
-> export to guest? I am assuming that its probably a volume mount
-> inside container. If yes, volume mounts can set propagation
-> properties say "slave" and that means mounts done later will
-> propagate inside container in that volume (and hopefully be
-> visible inside guest once submount patches are upstream).
-
-Yes, the shared directory is a volume mount and propagation works as
-expected:
-
-  $ docker run -v path/to/shared-dir:/shared-dir:slave \
-=09       -v /tmp/socket-dir:/var/run \
-=09       virtiofsd
-
-When I mount things in path/to/shared-dir on the host they appear in
-/shared-dir inside the guest. When I omit the "slave" option (the
-default is "private") then the mount does not propagate.
-
-The following Dockerfile was used:
-
-  $ cp ~/src/qemu/virtiofsd . # copy the executable
-  $ cat >Dockerfile
-  FROM fedora:32
-  COPY --chown=3D0:0 virtiofsd /usr/bin/virtiofsd
-  RUN dnf update -qy && dnf install -qy libseccomp liburing zlib glib2 nett=
-le gnutls libcap-ng
-  VOLUME ["/shared-dir", "/var/run"]
-  CMD ["/usr/bin/virtiofsd", "--socket-path=3D/var/run/virtiofsd.sock", "-o=
-", "source=3D/shared-dir", "-o", "cache=3Dauto", "-o", "no_posix_lock", "-o=
-", "xattr", "-o", "chroot"]
-
-Stefan
-
---QTprm0S8XgL7H0Dt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8Zro8ACgkQnKSrs4Gr
-c8iWkggAtGpbfo1cQOxcG92FgjYSVkpMbpQGp+Mlmr1zpPbb/3jfk9KnX8ONeV5M
-YqCPm0tkPdX0Ufjkzano+Q3X1udYRCk3AShn7CfwhrkcWixQzzdk0QzO24pJDOjX
-tL1msD+tMuljJf4X6lqAxFnTVWegUPcGGtRH4kk+ebNoPwccWdO6f1P9y50Q5ChB
-POu4IFzY92ykUhJSB1EkyUKiQiqa467jU8twOkhaHjcw2ydGAs4Q6LAWSCgB0z+S
-QWgBhS/4VcMxipfOQC3kj1Zlhlax6Jp8QnokO95MHyIATVk0FS93K8o/g6CkbzNb
-TMoVWMMIHn1F4oMmVvpoF6JvWO0CfQ==
-=paOA
------END PGP SIGNATURE-----
-
---QTprm0S8XgL7H0Dt--
-
+On 200723 0455, Alexander Bulekov wrote:
+> Public bug reported:
+> 
+> Hello,
+> Here is a reproducer (build with --enable-sanitizers):
+> cat << EOF | ./i386-softmmu/qemu-system-i386 -nographic -M pc -nodefaults -m 512M -device virtio-vga -qtest stdio
+> outl 0xcf8 0x80001018
+> outl 0xcfc 0xe0800000
+> outl 0xcf8 0x80001020
+> outl 0xcf8 0x80001004
+> outw 0xcfc 0x7
+> writeq 0xe0801024 0x10646c00776c6cff
+> writeq 0xe080102d 0xe0801000320000
+> writeq 0xe0801015 0x12b2901ba000000
+> write 0x10646c02 0x1 0x2c
+> write 0x999 0x1 0x25
+> write 0x8 0x1 0x78
+> write 0x2c7 0x1 0x32
+> write 0x2cb 0x1 0xff
+> write 0x2cc 0x1 0x7e
+> writeq 0xe0803000 0xf2b8f0540ff83
+> EOF
+> 
+> The ASAN trace:
+> ==29798==ERROR: AddressSanitizer: heap-use-after-free on address 0x60d0000050e8 at pc 0x560629814761 bp 0x7ffe916eb1e0 sp 0x7ffe916eb1d8
+> READ of size 8 at 0x60d0000050e8 thread T0
+>     #0 0x560629814760 in virtio_gpu_ctrl_response /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:181:42
+>     #1 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:193:5
+>     #2 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:791:9
+>     #3 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:820:9
+>     #4 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
+>     #5 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
+>     #6 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
+>     #7 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
+>     #8 0x56062a919571 in glib_pollfds_poll /home/alxndr/Development/qemu/util/main-loop.c:217:9
+>     #9 0x56062a919571 in os_host_main_loop_wait /home/alxndr/Development/qemu/util/main-loop.c:240:5
+>     #10 0x56062a919571 in main_loop_wait /home/alxndr/Development/qemu/util/main-loop.c:516:11
+>     #11 0x560629094a64 in qemu_main_loop /home/alxndr/Development/qemu/softmmu/vl.c:1676:9
+>     #12 0x56062a749ab5 in main /home/alxndr/Development/qemu/softmmu/main.c:49:5
+>     #13 0x7f0d5cd55e0a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x26e0a)
+>     #14 0x5606288ba889 in _start (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x24d0889)
+> 
+> 0x60d0000050e8 is located 56 bytes inside of 136-byte region [0x60d0000050b0,0x60d000005138)
+> freed by thread T0 here:
+>     #0 0x56062893250d in free (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x254850d)
+>     #1 0x560629827730 in virtio_gpu_reset /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:1160:9
+>     #2 0x560628e81d34 in virtio_reset /home/alxndr/Development/qemu/hw/virtio/virtio.c:1999:9
+>     #3 0x560629f08773 in virtio_pci_reset /home/alxndr/Development/qemu/hw/virtio/virtio-pci.c:1841:5
+>     #4 0x560629043ab6 in memory_region_write_accessor /home/alxndr/Development/qemu/softmmu/memory.c:483:5
+>     #5 0x560629043473 in access_with_adjusted_size /home/alxndr/Development/qemu/softmmu/memory.c:544:18
+>     #6 0x560629042c99 in memory_region_dispatch_write /home/alxndr/Development/qemu/softmmu/memory.c
+>     #7 0x560628990a37 in flatview_write_continue /home/alxndr/Development/qemu/exec.c:3176:23
+>     #8 0x56062899041a in address_space_write_cached_slow /home/alxndr/Development/qemu/exec.c:3789:12
+>     #9 0x560628e6f9bb in vring_used_write /home/alxndr/Development/qemu/hw/virtio/virtio.c:347:5
+>     #10 0x560628e6f9bb in virtqueue_split_fill /home/alxndr/Development/qemu/hw/virtio/virtio.c:788:5
+>     #11 0x560628e6f9bb in virtqueue_fill /home/alxndr/Development/qemu/hw/virtio/virtio.c:852:9
+>     #12 0x560628e7205e in virtqueue_push /home/alxndr/Development/qemu/hw/virtio/virtio.c:917:5
+>     #13 0x560629814246 in virtio_gpu_ctrl_response /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:180:5
+>     #14 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:193:5
+>     #15 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:791:9
+>     #16 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:820:9
+>     #17 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
+>     #18 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
+>     #19 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
+>     #20 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
+> 
+> previously allocated by thread T0 here:
+>     #0 0x56062893278d in malloc (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x254878d)
+>     #1 0x7f0d5e1d5500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x54500)
+>     #2 0x560628e7844b in virtqueue_split_pop /home/alxndr/Development/qemu/hw/virtio/virtio.c:1524:12
+>     #3 0x560628e7844b in virtqueue_pop /home/alxndr/Development/qemu/hw/virtio/virtio.c:1693:16
+>     #4 0x560629829633 in virtio_gpu_handle_ctrl /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:878:15
+>     #5 0x560629829633 in virtio_gpu_ctrl_bh /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:893:5
+>     #6 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
+>     #7 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
+>     #8 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
+>     #9 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
+> 
+> 
+> With -trace virtio\* -trace pci\* :
+> [I 1595480025.666147] OPENED
+> 31900@1595480025.706962:virtio_set_status vdev 0x633000019640 val 0
+> 31900@1595480025.710297:virtio_set_status vdev 0x633000019640 val 0
+> [R +0.046276] outl 0xcf8 0x80001018
+> OK
+> [S +0.046313] OK
+> [R +0.046332] outl 0xcfc 0xe0800000
+> 31900@1595480025.712490:pci_cfg_write virtio-vga 02:0 @0x18 <- 0xe0800000
+> OK
+> [S +0.046356] OK
+> [R +0.046365] outl 0xcf8 0x80001020
+> OK
+> [S +0.046370] OK
+> [R +0.046379] outl 0xcf8 0x80001004
+> OK
+> [S +0.046383] OK
+> [R +0.046391] outw 0xcfc 0x7
+> 31900@1595480025.712544:pci_cfg_write virtio-vga 02:0 @0x4 <- 0x7
+> 31900@1595480025.712551:pci_update_mappings_add d=0x633000000800 00:02.0 2,0xe0800000+0x4000
+> OK
+> [S +0.047572] OK
+> [R +0.047597] writeq 0xe0801024 0x10646c00776c6cff
+> OK
+> [S +0.047610] OK
+> [R +0.047619] writeq 0xe080102d 0xe0801000320000
+> OK
+> [S +0.047627] OK
+> [R +0.047636] writeq 0xe0801015 0x12b2901ba000000
+> OK
+> [S +0.047650] OK
+> [R +0.047660] write 0x10646c02 0x1 0x2c
+> OK
+> [S +0.047769] OK
+> [R +0.047782] write 0x999 0x1 0x25
+> OK
+> [S +0.047907] OK
+> [R +0.047920] write 0x8 0x1 0x78
+> OK
+> [S +0.047927] OK
+> [R +0.047935] write 0x2c7 0x1 0x32
+> OK
+> [S +0.047941] OK
+> [R +0.047949] write 0x2cb 0x1 0xff
+> OK
+> [S +0.047954] OK
+> [R +0.047962] write 0x2cc 0x1 0x7e
+> OK
+> [S +0.047967] OK
+> [R +0.047975] writeq 0xe0803000 0xf2b8f0540ff83
+> 31900@1595480025.714133:virtio_queue_notify vdev 0x633000019640 n 0 vq 0x7fe20b13d800
+> OK
+> [S +0.047996] OK
+> 31900@1595480025.714386:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d800
+> 31900@1595480025.714406:virtio_gpu_features virgl 0
+> 31900@1595480025.714413:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d800
+> 31900@1595480025.714421:virtio_set_status vdev 0x633000019640 val 0
+> *CRASH*
+> 
+> Please let me know if I can provide any further info.
+> -Alex
+> 
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+> 
+> -- 
+> You received this bug notification because you are a member of qemu-
+> devel-ml, which is subscribed to QEMU.
+> https://bugs.launchpad.net/bugs/1888606
+> 
+> Title:
+>   Heap-use-after-free in virtio_gpu_ctrl_response
+> 
+> Status in QEMU:
+>   New
+> 
+> Bug description:
+>   Hello,
+>   Here is a reproducer (build with --enable-sanitizers):
+>   cat << EOF | ./i386-softmmu/qemu-system-i386 -nographic -M pc -nodefaults -m 512M -device virtio-vga -qtest stdio
+>   outl 0xcf8 0x80001018
+>   outl 0xcfc 0xe0800000
+>   outl 0xcf8 0x80001020
+>   outl 0xcf8 0x80001004
+>   outw 0xcfc 0x7
+>   writeq 0xe0801024 0x10646c00776c6cff
+>   writeq 0xe080102d 0xe0801000320000
+>   writeq 0xe0801015 0x12b2901ba000000
+>   write 0x10646c02 0x1 0x2c
+>   write 0x999 0x1 0x25
+>   write 0x8 0x1 0x78
+>   write 0x2c7 0x1 0x32
+>   write 0x2cb 0x1 0xff
+>   write 0x2cc 0x1 0x7e
+>   writeq 0xe0803000 0xf2b8f0540ff83
+>   EOF
+> 
+>   The ASAN trace:
+>   ==29798==ERROR: AddressSanitizer: heap-use-after-free on address 0x60d0000050e8 at pc 0x560629814761 bp 0x7ffe916eb1e0 sp 0x7ffe916eb1d8
+>   READ of size 8 at 0x60d0000050e8 thread T0
+>       #0 0x560629814760 in virtio_gpu_ctrl_response /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:181:42
+>       #1 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:193:5
+>       #2 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:791:9
+>       #3 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:820:9
+>       #4 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
+>       #5 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
+>       #6 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
+>       #7 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
+>       #8 0x56062a919571 in glib_pollfds_poll /home/alxndr/Development/qemu/util/main-loop.c:217:9
+>       #9 0x56062a919571 in os_host_main_loop_wait /home/alxndr/Development/qemu/util/main-loop.c:240:5
+>       #10 0x56062a919571 in main_loop_wait /home/alxndr/Development/qemu/util/main-loop.c:516:11
+>       #11 0x560629094a64 in qemu_main_loop /home/alxndr/Development/qemu/softmmu/vl.c:1676:9
+>       #12 0x56062a749ab5 in main /home/alxndr/Development/qemu/softmmu/main.c:49:5
+>       #13 0x7f0d5cd55e0a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x26e0a)
+>       #14 0x5606288ba889 in _start (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x24d0889)
+> 
+>   0x60d0000050e8 is located 56 bytes inside of 136-byte region [0x60d0000050b0,0x60d000005138)
+>   freed by thread T0 here:
+>       #0 0x56062893250d in free (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x254850d)
+>       #1 0x560629827730 in virtio_gpu_reset /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:1160:9
+>       #2 0x560628e81d34 in virtio_reset /home/alxndr/Development/qemu/hw/virtio/virtio.c:1999:9
+>       #3 0x560629f08773 in virtio_pci_reset /home/alxndr/Development/qemu/hw/virtio/virtio-pci.c:1841:5
+>       #4 0x560629043ab6 in memory_region_write_accessor /home/alxndr/Development/qemu/softmmu/memory.c:483:5
+>       #5 0x560629043473 in access_with_adjusted_size /home/alxndr/Development/qemu/softmmu/memory.c:544:18
+>       #6 0x560629042c99 in memory_region_dispatch_write /home/alxndr/Development/qemu/softmmu/memory.c
+>       #7 0x560628990a37 in flatview_write_continue /home/alxndr/Development/qemu/exec.c:3176:23
+>       #8 0x56062899041a in address_space_write_cached_slow /home/alxndr/Development/qemu/exec.c:3789:12
+>       #9 0x560628e6f9bb in vring_used_write /home/alxndr/Development/qemu/hw/virtio/virtio.c:347:5
+>       #10 0x560628e6f9bb in virtqueue_split_fill /home/alxndr/Development/qemu/hw/virtio/virtio.c:788:5
+>       #11 0x560628e6f9bb in virtqueue_fill /home/alxndr/Development/qemu/hw/virtio/virtio.c:852:9
+>       #12 0x560628e7205e in virtqueue_push /home/alxndr/Development/qemu/hw/virtio/virtio.c:917:5
+>       #13 0x560629814246 in virtio_gpu_ctrl_response /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:180:5
+>       #14 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:193:5
+>       #15 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:791:9
+>       #16 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:820:9
+>       #17 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
+>       #18 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
+>       #19 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
+>       #20 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
+> 
+>   previously allocated by thread T0 here:
+>       #0 0x56062893278d in malloc (/home/alxndr/Development/qemu/build/i386-softmmu/qemu-system-i386+0x254878d)
+>       #1 0x7f0d5e1d5500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x54500)
+>       #2 0x560628e7844b in virtqueue_split_pop /home/alxndr/Development/qemu/hw/virtio/virtio.c:1524:12
+>       #3 0x560628e7844b in virtqueue_pop /home/alxndr/Development/qemu/hw/virtio/virtio.c:1693:16
+>       #4 0x560629829633 in virtio_gpu_handle_ctrl /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:878:15
+>       #5 0x560629829633 in virtio_gpu_ctrl_bh /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:893:5
+>       #6 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
+>       #7 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/aio-posix.c:380:5
+>       #8 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/util/async.c:306:5
+>       #9 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e9ed)
+> 
+>   
+>   With -trace virtio\* -trace pci\* :
+>   [I 1595480025.666147] OPENED
+>   31900@1595480025.706962:virtio_set_status vdev 0x633000019640 val 0
+>   31900@1595480025.710297:virtio_set_status vdev 0x633000019640 val 0
+>   [R +0.046276] outl 0xcf8 0x80001018
+>   OK
+>   [S +0.046313] OK
+>   [R +0.046332] outl 0xcfc 0xe0800000
+>   31900@1595480025.712490:pci_cfg_write virtio-vga 02:0 @0x18 <- 0xe0800000
+>   OK
+>   [S +0.046356] OK
+>   [R +0.046365] outl 0xcf8 0x80001020
+>   OK
+>   [S +0.046370] OK
+>   [R +0.046379] outl 0xcf8 0x80001004
+>   OK
+>   [S +0.046383] OK
+>   [R +0.046391] outw 0xcfc 0x7
+>   31900@1595480025.712544:pci_cfg_write virtio-vga 02:0 @0x4 <- 0x7
+>   31900@1595480025.712551:pci_update_mappings_add d=0x633000000800 00:02.0 2,0xe0800000+0x4000
+>   OK
+>   [S +0.047572] OK
+>   [R +0.047597] writeq 0xe0801024 0x10646c00776c6cff
+>   OK
+>   [S +0.047610] OK
+>   [R +0.047619] writeq 0xe080102d 0xe0801000320000
+>   OK
+>   [S +0.047627] OK
+>   [R +0.047636] writeq 0xe0801015 0x12b2901ba000000
+>   OK
+>   [S +0.047650] OK
+>   [R +0.047660] write 0x10646c02 0x1 0x2c
+>   OK
+>   [S +0.047769] OK
+>   [R +0.047782] write 0x999 0x1 0x25
+>   OK
+>   [S +0.047907] OK
+>   [R +0.047920] write 0x8 0x1 0x78
+>   OK
+>   [S +0.047927] OK
+>   [R +0.047935] write 0x2c7 0x1 0x32
+>   OK
+>   [S +0.047941] OK
+>   [R +0.047949] write 0x2cb 0x1 0xff
+>   OK
+>   [S +0.047954] OK
+>   [R +0.047962] write 0x2cc 0x1 0x7e
+>   OK
+>   [S +0.047967] OK
+>   [R +0.047975] writeq 0xe0803000 0xf2b8f0540ff83
+>   31900@1595480025.714133:virtio_queue_notify vdev 0x633000019640 n 0 vq 0x7fe20b13d800
+>   OK
+>   [S +0.047996] OK
+>   31900@1595480025.714386:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d800
+>   31900@1595480025.714406:virtio_gpu_features virgl 0
+>   31900@1595480025.714413:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d800
+>   31900@1595480025.714421:virtio_set_status vdev 0x633000019640 val 0
+>   *CRASH*
+> 
+>   Please let me know if I can provide any further info.
+>   -Alex
+> 
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1888606/+subscriptions
+> 
 
