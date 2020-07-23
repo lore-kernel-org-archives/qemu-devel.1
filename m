@@ -2,86 +2,89 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2D8C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 05:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC08DC433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 06:05:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8A33207F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 05:52:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 855FB20658
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 06:05:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O68o2lEp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8A33207F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SVfWc9Lz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 855FB20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyU9w-0005cf-1S
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 01:52:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41008)
+	id 1jyUM6-0008JT-OQ
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 02:05:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jyU9N-0005CZ-BQ
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 01:52:13 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40837)
+ (Exim 4.90_1) (envelope-from <scw@google.com>) id 1jyULL-0007ru-GV
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 02:04:35 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:37840)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1jyU9L-0002qz-03
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 01:52:13 -0400
-Received: by mail-ot1-x344.google.com with SMTP id c25so3549067otf.7
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 22:52:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <scw@google.com>) id 1jyULJ-0004OX-JB
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 02:04:35 -0400
+Received: by mail-ej1-x641.google.com with SMTP id lx13so5083257ejb.4
+ for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 23:04:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=R7eyETZlPv+DUuGqe2AaCJDgastEZOj8ri+OYVVJ/Tw=;
- b=O68o2lEpMXtmj5QPr56fwgyE//XPVj33pemJtEon98WQ3SRcdgoz8kz96iPcNppGNO
- 9Ku/5pKrtOiSvHolZverzDdN5/IHYcsQnGrvL1HeODgQEbrBAvg0Q8Wl16nB6Xs431S6
- a3zDjrb2fsfxUFFg9BvGIn5EPKGH4m1WL6kIQDf8X1GUwwqnTCQmSZEtsbzpcXE+bQ79
- VOuOdi8h/7D7QN8TilrIwcmJn30nv0Ia+K/Uqla/zh3MWVHIpBVUpBKVbtR6wMXLauwk
- uhY2J/H5ggrbE4aozRzl61Cs3iNcLa+OlhNzO7f9yXIFwGe9QbsIg+11mpxGlR8QPDfr
- tpZg==
+ :cc; bh=mlhTFuI/2HM9DI3A8p2KMqGPIZ76+Qd5nYfMCvTr2Oo=;
+ b=SVfWc9LzXdIvZ7f9DRm5MCUkgozOUY9ETWV5Kagr084lmzLeKSF85byHa6sSfXiYWP
+ EYMtj1ZLTgrXO0o6YpUXBiwwv+jYCON2CGnik5DUiYKDzHHopaF0Dm/0tcI+7r5tGwEW
+ Z5bEIG4d26BtZ7EoGc8burmzZL7jCzYRDyGU5R1ol+ZCTnfq61vnI9sTYA9ZMYHJCUYK
+ u5gBwzHNmK+3iPVQGkaGmeUDgA7nq1winhEx1HQv7clAnFs6tEMAdm3j8jyXMpJ0AaAJ
+ lt5JiL2OTvy6gwvC9taHZpnnS9nUVR1AuENxvgdOMIMKq/UjZUVMXJBnOiN/4IQ10vv/
+ zK0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=R7eyETZlPv+DUuGqe2AaCJDgastEZOj8ri+OYVVJ/Tw=;
- b=QefGAlefkYYVIfOMgo/5Q1JfK1B1OEaUltUWcfCqnFwBtnHcdYfOkARkMPdKa0AcZ1
- 64uS6WWRO/rdaScRhN0d9gU7UnpFpziZSafJPtgD6xHS0QHByOfMBPsyASOPCU5tYNVR
- N/NQ6Ec8h2USvqd5qjNy7xHQRimCihcWcg9ITmW2+efzt8n0vvfuBRO05ivzXLMAS3es
- 3GkpqWnnqEqJazounIomH2ZkpslcgBKEX6qPsW89d9UOkbZr+YVFAua30HwW9Z2JQRjU
- rkRBeD7/cbsipCQmozK8J8DWaSsxh9MHDN7zyNoU8EGuJM628Ys4Q6CK33mxamzxzmQv
- Bj1A==
-X-Gm-Message-State: AOAM531R1sBAcPSX4L6Y9b3yO55SY2sb+Fb8I0Ys5xLmd/cKzIwz/eEy
- I1rbOyTISFS2fIBHhGJ8on6DIMnd7balkL10Cn0=
-X-Google-Smtp-Source: ABdhPJzJFDBjfqykMNB4mhBpVW6Hw5fnTHuwj5U8wpybmsUz0ArV7pxcJUzTLS2OB1YW8VHqySvJ83KG73Vc+ElnSMU=
-X-Received: by 2002:a9d:787:: with SMTP id 7mr2835019oto.333.1595483529645;
- Wed, 22 Jul 2020 22:52:09 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=mlhTFuI/2HM9DI3A8p2KMqGPIZ76+Qd5nYfMCvTr2Oo=;
+ b=Yf0kWyfYdNxEPVhMA0krmuK/+FyxcDeSUluAcIh59IqJTn25z0oTFnb63jPWuC+xG3
+ SO1j2NUisuj6s4B48rgxalvAa/POwzBeWjPEWbmZz3u6eX4aG/kQAT6tFXMYEaiRq7SP
+ S1tXMDtRdTAxAiN6Wq6mSky2C+hqnFlFumhytCxgRxwySCL+MGaxOHwDwjr/oJi586Yt
+ GK7dsRsivvqx7Lr72C9qjrYb5iEm6+RuDLTfh2EDB0FQnuxCgVuw236LXsLFZSzd+9ql
+ rHNscCM5mfkA3ddm/4ylYOXagORBBemVKhdk9dFe7aLXs9S6s+NNbkN23/8eW/KHTC9o
+ ekCA==
+X-Gm-Message-State: AOAM533upZE5eOaaTXCBUIlPKvR2KBx/qaVMpNRF8ZBasoBjU64qKVEn
+ d1FcIZs1LjRNDTz5+i6loJIAgl0AH2ZlsLmu1w8YpQ==
+X-Google-Smtp-Source: ABdhPJz3+O12NyhENFLOfsIkc/wQ0jtkIal+eg+got0Ky6xYF7ZsWkLJ9MbVVYKCWFQ68JBYteMZtXW0P1BKkzj6DBI=
+X-Received: by 2002:a17:906:f1d5:: with SMTP id
+ gx21mr2806159ejb.121.1595484269753; 
+ Wed, 22 Jul 2020 23:04:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <159548011952.31456.8249433335836304327.malonedeb@chaenomeles.canonical.com>
-In-Reply-To: <159548011952.31456.8249433335836304327.malonedeb@chaenomeles.canonical.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 23 Jul 2020 13:51:33 +0800
-Message-ID: <CAKXe6SK1=KoP4Vmyo-3pMsE+5BzMYwT-+uvqRY3zgi0qCiuENA@mail.gmail.com>
-Subject: Re: [Bug 1888606] [NEW] Heap-use-after-free in
- virtio_gpu_ctrl_response
-To: Bug 1888606 <1888606@bugs.launchpad.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x344.google.com
+References: <cover.1595463707.git.scw@google.com>
+ <bf706105addcaa3f48391be8f7e5c09c3b1735ae.1595463707.git.scw@google.com>
+ <0152137e-638a-dd06-741a-f03830c92ffd@redhat.com>
+In-Reply-To: <0152137e-638a-dd06-741a-f03830c92ffd@redhat.com>
+From: Shu-Chun Weng <scw@google.com>
+Date: Wed, 22 Jul 2020 23:04:18 -0700
+Message-ID: <CAF3nBxjpcPW182wJajOkd+kdTcGQOefptDg=R01C7G9DTrQpZA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] configure: avx2 and avx512f detection for clang
+To: Thomas Huth <thuth@redhat.com>
+Cc: rth@twiddle.net, qemu-devel@nongnu.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature";
+ micalg=sha-256; boundary="0000000000002c5dfc05ab15a16d"
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=scw@google.com; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,427 +97,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
- P J P <ppandit@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alexander Bulekov <1888606@bugs.launchpad.net> =E4=BA=8E2020=E5=B9=B47=E6=
-=9C=8823=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=881:02=E5=86=99=E9=81=
-=93=EF=BC=9A
+--0000000000002c5dfc05ab15a16d
+Content-Type: multipart/alternative; boundary="0000000000002543c405ab15a153"
+
+--0000000000002543c405ab15a153
+Content-Type: text/plain; charset="UTF-8"
+
+Do we have the flexibility to do that for util/bufferiszero.c as well?
+Otherwise, we are using different mechanisms to detect (compile test.c with
+-mavx2) and actually use (GCC pragma & __attribute__((target(*))))) the
+feature in production.
+
+Shu-Chun
+
+On Wed, Jul 22, 2020 at 9:55 PM Thomas Huth <thuth@redhat.com> wrote:
+
+> On 23/07/2020 02.27, Shu-Chun Weng wrote:
+> > Since clang does not support "#pragma GCC", the instruction sets are
+> > always disabled. In this change, we
+> >
+> >  1. wrap "#pragma GCC" inside "#ifndef __clang__",
+> >  2. only retain them around "#include <{e,i,s}mmintrin.h>" to work
+> >     around gcc bug,
+> >  3. and annotate each function with `__attribute__((target(*)))` which
+> >     is recognized by both gcc and clang.
+> >
+> > Signed-off-by: Shu-Chun Weng <scw@google.com>
+> > ---
+> >  configure           | 16 ++++++++++++++--
+> >  util/bufferiszero.c | 33 +++++++++++++++++++++++----------
+> >  2 files changed, 37 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/configure b/configure
+> > index 4bd80ed507..d9ce3aa5db 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -5808,10 +5808,16 @@ fi
+> >
+> >  if test "$cpuid_h" = "yes" && test "$avx2_opt" != "no"; then
+> >    cat > $TMPC << EOF
+> > +#include <cpuid.h>
+> > +#ifndef __clang__
+> >  #pragma GCC push_options
+> >  #pragma GCC target("avx2")
+> > -#include <cpuid.h>
+> > +#endif
+> >  #include <immintrin.h>
+> > +#ifndef __clang__
+> > +#pragma GCC pop_options
+> > +#endif
+> > +__attribute__((target("avx2")))
+> >  static int bar(void *a) {
+> >      __m256i x = *(__m256i *)a;
+> >      return _mm256_testz_si256(x, x);
 >
-> Public bug reported:
+> I wonder whether it would make more sense to pass "-mavx2" to the
+> compile_object call afterwards and simply remove the #pragmas here?
+> Did you try that already?
 >
-> Hello,
-> Here is a reproducer (build with --enable-sanitizers):
-> cat << EOF | ./i386-softmmu/qemu-system-i386 -nographic -M pc -nodefaults=
- -m 512M -device virtio-vga -qtest stdio
-> outl 0xcf8 0x80001018
-> outl 0xcfc 0xe0800000
-> outl 0xcf8 0x80001020
-> outl 0xcf8 0x80001004
-> outw 0xcfc 0x7
-> writeq 0xe0801024 0x10646c00776c6cff
-> writeq 0xe080102d 0xe0801000320000
-> writeq 0xe0801015 0x12b2901ba000000
-> write 0x10646c02 0x1 0x2c
-> write 0x999 0x1 0x25
-> write 0x8 0x1 0x78
-> write 0x2c7 0x1 0x32
-> write 0x2cb 0x1 0xff
-> write 0x2cc 0x1 0x7e
-> writeq 0xe0803000 0xf2b8f0540ff83
-> EOF
+>  Thomas
 >
-> The ASAN trace:
-> =3D=3D29798=3D=3DERROR: AddressSanitizer: heap-use-after-free on address =
-0x60d0000050e8 at pc 0x560629814761 bp 0x7ffe916eb1e0 sp 0x7ffe916eb1d8
-> READ of size 8 at 0x60d0000050e8 thread T0
->     #0 0x560629814760 in virtio_gpu_ctrl_response /home/alxndr/Developmen=
-t/qemu/hw/display/virtio-gpu.c:181:42
->     #1 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/Dev=
-elopment/qemu/hw/display/virtio-gpu.c:193:5
->     #2 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Devel=
-opment/qemu/hw/display/virtio-gpu.c:791:9
->     #3 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Development=
-/qemu/hw/display/virtio-gpu.c:820:9
->     #4 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/a=
-sync.c:164:13
->     #5 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/=
-aio-posix.c:380:5
->     #6 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/u=
-til/async.c:306:5
->     #7 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-g=
-nu/libglib-2.0.so.0+0x4e9ed)
->     #8 0x56062a919571 in glib_pollfds_poll /home/alxndr/Development/qemu/=
-util/main-loop.c:217:9
->     #9 0x56062a919571 in os_host_main_loop_wait /home/alxndr/Development/=
-qemu/util/main-loop.c:240:5
->     #10 0x56062a919571 in main_loop_wait /home/alxndr/Development/qemu/ut=
-il/main-loop.c:516:11
->     #11 0x560629094a64 in qemu_main_loop /home/alxndr/Development/qemu/so=
-ftmmu/vl.c:1676:9
->     #12 0x56062a749ab5 in main /home/alxndr/Development/qemu/softmmu/main=
-.c:49:5
->     #13 0x7f0d5cd55e0a in __libc_start_main (/lib/x86_64-linux-gnu/libc.s=
-o.6+0x26e0a)
->     #14 0x5606288ba889 in _start (/home/alxndr/Development/qemu/build/i38=
-6-softmmu/qemu-system-i386+0x24d0889)
->
-> 0x60d0000050e8 is located 56 bytes inside of 136-byte region [0x60d000005=
-0b0,0x60d000005138)
-> freed by thread T0 here:
->     #0 0x56062893250d in free (/home/alxndr/Development/qemu/build/i386-s=
-oftmmu/qemu-system-i386+0x254850d)
->     #1 0x560629827730 in virtio_gpu_reset /home/alxndr/Development/qemu/h=
-w/display/virtio-gpu.c:1160:9
->     #2 0x560628e81d34 in virtio_reset /home/alxndr/Development/qemu/hw/vi=
-rtio/virtio.c:1999:9
->     #3 0x560629f08773 in virtio_pci_reset /home/alxndr/Development/qemu/h=
-w/virtio/virtio-pci.c:1841:5
->     #4 0x560629043ab6 in memory_region_write_accessor /home/alxndr/Develo=
-pment/qemu/softmmu/memory.c:483:5
->     #5 0x560629043473 in access_with_adjusted_size /home/alxndr/Developme=
-nt/qemu/softmmu/memory.c:544:18
->     #6 0x560629042c99 in memory_region_dispatch_write /home/alxndr/Develo=
-pment/qemu/softmmu/memory.c
->     #7 0x560628990a37 in flatview_write_continue /home/alxndr/Development=
-/qemu/exec.c:3176:23
->     #8 0x56062899041a in address_space_write_cached_slow /home/alxndr/Dev=
-elopment/qemu/exec.c:3789:12
->     #9 0x560628e6f9bb in vring_used_write /home/alxndr/Development/qemu/h=
-w/virtio/virtio.c:347:5
->     #10 0x560628e6f9bb in virtqueue_split_fill /home/alxndr/Development/q=
-emu/hw/virtio/virtio.c:788:5
->     #11 0x560628e6f9bb in virtqueue_fill /home/alxndr/Development/qemu/hw=
-/virtio/virtio.c:852:9
->     #12 0x560628e7205e in virtqueue_push /home/alxndr/Development/qemu/hw=
-/virtio/virtio.c:917:5
->     #13 0x560629814246 in virtio_gpu_ctrl_response /home/alxndr/Developme=
-nt/qemu/hw/display/virtio-gpu.c:180:5
->     #14 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/De=
-velopment/qemu/hw/display/virtio-gpu.c:193:5
->     #15 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Deve=
-lopment/qemu/hw/display/virtio-gpu.c:791:9
->     #16 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Developmen=
-t/qemu/hw/display/virtio-gpu.c:820:9
->     #17 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/=
-async.c:164:13
->     #18 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util=
-/aio-posix.c:380:5
->     #19 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/=
-util/async.c:306:5
->     #20 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e9ed)
 >
 
-Seems again when we write back to virtio used vring, we write to the
-MMIO addresspace.
+--0000000000002543c405ab15a153
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Li Qiang
+<div dir=3D"ltr"><div dir=3D"ltr">Do we have the flexibility to do that for=
+ util/bufferiszero.c as well? Otherwise, we are using different mechanisms =
+to detect (compile test.c with -mavx2) and actually use (GCC pragma &amp; _=
+_attribute__((target(*))))) the feature in production.</div><div dir=3D"ltr=
+"><br></div><div>Shu-Chun</div><br><div class=3D"gmail_quote"><div dir=3D"l=
+tr" class=3D"gmail_attr">On Wed, Jul 22, 2020 at 9:55 PM Thomas Huth &lt;<a=
+ href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br></div>=
+<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
+left:1px solid rgb(204,204,204);padding-left:1ex">On 23/07/2020 02.27, Shu-=
+Chun Weng wrote:<br>
+&gt; Since clang does not support &quot;#pragma GCC&quot;, the instruction =
+sets are<br>
+&gt; always disabled. In this change, we<br>
+&gt; <br>
+&gt;=C2=A0 1. wrap &quot;#pragma GCC&quot; inside &quot;#ifndef __clang__&q=
+uot;,<br>
+&gt;=C2=A0 2. only retain them around &quot;#include &lt;{e,i,s}mmintrin.h&=
+gt;&quot; to work<br>
+&gt;=C2=A0 =C2=A0 =C2=A0around gcc bug,<br>
+&gt;=C2=A0 3. and annotate each function with `__attribute__((target(*)))` =
+which<br>
+&gt;=C2=A0 =C2=A0 =C2=A0is recognized by both gcc and clang.<br>
+&gt; <br>
+&gt; Signed-off-by: Shu-Chun Weng &lt;<a href=3D"mailto:scw@google.com" tar=
+get=3D"_blank" class=3D"cremed">scw@google.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 16 +++++++++=
++++++--<br>
+&gt;=C2=A0 util/bufferiszero.c | 33 +++++++++++++++++++++++----------<br>
+&gt;=C2=A0 2 files changed, 37 insertions(+), 12 deletions(-)<br>
+&gt; <br>
+&gt; diff --git a/configure b/configure<br>
+&gt; index 4bd80ed507..d9ce3aa5db 100755<br>
+&gt; --- a/configure<br>
+&gt; +++ b/configure<br>
+&gt; @@ -5808,10 +5808,16 @@ fi<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 if test &quot;$cpuid_h&quot; =3D &quot;yes&quot; &amp;&amp; test=
+ &quot;$avx2_opt&quot; !=3D &quot;no&quot;; then<br>
+&gt;=C2=A0 =C2=A0 cat &gt; $TMPC &lt;&lt; EOF<br>
+&gt; +#include &lt;cpuid.h&gt;<br>
+&gt; +#ifndef __clang__<br>
+&gt;=C2=A0 #pragma GCC push_options<br>
+&gt;=C2=A0 #pragma GCC target(&quot;avx2&quot;)<br>
+&gt; -#include &lt;cpuid.h&gt;<br>
+&gt; +#endif<br>
+&gt;=C2=A0 #include &lt;immintrin.h&gt;<br>
+&gt; +#ifndef __clang__<br>
+&gt; +#pragma GCC pop_options<br>
+&gt; +#endif<br>
+&gt; +__attribute__((target(&quot;avx2&quot;)))<br>
+&gt;=C2=A0 static int bar(void *a) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 __m256i x =3D *(__m256i *)a;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 return _mm256_testz_si256(x, x);<br>
+<br>
+I wonder whether it would make more sense to pass &quot;-mavx2&quot; to the=
+<br>
+compile_object call afterwards and simply remove the #pragmas here?<br>
+Did you try that already?<br>
+<br>
+=C2=A0Thomas<br>
+<br>
+</blockquote></div></div>
 
+--0000000000002543c405ab15a153--
 
-> previously allocated by thread T0 here:
->     #0 0x56062893278d in malloc (/home/alxndr/Development/qemu/build/i386=
--softmmu/qemu-system-i386+0x254878d)
->     #1 0x7f0d5e1d5500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.=
-so.0+0x54500)
->     #2 0x560628e7844b in virtqueue_split_pop /home/alxndr/Development/qem=
-u/hw/virtio/virtio.c:1524:12
->     #3 0x560628e7844b in virtqueue_pop /home/alxndr/Development/qemu/hw/v=
-irtio/virtio.c:1693:16
->     #4 0x560629829633 in virtio_gpu_handle_ctrl /home/alxndr/Development/=
-qemu/hw/display/virtio-gpu.c:878:15
->     #5 0x560629829633 in virtio_gpu_ctrl_bh /home/alxndr/Development/qemu=
-/hw/display/virtio-gpu.c:893:5
->     #6 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/a=
-sync.c:164:13
->     #7 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/util/=
-aio-posix.c:380:5
->     #8 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu/u=
-til/async.c:306:5
->     #9 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-g=
-nu/libglib-2.0.so.0+0x4e9ed)
->
->
-> With -trace virtio\* -trace pci\* :
-> [I 1595480025.666147] OPENED
-> 31900@1595480025.706962:virtio_set_status vdev 0x633000019640 val 0
-> 31900@1595480025.710297:virtio_set_status vdev 0x633000019640 val 0
-> [R +0.046276] outl 0xcf8 0x80001018
-> OK
-> [S +0.046313] OK
-> [R +0.046332] outl 0xcfc 0xe0800000
-> 31900@1595480025.712490:pci_cfg_write virtio-vga 02:0 @0x18 <- 0xe0800000
-> OK
-> [S +0.046356] OK
-> [R +0.046365] outl 0xcf8 0x80001020
-> OK
-> [S +0.046370] OK
-> [R +0.046379] outl 0xcf8 0x80001004
-> OK
-> [S +0.046383] OK
-> [R +0.046391] outw 0xcfc 0x7
-> 31900@1595480025.712544:pci_cfg_write virtio-vga 02:0 @0x4 <- 0x7
-> 31900@1595480025.712551:pci_update_mappings_add d=3D0x633000000800 00:02.=
-0 2,0xe0800000+0x4000
-> OK
-> [S +0.047572] OK
-> [R +0.047597] writeq 0xe0801024 0x10646c00776c6cff
-> OK
-> [S +0.047610] OK
-> [R +0.047619] writeq 0xe080102d 0xe0801000320000
-> OK
-> [S +0.047627] OK
-> [R +0.047636] writeq 0xe0801015 0x12b2901ba000000
-> OK
-> [S +0.047650] OK
-> [R +0.047660] write 0x10646c02 0x1 0x2c
-> OK
-> [S +0.047769] OK
-> [R +0.047782] write 0x999 0x1 0x25
-> OK
-> [S +0.047907] OK
-> [R +0.047920] write 0x8 0x1 0x78
-> OK
-> [S +0.047927] OK
-> [R +0.047935] write 0x2c7 0x1 0x32
-> OK
-> [S +0.047941] OK
-> [R +0.047949] write 0x2cb 0x1 0xff
-> OK
-> [S +0.047954] OK
-> [R +0.047962] write 0x2cc 0x1 0x7e
-> OK
-> [S +0.047967] OK
-> [R +0.047975] writeq 0xe0803000 0xf2b8f0540ff83
-> 31900@1595480025.714133:virtio_queue_notify vdev 0x633000019640 n 0 vq 0x=
-7fe20b13d800
-> OK
-> [S +0.047996] OK
-> 31900@1595480025.714386:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d8=
-00
-> 31900@1595480025.714406:virtio_gpu_features virgl 0
-> 31900@1595480025.714413:virtio_notify vdev 0x633000019640 vq 0x7fe20b13d8=
-00
-> 31900@1595480025.714421:virtio_set_status vdev 0x633000019640 val 0
-> *CRASH*
->
-> Please let me know if I can provide any further info.
-> -Alex
->
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->
-> --
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1888606
->
-> Title:
->   Heap-use-after-free in virtio_gpu_ctrl_response
->
-> Status in QEMU:
->   New
->
-> Bug description:
->   Hello,
->   Here is a reproducer (build with --enable-sanitizers):
->   cat << EOF | ./i386-softmmu/qemu-system-i386 -nographic -M pc -nodefaul=
-ts -m 512M -device virtio-vga -qtest stdio
->   outl 0xcf8 0x80001018
->   outl 0xcfc 0xe0800000
->   outl 0xcf8 0x80001020
->   outl 0xcf8 0x80001004
->   outw 0xcfc 0x7
->   writeq 0xe0801024 0x10646c00776c6cff
->   writeq 0xe080102d 0xe0801000320000
->   writeq 0xe0801015 0x12b2901ba000000
->   write 0x10646c02 0x1 0x2c
->   write 0x999 0x1 0x25
->   write 0x8 0x1 0x78
->   write 0x2c7 0x1 0x32
->   write 0x2cb 0x1 0xff
->   write 0x2cc 0x1 0x7e
->   writeq 0xe0803000 0xf2b8f0540ff83
->   EOF
->
->   The ASAN trace:
->   =3D=3D29798=3D=3DERROR: AddressSanitizer: heap-use-after-free on addres=
-s 0x60d0000050e8 at pc 0x560629814761 bp 0x7ffe916eb1e0 sp 0x7ffe916eb1d8
->   READ of size 8 at 0x60d0000050e8 thread T0
->       #0 0x560629814760 in virtio_gpu_ctrl_response /home/alxndr/Developm=
-ent/qemu/hw/display/virtio-gpu.c:181:42
->       #1 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/D=
-evelopment/qemu/hw/display/virtio-gpu.c:193:5
->       #2 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/Dev=
-elopment/qemu/hw/display/virtio-gpu.c:791:9
->       #3 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Developme=
-nt/qemu/hw/display/virtio-gpu.c:820:9
->       #4 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util=
-/async.c:164:13
->       #5 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/uti=
-l/aio-posix.c:380:5
->       #6 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu=
-/util/async.c:306:5
->       #7 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux=
--gnu/libglib-2.0.so.0+0x4e9ed)
->       #8 0x56062a919571 in glib_pollfds_poll /home/alxndr/Development/qem=
-u/util/main-loop.c:217:9
->       #9 0x56062a919571 in os_host_main_loop_wait /home/alxndr/Developmen=
-t/qemu/util/main-loop.c:240:5
->       #10 0x56062a919571 in main_loop_wait /home/alxndr/Development/qemu/=
-util/main-loop.c:516:11
->       #11 0x560629094a64 in qemu_main_loop /home/alxndr/Development/qemu/=
-softmmu/vl.c:1676:9
->       #12 0x56062a749ab5 in main /home/alxndr/Development/qemu/softmmu/ma=
-in.c:49:5
->       #13 0x7f0d5cd55e0a in __libc_start_main (/lib/x86_64-linux-gnu/libc=
-.so.6+0x26e0a)
->       #14 0x5606288ba889 in _start (/home/alxndr/Development/qemu/build/i=
-386-softmmu/qemu-system-i386+0x24d0889)
->
->   0x60d0000050e8 is located 56 bytes inside of 136-byte region [0x60d0000=
-050b0,0x60d000005138)
->   freed by thread T0 here:
->       #0 0x56062893250d in free (/home/alxndr/Development/qemu/build/i386=
--softmmu/qemu-system-i386+0x254850d)
->       #1 0x560629827730 in virtio_gpu_reset /home/alxndr/Development/qemu=
-/hw/display/virtio-gpu.c:1160:9
->       #2 0x560628e81d34 in virtio_reset /home/alxndr/Development/qemu/hw/=
-virtio/virtio.c:1999:9
->       #3 0x560629f08773 in virtio_pci_reset /home/alxndr/Development/qemu=
-/hw/virtio/virtio-pci.c:1841:5
->       #4 0x560629043ab6 in memory_region_write_accessor /home/alxndr/Deve=
-lopment/qemu/softmmu/memory.c:483:5
->       #5 0x560629043473 in access_with_adjusted_size /home/alxndr/Develop=
-ment/qemu/softmmu/memory.c:544:18
->       #6 0x560629042c99 in memory_region_dispatch_write /home/alxndr/Deve=
-lopment/qemu/softmmu/memory.c
->       #7 0x560628990a37 in flatview_write_continue /home/alxndr/Developme=
-nt/qemu/exec.c:3176:23
->       #8 0x56062899041a in address_space_write_cached_slow /home/alxndr/D=
-evelopment/qemu/exec.c:3789:12
->       #9 0x560628e6f9bb in vring_used_write /home/alxndr/Development/qemu=
-/hw/virtio/virtio.c:347:5
->       #10 0x560628e6f9bb in virtqueue_split_fill /home/alxndr/Development=
-/qemu/hw/virtio/virtio.c:788:5
->       #11 0x560628e6f9bb in virtqueue_fill /home/alxndr/Development/qemu/=
-hw/virtio/virtio.c:852:9
->       #12 0x560628e7205e in virtqueue_push /home/alxndr/Development/qemu/=
-hw/virtio/virtio.c:917:5
->       #13 0x560629814246 in virtio_gpu_ctrl_response /home/alxndr/Develop=
-ment/qemu/hw/display/virtio-gpu.c:180:5
->       #14 0x56062981adc8 in virtio_gpu_ctrl_response_nodata /home/alxndr/=
-Development/qemu/hw/display/virtio-gpu.c:193:5
->       #15 0x56062981adc8 in virtio_gpu_simple_process_cmd /home/alxndr/De=
-velopment/qemu/hw/display/virtio-gpu.c:791:9
->       #16 0x5606298175f8 in virtio_gpu_process_cmdq /home/alxndr/Developm=
-ent/qemu/hw/display/virtio-gpu.c:820:9
->       #17 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/uti=
-l/async.c:164:13
->       #18 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/ut=
-il/aio-posix.c:380:5
->       #19 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qem=
-u/util/async.c:306:5
->       #20 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linu=
-x-gnu/libglib-2.0.so.0+0x4e9ed)
->
->   previously allocated by thread T0 here:
->       #0 0x56062893278d in malloc (/home/alxndr/Development/qemu/build/i3=
-86-softmmu/qemu-system-i386+0x254878d)
->       #1 0x7f0d5e1d5500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.=
-0.so.0+0x54500)
->       #2 0x560628e7844b in virtqueue_split_pop /home/alxndr/Development/q=
-emu/hw/virtio/virtio.c:1524:12
->       #3 0x560628e7844b in virtqueue_pop /home/alxndr/Development/qemu/hw=
-/virtio/virtio.c:1693:16
->       #4 0x560629829633 in virtio_gpu_handle_ctrl /home/alxndr/Developmen=
-t/qemu/hw/display/virtio-gpu.c:878:15
->       #5 0x560629829633 in virtio_gpu_ctrl_bh /home/alxndr/Development/qe=
-mu/hw/display/virtio-gpu.c:893:5
->       #6 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util=
-/async.c:164:13
->       #7 0x56062a887b9d in aio_dispatch /home/alxndr/Development/qemu/uti=
-l/aio-posix.c:380:5
->       #8 0x56062a8f6b1c in aio_ctx_dispatch /home/alxndr/Development/qemu=
-/util/async.c:306:5
->       #9 0x7f0d5e1cf9ed in g_main_context_dispatch (/usr/lib/x86_64-linux=
--gnu/libglib-2.0.so.0+0x4e9ed)
->
->
->   With -trace virtio\* -trace pci\* :
->   [I 1595480025.666147] OPENED
->   31900@1595480025.706962:virtio_set_status vdev 0x633000019640 val 0
->   31900@1595480025.710297:virtio_set_status vdev 0x633000019640 val 0
->   [R +0.046276] outl 0xcf8 0x80001018
->   OK
->   [S +0.046313] OK
->   [R +0.046332] outl 0xcfc 0xe0800000
->   31900@1595480025.712490:pci_cfg_write virtio-vga 02:0 @0x18 <- 0xe08000=
-00
->   OK
->   [S +0.046356] OK
->   [R +0.046365] outl 0xcf8 0x80001020
->   OK
->   [S +0.046370] OK
->   [R +0.046379] outl 0xcf8 0x80001004
->   OK
->   [S +0.046383] OK
->   [R +0.046391] outw 0xcfc 0x7
->   31900@1595480025.712544:pci_cfg_write virtio-vga 02:0 @0x4 <- 0x7
->   31900@1595480025.712551:pci_update_mappings_add d=3D0x633000000800 00:0=
-2.0 2,0xe0800000+0x4000
->   OK
->   [S +0.047572] OK
->   [R +0.047597] writeq 0xe0801024 0x10646c00776c6cff
->   OK
->   [S +0.047610] OK
->   [R +0.047619] writeq 0xe080102d 0xe0801000320000
->   OK
->   [S +0.047627] OK
->   [R +0.047636] writeq 0xe0801015 0x12b2901ba000000
->   OK
->   [S +0.047650] OK
->   [R +0.047660] write 0x10646c02 0x1 0x2c
->   OK
->   [S +0.047769] OK
->   [R +0.047782] write 0x999 0x1 0x25
->   OK
->   [S +0.047907] OK
->   [R +0.047920] write 0x8 0x1 0x78
->   OK
->   [S +0.047927] OK
->   [R +0.047935] write 0x2c7 0x1 0x32
->   OK
->   [S +0.047941] OK
->   [R +0.047949] write 0x2cb 0x1 0xff
->   OK
->   [S +0.047954] OK
->   [R +0.047962] write 0x2cc 0x1 0x7e
->   OK
->   [S +0.047967] OK
->   [R +0.047975] writeq 0xe0803000 0xf2b8f0540ff83
->   31900@1595480025.714133:virtio_queue_notify vdev 0x633000019640 n 0 vq =
-0x7fe20b13d800
->   OK
->   [S +0.047996] OK
->   31900@1595480025.714386:virtio_notify vdev 0x633000019640 vq 0x7fe20b13=
-d800
->   31900@1595480025.714406:virtio_gpu_features virgl 0
->   31900@1595480025.714413:virtio_notify vdev 0x633000019640 vq 0x7fe20b13=
-d800
->   31900@1595480025.714421:virtio_set_status vdev 0x633000019640 val 0
->   *CRASH*
->
->   Please let me know if I can provide any further info.
->   -Alex
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1888606/+subscriptions
->
+--0000000000002c5dfc05ab15a16d
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIPAAYJKoZIhvcNAQcCoIIO8TCCDu0CAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ggxjMIIEkjCCA3qgAwIBAgINAewckktV4F6Q7sAtGDANBgkqhkiG9w0BAQsFADBMMSAwHgYDVQQL
+ExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UEAxMK
+R2xvYmFsU2lnbjAeFw0xODA2MjAwMDAwMDBaFw0yODA2MjAwMDAwMDBaMEsxCzAJBgNVBAYTAkJF
+MRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSEwHwYDVQQDExhHbG9iYWxTaWduIFNNSU1FIENB
+IDIwMTgwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCUeobu8FdB5oJg6Fz6SFf8YsPI
+dNcq4rBSiSDAwqMNYbeTpRrINMBdWuPqVWaBX7WHYMsKQwCOvAF1b7rkD+ROo+CCTJo76EAY25Pp
+jt7TYP/PxoLesLQ+Ld088+BeyZg9pQaf0VK4tn23fOCWbFWoM8hdnF86Mqn6xB6nLsxJcz4CUGJG
+qAhC3iedFiCfZfsIp2RNyiUhzPAqalkrtD0bZQvCgi5aSNJseNyCysS1yA58OuxEyn2e9itZJE+O
+sUeD8VFgz+nAYI5r/dmFEXu5d9npLvTTrSJjrEmw2/ynKn6r6ONueZnCfo6uLmP1SSglhI/SN7dy
+L1rKUCU7R1MjAgMBAAGjggFyMIIBbjAOBgNVHQ8BAf8EBAMCAYYwJwYDVR0lBCAwHgYIKwYBBQUH
+AwIGCCsGAQUFBwMEBggrBgEFBQcDCTASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBRMtwWJ
+1lPNI0Ci6A94GuRtXEzs0jAfBgNVHSMEGDAWgBSP8Et/qC5FJK5NUPpjmove4t0bvDA+BggrBgEF
+BQcBAQQyMDAwLgYIKwYBBQUHMAGGImh0dHA6Ly9vY3NwMi5nbG9iYWxzaWduLmNvbS9yb290cjMw
+NgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIzLmNybDBn
+BgNVHSAEYDBeMAsGCSsGAQQBoDIBKDAMBgorBgEEAaAyASgKMEEGCSsGAQQBoDIBXzA0MDIGCCsG
+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
+aHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wUQYIKwYBBQUHAQEERTBDMEEG
+CCsGAQUFBzAChjVodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc3NtaW1lY2Ey
+MDE4LmNydDAfBgNVHSMEGDAWgBRMtwWJ1lPNI0Ci6A94GuRtXEzs0jA/BgNVHR8EODA2MDSgMqAw
+hi5odHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2NhL2dzc21pbWVjYTIwMTguY3JsMA0GCSqGSIb3
+DQEBCwUAA4IBAQB0zgx4rAhCKzIVBMrEn4R/8FrisDQWZwJvA4VLbgtBPI1kP/Ys+cw3oYecxHED
+MAHXOYclqmcaKudfjsLKZ/jrpdjZMAHDazo86g4BREWWiAxAtnMPhKrL4Ciqs0Yx/fj4VJlJRgES
+1wscHQQNh2BgbqP15O5D2CtZVsLIuc9pSY3DZNYUrMQy55hszPnhgeghImVgNLtzUkF8oLKlnrWs
+blvMc7fi7e42/rSnhbE6WUWGHvXcQ3+qIptP079GF+p1ZnEVmXIrQeoP1Rh0wS2ThPBorHqMY8OB
++c1AbPa2A/qY7QkFA6Oq7I8gUPNRO1NyuEElN4LJy+SCH0kWzLawMYICYTCCAl0CAQEwXzBLMQsw
+CQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTEhMB8GA1UEAxMYR2xvYmFsU2ln
+biBTTUlNRSBDQSAyMDE4AhAB2NRaeBKJjaSQ9CGctwQsMA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqG
+SIb3DQEJBDEiBCBAU3aUnvf1zBbdJ5xmDM0JPHRAwDylaBiC/EPSSqq5kDAYBgkqhkiG9w0BCQMx
+CwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0yMDA3MjMwNjA0MzBaMGkGCSqGSIb3DQEJDzFc
+MFowCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJ
+KoZIhvcNAQEKMAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEATeEK
+vgRTWmnrm/Sd5mIu8S6+f76BV6XSSugZnaHsFvBr5Q+YZJDUuP/+UQql2n12nmmB/Re+7mA4wo+5
+twjzDVp2sHHOAppFo4UqRVBXgsTwqZ9pLiewvJREApBO1kDMbBvxqYt8clY0OBxwZ2l/CF2ot0Na
+jNm+FUZIxu851TSqxDsXoIc8Gfb+WIEiLY0uVGNKi2CeICfwcSzbBbnt016CukEHylnDvSfsbk0O
+ee9ybuJV53v/pMJyaBcD+9kAkj2TsnDr7RLTBPk/FsLhfygAZlW2nVqTivJ1p/d68m4fGwthTlNr
+m8TcyZh9blAlkVveYhovXL0vxtYidWGsKg==
+--0000000000002c5dfc05ab15a16d--
 
