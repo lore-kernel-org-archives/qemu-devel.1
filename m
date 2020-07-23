@@ -2,104 +2,67 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DAD7C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 00:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE34C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 00:53:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6623220825
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 00:52:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6623220825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id B9BC22086A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 00:53:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RqrpoSFV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9BC22086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyPTj-0006jj-Nv
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 20:52:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36730)
+	id 1jyPU8-00078c-0z
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 20:53:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jyPSt-0005jK-Q5; Wed, 22 Jul 2020 20:52:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29084
- helo=mx0a-001b2d01.pphosted.com)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jyPT4-0005yx-2B; Wed, 22 Jul 2020 20:52:14 -0400
+Received: from ozlabs.org ([203.11.71.1]:57371)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jyPSs-0006GV-40; Wed, 22 Jul 2020 20:52:03 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06N0WXTb076739; Wed, 22 Jul 2020 20:51:43 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32e1vwd53p-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 20:51:42 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06N0WaOm077109;
- Wed, 22 Jul 2020 20:51:42 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32e1vwd53a-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 20:51:42 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06N0p6U5006635;
- Thu, 23 Jul 2020 00:51:41 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma03wdc.us.ibm.com with ESMTP id 32brq9gafd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 23 Jul 2020 00:51:41 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06N0pfBi52756924
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 23 Jul 2020 00:51:41 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 023CC112064;
- Thu, 23 Jul 2020 00:51:41 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BB836112062;
- Thu, 23 Jul 2020 00:51:34 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.211.93.190])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
- Thu, 23 Jul 2020 00:51:34 +0000 (GMT)
-References: <20200722035016.469075-1-bauerman@linux.ibm.com>
- <20200722035016.469075-10-bauerman@linux.ibm.com>
- <20200722170032.GN1274972@habkost.net>
-User-agent: mu4e 1.2.0; emacs 26.3
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [RFC PATCH v2 9/9] target/s390x: Use start-powered-off CPUState
- property
-In-reply-to: <20200722170032.GN1274972@habkost.net>
-Date: Wed, 22 Jul 2020 21:51:29 -0300
-Message-ID: <87lfjbrr3i.fsf@morokweng.localdomain>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jyPT1-0006Gs-1H; Wed, 22 Jul 2020 20:52:13 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BBv1L1SP3z9sRW; Thu, 23 Jul 2020 10:52:06 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1595465526;
+ bh=n9Bis+XWaULeEyeUeeb5YTiZc8WiEHk+WS6RkQi+52E=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=RqrpoSFVWhLxdtsghHU25zrUH4Yw5w8N0pGpvKFBF8vjlWzZY03Xmd1c6wlT2x2dm
+ ExqUcPXlvYnc7HsYm/DBIJ0IN8J8KKx/KtCCi2k/W66Am3mUDipQlOnCT4p2sdUX25
+ nl4TzDwF5fV3F0CyehoMC+7CI9oZ+aILFiuD4G8A=
+Date: Thu, 23 Jul 2020 10:45:45 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Gustavo Romero <gromero@linux.ibm.com>
+Subject: Re: [PATCH] ppc/xive: Fix some typos in comments
+Message-ID: <20200723004545.GF5513@umbus.fritz.box>
+References: <1595461434-27725-1-git-send-email-gromero@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-22_16:2020-07-22,
- 2020-07-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 phishscore=0
- spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
- lowpriorityscore=0 mlxlogscore=999 malwarescore=0 clxscore=1015
- adultscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2007220151
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 18:08:00
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="sDKAb4OeUBrWWL6P"
+Content-Disposition: inline
+In-Reply-To: <1595461434-27725-1-git-send-email-gromero@linux.ibm.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 20:52:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,56 +75,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+--sDKAb4OeUBrWWL6P
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Jul 22, 2020 at 12:50:16AM -0300, Thiago Jung Bauermann wrote:
->> Instead of setting CPUState::halted to 1 in s390_cpu_initfn(), use the
->> start-powered-off property which makes cpu_common_reset() initialize it to
->> 1 in common code.
->>
->> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
->> ---
->>  target/s390x/cpu.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> NB: I was only able to test that this patch builds. I wasn't able to
->> run it.
->>
->> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
->> index 08eb674d22..d3a14af1d9 100644
->> --- a/target/s390x/cpu.c
->> +++ b/target/s390x/cpu.c
->> @@ -291,7 +291,8 @@ static void s390_cpu_initfn(Object *obj)
->>      S390CPU *cpu = S390_CPU(obj);
->>
->>      cpu_set_cpustate_pointers(cpu);
->> -    cs->halted = 1;
->> +    object_property_set_bool(OBJECT(cs), "start-powered-off", true,
->> +                             &error_abort);
->
-> Is this really OK?  s390 CPUs don't seem to set halted=1 on reset
-> today.
+On Wed, Jul 22, 2020 at 07:43:54PM -0400, Gustavo Romero wrote:
+> Fix some typos in comments about code modeling coalescing points in the
+> XIVE routing engine (IVRE).
+>=20
+> Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
 
-Hm, good point. That is indeed a behavior change that this patch
-introduces. I'll point it out in the description for v3, and if it's
-wrong then this patch can simply be dropped.
+Applied to ppc-for-5.2.
 
---
-Thiago Jung Bauermann
-IBM Linux Technology Center
+> ---
+>  hw/intc/xive.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 9a16243..9b55e03 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -1502,7 +1502,7 @@ static bool xive_presenter_notify(XiveFabric *xfb, =
+uint8_t format,
+> =20
+>  /*
+>   * Notification using the END ESe/ESn bit (Event State Buffer for
+> - * escalation and notification). Profide futher coalescing in the
+> + * escalation and notification). Provide further coalescing in the
+>   * Router.
+>   */
+>  static bool xive_router_end_es_notify(XiveRouter *xrtr, uint8_t end_blk,
+> @@ -1581,7 +1581,7 @@ static void xive_router_end_notify(XiveRouter *xrtr=
+, uint8_t end_blk,
+> =20
+>      /*
+>       * Check the END ESn (Event State Buffer for notification) for
+> -     * even futher coalescing in the Router
+> +     * even further coalescing in the Router
+>       */
+>      if (!xive_end_is_notify(&end)) {
+>          /* ESn[Q]=3D1 : end of notification */
+> @@ -1660,7 +1660,7 @@ do_escalation:
+> =20
+>      /*
+>       * Check the END ESe (Event State Buffer for escalation) for even
+> -     * futher coalescing in the Router
+> +     * further coalescing in the Router
+>       */
+>      if (!xive_end_is_uncond_escalation(&end)) {
+>          /* ESe[Q]=3D1 : end of notification */
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--sDKAb4OeUBrWWL6P
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8Y3bgACgkQbDjKyiDZ
+s5IraxAAqyz/LzFpttN5jQZVBKO5Du6SFP2CrWNFEW8yMWOeGozZQKPmu/ZQfsOD
+vsl1O8WOoR69pUmcqeEyMIOacAAaHCctiMck/vYU9DLZZP5w5BfYIXNIKXXsbkZs
+Ycdx9vN9xL8EXl+qFxXTNKjzBZddHu1rvaQKDOlltaqKGS4aFJVk5SsPL3tZrL4q
+LK/40Uh7eeYNxWpL1/4DSPocaWWNa96EwLCfEXnErDbY9UE6Ru5VnbPptYUCqpUy
+jTBqFEAaHdMp9SFXTO9eZIk/p5aGpkhFT+fzK4BH/c7kp3mRDPv3iUDh1ikwEyjU
+58aX+15bLnAm+zGOFvvWE/BAXl1OzBFPPuTxpqKVfyfzh9dBSUoUvm3jdUHETyvy
+kunoxwwpPmZBcXbs31y55NsTn8u+bDFM/17fXkQy3RZn2CUnBFf3QoxEMKXutRWY
+uZUe5YjAz1d0TyGvkiP+UazC5mcdVDxsVJqIjoUGfc0ybfq3qg5uV9DD+JuVDuWg
+GrmMhC9rV89zCOYSdPkDfGSU9s2sV7B0F9o8XxtCXEMSdNvssHGLjDas77jWsR8U
+VrwuZYnWZB6IXP/uf1S9F7RfLqGUaUbxg7BtD2WZp8rDrZKY+cHYTtMDO6RGc2bk
+XczALctAGjNqyBJgkqpBj+b6Ky5tMZl9m6CN6GJX6ES73vlPME0=
+=SyhT
+-----END PGP SIGNATURE-----
+
+--sDKAb4OeUBrWWL6P--
 
