@@ -2,76 +2,89 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDD8C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AECC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:20:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97EBC2071A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:16:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A7C420709
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:20:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cgCfZpfm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97EBC2071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F2RUmaEa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A7C420709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyepN-0003Ur-R0
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:16:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35940)
+	id 1jyetX-0005nk-NW
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:20:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jyeog-0002v6-Bn
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:15:34 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28144
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jyesi-0005Oi-VO
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:19:45 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60470
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jyeoc-0008QU-Qd
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:15:33 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jyesh-0000Qb-0p
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:19:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595524530;
+ s=mimecast20190719; t=1595524781;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6Fpt/TbyJxV7qRUlIQu9EO7VuLBHeRHePoE5O5C/nQs=;
- b=cgCfZpfmsbSKNtE8uApxzPAAK2TrSLZK5AsIU1ow9wu1MUi457gUIw/lZXJlmZ9j8T9kEY
- Q25hbBzjqgHXmGMTJhwkceMo5jnvJKhH11+fbkeinPW9+A3T5FSXrNw1xui8+s08UDxwGr
- XzqwWSdV9FUjqenMmHFopQJ4GpYglCk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-7GUBW3xMPTWkuAHRpAJr2w-1; Thu, 23 Jul 2020 13:15:27 -0400
-X-MC-Unique: 7GUBW3xMPTWkuAHRpAJr2w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7224800C64;
- Thu, 23 Jul 2020 17:15:25 +0000 (UTC)
-Received: from gondolin (ovpn-112-228.ams2.redhat.com [10.36.112.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5185B5F7D8;
- Thu, 23 Jul 2020 17:15:21 +0000 (UTC)
-Date: Thu, 23 Jul 2020 19:15:18 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH 1/1] s390x/protvirt: allow to IPL secure execution
- guests with -no-reboot
-Message-ID: <20200723191518.247063b9.cohuck@redhat.com>
-In-Reply-To: <20200721103202.30610-1-borntraeger@de.ibm.com>
-References: <20200721103202.30610-1-borntraeger@de.ibm.com>
-Organization: Red Hat GmbH
+ content-transfer-encoding:content-transfer-encoding;
+ bh=lb6eQAjQ2HF/DDL7JEJoIibADYGAxky7u3oNe8ug5Lg=;
+ b=F2RUmaEabiifsoOeO/vC0lUfgCIPOmp58yyr+++NLdVyERQdvWVofpucD/1ruzaeOuCzkc
+ SYWpSKxPv8eeV4hOO1V+xFtuK4L4WP+lumIw2RpaXilW9clsFA8bvPwL9YCC4vwISBP8al
+ 0YisjTVZ2/SGhY253KTwq/YeBJbIGsM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-285-8VyKluJAPG21t6FmT_m0dA-1; Thu, 23 Jul 2020 13:19:39 -0400
+X-MC-Unique: 8VyKluJAPG21t6FmT_m0dA-1
+Received: by mail-wr1-f69.google.com with SMTP id i12so1584282wrx.11
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 10:19:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=lb6eQAjQ2HF/DDL7JEJoIibADYGAxky7u3oNe8ug5Lg=;
+ b=nh3qPIn4nMsG5AQtlYGbaOil2TfzaYL/ufcXFMGtiw/WfCb0aLo6lVmfaqZwxBPKJQ
+ U0vc1gLfAURlpZWxu4mKmA4SGKZU9YsJzv3l807P9hFnoKC+UR5D2nGtXyyqg/B0YSp0
+ bKLxyJ79cV3xXZyTJTGiYdh0fJjVIbjqKNbG2F9HL49GyO+N5/TyCCk0SF/eN7/Wv1jw
+ 3eoApWGN8BD/Y68kxJp6abGUjbUA+RLHbmHwme0YT5IhRxWI46pkHxva57fr7AMQduLZ
+ uhsqOh+TeJjfjG0rIhNk2STh/7fNRMXOpomuNReLZc8QAw/nBoANMGOjeW64VKGJfdJA
+ +TEQ==
+X-Gm-Message-State: AOAM533AHi1ODdMD9LCCkxwLv9RjdromcgXolI5N/MkycYEyr1QsgVAj
+ lntTFJNE05hXSnDHirYdNeiVZ01tx4gP7dJYz6tfmeC52kyVO5kbnHgjT9aANA+UTJ7bywS+Q7C
+ 2K5FedLdzBnH9gm8=
+X-Received: by 2002:a5d:6802:: with SMTP id w2mr4783762wru.88.1595524778064;
+ Thu, 23 Jul 2020 10:19:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwNyaRQNSjERSnHBFtBV9MgZfwfQ3281+Bh2eWEbOwMvFVhF8TSLCDMTsPPdDHWUman4Bm2sQ==
+X-Received: by 2002:a5d:6802:: with SMTP id w2mr4783746wru.88.1595524777867;
+ Thu, 23 Jul 2020 10:19:37 -0700 (PDT)
+Received: from localhost.localdomain
+ (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id 68sm4841139wra.39.2020.07.23.10.19.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jul 2020 10:19:37 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.1] libvhost-user: Report descriptor index on panic
+Date: Thu, 23 Jul 2020 19:19:35 +0200
+Message-Id: <20200723171935.18535-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:26:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -94,50 +107,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jul 2020 06:32:02 -0400
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+We want to report the index of the descriptor,
+not its pointer.
 
-> Right now -no-reboot does prevent secure execution guests from running.
-> This is right from an implementation aspect, as we have modeled the
-> transition from non-secure to secure as a program directed IPL.
-> From a user perspective, this is not the behavior of least surprise.
-> 
-> We should implement the IPL into secure mode similar to the functions
-> that we use for kdump/kexec. In other words we do not stop here when
-> -no-reboot is specified on the command line. Like function 0 or function
-> 1 Function 10 is not a classic reboot. For example it can only be called
-> once. To call it a 2nd time a real reboot/reset must happen in-between.
-> So function code 10 is more or less a state transition reset, but not a
-> "standard" reset or reboot.
-> 
-> Fixes: 4d226deafc44 ("s390x: protvirt: Support unpack facility")
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  hw/s390x/ipl.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index ce21494c08..e312a35133 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -633,7 +633,8 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
->          }
->      }
->      if (reset_type == S390_RESET_MODIFIED_CLEAR ||
-> -        reset_type == S390_RESET_LOAD_NORMAL) {
-> +        reset_type == S390_RESET_LOAD_NORMAL ||
-> +        reset_type == S390_RESET_PV) {
->          /* ignore -no-reboot, send no event  */
->          qemu_system_reset_request(SHUTDOWN_CAUSE_SUBSYSTEM_RESET);
->      } else {
+Fixes: 7b2e5c65f4 ("contrib: add libvhost-user")
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks, queued to s390-fixes.
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index d315db1396..53f16bdf08 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -2074,7 +2074,7 @@ virtqueue_get_head(VuDev *dev, VuVirtq *vq,
+ 
+     /* If their number is silly, that's a fatal mistake. */
+     if (*head >= vq->vring.num) {
+-        vu_panic(dev, "Guest says index %u is available", head);
++        vu_panic(dev, "Guest says index %u is available", *head);
+         return false;
+     }
+ 
+@@ -2133,7 +2133,7 @@ virtqueue_read_next_desc(VuDev *dev, struct vring_desc *desc,
+     smp_wmb();
+ 
+     if (*next >= max) {
+-        vu_panic(dev, "Desc next is %u", next);
++        vu_panic(dev, "Desc next is %u", *next);
+         return VIRTQUEUE_READ_DESC_ERROR;
+     }
+ 
+-- 
+2.21.3
 
 
