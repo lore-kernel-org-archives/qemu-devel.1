@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0A6C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:48:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F8A8C433E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:49:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74C69207BB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:48:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 283F6207BB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:49:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cSKEf6mM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74C69207BB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRLPSLMV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 283F6207BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyfKX-0007qz-Mk
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:48:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43596)
+	id 1jyfL1-0000f3-E5
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:48:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jyfJL-0005gL-4B
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:47:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58988
- helo=us-smtp-1.mimecast.com)
+ id 1jyfIo-000567-00
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:46:42 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53651
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jyfJF-0004Dp-CW
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:47:14 -0400
+ id 1jyfIl-00049h-NC
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:46:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595526428;
+ s=mimecast20190719; t=1595526399;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QVdscPRd6imQsOABcuv9gyX+RdOmajO1F+PXzm8/OCE=;
- b=cSKEf6mMMLXhOBAdCl2i2OJJp1hs4OEChHler+3yFacxd1ioFIi7Qv0yceGj8IWQi+Cq9l
- knk6rlw8POrHni9s901nxYwcOMooVJnVFQ4e4V3v7XUW5HCK+i69xNGwWGH5W9ZvIv3C9/
- y2/jRDpcBTOlI1GsSj+zIILGCU1wefI=
+ bh=txsvG1Xp5ORtHBO3Fw0NSNNLQye/tWThgKOM1E2vDYs=;
+ b=DRLPSLMVhO08SfySC7edZ5b7lYCNXLZtxHCFDqzc5Wo7Xl2M0VRX2Wn7wcWt3TaE3dm+0/
+ KnF9n7AsbgQ6N3rCpNfT4KgrWKH9E4MqlsPvlS/lrItRirGNNcH1NkoS86mc7A/csN5ZJT
+ 8oUQghupvezFWklxwCgX4OfHVe6TbGQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-MB_heOcnPpKha69IQlc-gQ-1; Thu, 23 Jul 2020 13:47:04 -0400
-X-MC-Unique: MB_heOcnPpKha69IQlc-gQ-1
+ us-mta-468-hhc-bxO4MZO-kQR9mqZBzg-1; Thu, 23 Jul 2020 13:46:36 -0400
+X-MC-Unique: hhc-bxO4MZO-kQR9mqZBzg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8034E193248F;
- Thu, 23 Jul 2020 17:47:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D02FB800685;
+ Thu, 23 Jul 2020 17:46:35 +0000 (UTC)
 Received: from turbo.com (ovpn-113-141.ams2.redhat.com [10.36.113.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8CCB369316;
- Thu, 23 Jul 2020 17:46:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B462569316;
+ Thu, 23 Jul 2020 17:46:29 +0000 (UTC)
 From: Christophe de Dinechin <dinechin@redhat.com>
 To: qemu-devel@nongnu.org,
 	kraxel@redhat.com
-Subject: [PATCH 5/7] spice: Move all the spice-related code in spice-app.so
-Date: Thu, 23 Jul 2020 19:46:13 +0200
-Message-Id: <20200723174615.2370096-6-dinechin@redhat.com>
+Subject: [PATCH 1/7] spice: simplify chardev setup
+Date: Thu, 23 Jul 2020 19:46:09 +0200
+Message-Id: <20200723174615.2370096-2-dinechin@redhat.com>
 In-Reply-To: <20200723174615.2370096-1-dinechin@redhat.com>
 References: <20200723174615.2370096-1-dinechin@redhat.com>
 MIME-Version: 1.0
@@ -72,18 +72,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dinechin@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:13:02
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dinechin@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:33:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,66 +106,196 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to build spice as a separately loadable module, we need to
-put all the spice code in one loadable module, because the build
-system does not know how to deal with dependencies yet.
+From: Gerd Hoffmann <kraxel@redhat.com>
 
+Initialize spice before chardevs.  That allows to register the spice
+chardevs directly in the init function and removes the need to maintain
+a linked list of chardevs just for registration.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
 ---
- audio/Makefile.objs   | 2 +-
- chardev/Makefile.objs | 3 +--
- ui/Makefile.objs      | 8 ++++----
- 3 files changed, 6 insertions(+), 7 deletions(-)
+ chardev/spice.c         | 29 ++++++-----------------------
+ include/chardev/spice.h |  1 -
+ include/ui/qemu-spice.h |  1 -
+ softmmu/vl.c            |  9 +++++----
+ ui/spice-app.c          | 17 +++++++++--------
+ ui/spice-core.c         |  2 --
+ 6 files changed, 20 insertions(+), 39 deletions(-)
 
-diff --git a/audio/Makefile.objs b/audio/Makefile.objs
-index b4a4c11f31..298c895ff5 100644
---- a/audio/Makefile.objs
-+++ b/audio/Makefile.objs
-@@ -1,5 +1,5 @@
- common-obj-y = audio.o audio_legacy.o noaudio.o wavaudio.o mixeng.o
--common-obj-$(CONFIG_SPICE) += spiceaudio.o
-+spice-app.mo-objs += ../audio/spiceaudio.o
- common-obj-$(CONFIG_AUDIO_COREAUDIO) += coreaudio.o
- common-obj-$(CONFIG_AUDIO_DSOUND) += dsoundaudio.o
- common-obj-$(CONFIG_AUDIO_WIN_INT) += audio_win_int.o
-diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index 7cf05c9541..2add4319a9 100644
---- a/chardev/Makefile.objs
-+++ b/chardev/Makefile.objs
-@@ -26,5 +26,4 @@ baum.o-cflags := $(SDL_CFLAGS)
- baum.o-libs := $(BRLAPI_LIBS)
- endif
+diff --git a/chardev/spice.c b/chardev/spice.c
+index bf7ea1e294..9733f06716 100644
+--- a/chardev/spice.c
++++ b/chardev/spice.c
+@@ -14,9 +14,6 @@ typedef struct SpiceCharSource {
+     SpiceChardev       *scd;
+ } SpiceCharSource;
  
--common-obj-$(CONFIG_SPICE) += spice.mo
--spice.mo-objs := spice.o
-+spice-app.mo-objs += ../chardev/spice.o
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 504b196479..1ab515e23d 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -11,7 +11,6 @@ common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
- common-obj-y += input.o input-keymap.o input-legacy.o kbd-state.o
- common-obj-y += input-barrier.o
- common-obj-$(CONFIG_LINUX) += input-linux.o
--common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
- common-obj-$(CONFIG_COCOA) += cocoa.o
- common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
- common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
-@@ -53,10 +52,11 @@ curses.mo-objs := curses.o
- curses.mo-cflags := $(CURSES_CFLAGS) $(ICONV_CFLAGS)
- curses.mo-libs := $(CURSES_LIBS) $(ICONV_LIBS)
+-static QLIST_HEAD(, SpiceChardev) spice_chars =
+-    QLIST_HEAD_INITIALIZER(spice_chars);
+-
+ static int vmc_write(SpiceCharDeviceInstance *sin, const uint8_t *buf, int len)
+ {
+     SpiceChardev *scd = container_of(sin, SpiceChardev, sin);
+@@ -216,8 +213,6 @@ static void char_spice_finalize(Object *obj)
  
--ifeq ($(CONFIG_GIO)$(CONFIG_SPICE),yy)
--common-obj-$(if $(CONFIG_MODULES),m,y) += spice-app.mo
-+common-obj-$(CONFIG_SPICE) += spice-app.mo
-+spice-app.mo-objs += spice-core.o spice-input.o spice-display.o
-+ifeq ($(CONFIG_GIO)$(CONFIG_SPICE),ym)
-+spice-app.mo-objs += spice-app.o
- endif
--spice-app.mo-objs := spice-app.o
- spice-app.mo-cflags := $(GIO_CFLAGS)
- spice-app.mo-libs := $(GIO_LIBS)
+     vmc_unregister_interface(s);
  
+-    QLIST_SAFE_REMOVE(s, next);
+-
+     g_free((char *)s->sin.subtype);
+     g_free((char *)s->sin.portname);
+ }
+@@ -256,8 +251,6 @@ static void chr_open(Chardev *chr, const char *subtype)
+ 
+     s->active = false;
+     s->sin.subtype = g_strdup(subtype);
+-
+-    QLIST_INSERT_HEAD(&spice_chars, s, next);
+ }
+ 
+ static void qemu_chr_open_spice_vmc(Chardev *chr,
+@@ -310,28 +303,18 @@ void qemu_chr_open_spice_port(Chardev *chr,
+         return;
+     }
+ 
++    if (!using_spice) {
++        error_setg(errp, "spice not enabled");
++        return;
++    }
++
+     chr_open(chr, "port");
+ 
+     *be_opened = false;
+     s = SPICE_CHARDEV(chr);
+     s->sin.portname = g_strdup(name);
+ 
+-    if (using_spice) {
+-        /* spice server already created */
+-        vmc_register_interface(s);
+-    }
+-}
+-
+-void qemu_spice_register_ports(void)
+-{
+-    SpiceChardev *s;
+-
+-    QLIST_FOREACH(s, &spice_chars, next) {
+-        if (s->sin.portname == NULL) {
+-            continue;
+-        }
+-        vmc_register_interface(s);
+-    }
++    vmc_register_interface(s);
+ }
+ 
+ static void qemu_chr_parse_spice_vmc(QemuOpts *opts, ChardevBackend *backend,
+diff --git a/include/chardev/spice.h b/include/chardev/spice.h
+index 1f7339b649..2013255f34 100644
+--- a/include/chardev/spice.h
++++ b/include/chardev/spice.h
+@@ -12,7 +12,6 @@ typedef struct SpiceChardev {
+     bool                  blocked;
+     const uint8_t         *datapos;
+     int                   datalen;
+-    QLIST_ENTRY(SpiceChardev) next;
+ } SpiceChardev;
+ 
+ #define TYPE_CHARDEV_SPICE "chardev-spice"
+diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+index 8c23dfe717..d34cea2e0f 100644
+--- a/include/ui/qemu-spice.h
++++ b/include/ui/qemu-spice.h
+@@ -46,7 +46,6 @@ int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
+ #else
+ #define SPICE_NEEDS_SET_MM_TIME 0
+ #endif
+-void qemu_spice_register_ports(void);
+ 
+ #else  /* CONFIG_SPICE */
+ 
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index f476ef89ed..bc0dcc4f58 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -4125,6 +4125,11 @@ void qemu_init(int argc, char **argv, char **envp)
+     page_size_init();
+     socket_init();
+ 
++    /* spice needs the timers to be initialized by this point */
++    /* spice must initialize before audio as it changes the default auiodev */
++    /* spice must initialize before chardevs (for spicevmc and spiceport) */
++    qemu_spice_init();
++
+     qemu_opts_foreach(qemu_find_opts("object"),
+                       user_creatable_add_opts_foreach,
+                       object_create_initial, &error_fatal);
+@@ -4139,10 +4144,6 @@ void qemu_init(int argc, char **argv, char **envp)
+                       fsdev_init_func, NULL, &error_fatal);
+ #endif
+ 
+-    /* spice needs the timers to be initialized by this point */
+-    /* spice must initialize before audio as it changes the default auiodev */
+-    qemu_spice_init();
+-
+     /*
+      * Note: we need to create audio and block backends before
+      * machine_set_property(), so machine properties can refer to
+diff --git a/ui/spice-app.c b/ui/spice-app.c
+index 40fb2ef573..03d971b15f 100644
+--- a/ui/spice-app.c
++++ b/ui/spice-app.c
+@@ -117,7 +117,6 @@ static void spice_app_atexit(void)
+ static void spice_app_display_early_init(DisplayOptions *opts)
+ {
+     QemuOpts *qopts;
+-    ChardevBackend *be = chr_spice_backend_new();
+     GError *err = NULL;
+ 
+     if (opts->has_full_screen) {
+@@ -162,6 +161,15 @@ static void spice_app_display_early_init(DisplayOptions *opts)
+     qemu_opt_set(qopts, "gl", opts->has_gl ? "on" : "off", &error_abort);
+     display_opengl = opts->has_gl;
+ #endif
++}
++
++static void spice_app_display_init(DisplayState *ds, DisplayOptions *opts)
++{
++    ChardevBackend *be = chr_spice_backend_new();
++    QemuOpts *qopts;
++    GError *err = NULL;
++    gchar *uri;
++
+     be->u.spiceport.data->fqdn = g_strdup("org.qemu.monitor.qmp.0");
+     qemu_chardev_new("org.qemu.monitor.qmp", TYPE_CHARDEV_SPICEPORT,
+                      be, NULL, &error_abort);
+@@ -171,13 +179,6 @@ static void spice_app_display_early_init(DisplayOptions *opts)
+     qemu_opt_set(qopts, "mode", "control", &error_abort);
+ 
+     qapi_free_ChardevBackend(be);
+-}
+-
+-static void spice_app_display_init(DisplayState *ds, DisplayOptions *opts)
+-{
+-    GError *err = NULL;
+-    gchar *uri;
+-
+     uri = g_strjoin("", "spice+unix://", app_dir, "/", "spice.sock", NULL);
+     info_report("Launching display with URI: %s", uri);
+     g_app_info_launch_default_for_uri(uri, NULL, &err);
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index ecc2ec2c55..37dd68f2ab 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -813,8 +813,6 @@ void qemu_spice_init(void)
+     g_free(x509_cert_file);
+     g_free(x509_cacert_file);
+ 
+-    qemu_spice_register_ports();
+-
+ #ifdef HAVE_SPICE_GL
+     if (qemu_opt_get_bool(opts, "gl", 0)) {
+         if ((port != 0) || (tls_port != 0)) {
 -- 
 2.26.2
 
