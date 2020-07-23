@@ -2,125 +2,89 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8907C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B096FC433FE
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:13:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 722A820737
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:11:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EBBD207BB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:13:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="l1ZDBJhT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722A820737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WvQxMDEc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EBBD207BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyb07-000841-NL
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 09:11:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47278)
+	id 1jyb2p-00017p-P1
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 09:13:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jyaxx-0005Fb-GZ; Thu, 23 Jul 2020 09:08:53 -0400
-Received: from mail-db8eur05on2095.outbound.protection.outlook.com
- ([40.107.20.95]:28688 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jyaxu-00023L-IE; Thu, 23 Jul 2020 09:08:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GX4FrJ0QMQ3eSdVz9HQSv2sGN+xnqc2JQDPlvd3hPhCxrRySYnGNcNpb5nhspRuf8Gf8tZqXCTPZhBKv0QpOiRI0dT6m7TmJ63RwpsDlrxx3txdhw+ds1eqyc7EFzkxhw3qU7R85T8nuOXr0xMMMVqVMxpvJAQaacXKaNc3mN4D8qAIHLp3WNvy22DM2B9zGohb3l6PO03UmYaYelBidYNTbyWHLQq+vYK3aaLG3EHJQvIDkWMLWPUfHQnOCrQigfm1kmKhXNWFyY37EarLs/18lyCdzVkWmcno/s4ckfI8Fq54wig12CHTicSIJqoVyOFwZlQnYg+IdlG25C9DYtw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LEhS/K4Z2Z+goLA3sZ0ejVeQMWgDotB+22ydbBKJqak=;
- b=bXGiUlnNHnPfRAT5fZEHTR3AAAGyRhWiYJVELB1e3+zdrLHhF9xxrWTs571OhRMLXjLqR0IRGl7VMZd8uJQGkEj/+ytXuVwTk0KiijtOI923/ldu1+MjrJXt40S4GQSJTywXEkHUVcYfGJ+VkcqoIG5+JgYIbT4PT39BULJYaSuscPtDbFiHkWHx+meIbLFzI4ZVe7fHeVhlk+uQwJ3Xx5FEU/sr70VOcp8M0uAwKPtCito5F09Gw1/DEcmzSa7pjcVN8vzweZ6Bnhs2rjIcpBWt5l9tfa5N+YB7Vpor9LMFiFpPisYjwobpxVS3sQN7/lXjpn+eYM6T4/NNX6tvHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LEhS/K4Z2Z+goLA3sZ0ejVeQMWgDotB+22ydbBKJqak=;
- b=l1ZDBJhTUnjnVHwuftX2lobkr/nM4qCX8o0LI85z7JNoL1Snt5eRyoowFgGkfYLblgZqmvuevjVhBHoefL9XtjAQXFi/f/wxQgYOrXFicfJFVnVYJybm5t0urQdRgWYv6syvr9a0AgjrT8WVO+GXSVc7qSwAsfbhRZHGGxBRSi0=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
- by VE1PR08MB4944.eurprd08.prod.outlook.com (2603:10a6:803:116::32)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.23; Thu, 23 Jul
- 2020 13:08:45 +0000
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::ed6f:fa6e:70c9:be54]) by VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::ed6f:fa6e:70c9:be54%3]) with mapi id 15.20.3216.023; Thu, 23 Jul 2020
- 13:08:45 +0000
-Subject: Re: [PATCH for-5.1] nbd: Fix large trim/zero requests
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200722212231.535072-1-eblake@redhat.com>
- <e7b8151d-b9d3-b5c5-9bc4-661a045d4ff9@virtuozzo.com>
- <b72d8646-4ad5-be76-dca9-72bfb203d18f@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <6245f93c-03ae-1d77-49e0-7ecba214d8da@virtuozzo.com>
-Date: Thu, 23 Jul 2020 16:08:37 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <b72d8646-4ad5-be76-dca9-72bfb203d18f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM4PR0302CA0031.eurprd03.prod.outlook.com
- (2603:10a6:205:2::44) To VI1PR08MB5503.eurprd08.prod.outlook.com
- (2603:10a6:803:137::19)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jyb26-0000a6-B7
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:13:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35888
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jyb24-00039k-Bu
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:13:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595509987;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=vjP/I1agKhP7RydyRqEODfqln/Y74VNZi6MS6B5cUvU=;
+ b=WvQxMDEcGKPd4L2qRvcAYXOjhWPrDAANIhubFvlrrksuhTeJHNLvU4JcKuGZ5RFUmTCqHI
+ TmUElj3W+rX1qSb5TJ649g+o2Vm49tkfxslNTBgDEiJP2ebm9n+dUnFRK4wpE+NA7Ba2n3
+ tgXRmZ39ktc3ZROn2cVCAPoxVHzSGFU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-JrCACkWUPlmiorYhBdthHw-1; Thu, 23 Jul 2020 09:13:05 -0400
+X-MC-Unique: JrCACkWUPlmiorYhBdthHw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B8FD19057A5;
+ Thu, 23 Jul 2020 13:13:04 +0000 (UTC)
+Received: from work-vm (ovpn-114-148.ams2.redhat.com [10.36.114.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 805758FA20;
+ Thu, 23 Jul 2020 13:12:56 +0000 (UTC)
+Date: Thu, 23 Jul 2020 14:12:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v1] hw/pci-host: save/restore pci host config register
+Message-ID: <20200723130923.GK2621@work-vm>
+References: <20200723125303.2390-1-king.wang@huawei.com>
+ <20200723085516-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.141) by
- AM4PR0302CA0031.eurprd03.prod.outlook.com (2603:10a6:205:2::44) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23 via Frontend
- Transport; Thu, 23 Jul 2020 13:08:44 +0000
-X-Originating-IP: [185.215.60.141]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 906f081f-a7ed-4bdf-7a95-08d82f0987d5
-X-MS-TrafficTypeDiagnostic: VE1PR08MB4944:
-X-Microsoft-Antispam-PRVS: <VE1PR08MB494460800BA5C3BFD351A533C1760@VE1PR08MB4944.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zKkpDAs+mp2+U4Vds4RQbIGX3Mm8GNxre/gzhmX2XLIjwGdgQ49maE6QEXSpOxoYBcQaCpLpPLIO0mN90DxauyLe1s/ZviX7RtMr/WA9p8eifMLBr21U65GpAmtzEFbIF3X90Y5sws7whAgZl89qtNfK29OZmvPRqPJ9t0JPoPV7a9iCz3NUxcTCb8SIDMhcLPtotnpxNyL+XZILrOZ14Q2DDCbOeMlEMIJ4xzxg2TmUGLTXTCyzZMmO8fKMnctf8PLWg4eyckefVhlVHPsdPkJugN3zaQ2Jo/RfusqYkaZdfdvM4pLNYustvrkT6OZX0cX50tDGeh7MKgydOmW9WInZHWRIAUeSQ37x/3rPnCbq3cxNSGN8BeNH+ZbXaJDv
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(366004)(39840400004)(376002)(396003)(136003)(83380400001)(36756003)(6666004)(186003)(66476007)(66946007)(26005)(66556008)(16526019)(2616005)(956004)(86362001)(52116002)(316002)(8936002)(478600001)(8676002)(5660300002)(4326008)(6486002)(31696002)(16576012)(53546011)(2906002)(31686004)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 754e80e+zucee0yD1Ph9TcucnimCP2htYvqHepcCou1EmsrAkrY6Gj0DokLLB6885FPYLF6eFMweZK3rEJQegoREipZViGxA7NDTGNCFejEqSrsdoiUJOqCxhDzRxoZXLrSekjAMWtuEwkX5alJUWsRi5j1aNelD1r5Ya2JNmVNHpC96ThUF0jhosVR2PFkm/5lb6mG982Kw6yqmqHMdkGGL3CH5LuSlAZ1ubNIqn8M6FsHKRzDnOJsRlOx91nS7fN+PTX0tAR3O/LwFk6HtLQrhffSK49r7H4U9H9uCNgkgVFrokOU7rYs7GGhLdTv9beoY3mpV11zISCXi9SqDxCYYOUwlf1fie+/CeK18/fjqn9qdTY0cJssS9XzJLGiPwbGD7bB3tCoDvUjDenISElvl0w0OHyBBTDgwpQ5irExXxSPD4MQD+EyukHiIahdzW3dmVFiBhzPxuRlPL/zj+orDyCgxj2HCc8g5GPaXXuPp5nc69XUNq0zhb3BLntrp
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 906f081f-a7ed-4bdf-7a95-08d82f0987d5
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR08MB5503.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2020 13:08:45.5002 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3yQdzg24hOAOfwKlrBu3qdbmwZ6zcQJ1ZvNNn9x15qQjRpK5XqODbncHul3kcmq6cPUiuuFkdQd6XgZj9Blmw00+kUmroNZL+eg/0X6bX2Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB4944
-Received-SPF: pass client-ip=40.107.20.95;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 09:08:47
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <20200723085516-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:13:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,95 +97,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jusual@redhat.com,
+ qemu-devel@nongnu.org, Wang King <king.wang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-23.07.2020 14:47, Eric Blake wrote:
-> On 7/23/20 2:23 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 23.07.2020 00:22, Eric Blake wrote:
->>> Although qemu as NBD client limits requests to <2G, the NBD protocol
->>> allows clients to send requests almost all the way up to 4G.  But
->>> because our block layer is not yet 64-bit clean, we accidentally wrap
->>> such requests into a negative size, and fail with EIO instead of
->>> performing the intended operation.
->>>
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Thu, Jul 23, 2020 at 08:53:03PM +0800, Wang King wrote:
+> > From: Hogan Wang <king.wang@huawei.com>
+> > 
+> > The pci host config register is used to save PCI address for
+> > read/write config data. If guest write a value to config register,
+> > and then pause the vcpu to migrate, After the migration, the guest
+> > continue to write pci config data, and the write data will be ignored
+> > because of new qemu process lost the config register state.
+> > 
+> > Reproduction steps are:
+> > 1. guest booting in seabios.
+> > 2. guest enable the SMRAM in seabios:piix4_apmc_smm_setup, and then
+> >    expect to disable the SMRAM by pci_config_writeb.
+> > 3. after guest write the pci host config register, and then pasued vcpu
+> >    to finish migration.
+> > 4. guest write config data(0x0A) fail to disable the SMRAM becasue of
+> >    config register state lost.
+> > 5. guest continue to boot and crash in ipxe option ROM due to SMRAM in
+> >    enabled state.
+> > 
+> > Signed-off-by: Hogan Wang <king.wang@huawei.com>
 > 
->>> @@ -2378,8 +2378,17 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
->>>           if (request->flags & NBD_CMD_FLAG_FAST_ZERO) {
->>>               flags |= BDRV_REQ_NO_FALLBACK;
->>>           }
->>> -        ret = blk_pwrite_zeroes(exp->blk, request->from + exp->dev_offset,
->>> -                                request->len, flags);
->>> +        ret = 0;
->>> +        /* FIXME simplify this when blk_pwrite_zeroes switches to 64-bit */
->>> +        while (ret == 0 && request->len) {
->>> +            int align = client->check_align ?: 1;
->>> +            int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
->>> +                                                        align));
->>> +            ret = blk_pwrite_zeroes(exp->blk, request->from + exp->dev_offset,
->>> +                                    len, flags);
->>> +            request->len -= len;
->>> +            request->from += len;
->>> +        }
->>>           return nbd_send_generic_reply(client, request->handle, ret,
->>>                                         "writing to file failed", errp);
+> I guess this is like v3 right?
 > 
-> It's easy enough to audit that blk_pwrite_zeroes returns 0 (and not arbitrary positive) on success.
+> thanks a lot for the patch!
+> 
+> My question stands : does anyone see a way to pass this
+> info around without breaking migration for all existing
+> machine types?
 
-Yes, that's why I've posted my commend to blk_co_pdiscard :)
+You need a .needed clause in the vmstate_i440fx_pcihost and
+vmstate_q35_pcihost which is a pointer to a function which enables it on
+new machine types and ignores it on old ones.
 
-> 
->>>
->>> @@ -2393,8 +2402,17 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
->>>                                         "flush failed", errp);
->>>
->>>       case NBD_CMD_TRIM:
->>> -        ret = blk_co_pdiscard(exp->blk, request->from + exp->dev_offset,
->>> -                              request->len);
->>> +        ret = 0;
->>> +        /* FIXME simplify this when blk_co_pdiscard switches to 64-bit */
->>> +        while (ret == 0 && request->len) {
->>
->> Did you check all the paths not to return positive ret on success? I'd prefer to compare ret >= 0 for this temporary code to not care of it
-> 
-> And for blk_co_pdiscard, the audit is already right here in the patch: pre-patch, ret = blk_co_pdiscard, followed by...
-> 
->>
->>> +            int align = client->check_align ?: 1;
->>> +            int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
->>> +                                                        align));
->>> +            ret = blk_co_pdiscard(exp->blk, request->from + exp->dev_offset,
->>> +                                  len);
->>> +            request->len -= len;
->>> +            request->from += len;
->>
->> Hmm.. Modifying the function parameter. Safe now, as nbd_handle_request() call is the last usage of request in nbd_trip().
->>
->>> +        }
->>>           if (ret == 0 && request->flags & NBD_CMD_FLAG_FUA) {
-> 
-> ...a check for ret == 0.
+Or, if it always crashes if the SMRAM is enabled, then the migration is
+dead anyway; so you could make the .needed only save the config if
+the SMRAM is opened, so you'd get a unknown section error, which is
+nasty but it would only happen in the case it would crash anyway.
 
-Hmm. Is it a bug or not? Anyway, bdrv_co_pdiscard() does "if (ret && .." as well, so if some driver return positive ret,
-it may fail earlier..
+Dave
 
 > 
->>>               ret = blk_co_flush(exp->blk);
->>>           }
->>>
->>
->>
+> > ---
+> >  hw/pci-host/i440fx.c       | 11 +++++++++++
+> >  hw/pci-host/q35.c          | 11 +++++++++++
+> >  hw/pci/pci_host.c          | 11 +++++++++++
+> >  hw/pci/pcie_host.c         | 11 +++++++++++
+> >  include/hw/pci/pci_host.h  | 10 ++++++++++
+> >  include/hw/pci/pcie_host.h | 10 ++++++++++
+> >  6 files changed, 64 insertions(+)
+> > 
+> > diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+> > index 8ed2417f0c..17705bb025 100644
+> > --- a/hw/pci-host/i440fx.c
+> > +++ b/hw/pci-host/i440fx.c
+> > @@ -118,6 +118,16 @@ static const VMStateDescription vmstate_i440fx = {
+> >      }
+> >  };
+> >  
+> > +static const VMStateDescription vmstate_i440fx_pcihost = {
+> > +    .name = "I440FX_PCIHost",
+> > +    .version_id = 1,
+> > +    .minimum_version_id = 1,
+> > +    .fields = (VMStateField[]) {
+> > +        VMSTATE_PCI_HOST(parent_obj, I440FXState),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> >  static void i440fx_pcihost_get_pci_hole_start(Object *obj, Visitor *v,
+> >                                                const char *name, void *opaque,
+> >                                                Error **errp)
+> > @@ -398,6 +408,7 @@ static void i440fx_pcihost_class_init(ObjectClass *klass, void *data)
+> >      hc->root_bus_path = i440fx_pcihost_root_bus_path;
+> >      dc->realize = i440fx_pcihost_realize;
+> >      dc->fw_name = "pci";
+> > +    dc->vmsd = &vmstate_i440fx_pcihost;
+> >      device_class_set_props(dc, i440fx_props);
+> >      /* Reason: needs to be wired up by pc_init1 */
+> >      dc->user_creatable = false;
+> > diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> > index b67cb9c29f..5e323be2e3 100644
+> > --- a/hw/pci-host/q35.c
+> > +++ b/hw/pci-host/q35.c
+> > @@ -165,6 +165,16 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
+> >      visit_type_uint64(v, name, &value, errp);
+> >  }
+> >  
+> > +static const VMStateDescription vmstate_q35_pcihost = {
+> > +    .name = "Q35_PCIHost",
+> > +    .version_id = 1,
+> > +    .minimum_version_id = 1,
+> > +    .fields = (VMStateField[]) {
+> > +        VMSTATE_PCIE_HOST(parent_obj, Q35PCIHost),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> >  /*
+> >   * NOTE: setting defaults for the mch.* fields in this table
+> >   * doesn't work, because mch is a separate QOM object that is
+> > @@ -194,6 +204,7 @@ static void q35_host_class_init(ObjectClass *klass, void *data)
+> >  
+> >      hc->root_bus_path = q35_host_root_bus_path;
+> >      dc->realize = q35_host_realize;
+> > +    dc->vmsd = &vmstate_q35_pcihost;
+> >      device_class_set_props(dc, q35_host_props);
+> >      /* Reason: needs to be wired up by pc_q35_init */
+> >      dc->user_creatable = false;
+> > diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
+> > index ce7bcdb1d5..7cdd5a3ea3 100644
+> > --- a/hw/pci/pci_host.c
+> > +++ b/hw/pci/pci_host.c
+> > @@ -24,6 +24,7 @@
+> >  #include "hw/pci/pci_host.h"
+> >  #include "qemu/module.h"
+> >  #include "hw/pci/pci_bus.h"
+> > +#include "migration/vmstate.h"
+> >  #include "trace.h"
+> >  
+> >  /* debug PCI */
+> > @@ -200,6 +201,16 @@ const MemoryRegionOps pci_host_data_be_ops = {
+> >      .endianness = DEVICE_BIG_ENDIAN,
+> >  };
+> >  
+> > +const VMStateDescription vmstate_pcihost = {
+> > +    .name = "PCIHost",
+> > +    .version_id = 1,
+> > +    .minimum_version_id = 1,
+> > +    .fields = (VMStateField[]) {
+> > +        VMSTATE_UINT32(config_reg, PCIHostState),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> >  static const TypeInfo pci_host_type_info = {
+> >      .name = TYPE_PCI_HOST_BRIDGE,
+> >      .parent = TYPE_SYS_BUS_DEVICE,
+> > diff --git a/hw/pci/pcie_host.c b/hw/pci/pcie_host.c
+> > index 3534006f99..a653c39bb7 100644
+> > --- a/hw/pci/pcie_host.c
+> > +++ b/hw/pci/pcie_host.c
+> > @@ -24,6 +24,7 @@
+> >  #include "hw/pci/pcie_host.h"
+> >  #include "qemu/module.h"
+> >  #include "exec/address-spaces.h"
+> > +#include "migration/vmstate.h"
+> >  
+> >  /* a helper function to get a PCIDevice for a given mmconfig address */
+> >  static inline PCIDevice *pcie_dev_find_by_mmcfg_addr(PCIBus *s,
+> > @@ -121,6 +122,16 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
+> >      memory_region_transaction_commit();
+> >  }
+> >  
+> > +const VMStateDescription vmstate_pciehost = {
+> > +    .name = "PCIEHost",
+> > +    .version_id = 1,
+> > +    .minimum_version_id = 1,
+> > +    .fields = (VMStateField[]) {
+> > +        VMSTATE_PCI_HOST(pci, PCIExpressHost),
+> > +        VMSTATE_END_OF_LIST()
+> > +    }
+> > +};
+> > +
+> >  static const TypeInfo pcie_host_type_info = {
+> >      .name = TYPE_PCIE_HOST_BRIDGE,
+> >      .parent = TYPE_PCI_HOST_BRIDGE,
+> > diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+> > index 9ce088bd13..fc88305e04 100644
+> > --- a/include/hw/pci/pci_host.h
+> > +++ b/include/hw/pci/pci_host.h
+> > @@ -70,4 +70,14 @@ extern const MemoryRegionOps pci_host_conf_be_ops;
+> >  extern const MemoryRegionOps pci_host_data_le_ops;
+> >  extern const MemoryRegionOps pci_host_data_be_ops;
+> >  
+> > +extern const VMStateDescription vmstate_pcihost;
+> > +
+> > +#define VMSTATE_PCI_HOST(_field, _state) {                           \
+> > +    .name       = (stringify(_field)),                               \
+> > +    .size       = sizeof(PCIHostState),                              \
+> > +    .vmsd       = &vmstate_pcihost,                                  \
+> > +    .flags      = VMS_STRUCT,                                        \
+> > +    .offset     = vmstate_offset_value(_state, _field, PCIHostState),\
+> > +}
+> > +
+> >  #endif /* PCI_HOST_H */
+> > diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
+> > index 3f7b9886d1..e8856f03e9 100644
+> > --- a/include/hw/pci/pcie_host.h
+> > +++ b/include/hw/pci/pcie_host.h
+> > @@ -78,4 +78,14 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
+> >                                           PCIE_MMCFG_DEVFN_MASK)
+> >  #define PCIE_MMCFG_CONFOFFSET(addr)     ((addr) & PCIE_MMCFG_CONFOFFSET_MASK)
+> >  
+> > +extern const VMStateDescription vmstate_pciehost;
+> > +
+> > +#define VMSTATE_PCIE_HOST(_field, _state) {                            \
+> > +    .name       = (stringify(_field)),                                 \
+> > +    .size       = sizeof(PCIExpressHost),                              \
+> > +    .vmsd       = &vmstate_pciehost,                                   \
+> > +    .flags      = VMS_STRUCT,                                          \
+> > +    .offset     = vmstate_offset_value(_state, _field, PCIExpressHost),\
+> > +}
+> > +
+> >  #endif /* PCIE_HOST_H */
+> > -- 
+> > 2.23.0
+> > 
 > 
-> Yes, I can respin the patch to use >= 0 as the check for success in both functions, but it doesn't change the behavior.
-> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-OK. Anyway:
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
--- 
-Best regards,
-Vladimir
 
