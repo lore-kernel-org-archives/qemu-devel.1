@@ -2,103 +2,89 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0096C433E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 22:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB77C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 23:11:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 993F82068F
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 22:29:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5592C2071A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 23:11:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="ZDHDcM7B";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="p7q50bw5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 993F82068F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uR58oOGN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5592C2071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyji4-0001Hs-Tz
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 18:29:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57520)
+	id 1jykMp-0006aS-JS
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 19:11:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jyjh9-0000k5-Bn
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 18:28:07 -0400
-Received: from wout3-smtp.messagingengine.com ([64.147.123.19]:57581)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jyjh6-0000oQ-KX
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 18:28:07 -0400
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
- by mailout.west.internal (Postfix) with ESMTP id 78B71544;
- Thu, 23 Jul 2020 18:27:59 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute2.internal (MEProxy); Thu, 23 Jul 2020 18:27:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=
- from:to:cc:subject:in-reply-to:references:date:message-id
- :mime-version:content-type; s=fm3; bh=gIVsmJqRVx49Uxnan7dBG9qSgI
- u0KzFY23S6P45U9LE=; b=ZDHDcM7B/nKll/QyVKFSU3ejATYe8fWA350qTMwWft
- 3P4v02fO+IMPJA/vRcXbh9eFLCFKMxvGpKwbbpLPQHjAQPFnsTbxgZglA77F4dr/
- bWHUkk3BBb+DaAaf8dmNmBNHu3anYIk/yrul+2fPljP02SL+lj5U4pP4nw3oALoT
- CGXGjPlM4FPjcXeZCXVj8jqPYgtWjvmkZRIhQ92JQ+1hsm57i379gUO6EOx7SJnA
- Mb+8NpPmY+jTsnxBpmgRwBqsw6F929Ys1rRtOMUgcUtmdH5iFv1+58A3qZkE/gr/
- M/7Oh/C2J4ZntNjBEn3SiFtMlltrGQPNLisFZL75VehQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=gIVsmJ
- qRVx49Uxnan7dBG9qSgIu0KzFY23S6P45U9LE=; b=p7q50bw5jXqDK2/FhIshiW
- Y7iJVhiNN+SohgR4QL2vxoOC4YE0i/hE9oLjapCGrzt+LsLUUktbTDZwYpr82kRB
- 5/i4vY/Q+Z05e9mrYboQISqsUHDDzRLdUtRUBdGCno3DHJpjRZqXZ220+3P9lTf6
- s2q+CG6T2ZWTKet8HeJWIAxoOxMdwiUn6NCl5vBLhsGhdXk0bWVPCIWtDdRw9AB2
- HlvBI9wPexN8ng5b6VliyOchDXqZf5kbcVUJKcc4ITsVxbFRPFjF9LOtB6mvR873
- Pc29YHkypacTdDHGvCr8LksjspMTZnZ6oWd8COPUmvOGWunyIL6KMZZ1doKPr+lw
- ==
-X-ME-Sender: <xms:7g4aX-pcfgHQnjdqP6iW3QJDIhelRQXcXw-G2wB_a8171Go2l-a5BA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrhedvgddtkecutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenog
- fuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefhvffujghffffkgggtseht
- tdertddttddtnecuhfhrohhmpeetlhihshhsrgcutfhoshhsuceohhhisegrlhihshhsrg
- drihhsqeenucggtffrrghtthgvrhhnpeelkeduleelgeefhffgffeuffeguddtjeffgfdt
- tdegleekieevheettdevfeduleenucffohhmrghinhepqhgvmhhurdhorhhgpdhgihhthh
- husgdrihhonecukfhppeegiedrkedtrddugedvrdekfeenucevlhhushhtvghrufhiiigv
- pedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehhihesrghlhihsshgrrdhish
-X-ME-Proxy: <xmx:7g4aX8rn9QVqO9Wj1YwGr8wP_IXCmpbfz0Sse7PAZQ8QMAQqT_e1mw>
- <xmx:7g4aXzOFi0l3ri4F5gc6ANo3scS-Ed5sNJM7P8Sw8cuw0_IU6GD8Ig>
- <xmx:7g4aX970-vN1w1ZA1y7ltaAayrRIWfHV4x6LQYWmo1qNbOU3CFWqhw>
- <xmx:7w4aX-WJn-XXSTtwjw5QWUc7HViszyyCXwGrlYSU5AiQVFe2VICehg>
-Received: from x220.qyliss.net (p2e508e53.dip0.t-ipconnect.de [46.80.142.83])
- by mail.messagingengine.com (Postfix) with ESMTPA id 8740930600A6;
- Thu, 23 Jul 2020 18:27:58 -0400 (EDT)
-Received: by x220.qyliss.net (Postfix, from userid 1000)
- id 98D2742D; Thu, 23 Jul 2020 22:27:56 +0000 (UTC)
-From: Alyssa Ross <hi@alyssa.is>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: Testing the virtio-vhost-user QEMU patch
-In-Reply-To: <20200721083048.GB144170@stefanha-x1.localdomain>
-References: <87h7u1s5k1.fsf@alyssa.is>
- <20200721083048.GB144170@stefanha-x1.localdomain>
-Date: Thu, 23 Jul 2020 22:27:56 +0000
-Message-ID: <87eep1yihf.fsf@alyssa.is>
-MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=64.147.123.19; envelope-from=hi@alyssa.is;
- helo=wout3-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 18:28:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from
+ <34hgaXwMKCnsrbvfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--scw.bounces.google.com>)
+ id 1jykMB-00064a-MQ
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 19:10:31 -0400
+Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:46788)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from
+ <34hgaXwMKCnsrbvfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--scw.bounces.google.com>)
+ id 1jykM9-0006E1-JN
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 19:10:31 -0400
+Received: by mail-yb1-xb4a.google.com with SMTP id n141so8182431yba.13
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 16:10:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=fR+9GR4JP+2ZK6TVYrPcjRr9YqzsNSMFZdzugZy/37g=;
+ b=uR58oOGNLL+tGU4otw0NY5JSpyE3p+Cg5lVz7vpyroTa3EnTH4wXJoNlX31ZtUqYTs
+ nJZVwkTl7qysS9ceqhZmNRxJWxyFbnAa+EWzWVLXTPi/BXf1DvLMBBgEiDpGIiWeBTI8
+ lqYoDukXPW7PVYlf6jHWZruL9NI7BZQ6Iak4wBK38OJBI4ai3C5PzYGz24eqlmeAUXGm
+ f4omhgCGZ6zqb0EHpslaIhy7kiXpN5u3MiddPywsxx+z7QB3qM7/mEg7bYn9LR4HUa5w
+ yTILiEzaYGSEAjX8/dXmPfEpgPemZTvkAXVwRLmjDra6Y0im04m/yV4xz4zmKp/LOyl6
+ 83hA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=fR+9GR4JP+2ZK6TVYrPcjRr9YqzsNSMFZdzugZy/37g=;
+ b=VQqjeOqPC0eMhThJa401oavjRnYs3kT5u1qHueTQsDC45mDgfAhYLR6qXNc79FlKAL
+ tof9VwBy0Y3E3AhUHnXtKw3M2gX2U64Bm3E1fMfxzLFI6OusMS9yOhLfgda3mtpMgcVR
+ XxBw4ys1YxdWkPn828WCgNraknTsyhdMiLAccuZf+Y3657ybqyB38WjJuz+9fXAz7QMz
+ c8Ct3xz7MoSh+jmZbyXnjR1HOIIywR+gnrWgio+6yjJcxNNSmOSuNJn+d1D8LAoqSmVF
+ O0Ss6nbA5GfEwbN3tCj6Z+cHDWDmyqzIuC1ZZqB9n64W73ePfg+emP3wAPSGGRNnfjIJ
+ dsYw==
+X-Gm-Message-State: AOAM532FQ6c5oG2FNaaaGHg1uL6jM0evFIJaCZ3YXzZzZKHf48gxW7ZO
+ hHLiX++ZZwfnSJbNjk4h0kXH/Es=
+X-Google-Smtp-Source: ABdhPJzEwwKoXu9oeRXyty7yqvVtg7LqNobg9SnxAfufMYYfGR2a6oVPbuhbIM8ARywtLmwwKKML0wQ=
+X-Received: by 2002:a25:3355:: with SMTP id z82mr6397731ybz.445.1595545826925; 
+ Thu, 23 Jul 2020 16:10:26 -0700 (PDT)
+Date: Thu, 23 Jul 2020 16:10:20 -0700
+Message-Id: <20200723231020.769893-1-scw@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
+Subject: [PATCH v2] linux-user: Add most IFTUN ioctls
+From: Shu-Chun Weng <scw@google.com>
+To: laurent@vivier.eu
+Cc: Shu-Chun Weng <scw@google.com>, qemu-devel@nongnu.org, riku.voipio@iki.fi, 
+ Josh Kunz <jkz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
+ envelope-from=34hgaXwMKCnsrbvfnnfkd.bnlpdlt-cdudkmnmfmt.nqf@flex--scw.bounces.google.com;
+ helo=mail-yb1-xb4a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -105
+X-Spam_score: -10.6
+X-Spam_bar: ----------
+X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,51 +97,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nikos Dragazis <ndragazis@arrikto.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefan Hajnoczi <stefanha@redhat.com> writes:
+The three options handling `struct sock_fprog` (TUNATTACHFILTER,
+TUNDETACHFILTER, and TUNGETFILTER) are not implemented. Linux kernel
+keeps a user space pointer in them which we cannot correctly handle.
 
-> On Tue, Jul 21, 2020 at 07:14:38AM +0000, Alyssa Ross wrote:
->> Hi -- I hope it's okay me reaching out like this.
->> 
->> I've been trying to test out the virtio-vhost-user implementation that's
->> been posted to this list a couple of times, but have been unable to get
->> it to boot a kernel following the steps listed either on
->> <https://wiki.qemu.org/Features/VirtioVhostUser> or
->> <https://ndragazis.github.io/dpdk-vhost-vvu-demo.html>.
->> 
->> Specifically, the kernel appears to be unable to write to the
->> virtio-vhost-user device's PCI registers.  I've included the full panic
->> output from the kernel at the end of this message.  The panic is
->> reproducible with two different kernels I tried (with different configs
->> and versions).  I tried both versions of the virtio-vhost-user I was
->> able to find[1][2], and both exhibited the same behaviour.
->> 
->> Is this a known issue?  Am I doing something wrong?
->
-> Hi,
-> Unfortunately I'm not sure what the issue is. This is an early
-> virtio-pci register access before a driver for any specific device type
-> (net, blk, vhost-user, etc) comes into play.
+Signed-off-by: Josh Kunz <jkz@google.com>
+Signed-off-by: Shu-Chun Weng <scw@google.com>
+---
+v2:
+  Title changed from "linux-user: Add several IFTUN ioctls"
 
-Small update here: I tried on another computer, and it worked.  Made
-sure that it was exactly the same QEMU binary, command line, and VM
-disk/initrd/kernel, so I think I can fairly confidently say the panic
-depends on what hardware QEMU is running on.  I set -cpu value to the
-same on both as well (SandyBridge).
+  Properly specify the argument types for various options, including a custom
+  implementation for TUNSETTXFILTER.
 
-I also discovered that it works on my primary computer (the one it
-panicked on before) with KVM disabled.
+  #ifdef guards for macros introduced up to 5 years ago.
 
-Note that I've only got so far as finding that it boots on the other
-machine -- I haven't verified yet that it actually works.
+ linux-user/ioctls.h       | 45 +++++++++++++++++++++++++++++++++++++++
+ linux-user/syscall.c      | 36 +++++++++++++++++++++++++++++++
+ linux-user/syscall_defs.h | 32 ++++++++++++++++++++++++++++
+ 3 files changed, 113 insertions(+)
 
-Bad host CPU:  Intel(R) Core(TM) i5-2520M CPU @ 2.50GHz
-Good host CPU: AMD EPYC 7401P 24-Core Processor
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 0713ae1311..b9fb01f558 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -593,3 +593,48 @@
+   IOCTL(KCOV_DISABLE, 0, TYPE_NULL)
+   IOCTL(KCOV_INIT_TRACE, IOC_R, TYPE_ULONG)
+ #endif
++
++  IOCTL(TUNSETDEBUG,     IOC_W, TYPE_INT)
++  IOCTL(TUNSETIFF,       IOC_RW, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
++  IOCTL(TUNSETPERSIST,   IOC_W, TYPE_INT)
++  IOCTL(TUNSETOWNER,     IOC_W, TYPE_INT)
++  IOCTL(TUNSETLINK,      IOC_W, TYPE_INT)
++  IOCTL(TUNSETGROUP,     IOC_W, TYPE_INT)
++  IOCTL(TUNGETFEATURES,  IOC_R, MK_PTR(TYPE_INT))
++  IOCTL(TUNSETOFFLOAD,   IOC_W, TYPE_LONG)
++  IOCTL_SPECIAL(TUNSETTXFILTER, IOC_W, do_ioctl_TUNSETTXFILTER,
++                /*
++                 * We can't represent `struct tun_filter` in thunk so leaving
++                 * this empty. do_ioctl_TUNSETTXFILTER will do the conversion.
++                 */
++                TYPE_NULL)
++  IOCTL(TUNGETIFF,       IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
++  IOCTL(TUNGETSNDBUF,    IOC_R, MK_PTR(TYPE_INT))
++  IOCTL(TUNSETSNDBUF,    IOC_W, MK_PTR(TYPE_INT))
++  /*
++   * TUNATTACHFILTER and TUNDETACHFILTER are not supported. Linux kernel keeps a
++   * user pointer in TUNATTACHFILTER, which we are not able to correctly handle.
++   */
++  IOCTL(TUNGETVNETHDRSZ, IOC_R, MK_PTR(TYPE_INT))
++  IOCTL(TUNSETVNETHDRSZ, IOC_W, MK_PTR(TYPE_INT))
++  IOCTL(TUNSETQUEUE,     IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
++  IOCTL(TUNSETIFINDEX ,  IOC_W, MK_PTR(TYPE_INT))
++  /* TUNGETFILTER is not supported: see TUNATTACHFILTER. */
++  IOCTL(TUNSETVNETLE,    IOC_W, MK_PTR(TYPE_INT))
++  IOCTL(TUNGETVNETLE,    IOC_R, MK_PTR(TYPE_INT))
++#ifdef TUNSETVNETBE
++  IOCTL(TUNSETVNETBE,    IOC_W, MK_PTR(TYPE_INT))
++  IOCTL(TUNGETVNETBE,    IOC_R, MK_PTR(TYPE_INT))
++#endif
++#ifdef TUNSETSTEERINGEBPF
++  IOCTL(TUNSETSTEERINGEBPF, IOC_W, MK_PTR(TYPE_INT))
++#endif
++#ifdef TUNSETFILTEREBPF
++  IOCTL(TUNSETFILTEREBPF, IOC_W, MK_PTR(TYPE_INT))
++#endif
++#ifdef TUNSETCARRIER
++  IOCTL(TUNSETCARRIER,   IOC_W, MK_PTR(TYPE_INT))
++#endif
++#ifdef TUNGETDEVNETNS
++  IOCTL(TUNGETDEVNETNS,  IOC_R, TYPE_NULL)
++#endif
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 1211e759c2..7f1efed189 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -56,6 +56,7 @@
+ #include <linux/wireless.h>
+ #include <linux/icmp.h>
+ #include <linux/icmpv6.h>
++#include <linux/if_tun.h>
+ #include <linux/errqueue.h>
+ #include <linux/random.h>
+ #ifdef CONFIG_TIMERFD
+@@ -5422,6 +5423,41 @@ static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
+ 
+ #endif
+ 
++static abi_long do_ioctl_TUNSETTXFILTER(const IOCTLEntry *ie, uint8_t *buf_temp,
++                                        int fd, int cmd, abi_long arg)
++{
++    struct tun_filter *filter = (struct tun_filter *)buf_temp;
++    struct tun_filter *target_filter;
++    char *target_addr;
++
++    assert(ie->access == IOC_W);
++
++    target_filter = lock_user(VERIFY_READ, arg, sizeof(*filter), 1);
++    if (!target_filter) {
++        return -TARGET_EFAULT;
++    }
++    filter->flags = tswap16(target_filter->flags);
++    filter->count = tswap16(target_filter->count);
++    unlock_user(target_filter, arg, sizeof(*filter));
++
++    if (filter->count) {
++        if (sizeof(*filter) + filter->count * ETH_ALEN > MAX_STRUCT_SIZE) {
++            return -TARGET_EFAULT;
++        }
++
++        target_addr = lock_user(VERIFY_READ, arg + sizeof(*filter),
++                                filter->count * ETH_ALEN, 1);
++        if (!target_addr) {
++            return -TARGET_EFAULT;
++        }
++        memcpy(filter->addr, target_addr, filter->count * ETH_ALEN);
++        unlock_user(target_addr, arg + sizeof(*filter),
++                    filter->count * ETH_ALEN);
++    }
++
++    return get_errno(safe_ioctl(fd, ie->host_cmd, filter));
++}
++
+ IOCTLEntry ioctl_entries[] = {
+ #define IOCTL(cmd, access, ...) \
+     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 3c261cff0e..7ef0ff0328 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -891,6 +891,38 @@ struct target_rtc_pll_info {
+ 
+ #define TARGET_SIOCGIWNAME     0x8B01          /* get name == wireless protocol */
+ 
++/* From <linux/if_tun.h> */
++
++#define TARGET_TUNSETDEBUG        TARGET_IOW('T', 201, int)
++#define TARGET_TUNSETIFF          TARGET_IOW('T', 202, int)
++#define TARGET_TUNSETPERSIST      TARGET_IOW('T', 203, int)
++#define TARGET_TUNSETOWNER        TARGET_IOW('T', 204, int)
++#define TARGET_TUNSETLINK         TARGET_IOW('T', 205, int)
++#define TARGET_TUNSETGROUP        TARGET_IOW('T', 206, int)
++#define TARGET_TUNGETFEATURES     TARGET_IOR('T', 207, unsigned int)
++#define TARGET_TUNSETOFFLOAD      TARGET_IOW('T', 208, unsigned int)
++#define TARGET_TUNSETTXFILTER     TARGET_IOW('T', 209, unsigned int)
++#define TARGET_TUNGETIFF          TARGET_IOR('T', 210, unsigned int)
++#define TARGET_TUNGETSNDBUF       TARGET_IOR('T', 211, int)
++#define TARGET_TUNSETSNDBUF       TARGET_IOW('T', 212, int)
++/*
++ * TUNATTACHFILTER and TUNDETACHFILTER are not supported. Linux kernel keeps a
++ * user pointer in TUNATTACHFILTER, which we are not able to correctly handle.
++ */
++#define TARGET_TUNGETVNETHDRSZ    TARGET_IOR('T', 215, int)
++#define TARGET_TUNSETVNETHDRSZ    TARGET_IOW('T', 216, int)
++#define TARGET_TUNSETQUEUE        TARGET_IOW('T', 217, int)
++#define TARGET_TUNSETIFINDEX      TARGET_IOW('T', 218, unsigned int)
++/* TUNGETFILTER is not supported: see TUNATTACHFILTER. */
++#define TARGET_TUNSETVNETLE       TARGET_IOW('T', 220, int)
++#define TARGET_TUNGETVNETLE       TARGET_IOR('T', 221, int)
++#define TARGET_TUNSETVNETBE       TARGET_IOW('T', 222, int)
++#define TARGET_TUNGETVNETBE       TARGET_IOR('T', 223, int)
++#define TARGET_TUNSETSTEERINGEBPF TARGET_IOR('T', 224, int)
++#define TARGET_TUNSETFILTEREBPF   TARGET_IOR('T', 225, int)
++#define TARGET_TUNSETCARRIER      TARGET_IOW('T', 226, int)
++#define TARGET_TUNGETDEVNETNS     TARGET_IO('T', 227)
++
+ /* From <linux/random.h> */
+ 
+ #define TARGET_RNDGETENTCNT    TARGET_IOR('R', 0x00, int)
+-- 
+2.28.0.rc0.142.g3c755180ce-goog
 
-May I ask what host CPUs other people have tested this on?  Having more
-data would probably be useful.  Could it be an AMD vs. Intel thing?
 
