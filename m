@@ -2,84 +2,97 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7029C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:57:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1FF1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:58:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3BFA206E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:57:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D717206E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:58:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b+Oi+QzQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3BFA206E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QwKxJ1bs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D717206E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyfTV-00083Y-04
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:57:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45728)
+	id 1jyfUb-0000gL-Pc
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:58:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jyfSb-00078u-J3
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:56:49 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37785)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jyfSV-0005RL-8S
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:56:49 -0400
-Received: by mail-ot1-x341.google.com with SMTP id w17so5024023otl.4
- for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 10:56:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QzOQA4F3NZ+mW/tpH+3PMMYoIK656Ju45Uur3q7DbhE=;
- b=b+Oi+QzQdOUoC60bEFAP0zW/af9ztRpgXLIxzeRIgvXVRbX430FjxrX944R98uCC+R
- NDaRSpscdF4OlYkANDABNmGv9zBAJmPWs9mrox27ex0fxkU21spF2ldjR8fGJIv+TViF
- ihceWzEeeHuBooGE/y98V1xBlIQibfC+M2oEUefgOJHu3k01snvJFNlzufthAoWmn2nj
- O447qhrQAjfmKUgpLcNEoPgCUJuVUzWwMuCKew+yhzVw8Dq+sdW109NO1wVtWlfLwhkg
- 5SuYSLpiJa7wg2WiAUtZOOaS1FhIovxmuTFhysf+IEJNRnLX+pZPcvtGXLanRtDY/1Yy
- XO6g==
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jyfSu-0007Xp-Vx
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:57:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33399
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
+ id 1jyfSt-0005Z0-3Z
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:57:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595527025;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=c2z4JxNcHTM8KejeT/Y47p4uG/5TXZ+/pgJKsojE5MY=;
+ b=QwKxJ1bs0lUDM6ePPV0I0VKm3LeZP2H9eKkZyHhHiKDfQ+o+WXCsEjjf3Bznmv5GxadKoV
+ rP2CVcStuFgHxhuwdwDvB/GeDedfFFtbPHQMBIimeBB3aT9v/oyyK9lnDknAdeh48Bm0re
+ HSWG2uL2ds+NkMZ/qeybadweobDDEw4=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-475-PNCKKO0KOA2yZsVODmyX4Q-1; Thu, 23 Jul 2020 13:57:03 -0400
+X-MC-Unique: PNCKKO0KOA2yZsVODmyX4Q-1
+Received: by mail-il1-f198.google.com with SMTP id y13so3982574ila.10
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 10:57:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QzOQA4F3NZ+mW/tpH+3PMMYoIK656Ju45Uur3q7DbhE=;
- b=bsq2BRUuAALYw4hE2I15bkhPqkzlfUutIAbUqJQfNCazkMkmqOoET2/NIDPzng+xG0
- YJU5G7Ma3yexv5Kyl6TxYgc2N8L2vtCfuIrwgHDxXcI6OCVdNZiEscuIkGmYk+r8dqLm
- 1wuaOabHCcu/HXytLdnij19srDJPqzIBMYuGbdhACyX7lFHjaBVPb5oUeuEBhOH5cvpG
- iJ7km+OaqS61bmOdZQ4oI+l7gNAm4HuqkZw+8F35WyRa2fz1QsQptQAnuEgujChUC7fG
- Sw2tk22oH3PtJLn5jm4Ykyz8eQz4M1209wZO/7nuRQUXNWsEK8Q0XgeG0tR38HZSFk2R
- j+5w==
-X-Gm-Message-State: AOAM530T+Bs813na/0E4vnuwX5XgVv3CUKleyDzeBvdyonSw/achZjaB
- tvtqd0eIasWxuf6miUGiUmM0gjD0FF38/63ob0K44g==
-X-Google-Smtp-Source: ABdhPJwhYIBghpT7qvuuyfndg5M2xFAO0B5nra08LJooCV9nhliW5SH4FutOD7RXB8m+87esghctj6JZoZD2xracY1E=
-X-Received: by 2002:a9d:7303:: with SMTP id e3mr5004582otk.221.1595527001719; 
- Thu, 23 Jul 2020 10:56:41 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=c2z4JxNcHTM8KejeT/Y47p4uG/5TXZ+/pgJKsojE5MY=;
+ b=nFMcftncERiWinKvv8Kp4iKzSxjuMUU8UECKRmLiwwradAfP9mFWNVRdJAo4bLfx0p
+ Y2jzlyRj4dfxkcMzHxPk0IqUC1VQLWSEQeKOIdPK9djLSV7cWTeIMp3AiHHYFRdPq3YY
+ iMMi76tfXJG5sNySyop4HMZnsn/0NWKQE8jTYkd/RbkOg3iYCfMhGdZS9ciDSa5Xgypc
+ JoxBNuMKOzlgHWnH4v+qCOg3ZCEOW6IWc/40ipY2vEhfgLvK277QyUEwYH5ZkqoRTmZy
+ Umsda4gXmudSzUOO6P0q1B7t3vg3IHNoapglfLm40LzK8FUajQORq7EG4pjCcmYoqnO/
+ wPKA==
+X-Gm-Message-State: AOAM5331C9EfuTfYfnyrPqTuDxPvQ5MRkK17/Cibi4e+PhNJnrskV+z5
+ 9XMe2TjsWuAhK09c04RimcGitwf2YmqTNIPqhUgqJOen78vBTDXUB3yCyQLCW2D3k22gsqRP0nM
+ Dga0t3iN1zTfNMUPkNqGoiE7kev+3r2Y=
+X-Received: by 2002:a92:4049:: with SMTP id n70mr6118233ila.161.1595527022967; 
+ Thu, 23 Jul 2020 10:57:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw9wCCf6f07hv9eYq6PkgHdt5ZYMRXwSaPqZhz0ZAHPJFkXR99FTqRSOCZI765Q23/kRdI8IrWKqpPg48l6W88=
+X-Received: by 2002:a92:4049:: with SMTP id n70mr6118216ila.161.1595527022760; 
+ Thu, 23 Jul 2020 10:57:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200710095037.10885-1-mreitz@redhat.com>
-In-Reply-To: <20200710095037.10885-1-mreitz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Jul 2020 18:56:31 +0100
-Message-ID: <CAFEAcA_FmCSz=PnRm+CvZeZrdyM9spOZ6WwhcqFiS0Jak1+cXw@mail.gmail.com>
-Subject: Re: [PATCH] block/amend: Check whether the node exists
-To: Max Reitz <mreitz@redhat.com>
+References: <20200723171935.18535-1-philmd@redhat.com>
+In-Reply-To: <20200723171935.18535-1-philmd@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Thu, 23 Jul 2020 21:56:51 +0400
+Message-ID: <CAMxuvawjeX6y1Y8T1KDVZ0aLzi1EQf5VkP3XAPUHjMP=_6UcJg@mail.gmail.com>
+Subject: Re: [PATCH-for-5.1] libvhost-user: Report descriptor index on panic
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlureau@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:13:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,27 +105,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>, Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 Jul 2020 at 10:51, Max Reitz <mreitz@redhat.com> wrote:
+On Thu, Jul 23, 2020 at 9:19 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
 >
-> We should check whether the user-specified node-name actually refers to
-> a node.  The simplest way to do that is to use bdrv_lookup_bs() instead
-> of bdrv_find_node() (the former wraps the latter, and produces an error
-> message if necessary).
+> We want to report the index of the descriptor,
+> not its pointer.
 >
-> Reported-by: Coverity (CID 1430268)
-> Fixes: ced914d0ab9fb2c900f873f6349a0b8eecd1fdbe
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Fixes: 7b2e5c65f4 ("contrib: add libvhost-user")
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Hi; has this patch got lost? (I'm just running through the Coverity
-issues marked as fix-submitted to check the patches made it into
-master, and it looks like this one hasn't yet.)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-thanks
--- PMM
+> ---
+>  contrib/libvhost-user/libvhost-user.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+> index d315db1396..53f16bdf08 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -2074,7 +2074,7 @@ virtqueue_get_head(VuDev *dev, VuVirtq *vq,
+>
+>      /* If their number is silly, that's a fatal mistake. */
+>      if (*head >=3D vq->vring.num) {
+> -        vu_panic(dev, "Guest says index %u is available", head);
+> +        vu_panic(dev, "Guest says index %u is available", *head);
+>          return false;
+>      }
+>
+> @@ -2133,7 +2133,7 @@ virtqueue_read_next_desc(VuDev *dev, struct vring_d=
+esc *desc,
+>      smp_wmb();
+>
+>      if (*next >=3D max) {
+> -        vu_panic(dev, "Desc next is %u", next);
+> +        vu_panic(dev, "Desc next is %u", *next);
+>          return VIRTQUEUE_READ_DESC_ERROR;
+>      }
+>
+> --
+> 2.21.3
+>
+
 
