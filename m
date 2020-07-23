@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9902C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 19:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FDBDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 19:42:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A49A72065F
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 19:36:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B8C62065F
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 19:42:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+rGrX8c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A49A72065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VTIBfh80"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B8C62065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyh14-0000F8-U2
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 15:36:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39420)
+	id 1jyh7F-0001b0-9V
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 15:42:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jyh0O-0008Bo-SG
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 15:35:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54191
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jyh6g-0001AY-Hv
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 15:42:18 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55558
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jyh0M-0001w9-Jx
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 15:35:48 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jyh6e-0002gF-Gf
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 15:42:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595532945;
+ s=mimecast20190719; t=1595533335;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=n8TOOYWB4lunXnbSQmUrX9VSxwG3g0jjm9oPj4E6/3Y=;
- b=E+rGrX8cE1U7W1VGw6aEYDfgNy+Wcc0D/AF8g10rpNY4YI+k11hId3rAdzbOqq3IeMJoke
- WXjTgj7JoOmOqNLbSGehqOQMTVymQx+UgYvEYbysPkrD34s8VrQw8/awRaApULBhl9K1Cv
- wOp9hkDXjts/EEtn4WuWYRtXeHr+sys=
+ bh=kJCGgsyId6k/YdYtv828Oejs1prKUHWGt2iDKSGH6P0=;
+ b=VTIBfh80DIB3wLWP1oOikSfl0ex4hOJGXqT1+iCr3GhzWeZflNsC5+FGYfmDgG8aMUdTse
+ ULfQ0bpp9bjeRM2ZwuMkc3YW78zYYAl7qCzQJWj49znOE+V6aRSjKYY2VVDQ8eoXk7kvKR
+ 8GrQ3/PZNsKaidP4bIiLjycj06R5eaY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-2kYnxYwVN6apunvD-rRtyQ-1; Thu, 23 Jul 2020 15:35:43 -0400
-X-MC-Unique: 2kYnxYwVN6apunvD-rRtyQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-497-N1lX02mzPzSpdkhTZeU1AA-1; Thu, 23 Jul 2020 15:42:11 -0400
+X-MC-Unique: N1lX02mzPzSpdkhTZeU1AA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57023100AA24;
- Thu, 23 Jul 2020 19:35:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C6B280046C;
+ Thu, 23 Jul 2020 19:42:10 +0000 (UTC)
 Received: from [10.3.112.189] (ovpn-112-189.phx2.redhat.com [10.3.112.189])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EFA1C8BEE8;
- Thu, 23 Jul 2020 19:35:39 +0000 (UTC)
-Subject: Re: [PATCH for-5.1? 0/4] non-blocking connect
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200720180715.10521-1-vsementsov@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D4F3B1001B0B;
+ Thu, 23 Jul 2020 19:42:08 +0000 (UTC)
+Subject: Re: [PATCH v11 00/11] iotests: Dump QCOW2 dirty bitmaps metadata
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1594973699-781898-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <c8a9ac63-6d7d-1955-976d-b51c3ad6b0ab@redhat.com>
-Date: Thu, 23 Jul 2020 14:35:35 -0500
+Message-ID: <20743b55-8eeb-3cac-86db-eab8c2bcd4ea@redhat.com>
+Date: Thu, 23 Jul 2020 14:42:08 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200720180715.10521-1-vsementsov@virtuozzo.com>
+In-Reply-To: <1594973699-781898-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:13:02
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:26:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,37 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, kraxel@redhat.com, den@openvz.org
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/20/20 1:07 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi! This fixes real problem (see 04). On the other hand it may be too
-> much for 5.1, and it's not a degradation. So, up to you.
+On 7/17/20 3:14 AM, Andrey Shinkevich wrote:
+> Add dirty bitmap information to QCOW2 metadata dump in the qcow2_format.py.
+> 
+> v10:
+>    01: Fixing of issues in QCOW2 extension classes noted by Vladimir.
+>    02: Reading bitmap tables was moved into Qcow2BitmapTable class.
+>    03: Handling '-j' key was moved into "if __name__" section.
+>    04: Making copy of __dict__ was replaced with the method to_dict().
+>    05: Qcow2HeaderExtensionsDoc is introduced in the separate patch.
+> 
+> Andrey Shinkevich (11):
+>    qcow2: Fix capitalization of header extension constant.
+>    qcow2_format.py: make printable data an extension class member
+>    qcow2_format.py: change Qcow2BitmapExt initialization method
+>    qcow2_format.py: dump bitmap flags in human readable way.
+>    qcow2_format.py: Dump bitmap directory information
+>    qcow2_format.py: pass cluster size to substructures
+>    qcow2_format.py: Dump bitmap table serialized entries
+>    qcow2.py: Introduce '-j' key to dump in JSON format
+>    qcow2_format.py: collect fields to dump in JSON format
+>    qcow2_format.py: introduce Qcow2HeaderExtensionsDoc class
+>    qcow2_format.py: support dumping metadata in JSON format
+> 
+>   block/qcow2.c                      |   2 +-
+>   docs/interop/qcow2.txt             |   2 +-
+>   tests/qemu-iotests/qcow2.py        |  18 ++-
+>   tests/qemu-iotests/qcow2_format.py | 221 ++++++++++++++++++++++++++++++++++---
+>   4 files changed, 220 insertions(+), 23 deletions(-)
 
-Given the concerns raised on 3, I think I'll wait for v2 of the series, 
-and defer it to 5.2.
-
-> 
-> It's based on "[PATCH for-5.1? 0/3] Fix nbd reconnect dead-locks", or
-> in other words
-> Based-on: <20200720090024.18186-1-vsementsov@virtuozzo.com>
-> 
-> Vladimir Sementsov-Ogievskiy (4):
->    qemu-sockets: refactor inet_connect_addr
->    qemu-sockets: implement non-blocking connect interface
->    io/channel-socket: implement non-blocking connect
->    block/nbd: use non-blocking connect: fix vm hang on connect()
-> 
->   include/io/channel-socket.h | 14 +++++++
->   include/qemu/sockets.h      |  6 +++
->   block/nbd.c                 | 11 +++---
->   io/channel-socket.c         | 74 ++++++++++++++++++++++++++++++++++++
->   util/qemu-sockets.c         | 76 ++++++++++++++++++++++++++-----------
->   5 files changed, 153 insertions(+), 28 deletions(-)
-> 
+I still don't see any obvious coverage of the new output, which makes it 
+harder to test (I have to manually run qcow2.py on a file rather than 
+seeing what changes in a ???.out file).  I know we said back in v9 that 
+test 291 is not the right test, but that does not stop you from adding a 
+new test just for that purpose.
 
 -- 
 Eric Blake, Principal Software Engineer
