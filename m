@@ -2,88 +2,105 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87782C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D11BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:35:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51C7A20771
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:21:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="lo4TvUut"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C7A20771
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id CCCDA206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:35:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCCDA206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyRnt-0000kq-Kt
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 23:21:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43208)
+	id 1jyS0m-00034P-4o
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 23:35:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1jyRmq-0008Rx-Ub
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:20:48 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38766)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1jyRmp-0008SZ-6r
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:20:48 -0400
-Received: by mail-ot1-x344.google.com with SMTP id t18so3387041otq.5
- for <qemu-devel@nongnu.org>; Wed, 22 Jul 2020 20:20:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BNXpHc2EtQBwYYXOJAAWmqMrbRXKhB/87zHefCPJioY=;
- b=lo4TvUutv+35DdpdN30nF7xhB6x+7l/4n2BGuldG2nxulVskezugQ9EO7hpgeITEfw
- SMVauKqc84Y3PQCm7WrdZuB9uiZ+H4ZBuj4bxmtn2opBjC9qblrbXIMLLNQRtiGZx8OE
- JS2KkWoxKEg8owk0656dWLMOTlvszrY+B0jH97e1jNqTZOHettG8Xf9x6jZ91sDNWxEr
- DrbuaaMnNx9m0weF+qzzsz+lcr8B0OcQTAhHXs1RU4p/LPktaqnFIoncYNk/Aobjrmis
- wF8S7q+3Nm2Jhn8WQSxlHBD8nA2I0P2R8x9vFN7PE4xX/NMRaFiigZyIyiALKQaSZhTL
- VfgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BNXpHc2EtQBwYYXOJAAWmqMrbRXKhB/87zHefCPJioY=;
- b=cEF3GCZdGbOQ1LrzkBAPb5AvtDDeowdDIvP7AHUt05oktnZrsXYJnnouIaa23tOcDe
- aUFGyYKYa1hVtCLeF7h2FAepadkdknUod/GjXy3HXIe6ZJFcdx2Rh+fjrc31vzTsw0Ww
- PWUPWgXJTo/iZjCfP0D04BZ7cya2dzMqBvmNQcfuF0lEEzajL5o7IIg8K7jFTlDs54/b
- lXu2PlS/O1+mNRFKz6fLEup4fp8R0qhNC9YB87xksXcmxQSp1ob33IrZ6PnTGWEiWc29
- RVqw5SF/fGwgpPgI7fHITUTs0LiX44XLohoBufHBftxxs1J6PtHWbltyRfkyIM1HnOYb
- PYFQ==
-X-Gm-Message-State: AOAM532wRDEwkU3gawDSq4b47h7w8sFY2j01WoK+RWR1bAxVqU50Um2C
- R5hd0sTpIboM/WFmFC271zmRdaNeJtRnalE1X0Sc9w==
-X-Google-Smtp-Source: ABdhPJxCHHc/iiTwaXKA24SHwdPiZhCnb+jU0OcvgO+hNPaSBihuX8AsPvCCvWl6Cnhf7yOLteDakkBbLIuEWM3E7zs=
-X-Received: by 2002:a9d:708e:: with SMTP id l14mr2771277otj.127.1595474446040; 
- Wed, 22 Jul 2020 20:20:46 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
+ id 1jyS0A-0002Pw-RY; Wed, 22 Jul 2020 23:34:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45504)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
+ id 1jyS08-0001eb-VS; Wed, 22 Jul 2020 23:34:34 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06N3XrtV011030; Wed, 22 Jul 2020 23:34:07 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32bvqx864b-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 22 Jul 2020 23:34:06 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06N3Y40G011276;
+ Wed, 22 Jul 2020 23:34:05 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32bvqx862v-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 22 Jul 2020 23:34:04 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06N3L74i021535;
+ Thu, 23 Jul 2020 03:33:56 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma03wdc.us.ibm.com with ESMTP id 32brq9hajj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 23 Jul 2020 03:33:56 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06N3XrtG7995874
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 23 Jul 2020 03:33:53 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C2B3FC6055;
+ Thu, 23 Jul 2020 03:33:55 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9A625C6057;
+ Thu, 23 Jul 2020 03:33:50 +0000 (GMT)
+Received: from morokweng.localdomain (unknown [9.211.93.190])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Thu, 23 Jul 2020 03:33:49 +0000 (GMT)
+References: <20200723025657.644724-1-bauerman@linux.ibm.com>
+ <20200723025657.644724-2-bauerman@linux.ibm.com>
+ <20200723030609.GL5513@umbus.fritz.box>
+User-agent: mu4e 1.2.0; emacs 26.3
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v3 1/8] target/arm: Move start-powered-off property to
+ generic CPUState
+In-reply-to: <20200723030609.GL5513@umbus.fritz.box>
+Date: Thu, 23 Jul 2020 00:33:47 -0300
+Message-ID: <87imeesy5g.fsf@morokweng.localdomain>
 MIME-Version: 1.0
-References: <cover.1595335112.git.zong.li@sifive.com>
- <26ac4734d2079d5ec782adef3a5a40e82082b51f.1595335112.git.zong.li@sifive.com>
- <CAEeofchMe3H35zmuyzbVMOWOKrYZwfEGT9UVRb4k8L18WwW8PQ@mail.gmail.com>
-In-Reply-To: <CAEeofchMe3H35zmuyzbVMOWOKrYZwfEGT9UVRb4k8L18WwW8PQ@mail.gmail.com>
-From: Zong Li <zong.li@sifive.com>
-Date: Thu, 23 Jul 2020 11:20:36 +0800
-Message-ID: <CANXhq0rcvhGX95JkX08OpRWWZBNZyDgeShD35BvbcQax10PBOA@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] target/riscv: Fix the translation of physical
- address
-To: Alexander Richardson <Alexander.Richardson@cl.cam.ac.uk>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=zong.li@sifive.com; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-22_17:2020-07-22,
+ 2020-07-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999 spamscore=0
+ bulkscore=0 impostorscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0
+ suspectscore=0 adultscore=0 clxscore=1015 phishscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007230026
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:57:53
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,53 +113,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ David Hildenbrand <david@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 22, 2020 at 5:08 PM Alexander Richardson
-<Alexander.Richardson@cl.cam.ac.uk> wrote:
->
-> On Tue, 21 Jul 2020 at 13:43, Zong Li <zong.li@sifive.com> wrote:
-> >
-> > The real physical address should add the 12 bits page offset. It also
-> > causes the PMP wrong checking due to the minimum granularity of PMP is
-> > 4 byte, but we always get the physical address which is 4KB alignment,
-> > that means, we always use the start address of the page to check PMP for
-> > all addresses which in the same page.
-> >
-> > Signed-off-by: Zong Li <zong.li@sifive.com>
-> > ---
-> >  target/riscv/cpu_helper.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> > index 75d2ae3434..08b069f0c9 100644
-> > --- a/target/riscv/cpu_helper.c
-> > +++ b/target/riscv/cpu_helper.c
-> > @@ -543,7 +543,8 @@ restart:
-> >              /* for superpage mappings, make a fake leaf PTE for the TLB's
-> >                 benefit. */
-> >              target_ulong vpn = addr >> PGSHIFT;
-> > -            *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
-> > +            *physical = ((ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT) |
-> > +                        (addr & ~TARGET_PAGE_MASK);
-> >
-> >              /* set permissions on the TLB entry */
-> >              if ((pte & PTE_R) || ((pte & PTE_X) && mxr)) {
-> > --
-> > 2.27.0
->
-> I made the same change for our CHERI fork a few months ago but forgot
-> to send the patch upstream (despite marking the commit as a candidate
-> for upstreaming). Sorry about the duplicated debugging work!
-> (https://github.com/CTSRD-CHERI/qemu/commit/61c8e3f2c0fd4965ec3f316146d1751fae673c12)
 
-No, problem.
+David Gibson <david@gibson.dropbear.id.au> writes:
+
+> On Wed, Jul 22, 2020 at 11:56:50PM -0300, Thiago Jung Bauermann wrote:
+>> There are other platforms which also have CPUs that start powered off, so
+>> generalize the start-powered-off property so that it can be used by them.
+>>=20
+>> Note that ARMv7MState also has a property of the same name but this patch
+>> doesn't change it because that class isn't a subclass of CPUState so it
+>> wouldn't be a trivial change.
+>>=20
+>> This change should not cause any change in behavior.
+>>=20
+>> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+Thanks! Sory about the extra work.
+
+--=20
+Thiago Jung Bauermann
+IBM Linux Technology Center
 
