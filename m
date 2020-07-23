@@ -6,83 +6,93 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D69C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 16:30:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 172F6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 16:37:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D276206F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 16:30:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5B3D206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 16:37:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F68NYpnW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D276206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gk4x2V9T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5B3D206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jye7L-0000pp-O6
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 12:30:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52698)
+	id 1jyeDw-00036x-43
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 12:37:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jye64-0000Ag-Rp
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 12:29:28 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45311
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1jye62-0001rE-0f
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 12:29:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595521764;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aCXe3jfotzbUvjD8I3tsHxWwbY51L/PudZ2QLiT+y4I=;
- b=F68NYpnWePe40b+Z4g4ahbVb6ZtPI9vuJTvfNxVeZ67rIDgjzc60XrYCBzMHB6FoYKGTE2
- bf4054kgE6JpHiPYlpZCOfMbb8WF4YkZDTa/2/L8TaItqxUCuElM1uIpwsuLmks16CRzZJ
- fthXqHxs+G0HC7EqeqDwwKAb3DRWRXU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-hpE9W005M6a1hRLzUP7obQ-1; Thu, 23 Jul 2020 12:29:22 -0400
-X-MC-Unique: hpE9W005M6a1hRLzUP7obQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB6BB1005504;
- Thu, 23 Jul 2020 16:29:20 +0000 (UTC)
-Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3FA787854D;
- Thu, 23 Jul 2020 16:29:17 +0000 (UTC)
-Date: Thu, 23 Jul 2020 10:29:16 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: Re: [RFC PATCH] s390x/pci: vfio-pci breakage with disabled mem
- enforcement
-Message-ID: <20200723102916.7cf15b43@w520.home>
-In-Reply-To: <1595517236-17823-1-git-send-email-mjrosato@linux.ibm.com>
-References: <1595517236-17823-1-git-send-email-mjrosato@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jyeDM-0002hw-8f
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 12:37:00 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:37261)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jyeDJ-0002v0-UW
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 12:36:59 -0400
+Received: by mail-wr1-x433.google.com with SMTP id y3so5794335wrl.4
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 09:36:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=EEpKZjbcM4Lj96g6PObQWoCzM/9dw24XuRBGO5muidE=;
+ b=Gk4x2V9TKveyU95Monw5q1/cl/Df07kQA6WIQ15K5V3jahmNTjLgoiD9weClb8cq3o
+ rBMGcUjJ5xejlhh8YO1rySop/uRMx8TzjquzbRB9EVXAGVwPZXpl6YTzRNIED7vooReW
+ kSoHQDnuJCPIHjD4FCFSYVJ4kbZ71+leCXuBlgUkM4kA0kzEN59rR22vXUv/YdcUWKOU
+ gdk1Pn6xoB5YSSKTA/JMk1Fz9Pk9Ttp7eSGDakQdYUl+3OqTdw8isWFGelG7nk7zKUwG
+ vUl7ZtzA1xmqXiDmcRnlX0oG4wKtkNA6j4rehfzIPhgXB66UXt2KTnAfFlxTZ7NkLOEt
+ RgjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=EEpKZjbcM4Lj96g6PObQWoCzM/9dw24XuRBGO5muidE=;
+ b=TG86Kuz2LXkpIiJun1lR+v8BWNoWPm6iDkrr5FFZJmYrR68gKAhBMk9dXK0seN6Mre
+ PVZGzd5Kn8T/SPMX+tkLAFUWI1cy8eakjSOGxHUuklz3YSpthKJfKDjorPBy2cokwie1
+ aI0eX/aOKCrQ0rsVFloMZlVQ+4y3rGXh9I7lNk1bNnM5UzCacDc5uR/UYadrD6j4n4gX
+ hPZO5S1mZ7GERo+SoG0hmM70YT034/Tx8m6gSOjqRBseQtSZJrpvdo/yKitCmJ/mWnRI
+ EqkZMpl+2SyEybkrm4LUdRVquUA6kp0pjmGl7TPQZ14H9JGINuJlY20kwvtk99ytAsgH
+ W0LQ==
+X-Gm-Message-State: AOAM531LtcE50aSlZIuXsiP4Xii46wZpcWhDIQ7fz+J08DsPTZGU5rYy
+ cFo9kXrm1pv8w8VWzslA6jGQCA==
+X-Google-Smtp-Source: ABdhPJwFAM4vtk9cErjJvzTA/neZxej5A5O68qrXv129b4/v+UCJIX+zhr5AcVpThBkEyjRmLYVfbw==
+X-Received: by 2002:adf:f045:: with SMTP id t5mr5082690wro.288.1595522215812; 
+ Thu, 23 Jul 2020 09:36:55 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a11sm4820660wrq.0.2020.07.23.09.36.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jul 2020 09:36:54 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id BBDAE1FF7E;
+ Thu, 23 Jul 2020 17:36:53 +0100 (BST)
+References: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
+ <20200722093621.GA4838@linux.fritz.box> <87r1t3u4me.fsf@linaro.org>
+ <87o8o6pwwm.fsf@dusky.pond.sub.org>
+ <16f1e661-edaa-2ee2-008d-3c9ad0e5e10d@redhat.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: please try to avoid sending pullreqs late on release-candidate day
+In-reply-to: <16f1e661-edaa-2ee2-008d-3c9ad0e5e10d@redhat.com>
+Date: Thu, 23 Jul 2020 17:36:53 +0100
+Message-ID: <871rl2tcgq.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81;
- envelope-from=alex.williamson@redhat.com; helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:26:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x433.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,64 +105,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: schnelle@linux.ibm.com, pmorel@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jul 2020 11:13:55 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-> I noticed that after kernel commit abafbc55 'vfio-pci: Invalidate mmaps
-> and block MMIO access on disabled memory' vfio-pci via qemu on s390x
-> fails spectacularly, with errors in qemu like:
-> 
-> qemu-system-s390x: vfio_region_read(0001:00:00.0:region0+0x0, 4) failed: Input/output error
-> 
-> From read to bar 0 originating out of hw/s390x/s390-pci-inst.c:zpci_read_bar().
-> 
-> So, I'm trying to figure out how to get vfio-pci happy again on s390x.  From
-> a bit of tracing, we seem to be triggering the new trap in
-> __vfio_pci_memory_enabled().  Sure enough, if I just force this function to
-> return 'true' as a test case, things work again.
-> The included patch attempts to enforce the setting, which restores everything
-> to working order but also triggers vfio_bar_restore() in the process....  So
-> this isn't the right answer, more of a proof-of-concept.
-> 
-> @Alex: Any guidance on what needs to happen to make qemu-s390x happy with this
-> recent kernel change?
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Bummer!  I won't claim to understand s390 PCI, but if we have a VF
-exposed to the "host" (ie. the first level where vfio-pci is being
-used), but we can't tell that it's a VF, how do we know whether the
-memory bit in the command register is unimplemented because it's a VF
-or unimplemented because the device doesn't support MMIO?  How are the
-device ID, vendor ID, and BAR registers virtualized to the host?  Could
-the memory enable bit also be emulated by that virtualization, much
-like vfio-pci does for userspace?  If the other registers are
-virtualized, but these command register bits are left unimplemented, do
-we need code to deduce that we have a VF based on the existence of MMIO
-BARs, but lack of memory enable bit?  Thanks,
+> On 7/23/20 8:28 AM, Markus Armbruster wrote:
+>> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>>=20
+>>> Kevin Wolf <kwolf@redhat.com> writes:
+>>>
+>>>> Am 21.07.2020 um 17:56 hat Peter Maydell geschrieben:
+>>>>> It is not helpful if everybody sends their pullrequests late
+>>>>> on the Tuesday afternoon, as there just isn't enough time in the
+>>>>> day to merge test and apply them all before I have to cut the tag.
+>>>>> Please, if you can, try to send pullrequests earlier, eg Monday.
+>>>>
+>>> <snip>
+>>>>
+>>>> So given that we _will_ have some late patches, what can we do to
+>>>> improve the situation?
+>>>>
+>>>> Maybe I could send the pull request before testing it to save some tim=
+e.
+>>>> Your tests will take a while anyway, so if my own testing fails (e.g.
+>>>> for the parts of iotests that you don't test), I would still have time
+>>>> to NACK my own pull request. This wouldn't buy us more than an hour at
+>>>> most and could lead to wasted testing effort on your side (which is
+>>>> exactly the resource we want to save).
+>>>>
+>>>> Can you test multiple pull requests at once? The Tuesday ones tend to =
+be
+>>>> small (between 1 and 3 patches was what I saw yesterday), so they shou=
+ld
+>>>> be much less likely to fail than large pull requests. If you test two
+>>>> pull requests together and it fails so you have to retest one of them =
+in
+>>>> isolation, you still haven't really lost time compared to testing both
+>>>> individually. And if it succeeds, you cut the testing time in half.
+>>>
+>>> I've taken to just stacking up patches from my multiple trees to avoid
+>>> sending more than one PR a week. Of course sometimes the stack grows a
+>>> bit too tall and becomes unwieldy :-/
+>>=20
+>> You're right, stacking unrelated smaller pull requests makes sense when
+>> pulling all the pull requests in flight races with a deadline.
+>
+> I tend to disagree, since few patches from the "candidate fixes for
+> 5.1-rc1" series are still being discussed, and we are past rc1. Half
+> of them could have been merged in for rc1.
 
-Alex
+Sometime I do peel of the patches that are already ready and push
+through the PR - especially if the stack is getting a bit too wobbly.
+However as rc1 had already passed I just continued to collect them.
 
-> @Nilkas/@Pierre: I wonder if this might be related to host device is_virtfn?
-> I note that my host device lspci output looks like:
-> 
-> 0000:00:00.0 Ethernet controller: Mellanox Technologies MT27710 Family [ConnectX-4 Lx Virtual Function]
-> 
-> But the device is not marked as is_virtfn..  Otherwise, Alex's fix
-> from htps://lkml.org/lkml/2020/6/25/628 should cover the case.
-> 
-> 
-> 
-> Matthew Rosato (1):
->   s390x/pci: Enforce PCI_COMMAND_MEMORY for vfio-pci
-> 
->  hw/s390x/s390-pci-inst.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
+After all splitting them off is not cost free as I like to ensure my
+final tag has a clean run through our CI as well as an overnight soak
+through some of the longer tests ("make docker-test-build" & the vm
+tests). Usually I tag at the end of the day and then send the PR the
+next morning.
 
+I'm about to post v3 of the series - I'll aim to tag it all Friday
+evening or over the w/e and post the PR on Monday.
+
+--=20
+Alex Benn=C3=A9e
 
