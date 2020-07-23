@@ -2,91 +2,94 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B08B0C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C5CC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:56:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F31020759
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:46:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B248207BB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:56:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P7e3xzMQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F31020759
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FhSiwf1e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B248207BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jybYe-0007V6-Pd
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 09:46:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60478)
+	id 1jybiQ-00047F-DB
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 09:56:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jybXr-0006xp-UL
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:45:59 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21093
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jybhr-0003f5-4U
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:56:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52350
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jybXo-0000Il-UP
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:45:59 -0400
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1jybho-0001mv-Kn
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:56:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595511956;
+ s=mimecast20190719; t=1595512574;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=iUDYCT2c+Qb7jJW+GV3PymMxld0AOo1JfsIRCzQZv6Y=;
- b=P7e3xzMQ82c13SDIclaIMhQCpWHy7jUcIEA8MzCu2wK3x/hWo3uzxrrII9RVx8Y6bia/t4
- fDMzsVv9cuRurK4511PmahGZ4sjpZNqGkzOfToBx1uEra2tWc2cqOdzS5YWgo+K8S3q2R5
- oHHtAWg60Ixm0xYq+QCpg0BK+0eJ8i4=
+ in-reply-to:in-reply-to:references:references;
+ bh=2sFajibqmkKg6QpXeK2bQ916jthKVU9mU9g4SXH3fuM=;
+ b=FhSiwf1ekrVeaESPeJkSSH6mB1j3unC+8HFuNMuGh4kozlOkLkYeUCS60RuT3vr+EwxBfp
+ hifZEq+ULJKwSiVW62+FaMm5r9WKiZFNrDyYLZOGoWwgmFLKMIHN9kxbtYSIh4EqQUsHPG
+ fid3zajAXvg2gZIfdoOa5ZYWrw/wJDw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-KwitdmZCOoeUFtEm_Ni3NA-1; Thu, 23 Jul 2020 09:45:52 -0400
-X-MC-Unique: KwitdmZCOoeUFtEm_Ni3NA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-81-IWzaUm8CNheByVKZ63IP7w-1; Thu, 23 Jul 2020 09:56:11 -0400
+X-MC-Unique: IWzaUm8CNheByVKZ63IP7w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C0B518C63C1;
- Thu, 23 Jul 2020 13:45:51 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-87.ams2.redhat.com [10.36.112.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 00F6874F44;
- Thu, 23 Jul 2020 13:45:48 +0000 (UTC)
-Subject: Re: [PATCH] target/unicore32: Remove CURSES stuff from the
- Makefile.objs
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, qemu-devel@nongnu.org
-References: <20200723132219.2956-1-thuth@redhat.com>
- <b177ca63-a7bb-03e7-df22-13f77fed9678@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <18291cc0-13e1-65de-d878-eb432acd6219@redhat.com>
-Date: Thu, 23 Jul 2020 15:45:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EF62100A8EA
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 13:56:10 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-118-146.rdu2.redhat.com [10.10.118.146])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 540575C1D3;
+ Thu, 23 Jul 2020 13:56:04 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id B32452204C7; Thu, 23 Jul 2020 09:56:03 -0400 (EDT)
+Date: Thu, 23 Jul 2020 09:56:03 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [Virtio-fs] [PATCH for-5.1 3/3] virtiofsd: probe
+ unshare(CLONE_FS) and print an error
+Message-ID: <20200723135603.GB5885@redhat.com>
+References: <20200722130206.224898-1-stefanha@redhat.com>
+ <20200722130206.224898-4-stefanha@redhat.com>
+ <20200722170328.GU2324845@redhat.com>
+ <20200723124611.GL186372@stefanha-x1.localdomain>
+ <20200723125035.GH2615312@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b177ca63-a7bb-03e7-df22-13f77fed9678@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200723125035.GH2615312@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:26:42
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:13:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,27 +102,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+Cc: virtio-fs@redhat.com, rmohr@redhat.com, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, vromanso@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/07/2020 15.42, Philippe Mathieu-Daudé wrote:
-> On 7/23/20 3:22 PM, Thomas Huth wrote:
->> The dependency on curses has been removed in commit c7a856b42e403e2b
->> ("target/unicore32: Prefer qemu_semihosting_log_out() over curses").
->> So we can remove the related lines in the Makefile now, too.
+On Thu, Jul 23, 2020 at 01:50:35PM +0100, Daniel P. Berrangé wrote:
+> On Thu, Jul 23, 2020 at 01:46:11PM +0100, Stefan Hajnoczi wrote:
+> > On Wed, Jul 22, 2020 at 06:03:28PM +0100, Daniel P. Berrangé wrote:
+> > > On Wed, Jul 22, 2020 at 02:02:06PM +0100, Stefan Hajnoczi wrote:
+> > > > An assertion failure is raised during request processing if
+> > > > unshare(CLONE_FS) fails. Implement a probe at startup so the problem can
+> > > > be detected right away.
+> > > > 
+> > > > Unfortunately Docker/Moby does not include unshare in the seccomp.json
+> > > > list unless CAP_SYS_ADMIN is given. Other seccomp.json lists always
+> > > > include unshare (e.g. podman is unaffected):
+> > > > https://raw.githubusercontent.com/seccomp/containers-golang/master/seccomp.json
+> > > > 
+> > > > Use "docker run --security-opt seccomp=path/to/seccomp.json ..." if the
+> > > > default seccomp.json is missing unshare.
+> > > > 
+> > > > Cc: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+> > > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > ---
+> > > >  tools/virtiofsd/fuse_virtio.c | 13 +++++++++++++
+> > > >  1 file changed, 13 insertions(+)
+> > > > 
+> > > > diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+> > > > index 3b6d16a041..ebeb352514 100644
+> > > > --- a/tools/virtiofsd/fuse_virtio.c
+> > > > +++ b/tools/virtiofsd/fuse_virtio.c
+> > > > @@ -949,6 +949,19 @@ int virtio_session_mount(struct fuse_session *se)
+> > > >  {
+> > > >      int ret;
+> > > >  
+> > > > +    /*
+> > > > +     * Test that unshare(CLONE_FS) works. fv_queue_worker() will need it. It's
+> > > > +     * an unprivileged system call but some Docker/Moby versions are known to
+> > > > +     * reject it via seccomp when CAP_SYS_ADMIN is not given.
+> > > > +     */
+> > > > +    ret = unshare(CLONE_FS);
+> > > > +    if (ret == -1 && errno == EPERM) {
+> > > > +        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_FS) failed with EPERM. If "
+> > > > +                "running in a container please check that the container "
+> > > > +                "runtime seccomp policy allows unshare.\n");
+> > > > +        return -1;
+> > > > +    }
+> > > > +
+> > > 
+> > > This describes the unshare() call as a "probe" and a "test", but that's
+> > > misleading IMHO. A "probe" / "test" implies that after it has completed,
+> > > there's no lingering side-effect, which isn't the case here.
+> > > 
+> > > This is actively changing the process' namespace environment in the
+> > > success case, and not putting it back how it was originally.
+> > > 
+> > > May be this is in fact OK, but if so I think the commit message and
+> > > comment should explain/justify what its fine to have this lingering
+> > > side-effect.
+> > > 
+> > > If we want to avoid the side-effect then we need to fork() and run
+> > > unshare() in the child, and use a check of exit status of the child
+> > > to determine the result.
+> > 
+> > Thanks for pointing this out. I'll add a comment explaining that
+> > virtiofsd is single-threaded at this point. No other threads share the
+> > file system attributes so the call has no observable side-effects.
 > 
-> Don't we also need to remove all uses of CONFIG_CURSES to
-> be complete? Eventually display a warning with --(en|dis)able-curses
-> is used.
+> Also, if we do an unshare() here, do we still need the unshare() later
+> on in the code ?
 
-Which ones do you mean? I can't find any other CONFIG_CURSES anymore in
-the target/ folder...
+I think so. That unshare() later is to isolate one thread from other.
 
-Or do you also plan to get rid of ui/curses.c ??? ... that's certainly
-another story.
-
- Thomas
+Thanks
+Vivek
 
 
