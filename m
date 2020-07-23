@@ -2,125 +2,79 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CECA9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:43:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05550C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:51:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99D5F2084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:43:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="Eb4+5mR8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99D5F2084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id CEF36206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 03:51:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF36206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyS8S-0000dT-S3
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 23:43:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45944)
+	id 1jySGQ-0008Vq-55
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 23:51:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jyS5w-0004WB-Cz
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:40:32 -0400
-Received: from mail-mw2nam12on2114.outbound.protection.outlook.com
- ([40.107.244.114]:16939 helo=NAM12-MW2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1jyS5u-0002Ew-Vc
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:40:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l6VtSUIj/1uVsOxycihbNcZ4nZcF2DgX/zyiCwh26N2VlqOOVHOeRiTbrQNmnd2FzHK6w5wa+ApY+DKt1i/WHztiPkf2DUs9kWllnIBoitGSEhBjsUxqEks//V30IstQeYNi5ecXLnoZb9TX0prcfaEQn3LPa4r44sZHPm8hdb1hJ/AYjDOVuBof6OmnoV554K0qawcrKEc91WmxhAefiKT0wAWj5u23c/RTrVGHrxrsqL5cFw7t+GZW4lrMGCWaUBiGR/6dKxajhCknFBx05efm8AjCOyGoXQpfnPyzHQlyRZ/cWK+o2PAxnwghEdf1BzJxRIMUqr1p07rhs/6ahA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ktyxUGnYf+LmUVRdpxI0BGBhgpxPWQEYle6Jaz1ifws=;
- b=fCXrbzUv35Y2eRcTC/VT18Clhsdp1MXETbCL3F0qXhtiUO97FovOEFsMEn6G+2sScElFbZWL2itljCiY0Lh5aNr2mcJ/5FmBZIBT1ytAi1HRrqDnz8fHV4pSfzgkgetVFgZHF6lpjEt64+srdmM4TuQhD00Sy8qY02N1oFAfu77Z2jWYY+CLIFjBi1PAWdUq7Gv2yP09MUGt+0w9iAe3yfITTi89ynUR2XOXKjPAum9HbVtpWf/PNqjCjlyyYUebups3pSbCrF2dFSTeXCNLhcP3RqsTavjVxkUWEHedFvZocm3p0nioLxnYd535UoVNewRALw4420J8EMW54gZCuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
- header.d=bu.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ktyxUGnYf+LmUVRdpxI0BGBhgpxPWQEYle6Jaz1ifws=;
- b=Eb4+5mR8ZWWiN9FCG9FC7D4bYdKVE9mWZ1NEkC36jSuln0JCf41Jd6N7dgxmplTy3ytCnfNTodaulqBkhegN20D8HW3gLCqAfPNo8l92wQslrRaC9uVbLw6bogPGfGdfdT7qDYr2kpk3vuN9NXMwekw64TW3/iQilOYsfDXV1mY=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SN6PR03MB3982.namprd03.prod.outlook.com (2603:10b6:805:67::13)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.22; Thu, 23 Jul
- 2020 03:40:17 +0000
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::8ce:29a6:77be:c35b]) by SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::8ce:29a6:77be:c35b%7]) with mapi id 15.20.3216.024; Thu, 23 Jul 2020
- 03:40:17 +0000
-From: Alexander Bulekov <alxndr@bu.edu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 07/12] scripts/oss-fuzz: Add wrapper program for generic fuzzer
-Date: Wed, 22 Jul 2020 23:39:28 -0400
-Message-Id: <20200723033933.21883-8-alxndr@bu.edu>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200723033933.21883-1-alxndr@bu.edu>
-References: <20200723033933.21883-1-alxndr@bu.edu>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR16CA0057.namprd16.prod.outlook.com
- (2603:10b6:208:234::26) To SN6PR03MB3871.namprd03.prod.outlook.com
- (2603:10b6:805:6d::32)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jySFo-00084h-Pq
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:50:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57908)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jySFm-0003e6-HH
+ for qemu-devel@nongnu.org; Wed, 22 Jul 2020 23:50:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jySFh-0007qp-TW
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 03:50:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id BD6232E80E7
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 03:50:37 +0000 (UTC)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mozz.bu.edu (128.197.127.33) by
- MN2PR16CA0057.namprd16.prod.outlook.com (2603:10b6:208:234::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23 via Frontend
- Transport; Thu, 23 Jul 2020 03:40:15 +0000
-X-Mailer: git-send-email 2.27.0
-X-Originating-IP: [128.197.127.33]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ead30c39-6fac-4fff-3b2a-08d82eba1d61
-X-MS-TrafficTypeDiagnostic: SN6PR03MB3982:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR03MB39828FF3ECC728C670A38E08BA760@SN6PR03MB3982.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:849;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tLxPHZcrh1YbdrijRoHz1fyWWGHEIWC1g+ktndOfKVUcqzTP2v+kmxOhdjcfSVaHl0Uapq7xk+IwhHb5q3pGgtfD+pbYcgJ0euXL2RwdSbgBkuDHAA8j8PF+Ozwh8G2NdmgU5/J17PUNKv1vPk4lszEbIdtMgljvjmQoza21VkhqJwy9G/LUXwyiEUqiQan5YPobAM/i8DP6OCTPqQADxID6zFkbGGtHr1McRhYIDzTCQY88V6KSOM1n/QsK/qXsxl18qTRmLKIHetIPROYMnbLQ+Be6yQgxLLMOo32yi5jX1YLEiW4UFhvPLsdPKkHvqR++HCPLEFEnlqWeUn7tpKYYbH6RmLIWGrKaKvbJlG2CprcmnGvrTx9rGcGEIK1V
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39860400002)(396003)(346002)(366004)(136003)(376002)(6916009)(4326008)(36756003)(478600001)(83380400001)(5660300002)(2616005)(956004)(6666004)(8936002)(52116002)(7696005)(66946007)(66556008)(66476007)(6486002)(75432002)(26005)(8676002)(16526019)(54906003)(86362001)(186003)(316002)(1076003)(786003)(2906002)(41533002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 7bUTUSOzZVBIgWrhpl/qAqR+NFG63Jp4roohOqDRF9Qc3u/kNPQcr10vJH166vSa9sz+apmOV46Fmaj4ud/gpUN8K4014BV0X2H1OaH7RVwUbQHwc+gRf1DS7d1l+Oaz2izUmAcRcJ+hmqu6VTscckHAHbaGF+pKNm7n3uydSDA+xJE1udobA3pJ3zmVWVCyuWpu2pq3d25WRWTLBe6cnHMb9DjuDb6YJZGKIWhhS4S5qrUbiQBcuMqekXf0jUteZC135g3Rk/tkAofJC6ar1f2hymgfGk+OlC6knuWEaQpVpE80UpGqoO7BWm/C6LZPhT4S5AnnGfY1M+foJnhfAspU+1PfnJ4pxMV9yJoNbdp0CAAX5ohA9emkACVdGLlrvwayWpft9EP8Qlbe9bi+36V3h+FK/kh3mRBEg2QQhEb514/cOcA2oo6fT+kXrb6o/Hhl+3j+WsBamHReUirs/GQIiQR2JSt287Mj8nt9TiM=
-X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: ead30c39-6fac-4fff-3b2a-08d82eba1d61
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2020 03:40:17.4475 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dHBcueXBFzcLNmCnTEMcR/4S//S6saPBvwPO4/VPd6LB76RQ9WR7RL4oimmDWfUm
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB3982
-Received-SPF: pass client-ip=40.107.244.114; envelope-from=alxndr@bu.edu;
- helo=NAM12-MW2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 23:40:15
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Jul 2020 03:43:59 -0000
+From: Simon Kaegi <1888601@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: skaegi
+X-Launchpad-Bug-Reporter: Simon Kaegi (skaegi)
+X-Launchpad-Bug-Modifier: Simon Kaegi (skaegi)
+Message-Id: <159547584008.11100.1316842366379773629.malonedeb@wampee.canonical.com>
+Subject: [Bug 1888601] [NEW] QEMU v5.1.0-rc0/rc1 hang with nested
+ virtualization
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="f877c5162b568393e2d07ce948459ba0abc456fe";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 2e544754d59d2ecef43be41b067215b9d5fe3140
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 23:50:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -129,74 +83,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Alexander Bulekov <alxndr@bu.edu>, f4bug@amsat.org,
- darren.kenny@oracle.com, bsd@redhat.com, dstepanov.src@gmail.com,
- stefanha@redhat.com, andrew@coatesdev.com, Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Bug 1888601 <1888601@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On oss-fuzz we need some sort of wrapper to specify command-line
-arguments or environment variables. When we had a similar problem with
-other targets that I fixed with
-05509c8e6d ("fuzz: select fuzz target using executable name")
-by selecting the fuzz target based on the executable's name. In the
-future should probably commit to one approach (wrapper binary or
-argv0-based target selection).
+Public bug reported:
 
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+We're running Kata Containers using QEMU and with v5.1.0rc0 and rc1 have
+noticed a problem at startup where QEMu appears to hang. We are not
+seeing this problem on our bare metal nodes and only on a VSI that
+supports nested virtualization.
+
+We unfortunately see nothing at all in the QEMU logs to help understand
+the problem and a hung process is just a guess at this point.
+
+Using git bisect we first see the problem with...
+
 ---
- scripts/oss-fuzz/target.c | 40 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
- create mode 100644 scripts/oss-fuzz/target.c
 
-diff --git a/scripts/oss-fuzz/target.c b/scripts/oss-fuzz/target.c
-new file mode 100644
-index 0000000000..4a7257412a
---- /dev/null
-+++ b/scripts/oss-fuzz/target.c
-@@ -0,0 +1,40 @@
-+/*
-+ * Copyright Red Hat Inc., 2020
-+ *
-+ * Authors:
-+ *  Alexander Bulekov   <alxndr@bu.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <limits.h>
-+#include <libgen.h>
-+#include <string.h>
-+#include <unistd.h>
-+
-+
-+/* Required for oss-fuzz to consider the binary a target. */
-+static const char *magic __attribute__((used)) = "LLVMFuzzerTestOneInput";
-+static const char args[] = {QEMU_FUZZ_ARGS, 0x00};
-+static const char objects[] = {QEMU_FUZZ_OBJECTS, 0x00};
-+
-+int main(int argc, char *argv[])
-+{
-+    char path[PATH_MAX] = {0};
-+    char *dir = dirname(argv[0]);
-+    strncpy(path, dir, PATH_MAX);
-+    strcat(path, "/deps/qemu-fuzz-i386-target-general-fuzz");
-+
-+    setenv("QEMU_FUZZ_ARGS", args, 0);
-+    setenv("QEMU_FUZZ_OBJECTS", objects, 0);
-+
-+    argv[0] = path;
-+    int ret = execvp(path, argv);
-+    if (ret) {
-+        perror("execv");
-+    }
-+    return ret;
-+}
--- 
-2.27.0
+f19bcdfedd53ee93412d535a842a89fa27cae7f2 is the first bad commit
+commit f19bcdfedd53ee93412d535a842a89fa27cae7f2
+Author: Jason Wang <jasowang@redhat.com>
+Date:   Wed Jul 1 22:55:28 2020 +0800
 
+    virtio-pci: implement queue_enabled method
+    =
+
+    With version 1, we can detect whether a queue is enabled via
+    queue_enabled.
+    =
+
+    Signed-off-by: Jason Wang <jasowang@redhat.com>
+    Signed-off-by: Cindy Lu <lulu@redhat.com>
+    Message-Id: <20200701145538.22333-5-lulu@redhat.com>
+    Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+    Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+    Acked-by: Jason Wang <jasowang@redhat.com>
+
+ hw/virtio/virtio-pci.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+---
+
+Reverting this commit seems to work and prevent the hanging.
+
+---
+
+Here's how kata ends up launching qemu in our environment -- =
+
+/opt/kata/bin/qemu-system-x86_64 -name sandbox-849df14c6065931adedb9d18bc92=
+60a6d896f1814a8c5cfa239865772f1b7a5f -uuid 6bec458e-1da7-4847-a5d7-5ab31d4d=
+2465 -machine pc,accel=3Dkvm,kernel_irqchip -cpu host,pmu=3Doff -qmp unix:/=
+run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5f/=
+qmp.sock,server,nowait -m 4096M,slots=3D10,maxmem=3D30978M -device pci-brid=
+ge,bus=3Dpci.0,id=3Dpci-bridge-0,chassis_nr=3D1,shpc=3Don,addr=3D2,romfile=
+=3D -device virtio-serial-pci,disable-modern=3Dtrue,id=3Dserial0,romfile=3D=
+ -device virtconsole,chardev=3Dcharconsole0,id=3Dconsole0 -chardev socket,i=
+d=3Dcharconsole0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f181=
+4a8c5cfa239865772f1b7a5f/console.sock,server,nowait -device virtio-scsi-pci=
+,id=3Dscsi0,disable-modern=3Dtrue,romfile=3D -object rng-random,id=3Drng0,f=
+ilename=3D/dev/urandom -device virtio-rng-pci,rng=3Drng0,romfile=3D -device=
+ virtserialport,chardev=3Dcharch0,id=3Dchannel0,name=3Dagent.channel.0 -cha=
+rdev socket,id=3Dcharch0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc9260a6=
+d896f1814a8c5cfa239865772f1b7a5f/kata.sock,server,nowait -chardev socket,id=
+=3Dchar-396c5c3e19e29353,path=3D/run/vc/vm/849df14c6065931adedb9d18bc9260a6=
+d896f1814a8c5cfa239865772f1b7a5f/vhost-fs.sock -device vhost-user-fs-pci,ch=
+ardev=3Dchar-396c5c3e19e29353,tag=3DkataShared,romfile=3D -netdev tap,id=3D=
+network-0,vhost=3Don,vhostfds=3D3:4,fds=3D5:6 -device driver=3Dvirtio-net-p=
+ci,netdev=3Dnetwork-0,mac=3D52:ac:2d:02:1f:6f,disable-modern=3Dtrue,mq=3Don=
+,vectors=3D6,romfile=3D -global kvm-pit.lost_tick_policy=3Ddiscard -vga non=
+e -no-user-config -nodefaults -nographic -daemonize -object memory-backend-=
+file,id=3Ddimm1,size=3D4096M,mem-path=3D/dev/shm,share=3Don -numa node,memd=
+ev=3Ddimm1 -kernel /opt/kata/share/kata-containers/vmlinuz-5.7.9-74 -initrd=
+ /opt/kata/share/kata-containers/kata-containers-initrd_alpine_1.11.2-6_age=
+nt.initrd -append tsc=3Dreliable no_timer_check rcupdate.rcu_expedited=3D1 =
+i8042.direct=3D1 i8042.dumbkbd=3D1 i8042.nopnp=3D1 i8042.noaux=3D1 noreplac=
+e-smp reboot=3Dk console=3Dhvc0 console=3Dhvc1 iommu=3Doff cryptomgr.notest=
+s net.ifnames=3D0 pci=3Dlastbus=3D0 debug panic=3D1 nr_cpus=3D4 agent.use_v=
+sock=3Dfalse scsi_mod.scan=3Dnone init=3D/usr/bin/kata-agent -pidfile /run/=
+vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5f/pid =
+-D /run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7=
+a5f/qemu.log -smp 2,cores=3D1,threads=3D1,sockets=3D4,maxcpus=3D4
+
+---
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888601
+
+Title:
+  QEMU v5.1.0-rc0/rc1 hang with nested virtualization
+
+Status in QEMU:
+  New
+
+Bug description:
+  We're running Kata Containers using QEMU and with v5.1.0rc0 and rc1
+  have noticed a problem at startup where QEMu appears to hang. We are
+  not seeing this problem on our bare metal nodes and only on a VSI that
+  supports nested virtualization.
+
+  We unfortunately see nothing at all in the QEMU logs to help
+  understand the problem and a hung process is just a guess at this
+  point.
+
+  Using git bisect we first see the problem with...
+
+  ---
+
+  f19bcdfedd53ee93412d535a842a89fa27cae7f2 is the first bad commit
+  commit f19bcdfedd53ee93412d535a842a89fa27cae7f2
+  Author: Jason Wang <jasowang@redhat.com>
+  Date:   Wed Jul 1 22:55:28 2020 +0800
+
+      virtio-pci: implement queue_enabled method
+      =
+
+      With version 1, we can detect whether a queue is enabled via
+      queue_enabled.
+      =
+
+      Signed-off-by: Jason Wang <jasowang@redhat.com>
+      Signed-off-by: Cindy Lu <lulu@redhat.com>
+      Message-Id: <20200701145538.22333-5-lulu@redhat.com>
+      Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+      Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+      Acked-by: Jason Wang <jasowang@redhat.com>
+
+   hw/virtio/virtio-pci.c | 13 +++++++++++++
+   1 file changed, 13 insertions(+)
+
+  ---
+
+  Reverting this commit seems to work and prevent the hanging.
+
+  ---
+
+  Here's how kata ends up launching qemu in our environment -- =
+
+  /opt/kata/bin/qemu-system-x86_64 -name sandbox-849df14c6065931adedb9d18bc=
+9260a6d896f1814a8c5cfa239865772f1b7a5f -uuid 6bec458e-1da7-4847-a5d7-5ab31d=
+4d2465 -machine pc,accel=3Dkvm,kernel_irqchip -cpu host,pmu=3Doff -qmp unix=
+:/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5=
+f/qmp.sock,server,nowait -m 4096M,slots=3D10,maxmem=3D30978M -device pci-br=
+idge,bus=3Dpci.0,id=3Dpci-bridge-0,chassis_nr=3D1,shpc=3Don,addr=3D2,romfil=
+e=3D -device virtio-serial-pci,disable-modern=3Dtrue,id=3Dserial0,romfile=
+=3D -device virtconsole,chardev=3Dcharconsole0,id=3Dconsole0 -chardev socke=
+t,id=3Dcharconsole0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f=
+1814a8c5cfa239865772f1b7a5f/console.sock,server,nowait -device virtio-scsi-=
+pci,id=3Dscsi0,disable-modern=3Dtrue,romfile=3D -object rng-random,id=3Drng=
+0,filename=3D/dev/urandom -device virtio-rng-pci,rng=3Drng0,romfile=3D -dev=
+ice virtserialport,chardev=3Dcharch0,id=3Dchannel0,name=3Dagent.channel.0 -=
+chardev socket,id=3Dcharch0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
+0a6d896f1814a8c5cfa239865772f1b7a5f/kata.sock,server,nowait -chardev socket=
+,id=3Dchar-396c5c3e19e29353,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
+0a6d896f1814a8c5cfa239865772f1b7a5f/vhost-fs.sock -device vhost-user-fs-pci=
+,chardev=3Dchar-396c5c3e19e29353,tag=3DkataShared,romfile=3D -netdev tap,id=
+=3Dnetwork-0,vhost=3Don,vhostfds=3D3:4,fds=3D5:6 -device driver=3Dvirtio-ne=
+t-pci,netdev=3Dnetwork-0,mac=3D52:ac:2d:02:1f:6f,disable-modern=3Dtrue,mq=
+=3Don,vectors=3D6,romfile=3D -global kvm-pit.lost_tick_policy=3Ddiscard -vg=
+a none -no-user-config -nodefaults -nographic -daemonize -object memory-bac=
+kend-file,id=3Ddimm1,size=3D4096M,mem-path=3D/dev/shm,share=3Don -numa node=
+,memdev=3Ddimm1 -kernel /opt/kata/share/kata-containers/vmlinuz-5.7.9-74 -i=
+nitrd /opt/kata/share/kata-containers/kata-containers-initrd_alpine_1.11.2-=
+6_agent.initrd -append tsc=3Dreliable no_timer_check rcupdate.rcu_expedited=
+=3D1 i8042.direct=3D1 i8042.dumbkbd=3D1 i8042.nopnp=3D1 i8042.noaux=3D1 nor=
+eplace-smp reboot=3Dk console=3Dhvc0 console=3Dhvc1 iommu=3Doff cryptomgr.n=
+otests net.ifnames=3D0 pci=3Dlastbus=3D0 debug panic=3D1 nr_cpus=3D4 agent.=
+use_vsock=3Dfalse scsi_mod.scan=3Dnone init=3D/usr/bin/kata-agent -pidfile =
+/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5f=
+/pid -D /run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa23986577=
+2f1b7a5f/qemu.log -smp 2,cores=3D1,threads=3D1,sockets=3D4,maxcpus=3D4
+
+  ---
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888601/+subscriptions
 
