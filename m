@@ -6,87 +6,85 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3341DC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 06:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D731EC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 06:34:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F20DD206E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 06:30:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F3F5206E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 06:34:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fB/WNHDS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F20DD206E3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWNdVTjf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F3F5206E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyUjw-0007TE-9u
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 02:30:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49460)
+	id 1jyUo0-0000TL-UW
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 02:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyUj5-00070b-DX
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 02:29:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30951
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jyUnN-0008QH-7C
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 02:33:33 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28063
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyUj3-0007uD-Nf
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 02:29:07 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jyUnK-00008Y-IW
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 02:33:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595485745;
+ s=mimecast20190719; t=1595486009;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tWjpTPc8YJbUZPP5INmjIjPDig/+hsfvKiWZZBatP1M=;
- b=fB/WNHDS2JE56WRscGq/TMMhYqZ0AIaXzxFArCgMGTbDkQjST04gcrnzCle2Vzd4G4CD9f
- XqftCn75T/e4nAS/O4NVL//yxAf7t/CKdxA57DN5Qj/HHqxZ5i0ReXExenFtzw1bpPMds0
- 0c/IxCAsGUZhKdz18VzMejVEQ2CvuMk=
+ bh=gP0ziDWKaozYPxJlEaJijEiUf6ovghsYvBsep3uCLjY=;
+ b=EWNdVTjf0wHXfP76BZpRYuXSYp4nhIhgf7r3Za/G2FAsR1FgtLAjvoihhtOnIibTzqRMSV
+ boSASO/zRXGrYr1Y5tsPuGAHI/KxLdij7fL5bLSUOdTbHjj95FkPz+eFcQv9F7WHnpX1xB
+ 0mmVa/DLdWSvu5wwvTocpoc60LHjizU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-6xvJ0T99PrCqY9Y3__WaNQ-1; Thu, 23 Jul 2020 02:29:03 -0400
-X-MC-Unique: 6xvJ0T99PrCqY9Y3__WaNQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-10--uCv4kzpNmKHO0pSzbikGQ-1; Thu, 23 Jul 2020 02:33:27 -0400
+X-MC-Unique: -uCv4kzpNmKHO0pSzbikGQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C7D910059A2;
- Thu, 23 Jul 2020 06:29:02 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C1122C2BC;
- Thu, 23 Jul 2020 06:28:59 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B952C111CA26; Thu, 23 Jul 2020 08:28:57 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: please try to avoid sending pullreqs late on release-candidate day
-References: <CAFEAcA9+9ZQY2CxZ9V4bZrkAGR5eUapbwSk6sNyFGyyd39Y=1Q@mail.gmail.com>
- <20200722093621.GA4838@linux.fritz.box> <87r1t3u4me.fsf@linaro.org>
-Date: Thu, 23 Jul 2020 08:28:57 +0200
-In-Reply-To: <87r1t3u4me.fsf@linaro.org> ("Alex =?utf-8?Q?Benn=C3=A9e=22's?=
- message of "Wed, 22 Jul 2020 13:16:25 +0100")
-Message-ID: <87o8o6pwwm.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E4AD58;
+ Thu, 23 Jul 2020 06:33:26 +0000 (UTC)
+Received: from gondolin (ovpn-112-228.ams2.redhat.com [10.36.112.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 60EF45C1BB;
+ Thu, 23 Jul 2020 06:33:16 +0000 (UTC)
+Date: Thu, 23 Jul 2020 08:33:13 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 0/2] virtio: non-legacy device handling
+Message-ID: <20200723083313.49e3502a.cohuck@redhat.com>
+In-Reply-To: <4309b9dd-cc94-e183-60f8-67e4ec36c666@redhat.com>
+References: <20200707105446.677966-1-cohuck@redhat.com>
+ <51e457ef-106e-1c1a-778d-4d53d9e48d8e@redhat.com>
+ <20200720050215-mutt-send-email-mst@kernel.org>
+ <4309b9dd-cc94-e183-60f8-67e4ec36c666@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:13:02
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:33:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,47 +97,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+On Mon, 20 Jul 2020 11:07:51 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> Kevin Wolf <kwolf@redhat.com> writes:
->
->> Am 21.07.2020 um 17:56 hat Peter Maydell geschrieben:
->>> It is not helpful if everybody sends their pullrequests late
->>> on the Tuesday afternoon, as there just isn't enough time in the
->>> day to merge test and apply them all before I have to cut the tag.
->>> Please, if you can, try to send pullrequests earlier, eg Monday.
->>
-> <snip>
->>
->> So given that we _will_ have some late patches, what can we do to
->> improve the situation?
->>
->> Maybe I could send the pull request before testing it to save some time.
->> Your tests will take a while anyway, so if my own testing fails (e.g.
->> for the parts of iotests that you don't test), I would still have time
->> to NACK my own pull request. This wouldn't buy us more than an hour at
->> most and could lead to wasted testing effort on your side (which is
->> exactly the resource we want to save).
->>
->> Can you test multiple pull requests at once? The Tuesday ones tend to be
->> small (between 1 and 3 patches was what I saw yesterday), so they should
->> be much less likely to fail than large pull requests. If you test two
->> pull requests together and it fails so you have to retest one of them in
->> isolation, you still haven't really lost time compared to testing both
->> individually. And if it succeeds, you cut the testing time in half.
->
-> I've taken to just stacking up patches from my multiple trees to avoid
-> sending more than one PR a week. Of course sometimes the stack grows a
-> bit too tall and becomes unwieldy :-/
+> On 20.07.20 11:03, Michael S. Tsirkin wrote:
+> > On Mon, Jul 20, 2020 at 10:09:57AM +0200, David Hildenbrand wrote:  
+> >> On 07.07.20 12:54, Cornelia Huck wrote:  
+> >>> As discussed in "virtio-fs: force virtio 1.x usage", it seems like
+> >>> a good idea to make sure that any new virtio device (which does not
+> >>> support legacy virtio) is indeed a non-transitional device, just to
+> >>> catch accidental misconfigurations. We can easily compile a list
+> >>> of virtio devices with legacy support and have transports verify
+> >>> in their plugged callbacks that legacy support is off for any device
+> >>> not in that list.
+> >>>
+> >>> Most new virtio devices force non-transitional already, so nothing
+> >>> changes for them. vhost-user-fs-pci even does not allow to configure
+> >>> a non-transitional device, so it is fine as well.
+> >>>
+> >>> One problematic device, however, is virtio-iommu-pci. It currently
+> >>> offers both the transitional and the non-transitional variety of the
+> >>> device, and does not force anything. I'm unsure whether we should
+> >>> consider transitional virtio-iommu unsupported, or if we should add
+> >>> some compat handling. (The support for legacy or not generally may
+> >>> change based upon the bus, IIUC, so I'm unsure how to come up with
+> >>> something generic.)
+> >>>
+> >>> Cornelia Huck (2):
+> >>>   virtio: list legacy-capable devices
+> >>>   virtio: verify that legacy support is not accidentally on  
+> >>
+> >> I'd squash both patches. Looking at patch #1, I wonder why we don't
+> >> store that information along with the device implementation? What was
+> >> the motivation to define this information separately?  
+> > 
+> > Because people seem to cut and paste code, so when one
+> > enables it in an old device, it gets pasted into a new one.
+> > With a list in a central place, it's easier to figure out
+> > what's going on.  
+> 
+> Makes sense, I suggest adding that to the patch description.
 
-You're right, stacking unrelated smaller pull requests makes sense when
-pulling all the pull requests in flight races with a deadline.
+"The list of devices supporting legacy is supposed to be static. We
+keep it in a central place to make sure that new devices do not enable
+legacy by accident."
+
+?
+
+> 
+> Both patches look sane to me (- squashing them).
+> 
+
+Patch 1 does not change behaviour, while patch 2 does (for
+virtio-iommu-pci). Still would like an opinion whether changing the
+behaviour for virtio-iommu-pci with no compat handling is ok.
+
+(I could be persuaded to squash them.)
 
 
