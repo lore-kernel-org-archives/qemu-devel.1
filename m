@@ -2,60 +2,62 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE34C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 00:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C61F4C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:02:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9BC22086A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 00:53:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9273620888
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:02:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RqrpoSFV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9BC22086A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YiKCuN8s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9273620888
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyPU8-00078c-0z
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 20:53:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36778)
+	id 1jyPct-0002Gi-Ll
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 21:02:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jyPT4-0005yx-2B; Wed, 22 Jul 2020 20:52:14 -0400
-Received: from ozlabs.org ([203.11.71.1]:57371)
+ id 1jyPaw-0008Qd-CT; Wed, 22 Jul 2020 21:00:22 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:42731)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jyPT1-0006Gs-1H; Wed, 22 Jul 2020 20:52:13 -0400
+ id 1jyPau-0007HN-7b; Wed, 22 Jul 2020 21:00:22 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BBv1L1SP3z9sRW; Thu, 23 Jul 2020 10:52:06 +1000 (AEST)
+ id 4BBvBk6Pvvz9sRf; Thu, 23 Jul 2020 11:00:14 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1595465526;
- bh=n9Bis+XWaULeEyeUeeb5YTiZc8WiEHk+WS6RkQi+52E=;
+ d=gibson.dropbear.id.au; s=201602; t=1595466014;
+ bh=/dGgJclc9RTkcxSGPVohP34vadU4jFuxm92lYW2hUIQ=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=RqrpoSFVWhLxdtsghHU25zrUH4Yw5w8N0pGpvKFBF8vjlWzZY03Xmd1c6wlT2x2dm
- ExqUcPXlvYnc7HsYm/DBIJ0IN8J8KKx/KtCCi2k/W66Am3mUDipQlOnCT4p2sdUX25
- nl4TzDwF5fV3F0CyehoMC+7CI9oZ+aILFiuD4G8A=
-Date: Thu, 23 Jul 2020 10:45:45 +1000
+ b=YiKCuN8sQG8+6edKLVlPmEt/SDXTmVwADMu8O6hqsc28OWcqLoal8FMqBQlM3hy7o
+ F8Rffg5pnr7hiLN+0aqILejml97YWzeXxk7D54QEDMxpU2ScegFerj9Ud5cBkZ91lA
+ 5ZkPWAGVfguk9B4rmKSo1Hngti/HORT1vQZ0YeLI=
+Date: Thu, 23 Jul 2020 10:57:36 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Gustavo Romero <gromero@linux.ibm.com>
-Subject: Re: [PATCH] ppc/xive: Fix some typos in comments
-Message-ID: <20200723004545.GF5513@umbus.fritz.box>
-References: <1595461434-27725-1-git-send-email-gromero@linux.ibm.com>
+To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: Re: [PATCH v2 6/9] sparc/sun4m: Use start-powered-off CPUState
+ property
+Message-ID: <20200723005736.GK5513@umbus.fritz.box>
+References: <20200722035016.469075-1-bauerman@linux.ibm.com>
+ <20200722035016.469075-7-bauerman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="sDKAb4OeUBrWWL6P"
+ protocol="application/pgp-signature"; boundary="Cy+5HEalSgyXkpVS"
 Content-Disposition: inline
-In-Reply-To: <1595461434-27725-1-git-send-email-gromero@linux.ibm.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <20200722035016.469075-7-bauerman@linux.ibm.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 20:52:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -75,62 +77,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---sDKAb4OeUBrWWL6P
+--Cy+5HEalSgyXkpVS
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 22, 2020 at 07:43:54PM -0400, Gustavo Romero wrote:
-> Fix some typos in comments about code modeling coalescing points in the
-> XIVE routing engine (IVRE).
+On Wed, Jul 22, 2020 at 12:50:13AM -0300, Thiago Jung Bauermann wrote:
+> Instead of setting CPUState::halted to 1 in secondary_cpu_reset(), use the
+> start-powered-off property which makes cpu_common_reset() initialize it
+> to 1 in common code.
 >=20
-> Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
+> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 
-Applied to ppc-for-5.2.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/intc/xive.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  hw/sparc/sun4m.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 9a16243..9b55e03 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -1502,7 +1502,7 @@ static bool xive_presenter_notify(XiveFabric *xfb, =
-uint8_t format,
+> NB: I was only able to test that this patch builds. I wasn't able to
+> run it.
+>=20
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 9be930415f..766e79bb5e 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -233,7 +233,6 @@ static void secondary_cpu_reset(void *opaque)
+>      CPUState *cs =3D CPU(cpu);
 > =20
->  /*
->   * Notification using the END ESe/ESn bit (Event State Buffer for
-> - * escalation and notification). Profide futher coalescing in the
-> + * escalation and notification). Provide further coalescing in the
->   * Router.
->   */
->  static bool xive_router_end_es_notify(XiveRouter *xrtr, uint8_t end_blk,
-> @@ -1581,7 +1581,7 @@ static void xive_router_end_notify(XiveRouter *xrtr=
-, uint8_t end_blk,
+>      cpu_reset(cs);
+> -    cs->halted =3D 1;
+>  }
 > =20
->      /*
->       * Check the END ESn (Event State Buffer for notification) for
-> -     * even futher coalescing in the Router
-> +     * even further coalescing in the Router
->       */
->      if (!xive_end_is_notify(&end)) {
->          /* ESn[Q]=3D1 : end of notification */
-> @@ -1660,7 +1660,7 @@ do_escalation:
-> =20
->      /*
->       * Check the END ESe (Event State Buffer for escalation) for even
-> -     * futher coalescing in the Router
-> +     * further coalescing in the Router
->       */
->      if (!xive_end_is_uncond_escalation(&end)) {
->          /* ESe[Q]=3D1 : end of notification */
+>  static void cpu_halt_signal(void *opaque, int irq, int level)
+> @@ -833,6 +832,8 @@ static void cpu_devinit(const char *cpu_type, unsigne=
+d int id,
+>          qemu_register_reset(secondary_cpu_reset, cpu);
+>          cs =3D CPU(cpu);
+>          cs->halted =3D 1;
+> +        object_property_set_bool(OBJECT(cs), "start-powered-off", true,
+> +                                 &error_abort);
+>      }
+>      *cpu_irqs =3D qemu_allocate_irqs(cpu_set_irq, cpu, MAX_PILS);
+>      env->prom_addr =3D prom_addr;
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -138,25 +143,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---sDKAb4OeUBrWWL6P
+--Cy+5HEalSgyXkpVS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8Y3bgACgkQbDjKyiDZ
-s5IraxAAqyz/LzFpttN5jQZVBKO5Du6SFP2CrWNFEW8yMWOeGozZQKPmu/ZQfsOD
-vsl1O8WOoR69pUmcqeEyMIOacAAaHCctiMck/vYU9DLZZP5w5BfYIXNIKXXsbkZs
-Ycdx9vN9xL8EXl+qFxXTNKjzBZddHu1rvaQKDOlltaqKGS4aFJVk5SsPL3tZrL4q
-LK/40Uh7eeYNxWpL1/4DSPocaWWNa96EwLCfEXnErDbY9UE6Ru5VnbPptYUCqpUy
-jTBqFEAaHdMp9SFXTO9eZIk/p5aGpkhFT+fzK4BH/c7kp3mRDPv3iUDh1ikwEyjU
-58aX+15bLnAm+zGOFvvWE/BAXl1OzBFPPuTxpqKVfyfzh9dBSUoUvm3jdUHETyvy
-kunoxwwpPmZBcXbs31y55NsTn8u+bDFM/17fXkQy3RZn2CUnBFf3QoxEMKXutRWY
-uZUe5YjAz1d0TyGvkiP+UazC5mcdVDxsVJqIjoUGfc0ybfq3qg5uV9DD+JuVDuWg
-GrmMhC9rV89zCOYSdPkDfGSU9s2sV7B0F9o8XxtCXEMSdNvssHGLjDas77jWsR8U
-VrwuZYnWZB6IXP/uf1S9F7RfLqGUaUbxg7BtD2WZp8rDrZKY+cHYTtMDO6RGc2bk
-XczALctAGjNqyBJgkqpBj+b6Ky5tMZl9m6CN6GJX6ES73vlPME0=
-=SyhT
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8Y4IAACgkQbDjKyiDZ
+s5L62g/8C3RVn5hXu4Ubj7n3wjsL2HJXNRFYXkuPXXQFEQSQjV0bcx94ckyrvV9S
+NBYEallDQ8gm7MTI8OyBs7LTBpzyCdg5U4CBU+ybsM78kqrIghMOOnUvBBQip8tm
+ihUBhLSNV08xvUf/S0yjn5pkvmvfDjhZRNGPo9S9u+xY86FqK0Ipm436jAetXq0j
+VJccwALsdj5L3eaYrhKocyRal6VDRIoHAN0HcjClSg85y6Nx7ZJdl8uxNqKWxbgi
+jRmooWASAUUcJJfr+FmE3r+qkl2ZjWu7Tr3/3cPRb7qoXAsrQYMi1Z20W5CvVhRt
+kMcOtJRPW3k/3o5ChwUciZoHvU05bb5KOMGmrdaj4hs85HYrvhywO5m+nNH6DKb7
+Hy5YGwzzZJPtyEUc67n5hGkQqbllyAXw8fTDm18cxYohW60zx8T/kY912R4NRYBf
+bt0GzIYAHwSRE4niINxXdR70cYY4ufh3Cv9vmD29tQVk65EfuZQyPSuTTaCpqqe6
+s8sfCoI4wj6vTuBpeSWEUSEwlyD1A4sFPhKHxehLaMi9SsCgZmpCJcAvjQ2/d2Xi
+kJ199l7Ij18qXe3+lOu3ha4X4Bk8pwz0yW/DDoLuR8tqUvOdca/8CJGXEvk2FyAP
+uapmP3ednQaXA3lDfMX/Bf0Zx75NKmocTrt9RXpKBA+bTXO3FNM=
+=FTDb
 -----END PGP SIGNATURE-----
 
---sDKAb4OeUBrWWL6P--
+--Cy+5HEalSgyXkpVS--
 
