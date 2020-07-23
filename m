@@ -2,97 +2,82 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5537DC433E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 11:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D771C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 11:31:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21F97206F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 11:19:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uRSrXdGA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21F97206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4303D20709
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 11:31:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4303D20709
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyZFw-0004C5-A4
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 07:19:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35918)
+	id 1jyZS7-00086n-Ff
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 07:31:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jyZFM-0003kd-Lq
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 07:18:44 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43429)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jyZRJ-0007i4-A8
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 07:31:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49402)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jyZFL-0006ok-Aj
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 07:18:44 -0400
-Received: by mail-wr1-x441.google.com with SMTP id a15so4770576wrh.10
- for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 04:18:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=aLvcWRQgITp382d3UZsBk/qwMeXtqhkfan9BdjQD9e0=;
- b=uRSrXdGAwwkbm0c65poMcgCA38J0C+Dpse5N6Ynud0In8plzfHPtKrLIM+bFo5Wf31
- fPDxanjQI5zWgNg2702dlYbCAW0996+OX17wo29m6Mo/mWhAKJlBRZFNj5h/VvG/0bIb
- Zkqrf5w22x/zN6iq88xUEX1ArxRKzZNnjn7AvpvhPaTdcijd9hoT1PSojCE4+G7uZ3aX
- ncdAei2BVE5dq/UjdBiJuiCwm4cwFULJokG+rBYMTZWYI6QDF7ZzHhCO5QnWybO+osnO
- nSI7l4h6hGlVqk7fyF4jGmpfDTe8wizACGnQmOFG1BLumnx/+oj6XwpZH8kpFXb9gZqr
- lgug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=aLvcWRQgITp382d3UZsBk/qwMeXtqhkfan9BdjQD9e0=;
- b=MsZjnm5+dba5MFhf9rnlRz0/APLDz+JNGbuODTAb+s2Bad/fU1K6ufHchQ5pkcYF2A
- DcKK5nMN8PW95kObCL1ywa5iinmr5pQ9mCjNKs6CwB/a2voOpJSlOnh3tbuBybazAqlq
- 8KDRsXqsVBMmTVqbB1UFvvilVmOElB5pVCa83fst3BOqLJs3TP85s2g8cwkoGXihHuQD
- OAxRjf94QIuIvPAQBXQrI3XS8/DXuZn5WU/U4dXhSQEareHYu/AXEZegVKVcGkrb5QKB
- NXm1mdR4VHcnKbXTJDyb983bdG4ysnvAv0UpB4D11SLzFmGFvhWFLdkqNMUqUSYWEyrz
- 1STA==
-X-Gm-Message-State: AOAM5333yRHwFHgNpL6bB7fqsArdw0uNiuvFGzYCIKz15Txa94EQ6lr4
- 6IfQgcbMEXCR4OYt0vZfIf7GQ/h4XXs=
-X-Google-Smtp-Source: ABdhPJz8nRcT4XOIe5xlFdthVCKTYNWjSU/n2FBtN5eZMsyfxPIhnQM9qg5cjhpD35KT1lza4q3P+g==
-X-Received: by 2002:adf:f08a:: with SMTP id n10mr3811456wro.351.1595503121024; 
- Thu, 23 Jul 2020 04:18:41 -0700 (PDT)
-Received: from localhost.localdomain
- (138.red-83-57-170.dynamicip.rima-tde.net. [83.57.170.138])
- by smtp.gmail.com with ESMTPSA id y84sm3261917wmg.38.2020.07.23.04.18.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Jul 2020 04:18:40 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1?] exec/memory: Fix memory_region_init_alias()
- documentation
-Date: Thu, 23 Jul 2020 13:18:38 +0200
-Message-Id: <20200723111838.32398-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jyZRG-0001Ny-Hc
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 07:31:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jyZRE-0002b5-37
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 11:31:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id F29A92E80F0
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 11:30:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Jul 2020 11:24:15 -0000
+From: Nirman Narang <1886793@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: laurent-vivier nirmannarang
+X-Launchpad-Bug-Reporter: Nirman Narang (nirmannarang)
+X-Launchpad-Bug-Modifier: Nirman Narang (nirmannarang)
+References: <159420215057.30952.7191975282964377029.malonedeb@wampee.canonical.com>
+Message-Id: <159550345547.21570.2854548836110406415.malone@soybean.canonical.com>
+Subject: [Bug 1886793] Re: "go install" command fails while running inside
+ s390x docker container on x86_64 host using qemu
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="f877c5162b568393e2d07ce948459ba0abc456fe";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3a792e265667552266a40a19a0f64349a753c030
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 07:31:00
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -101,37 +86,265 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1886793 <1886793@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The @size argument refers to the size of the aliased
-section, not the original region.
+I ran the following commands:
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/exec/memory.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+#apt install debootstrap
+#debootstrap_dir=3Ddebootstrap
+#debootstrap --arch=3Ds390x --foreign sid "$debootstrap_dir"
+#sudo mkdir -p "${debootstrap_dir}/usr/bin"
+#sudo cp "$(which qemu-s390x-static)" "${debootstrap_dir}/usr/bin"
+#sudo cp "$(which qemu-s390x)" "${debootstrap_dir}/usr/bin"
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 307e527835..10a809ee10 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -980,8 +980,8 @@ void memory_region_init_ram_device_ptr(MemoryRegion *mr,
-  * @name: used for debugging; not visible to the user or ABI
-  * @orig: the region to be referenced; @mr will be equivalent to
-  *        @orig between @offset and @offset + @size - 1.
-- * @offset: start of the section in @orig to be referenced.
-- * @size: size of the region.
-+ * @offset: start of the section in @orig.
-+ * @size: size of the section in @orig.
-  */
- void memory_region_init_alias(MemoryRegion *mr,
-                               struct Object *owner,
--- 
-2.21.3
+All commands above were successful except below one:
 
+#sudo chroot "$debootstrap_dir" /debootstrap/debootstrap --second-stage
+Gave following error:
+W: Failure trying to run:  dpkg --force-depends --install /var/cache/apt/ar=
+chives/base-passwd_3.5.47_s390x.deb
+W: See //debootstrap/debootstrap.log for details (possibly the package libg=
+cc1 is at fault)
+
+Anyway, I proceeded:
+# uname -m
+s390x
+
+# apt install golang-go
+Reading package lists... Done
+Building dependency tree... Done
+You might want to run 'apt --fix-broken install' to correct these.
+The following packages have unmet dependencies:
+ dpkg : Conflicts: dpkg:none
+ dpkg:none : Conflicts: dpkg but 1.20.5 is to be installed
+ golang-go : Depends: golang-1.14-go but it is not going to be installed
+             Depends: golang-src (>=3D 2:1.14~2) but it is not going to be =
+installed
+ libgcc1 : Depends: gcc-10-base (=3D 10.1.0-1) but 10.1.0-6+b1 is to be ins=
+talled
+E: Unmet dependencies. Try 'apt --fix-broken install' with no packages (or =
+specify a solution).
+
+# apt --fix-broken install
+Reading package lists... Done
+Building dependency tree... Done
+Correcting dependencies... Done
+The following packages will be REMOVED:
+  dpkg:none libgcc1
+0 upgraded, 0 newly installed, 2 to remove and 0 not upgraded.
+1 not fully installed or removed.
+After this operation, 85.0 kB disk space will be freed.
+Do you want to continue? [Y/n] y
+perl: warning: Setting locale failed.
+perl: warning: Please check that your locale settings:
+        LANGUAGE =3D (unset),
+        LC_ALL =3D (unset),
+        LANG =3D "en_US.UTF-8"
+    are supported and installed on your system.
+perl: warning: Falling back to the standard locale ("C").
+/usr/bin/locale: Cannot set LC_CTYPE to default locale: No such file or dir=
+ectory
+/usr/bin/locale: Cannot set LC_MESSAGES to default locale: No such file or =
+directory
+/usr/bin/locale: Cannot set LC_ALL to default locale: No such file or direc=
+tory
+dpkg: error: parsing file '/var/lib/dpkg/status' near line 3918 package 'dp=
+kg':
+ duplicate value for 'Package' field
+E: Sub-process dpkg --set-selections returned an error code (2)
+E: Couldn't record the approved state changes as dpkg selection states
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1886793
+
+Title:
+  "go install" command fails while running inside s390x docker container
+  on x86_64 host using qemu
+
+Status in QEMU:
+  New
+
+Bug description:
+  Steps to reproduce the issue:
+
+  Register x86_64 host with the latest qemu-user-static.
+  docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+  Build the following Docker Image using following Dockerfile.s390x
+  using command docker build -t test/crossbuild:latest-s390x -f
+  Dockerfile.s390x .
+
+  Dockerfile.s390x
+
+  ##############################################
+  FROM alpine:3.11 as qemu
+  ARG QEMU_VERSION=3D5.0.0-2
+  ARG QEMU_ARCHS=3D"s390x"
+  RUN apk --update add curl
+  #Enable non-native runs on amd64 architecture hosts
+  RUN for i in ${QEMU_ARCHS}; do curl -L https://github.com/multiarch/qemu-=
+user-static/releases/download/v${QEMU_VERSION}/qemu-${i}-static.tar.gz | ta=
+r zxvf - -C /usr/bin; done
+  RUN chmod +x /usr/bin/qemu-*
+
+  FROM s390x/golang:1.14.2-alpine3.11
+  MAINTAINER LoZ Open Source Ecosystem (https://www.ibm.com/developerworks/=
+community/groups/community/lozopensource)
+
+  ARG MANIFEST_TOOL_VERSION=3Dv1.0.2
+
+  #Enable non-native builds of this image on an amd64 hosts.
+  #This must be the first RUN command in this file!
+  COPY --from=3Dqemu /usr/bin/qemu-*-static /usr/bin/
+
+  #Install su-exec for use in the entrypoint.sh (so processes run as the ri=
+ght user)
+  #Install bash for the entry script (and because it's generally useful)
+  #Install curl to download glide
+  #Install git for fetching Go dependencies
+  #Install ssh for fetching Go dependencies
+  #Install mercurial for fetching go dependencies
+  #Install wget since it's useful for fetching
+  #Install make for building things
+  #Install util-linux for column command (used for output formatting).
+  #Install grep and sed for use in some Makefiles (e.g. pulling versions ou=
+t of glide.yaml)
+  #Install shadow for useradd (it allows to use big UID)
+  RUN apk update && apk add --no-cache su-exec curl bash git openssh mercur=
+ial make wget util-linux tini file grep sed shadow
+  RUN apk upgrade --no-cache
+
+  #Disable ssh host key checking
+  RUN echo 'Host *' >> /etc/ssh/ssh_config \
+  =C2=A0=C2=A0&& echo '    StrictHostKeyChecking no' >> /etc/ssh/ssh_config
+
+  #Disable cgo so that binaries we build will be fully static.
+  ENV CGO_ENABLED=3D0
+
+  #Recompile the standard library with cgo disabled.  This prevents the sta=
+ndard library from being
+  #marked stale, causing full rebuilds every time.
+  RUN go install -v std
+
+  #Install glide
+  RUN go get github.com/Masterminds/glide
+  ENV GLIDE_HOME /home/user/.glide
+
+  #Install dep
+  RUN go get github.com/golang/dep/cmd/dep
+
+  #Install ginkgo CLI tool for running tests
+  RUN go get github.com/onsi/ginkgo/ginkgo
+
+  #Install linting tools.
+  RUN wget -O - -q https://install.goreleaser.com/github.com/golangci/golan=
+gci-lint.sh | sh -s v1.20.0
+  RUN golangci-lint --version
+
+  #Install license checking tool.
+  RUN go get github.com/pmezard/licenses
+
+  #Install tool to merge coverage reports.
+  RUN go get github.com/wadey/gocovmerge
+
+  #Install CLI tool for working with yaml files
+  RUN go get github.com/mikefarah/yaml
+
+  #Delete all the Go sources that were downloaded, we only rely on the bina=
+ries
+  RUN rm -rf /go/src/*
+
+  #Install vgo (should be removed once we take Go 1.11)
+  RUN go get -u golang.org/x/vgo
+
+  #Ensure that everything under the GOPATH is writable by everyone
+  RUN chmod -R 777 $GOPATH
+
+  RUN curl -sSL https://github.com/estesp/manifest-tool/releases/download/$=
+{MANIFEST_TOOL_VERSION}/manifest-tool-linux-s390x > manifest-tool && \
+  =C2=A0=C2=A0=C2=A0=C2=A0chmod +x manifest-tool && \
+  =C2=A0=C2=A0=C2=A0=C2=A0mv manifest-tool /usr/bin/
+
+  COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+  ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+  ##################################################################
+
+  =
+
+  The build just hangs at RUN go install -v std
+
+
+  Also, while running the same command inside s390x container on x86_64
+  host, error Illegal instruction (core dumped) is thrown.
+
+  Register x86_64 host with the latest qemu-user-static.
+  docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+  docker run -it -v /home/test/qemu-s390x-static:/usr/bin/qemu-s390x-
+  static s390x/golang:1.14.2-alpine3.11
+
+  Inside s390x container:
+
+  apk update && apk add --no-cache su-exec curl bash git openssh mercurial =
+make wget util-linux tini file grep sed shadow
+  apk upgrade --no-cache
+
+  #Disable cgo so that binaries we build will be fully static.
+  export CGO_ENABLED=3D0
+  go install -v std
+
+  =
+
+  This gives the following error:
+  Illegal instruction (core dumped)
+
+  =
+
+  Environment:
+  x86_64 Ub18.04 4.15.0-101-generic Ubuntu SMP x86_64 GNU/Linux
+
+  QEMU user static version: 5.0.0-2
+
+  Container application: Docker
+
+  Client: Docker Engine - Community
+  =C2=A0Version:           19.03.11
+  =C2=A0API version:       1.40
+  =C2=A0Go version:        go1.13.10
+  =C2=A0Git commit:        42e35e61f3
+  =C2=A0Built:             Mon Jun  1 09:12:22 2020
+  =C2=A0OS/Arch:           linux/amd64
+  =C2=A0Experimental:      false
+
+  Server: Docker Engine - Community
+  =C2=A0Engine:
+  =C2=A0=C2=A0Version:          19.03.11
+  =C2=A0=C2=A0API version:      1.40 (minimum version 1.12)
+  =C2=A0=C2=A0Go version:       go1.13.10
+  =C2=A0=C2=A0Git commit:       42e35e61f3
+  =C2=A0=C2=A0Built:            Mon Jun  1 09:10:54 2020
+  =C2=A0=C2=A0OS/Arch:          linux/amd64
+  =C2=A0=C2=A0Experimental:     false
+  =C2=A0containerd:
+  =C2=A0=C2=A0Version:          1.2.13
+  =C2=A0=C2=A0GitCommit:        7ad184331fa3e55e52b890ea95e65ba581ae3429
+  =C2=A0runc:
+  =C2=A0=C2=A0Version:          1.0.0-rc10
+  =C2=A0=C2=A0GitCommit:        dc9208a3303feef5b3839f4323d9beb36df0a9dd
+  =C2=A0docker-init:
+  =C2=A0=C2=A0Version:          0.18.0
+  =C2=A0=C2=A0GitCommit:        fec3683
+
+  Additional information optionally:
+  When I build the same Dockerfile.s390x on an s390x machine, it is built s=
+uccessfully.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1886793/+subscriptions
 
