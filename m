@@ -7,84 +7,83 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B91FFC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC76BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 858A32065F
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:50:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A16F6206E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:51:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+0KgDzX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 858A32065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q0e8UqC1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A16F6206E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyfMI-0002Va-PT
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:50:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43426)
+	id 1jyfMx-0003SV-TW
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:51:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jyfJ3-0005Kq-7x
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:46:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21639
+ id 1jyfJT-00061L-Bj
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:47:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34929
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jyfJ1-0004Bc-Dr
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:46:56 -0400
+ id 1jyfJR-0004Er-Bu
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:47:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595526414;
+ s=mimecast20190719; t=1595526440;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Vh5y6IxFHd1mghC1947BBUvp4rrSDNgO8cJkedJIYaE=;
- b=h+0KgDzXtJi2Vo8l+NCfDFvUuCNWGSjAIjtZjuCR2KlAhFhLeHQY61ggorgsVuY1FX05To
- +sMVUEAf36MrLsaH3EWWfykybfGbPIJdXt9Kw0JdcKlpQgUH9H63d9YhkqgWXIYdvV3K5D
- 3wRV75ROm5PDGeldNC5z2w1PBlsAFv0=
+ bh=cuN2A5nVv8qvcFglG8w7xF0+KQS4lEX4mWOf4HwsCvo=;
+ b=Q0e8UqC1k7Qbv2ZA5ZatGxI+ZEwgdolnTZDcJMMybyInaSWWwg+8l/dR9ggF8sjemZUzcK
+ H5bvvjLRU/1mR1SqPFj1xstzKW+CAWeN4RkTab9x4OnzwoXMm67hINvjkrDo6yfBogHSbn
+ VBimd1xdxLQogXQkH5PWLfj4SbzyxDc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-yUFXwX8qMN6cqWRTQ9Qgug-1; Thu, 23 Jul 2020 13:46:50 -0400
-X-MC-Unique: yUFXwX8qMN6cqWRTQ9Qgug-1
+ us-mta-171-maXPm4E5NV2dFEmUye3rgw-1; Thu, 23 Jul 2020 13:47:12 -0400
+X-MC-Unique: maXPm4E5NV2dFEmUye3rgw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C86C480183C;
- Thu, 23 Jul 2020 17:46:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4A64106B204;
+ Thu, 23 Jul 2020 17:47:11 +0000 (UTC)
 Received: from turbo.com (ovpn-113-141.ams2.redhat.com [10.36.113.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4071E69316;
- Thu, 23 Jul 2020 17:46:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF39769327;
+ Thu, 23 Jul 2020 17:47:03 +0000 (UTC)
 From: Christophe de Dinechin <dinechin@redhat.com>
 To: qemu-devel@nongnu.org,
 	kraxel@redhat.com
-Subject: [PATCH 2/7] build: fix device module builds
-Date: Thu, 23 Jul 2020 19:46:10 +0200
-Message-Id: <20200723174615.2370096-3-dinechin@redhat.com>
+Subject: [PATCH 6/7] build: Add SPICE_CFLAGS and SPICE_LIBS to relevant files
+Date: Thu, 23 Jul 2020 19:46:14 +0200
+Message-Id: <20200723174615.2370096-7-dinechin@redhat.com>
 In-Reply-To: <20200723174615.2370096-1-dinechin@redhat.com>
 References: <20200723174615.2370096-1-dinechin@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dinechin@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dinechin@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dinechin@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 06:04:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:13:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,63 +107,104 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+Instead of adding the spice build flags to the top-level build
+options, add them where they are necessary. This is a step to move the
+burden of linking with spice libraries away from the top-level qemu.
 
-See comment.  Feels quite hackish.  Better ideas anyone?
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
 ---
- dtc           | 2 +-
- roms/SLOF     | 2 +-
- roms/openbios | 2 +-
- roms/opensbi  | 2 +-
- roms/seabios  | 2 +-
- slirp         | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+ configure                | 4 ++--
+ hw/display/Makefile.objs | 1 +
+ hw/i386/pc.c             | 1 -
+ monitor/Makefile.objs    | 3 +++
+ softmmu/Makefile.objs    | 2 +-
+ ui/Makefile.objs         | 4 ++--
+ 6 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/dtc b/dtc
-index 85e5d83984..88f18909db 160000
---- a/dtc
-+++ b/dtc
-@@ -1 +1 @@
--Subproject commit 85e5d839847af54efab170f2b1331b2a6421e647
-+Subproject commit 88f18909db731a627456f26d779445f84e449536
-diff --git a/roms/SLOF b/roms/SLOF
-index e18ddad851..9546892a80 160000
---- a/roms/SLOF
-+++ b/roms/SLOF
-@@ -1 +1 @@
--Subproject commit e18ddad8516ff2cfe36ec130200318f7251aa78c
-+Subproject commit 9546892a80d5a4c73deea6719de46372f007f4a6
-diff --git a/roms/openbios b/roms/openbios
-index 75fbb41d28..7e5b89e429 160000
---- a/roms/openbios
-+++ b/roms/openbios
-@@ -1 +1 @@
--Subproject commit 75fbb41d2857d93208c74a8e0228b29fd7bf04c0
-+Subproject commit 7e5b89e4295063d8eba55b9c8ce8bc681c2d129a
-diff --git a/roms/opensbi b/roms/opensbi
-index 9f1b72ce66..be92da280d 160000
---- a/roms/opensbi
-+++ b/roms/opensbi
-@@ -1 +1 @@
--Subproject commit 9f1b72ce66d659e91013b358939e832fb27223f5
-+Subproject commit be92da280d87c38a2e0adc5d3f43bab7b5468f09
-diff --git a/roms/seabios b/roms/seabios
-index 88ab0c1552..f21b5a4aeb 160000
---- a/roms/seabios
-+++ b/roms/seabios
-@@ -1 +1 @@
--Subproject commit 88ab0c15525ced2eefe39220742efe4769089ad8
-+Subproject commit f21b5a4aeb020f2a5e2c6503f906a9349dd2f069
-diff --git a/slirp b/slirp
-index 2faae0f778..126c04acba 160000
---- a/slirp
-+++ b/slirp
-@@ -1 +1 @@
--Subproject commit 2faae0f778f818fadc873308f983289df697eb93
-+Subproject commit 126c04acbabd7ad32c2b018fe10dfac2a3bc1210
+diff --git a/configure b/configure
+index 054aab31be..86fc03699a 100755
+--- a/configure
++++ b/configure
+@@ -5223,8 +5223,6 @@ EOF
+      $pkg_config --atleast-version=0.12.3 spice-protocol && \
+      compile_prog "$spice_cflags" "$spice_libs" ; then
+     spice="yes"
+-    libs_softmmu="$libs_softmmu $spice_libs"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $spice_cflags"
+     spice_protocol_version=$($pkg_config --modversion spice-protocol)
+     spice_server_version=$($pkg_config --modversion spice-server)
+   else
+@@ -7535,6 +7533,8 @@ fi
+ 
+ if test "$spice" = "yes" ; then
+   echo "CONFIG_SPICE=m" >> $config_host_mak
++  echo "SPICE_CFLAGS=$spice_cflags" >> $config_host_mak
++  echo "SPICE_LIBS=$spice_libs" >> $config_host_mak
+ fi
+ 
+ if test "$smartcard" = "yes" ; then
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index d619594ad4..3963fd1dcd 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -47,6 +47,7 @@ obj-$(CONFIG_VGA) += vga.o
+ ifeq ($(CONFIG_QXL),y)
+ common-obj-m += qxl.mo
+ qxl.mo-objs = qxl.o qxl-logger.o qxl-render.o
++qxl.mo-cflags += $(SPICE_CFLAGS)
+ endif
+ 
+ common-obj-$(CONFIG_VIRTIO_GPU) += virtio-gpu-base.o virtio-gpu.o virtio-gpu-3d.o
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 3d419d5991..9f28a91df9 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -64,7 +64,6 @@
+ #include "kvm_i386.h"
+ #include "hw/xen/xen.h"
+ #include "hw/xen/start_info.h"
+-#include "ui/qemu-spice.h"
+ #include "exec/memory.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/arch_init.h"
+diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
+index a8533c9dd7..fd58d80195 100644
+--- a/monitor/Makefile.objs
++++ b/monitor/Makefile.objs
+@@ -2,5 +2,8 @@ obj-y += misc.o
+ common-obj-y += monitor.o qmp.o hmp.o
+ common-obj-y += qmp-cmds.o qmp-cmds-control.o
+ common-obj-y += hmp-cmds.o
++qmp-cmds.o-cflags += $(SPICE_CFLAGS)
++hmp-cmds.o-cflags += $(SPICE_CFLAGS)
++misc.o-cflags += $(SPICE_CFLAGS)
+ 
+ storage-daemon-obj-y += monitor.o qmp.o qmp-cmds-control.o
+diff --git a/softmmu/Makefile.objs b/softmmu/Makefile.objs
+index a414a74c50..4e36ff47a2 100644
+--- a/softmmu/Makefile.objs
++++ b/softmmu/Makefile.objs
+@@ -11,4 +11,4 @@ obj-y += memory_mapping.o
+ obj-y += qtest.o
+ 
+ obj-y += vl.o
+-vl.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS)
++vl.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS) $(SPICE_CFLAGS)
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+index 1ab515e23d..6a6fda2f06 100644
+--- a/ui/Makefile.objs
++++ b/ui/Makefile.objs
+@@ -57,8 +57,8 @@ spice-app.mo-objs += spice-core.o spice-input.o spice-display.o
+ ifeq ($(CONFIG_GIO)$(CONFIG_SPICE),ym)
+ spice-app.mo-objs += spice-app.o
+ endif
+-spice-app.mo-cflags := $(GIO_CFLAGS)
+-spice-app.mo-libs := $(GIO_LIBS)
++spice-app.mo-cflags := $(GIO_CFLAGS) $(SPICE_CFLAGS)
++spice-app.mo-libs := $(GIO_LIBS) $(SPICE_LIBS)
+ 
+ common-obj-$(CONFIG_OPENGL) += shader.o
+ common-obj-$(CONFIG_OPENGL) += console-gl.o
 -- 
 2.26.2
 
