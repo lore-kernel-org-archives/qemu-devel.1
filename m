@@ -2,125 +2,150 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65411C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F97BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:54:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30CA02071A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:53:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="m0l0KBm8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30CA02071A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6E5032071A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 15:54:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E5032071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jydWs-0005Bc-Gv
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 11:53:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40806)
+	id 1jydXz-0006Ew-O8
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 11:54:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jydVY-0003dn-Q0; Thu, 23 Jul 2020 11:51:45 -0400
-Received: from mail-vi1eur05on2127.outbound.protection.outlook.com
- ([40.107.21.127]:56289 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jydWN-00050s-IV; Thu, 23 Jul 2020 11:52:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39304)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jydVV-00057U-6R; Thu, 23 Jul 2020 11:51:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TmwnacxYIzwo/MGVOqcbz5NogQG9HSxHpSgYg4aTJ8y6ciC4zzbf1MSLmIGXA2iycOfFsKuyPNvKKhK3e/AkM1r5ph80vObmPOWAdoLtahUp29Doh0yH1Z5VFU7v1utS24486F2q+AX5XTWF77bKAKirz9jSFyTrQ46t0A1HyZZLiCkDV+YY5t9fq5978Wc4zaJMgglir/LcPb2fKHihJl+63R9NVSUpD+YI6K2kKu8thD22qI+mG4O/ebxxAiE6q+/NctjJpfi27u81ovi4MdxEH07IQAKsxNuOMzsLVYLnbgyMBqJa1albjpLLGyc9viooMBHr03xzEZO+2ye3Jg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LldV9IB+k4FahNaMapfdVfXh986ElA8CCkS6AmUcJsg=;
- b=enUYLBbrpxCpUHBQiEQv5N5B+rpaX2zy3vGcp5KAszJ0xSbzwjl3/6VQZbZRkSCteje68QeD9MEtDq3zs9phRqGUydLgLfow0lN4z45mT2n/kjVC/awdi+9dOwEycCckJ7n+A/lCBRFAagbW/KR/AyV75+AcM5XJ9zxOwVRxHFTbmjEKZrFZfAHeE6XGau2C2/Yc/KknCT7T61r+XYxyKCLEkHNWfiuPbeu46kbG6JRVKkyEuq01+6nc+8O6h9AOt/i4nReKS4y4TdpkvDJFMBC3fNPo38KVRy0dmos9Yg/7laZFm6B03yMfxb+Yt66c8YMfImdR8URd2Sqbz7MPwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LldV9IB+k4FahNaMapfdVfXh986ElA8CCkS6AmUcJsg=;
- b=m0l0KBm8ttQAFUE2JBaP6fqngxmFsUpbmGPKoqVTH8ysNT3ghepxQ7oJPeeE0qFpeduq0/oDXaaLiDibbDuSgRCRK+2eTaoHxVwmn0MYj5VhhD8yvPrxQZzy2PrkQOwhzrGtJ0AQxv4X3V0Nfe187q9DIe9X5TFqmUVQ/KZ4Oew=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM5PR0802MB2611.eurprd08.prod.outlook.com (2603:10a6:203:a2::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23; Thu, 23 Jul
- 2020 15:51:37 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3195.028; Thu, 23 Jul 2020
- 15:51:37 +0000
-Subject: Re: [PATCH v7 34/47] backup: Deal with filters
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-35-mreitz@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <be4213b2-75b9-c1e1-69d6-171d704013ea@virtuozzo.com>
-Date: Thu, 23 Jul 2020 18:51:30 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <20200625152215.941773-35-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-X-ClientProxiedBy: FR2P281CA0027.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:14::14) To AM6PR08MB4070.eurprd08.prod.outlook.com
- (2603:10a6:20b:a3::25)
+ (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
+ id 1jydWL-00059x-68; Thu, 23 Jul 2020 11:52:35 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06NFWKxT038378; Thu, 23 Jul 2020 11:52:30 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32fb9b5g9k-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 23 Jul 2020 11:52:29 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06NFXAIt041995;
+ Thu, 23 Jul 2020 11:52:29 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.107])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32fb9b5g8s-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 23 Jul 2020 11:52:29 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+ by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06NFoEJw000576;
+ Thu, 23 Jul 2020 15:52:27 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma03fra.de.ibm.com with ESMTP id 32brq83ef3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 23 Jul 2020 15:52:27 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06NFqOgf25559296
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 23 Jul 2020 15:52:24 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8962E42047;
+ Thu, 23 Jul 2020 15:52:24 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 290514204B;
+ Thu, 23 Jul 2020 15:52:24 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.153.116])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 23 Jul 2020 15:52:24 +0000 (GMT)
+Subject: Re: [PATCH 1/1] s390x/protvirt: allow to IPL secure execution guests
+ with -no-reboot
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200721103202.30610-1-borntraeger@de.ibm.com>
+ <ecec58d9-4b9c-c677-e2d2-ca3cf0632530@linux.ibm.com>
+ <d2d0d040-3fa9-df7b-eb05-8a5906212486@de.ibm.com>
+ <20200723170515.4e2ee21e.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Message-ID: <3d824693-1442-07aa-b414-a8af7c718a22@de.ibm.com>
+Date: Thu, 23 Jul 2020 17:52:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.82) by
- FR2P281CA0027.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3239.10 via Frontend Transport; Thu, 23 Jul 2020 15:51:35 +0000
-X-Originating-IP: [109.252.114.82]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4cf4a9dd-267c-420d-42ce-08d82f20487e
-X-MS-TrafficTypeDiagnostic: AM5PR0802MB2611:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0802MB26116B4CB4200746C47BF7FAF4760@AM5PR0802MB2611.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rffGCvrsPVQ+DUBFHKBIGnaY3GNb9beDuXZ9mHQxDxSWWVVH9yBeVxgQ1TV93h7OxHsn6L3V8whWF0MNmBS3OtmcTVPcnadNqPLCeIwtZXKyuqcl07r3c3428JrhwKoj92oC8ecFc3nX1I+v2DTonHTr3iaRq1BxWjjMTTUl3+XmrtLYlRF+FFeO9f6ZBlkGHwku40LYfBTa7etS9aylfEWPbxfwKCK6xoiFSowf5HOHSk+Uy7iKaOGAfn/0l0XT8r1t6PLV1jC9sJQI1PKIHQIXZJMXX+/GK/ZdFp7ejxOE1wr84tKa1DgMux7IPs2g3NGY3HBg04KeG0vSFIqRWV6KaOlRqBqXJi/ti9IJVpc71A2OZjs+zJnkwDAWGBMR
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(136003)(376002)(346002)(39840400004)(366004)(396003)(4326008)(6666004)(31686004)(66556008)(66476007)(36756003)(5660300002)(52116002)(44832011)(66946007)(956004)(8676002)(6506007)(2616005)(6486002)(478600001)(54906003)(31696002)(316002)(86362001)(186003)(16526019)(8936002)(26005)(2906002)(83380400001)(6512007)(53546011)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: g8/H/NzorTEoeImPDdShWYljAj9GxMAme9pYXXP9jAPgvC6V2ChyC5XBZdQftL2SaJabLMpsH11M5f7w6iwegk6xtgmIB1yDdVHTkHh8gere7/FHWeQ6m+N1vssA1Xka3C0jTiGo4s9PPli4o5F8uK4LNj5iM2pmBlLP2kM1BzwQOHcxKOzPV4DlT6lH2flB8/PMQY3AbkMJpyUOym9vagpvFe69EsO018foaH8OoU9i+fpnoWPla/mPNqquAz0cPHB9wO6tpGRcIK7qJq7fAUfyF/teEStRx0vGIul1XkYCwTvU4N9R+3X26k5lvBPfOmGgcnV3W/mNS9HmGREZhjFDlA95vXGlq0yO8Gso03Pqvi7Hf6eTyczSvYbn2AFqNMq+cajlxWZNZAppgTrF3bbUaATE5GCrAwToYIZ2dRgDo/INofGWWT0fXUNxJUBcvY/Fvqg8RaQMP61O57FhBRDj3IYdSEBROHs2QBMW9kLM6Oa7eV5JhfwxbYVRE1ce
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4cf4a9dd-267c-420d-42ce-08d82f20487e
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2020 15:51:37.6407 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: joU6ikqIcsSETSkXWNlLPpDvleRJjdt3NFgExCLop5MN/ck/Y/0+3O+LbJ/1hdurhbK7kopSdQR/XeunvhzMm/J3g5yqmikglvGXsGAQ9EM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2611
-Received-SPF: pass client-ip=40.107.21.127;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 11:51:38
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <20200723170515.4e2ee21e.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-23_08:2020-07-23,
+ 2020-07-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 mlxscore=0
+ mlxlogscore=999 lowpriorityscore=0 clxscore=1015 spamscore=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 adultscore=0 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007230113
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=borntraeger@de.ibm.com; helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 10:22:03
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,52 +158,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25.06.2020 18:22, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   block/backup-top.c |  2 +-
->   block/backup.c     |  9 +++++----
->   blockdev.c         | 19 +++++++++++++++----
->   3 files changed, 21 insertions(+), 9 deletions(-)
->
->
-> diff --git a/block/backup.c b/block/backup.c
-> index 4f13bb20a5..9afa0bf3b4 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -297,6 +297,7 @@ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
->   {
->       int ret;
->       BlockDriverInfo bdi;
-> +    bool target_does_cow = bdrv_backing_chain_next(target);
->   
 
 
-Wouldn't it better to make the explicit type conversion or use "!!" 
-approach?
+On 23.07.20 17:05, Cornelia Huck wrote:
+> On Tue, 21 Jul 2020 14:29:29 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> On 21.07.20 14:25, Janosch Frank wrote:
+>>> On 7/21/20 12:32 PM, Christian Borntraeger wrote:  
+>>>> Right now -no-reboot does prevent secure execution guests from running.  
+>>>
+>>> s/-no-reboot/--no-reboot/  
+>>
+>> Actually qemu --help gives the parameters with just one "-"
+>>
+>>
+>> Not sure about secure vs protected. Whatever Conny prefers.
+> 
+> The doc seems to talk about "protected virtualization", "protected
+> mode", and "secure guests". What about (slight rewording):
+> 
+> "s390x/protvirt: allow to IPL secure guests with -no-reboot
+> 
+> Right now, -no-reboot prevents secure guests from running. This is
+> correct from an implementation point of view, as we have modeled the
+> transition from non-secure to secure as a program directed IPL. From a
+> user perspective, this is not the behavior of least surprise.
+> 
+> We should implement the IPL into protected mode similar to the functions
+> that we use for kdump/kexec. In other words, we do not stop here when
+> -no-reboot is specified on the command line. Like function 0 or function
+> 1, function 10 is not a classic reboot. For example, it can only be called
+> once. Before calling it a second time, a real reboot/reset must happen
+> in-between. So function code 10 is more or less a state transition
+> reset, but not a "standard" reset or reboot."
+> 
+> I think this is still appropriate for hard freeze.
 
-Andrey
-
-
->       /*
->        * If there is no backing file on the target, we cannot rely on COW if our
-> @@ -304,7 +305,7 @@ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
->        * targets with a backing file, try to avoid COW if possible.
->        */
->       ret = bdrv_get_info(target, &bdi);
-> -    if (ret == -ENOTSUP && !target->backing) {
-> +    if (ret == -ENOTSUP && !target_does_cow) {
->           /* Cluster size is not defined */
-
-...
-
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-
-
+i agree. Can you pick this up and fixup the patch description according to
+your preference? Your proposal looks fine. 
 
