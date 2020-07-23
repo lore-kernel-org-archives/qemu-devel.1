@@ -2,80 +2,58 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	CHARSET_FARAWAY_HEADER,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C790C433E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 14:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE23C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 14:34:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E535420771
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 14:30:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E535420771
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id D2C2120771
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 14:33:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2C2120771
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jycF8-0002cK-2f
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 10:30:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45726)
+	id 1jycIJ-00052R-3d
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 10:33:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <king.wang@huawei.com>)
- id 1jycEH-0001Xx-Uw
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 10:29:49 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2471 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <a.lauterer@proxmox.com>)
+ id 1jycHK-0004DB-AS
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 10:32:58 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:26993)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <king.wang@huawei.com>)
- id 1jycED-00076I-SG
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 10:29:49 -0400
-Received: from nkgeml706-chm.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id 965EE510DBDE35DEEF72;
- Thu, 23 Jul 2020 22:29:37 +0800 (CST)
-Received: from dggema763-chm.china.huawei.com (10.1.198.205) by
- nkgeml706-chm.china.huawei.com (10.98.57.153) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.1913.5; Thu, 23 Jul 2020 22:29:37 +0800
-Received: from dggema763-chm.china.huawei.com ([10.9.49.85]) by
- dggema763-chm.china.huawei.com ([10.9.49.85]) with mapi id 15.01.1913.007;
- Thu, 23 Jul 2020 22:29:36 +0800
-From: "Wangjing (Hogan, Cloud Infrastructure Service Product Dept.)"
- <king.wang@huawei.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIIHYxXSBody9wY2ktaG9zdDogc2F2ZS9yZXN0b3JlIHBj?=
- =?gb2312?Q?i_host_config_register?=
-Thread-Topic: [PATCH v1] hw/pci-host: save/restore pci host config register
-Thread-Index: AQHWYPA68aHRNmrveEmbvmzXYw8iJqkUmYGAgAAEdQCAAJsxMA==
-Date: Thu, 23 Jul 2020 14:29:36 +0000
-Message-ID: <5b45808d05384d72beae7915506301e4@huawei.com>
-References: <20200723125303.2390-1-king.wang@huawei.com>
- <20200723085516-mutt-send-email-mst@kernel.org>
- <20200723130923.GK2621@work-vm>
-In-Reply-To: <20200723130923.GK2621@work-vm>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.149.56]
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <a.lauterer@proxmox.com>)
+ id 1jycHI-00087G-5m
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 10:32:57 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id CA6114333E;
+ Thu, 23 Jul 2020 16:24:06 +0200 (CEST)
+To: qemu-devel <qemu-devel@nongnu.org>
+From: Aaron Lauterer <a.lauterer@proxmox.com>
+Subject: Possible regression with VGA and resolutions in Windows 10?
+Message-ID: <24909a16-be74-7516-b5c5-08bdc743a553@proxmox.com>
+Date: Thu, 23 Jul 2020 16:24:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.0.1
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.187; envelope-from=king.wang@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 10:29:38
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: 14
-X-Spam_score: 1.4
-X-Spam_bar: +
-X-Spam_report: (1.4 / 5.0 requ) BAYES_00=-1.9, CHARSET_FARAWAY_HEADER=3.2,
- MIME_CHARSET_FARAWAY=2.45, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=212.186.127.180;
+ envelope-from=a.lauterer@proxmox.com; helo=proxmox-new.maurer-it.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 10:24:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,174 +66,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jusual@redhat.com" <jusual@redhat.com>,
- "Wangxin \(Alexander\)" <wangxinxin.wang@huawei.com>,
- "Huangweidong \(C\)" <weidong.huang@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-V2FuZyBLaW5nIHdyb3RlOg0KPiAqIE1pY2hhZWwgUy4gVHNpcmtpbiAobXN0QHJlZGhhdC5jb20p
-IHdyb3RlOg0KPiA+IE9uIFRodSwgSnVsIDIzLCAyMDIwIGF0IDA4OjUzOjAzUE0gKzA4MDAsIFdh
-bmcgS2luZyB3cm90ZToNCj4gPiA+IEZyb206IEhvZ2FuIFdhbmcgPGtpbmcud2FuZ0BodWF3ZWku
-Y29tPg0KPiA+ID4gDQo+ID4gPiBUaGUgcGNpIGhvc3QgY29uZmlnIHJlZ2lzdGVyIGlzIHVzZWQg
-dG8gc2F2ZSBQQ0kgYWRkcmVzcyBmb3IgDQo+ID4gPiByZWFkL3dyaXRlIGNvbmZpZyBkYXRhLiBJ
-ZiBndWVzdCB3cml0ZSBhIHZhbHVlIHRvIGNvbmZpZyByZWdpc3RlciwgDQo+ID4gPiBhbmQgdGhl
-biBwYXVzZSB0aGUgdmNwdSB0byBtaWdyYXRlLCBBZnRlciB0aGUgbWlncmF0aW9uLCB0aGUgZ3Vl
-c3QgDQo+ID4gPiBjb250aW51ZSB0byB3cml0ZSBwY2kgY29uZmlnIGRhdGEsIGFuZCB0aGUgd3Jp
-dGUgZGF0YSB3aWxsIGJlIA0KPiA+ID4gaWdub3JlZCBiZWNhdXNlIG9mIG5ldyBxZW11IHByb2Nl
-c3MgbG9zdCB0aGUgY29uZmlnIHJlZ2lzdGVyIHN0YXRlLg0KPiA+ID4gDQo+ID4gPiBSZXByb2R1
-Y3Rpb24gc3RlcHMgYXJlOg0KPiA+ID4gMS4gZ3Vlc3QgYm9vdGluZyBpbiBzZWFiaW9zLg0KPiA+
-ID4gMi4gZ3Vlc3QgZW5hYmxlIHRoZSBTTVJBTSBpbiBzZWFiaW9zOnBpaXg0X2FwbWNfc21tX3Nl
-dHVwLCBhbmQgdGhlbg0KPiA+ID4gICAgZXhwZWN0IHRvIGRpc2FibGUgdGhlIFNNUkFNIGJ5IHBj
-aV9jb25maWdfd3JpdGViLg0KPiA+ID4gMy4gYWZ0ZXIgZ3Vlc3Qgd3JpdGUgdGhlIHBjaSBob3N0
-IGNvbmZpZyByZWdpc3RlciwgYW5kIHRoZW4gcGFzdWVkIHZjcHUNCj4gPiA+ICAgIHRvIGZpbmlz
-aCBtaWdyYXRpb24uDQo+ID4gPiA0LiBndWVzdCB3cml0ZSBjb25maWcgZGF0YSgweDBBKSBmYWls
-IHRvIGRpc2FibGUgdGhlIFNNUkFNIGJlY2FzdWUgb2YNCj4gPiA+ICAgIGNvbmZpZyByZWdpc3Rl
-ciBzdGF0ZSBsb3N0Lg0KPiA+ID4gNS4gZ3Vlc3QgY29udGludWUgdG8gYm9vdCBhbmQgY3Jhc2gg
-aW4gaXB4ZSBvcHRpb24gUk9NIGR1ZSB0byBTTVJBTSBpbg0KPiA+ID4gICAgZW5hYmxlZCBzdGF0
-ZS4NCj4gPiA+IA0KPiA+ID4gU2lnbmVkLW9mZi1ieTogSG9nYW4gV2FuZyA8a2luZy53YW5nQGh1
-YXdlaS5jb20+DQo+ID4gDQo+ID4gSSBndWVzcyB0aGlzIGlzIGxpa2UgdjMgcmlnaHQ/DQo+ID4g
-DQo+ID4gdGhhbmtzIGEgbG90IGZvciB0aGUgcGF0Y2ghDQo+ID4gDQo+ID4gTXkgcXVlc3Rpb24g
-c3RhbmRzIDogZG9lcyBhbnlvbmUgc2VlIGEgd2F5IHRvIHBhc3MgdGhpcyBpbmZvIGFyb3VuZCAN
-Cj4gPiB3aXRob3V0IGJyZWFraW5nIG1pZ3JhdGlvbiBmb3IgYWxsIGV4aXN0aW5nIG1hY2hpbmUg
-dHlwZXM/DQo+IA0KPiBZb3UgbmVlZCBhIC5uZWVkZWQgY2xhdXNlIGluIHRoZSB2bXN0YXRlX2k0
-NDBmeF9wY2lob3N0IGFuZCB2bXN0YXRlX3EzNV9wY2lob3N0IHdoaWNoIGlzIGEgcG9pbnRlciB0
-byBhIGZ1bmN0aW9uIHdoaWNoIGVuYWJsZXMgaXQgb24gbmV3IG1hY2hpbmUgdHlwZXMgYW5kIGln
-bm9yZXMgaXQgb24gb2xkIG9uZXMuDQo+IA0KPiBPciwgaWYgaXQgYWx3YXlzIGNyYXNoZXMgaWYg
-dGhlIFNNUkFNIGlzIGVuYWJsZWQsIHRoZW4gdGhlIG1pZ3JhdGlvbiBpcyBkZWFkIGFueXdheTsg
-c28geW91IGNvdWxkIG1ha2UgdGhlIC5uZWVkZWQgb25seSBzYXZlIHRoZSBjb25maWcgaWYgdGhl
-IFNNUkFNIGlzIG9wZW5lZCwgc28geW91J2QgZ2V0IGEgdW5rbm93biBzZWN0aW9uIGVycm9yLCB3
-aGljaCBpcyBuYXN0eSBidXQgaXQgd291bGQgb25seSBoYXBwZW4gaW4gdGhlIGNhc2UgaXQgd291
-bGQgY3Jhc2ggYW55d2F5Lg0KPiANCj4gRGF2ZQ0KPiANCg0KSXQgYWx3YXlzIGNyYXNoZXMgaWYg
-dGhlIFNNUkFNIGlzIGVuYWJsZWQsIGJ1dCBpdCdzIGp1c3Qgb25lIGNhc2UsIGNvbmZpZyByZWdp
-c3Rlcg0Kc3RhdGUgbG9zdCBtYXkgY2F1c2Ugb3RoZXIgdW5jZXJ0YWluIGVycm9ycywgc28gaXQn
-cyBuZWVkIG9uIG5ldyBtYWNoaW5lIHR5cGVzLg0KDQo+ID4gDQo+ID4gPiAtLS0NCj4gPiA+ICBo
-dy9wY2ktaG9zdC9pNDQwZnguYyAgICAgICB8IDExICsrKysrKysrKysrDQo+ID4gPiAgaHcvcGNp
-LWhvc3QvcTM1LmMgICAgICAgICAgfCAxMSArKysrKysrKysrKw0KPiA+ID4gIGh3L3BjaS9wY2lf
-aG9zdC5jICAgICAgICAgIHwgMTEgKysrKysrKysrKysNCj4gPiA+ICBody9wY2kvcGNpZV9ob3N0
-LmMgICAgICAgICB8IDExICsrKysrKysrKysrDQo+ID4gPiAgaW5jbHVkZS9ody9wY2kvcGNpX2hv
-c3QuaCAgfCAxMCArKysrKysrKysrICANCj4gPiA+IGluY2x1ZGUvaHcvcGNpL3BjaWVfaG9zdC5o
-IHwgMTAgKysrKysrKysrKw0KPiA+ID4gIDYgZmlsZXMgY2hhbmdlZCwgNjQgaW5zZXJ0aW9ucygr
-KQ0KPiA+ID4gDQo+ID4gPiBkaWZmIC0tZ2l0IGEvaHcvcGNpLWhvc3QvaTQ0MGZ4LmMgYi9ody9w
-Y2ktaG9zdC9pNDQwZnguYyBpbmRleCANCj4gPiA+IDhlZDI0MTdmMGMuLjE3NzA1YmIwMjUgMTAw
-NjQ0DQo+ID4gPiAtLS0gYS9ody9wY2ktaG9zdC9pNDQwZnguYw0KPiA+ID4gKysrIGIvaHcvcGNp
-LWhvc3QvaTQ0MGZ4LmMNCj4gPiA+IEBAIC0xMTgsNiArMTE4LDE2IEBAIHN0YXRpYyBjb25zdCBW
-TVN0YXRlRGVzY3JpcHRpb24gdm1zdGF0ZV9pNDQwZnggPSB7DQo+ID4gPiAgICAgIH0NCj4gPiA+
-ICB9Ow0KPiA+ID4gIA0KPiA+ID4gK3N0YXRpYyBjb25zdCBWTVN0YXRlRGVzY3JpcHRpb24gdm1z
-dGF0ZV9pNDQwZnhfcGNpaG9zdCA9IHsNCj4gPiA+ICsgICAgLm5hbWUgPSAiSTQ0MEZYX1BDSUhv
-c3QiLA0KPiA+ID4gKyAgICAudmVyc2lvbl9pZCA9IDEsDQo+ID4gPiArICAgIC5taW5pbXVtX3Zl
-cnNpb25faWQgPSAxLA0KPiA+ID4gKyAgICAuZmllbGRzID0gKFZNU3RhdGVGaWVsZFtdKSB7DQo+
-ID4gPiArICAgICAgICBWTVNUQVRFX1BDSV9IT1NUKHBhcmVudF9vYmosIEk0NDBGWFN0YXRlKSwN
-Cj4gPiA+ICsgICAgICAgIFZNU1RBVEVfRU5EX09GX0xJU1QoKQ0KPiA+ID4gKyAgICB9DQo+ID4g
-PiArfTsNCj4gPiA+ICsNCj4gPiA+ICBzdGF0aWMgdm9pZCBpNDQwZnhfcGNpaG9zdF9nZXRfcGNp
-X2hvbGVfc3RhcnQoT2JqZWN0ICpvYmosIFZpc2l0b3IgKnYsDQo+ID4gPiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IGNoYXIgKm5hbWUsIHZvaWQg
-Km9wYXF1ZSwNCj4gPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgRXJyb3IgKiplcnJwKSBAQCANCj4gPiA+IC0zOTgsNiArNDA4LDcgQEAgc3RhdGljIHZv
-aWQgaTQ0MGZ4X3BjaWhvc3RfY2xhc3NfaW5pdChPYmplY3RDbGFzcyAqa2xhc3MsIHZvaWQgKmRh
-dGEpDQo+ID4gPiAgICAgIGhjLT5yb290X2J1c19wYXRoID0gaTQ0MGZ4X3BjaWhvc3Rfcm9vdF9i
-dXNfcGF0aDsNCj4gPiA+ICAgICAgZGMtPnJlYWxpemUgPSBpNDQwZnhfcGNpaG9zdF9yZWFsaXpl
-Ow0KPiA+ID4gICAgICBkYy0+ZndfbmFtZSA9ICJwY2kiOw0KPiA+ID4gKyAgICBkYy0+dm1zZCA9
-ICZ2bXN0YXRlX2k0NDBmeF9wY2lob3N0Ow0KPiA+ID4gICAgICBkZXZpY2VfY2xhc3Nfc2V0X3By
-b3BzKGRjLCBpNDQwZnhfcHJvcHMpOw0KPiA+ID4gICAgICAvKiBSZWFzb246IG5lZWRzIHRvIGJl
-IHdpcmVkIHVwIGJ5IHBjX2luaXQxICovDQo+ID4gPiAgICAgIGRjLT51c2VyX2NyZWF0YWJsZSA9
-IGZhbHNlOw0KPiA+ID4gZGlmZiAtLWdpdCBhL2h3L3BjaS1ob3N0L3EzNS5jIGIvaHcvcGNpLWhv
-c3QvcTM1LmMgaW5kZXggDQo+ID4gPiBiNjdjYjljMjlmLi41ZTMyM2JlMmUzIDEwMDY0NA0KPiA+
-ID4gLS0tIGEvaHcvcGNpLWhvc3QvcTM1LmMNCj4gPiA+ICsrKyBiL2h3L3BjaS1ob3N0L3EzNS5j
-DQo+ID4gPiBAQCAtMTY1LDYgKzE2NSwxNiBAQCBzdGF0aWMgdm9pZCBxMzVfaG9zdF9nZXRfcGNp
-X2hvbGU2NF9lbmQoT2JqZWN0ICpvYmosIFZpc2l0b3IgKnYsDQo+ID4gPiAgICAgIHZpc2l0X3R5
-cGVfdWludDY0KHYsIG5hbWUsICZ2YWx1ZSwgZXJycCk7ICB9DQo+ID4gPiAgDQo+ID4gPiArc3Rh
-dGljIGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbiB2bXN0YXRlX3EzNV9wY2lob3N0ID0gew0KPiA+
-ID4gKyAgICAubmFtZSA9ICJRMzVfUENJSG9zdCIsDQo+ID4gPiArICAgIC52ZXJzaW9uX2lkID0g
-MSwNCj4gPiA+ICsgICAgLm1pbmltdW1fdmVyc2lvbl9pZCA9IDEsDQo+ID4gPiArICAgIC5maWVs
-ZHMgPSAoVk1TdGF0ZUZpZWxkW10pIHsNCj4gPiA+ICsgICAgICAgIFZNU1RBVEVfUENJRV9IT1NU
-KHBhcmVudF9vYmosIFEzNVBDSUhvc3QpLA0KPiA+ID4gKyAgICAgICAgVk1TVEFURV9FTkRfT0Zf
-TElTVCgpDQo+ID4gPiArICAgIH0NCj4gPiA+ICt9Ow0KPiA+ID4gKw0KPiA+ID4gIC8qDQo+ID4g
-PiAgICogTk9URTogc2V0dGluZyBkZWZhdWx0cyBmb3IgdGhlIG1jaC4qIGZpZWxkcyBpbiB0aGlz
-IHRhYmxlDQo+ID4gPiAgICogZG9lc24ndCB3b3JrLCBiZWNhdXNlIG1jaCBpcyBhIHNlcGFyYXRl
-IFFPTSBvYmplY3QgdGhhdCBpcyBAQCANCj4gPiA+IC0xOTQsNiArMjA0LDcgQEAgc3RhdGljIHZv
-aWQgcTM1X2hvc3RfY2xhc3NfaW5pdChPYmplY3RDbGFzcyAqa2xhc3MsIA0KPiA+ID4gdm9pZCAq
-ZGF0YSkNCj4gPiA+ICANCj4gPiA+ICAgICAgaGMtPnJvb3RfYnVzX3BhdGggPSBxMzVfaG9zdF9y
-b290X2J1c19wYXRoOw0KPiA+ID4gICAgICBkYy0+cmVhbGl6ZSA9IHEzNV9ob3N0X3JlYWxpemU7
-DQo+ID4gPiArICAgIGRjLT52bXNkID0gJnZtc3RhdGVfcTM1X3BjaWhvc3Q7DQo+ID4gPiAgICAg
-IGRldmljZV9jbGFzc19zZXRfcHJvcHMoZGMsIHEzNV9ob3N0X3Byb3BzKTsNCj4gPiA+ICAgICAg
-LyogUmVhc29uOiBuZWVkcyB0byBiZSB3aXJlZCB1cCBieSBwY19xMzVfaW5pdCAqLw0KPiA+ID4g
-ICAgICBkYy0+dXNlcl9jcmVhdGFibGUgPSBmYWxzZTsNCj4gPiA+IGRpZmYgLS1naXQgYS9ody9w
-Y2kvcGNpX2hvc3QuYyBiL2h3L3BjaS9wY2lfaG9zdC5jIGluZGV4IA0KPiA+ID4gY2U3YmNkYjFk
-NS4uN2NkZDVhM2VhMyAxMDA2NDQNCj4gPiA+IC0tLSBhL2h3L3BjaS9wY2lfaG9zdC5jDQo+ID4g
-PiArKysgYi9ody9wY2kvcGNpX2hvc3QuYw0KPiA+ID4gQEAgLTI0LDYgKzI0LDcgQEANCj4gPiA+
-ICAjaW5jbHVkZSAiaHcvcGNpL3BjaV9ob3N0LmgiDQo+ID4gPiAgI2luY2x1ZGUgInFlbXUvbW9k
-dWxlLmgiDQo+ID4gPiAgI2luY2x1ZGUgImh3L3BjaS9wY2lfYnVzLmgiDQo+ID4gPiArI2luY2x1
-ZGUgIm1pZ3JhdGlvbi92bXN0YXRlLmgiDQo+ID4gPiAgI2luY2x1ZGUgInRyYWNlLmgiDQo+ID4g
-PiAgDQo+ID4gPiAgLyogZGVidWcgUENJICovDQo+ID4gPiBAQCAtMjAwLDYgKzIwMSwxNiBAQCBj
-b25zdCBNZW1vcnlSZWdpb25PcHMgcGNpX2hvc3RfZGF0YV9iZV9vcHMgPSB7DQo+ID4gPiAgICAg
-IC5lbmRpYW5uZXNzID0gREVWSUNFX0JJR19FTkRJQU4sICB9Ow0KPiA+ID4gIA0KPiA+ID4gK2Nv
-bnN0IFZNU3RhdGVEZXNjcmlwdGlvbiB2bXN0YXRlX3BjaWhvc3QgPSB7DQo+ID4gPiArICAgIC5u
-YW1lID0gIlBDSUhvc3QiLA0KPiA+ID4gKyAgICAudmVyc2lvbl9pZCA9IDEsDQo+ID4gPiArICAg
-IC5taW5pbXVtX3ZlcnNpb25faWQgPSAxLA0KPiA+ID4gKyAgICAuZmllbGRzID0gKFZNU3RhdGVG
-aWVsZFtdKSB7DQo+ID4gPiArICAgICAgICBWTVNUQVRFX1VJTlQzMihjb25maWdfcmVnLCBQQ0lI
-b3N0U3RhdGUpLA0KPiA+ID4gKyAgICAgICAgVk1TVEFURV9FTkRfT0ZfTElTVCgpDQo+ID4gPiAr
-ICAgIH0NCj4gPiA+ICt9Ow0KPiA+ID4gKw0KPiA+ID4gIHN0YXRpYyBjb25zdCBUeXBlSW5mbyBw
-Y2lfaG9zdF90eXBlX2luZm8gPSB7DQo+ID4gPiAgICAgIC5uYW1lID0gVFlQRV9QQ0lfSE9TVF9C
-UklER0UsDQo+ID4gPiAgICAgIC5wYXJlbnQgPSBUWVBFX1NZU19CVVNfREVWSUNFLA0KPiA+ID4g
-ZGlmZiAtLWdpdCBhL2h3L3BjaS9wY2llX2hvc3QuYyBiL2h3L3BjaS9wY2llX2hvc3QuYyBpbmRl
-eCANCj4gPiA+IDM1MzQwMDZmOTkuLmE2NTNjMzliYjcgMTAwNjQ0DQo+ID4gPiAtLS0gYS9ody9w
-Y2kvcGNpZV9ob3N0LmMNCj4gPiA+ICsrKyBiL2h3L3BjaS9wY2llX2hvc3QuYw0KPiA+ID4gQEAg
-LTI0LDYgKzI0LDcgQEANCj4gPiA+ICAjaW5jbHVkZSAiaHcvcGNpL3BjaWVfaG9zdC5oIg0KPiA+
-ID4gICNpbmNsdWRlICJxZW11L21vZHVsZS5oIg0KPiA+ID4gICNpbmNsdWRlICJleGVjL2FkZHJl
-c3Mtc3BhY2VzLmgiDQo+ID4gPiArI2luY2x1ZGUgIm1pZ3JhdGlvbi92bXN0YXRlLmgiDQo+ID4g
-PiAgDQo+ID4gPiAgLyogYSBoZWxwZXIgZnVuY3Rpb24gdG8gZ2V0IGEgUENJRGV2aWNlIGZvciBh
-IGdpdmVuIG1tY29uZmlnIA0KPiA+ID4gYWRkcmVzcyAqLyAgc3RhdGljIGlubGluZSBQQ0lEZXZp
-Y2UgDQo+ID4gPiAqcGNpZV9kZXZfZmluZF9ieV9tbWNmZ19hZGRyKFBDSUJ1cyAqcywgQEAgLTEy
-MSw2ICsxMjIsMTYgQEAgdm9pZCBwY2llX2hvc3RfbW1jZmdfdXBkYXRlKFBDSUV4cHJlc3NIb3N0
-ICplLA0KPiA+ID4gICAgICBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2NvbW1pdCgpOw0KPiA+
-ID4gIH0NCj4gPiA+ICANCj4gPiA+ICtjb25zdCBWTVN0YXRlRGVzY3JpcHRpb24gdm1zdGF0ZV9w
-Y2llaG9zdCA9IHsNCj4gPiA+ICsgICAgLm5hbWUgPSAiUENJRUhvc3QiLA0KPiA+ID4gKyAgICAu
-dmVyc2lvbl9pZCA9IDEsDQo+ID4gPiArICAgIC5taW5pbXVtX3ZlcnNpb25faWQgPSAxLA0KPiA+
-ID4gKyAgICAuZmllbGRzID0gKFZNU3RhdGVGaWVsZFtdKSB7DQo+ID4gPiArICAgICAgICBWTVNU
-QVRFX1BDSV9IT1NUKHBjaSwgUENJRXhwcmVzc0hvc3QpLA0KPiA+ID4gKyAgICAgICAgVk1TVEFU
-RV9FTkRfT0ZfTElTVCgpDQo+ID4gPiArICAgIH0NCj4gPiA+ICt9Ow0KPiA+ID4gKw0KPiA+ID4g
-IHN0YXRpYyBjb25zdCBUeXBlSW5mbyBwY2llX2hvc3RfdHlwZV9pbmZvID0gew0KPiA+ID4gICAg
-ICAubmFtZSA9IFRZUEVfUENJRV9IT1NUX0JSSURHRSwNCj4gPiA+ICAgICAgLnBhcmVudCA9IFRZ
-UEVfUENJX0hPU1RfQlJJREdFLCBkaWZmIC0tZ2l0IA0KPiA+ID4gYS9pbmNsdWRlL2h3L3BjaS9w
-Y2lfaG9zdC5oIGIvaW5jbHVkZS9ody9wY2kvcGNpX2hvc3QuaCBpbmRleCANCj4gPiA+IDljZTA4
-OGJkMTMuLmZjODgzMDVlMDQgMTAwNjQ0DQo+ID4gPiAtLS0gYS9pbmNsdWRlL2h3L3BjaS9wY2lf
-aG9zdC5oDQo+ID4gPiArKysgYi9pbmNsdWRlL2h3L3BjaS9wY2lfaG9zdC5oDQo+ID4gPiBAQCAt
-NzAsNCArNzAsMTQgQEAgZXh0ZXJuIGNvbnN0IE1lbW9yeVJlZ2lvbk9wcyANCj4gPiA+IHBjaV9o
-b3N0X2NvbmZfYmVfb3BzOyAgZXh0ZXJuIGNvbnN0IE1lbW9yeVJlZ2lvbk9wcyANCj4gPiA+IHBj
-aV9ob3N0X2RhdGFfbGVfb3BzOyAgZXh0ZXJuIGNvbnN0IE1lbW9yeVJlZ2lvbk9wcyANCj4gPiA+
-IHBjaV9ob3N0X2RhdGFfYmVfb3BzOw0KPiA+ID4gIA0KPiA+ID4gK2V4dGVybiBjb25zdCBWTVN0
-YXRlRGVzY3JpcHRpb24gdm1zdGF0ZV9wY2lob3N0Ow0KPiA+ID4gKw0KPiA+ID4gKyNkZWZpbmUg
-Vk1TVEFURV9QQ0lfSE9TVChfZmllbGQsIF9zdGF0ZSkgeyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFwNCj4gPiA+ICsgICAgLm5hbWUgICAgICAgPSAoc3RyaW5naWZ5KF9maWVsZCkpLCAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ID4gPiArICAgIC5zaXplICAgICAgID0gc2l6
-ZW9mKFBDSUhvc3RTdGF0ZSksICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiA+ID4g
-KyAgICAudm1zZCAgICAgICA9ICZ2bXN0YXRlX3BjaWhvc3QsICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwNCj4gPiA+ICsgICAgLmZsYWdzICAgICAgPSBWTVNfU1RSVUNULCAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQo+ID4gPiArICAgIC5vZmZzZXQg
-ICAgID0gdm1zdGF0ZV9vZmZzZXRfdmFsdWUoX3N0YXRlLCBfZmllbGQsIFBDSUhvc3RTdGF0ZSks
-XA0KPiA+ID4gK30NCj4gPiA+ICsNCj4gPiA+ICAjZW5kaWYgLyogUENJX0hPU1RfSCAqLw0KPiA+
-ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvaHcvcGNpL3BjaWVfaG9zdC5oIGIvaW5jbHVkZS9ody9w
-Y2kvcGNpZV9ob3N0LmggDQo+ID4gPiBpbmRleCAzZjdiOTg4NmQxLi5lODg1NmYwM2U5IDEwMDY0
-NA0KPiA+ID4gLS0tIGEvaW5jbHVkZS9ody9wY2kvcGNpZV9ob3N0LmgNCj4gPiA+ICsrKyBiL2lu
-Y2x1ZGUvaHcvcGNpL3BjaWVfaG9zdC5oDQo+ID4gPiBAQCAtNzgsNCArNzgsMTQgQEAgdm9pZCBw
-Y2llX2hvc3RfbW1jZmdfdXBkYXRlKFBDSUV4cHJlc3NIb3N0ICplLA0KPiA+ID4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgUENJRV9NTUNGR19ERVZGTl9NQVNLKQ0K
-PiA+ID4gICNkZWZpbmUgUENJRV9NTUNGR19DT05GT0ZGU0VUKGFkZHIpICAgICAoKGFkZHIpICYg
-UENJRV9NTUNGR19DT05GT0ZGU0VUX01BU0spDQo+ID4gPiAgDQo+ID4gPiArZXh0ZXJuIGNvbnN0
-IFZNU3RhdGVEZXNjcmlwdGlvbiB2bXN0YXRlX3BjaWVob3N0Ow0KPiA+ID4gKw0KPiA+ID4gKyNk
-ZWZpbmUgVk1TVEFURV9QQ0lFX0hPU1QoX2ZpZWxkLCBfc3RhdGUpIHsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXA0KPiA+ID4gKyAgICAubmFtZSAgICAgICA9IChzdHJpbmdpZnkoX2ZpZWxk
-KSksICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiA+ID4gKyAgICAuc2l6ZSAg
-ICAgICA9IHNpemVvZihQQ0lFeHByZXNzSG9zdCksICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXA0KPiA+ID4gKyAgICAudm1zZCAgICAgICA9ICZ2bXN0YXRlX3BjaWVob3N0LCAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiA+ID4gKyAgICAuZmxhZ3MgICAgICA9IFZN
-U19TVFJVQ1QsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KPiA+
-ID4gKyAgICAub2Zmc2V0ICAgICA9IHZtc3RhdGVfb2Zmc2V0X3ZhbHVlKF9zdGF0ZSwgX2ZpZWxk
-LCBQQ0lFeHByZXNzSG9zdCksXA0KPiA+ID4gK30NCj4gPiA+ICsNCj4gPiA+ICAjZW5kaWYgLyog
-UENJRV9IT1NUX0ggKi8NCj4gPiA+IC0tDQo+ID4gPiAyLjIzLjANCj4gPiA+IA0KPiA+IA0KPiAt
-LQ0KPiBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IC8gZGdpbGJlcnRAcmVkaGF0LmNvbSAvIE1hbmNo
-ZXN0ZXIsIFVLDQoNCg==
+Hi all,
+
+I think we have a regression introduced in commit 0221d73ce6.
+
+Once I start a Windows 10 VM (build 18363) with `-device VGA` I have only the following resolutions to choose from instead of the much longer list:
+
+1920x1080
+1024x768
+800x600
+
+Linux guests work fine.
+
+qemu-system-x86_64 \
+   -name windows-resolution-test \
+   -smp '2,sockets=1,cores=2,maxcpus=2' \
+   -nodefaults \
+   -cpu host,+kvm_pv_eoi,+kvm_pv_unhalt \
+   -m 3072 \
+   -device 'piix3-usb-uhci,id=uhci,bus=pci.0,addr=0x1.0x2' \
+   -device 'usb-tablet,id=tablet,bus=uhci.0,port=1' \
+   -device 'VGA,id=vga,vgamem_mb=32,bus=pci.0,addr=0x2' \
+   -device 'virtio-scsi-pci,id=scsihw0,bus=pci.0,addr=0x5' \
+   -drive 'file=/dev/zvol/rpool/data/vm-102-disk-0,if=none,id=drive-scsi0,discard=on,format=raw,cache=none,aio=native,detect-zeroes=unmap' \
+   -device 'scsi-hd,bus=scsihw0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0,id=scsi0,rotation_rate=1,bootindex=100' \
+   -machine pc,accel=kvm
+
+
+I have not yet gotten around to bisect the SeaBIOS repository to know exactly which commit there is causing it.
+
+If this is better handled at the SeaBIOS mailing list, let me know.
+
+
+Aaron
+
 
