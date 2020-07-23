@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67533C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:48:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F97C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:48:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21F48207BB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:48:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 418CD207BB
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:48:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tejynlmm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21F48207BB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y7JrLfWx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 418CD207BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyfK9-0006z7-DG
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:48:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43450)
+	id 1jyfKF-0007CQ-Ek
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:48:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jyfJ4-0005M9-KN
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:46:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39844
+ id 1jyfJA-0005T3-UE
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:47:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51598
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1jyfJ2-0004Bp-Ko
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:46:58 -0400
+ id 1jyfJ6-0004CX-VR
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:47:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595526415;
+ s=mimecast20190719; t=1595526420;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GJX9oFYWeI2gJAGUHHop5bfOVja0UQenPIRkX5m0vFQ=;
- b=TejynlmmOLTUNLitkdjnVQOdiuSc9h0lTnhujUILdlppqzKqaNz32UwVo3NEGlJq16rH83
- ULz5bkKW6RDd9ZKz8WVyPglN1JgAInL9VMhiH4en3+22Ogq9qfJMTkaFOLj02D7Dgb4YTn
- vJTf9YQVpTIadSnbQS/BEVlSI4Lzico=
+ bh=5hDiABnSVTJmwW4/l6/BO7SmKArZXogC39VD0mu6opk=;
+ b=Y7JrLfWxtPTqWH9DrkTQEty8y/iV9r5tl624jxeLn5nTaq3H22jRl881BQg8nqFa2tn0At
+ /4pISEzZZ1PZqMGxFCO6PyabvbFljLXBuEoLqqxRm8nSPOlTyIwuNaUa7M4GAO6Psl6mDx
+ HezHfx7wDjzg/dtEXxZ8Sssl8dxLp4U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-qFoEvPjcM9uRs-Qxuiwezg-1; Thu, 23 Jul 2020 13:46:53 -0400
-X-MC-Unique: qFoEvPjcM9uRs-Qxuiwezg-1
+ us-mta-509-6J5YDb7lNaGUX6z4QPcitw-1; Thu, 23 Jul 2020 13:46:56 -0400
+X-MC-Unique: 6J5YDb7lNaGUX6z4QPcitw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D0F88015F3;
- Thu, 23 Jul 2020 17:46:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D84A100AA51;
+ Thu, 23 Jul 2020 17:46:55 +0000 (UTC)
 Received: from turbo.com (ovpn-113-141.ams2.redhat.com [10.36.113.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 223786972F;
- Thu, 23 Jul 2020 17:46:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D9FA469316;
+ Thu, 23 Jul 2020 17:46:52 +0000 (UTC)
 From: Christophe de Dinechin <dinechin@redhat.com>
 To: qemu-devel@nongnu.org,
 	kraxel@redhat.com
-Subject: [PATCH 3/7] minikconf: Pass variables for modules
-Date: Thu, 23 Jul 2020 19:46:11 +0200
-Message-Id: <20200723174615.2370096-4-dinechin@redhat.com>
+Subject: [PATCH 4/7] spice: Make spice a module configuration
+Date: Thu, 23 Jul 2020 19:46:12 +0200
+Message-Id: <20200723174615.2370096-5-dinechin@redhat.com>
 In-Reply-To: <20200723174615.2370096-1-dinechin@redhat.com>
 References: <20200723174615.2370096-1-dinechin@redhat.com>
 MIME-Version: 1.0
@@ -107,28 +107,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This commit changes the spice configuration 'm' by default, and moves
+the spice components to obj-m variables. It is sufficient to build
+without modules enable, but does not link correctly yet, since no
+shims have been created for the missing functions yet.
+
 Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
 ---
- scripts/minikconf.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ chardev/Makefile.objs | 3 ++-
+ configure             | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/minikconf.py b/scripts/minikconf.py
-index bcd91015d3..d60add97f6 100755
---- a/scripts/minikconf.py
-+++ b/scripts/minikconf.py
-@@ -690,10 +690,10 @@ if __name__ == '__main__':
-     parser = KconfigParser(data)
-     external_vars = set()
-     for arg in argv[3:]:
--        m = re.match(r'^(CONFIG_[A-Z0-9_]+)=([yn]?)$', arg)
-+        m = re.match(r'^(CONFIG_[A-Z0-9_]+)=([ymn]?)$', arg)
-         if m is not None:
-             name, value = m.groups()
--            parser.do_assignment(name, value == 'y')
-+            parser.do_assignment(name, value == 'y' or value == 'm')
-             external_vars.add(name[7:])
-         else:
-             fp = open(arg, 'rt', encoding='utf-8')
+diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
+index 3783dadc4c..7cf05c9541 100644
+--- a/chardev/Makefile.objs
++++ b/chardev/Makefile.objs
+@@ -26,4 +26,5 @@ baum.o-cflags := $(SDL_CFLAGS)
+ baum.o-libs := $(BRLAPI_LIBS)
+ endif
+ 
+-common-obj-$(CONFIG_SPICE) += spice.o
++common-obj-$(CONFIG_SPICE) += spice.mo
++spice.mo-objs := spice.o
+diff --git a/configure b/configure
+index 4bd80ed507..054aab31be 100755
+--- a/configure
++++ b/configure
+@@ -7534,7 +7534,7 @@ if test "$posix_memalign" = "yes" ; then
+ fi
+ 
+ if test "$spice" = "yes" ; then
+-  echo "CONFIG_SPICE=y" >> $config_host_mak
++  echo "CONFIG_SPICE=m" >> $config_host_mak
+ fi
+ 
+ if test "$smartcard" = "yes" ; then
 -- 
 2.26.2
 
