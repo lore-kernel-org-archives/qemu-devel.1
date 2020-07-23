@@ -2,123 +2,93 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7812BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 07:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21401C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 07:38:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FE492080D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 07:25:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D069A206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 07:38:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vxQIXuef"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FE492080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bAGOeFZK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D069A206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyVbK-00046U-IL
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 03:25:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37094)
+	id 1jyVnv-0006U0-3P
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 03:38:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jyVaE-0003Cx-7j; Thu, 23 Jul 2020 03:24:02 -0400
-Received: from mail-eopbgr70120.outbound.protection.outlook.com
- ([40.107.7.120]:40324 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jyVaB-0007Jy-DF; Thu, 23 Jul 2020 03:24:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZBVEu4+vBeYfv21EARhHPMZVOcKgnSi0r165qVyKzIJjLEtrjqJ6QM7PrwnRvFwlrgO+S8Vfsf2wo3UrfjU9ZyojPzgWVcp8ca1I+zYTZNBXIigjL+UUS9woRZsX0t+1+9u2+qewTnpFC5W1RG41fyXRClkH9rvjikj6C1ZNaCoT8xv+uTyEf1a6TykMw8JvOtZP0C/c6JE+MRYn2jxHBf/XocPH64/G7wCzA0dQBhgAGcW+wRNq+hj5+CB9cn1qeB4dYLTMt1OyenQ9ABLMXqvv51n1jvSTMRFdwwTK2AeEgJV+83S9tRBcfz1OUS2o0oIaFVPALDlOBqIMCdJdEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hQlotNphQV0nzM0KC248iO3ylescq5q1Tu0Vw5ZAPbU=;
- b=de0BA6E+TF0cxnQE13ekNQjuXnGvHyv7ynddbDwOWnZBIpXetKeDC6d1L1/pZyhtBQlYK9Nk3WIYz9ZVAonWrlWVkM1QbF5vrsB0yR/vzkzPZP/PaLU8rI3nTj9+0JlncGJ7xy5kzk2kZ59547azR4QlDV6ktMvgReDyDzYPooQ7hm0nqUAUoIobyvPTNjj4GoFRSy54WV/OA+AWfmZcn7iHi8KSMhnzUZhraqqfUBcJ3HlM5bPY1dt5q/GJEdfTGb2xymTM0vMCG3ZNYkx+pA770WGkQOlxKattJTE4PUCR4NEuASxTDjy2V6CPhR4BgsFk2QiQUjr6EpUVr4QwTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hQlotNphQV0nzM0KC248iO3ylescq5q1Tu0Vw5ZAPbU=;
- b=vxQIXuefWySNn66mr3+YQGZm/CMTxNK80KGW0xW1fIH9T0/jdsBaOMy4t+/HPiuIhcZpyQf47Q53QwpoqHzfqYjPleMJaRleFCpgqlPjTz/p8AlqHD6Z8yxv03xxmwLf6gCn1N+vKtxPTVy4pe7zuYrskjUZyO5ltA+b3GgybUk=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4916.eurprd08.prod.outlook.com (2603:10a6:20b:ca::17)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.22; Thu, 23 Jul
- 2020 07:23:54 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::a408:2f0f:bc6c:d312%3]) with mapi id 15.20.3195.026; Thu, 23 Jul 2020
- 07:23:54 +0000
-Subject: Re: [PATCH for-5.1] nbd: Fix large trim/zero requests
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20200722212231.535072-1-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e7b8151d-b9d3-b5c5-9bc4-661a045d4ff9@virtuozzo.com>
-Date: Thu, 23 Jul 2020 10:23:53 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200722212231.535072-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR07CA0079.eurprd07.prod.outlook.com
- (2603:10a6:207:6::13) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyVnJ-0005vt-Gy
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 03:37:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52232
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyVnG-0001DB-EG
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 03:37:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595489849;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QNN+ZSW3plgDBG+aAYlqui/4yeOvxw55wAG2XsF+58s=;
+ b=bAGOeFZKHbKnD5GxYOQhP6b29/z06q2/5R69lQBT/39aHlTzmsjpm8bRnZmtm4JiVOa9MF
+ 5Zc8lAtjCIsPFZKm30xiKgPPeuguSZPqmjN9uaxQIIOujYuB26z/a74yptu86tcAQL4UMr
+ jA39tc9SQfTVakI0TVedEZ8weqkywMI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-VR8i-SQeMTSC2EF6APCPaw-1; Thu, 23 Jul 2020 03:37:25 -0400
+X-MC-Unique: VR8i-SQeMTSC2EF6APCPaw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35E0E58;
+ Thu, 23 Jul 2020 07:37:24 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2361071D2F;
+ Thu, 23 Jul 2020 07:37:21 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B4E3F111CA26; Thu, 23 Jul 2020 09:37:19 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [PATCH-for-5.1] hw/nvram/fw_cfg: Let fw_cfg_add_from_generator()
+ return boolean value
+References: <20200720123521.8135-1-philmd@redhat.com>
+ <34e8619f-4301-d746-fe3f-c340040c22c1@redhat.com>
+ <87r1t59sj7.fsf@dusky.pond.sub.org>
+ <b7bdbf46-b410-3ff7-4536-86b2886dc201@redhat.com>
+Date: Thu, 23 Jul 2020 09:37:19 +0200
+In-Reply-To: <b7bdbf46-b410-3ff7-4536-86b2886dc201@redhat.com> (Laszlo Ersek's
+ message of "Wed, 22 Jul 2020 19:50:57 +0200")
+Message-ID: <875zaeptqo.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.141) by
- AM3PR07CA0079.eurprd07.prod.outlook.com (2603:10a6:207:6::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3216.16 via Frontend Transport; Thu, 23 Jul 2020 07:23:54 +0000
-X-Originating-IP: [185.215.60.141]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 08b66e3e-960a-4cc2-e939-08d82ed95b28
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4916:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB49166905B8E819DCC79B90ECC1760@AM6PR08MB4916.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6zHXSrKf/lekjjfjPmM7ixnBJkZL9qiMORdBgu9RbntlDupFq+WrcxsjFo4qCGkjBJoZYgrDnQuoiR88ambBZ6gE6eimwR5QqaWJ4Fxj6wcU5L5TpLYYZ2M2vwzfTdmj11iEFkkFi0NAR6pQ+wyNfAd1QK66odWp6OJgYLE1c/N83UDJ3SWRD40QDfeFQ4t3iB78Dh6lLfmevfQhtvaw+hz6e/b6Oybxqu3o/mPC0eEPJBc90F2euOZZkJV0K2Vp/BjOOLQww9xTjHe8VnBA/PjIK9EqeF7D7vMSkSXVHeiAe3BXq/gv52qBzX5onshgcolmHgz4SHkUUywBpUC+GrzkLLfMFoy171c7B+Bgj7elq2xqMZsYKhpXA7+ppQHLT5slc+WOIBFiPydAMKw0f2vZyShgkhhnOh5Pnnd2/8GrqIUtQycmkUL23iHumaDBPQeA/PqyvWwQPQxcubv6+A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(136003)(346002)(366004)(396003)(376002)(2906002)(52116002)(6486002)(31686004)(83380400001)(26005)(8676002)(16526019)(186003)(956004)(316002)(16576012)(5660300002)(66556008)(66946007)(66476007)(4326008)(478600001)(36756003)(86362001)(8936002)(31696002)(966005)(2616005)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: aGiEe7v/6H5oniMZmsCliOP1NZXrCWyoV2pTQIQVGMdIIbdaivYRyc352HstaThWpa6YOPJ2GraIEmFAt1rgVy66QL8iZQggO4aEOfDuVHVtlwfoT+W1j0PNAuEQT/72EAPFGUHw0Bh9msvlESOAi8fIhthgQNb54WNpIQn62rr2fIHMDOTrlWEYXSmXrAqZ7myx+OmFHepqD40QrLKrQ89LwYRe8BjBl3r/GIsisPCV2+frGjDpFRC7aMb1F/AFYbrZiZeDNVaF8ZiXE+M/4d6qgKPObE3QAwdfmXQJkmS9w+NK2xxqoGHLxOTQ6DH6fzoP1h/voC5VPutG6n5zy0qCu79Cv1ovIi64YIF4KcQ09l6Ve/ZG5VBuis5+L2UP7Xoe3JWfSe5o3HCb5ro9MUeuCHwhJe8mofgbkIgAFlQd7V5Vr1Dxb6vcYqdkHY4NfqbxjxAWeeQETruQ0O+avntFAtnEVIK4WPg93IAMIIzdonBI/YnwREpkPU0S5V3u
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08b66e3e-960a-4cc2-e939-08d82ed95b28
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2020 07:23:54.6597 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TkxBoMC2Srj/qahAn5Kn2J/CC+knZF3yGiY71diJ2Qv7B9BITnOq8gvd6nu72Yi6L0yrTY3qE+rlEctHZMZc7TSRW/9IrF0JsNY0nDq3upM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4916
-Received-SPF: pass client-ip=40.107.7.120;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 03:23:56
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:33:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,102 +101,307 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-23.07.2020 00:22, Eric Blake wrote:
-> Although qemu as NBD client limits requests to <2G, the NBD protocol
-> allows clients to send requests almost all the way up to 4G.  But
-> because our block layer is not yet 64-bit clean, we accidentally wrap
-> such requests into a negative size, and fail with EIO instead of
-> performing the intended operation.
-> 
-> The bug is visible in modern systems with something as simple as:
-> 
-> $ qemu-img create -f qcow2 /tmp/image.img 5G
-> $ sudo qemu-nbd --connect=/dev/nbd0 /tmp/image.img
-> $ sudo blkdiscard /dev/nbd0
-> 
-> or with user-space only:
-> 
-> $ truncate --size=3G file
-> $ qemu-nbd -f raw file
-> $ nbdsh -u nbd://localhost:10809 -c 'h.trim(3*1024*1024*1024,0)'
-> 
-> Alas, our iotests do not currently make it easy to add external
-> dependencies on blkdiscard or nbdsh, so we have to rely on manual
-> testing for now.
-> 
-> This patch can be reverted when we later improve the overall block
-> layer to be 64-bit clean, but for now, a minimal fix was deemed less
-> risky prior to release.
-> 
-> CC: qemu-stable@nongnu.org
-> Fixes: 1f4d6d18ed
-> Fixes: 1c6c4bb7f0
-> Fixes: https://github.com/systemd/systemd/issues/16242
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->   nbd/server.c | 26 ++++++++++++++++++++++----
->   1 file changed, 22 insertions(+), 4 deletions(-)
-> 
-> diff --git a/nbd/server.c b/nbd/server.c
-> index 4752a6c8bc07..029618017c90 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -2378,8 +2378,17 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
->           if (request->flags & NBD_CMD_FLAG_FAST_ZERO) {
->               flags |= BDRV_REQ_NO_FALLBACK;
->           }
-> -        ret = blk_pwrite_zeroes(exp->blk, request->from + exp->dev_offset,
-> -                                request->len, flags);
-> +        ret = 0;
-> +        /* FIXME simplify this when blk_pwrite_zeroes switches to 64-bit */
-> +        while (ret == 0 && request->len) {
-> +            int align = client->check_align ?: 1;
-> +            int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
-> +                                                        align));
-> +            ret = blk_pwrite_zeroes(exp->blk, request->from + exp->dev_offset,
-> +                                    len, flags);
-> +            request->len -= len;
-> +            request->from += len;
-> +        }
->           return nbd_send_generic_reply(client, request->handle, ret,
->                                         "writing to file failed", errp);
-> 
-> @@ -2393,8 +2402,17 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
->                                         "flush failed", errp);
-> 
->       case NBD_CMD_TRIM:
-> -        ret = blk_co_pdiscard(exp->blk, request->from + exp->dev_offset,
-> -                              request->len);
-> +        ret = 0;
-> +        /* FIXME simplify this when blk_co_pdiscard switches to 64-bit */
-> +        while (ret == 0 && request->len) {
+Cc: Vladimir
 
-Did you check all the paths not to return positive ret on success? I'd prefer to compare ret >= 0 for this temporary code to not care of it
+Laszlo Ersek <lersek@redhat.com> writes:
 
-> +            int align = client->check_align ?: 1;
-> +            int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
-> +                                                        align));
-> +            ret = blk_co_pdiscard(exp->blk, request->from + exp->dev_offset,
-> +                                  len);
-> +            request->len -= len;
-> +            request->from += len;
+> On 07/21/20 10:33, Markus Armbruster wrote:
+>> Laszlo Ersek <lersek@redhat.com> writes:
+>>
+>>> On 07/20/20 14:35, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> Commits b6d7e9b66f..a43770df5d simplified the error propagation.
+>>>> Similarly to commit 6fd5bef10b "qom: Make functions taking Error**
+>>>> return bool, not void", let fw_cfg_add_from_generator() return a
+>>>> boolean value, not void.
+>>>> This allow to simplify parse_fw_cfg() and fixes the error handling
+>>>> issue reported by Coverity (CID 1430396):
+>>>>
+>>>>   In parse_fw_cfg():
+>>>>
+>>>>     Variable assigned once to a constant guards dead code.
+>>>>
+>>>>     Local variable local_err is assigned only once, to a constant
+>>>>     value, making it effectively constant throughout its scope.
+>>>>     If this is not the intent, examine the logic to see if there
+>>>>     is a missing assignment that would make local_err not remain
+>>>>     constant.
+>>
+>> It's the call of fw_cfg_add_from_generator():
+>>
+>>         Error *local_err =3D NULL;
+>>
+>>         fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
+>>         if (local_err) {
+>>             error_propagate(errp, local_err);
+>>             return -1;
+>>         }
+>>         return 0;
+>>
+>> If it fails, parse_fw_cfg() sets an error and returns 0, which is wrong.
+>> Harmless, because the only caller passes &error_fatal.
+>>
+>> Please work this impact assessment into the commit message.
+>>
+>>>>
+>>>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+>>>> Fixes: Coverity CID 1430396: 'Constant' variable guards dead code (DEA=
+DCODE)
+>>>> Fixes: 6552d87c48 ("softmmu/vl: Let -fw_cfg option take a 'gen_id' arg=
+ument")
+>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>> ---
+>>>>  include/hw/nvram/fw_cfg.h |  4 +++-
+>>>>  hw/nvram/fw_cfg.c         | 10 ++++++----
+>>>>  softmmu/vl.c              |  6 +-----
+>>>>  3 files changed, 10 insertions(+), 10 deletions(-)
+>>>>
+>>>> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+>>>> index 11feae3177..d90857f092 100644
+>>>> --- a/include/hw/nvram/fw_cfg.h
+>>>> +++ b/include/hw/nvram/fw_cfg.h
+>>>> @@ -302,8 +302,10 @@ void *fw_cfg_modify_file(FWCfgState *s, const cha=
+r *filename, void *data,
+>>>>   * will be used; also, a new entry will be added to the file director=
+y
+>>>>   * structure residing at key value FW_CFG_FILE_DIR, containing the it=
+em name,
+>>>>   * data size, and assigned selector key value.
+>>>> + *
+>>>> + * Returns: %true on success, %false on error.
+>>>>   */
+>>>> -void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
+>>>> +bool fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
+>>>>                                 const char *gen_id, Error **errp);
+>>>>
+>>>>  FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>>>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>>>> index 3b1811d3bf..c88aec4341 100644
+>>>> --- a/hw/nvram/fw_cfg.c
+>>>> +++ b/hw/nvram/fw_cfg.c
+>>>> @@ -1032,7 +1032,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const ch=
+ar *filename,
+>>>>      return NULL;
+>>>>  }
+>>>>
+>>>> -void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
+>>>> +bool fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
+>>>>                                 const char *gen_id, Error **errp)
+>>>>  {
+>>>>      ERRP_GUARD();
+>>>> @@ -1044,20 +1044,22 @@ void fw_cfg_add_from_generator(FWCfgState *s, =
+const char *filename,
+>>>>      obj =3D object_resolve_path_component(object_get_objects_root(), =
+gen_id);
+>>>>      if (!obj) {
+>>>>          error_setg(errp, "Cannot find object ID '%s'", gen_id);
+>>>> -        return;
+>>>> +        return false;
+>>>>      }
+>>>>      if (!object_dynamic_cast(obj, TYPE_FW_CFG_DATA_GENERATOR_INTERFAC=
+E)) {
+>>>>          error_setg(errp, "Object ID '%s' is not a '%s' subclass",
+>>>>                     gen_id, TYPE_FW_CFG_DATA_GENERATOR_INTERFACE);
+>>>> -        return;
+>>>> +        return false;
+>>>>      }
+>>>>      klass =3D FW_CFG_DATA_GENERATOR_GET_CLASS(obj);
+>>>>      array =3D klass->get_data(obj, errp);
+>>>>      if (*errp) {
+>>>> -        return;
+>>>> +        return false;
+>>>>      }
+>>>>      size =3D array->len;
+>>>>      fw_cfg_add_file(s, filename, g_byte_array_free(array, TRUE), size=
+);
+>>>> +
+>>>> +    return true;
+>>>>  }
+>>>>
+>>>>  static void fw_cfg_machine_reset(void *opaque)
+>>>> diff --git a/softmmu/vl.c b/softmmu/vl.c
+>>>> index f476ef89ed..3416241557 100644
+>>>> --- a/softmmu/vl.c
+>>>> +++ b/softmmu/vl.c
+>>>> @@ -2070,11 +2070,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts =
+*opts, Error **errp)
+>>>>          size =3D strlen(str); /* NUL terminator NOT included in fw_cf=
+g blob */
+>>>>          buf =3D g_memdup(str, size);
+>>>>      } else if (nonempty_str(gen_id)) {
+>>>> -        Error *local_err =3D NULL;
+>>>> -
+>>>> -        fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
+>>>> -        if (local_err) {
+>>>> -            error_propagate(errp, local_err);
+>>>> +        if (!fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp)) {
+>>>>              return -1;
+>>>>          }
+>>>>          return 0;
+>>
+>> The minimally invasive fix would be this one-liner:
+>>
+>>     diff --git a/softmmu/vl.c b/softmmu/vl.c
+>>     index f476ef89ed..46718c1eea 100644
+>>     --- a/softmmu/vl.c
+>>     +++ b/softmmu/vl.c
+>>     @@ -2072,7 +2072,7 @@ static int parse_fw_cfg(void *opaque, QemuOpts=
+ *opts, Error **errp)
+>>          } else if (nonempty_str(gen_id)) {
+>>              Error *local_err =3D NULL;
+>>
+>>     -        fw_cfg_add_from_generator(fw_cfg, name, gen_id, errp);
+>>     +        fw_cfg_add_from_generator(fw_cfg, name, gen_id, &local_err)=
+;
+>>              if (local_err) {
+>>                  error_propagate(errp, local_err);
+>>                  return -1;
+>>
+>> I like yours better.  We have a long tail of functions taking the
+>> conventional Error **errp parameter to convert from returning void to
+>> bool.
+>>
+>>> The retvals seem OK, but I have no idea if this plays nicely with the
+>>> new ERRP_GUARD (which I'm just noticing in fw_cfg_add_from_generator())=
+.
+>>
+>> Return values don't interfere with ERRP_GUARD().
+>>
+>> Below the hood, ERRP_GUARD() replaces problematic values of @errp by a
+>> pointer to a local variable that is automatically propagated to the
+>> original value.  Why is that useful?  From error.h's big comment:
+>>
+>>  * Without ERRP_GUARD(), use of the @errp parameter is restricted:
+>>  * - It must not be dereferenced, because it may be null.
+>>  * - It should not be passed to error_prepend() or
+>>  *   error_append_hint(), because that doesn't work with &error_fatal.
+>>  * ERRP_GUARD() lifts these restrictions.
+>
+> Hmmm... OK. So I guess the problem was that some functions didn't
+> introduce their own local_err variables (which is always safe to use),
+> and consequently didn't use explicit propagation to the errp that they
+> received form their callers. Instead, they just passed on the errp they
+> received to their callees. And ERRP_GUARD was deemed a better / safer
+> design than manually converting all such functions to local_err usage /
+> propagation.
 
-Hmm.. Modifying the function parameter. Safe now, as nbd_handle_request() call is the last usage of request in nbd_trip().
+Not quite :)
 
-> +        }
->           if (ret == 0 && request->flags & NBD_CMD_FLAG_FUA) {
->               ret = blk_co_flush(exp->blk);
->           }
-> 
+Passing @errp directly to avoid error_propagate() is fine.  In fact,
+I've grown to dislike use of error_propagate() for several reasons:
 
+1. It's t-e-d-i-o-u-s-l-y verbose.  All that error handling boilerplate
+makes it hard to see what the code is trying to get done.
 
--- 
-Best regards,
-Vladimir
+2. It gives me crappy stack backtraces: the backtrace for
+error_propagate(&error_abort, local_err) is better than nothing, but the
+one I really want is for the error_setg().
+
+3. It annoys me in the debugger by defeating things like break
+error_setg_internal if errp =3D=3D ...
+
+I'm on a quest to kill as many error_propagate() as I can.
+
+We can pass @errp directly unless
+
+a. we need to check for failure by checking whether an error was set, or
+
+b. we want to use error_prepend() or error_append_hint().
+
+We can often avoid (a) by making the function return a distinct error
+value.  I finally codified this practice in commit e3fe3988d78, and
+updated a substantial amount of code to work that way ("[PATCH v4 00/45]
+Less clumsy error checking", commit b6d7e9b66f..a43770df5d).  The
+diffstat illustrates the severity of 1.: 275 files changed, 2419
+insertions(+), 3558 deletions(-).
+
+ERRP_GUARD() mitigates the remaining propagations: 1. becomes much
+better, 2. is addressed fully, 3. remains.
+
+> If a function receives an errp, is the function now *required* to use
+> ERRP_GUARD? Even if the function uses local_err + explicit propagation?
+
+You must use ERRP_GUARD() in functions that dereference their @errp
+parameter (so that works even when the argument is null) or pass it to
+error_prepend() or error_append_hint() (so they get reached even when
+the argumentis &error_fatal).
+
+You should use Use ERRP_GUARD() to avoid clumsy error propagation.
+
+You should not use ERRP_GUARD() when propagation is not actually needed.
+
+> (I think error_prepend() and error_append_hint() should work with
+> local_err, no?)
+
+They do.
+
+In fact, ERRP_GUARD() creates local variable under the hood.
+
+> Anyway... commit 8b4b52759a7c ("fw_cfg: Use ERRP_GUARD()", 2020-07-10)
+> indicates that ERRP_GUARD() is not preferred over local_err + manual
+> propagation. OK.
+>
+> Side question: how do we intend to catch reintroductions of local_err +
+> manual propagation?
+
+It's the usual plan
+
+1. Put the rule in writing (done)
+
+2. Eliminate the bad examples (in progress)
+
+We could additionally
+
+3. Make checkpatch.pl flag (some) rule violations, but I go there only
+when I know it's necessary.
+
+The plan's success depends on carrying through 2.  That's where many an
+ambitious improvement has stalled for us.  I'm confident on this one,
+because Vladimir *automated* the conversion to ERRP_GUARD(): commit
+8220f3ac74 "scripts: Coccinelle script to use ERRP_GUARD()".
+
+>> fw_cfg_add_from_generator() dereferences @errp to check for failure of
+>> klass->get_data().
+>>
+>> If ->get_data() returns null on error and non-null on success, we
+>> could simplify:
+>>
+>>   diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>>   index 3b1811d3bf..dfa1f2012a 100644
+>>   --- a/hw/nvram/fw_cfg.c
+>>   +++ b/hw/nvram/fw_cfg.c
+>>   @@ -1035,7 +1035,6 @@ void *fw_cfg_modify_file(FWCfgState *s, const ch=
+ar *filename,
+>>    void fw_cfg_add_from_generator(FWCfgState *s, const char *filename,
+>>                                   const char *gen_id, Error **errp)
+>>    {
+>>   -    ERRP_GUARD();
+>>        FWCfgDataGeneratorClass *klass;
+>>        GByteArray *array;
+>>        Object *obj;
+>>   @@ -1053,7 +1052,7 @@ void fw_cfg_add_from_generator(FWCfgState *s, co=
+nst char *filename,
+>>        }
+>>        klass =3D FW_CFG_DATA_GENERATOR_GET_CLASS(obj);
+>>        array =3D klass->get_data(obj, errp);
+>>   -    if (*errp) {
+>>   +    if (!array) {
+>>            return;
+>>        }
+>>        size =3D array->len;
+>>
+>> Clearer now?
+>
+> Yes, thanks!
+>
+> Laszlo
+
 
