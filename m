@@ -2,80 +2,76 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86CDDC433EB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 640E7C433E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:56:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 283E9206E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:52:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FFA2206E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 17:56:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yv5oCa71"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 283E9206E3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q1SkTSJ/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FFA2206E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyfOC-0005Gl-M6
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:52:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44716)
+	id 1jyfRv-0006Nu-CD
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 13:56:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jyfNa-0004kT-Rs
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:51:38 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:37039)
+ id 1jyfRC-0005rn-TK
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:55:22 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39700)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1jyfNZ-0004m4-4f
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:51:38 -0400
-Received: by mail-ot1-x329.google.com with SMTP id w17so5012265otl.4
- for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 10:51:36 -0700 (PDT)
+ id 1jyfRB-0005BB-7n
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 13:55:22 -0400
+Received: by mail-ot1-x344.google.com with SMTP id 18so5011212otv.6
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 10:55:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BVlfn3AAWZV6nx0aW54CtW2+CNLKwOI+01JMPEXaALQ=;
- b=yv5oCa716FANd1fmC+gHKeIl7puJ2hSyAFdn3rAhkUh3tvOy7+STu9NtupvDD8Uiqm
- CEAPJhyCRHg/4iwvGYk/NnvDcKxiU+T6jjW+0n4T1g1UqseXes9A0NjZoszXT+vQsTOB
- GY6HYibqTV0PKdGyoc8M/9mc905rjNt+7Lj7Ly2xGQkl68jWAqgSeWwxk8X61g+JwA4w
- Ovnv8oVwLzDFjdILBh+aG9niaF75WFmG+Tue7eXUNDjN0Lgy/C2aTOQ7RfvETcB2Sw9S
- pzL4V5At+eEvKDHkbizdlV3sTz3bVbdbLWae3FhDfd4w5s5Kvp7gvooYAF7KD0VHYew8
- jtdw==
+ :cc; bh=hjO4sAqNk87d29tUpcojtJg6DKFI+TSCsesTqD6qtKs=;
+ b=Q1SkTSJ/7ktS5zcmuWDJXXn2+9c9x1hlswPBRPQda4sGnOfvSDvnPqtCxBDjrU7BC7
+ GNCqu+u0Zy/cwUkqNsUCmWTRTKc7BNYIoz0zfR6NgeTsDP/wDcBV6C3oyy25nxXWbkzw
+ iq8mMHoPRAEW9EdwFT+pygBiZv2DgGAa82NrawOCqqZbQxN7UNQsecvd/rnT6XjQ2kBe
+ /8pd5LuLK3gYWEMnkRxYsidZo6wACPF1H2lAooYt2712TuUpDNfvMMsTWQSYW17cqYF+
+ HsDrTlBEXH+KwTu3qIbalD9fbZcASPZYHR7ZGXEEkR4XhycBb9ISo80rLN4zJtvVlqSU
+ W75Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=BVlfn3AAWZV6nx0aW54CtW2+CNLKwOI+01JMPEXaALQ=;
- b=i38ALRNqzcNnRSpttyNWr6h3iEWpSw+SWv77YutgBN+vCA90x+jfeVXQx47Ig8T4fK
- lCf2PZ0VykyJdQ1ebCqCFo5mLHiYxxQH2uDPwiX1nYpyQZgIsFb4vzJCgDQXa5tqdabd
- 5NR5nQSZ6ej4aSWWvHe0p/HwzizrwtTSqmRyq4ah8UfPgixst7fg1S4UqmDRRISD2LZn
- 1+UHkoMc56Zxt4613vy2YkhHv8F3q7EFryA3fqhgQ85ACVR6WDD2z88W5+LNCnCPxaKQ
- qu6wNwNALlnOA2zlO7P6Ln4g/ZCh94X2XIWxpwxEZmRI0jETKaM1rJY6bIu8/XfnCVLx
- A0oQ==
-X-Gm-Message-State: AOAM53038CU1zHzH6xLZsTYCRwDd3T6AyXZlMsnHMt724RzVijyfwlnz
- iJWrGN/rIT7FtoqJ2e7SdxWeuNYZY8m6Ph43irCFAQ==
-X-Google-Smtp-Source: ABdhPJxV3mUlGt9jXaWM7+iTmLXVo3XW1zDIVPjQYQDaJaHDHOOdPm98iyPyyVMMcQA2O/2Eg7qY0SRvpi1+lROt1No=
-X-Received: by 2002:a05:6830:10ce:: with SMTP id
- z14mr5342049oto.135.1595526695944; 
- Thu, 23 Jul 2020 10:51:35 -0700 (PDT)
+ bh=hjO4sAqNk87d29tUpcojtJg6DKFI+TSCsesTqD6qtKs=;
+ b=Y8eZyXWr+tymznJMZLbYr3abocSqwzfOTFSEKDoqVbPnRcGHoeiWVOhVCpC9vthig1
+ 5PnnKXUqQTyfmveggVu3RYYL76NfooiAU9FtumUBO+0Xq30m/1tG9j5IaYV1EjIXVlY0
+ TiCtyc2lmiBHQny+/1BqCQbig+s20ZZhu0D1EEafAZDpQpJKiHXDcL2BcA2+QTDSYJ1U
+ 8obLFBhp9Resu+z8Vs3YB8Scbsud0lkMBQ9RyCYjEnUHj3JPM2ZGdMW3LkEUNup0XHF0
+ mMuRThhk4kPIztUg+MLZ+xylA7mcHuO+JGZs7FIH36HL3/QXBl93b+VZ9QkYmNglASFL
+ cfcQ==
+X-Gm-Message-State: AOAM530/44LITZm+QBzjbw7FoLGa9zgra/SW6qbwiVRNgnGasvolV/Gy
+ cbYndKRvKdBvcaM0VKY+aGHroxAOI0MNQqWZmUogdime
+X-Google-Smtp-Source: ABdhPJzNBa87Z19Ftl9JhQSdW4pfQ7zUP7NJPhaBZ+Ks2ru07bhuZuZiren5FKggkfX5LjkD8Ka4RGwgeJzr+BrqtME=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr5207885ota.91.1595526919629; 
+ Thu, 23 Jul 2020 10:55:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <1592486508-6135-1-git-send-email-jasowang@redhat.com>
- <1592486508-6135-30-git-send-email-jasowang@redhat.com>
- <CAFEAcA-1K_zVHPFz31W9Tx7CmAXo=4-qQNJxrZnYT0Heg5_1NA@mail.gmail.com>
- <20200703181031.4ed6fcde@luklap>
-In-Reply-To: <20200703181031.4ed6fcde@luklap>
+References: <20200710064642.24505-1-lulu@redhat.com>
+In-Reply-To: <20200710064642.24505-1-lulu@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 Jul 2020 18:51:25 +0100
-Message-ID: <CAFEAcA_5xBd8YhD72gGQgXroVoGi7RZkNet6_Zk_b-NALuHQ-g@mail.gmail.com>
-Subject: Re: [PULL V2 29/33] net/colo-compare.c: Correct ordering in complete
- and finalize
-To: Lukas Straub <lukasstraub2@web.de>
+Date: Thu, 23 Jul 2020 18:55:08 +0100
+Message-ID: <CAFEAcA_dhusPWdObGznvh_Ox0ntwk-fE67f26iFfLkRbbx0K1Q@mail.gmail.com>
+Subject: Re: [PATCH v2] vhost-vdpa :Fix Coverity CID 1430270 / CID 1420267
+To: Cindy Lu <lulu@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::329;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x329.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -97,37 +93,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 3 Jul 2020 at 17:10, Lukas Straub <lukasstraub2@web.de> wrote:
->
-> On Thu, 25 Jun 2020 10:30:24 +0100
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> > On Thu, 18 Jun 2020 at 14:23, Jason Wang <jasowang@redhat.com> wrote:
-> > >
-> > > From: Lukas Straub <lukasstraub2@web.de>
-> > >
-> > > In colo_compare_complete, insert CompareState into net_compares
-> > > only after everything has been initialized.
-> > > In colo_compare_finalize, remove CompareState from net_compares
-> > > before anything is deinitialized.
-> >
-> > Hi; this code-motion seems to have prompted Coverity to
-> > discover a possible deref-of-NULL-pointer (cID 1429969):
+(trimming down the rather exuberant CC list)
 
-> > Either we need to avoid calling this if s->iothread is NULL,
-> > or if it can't ever be NULL then the earlier NULL check was
-> > pointless and can be removed.
+On Fri, 10 Jul 2020 at 07:47, Cindy Lu <lulu@redhat.com> wrote:
 >
-> I'll look into it.
+> In the function vhost_vdpa_dma_map/unmap, The struct msg was not initialized all its fields.
+>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  hw/virtio/vhost-vdpa.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Did you send a fix for this? I couldn't find one in a quick
-search of my mail archive...
+Michael, I guess this should go via your tree ?
 
 thanks
 -- PMM
