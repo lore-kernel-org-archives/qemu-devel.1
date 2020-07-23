@@ -2,79 +2,96 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A54EC433E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:02:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DACBC433E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:06:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7254A20768
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:02:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7254A20768
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DB9D72064C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:06:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DmzHi+EO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB9D72064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyas2-0000cm-L4
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 09:02:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44594)
+	id 1jyavi-0003jV-6G
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 09:06:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jyaqu-00085E-Iw
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:01:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43844)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jyaqr-0000XH-Uk
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:01:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jyaqo-00081O-Fb
- for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 13:01:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0A2D62E80ED
- for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 13:01:29 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jyav9-0003KG-Ss
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:05:59 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53786
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jyav7-0001TN-Hs
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:05:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595509556;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=nx4488akHd+9ueCDEH3Ez24fQFlFQmz1ftTCK+KRyHY=;
+ b=DmzHi+EOV2Asa2NEVRnePgf17NZFvcDhghQdYiZ9DCkFcCjrLXUX+jHLEGNithupqeuY4n
+ TudzLzCJAOJYKIB4swVorLUTLGpwGocPIcAX8IEo6ShZRq/xhsjqud4wcMWcou2gBHLwKy
+ v02DtR9+fdw39DAb1imU3LegDBAs0Uo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-ngD_HI94M564LLqHYhPz_w-1; Thu, 23 Jul 2020 09:05:52 -0400
+X-MC-Unique: ngD_HI94M564LLqHYhPz_w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B847857;
+ Thu, 23 Jul 2020 13:05:50 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-87.ams2.redhat.com [10.36.112.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 331956931B;
+ Thu, 23 Jul 2020 13:05:46 +0000 (UTC)
+Subject: Re: [PATCH 3/4] tests/acceptance: Disable the rx sash and arm
+ cubieboard replay test on Gitlab
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200723122800.723-1-thuth@redhat.com>
+ <20200723122800.723-4-thuth@redhat.com>
+ <a78f13d8-5f81-43ae-f497-90f86f60f0bc@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <de0c01b5-80e0-63f7-7a69-fb8f0d4b5b4c@redhat.com>
+Date: Thu, 23 Jul 2020 15:05:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Jul 2020 12:50:57 -0000
-From: Lorenzo Gatti <1888663@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: mouse msmouse serial
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gattilorenz
-X-Launchpad-Bug-Reporter: Lorenzo Gatti (gattilorenz)
-X-Launchpad-Bug-Modifier: Lorenzo Gatti (gattilorenz)
-Message-Id: <159550865727.2767.17464111511631671280.malonedeb@gac.canonical.com>
-Subject: [Bug 1888663] [NEW] msmouse not recognized in guest
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="f877c5162b568393e2d07ce948459ba0abc456fe";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 72bbd9b7d52203609499089c05b0887e7a489158
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 07:31:00
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <a78f13d8-5f81-43ae-f497-90f86f60f0bc@amsat.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:26:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,84 +100,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1888663 <1888663@bugs.launchpad.net>
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Fam Zheng <fam@euphon.net>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 23/07/2020 14.53, Philippe Mathieu-Daudé wrote:
+> On 7/23/20 2:27 PM, Thomas Huth wrote:
+>> These tests always time out on Gitlab, not sure what's happening here.
+>> Let's disable them until somebody has enough spare time to debug the
+>> issues.
+> 
+> Is the Avocado cache working? Is it failing with an empty cache?
+> If so, maybe we need to run avocado cache fetching in a previous
+> step, before the testing job.
+> 
+> Can you share a url of failed job so I can have a look?
 
-The msmouse option for emulating a serial mouse does not seem to work in
-a DOS guest.
+CentOS:
+ https://gitlab.com/huth/qemu/-/jobs/651179303
 
-I'm on Windows 10 X64, I have tried launching qemu (commit d0cc248164961a7b=
-a9d43806feffd76f9f6d7f41 but also way older) with:
-./qemu-system-i386 -serial msmouse -fda mousetest.img
-./qemu-system-i386 -chardev msmouse,id=3Dmsmouse -device isa-serial,chardev=
-=3Dmsmouse -fda mousetest.img
-./qemu-system-i386 -chardev msmouse,id=3Dmsmouse -device pci-serial,chardev=
-=3Dmsmouse -chardev msmouse,id=3Dmsmouse -fda mousetest.img
+Debian:
+ https://gitlab.com/huth/qemu/-/jobs/651179296
 
-Then I boot FreeDOS (but regular DOS shows same behavior), start the CuteMo=
-use driver and force the scan of a serial mouse with CTM /S.
-The mouse is never found. With other drivers (in the attachment), the mouse=
- is probably not found but the driver is installed anyway, but it does not =
-work (there's a MOUSETST in the same floppy; it works iwth CTM and PS/2 mou=
-se emulation).
+... might be a cache issue, indeed.
 
-Using a serial port sniffer inside the guest, it would seem that data is
-indeed transmitted. Setting a few printf in msmouse.c also confirms that
-the mouse gets initilized and starts transmitting data. However, it does
-not work...
+ Thomas
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: mouse msmouse serial
-
-** Attachment added: "FreeDOS image with multiple mouse drivers and mouse t=
-est program"
-   https://bugs.launchpad.net/bugs/1888663/+attachment/5395214/+files/mouse=
-test.img
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1888663
-
-Title:
-  msmouse not recognized in guest
-
-Status in QEMU:
-  New
-
-Bug description:
-  The msmouse option for emulating a serial mouse does not seem to work
-  in a DOS guest.
-
-  I'm on Windows 10 X64, I have tried launching qemu (commit d0cc248164961a=
-7ba9d43806feffd76f9f6d7f41 but also way older) with:
-  ./qemu-system-i386 -serial msmouse -fda mousetest.img
-  ./qemu-system-i386 -chardev msmouse,id=3Dmsmouse -device isa-serial,chard=
-ev=3Dmsmouse -fda mousetest.img
-  ./qemu-system-i386 -chardev msmouse,id=3Dmsmouse -device pci-serial,chard=
-ev=3Dmsmouse -chardev msmouse,id=3Dmsmouse -fda mousetest.img
-
-  Then I boot FreeDOS (but regular DOS shows same behavior), start the Cute=
-Mouse driver and force the scan of a serial mouse with CTM /S.
-  The mouse is never found. With other drivers (in the attachment), the mou=
-se is probably not found but the driver is installed anyway, but it does no=
-t work (there's a MOUSETST in the same floppy; it works iwth CTM and PS/2 m=
-ouse emulation).
-
-  Using a serial port sniffer inside the guest, it would seem that data
-  is indeed transmitted. Setting a few printf in msmouse.c also confirms
-  that the mouse gets initilized and starts transmitting data. However,
-  it does not work...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1888663/+subscriptions
 
