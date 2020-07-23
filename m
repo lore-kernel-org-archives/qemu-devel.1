@@ -2,75 +2,68 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C9EC433EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE73C433F8
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:04:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E30112086A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:04:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E30112086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9B6412086A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:04:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bBtJ7vdy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B6412086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyPed-0005Kb-88
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 21:04:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38570)
+	id 1jyPer-0005fR-UN
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 21:04:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <guang.zeng@intel.com>)
- id 1jyPbi-0001VQ-GJ
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 21:01:10 -0400
-Received: from mga11.intel.com ([192.55.52.93]:15170)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jyPaw-0008RO-QM; Wed, 22 Jul 2020 21:00:22 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:36849)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <guang.zeng@intel.com>)
- id 1jyPbf-0007R1-KI
- for qemu-devel@nongnu.org; Wed, 22 Jul 2020 21:01:09 -0400
-IronPort-SDR: HsOqlbOz178T6wNDXE6cKTCcgeDKhrJI+InVzqTGA0pbZhvhoRtvZzsQqhhC+SumbHZBpxrWpP
- /QtNs0c4dqxg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9690"; a="148385497"
-X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; d="scan'208";a="148385497"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 22 Jul 2020 18:01:03 -0700
-IronPort-SDR: W/HWfaItXgle0qSdtTODqvSQtc9/JjpDTtmlwum0zJa3sm106gL6lVrjxuoknrHjz2xoUd/2/e
- 5B76V5nxducQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,383,1589266800"; d="scan'208";a="488185534"
-Received: from zengguan-mobl.ccr.corp.intel.com (HELO [10.238.0.188])
- ([10.238.0.188])
- by fmsmga006.fm.intel.com with ESMTP; 22 Jul 2020 18:01:01 -0700
-Subject: Re: [PATCH] hw/misc/edu: support pci device state migration
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200722081323.9893-1-guang.zeng@intel.com>
- <CAFEAcA-M6OghOCX76q2kZDh_Nf1YLEDSLZcwa2ZVJgzwjdDaWw@mail.gmail.com>
-From: Zeng Guang <guang.zeng@intel.com>
-Message-ID: <03961ed0-f917-8f2c-0262-442d768ce3e4@intel.com>
-Date: Thu, 23 Jul 2020 09:01:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jyPau-0007HH-Hk; Wed, 22 Jul 2020 21:00:22 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BBvBk4qCWz9sRR; Thu, 23 Jul 2020 11:00:14 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1595466014;
+ bh=Dj0Y0gkrxPHbTK/MI/TwCv7ZL7R9wEyOUsLsGzFq2Z4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=bBtJ7vdyoRl3HDe/HBYdeIPU1tT0SpmAmthKh15FonsXjj03Yjd3C5+LH4Gep0c5j
+ TWSD3GlK16FVF5aES+lEy3IZoS6smkDw9+K3C2Wf2nlkEpNzBMkk44hO3J9FIZ5tXi
+ ZzE1/BuwmnEYWaS7MpZysIaHyUqzb/mt3Mu1hfyc=
+Date: Thu, 23 Jul 2020 10:56:30 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: Re: [PATCH v2 4/9] ppc/e500: Use start-powered-off CPUState property
+Message-ID: <20200723005630.GI5513@umbus.fritz.box>
+References: <20200722035016.469075-1-bauerman@linux.ibm.com>
+ <20200722035016.469075-5-bauerman@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-M6OghOCX76q2kZDh_Nf1YLEDSLZcwa2ZVJgzwjdDaWw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=192.55.52.93; envelope-from=guang.zeng@intel.com;
- helo=mga11.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 21:01:03
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="4BlIp4fARb6QCoOq"
+Content-Disposition: inline
+In-Reply-To: <20200722035016.469075-5-bauerman@linux.ibm.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,54 +76,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, wei.w.wang@intel.com,
- Jiri Slaby <jslaby@suse.cz>, chao.gao@intel.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/2020 4:37 PM, Peter Maydell wrote:
-> On Wed, 22 Jul 2020 at 09:31, Zeng Guang <guang.zeng@intel.com> wrote:
->> Currently edu device doesn't support live migration. Part of PCI
->> configuration information would be lost after migration.
->>
->> PCI device state in source VM:
->>       Bus  0, device   3, function 0:
->>       Class 0255: PCI device 1234:11e8
->>       PCI subsystem 1af4:1100
->>       IRQ 11, pin A
->>       BAR0: 32 bit memory at 0xfea00000 [0xfeafffff].
->>       id ""
->>
->> PCI device state in destination VM:
->>       Bus  0, device   3, function 0:
->>       Class 0255: PCI device 1234:11e8
->>       PCI subsystem 1af4:1100
->>       IRQ 0, pin A
->>       BAR0: 32 bit memory at 0xffffffffffffffff [0x000ffffe].
->>       id ""
->>
->> Add VMState for edu device to support migration.
->>
->> Signed-off-by: Gao Chao <chao.gao@intel.com>
->> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
->> Reviewed-by: Wei Wang <wei.w.wang@intel.com>
-> Hi; thanks for adding migration support for this device.
->
->
->> +static const VMStateDescription vmstate_edu = {
->> +    .name = "edu",
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_PCI_DEVICE(pdev, EduState),
-> This isn't the only state that the device has. You
-> also need to migrate:
-> stopping, addr4, fact, status, irq_status, the struct dma_state members,
-> the dma_timer, dma_buf and dma_mask.
-Right . I will add those params in VMstate and update patch. Thanks.
->
-> thanks
-> -- PMM
+
+--4BlIp4fARb6QCoOq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jul 22, 2020 at 12:50:11AM -0300, Thiago Jung Bauermann wrote:
+> Instead of setting CPUState::halted to 1 in ppce500_cpu_reset_sec(), use
+> the start-powered-off property which makes cpu_common_reset() initialize =
+it
+> to 1 in common code.
+>=20
+> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/ppc/e500.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+>=20
+> NB: I was only able to test that this patch builds. I wasn't able to
+> run it.
+>=20
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index ab9884e315..dda71bc05d 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -704,9 +704,6 @@ static void ppce500_cpu_reset_sec(void *opaque)
+> =20
+>      cpu_reset(cs);
+> =20
+> -    /* Secondary CPU starts in halted state for now. Needs to change when
+> -       implementing non-kernel boot. */
+> -    cs->halted =3D 1;
+>      cs->exception_index =3D EXCP_HLT;
+>  }
+> =20
+> @@ -897,6 +894,13 @@ void ppce500_init(MachineState *machine)
+>          } else {
+>              /* Secondary CPUs */
+>              qemu_register_reset(ppce500_cpu_reset_sec, cpu);
+> +
+> +            /*
+> +             * Secondary CPU starts in halted state for now. Needs to ch=
+ange
+> +             * when implementing non-kernel boot.
+> +             */
+> +            object_property_set_bool(OBJECT(cs), "start-powered-off", tr=
+ue,
+> +                                     &error_abort);
+>          }
+>      }
+> =20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--4BlIp4fARb6QCoOq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8Y4D0ACgkQbDjKyiDZ
+s5Lf5w/+PoQjOoiGcvCl8nMUJvCDIB2G8Ft0xGjbAxMJf3IYkQaLAWiczhujLem7
+GYIXtu8WpgjGZj9u+tMEKkfch9L9OtLbmpvRXXxrcBovhXu8YQPoMcjePwbJijVd
+3fxHWC6g+Dc5GUJD3ugqHQP/ntpLjr5+vZ43I6NwOtuL71INn5R5jdHhP36zrCYq
+xQQnRQT3Sg+hoD/9kkffP1qCXm1siw64RwsELLbKCVYbLyI85ZUQJqS3nxiuXlDx
+vp8gMX3NLjDevvz4wkPMOp9xq68CN1sosiQXSzenLNND2f1lx0iC0/RM8WNIvssA
+DitHjO6UJMlqrwHg423ko1G+74VKy7r/3rC91scg0ldXKjceABIGz7RhHvaImLbH
+ar5PG4uTgN6HxjVUK97dgjcFflvfn055jKAoOWOhfJZDtfiSp+JWf79JxQzf1Wt3
+iQVs6NGBxkANwhMVu7ztzJBA3NzoCvpa2fJ0xyoBW49BvNFQqNCGZ9CXeEsD5sny
+r8CQGOhSUYuGs8bmVkQmGEyqRcbDwUPXotF2tUv1iAGZ7NENJsiR+cWaPVX3qxq7
+Iu4hPpIXeMSxvnjIC393yTtzRkDA3wI3d0gG6X2iXFU1qAS3IfAWz+cRAw2ZPyI6
+1/PTAvo9RRKO6T4CPJX2ZBg6hI9DlSXWUjsmGulppBQbTDvxK8g=
+=J82A
+-----END PGP SIGNATURE-----
+
+--4BlIp4fARb6QCoOq--
 
