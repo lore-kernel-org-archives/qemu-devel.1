@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8C7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4CCC433E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:02:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A7CA2086A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:02:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB14120888
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 01:02:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="D4BEZOPL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A7CA2086A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="COxYNQYX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB14120888
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyPd7-0002mF-C2
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 21:02:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38404)
+	id 1jyPdI-00030M-5o
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 21:02:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jyPaw-0008QX-6P; Wed, 22 Jul 2020 21:00:22 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:53295 helo=ozlabs.org)
+ id 1jyPaw-0008QZ-A3; Wed, 22 Jul 2020 21:00:22 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:51885)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jyPau-0007HK-5O; Wed, 22 Jul 2020 21:00:21 -0400
+ id 1jyPat-0007HG-IE; Wed, 22 Jul 2020 21:00:21 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BBvBk5hgVz9sRk; Thu, 23 Jul 2020 11:00:14 +1000 (AEST)
+ id 4BBvBk3vcHz9sRW; Thu, 23 Jul 2020 11:00:14 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1595466014;
- bh=tr7gQrN42u5aEHaqrxncV5QaQ2nEQSjtEEwFVJkNzAo=;
+ bh=zuHmYIrYBOFbbEdGZavubGZBe9b7544HmjAR9Vay8nE=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=D4BEZOPLe5WPvlQqRD22k1IHcutUcFSpDgl/8p0znAMxDe4Ml169YJVlfRkZqOqW3
- u+llE1hg1RUKpX9gojNfwSYVd9kgpxcGTI72rcEXHKsCkS3Q0qNU79a5EBYYH2qgxw
- 0uKvEqls3EmGVm143t2eyCMvfQx2Dh5oSOX2SG+k=
-Date: Thu, 23 Jul 2020 10:55:49 +1000
+ b=COxYNQYXizt7d/ghFohWDTEMAtZFbercQGaF1uC11VXRPuOSGTWZ5jA14FFZOP0ul
+ bVy+AqxGb8KSAxsApdfplVMXn2UX79tPC8Ao23nNayAmXcUqTg5Ss4Mlmkoeqibe1A
+ HbNzEDbGkuAb6YQwP2bDd46st+7SfnxTihjffhBw=
+Date: Thu, 23 Jul 2020 10:55:30 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: Re: [PATCH v2 2/9] target/arm: Move setting of CPU halted state to
- generic code
-Message-ID: <20200723005549.GH5513@umbus.fritz.box>
+Subject: Re: [PATCH v2 1/9] target/arm: Move start-powered-off property to
+ generic CPUState
+Message-ID: <20200723005530.GG5513@umbus.fritz.box>
 References: <20200722035016.469075-1-bauerman@linux.ibm.com>
- <20200722035016.469075-3-bauerman@linux.ibm.com>
+ <20200722035016.469075-2-bauerman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="uJrvpPjGB3z5kYrA"
+ protocol="application/pgp-signature"; boundary="MrRUTeZlqqNo1jQ9"
 Content-Disposition: inline
-In-Reply-To: <20200722035016.469075-3-bauerman@linux.ibm.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <20200722035016.469075-2-bauerman@linux.ibm.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 20:52:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -92,14 +92,20 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---uJrvpPjGB3z5kYrA
+--MrRUTeZlqqNo1jQ9
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 22, 2020 at 12:50:09AM -0300, Thiago Jung Bauermann wrote:
-> This change is in a separate patch because it's not so obvious that it
-> won't cause a regression.
+On Wed, Jul 22, 2020 at 12:50:08AM -0300, Thiago Jung Bauermann wrote:
+> There are other platforms which also have CPUs that start powered off, so
+> generalize the start-powered-off property so that it can be used by them.
+>=20
+> Note that ARMv7MState also has a property of the same name but this patch
+> doesn't change it because that class isn't a subclass of CPUState so it
+> wouldn't be a trivial change.
+>=20
+> This change should not cause any change in behavior.
 >=20
 > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 > Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
@@ -107,38 +113,109 @@ On Wed, Jul 22, 2020 at 12:50:09AM -0300, Thiago Jung Bauermann wrote:
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/core/cpu.c    | 2 +-
->  target/arm/cpu.c | 1 -
->  2 files changed, 1 insertion(+), 2 deletions(-)
+>  exec.c                | 1 +
+>  include/hw/core/cpu.h | 4 ++++
+>  target/arm/cpu.c      | 5 ++---
+>  target/arm/cpu.h      | 3 ---
+>  target/arm/kvm32.c    | 2 +-
+>  target/arm/kvm64.c    | 2 +-
+>  6 files changed, 9 insertions(+), 8 deletions(-)
 >=20
 > NB: I was only able to test that this patch builds. I wasn't able to
-> run it on an ARM machine. I did on a ppc64le pseries KVM guest.
+> run it.
 >=20
-> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-> index 594441a150..71bb7859f1 100644
-> --- a/hw/core/cpu.c
-> +++ b/hw/core/cpu.c
-> @@ -258,7 +258,7 @@ static void cpu_common_reset(DeviceState *dev)
->      }
+> diff --git a/exec.c b/exec.c
+> index 6f381f98e2..82e82fab09 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -899,6 +899,7 @@ Property cpu_common_props[] =3D {
+>      DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
+>                       MemoryRegion *),
+>  #endif
+> +    DEFINE_PROP_BOOL("start-powered-off", CPUState, start_powered_off, f=
+alse),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
 > =20
->      cpu->interrupt_request =3D 0;
-> -    cpu->halted =3D 0;
-> +    cpu->halted =3D cpu->start_powered_off;
->      cpu->mem_io_pc =3D 0;
->      cpu->icount_extra =3D 0;
->      atomic_set(&cpu->icount_decr_ptr->u32, 0);
+> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+> index 8f145733ce..9fc2696db5 100644
+> --- a/include/hw/core/cpu.h
+> +++ b/include/hw/core/cpu.h
+> @@ -374,6 +374,10 @@ struct CPUState {
+>      bool created;
+>      bool stop;
+>      bool stopped;
+> +
+> +    /* Should CPU start in powered-off state? */
+> +    bool start_powered_off;
+> +
+>      bool unplug;
+>      bool crash_occurred;
+>      bool exit_request;
 > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index ec65c7653f..b6c65e4df6 100644
+> index 111579554f..ec65c7653f 100644
 > --- a/target/arm/cpu.c
 > +++ b/target/arm/cpu.c
-> @@ -175,7 +175,6 @@ static void arm_cpu_reset(DeviceState *dev)
+> @@ -174,8 +174,8 @@ static void arm_cpu_reset(DeviceState *dev)
+>      env->vfp.xregs[ARM_VFP_MVFR1] =3D cpu->isar.mvfr1;
 >      env->vfp.xregs[ARM_VFP_MVFR2] =3D cpu->isar.mvfr2;
 > =20
->      cpu->power_state =3D s->start_powered_off ? PSCI_OFF : PSCI_ON;
-> -    s->halted =3D s->start_powered_off;
+> -    cpu->power_state =3D cpu->start_powered_off ? PSCI_OFF : PSCI_ON;
+> -    s->halted =3D cpu->start_powered_off;
+> +    cpu->power_state =3D s->start_powered_off ? PSCI_OFF : PSCI_ON;
+> +    s->halted =3D s->start_powered_off;
 > =20
 >      if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
 >          env->iwmmxt.cregs[ARM_IWMMXT_wCID] =3D 0x69051000 | 'Q';
+> @@ -2182,7 +2182,6 @@ static const ARMCPUInfo arm_cpus[] =3D {
+>  };
+> =20
+>  static Property arm_cpu_properties[] =3D {
+> -    DEFINE_PROP_BOOL("start-powered-off", ARMCPU, start_powered_off, fal=
+se),
+>      DEFINE_PROP_UINT32("psci-conduit", ARMCPU, psci_conduit, 0),
+>      DEFINE_PROP_UINT64("midr", ARMCPU, midr, 0),
+>      DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 9e8ed423ea..a925d26996 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -810,9 +810,6 @@ struct ARMCPU {
+>       */
+>      uint32_t psci_version;
+> =20
+> -    /* Should CPU start in PSCI powered-off state? */
+> -    bool start_powered_off;
+> -
+>      /* Current power state, access guarded by BQL */
+>      ARMPSCIState power_state;
+> =20
+> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+> index 0af46b41c8..1f2b8f8b7a 100644
+> --- a/target/arm/kvm32.c
+> +++ b/target/arm/kvm32.c
+> @@ -218,7 +218,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+> =20
+>      /* Determine init features for this CPU */
+>      memset(cpu->kvm_init_features, 0, sizeof(cpu->kvm_init_features));
+> -    if (cpu->start_powered_off) {
+> +    if (cs->start_powered_off) {
+>          cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_POWER_OFF;
+>      }
+>      if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 1169237905..f8a6d905fb 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -775,7 +775,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+> =20
+>      /* Determine init features for this CPU */
+>      memset(cpu->kvm_init_features, 0, sizeof(cpu->kvm_init_features));
+> -    if (cpu->start_powered_off) {
+> +    if (cs->start_powered_off) {
+>          cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_POWER_OFF;
+>      }
+>      if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
 >=20
 
 --=20
@@ -147,25 +224,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---uJrvpPjGB3z5kYrA
+--MrRUTeZlqqNo1jQ9
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8Y4BUACgkQbDjKyiDZ
-s5K3iRAApLHWr2t2WVJoDwgdjlDiUu5LgaiieQH4R6cxApqBnNYE/0oMTnsMSK9g
-LmBG1CcRcjs751PUdZTPECu8HeIk1Jjlsw6m3TZLR8k2JFYlbNjOPFJs4GqZDU74
-KQVuUp0/wIjCppuYNcpjL/i2vnRBiErKvOXy00Z3M9I3Vuux5kWjV9gpMDRuQlCG
-97KgCVmO7YR7eYDX7T4jR1DSNCz1gMeuD5AbiPPR3vk76z9wwoQ48y5+vnLA5TXk
-+iOhHsgtDtlJVVoVCCnmJuoowRzBZDuCiM8BZeGmj0smkn8+h3CcujoX5t7gE0G5
-PdaLewLS3FsZMR89LgsTVGj41EeKpN/ITUxwkdPN9pBxDWhb/pXlzQIAfJadotzZ
-AvaenDHeue4e66oLHe54XGdyTqQBq6tzAq4/Zi3qnALIjRZxC7l2Y2STuB+wkWEX
-JU6sAfme+YLZpIW3FvhvB6jbK+jwDDrRmZ3Z3j5JNy3eJeaz5XCHdZerUVAp/7F5
-SGXRmh+bjX4yb2DDI0/Q57qwaOJWUgp+53mL6758qQ9mktGL0Eekq6i1oeh5xnGZ
-LMLBY2nuftk4QCnhL5IKhxZGmcGHHqWvU/w6MjbYPjd+AG0pwqBfw3JD6R8vDVRv
-SkQQCxZRV1+APEPRjoHBH+BfdP6xagns2j/lostFo/iOVK4lD7I=
-=n6yt
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8Y4AIACgkQbDjKyiDZ
+s5KG/xAAheuxIOm/147keYG58h1DJMAKRtgfLlgArGcPgMoxiCc3pyUwgiCzwZJJ
+Vb+M5t9WYdTed/X7ptevwriWMqOCwyzDk/uBj2two3fXiDt8TLcprYBs21YY0HAS
+1Jwk/Vnk9uq89tIdlZ7JRjSJk9DxUakY/gBOKsnTPSX7trVaQu89yy4uliX3AXun
+gCL2ugoGechlQhXfV8KcvQ+haCuMZ+tpIcYitPkHH2QnkRP3zP+Ttg5cG1aYkLIF
+NKRWxxr4KANeyVAC9gkniPyOzWiKhUeuxUPkEdeWk3oJAakGVBD+nVOD3DH/t9jp
+L8dOH2Aw6eweBIIoCe90Utq8FVLQG3CjvMN33xUSWtoo1rtLEY1GM9KMZSKTQ758
+VPkGyiONjzunGUbT0L9dl8wD3Fwg0Y/7yGmbSDTVZdJsg7/DsQ8AnZ6Ho+v+Drgz
+gh7vm1em3bKMeVXLBIWuWh3AxYGKCd3JPqRhYefHzSQ86brwbuBVUpLIQdHrQo32
+lPJCGi3inUWelVvhZOJXRWyKgifzr6QD1mYjIpKbp2HvTalbZIokMgFAJSa9uLlB
+aMD2lIcnxcGvsfFGAthbm8rUMG1WAFVhBXvtXJpV+NvSN5ndFZd1yp9O46ES3Ef2
+0DYn8kuw3JEtpA/ykCv6MMcMqTped01hTUn7Xv04xiTk/w8F+Xo=
+=9IsF
 -----END PGP SIGNATURE-----
 
---uJrvpPjGB3z5kYrA--
+--MrRUTeZlqqNo1jQ9--
 
