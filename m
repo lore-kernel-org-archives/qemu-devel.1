@@ -2,62 +2,127 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 316C2C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 10:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6421C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 10:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 031472080D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 10:51:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 031472080D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 823812086A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 10:51:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fRaSkW81"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 823812086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyYoe-0007wW-8j
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 06:51:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51382)
+	id 1jyYoo-0008ER-PG
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 06:51:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <king.wang@huawei.com>)
- id 1jyYnb-0006oD-9Y
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 06:50:03 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3720 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <king.wang@huawei.com>)
- id 1jyYnY-00008n-LF
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 06:50:02 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 5C1CA3141AA24C5F9490;
- Thu, 23 Jul 2020 18:49:46 +0800 (CST)
-Received: from localhost (10.174.149.56) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Thu, 23 Jul 2020
- 18:49:38 +0800
-From: Wang King <king.wang@huawei.com>
-To: <mst@redhat.com>, <marcel.apfelbaum@gmail.com>
-Subject: [PATCH] hw/pci-host: save/restore pci host config register
-Date: Thu, 23 Jul 2020 18:49:35 +0800
-Message-ID: <20200723104935.2286-1-king.wang@huawei.com>
-X-Mailer: git-send-email 2.27.0
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jyYnk-0006yI-TS
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 06:50:13 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26657
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jyYni-0000Kr-Bb
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 06:50:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595501408;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=qL5PSwBcjX4a+9VFdnbhK09oit5slpaQEGQ8FuXFaTA=;
+ b=fRaSkW81bStomEa9zUrWb0TKmajaWPrV8yiaVHUDgoOcsx7U4kymr04G+vOnuMmDrDqD9F
+ gXPqdYXs6IGzjsh6GGyFQrx0+v5/JL/+TmSc8Zn/FoZuYm3Ng6CLgKzXiUvMOgI9j58plz
+ 0tZCDoLzBujPQdIXFmPfvNALiKxCixc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-LOD4TyxdNmuQM9JuIjH2uA-1; Thu, 23 Jul 2020 06:50:07 -0400
+X-MC-Unique: LOD4TyxdNmuQM9JuIjH2uA-1
+Received: by mail-wm1-f69.google.com with SMTP id q15so1648099wmj.6
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 03:50:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=qL5PSwBcjX4a+9VFdnbhK09oit5slpaQEGQ8FuXFaTA=;
+ b=e9n3Ujax9VAPYC8h0J47rt8GhUCTTy7IRdR1MT4ykmswLWPodNdaF0Ryzjc3SPtM6q
+ kRc6PvKct1ASzF1dWtyozs8jnagMTttFsmzmff5pPAOwTMlt+IkSQlJg7SVps1DaKs3y
+ 1gPrYO9B3Hr3aBzCvXRKf1ST2yVNM6boD2lUXb+JLmQt6phlLReC8Q2h6RGKzxP9xgrL
+ S6AHvUqWTNPBxjK8kQcv9ehFDP6xoZV164NmuHZpU0UlEFsKSDNUJyvxRznwkhRhp+6c
+ N2Gi43FevSgxEX9MJ2UMMgo8V7Rq2tki6BumvM33BVgvz1FkQwjLw6ciHKH/ZNVryqkE
+ zi+Q==
+X-Gm-Message-State: AOAM5316AKT7L/1h/vVbdbDL5drkbtg6fMhOQ32SMMMCg6Z6iNNin8dW
+ R0FKjTQSpdFaIEfTRNRgrpXkLgrwoaOJg2cY3HiYjTvyZyTR2KRZET1PkFBkQx+5hz93SAP9g2U
+ FYOx5BS9YsCXSR/k=
+X-Received: by 2002:adf:9bdd:: with SMTP id e29mr3796740wrc.394.1595501405833; 
+ Thu, 23 Jul 2020 03:50:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzJW0Z8ybjzUHaN6a3luC5/Wo6TsbOzSXbGzuhsQl/fHsS8fDzm2jJzB3gRwSId0RgDXayu/A==
+X-Received: by 2002:adf:9bdd:: with SMTP id e29mr3796727wrc.394.1595501405601; 
+ Thu, 23 Jul 2020 03:50:05 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id w7sm3167163wmc.32.2020.07.23.03.50.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Jul 2020 03:50:04 -0700 (PDT)
+Subject: Re: [PATCH-for-5.1 v2 2/2] tpm: List the available TPM backends
+To: qemu-devel@nongnu.org
+References: <20200723103939.19624-1-philmd@redhat.com>
+ <20200723103939.19624-3-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <767c3596-a7e4-ac22-d754-0b67483d63f5@redhat.com>
+Date: Thu, 23 Jul 2020 12:50:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200723103939.19624-3-philmd@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.149.56]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190; envelope-from=king.wang@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 06:49:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:33:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,196 +136,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wangxinxin.wang@huawei.com, weidong.huang@huawei.com, qemu-devel@nongnu.org,
- king.wang@huawei.com
+Cc: Markus Armbruster <armbru@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Hogan Wang <king.wang@huawei.com>
+On 7/23/20 12:39 PM, Philippe Mathieu-Daudé wrote:
+> When an incorrect backend is selected, tpm_display_backend_drivers()
+> is supposed to list the available backends. However the error is
+> directly propagated, and we never display the list. The user only
+> gets "Parameter 'type' expects a TPM backend type" error.
+> 
+> Convert the fprintf(stderr,) calls to error hints propagated with
+> the error.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Since v1:
+> - Use g_assert_not_reached after processing 'help' in tpm_config_parse
+> ---
+>  tpm.c | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
+> 
+> diff --git a/tpm.c b/tpm.c
+> index e36803a64d..f883340d1a 100644
+> --- a/tpm.c
+> +++ b/tpm.c
+> @@ -58,23 +58,21 @@ static int tpm_backend_drivers_count(void)
+>  }
+>  
+>  /*
+> - * Walk the list of available TPM backend drivers and display them on the
+> - * screen.
+> + * Walk the list of available TPM backend drivers and list them as Error hint.
+>   */
+> -static void tpm_display_backend_drivers(void)
+> +static void tpm_list_backend_drivers_hint(Error **errp)
+>  {
+>      int i;
+>  
+> -    fprintf(stderr, "Supported TPM types (choose only one):\n");
+> +    error_append_hint(errp, "Supported TPM types (choose only one):\n");
+>  
+>      for (i = 0; i < TPM_TYPE__MAX; i++) {
+>          const TPMBackendClass *bc = tpm_be_find_by_type(i);
+>          if (!bc) {
+>              continue;
+>          }
+> -        fprintf(stderr, "%12s   %s\n", TpmType_str(i), bc->desc);
+> +        error_append_hint(errp, "%12s   %s\n", TpmType_str(i), bc->desc);
+>      }
+> -    fprintf(stderr, "\n");
+>  }
+>  
+>  /*
+> @@ -97,6 +95,7 @@ TPMBackend *qemu_find_tpm_be(const char *id)
+>  
+>  static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+>  {
+> +    ERRP_GUARD();
+>      const char *value;
+>      const char *id;
+>      const TPMBackendClass *be;
+> @@ -122,7 +121,7 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+>      value = qemu_opt_get(opts, "type");
+>      if (!value) {
+>          error_setg(errp, QERR_MISSING_PARAMETER, "type");
+> -        tpm_display_backend_drivers();
+> +        tpm_list_backend_drivers_hint(errp);
+>          return 1;
+>      }
+>  
+> @@ -131,7 +130,7 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
+>      if (be == NULL) {
+>          error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "type",
+>                     "a TPM backend type");
+> -        tpm_display_backend_drivers();
+> +        tpm_list_backend_drivers_hint(errp);
+>          return 1;
+>      }
+>  
+> @@ -184,8 +183,8 @@ int tpm_config_parse(QemuOptsList *opts_list, const char *optarg)
+>      QemuOpts *opts;
+>  
+>      if (!strcmp(optarg, "help")) {
+> -        tpm_display_backend_drivers();
+> -        return -1;
+> +        tpm_list_backend_drivers_hint(&error_fatal);
+> +        g_assert_not_reached(); /* Using &error_fatal triggers exit(1). */
 
-The pci host config register is used to save PCI address for
-read/write config data. If guest write a value to config register,
-and then pause the vcpu to migrate, After the migration, the guest
-continue to write pci config data, and the write data will be ignored
-because of new qemu process lost the config register state.
+Maybe tpm_config_parse() should take an Error** parameter instead?
+And in vl.c:
 
-Example:
-1. guest booting in seabios.
-2. guest enabled the SMM memory window in piix4_apmc_smm_setup, and
-then try to close the SMM memory window.
-3. pasued vcpu to finish migration.
-4. guest close the SMM memory window fail becasue of config register
-state lost.
-5. guest continue to boot and crash in ipxe option ROM (SMM memory
-window is enabled).
-
-Due to the complex guest, the negative effect is unpredictable.
+-- >8 --
+ #ifdef CONFIG_TPM
+             case QEMU_OPTION_tpmdev:
+-                if (tpm_config_parse(qemu_find_opts("tpmdev"), optarg)
+< 0) {
+-                    exit(1);
+-                }
++                tpm_config_parse(qemu_find_opts("tpmdev"), optarg,
++                                 &error_fatal);
+                 break;
+ #endif
 ---
- hw/pci-host/i440fx.c       | 11 +++++++++++
- hw/pci-host/q35.c          | 11 +++++++++++
- hw/pci/pci_host.c          | 11 +++++++++++
- hw/pci/pcie_host.c         | 11 +++++++++++
- include/hw/pci/pci_host.h  | 10 ++++++++++
- include/hw/pci/pcie_host.h | 10 ++++++++++
- 6 files changed, 64 insertions(+)
 
-diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
-index 8ed2417f0c..17705bb025 100644
---- a/hw/pci-host/i440fx.c
-+++ b/hw/pci-host/i440fx.c
-@@ -118,6 +118,16 @@ static const VMStateDescription vmstate_i440fx = {
-     }
- };
- 
-+static const VMStateDescription vmstate_i440fx_pcihost = {
-+    .name = "I440FX_PCIHost",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_HOST(parent_obj, I440FXState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static void i440fx_pcihost_get_pci_hole_start(Object *obj, Visitor *v,
-                                               const char *name, void *opaque,
-                                               Error **errp)
-@@ -398,6 +408,7 @@ static void i440fx_pcihost_class_init(ObjectClass *klass, void *data)
-     hc->root_bus_path = i440fx_pcihost_root_bus_path;
-     dc->realize = i440fx_pcihost_realize;
-     dc->fw_name = "pci";
-+    dc->vmsd = &vmstate_i440fx_pcihost;
-     device_class_set_props(dc, i440fx_props);
-     /* Reason: needs to be wired up by pc_init1 */
-     dc->user_creatable = false;
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index b67cb9c29f..5e323be2e3 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -165,6 +165,16 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
-     visit_type_uint64(v, name, &value, errp);
- }
- 
-+static const VMStateDescription vmstate_q35_pcihost = {
-+    .name = "Q35_PCIHost",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCIE_HOST(parent_obj, Q35PCIHost),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- /*
-  * NOTE: setting defaults for the mch.* fields in this table
-  * doesn't work, because mch is a separate QOM object that is
-@@ -194,6 +204,7 @@ static void q35_host_class_init(ObjectClass *klass, void *data)
- 
-     hc->root_bus_path = q35_host_root_bus_path;
-     dc->realize = q35_host_realize;
-+    dc->vmsd = &vmstate_q35_pcihost;
-     device_class_set_props(dc, q35_host_props);
-     /* Reason: needs to be wired up by pc_q35_init */
-     dc->user_creatable = false;
-diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
-index ce7bcdb1d5..7cdd5a3ea3 100644
---- a/hw/pci/pci_host.c
-+++ b/hw/pci/pci_host.c
-@@ -24,6 +24,7 @@
- #include "hw/pci/pci_host.h"
- #include "qemu/module.h"
- #include "hw/pci/pci_bus.h"
-+#include "migration/vmstate.h"
- #include "trace.h"
- 
- /* debug PCI */
-@@ -200,6 +201,16 @@ const MemoryRegionOps pci_host_data_be_ops = {
-     .endianness = DEVICE_BIG_ENDIAN,
- };
- 
-+const VMStateDescription vmstate_pcihost = {
-+    .name = "PCIHost",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(config_reg, PCIHostState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const TypeInfo pci_host_type_info = {
-     .name = TYPE_PCI_HOST_BRIDGE,
-     .parent = TYPE_SYS_BUS_DEVICE,
-diff --git a/hw/pci/pcie_host.c b/hw/pci/pcie_host.c
-index 3534006f99..a653c39bb7 100644
---- a/hw/pci/pcie_host.c
-+++ b/hw/pci/pcie_host.c
-@@ -24,6 +24,7 @@
- #include "hw/pci/pcie_host.h"
- #include "qemu/module.h"
- #include "exec/address-spaces.h"
-+#include "migration/vmstate.h"
- 
- /* a helper function to get a PCIDevice for a given mmconfig address */
- static inline PCIDevice *pcie_dev_find_by_mmcfg_addr(PCIBus *s,
-@@ -121,6 +122,16 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
-     memory_region_transaction_commit();
- }
- 
-+const VMStateDescription vmstate_pciehost = {
-+    .name = "PCIEHost",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_HOST(pci, PCIExpressHost),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const TypeInfo pcie_host_type_info = {
-     .name = TYPE_PCIE_HOST_BRIDGE,
-     .parent = TYPE_PCI_HOST_BRIDGE,
-diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
-index 9ce088bd13..fc88305e04 100644
---- a/include/hw/pci/pci_host.h
-+++ b/include/hw/pci/pci_host.h
-@@ -70,4 +70,14 @@ extern const MemoryRegionOps pci_host_conf_be_ops;
- extern const MemoryRegionOps pci_host_data_le_ops;
- extern const MemoryRegionOps pci_host_data_be_ops;
- 
-+extern const VMStateDescription vmstate_pcihost;
-+
-+#define VMSTATE_PCI_HOST(_field, _state) {                           \
-+    .name       = (stringify(_field)),                               \
-+    .size       = sizeof(PCIHostState),                              \
-+    .vmsd       = &vmstate_pcihost,                                  \
-+    .flags      = VMS_STRUCT,                                        \
-+    .offset     = vmstate_offset_value(_state, _field, PCIHostState),\
-+}
-+
- #endif /* PCI_HOST_H */
-diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
-index 3f7b9886d1..a91ba0241a 100644
---- a/include/hw/pci/pcie_host.h
-+++ b/include/hw/pci/pcie_host.h
-@@ -78,4 +78,14 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
-                                          PCIE_MMCFG_DEVFN_MASK)
- #define PCIE_MMCFG_CONFOFFSET(addr)     ((addr) & PCIE_MMCFG_CONFOFFSET_MASK)
- 
-+extern const VMStateDescription vmstate_pciehost;
-+
-+#define VMSTATE_PCIE_HOST(_field, _state) {                            \
-+    .name       = (stringify(_field)),                                 \
-+    .size       = sizeof(PCIExpressHost),                              \
-+    .vmsd       = &vmstate_pcihost,                                    \
-+    .flags      = VMS_STRUCT,                                          \
-+    .offset     = vmstate_offset_value(_state, _field, PCIExpressHost),\
-+}
-+
- #endif /* PCIE_HOST_H */
--- 
-2.23.0
-
+>      }
+>      opts = qemu_opts_parse_noisily(opts_list, optarg, true);
+>      if (!opts) {
+> 
 
 
