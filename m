@@ -2,113 +2,130 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6435C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 09:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA91C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 10:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8059F20825
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 09:48:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65875206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 10:05:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iipnCfXf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8059F20825
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpNJjRqM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65875206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyXq2-0003yZ-PI
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 05:48:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54004)
+	id 1jyY6O-00083U-Kf
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 06:05:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jyXpR-0003U5-Rt
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 05:47:53 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29885
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jyY5Y-0007bu-AX
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 06:04:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22851
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jyXpQ-0005Kv-82
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 05:47:53 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jyY5U-00009r-13
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 06:04:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595497670;
+ s=mimecast20190719; t=1595498665;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=DX8uXEh/qO3DTMaGzg0CHAG1+ZxeoLutgHjWRbdLlEI=;
- b=iipnCfXfM9kOuPajrRa51pKMJuivMJyL669SimkKVlO7sro3mNXGNC3mvidm8uewn27nuF
- 9CR9Hhgm2TVkrEJvnL4fN5X1fOuj8H7DQITbs28oWabSyIcuNheR5otWm8iFW+ZykK9yar
- kMs3tNKnzRJIRzEHhsxRiNzKDHIPvro=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-ap4V2y9KMKWDpl4vVdcIKw-1; Thu, 23 Jul 2020 05:47:46 -0400
-X-MC-Unique: ap4V2y9KMKWDpl4vVdcIKw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8507100CD4E;
- Thu, 23 Jul 2020 09:47:44 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-146.ams2.redhat.com
- [10.36.113.146])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CF36E5D9E2;
- Thu, 23 Jul 2020 09:47:42 +0000 (UTC)
-Subject: Re: [PATCH v2 17/20] backup: move to block-copy
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200601181118.579-1-vsementsov@virtuozzo.com>
- <20200601181118.579-18-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6376705f-d24d-1b40-f4dd-480c53c7ae55@redhat.com>
-Date: Thu, 23 Jul 2020 11:47:41 +0200
+ bh=SSGmm6xtM69zTzKFIxXaX6TpibO/eETXRcWfdxBdnHE=;
+ b=OpNJjRqMIFWfiDgBbe4uKbqXaugpdg3CiLqnJfVmdm1sqzs1MIo5BkTgu9ay9dsoTU8ZG/
+ 81prf6ZN+pxqXWQD/8pDCyJ3vQNQ6NkmKxt5u/s2wIlz8qXNFlpD6lTulA+iyzEb8HlK3j
+ weXPp4AcsEpIvJCh0nw2IdaoC1CJKi8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-3y6Tj1sPNlWM3aJ_nm8-lw-1; Thu, 23 Jul 2020 06:04:22 -0400
+X-MC-Unique: 3y6Tj1sPNlWM3aJ_nm8-lw-1
+Received: by mail-wm1-f72.google.com with SMTP id v4so216956wmh.3
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 03:04:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=SSGmm6xtM69zTzKFIxXaX6TpibO/eETXRcWfdxBdnHE=;
+ b=BLByWXE3PHI5y3eZtAgnOYM7kvrdT1Ej4MCcVeZZ14dYyOodzT1yu0RvEAAcz8KKn+
+ OIGaLVt7Tt0Vql0osyXGV/woR4whVEiWtHQc5cK9AVWL3iPeghNyidmcHDK2w3yPmjdH
+ w0QRCS4LTorCX45Zy8zsiuNDoeMl/f7SLyvkHLzyZKGO2bgvSnx8kxhDPLvp8QAbtMch
+ gjaTJXs+cgznBnwl35LQiN+pqY98PLoHiqzKCmj9U7LJXPZ9KX3xWQ4LvU3eL/F0PdK3
+ usg2tt3SAdMFsjLGEQEdRNslb/xUaJnWNjVZWy20wSN3hP8o6IqFwNs/2NZWkqsxKdPz
+ USUw==
+X-Gm-Message-State: AOAM5314Q3CMgBXt5AFK8LYlsepi+74LNuJ+FopR9iNLF+ZhjXYhH70J
+ XaHIfUYriIW/0qBBy979wWT2kDO3o3EgiR3mPwb/oguF5bNvJ53+5I3RIhmI88ZNtZqShmTK95x
+ +AvgJwcqKNMqR3Q4=
+X-Received: by 2002:a1c:b6c3:: with SMTP id g186mr3614784wmf.135.1595498661688; 
+ Thu, 23 Jul 2020 03:04:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzMe7VEajTEKypNioFMyCqLKWZeAB7DzXPULRIOkQxDPNyZvJjvbRMy3KCKLO01XeHGeH/qXA==
+X-Received: by 2002:a1c:b6c3:: with SMTP id g186mr3614754wmf.135.1595498661350; 
+ Thu, 23 Jul 2020 03:04:21 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id l14sm3430817wrn.18.2020.07.23.03.04.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Jul 2020 03:04:20 -0700 (PDT)
+Subject: Re: [PATCH-for-5.1?] qapi/error: Check format string argument in
+ error_propagate_prepend()
+To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
+References: <20200723091309.18690-1-philmd@redhat.com>
+ <c8068bb8-cff1-a2a6-3eff-f709822917b7@weilnetz.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <0b9f2a2e-0d54-08eb-60fa-237d29c2529e@redhat.com>
+Date: Thu, 23 Jul 2020 12:04:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200601181118.579-18-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <c8068bb8-cff1-a2a6-3eff-f709822917b7@weilnetz.de>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9xAgZ9d7uFUaIQa0f7hIKrhjUNIublmPD"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 02:26:42
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 06:04:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,247 +138,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com,
- armbru@redhat.com, qemu-devel@nongnu.org, den@openvz.org, jsnow@redhat.com
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9xAgZ9d7uFUaIQa0f7hIKrhjUNIublmPD
-Content-Type: multipart/mixed; boundary="7yjSwbmJBF26XVaHHRlQKVc9ObUJzlU6k"
+On 7/23/20 11:44 AM, Stefan Weil wrote:
+> Am 23.07.20 um 11:13 schrieb Philippe Mathieu-Daudé:
+> 
+>> error_propagate_prepend() "behaves like error_prepend()", and
+>> error_prepend() uses "formatting @fmt, ... like printf()".
+>> error_prepend() checks its format string argument, but
+>> error_propagate_prepend() does not. Fix that.
+>>
+>> This would have catched the invalid format introduced in commit
+>> b98e8d1230f:
+>>
+>>     CC      hw/sd/milkymist-memcard.o
+>>   hw/sd/milkymist-memcard.c: In function ‘milkymist_memcard_realize’:
+>>   hw/sd/milkymist-memcard.c:284:70: error: format ‘%s’ expects a matching ‘char *’ argument [-Werror=format=]
+>>     284 |         error_propagate_prepend(errp, err, "failed to init SD card: %s");
+>>         |                                                                     ~^
+>>         |                                                                      |
+>>         |                                                                      char *
+>>
+>> Fixes: 4b5766488f ("Fix use of error_prepend() with &error_fatal, &error_abort")
+>> Inspired-by: Stefan Weil <sw@weilnetz.de>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  include/qapi/error.h | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/include/qapi/error.h b/include/qapi/error.h
+>> index 7932594dce..eeeef1a34d 100644
+>> --- a/include/qapi/error.h
+>> +++ b/include/qapi/error.h
+>> @@ -381,6 +381,7 @@ void error_propagate(Error **dst_errp, Error *local_err);
+>>   *     error_propagate(dst_errp, local_err);
+>>   * Please use ERRP_GUARD() and error_prepend() instead when possible.
+>>   */
+>> +GCC_FMT_ATTR(3, 4)
+>>  void error_propagate_prepend(Error **dst_errp, Error *local_err,
+>>                               const char *fmt, ...);
+>>  
+> 
+> 
+> Reviewed-by: Stefan Weil <sw@weilnetz.de>
+> 
+> error_vprepend is one more candidate for GCC_FMT_ATTR. Maybe you can add
+> that, too.
 
---7yjSwbmJBF26XVaHHRlQKVc9ObUJzlU6k
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This one is different as it uses a va_list. Now I realize it is
+only called in util/error.c, and all its callers are guarded with
+GCC_FMT_ATTR. Maybe we can make it static to simplify... Markus?
 
-On 01.06.20 20:11, Vladimir Sementsov-Ogievskiy wrote:
-> This brings async request handling and block-status driven chunk sizes
-> to backup out of the box, which improves backup performance.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/block-copy.h |   9 +--
->  block/backup.c             | 145 +++++++++++++++++++------------------
->  block/block-copy.c         |  21 ++----
->  3 files changed, 83 insertions(+), 92 deletions(-)
-
-This patch feels like it should be multiple ones.  I don=E2=80=99t see why =
-a
-patch that lets backup use block-copy (more) should have to modify the
-block-copy code.
-
-More specifically: I think that block_copy_set_progress_callback()
-should be removed in a separate patch.  Also, moving
-@cb_opaque/@progress_opaque from BlockCopyState into BlockCopyCallState
-seems like a separate patch to me, too.
-
-(I presume if the cb had had its own opaque object from patch 5 on,
-there wouldn=E2=80=99t be this problem now.  We=E2=80=99d just stop using t=
-he progress
-callback in backup, and remove it in one separate patch.)
-
-[...]
-
-> diff --git a/block/backup.c b/block/backup.c
-> index ec2676abc2..59c00f5293 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -44,42 +44,19 @@ typedef struct BackupBlockJob {
->      BlockdevOnError on_source_error;
->      BlockdevOnError on_target_error;
->      uint64_t len;
-> -    uint64_t bytes_read;
->      int64_t cluster_size;
->      int max_workers;
->      int64_t max_chunk;
-> =20
->      BlockCopyState *bcs;
-> +
-> +    BlockCopyCallState *bcs_call;
-
-Can this be more descriptive?  E.g. background_bcs?  bg_bcs_call?  bg_bcsc?
-
-> +    int ret;
-> +    bool error_is_read;
->  } BackupBlockJob;
-> =20
->  static const BlockJobDriver backup_job_driver;
-> =20
-
-[...]
-
->  static int coroutine_fn backup_loop(BackupBlockJob *job)
->  {
-> -    bool error_is_read;
-> -    int64_t offset;
-> -    BdrvDirtyBitmapIter *bdbi;
-> -    int ret =3D 0;
-> +    while (true) { /* retry loop */
-> +        assert(!job->bcs_call);
-> +        job->bcs_call =3D block_copy_async(job->bcs, 0,
-> +                                         QEMU_ALIGN_UP(job->len,
-> +                                                       job->cluster_size=
-),
-> +                                         true, job->max_workers, job->ma=
-x_chunk,
-> +                                         backup_block_copy_callback, job=
-);
-> =20
-> -    bdbi =3D bdrv_dirty_iter_new(block_copy_dirty_bitmap(job->bcs));
-> -    while ((offset =3D bdrv_dirty_iter_next(bdbi)) !=3D -1) {
-> -        do {
-> -            if (yield_and_check(job)) {
-> -                goto out;
-> +        while (job->bcs_call && !job->common.job.cancelled) {
-> +            /* wait and handle pauses */
-
-Doesn=E2=80=99t someone need to reset BlockCopyCallState.cancelled when the=
- job
-is unpaused?  I can=E2=80=99t see anyone doing that.
-
-Well, or even just reentering the block-copy operation after
-backup_pause() has cancelled it.  Is there some magic I=E2=80=99m missing?
-
-Does pausing (which leads to cancelling the block-copy operation) just
-yield to the CB being invoked, so the copy operation is considered done,
-and then we just enter the next iteration of the loop and try again?
-But cancelling the block-copy operation leads to it returning 0, AFAIR,
-so...
-
-> +
-> +            job_pause_point(&job->common.job);
-> +
-> +            if (job->bcs_call && !job->common.job.cancelled) {
-> +                job_yield(&job->common.job);
->              }
-> -            ret =3D backup_do_cow(job, offset, job->cluster_size, &error=
-_is_read);
-> -            if (ret < 0 && backup_error_action(job, error_is_read, -ret)=
- =3D=3D
-> -                           BLOCK_ERROR_ACTION_REPORT)
-> -            {
-> -                goto out;
-> +        }
-> +
-> +        if (!job->bcs_call && job->ret =3D=3D 0) {
-> +            /* Success */
-> +            return 0;
-
-...I would assume we return here when the job is paused.
-
-> +        }
-> +
-> +        if (job->common.job.cancelled) {
-> +            if (job->bcs_call) {
-> +                block_copy_cancel(job->bcs_call);
->              }
-> -        } while (ret < 0);
-> +            return 0;
-> +        }
-> +
-> +        if (!job->bcs_call && job->ret < 0 &&
-
-Is it even possible for bcs_call to be non-NULL here?
-
-> +            (backup_error_action(job, job->error_is_read, -job->ret) =3D=
-=3D
-> +             BLOCK_ERROR_ACTION_REPORT))
-> +        {
-> +            return job->ret;
-> +        }
-
-So if we get an error, and the error action isn=E2=80=99t REPORT, we just t=
-ry
-the whole operation again?  That doesn=E2=80=99t sound very IGNORE-y to me.
-
->      }
-> =20
-> - out:
-> -    bdrv_dirty_iter_free(bdbi);
-> -    return ret;
-> +    g_assert_not_reached();
->  }
-> =20
->  static void backup_init_bcs_bitmap(BackupBlockJob *job)
-> @@ -246,9 +227,14 @@ static int coroutine_fn backup_run(Job *job, Error *=
-*errp)
->          int64_t count;
-> =20
->          for (offset =3D 0; offset < s->len; ) {
-> -            if (yield_and_check(s)) {
-> -                ret =3D -ECANCELED;
-> -                goto out;
-> +            if (job_is_cancelled(job)) {
-> +                return -ECANCELED;
-
-I=E2=80=99d either drop the out label altogether, or use it here.  It=E2=80=
-=99s a bit
-weird to use it sometimes, but not all the time.
-
-> +            }
-> +
-> +            job_pause_point(job);
-> +
-> +            if (job_is_cancelled(job)) {
-> +                return -ECANCELED;
->              }
-> =20
->              ret =3D block_copy_reset_unallocated(s->bcs, offset, &count)=
-;
-> @@ -281,6 +267,25 @@ static int coroutine_fn backup_run(Job *job, Error *=
-*errp)
->      return ret;
->  }
-> =20
-> +static void coroutine_fn backup_pause(Job *job)
-> +{
-> +    BackupBlockJob *s =3D container_of(job, BackupBlockJob, common.job);
-> +
-> +    if (s->bcs_call) {
-> +        block_copy_cancel(s->bcs_call);
-> +    }
-> +}
-> +
-> +static void coroutine_fn backup_set_speed(BlockJob *job, int64_t speed)
-> +{
-> +    BackupBlockJob *s =3D container_of(job, BackupBlockJob, common);
-> +
-> +    if (s->bcs) {
-> +        /* In block_job_create we yet don't have bcs */
-
-Shouldn=E2=80=99t hurt to make it conditional, but how can we get here in
-block_job_create()?
-
-> +        block_copy_set_speed(s->bcs, s->bcs_call, speed);
-> +    }
-> +}
-> +
->  static const BlockJobDriver backup_job_driver =3D {
->      .job_driver =3D {
->          .instance_size          =3D sizeof(BackupBlockJob),
-
-
---7yjSwbmJBF26XVaHHRlQKVc9ObUJzlU6k--
-
---9xAgZ9d7uFUaIQa0f7hIKrhjUNIublmPD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8ZXL0ACgkQ9AfbAGHV
-z0By8gf/SUMri6dAwyfPb6tlCRx4iqgf+r2+bnf/zcR/ezV6mXCY6WgR+W9mJRfW
-WCWMsHxHi7tKxcKY1HZoA4NfV59EvK6xPd3NPdNRypEpmwgR/Qeyvji9piz5MCvp
-N0gjZjpFT/6nke/jc3DxijLErxmWuzuXGGcI42C36dYJZxz9R00ULeYLhC2eBBKX
-UdCgUTwgbVdS1ZE97H2Hy+XOPZ+Y7lvbl200aopqHmobNcRu8vwJ4YzVgul1sgxA
-VUoxgmmVEP3/tsUT6VpBptJnTcxoYWKk2vJs7cecPbiQtUVODm5rPJl+GOkaNK4r
-XLkCKQb8jb2taUZz19WMHaZzH9/rAA==
-=ny4d
------END PGP SIGNATURE-----
-
---9xAgZ9d7uFUaIQa0f7hIKrhjUNIublmPD--
+> 
+> Regards,
+> 
+> Stefan
+> 
+> 
 
 
