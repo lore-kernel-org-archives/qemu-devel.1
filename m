@@ -2,91 +2,125 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44800C433E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8907C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:11:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12E0022B49
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:10:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 722A820737
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 13:11:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FgoLGSIj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12E0022B49
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="l1ZDBJhT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722A820737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyaz4-0006ia-Bh
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 09:10:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47388)
+	id 1jyb07-000841-NL
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 09:11:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyayG-0005lO-HB
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:09:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38112
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyayE-00025G-S7
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 09:09:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595509750;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=enNkGzHiE3Cu/yUcvfbbEBt8oFR1XU5ocSYs5XM7SEs=;
- b=FgoLGSIjUfvmEQNljZ3j98WGhgRVKvMi8kAhWbK+5AZ33aGN2IlCLFvrcVW85aouJ4jmcJ
- b3H6opOqbmQV6mQ7/0LrMSmYNme9kDt7R9acbXrXN9zKlNeFt1Bndv5HWx9iU3EqMr7loj
- ljFBVl9aGB2R+8mNqqNpOIxuhYs/fxs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-jdT1jZEFOUeB3IfnZIOAtg-1; Thu, 23 Jul 2020 09:09:08 -0400
-X-MC-Unique: jdT1jZEFOUeB3IfnZIOAtg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17ACA58;
- Thu, 23 Jul 2020 13:09:07 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B701A5FC3B;
- Thu, 23 Jul 2020 13:09:06 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 40B20111CA26; Thu, 23 Jul 2020 15:09:05 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-5.1?] qapi/error: Check format string argument in
- error_propagate_prepend()
-References: <20200723091309.18690-1-philmd@redhat.com>
-Date: Thu, 23 Jul 2020 15:09:05 +0200
-In-Reply-To: <20200723091309.18690-1-philmd@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 23 Jul 2020 11:13:09
- +0200")
-Message-ID: <87o8o6fkem.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jyaxx-0005Fb-GZ; Thu, 23 Jul 2020 09:08:53 -0400
+Received: from mail-db8eur05on2095.outbound.protection.outlook.com
+ ([40.107.20.95]:28688 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jyaxu-00023L-IE; Thu, 23 Jul 2020 09:08:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GX4FrJ0QMQ3eSdVz9HQSv2sGN+xnqc2JQDPlvd3hPhCxrRySYnGNcNpb5nhspRuf8Gf8tZqXCTPZhBKv0QpOiRI0dT6m7TmJ63RwpsDlrxx3txdhw+ds1eqyc7EFzkxhw3qU7R85T8nuOXr0xMMMVqVMxpvJAQaacXKaNc3mN4D8qAIHLp3WNvy22DM2B9zGohb3l6PO03UmYaYelBidYNTbyWHLQq+vYK3aaLG3EHJQvIDkWMLWPUfHQnOCrQigfm1kmKhXNWFyY37EarLs/18lyCdzVkWmcno/s4ckfI8Fq54wig12CHTicSIJqoVyOFwZlQnYg+IdlG25C9DYtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LEhS/K4Z2Z+goLA3sZ0ejVeQMWgDotB+22ydbBKJqak=;
+ b=bXGiUlnNHnPfRAT5fZEHTR3AAAGyRhWiYJVELB1e3+zdrLHhF9xxrWTs571OhRMLXjLqR0IRGl7VMZd8uJQGkEj/+ytXuVwTk0KiijtOI923/ldu1+MjrJXt40S4GQSJTywXEkHUVcYfGJ+VkcqoIG5+JgYIbT4PT39BULJYaSuscPtDbFiHkWHx+meIbLFzI4ZVe7fHeVhlk+uQwJ3Xx5FEU/sr70VOcp8M0uAwKPtCito5F09Gw1/DEcmzSa7pjcVN8vzweZ6Bnhs2rjIcpBWt5l9tfa5N+YB7Vpor9LMFiFpPisYjwobpxVS3sQN7/lXjpn+eYM6T4/NNX6tvHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LEhS/K4Z2Z+goLA3sZ0ejVeQMWgDotB+22ydbBKJqak=;
+ b=l1ZDBJhTUnjnVHwuftX2lobkr/nM4qCX8o0LI85z7JNoL1Snt5eRyoowFgGkfYLblgZqmvuevjVhBHoefL9XtjAQXFi/f/wxQgYOrXFicfJFVnVYJybm5t0urQdRgWYv6syvr9a0AgjrT8WVO+GXSVc7qSwAsfbhRZHGGxBRSi0=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
+ by VE1PR08MB4944.eurprd08.prod.outlook.com (2603:10a6:803:116::32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.23; Thu, 23 Jul
+ 2020 13:08:45 +0000
+Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
+ ([fe80::ed6f:fa6e:70c9:be54]) by VI1PR08MB5503.eurprd08.prod.outlook.com
+ ([fe80::ed6f:fa6e:70c9:be54%3]) with mapi id 15.20.3216.023; Thu, 23 Jul 2020
+ 13:08:45 +0000
+Subject: Re: [PATCH for-5.1] nbd: Fix large trim/zero requests
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200722212231.535072-1-eblake@redhat.com>
+ <e7b8151d-b9d3-b5c5-9bc4-661a045d4ff9@virtuozzo.com>
+ <b72d8646-4ad5-be76-dca9-72bfb203d18f@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <6245f93c-03ae-1d77-49e0-7ecba214d8da@virtuozzo.com>
+Date: Thu, 23 Jul 2020 16:08:37 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <b72d8646-4ad5-be76-dca9-72bfb203d18f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM4PR0302CA0031.eurprd03.prod.outlook.com
+ (2603:10a6:205:2::44) To VI1PR08MB5503.eurprd08.prod.outlook.com
+ (2603:10a6:803:137::19)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 06:04:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.141) by
+ AM4PR0302CA0031.eurprd03.prod.outlook.com (2603:10a6:205:2::44) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23 via Frontend
+ Transport; Thu, 23 Jul 2020 13:08:44 +0000
+X-Originating-IP: [185.215.60.141]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 906f081f-a7ed-4bdf-7a95-08d82f0987d5
+X-MS-TrafficTypeDiagnostic: VE1PR08MB4944:
+X-Microsoft-Antispam-PRVS: <VE1PR08MB494460800BA5C3BFD351A533C1760@VE1PR08MB4944.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zKkpDAs+mp2+U4Vds4RQbIGX3Mm8GNxre/gzhmX2XLIjwGdgQ49maE6QEXSpOxoYBcQaCpLpPLIO0mN90DxauyLe1s/ZviX7RtMr/WA9p8eifMLBr21U65GpAmtzEFbIF3X90Y5sws7whAgZl89qtNfK29OZmvPRqPJ9t0JPoPV7a9iCz3NUxcTCb8SIDMhcLPtotnpxNyL+XZILrOZ14Q2DDCbOeMlEMIJ4xzxg2TmUGLTXTCyzZMmO8fKMnctf8PLWg4eyckefVhlVHPsdPkJugN3zaQ2Jo/RfusqYkaZdfdvM4pLNYustvrkT6OZX0cX50tDGeh7MKgydOmW9WInZHWRIAUeSQ37x/3rPnCbq3cxNSGN8BeNH+ZbXaJDv
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(366004)(39840400004)(376002)(396003)(136003)(83380400001)(36756003)(6666004)(186003)(66476007)(66946007)(26005)(66556008)(16526019)(2616005)(956004)(86362001)(52116002)(316002)(8936002)(478600001)(8676002)(5660300002)(4326008)(6486002)(31696002)(16576012)(53546011)(2906002)(31686004)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 754e80e+zucee0yD1Ph9TcucnimCP2htYvqHepcCou1EmsrAkrY6Gj0DokLLB6885FPYLF6eFMweZK3rEJQegoREipZViGxA7NDTGNCFejEqSrsdoiUJOqCxhDzRxoZXLrSekjAMWtuEwkX5alJUWsRi5j1aNelD1r5Ya2JNmVNHpC96ThUF0jhosVR2PFkm/5lb6mG982Kw6yqmqHMdkGGL3CH5LuSlAZ1ubNIqn8M6FsHKRzDnOJsRlOx91nS7fN+PTX0tAR3O/LwFk6HtLQrhffSK49r7H4U9H9uCNgkgVFrokOU7rYs7GGhLdTv9beoY3mpV11zISCXi9SqDxCYYOUwlf1fie+/CeK18/fjqn9qdTY0cJssS9XzJLGiPwbGD7bB3tCoDvUjDenISElvl0w0OHyBBTDgwpQ5irExXxSPD4MQD+EyukHiIahdzW3dmVFiBhzPxuRlPL/zj+orDyCgxj2HCc8g5GPaXXuPp5nc69XUNq0zhb3BLntrp
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 906f081f-a7ed-4bdf-7a95-08d82f0987d5
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR08MB5503.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2020 13:08:45.5002 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3yQdzg24hOAOfwKlrBu3qdbmwZ6zcQJ1ZvNNn9x15qQjRpK5XqODbncHul3kcmq6cPUiuuFkdQd6XgZj9Blmw00+kUmroNZL+eg/0X6bX2Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB4944
+Received-SPF: pass client-ip=40.107.20.95;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 09:08:47
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,77 +133,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-stable@nongnu.org,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+23.07.2020 14:47, Eric Blake wrote:
+> On 7/23/20 2:23 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 23.07.2020 00:22, Eric Blake wrote:
+>>> Although qemu as NBD client limits requests to <2G, the NBD protocol
+>>> allows clients to send requests almost all the way up to 4G.  But
+>>> because our block layer is not yet 64-bit clean, we accidentally wrap
+>>> such requests into a negative size, and fail with EIO instead of
+>>> performing the intended operation.
+>>>
+> 
+>>> @@ -2378,8 +2378,17 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+>>>           if (request->flags & NBD_CMD_FLAG_FAST_ZERO) {
+>>>               flags |= BDRV_REQ_NO_FALLBACK;
+>>>           }
+>>> -        ret = blk_pwrite_zeroes(exp->blk, request->from + exp->dev_offset,
+>>> -                                request->len, flags);
+>>> +        ret = 0;
+>>> +        /* FIXME simplify this when blk_pwrite_zeroes switches to 64-bit */
+>>> +        while (ret == 0 && request->len) {
+>>> +            int align = client->check_align ?: 1;
+>>> +            int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
+>>> +                                                        align));
+>>> +            ret = blk_pwrite_zeroes(exp->blk, request->from + exp->dev_offset,
+>>> +                                    len, flags);
+>>> +            request->len -= len;
+>>> +            request->from += len;
+>>> +        }
+>>>           return nbd_send_generic_reply(client, request->handle, ret,
+>>>                                         "writing to file failed", errp);
+> 
+> It's easy enough to audit that blk_pwrite_zeroes returns 0 (and not arbitrary positive) on success.
 
-> error_propagate_prepend() "behaves like error_prepend()", and
-> error_prepend() uses "formatting @fmt, ... like printf()".
-> error_prepend() checks its format string argument, but
-> error_propagate_prepend() does not. Fix that.
->
-> This would have catched the invalid format introduced in commit
+Yes, that's why I've posted my commend to blk_co_pdiscard :)
 
-s/catched/caught/
+> 
+>>>
+>>> @@ -2393,8 +2402,17 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+>>>                                         "flush failed", errp);
+>>>
+>>>       case NBD_CMD_TRIM:
+>>> -        ret = blk_co_pdiscard(exp->blk, request->from + exp->dev_offset,
+>>> -                              request->len);
+>>> +        ret = 0;
+>>> +        /* FIXME simplify this when blk_co_pdiscard switches to 64-bit */
+>>> +        while (ret == 0 && request->len) {
+>>
+>> Did you check all the paths not to return positive ret on success? I'd prefer to compare ret >= 0 for this temporary code to not care of it
+> 
+> And for blk_co_pdiscard, the audit is already right here in the patch: pre-patch, ret = blk_co_pdiscard, followed by...
+> 
+>>
+>>> +            int align = client->check_align ?: 1;
+>>> +            int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
+>>> +                                                        align));
+>>> +            ret = blk_co_pdiscard(exp->blk, request->from + exp->dev_offset,
+>>> +                                  len);
+>>> +            request->len -= len;
+>>> +            request->from += len;
+>>
+>> Hmm.. Modifying the function parameter. Safe now, as nbd_handle_request() call is the last usage of request in nbd_trip().
+>>
+>>> +        }
+>>>           if (ret == 0 && request->flags & NBD_CMD_FLAG_FUA) {
+> 
+> ...a check for ret == 0.
 
-> b98e8d1230f:
->
->     CC      hw/sd/milkymist-memcard.o
->   hw/sd/milkymist-memcard.c: In function =E2=80=98milkymist_memcard_reali=
-ze=E2=80=99:
->   hw/sd/milkymist-memcard.c:284:70: error: format =E2=80=98%s=E2=80=99 ex=
-pects a matching =E2=80=98char *=E2=80=99 argument [-Werror=3Dformat=3D]
->     284 |         error_propagate_prepend(errp, err, "failed to init SD c=
-ard: %s");
->         |                                                                =
-     ~^
->         |                                                                =
-      |
->         |                                                                =
-      char *
+Hmm. Is it a bug or not? Anyway, bdrv_co_pdiscard() does "if (ret && .." as well, so if some driver return positive ret,
+it may fail earlier..
 
-Suggest to shorten to
+> 
+>>>               ret = blk_co_flush(exp->blk);
+>>>           }
+>>>
+>>
+>>
+> 
+> Yes, I can respin the patch to use >= 0 as the check for success in both functions, but it doesn't change the behavior.
+> 
 
-  This would have caught the bug fixed in the previous commit.
+OK. Anyway:
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-and make sure Stefan's fix actually becomes the previous commit.
-
-> Fixes: 4b5766488f ("Fix use of error_prepend() with &error_fatal, &error_=
-abort")
-
-Kind of.  Omitting the attritbute isn't wrong, just foolish / careless.
-
-I'd write
-
-  Missed in commit 4b5766488f "error: Fix use of error_prepend() with
-  &error_fatal, &error_abort".
-
-> Inspired-by: Stefan Weil <sw@weilnetz.de>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-If you like my tweaks, I can apply them in my tree.
-
-> ---
->  include/qapi/error.h | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/include/qapi/error.h b/include/qapi/error.h
-> index 7932594dce..eeeef1a34d 100644
-> --- a/include/qapi/error.h
-> +++ b/include/qapi/error.h
-> @@ -381,6 +381,7 @@ void error_propagate(Error **dst_errp, Error *local_e=
-rr);
->   *     error_propagate(dst_errp, local_err);
->   * Please use ERRP_GUARD() and error_prepend() instead when possible.
->   */
-> +GCC_FMT_ATTR(3, 4)
->  void error_propagate_prepend(Error **dst_errp, Error *local_err,
->                               const char *fmt, ...);
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
+-- 
+Best regards,
+Vladimir
 
