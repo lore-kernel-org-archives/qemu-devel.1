@@ -2,71 +2,89 @@ Return-Path: <SRS0=cpkI=BC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BBDC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 16:07:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F157C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 16:08:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4F55207BB
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 16:07:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F55207BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A78A20714
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 16:08:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cn8nvgRx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A78A20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jydkX-0000S2-2k
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 12:07:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44722)
+	id 1jydm3-00027J-Kb
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 12:08:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jydfP-0003IP-Gh; Thu, 23 Jul 2020 12:01:55 -0400
-Received: from mga03.intel.com ([134.134.136.65]:36921)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1jydfN-0006j0-LG; Thu, 23 Jul 2020 12:01:55 -0400
-IronPort-SDR: zvjIa4CamGcESwPgtKODoesRzLdbGKusv5jjRW4aG9SgF3nZdScyd4NCLBh6aZlj0pSnk31+Cm
- r3mN46CpOuAw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9691"; a="150543473"
-X-IronPort-AV: E=Sophos;i="5.75,387,1589266800"; d="scan'208";a="150543473"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Jul 2020 09:01:52 -0700
-IronPort-SDR: 1E0oNIEvKa2hmLJfGqtr12ZR8iwtskMF9A5Pxsd7ZseL5EhkCC/hVD1n55JPwNKKOmJBZ2cQMz
- j+Bq1duXEzKg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,387,1589266800"; d="scan'208";a="319033209"
-Received: from unknown (HELO localhost.ch.intel.com) ([10.2.61.79])
- by orsmga008.jf.intel.com with ESMTP; 23 Jul 2020 09:01:51 -0700
-From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-To: kbusch@kernel.org,
-	kwolf@redhat.com,
-	mreitz@redhat.com
-Subject: [PATCH v5 2/3] nvme: indicate CMB support through controller
- capabilities register
-Date: Thu, 23 Jul 2020 09:03:24 -0700
-Message-Id: <20200723160325.41734-3-andrzej.jakowski@linux.intel.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200723160325.41734-1-andrzej.jakowski@linux.intel.com>
-References: <20200723160325.41734-1-andrzej.jakowski@linux.intel.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jydiV-0006x3-MU
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 12:05:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57937
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jydiR-0007Ah-2C
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 12:05:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595520300;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=FqgIXUJAxkaLDphJ/WjYalna2E0dyU2Y9FEieFILfPg=;
+ b=cn8nvgRxu4XKghMgBH9jeTDOie65Hyfn6uykR6YEQJJ/2wQX01j7rf+ieAwwFR89ctupvm
+ 40JJQOaZ6+6gCD5G2f3D9wekVLurawNC0nUBMXsuIBByMgF++JhPPkhtwAnMfNopr+NzgM
+ +IXFkw28cfCU8yvLfKyC0CgrRk25taY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-508-gYLrrn_KMaafau7fdes4cg-1; Thu, 23 Jul 2020 12:04:58 -0400
+X-MC-Unique: gYLrrn_KMaafau7fdes4cg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 705EC18C63F4;
+ Thu, 23 Jul 2020 16:04:57 +0000 (UTC)
+Received: from work-vm (ovpn-114-148.ams2.redhat.com [10.36.114.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9AD8769324;
+ Thu, 23 Jul 2020 16:04:55 +0000 (UTC)
+Date: Thu, 23 Jul 2020 17:04:53 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v1] hw/pci-host: save/restore pci host config register
+Message-ID: <20200723160453.GT2621@work-vm>
+References: <20200723125303.2390-1-king.wang@huawei.com>
+ <20200723085516-mutt-send-email-mst@kernel.org>
+ <20200723130923.GK2621@work-vm>
+ <20200723114756-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=134.134.136.65;
- envelope-from=andrzej.jakowski@linux.intel.com; helo=mga03.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 12:01:45
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200723114756-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 06:04:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,73 +97,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Andrzej Jakowski <andrzej.jakowski@linux.intel.com>,
- Maxim Levitsky <mlevitsky@gmail.com>, pbonzini@redhat.com
+Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jusual@redhat.com,
+ qemu-devel@nongnu.org, Wang King <king.wang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch sets CMBS bit in controller capabilities register when user
-configures NVMe driver with CMB support, so capabilites are correctly
-reported to guest OS.
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Thu, Jul 23, 2020 at 02:12:54PM +0100, Dr. David Alan Gilbert wrote:
+> > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > > On Thu, Jul 23, 2020 at 08:53:03PM +0800, Wang King wrote:
+> > > > From: Hogan Wang <king.wang@huawei.com>
+> > > > 
+> > > > The pci host config register is used to save PCI address for
+> > > > read/write config data. If guest write a value to config register,
+> > > > and then pause the vcpu to migrate, After the migration, the guest
+> > > > continue to write pci config data, and the write data will be ignored
+> > > > because of new qemu process lost the config register state.
+> > > > 
+> > > > Reproduction steps are:
+> > > > 1. guest booting in seabios.
+> > > > 2. guest enable the SMRAM in seabios:piix4_apmc_smm_setup, and then
+> > > >    expect to disable the SMRAM by pci_config_writeb.
+> > > > 3. after guest write the pci host config register, and then pasued vcpu
+> > > >    to finish migration.
+> > > > 4. guest write config data(0x0A) fail to disable the SMRAM becasue of
+> > > >    config register state lost.
+> > > > 5. guest continue to boot and crash in ipxe option ROM due to SMRAM in
+> > > >    enabled state.
+> > > > 
+> > > > Signed-off-by: Hogan Wang <king.wang@huawei.com>
+> > > 
+> > > I guess this is like v3 right?
+> > > 
+> > > thanks a lot for the patch!
+> > > 
+> > > My question stands : does anyone see a way to pass this
+> > > info around without breaking migration for all existing
+> > > machine types?
+> > 
+> > You need a .needed clause in the vmstate_i440fx_pcihost and
+> > vmstate_q35_pcihost which is a pointer to a function which enables it on
+> > new machine types and ignores it on old ones.
+> > 
+> > Or, if it always crashes if the SMRAM is enabled, then the migration is
+> > dead anyway; so you could make the .needed only save the config if
+> > the SMRAM is opened, so you'd get a unknown section error, which is
+> > nasty but it would only happen in the case it would crash anyway.
+> > 
+> > Dave
+> 
+> Problem is we never know whether it's needed.
+> 
+> For example: guest programs cf8, then cfc.
+> Guest on destination can crash if migrated after
+> writing cf8 before writing cfc.
+> But in theory it can also crash if guest assumes
+> cf8 is unchanged and just writes cfc.
+> 
+> So what I'd prefer to do is put it in some data that
+> old qemu ignores. Then once qemu on destination
+> is updated, it will start interpreting it.
 
-Signed-off-by: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Maxim Levitsky <mlevitsky@gmail.com>
----
- hw/block/nvme.c      |  1 +
- include/block/nvme.h | 10 +++++++---
- 2 files changed, 8 insertions(+), 3 deletions(-)
+We don't have a way to do that; the choice is:
+  a) Not sending it for old versions, so you only get the
+    fix for new machine types
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 841c18920c..43866b744f 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -2198,6 +2198,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     NVME_CAP_SET_TO(n->bar.cap, 0xf);
-     NVME_CAP_SET_CSS(n->bar.cap, 1);
-     NVME_CAP_SET_MPSMAX(n->bar.cap, 4);
-+    NVME_CAP_SET_CMBS(n->bar.cap, n->params.cmb_size_mb ? 1 : 0);
- 
-     n->bar.vs = NVME_SPEC_VER;
-     n->bar.intmc = n->bar.intms = 0;
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 370df7fc05..d641ca6649 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -36,6 +36,7 @@ enum NvmeCapShift {
-     CAP_MPSMIN_SHIFT   = 48,
-     CAP_MPSMAX_SHIFT   = 52,
-     CAP_PMR_SHIFT      = 56,
-+    CAP_CMB_SHIFT      = 57,
- };
- 
- enum NvmeCapMask {
-@@ -49,6 +50,7 @@ enum NvmeCapMask {
-     CAP_MPSMIN_MASK    = 0xf,
-     CAP_MPSMAX_MASK    = 0xf,
-     CAP_PMR_MASK       = 0x1,
-+    CAP_CMB_MASK       = 0x1,
- };
- 
- #define NVME_CAP_MQES(cap)  (((cap) >> CAP_MQES_SHIFT)   & CAP_MQES_MASK)
-@@ -78,9 +80,11 @@ enum NvmeCapMask {
- #define NVME_CAP_SET_MPSMIN(cap, val) (cap |= (uint64_t)(val & CAP_MPSMIN_MASK)\
-                                                            << CAP_MPSMIN_SHIFT)
- #define NVME_CAP_SET_MPSMAX(cap, val) (cap |= (uint64_t)(val & CAP_MPSMAX_MASK)\
--                                                            << CAP_MPSMAX_SHIFT)
--#define NVME_CAP_SET_PMRS(cap, val) (cap |= (uint64_t)(val & CAP_PMR_MASK)\
--                                                            << CAP_PMR_SHIFT)
-+                                                           << CAP_MPSMAX_SHIFT)
-+#define NVME_CAP_SET_PMRS(cap, val)   (cap |= (uint64_t)(val & CAP_PMR_MASK)   \
-+                                                           << CAP_PMR_SHIFT)
-+#define NVME_CAP_SET_CMBS(cap, val)   (cap |= (uint64_t)(val & CAP_CMB_MASK)   \
-+                                                           << CAP_CMB_SHIFT)
- 
- enum NvmeCcShift {
-     CC_EN_SHIFT     = 0,
--- 
-2.21.1
+  b) Trying to second guess when it will crash
+
+I recommend (a) generally - but the format has no
+way to ignore unknown data.
+
+Dave
+
+> 
+> > > 
+> > > > ---
+> > > >  hw/pci-host/i440fx.c       | 11 +++++++++++
+> > > >  hw/pci-host/q35.c          | 11 +++++++++++
+> > > >  hw/pci/pci_host.c          | 11 +++++++++++
+> > > >  hw/pci/pcie_host.c         | 11 +++++++++++
+> > > >  include/hw/pci/pci_host.h  | 10 ++++++++++
+> > > >  include/hw/pci/pcie_host.h | 10 ++++++++++
+> > > >  6 files changed, 64 insertions(+)
+> > > > 
+> > > > diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+> > > > index 8ed2417f0c..17705bb025 100644
+> > > > --- a/hw/pci-host/i440fx.c
+> > > > +++ b/hw/pci-host/i440fx.c
+> > > > @@ -118,6 +118,16 @@ static const VMStateDescription vmstate_i440fx = {
+> > > >      }
+> > > >  };
+> > > >  
+> > > > +static const VMStateDescription vmstate_i440fx_pcihost = {
+> > > > +    .name = "I440FX_PCIHost",
+> > > > +    .version_id = 1,
+> > > > +    .minimum_version_id = 1,
+> > > > +    .fields = (VMStateField[]) {
+> > > > +        VMSTATE_PCI_HOST(parent_obj, I440FXState),
+> > > > +        VMSTATE_END_OF_LIST()
+> > > > +    }
+> > > > +};
+> > > > +
+> > > >  static void i440fx_pcihost_get_pci_hole_start(Object *obj, Visitor *v,
+> > > >                                                const char *name, void *opaque,
+> > > >                                                Error **errp)
+> > > > @@ -398,6 +408,7 @@ static void i440fx_pcihost_class_init(ObjectClass *klass, void *data)
+> > > >      hc->root_bus_path = i440fx_pcihost_root_bus_path;
+> > > >      dc->realize = i440fx_pcihost_realize;
+> > > >      dc->fw_name = "pci";
+> > > > +    dc->vmsd = &vmstate_i440fx_pcihost;
+> > > >      device_class_set_props(dc, i440fx_props);
+> > > >      /* Reason: needs to be wired up by pc_init1 */
+> > > >      dc->user_creatable = false;
+> > > > diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> > > > index b67cb9c29f..5e323be2e3 100644
+> > > > --- a/hw/pci-host/q35.c
+> > > > +++ b/hw/pci-host/q35.c
+> > > > @@ -165,6 +165,16 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
+> > > >      visit_type_uint64(v, name, &value, errp);
+> > > >  }
+> > > >  
+> > > > +static const VMStateDescription vmstate_q35_pcihost = {
+> > > > +    .name = "Q35_PCIHost",
+> > > > +    .version_id = 1,
+> > > > +    .minimum_version_id = 1,
+> > > > +    .fields = (VMStateField[]) {
+> > > > +        VMSTATE_PCIE_HOST(parent_obj, Q35PCIHost),
+> > > > +        VMSTATE_END_OF_LIST()
+> > > > +    }
+> > > > +};
+> > > > +
+> > > >  /*
+> > > >   * NOTE: setting defaults for the mch.* fields in this table
+> > > >   * doesn't work, because mch is a separate QOM object that is
+> > > > @@ -194,6 +204,7 @@ static void q35_host_class_init(ObjectClass *klass, void *data)
+> > > >  
+> > > >      hc->root_bus_path = q35_host_root_bus_path;
+> > > >      dc->realize = q35_host_realize;
+> > > > +    dc->vmsd = &vmstate_q35_pcihost;
+> > > >      device_class_set_props(dc, q35_host_props);
+> > > >      /* Reason: needs to be wired up by pc_q35_init */
+> > > >      dc->user_creatable = false;
+> > > > diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
+> > > > index ce7bcdb1d5..7cdd5a3ea3 100644
+> > > > --- a/hw/pci/pci_host.c
+> > > > +++ b/hw/pci/pci_host.c
+> > > > @@ -24,6 +24,7 @@
+> > > >  #include "hw/pci/pci_host.h"
+> > > >  #include "qemu/module.h"
+> > > >  #include "hw/pci/pci_bus.h"
+> > > > +#include "migration/vmstate.h"
+> > > >  #include "trace.h"
+> > > >  
+> > > >  /* debug PCI */
+> > > > @@ -200,6 +201,16 @@ const MemoryRegionOps pci_host_data_be_ops = {
+> > > >      .endianness = DEVICE_BIG_ENDIAN,
+> > > >  };
+> > > >  
+> > > > +const VMStateDescription vmstate_pcihost = {
+> > > > +    .name = "PCIHost",
+> > > > +    .version_id = 1,
+> > > > +    .minimum_version_id = 1,
+> > > > +    .fields = (VMStateField[]) {
+> > > > +        VMSTATE_UINT32(config_reg, PCIHostState),
+> > > > +        VMSTATE_END_OF_LIST()
+> > > > +    }
+> > > > +};
+> > > > +
+> > > >  static const TypeInfo pci_host_type_info = {
+> > > >      .name = TYPE_PCI_HOST_BRIDGE,
+> > > >      .parent = TYPE_SYS_BUS_DEVICE,
+> > > > diff --git a/hw/pci/pcie_host.c b/hw/pci/pcie_host.c
+> > > > index 3534006f99..a653c39bb7 100644
+> > > > --- a/hw/pci/pcie_host.c
+> > > > +++ b/hw/pci/pcie_host.c
+> > > > @@ -24,6 +24,7 @@
+> > > >  #include "hw/pci/pcie_host.h"
+> > > >  #include "qemu/module.h"
+> > > >  #include "exec/address-spaces.h"
+> > > > +#include "migration/vmstate.h"
+> > > >  
+> > > >  /* a helper function to get a PCIDevice for a given mmconfig address */
+> > > >  static inline PCIDevice *pcie_dev_find_by_mmcfg_addr(PCIBus *s,
+> > > > @@ -121,6 +122,16 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
+> > > >      memory_region_transaction_commit();
+> > > >  }
+> > > >  
+> > > > +const VMStateDescription vmstate_pciehost = {
+> > > > +    .name = "PCIEHost",
+> > > > +    .version_id = 1,
+> > > > +    .minimum_version_id = 1,
+> > > > +    .fields = (VMStateField[]) {
+> > > > +        VMSTATE_PCI_HOST(pci, PCIExpressHost),
+> > > > +        VMSTATE_END_OF_LIST()
+> > > > +    }
+> > > > +};
+> > > > +
+> > > >  static const TypeInfo pcie_host_type_info = {
+> > > >      .name = TYPE_PCIE_HOST_BRIDGE,
+> > > >      .parent = TYPE_PCI_HOST_BRIDGE,
+> > > > diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+> > > > index 9ce088bd13..fc88305e04 100644
+> > > > --- a/include/hw/pci/pci_host.h
+> > > > +++ b/include/hw/pci/pci_host.h
+> > > > @@ -70,4 +70,14 @@ extern const MemoryRegionOps pci_host_conf_be_ops;
+> > > >  extern const MemoryRegionOps pci_host_data_le_ops;
+> > > >  extern const MemoryRegionOps pci_host_data_be_ops;
+> > > >  
+> > > > +extern const VMStateDescription vmstate_pcihost;
+> > > > +
+> > > > +#define VMSTATE_PCI_HOST(_field, _state) {                           \
+> > > > +    .name       = (stringify(_field)),                               \
+> > > > +    .size       = sizeof(PCIHostState),                              \
+> > > > +    .vmsd       = &vmstate_pcihost,                                  \
+> > > > +    .flags      = VMS_STRUCT,                                        \
+> > > > +    .offset     = vmstate_offset_value(_state, _field, PCIHostState),\
+> > > > +}
+> > > > +
+> > > >  #endif /* PCI_HOST_H */
+> > > > diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
+> > > > index 3f7b9886d1..e8856f03e9 100644
+> > > > --- a/include/hw/pci/pcie_host.h
+> > > > +++ b/include/hw/pci/pcie_host.h
+> > > > @@ -78,4 +78,14 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
+> > > >                                           PCIE_MMCFG_DEVFN_MASK)
+> > > >  #define PCIE_MMCFG_CONFOFFSET(addr)     ((addr) & PCIE_MMCFG_CONFOFFSET_MASK)
+> > > >  
+> > > > +extern const VMStateDescription vmstate_pciehost;
+> > > > +
+> > > > +#define VMSTATE_PCIE_HOST(_field, _state) {                            \
+> > > > +    .name       = (stringify(_field)),                                 \
+> > > > +    .size       = sizeof(PCIExpressHost),                              \
+> > > > +    .vmsd       = &vmstate_pciehost,                                   \
+> > > > +    .flags      = VMS_STRUCT,                                          \
+> > > > +    .offset     = vmstate_offset_value(_state, _field, PCIExpressHost),\
+> > > > +}
+> > > > +
+> > > >  #endif /* PCIE_HOST_H */
+> > > > -- 
+> > > > 2.23.0
+> > > > 
+> > > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
