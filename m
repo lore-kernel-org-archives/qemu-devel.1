@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59FACC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 12:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9368C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 12:29:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D95D8206D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 12:29:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7D50206D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 12:29:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hr4FFJzE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D95D8206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AV8zr3Ek"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7D50206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyaLl-0000Hz-Rs
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 08:29:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33474)
+	id 1jyaLn-0000MA-UI
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 08:29:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jyaKe-0007Tu-8m
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 08:28:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48405
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jyaKj-0007XH-Gv
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 08:28:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23551
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jyaKc-0003L0-MM
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 08:28:15 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jyaKg-0003LX-EA
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 08:28:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595507293;
+ s=mimecast20190719; t=1595507297;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=x5tXcDBrYgUhz/WsAmxTDLW8jPpX0PCK+2AWepR6TEE=;
- b=Hr4FFJzEl0cg7QoJolp55/Uwc8J9s1gJSjP/QsTJxvKGvLFmCtWLUFRjHunh4MygoxBEXw
- 3dPYA46STdLdPBpvfeFou9RjM1WkWE51WMNZbZurKIT9j/BfFmeb3Bxoi5OKBXZdcU4J3Q
- GinHfJqQsiN4yQSezoOItnaY7ZMR6lA=
+ references:references; bh=/0sFoRIWpUKF/i3Q3WPj/p9JmHExKn6su5RsDl0XSdI=;
+ b=AV8zr3Ek/ee3JsYywbBnWkYol73QaffRz2sVjl1jU9RoTn+vCh2pLmenPQokuu43+ZnTZu
+ ZvdGw8EOcK4cAjQnma/tu5Hyq1jBxgI4PagvaAycVMMQ0WdAcZGKjh4w8RFlnhi50zAtAn
+ 0ipEZekM+/q0J3bGoBz68+IWoBk+tgo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-62gFBc-uOryzUEgjV2H_bw-1; Thu, 23 Jul 2020 08:28:11 -0400
-X-MC-Unique: 62gFBc-uOryzUEgjV2H_bw-1
+ us-mta-224-fVsoML6yOLOXVROeehI__w-1; Thu, 23 Jul 2020 08:28:14 -0400
+X-MC-Unique: fVsoML6yOLOXVROeehI__w-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D9BE800460;
- Thu, 23 Jul 2020 12:28:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC17A185BDED;
+ Thu, 23 Jul 2020 12:28:12 +0000 (UTC)
 Received: from thuth.com (ovpn-112-87.ams2.redhat.com [10.36.112.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 82BA38BEDB;
- Thu, 23 Jul 2020 12:28:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D93708BED9;
+ Thu, 23 Jul 2020 12:28:10 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH 1/4] tests/docker: Add python3-venv and netcat to the
- debian-amd64 container
-Date: Thu, 23 Jul 2020 14:27:57 +0200
-Message-Id: <20200723122800.723-2-thuth@redhat.com>
+Subject: [PATCH 2/4] iotests: Select a default machine for the rx and avr
+ targets
+Date: Thu, 23 Jul 2020 14:27:58 +0200
+Message-Id: <20200723122800.723-3-thuth@redhat.com>
 In-Reply-To: <20200723122800.723-1-thuth@redhat.com>
 References: <20200723122800.723-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
@@ -99,41 +99,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Without python3-venv, I get the following message when trying to
-run the acceptance tests within the debian container:
-
- The virtual environment was not created successfully because ensurepip is not
- available.  On Debian/Ubuntu systems, you need to install the python3-venv
- package using the following command.
-    apt-get install python3-venv
- You may need to use sudo with that command.  After installing the python3-venv
- package, recreate your virtual environment.
-
-Let's do it as the message suggests.
-
-And while we're at it, also add netcat here since it is required for
-some of the acceptance tests.
+If you are building only with either the new rx-softmmu or avr-softmmu
+target, "make check-block" fails a couple of tests since there is no
+default machine defined in these new targets. We have to select a machine
+in the "check" script for these, just like we already do for the arm- and
+tricore-softmmu targets.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/docker/dockerfiles/debian-amd64.docker | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/check | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/debian-amd64.docker b/tests/docker/dockerfiles/debian-amd64.docker
-index 8fdfd6a6b0..d2500dcff1 100644
---- a/tests/docker/dockerfiles/debian-amd64.docker
-+++ b/tests/docker/dockerfiles/debian-amd64.docker
-@@ -20,7 +20,9 @@ RUN apt update && \
-         librdmacm-dev \
-         libsasl2-dev \
-         libsnappy-dev \
--        libvte-dev
-+        libvte-dev \
-+        netcat-openbsd \
-+        python3-venv
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index e0d8049012..0657f7286c 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -595,15 +595,19 @@ then
+ fi
+ export QEMU_PROG="$(type -p "$QEMU_PROG")"
  
- # virgl
- RUN apt update && \
++export QEMU_OPTIONS="-nodefaults -display none -accel qtest"
+ case "$QEMU_PROG" in
+     *qemu-system-arm|*qemu-system-aarch64)
+-        export QEMU_OPTIONS="-nodefaults -display none -machine virt -accel qtest"
++        export QEMU_OPTIONS="$QEMU_OPTIONS -machine virt"
+         ;;
+-    *qemu-system-tricore)
+-        export QEMU_OPTIONS="-nodefaults -display none -machine tricore_testboard -accel qtest"
++    *qemu-system-avr)
++        export QEMU_OPTIONS="$QEMU_OPTIONS -machine mega2560"
++        ;;
++    *qemu-system-rx)
++        export QEMU_OPTIONS="$QEMU_OPTIONS -machine gdbsim-r5f562n8"
+         ;;
+-    *)
+-        export QEMU_OPTIONS="-nodefaults -display none -accel qtest"
++    *qemu-system-tricore)
++        export QEMU_OPTIONS="-$QEMU_OPTIONS -machine tricore_testboard"
+         ;;
+ esac
+ 
 -- 
 2.18.1
 
