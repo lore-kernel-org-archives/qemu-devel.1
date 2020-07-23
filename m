@@ -7,72 +7,71 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF175C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 02:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 390E9C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 02:59:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92096206F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 02:59:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92096206F4
+	by mail.kernel.org (Postfix) with ESMTPS id 0CADF206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 Jul 2020 02:59:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CADF206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyRSA-0006A9-QP
-	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 22:59:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34938)
+	id 1jyRSL-0006af-AJ
+	for qemu-devel@archiver.kernel.org; Wed, 22 Jul 2020 22:59:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jyRQn-0003pU-40; Wed, 22 Jul 2020 22:58:01 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11364)
+ id 1jyRRB-0004lf-Qg; Wed, 22 Jul 2020 22:58:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27758)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1jyRQl-0002wO-Fa; Wed, 22 Jul 2020 22:58:00 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ id 1jyRR9-00035c-DW; Wed, 22 Jul 2020 22:58:25 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06N2Vqr4048847; Wed, 22 Jul 2020 22:57:39 -0400
+ 06N2WFEj048962; Wed, 22 Jul 2020 22:58:02 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32f1pp0qy0-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32ecpb5j07-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 22:57:39 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06N2iFL6093589;
- Wed, 22 Jul 2020 22:57:38 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32f1pp0qxr-1
+ Wed, 22 Jul 2020 22:58:02 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06N2qUlL105138;
+ Wed, 22 Jul 2020 22:58:02 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32ecpb5hyw-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 22 Jul 2020 22:57:38 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06N2nNiB009738;
- Thu, 23 Jul 2020 02:57:37 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
- [9.57.198.25]) by ppma05wdc.us.ibm.com with ESMTP id 32brq910wb-1
+ Wed, 22 Jul 2020 22:58:01 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06N2oxeX016127;
+ Thu, 23 Jul 2020 02:58:00 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma01dal.us.ibm.com with ESMTP id 32brq939rt-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 23 Jul 2020 02:57:37 +0000
+ Thu, 23 Jul 2020 02:58:00 +0000
 Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
  [9.57.199.111])
- by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06N2vbHC46268810
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06N2vx6811207650
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 23 Jul 2020 02:57:37 GMT
+ Thu, 23 Jul 2020 02:57:59 GMT
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 53DEDAC05E;
- Thu, 23 Jul 2020 02:57:37 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id BC5C8AC059;
+ Thu, 23 Jul 2020 02:57:59 +0000 (GMT)
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5D265AC059;
- Thu, 23 Jul 2020 02:57:30 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 7A235AC05F;
+ Thu, 23 Jul 2020 02:57:52 +0000 (GMT)
 Received: from morokweng.localdomain.com (unknown [9.211.93.190])
  by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu, 23 Jul 2020 02:57:30 +0000 (GMT)
+ Thu, 23 Jul 2020 02:57:52 +0000 (GMT)
 From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 To: qemu-ppc@nongnu.org
-Subject: [PATCH v3 2/8] target/arm: Move setting of CPU halted state to
- generic code
-Date: Wed, 22 Jul 2020 23:56:51 -0300
-Message-Id: <20200723025657.644724-3-bauerman@linux.ibm.com>
+Subject: [PATCH v3 5/8] mips/cps: Use start-powered-off CPUState property
+Date: Wed, 22 Jul 2020 23:56:54 -0300
+Message-Id: <20200723025657.644724-6-bauerman@linux.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200723025657.644724-1-bauerman@linux.ibm.com>
 References: <20200723025657.644724-1-bauerman@linux.ibm.com>
@@ -84,15 +83,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-07-22_17:2020-07-22,
  2020-07-22 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 mlxscore=0
- bulkscore=0 phishscore=0 clxscore=1015 impostorscore=0 malwarescore=0
- lowpriorityscore=0 suspectscore=1 mlxlogscore=999 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ bulkscore=0 spamscore=0
+ impostorscore=0 clxscore=1015 suspectscore=1 phishscore=0 malwarescore=0
+ priorityscore=1501 adultscore=0 mlxlogscore=961 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2007230014
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=bauerman@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:57:54
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/22 22:57:53
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -129,43 +128,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change is in a separate patch because it's not so obvious that it
-won't cause a regression.
+Instead of setting CPUState::halted to 1 in main_cpu_reset(), use the
+start-powered-off property which makes cpu_common_reset() initialize it
+to 1 in common code.
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 ---
- hw/core/cpu.c    | 2 +-
- target/arm/cpu.c | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ hw/mips/cps.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-NB: I wasn't able to run this patch on an ARM machine. I did run it on
-a ppc64le pseries KVM guest.
+NB: I was only able to test that this patch builds. I wasn't able to
+run it.
 
-diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-index 594441a150..71bb7859f1 100644
---- a/hw/core/cpu.c
-+++ b/hw/core/cpu.c
-@@ -258,7 +258,7 @@ static void cpu_common_reset(DeviceState *dev)
+diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+index 615e1a1ad2..d5b6c78019 100644
+--- a/hw/mips/cps.c
++++ b/hw/mips/cps.c
+@@ -52,9 +52,6 @@ static void main_cpu_reset(void *opaque)
+     CPUState *cs = CPU(cpu);
+ 
+     cpu_reset(cs);
+-
+-    /* All VPs are halted on reset. Leave powering up to CPC. */
+-    cs->halted = 1;
+ }
+ 
+ static bool cpu_mips_itu_supported(CPUMIPSState *env)
+@@ -89,6 +86,9 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+             env->itc_tag = mips_itu_get_tag_region(&s->itu);
+             env->itu = &s->itu;
+         }
++        /* All VPs are halted on reset. Leave powering up to CPC. */
++        object_property_set_bool(OBJECT(cpu), "start-powered-off", true,
++                                 &error_abort);
+         qemu_register_reset(main_cpu_reset, cpu);
      }
  
-     cpu->interrupt_request = 0;
--    cpu->halted = 0;
-+    cpu->halted = cpu->start_powered_off;
-     cpu->mem_io_pc = 0;
-     cpu->icount_extra = 0;
-     atomic_set(&cpu->icount_decr_ptr->u32, 0);
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index ec65c7653f..b6c65e4df6 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -175,7 +175,6 @@ static void arm_cpu_reset(DeviceState *dev)
-     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->isar.mvfr2;
- 
-     cpu->power_state = s->start_powered_off ? PSCI_OFF : PSCI_ON;
--    s->halted = s->start_powered_off;
- 
-     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
-         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
 
