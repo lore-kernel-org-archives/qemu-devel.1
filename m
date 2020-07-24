@@ -7,50 +7,52 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F14A9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C50C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:03:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC84020737
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC4A720737
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:03:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pSuzO9oG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC84020737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OGBTdOPi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC4A720737
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyo18-0000qw-0I
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 23:05:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55496)
+	id 1jynza-0006m3-1v
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 23:03:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jynuR-0007QF-9y; Thu, 23 Jul 2020 22:58:07 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36865 helo=ozlabs.org)
+ id 1jynuP-0007Mm-UH; Thu, 23 Jul 2020 22:58:05 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:41959 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jynuO-00061o-BI; Thu, 23 Jul 2020 22:58:06 -0400
+ id 1jynuN-00061f-W3; Thu, 23 Jul 2020 22:58:05 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BCYlw2nzSz9sTT; Fri, 24 Jul 2020 12:57:48 +1000 (AEST)
+ id 4BCYlw00Rzz9sTF; Fri, 24 Jul 2020 12:57:47 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1595559468;
- bh=/o46AHd29VbcsNq9WcZf6nE94CsdYc+R5nZVL/Rr/HI=;
+ bh=xgmDQa3udk5W0XmmFTnrKQDvJ/BjSvIb0v09eBORE70=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=pSuzO9oG4N0zQaZIvbeJU7FN70QP4ZKEEpvcOr/jb4KRvrGtL4GgERFkyKACeAnXN
- C3V2s+HwQakiko3lp4TBXkrCi7CoBZhihn8CuBdR0/9T1ELAjFSeGV7tcu2j5wPuxC
- 6hX7tzTwsR/GqgVUfC1xdRMGLpbwYxSnB6k/qEEE=
+ b=OGBTdOPiL8Nuu2cNvQr4R0hIaMZJWJVN7ZYOOU1+Jy0huQdGQy/w2e1zDJi8inGMI
+ sfXsFRM+wueL5uASQSTxss6FU3dO287ugy3GwG20FzTIJmZBhmgeHhy9l/aCGLs3To
+ iO87zT9VzxIzMNoBplOdxlcOc+iAP26IC9fuwfF0=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: dgilbert@redhat.com, frankja@linux.ibm.com, pair@us.ibm.com,
  qemu-devel@nongnu.org, pbonzini@redhat.com, brijesh.singh@amd.com
-Subject: [for-5.2 v4 10/10] s390: Recognize host-trust-limitation option
-Date: Fri, 24 Jul 2020 12:57:44 +1000
-Message-Id: <20200724025744.69644-11-david@gibson.dropbear.id.au>
+Subject: [for-5.2 v4 06/10] host trust limitation: Add Error ** to
+ HostTrustLimitation::kvm_init
+Date: Fri, 24 Jul 2020 12:57:40 +1000
+Message-Id: <20200724025744.69644-7-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200724025744.69644-1-david@gibson.dropbear.id.au>
 References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
@@ -79,125 +81,135 @@ Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  ehabkost@redhat.com, kvm@vger.kernel.org,
  "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
- mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>,
+ Richard Henderson <richard.henderson@linaro.org>, mdroth@linux.vnet.ibm.com,
+ pasic@linux.ibm.com, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At least some s390 cpu models support "Protected Virtualization" (PV),
-a mechanism to protect guests from eavesdropping by a compromised
-hypervisor.
-
-This is similar in function to other mechanisms like AMD's SEV and
-POWER's PEF, which are controlled bythe "host-trust-limitation"
-machine option.  s390 is a slightly special case, because we already
-supported PV, simply by using a CPU model with the required feature
-(S390_FEAT_UNPACK).
-
-To integrate this with the option used by other platforms, we
-implement the following compromise:
-
- - When the host-trust-limitation option is set, s390 will recognize
-   it, verify that the CPU can support PV (failing if not) and set
-   virtio default options necessary for encrypted or protected guests,
-   as on other platforms.  i.e. if host-trust-limitation is set, we
-   will either create a guest capable of entering PV mode, or fail
-   outright
-
- - If host-trust-limitation is not set, guest's might still be able to
-   enter PV mode, if the CPU has the right model.  This may be a
-   little surprising, but shouldn't actually be harmful.
-
-To start a guest supporting Protected Virtualization using the new
-option use the command line arguments:
-    -object s390-pv-guest,id=pv0 -machine host-trust-limitation=pv0
+This allows failures to be reported richly and idiomatically.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/s390x/pv.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+ accel/kvm/kvm-all.c                  |  4 +++-
+ include/exec/host-trust-limitation.h |  2 +-
+ target/i386/sev.c                    | 31 ++++++++++++++--------------
+ 3 files changed, 19 insertions(+), 18 deletions(-)
 
-diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
-index ab3a2482aa..4bf3b345b6 100644
---- a/hw/s390x/pv.c
-+++ b/hw/s390x/pv.c
-@@ -14,8 +14,11 @@
- #include <linux/kvm.h>
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 4b6402c12c..3f98c6be7c 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2164,9 +2164,11 @@ static int kvm_init(MachineState *ms)
+     if (ms->htl) {
+         HostTrustLimitationClass *htlc =
+             HOST_TRUST_LIMITATION_GET_CLASS(ms->htl);
++        Error *local_err = NULL;
  
- #include "cpu.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-+#include "qom/object_interfaces.h"
-+#include "exec/host-trust-limitation.h"
- #include "hw/s390x/ipl.h"
- #include "hw/s390x/pv.h"
+-        ret = htlc->kvm_init(ms->htl);
++        ret = htlc->kvm_init(ms->htl, &local_err);
+         if (ret < 0) {
++            error_report_err(local_err);
+             goto err;
+         }
+     }
+diff --git a/include/exec/host-trust-limitation.h b/include/exec/host-trust-limitation.h
+index fc30ea3f78..d93b537280 100644
+--- a/include/exec/host-trust-limitation.h
++++ b/include/exec/host-trust-limitation.h
+@@ -30,7 +30,7 @@
+ typedef struct HostTrustLimitationClass {
+     InterfaceClass parent;
  
-@@ -111,3 +114,61 @@ void s390_pv_inject_reset_error(CPUState *cs)
-     /* Report that we are unable to enter protected mode */
-     env->regs[r1 + 1] = DIAG_308_RC_INVAL_FOR_PV;
+-    int (*kvm_init)(HostTrustLimitation *);
++    int (*kvm_init)(HostTrustLimitation *, Error **);
+     int (*encrypt_data)(HostTrustLimitation *, uint8_t *, uint64_t);
+ } HostTrustLimitationClass;
+ 
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 8e3c9dcc2c..0d06976da5 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -626,7 +626,7 @@ sev_vm_state_change(void *opaque, int running, RunState state)
+     }
  }
-+
-+#define TYPE_S390_PV_GUEST "s390-pv-guest"
-+#define S390_PV_GUEST(obj)                              \
-+    OBJECT_CHECK(S390PVGuestState, (obj), TYPE_S390_PV_GUEST)
-+
-+typedef struct S390PVGuestState S390PVGuestState;
-+
-+/**
-+ * S390PVGuestState:
-+ *
-+ * The S390PVGuestState object is basically a dummy used to tell the
-+ * host trust limitation system to use s390's PV mechanism.  guest.
-+ *
-+ * # $QEMU \
-+ *         -object s390-pv-guest,id=pv0 \
-+ *         -machine ...,host-trust-limitation=pv0
-+ */
-+struct S390PVGuestState {
-+    Object parent_obj;
-+};
-+
-+static int s390_pv_kvm_init(HostTrustLimitation *gmpo, Error **errp)
-+{
-+    if (!s390_has_feat(S390_FEAT_UNPACK)) {
-+        error_setg(errp,
-+                   "CPU model does not support Protected Virtualization");
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static void s390_pv_guest_class_init(ObjectClass *oc, void *data)
-+{
-+    HostTrustLimitationClass *gmpc = HOST_TRUST_LIMITATION_CLASS(oc);
-+
-+    gmpc->kvm_init = s390_pv_kvm_init;
-+}
-+
-+static const TypeInfo s390_pv_guest_info = {
-+    .parent = TYPE_OBJECT,
-+    .name = TYPE_S390_PV_GUEST,
-+    .instance_size = sizeof(S390PVGuestState),
-+    .class_init = s390_pv_guest_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_HOST_TRUST_LIMITATION },
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void
-+s390_pv_register_types(void)
-+{
-+    type_register_static(&s390_pv_guest_info);
-+}
-+
-+type_init(s390_pv_register_types);
+ 
+-static int sev_kvm_init(HostTrustLimitation *htl)
++static int sev_kvm_init(HostTrustLimitation *htl, Error **errp)
+ {
+     SevGuestState *sev = SEV_GUEST(htl);
+     char *devname;
+@@ -648,14 +648,14 @@ static int sev_kvm_init(HostTrustLimitation *htl)
+     host_cbitpos = ebx & 0x3f;
+ 
+     if (host_cbitpos != sev->cbitpos) {
+-        error_report("%s: cbitpos check failed, host '%d' requested '%d'",
+-                     __func__, host_cbitpos, sev->cbitpos);
++        error_setg(errp, "%s: cbitpos check failed, host '%d' requested '%d'",
++                   __func__, host_cbitpos, sev->cbitpos);
+         goto err;
+     }
+ 
+     if (sev->reduced_phys_bits < 1) {
+-        error_report("%s: reduced_phys_bits check failed, it should be >=1,"
+-                     " requested '%d'", __func__, sev->reduced_phys_bits);
++        error_setg(errp, "%s: reduced_phys_bits check failed, it should be >=1,"
++                   " requested '%d'", __func__, sev->reduced_phys_bits);
+         goto err;
+     }
+ 
+@@ -664,20 +664,19 @@ static int sev_kvm_init(HostTrustLimitation *htl)
+     devname = object_property_get_str(OBJECT(sev), "sev-device", NULL);
+     sev->sev_fd = open(devname, O_RDWR);
+     if (sev->sev_fd < 0) {
+-        error_report("%s: Failed to open %s '%s'", __func__,
+-                     devname, strerror(errno));
+-    }
+-    g_free(devname);
+-    if (sev->sev_fd < 0) {
++        error_setg(errp, "%s: Failed to open %s '%s'", __func__,
++                   devname, strerror(errno));
++        g_free(devname);
+         goto err;
+     }
++    g_free(devname);
+ 
+     ret = sev_platform_ioctl(sev->sev_fd, SEV_PLATFORM_STATUS, &status,
+                              &fw_error);
+     if (ret) {
+-        error_report("%s: failed to get platform status ret=%d "
+-                     "fw_error='%d: %s'", __func__, ret, fw_error,
+-                     fw_error_to_str(fw_error));
++        error_setg(errp, "%s: failed to get platform status ret=%d "
++                   "fw_error='%d: %s'", __func__, ret, fw_error,
++                   fw_error_to_str(fw_error));
+         goto err;
+     }
+     sev->build_id = status.build;
+@@ -687,14 +686,14 @@ static int sev_kvm_init(HostTrustLimitation *htl)
+     trace_kvm_sev_init();
+     ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
+     if (ret) {
+-        error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
+-                     __func__, ret, fw_error, fw_error_to_str(fw_error));
++        error_setg(errp, "%s: failed to initialize ret=%d fw_error=%d '%s'",
++                   __func__, ret, fw_error, fw_error_to_str(fw_error));
+         goto err;
+     }
+ 
+     ret = sev_launch_start(sev);
+     if (ret) {
+-        error_report("%s: failed to create encryption context", __func__);
++        error_setg(errp, "%s: failed to create encryption context", __func__);
+         goto err;
+     }
+ 
 -- 
 2.26.2
 
