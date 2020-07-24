@@ -2,68 +2,128 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C73EC433EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 06:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 488A5C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 06:17:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4200D20714
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 06:06:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4200D20714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 121BF20714
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 06:17:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZmX4nSjq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 121BF20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyqqc-0003b0-J0
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 02:06:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58826)
+	id 1jyr1T-00064M-2Z
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 02:17:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jyqpx-00034T-VW; Fri, 24 Jul 2020 02:05:41 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:60316)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1jyqpv-0004Bu-8P; Fri, 24 Jul 2020 02:05:41 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1413044|-1; CH=green; DM=|CONTINUE|false|;
- DS=CONTINUE|ham_regular_dialog|0.0934425-0.00159043-0.904967;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03308; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=5; RT=5; SR=0; TI=SMTPD_---.I6om39v_1595570734; 
-Received: from 30.225.208.37(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.I6om39v_1595570734)
- by smtp.aliyun-inc.com(10.147.44.145);
- Fri, 24 Jul 2020 14:05:34 +0800
-Subject: Re: [PATCH v2 1/7] target/riscv: Generate nanboxed results from fp
- helpers
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200724002807.441147-1-richard.henderson@linaro.org>
- <20200724002807.441147-2-richard.henderson@linaro.org>
- <1aa6cb56-2f41-45c1-2d32-ec8b3b10780b@c-sky.com>
- <9e10c17c-7a9e-5f7f-b1e3-c195d4e30b32@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <ccc72223-d98e-6dd4-6c44-ca30f4e687d5@c-sky.com>
-Date: Fri, 24 Jul 2020 14:05:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jyr0U-0005HG-Va
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 02:16:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29303
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1jyr0T-0005RS-7Q
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 02:16:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595571392;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=/45hO55ke5izVX3RXey5PYITo1YS3iRDx99sZ9y/4xI=;
+ b=ZmX4nSjqcW3AA5ACqzFwYIdI4xib/CpDNafrGC9+THJOtrBEYrVCbMbxCNAu/J7ZjFZwSq
+ ublCAHEy0noDpcR5QywX2RmK+96/uXeyEFsEmhDNBXSbsmt08VOaiM0Et1NYj6FNXe6YWE
+ lCyuJ9viGLWe1urWcEHzFTZE99acoc4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-74OtwX-QMJmsiPedHPtUzw-1; Fri, 24 Jul 2020 02:16:28 -0400
+X-MC-Unique: 74OtwX-QMJmsiPedHPtUzw-1
+Received: by mail-wm1-f72.google.com with SMTP id f74so3569958wmf.1
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 23:16:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=/45hO55ke5izVX3RXey5PYITo1YS3iRDx99sZ9y/4xI=;
+ b=B1ASoGWLd46aAqElJ4FhtY9BsoSo1npz1ax90CJfKzGFZ8LtKaQPcf+FSMoeMFvhTv
+ cwqq+1FBovt7uZM4gR3wnKWJ8w6m/EOnbVtqbuE+JufBotoZ+dtEBIW9kIAX2itqdZUH
+ TAOlJXPKG2JdZFViJ20DdhTNKRA3ytQBw7MhS2gXCNYqWMIpS/hVt+A24FNIDcduDpFZ
+ dxBoDIVnAZCQ09jejM+bMLie/zPrgEkrJz7Or4EU8PsEydAgYZvLgM5iZCQZ7hjTY/uO
+ gfZP4r92LEtG1GSbpiXCAc5Ou3ot2ogdC+daAACh5SXZH/5zBHLT//9fbvUiU65CpoSk
+ e/LQ==
+X-Gm-Message-State: AOAM530e0bu9+KmXYIZFK/BmNUIWXZ+Gz2/5+HaSm4VfrA5tv1dTAjQq
+ IAv578kyltvoKrTVpfvvSs0vAtpfg0fC//2R8NXx0aYJCZcfKErQvcILHIjHNTVedNOJN3gxpJJ
+ oPKZ0Zpg2Jpo8CCg=
+X-Received: by 2002:adf:ed88:: with SMTP id c8mr6598877wro.233.1595571386993; 
+ Thu, 23 Jul 2020 23:16:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy7CPXLY5FKUxCiBxiUoVchGnVOsWXrngSYSRv83b1ISBiLHM40fd3en9LYR6w4YdyfQYDltA==
+X-Received: by 2002:adf:ed88:: with SMTP id c8mr6598862wro.233.1595571386811; 
+ Thu, 23 Jul 2020 23:16:26 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id j75sm88671wrj.22.2020.07.23.23.16.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Jul 2020 23:16:26 -0700 (PDT)
+Subject: Re: [PATCH 1/7] ide: rename cmd_write to ctrl_write
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20200724052300.1163728-1-jsnow@redhat.com>
+ <20200724052300.1163728-2-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <705b33b7-ec0d-99a0-e6e2-213c4ebddcfb@redhat.com>
+Date: Fri, 24 Jul 2020 08:16:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <9e10c17c-7a9e-5f7f-b1e3-c195d4e30b32@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200724052300.1163728-2-jsnow@redhat.com>
 Content-Language: en-US
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 02:04:16
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 01:23:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,61 +136,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: frank.chang@sifive.com, alistair23@gmail.com, qemu-riscv@nongnu.org
+Cc: kwolf@redhat.com, Alexander Bulekov <alxndr@bu.edu>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 7/24/20 7:22 AM, John Snow wrote:
+> It's the Control register, part of the Control block -- Command is
+> misleading here. Rename all related functions and constants.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  include/hw/ide/internal.h |  9 +++++----
+>  hw/ide/core.c             | 12 ++++++------
+>  hw/ide/ioport.c           |  2 +-
+>  hw/ide/macio.c            |  2 +-
+>  hw/ide/mmio.c             |  8 ++++----
+>  hw/ide/pci.c              | 12 ++++++------
+>  hw/ide/trace-events       |  2 +-
+>  7 files changed, 24 insertions(+), 23 deletions(-)
 
-
-On 2020/7/24 11:55, Richard Henderson wrote:
-> On 7/23/20 7:35 PM, LIU Zhiwei wrote:
->>
->> On 2020/7/24 8:28, Richard Henderson wrote:
->>> Make sure that all results from single-precision scalar helpers
->>> are properly nan-boxed to 64-bits.
->>>
->>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>> ---
->>>    target/riscv/internals.h  |  5 +++++
->>>    target/riscv/fpu_helper.c | 42 +++++++++++++++++++++------------------
->>>    2 files changed, 28 insertions(+), 19 deletions(-)
->>>
->>> diff --git a/target/riscv/internals.h b/target/riscv/internals.h
->>> index 37d33820ad..9f4ba7d617 100644
->>> --- a/target/riscv/internals.h
->>> +++ b/target/riscv/internals.h
->>> @@ -38,4 +38,9 @@ target_ulong fclass_d(uint64_t frs1);
->>>    #define SEW32 2
->>>    #define SEW64 3
->>>    +static inline uint64_t nanbox_s(float32 f)
->>> +{
->>> +    return f | MAKE_64BIT_MASK(32, 32);
->>> +}
->>> +
->> If define it here,  we can also define a more general  function with flen.
->>
->> +static inline uint64_t nanbox_s(float32 f, uint32_t flen)
->> +{
->> +    return f | MAKE_64BIT_MASK(flen, 64 - flen);
->> +}
->> +
->>
->> So we can reuse it in fp16 or bf16 scalar instruction and in vector instructions.
-> While we could do that, we will not encounter all possible lengths.  In the
-> cover letter, I mentioned defining a second function,
->
-> static inline uint64_t nanbox_h(float16 f)
-> {
->     return f | MAKE_64BIT_MASK(16, 48);
-> }
->
-> Having two separate functions will, I believe, be easier to use in practice.
->
-Get  it. Thanks.
-
-Zhiwei
->
-> r~
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
