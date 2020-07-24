@@ -2,61 +2,88 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94204C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 13:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8989C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 13:20:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64EFF2065F
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 13:17:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64EFF2065F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 749392065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 13:20:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YFZnEp7/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 749392065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyxaA-0002qr-ML
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 09:17:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41410)
+	id 1jyxd2-0004AM-Pd
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 09:20:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <a.lauterer@proxmox.com>)
- id 1jyxZe-0002S6-DX
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 09:17:18 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:13848)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <a.lauterer@proxmox.com>)
- id 1jyxZb-00084o-DO
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 09:17:18 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 3DA0F432DC;
- Fri, 24 Jul 2020 15:17:11 +0200 (CEST)
-Subject: Re: Possible regression with VGA and resolutions in Windows 10?
-To: Gerd Hoffmann <kraxel@redhat.com>
-References: <24909a16-be74-7516-b5c5-08bdc743a553@proxmox.com>
- <20200724094120.dptmucij4phzd3od@sirius.home.kraxel.org>
-From: Aaron Lauterer <a.lauterer@proxmox.com>
-Message-ID: <1ee13b41-3ed7-8dd4-99b7-e325e95878d5@proxmox.com>
-Date: Fri, 24 Jul 2020 15:17:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.0.1
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jyxcG-0003Qw-AS
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 09:20:00 -0400
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:39413)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jyxcD-0008JL-La
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 09:20:00 -0400
+Received: by mail-ot1-x32d.google.com with SMTP id 18so6953249otv.6
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 06:19:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=jTEf1o++WaVJfH5RXYmaRp2hBzAR3Y42Mk52reBi4WA=;
+ b=YFZnEp7/W2ybtHY5mYiOP77ckpKkeOvV24exIgBLSWYQ1qi+05rPNOUOEWQvaIq/h6
+ 0HcGDkdEIxEVRS/IJgdnO1v2vsOE1VXMmBXrl+TrWiAX1Vc1eZO7Ec/I6k1EG+VmJldf
+ vXaBz0gKSqob+H5eLh3r9TDm+o3p+rEGIOBVtKiX3RWZJuHwW+9KCisK5dZ003nocBnX
+ UWhmSG9WtNrzbkgE+xe1cXTBnsxseS1pPpC3xXPr59XxKHe8vCnhVQuysIOsBJqG6oht
+ s4aPZ7hknS/XpDFuKnkYBKhLLix58PGosMYbK+SftlEEYPWM35dzyNAH10bq7oQezgB5
+ xZFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=jTEf1o++WaVJfH5RXYmaRp2hBzAR3Y42Mk52reBi4WA=;
+ b=tLPH909JRcwzP8N2H9YZPBQhuJ7uA2vYJxieKI7gBKUsJv1Qw+khia2gQKMn09nUYQ
+ dO6PdN+d71a9G+BNXPKNRWth1erVZg01CyNLHpmANnVrPUp7pkBBWPoGx0mSBQN7JQjC
+ /OcG9Z7SQtGh1bYcuW/o7ZIwjcatB/rSzbu0/SdrcWlfdd1+lr5WJYdlDuLgWQO9aFHj
+ 3NoF7H1wayGLd2t9sN0jeGSCAD4MOz2YQPP5shHSrWYAqSkENAaxGfty2JEmJalH1GUK
+ hmpTPozctKgCQHfPGHI/+vdsOJmO8llPSBTDaP/VxRgYxF30OyiD0hwBZm6QbE9jtUW7
+ hXJA==
+X-Gm-Message-State: AOAM533mzENQdRKm/FQYnsgZE6ul/2YkHU/M7Vd2NK7TqgunxPaxll4q
+ LtuGwrf5NIc/3YECHLFKchvX857CG1/FKzCSx38CCA==
+X-Google-Smtp-Source: ABdhPJyM9eLqy2fs/eTDUfDNPXA7asIAcsJIFHdNItKNLOei76J2z4NNzo1Ekh5f++WB65Edzj5vjj96X6hWeD8U+Hk=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr8710838ota.91.1595596796072; 
+ Fri, 24 Jul 2020 06:19:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200724094120.dptmucij4phzd3od@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=212.186.127.180;
- envelope-from=a.lauterer@proxmox.com; helo=proxmox-new.maurer-it.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 09:17:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200721124250.8601-1-f4bug@amsat.org>
+In-Reply-To: <20200721124250.8601-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 Jul 2020 14:19:45 +0100
+Message-ID: <CAFEAcA-VSRCR4fFwLkWhOcPtivQJOCM_LEbUafvsW-62Cb15bw@mail.gmail.com>
+Subject: Re: [PATCH-for-5.1 v3] hw/misc/aspeed_sdmc: Fix incorrect memory size
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::32d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x32d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,70 +96,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>, QEMU Developers <qemu-devel@nongnu.org>,
+ QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 21 Jul 2020 at 13:42, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>
+> The SDRAM Memory Controller has a 32-bit address bus, thus
+> supports up to 4 GiB of DRAM. There is a signed to unsigned
+> conversion error with the AST2600 maximum memory size:
+>
+>   (uint64_t)(2048 << 20) =3D (uint64_t)(-2147483648)
+>                          =3D 0xffffffff40000000
+>                          =3D 16 EiB - 2 GiB
+>
+> Fix by using the IEC suffixes which are usually safer, and add
+> an assertion check to verify the memory is valid. This would have
+> caught this bug:
+>
+>   $ qemu-system-arm -M ast2600-evb
+>   qemu-system-arm: hw/misc/aspeed_sdmc.c:258: aspeed_sdmc_realize: Assert=
+ion `asc->max_ram_size < 4 * GiB' failed.
+>   Aborted (core dumped)
+>
+> Fixes: 1550d72679 ("aspeed/sdmc: Add AST2600 support")
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> --
 
 
-On 7/24/20 11:41 AM, Gerd Hoffmann wrote:
-> On Thu, Jul 23, 2020 at 04:24:06PM +0200, Aaron Lauterer wrote:
->> Hi all,
->>
->> I think we have a regression introduced in commit 0221d73ce6.
->>
->> Once I start a Windows 10 VM (build 18363) with `-device VGA` I have only the following resolutions to choose from instead of the much longer list:
->>
->> 1920x1080
->> 1024x768
->> 800x600
-> 
-> That is probably vgabios gaining edid support.
-> 
-> The list should be longer though, the qemu edid block has more
-> resolutions included.  The qemu-edid tool is a command line
-> interface to the edid generator, for testing purposes.
-> 
-> Try "qemu-edid | edid-decode" to see the decoded edid data.
-> 
-> Linux guests have the raw edid block in sysfs, see
-> /sys/class/drm/card0/card0-Virtual-1/edid.
-> 
->>    -device 'VGA,id=vga,vgamem_mb=32,bus=pci.0,addr=0x2' \
-> 
-> Try adding "xres=<width>,yres=<height>" of you want a specific
-> display resolution.
-> 
-> Try adding "edid=off" to return to previous behavior.
 
-I did try that initially but it seemingly was ignored by Windows.
+Applied to target-arm.next, thanks.
 
-But I took another look at it and I was able to observe the following behavior with Win10:
-
-Boot it first with edid enabled (by default) and I see only the short list of possible resolutions (I forgot 640x480, which is only shown in the Display Adapter Properties -> List all modes).
-
-Boot it with edid=off and nothing changes, still the short list.
-Uninstall the `Microsoft Basic Display Adapter` in Device Manager and reboot the VM. Now it recognizes all resolutions again.
-
-The behavior is similar when setting a custom resolution with the xres and yres parameters. Setting it the first time works fine and it is shown along with the short list. Setting it to something different on the next boot will not be recognized unless the display adapter is uninstalled and the VM rebooted.
-
-The same applies when changing from edid=off to edid=on. Only after uninstalling the display driver and a reboot will it change from showing the long list of resolution to the mentioned short one.
-
-
-Knowing that uninstalling the display driver after setting edid=off will help is good enough for now.
-
-Thanks for pointing that out again and nudging me in the right direction.
-
-All the best,
-Aaron
-
-
-> 
-> HTH & take care,
->    Gerd
-> 
-> 
-> 
-
+-- PMM
 
