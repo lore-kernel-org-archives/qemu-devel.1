@@ -2,92 +2,108 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE913C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 00:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F2CDC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 00:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9811F2064B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 00:36:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FScUEfH+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9811F2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 564DA22B43
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 00:57:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 564DA22B43
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jylhG-0007xL-Ue
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 20:36:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54470)
+	id 1jym1M-00030r-Jy
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 20:57:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58970)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jylZV-0000ML-5y
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 20:28:21 -0400
-Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:46606)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jylZT-0008GF-KL
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 20:28:20 -0400
-Received: by mail-pf1-x431.google.com with SMTP id a23so4051334pfk.13
- for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 17:28:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=jQCpNdFJsrF3Bpi0rRRCXqsUrN96754LDnpff+tQIzo=;
- b=FScUEfH+7aJujA9JSdolRAFuUDhHsshCEERdH9W9YZSRKL/KK/ZQsHZL+zn+iNOTsk
- FJAmFC0hc3hPsj3xkJEUkQpUG+TS1RPZDrhIKySvy2ApU0W9w1NYKkALTK+ONPCTrpws
- J5WH6aOhDU6jrfUwYLZzk61TkcUHDnAIydTHzdvoZZrhHZWiVNAiQSmrVqUttLZRRhAl
- ClcKyQDVEaI+Wd5IGe+Iw5wV86HJ93TnaHhInjRwCOprPbSMmozOxl6ya3bfaiKuhYWa
- HHVGd4ETYkVEfcJ0DoY5nr2ydDGeVVDSvZrfda7/wc32U8Znms5Kzw9GBjsb8Eb7q8fQ
- b5Xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=jQCpNdFJsrF3Bpi0rRRCXqsUrN96754LDnpff+tQIzo=;
- b=Jcwk7SqWzBQtYjjJOD6MU8w3oYMnqsmyfXiIfyjGy1TcdERh6B1psLH89gS4lUob9A
- 5QT9BJ1OblU99K2llyQEdIbV4W/x+a2cGr4D7QhxowDcxxGDJ8qEBibnj0X9Li1qFD8O
- r+M+cnFgjEbSqJz1GCkmJjuFOYihhmT4Q7EXpdR7FzEihfOpIpJhCACFyGWkv8dXdDFM
- ZnsLpJYBnJPe6bgOY3dD2iy76zBezhAkjN9qKxqzUpYRjVPQAUaUtqC6TNtn/w2m0fqY
- tqi6J8AiAQzf4QmGCf2zbDEVLmGZxl7gl+3hQzjCGTKQR3tRhe5Q8xgeT7QirMSPbUL0
- fZ4g==
-X-Gm-Message-State: AOAM5323H2cHOT5Xe0aNuJmRxnsObgv/ifB4ARMOH0VALLOU33hZKu/r
- fsGC7pSgHZB6dXImaK8DJc/tz0tF8dw=
-X-Google-Smtp-Source: ABdhPJwJpM0IToCX7H1EapTXmYY8AmBjtWlS0t+IfEhdMMHDFQjM4DNvrOefl4ODTNMaCzGEDy0FNA==
-X-Received: by 2002:a65:6416:: with SMTP id a22mr6212003pgv.392.1595550497983; 
- Thu, 23 Jul 2020 17:28:17 -0700 (PDT)
-Received: from localhost.localdomain (216-160-65-90.tukw.qwest.net.
- [216.160.65.90])
- by smtp.gmail.com with ESMTPSA id q20sm4224635pfn.111.2020.07.23.17.28.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Jul 2020 17:28:17 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 7/7] target/riscv: check before allocating TCG temps
-Date: Thu, 23 Jul 2020 17:28:07 -0700
-Message-Id: <20200724002807.441147-8-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200724002807.441147-1-richard.henderson@linaro.org>
-References: <20200724002807.441147-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jym0g-0002aC-Jx
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 20:56:26 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63320)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1jym0e-0003Bh-RQ
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 20:56:26 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06O0chY8012221
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 20:56:21 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32facej32g-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 20:56:21 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06O0grQU031996
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 20:56:21 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32facej324-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 23 Jul 2020 20:56:21 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06O0t8kQ003984;
+ Fri, 24 Jul 2020 00:56:20 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma02wdc.us.ibm.com with ESMTP id 32brq9rjph-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 24 Jul 2020 00:56:20 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
+ [9.57.199.108])
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06O0uJbR54657406
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 24 Jul 2020 00:56:19 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9AF1AB2066;
+ Fri, 24 Jul 2020 00:56:19 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8E44EB2064;
+ Fri, 24 Jul 2020 00:56:19 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+ Fri, 24 Jul 2020 00:56:19 +0000 (GMT)
+Subject: Re: [PATCH for-5.1 2/2] tpm: Improve help on TPM types when none are
+ available
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200723115845.1865886-1-armbru@redhat.com>
+ <20200723115845.1865886-3-armbru@redhat.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <45421f31-caf0-7f7f-de60-bf55b4c5c431@linux.ibm.com>
+Date: Thu, 23 Jul 2020 20:56:19 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <20200723115845.1865886-3-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::431;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x431.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-23_09:2020-07-23,
+ 2020-07-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999 spamscore=0
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 impostorscore=0
+ phishscore=0 malwarescore=0 suspectscore=0 adultscore=0 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007240001
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 20:56:22
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,84 +116,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: frank.chang@sifive.com, alistair23@gmail.com, qemu-riscv@nongnu.org,
- zhiwei_liu@c-sky.com
+Cc: philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+On 7/23/20 7:58 AM, Markus Armbruster wrote:
+> Help is a bit awkward when no TPM types are built into QEMU:
+>
+>      $ upstream-qemu -tpmdev nonexistent,id=tpm0
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-Id: <20200626205917.4545-5-zhiwei_liu@c-sky.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/insn_trans/trans_rvd.inc.c | 8 ++++----
- target/riscv/insn_trans/trans_rvf.inc.c | 8 ++++----
- 2 files changed, 8 insertions(+), 8 deletions(-)
+I hope you don't mind me replacing 'upstream-qemu' with 
+'x86_64-softmmu/qemu-system-x86_64'?
 
-diff --git a/target/riscv/insn_trans/trans_rvd.inc.c b/target/riscv/insn_trans/trans_rvd.inc.c
-index ea1044f13b..4f832637fa 100644
---- a/target/riscv/insn_trans/trans_rvd.inc.c
-+++ b/target/riscv/insn_trans/trans_rvd.inc.c
-@@ -20,10 +20,10 @@
- 
- static bool trans_fld(DisasContext *ctx, arg_fld *a)
- {
--    TCGv t0 = tcg_temp_new();
--    gen_get_gpr(t0, a->rs1);
-     REQUIRE_FPU;
-     REQUIRE_EXT(ctx, RVD);
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-     tcg_gen_addi_tl(t0, t0, a->imm);
- 
-     tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEQ);
-@@ -35,10 +35,10 @@ static bool trans_fld(DisasContext *ctx, arg_fld *a)
- 
- static bool trans_fsd(DisasContext *ctx, arg_fsd *a)
- {
--    TCGv t0 = tcg_temp_new();
--    gen_get_gpr(t0, a->rs1);
-     REQUIRE_FPU;
-     REQUIRE_EXT(ctx, RVD);
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-     tcg_gen_addi_tl(t0, t0, a->imm);
- 
-     tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEQ);
-diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
-index 0d04677a02..16df9c5ee2 100644
---- a/target/riscv/insn_trans/trans_rvf.inc.c
-+++ b/target/riscv/insn_trans/trans_rvf.inc.c
-@@ -25,10 +25,10 @@
- 
- static bool trans_flw(DisasContext *ctx, arg_flw *a)
- {
--    TCGv t0 = tcg_temp_new();
--    gen_get_gpr(t0, a->rs1);
-     REQUIRE_FPU;
-     REQUIRE_EXT(ctx, RVF);
-+    TCGv t0 = tcg_temp_new();
-+    gen_get_gpr(t0, a->rs1);
-     tcg_gen_addi_tl(t0, t0, a->imm);
- 
-     tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
-@@ -41,11 +41,11 @@ static bool trans_flw(DisasContext *ctx, arg_flw *a)
- 
- static bool trans_fsw(DisasContext *ctx, arg_fsw *a)
- {
-+    REQUIRE_FPU;
-+    REQUIRE_EXT(ctx, RVF);
-     TCGv t0 = tcg_temp_new();
-     gen_get_gpr(t0, a->rs1);
- 
--    REQUIRE_FPU;
--    REQUIRE_EXT(ctx, RVF);
-     tcg_gen_addi_tl(t0, t0, a->imm);
- 
-     tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEUL);
--- 
-2.25.1
+>      upstream-qemu: -tpmdev nonexistent,id=tpm0: Parameter 'type' expects a TPM backend type
 
+
+and this one with 'qemu-system-x86_64:'
+
+
+>      Supported TPM types (choose only one):
+>
+> Improve to
+>
+>      upstream-qemu: -tpmdev nonexistent,id=tpm0: Parameter 'type' expects a TPM backend type
+>      No TPM backend types are available'
+
+
+I hope you don't mind me replacing 'upstream-qemu' with 
+'x86_64-softmmu/qemu-system-x86_64'?
+
+    Stefan
 
