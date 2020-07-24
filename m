@@ -2,89 +2,128 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E4CC433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 19:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19973C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 20:31:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1167F206F0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 19:52:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8B3F206F0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 20:31:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q6O/w9gv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1167F206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Qjo12Kft"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8B3F206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jz3jr-0000Wk-8q
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 15:52:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41936)
+	id 1jz4Ll-0006Mc-4M
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 16:31:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from
- <3xDsbXwMKCqcZJdNVVNSL.JVTXLTb-KLcLSUVUNUb.VYN@flex--scw.bounces.google.com>)
- id 1jz3jF-0008R7-0N
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 15:51:37 -0400
-Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:39248)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from
- <3xDsbXwMKCqcZJdNVVNSL.JVTXLTb-KLcLSUVUNUb.VYN@flex--scw.bounces.google.com>)
- id 1jz3jC-0005VH-Nn
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 15:51:36 -0400
-Received: by mail-yb1-xb4a.google.com with SMTP id e196so7603112ybh.6
- for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 12:51:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=5kTldTUahb9hanRev110jm8tKPEE4Mv5hUBvGw1c6J4=;
- b=Q6O/w9gv3SSskvDZbygnRq9aa+MfX4k8VbxQah+/U7+26gt4gQKuknjY15+R6CPAew
- 53NKHJsSCTKiOuNY/1D4wLYgo9Z7EXAFPJxSl16DlVa++JEF4/gEyUEnBFj3Xls/YQDI
- wdfWwcsT354b6zVpqi4w0t5klbuRufjw99ig4hFil4YTb04OLhIRP9Wk2XFDhcAG/Inu
- ramagqriXk2IPXzVr0c9U9o7lFcGaHHgnHhEAVbnfq6eLtu+DgZcyYXPte7c8s0wlQWK
- oJbfoMPzkx9BoR9WcZxFhghru+8Qj/Y6RjaXptqo20M9cRVDaW4vvFUpJZnc9dMDdx+u
- GJMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=5kTldTUahb9hanRev110jm8tKPEE4Mv5hUBvGw1c6J4=;
- b=et6/UA5y0XrAwVD4mVYyN0uxZAmu93kLrqDm1UhuU21AXtb4w8+SscW+hN9btczMno
- 21qucAaXm1blshtt0fRd6ySB7ZfxORPAagllWEYZsV0pMSALsrWfj1QTpNt00dHPbW/T
- 03vjPtg+QPk//IGX0EhC4vmqZ7hELgaRVR8kDHtUg9tzZY6O9uOCEKqChOOA6oxEgJw4
- 2cZ99Rn4t+aajvdZxJxqCPdZ98m28p0+Gfqy50t/nqs0GI4g8sPk4gZmnJ9jLeKfhHOI
- SFwCns0JUGTC1gk1lZfIx+j920zL0Y6MS/4pWjgVUZ2yqW+wvnJeCjZ9ht/35CtvpdI+
- s6vQ==
-X-Gm-Message-State: AOAM531OgRl4AAZ9LnTG13m13h1kr4PLKg4QIoBO6D2ehxOWto02ZOwO
- TTcyxpwTcjoIPHT4RUZB65Fxco4=
-X-Google-Smtp-Source: ABdhPJxJXPbq4AMHFRyrwkrNbEvQCzNTu4RUbyCC0UO0WTlvSmO9sJsIYj0m0+VxoR1DYSusZsUFFZU=
-X-Received: by 2002:a25:7e84:: with SMTP id z126mr16774517ybc.73.1595620292553; 
- Fri, 24 Jul 2020 12:51:32 -0700 (PDT)
-Date: Fri, 24 Jul 2020 12:51:28 -0700
-Message-Id: <20200724195128.2373212-1-scw@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.28.0.rc0.142.g3c755180ce-goog
-Subject: [PATCH v2] cputlb: Make store_helper less fragile to compiler
- optimizations
-From: Shu-Chun Weng <scw@google.com>
-To: richard.henderson@linaro.org, pbonzini@redhat.com, alex.bennee@linaro.org
-Cc: Shu-Chun Weng <scw@google.com>, qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
- envelope-from=3xDsbXwMKCqcZJdNVVNSL.JVTXLTb-KLcLSUVUNUb.VYN@flex--scw.bounces.google.com;
- helo=mail-yb1-xb4a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -105
-X-Spam_score: -10.6
-X-Spam_bar: ----------
-X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jz4L4-0005r5-QF; Fri, 24 Jul 2020 16:30:42 -0400
+Received: from mail-eopbgr20128.outbound.protection.outlook.com
+ ([40.107.2.128]:32483 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1jz4L1-0001xT-Uf; Fri, 24 Jul 2020 16:30:42 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=P47p78oQjR4h70eRXfLE6maOVRGrxDBFOLYXX5OZ45nelbJcWermnUSkYVbRYhpSj21b7qJcFqYWXMdBi+gFlKHBUPjIvetxFxU0osJ6oq3yM6Gma2aTW96NQ+SIYFbyTYWYMtrJnY/bl8gaAbopS0vQb4Vzbwv3UcuMrHKzvD8XzS7ulY8pJMvlfDfz4YrSE3Q5BKsZaJXs49Gk0/89wT0m+7zz5ZzsjCPMA8/yudgIkXp446ETPUvwJLjc3J/h0GPODlsC7QVLTW4loqsYU3FBjUv/clZfsk0/Ur1cYBSXet7HdotKW1zdxZartG3ZKxA+7LZgp7OpVgR5KOAo/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fMynVFLGJ/cHgLWwz3l9RWCKroqAAvgSJW2VApRKMkg=;
+ b=NcuRnWINcXQ9X5KeU8foJ0UugOGiGdph9cHZtQs35ok1z3U1qJ497Z16aFL1H2+1d1ISJ8CVppBm+17Uym01ryH3sFEREQMpNAmTo3Rg3XasgFf2h8Li8DD+Y0A9rQOuyJFWhSeIPTlvuGIvWDreozvirFJRj0e0J/Pq7e4ZpeWBPVyvdH2z4ImDPWogfiTqVS/zH9CqaDlmIO8/mNQ7jmp4QoIMpe660I/i1Gt2eN5hWcd04hodnipnE1LsFlt8+si+FJw17OLiHzFLbiDf9hB7QjsynYqbAuDl5b2DMhVpDJiktywDvAzHpoy/MnHJrOQqb8zGA3N3JuMMbEKqWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fMynVFLGJ/cHgLWwz3l9RWCKroqAAvgSJW2VApRKMkg=;
+ b=Qjo12KftW1RzOqU+k/jlrRyegnY+Yo26Qkmaqxnl8tmjGoYKC9X0TTiM40WQMq9Ez3d+GhwlNxSbwav68uEneiaMzE1Of1elX5ChrqfxkhKF0FlTda8n1jSG5Dw0M+OO1eoEw51jwjnLODD4yi4+ZDGBxlaDibAi1v3Te7a40hI=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4915.eurprd08.prod.outlook.com (2603:10a6:20b:d1::15)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.22; Fri, 24 Jul
+ 2020 20:30:34 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%4]) with mapi id 15.20.3216.024; Fri, 24 Jul 2020
+ 20:30:34 +0000
+Subject: Re: [PATCH v3 15/21] migration/block-dirty-bitmap: relax error
+ handling in incoming part
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200724084327.15665-1-vsementsov@virtuozzo.com>
+ <20200724084327.15665-16-vsementsov@virtuozzo.com>
+ <35252620-8a4e-9440-f647-6b15d697365f@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <685495bd-83a6-6a2a-7ae6-9632e432e771@virtuozzo.com>
+Date: Fri, 24 Jul 2020 23:30:32 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <35252620-8a4e-9440-f647-6b15d697365f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR03CA0092.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::33) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.156) by
+ AM0PR03CA0092.eurprd03.prod.outlook.com (2603:10a6:208:69::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3216.21 via Frontend Transport; Fri, 24 Jul 2020 20:30:33 +0000
+X-Originating-IP: [185.215.60.156]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 616d2602-a4e5-4268-6527-08d830106aa5
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4915:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4915A4EAFA7C9276CDE069B0C1770@AM6PR08MB4915.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:883;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Y0LtzUPzCwADNHMWLUNDDdS6oAAC3qCGFLc3JmgDTyfh3byjdE9Ummk6SJBj3gJLdEbGwCkSpp8fvm1qOS1t/ElkQEuzdQU0WnA2/v/etUcYPiT83ixxzc/iH6YdeYhXRMbEFG5buzevEgSRnUUjrcgRUMemoNoNS84WBG+/RCb02Clq9o8nhPpzTHmSmG8HWXLnIdrDd0D23iwdAkU54RAo1SWDaAVZ3Xj6zhDPM7kBuxdcrASX7ednd/D6jZyDSmnzlKyz7BAU7wrkM9hq5CjjmtSCrJjbg2JHxPK6ykloOEBhLF25kQhlixa+9Nk9VhElV9vd9+1Qit4i1eBNfLDfo4Ti8NEISMSNTVqukc9DPkWlaxgFoYJqorlrfbWJw81wAqruouSSXDfk4snMBQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(376002)(136003)(346002)(396003)(39850400004)(26005)(956004)(2616005)(4326008)(31696002)(31686004)(7416002)(86362001)(66476007)(66556008)(83380400001)(66946007)(107886003)(8676002)(16526019)(5660300002)(186003)(36756003)(2906002)(316002)(16576012)(6486002)(8936002)(53546011)(52116002)(478600001)(14143004)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: +fiCUkYQOEuliHlVdx6oZQr3+tuUc+ukobCean5SSt2I7I+Tj3qcmQp1JHkySZ4gHTldbXy2Yu0iiNWqrpVNxklAHMnt2ZqpwkHWL3NNs/ziQbCq7rhOrMV86BqkOEc0JSIhAIFG7iMg8H2Wcpu8tFQMQGFNInTEZYsQzMTU6t7BX48mMTte0ppUPCm8xLacrhER41xOjMbktUGEWLZdwMGsjmq/k1tmDzllZ42UjZQ9QWU3QalMHdUYAUMtU2u5qaT2PJ9klHA5m6IP4memyDimGhiYcgjq6lDJbflHWJTpp92ARarB7Qkf8LoM96IMLHP3mT5dLpqkTLB6d971txWplGZMr2AbYs5BHRFo2SrOKIL48BQlZxofm3MfxOUnHbp0jsXXLsSGDTTRSwJaGZjjeOGhhMxOA5h+R8MjMwwRC506hOL+reOWqsMQLGhRku/jTdHL/fo2sOQPcnsGSkR02kl1IbPkxlAw0m2yTLcPAjyr+kgsSiSB0sA28EaK
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 616d2602-a4e5-4268-6527-08d830106aa5
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2020 20:30:34.1422 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NG6osOdBo+3HU6rPEnU/ArMnez1AwpyMfnAvYfGaT6iPfvRAsgBE0zD/2VI1PTJOsyc08TpzO4dBq1iNaXodtyBHtOfy49iFYeGWx8jQWe8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4915
+Received-SPF: pass client-ip=40.107.2.128;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 16:30:35
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,303 +136,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, fam@euphon.net, quintela@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com,
+ andrey.shinkevich@virtuozzo.com, den@openvz.org, mreitz@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change has no functional change.
+24.07.2020 20:35, Eric Blake wrote:
+> On 7/24/20 3:43 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Bitmaps data is not critical, and we should not fail the migration (or
+>> use postcopy recovering) because of dirty-bitmaps migration failure.
+>> Instead we should just lose unfinished bitmaps.
+>>
+>> Still we have to report io stream violation errors, as they affect the
+>> whole migration stream.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   migration/block-dirty-bitmap.c | 152 +++++++++++++++++++++++++--------
+>>   1 file changed, 117 insertions(+), 35 deletions(-)
+>>
+> 
+>> @@ -650,15 +695,32 @@ static int dirty_bitmap_load_bits(QEMUFile *f, DBMLoadState *s)
+>>       if (s->flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
+>>           trace_dirty_bitmap_load_bits_zeroes();
+>> -        bdrv_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte, nr_bytes,
+>> -                                             false);
+>> +        if (!s->cancelled) {
+>> +            bdrv_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte,
+>> +                                                 nr_bytes, false);
+>> +        }
+>>       } else {
+>>           size_t ret;
+>>           uint8_t *buf;
+>>           uint64_t buf_size = qemu_get_be64(f);
+> 
+> Pre-existing, but if I understand, we are reading a value from the migration stream...
 
-There is a potential link error with "undefined symbol:
-qemu_build_not_reached" due to how `store_helper` is structured.
-This does not produce at current QEMU head, but was reproducible at
-v4.2.0 with `clang-10 -O2 -fexperimental-new-pass-manager`.
+Hmm, actually, this becomes worse after patch, as before patch we had the check, that the size at least corresponds to the bitmap.. But we want to relax things in cancelled mode (and we may not have any bitmap). Most correct thing is to use read in a loop to just skip the data from stream if we are in cancelled mode (something like nbd_drop()).
 
-The current function structure is:
+I can fix this with a follow-up patch.
 
-    inline QEMU_ALWAYSINLINE
-    store_memop() {
-        switch () {
-            ...
-        default:
-            qemu_build_not_reached();
-        }
-    }
-    inline QEMU_ALWAYSINLINE
-    store_helper() {
-        ...
-        if (span_two_pages_or_io) {
-            ...
-            helper_rst_stb_mmu();
-        }
-        store_memop();
-    }
-    helper_rst_stb_mmu() {
-        store_helper();
-    }
+> 
+>> -        uint64_t needed_size =
+>> -            bdrv_dirty_bitmap_serialization_size(s->bitmap,
+>> -                                                 first_byte, nr_bytes);
+>> +        uint64_t needed_size;
+>> +
+>> +        buf = g_malloc(buf_size);
+>> +        ret = qemu_get_buffer(f, buf, buf_size);
+> 
+> ...and using it to malloc memory.  Is that a potential risk of a malicious stream causing us to allocate too much memory in relation to the guest's normal size?  If so, fixing that should be done separately.
+> 
+> I'm not a migration expert, but the patch looks reasonable to me.
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
 
-Both `store_memop` and `store_helper` need to be inlined and allow
-constant propogations to eliminate the `qemu_build_not_reached` call.
-QEMU_ALWAYSINLINE is a valiant effort to make that happen, but it's
-still not guaranteed to be inlined. What happens with the failing
-combination is that the compiler decided to inline the
-`helper_rst_stb_mmu` call inside `store_helper`, making the latter
-self-recursive, thus prevents constant propagations.
 
-The new structure is:
-
-    inline QEMU_ALWAYSINLINE
-    store_memop() {
-        switch () {
-            ...
-        default:
-            qemu_build_not_reached();
-        }
-    }
-    inline QEMU_ALWAYSINLINE
-    store_helper_size_aligned()() {
-        ...
-        if (span_two_pages_or_io) {
-            return false;
-        }
-        store_memoop();
-        return true;
-    }
-    inline QEMU_ALWAYSINLINE
-    store_helper() {
-        if (store_helper_size_aligned() {
-            return;
-        }
-        helper_rst_stb_mmu();
-    }
-    helper_rst_stb_mmu() {
-        store_helper_size_aligned()();
-    }
-
-Since a byte store cannot span across more than one page, this is a
-no-op. Moreover, there is no more recursion making it more robust
-against potential optimizations.
-
-Signed-off-by: Shu-Chun Weng <scw@google.com>
----
-v1: https://patchew.org/QEMU/20200318062057.224953-1-scw@google.com/
-
-v1 -> v2:
-  Restructure the function instead of marking `helper_rst_stb_mmu` noinline.
-
- accel/tcg/cputlb.c | 158 ++++++++++++++++++++++++++-------------------
- 1 file changed, 92 insertions(+), 66 deletions(-)
-
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index d370aedb47..14324f08d2 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -2010,9 +2010,10 @@ store_memop(void *haddr, uint64_t val, MemOp op)
-     }
- }
- 
--static inline void QEMU_ALWAYS_INLINE
--store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
--             TCGMemOpIdx oi, uintptr_t retaddr, MemOp op)
-+/* Returns false if the store is not size-aligned and no store is done. */
-+static inline bool QEMU_ALWAYS_INLINE
-+store_helper_size_aligned(CPUArchState *env, target_ulong addr, uint64_t val,
-+                          TCGMemOpIdx oi, uintptr_t retaddr, MemOp op)
- {
-     uintptr_t mmu_idx = get_mmuidx(oi);
-     uintptr_t index = tlb_index(env, mmu_idx, addr);
-@@ -2048,7 +2049,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
- 
-         /* For anything that is unaligned, recurse through byte stores.  */
-         if ((addr & (size - 1)) != 0) {
--            goto do_unaligned_access;
-+            return false;
-         }
- 
-         iotlbentry = &env_tlb(env)->d[mmu_idx].iotlb[index];
-@@ -2066,12 +2067,12 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-         if (tlb_addr & TLB_MMIO) {
-             io_writex(env, iotlbentry, mmu_idx, val, addr, retaddr,
-                       op ^ (need_swap * MO_BSWAP));
--            return;
-+            return true;
-         }
- 
-         /* Ignore writes to ROM.  */
-         if (unlikely(tlb_addr & TLB_DISCARD_WRITE)) {
--            return;
-+            return true;
-         }
- 
-         /* Handle clean RAM pages.  */
-@@ -2091,82 +2092,107 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-         } else {
-             store_memop(haddr, val, op);
-         }
--        return;
-+        return true;
-     }
- 
--    /* Handle slow unaligned access (it spans two pages or IO).  */
-     if (size > 1
-         && unlikely((addr & ~TARGET_PAGE_MASK) + size - 1
-                      >= TARGET_PAGE_SIZE)) {
--        int i;
--        uintptr_t index2;
--        CPUTLBEntry *entry2;
--        target_ulong page2, tlb_addr2;
--        size_t size2;
-+        /* Slow unaligned access (it spans two pages or IO).  */
-+        return false;
-+    }
- 
--    do_unaligned_access:
--        /*
--         * Ensure the second page is in the TLB.  Note that the first page
--         * is already guaranteed to be filled, and that the second page
--         * cannot evict the first.
--         */
--        page2 = (addr + size) & TARGET_PAGE_MASK;
--        size2 = (addr + size) & ~TARGET_PAGE_MASK;
--        index2 = tlb_index(env, mmu_idx, page2);
--        entry2 = tlb_entry(env, mmu_idx, page2);
--        tlb_addr2 = tlb_addr_write(entry2);
--        if (!tlb_hit_page(tlb_addr2, page2)) {
--            if (!victim_tlb_hit(env, mmu_idx, index2, tlb_off, page2)) {
--                tlb_fill(env_cpu(env), page2, size2, MMU_DATA_STORE,
--                         mmu_idx, retaddr);
--                index2 = tlb_index(env, mmu_idx, page2);
--                entry2 = tlb_entry(env, mmu_idx, page2);
--            }
--            tlb_addr2 = tlb_addr_write(entry2);
--        }
-+    haddr = (void *)((uintptr_t)addr + entry->addend);
-+    store_memop(haddr, val, op);
-+    return true;
-+}
- 
--        /*
--         * Handle watchpoints.  Since this may trap, all checks
--         * must happen before any store.
--         */
--        if (unlikely(tlb_addr & TLB_WATCHPOINT)) {
--            cpu_check_watchpoint(env_cpu(env), addr, size - size2,
--                                 env_tlb(env)->d[mmu_idx].iotlb[index].attrs,
--                                 BP_MEM_WRITE, retaddr);
--        }
--        if (unlikely(tlb_addr2 & TLB_WATCHPOINT)) {
--            cpu_check_watchpoint(env_cpu(env), page2, size2,
--                                 env_tlb(env)->d[mmu_idx].iotlb[index2].attrs,
--                                 BP_MEM_WRITE, retaddr);
--        }
-+static inline void QEMU_ALWAYS_INLINE
-+store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-+             TCGMemOpIdx oi, uintptr_t retaddr, MemOp op)
-+{
-+    uintptr_t mmu_idx;
-+    uintptr_t index;
-+    CPUTLBEntry *entry;
-+    target_ulong tlb_addr;
-+    const size_t tlb_off = offsetof(CPUTLBEntry, addr_write);
-+    size_t size;
-+    int i;
-+    uintptr_t index2;
-+    CPUTLBEntry *entry2;
-+    target_ulong page2, tlb_addr2;
-+    size_t size2;
- 
--        /*
--         * XXX: not efficient, but simple.
--         * This loop must go in the forward direction to avoid issues
--         * with self-modifying code in Windows 64-bit.
--         */
--        for (i = 0; i < size; ++i) {
--            uint8_t val8;
--            if (memop_big_endian(op)) {
--                /* Big-endian extract.  */
--                val8 = val >> (((size - 1) * 8) - (i * 8));
--            } else {
--                /* Little-endian extract.  */
--                val8 = val >> (i * 8);
--            }
--            helper_ret_stb_mmu(env, addr + i, val8, oi, retaddr);
--        }
-+    if (store_helper_size_aligned(env, addr, val, oi, retaddr, op)) {
-         return;
-     }
- 
--    haddr = (void *)((uintptr_t)addr + entry->addend);
--    store_memop(haddr, val, op);
-+    mmu_idx = get_mmuidx(oi);
-+
-+    size = memop_size(op);
-+    index = tlb_index(env, mmu_idx, addr);
-+    entry = tlb_entry(env, mmu_idx, addr);
-+    tlb_addr = tlb_addr_write(entry);
-+
-+    /* Handle slow unaligned access (it spans two pages or IO).  */
-+    /*
-+     * Ensure the second page is in the TLB.  Note that the first page
-+     * is already guaranteed to be filled, and that the second page
-+     * cannot evict the first.
-+     */
-+    page2 = (addr + size) & TARGET_PAGE_MASK;
-+    size2 = (addr + size) & ~TARGET_PAGE_MASK;
-+    index2 = tlb_index(env, mmu_idx, page2);
-+    entry2 = tlb_entry(env, mmu_idx, page2);
-+    tlb_addr2 = tlb_addr_write(entry2);
-+    if (!tlb_hit_page(tlb_addr2, page2)) {
-+        if (!victim_tlb_hit(env, mmu_idx, index2, tlb_off, page2)) {
-+            tlb_fill(env_cpu(env), page2, size2, MMU_DATA_STORE,
-+                     mmu_idx, retaddr);
-+            index2 = tlb_index(env, mmu_idx, page2);
-+            entry2 = tlb_entry(env, mmu_idx, page2);
-+        }
-+        tlb_addr2 = tlb_addr_write(entry2);
-+    }
-+
-+    /*
-+     * Handle watchpoints.  Since this may trap, all checks
-+     * must happen before any store.
-+     */
-+    if (unlikely(tlb_addr & TLB_WATCHPOINT)) {
-+        cpu_check_watchpoint(env_cpu(env), addr, size - size2,
-+                             env_tlb(env)->d[mmu_idx].iotlb[index].attrs,
-+                             BP_MEM_WRITE, retaddr);
-+    }
-+    if (unlikely(tlb_addr2 & TLB_WATCHPOINT)) {
-+        cpu_check_watchpoint(env_cpu(env), page2, size2,
-+                             env_tlb(env)->d[mmu_idx].iotlb[index2].attrs,
-+                             BP_MEM_WRITE, retaddr);
-+    }
-+
-+    /*
-+     * XXX: not efficient, but simple.
-+     * This loop must go in the forward direction to avoid issues
-+     * with self-modifying code in Windows 64-bit.
-+     */
-+    for (i = 0; i < size; ++i) {
-+        uint8_t val8;
-+        if (memop_big_endian(op)) {
-+            /* Big-endian extract.  */
-+            val8 = val >> (((size - 1) * 8) - (i * 8));
-+        } else {
-+            /* Little-endian extract.  */
-+            val8 = val >> (i * 8);
-+        }
-+        helper_ret_stb_mmu(env, addr + i, val8, oi, retaddr);
-+    }
- }
- 
- void helper_ret_stb_mmu(CPUArchState *env, target_ulong addr, uint8_t val,
-                         TCGMemOpIdx oi, uintptr_t retaddr)
- {
--    store_helper(env, addr, val, oi, retaddr, MO_UB);
-+    /* Byte store is always size-aligned. */
-+    store_helper_size_aligned(env, addr, val, oi, retaddr, MO_UB);
- }
- 
- void helper_le_stw_mmu(CPUArchState *env, target_ulong addr, uint16_t val,
 -- 
-2.28.0.rc0.142.g3c755180ce-goog
-
+Best regards,
+Vladimir
 
