@@ -7,81 +7,88 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FFFC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 06:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E759C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 07:01:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA45220714
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 06:56:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDE6720714
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 07:01:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+HE+cQ2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA45220714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gidCBKqG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDE6720714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyrcg-0005Xa-0F
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 02:56:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39868)
+	id 1jyriK-0007UV-2z
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 03:01:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jyrZr-0000Pv-6w
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 02:53:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60824
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyrhV-00074f-39
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 03:01:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20825
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jyrZp-0001JX-8t
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 02:53:06 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyrhS-0002pj-H6
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 03:01:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595573583;
+ s=mimecast20190719; t=1595574056;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kKADiSd/iflVBop3t+eQx+760Ivpih1CCbTxugA27Rk=;
- b=E+HE+cQ2vM42eIvjGmS/TKkYtQpmaAULCiRdluxOkrJDTsnNrjrjouaLSjiSessFbRxJ/5
- 2yoa5t49Le6xOCA3E/CXIg1c29hILO5D4KFu2O3VQp+J5jfq6KoyTer21euqD8DbgzpIXl
- bNGLLakUfUDBkESU7ynWLPL6FfhkMfo=
+ bh=2ZhzurZ3jkx2f4JV7Mqj7UPcA6W5MhNpPEz1GMoAcKw=;
+ b=gidCBKqGD8VPB7UcHVxBb1uETqHUctiPorEqxs9PuIeHevIRctSzROwuDpZ3XJuo9KBoTt
+ X5l6ryCM5yAcRml5RZQMrOukadU0kiVRqsnznNPAKVyxKPJ3pD8Vk2HwYUQ1E+NavTY1xa
+ Zsg8X1cINvKqSPNXq496Y3PUQJmp2zw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-H4ED6QJqOECH6bW2Ly9jGg-1; Fri, 24 Jul 2020 02:53:02 -0400
-X-MC-Unique: H4ED6QJqOECH6bW2Ly9jGg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-398-tTM7jx4cN7C05x9Y-sgjBg-1; Fri, 24 Jul 2020 03:00:54 -0400
+X-MC-Unique: tTM7jx4cN7C05x9Y-sgjBg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA06A1005504;
- Fri, 24 Jul 2020 06:53:00 +0000 (UTC)
-Received: from gondolin (ovpn-112-188.ams2.redhat.com [10.36.112.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5541D71D24;
- Fri, 24 Jul 2020 06:52:56 +0000 (UTC)
-Date: Fri, 24 Jul 2020 08:52:53 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 1/1] s390x/s390-virtio-ccw: fix loadparm property getter
-Message-ID: <20200724085253.2a33a940.cohuck@redhat.com>
-In-Reply-To: <0ce16e30-a5ea-f9ff-89a8-83c393b5118c@redhat.com>
-References: <20200723162717.88485-1-pasic@linux.ibm.com>
- <0ce16e30-a5ea-f9ff-89a8-83c393b5118c@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7C72100AA23
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 07:00:53 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 886707AC80;
+ Fri, 24 Jul 2020 07:00:53 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0B2ED111CA26; Fri, 24 Jul 2020 09:00:52 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 3/3] scripts/qmp/qom-fuse: Fix getattr(),
+ read() for files in /
+References: <20200723142738.1868568-1-armbru@redhat.com>
+ <20200723142738.1868568-4-armbru@redhat.com>
+ <7850b7db-d1ec-638c-c044-3cc0e6d2a1a0@redhat.com>
+Date: Fri, 24 Jul 2020 09:00:52 +0200
+In-Reply-To: <7850b7db-d1ec-638c-c044-3cc0e6d2a1a0@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 23 Jul 2020 17:10:14
+ +0200")
+Message-ID: <87ft9he6sb.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:01:02
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 01:23:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,68 +101,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 Jul 2020 18:37:50 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> On 23/07/2020 18.27, Halil Pasic wrote:
-> > The function machine_get_loadparm() is supposed to produce as C-string,  
-> 
-> sed "s/ as / a /"
-> 
-> > that is a null-terminated one, but it does not. ElectricFence can detect  
-> 
-> maybe: sed "s/null/NUL/"
+> On 7/23/20 4:27 PM, Markus Armbruster wrote:
+>> path, prop =3D "type".rsplit('/', 1) sets path to "", which doesn't
+>> work.  Correct to "/".
+>>=20
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  scripts/qmp/qom-fuse | 10 ++++++++--
+>>  1 file changed, 8 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
+>> index 405e6ebd67..7c7cff8edf 100755
+>> --- a/scripts/qmp/qom-fuse
+>> +++ b/scripts/qmp/qom-fuse
+>> @@ -45,8 +45,10 @@ class QOMFS(Operations):
+>>              return False
+>> =20
+>>      def is_property(self, path):
+>> +        path, prop =3D path.rsplit('/', 1)
+>> +        if path =3D=3D '':
+>> +            path =3D '/'
+>>          try:
+>> -            path, prop =3D path.rsplit('/', 1)
+>
+> Maybe worth adding an tiny root_path_split() helper?
 
-"NUL" seems to be the more commonly used form in QEMU, so I went ahead
-and changed it.
-> 
-> > this problem if the loadparm machine property is used.
-> > 
-> > Let us make the returned string a null-terminated one.  
-> 
-> dito
-> 
-> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> > Fixes: 7104bae9de ("hw/s390x: provide loadparm property for the machine")
-> > ---
-> >  hw/s390x/s390-virtio-ccw.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> > index 8cc2f25d8a..e0e4a69ac8 100644
-> > --- a/hw/s390x/s390-virtio-ccw.c
-> > +++ b/hw/s390x/s390-virtio-ccw.c
-> > @@ -701,8 +701,12 @@ bool hpage_1m_allowed(void)
-> >  static char *machine_get_loadparm(Object *obj, Error **errp)
-> >  {
-> >      S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-> > +    char *loadparm_str;
-> >  
-> > -    return g_memdup(ms->loadparm, sizeof(ms->loadparm));
-> > +    /* make a null-terminated string */  
-> 
-> maybe: sed "s/null/NUL/"
-> 
-> > +     loadparm_str = g_memdup(ms->loadparm, sizeof(ms->loadparm) + 1);  
-> 
-> Wrong indentation.
-> 
-> > +    loadparm_str[sizeof(ms->loadparm)] = 0;
-> > +    return loadparm_str;
-> >  }  
-> 
-> With the cosmetics fixed:
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+The script goes back to commit 5ade767485 "qom: quick and dirty QOM
+filesystem based on FUSE" (2014).  It's as "quick and dirty" as ever.
+It could use a thorough rework.
 
-Thanks, queued to s390-fixes (with the nits fixed.)
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Thanks!
+
+[...]
 
 
