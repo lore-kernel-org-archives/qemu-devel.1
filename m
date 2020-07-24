@@ -2,85 +2,82 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D815BC433E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:40:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 624BFC433EA
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:40:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1B2520674
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:40:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FB9120674
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:40:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KcNU0UDu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1B2520674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hq2tyWLZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB9120674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyyrr-0005FK-QL
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 10:40:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50806)
+	id 1jyyrn-0005AA-9g
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 10:40:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyr0-0003wA-O6
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyr0-0003w7-H7
  for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:39:18 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21247
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28531
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyqz-0005hg-00
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyqy-0005hc-Pq
  for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:39:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1595601556;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QbaWCnTfIwlnQBcnbAusk7KmwDgK8uxiYY+Ojl1UPqI=;
- b=KcNU0UDuJDXWda8JuNzdKtEW5oBxjs1tobVAOGa/Z9Bzj1V4tlXh4nFaW3BypcEdC9LVRq
- QJWSrdL2hdt7x0g/yDR8VYB7Z2aSV1LF+F6EyBhISpvYE9XyvYRfppxeLBqCfR4tQuwRA7
- LbsPAaoPYVtxGmXc2pIO/aPoZh0Y71A=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=BC5vj2jVGiXPIFp8wc3EHgX/0AN8Bj59g7u/hl368/Q=;
+ b=Hq2tyWLZpOoSnONln1pv8/PhFUIB7i6yQmAZnor/j+NMNIAmcdHaMZp9wbC97qr+cJM8Bg
+ /B8IHD40sSs3TaRaEb/XrtSZ3JEX+mU/fjPLVEmjighjVsPs18GHX8LGj22Bp6nWxbXq33
+ 7Rn0Rl7wrkaewW7DL7GgiOYp7kOFQrA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-Ufmx3nrVNC--qoLDgK02Nw-1; Fri, 24 Jul 2020 10:38:03 -0400
-X-MC-Unique: Ufmx3nrVNC--qoLDgK02Nw-1
+ us-mta-230--zMXpxCtP8mdWsH8yGB17w-1; Fri, 24 Jul 2020 10:38:00 -0400
+X-MC-Unique: -zMXpxCtP8mdWsH8yGB17w-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E98F880046A;
- Fri, 24 Jul 2020 14:38:01 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-113-94.ams2.redhat.com [10.36.113.94])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E7F1726A4;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5272D800597;
  Fri, 24 Jul 2020 14:37:59 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-113-94.ams2.redhat.com [10.36.113.94])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 44FA488F00;
+ Fri, 24 Jul 2020 14:37:51 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFCv3 1/9] s390x: move setting of maximum ram size to machine
- init
-Date: Fri, 24 Jul 2020 16:37:42 +0200
-Message-Id: <20200724143750.59836-2-david@redhat.com>
-In-Reply-To: <20200724143750.59836-1-david@redhat.com>
-References: <20200724143750.59836-1-david@redhat.com>
+Subject: [PATCH RFCv3 0/9] s390x: initial support for virtio-mem
+Date: Fri, 24 Jul 2020 16:37:41 +0200
+Message-Id: <20200724143750.59836-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:00:27
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 08:55:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,91 +100,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we no longer fixup the maximum ram size in sclp code, let's move
-setting the maximum ram size to ccw_init()->s390_memory_init(), which
-now looks like a better fit.
+This wires up the initial, basic version of virito-mem for s390x. General
+information about virtio-mem can be found at [1] and in QEMU commit [2].
+Patch #5 contains a short example for s390x.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-virtio-ccw.c | 19 ++++++++++++++++---
- hw/s390x/sclp.c            | 15 +--------------
- 2 files changed, 17 insertions(+), 17 deletions(-)
+virtio-mem for x86-64 Linux is part of v5.8-rc1. A branch with a s390x
+prototype can be found at:
+    git@github.com:davidhildenbrand/linux.git virtio-mem-s390x
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 8cc2f25d8a..dca8e43001 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -158,13 +158,26 @@ static void virtio_ccw_register_hcalls(void)
-                                    virtio_ccw_hcall_early_printk);
- }
- 
--static void s390_memory_init(MemoryRegion *ram)
-+static void s390_memory_init(MachineState *machine)
- {
-     MemoryRegion *sysmem = get_system_memory();
-     Error *local_err = NULL;
-+    uint64_t hw_limit;
-+    int ret;
-+
-+    /* We have to set the memory limit before adding any regions to sysmem. */
-+    ret = s390_set_memory_limit(machine->maxram_size, &hw_limit);
-+    if (ret == -E2BIG) {
-+        error_report("host supports a maximum of %" PRIu64 " GB",
-+                     hw_limit / GiB);
-+        exit(EXIT_FAILURE);
-+    } else if (ret) {
-+        error_report("setting the guest size failed");
-+        exit(EXIT_FAILURE);
-+    }
- 
-     /* allocate RAM for core */
--    memory_region_add_subregion(sysmem, 0, ram);
-+    memory_region_add_subregion(sysmem, 0, machine->ram);
- 
-     /*
-      * Configure the maximum page size. As no memory devices were created
-@@ -247,7 +260,7 @@ static void ccw_init(MachineState *machine)
- 
-     s390_sclp_init();
-     /* init memory + setup max page size. Required for the CPU model */
--    s390_memory_init(machine->ram);
-+    s390_memory_init(machine);
- 
-     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
-     s390_init_cpus(machine);
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index a0ce444b4b..f59195e15a 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -327,27 +327,14 @@ void s390_sclp_init(void)
- 
- static void sclp_realize(DeviceState *dev, Error **errp)
- {
--    MachineState *machine = MACHINE(qdev_get_machine());
-     SCLPDevice *sclp = SCLP(dev);
--    uint64_t hw_limit;
--    int ret;
- 
-     /*
-      * qdev_device_add searches the sysbus for TYPE_SCLP_EVENTS_BUS. As long
-      * as we can't find a fitting bus via the qom tree, we have to add the
-      * event facility to the sysbus, so e.g. a sclp console can be created.
-      */
--    if (!sysbus_realize(SYS_BUS_DEVICE(sclp->event_facility), errp)) {
--        return;
--    }
--
--    ret = s390_set_memory_limit(machine->maxram_size, &hw_limit);
--    if (ret == -E2BIG) {
--        error_setg(errp, "host supports a maximum of %" PRIu64 " GB",
--                   hw_limit / GiB);
--    } else if (ret) {
--        error_setg(errp, "setting the guest size failed");
--    }
-+    sysbus_realize(SYS_BUS_DEVICE(sclp->event_facility), errp);
- }
- 
- static void sclp_memory_init(SCLPDevice *sclp)
+Note that the kernel should either be compiled via
+ CONFIG_MEMORY_HOTPLUG_DEFAULT_ONLINE, or "memhp_default_state=online"
+ should be passed on the kernel cmdline.
+
+This series can be found at:
+    git@github.com:davidhildenbrand/qemu.git virtio-mem-s390x-rfcv3
+
+Related to s390x, we'll have to tackle migration of storage keys and
+storage attributes (especially, maybe skipping unplugged parts). Not sure
+if I am missing something else (any ideas?). For virtio-mem in general,
+there are a couple of TODOs, e.g., documented in [1] and [2], both in QEMU
+and Linux. However, the basics are around.
+
+I only tested this with fairly small amount of RAM in a z/VM environemnt
+and under TCG ...
+
+[1] https://virtio-mem.gitlab.io/
+[2] 910b25766b33 ("virtio-mem: Paravirtualized memory hot(un)plug")
+
+RFCv2 -> RFCv3:
+- Use a new diag500 subcode to communicate the memory device region. Don't
+  use diag260. Clarify why device memory is never exposed via other
+  HW/firmware interface. (thanks Heiko for the discussion and looking into
+  this!). This needed kernel changes (updated the Linux kernel branch)
+- Added
+-- "s390x: remove hypercall registration mechanism"
+-- "s390x: prepare for more diag500 hypercalls"
+-- "s390x: rename s390-virtio-hcall* to s390-hypercall*"
+-- "s390x/diag500: subcode to query device memory region"
+- "s390x: initial support for virtio-mem"
+-- Also wire-up virtio-mem-pci, although it does not seem to be compatible
+   (yet?) due to MSI-X
+
+RFCv1 -> RFCv2:
+- "s390x/diag: no need to check for PGM_PRIVILEGED in diag308"
+-- Added
+- "s390x/diag: implement diag260"
+-- Implement according to doc (fix error cases)
+-- Implement subcode 0xc.
+-- Enable the new diag unconditionally
+- "s390x: prepare device memory address space"
+-- Expose maxram size now via diag260 (0xc), not via SCLP. Unfmodified
+   guests can now boot without any issues. This needed kernel changes
+   (updated the Linux kernel branch)
+- "s390x: implement virtio-mem-ccw"
+-- Force virtio revision 1
+
+David Hildenbrand (9):
+  s390x: move setting of maximum ram size to machine init
+  s390x/diag: no need to check for PGM_PRIVILEGED in diag308
+  s390x: remove hypercall registration mechanism
+  s390x: prepare for more diag500 hypercalls
+  s390x: rename s390-virtio-hcall* to s390-hypercall*
+  s390x/diag: subcode to query device memory region
+  s390x: prepare device memory address space
+  s390x: implement virtio-mem-ccw
+  s390x: initial support for virtio-mem
+
+ hw/s390x/Kconfig                   |   1 +
+ hw/s390x/Makefile.objs             |   3 +-
+ hw/s390x/s390-hypercall.c          |  79 +++++++++++
+ hw/s390x/s390-hypercall.h          |  22 +++
+ hw/s390x/s390-virtio-ccw.c         | 207 +++++++++++++++++++++++------
+ hw/s390x/s390-virtio-hcall.c       |  41 ------
+ hw/s390x/s390-virtio-hcall.h       |  23 ----
+ hw/s390x/sclp.c                    |  21 +--
+ hw/s390x/virtio-ccw-mem.c          | 167 +++++++++++++++++++++++
+ hw/s390x/virtio-ccw.h              |  13 ++
+ hw/virtio/virtio-mem.c             |   2 +
+ include/hw/s390x/s390-virtio-ccw.h |   3 +
+ target/s390x/diag.c                |   5 -
+ target/s390x/kvm.c                 |  17 +--
+ target/s390x/misc_helper.c         |   5 +-
+ 15 files changed, 466 insertions(+), 143 deletions(-)
+ create mode 100644 hw/s390x/s390-hypercall.c
+ create mode 100644 hw/s390x/s390-hypercall.h
+ delete mode 100644 hw/s390x/s390-virtio-hcall.c
+ delete mode 100644 hw/s390x/s390-virtio-hcall.h
+ create mode 100644 hw/s390x/virtio-ccw-mem.c
+
 -- 
 2.26.2
 
