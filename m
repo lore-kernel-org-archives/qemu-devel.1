@@ -2,94 +2,93 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D154C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F78DC433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:07:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C98E8206EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:11:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E920D2074F
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:07:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="eA4tkyEB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C98E8206EB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aq1ZnIdi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E920D2074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jytjf-00077J-4L
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 05:11:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45738)
+	id 1jytgE-0002R7-85
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 05:07:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1jytgx-0003Ew-SL
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:08:35 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42406)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1jytgr-0003sG-9A
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:08:35 -0400
-Received: by mail-pf1-x441.google.com with SMTP id 1so4730797pfn.9
- for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 02:08:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=4QaCAi9itYTAEWQbQQ1orCya0omL343c9jLTjKapu5Y=;
- b=eA4tkyEBCbQQuS+oqF1SxXFy+0RTxdJMDioXy0vYLE27UgnFMzbobCwc6IpJROm2VP
- AU8pN/RSysIQG1hajcsx0yxB4MxVpdYi60IgG1wXoKabBnnCsU/5LPxkXfYCb43V3lex
- ZZqZ4xlByEWwtBPq1aF9giXcGlp6WibmtgezP3Jx/AYCYo4/Sj8FhUoxqJSVwwse4B4H
- SIliwF4Pxw+AS2MMjrnXkQhWmg9KGGXJQ+s//BSOAzV7juVdafNhb9oX14mA6vZ0PJcG
- 2kAVb8D5BtQ5pn3lmK/tVomUA7StyhJ1mPrDaX3LNjhilKdNXlONXtBmDLrEDfrJHOuD
- JLwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=4QaCAi9itYTAEWQbQQ1orCya0omL343c9jLTjKapu5Y=;
- b=qoAs7kYDzJmic/KC1tt7J+3E9RFAOV3m5IZ5X2tymkWyDf91hUFvrMc5rwcALQmaLn
- 25ubvuJ83eZunNrHO4KlEZ6iWOEDJWD1flrBGEe1Rgg0IlE1DWU4Hl9IZUBdPuuEqRl6
- CRJGJOjMQwNVI3a9dCaB4Arj/Pwu1y+z6vrhyZy2aTNpDB2n7lxj6vBBazX7jmh497Fs
- Fy5h4YoKU7v3Tf1rKcxHdxiI+Lnb+j3qJo/rXzw9fv9fgbmQmiELJg6lDnLAJJPs0yd3
- qKyl82SB62Cc9ETcBMn8qbjizWGtX1AO99P4Mz1T+uaPHBfnIWMyKGVoHFDVbtG9LBDp
- weaw==
-X-Gm-Message-State: AOAM532oBCHCLupFZCPP0w2ALrNGFhMbWOfr8aK/mbSKWx0d5GPUjgO/
- CoOSuBzUNQOk7tulVO7yo9lnIVZ/d+U=
-X-Google-Smtp-Source: ABdhPJzm3Z2+Z3Mx0Im4J7zoNuXbRnryFhcJQ8Tv6/+a/HEKWtTFogn8wumdprZtnQFfnos6uualTw==
-X-Received: by 2002:aa7:91cd:: with SMTP id z13mr8309698pfa.133.1595581708000; 
- Fri, 24 Jul 2020 02:08:28 -0700 (PDT)
-Received: from hsinchu02.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id z10sm5751282pfr.90.2020.07.24.02.08.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 24 Jul 2020 02:08:27 -0700 (PDT)
-From: Zong Li <zong.li@sifive.com>
-To: palmer@dabbelt.com, Alistair.Francis@wdc.com, bmeng.cn@gmail.com,
- sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org
-Subject: [PATCH v4 3/4] target/riscv: Fix the translation of physical address
-Date: Fri, 24 Jul 2020 17:08:16 +0800
-Message-Id: <afaa7722419a59f42a7eb804f2902e2313a615ed.1595581140.git.zong.li@sifive.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <cover.1595581140.git.zong.li@sifive.com>
-References: <cover.1595581140.git.zong.li@sifive.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jytfW-0001vN-85
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:07:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20244
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1jytfT-0003hn-Ey
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:07:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595581622;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MnVw0kXA0Ec2o0GkyE9hdHCgjEzrPCHTTEZ7Lv/XNq4=;
+ b=aq1ZnIdig1tKPP7jmSjYwdUIkNIeR0oHeLN8i7fKOp1k++ubLX00v/cNgdzXODs6bP+/db
+ miH5CfgBG2371/7OEqfMb1QGUvfqmXLrah1pHg6TIzBRfXVbUq/BXvHCanXbTO4+QFGiC1
+ 0j6X+rIZsDss84O6V8T4ymC8nKTELiI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-505-NfutU0SvNc2WjJ7ti3OSyw-1; Fri, 24 Jul 2020 05:06:56 -0400
+X-MC-Unique: NfutU0SvNc2WjJ7ti3OSyw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71FD491271
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 09:06:55 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4052E10013D9;
+ Fri, 24 Jul 2020 09:06:54 +0000 (UTC)
+Date: Fri, 24 Jul 2020 10:06:51 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 1/4] qom: make object_ref/unref use a void * instead of
+ Object *.
+Message-ID: <20200724090651.GA3146350@redhat.com>
+References: <20200723181410.3145233-1-berrange@redhat.com>
+ <20200723181410.3145233-2-berrange@redhat.com>
+ <c8ac5a99-6a66-e0ad-6876-aa1064e07541@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <c8ac5a99-6a66-e0ad-6876-aa1064e07541@redhat.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=zong.li@sifive.com; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:01:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,37 +101,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zong Li <zong.li@sifive.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The real physical address should add the 12 bits page offset. It also
-causes the PMP wrong checking due to the minimum granularity of PMP is
-4 byte, but we always get the physical address which is 4KB alignment,
-that means, we always use the start address of the page to check PMP for
-all addresses which in the same page.
+On Thu, Jul 23, 2020 at 02:04:45PM -0500, Eric Blake wrote:
+> On 7/23/20 1:14 PM, Daniel P. Berrangé wrote:
+> > The object_ref/unref methods are intended for use with any subclass of
+> > the base Object. Using "Object *" in the signature is not adding any
+> > meaningful level of type safety, since callers simply use "OBJECT(ptr)"
+> > and this expands to an unchecked cast "(Object *)".
+> > 
+> > By using "void *" we enable the object_unref() method to be used to
+> > provide support for g_autoptr() with any subclass.
+> > 
+> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> > ---
+> >   include/qom/object.h | 4 ++--
+> >   qom/object.c         | 6 ++++--
+> >   2 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> Is it worth a followup patch (probably with Coccinelle) that changes:
+> 
+> object_ref(OBJECT(dev));
+> 
+> to the now-simpler
+> 
+> object_ref(dev);
 
-Signed-off-by: Zong Li <zong.li@sifive.com>
----
- target/riscv/cpu_helper.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Yes, its worth a cleanup.
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 75d2ae3434..08b069f0c9 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -543,7 +543,8 @@ restart:
-             /* for superpage mappings, make a fake leaf PTE for the TLB's
-                benefit. */
-             target_ulong vpn = addr >> PGSHIFT;
--            *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
-+            *physical = ((ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT) |
-+                        (addr & ~TARGET_PAGE_MASK);
- 
-             /* set permissions on the TLB entry */
-             if ((pte & PTE_R) || ((pte & PTE_X) && mxr)) {
+> But I don't think it belongs in this patch, so
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Regards,
+Daniel
 -- 
-2.27.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
