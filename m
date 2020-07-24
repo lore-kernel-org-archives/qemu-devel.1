@@ -2,91 +2,91 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19774C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2BF6C433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:53:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DABCB2067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:52:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0C3B2067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:53:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dnXLFwUl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DABCB2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ks9OfA5y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0C3B2067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jz0vz-0007HM-0Y
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 12:52:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58454)
+	id 1jz0x9-0000fU-2N
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 12:53:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jz0uv-0006Av-Kq
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 12:51:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26913
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1jz0ut-0003ui-QY
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 12:51:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595609487;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nWIiOSuXe+Q+okSLGCDh4yIfClofIpSGsK1prWzGQmY=;
- b=dnXLFwUlGpN8li5xcpGKDrxzEtoINnIVu10ISNBk8FsdCOu/jgiDDb2R+k+tf1kSsju7g/
- VvVjHJ8g9sTGsekGjfsFYUO7T2wqLrFlsU6NN3+bivu/DjMv80+ET4bWbk8jdOr1q1Xf+y
- 1mqotKSXf0EOlsskdT0Vo9WhUfeL1Q8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-hl-lHPVyNhe1PvjR0ntuIA-1; Fri, 24 Jul 2020 12:51:25 -0400
-X-MC-Unique: hl-lHPVyNhe1PvjR0ntuIA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56980102CC3C
- for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 16:51:24 +0000 (UTC)
-Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
- (ovpn-120-206.rdu2.redhat.com [10.10.120.206])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2556769330;
- Fri, 24 Jul 2020 16:51:22 +0000 (UTC)
-Subject: Re: [PATCH 1/3] scripts/qmp/qom-fuse: Unbreak import of
- QEMUMonitorProtocol
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20200723142738.1868568-1-armbru@redhat.com>
- <20200723142738.1868568-2-armbru@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <11e45be0-e37b-00e2-2880-1e3bd55461ee@redhat.com>
-Date: Fri, 24 Jul 2020 12:51:22 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jz0wT-0008Jm-SI; Fri, 24 Jul 2020 12:53:05 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39371)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jz0wS-00049r-Cz; Fri, 24 Jul 2020 12:53:05 -0400
+Received: by mail-wr1-x443.google.com with SMTP id q5so8910362wru.6;
+ Fri, 24 Jul 2020 09:53:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=bAVTZOupnGMYvubPUriAuW0Htk+wYR8jr99gkQhkeZA=;
+ b=Ks9OfA5yYhMuqBEwuQJIgcb76xljJ97YRKE5QHWCMk1A9a6iDPXNxHcFcFaIp91JpU
+ pRwOMXwWDO82mfkkLfsFhVIvlyPPqY8992bUco4RCL+DBsJFxGdFP0N5lDR9dMOhOMv4
+ fB7PNIMcnpD0o9Cg276zg7dN7mxKVym3qWjYGUWaeJbuV8+SbrAFU59E/ESA5K70+/TU
+ eV+iqEqZUaW8Q0D7nCTpWjgxvVWkAK4bcnposnZQgQgmHOymHr4pQi0oAKmnG85CHfkv
+ 4HaDZ2I7MuzvH6XI8BGypZAhkorhbL5jQ006MMPsrkXYrfUvg0/Q2NaGAixqMTEjtyow
+ 3Jcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=bAVTZOupnGMYvubPUriAuW0Htk+wYR8jr99gkQhkeZA=;
+ b=audPu2FObcdWDYuj0cspJVON26/a5vXo6l7XohB/hURc8khRHfh8ecoHQ6seDIlROt
+ ymZuDFM6XKYtNs7BML96qtUmVSaGz2TW8Yn1qMGHBsJ8gnOYWbmPnlg6H0t+XWcWe+Ls
+ t2O56SuZxf5v/CQ7MDP4q8N2fbIYMjUUS2qcq8kWEiUEVF9BvBmYL8h/rQTEfDG5MjSa
+ R0qzeXbQN2wb1oE6JNdQRgEkz03XCrcgSKoAXG6pB9c+ri47DmUs4JzIVOt2sRGxgXAW
+ R0VZc4DQzYEOPKTJSqJbelQ8cSHEK11FxHlzAUzXR+9nbd5C1PdEA9xSkYD7v4oMOvgN
+ CWKw==
+X-Gm-Message-State: AOAM533zDGX2SAqvgSt91qTkj4N4Ggydi2l9AiMZtQa3fbeVTtB3yNaw
+ z0Fj01IsZeown6QGM5c5Yu5ToZwI
+X-Google-Smtp-Source: ABdhPJwpWcNJatZcmykOrr2S+Cevrs3GdkZx71id3d3Akx1uXNZibqLXRvQzeM6CZEmZRaxKQvHeuA==
+X-Received: by 2002:adf:e704:: with SMTP id c4mr10200699wrm.81.1595609582252; 
+ Fri, 24 Jul 2020 09:53:02 -0700 (PDT)
+Received: from localhost.localdomain (214.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.214])
+ by smtp.gmail.com with ESMTPSA id t3sm2164830wre.41.2020.07.24.09.53.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Jul 2020 09:53:01 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.2] default-configs: Remove ACPI_CPU_HOTPLUG from MIPS
+ machines
+Date: Fri, 24 Jul 2020 18:52:59 +0200
+Message-Id: <20200724165259.19939-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <20200723142738.1868568-2-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 08:23:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,75 +99,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/23/20 10:27 AM, Markus Armbruster wrote:
-> Commit c7b942d7f8 "scripts/qmp: Fix shebang and imports" messed with
-> it for reasons I don't quite understand.  I do understand how it fails
-> now: it neglects to import sys.  Fix that.
-> 
+No MIPS machine uses the ACPI cpu-hotplug feature
+(QEMU implementation is X86 specific).
 
-Apologies. These scripts didn't appear to work because they don't have 
-any clue where the script they are trying to import lives. I was working 
-on a series that refactored ./python/qemu into a python package.
+Fixes: 135a67a692 ("ACPI: split CONFIG_ACPI into 4 pieces")
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ default-configs/mips-softmmu-common.mak | 1 -
+ 1 file changed, 1 deletion(-)
 
-The back half of that series hasn't landed upstream yet, so the import 
-refuddling looks an awful lot more arbitrary at the moment, but the idea 
-is that the scripts SHOULD work without needing to explicitly set your 
-PYTHONPATH. For the moment, I think that's better.
-
-My ultimate end-game is to get most python scripts under ./python/ and 
-checked with pylint/mypy etc. as it will help detect breaking changes if 
-library routines change. I want to institute a tree-wide regime for 
-python code management that has a unified vision about how imports work 
-and so on.
-
-I would hope that this would reduce confusion in the future about how to 
-execute scripts, how to write import statements, etc.
-
-Most of what I am doing is baby steps towards that.
-
-> It now fails because it expects an old version of module fuse.  That's
-> next.
-> 
-
-See also my commit message: "There's more wrong with these scripts; ..."
-
-> Fixes: c7b942d7f84ef54f266921bf7668d43f1f2c7c79
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-Thanks:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-> ---
->   scripts/qmp/qom-fuse | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
-> index 5fa6b3bf64..b7dabe8d65 100755
-> --- a/scripts/qmp/qom-fuse
-> +++ b/scripts/qmp/qom-fuse
-> @@ -13,7 +13,7 @@
->   
->   import fuse, stat
->   from fuse import Fuse
-> -import os, posix
-> +import os, posix, sys
->   from errno import *
->   
->   sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
-> @@ -134,7 +134,7 @@ class QOMFS(Fuse):
->               yield fuse.Direntry(str(item['name']))
->   
->   if __name__ == '__main__':
-> -    import sys, os
-> +    import os
->   
->       fs = QOMFS(QEMUMonitorProtocol(os.environ['QMP_SOCKET']))
->       fs.main(sys.argv)
-> 
+diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+index da29c6c0b2..e9c208da3d 100644
+--- a/default-configs/mips-softmmu-common.mak
++++ b/default-configs/mips-softmmu-common.mak
+@@ -21,7 +21,6 @@ CONFIG_ACPI=y
+ CONFIG_ACPI_X86=y
+ CONFIG_ACPI_MEMORY_HOTPLUG=y
+ CONFIG_ACPI_NVDIMM=y
+-CONFIG_ACPI_CPU_HOTPLUG=y
+ CONFIG_APM=y
+ CONFIG_I8257=y
+ CONFIG_PIIX4=y
+-- 
+2.21.3
 
 
