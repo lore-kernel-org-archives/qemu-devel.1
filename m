@@ -2,99 +2,105 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D847DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 21:48:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7311C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 21:57:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F969206EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 21:48:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A92F206F0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 21:57:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S9W7W6Vl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F969206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="mpWIsXMJ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LsLmcwxC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A92F206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jz5Ye-00020J-Pz
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 17:48:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59386)
+	id 1jz5hH-0004hj-T7
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 17:57:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jz5Xu-0001OD-FL
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 17:48:03 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:36007)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jz5Xq-0003cj-LS
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 17:48:02 -0400
-Received: by mail-pg1-x541.google.com with SMTP id p3so6155727pgh.3
- for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 14:47:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=wr4VGmL+brILUZZ6hS/vTStdypvVhVQSoCZ/djG3T8A=;
- b=S9W7W6VlCx69wn++W9DpblLl0OOPumvxK3afQXsQ+2sjWkU/H6gEPcvtiX4bAm1uaX
- Sy1msZFSUP0zA7Ydj+4rCFi1XvRoM+jfH0sG7K9MfwRGpreEu7I9ZZzoCafZUaoResxO
- xDR3DeFfqF+pxS+tt4FXiv/RN0W4MBA3d5QmwTtsXcQINNYMosWpds9Ushkg1ouBO965
- 3Dl6Hjb72KhYLeWrlrXt189XX+xRuqFcZYTrWLqOf23SSF/92r9BCK/kh8xfK71nbP8T
- 3+5LBicBK44q7wulXKfZHB+l5whw6+ELZL+6DziND8zyH8H2WBy0/4wHjuM1rTs0uRjI
- cz1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wr4VGmL+brILUZZ6hS/vTStdypvVhVQSoCZ/djG3T8A=;
- b=YTkZrSm12MOUhzRSCS9jA2JtzIvEP9LENhy1X2IE/0AtZB+zwPfPgl30z+K0OisEbG
- Bhlm5LOZdLy+KxFxQn0GFR7F/zMbp5k0uE/BWdRAAndsbi4jMpVo1sQkEIFMWWQGi28T
- Y0e9HWt05QaOI43mnIc3sVzFm4K0I5zmqzVAleVZ06f/K9BXZBTnBLpCVlqbHb6OPJXf
- /YpxIl3iof/rTUY0M3LJXTrek+qZcqDFHUGDtG0EAkVGwDnTS/NvP6x0wH3Do+Oxnvtd
- eLO1xnRysGN8R6m04EryzPbryAEdPYis3azY4QJENshaU5WLmibnk0wI5wqObXLYJ8Ea
- Jtgw==
-X-Gm-Message-State: AOAM531qjplLgzbmIdCKs37IAii29/ifrW/zt1m1fpI23uBD6+iOu/lU
- BV7kzWTRqLxdgV5QmJneC1eMOA==
-X-Google-Smtp-Source: ABdhPJxHAyHhvrohnlaPUi+YboKdI4YEPnWzVvT4Cobzw97YDJ1RhsCEZEICTlhvZEzAw7HGTF9/bA==
-X-Received: by 2002:a05:6a00:158b:: with SMTP id
- u11mr10569063pfk.92.1595627276665; 
- Fri, 24 Jul 2020 14:47:56 -0700 (PDT)
-Received: from [192.168.1.11] (216-160-65-90.tukw.qwest.net. [216.160.65.90])
- by smtp.gmail.com with ESMTPSA id
- ml8sm6722160pjb.47.2020.07.24.14.47.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 24 Jul 2020 14:47:55 -0700 (PDT)
-Subject: Re: [PATCH for-5.1?] target/i386: Save cc_op before loop insns
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20200720154028.477457-1-richard.henderson@linaro.org>
- <cc3e60e3-e150-4b62-cb8e-abc71920f897@linaro.org>
- <CABgObfZVXtspgcoG_b33j5NcCSJFiBCXntT+388GWFuJ0aTh2A@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <72edd3a8-55df-221c-5b4a-8e8f4a80b07d@linaro.org>
-Date: Fri, 24 Jul 2020 14:47:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jz5gY-0004IO-W7
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 17:56:59 -0400
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:58717)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jz5gW-000537-KZ
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 17:56:58 -0400
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+ by mailout.nyi.internal (Postfix) with ESMTP id 8321F5C0163;
+ Fri, 24 Jul 2020 17:56:55 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute2.internal (MEProxy); Fri, 24 Jul 2020 17:56:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=
+ from:to:cc:subject:in-reply-to:references:date:message-id
+ :mime-version:content-type; s=fm3; bh=0t1KiAVitErSvP3R7Gh+rRESQJ
+ M3E3D9x3G6AXPPK6A=; b=mpWIsXMJN+mOrLLb+vamVZEHlfsnxhFMlO3dX9Jxv5
+ oXs3HnU4W4FBpp++n+Ye2FgD7kqt2AWp2gL2/HjwBa8wgxk842wCONH9wSZnlL+s
+ s5e+twa5e5lIUTYAhRNjza9eQg5DEqQxPcvDIiI+5tLUEhL93utVGQ8MHZ1hoDDx
+ 821LOdNzbg5bfQFAuuQTwLYFjpYt/7gW0EYKnAEt3W12UeEN64ZJd15R/3BRKB6D
+ M7W+S6FPUZFLKPeSg3O0y7FDinx5j/3aWH+TlpGvfFM37tpAmqU63ichbd+F9JEf
+ ffkKJ0I6WPafcJFEsN825CBl7NZhwOJTHvyTX6sE90LQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=0t1KiA
+ VitErSvP3R7Gh+rRESQJM3E3D9x3G6AXPPK6A=; b=LsLmcwxCKbW1Q/ArcJSWL4
+ hRhrQFlFefGnTDaI4rDYcKuyK8oqfRhy+Xp8Dl7cG4dKX0C7p5AECyXNJ35ZMSek
+ or1NbgXk3EBG3qm2khU1zloaBl+yxUeedOu5aWlOTRzViiCeZLFChg/o8V+WEZ0s
+ +KrUDU24M7yd3RQp+58989a/zOpfWlGTawbRBqif0d3/mQSoN2WLEDA6hOLTxX7s
+ 3L25AIcgusB4PkqAYsInbnejNuhfBPtZVvKH72wXfea3DPxqI4x4NC1aszo9cn9l
+ CcQuD5Wl/TbcNAdeMR+PdXvqSL49ou7gzpnn2PQxQsaxNisL0vdIcgIRslCESTeQ
+ ==
+X-ME-Sender: <xms:JlkbX45jt3m1yYsSCXZ_yrx6ZjwdI-dzIClrJBTNhGg2mlkHQjfj0g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrheeggddtvdcutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenog
+ fuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefhvffujghffffkgggtseht
+ tdertddttddtnecuhfhrohhmpeetlhihshhsrgcutfhoshhsuceohhhisegrlhihshhsrg
+ drihhsqeenucggtffrrghtthgvrhhnpeehtdejffektedtkeethfetheetveeggfeugfel
+ ueffheeuudejvdefgfeiiefgleenucffohhmrghinhepqhgvmhhurdhorhhgpdhgihhthh
+ husgdrihhopdhgihhthhhusgdrtghomhenucfkphepgeeirdektddrudegvddrkeefnecu
+ vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhephhhisegrlh
+ ihshhsrgdrihhs
+X-ME-Proxy: <xmx:JlkbX54TZcl1d9wcYacBh1Wjh8kq87kW7-sRids5bj6GgHHmTB3ZHQ>
+ <xmx:JlkbX3emsaASgFP8uTgdy_aU35dYDyMFpd8wsCPcqkXmgA51blzupQ>
+ <xmx:JlkbX9I2yvMAW1emgLrb5i6r1Cj8Gq27cerECzv-PLEEDqd-0URmOg>
+ <xmx:J1kbXznc0CTQzgiI-0zWLRL7GLF1LbwtlINtNdcad_NxQxDqHpdUiA>
+Received: from x220.qyliss.net (p2e508e53.dip0.t-ipconnect.de [46.80.142.83])
+ by mail.messagingengine.com (Postfix) with ESMTPA id A81E830600A9;
+ Fri, 24 Jul 2020 17:56:54 -0400 (EDT)
+Received: by x220.qyliss.net (Postfix, from userid 1000)
+ id 16E053BD; Fri, 24 Jul 2020 21:56:53 +0000 (UTC)
+From: Alyssa Ross <hi@alyssa.is>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: Testing the virtio-vhost-user QEMU patch
+In-Reply-To: <20200724123254.GB333683@stefanha-x1.localdomain>
+References: <87h7u1s5k1.fsf@alyssa.is>
+ <20200721083048.GB144170@stefanha-x1.localdomain> <87eep1yihf.fsf@alyssa.is>
+ <87o8o5dvru.fsf@alyssa.is> <20200724123254.GB333683@stefanha-x1.localdomain>
+Date: Fri, 24 Jul 2020 21:56:53 +0000
+Message-ID: <87lfj8efve.fsf@alyssa.is>
 MIME-Version: 1.0
-In-Reply-To: <CABgObfZVXtspgcoG_b33j5NcCSJFiBCXntT+388GWFuJ0aTh2A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain
+Received-SPF: pass client-ip=66.111.4.27; envelope-from=hi@alyssa.is;
+ helo=out3-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 17:12:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,54 +113,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>, "Habkost, Eduardo" <ehabkost@redhat.com>
+Cc: Nikos Dragazis <ndragazis@arrikto.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/24/20 11:53 AM, Paolo Bonzini wrote:
-> Looks good, will queue when I am back---or just send a pull request yourself if
-> you prefer.
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-Ok, will do.  Thanks.
+> On Fri, Jul 24, 2020 at 10:58:45AM +0000, Alyssa Ross wrote:
+>> Alyssa Ross <hi@alyssa.is> writes:
+>> 
+>> > Stefan Hajnoczi <stefanha@redhat.com> writes:
+>> >
+>> >> On Tue, Jul 21, 2020 at 07:14:38AM +0000, Alyssa Ross wrote:
+>> >>> Hi -- I hope it's okay me reaching out like this.
+>> >>> 
+>> >>> I've been trying to test out the virtio-vhost-user implementation that's
+>> >>> been posted to this list a couple of times, but have been unable to get
+>> >>> it to boot a kernel following the steps listed either on
+>> >>> <https://wiki.qemu.org/Features/VirtioVhostUser> or
+>> >>> <https://ndragazis.github.io/dpdk-vhost-vvu-demo.html>.
+>> >>> 
+>> >>> Specifically, the kernel appears to be unable to write to the
+>> >>> virtio-vhost-user device's PCI registers.  I've included the full panic
+>> >>> output from the kernel at the end of this message.  The panic is
+>> >>> reproducible with two different kernels I tried (with different configs
+>> >>> and versions).  I tried both versions of the virtio-vhost-user I was
+>> >>> able to find[1][2], and both exhibited the same behaviour.
+>> >>> 
+>> >>> Is this a known issue?  Am I doing something wrong?
+>> >>
+>> >> Hi,
+>> >> Unfortunately I'm not sure what the issue is. This is an early
+>> >> virtio-pci register access before a driver for any specific device type
+>> >> (net, blk, vhost-user, etc) comes into play.
+>> >
+>> > Small update here: I tried on another computer, and it worked.  Made
+>> > sure that it was exactly the same QEMU binary, command line, and VM
+>> > disk/initrd/kernel, so I think I can fairly confidently say the panic
+>> > depends on what hardware QEMU is running on.  I set -cpu value to the
+>> > same on both as well (SandyBridge).
+>> >
+>> > I also discovered that it works on my primary computer (the one it
+>> > panicked on before) with KVM disabled.
+>> >
+>> > Note that I've only got so far as finding that it boots on the other
+>> > machine -- I haven't verified yet that it actually works.
+>> >
+>> > Bad host CPU:  Intel(R) Core(TM) i5-2520M CPU @ 2.50GHz
+>> > Good host CPU: AMD EPYC 7401P 24-Core Processor
+>> >
+>> > May I ask what host CPUs other people have tested this on?  Having more
+>> > data would probably be useful.  Could it be an AMD vs. Intel thing?
+>> 
+>> I think I've figured it out!
+>> 
+>> Sandy Bridge and Ivy Bridge hosts encounter this panic because the
+>> "additional resources" bar size is too big, at 1 << 36.  If I change
+>> this to 1 << 35, no more kernel panic.
+>> 
+>> Skylake and later are fine with 1 << 36.  In between Ivy Bridge and
+>> Skylake were Haswell and Broadwell, but I couldn't find anybody who was
+>> able to help me test on either of those, so I don't know what they do.
+>> 
+>> Perhaps related, the hosts that produce panics all seem to have a
+>> physical address size of 36 bits, while the hosts that work have larger
+>> physical address sizes, as reported by lscpu.
+>
+> I have run it successfully on Broadwell but never tried 64GB or larger
+> shared memory resources.
 
-
-r~
-
-> 
-> Paolo
-> 
-> Il ven 24 lug 2020, 20:35 Richard Henderson <richard.henderson@linaro.org
-> <mailto:richard.henderson@linaro.org>> ha scritto:
-> 
->     Ping?
-> 
->     On 7/20/20 8:40 AM, Richard Henderson wrote:
->     > We forgot to update cc_op before these branch insns,
->     > which lead to losing track of the current eflags.
->     >
->     > Buglink: https://bugs.launchpad.net/qemu/+bug/1888165
->     > Signed-off-by: Richard Henderson <richard.henderson@linaro.org
->     <mailto:richard.henderson@linaro.org>>
->     > ---
->     >  target/i386/translate.c | 1 +
->     >  1 file changed, 1 insertion(+)
->     >
->     > diff --git a/target/i386/translate.c b/target/i386/translate.c
->     > index a1d31f09c1..caea6f5fb1 100644
->     > --- a/target/i386/translate.c
->     > +++ b/target/i386/translate.c
->     > @@ -7148,6 +7148,7 @@ static target_ulong disas_insn(DisasContext *s,
->     CPUState *cpu)
->     >              l1 = gen_new_label();
->     >              l2 = gen_new_label();
->     >              l3 = gen_new_label();
->     > +            gen_update_cc_op(s);
->     >              b &= 3;
->     >              switch(b) {
->     >              case 0: /* loopnz */
->     >
-> 
-
+To clarify, I haven't been using big shared memory resources either --
+this has all been about getting the backend VM to start at all.  The
+panic happens at boot, and the 1 << 36 BAR allocation comes from here,
+during realization:
+https://github.com/ndragazis/qemu/blob/f9ab08c0c8/hw/virtio/virtio-vhost-user-pci.c#L291
 
