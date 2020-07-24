@@ -2,84 +2,101 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C33C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3877C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:43:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61AC620674
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:42:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92E462065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:43:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a+s/KKfT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61AC620674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJBuUfTy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92E462065F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyytw-0000QO-Kz
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 10:42:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51218)
+	id 1jyyvJ-00033T-QN
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 10:43:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyrn-0005bl-S5
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:40:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48548
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyri-0005mz-K0
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:40:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595601601;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lnBZKhdNHwXhFsbWOgsxavhaHfMVzp6zwisaljy/u08=;
- b=a+s/KKfThC7jY9BGcyyraCOQZKCzX8drjinBb8BXGDFgYPyP3PGtiov9lWgoAYOfCXG2WD
- jA7yfvkx4i8QxHN9NWJuLEASfyCYLEqo3oKIs6TFk9LUe1fml6QBhO3vcjA3UGwknRKSkk
- 7gxfEfGdyiCINM/yVWrAr2HYT2oDiNI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-IKtQ2ZbpOu-s-VzniHxDBg-1; Fri, 24 Jul 2020 10:38:10 -0400
-X-MC-Unique: IKtQ2ZbpOu-s-VzniHxDBg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 239F11083E83;
- Fri, 24 Jul 2020 14:38:07 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-113-94.ams2.redhat.com [10.36.113.94])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D122B726A5;
- Fri, 24 Jul 2020 14:38:04 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH RFCv3 3/9] s390x: remove hypercall registration mechanism
-Date: Fri, 24 Jul 2020 16:37:44 +0200
-Message-Id: <20200724143750.59836-4-david@redhat.com>
-In-Reply-To: <20200724143750.59836-1-david@redhat.com>
-References: <20200724143750.59836-1-david@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jyyrj-0005Sl-Oa
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:40:03 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33637)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jyyrh-0005mW-Ve
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:40:03 -0400
+Received: by mail-wr1-x444.google.com with SMTP id f18so8560575wrs.0
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 07:40:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=2fqZCLPpcAj+SC+G0YHB/axRgjD28aMTaC8MED3pIFM=;
+ b=aJBuUfTyTlyTrrp2Gkd6pz1yUGPpRad/5xlD0S5gWwZSPCKaGLSoxwYxEZfSF3HFWx
+ +WTkblewCf5KlDD0AbCxDRrpeKy6qIi+3w7qxIYpG8XBvvlYkWGnHoZw1aauLqsse8Nf
+ ALNFTgsx4chea+JNkc3sZuTfKQu8vynVnyyOjeh6xFoQDMbmy6JtBPj/iX6+1+B6RxgP
+ myID/L0Py731pEmfkeap1iqNcvS+uIr25J+eUO35bs4RGM/KQzteNffk+StCWIHw3hLP
+ zo795g2V4lDtFc7KOq+b+PDxN7IYI8NGr6hNNoH6Iwap/NYsICD0qqRrcq+a+A5729mY
+ 0HrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2fqZCLPpcAj+SC+G0YHB/axRgjD28aMTaC8MED3pIFM=;
+ b=geZ1IlXDM7CEdHYTI2VsRe2/OnbNEIz+7d3GpzfkBPlTDbrPXcYLShiAUrHxxjgkXF
+ C8YNPOBnIkidmo18JZEd9+qwkB/3eGdVFah8WLRom1IWcz35OrZ7c51jtgOHzMV3HgO/
+ oSTd9OM8HE6zjTWhGLynKurSdw94/5cqPTc3/41YSv8CcftBTLxzZjzmpPPL1GpzGTil
+ ZSH19f4h3OGhrSgS8+HL5NCtZWiWVF0sMLeBq8+ZbVoILZt8QaKfGdKuw83gMZbGN6wm
+ iMHTEnKf20U/Ywgsj55HNnE/gmCuk6sG7uaXQS+n6/zp8qcQja1y1NKX4v+n2CoRe0im
+ AAjg==
+X-Gm-Message-State: AOAM531UKT+9VCvaWmLF2meXmGi0GT3kfloE5igqbJLRm5n7HbyflFtC
+ YknIJdR5IPMcQRXFQsWHm+Y=
+X-Google-Smtp-Source: ABdhPJzjfoJRRMmX/U5A7CwBjG6wyNPY704HGir+4wgPGS1eFRcVP91RFYoyO11y/c+GQ6WFLEmrsw==
+X-Received: by 2002:adf:dc83:: with SMTP id r3mr9730305wrj.172.1595601600342; 
+ Fri, 24 Jul 2020 07:40:00 -0700 (PDT)
+Received: from [192.168.1.33] (214.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.214])
+ by smtp.gmail.com with ESMTPSA id h6sm1513745wrv.40.2020.07.24.07.39.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 24 Jul 2020 07:39:59 -0700 (PDT)
+Subject: Re: [RFC PATCH] buildsys: Only build capstone if softmmu/user mode is
+ enabled
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200724071657.21508-1-f4bug@amsat.org>
+ <5d8ade29-c085-9f6d-b896-fda48c1f5666@redhat.com>
+ <0ce8f279-1ef0-6d93-5fff-032783fba2b6@amsat.org>
+ <45942406-2ee2-150a-fb11-d485a12ca290@amsat.org>
+ <CAFEAcA9wXHK0h6kzfX_re=Q8P3Yv93c_WFQxjbEUnj_PhV-_bQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7b9fe174-f47d-bea6-a915-1c6a45c57e51@amsat.org>
+Date: Fri, 24 Jul 2020 16:39:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAFEAcA9wXHK0h6kzfX_re=Q8P3Yv93c_WFQxjbEUnj_PhV-_bQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:00:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,185 +109,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Nowadays, we only have a single machine type in QEMU, everything is based
-on virtio-ccw and the traditional virtio machine does no longer exist. No
-need to dynamically register diag500 handlers. Move the two existing
-handlers into diag500.c.
+On 7/24/20 11:59 AM, Peter Maydell wrote:
+> On Fri, 24 Jul 2020 at 10:47, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> On 7/24/20 11:38 AM, Philippe Mathieu-Daudé wrote:
+>>> On 7/24/20 9:56 AM, Thomas Huth wrote:
+>>>> On 24/07/2020 09.16, Philippe Mathieu-Daudé wrote:
+>>>>> At least one of softmmu or user mode has to be enabled to use
+>>>>> capstone. If not, don't clone/built it.
+>>>>>
+>>>>> This save CI time for the tools/documentation-only build jobs.
+> 
+>>>>> +if test -z "$capstone" && test $tcg = 'no' ; then # !tcg implies !softmmu
+>>>>> +  capstone="no"
+>>>>> +fi
+>>>>
+>>>> I don't think this is right. You could have a KVM-only build where you
+>>>> still want to use the disassembler for the human monitor.
+>>>
+>>> I had the same question with KVM, I agree this is unclear, this is why
+>>> I added RFC.
+>>>
+>>> Don't we have !softmmu implies !kvm?
+>>
+>> It works because it falls back to the old disas.c (if capstone is
+>> here, use it, else fall-back).
+>>
+>> Does this means we can directly remove the capstone experiment &
+>> submodule without waiting for the libllvm integration?
+> 
+> The theory (at least at the time) was that capstone was better
+> than the internal disassembler for at least some targets.
+> If we want to go from libllvm to capstone as our long term
+> plan that's cool, but until we actually do that I don't think
+> we should drop capstone.
+> 
+> As far as this patch goes: if you want to disable capstone for
+> the tools-and-docs-only setup
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-virtio-ccw.c   | 46 -----------------------------
- hw/s390x/s390-virtio-hcall.c | 56 ++++++++++++++++++++++++------------
- hw/s390x/s390-virtio-hcall.h |  2 --
- 3 files changed, 38 insertions(+), 66 deletions(-)
+This is also useful for a job downloading CI prerequisite artifacts.
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index dca8e43001..b481e5e5bd 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -17,7 +17,6 @@
- #include "hw/boards.h"
- #include "exec/address-spaces.h"
- #include "exec/ram_addr.h"
--#include "hw/s390x/s390-virtio-hcall.h"
- #include "hw/s390x/sclp.h"
- #include "hw/s390x/s390_flic.h"
- #include "hw/s390x/ioinst.h"
-@@ -116,48 +115,6 @@ static void subsystem_reset(void)
-     }
- }
- 
--static int virtio_ccw_hcall_notify(const uint64_t *args)
--{
--    uint64_t subch_id = args[0];
--    uint64_t queue = args[1];
--    SubchDev *sch;
--    int cssid, ssid, schid, m;
--
--    if (ioinst_disassemble_sch_ident(subch_id, &m, &cssid, &ssid, &schid)) {
--        return -EINVAL;
--    }
--    sch = css_find_subch(m, cssid, ssid, schid);
--    if (!sch || !css_subch_visible(sch)) {
--        return -EINVAL;
--    }
--    if (queue >= VIRTIO_QUEUE_MAX) {
--        return -EINVAL;
--    }
--    virtio_queue_notify(virtio_ccw_get_vdev(sch), queue);
--    return 0;
--
--}
--
--static int virtio_ccw_hcall_early_printk(const uint64_t *args)
--{
--    uint64_t mem = args[0];
--
--    if (mem < ram_size) {
--        /* Early printk */
--        return 0;
--    }
--    return -EINVAL;
--}
--
--static void virtio_ccw_register_hcalls(void)
--{
--    s390_register_virtio_hypercall(KVM_S390_VIRTIO_CCW_NOTIFY,
--                                   virtio_ccw_hcall_notify);
--    /* Tolerate early printk. */
--    s390_register_virtio_hypercall(KVM_S390_VIRTIO_NOTIFY,
--                                   virtio_ccw_hcall_early_printk);
--}
--
- static void s390_memory_init(MachineState *machine)
- {
-     MemoryRegion *sysmem = get_system_memory();
-@@ -284,9 +241,6 @@ static void ccw_init(MachineState *machine)
-                               OBJECT(dev));
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
- 
--    /* register hypercalls */
--    virtio_ccw_register_hcalls();
--
-     s390_enable_css_support(s390_cpu_addr2state(0));
- 
-     ret = css_create_css_image(VIRTUAL_CSSID, true);
-diff --git a/hw/s390x/s390-virtio-hcall.c b/hw/s390x/s390-virtio-hcall.c
-index ec7cf8beb3..5e14bd49b7 100644
---- a/hw/s390x/s390-virtio-hcall.c
-+++ b/hw/s390x/s390-virtio-hcall.c
-@@ -12,30 +12,50 @@
- #include "qemu/osdep.h"
- #include "cpu.h"
- #include "hw/s390x/s390-virtio-hcall.h"
-+#include "hw/s390x/ioinst.h"
-+#include "hw/s390x/css.h"
-+#include "virtio-ccw.h"
- 
--#define MAX_DIAG_SUBCODES 255
--
--static s390_virtio_fn s390_diag500_table[MAX_DIAG_SUBCODES];
--
--void s390_register_virtio_hypercall(uint64_t code, s390_virtio_fn fn)
-+static int handle_virtio_notify(uint64_t mem)
- {
--    assert(code < MAX_DIAG_SUBCODES);
--    assert(!s390_diag500_table[code]);
--
--    s390_diag500_table[code] = fn;
-+    if (mem < ram_size) {
-+        /* Tolerate early printk. */
-+        return 0;
-+    }
-+    return -EINVAL;
- }
- 
--int s390_virtio_hypercall(CPUS390XState *env)
-+static int handle_virtio_ccw_notify(uint64_t subch_id, uint64_t queue)
- {
--    s390_virtio_fn fn;
-+    SubchDev *sch;
-+    int cssid, ssid, schid, m;
- 
--    if (env->regs[1] < MAX_DIAG_SUBCODES) {
--        fn = s390_diag500_table[env->regs[1]];
--        if (fn) {
--            env->regs[2] = fn(&env->regs[2]);
--            return 0;
--        }
-+    if (ioinst_disassemble_sch_ident(subch_id, &m, &cssid, &ssid, &schid)) {
-+        return -EINVAL;
-     }
-+    sch = css_find_subch(m, cssid, ssid, schid);
-+    if (!sch || !css_subch_visible(sch)) {
-+        return -EINVAL;
-+    }
-+    if (queue >= VIRTIO_QUEUE_MAX) {
-+        return -EINVAL;
-+    }
-+    virtio_queue_notify(virtio_ccw_get_vdev(sch), queue);
-+    return 0;
-+}
- 
--    return -EINVAL;
-+int s390_virtio_hypercall(CPUS390XState *env)
-+{
-+     const uint64_t subcode = env->regs[1];
-+
-+     switch (subcode) {
-+     case KVM_S390_VIRTIO_NOTIFY:
-+         env->regs[2] = handle_virtio_notify(env->regs[2]);
-+         return 0;
-+     case KVM_S390_VIRTIO_CCW_NOTIFY:
-+         env->regs[2] = handle_virtio_ccw_notify(env->regs[2], env->regs[3]);
-+         return 0;
-+     default:
-+         return -EINVAL;
-+     }
- }
-diff --git a/hw/s390x/s390-virtio-hcall.h b/hw/s390x/s390-virtio-hcall.h
-index 9800c4b351..67e11ea39a 100644
---- a/hw/s390x/s390-virtio-hcall.h
-+++ b/hw/s390x/s390-virtio-hcall.h
-@@ -17,7 +17,5 @@
- /* The only thing that we need from the old kvm_virtio.h file */
- #define KVM_S390_VIRTIO_NOTIFY 0
- 
--typedef int (*s390_virtio_fn)(const uint64_t *args);
--void s390_register_virtio_hypercall(uint64_t code, s390_virtio_fn fn);
- int s390_virtio_hypercall(CPUS390XState *env);
- #endif /* HW_S390_VIRTIO_HCALL_H */
--- 
-2.26.2
+> then I think the right condition is
+> if [ "$bsd_user" = "no" -a "$linux_user" = "no" -a "$softmmu" = "no" ] ; then
+>   capstone=no
+> fi
 
+OK, thanks!
+
+> 
+> thanks
+> -- PMM
+> 
 
