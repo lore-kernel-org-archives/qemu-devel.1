@@ -2,66 +2,69 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDCFC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:46:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E03E6C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6039F206E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:46:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6039F206E3
+	by mail.kernel.org (Postfix) with ESMTPS id B54D7206D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:56:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B54D7206D8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jypb7-0003mB-Gk
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 00:46:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45530)
+	id 1jypkt-0005aw-UV
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 00:56:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47292)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jypaZ-0003LS-41
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 00:45:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40418)
+ id 1jypkD-00054F-Fz
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 00:55:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40982)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jypaW-0003Fi-S8
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 00:45:42 -0400
+ id 1jypkB-0004Ly-F9
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 00:55:41 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jypaT-0001zd-1Z
- for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 04:45:37 +0000
+ id 1jypk9-0002Qd-Uz
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 04:55:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E7EE42E80BA
- for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 04:45:36 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E97D12E8073
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 04:55:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 Jul 2020 04:36:13 -0000
-From: Simon Kaegi <1888601@bugs.launchpad.net>
+Date: Fri, 24 Jul 2020 04:49:27 -0000
+From: Thomas Huth <1888431@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=Won't Fix; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: build-failed macosx-10.11.6 v5.1.0-rc1
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h skaegi
-X-Launchpad-Bug-Reporter: Simon Kaegi (skaegi)
-X-Launchpad-Bug-Modifier: Simon Kaegi (skaegi)
-References: <159547584008.11100.1316842366379773629.malonedeb@wampee.canonical.com>
-Message-Id: <159556537330.21676.10858288154118068374.malone@soybean.canonical.com>
-Subject: [Bug 1888601] Re: QEMU v5.1.0-rc0/rc1 hang with nested virtualization
+X-Launchpad-Bug-Commenters: ebolainfluenza th-huth
+X-Launchpad-Bug-Reporter: Robert Ball (ebolainfluenza)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <159536546453.8597.9185320640612954142.malonedeb@wampee.canonical.com>
+Message-Id: <159556616786.3518.9322747742222332396.malone@gac.canonical.com>
+Subject: [Bug 1888431] Re: v5.1.0-rc1 build fails on Mac OS X 10.11.6 
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="f877c5162b568393e2d07ce948459ba0abc456fe";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 33dbc3c1dec8b4f50f4e7c720e3b69665ebdc8b2
+X-Launchpad-Hash: 62e6d7c164afe0babb62e596505f4c5c7ed974bd
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:45:38
@@ -83,148 +86,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1888601 <1888601@bugs.launchpad.net>
+Reply-To: Bug 1888431 <1888431@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I believe the VSI itself is QEMU based but don't know the version or
-details but suspect it's 4.1 based. We compile our own QEMU version for
-use with Kata and that's where we're now using 5.1.0-rc1 with the above
-commit reverted.
+Hmm, let's see ... the work-arounds for old Mac OS X versions have been
+removed here:
 
-Host Kernel is ... 4.15.0-101-generic if that helps
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D483644c25b932360018
 
-re: cpu -- four of these...
-```
-processor	: 0
-vendor_id	: GenuineIntel
-cpu family	: 6
-model		: 61
-model name	: Intel Core Processor (Broadwell, IBRS)
-stepping	: 2
-microcode	: 0x1
-cpu MHz		: 2095.148
-cache size	: 16384 KB
-physical id	: 0
-siblings	: 4
-core id		: 0
-cpu cores	: 2
-apicid		: 0
-initial apicid	: 0
-fpu		: yes
-fpu_exception	: yes
-cpuid level	: 13
-wp		: yes
-flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
-pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant=
-_tsc rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq vmx ssse3 f=
-ma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave=
- avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault invpcid_s=
-ingle pti ssbd ibrs ibpb tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc=
-_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm rdseed adx smap xsaveopt a=
-rat md_clear
-bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapg=
-s taa itlb_multihit
-bogomips	: 4190.29
-clflush size	: 64
-cache_alignment	: 64
-address sizes	: 40 bits physical, 48 bits virtual
-power management:
-```
+It mentiones that this commit has broken compilation earlier:
+
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D50290c002c045280f8d
+
+... so the newest version that still might be compilable is v4.0.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1888601
+https://bugs.launchpad.net/bugs/1888431
 
 Title:
-  QEMU v5.1.0-rc0/rc1 hang with nested virtualization
+  v5.1.0-rc1 build fails on Mac OS X 10.11.6
 
 Status in QEMU:
-  New
+  Won't Fix
 
 Bug description:
-  We're running Kata Containers using QEMU and with v5.1.0rc0 and rc1
-  have noticed a problem at startup where QEMu appears to hang. We are
-  not seeing this problem on our bare metal nodes and only on a VSI that
-  supports nested virtualization.
+  Hi all,
 
-  We unfortunately see nothing at all in the QEMU logs to help
-  understand the problem and a hung process is just a guess at this
-  point.
+  build of tag v5.1.0-rc1 fails on Mac OS X 10.11.6 (El Capitan) with
+  the following error:
 
-  Using git bisect we first see the problem with...
+  git clone https://git.qemu.org/git/qemu.git
+      <output elided, but all OK>
+  cd qemu
+  git submodule init
+      <output elided, but all OK>
+  git submodule update --recursive
+      <output elided, but all OK>
+  ./configure
+      <output elided, but all OK>
+  make
+      <output elided, but all OK up until fail>
 
-  ---
+    CC      trace/control.o
+  In file included from trace/control.c:29:
+  In file included from /Users/rtb/src/qemu/include/monitor/monitor.h:4:
+  In file included from /Users/rtb/src/qemu/include/block/block.h:4:
+  In file included from /Users/rtb/src/qemu/include/block/aio.h:23:
+  /Users/rtb/src/qemu/include/qemu/timer.h:843:9: warning: implicit declara=
+tion of function 'clock_gettime' is invalid in C99
+        [-Wimplicit-function-declaration]
+          clock_gettime(CLOCK_MONOTONIC, &ts);
+          ^
+  /Users/rtb/src/qemu/include/qemu/timer.h:843:23: error: use of undeclared=
+ identifier 'CLOCK_MONOTONIC'
+          clock_gettime(CLOCK_MONOTONIC, &ts);
+                        ^
+  1 warning and 1 error generated.
+  make: *** [trace/control.o] Error 1
 
-  f19bcdfedd53ee93412d535a842a89fa27cae7f2 is the first bad commit
-  commit f19bcdfedd53ee93412d535a842a89fa27cae7f2
-  Author: Jason Wang <jasowang@redhat.com>
-  Date:   Wed Jul 1 22:55:28 2020 +0800
+  =
 
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio-pci: implement queue_enabled method
+  rtb:qemu rtb$ git log -n1
+  commit c8004fe6bbfc0d9c2e7b942c418a85efb3ac4b00 (HEAD -> master, tag: v5.=
+1.0-rc1, origin/master, origin/HEAD)
+  Author: Peter Maydell <peter.maydell@linaro.org>
+  Date:   Tue Jul 21 20:28:59 2020 +0100
 
-  =C2=A0=C2=A0=C2=A0=C2=A0With version 1, we can detect whether a queue is =
-enabled via
-  =C2=A0=C2=A0=C2=A0=C2=A0queue_enabled.
+      Update version for v5.1.0-rc1 release
+      =
 
-  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Jason Wang <jasowang@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Cindy Lu <lulu@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <20200701145538.22333-5-lulu@redhat.c=
-om>
-  =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Acked-by: Jason Wang <jasowang@redhat.com>
+      Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+  rtb:qemu rtb$ =
 
-  =C2=A0hw/virtio/virtio-pci.c | 13 +++++++++++++
-  =C2=A01 file changed, 13 insertions(+)
 
-  ---
+  =
 
-  Reverting this commit (on top of 5.1.0-rc1) seems to work and prevent
-  the hanging.
+  Please find the full output of all the commands (from git clone of the re=
+po, to the make) in the attached file "buildfail.txt".
 
-  ---
+  Thank you!
 
-  Here's how kata ends up launching qemu in our environment --
-  /opt/kata/bin/qemu-system-x86_64 -name sandbox-849df14c6065931adedb9d18bc=
-9260a6d896f1814a8c5cfa239865772f1b7a5f -uuid 6bec458e-1da7-4847-a5d7-5ab31d=
-4d2465 -machine pc,accel=3Dkvm,kernel_irqchip -cpu host,pmu=3Doff -qmp unix=
-:/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5=
-f/qmp.sock,server,nowait -m 4096M,slots=3D10,maxmem=3D30978M -device pci-br=
-idge,bus=3Dpci.0,id=3Dpci-bridge-0,chassis_nr=3D1,shpc=3Don,addr=3D2,romfil=
-e=3D -device virtio-serial-pci,disable-modern=3Dtrue,id=3Dserial0,romfile=
-=3D -device virtconsole,chardev=3Dcharconsole0,id=3Dconsole0 -chardev socke=
-t,id=3Dcharconsole0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f=
-1814a8c5cfa239865772f1b7a5f/console.sock,server,nowait -device virtio-scsi-=
-pci,id=3Dscsi0,disable-modern=3Dtrue,romfile=3D -object rng-random,id=3Drng=
-0,filename=3D/dev/urandom -device virtio-rng-pci,rng=3Drng0,romfile=3D -dev=
-ice virtserialport,chardev=3Dcharch0,id=3Dchannel0,name=3Dagent.channel.0 -=
-chardev socket,id=3Dcharch0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
-0a6d896f1814a8c5cfa239865772f1b7a5f/kata.sock,server,nowait -chardev socket=
-,id=3Dchar-396c5c3e19e29353,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
-0a6d896f1814a8c5cfa239865772f1b7a5f/vhost-fs.sock -device vhost-user-fs-pci=
-,chardev=3Dchar-396c5c3e19e29353,tag=3DkataShared,romfile=3D -netdev tap,id=
-=3Dnetwork-0,vhost=3Don,vhostfds=3D3:4,fds=3D5:6 -device driver=3Dvirtio-ne=
-t-pci,netdev=3Dnetwork-0,mac=3D52:ac:2d:02:1f:6f,disable-modern=3Dtrue,mq=
-=3Don,vectors=3D6,romfile=3D -global kvm-pit.lost_tick_policy=3Ddiscard -vg=
-a none -no-user-config -nodefaults -nographic -daemonize -object memory-bac=
-kend-file,id=3Ddimm1,size=3D4096M,mem-path=3D/dev/shm,share=3Don -numa node=
-,memdev=3Ddimm1 -kernel /opt/kata/share/kata-containers/vmlinuz-5.7.9-74 -i=
-nitrd /opt/kata/share/kata-containers/kata-containers-initrd_alpine_1.11.2-=
-6_agent.initrd -append tsc=3Dreliable no_timer_check rcupdate.rcu_expedited=
-=3D1 i8042.direct=3D1 i8042.dumbkbd=3D1 i8042.nopnp=3D1 i8042.noaux=3D1 nor=
-eplace-smp reboot=3Dk console=3Dhvc0 console=3Dhvc1 iommu=3Doff cryptomgr.n=
-otests net.ifnames=3D0 pci=3Dlastbus=3D0 debug panic=3D1 nr_cpus=3D4 agent.=
-use_vsock=3Dfalse scsi_mod.scan=3Dnone init=3D/usr/bin/kata-agent -pidfile =
-/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5f=
-/pid -D /run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa23986577=
-2f1b7a5f/qemu.log -smp 2,cores=3D1,threads=3D1,sockets=3D4,maxcpus=3D4
+  Best regards,
 
-  ---
+  Robert Ball
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1888601/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1888431/+subscriptions
 
