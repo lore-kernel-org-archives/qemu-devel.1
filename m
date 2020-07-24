@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE17C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14A9C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:05:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6A8320737
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:04:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC84020737
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:05:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YAM+uwL/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6A8320737
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pSuzO9oG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC84020737
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyo0e-0008QM-UM
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 23:04:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55500)
+	id 1jyo18-0000qw-0I
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 23:05:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jynuR-0007Ra-Pp; Thu, 23 Jul 2020 22:58:07 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42179 helo=ozlabs.org)
+ id 1jynuR-0007QF-9y; Thu, 23 Jul 2020 22:58:07 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36865 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1jynuO-00061m-FB; Thu, 23 Jul 2020 22:58:07 -0400
+ id 1jynuO-00061o-BI; Thu, 23 Jul 2020 22:58:06 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BCYlw1T28z9sTK; Fri, 24 Jul 2020 12:57:48 +1000 (AEST)
+ id 4BCYlw2nzSz9sTT; Fri, 24 Jul 2020 12:57:48 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1595559468;
- bh=oUlu8u5TiukpYL5YY0i+HjSckV5d3NnHfXBN6cEFoNM=;
+ bh=/o46AHd29VbcsNq9WcZf6nE94CsdYc+R5nZVL/Rr/HI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=YAM+uwL/E+M/lqPo6JwEV3OirVdPwoH0YUjmphFtXRnwwwmqxPNOtpZXt6UKp+3y2
- kVvh0eEmXx8oPDzXuZjXDRfW1jIUhPJ/GeNmPPagmkoRSudKOBfc+1SUViCmyhbYOT
- k/e5svfcGURMKHpEqITtS1JU8RUB0oQRn4sjEifo=
+ b=pSuzO9oG4N0zQaZIvbeJU7FN70QP4ZKEEpvcOr/jb4KRvrGtL4GgERFkyKACeAnXN
+ C3V2s+HwQakiko3lp4TBXkrCi7CoBZhihn8CuBdR0/9T1ELAjFSeGV7tcu2j5wPuxC
+ 6hX7tzTwsR/GqgVUfC1xdRMGLpbwYxSnB6k/qEEE=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: dgilbert@redhat.com, frankja@linux.ibm.com, pair@us.ibm.com,
  qemu-devel@nongnu.org, pbonzini@redhat.com, brijesh.singh@amd.com
-Subject: [for-5.2 v4 08/10] spapr: PEF: block migration
-Date: Fri, 24 Jul 2020 12:57:42 +1000
-Message-Id: <20200724025744.69644-9-david@gibson.dropbear.id.au>
+Subject: [for-5.2 v4 10/10] s390: Recognize host-trust-limitation option
+Date: Fri, 24 Jul 2020 12:57:44 +1000
+Message-Id: <20200724025744.69644-11-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200724025744.69644-1-david@gibson.dropbear.id.au>
 References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 22:57:48
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -87,40 +87,117 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We haven't yet implemented the fairly involved handshaking that will be
-needed to migrate PEF protected guests.  For now, just use a migration
-blocker so we get a meaningful error if someone attempts this (this is the
-same approach used by AMD SEV).
+At least some s390 cpu models support "Protected Virtualization" (PV),
+a mechanism to protect guests from eavesdropping by a compromised
+hypervisor.
+
+This is similar in function to other mechanisms like AMD's SEV and
+POWER's PEF, which are controlled bythe "host-trust-limitation"
+machine option.  s390 is a slightly special case, because we already
+supported PV, simply by using a CPU model with the required feature
+(S390_FEAT_UNPACK).
+
+To integrate this with the option used by other platforms, we
+implement the following compromise:
+
+ - When the host-trust-limitation option is set, s390 will recognize
+   it, verify that the CPU can support PV (failing if not) and set
+   virtio default options necessary for encrypted or protected guests,
+   as on other platforms.  i.e. if host-trust-limitation is set, we
+   will either create a guest capable of entering PV mode, or fail
+   outright
+
+ - If host-trust-limitation is not set, guest's might still be able to
+   enter PV mode, if the CPU has the right model.  This may be a
+   little surprising, but shouldn't actually be harmful.
+
+To start a guest supporting Protected Virtualization using the new
+option use the command line arguments:
+    -object s390-pv-guest,id=pv0 -machine host-trust-limitation=pv0
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/pef.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/s390x/pv.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
-diff --git a/target/ppc/pef.c b/target/ppc/pef.c
-index 53a6af0347..6a50efd580 100644
---- a/target/ppc/pef.c
-+++ b/target/ppc/pef.c
-@@ -36,6 +36,8 @@ struct PefGuestState {
-     Object parent_obj;
- };
+diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
+index ab3a2482aa..4bf3b345b6 100644
+--- a/hw/s390x/pv.c
++++ b/hw/s390x/pv.c
+@@ -14,8 +14,11 @@
+ #include <linux/kvm.h>
  
-+static Error *pef_mig_blocker;
-+
- static int pef_kvm_init(HostTrustLimitation *gmpo, Error **errp)
- {
-     if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURE_GUEST)) {
-@@ -52,6 +54,10 @@ static int pef_kvm_init(HostTrustLimitation *gmpo, Error **errp)
-         }
-     }
+ #include "cpu.h"
++#include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/kvm.h"
++#include "qom/object_interfaces.h"
++#include "exec/host-trust-limitation.h"
+ #include "hw/s390x/ipl.h"
+ #include "hw/s390x/pv.h"
  
-+    /* add migration blocker */
-+    error_setg(&pef_mig_blocker, "PEF: Migration is not implemented");
-+    migrate_add_blocker(pef_mig_blocker, &error_abort);
-+
-     return 0;
+@@ -111,3 +114,61 @@ void s390_pv_inject_reset_error(CPUState *cs)
+     /* Report that we are unable to enter protected mode */
+     env->regs[r1 + 1] = DIAG_308_RC_INVAL_FOR_PV;
  }
- 
++
++#define TYPE_S390_PV_GUEST "s390-pv-guest"
++#define S390_PV_GUEST(obj)                              \
++    OBJECT_CHECK(S390PVGuestState, (obj), TYPE_S390_PV_GUEST)
++
++typedef struct S390PVGuestState S390PVGuestState;
++
++/**
++ * S390PVGuestState:
++ *
++ * The S390PVGuestState object is basically a dummy used to tell the
++ * host trust limitation system to use s390's PV mechanism.  guest.
++ *
++ * # $QEMU \
++ *         -object s390-pv-guest,id=pv0 \
++ *         -machine ...,host-trust-limitation=pv0
++ */
++struct S390PVGuestState {
++    Object parent_obj;
++};
++
++static int s390_pv_kvm_init(HostTrustLimitation *gmpo, Error **errp)
++{
++    if (!s390_has_feat(S390_FEAT_UNPACK)) {
++        error_setg(errp,
++                   "CPU model does not support Protected Virtualization");
++        return -1;
++    }
++
++    return 0;
++}
++
++static void s390_pv_guest_class_init(ObjectClass *oc, void *data)
++{
++    HostTrustLimitationClass *gmpc = HOST_TRUST_LIMITATION_CLASS(oc);
++
++    gmpc->kvm_init = s390_pv_kvm_init;
++}
++
++static const TypeInfo s390_pv_guest_info = {
++    .parent = TYPE_OBJECT,
++    .name = TYPE_S390_PV_GUEST,
++    .instance_size = sizeof(S390PVGuestState),
++    .class_init = s390_pv_guest_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_HOST_TRUST_LIMITATION },
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
++
++static void
++s390_pv_register_types(void)
++{
++    type_register_static(&s390_pv_guest_info);
++}
++
++type_init(s390_pv_register_types);
 -- 
 2.26.2
 
