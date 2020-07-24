@@ -2,81 +2,83 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4884C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F76EC433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:39:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E0E4206EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:39:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2C2A206EB
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:39:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cCnClEKP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E0E4206EB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YfD9sR6z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2C2A206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jz0jd-00023u-OF
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 12:39:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54552)
+	id 1jz0jg-00025x-7G
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 12:39:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jz0ip-0000Xx-O9
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 12:38:59 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43165)
+ id 1jz0iq-0000Y4-Mh
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 12:39:00 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41736)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jz0io-0001Tk-49
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 12:38:59 -0400
-Received: by mail-pf1-x444.google.com with SMTP id f185so540718pfg.10
- for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 09:38:57 -0700 (PDT)
+ id 1jz0io-0001Tr-Mb
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 12:39:00 -0400
+Received: by mail-pf1-x442.google.com with SMTP id w126so5298736pfw.8
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 09:38:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4aBcC4w6SG44oGtHtWrUXgQKLmEbrKr/r9+YPAa/F24=;
- b=cCnClEKPR9fZ4Li9UbGq+IDLzG+9xX6FDINP7P3REXRWGgV+gwnRXzvjpfOvW5QIgk
- us5fINJILKxkzf3ubyQzsJphHYrKwctUGg/IYv+oBIUdl8KTNdT6JaojIxjk+ls40f0k
- IPzpKo0fBjl1Xakyqpwy8cAYfEjtw9dStsimwbK2MLfE2rhHpQozaeKbrvJyXyomp399
- WBbvdL3WfUryb4S/1daElJAr1gagsuMUD8UEhRpLbPWk006zOZJsaU/N58j2mKYzzk9z
- inwlCnwPiYAADNoVMeYsgZVQX2OoMSmviy9KHPa6Uedh02bXlsGWBXZvI+xBgl05CmHU
- hyhg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=qt22xVqHd5YyzEckOxpQME7xz7JKzheB5mpy8sevhNw=;
+ b=YfD9sR6zM90w3eAwKCmYtoJ2CTjePq9q+W+oumniCQg5WpnrfhvHtuaI+vrgrPinAA
+ vSW/S0MSFN+OmWoZctNrZYWsA7r7AQJqNFQUsXEmMpJXLeX42GOswB8PJ8rpe0ktZBco
+ f1DlS92F/Rezig+Yzujqd8JgzgniRmzxhlbC4J3L0s2x812Xxe8A0TUmB72HcQDTF+Xu
+ 0BFzwPbcAeVHFTeozHEjDkHV6CgYm4Ffh5Xacnx+I74a5tYidMPRz9ip9NzxJFxpegvt
+ +vBGX62VnpZujoelGEJjuWfbXvKs+1VOLhrFHUgzHZWRIBsUvr/uQZwiX9qfme9KqQfN
+ DlFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4aBcC4w6SG44oGtHtWrUXgQKLmEbrKr/r9+YPAa/F24=;
- b=BWMs5MUHkbWgz4iC4ym4T4bLTblpPTPQnQ7RTBUgGTDIxXDgJV6wv4qIDtZ8u/6ty7
- j+7ftHHjevJwg821HNYkEGkxTDH3F0NsipTB9Ejh8IJaGA9Ldp+JbSUkWBcd1zocqn/D
- obcV4TuhK+0jELYEarP1Vi7mrAY1Z2R4yBZmxWgH7ywPvPxB85x+8T+Gj7UU1T/1DgA3
- rATPDsk9nFCFyUJesQBMmFQjSglecMtSKMj6vbLYpSNZHv2ud71sbsIKQdX4OBfPN4Pl
- Y+2fH4AupRJX/O3JiS4epX0K0Fg7D15igMs+Vm/PNL78akoT7TxnLBTyO12oLD6ai83J
- gdYg==
-X-Gm-Message-State: AOAM533T7wSx5XmaahODuUSO6L18TGs0DgFS354gyye5+9Cf495WuMWr
- oQazTMI1wxlV0UvOnVhUYd61SmK9CPs=
-X-Google-Smtp-Source: ABdhPJxkEr/kn7BYLokcZo+niVfluZ0JVNyJRVb5pnmKLa6Esy+VJFaPMoqQQmAgZJgZafXT1g1ggA==
-X-Received: by 2002:a63:f90f:: with SMTP id h15mr9110948pgi.53.1595608735674; 
- Fri, 24 Jul 2020 09:38:55 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=qt22xVqHd5YyzEckOxpQME7xz7JKzheB5mpy8sevhNw=;
+ b=jAPit87LyabW4aVl8pgCN+s6569q6UUlGB/aNv6A/maIdDTAHSLZ3oaFIGDv7DbkM3
+ pN1EzLr1Xl5zVQH1BuG/1CYXKE1JeGn7DwyD1/B9XfCG1JsTpzu0YX4lkhTOUoQZouMX
+ LQ0FJ5XYs8wTz+z2xb6p8O77euL08W+oA5zWy+VVEolxq2WQIVCvaQCvsYZ0hrvhoGoV
+ TfqhHEfLE42Js0/9ITvVrVl4tlTsLXuy+eR+RtPPKQI31w4Qs1K5b9KbqgtaKo55UptC
+ gbLHkl7+rVBxN1z7dtvlXN9KDqYwfK8y9PUe+rLv1xezWOS1CQlxfarEIDbZfbCC6cuL
+ uLvA==
+X-Gm-Message-State: AOAM531eanJLl3HTnT53OMKjFD5tEWecJE8UHQizHStxiQyxH8AeV1aK
+ G84LF+fPJIWeJLVwEuqjxkWC4dACwkM=
+X-Google-Smtp-Source: ABdhPJwZEFTrVatJOlWPu/ixbHba6f+ynd+00XfigfZA82wcEX6fKcsrvZRrACkpgfMm58csksk3uA==
+X-Received: by 2002:a63:eb52:: with SMTP id b18mr9022226pgk.434.1595608737060; 
+ Fri, 24 Jul 2020 09:38:57 -0700 (PDT)
 Received: from localhost.localdomain (216-160-65-90.tukw.qwest.net.
  [216.160.65.90])
- by smtp.gmail.com with ESMTPSA id r191sm7261663pfr.181.2020.07.24.09.38.54
+ by smtp.gmail.com with ESMTPSA id r191sm7261663pfr.181.2020.07.24.09.38.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 24 Jul 2020 09:38:55 -0700 (PDT)
+ Fri, 24 Jul 2020 09:38:56 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH for-5.1 0/3] target/arm: mte+pauth fixes
-Date: Fri, 24 Jul 2020 09:38:50 -0700
-Message-Id: <20200724163853.504655-1-richard.henderson@linaro.org>
+Subject: [PATCH 1/3] hw/arm/boot: Fix PAUTH for EL3 direct kernel boot
+Date: Fri, 24 Jul 2020 09:38:51 -0700
+Message-Id: <20200724163853.504655-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200724163853.504655-1-richard.henderson@linaro.org>
+References: <20200724163853.504655-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,34 +105,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A couple of last minute fixes for MTE:
+When booting an EL3 cpu with -kernel, we set up EL3 and then
+drop down to EL2.  We need to enable access to v8.3-PAuth
+keys and instructions at EL3 before doing so.
 
- (1) Peter pointed out that EL3's SCR.ATA needs to be set when
-     we're booting a kernel directly.  Similarly for API & APK.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ hw/arm/boot.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
- (2) Vincenzo pointed out that with RRND=1, we can't rely on
-     RGSR having being initialized.
-
-     I suppose the only follow-on question here is whether it is
-     better to minimize the number of calls to qemu_guest_getrandom,
-     or instead to name that our IMPDEF algorithm and use it for
-     every call to IRG.  We already have other user-space available
-     RNG instructions that can drain the entropy pool, so this is
-     not really different.
-
-
-r~
-
-
-Richard Henderson (3):
-  hw/arm/boot: Fix PAUTH for EL3 direct kernel boot
-  hw/arm/boot: Fix MTE for EL3 direct kernel boot
-  target/arm: Improve IMPDEF algorithm for IRG
-
- hw/arm/boot.c           |  6 ++++++
- target/arm/mte_helper.c | 37 ++++++++++++++++++++++++++++++-------
- 2 files changed, 36 insertions(+), 7 deletions(-)
-
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index fef4072db1..c44fd3382d 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -736,6 +736,9 @@ static void do_cpu_reset(void *opaque)
+                     } else {
+                         env->pstate = PSTATE_MODE_EL1h;
+                     }
++                    if (cpu_isar_feature(aa64_pauth, cpu)) {
++                        env->cp15.scr_el3 |= SCR_API | SCR_APK;
++                    }
+                     /* AArch64 kernels never boot in secure mode */
+                     assert(!info->secure_boot);
+                     /* This hook is only supported for AArch32 currently:
 -- 
 2.25.1
 
