@@ -2,82 +2,70 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A4DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 17:02:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4BA3C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 17:21:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 868D12067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 17:02:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1C8920674
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 17:21:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="JHgq/5Kn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 868D12067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="DVrxJI2s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C8920674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jz15B-0001D2-QJ
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 13:02:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60800)
+	id 1jz1OK-0002LD-0t
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 13:21:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jz13M-0007vs-Dr
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 13:00:12 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:48224 helo=mta-01.yadro.com)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jz1Nl-0001sZ-7L
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 13:21:17 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:56353)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1jz13J-0005Dr-TR
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 13:00:11 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id C22CB4C8B7;
- Fri, 24 Jul 2020 17:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- in-reply-to:content-transfer-encoding:content-disposition
- :content-type:content-type:mime-version:references:message-id
- :subject:subject:from:from:date:date:received:received:received;
- s=mta-01; t=1595610003; x=1597424404; bh=loLDjDc7xyR0xsn1AXmD2h
- v8VAo/Q+F3n/iRMw33/2E=; b=JHgq/5Kn9unAloxzOfPEJLXwB7WQIf3VNArJ9K
- uKkWGOcyoqorByTTggHakVSYP4YNKKxZnRds7jVGLYleqQ/WVXS0MCa832489Yzo
- 7t8RnvfHiB2hRGYTNxYwB1Hf9gNxUu6uMINTFswVn59qZep37xuHbluHOoErO1/W
- dY1c8=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9l-pIoO2RPIU; Fri, 24 Jul 2020 20:00:03 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id D7C354C8A9;
- Fri, 24 Jul 2020 20:00:02 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Fri, 24
- Jul 2020 20:00:02 +0300
-Date: Fri, 24 Jul 2020 20:00:02 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v2 3/4] build: Don't make object files for dtrace on macOS
-Message-ID: <20200724170002.GA34804@SPB-NB-133.local>
-References: <20200717093517.73397-1-r.bolshakov@yadro.com>
- <20200717093517.73397-4-r.bolshakov@yadro.com>
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1jz1Nj-0008TR-Ae
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 13:21:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=Lv0H4ZUlhiuw6jtXbl0KytiCkF9kntugzLamritpvAU=; b=DVrxJI2shqFxPci58ivEXH8fQ9
+ gca2KZ5nj5hEgIw3nPGdAfbqLuWZCJbAsidkrXnf+nn2fGHEAw2ZHtZzrPBhuA1VUuJsvjCsgIEgQ
+ fKgtBuaCLs8tCciudqqnJDoYnFz3HXddZD1lia700YdMsXS7tjdZVX5aHPgo5TPgD0rYAGTUmR3xY
+ ynHabN+3pGi+ArHNlUTrO6mkT9Om+8ArBMRpRGoZgw9PXueVjq2y2JZvL2VIN5/61GH/Cp1yFaHao
+ KAmv7j8W8M9k/8uxBB1gwXLH0ZzgLsdyG6hjofnq0zmSnHYpiLyHCKq8N/t1SwWg58qWV9qwUuU/s
+ Okd3jpDQ==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Richard Henderson <rth@twiddle.net>
+Subject: Re: [PATCH 2/3] cirrus.yml: Compile macOS and FreeBSD with -Werror
+Date: Fri, 24 Jul 2020 19:21:11 +0200
+Message-ID: <13876222.7aOH5gNrAa@silver>
+In-Reply-To: <CAFEAcA9C9V_sJT15jkny+zDzZgGDpuQSkuU6XjEDp1i7J0r8CA@mail.gmail.com>
+References: <20200724143220.32751-1-thuth@redhat.com>
+ <506e2579-410e-8553-6cbf-508793bb35a0@redhat.com>
+ <CAFEAcA9C9V_sJT15jkny+zDzZgGDpuQSkuU6XjEDp1i7J0r8CA@mail.gmail.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200717093517.73397-4-r.bolshakov@yadro.com>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 13:00:05
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 13:21:13
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -97,53 +85,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Cameron Esfahani <dirty@apple.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 17, 2020 at 12:35:16PM +0300, Roman Bolshakov wrote:
-> dtrace on macOS uses unresolved symbols with a special prefix to define
-> probes [1], only headers should be generated for USDT (dtrace(1)). But
-> it doesn't support backwards compatible no-op -G flag [2] and implicit
-> build rules fail.
-> 
-> 1. https://markmail.org/message/6grq2ygr5nwdwsnb
-> 2. https://markmail.org/message/5xrxt2w5m42nojkz
-> 
-> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-> Cc: Cameron Esfahani <dirty@apple.com>
-> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> ---
->  Makefile.objs | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/Makefile.objs b/Makefile.objs
-> index d22b3b45d7..982f15ba30 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -211,5 +211,7 @@ trace-events-files = $(SRC_PATH)/trace-events $(trace-events-subdirs:%=$(SRC_PAT
->  trace-obj-y = trace-root.o
->  trace-obj-y += $(trace-events-subdirs:%=%/trace.o)
->  trace-obj-$(CONFIG_TRACE_UST) += trace-ust-all.o
-> +ifneq ($(CONFIG_DARWIN),y)
->  trace-obj-$(CONFIG_TRACE_DTRACE) += trace-dtrace-root.o
->  trace-obj-$(CONFIG_TRACE_DTRACE) += $(trace-events-subdirs:%=%/trace-dtrace.o)
-> +endif
-> -- 
-> 2.26.1
-> 
+On Freitag, 24. Juli 2020 18:50:47 CEST Peter Maydell wrote:
+> On Fri, 24 Jul 2020 at 17:46, Philippe Mathieu-Daud=E9 <philmd@redhat.com=
+> wrote:
+> > I guess we were expecting the distrib to update the pkg.
+>=20
+> Apple's view is that you shouldn't be using the sasl header
+> at all but instead their proprietary crypto library APIs, so
+> I wouldn't expect them to ever ship something without the
+> deprecation warnings.
 
-An article about DTrace [1] mentions that FreeBSD also doesn't need that:
-"On FreeBSD/Mac OS X, you do not have to generate a separate probe
-object file for linking. This makes the compilation process much more
-straightforward [...]"
+AFAIK Apple's reason for this is similar to no longer providing headers for
+OpenSSL [1] (or now actually BoringSSL): they cannot guarantee binary
+compatibility of these libs beyond individual macOS releases (i.e. without
+breaking old clients) and bad things happened [2] in the past for apps which
+expected it would.
 
-I don't know for sure but perhaps "-G" makes dummy object files there.
+[1] https://lists.apple.com/archives/macnetworkprog/2015/Jun/msg00025.html
+[2] https://lists.andrew.cmu.edu/pipermail/cyrus-sasl/2007-November/001254.=
+html
 
-1. https://www.ibm.com/developerworks/aix/library/au-dtraceprobes.html
+The common recommendation is: "Ship your macOS app bundled with the preferr=
+ed
+version of these libs."
 
-Thanks,
-Roman
+Best regards,
+Christian Schoenebeck
+
+
 
