@@ -2,74 +2,90 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96043C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 15:03:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 299ACC433E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 15:04:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F80D206D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 15:03:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6103206D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 15:04:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="CBw77/Hj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F80D206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LMNzEIfE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6103206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyzEP-0000Vv-K6
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 11:03:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58392)
+	id 1jyzFd-00027r-90
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 11:04:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jyzDA-0007q2-Eo
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 11:02:12 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:37571)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1jyzD7-0001BD-R9
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 11:02:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:MIME-Version:References:In-Reply-To:
- Message-ID:Date:Subject:Cc:To:From:Content-Transfer-Encoding:Content-ID:
- Content-Description; bh=31cmAYKdATjWXDDPPjryBJpz/tKY8AQ1GEVtTsWtv5g=; b=CBw77
- /HjDb5/mNA16LLRmOtuQvAN+QSIil+b3QamRFyma0KrzsWuafTPR+k5Oe8qPpMDpdea5/CUVgfUD+
- u/zWZ0EKSTxHgW8/8zxOMhhT3ph4LiOku66dbiXB44q8fGwLn1YSRp/DtpI0k/ukDu6rkz/lLoDRR
- bX5fSbiXjJKGsieAYNOhvUa6QcPgZMHwXx6Ips+cGTRBXs8i6TsYF6vvHPkB2dmH3x7AmW5jLV9Jd
- uk4z73ItbOak2d1FE1PzjpVYVPI517bvIHQIwl/LfVMnu++Dtfy1Dal6ytmuyPKA92MQ2dGWn8im+
- 09ymiYmPjz2DyRsxfIEziR5BgbfyA==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>,
- Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>, Ed Maste <emaste@freebsd.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
- Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH 1/3] configure: Fix atomic64 test for --enable-werror on
- macOS
-Date: Fri, 24 Jul 2020 17:01:59 +0200
-Message-ID: <6594742.2WtYCQuXUD@silver>
-In-Reply-To: <20200724143220.32751-2-thuth@redhat.com>
-References: <20200724143220.32751-1-thuth@redhat.com>
- <20200724143220.32751-2-thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jyzEC-0000ik-A0
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 11:03:16 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44006
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jyzEA-0001P0-4b
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 11:03:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595602992;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=K2JN3K9NIdX56yYoTvuGSPfdONjuhK5zqZ5OOhBxcfc=;
+ b=LMNzEIfEJvCpu2d2eo+CrPrujYBQiL0gzoQQ6Ksffw73xGxK3+bkJvtd8Ua9GOaNQSc8wL
+ Qr0L/SeK4nSj3G4O/vW8MdMWQF+IvTC8SZcdrzyTKbhHh5NC8Vl/Hv5aCNv0U9p8Ztggpc
+ qa32MTs5XbWBi1uxWXvg9H5K2sozY0Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-177-TRC24ixxMEqwFI-X6faGmg-1; Fri, 24 Jul 2020 11:03:07 -0400
+X-MC-Unique: TRC24ixxMEqwFI-X6faGmg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D3E8100AA2B;
+ Fri, 24 Jul 2020 15:03:06 +0000 (UTC)
+Received: from [10.3.112.130] (ovpn-112-130.phx2.redhat.com [10.3.112.130])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5CEC669326;
+ Fri, 24 Jul 2020 15:03:02 +0000 (UTC)
+Subject: Re: [PATCH v3 01/21] qemu-iotests/199: fix style
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200724084327.15665-1-vsementsov@virtuozzo.com>
+ <20200724084327.15665-2-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <cf7ae161-7fef-b59c-f290-6196e770b26d@redhat.com>
+Date: Fri, 24 Jul 2020 10:03:01 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart4421294.T87a3rL90d";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 11:02:06
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200724084327.15665-2-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:00:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,98 +98,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, fam@euphon.net, quintela@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com,
+ andrey.shinkevich@virtuozzo.com, den@openvz.org, mreitz@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---nextPart4421294.T87a3rL90d
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+On 7/24/20 3:43 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Mostly, satisfy pep8 complains.
 
-On Freitag, 24. Juli 2020 16:32:18 CEST Thomas Huth wrote:
-> When using --enable-werror for the macOS builders in the Cirrus-CI,
-> the atomic64 test is currently failing, and config.log shows a bunch
-> of error messages like this:
+complaints
+
+I can touch that up while staging.
+
 > 
->  config-temp/qemu-conf.c:6:7: error: implicit declaration of function
->  '__atomic_load_8' is invalid in C99
-> [-Werror,-Wimplicit-function-declaration] y = __atomic_load_8(&x, 0);
->       ^
->  config-temp/qemu-conf.c:6:7: error: this function declaration is not a
->  prototype [-Werror,-Wstrict-prototypes]
-> 
-> Seems like these __atomic_*_8 functions are available in one of the
-> libraries there, so that the test links and passes there when not
-> using --enable-werror. But there does not seem to be a valid prototype
-> for them in any of the header files, so that the test fails when using
-> --enable-werror.
-> 
-> Fix it by using the "official" built-in functions instead (see e.g.
-> https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html).
-> We are not using the *_8 variants in QEMU anyway.
-> 
-> Suggested-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Tested-by: Eric Blake <eblake@redhat.com>
 > ---
->  configure | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+>   tests/qemu-iotests/199 | 13 +++++++------
+>   1 file changed, 7 insertions(+), 6 deletions(-)
 > 
-> diff --git a/configure b/configure
-> index 4bd80ed507..9eaf501f50 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5919,11 +5919,11 @@ int main(void)
->  {
->    uint64_t x = 0, y = 0;
->  #ifdef __ATOMIC_RELAXED
-> -  y = __atomic_load_8(&x, 0);
-> -  __atomic_store_8(&x, y, 0);
-> -  __atomic_compare_exchange_8(&x, &y, x, 0, 0, 0);
-> -  __atomic_exchange_8(&x, y, 0);
-> -  __atomic_fetch_add_8(&x, y, 0);
-> +  y = __atomic_load_n(&x, __ATOMIC_RELAXED);
-> +  __atomic_store_n(&x, y, __ATOMIC_RELAXED);
-> +  __atomic_compare_exchange_n(&x, &y, x, 0, __ATOMIC_RELAXED,
-> __ATOMIC_RELAXED); +  __atomic_exchange_n(&x, y, __ATOMIC_RELAXED);
-
-Ah right, there is also the __atomic_*_n() variant of these functions. I 
-actually had the more generic variants in mind.
-
-But LGTM and yes, it resolves the warnings on macOS, so ...
-
-Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-
-> +  __atomic_fetch_add(&x, y, __ATOMIC_RELAXED);
->  #else
->    typedef char is_host64[sizeof(void *) >= sizeof(uint64_t) ? 1 : -1];
->    __sync_lock_test_and_set(&x, y);
-
-Best regards,
-Christian Schoenebeck
---nextPart4421294.T87a3rL90d
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEltjREM96+AhPiFkBNMK1h2Wkc5UFAl8a9+cACgkQNMK1h2Wk
-c5UsaRAAtJDL7c3Vh31o82+JzNvRH9KcsM4MyPgfZA/jhFdbDtbfuo+cHz9p3UVE
-88F9GINO+EbHGQJMzHLGRh6twKJkTQpCjoekyLIrOdoW2mAxsT/lhhKaKFPQ/cUl
-HUwIp1SQGqgVzq23Pm80DbIpSptbxdUHIeAY8Q8hYzwNBdrfVJhiFnHpd9lUu9JW
-vJwfzQGDJNMqxzQS3p6n1EkrNMSyIDwJNb0Dl8/k1+08+qVniUYX+OobxtrDg4Q9
-1NUH7t+RWwysxhYUQpwF5UPz5yvwGN1FMNhjXNG43gfL0s8yy0RPCad9/dwi62fV
-0N7oJ73UKxPUXbhfx00b2Tb91VWs2RV0tGep051faYIiCZqwTwaVnngv2zH4iMIW
-l3d63lTFkcCi9lXZo+KKxLG5ew3nqalt+FFoKzJixcP7NVrLWRXSEL+fW3M+gELY
-G6cGsqBysS730FWwmHrYm1hXjlBDBGLiEKh81wJN0P9CfspBps7QKbgDi0XvmECS
-agmQcaoTtNmghj1AMmQ4baFWHErROZFjCAprSwuqbm2knmDTbXYuYPWqX/NjvDXX
-Mxu4zXGiS3fWwbtqXqlQKqe28mlP0l7zMYPlUyrkeKVs+neMM0MCFWWqkrhdJZdV
-7G8vnqE1YrbW/EwkzYkOti8MlOhy3VspClEr3Dy1qbmZrT5Bv6g=
-=AFDc
------END PGP SIGNATURE-----
-
---nextPart4421294.T87a3rL90d--
 
 
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
