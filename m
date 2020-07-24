@@ -2,95 +2,68 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF658C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 05:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F2AC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 05:10:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DFCB206D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 05:00:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DFCB206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4881206F6
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 05:10:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mGwSKQMv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4881206F6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyppA-0008LQ-Re
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 01:00:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47866)
+	id 1jypyo-0006jN-WB
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 01:10:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jypnO-0006GQ-Sq; Fri, 24 Jul 2020 00:58:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8808)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jypy8-0006De-R6; Fri, 24 Jul 2020 01:10:05 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:39915)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jypnM-0004fS-Ji; Fri, 24 Jul 2020 00:58:58 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06O4rb0B155273; Fri, 24 Jul 2020 00:58:51 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32facep8eb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 24 Jul 2020 00:58:51 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06O4tUP2032189;
- Fri, 24 Jul 2020 04:58:50 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma04wdc.us.ibm.com with ESMTP id 32brq9su13-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 24 Jul 2020 04:58:50 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06O4wn5v37487012
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Jul 2020 04:58:49 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CDF6228059;
- Fri, 24 Jul 2020 04:58:49 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4C12228058;
- Fri, 24 Jul 2020 04:58:49 +0000 (GMT)
-Received: from pompom.ibm.com (unknown [9.160.100.101])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Fri, 24 Jul 2020 04:58:49 +0000 (GMT)
-From: Lijun Pan <ljp@linux.ibm.com>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org, 
- david@gibson.dropbear.id.au
-Subject: [PATCH v5 6/6] target/ppc: add vmsumudm vmsumcud instructions
-Date: Thu, 23 Jul 2020 23:58:45 -0500
-Message-Id: <20200724045845.89976-7-ljp@linux.ibm.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20200724045845.89976-1-ljp@linux.ibm.com>
-References: <20200724045845.89976-1-ljp@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jypy6-0005xL-58; Fri, 24 Jul 2020 01:10:04 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BCchM0pTPz9sSn; Fri, 24 Jul 2020 15:09:55 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1595567395;
+ bh=krR4IXYLuHabOUY3BMiLq7i+ulR4X0AT75KotwhH2HQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=mGwSKQMvrQYofLmspNmi480TSJ1kCHG0TOcPgAmkLHjmT3aEegk7i5SklBC0CLQaF
+ Fle8vEmaeAydo1ItdklSSqfiQOWpOIUxJmTm+Ky66gc5c2Mbuj0VDOLTVyfjl5bA/J
+ 6Y3HT2oocEpUjkz0mRk+8Hwp9cFA/cE8h0QrHlhc=
+Date: Fri, 24 Jul 2020 14:56:13 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+Subject: Re: [PATCH 2/2] ppc: Enable 2nd DAWR support on p10
+Message-ID: <20200724045613.GA8983@umbus.fritz.box>
+References: <20200723104220.314671-1-ravi.bangoria@linux.ibm.com>
+ <20200723104220.314671-3-ravi.bangoria@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-23_20:2020-07-23,
- 2020-07-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=617 spamscore=0
- priorityscore=1501 bulkscore=0 lowpriorityscore=0 impostorscore=0
- phishscore=0 malwarescore=0 suspectscore=2 adultscore=0 clxscore=1015
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007240032
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=ljp@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:58:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="GvXjxJ+pjyke8COw"
+Content-Disposition: inline
+In-Reply-To: <20200723104220.314671-3-ravi.bangoria@linux.ibm.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,213 +76,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lijun Pan <ljp@linux.ibm.com>
+Cc: christophe.leroy@c-s.fr, qemu-ppc@nongnu.org, mikey@neuling.org,
+ rogealve@br.ibm.com, kvm@vger.kernel.org, mst@redhat.com, mpe@ellerman.id.au,
+ cohuck@redhat.com, qemu-devel@nongnu.org, npiggin@gmail.com, paulus@samba.org,
+ clg@kaod.org, jniethe5@gmail.com, pedromfc@br.ibm.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vmsumudm (Power ISA 3.0) - Vector Multiply-Sum Unsigned Doubleword Modulo
-VA-form.
-vmsumcud (Power ISA 3.1) - Vector Multiply-Sum & write Carry-out Unsigned
-Doubleword VA-form.
 
-Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
----
-v5: update instruction flag for vmsumcud.
-    integrate into this isa3.1 patch series
-v3: implement vmsumudm/vmsumcud through int128 functions,
-    suggested by Richard Henderson.
+--GvXjxJ+pjyke8COw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- disas/ppc.c                         |  2 ++
- target/ppc/helper.h                 |  4 ++-
- target/ppc/int_helper.c             | 49 ++++++++++++++++++++++++++++-
- target/ppc/translate.c              |  1 -
- target/ppc/translate/vmx-impl.inc.c | 39 ++++++++++++-----------
- target/ppc/translate/vmx-ops.inc.c  |  2 ++
- 6 files changed, 76 insertions(+), 21 deletions(-)
+On Thu, Jul 23, 2020 at 04:12:20PM +0530, Ravi Bangoria wrote:
+> As per the PAPR, bit 0 of byte 64 in pa-features property indicates
+> availability of 2nd DAWR registers. i.e. If this bit is set, 2nd
+> DAWR is present, otherwise not. Use KVM_CAP_PPC_DAWR1 capability to
+> find whether kvm supports 2nd DAWR or nor. If it's supported, set
+> the pa-feature bit in guest DT so the guest kernel can support 2nd
+> DAWR.
+>=20
+> Signed-off-by: Ravi Bangoria <ravi.bangoria@linux.ibm.com>
+> ---
+>  hw/ppc/spapr.c                  | 33 +++++++++++++++++++++++++++++++++
+>  include/hw/ppc/spapr.h          |  1 +
+>  linux-headers/asm-powerpc/kvm.h |  4 ++++
+>  linux-headers/linux/kvm.h       |  1 +
+>  target/ppc/cpu.h                |  2 ++
+>  target/ppc/kvm.c                |  7 +++++++
+>  target/ppc/kvm_ppc.h            |  6 ++++++
+>  target/ppc/translate_init.inc.c | 17 ++++++++++++++++-
+>  8 files changed, 70 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 0ae293ec94..4416319363 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -252,6 +252,31 @@ static void spapr_dt_pa_features(SpaprMachineState *=
+spapr,
+>          /* 60: NM atomic, 62: RNG */
+>          0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 60 - 65 */
+>      };
+> +    uint8_t pa_features_310[] =3D { 66, 0,
+> +        /* 0: MMU|FPU|SLB|RUN|DABR|NX, 1: fri[nzpm]|DABRX|SPRG3|SLB0|PP1=
+10 */
+> +        /* 2: VPM|DS205|PPR|DS202|DS206, 3: LSD|URG, SSO, 5: LE|CFAR|EB|=
+LSQ */
+> +        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0, /* 0 - 5 */
+> +        /* 6: DS207 */
+> +        0x80, 0x00, 0x00, 0x00, 0x00, 0x00, /* 6 - 11 */
+> +        /* 16: Vector */
+> +        0x00, 0x00, 0x00, 0x00, 0x80, 0x00, /* 12 - 17 */
+> +        /* 18: Vec. Scalar, 20: Vec. XOR, 22: HTM */
+> +        0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 18 - 23 */
+> +        /* 24: Ext. Dec, 26: 64 bit ftrs, 28: PM ftrs */
+> +        0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 24 - 29 */
+> +        /* 30: MMR, 32: LE atomic, 34: EBB + ext EBB */
+> +        0x80, 0x00, 0x80, 0x00, 0xC0, 0x00, /* 30 - 35 */
+> +        /* 36: SPR SO, 38: Copy/Paste, 40: Radix MMU */
+> +        0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 36 - 41 */
+> +        /* 42: PM, 44: PC RA, 46: SC vec'd */
+> +        0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 42 - 47 */
+> +        /* 48: SIMD, 50: QP BFP, 52: String */
+> +        0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 48 - 53 */
+> +        /* 54: DecFP, 56: DecI, 58: SHA */
+> +        0x80, 0x00, 0x80, 0x00, 0x80, 0x00, /* 54 - 59 */
+> +        /* 60: NM atomic, 62: RNG, 64: DAWR1 */
+> +        0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 60 - 65 */
+> +    };
+>      uint8_t *pa_features =3D NULL;
+>      size_t pa_size;
+> =20
+> @@ -267,6 +292,10 @@ static void spapr_dt_pa_features(SpaprMachineState *=
+spapr,
+>          pa_features =3D pa_features_300;
+>          pa_size =3D sizeof(pa_features_300);
+>      }
+> +    if (ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_10, 0, cpu->compat_p=
+vr)) {
+> +        pa_features =3D pa_features_310;
+> +        pa_size =3D sizeof(pa_features_310);
+> +    }
+>      if (!pa_features) {
+>          return;
+>      }
+> @@ -291,6 +320,10 @@ static void spapr_dt_pa_features(SpaprMachineState *=
+spapr,
+>          pa_features[40 + 2] &=3D ~0x80; /* Radix MMU */
+>      }
+> =20
+> +    if (kvm_enabled() && kvmppc_has_cap_dawr1()) {
+> +        pa_features[66] |=3D 0x80;
+> +    }
 
-diff --git a/disas/ppc.c b/disas/ppc.c
-index 63e97cfe1d..bd76fae4c4 100644
---- a/disas/ppc.c
-+++ b/disas/ppc.c
-@@ -2261,7 +2261,9 @@ const struct powerpc_opcode powerpc_opcodes[] = {
- { "vmsumshs",  VXA(4,  41), VXA_MASK,	PPCVEC,		{ VD, VA, VB, VC } },
- { "vmsumubm",  VXA(4,  36), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
- { "vmsumuhm",  VXA(4,  38), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
-+{ "vmsumudm",  VXA(4,  35), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC } },
- { "vmsumuhs",  VXA(4,  39), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
-+{ "vmsumcud",  VXA(4,  23), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC } },
- { "vmulesb",   VX(4,  776), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
- { "vmulesh",   VX(4,  840), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
- { "vmuleub",   VX(4,  520), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 70a14029ca..00a31d64bc 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -274,10 +274,12 @@ DEF_HELPER_3(vpkpx, void, avr, avr, avr)
- DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)
-+DEF_HELPER_5(vmsumudm, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmsumuhs, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmsumshm, void, env, avr, avr, avr, avr)
- DEF_HELPER_5(vmsumshs, void, env, avr, avr, avr, avr)
--DEF_HELPER_4(vmladduhm, void, avr, avr, avr, avr)
-+DEF_HELPER_5(vmsumcud, void, env, avr, avr, avr, avr)
-+DEF_HELPER_5(vmladduhm, void, env, avr, avr, avr, avr)
- DEF_HELPER_FLAGS_2(mtvscr, TCG_CALL_NO_RWG, void, env, i32)
- DEF_HELPER_FLAGS_1(mfvscr, TCG_CALL_NO_RWG, i32, env)
- DEF_HELPER_3(lvebx, void, env, avr, tl)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 62b93b4568..2e919a7b8e 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -913,7 +913,8 @@ void helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
-     }
- }
- 
--void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-+void helper_vmladduhm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
-+                      ppc_avr_t *b, ppc_avr_t *c)
- {
-     int i;
- 
-@@ -1051,6 +1052,52 @@ void helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
-     }
- }
- 
-+void helper_vmsumudm(CPUPPCState *env, ppc_avr_t *r,
-+                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-+{
-+    Int128 sum;
-+    uint64_t lo, hi;
-+
-+    sum = int128_make128(c->VsrD(1), c->VsrD(0));
-+
-+    mulu64(&lo, &hi, a->VsrD(0), b->VsrD(0));
-+    sum = int128_add(sum, int128_make128(lo, hi));
-+
-+    mulu64(&lo, &hi, a->VsrD(1), b->VsrD(1));
-+    sum = int128_add(sum, int128_make128(lo, hi));
-+
-+    r->VsrD(0) = int128_gethi(sum);
-+    r->VsrD(1) = int128_getlo(sum);
-+}
-+
-+void helper_vmsumcud(CPUPPCState *env, ppc_avr_t *r,
-+                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
-+{
-+    Int128 sum;
-+    uint64_t p1lo, p1hi, p2lo, p2hi;
-+
-+    mulu64(&p1lo, &p1hi, a->VsrD(0), b->VsrD(0));
-+    mulu64(&p2lo, &p2hi, a->VsrD(1), b->VsrD(1));
-+
-+    /* Sum lowest 64-bit elements.  */
-+    sum = int128_make128(c->VsrD(1), 0);
-+    sum = int128_add(sum, int128_make128(p1lo, 0));
-+    sum = int128_add(sum, int128_make128(p2lo, 0));
-+
-+    /*
-+     * Discard low 64-bits, leaving the carry into bit 64.
-+     * Then sum the higher 64-bit elements.
-+     */
-+    sum = int128_rshift(sum, 64);
-+    sum = int128_add(sum, int128_make128(c->VsrD(0), 0));
-+    sum = int128_add(sum, int128_make128(p1hi, 0));
-+    sum = int128_add(sum, int128_make128(p2hi, 0));
-+
-+    /* The result is only the carry into bits 64 & 65. */
-+    r->VsrD(1) = int128_gethi(sum);
-+    r->VsrD(0) = 0;
-+}
-+
- #define VMUL_DO_EVN(name, mul_element, mul_access, prod_access, cast)   \
-     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
-     {                                                                   \
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 55f0e1a01d..b33b2d87a4 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7324,7 +7324,6 @@ GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
- GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
- GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
- GEN_HANDLER(mtvscr, 0x04, 0x2, 0x19, 0x03ff0000, PPC_ALTIVEC),
--GEN_HANDLER(vmladduhm, 0x04, 0x11, 0xFF, 0x00000000, PPC_ALTIVEC),
- #if defined(TARGET_PPC64)
- GEN_HANDLER_E(maddhd_maddhdu, 0x04, 0x18, 0xFF, 0x00000000, PPC_NONE,
-               PPC2_ISA300),
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index ac5e820541..5b85b6ea06 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -1272,6 +1272,25 @@ static void gen_vsldoi(DisasContext *ctx)
-     tcg_temp_free_i32(sh);
- }
- 
-+#define GEN_VAFORM(name, opc2)                                          \
-+static void glue(gen_, name)(DisasContext *ctx)                         \
-+{                                                                       \
-+    TCGv_ptr ra, rb, rc, rd;                                            \
-+    if (unlikely(!ctx->altivec_enabled)) {                              \
-+        gen_exception(ctx, POWERPC_EXCP_VPU);                           \
-+        return;                                                         \
-+    }                                                                   \
-+    ra = gen_avr_ptr(rA(ctx->opcode));                                  \
-+    rb = gen_avr_ptr(rB(ctx->opcode));                                  \
-+    rc = gen_avr_ptr(rC(ctx->opcode));                                  \
-+    rd = gen_avr_ptr(rD(ctx->opcode));                                  \
-+    gen_helper_##name(cpu_env, rd, ra, rb, rc);                         \
-+    tcg_temp_free_ptr(ra);                                              \
-+    tcg_temp_free_ptr(rb);                                              \
-+    tcg_temp_free_ptr(rc);                                              \
-+    tcg_temp_free_ptr(rd);                                              \
-+}
-+
- #define GEN_VAFORM_PAIRED(name0, name1, opc2)                           \
- static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
-     {                                                                   \
-@@ -1296,24 +1315,8 @@ static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
-     }
- 
- GEN_VAFORM_PAIRED(vmhaddshs, vmhraddshs, 16)
--
--static void gen_vmladduhm(DisasContext *ctx)
--{
--    TCGv_ptr ra, rb, rc, rd;
--    if (unlikely(!ctx->altivec_enabled)) {
--        gen_exception(ctx, POWERPC_EXCP_VPU);
--        return;
--    }
--    ra = gen_avr_ptr(rA(ctx->opcode));
--    rb = gen_avr_ptr(rB(ctx->opcode));
--    rc = gen_avr_ptr(rC(ctx->opcode));
--    rd = gen_avr_ptr(rD(ctx->opcode));
--    gen_helper_vmladduhm(rd, ra, rb, rc);
--    tcg_temp_free_ptr(ra);
--    tcg_temp_free_ptr(rb);
--    tcg_temp_free_ptr(rc);
--    tcg_temp_free_ptr(rd);
--}
-+GEN_VAFORM(vmsumcud, 11)
-+GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17)
- 
- static void gen_vpermr(DisasContext *ctx)
- {
-diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
-index 528458cb25..fd689a5086 100644
---- a/target/ppc/translate/vmx-ops.inc.c
-+++ b/target/ppc/translate/vmx-ops.inc.c
-@@ -295,6 +295,8 @@ GEN_VAFORM_PAIRED(vmsumuhm, vmsumuhs, 19),
- GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20),
- GEN_VAFORM_PAIRED(vsel, vperm, 21),
- GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23),
-+GEN_HANDLER(vmsumcud, 0x4, 11, 0xFF, 0x00000000, PPC2_ISA310),
-+GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17),
- 
- GEN_VXFORM_DUAL(vclzb, vpopcntb, 1, 28, PPC_NONE, PPC2_ALTIVEC_207),
- GEN_VXFORM_DUAL(vclzh, vpopcnth, 1, 29, PPC_NONE, PPC2_ALTIVEC_207),
--- 
-2.23.0
+Nack.  The guest visible platform must not depend on host capabilities
+because it makes a complete mess of migration.  The machine type and
+properties of other devices need to define what the guest environment
+will be, then qemu can either provide it, or fail outright if KVM
+doesn't have the neccessary support.
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--GvXjxJ+pjyke8COw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8aaesACgkQbDjKyiDZ
+s5KFuBAAgA/6qyCnJFK/OeujSjvdernralmgH+KVxxVPiNmFIBPePIDqIulT961C
+dO1mb3MmMhiPgJRqW40VH3lAPs3izOKz1gFAPrad3CVEKaKxtvallziOWSRTotAd
+wz5Scc5ch6ev5VAws8bfXTYpng12KmdHVxL1SioScgKZoIfzAZ7VhnP+POZix6fw
+DwCC/mNKsluW7NWeKrK5DJ9A+azX69A2PYvD1SWUpF4JOYfmxKrIKgLDsFXPRyUX
+bxwZV9RZ3qXoviNDwxAwcSPYiVIb2GZtN9CLoAJnfsvFHBlpRVlVNz2F5o/yndqQ
+tpOO1ee7OQXXJZvj1WnaD4UOUzrVEo+TzdfsseGqjZGusJQiQ+foSLJ+bcc6XUE3
+ASvRIR5grY7ggp6vHE/rkbjoOf3nw+5GW43BaMmWu10ol+QnsB7rtmm9TwfPhiF8
+6YPErgnPcS2GI5sr5yhL8SlbBL2d3f5OPluiMQqa8UtHj5RbQEbvynZcYNc1O29o
+diisn+kpOWA9sQL631u7rxYYNe5wtij83CmHLV0lQCW0F4OHuJ0nhWdt4sVoDW6D
+auELJeVAJFDDlfsQrQwvo3WDOxpOXlMjJbNnQZE0QEUBNTVgYdozMpKJSmZT/OLV
+YRWKyeJERYr6L4MWhKRHocWhlMuPlFLm1CUEntHznfA6mTCVrTg=
+=nSJ3
+-----END PGP SIGNATURE-----
+
+--GvXjxJ+pjyke8COw--
 
