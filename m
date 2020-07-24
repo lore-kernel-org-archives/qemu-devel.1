@@ -2,124 +2,101 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD00C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 589DAC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:59:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82FF32074B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:51:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21DEB20767
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:59:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="EJzPQNCL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82FF32074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="KOPJcT61";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WAcM+x0e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21DEB20767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyvIa-0008IY-P5
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 06:51:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55576)
+	id 1jyvQR-0001su-F3
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 06:59:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jyvHQ-0007fK-Oz; Fri, 24 Jul 2020 06:50:21 -0400
-Received: from mail-vi1eur05on2094.outbound.protection.outlook.com
- ([40.107.21.94]:5984 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jyvPh-0001Jq-3b
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 06:58:53 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:32841)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jyvHN-00043v-3A; Fri, 24 Jul 2020 06:50:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dgiS5gQzusvAl3KgikVyz/9seq8qrxtlKvrT65AVn43WEvgyrYOvc4gmU7+Qs7nR6+CdZ1RRlGsp7kx7mZ1XTo6KnEIjKoTWdThoDWPiC6EfWifldjcfEGWQq+e9fVZU1uQifQ1cHMy2RnRjeAT7UWieyzVkWwrCKl+LdMWBJE5n0OpokEvCOhr8qgn3BzHUtRfrCke2CueJUU21cKMqHEM/xw1JR9d7ofTtBaW1RN8uU82x6oYrR6SRIbE1tyd3Ql4eMX45tDTcfsq57D8X+HqHpJCj/wr90Gd9KdyeqBy1K+z/ih11fxU3ubmLeIAGraQzLL29AucjrMUMPhFwZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rGTB7fX6GF/d/TeosBRRYUyky3wriyxZtYKvLgwWW7E=;
- b=B0ERuuYwrADfyGacL0QG1tnbC5Usv7LlssZp1MeBrSyI6zUWSAEntFSFeSDQphLU6m3b0Yyq5zsFiaT8T1I/R29uD6PIIgZUIXyFwpKLZGdqYsRlEVJ+gstGtRXciu7ZzigBR7r5jyjdN/V2s2DShbfqTZ2nFgyNMQPi5JKWo1hCN0ZPRyaMpMmjIKixuAJZoCf6GM+qho4oXHF5C0WQgJQ9VOKZ67BK+jKlDG8TqdhYtYZgTVUfplcOhCujCcjiYGMDv/4kmOv1jqgT0PZG8JQtGathLyT7vk3sKfFW4OfiCnNmEb4OC+7S5aFx8ZuwGuPaV3qTiMq8htwBkLWjoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rGTB7fX6GF/d/TeosBRRYUyky3wriyxZtYKvLgwWW7E=;
- b=EJzPQNCLIFQYbs+zRmdzq8pfhNMnAFv7PW6JkyZHe4MvNmnJFmPm0Qq/UZzy6CzyosDeK3RxujypISZiFSR2y3MJCtU8T6c39wFnyn77WbCKsFckkAxDh+uP/nzddTFD7J5p0SEdS/IKTKn3TC8mwxSUDOoctbcgi0qnk7RrDYc=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3032.eurprd08.prod.outlook.com (2603:10a6:209:43::31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.24; Fri, 24 Jul
- 2020 10:50:12 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a%4]) with mapi id 15.20.3216.024; Fri, 24 Jul 2020
- 10:50:12 +0000
-Subject: Re: [PATCH v11 00/11] iotests: Dump QCOW2 dirty bitmaps metadata
-To: Eric Blake <eblake@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-References: <1594973699-781898-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <20743b55-8eeb-3cac-86db-eab8c2bcd4ea@redhat.com>
- <445af8f9-2749-480a-09dd-572172653f47@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <13e26eb5-a41a-c65a-04a1-9eda057ac157@virtuozzo.com>
-Date: Fri, 24 Jul 2020 13:50:10 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <445af8f9-2749-480a-09dd-572172653f47@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR06CA0139.eurprd06.prod.outlook.com
- (2603:10a6:208:ab::44) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jyvPd-00054k-Jj
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 06:58:52 -0400
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+ by mailout.nyi.internal (Postfix) with ESMTP id 564D05C00CA;
+ Fri, 24 Jul 2020 06:58:48 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute2.internal (MEProxy); Fri, 24 Jul 2020 06:58:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=
+ from:to:cc:subject:in-reply-to:references:date:message-id
+ :mime-version:content-type; s=fm3; bh=qah2nb41Fw6UeTLVpYDD8itbw1
+ BVxbHiDPUTwiMMyGQ=; b=KOPJcT61SSHOkTeWrJ5T7ka4B0eLTg/Pf4SlKxPRSU
+ 9vKjx3KUD5zglOgwo9Bcfh1LRQwURxUzFttOfE+WBHxgY2i50fCEaJVRX8FwK0kt
+ war/6/LDguAQFLKzYhlNL60hdYfNOp2z/PQ5RruYsNDHPUIfZwEPE9nMAjmBu0CW
+ j9e0PGuVrK0yUKfrhbgfSbSqKmhQu9x6gJRqFjJnpPSC83qWdtHIl4QuigauRJwm
+ Jh6JLBO2onH3OVPGGEj4tgZSlvD078T5cbNdOP044JnkkAPyM6XFsl++uIuB2Lat
+ 9Ju89n+SQaLysbQuEgeGxz1zYuTNuA5m3699ioHA8/ow==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=qah2nb
+ 41Fw6UeTLVpYDD8itbw1BVxbHiDPUTwiMMyGQ=; b=WAcM+x0e40qeTLqNhYNHqV
+ fGxA4O9LZAYGgYh0G+1L1W06gbLVXtIo9MHYb/YjnS08UYfKFXBXUNiZnoez6Pvc
+ F3ovs8qcFXCKhCDBgzBb4ekrofQjAbzuTdgr452NY2rHsE2EW5FlYBX+GObqRMle
+ nlmJR3GZ+RtgCV5mxmIgA3apNv2DGv9wxePllhNmR3vs6Iv8UpjgOvH6Rv1Qa0dS
+ VFG8RDNJ83iPPJpHh3PPDPmsYwifPSFYeB7WqSAFm5xR5eV08pl7f8uvGHU3y1gU
+ +u+x6yov0Iifs8YQJp93tOOjBuYgkD2SX2/OardjHu6N76sWJU7lF9Gpf+P4wMfw
+ ==
+X-ME-Sender: <xms:574aX-zAwdwtdUbYtyGN-kWyWNmreF4T94HCELqFFRcSbeyytHEKNA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrheefgdefgecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenog
+ fuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefhvffujghffffkgggtseht
+ tdertddttddtnecuhfhrohhmpeetlhihshhsrgcutfhoshhsuceohhhisegrlhihshhsrg
+ drihhsqeenucggtffrrghtthgvrhhnpeelkeduleelgeefhffgffeuffeguddtjeffgfdt
+ tdegleekieevheettdevfeduleenucffohhmrghinhepqhgvmhhurdhorhhgpdhgihhthh
+ husgdrihhonecukfhppeegiedrkedtrddugedvrdekfeenucevlhhushhtvghrufhiiigv
+ pedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehhihesrghlhihsshgrrdhish
+X-ME-Proxy: <xmx:574aX6RIWdvUCJZkiuYzRVk6foj0EjhadbFSurvt50qVjjX3PufSnw>
+ <xmx:574aXwWe18LNQMG5GxkanMwMoQeISF9GRwxAB5z3ench3rH_YLj3Qw>
+ <xmx:574aX0gyRvXOzhVb-VkSXktHjTWhEZbWnKHSHJ8f-2X6cXT_mDzDEQ>
+ <xmx:6L4aX_9rGIbvW0DJGGy23GOJQyNSLCX28GTwQk6wUevg5Kci7n520A>
+Received: from x220.qyliss.net (p2e508e53.dip0.t-ipconnect.de [46.80.142.83])
+ by mail.messagingengine.com (Postfix) with ESMTPA id A55243280059;
+ Fri, 24 Jul 2020 06:58:47 -0400 (EDT)
+Received: by x220.qyliss.net (Postfix, from userid 1000)
+ id E72E42E7; Fri, 24 Jul 2020 10:58:45 +0000 (UTC)
+From: Alyssa Ross <hi@alyssa.is>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: Testing the virtio-vhost-user QEMU patch
+In-Reply-To: <87eep1yihf.fsf@alyssa.is>
+References: <87h7u1s5k1.fsf@alyssa.is>
+ <20200721083048.GB144170@stefanha-x1.localdomain> <87eep1yihf.fsf@alyssa.is>
+Date: Fri, 24 Jul 2020 10:58:45 +0000
+Message-ID: <87o8o5dvru.fsf@alyssa.is>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.156) by
- AM0PR06CA0139.eurprd06.prod.outlook.com (2603:10a6:208:ab::44) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3216.22 via Frontend Transport; Fri, 24 Jul 2020 10:50:11 +0000
-X-Originating-IP: [185.215.60.156]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5b5947e3-6d8e-4f7c-4638-08d82fbf573c
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3032:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB303261BFD9462832B8B793C9C1770@AM6PR08MB3032.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oUtXs4OsRWfbWr6LsofSHmGoKsQC1pX1CTaLsnsD2Be8jyWJSkGxJrlim0vkuNCxVik3oe1ewPYwsXayyO7Wd/m3va8V3c6ZVFPTQH+kPCZn/Yy+8wrrtt8LhM2CZFUv3q8kafiqzR5R3X4sl5MR+2Rw2Qr5DzLEqErJXB/m8qJ55g6SXkXG2QD8V7sufwnJNUXDmYC1hh5sbXEdN6c7D0YqRXUgRM1/Vb1hBkJeefalqWs8W7TfSbQ160SX+h4+OU7xDv9cUzZxNHruJt0cCS5s38wp6GL36vsEnVg+oQuErcR6Ecqbinaj3Vr2bp15OYKty1/B8Ubk04Y5oLJMD8wkJ+oDO15+5WG3KDuBCAUXqS8Z7kkiL5ZtzCD/GDhCx/uSDbMbqvXgwBmRVJNqgg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(366004)(136003)(376002)(396003)(39850400004)(83380400001)(86362001)(8676002)(6486002)(110136005)(36756003)(16576012)(316002)(8936002)(2906002)(956004)(2616005)(66946007)(66556008)(31696002)(66476007)(53546011)(5660300002)(31686004)(186003)(4326008)(52116002)(478600001)(16526019)(26005)(14143004)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: ZJ/wQRUcdHTWWZMUCul1yJTGxptH12Blq2sq6Egp9eg84L+0TSs3TrjrlvziQKGCrM8lE2xDzTOSIBEUqWx3QhC+4nwodRFKKIoBPFKjOJ1Ax5k1esOnnb6V1XyuIMrs5T3tvI+OTe+zzN+YcXAIyYAlLPLyFxH34xc01hpUBt25ILTOCpvnKULB6nkb3wVxqRj0LzgHIjU1f7tMfbrJrDUx8VnEHKkDdQtqBFbcMd6YYVr+D7ZXbYk8Xq1JbdqRUY5/C1DsCDgawxb6vgSn8domnvK9zTVSR8as5sQ1jkWo8SLZcdcylgYa1OXbC8hWTT/pNfQAfZU7XSRmdglW8ToPHQPHO1OnYE5V36+4C44bK3dhgX0EqKgQQpKUU5XADLSxAzJ/pjhM7IL7E9lRMI85oHqNI5G3OvYhkgGfD0G9HO6Uqk/tnq4lFj6865oeF9enrKA/hTG14pEOnriQ5f90HWC9j4L7fAG/AfAMLY0mvMiYabjfMmH5rAjVc/SF
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5b5947e3-6d8e-4f7c-4638-08d82fbf573c
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2020 10:50:12.3146 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AQ2fAjMIegOjv21jroasOMJuEC3I+vNm7KlJef4dNsu5AkG7+HsyRNvinA5B4go79x9e+xJHNsVvyYgPFjlWynz4zTaEQKMV2IsTH4tivFQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3032
-Received-SPF: pass client-ip=40.107.21.94;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 06:50:13
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Type: text/plain
+Received-SPF: pass client-ip=66.111.4.26; envelope-from=hi@alyssa.is;
+ helo=out2-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 06:58:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -134,33 +111,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Nikos Dragazis <ndragazis@arrikto.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-23.07.2020 23:18, Eric Blake wrote:
-> On 7/23/20 2:42 PM, Eric Blake wrote:
->> On 7/17/20 3:14 AM, Andrey Shinkevich wrote:
->>> Add dirty bitmap information to QCOW2 metadata dump in the qcow2_format.py.
->>>
-> 
->>>   block/qcow2.c                      |   2 +-
->>>   docs/interop/qcow2.txt             |   2 +-
->>>   tests/qemu-iotests/qcow2.py        |  18 ++-
->>>   tests/qemu-iotests/qcow2_format.py | 221 ++++++++++++++++++++++++++++++++++---
->>>   4 files changed, 220 insertions(+), 23 deletions(-)
+Alyssa Ross <hi@alyssa.is> writes:
+
+> Stefan Hajnoczi <stefanha@redhat.com> writes:
+>
+>> On Tue, Jul 21, 2020 at 07:14:38AM +0000, Alyssa Ross wrote:
+>>> Hi -- I hope it's okay me reaching out like this.
+>>> 
+>>> I've been trying to test out the virtio-vhost-user implementation that's
+>>> been posted to this list a couple of times, but have been unable to get
+>>> it to boot a kernel following the steps listed either on
+>>> <https://wiki.qemu.org/Features/VirtioVhostUser> or
+>>> <https://ndragazis.github.io/dpdk-vhost-vvu-demo.html>.
+>>> 
+>>> Specifically, the kernel appears to be unable to write to the
+>>> virtio-vhost-user device's PCI registers.  I've included the full panic
+>>> output from the kernel at the end of this message.  The panic is
+>>> reproducible with two different kernels I tried (with different configs
+>>> and versions).  I tried both versions of the virtio-vhost-user I was
+>>> able to find[1][2], and both exhibited the same behaviour.
+>>> 
+>>> Is this a known issue?  Am I doing something wrong?
 >>
->> I still don't see any obvious coverage of the new output, which makes it harder to test (I have to manually run qcow2.py on a file rather than seeing what changes in a ???.out file).  I know we said back in v9 that test 291 is not the right test, but that does not stop you from adding a new test just for that purpose.
-> 
-> The bulk of this series is touching a non-installed utility. At this point, I feel safer deferring it to 5.2 (it is a feature addition for testsuite use only, and we missed soft freeze), even though it has no negative impact to installed binaries.
-> 
+>> Hi,
+>> Unfortunately I'm not sure what the issue is. This is an early
+>> virtio-pci register access before a driver for any specific device type
+>> (net, blk, vhost-user, etc) comes into play.
+>
+> Small update here: I tried on another computer, and it worked.  Made
+> sure that it was exactly the same QEMU binary, command line, and VM
+> disk/initrd/kernel, so I think I can fairly confidently say the panic
+> depends on what hardware QEMU is running on.  I set -cpu value to the
+> same on both as well (SandyBridge).
+>
+> I also discovered that it works on my primary computer (the one it
+> panicked on before) with KVM disabled.
+>
+> Note that I've only got so far as finding that it boots on the other
+> machine -- I haven't verified yet that it actually works.
+>
+> Bad host CPU:  Intel(R) Core(TM) i5-2520M CPU @ 2.50GHz
+> Good host CPU: AMD EPYC 7401P 24-Core Processor
+>
+> May I ask what host CPUs other people have tested this on?  Having more
+> data would probably be useful.  Could it be an AMD vs. Intel thing?
 
-Yes, it's absolutely OK to defer to 5.2.
+I think I've figured it out!
 
-Thanks a lot for taking a look at our series!
+Sandy Bridge and Ivy Bridge hosts encounter this panic because the
+"additional resources" bar size is too big, at 1 << 36.  If I change
+this to 1 << 35, no more kernel panic.
 
--- 
-Best regards,
-Vladimir
+Skylake and later are fine with 1 << 36.  In between Ivy Bridge and
+Skylake were Haswell and Broadwell, but I couldn't find anybody who was
+able to help me test on either of those, so I don't know what they do.
+
+Perhaps related, the hosts that produce panics all seem to have a
+physical address size of 36 bits, while the hosts that work have larger
+physical address sizes, as reported by lscpu.
 
