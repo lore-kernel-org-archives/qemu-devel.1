@@ -2,103 +2,90 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 589DAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4FAC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 11:45:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21DEB20767
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:59:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8833D206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 11:45:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="KOPJcT61";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WAcM+x0e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21DEB20767
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LUcgbefB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8833D206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyvQR-0001su-F3
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 06:59:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57088)
+	id 1jyw8t-0002Yb-Nk
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 07:45:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jyvPh-0001Jq-3b
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 06:58:53 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:32841)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1jyvPd-00054k-Jj
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 06:58:52 -0400
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
- by mailout.nyi.internal (Postfix) with ESMTP id 564D05C00CA;
- Fri, 24 Jul 2020 06:58:48 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute2.internal (MEProxy); Fri, 24 Jul 2020 06:58:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=
- from:to:cc:subject:in-reply-to:references:date:message-id
- :mime-version:content-type; s=fm3; bh=qah2nb41Fw6UeTLVpYDD8itbw1
- BVxbHiDPUTwiMMyGQ=; b=KOPJcT61SSHOkTeWrJ5T7ka4B0eLTg/Pf4SlKxPRSU
- 9vKjx3KUD5zglOgwo9Bcfh1LRQwURxUzFttOfE+WBHxgY2i50fCEaJVRX8FwK0kt
- war/6/LDguAQFLKzYhlNL60hdYfNOp2z/PQ5RruYsNDHPUIfZwEPE9nMAjmBu0CW
- j9e0PGuVrK0yUKfrhbgfSbSqKmhQu9x6gJRqFjJnpPSC83qWdtHIl4QuigauRJwm
- Jh6JLBO2onH3OVPGGEj4tgZSlvD078T5cbNdOP044JnkkAPyM6XFsl++uIuB2Lat
- 9Ju89n+SQaLysbQuEgeGxz1zYuTNuA5m3699ioHA8/ow==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=qah2nb
- 41Fw6UeTLVpYDD8itbw1BVxbHiDPUTwiMMyGQ=; b=WAcM+x0e40qeTLqNhYNHqV
- fGxA4O9LZAYGgYh0G+1L1W06gbLVXtIo9MHYb/YjnS08UYfKFXBXUNiZnoez6Pvc
- F3ovs8qcFXCKhCDBgzBb4ekrofQjAbzuTdgr452NY2rHsE2EW5FlYBX+GObqRMle
- nlmJR3GZ+RtgCV5mxmIgA3apNv2DGv9wxePllhNmR3vs6Iv8UpjgOvH6Rv1Qa0dS
- VFG8RDNJ83iPPJpHh3PPDPmsYwifPSFYeB7WqSAFm5xR5eV08pl7f8uvGHU3y1gU
- +u+x6yov0Iifs8YQJp93tOOjBuYgkD2SX2/OardjHu6N76sWJU7lF9Gpf+P4wMfw
- ==
-X-ME-Sender: <xms:574aX-zAwdwtdUbYtyGN-kWyWNmreF4T94HCELqFFRcSbeyytHEKNA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrheefgdefgecutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenog
- fuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefhvffujghffffkgggtseht
- tdertddttddtnecuhfhrohhmpeetlhihshhsrgcutfhoshhsuceohhhisegrlhihshhsrg
- drihhsqeenucggtffrrghtthgvrhhnpeelkeduleelgeefhffgffeuffeguddtjeffgfdt
- tdegleekieevheettdevfeduleenucffohhmrghinhepqhgvmhhurdhorhhgpdhgihhthh
- husgdrihhonecukfhppeegiedrkedtrddugedvrdekfeenucevlhhushhtvghrufhiiigv
- pedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehhihesrghlhihsshgrrdhish
-X-ME-Proxy: <xmx:574aX6RIWdvUCJZkiuYzRVk6foj0EjhadbFSurvt50qVjjX3PufSnw>
- <xmx:574aXwWe18LNQMG5GxkanMwMoQeISF9GRwxAB5z3ench3rH_YLj3Qw>
- <xmx:574aX0gyRvXOzhVb-VkSXktHjTWhEZbWnKHSHJ8f-2X6cXT_mDzDEQ>
- <xmx:6L4aX_9rGIbvW0DJGGy23GOJQyNSLCX28GTwQk6wUevg5Kci7n520A>
-Received: from x220.qyliss.net (p2e508e53.dip0.t-ipconnect.de [46.80.142.83])
- by mail.messagingengine.com (Postfix) with ESMTPA id A55243280059;
- Fri, 24 Jul 2020 06:58:47 -0400 (EDT)
-Received: by x220.qyliss.net (Postfix, from userid 1000)
- id E72E42E7; Fri, 24 Jul 2020 10:58:45 +0000 (UTC)
-From: Alyssa Ross <hi@alyssa.is>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: Testing the virtio-vhost-user QEMU patch
-In-Reply-To: <87eep1yihf.fsf@alyssa.is>
-References: <87h7u1s5k1.fsf@alyssa.is>
- <20200721083048.GB144170@stefanha-x1.localdomain> <87eep1yihf.fsf@alyssa.is>
-Date: Fri, 24 Jul 2020 10:58:45 +0000
-Message-ID: <87o8o5dvru.fsf@alyssa.is>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyw87-00026D-U4
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 07:44:48 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54721
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jyw85-0003Pv-Dq
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 07:44:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595591083;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uZ+/v0bulO2yZjMmhD6CMZfK6NjajQHza/hAj6xHUwY=;
+ b=LUcgbefBhXG1FqUBt2xdCXUZer7SqADkjwF6M1OAiReayKEOGcQmP9K2Ljh/B323dU92/V
+ QlCl7arr9Ws7+WF6t/BFoAib/AdPIEiWja3wZKI0JUyBmnA80vk12VAc+A5U8kolvZgXw4
+ Tqi54FC4ZqIVjiJZ2ZLygxnO1PCrFsU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-Buz196eRMJOWTJ257jD25g-1; Fri, 24 Jul 2020 07:44:41 -0400
+X-MC-Unique: Buz196eRMJOWTJ257jD25g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 847AE8017FB;
+ Fri, 24 Jul 2020 11:44:40 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4043910013D9;
+ Fri, 24 Jul 2020 11:44:40 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id CAE621138648; Fri, 24 Jul 2020 13:44:38 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.1? v2] qapi/error: Check format string argument in
+ error_*prepend()
+References: <20200723171205.14949-1-philmd@redhat.com>
+Date: Fri, 24 Jul 2020 13:44:38 +0200
+In-Reply-To: <20200723171205.14949-1-philmd@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 23 Jul 2020 19:12:05
+ +0200")
+Message-ID: <87r1t1b0ih.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=66.111.4.26; envelope-from=hi@alyssa.is;
- helo=out2-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 06:58:48
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:00:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,67 +98,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nikos Dragazis <ndragazis@arrikto.com>, qemu-devel@nongnu.org
+Cc: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alyssa Ross <hi@alyssa.is> writes:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Stefan Hajnoczi <stefanha@redhat.com> writes:
+> error_propagate_prepend() "behaves like error_prepend()", and
+> error_prepend() uses "formatting @fmt, ... like printf()".
+> error_prepend() checks its format string argument, but
+> error_propagate_prepend() does not. Fix by addint the format
+> attribute to error_propagate_prepend() and error_vprepend().
 >
->> On Tue, Jul 21, 2020 at 07:14:38AM +0000, Alyssa Ross wrote:
->>> Hi -- I hope it's okay me reaching out like this.
->>> 
->>> I've been trying to test out the virtio-vhost-user implementation that's
->>> been posted to this list a couple of times, but have been unable to get
->>> it to boot a kernel following the steps listed either on
->>> <https://wiki.qemu.org/Features/VirtioVhostUser> or
->>> <https://ndragazis.github.io/dpdk-vhost-vvu-demo.html>.
->>> 
->>> Specifically, the kernel appears to be unable to write to the
->>> virtio-vhost-user device's PCI registers.  I've included the full panic
->>> output from the kernel at the end of this message.  The panic is
->>> reproducible with two different kernels I tried (with different configs
->>> and versions).  I tried both versions of the virtio-vhost-user I was
->>> able to find[1][2], and both exhibited the same behaviour.
->>> 
->>> Is this a known issue?  Am I doing something wrong?
->>
->> Hi,
->> Unfortunately I'm not sure what the issue is. This is an early
->> virtio-pci register access before a driver for any specific device type
->> (net, blk, vhost-user, etc) comes into play.
+> This would have caught the bug fixed in the previous commit:
 >
-> Small update here: I tried on another computer, and it worked.  Made
-> sure that it was exactly the same QEMU binary, command line, and VM
-> disk/initrd/kernel, so I think I can fairly confidently say the panic
-> depends on what hardware QEMU is running on.  I set -cpu value to the
-> same on both as well (SandyBridge).
+>     CC      hw/sd/milkymist-memcard.o
+>   hw/sd/milkymist-memcard.c: In function =E2=80=98milkymist_memcard_reali=
+ze=E2=80=99:
+>   hw/sd/milkymist-memcard.c:284:70: error: format =E2=80=98%s=E2=80=99 ex=
+pects a matching =E2=80=98char *=E2=80=99 argument [-Werror=3Dformat=3D]
+>     284 |         error_propagate_prepend(errp, err, "failed to init SD c=
+ard: %s");
+>         |                                                                =
+     ~^
+>         |                                                                =
+      |
+>         |                                                                =
+      char *
 >
-> I also discovered that it works on my primary computer (the one it
-> panicked on before) with KVM disabled.
+> Missed in commit 4b5766488f "error: Fix use of error_prepend() with
+> &error_fatal, &error_abort".
 >
-> Note that I've only got so far as finding that it boots on the other
-> machine -- I haven't verified yet that it actually works.
+> Inspired-by: Stefan Weil <sw@weilnetz.de>
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> Since v1:
+> - Reword (Markus)
+> - Add error_vprepend (Stefan)
+> - Use local style to add the attribute *after* the declaration,
+>   which is invalid on definition where we get (depending on the
+>   toolchain):
 >
-> Bad host CPU:  Intel(R) Core(TM) i5-2520M CPU @ 2.50GHz
-> Good host CPU: AMD EPYC 7401P 24-Core Processor
+>   . error: attributes should be specified before the declarator in a func=
+tion definition
 >
-> May I ask what host CPUs other people have tested this on?  Having more
-> data would probably be useful.  Could it be an AMD vs. Intel thing?
+>   . error: attributes are not allowed on a function-definition
+>
+> Supersedes: <20200723091309.18690-1-philmd@redhat.com>
 
-I think I've figured it out!
+Queued with Stefan's R-by from v1.  Hope what's okay.  Thanks!
 
-Sandy Bridge and Ivy Bridge hosts encounter this panic because the
-"additional resources" bar size is too big, at 1 << 36.  If I change
-this to 1 << 35, no more kernel panic.
-
-Skylake and later are fine with 1 << 36.  In between Ivy Bridge and
-Skylake were Haswell and Broadwell, but I couldn't find anybody who was
-able to help me test on either of those, so I don't know what they do.
-
-Perhaps related, the hosts that produce panics all seem to have a
-physical address size of 36 bits, while the hosts that work have larger
-physical address sizes, as reported by lscpu.
 
