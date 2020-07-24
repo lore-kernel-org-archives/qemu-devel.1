@@ -4,68 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FB9C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 05:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF658C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 05:00:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD482206D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 05:03:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD482206D8
+	by mail.kernel.org (Postfix) with ESMTPS id 8DFCB206D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 05:00:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DFCB206D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jypsE-0004Wn-0r
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 01:03:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47868)
+	id 1jyppA-0008LQ-Re
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 01:00:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jypnP-0006GY-Fx; Fri, 24 Jul 2020 00:59:00 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30694)
+ id 1jypnO-0006GQ-Sq; Fri, 24 Jul 2020 00:58:59 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8808)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ljp@linux.ibm.com>)
- id 1jypnK-0004ex-UY; Fri, 24 Jul 2020 00:58:59 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ id 1jypnM-0004fS-Ji; Fri, 24 Jul 2020 00:58:58 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06O4WbDe160447; Fri, 24 Jul 2020 00:58:49 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32fb9bpdrj-1
+ 06O4rb0B155273; Fri, 24 Jul 2020 00:58:51 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32facep8eb-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 24 Jul 2020 00:58:49 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06O4sb6b025326;
- Fri, 24 Jul 2020 04:58:48 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
- [9.57.198.25]) by ppma02dal.us.ibm.com with ESMTP id 32brqa68w8-1
+ Fri, 24 Jul 2020 00:58:51 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06O4tUP2032189;
+ Fri, 24 Jul 2020 04:58:50 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
+ [9.57.198.27]) by ppma04wdc.us.ibm.com with ESMTP id 32brq9su13-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 24 Jul 2020 04:58:48 +0000
+ Fri, 24 Jul 2020 04:58:50 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
- by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06O4wlxK41025880
+ by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06O4wn5v37487012
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 24 Jul 2020 04:58:47 GMT
+ Fri, 24 Jul 2020 04:58:49 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D63C928059;
- Fri, 24 Jul 2020 04:58:47 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id CDF6228059;
+ Fri, 24 Jul 2020 04:58:49 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5FB902805C;
- Fri, 24 Jul 2020 04:58:47 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 4C12228058;
+ Fri, 24 Jul 2020 04:58:49 +0000 (GMT)
 Received: from pompom.ibm.com (unknown [9.160.100.101])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Fri, 24 Jul 2020 04:58:47 +0000 (GMT)
+ Fri, 24 Jul 2020 04:58:49 +0000 (GMT)
 From: Lijun Pan <ljp@linux.ibm.com>
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org, 
  david@gibson.dropbear.id.au
-Subject: [PATCH v5 3/6] target/ppc: add vmulh{su}w instructions
-Date: Thu, 23 Jul 2020 23:58:42 -0500
-Message-Id: <20200724045845.89976-4-ljp@linux.ibm.com>
+Subject: [PATCH v5 6/6] target/ppc: add vmsumudm vmsumcud instructions
+Date: Thu, 23 Jul 2020 23:58:45 -0500
+Message-Id: <20200724045845.89976-7-ljp@linux.ibm.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20200724045845.89976-1-ljp@linux.ibm.com>
 References: <20200724045845.89976-1-ljp@linux.ibm.com>
@@ -76,15 +76,15 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-07-23_20:2020-07-23,
  2020-07-23 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 mlxscore=0
- mlxlogscore=958 lowpriorityscore=0 clxscore=1015 spamscore=0
- malwarescore=0 suspectscore=0 priorityscore=1501 adultscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ mlxlogscore=617 spamscore=0
+ priorityscore=1501 bulkscore=0 lowpriorityscore=0 impostorscore=0
+ phishscore=0 malwarescore=0 suspectscore=2 adultscore=0 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2007240032
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=ljp@linux.ibm.com;
- helo=mx0b-001b2d01.pphosted.com
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=ljp@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:58:52
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
 X-Spam_bar: ---
@@ -108,103 +108,207 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vmulhsw: Vector Multiply High Signed Word
-vmulhuw: Vector Multiply High Unsigned Word
+vmsumudm (Power ISA 3.0) - Vector Multiply-Sum Unsigned Doubleword Modulo
+VA-form.
+vmsumcud (Power ISA 3.1) - Vector Multiply-Sum & write Carry-out Unsigned
+Doubleword VA-form.
 
 Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
 ---
-v4/v5: no change
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-v3: inline the helper_vmulh{su}w multiply directly instead of using macro
-v2: fix coding style
-    use Power ISA 3.1 flag
+v5: update instruction flag for vmsumcud.
+    integrate into this isa3.1 patch series
+v3: implement vmsumudm/vmsumcud through int128 functions,
+    suggested by Richard Henderson.
 
- target/ppc/helper.h                 |  2 ++
- target/ppc/int_helper.c             | 19 +++++++++++++++++++
- target/ppc/translate/vmx-impl.inc.c |  6 ++++++
- target/ppc/translate/vmx-ops.inc.c  |  4 ++--
- 4 files changed, 29 insertions(+), 2 deletions(-)
+ disas/ppc.c                         |  2 ++
+ target/ppc/helper.h                 |  4 ++-
+ target/ppc/int_helper.c             | 49 ++++++++++++++++++++++++++++-
+ target/ppc/translate.c              |  1 -
+ target/ppc/translate/vmx-impl.inc.c | 39 ++++++++++++-----------
+ target/ppc/translate/vmx-ops.inc.c  |  2 ++
+ 6 files changed, 76 insertions(+), 21 deletions(-)
 
+diff --git a/disas/ppc.c b/disas/ppc.c
+index 63e97cfe1d..bd76fae4c4 100644
+--- a/disas/ppc.c
++++ b/disas/ppc.c
+@@ -2261,7 +2261,9 @@ const struct powerpc_opcode powerpc_opcodes[] = {
+ { "vmsumshs",  VXA(4,  41), VXA_MASK,	PPCVEC,		{ VD, VA, VB, VC } },
+ { "vmsumubm",  VXA(4,  36), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
+ { "vmsumuhm",  VXA(4,  38), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
++{ "vmsumudm",  VXA(4,  35), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC } },
+ { "vmsumuhs",  VXA(4,  39), VXA_MASK,   PPCVEC,		{ VD, VA, VB, VC } },
++{ "vmsumcud",  VXA(4,  23), VXA_MASK,   PPCVEC,         { VD, VA, VB, VC } },
+ { "vmulesb",   VX(4,  776), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
+ { "vmulesh",   VX(4,  840), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
+ { "vmuleub",   VX(4,  520), VX_MASK,	PPCVEC,		{ VD, VA, VB } },
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 69416b6d7c..3b3013866a 100644
+index 70a14029ca..00a31d64bc 100644
 --- a/target/ppc/helper.h
 +++ b/target/ppc/helper.h
-@@ -184,6 +184,8 @@ DEF_HELPER_3(vmulosw, void, avr, avr, avr)
- DEF_HELPER_3(vmuloub, void, avr, avr, avr)
- DEF_HELPER_3(vmulouh, void, avr, avr, avr)
- DEF_HELPER_3(vmulouw, void, avr, avr, avr)
-+DEF_HELPER_3(vmulhsw, void, avr, avr, avr)
-+DEF_HELPER_3(vmulhuw, void, avr, avr, avr)
- DEF_HELPER_3(vslo, void, avr, avr, avr)
- DEF_HELPER_3(vsro, void, avr, avr, avr)
- DEF_HELPER_3(vsrv, void, avr, avr, avr)
+@@ -274,10 +274,12 @@ DEF_HELPER_3(vpkpx, void, avr, avr, avr)
+ DEF_HELPER_5(vmhaddshs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmhraddshs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumuhm, void, env, avr, avr, avr, avr)
++DEF_HELPER_5(vmsumudm, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumuhs, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumshm, void, env, avr, avr, avr, avr)
+ DEF_HELPER_5(vmsumshs, void, env, avr, avr, avr, avr)
+-DEF_HELPER_4(vmladduhm, void, avr, avr, avr, avr)
++DEF_HELPER_5(vmsumcud, void, env, avr, avr, avr, avr)
++DEF_HELPER_5(vmladduhm, void, env, avr, avr, avr, avr)
+ DEF_HELPER_FLAGS_2(mtvscr, TCG_CALL_NO_RWG, void, env, i32)
+ DEF_HELPER_FLAGS_1(mfvscr, TCG_CALL_NO_RWG, i32, env)
+ DEF_HELPER_3(lvebx, void, env, avr, tl)
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index bd3e6d7cc7..a3a20821fc 100644
+index 62b93b4568..2e919a7b8e 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -1086,6 +1086,25 @@ VMUL(uw, u32, VsrW, VsrD, uint64_t)
- #undef VMUL_DO_ODD
- #undef VMUL
+@@ -913,7 +913,8 @@ void helper_vmhraddshs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+     }
+ }
  
-+void helper_vmulhsw(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-+{
-+    int i;
-+
-+    for (i = 0; i < 4; i++) {
-+        r->s32[i] = (int32_t)(((int64_t)a->s32[i] * (int64_t)b->s32[i]) >> 32);
-+    }
-+}
-+
-+void helper_vmulhuw(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
-+{
-+    int i;
-+
-+    for (i = 0; i < 4; i++) {
-+        r->u32[i] = (uint32_t)(((uint64_t)a->u32[i] *
-+                               (uint64_t)b->u32[i]) >> 32);
-+    }
-+}
-+
- void helper_vperm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b,
-                   ppc_avr_t *c)
+-void helper_vmladduhm(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
++void helper_vmladduhm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
++                      ppc_avr_t *b, ppc_avr_t *c)
  {
+     int i;
+ 
+@@ -1051,6 +1052,52 @@ void helper_vmsumuhs(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a,
+     }
+ }
+ 
++void helper_vmsumudm(CPUPPCState *env, ppc_avr_t *r,
++                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
++{
++    Int128 sum;
++    uint64_t lo, hi;
++
++    sum = int128_make128(c->VsrD(1), c->VsrD(0));
++
++    mulu64(&lo, &hi, a->VsrD(0), b->VsrD(0));
++    sum = int128_add(sum, int128_make128(lo, hi));
++
++    mulu64(&lo, &hi, a->VsrD(1), b->VsrD(1));
++    sum = int128_add(sum, int128_make128(lo, hi));
++
++    r->VsrD(0) = int128_gethi(sum);
++    r->VsrD(1) = int128_getlo(sum);
++}
++
++void helper_vmsumcud(CPUPPCState *env, ppc_avr_t *r,
++                     ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
++{
++    Int128 sum;
++    uint64_t p1lo, p1hi, p2lo, p2hi;
++
++    mulu64(&p1lo, &p1hi, a->VsrD(0), b->VsrD(0));
++    mulu64(&p2lo, &p2hi, a->VsrD(1), b->VsrD(1));
++
++    /* Sum lowest 64-bit elements.  */
++    sum = int128_make128(c->VsrD(1), 0);
++    sum = int128_add(sum, int128_make128(p1lo, 0));
++    sum = int128_add(sum, int128_make128(p2lo, 0));
++
++    /*
++     * Discard low 64-bits, leaving the carry into bit 64.
++     * Then sum the higher 64-bit elements.
++     */
++    sum = int128_rshift(sum, 64);
++    sum = int128_add(sum, int128_make128(c->VsrD(0), 0));
++    sum = int128_add(sum, int128_make128(p1hi, 0));
++    sum = int128_add(sum, int128_make128(p2hi, 0));
++
++    /* The result is only the carry into bits 64 & 65. */
++    r->VsrD(1) = int128_gethi(sum);
++    r->VsrD(0) = 0;
++}
++
+ #define VMUL_DO_EVN(name, mul_element, mul_access, prod_access, cast)   \
+     void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
+     {                                                                   \
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 55f0e1a01d..b33b2d87a4 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -7324,7 +7324,6 @@ GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
+ GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
+ GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
+ GEN_HANDLER(mtvscr, 0x04, 0x2, 0x19, 0x03ff0000, PPC_ALTIVEC),
+-GEN_HANDLER(vmladduhm, 0x04, 0x11, 0xFF, 0x00000000, PPC_ALTIVEC),
+ #if defined(TARGET_PPC64)
+ GEN_HANDLER_E(maddhd_maddhdu, 0x04, 0x18, 0xFF, 0x00000000, PPC_NONE,
+               PPC2_ISA300),
 diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index 8c89738552..50bac375fc 100644
+index ac5e820541..5b85b6ea06 100644
 --- a/target/ppc/translate/vmx-impl.inc.c
 +++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -811,9 +811,15 @@ GEN_VXFORM_V(vmulld, MO_64, tcg_gen_gvec_mul, 4, 7);
- GEN_VXFORM(vmuleub, 4, 8);
- GEN_VXFORM(vmuleuh, 4, 9);
- GEN_VXFORM(vmuleuw, 4, 10);
-+GEN_VXFORM(vmulhuw, 4, 10);
-+GEN_VXFORM_DUAL(vmuleuw, PPC_ALTIVEC, PPC_NONE,
-+                vmulhuw, PPC_NONE, PPC2_ISA310);
- GEN_VXFORM(vmulesb, 4, 12);
- GEN_VXFORM(vmulesh, 4, 13);
- GEN_VXFORM(vmulesw, 4, 14);
-+GEN_VXFORM(vmulhsw, 4, 14);
-+GEN_VXFORM_DUAL(vmulesw, PPC_ALTIVEC, PPC_NONE,
-+                vmulhsw, PPC_NONE, PPC2_ISA310);
- GEN_VXFORM_V(vslb, MO_8, tcg_gen_gvec_shlv, 2, 4);
- GEN_VXFORM_V(vslh, MO_16, tcg_gen_gvec_shlv, 2, 5);
- GEN_VXFORM_V(vslw, MO_32, tcg_gen_gvec_shlv, 2, 6);
+@@ -1272,6 +1272,25 @@ static void gen_vsldoi(DisasContext *ctx)
+     tcg_temp_free_i32(sh);
+ }
+ 
++#define GEN_VAFORM(name, opc2)                                          \
++static void glue(gen_, name)(DisasContext *ctx)                         \
++{                                                                       \
++    TCGv_ptr ra, rb, rc, rd;                                            \
++    if (unlikely(!ctx->altivec_enabled)) {                              \
++        gen_exception(ctx, POWERPC_EXCP_VPU);                           \
++        return;                                                         \
++    }                                                                   \
++    ra = gen_avr_ptr(rA(ctx->opcode));                                  \
++    rb = gen_avr_ptr(rB(ctx->opcode));                                  \
++    rc = gen_avr_ptr(rC(ctx->opcode));                                  \
++    rd = gen_avr_ptr(rD(ctx->opcode));                                  \
++    gen_helper_##name(cpu_env, rd, ra, rb, rc);                         \
++    tcg_temp_free_ptr(ra);                                              \
++    tcg_temp_free_ptr(rb);                                              \
++    tcg_temp_free_ptr(rc);                                              \
++    tcg_temp_free_ptr(rd);                                              \
++}
++
+ #define GEN_VAFORM_PAIRED(name0, name1, opc2)                           \
+ static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
+     {                                                                   \
+@@ -1296,24 +1315,8 @@ static void glue(gen_, name0##_##name1)(DisasContext *ctx)              \
+     }
+ 
+ GEN_VAFORM_PAIRED(vmhaddshs, vmhraddshs, 16)
+-
+-static void gen_vmladduhm(DisasContext *ctx)
+-{
+-    TCGv_ptr ra, rb, rc, rd;
+-    if (unlikely(!ctx->altivec_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_VPU);
+-        return;
+-    }
+-    ra = gen_avr_ptr(rA(ctx->opcode));
+-    rb = gen_avr_ptr(rB(ctx->opcode));
+-    rc = gen_avr_ptr(rC(ctx->opcode));
+-    rd = gen_avr_ptr(rD(ctx->opcode));
+-    gen_helper_vmladduhm(rd, ra, rb, rc);
+-    tcg_temp_free_ptr(ra);
+-    tcg_temp_free_ptr(rb);
+-    tcg_temp_free_ptr(rc);
+-    tcg_temp_free_ptr(rd);
+-}
++GEN_VAFORM(vmsumcud, 11)
++GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17)
+ 
+ static void gen_vpermr(DisasContext *ctx)
+ {
 diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
-index b49787ac97..29701ad778 100644
+index 528458cb25..fd689a5086 100644
 --- a/target/ppc/translate/vmx-ops.inc.c
 +++ b/target/ppc/translate/vmx-ops.inc.c
-@@ -110,10 +110,10 @@ GEN_VXFORM_207(vmulosw, 4, 6),
- GEN_VXFORM_310(vmulld, 4, 7),
- GEN_VXFORM(vmuleub, 4, 8),
- GEN_VXFORM(vmuleuh, 4, 9),
--GEN_VXFORM_207(vmuleuw, 4, 10),
-+GEN_VXFORM_DUAL(vmuleuw, vmulhuw, 4, 10, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM(vmulesb, 4, 12),
- GEN_VXFORM(vmulesh, 4, 13),
--GEN_VXFORM_207(vmulesw, 4, 14),
-+GEN_VXFORM_DUAL(vmulesw, vmulhsw, 4, 14, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM(vslb, 2, 4),
- GEN_VXFORM(vslh, 2, 5),
- GEN_VXFORM_DUAL(vslw, vrlwnm, 2, 6, PPC_ALTIVEC, PPC_NONE),
+@@ -295,6 +295,8 @@ GEN_VAFORM_PAIRED(vmsumuhm, vmsumuhs, 19),
+ GEN_VAFORM_PAIRED(vmsumshm, vmsumshs, 20),
+ GEN_VAFORM_PAIRED(vsel, vperm, 21),
+ GEN_VAFORM_PAIRED(vmaddfp, vnmsubfp, 23),
++GEN_HANDLER(vmsumcud, 0x4, 11, 0xFF, 0x00000000, PPC2_ISA310),
++GEN_VAFORM_PAIRED(vmladduhm, vmsumudm, 17),
+ 
+ GEN_VXFORM_DUAL(vclzb, vpopcntb, 1, 28, PPC_NONE, PPC2_ALTIVEC_207),
+ GEN_VXFORM_DUAL(vclzh, vpopcnth, 1, 29, PPC_NONE, PPC2_ALTIVEC_207),
 -- 
 2.23.0
 
