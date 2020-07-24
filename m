@@ -8,60 +8,60 @@ X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1C2C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 482FEC433E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 654B320714
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:56:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 027E520674
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:51:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EGHOngaj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 654B320714
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F5TCKt4+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 027E520674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyuRC-0007p4-OB
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 05:56:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36582)
+	id 1jyuMs-0004il-6j
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 05:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jyuQX-0007Hn-KL
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:55:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49753
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jyuKR-000213-Lh
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:49:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55363
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jyuQU-0003a8-EU
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:55:41 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jyuKO-0002Gi-HS
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:49:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595584537;
+ s=mimecast20190719; t=1595584159;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=tOqQ66tv86CHycVbj+i45ATOxG5K7QbpU42hR/DOJuM=;
- b=EGHOngajEoLA9Bo/EWh+C0457458XtEFZAZr+36Uc6e96xXJpoUMs/YVxxFHeNKn1eyPZZ
- zpu7ygyN8byhz9uGSNnKnjnesAra6Tohs10BkXV1A5/wCXXSFwwt0I+ZS5ZrcYPRYj4nsj
- mWFx/IHGc4fe15m2UJEARRWJTAvhKac=
+ bh=v6DrxEZzxrpctvNigmpEmhcEadbfYBCVe/71R17+7ko=;
+ b=F5TCKt4+Ryh4PsH6wPWYF09Ox0O1aWWUdrIAVnofPw68PbVqNzYzoTBM83Nilka8a5nB1b
+ uSPiczxC6hoBHtWuVMpfeI59QZNTtRGqJlcNkn4eEsS8myeSEwnoljAmeE9dXwYjkDhuhz
+ xGI282Gu0MamWVvu3oRIM7tflF5eQoY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-791JLQIQNeKwdN33K57vlA-1; Fri, 24 Jul 2020 05:55:35 -0400
-X-MC-Unique: 791JLQIQNeKwdN33K57vlA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-358-Qt18OR1PODKNV69_4Rtrzw-1; Fri, 24 Jul 2020 05:49:17 -0400
+X-MC-Unique: Qt18OR1PODKNV69_4Rtrzw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E918C800597;
- Fri, 24 Jul 2020 09:55:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39870193F562;
+ Fri, 24 Jul 2020 09:49:16 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-32.ams2.redhat.com
  [10.36.113.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B8CE369326;
- Fri, 24 Jul 2020 09:55:32 +0000 (UTC)
-Subject: Re: [PATCH v7 34/47] backup: Deal with filters
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DA66610013C0;
+ Fri, 24 Jul 2020 09:49:14 +0000 (UTC)
+Subject: Re: [PATCH v7 33/47] mirror: Deal with filters
 To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
 References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-35-mreitz@redhat.com>
- <be4213b2-75b9-c1e1-69d6-171d704013ea@virtuozzo.com>
+ <20200625152215.941773-34-mreitz@redhat.com>
+ <b69b871a-4cc5-a09d-c20b-deaa7438afda@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -87,29 +87,29 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b6653e3d-2b2e-7cb7-53ca-f52015557ac2@redhat.com>
-Date: Fri, 24 Jul 2020 11:55:31 +0200
+Message-ID: <bc5ef8af-6938-6abf-1232-e58c5caad38a@redhat.com>
+Date: Fri, 24 Jul 2020 11:49:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <be4213b2-75b9-c1e1-69d6-171d704013ea@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <b69b871a-4cc5-a09d-c20b-deaa7438afda@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="pedGqhMB1Q0hdh4oacSsq2dohxUUjN5Hm"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ boundary="c5x4npZVcB270GfjhvfzsSi0YsmGWDCTv"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:01:02
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 01:23:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,74 +129,212 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pedGqhMB1Q0hdh4oacSsq2dohxUUjN5Hm
-Content-Type: multipart/mixed; boundary="UGaSVmeJhIU6iRKNmZaS6aPkdBw6rwrSn"
+--c5x4npZVcB270GfjhvfzsSi0YsmGWDCTv
+Content-Type: multipart/mixed; boundary="gwPBYk1Mpl24QAOwrdSrGctR4iYTpPfBH"
 
---UGaSVmeJhIU6iRKNmZaS6aPkdBw6rwrSn
+--gwPBYk1Mpl24QAOwrdSrGctR4iYTpPfBH
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 23.07.20 17:51, Andrey Shinkevich wrote:
+On 22.07.20 20:31, Andrey Shinkevich wrote:
 > On 25.06.2020 18:22, Max Reitz wrote:
+>> This includes some permission limiting (for example, we only need to
+>> take the RESIZE permission for active commits where the base is smaller
+>> than the top).
+>>
+>> Use this opportunity to rename qmp_drive_mirror()'s "source" BDS to
+>> "target_backing_bs", because that is what it really refers to.
+>>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->> =C2=A0 block/backup-top.c |=C2=A0 2 +-
->> =C2=A0 block/backup.c=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 9 +++++----
->> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 19 +=
-++++++++++++++----
->> =C2=A0 3 files changed, 21 insertions(+), 9 deletions(-)
+>> =C2=A0 qapi/block-core.json |=C2=A0=C2=A0 6 ++-
+>> =C2=A0 block/mirror.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 118 ++++++++=
++++++++++++++++++++++++++----------
+>> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0 36 +++++++++----
+>> =C2=A0 3 files changed, 121 insertions(+), 39 deletions(-)
 >>
->>
->> diff --git a/block/backup.c b/block/backup.c
->> index 4f13bb20a5..9afa0bf3b4 100644
->> --- a/block/backup.c
->> +++ b/block/backup.c
->> @@ -297,6 +297,7 @@ static int64_t
->> backup_calculate_cluster_size(BlockDriverState *target,
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverInfo bdi;
->> +=C2=A0=C2=A0=C2=A0 bool target_does_cow =3D bdrv_backing_chain_next(tar=
-get);
->> =C2=A0=20
+> ...
+>> diff --git a/block/mirror.c b/block/mirror.c
+>> index 469acf4600..770de3b34e 100644
+>> --- a/block/mirror.c
+>> +++ b/block/mirror.c
+>> @@ -42,6 +42,7 @@ typedef struct MirrorBlockJob {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockBackend *target;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverState *mirror_top_bs;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverState *base;
+>> +=C2=A0=C2=A0=C2=A0 BlockDriverState *base_overlay;
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* The name of the graph node to r=
+eplace */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char *replaces;
+>> @@ -677,8 +678,10 @@ static int mirror_exit_common(Job *job)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &error_abort);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!abort && s->backing_mode =3D=3D MIRR=
+OR_SOURCE_BACKING_CHAIN) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverState =
+*backing =3D s->is_none_mode ? src : s->base;
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (backing_bs(target_bs) !=
+=3D backing) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv=
+_set_backing_hd(target_bs, backing, &local_err);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverState *unfiltered=
+_target =3D
+>> bdrv_skip_filters(target_bs);
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_cow_bs(unfiltered_t=
+arget) !=3D backing) {
 >=20
 >=20
-> Wouldn't it better to make the explicit type conversion or use "!!"
-> approach?
+> I just worry about a filter node of the concurrent job right below the
+> unfiltered_target.
 
-I don=E2=80=99t know. O:)
+Having a concurrent job on the target sounds extremely problematic in
+itself (because at least for most of the mirror job, the target isn=E2=80=
+=99t in
+a consistent state).  Is that a real use case?
 
-I personally don=E2=80=99t like too may exclamation marks because I feel li=
-ke
-the code is screaming at me.  So I tend to use them only where necessary.
+> The filter has unfiltered_target in its parent list.
+> Will that filter node be replaced correctly then?
 
-As for doing an explicit cast...  I think I=E2=80=99ll keep that in mind to
-reduce my future use of !!.  But in this case, the type name is in the
-same line, so I feel like it=E2=80=99s sufficiently clear.
+I=E2=80=99m also not quite sure what you mean.  We need to attach the sourc=
+e=E2=80=99s
+backing chain to the target here, so we go down to the first node that
+might accept COW backing files (by invoking bdrv_skip_filters()).  That
+should be correct no matter what kind of filters are on it.
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * The topmost node wit=
+h
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * bdrv_skip_filters(fi=
+ltered_target) =3D=3D
+>> bdrv_skip_filters(target)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 filtered_target =3D bdrv_cow=
+_bs(bdrv_find_overlay(bs, target));
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(bdrv_skip_filters(fil=
+tered_target) =3D=3D
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 bdrv_skip_filters(target));
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * XXX BLK_PERM_WRITE n=
+eeds to be allowed so we don't block
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * ourselves at s->base=
+ (if writes are blocked for a node,
+>> they are
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * also blocked for its=
+ backing file). The other options
+>> would be a
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * second filter driver=
+ above s->base (=3D=3D target).
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iter_shared_perms =3D BLK_PE=
+RM_WRITE_UNCHANGED | BLK_PERM_WRITE;
+>> +
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (iter =3D bdrv_filter_or=
+_cow_bs(bs); iter !=3D target;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 iter =3D bdrv_filter_or_cow_bs(iter))
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (=
+iter =3D=3D filtered_target) {
+>=20
+>=20
+> For one filter node only?
+
+No, iter_shared_perms is never reset, so it retains the
+BLK_PERM_CONSISTENT_READ flag until the end of the loop.
+
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 /*
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 * From here on, all nodes are filters on the ba=
+se.
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 * This allows us to share BLK_PERM_CONSISTENT_R=
+EAD.
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 iter_shared_perms |=3D BLK_PERM_CONSISTENT_READ;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 ret =3D block_job_add_bdrv(&s->common, "intermediate
+>> node", iter, 0,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BL=
+K_PERM_WRITE_UNCHANGED |
+>> BLK_PERM_WRITE,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
+rp);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 it=
+er_shared_perms, errp);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 if (ret < 0) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 }
+> ...
+>> @@ -3042,6 +3053,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error
+>> **errp)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 " named node of the graph");
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 goto out;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 replaces_node_name =3D arg->=
+replaces;
+>=20
+>=20
+> What is the idea behind the variables substitution?
+
+Looks like a remnant from v6, where there was an
+
+if (arg->has_replaces) {
+    ...
+    replaces_node_name =3D arg->replaces;
+} else if (unfiltered_bs !=3D bs) {
+    replaces_node_name =3D unfiltered_bs->node_name;
+}
+
+But I moved that logic to blockdev_mirror_common() in this version.
+
+So it=E2=80=99s just useless now and replaces_node_name shouldn=E2=80=99t e=
+xist.
 
 Max
 
 
---UGaSVmeJhIU6iRKNmZaS6aPkdBw6rwrSn--
+--gwPBYk1Mpl24QAOwrdSrGctR4iYTpPfBH--
 
---pedGqhMB1Q0hdh4oacSsq2dohxUUjN5Hm
+--c5x4npZVcB270GfjhvfzsSi0YsmGWDCTv
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8asBMACgkQ9AfbAGHV
-z0ALGQf+MG6rWTlAk7zwC7P1SvUbJIKyE7M12+1FGUn046n6Jqj0R1qCin+6Fg4r
-icbgj+D/8lcUarkRYmyli53CGekMLfJP7qOMbbM2D92IwJ1TMgP61uHA7YQllkVn
-mk0wZ0CgXm9gu5ScWMvFM/a++rKCmlsyUvsCNnGPPO5tkeqgbU1mofSAS5OZM8nx
-+iQE0c5dzwzncsSWA3547rrtgQLPZp1Dkl3Q72Fu56s8p/WplE0ZHV0T34IMmgcN
-y6ikP8o1tngL/ADTj2l7W6aFMrLenOi+uPUZhmDpo9hKI9p538EZRPmGk31LX3/u
-l5LXx1cspaeQifDZQ5Y3NRl03KBLxg==
-=WJ9D
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8arpkACgkQ9AfbAGHV
+z0B6TAf7BTB2c3nEWTHngRMIfHxzMxHYNFOejHY3ntvw83XKr2WSlUsB0KNMJdBE
+Dlsrv4zGuMsP+fmfCrp6D/2EZccR9Ws2+pV34cMJvS2VLgN/LqDBtD/Yq3WkpsPW
+whoe7mL2OGiig6FbLAQtkOS14cAPHO5EkDMPZZmP/Gw3x2oVc27pSbzonJsZVQT8
+qcAIQBk5FUmeMNOPiEns/zMctSpa0SdyghIIFCsjm7CXU4Etep2qD5oRqpMZgq01
+u+EBKQ4AW0hFkm4rgAMcg1iQi8lFWetfiI1NYbmjVP83XopbclBvt4aazWKgLYV8
+TTdMISFsAz2eKAX1JZX9ZNTYYToekg==
+=ZGqJ
 -----END PGP SIGNATURE-----
 
---pedGqhMB1Q0hdh4oacSsq2dohxUUjN5Hm--
+--c5x4npZVcB270GfjhvfzsSi0YsmGWDCTv--
 
 
