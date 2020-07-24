@@ -2,120 +2,79 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E07C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDAF1C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:26:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DE0C2063A
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:24:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7zXGTiM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DE0C2063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B1F032063A
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:26:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1F032063A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jytwS-0007L4-Se
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 05:24:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50300)
+	id 1jytyC-0008Qj-13
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 05:26:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jytvr-0006h2-U5
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:23:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32250
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1jytvq-0005w2-6l
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:23:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595582636;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=e72o4FGX6KD/KS/5tmxy3Mi8ikGXO1RDdmgx4FZTSro=;
- b=c7zXGTiMaekQo730X/EV4zeTJ6k+i/bqbEV3hIk2hgIWgFjt4+VKIelegaYXt40H0qTpFz
- HpcI81dq3fkhQAGCtw3ez04PhL9ptN6F9SPyfzryGgDee855vS79jv4PuuKGTDHdD6Rg2W
- 9rpD3YsDb68aQWhSExkLxFAJTq9/SWc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-117-4ip3koTVPh6gV2V7stG7yA-1; Fri, 24 Jul 2020 05:23:52 -0400
-X-MC-Unique: 4ip3koTVPh6gV2V7stG7yA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5E6B800685;
- Fri, 24 Jul 2020 09:23:51 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-32.ams2.redhat.com
- [10.36.113.32])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7406572684;
- Fri, 24 Jul 2020 09:23:50 +0000 (UTC)
-Subject: Re: [PATCH v7 29/47] blockdev: Use CAF in external_snapshot_prepare()
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-30-mreitz@redhat.com>
- <f89e95e4-10c8-f5ae-f085-2da4d936c043@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3c127508-ca2e-a92d-9caf-da707bfb5d0b@redhat.com>
-Date: Fri, 24 Jul 2020 11:23:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jytxd-000806-TH
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:25:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59576)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jytxb-0006Fj-9g
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:25:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jytxZ-0002NA-Ir
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 09:25:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8D5292E80D2
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 09:25:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <f89e95e4-10c8-f5ae-f085-2da4d936c043@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="BSeumGVnHOeB2ZHbXnSB1WNUYhdkUYHko"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:01:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 24 Jul 2020 09:10:34 -0000
+From: xuan <1888818@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: xavier-ding
+X-Launchpad-Bug-Reporter: xuan (xavier-ding)
+X-Launchpad-Bug-Modifier: xuan (xavier-ding)
+Message-Id: <159558183424.11837.7512442025195132206.malonedeb@wampee.canonical.com>
+Subject: [Bug 1888818] [NEW] Multi-queue vhost-user fails to reconnect with
+ qemu version >=4.2
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="f877c5162b568393e2d07ce948459ba0abc456fe";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a29f9a9e0f1c6f5aca7ebd22871209a0ab29a587
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 04:30:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -124,91 +83,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1888818 <1888818@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BSeumGVnHOeB2ZHbXnSB1WNUYhdkUYHko
-Content-Type: multipart/mixed; boundary="YPdenUVkjkdkchT1oHgwuFiM8pPa59zFM"
+Public bug reported:
 
---YPdenUVkjkdkchT1oHgwuFiM8pPa59zFM
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Test Environment:
+DPDK version: DPDK v20.08
+Other software versions: qemu4.2.0, qemu5.0.0.
+OS: Linux 4.15.0-20-generic
+Compiler: gcc (Ubuntu 7.3.0-16ubuntu3) 8.4.0
+Hardware platform: Purley.
+Test Setup
+Steps to reproduce
+List the steps to reproduce the issue.
 
-On 20.07.20 18:08, Andrey Shinkevich wrote:
-> On 25.06.2020 18:21, Max Reitz wrote:
->> This allows us to differentiate between filters and nodes with COW
->> backing files: Filters cannot be used as overlays at all (for this
->> function).
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 blockdev.c | 7 ++++++-
->> =C2=A0 1 file changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/blockdev.c b/blockdev.c
->> index 1eb0fcdea2..aabe51036d 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -1549,7 +1549,12 @@ static void
->> external_snapshot_prepare(BlkActionState *common,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto out;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (state->new_bs->backing !=3D NULL) {
->> +=C2=A0=C2=A0=C2=A0 if (state->new_bs->drv->is_filter) {
->=20
->=20
-> Is there a chance to get a filter here? If so, is that when a user
-> specifies the file name of such a kind =E2=80=9Cfilter[filter-name]:foo.q=
-cow2=E2=80=9D
-> or somehow else?
+Test flow
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+1. Launch vhost-user testpmd as port0 with 2 queues:
 
-It would be with blockdev-snapshot and by specifying a filter for
-@overlay.  Technically that=E2=80=99s already caught by the check whether t=
-he
-overlay supports backing images (whether drv->supports_backing is true),
-but we might as well give a nicer error message.
+./x86_64-native-linuxapp-gcc/app/testpmd -l 2-4 -n 4 \
+=C2=A0=C2=A0=C2=A0=C2=A0--file-prefix=3Dvhost --vdev 'net_vhost0,iface=3Dvh=
+ost-net,queues=3D2,client=3D1' -- -i --txd=3D1024 --rxd=3D1024 --txq=3D2 --=
+rxq=3D2
+testpmd>start
 
-Example:
+3. Launch qemu with virtio-net:
 
-{"execute":"qmp_capabilities"}
+=C2=A0taskset -c 13 \
+=C2=A0=C2=A0=C2=A0=C2=A0qemu-system-x86_64 -name us-vhost-vm1 \
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-cpu host -enable-kvm -m 2048 -ob=
+ject memory-backend-file,id=3Dmem,size=3D2048M,mem-path=3D/mnt/huge,share=
+=3Don \
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-numa node,memdev=3Dmem \
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-mem-prealloc -monitor unix:/tmp/=
+vm2_monitor.sock,server,nowait -netdev user,id=3Dyinan,hostfwd=3Dtcp:127.0.=
+0.1:6005-:22 -device e1000,netdev=3Dyinan \
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-smp cores=3D1,sockets=3D1 -drive=
+ file=3D/home/osimg/ubuntu16.img  \
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-chardev socket,id=3Dchar0,path=
+=3D./vhost-net,server \
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-netdev type=3Dvhost-user,id=3Dmy=
+net1,chardev=3Dchar0,vhostforce,queues=3D2 \
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,mac=3D52:5=
+4:00:00:00:01,netdev=3Dmynet1,mrg_rxbuf=3Don,csum=3Don,gso=3Don,host_tso4=
+=3Don,guest_tso4=3Don,mq=3Don,vectors=3D15 \
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-vnc :10 -daemonize
 
-{"execute":"blockdev-add","arguments":
- {"node-name":"overlay","driver":"copy-on-read",
-  "file":{"driver":"null-co"}}}
+6. Quit testpmd and restart vhost-user :
 
-{"execute":"blockdev-add","arguments":
- {"node-name":"base","driver":"null-co"}}
+testpmd>quit
+./x86_64-native-linuxapp-gcc/app/testpmd -l 2-4 -n 4 \
+=C2=A0=C2=A0=C2=A0=C2=A0--file-prefix=3Dvhost --vdev 'net_vhost0,iface=3Dvh=
+ost-net,queues=3D2,client=3D1' -- -i --txd=3D1024 --rxd=3D1024 --txq=3D2 --=
+rxq=3D2
 
-{"execute":"blockdev-snapshot","arguments":
- {"node":"base","overlay":"overlay"}}
+Expected Result:
+After the vhost-user is killed then re-launched, the virtio-net can connect=
+ back to vhost-user again.
 
-Max
+Actual Result:
+Vhost-user relaunch failed with continous log printed"VHOST_CONFIG: Process=
+ing VHOST_USER_SET_FEATURES failed.
 
+Analysis:
+This is a regression bug, bad commit: c6beefd674f
+When vhost-user quits, QEMU doesnot save acked features for each virtio-net=
+ after vhost-user quits. When vhost-user reconnects to QEMU, QEMU sends two=
+ different features(one is the true acked feature while the another is 0x40=
+000000) to vhost-user successively which causing vhost-user exits abnormall=
+y.
 
---YPdenUVkjkdkchT1oHgwuFiM8pPa59zFM--
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
---BSeumGVnHOeB2ZHbXnSB1WNUYhdkUYHko
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+** Summary changed:
 
------BEGIN PGP SIGNATURE-----
+- vhost-user/vitrio-net test fail to reconnect from vhost-user with qemu ve=
+rsion >=3D4.2
++ vhost-user fail to reconnect from virtio-net with qemu version >=3D4.2
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8aqKQACgkQ9AfbAGHV
-z0DpUAf7Bbo+eQHXgIKyivthXzNdTKUeA1mUa/0S14dRQeqpwq0Z5CxPh4qEFDI+
-/2zdX0Mxap4VsnVJ6ntkFLpy+uvCok0aZHrgsEnOTSYS4VFwRGzXABARMsuWMXJ9
-PDjIIKXD7WsCCBfPk/GSDzLkwowbEjRtCC1bEOeJospAn5kt2r4sNTKZVRc0RNQd
-BSlgVNj5VZBE7lD0qwTXbgsYGx5zDBpg8EyHsusa/d/wyywnUcXx3QJCorUtyaPZ
-orDtI2ZyjTs5WViFnIIhEjDbrIboqvamCfyg2OzPDXETp9I3u47lGxAwZYxLoQn0
-MzeXLdeWHH36kra94JNWUCLKG97Ylg==
-=ffLW
------END PGP SIGNATURE-----
+** Description changed:
 
---BSeumGVnHOeB2ZHbXnSB1WNUYhdkUYHko--
+  Test Environment:
+  DPDK version: DPDK v20.08
+- Other software versions: qemu4.2, qemu5.0.
++ Other software versions: qemu4.2.0, qemu5.0.0.
+  OS: Linux 4.15.0-20-generic
+  Compiler: gcc (Ubuntu 7.3.0-16ubuntu3) 8.4.0
+  Hardware platform: Purley.
+  Test Setup
+  Steps to reproduce
+  List the steps to reproduce the issue.
+  =
 
+  Test flow
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D
+  1. Launch vhost-user testpmd as port0 with 2 queues:
+  =
+
+  ./x86_64-native-linuxapp-gcc/app/testpmd -l 2-4 -n 4 \
+-     --file-prefix=3Dvhost --vdev 'net_vhost0,iface=3Dvhost-net,queues=3D2=
+,client=3D1' -- -i --txd=3D1024 --rxd=3D1024 --txq=3D2 --rxq=3D2
++ =C2=A0=C2=A0=C2=A0=C2=A0--file-prefix=3Dvhost --vdev 'net_vhost0,iface=3D=
+vhost-net,queues=3D2,client=3D1' -- -i --txd=3D1024 --rxd=3D1024 --txq=3D2 =
+--rxq=3D2
+  testpmd>start
+  =
+
+  3. Launch qemu with virtio-net:
+  =
+
+-  taskset -c 13 \
+-     qemu-system-x86_64 -name us-vhost-vm1 \
+-        -cpu host -enable-kvm -m 2048 -object memory-backend-file,id=3Dmem=
+,size=3D2048M,mem-path=3D/mnt/huge,share=3Don \
+-        -numa node,memdev=3Dmem \
+-        -mem-prealloc -monitor unix:/tmp/vm2_monitor.sock,server,nowait -n=
+etdev user,id=3Dyinan,hostfwd=3Dtcp:127.0.0.1:6005-:22 -device e1000,netdev=
+=3Dyinan \
+-        -smp cores=3D1,sockets=3D1 -drive file=3D/home/osimg/ubuntu16.img =
+ \
+-        -chardev socket,id=3Dchar0,path=3D./vhost-net,server \
+-        -netdev type=3Dvhost-user,id=3Dmynet1,chardev=3Dchar0,vhostforce,q=
+ueues=3D2 \
+-        -device virtio-net-pci,mac=3D52:54:00:00:00:01,netdev=3Dmynet1,mrg=
+_rxbuf=3Don,csum=3Don,gso=3Don,host_tso4=3Don,guest_tso4=3Don,mq=3Don,vecto=
+rs=3D15 \
+-        -vnc :10 -daemonize
++ =C2=A0taskset -c 13 \
++ =C2=A0=C2=A0=C2=A0=C2=A0qemu-system-x86_64 -name us-vhost-vm1 \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-cpu host -enable-kvm -m 2048 -=
+object memory-backend-file,id=3Dmem,size=3D2048M,mem-path=3D/mnt/huge,share=
+=3Don \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-numa node,memdev=3Dmem \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-mem-prealloc -monitor unix:/tm=
+p/vm2_monitor.sock,server,nowait -netdev user,id=3Dyinan,hostfwd=3Dtcp:127.=
+0.0.1:6005-:22 -device e1000,netdev=3Dyinan \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-smp cores=3D1,sockets=3D1 -dri=
+ve file=3D/home/osimg/ubuntu16.img  \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-chardev socket,id=3Dchar0,path=
+=3D./vhost-net,server \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-netdev type=3Dvhost-user,id=3D=
+mynet1,chardev=3Dchar0,vhostforce,queues=3D2 \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,mac=3D52=
+:54:00:00:00:01,netdev=3Dmynet1,mrg_rxbuf=3Don,csum=3Don,gso=3Don,host_tso4=
+=3Don,guest_tso4=3Don,mq=3Don,vectors=3D15 \
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-vnc :10 -daemonize
+  =
+
+  6. Quit testpmd and restart vhost-user :
+  =
+
+  testpmd>quit
+  ./x86_64-native-linuxapp-gcc/app/testpmd -l 2-4 -n 4 \
+-     --file-prefix=3Dvhost --vdev 'net_vhost0,iface=3Dvhost-net,queues=3D2=
+,client=3D1' -- -i --txd=3D1024 --rxd=3D1024 --txq=3D2 --rxq=3D2
+- =
+
++ =C2=A0=C2=A0=C2=A0=C2=A0--file-prefix=3Dvhost --vdev 'net_vhost0,iface=3D=
+vhost-net,queues=3D2,client=3D1' -- -i --txd=3D1024 --rxd=3D1024 --txq=3D2 =
+--rxq=3D2
+  =
+
+  Expected Result:
+  After the vhost-user is killed then re-launched, the virtio-net can conne=
+ct back to vhost-user again.
+  =
+
+  Actual Result:
+  Vhost-user relaunch failed with continous log printed"VHOST_CONFIG: Proce=
+ssing VHOST_USER_SET_FEATURES failed.
+  =
+
+  Analysis:
+  This is a regression bug, bad commit: c6beefd674f
+  When vhost-user quits, QEMU doesnot save acked features for each virtio-n=
+et after vhost-user quits. When vhost-user reconnects to QEMU, QEMU sends t=
+wo different features(one is the true acked feature while the another is 0x=
+40000000) to vhost-user successively which causing vhost-user exits abnorma=
+lly.
+
+** Summary changed:
+
+- vhost-user fail to reconnect from virtio-net with qemu version >=3D4.2
++ Multi-queue vhost-user fails to reconnect with qemu version >=3D4.2
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888818
+
+Title:
+  Multi-queue vhost-user fails to reconnect with qemu version >=3D4.2
+
+Status in QEMU:
+  New
+
+Bug description:
+  Test Environment:
+  DPDK version: DPDK v20.08
+  Other software versions: qemu4.2.0, qemu5.0.0.
+  OS: Linux 4.15.0-20-generic
+  Compiler: gcc (Ubuntu 7.3.0-16ubuntu3) 8.4.0
+  Hardware platform: Purley.
+  Test Setup
+  Steps to reproduce
+  List the steps to reproduce the issue.
+
+  Test flow
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D
+  1. Launch vhost-user testpmd as port0 with 2 queues:
+
+  ./x86_64-native-linuxapp-gcc/app/testpmd -l 2-4 -n 4 \
+  =C2=A0=C2=A0=C2=A0=C2=A0--file-prefix=3Dvhost --vdev 'net_vhost0,iface=3D=
+vhost-net,queues=3D2,client=3D1' -- -i --txd=3D1024 --rxd=3D1024 --txq=3D2 =
+--rxq=3D2
+  testpmd>start
+
+  3. Launch qemu with virtio-net:
+
+  =C2=A0taskset -c 13 \
+  =C2=A0=C2=A0=C2=A0=C2=A0qemu-system-x86_64 -name us-vhost-vm1 \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-cpu host -enable-kvm -m 2048 -=
+object memory-backend-file,id=3Dmem,size=3D2048M,mem-path=3D/mnt/huge,share=
+=3Don \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-numa node,memdev=3Dmem \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-mem-prealloc -monitor unix:/tm=
+p/vm2_monitor.sock,server,nowait -netdev user,id=3Dyinan,hostfwd=3Dtcp:127.=
+0.0.1:6005-:22 -device e1000,netdev=3Dyinan \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-smp cores=3D1,sockets=3D1 -dri=
+ve file=3D/home/osimg/ubuntu16.img  \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-chardev socket,id=3Dchar0,path=
+=3D./vhost-net,server \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-netdev type=3Dvhost-user,id=3D=
+mynet1,chardev=3Dchar0,vhostforce,queues=3D2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net-pci,mac=3D52=
+:54:00:00:00:01,netdev=3Dmynet1,mrg_rxbuf=3Don,csum=3Don,gso=3Don,host_tso4=
+=3Don,guest_tso4=3Don,mq=3Don,vectors=3D15 \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-vnc :10 -daemonize
+
+  6. Quit testpmd and restart vhost-user :
+
+  testpmd>quit
+  ./x86_64-native-linuxapp-gcc/app/testpmd -l 2-4 -n 4 \
+  =C2=A0=C2=A0=C2=A0=C2=A0--file-prefix=3Dvhost --vdev 'net_vhost0,iface=3D=
+vhost-net,queues=3D2,client=3D1' -- -i --txd=3D1024 --rxd=3D1024 --txq=3D2 =
+--rxq=3D2
+
+  Expected Result:
+  After the vhost-user is killed then re-launched, the virtio-net can conne=
+ct back to vhost-user again.
+
+  Actual Result:
+  Vhost-user relaunch failed with continous log printed"VHOST_CONFIG: Proce=
+ssing VHOST_USER_SET_FEATURES failed.
+
+  Analysis:
+  This is a regression bug, bad commit: c6beefd674f
+  When vhost-user quits, QEMU doesnot save acked features for each virtio-n=
+et after vhost-user quits. When vhost-user reconnects to QEMU, QEMU sends t=
+wo different features(one is the true acked feature while the another is 0x=
+40000000) to vhost-user successively which causing vhost-user exits abnorma=
+lly.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888818/+subscriptions
 
