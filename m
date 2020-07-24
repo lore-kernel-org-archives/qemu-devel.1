@@ -5,87 +5,87 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F27C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC30C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:56:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57FD320714
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:00:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEC8D20792
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:56:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xqvDR586"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57FD320714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AsND7eHY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEC8D20792
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyosn-0003NA-KZ
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 00:00:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38722)
+	id 1jyooZ-0001ug-VY
+	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 23:56:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jyorx-0002tP-Ow
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 23:59:37 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38989)
+ id 1jyont-0001QB-7P
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 23:55:25 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42807)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jyorw-0005jL-3I
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 23:59:37 -0400
-Received: by mail-pl1-x641.google.com with SMTP id b9so3770339plx.6
- for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 20:59:35 -0700 (PDT)
+ id 1jyonr-0004xY-Cp
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 23:55:24 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 1so4359056pfn.9
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 20:55:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=XjdktMDmz9PN4tGrlzmXySUB4FgiQVb7VNbcbwk1gP4=;
- b=xqvDR586IFTSphozaZtOIXepGSwdlVBRGoNlGKo5xFRxaw3Np0JM2sScNtCe4/zUKb
- horoj1vwnSQ2fuLNOir+GNlzuIif81EDKfNNT5AiPpciXmyDeFoGFO3Rhwk2moYhPqDQ
- PR1cK2UUVCp6E2znSGTjQQ5QflawkYahmRbkJ8dZEbDwTu/QHuCoymXA/FOXDigZ36wL
- IC8QZVuR97zb0eKcJc7KhNB4zU+COLVfJwGqwWF4fdg3Gwp9wWDWqg54kQvIAVxkj1o3
- 1LHTr0vvqrNfdlrTeWtoz8qw5F2CmGeSEBBGi8RatNLcJ569TC+7OMp+mxFLHEIPIlqX
- 49Jg==
+ bh=nAwJfw/ynnW+pwvb1PJ+GO/cChQY6DGXtFZA8patnu8=;
+ b=AsND7eHYwStsSLu+w99k/5HJeJHqsiyww8FP7ZBe4O8p83aymnJfwK4JSmuf88LD/J
+ LesbTQraPhPlYtJk9HiH4Qcu+uIvW5khHWf1w7Ds5T+LGZjBHNj44uJVaKquFkFziUWk
+ W+NV6skiuxMPHbEqGhocWhe9FUenDkNB7xkejQw8onlFx2XxhSdPiq7/BByiVXWDokcW
+ Wa3YYro++oCMo+14DvF1ZNmDsOtuelo8kYClyn5ILf2SGauH6J7jvnB1IfGJOwh6K8vk
+ 4UfA4ERTHiY3DiJN9sl0smWwIEi4DQlC6Wyk27EQWGRLjDLKr3OWTOAPtEQIK3MIcOK5
+ iVDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=XjdktMDmz9PN4tGrlzmXySUB4FgiQVb7VNbcbwk1gP4=;
- b=IR83n8NR4nltnC0gCVdCLd8YkjaYvxU2FETCrilJVt/VZ1BFTjH8EV+jJqatPaUFpk
- cu8K9iFT7bFGsTlWM15NG7IS+lZb/GjlUAAtoNoQID7dZIlib9M4y5SmSn83Bm0fSicq
- z06PvpEuu+ECw+F56aT2P0qi4rxqfFw84k+J0HHjGamwzoxpMqD4HheV1AadvSGYZXB2
- Lzrma52enI+9SHMT4Fba5rPJRnN0fMuV/xJrldNU9CXUWIAhPsFnqwyv2jhfeIPkNueA
- E5FHg4PyKdTEI/yLsb27yzRJyhOPbYEwlM1IX4VWaUT2oiFj8aeLWWFb9RyOvCPAbJqm
- wUAw==
-X-Gm-Message-State: AOAM5313xOIwFRbdSAGq59hZqUGNrGpjsLbqGADDdWAgDc8KninKDLvo
- KH4oR+1pHYVT5iGuhx9dYw8UtA==
-X-Google-Smtp-Source: ABdhPJzhgd6xmZPBn7dtZJJdptZeTNsNt1oAyloLyUv9qnJZPVS2Jts46uP4ncq1P4AOQWcox5Nrdw==
-X-Received: by 2002:a17:90a:6b02:: with SMTP id
- v2mr3351394pjj.163.1595563174671; 
- Thu, 23 Jul 2020 20:59:34 -0700 (PDT)
+ bh=nAwJfw/ynnW+pwvb1PJ+GO/cChQY6DGXtFZA8patnu8=;
+ b=E+2jz3yYMbKlw8nBati30aEVqUVUGtQGCYkLDf8q9Xvkf6ER0i8Rbk67oHIHrDBvMK
+ JoPM3RMV3dowKrhumq9/3mqMF9ZUi+4myNu7d7aZCTcWqVW2oJ50YpNqsQHIsi99D26N
+ UxNzGkC7pm/nvgQw1Vm0GdWoybtro/lZmyicICJW4Sok7LMPfu9kQ2DkzlGx63gHWf5/
+ ITpmV1ovo/vXGaf9fNNbfcHVab0sGm20ysqrBrL29KTK/932LgrGpjgRVBxV0WonaQ4h
+ KTKOPftHFLPzZq5zW+q5ZrH/qjh/7fdWqJiaM6AAUGmogjaeTmTtBZHRiMLWEXCA6Jxi
+ 8BCA==
+X-Gm-Message-State: AOAM533y88U1AHbi6HOBjyfHESas5qiB5IHH1Vhl3nB60avIR41s9KW2
+ zKajAY/ArYHGP4SwQY7KSo6Guw==
+X-Google-Smtp-Source: ABdhPJz4qtUh3bQJ6DoOwNRm1iPGGcdiS8VHCycUPP8RyTzKZuKXISi1giOIu9qRzs4ShBh5SEh9sA==
+X-Received: by 2002:a63:4144:: with SMTP id o65mr6966068pga.8.1595562921530;
+ Thu, 23 Jul 2020 20:55:21 -0700 (PDT)
 Received: from [192.168.1.11] (216-160-65-90.tukw.qwest.net. [216.160.65.90])
  by smtp.gmail.com with ESMTPSA id
- 66sm4746432pfa.92.2020.07.23.20.59.33
+ v28sm4728708pgn.81.2020.07.23.20.55.19
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 23 Jul 2020 20:59:33 -0700 (PDT)
-Subject: Re: [PATCH v2 4/7] target/riscv: Check nanboxed inputs to fp helpers
+ Thu, 23 Jul 2020 20:55:20 -0700 (PDT)
+Subject: Re: [PATCH v2 1/7] target/riscv: Generate nanboxed results from fp
+ helpers
 To: LIU Zhiwei <zhiwei_liu@c-sky.com>, qemu-devel@nongnu.org
 References: <20200724002807.441147-1-richard.henderson@linaro.org>
- <20200724002807.441147-5-richard.henderson@linaro.org>
- <abf8bc3d-b021-6d01-3b7d-fa42bfe64653@c-sky.com>
+ <20200724002807.441147-2-richard.henderson@linaro.org>
+ <1aa6cb56-2f41-45c1-2d32-ec8b3b10780b@c-sky.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a624b5cc-bee5-76c6-35ce-008a4bf9f0ca@linaro.org>
-Date: Thu, 23 Jul 2020 20:59:31 -0700
+Message-ID: <9e10c17c-7a9e-5f7f-b1e3-c195d4e30b32@linaro.org>
+Date: Thu, 23 Jul 2020 20:55:18 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <abf8bc3d-b021-6d01-3b7d-fa42bfe64653@c-sky.com>
+In-Reply-To: <1aa6cb56-2f41-45c1-2d32-ec8b3b10780b@c-sky.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,56 +112,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/23/20 7:47 PM, LIU Zhiwei wrote:
+On 7/23/20 7:35 PM, LIU Zhiwei wrote:
 > 
 > 
 > On 2020/7/24 8:28, Richard Henderson wrote:
->> If a 32-bit input is not properly nanboxed, then the input is
->> replaced with the default qnan.
+>> Make sure that all results from single-precision scalar helpers
+>> are properly nan-boxed to 64-bits.
 >>
 >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 >> ---
->>   target/riscv/internals.h  | 11 +++++++
->>   target/riscv/fpu_helper.c | 64 ++++++++++++++++++++++++++++-----------
->>   2 files changed, 57 insertions(+), 18 deletions(-)
+>>   target/riscv/internals.h  |  5 +++++
+>>   target/riscv/fpu_helper.c | 42 +++++++++++++++++++++------------------
+>>   2 files changed, 28 insertions(+), 19 deletions(-)
 >>
 >> diff --git a/target/riscv/internals.h b/target/riscv/internals.h
->> index 9f4ba7d617..f1a546dba6 100644
+>> index 37d33820ad..9f4ba7d617 100644
 >> --- a/target/riscv/internals.h
 >> +++ b/target/riscv/internals.h
->> @@ -43,4 +43,15 @@ static inline uint64_t nanbox_s(float32 f)
->>       return f | MAKE_64BIT_MASK(32, 32);
->>   }
->>   +static inline float32 check_nanbox_s(uint64_t f)
+>> @@ -38,4 +38,9 @@ target_ulong fclass_d(uint64_t frs1);
+>>   #define SEW32 2
+>>   #define SEW64 3
+>>   +static inline uint64_t nanbox_s(float32 f)
 >> +{
->> +    uint64_t mask = MAKE_64BIT_MASK(32, 32);
->> +
->> +    if (likely((f & mask) == mask)) {
->> +        return (uint32_t)f;
->> +    } else {
->> +        return 0x7fc00000u; /* default qnan */
->> +    }
+>> +    return f | MAKE_64BIT_MASK(32, 32);
 >> +}
 >> +
-> If possible,
+> If define it here,  we can also define a more general  function with flen.
 > 
-> +static inline float32 check_nanbox(uint64_t f, uint32_t flen)
+> +static inline uint64_t nanbox_s(float32 f, uint32_t flen)
 > +{
-> +    uint64_t mask = MAKE_64BIT_MASK(flen, 64 - flen);
-> +
-> +    if (likely((f & mask) == mask)) {
-> +        return (uint32_t)f;
-> +    } else {
-> +        return (flen == 32) ? 0x7fc00000u : 0x7e00u; /* default qnan */
-> +    }
+> +    return f | MAKE_64BIT_MASK(flen, 64 - flen);
 > +}
+> +
+> 
+> So we can reuse it in fp16 or bf16 scalar instruction and in vector instructions.
 
-The difficulty of choosing the proper default qnan is an example of why we
-should *not* attempt to make this function fully general, but should instead
-define separate functions for each type.  E.g.
+While we could do that, we will not encounter all possible lengths.  In the
+cover letter, I mentioned defining a second function,
 
-static inline float16 check_nanbox_h(uint64_t f);
-static inline bfloat16 check_nanbox_b(uint64_t f);
+static inline uint64_t nanbox_h(float16 f)
+{
+   return f | MAKE_64BIT_MASK(16, 48);
+}
+
+Having two separate functions will, I believe, be easier to use in practice.
 
 
 r~
