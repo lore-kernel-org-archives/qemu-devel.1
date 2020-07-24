@@ -2,129 +2,79 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888EEC433E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 15:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EBA0C433E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 15:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54FE02064B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 15:56:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="gFb7gKNj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54FE02064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id D74002064B
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 15:57:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74002064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jz03s-0002yQ-FN
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 11:56:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44474)
+	id 1jz04K-0003PF-6y
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 11:57:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jz02Q-0001p0-QO; Fri, 24 Jul 2020 11:55:10 -0400
-Received: from mail-eopbgr40139.outbound.protection.outlook.com
- ([40.107.4.139]:65178 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jz02P-0002Im-5Y; Fri, 24 Jul 2020 11:55:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h2T6hKhbtkqQPSQT3I3wQekxqwGmLHeJqXMt4W8SWKo/YedG87Ln7n8NkvkiBNFjTxn5TXjdKx4SZ8R8Bn104VUhAUB87rIPgDYZSpEvTknkcKQYREjkyxHOFsjWpa1tQHj5VNGAAhPJZRaHIHauul/UmFs9DCJECOADIvfCNWslOLM4mQDI+v0susMAy7MJUQ6XhyMBpDBjLa3273p73lyBp0OHO4Nw+ztPrLC8o4++ErWeXiLpZ5vXEcY0qlS/fQGNlYaLYAI5vEzxZg9x1kJTMnu4FWq2VVk1WyqF5DEoBWq8uxm3dz5q372i3DYbFZNZLT++WzUiQKbFZoo9vg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Srv4/PLf9bwoofbnslXbjWMbaVuL9Os+h4XJmVNf7DI=;
- b=iRxqsRvZFIkd15KThabDDRnEmNCj3uLmtvA1OjPi8pE1nKp9ofAHUJnqqz0qjh6jr6AJLBKbJDs06s9+9U2Iv11c8nlReqHbzVJdgO76niLWPFE9g8kJGTurKgICreOS+efWHNrIJtKrlwt9ThJ+Stz3uqEcS6bzuUEETTGM4902af5bYdXshi1dxiOXUhuWzn9vrv8S4MBd8pKSl1tlJH07AaEazc1+AbffAVSqfrXTh6X9pJSoRK3NSc8oAA1IjSPLrbZYRXt+Dx5jCYeAKkwqkX5WoEtrnbkZTQNRIdIo6JBveeLIvFFzHkNzT/CK9eoF5DhOAGmCLEl1hFdY6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Srv4/PLf9bwoofbnslXbjWMbaVuL9Os+h4XJmVNf7DI=;
- b=gFb7gKNjj01bmZD4mR8R/qRq2zu74rDYUHlSdyezwREvEHv7kpfpr24IINScOk2Lu4RAlRqctMkx6yoQCloSqmWhU7/gifE5SfxEqaAng7H9Asirxgt0oTYKD0h6gOsMYyyRhtDmnVuqEXASonXBTG97KlC8HOm4hrKv+NN5OGg=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB3765.eurprd08.prod.outlook.com (2603:10a6:20b:8f::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.24; Fri, 24 Jul
- 2020 15:55:06 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3195.028; Fri, 24 Jul 2020
- 15:55:06 +0000
-Subject: Re: [PATCH v7 38/47] block: Drop backing_bs()
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-39-mreitz@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <2abe7568-75ca-d09f-0241-17db11ccc5e4@virtuozzo.com>
-Date: Fri, 24 Jul 2020 18:55:00 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <20200625152215.941773-39-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM0PR03CA0040.eurprd03.prod.outlook.com (2603:10a6:208::17)
- To AM6PR08MB4070.eurprd08.prod.outlook.com
- (2603:10a6:20b:a3::25)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jz035-0002XM-UI
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 11:55:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41734)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jz033-0002XY-HJ
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 11:55:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jz031-0008NY-Dv
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 15:55:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 59CA12E804E
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 15:55:47 +0000 (UTC)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.82) by
- AM0PR03CA0040.eurprd03.prod.outlook.com (2603:10a6:208::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3216.21 via Frontend Transport; Fri, 24 Jul 2020 15:55:02 +0000
-X-Originating-IP: [109.252.114.82]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 32883f40-ed25-4e5d-3bd3-08d82fe9ef11
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3765:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3765C3753CC7826E26DFEF9FF4770@AM6PR08MB3765.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:989;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yPlTC4JxjdrneehW9biJpJqKGF+S96iQCZY7S6QCC5cKfEGimbDxZjd6CxPmUtQwfkI7vwwtqdmvn6SLbR7TbxRBd/7TTqvGwyRpf0I+UWGCw6/Ly/+6kdaFB4ZBGNK6oBxP2pkIrzP7DccHIVaomTl3i6jZLWs2VjQej+9M12+XRzG2RkWRiJIzpMX1opDAjHYcbx3jWqDTsTwTG8Zqr4uRlBOH1oGg5GE9N+YhkJQRt02TaDXScW98RyXITW83+RTQ7jxzBCI4th57rtYMaxHIcwkhWb+WS32F6CATk3dafK/OvNBpvVvkoQYBhNruLD+wSZYS/4n9IKU5GYxB73Mjs6tjPdGulcB7VKrzYxt1oLANUBmss+47BSJtawNi
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(366004)(396003)(136003)(346002)(376002)(39850400004)(316002)(54906003)(2906002)(31696002)(31686004)(8936002)(8676002)(5660300002)(478600001)(83380400001)(36756003)(4326008)(66946007)(66476007)(66556008)(52116002)(6506007)(53546011)(86362001)(6486002)(16526019)(186003)(26005)(6512007)(956004)(2616005)(44832011)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 9i0ampoAs7mck0DKyZ6L9+viNMX1j5twysgvlkTKWmYZHvV1A8GdJAxLDkxpScRxCJB8yVDtfOb+S+p/Cczdqk3eszxmOfKoIVGFaw4K0mmSW/lZsLAcWY+tX39VcrjtDuYjTdpYm45Yi+s9sGfT6Uf7gnTYpX6VlXEcL81+NBj3Na9wLkORahS/6Nbyy6KAjg92ZOlyuEsVIyKQy/RzBsxJ5LdAM1f8SATZXrbqjKEsPnPdaRY3xeUsUZ+5+a0+iMG0yYxkFjKjNAyU0ApskhRsMS6oIgPezNYTtE9KgeQQZodvPnllau9s4Kwfz2B06hM2G/dl2SCKcbon0hV9hKhCVqv383jd49l7rJXD86sS74wS9ZfmCZGdUsh5WJLHPQLfENbbWKlucEs4Pxf+zEGxQ4+wc+brQfw5BVrJib3z6cDmR9ZcegyvcEuZXG0oDsK3mtaw52+KMd6lFutI9NdPwlEWeEJ4azRYXOKKim8em4FN87u6MqotGU4KHObg
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32883f40-ed25-4e5d-3bd3-08d82fe9ef11
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2020 15:55:05.9823 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e3LwObsiJRzFXegyghTxp1Txb6lwEoAwW7XpmXmgQDOkBncCKkxW//ievbV+G5E7Cwvh4WzmHmy7u+QUSRO22H8IH3l5KKmLqSIFHhiJ03E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3765
-Received-SPF: pass client-ip=40.107.4.139;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 11:55:07
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 24 Jul 2020 15:42:00 -0000
+From: Simon Kaegi <1888601@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h jasowang skaegi
+X-Launchpad-Bug-Reporter: Simon Kaegi (skaegi)
+X-Launchpad-Bug-Modifier: Simon Kaegi (skaegi)
+References: <159547584008.11100.1316842366379773629.malonedeb@wampee.canonical.com>
+Message-Id: <159560532032.4482.9344519056579498808.malone@wampee.canonical.com>
+Subject: [Bug 1888601] Re: QEMU v5.1.0-rc0/rc1 hang with nested virtualization
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e85d0ab92e2924d39b8285aeae075a01d25eff06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ea69d246f3e7944d673ad4db27be5d418b4f5748
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 10:50:36
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -133,42 +83,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1888601 <1888601@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25.06.2020 18:22, Max Reitz wrote:
-> We want to make it explicit where bs->backing is used, and we have done
-> so.  The old role of backing_bs() is now effectively taken by
-> bdrv_cow_bs().
->
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   include/block/block_int.h | 5 -----
->   1 file changed, 5 deletions(-)
->
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index c963ee9f28..6e09e15ed4 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -991,11 +991,6 @@ typedef enum BlockMirrorBackingMode {
->       MIRROR_LEAVE_BACKING_CHAIN,
->   } BlockMirrorBackingMode;
->   
-> -static inline BlockDriverState *backing_bs(BlockDriverState *bs)
-> -{
-> -    return bs->backing ? bs->backing->bs : NULL;
-> -}
-> -
->   
->   /* Essential block drivers which must always be statically linked into qemu, and
->    * which therefore can be accessed without using bdrv_find_format() */
+It hangs (still guessing here) immediately -- before anything is logged.
+I'll try to get you a calltrace but have to figure out how to do that
+first ;) Any pointers appreciated.
 
+-- =
 
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888601
 
+Title:
+  QEMU v5.1.0-rc0/rc1 hang with nested virtualization
 
+Status in QEMU:
+  New
+
+Bug description:
+  We're running Kata Containers using QEMU and with v5.1.0rc0 and rc1
+  have noticed a problem at startup where QEMu appears to hang. We are
+  not seeing this problem on our bare metal nodes and only on a VSI that
+  supports nested virtualization.
+
+  We unfortunately see nothing at all in the QEMU logs to help
+  understand the problem and a hung process is just a guess at this
+  point.
+
+  Using git bisect we first see the problem with...
+
+  ---
+
+  f19bcdfedd53ee93412d535a842a89fa27cae7f2 is the first bad commit
+  commit f19bcdfedd53ee93412d535a842a89fa27cae7f2
+  Author: Jason Wang <jasowang@redhat.com>
+  Date:   Wed Jul 1 22:55:28 2020 +0800
+
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio-pci: implement queue_enabled method
+
+  =C2=A0=C2=A0=C2=A0=C2=A0With version 1, we can detect whether a queue is =
+enabled via
+  =C2=A0=C2=A0=C2=A0=C2=A0queue_enabled.
+
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Jason Wang <jasowang@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Cindy Lu <lulu@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <20200701145538.22333-5-lulu@redhat.c=
+om>
+  =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Acked-by: Jason Wang <jasowang@redhat.com>
+
+  =C2=A0hw/virtio/virtio-pci.c | 13 +++++++++++++
+  =C2=A01 file changed, 13 insertions(+)
+
+  ---
+
+  Reverting this commit (on top of 5.1.0-rc1) seems to work and prevent
+  the hanging.
+
+  ---
+
+  Here's how kata ends up launching qemu in our environment --
+  /opt/kata/bin/qemu-system-x86_64 -name sandbox-849df14c6065931adedb9d18bc=
+9260a6d896f1814a8c5cfa239865772f1b7a5f -uuid 6bec458e-1da7-4847-a5d7-5ab31d=
+4d2465 -machine pc,accel=3Dkvm,kernel_irqchip -cpu host,pmu=3Doff -qmp unix=
+:/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5=
+f/qmp.sock,server,nowait -m 4096M,slots=3D10,maxmem=3D30978M -device pci-br=
+idge,bus=3Dpci.0,id=3Dpci-bridge-0,chassis_nr=3D1,shpc=3Don,addr=3D2,romfil=
+e=3D -device virtio-serial-pci,disable-modern=3Dtrue,id=3Dserial0,romfile=
+=3D -device virtconsole,chardev=3Dcharconsole0,id=3Dconsole0 -chardev socke=
+t,id=3Dcharconsole0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f=
+1814a8c5cfa239865772f1b7a5f/console.sock,server,nowait -device virtio-scsi-=
+pci,id=3Dscsi0,disable-modern=3Dtrue,romfile=3D -object rng-random,id=3Drng=
+0,filename=3D/dev/urandom -device virtio-rng-pci,rng=3Drng0,romfile=3D -dev=
+ice virtserialport,chardev=3Dcharch0,id=3Dchannel0,name=3Dagent.channel.0 -=
+chardev socket,id=3Dcharch0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
+0a6d896f1814a8c5cfa239865772f1b7a5f/kata.sock,server,nowait -chardev socket=
+,id=3Dchar-396c5c3e19e29353,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
+0a6d896f1814a8c5cfa239865772f1b7a5f/vhost-fs.sock -device vhost-user-fs-pci=
+,chardev=3Dchar-396c5c3e19e29353,tag=3DkataShared,romfile=3D -netdev tap,id=
+=3Dnetwork-0,vhost=3Don,vhostfds=3D3:4,fds=3D5:6 -device driver=3Dvirtio-ne=
+t-pci,netdev=3Dnetwork-0,mac=3D52:ac:2d:02:1f:6f,disable-modern=3Dtrue,mq=
+=3Don,vectors=3D6,romfile=3D -global kvm-pit.lost_tick_policy=3Ddiscard -vg=
+a none -no-user-config -nodefaults -nographic -daemonize -object memory-bac=
+kend-file,id=3Ddimm1,size=3D4096M,mem-path=3D/dev/shm,share=3Don -numa node=
+,memdev=3Ddimm1 -kernel /opt/kata/share/kata-containers/vmlinuz-5.7.9-74 -i=
+nitrd /opt/kata/share/kata-containers/kata-containers-initrd_alpine_1.11.2-=
+6_agent.initrd -append tsc=3Dreliable no_timer_check rcupdate.rcu_expedited=
+=3D1 i8042.direct=3D1 i8042.dumbkbd=3D1 i8042.nopnp=3D1 i8042.noaux=3D1 nor=
+eplace-smp reboot=3Dk console=3Dhvc0 console=3Dhvc1 iommu=3Doff cryptomgr.n=
+otests net.ifnames=3D0 pci=3Dlastbus=3D0 debug panic=3D1 nr_cpus=3D4 agent.=
+use_vsock=3Dfalse scsi_mod.scan=3Dnone init=3D/usr/bin/kata-agent -pidfile =
+/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5f=
+/pid -D /run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa23986577=
+2f1b7a5f/qemu.log -smp 2,cores=3D1,threads=3D1,sockets=3D4,maxcpus=3D4
+
+  ---
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888601/+subscriptions
 
