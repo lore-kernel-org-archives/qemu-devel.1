@@ -2,72 +2,98 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 576D8C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F27C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:00:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2901320709
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 03:22:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2901320709
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57FD320714
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:00:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xqvDR586"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57FD320714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyoIP-0004im-FO
-	for qemu-devel@archiver.kernel.org; Thu, 23 Jul 2020 23:22:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59564)
+	id 1jyosn-0003NA-KZ
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 00:00:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <king.wang@huawei.com>)
- id 1jyoHh-0004Ip-EI
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 23:22:09 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2472 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <king.wang@huawei.com>)
- id 1jyoHe-0000fH-H8
- for qemu-devel@nongnu.org; Thu, 23 Jul 2020 23:22:09 -0400
-Received: from nkgeml707-chm.china.huawei.com (unknown [172.30.72.55])
- by Forcepoint Email with ESMTP id 8EBA57340CC32C743A90;
- Fri, 24 Jul 2020 11:21:59 +0800 (CST)
-Received: from dggema763-chm.china.huawei.com (10.1.198.205) by
- nkgeml707-chm.china.huawei.com (10.98.57.157) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.1913.5; Fri, 24 Jul 2020 11:21:59 +0800
-Received: from dggema763-chm.china.huawei.com ([10.9.49.85]) by
- dggema763-chm.china.huawei.com ([10.9.49.85]) with mapi id 15.01.1913.007;
- Fri, 24 Jul 2020 11:21:58 +0800
-From: "Wangjing (Hogan, Cloud Infrastructure Service Product Dept.)"
- <king.wang@huawei.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>
-Subject: Re: [PATCH v1] hw/pci-host: save/restore pci host config register
-Thread-Topic: [PATCH v1] hw/pci-host: save/restore pci host config register
-Thread-Index: AdZhaT+s8aHRNmrveEmbvmzXYw8iJg==
-Date: Fri, 24 Jul 2020 03:21:58 +0000
-Message-ID: <ec09235475524a94b8aeb5dc73cd0e74@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.149.56]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jyorx-0002tP-Ow
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 23:59:37 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38989)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jyorw-0005jL-3I
+ for qemu-devel@nongnu.org; Thu, 23 Jul 2020 23:59:37 -0400
+Received: by mail-pl1-x641.google.com with SMTP id b9so3770339plx.6
+ for <qemu-devel@nongnu.org>; Thu, 23 Jul 2020 20:59:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=XjdktMDmz9PN4tGrlzmXySUB4FgiQVb7VNbcbwk1gP4=;
+ b=xqvDR586IFTSphozaZtOIXepGSwdlVBRGoNlGKo5xFRxaw3Np0JM2sScNtCe4/zUKb
+ horoj1vwnSQ2fuLNOir+GNlzuIif81EDKfNNT5AiPpciXmyDeFoGFO3Rhwk2moYhPqDQ
+ PR1cK2UUVCp6E2znSGTjQQ5QflawkYahmRbkJ8dZEbDwTu/QHuCoymXA/FOXDigZ36wL
+ IC8QZVuR97zb0eKcJc7KhNB4zU+COLVfJwGqwWF4fdg3Gwp9wWDWqg54kQvIAVxkj1o3
+ 1LHTr0vvqrNfdlrTeWtoz8qw5F2CmGeSEBBGi8RatNLcJ569TC+7OMp+mxFLHEIPIlqX
+ 49Jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XjdktMDmz9PN4tGrlzmXySUB4FgiQVb7VNbcbwk1gP4=;
+ b=IR83n8NR4nltnC0gCVdCLd8YkjaYvxU2FETCrilJVt/VZ1BFTjH8EV+jJqatPaUFpk
+ cu8K9iFT7bFGsTlWM15NG7IS+lZb/GjlUAAtoNoQID7dZIlib9M4y5SmSn83Bm0fSicq
+ z06PvpEuu+ECw+F56aT2P0qi4rxqfFw84k+J0HHjGamwzoxpMqD4HheV1AadvSGYZXB2
+ Lzrma52enI+9SHMT4Fba5rPJRnN0fMuV/xJrldNU9CXUWIAhPsFnqwyv2jhfeIPkNueA
+ E5FHg4PyKdTEI/yLsb27yzRJyhOPbYEwlM1IX4VWaUT2oiFj8aeLWWFb9RyOvCPAbJqm
+ wUAw==
+X-Gm-Message-State: AOAM5313xOIwFRbdSAGq59hZqUGNrGpjsLbqGADDdWAgDc8KninKDLvo
+ KH4oR+1pHYVT5iGuhx9dYw8UtA==
+X-Google-Smtp-Source: ABdhPJzhgd6xmZPBn7dtZJJdptZeTNsNt1oAyloLyUv9qnJZPVS2Jts46uP4ncq1P4AOQWcox5Nrdw==
+X-Received: by 2002:a17:90a:6b02:: with SMTP id
+ v2mr3351394pjj.163.1595563174671; 
+ Thu, 23 Jul 2020 20:59:34 -0700 (PDT)
+Received: from [192.168.1.11] (216-160-65-90.tukw.qwest.net. [216.160.65.90])
+ by smtp.gmail.com with ESMTPSA id
+ 66sm4746432pfa.92.2020.07.23.20.59.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Jul 2020 20:59:33 -0700 (PDT)
+Subject: Re: [PATCH v2 4/7] target/riscv: Check nanboxed inputs to fp helpers
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, qemu-devel@nongnu.org
+References: <20200724002807.441147-1-richard.henderson@linaro.org>
+ <20200724002807.441147-5-richard.henderson@linaro.org>
+ <abf8bc3d-b021-6d01-3b7d-fa42bfe64653@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a624b5cc-bee5-76c6-35ce-008a4bf9f0ca@linaro.org>
+Date: Thu, 23 Jul 2020 20:59:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.187; envelope-from=king.wang@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/23 23:22:00
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+In-Reply-To: <abf8bc3d-b021-6d01-3b7d-fa42bfe64653@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,113 +107,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jusual@redhat.com" <jusual@redhat.com>,
- "Wangxin \(Alexander\)" <wangxinxin.wang@huawei.com>,
- "Huangweidong \(C\)" <weidong.huang@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: frank.chang@sifive.com, alistair23@gmail.com, qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jul 25, 2020 at 10:53:03AM Hogan Wang wrote:
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > On Thu, Jul 23, 2020 at 02:12:54PM +0100, Dr. David Alan Gilbert wrote:
-> > > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > > On Thu, Jul 23, 2020 at 08:53:03PM +0800, Hogan Wang wrote:
-> > > > > From: Hogan Wang <king.wang@huawei.com>
-> > > > >=20
-> > > > > The pci host config register is used to save PCI address for=20
-> > > > > read/write config data. If guest write a value to config=20
-> > > > > register, and then pause the vcpu to migrate, After the=20
-> > > > > migration, the guest continue to write pci config data, and the=20
-> > > > > write data will be ignored because of new qemu process lost the c=
-onfig register state.
-> > > > >=20
-> > > > > Reproduction steps are:
-> > > > > 1. guest booting in seabios.
-> > > > > 2. guest enable the SMRAM in seabios:piix4_apmc_smm_setup, and th=
-en
-> > > > >    expect to disable the SMRAM by pci_config_writeb.
-> > > > > 3. after guest write the pci host config register, and then pasue=
-d vcpu
-> > > > >    to finish migration.
-> > > > > 4. guest write config data(0x0A) fail to disable the SMRAM becasu=
-e of
-> > > > >    config register state lost.
-> > > > > 5. guest continue to boot and crash in ipxe option ROM due to SMR=
-AM in
-> > > > >    enabled state.
-> > > > >=20
-> > > > > Signed-off-by: Hogan Wang <king.wang@huawei.com>
-> > > >=20
-> > > > I guess this is like v3 right?
-> > > >=20
-> > > > thanks a lot for the patch!
-> > > >=20
-> > > > My question stands : does anyone see a way to pass this info=20
-> > > > around without breaking migration for all existing machine types?
-> > >=20
-> > > You need a .needed clause in the vmstate_i440fx_pcihost and=20
-> > > vmstate_q35_pcihost which is a pointer to a function which enables=20
-> > > it on new machine types and ignores it on old ones.
-> > >=20
-> > > Or, if it always crashes if the SMRAM is enabled, then the migration=
-=20
-> > > is dead anyway; so you could make the .needed only save the config=20
-> > > if the SMRAM is opened, so you'd get a unknown section error, which=20
-> > > is nasty but it would only happen in the case it would crash anyway.
-> > >=20
-> > > Dave
-> >=20
-> > Problem is we never know whether it's needed.
-> >=20
-> > For example: guest programs cf8, then cfc.
-> > Guest on destination can crash if migrated after writing cf8 before=20
-> > writing cfc.
-> > But in theory it can also crash if guest assumes
-> > cf8 is unchanged and just writes cfc.
-> >=20
-> > So what I'd prefer to do is put it in some data that old qemu ignores.=
-=20
-> > Then once qemu on destination is updated, it will start interpreting=20
-> > it.
->=20
-> We don't have a way to do that; the choice is:
->   a) Not sending it for old versions, so you only get the
->     fix for new machine types
->=20
->   b) Trying to second guess when it will crash
->=20
-> I recommend (a) generally - but the format has no way to ignore unknown d=
-ata.
->=20
-> Dave
->=20
+On 7/23/20 7:47 PM, LIU Zhiwei wrote:
+> 
+> 
+> On 2020/7/24 8:28, Richard Henderson wrote:
+>> If a 32-bit input is not properly nanboxed, then the input is
+>> replaced with the default qnan.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>   target/riscv/internals.h  | 11 +++++++
+>>   target/riscv/fpu_helper.c | 64 ++++++++++++++++++++++++++++-----------
+>>   2 files changed, 57 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/target/riscv/internals.h b/target/riscv/internals.h
+>> index 9f4ba7d617..f1a546dba6 100644
+>> --- a/target/riscv/internals.h
+>> +++ b/target/riscv/internals.h
+>> @@ -43,4 +43,15 @@ static inline uint64_t nanbox_s(float32 f)
+>>       return f | MAKE_64BIT_MASK(32, 32);
+>>   }
+>>   +static inline float32 check_nanbox_s(uint64_t f)
+>> +{
+>> +    uint64_t mask = MAKE_64BIT_MASK(32, 32);
+>> +
+>> +    if (likely((f & mask) == mask)) {
+>> +        return (uint32_t)f;
+>> +    } else {
+>> +        return 0x7fc00000u; /* default qnan */
+>> +    }
+>> +}
+>> +
+> If possible,
+> 
+> +static inline float32 check_nanbox(uint64_t f, uint32_t flen)
+> +{
+> +    uint64_t mask = MAKE_64BIT_MASK(flen, 64 - flen);
+> +
+> +    if (likely((f & mask) == mask)) {
+> +        return (uint32_t)f;
+> +    } else {
+> +        return (flen == 32) ? 0x7fc00000u : 0x7e00u; /* default qnan */
+> +    }
+> +}
 
-The i440fx and q35 machines integrate i440FX or ICH9-LPC PCI device by
-default. Refer to i440FX and ICH9-LPC spcifications, there are some reserve=
-d
-configuration registers can used to save/restore PCIHostState.config_reg,
-like i440FX.config[0x57] used for Older coreboot to get RAM size from QEMU.
+The difficulty of choosing the proper default qnan is an example of why we
+should *not* attempt to make this function fully general, but should instead
+define separate functions for each type.  E.g.
 
-whitch is nasty but it friendly to old ones.
+static inline float16 check_nanbox_h(uint64_t f);
+static inline bfloat16 check_nanbox_b(uint64_t f);
 
-> >=20
-> > > >=20
-> > > > > ---
-> > > > >  hw/pci-host/i440fx.c       | 11 +++++++++++
-> > > > >  hw/pci-host/q35.c          | 11 +++++++++++
-> > > > >  hw/pci/pci_host.c          | 11 +++++++++++
-> > > > >  hw/pci/pcie_host.c         | 11 +++++++++++
-> > > > >  include/hw/pci/pci_host.h  | 10 ++++++++++ =20
-> > > > > include/hw/pci/pcie_host.h | 10 ++++++++++
-> > > > >  6 files changed, 64 insertions(+)
-> > > > >=20
-> > > >=20
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
+r~
 
