@@ -2,129 +2,124 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E69C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF6CC433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:47:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3872A20674
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:51:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09E0B2070B
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 09:47:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Fz0iA2fT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3872A20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QnARXzPk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E0B2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyuM2-0003eo-H9
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 05:51:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33370)
+	id 1jyuIO-0000tm-Az
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 05:47:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58122)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jyuKu-0002ba-Cv; Fri, 24 Jul 2020 05:49:52 -0400
-Received: from mail-eopbgr80114.outbound.protection.outlook.com
- ([40.107.8.114]:15677 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1jyuKp-0002Pc-RF; Fri, 24 Jul 2020 05:49:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JGJIsdmq3efcCPAFj4HPoq+jbnT07Xp5dDnmwaKUo4nAbPIBNry7wRzxQnTy+22gfdQU3hQ4y2xzzlLSn3LNuFLI2FDvt+CUboTqBdjDN5JrSzlmn5yWp5WLYY0Ld1hlMc6+qCYKRJPdDICqhIhN/FpWpliljvhvDTsElRI7WCkZoct58w1pKZliwXBjlyeD22rQ7YHRGP3Ufk/sGbxgNLL5XjNuWUiil/Cb2npWXCgj30Ny5sq9Ii85gyvorGk5ST2hnIVeWDqmy7ZlE/+JyUf1SAbkvMf5PlwfExV6xUzvbrwQm5v8cVcwcJcw6YgTch3/hfyUtvLHV9b56J3x0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tlIx278EKa/Z1rCkkTluUDucbPO/f4lMllxLTrlEBiI=;
- b=klR4RdLogMDGcSt/oj/FthuDFQdBVP8rt9P2PDdRDEuWaPXdA2/oKgDZu+Vwv/lsj/qDfGP6AM+HxZjm34UkbmpbMcV3vyIWOKmhPE8Ujfx87xMKSU95lJ7GnNHjlsNwPeC+0CAEzCDH/q1t12Jj2Jv7ZstrIhn59M8Tt7ds/pkZO7n/M6+xyRzTsOXm77h3wwmLNxouvnAPEl906/clRDSKp8NtVCbIOIaAoQbgHDCfaXI6qY9q+veu8XsdeeG2JtJW+XKYIrbUQK3SHc4lV37FHB+NBTCSK6SkN90YQcAB3MUK1x2rQSNMolXlgAsmsUQcUhpMmJH34lJdkAmthw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tlIx278EKa/Z1rCkkTluUDucbPO/f4lMllxLTrlEBiI=;
- b=Fz0iA2fTV8sDqFqmikxPHqYNVQ7aD1SGrVB1mh/32BGJ0NhrgmgemqHUz5tv89JLCyHIHNfHdJrMCfAqnAEDMLsu/7KwQROsWSkHr9P926xgeZS4yPcVtLte2q7gXUmAeLtVEKXF+/atc9vwocA5qfJH+121tYGd4iHIIfAxT08=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM6PR08MB4786.eurprd08.prod.outlook.com (2603:10a6:20b:cc::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.17; Fri, 24 Jul
- 2020 09:49:39 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3195.028; Fri, 24 Jul 2020
- 09:49:39 +0000
-Subject: Re: [PATCH v7 28/47] block/null: Implement
- bdrv_get_allocated_file_size
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-29-mreitz@redhat.com>
- <93f4b62e-78d9-af84-ab1c-95eea55bbc0f@virtuozzo.com>
- <b0c02e56-538e-88e9-33d6-4bb276aa3ed1@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <fa3b2624-b155-450b-5cff-2d41b41463bc@virtuozzo.com>
-Date: Fri, 24 Jul 2020 12:49:36 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <b0c02e56-538e-88e9-33d6-4bb276aa3ed1@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM4PR0302CA0023.eurprd03.prod.outlook.com
- (2603:10a6:205:2::36) To AM6PR08MB4070.eurprd08.prod.outlook.com
- (2603:10a6:20b:a3::25)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jyuHb-0000S5-To
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:46:28 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:47092)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1jyuHa-0001OW-Gr
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:46:27 -0400
+Received: by mail-wr1-x442.google.com with SMTP id r12so7681801wrj.13
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 02:46:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bg/P8S5COpS2jkrOxdXx4kcF6QFlQwpf0sQ2e1ValAg=;
+ b=QnARXzPk3/i1um1d6eTcDTe+RcGy/8EhNwK0R4sdW4atSaBkugslQrNBn/MHHIItCc
+ DWYpsMWG7JIeLTqGOEfjCaDphNNdDEdGBf1pd6Qsvm/DGI90RbnTU3YEAkEs+2GXKtgH
+ /483t89jFMa7JCnj+Z7qs9W2Cjs1Wug2Ffa966uGxRSvWO/6QeaoH+fWmO5mkmR7wvvT
+ owg952OmtOI1o1PhLVOU3iE/Ad/Yhk6vihNfVsOTI0iEROzeSqJ52jO4RNnSl3TQG5P3
+ wzM/oq8SsUcgljDGZ34KBODAPrh7THINPAWb6E2Hilx4JwAsxQ1/M1J5fJSeznugT6OY
+ REqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=bg/P8S5COpS2jkrOxdXx4kcF6QFlQwpf0sQ2e1ValAg=;
+ b=A7Y+w7sWbdHg0eojxkXVz+5kjWFo/+rO2zkoj/mcEGncSpHgVHjlMkx9fOfEb+cj/d
+ Z3kixzM8hcLM7gAzxM7H0s5X6rXy9ZcaaIdGtVhnViGtUpEdCpTZ7Dr7xJ81CVVAJk1V
+ y0e81ImG0b1IM72O28TicpXmgLfhtCEFehHcye7nwQ2Fhv00aqYKsEN/3GkCoVoKIPDV
+ uj+JKq1/2bOBOH58vTZgfROUAMd/vE1xbYjYLOuTbYCs325KypxG7YCwcUi2SolfJhsQ
+ r1TO1qUDsdz9y7sle9c2t8RfvR34sQEpGzaYErWbrhkKC0cVtGi4EdBF6u/0n+B07rrM
+ Cmew==
+X-Gm-Message-State: AOAM5329azj7qGOnzBntvSHAd0KCCr8Qc83f699zaGglJz8/mHjRw5jD
+ 7S4dxNoVnhnynup5NsASK3g=
+X-Google-Smtp-Source: ABdhPJy1ybvbRy8kQ4SxjLdy/PrwI4T6ez+6X4J8W5mqMF+/h+ATxxg7sV732GimSO6r4S8WLrtYsA==
+X-Received: by 2002:adf:fa09:: with SMTP id m9mr7713261wrr.130.1595583984868; 
+ Fri, 24 Jul 2020 02:46:24 -0700 (PDT)
+Received: from [192.168.1.36] (138.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.138])
+ by smtp.gmail.com with ESMTPSA id o30sm745318wra.67.2020.07.24.02.46.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 24 Jul 2020 02:46:24 -0700 (PDT)
+Subject: Re: [RFC PATCH] buildsys: Only build capstone if softmmu/user mode is
+ enabled
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
+References: <20200724071657.21508-1-f4bug@amsat.org>
+ <5d8ade29-c085-9f6d-b896-fda48c1f5666@redhat.com>
+ <0ce8f279-1ef0-6d93-5fff-032783fba2b6@amsat.org>
+Autocrypt: addr=f4bug@amsat.org; keydata=
+ mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
+ u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
+ HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
+ YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
+ ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
+ dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
+ ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
+ Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
+ HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
+ Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
+ klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
+ jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
+ 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
+ loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
+ sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
+ JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
+ 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
+ K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
+ n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
+ CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
+Message-ID: <45942406-2ee2-150a-fb11-d485a12ca290@amsat.org>
+Date: Fri, 24 Jul 2020 11:46:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.82) by
- AM4PR0302CA0023.eurprd03.prod.outlook.com (2603:10a6:205:2::36) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.22 via Frontend
- Transport; Fri, 24 Jul 2020 09:49:37 +0000
-X-Originating-IP: [109.252.114.82]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 96acbdc2-6ec2-40c1-82b0-08d82fb6e1a1
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4786:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB47861F4DDC3D29C332182B94F4770@AM6PR08MB4786.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3631;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KBrhVH4fXZyNeeUK2egoqU10pbRu2IyrK3WX7+xlLfz4XNRjnbm/IxgZJ4iLCr0NvHnzUhyJ9XK6Ev2l2VkCrJf2HSI4dX9eVHV9UcDVjYz4M4C4RDehpsCRO3LK8UHtX5WrEc/LoxhrL52KUp2/pCGgkMAnUlRzJ9pcB2DFMbKAnHh3+MjyDgwz2xLzbrxr1RpjS89gMUBDkZi7WbKZj5lDhGLx6yoxreIff+FWnNjBfUvZKS3mRgRwlVXcGx1Zc7oLQLH7+BFGBXo+EVS7U59DPb9bCNQssPAb8ul9cTT39JOB5x/nkDL/DVD2nfP0CkqUg3gaSsl9Dms/uzdVE/2jTmOXzpZ/9CF01bGK2LO4TthzZygTPNYZ2X6l+z7c
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(136003)(346002)(376002)(39840400004)(396003)(366004)(8936002)(2906002)(66556008)(52116002)(8676002)(478600001)(53546011)(66476007)(6506007)(66946007)(6512007)(31686004)(4326008)(16526019)(26005)(6486002)(44832011)(5660300002)(186003)(54906003)(956004)(2616005)(31696002)(83380400001)(36756003)(316002)(86362001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: LLWdfWcyLubDr68zD0/Ln3jxEz0JmUNh9jl2GBrfWXBoiYrMGo/uGpjqQ2G7i2uiv2uvq1UzQ76b5yMlJbY4pHIhnmXXsZFfewFN31ewfjAzZyI7u484Q4Z74fFa21jPBJjrfhVzeZcNRVz8tUmrTxY+JNcKGvitZ3BRWDVHEfRNQGUHT96P8M+svO5aXCuuuPnx//N0SCVmYZv5Shmnby27L2SLP5BDyJKtqCPSm6Vo/K8ie0k3yh7i1QfZcyjs5vIUjZopiHKnqrndxXGQQi+S6UAXXosduOL1WRfhFLg8KbIhsBs9VxSdZoST8eEwi0vKoRo3eqIElVLGSImKhhWFsbavyF9PfomZxLpC1QLyK1Vk1lQmQUpla0FLtEpYFNR2W+ySCsRQ+gP+L6+mwQX9lsJgffa5zC4TIgwrh/Zwf+iLTHWv78xPs7Nfg2Ay0xxRnNKb6xjwcenIC/PqZmOrYla8aC1EwH5eAgjcVMK93xxYBdApwgdn10wgBrIi
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96acbdc2-6ec2-40c1-82b0-08d82fb6e1a1
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2020 09:49:39.0655 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4OAMbhQ1Fdialql2dQ7pV33Udecr+5fDISJ4FLGaCy8MqtOZyiVV4WP8oe7RL+MLlMzhEp/4TSMR5+lpY8Aj1Mzg3KTWZ2tISFkEJxs2Qy8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4786
-Received-SPF: pass client-ip=40.107.8.114;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 05:49:40
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <0ce8f279-1ef0-6d93-5fff-032783fba2b6@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,49 +132,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.07.2020 11:58, Max Reitz wrote:
-> On 20.07.20 17:10, Andrey Shinkevich wrote:
->> On 25.06.2020 18:21, Max Reitz wrote:
->>> It is trivial, so we might as well do it.
+On 7/24/20 11:38 AM, Philippe Mathieu-Daudé wrote:
+> On 7/24/20 9:56 AM, Thomas Huth wrote:
+>> On 24/07/2020 09.16, Philippe Mathieu-Daudé wrote:
+>>> At least one of softmmu or user mode has to be enabled to use
+>>> capstone. If not, don't clone/built it.
 >>>
->>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> This save CI time for the tools/documentation-only build jobs.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 >>> ---
->>>    block/null.c               | 7 +++++++
->>>    tests/qemu-iotests/153.out | 2 +-
->>>    tests/qemu-iotests/184.out | 6 ++++--
->>>    3 files changed, 12 insertions(+), 3 deletions(-)
-...
->>> diff --git a/tests/qemu-iotests/184.out b/tests/qemu-iotests/184.out
->>> index 3deb3cfb94..28b104da89 100644
->>> --- a/tests/qemu-iotests/184.out
->>> +++ b/tests/qemu-iotests/184.out
->>> @@ -29,7 +29,8 @@ Testing:
->>>                "image": {
->>>                    "virtual-size": 1073741824,
->>>                    "filename": "json:{\"throttle-group\": \"group0\",
->>> \"driver\": \"throttle\", \"file\": {\"driver\": \"null-co\"}}",
->>> -                "format": "throttle"
->>> +                "format": "throttle",
->>> +                "actual-size": SIZE
+>>>  configure | 4 ++++
+>>>  1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/configure b/configure
+>>> index 4bd80ed507..bc5757159a 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -5381,6 +5381,10 @@ fi
+>>>  ##########################################
+>>>  # capstone
+>>>  
+>>> +if test -z "$capstone" && test $tcg = 'no' ; then # !tcg implies !softmmu
+>>> +  capstone="no"
+>>> +fi
 >>
->> If we remove the _filter_generated_node_ids() in the current
->> implementation of the test #184, we will get '"actual-size": 0'. It
->> might be more informative when analyzing the output in 184.out.
-> You mean _filter_actual_image_size?  Yeah, why not, it doesn’t seem
-> necessary here.
->
-> Max
->
+>> I don't think this is right. You could have a KVM-only build where you
+>> still want to use the disassembler for the human monitor.
+> 
+> I had the same question with KVM, I agree this is unclear, this is why
+> I added RFC.
+> 
+> Don't we have !softmmu implies !kvm?
 
-Yes Max, you are right, I ment the _filter_actual_image_size. It was my 
-copy/paste mistake.
+It works because it falls back to the old disas.c (if capstone is
+here, use it, else fall-back).
 
-Andrey
+Does this means we can directly remove the capstone experiment &
+submodule without waiting for the libllvm integration?
 
+> 
+>>
+>> But maybe it could be disabled if softmmu="no", linux_user="no" and
+>> bsd_user="no" ?
+>>
+>>  Thomas
+>>
+>>
+> 
 
