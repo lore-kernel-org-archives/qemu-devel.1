@@ -2,83 +2,80 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7918C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 473C6C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:33:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90C9C20714
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:02:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07FFE206F0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 04:33:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fxos3acU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C9C20714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OfBVdtoF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07FFE206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyouy-0004v2-Qe
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 00:02:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38872)
+	id 1jypOR-0001cc-Aa
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 00:33:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jyosq-0003WO-Dc
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 00:00:32 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24164
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jypJQ-0008NP-Kf
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 00:28:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52457
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jyosn-0005uO-6E
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 00:00:31 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jypJO-0000IS-6p
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 00:27:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595563227;
+ s=mimecast20190719; t=1595564876;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1m+QtJyViz6KR5C6aFqYIQ6bSPPAo1REYSpCFB+UmP0=;
- b=Fxos3acUup5iJHx1nTHwWnBVYMayZyL16i6Q7TcW8jCzvlYY4Y+cBrU0kYrF+Xb9jlqG2F
- NHoCydhXSnb0cnTtUH9c+tnfHXYl4dFItIS0x2f5krE524GuppI9cn2WuM/CDIMOPOdgG/
- e4PMQJA2+mbefojBIcY+5uyGwmEjFVk=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=/Sg0J4R+QSQ9MEhufoVMFTHZOZhrVjT0sHOnOHpE4ck=;
+ b=OfBVdtoF/dKuuk/xKcEGL1AUh9PMbd90UePHAzzq/shT2G9HFqIMLT+C5grSh8QqafFcDO
+ GwWU5fmfN/a82z85d16q5Ym+4t9h38Vle2JuIDN29y1j8FtDAzIteiSzSET+4Tm9AXIopH
+ bU4tnZY0tg6vA2+AT+NbiytUvzFZK4A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-jGVmyWbsOpKncft2bXOhPQ-1; Fri, 24 Jul 2020 00:00:21 -0400
-X-MC-Unique: jGVmyWbsOpKncft2bXOhPQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-89-9V1PDo9nM3qMft2hGJCk1A-1; Fri, 24 Jul 2020 00:27:53 -0400
+X-MC-Unique: 9V1PDo9nM3qMft2hGJCk1A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFD118064DE;
- Fri, 24 Jul 2020 04:00:19 +0000 (UTC)
-Received: from [10.72.12.225] (ovpn-12-225.pek2.redhat.com [10.72.12.225])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5B91C8BEF4;
- Fri, 24 Jul 2020 04:00:06 +0000 (UTC)
-Subject: Re: [PATCH 2/2] e1000e: make TX reentrant
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200722085747.6514-1-jasowang@redhat.com>
- <20200722085747.6514-2-jasowang@redhat.com>
- <CAFEAcA-XHFXBeQ9qp91T_gzNqyxEEDz_caHanwMuYRjKjEocWQ@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <67267c28-f706-700a-d1aa-6e5cd8ef0c8d@redhat.com>
-Date: Fri, 24 Jul 2020 12:00:05 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5449A8015F4;
+ Fri, 24 Jul 2020 04:27:52 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-77.ams2.redhat.com [10.36.112.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EDE25C1BD;
+ Fri, 24 Jul 2020 04:27:44 +0000 (UTC)
+Subject: Re: [PATCH] hw/input/virtio-input-hid.c: Don't undef CONFIG_CURSES
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20200723192457.28136-1-peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <02eb937a-ecf9-f453-4853-0d27ff3cb961@redhat.com>
+Date: Fri, 24 Jul 2020 06:27:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-XHFXBeQ9qp91T_gzNqyxEEDz_caHanwMuYRjKjEocWQ@mail.gmail.com>
+In-Reply-To: <20200723192457.28136-1-peter.maydell@linaro.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:00:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -101,46 +98,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Li Qiang <liq3ea@163.com>,
- Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Alexander Bulekov <alxndr@bu.edu>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 23/07/2020 21.24, Peter Maydell wrote:
+> virtio-input-hid.c undefines CONFIG_CURSES before including
+> ui/console.h. However since commits e2f82e924d057935 and b0766612d16da18
+> that header does not have behaviour dependent on CONFIG_CURSES.
+> Remove the now-unneeded undef.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> NB: tested with 'make check' only.
+> 
+>  hw/input/virtio-input-hid.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/input/virtio-input-hid.c b/hw/input/virtio-input-hid.c
+> index 09cf2609854..a7a244a95db 100644
+> --- a/hw/input/virtio-input-hid.c
+> +++ b/hw/input/virtio-input-hid.c
+> @@ -12,7 +12,6 @@
+>  #include "hw/qdev-properties.h"
+>  #include "hw/virtio/virtio-input.h"
+>  
+> -#undef CONFIG_CURSES
+>  #include "ui/console.h"
+>  
+>  #include "standard-headers/linux/input.h"
+> 
 
-On 2020/7/23 下午6:36, Peter Maydell wrote:
-> On Wed, 22 Jul 2020 at 10:00, Jason Wang <jasowang@redhat.com> wrote:
->> In loopback mode, e1000e RX can DMA into TX doorbell which requires
->> TX to be reentrant. This patch make e1000e's TX routine reentrant by
->> introducing a per device boolean for recording whether or not a TX
->> rountine is being called and return early.
->>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> ---
-> This feels like a sticking-plaster fix that's not really in the
-> right place... It stops us from calling back into
-> e1000e_start_xmit(), but it doesn't prevent a DMA request
-> from touching other device registers that update state in
-> the E100ECore struct that the transmit code is not expecting
-> to change.
-
-
-Right, so we can track the mr owner and fail the memory access if 
-there's another mr transaction in memory core: 
-memory_region_dispatch_read() and memory_region_dispatch_write().
-
-But what's more interesting is that some device uses bh for the doorbell 
-which may require more thought...
-
-Thanks
-
-
->
-> thanks
-> -- PMM
->
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
