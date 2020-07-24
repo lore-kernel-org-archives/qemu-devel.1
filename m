@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9853FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C87C7C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:42:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62BD32065F
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:42:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 934AE2065F
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 14:42:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V4iq6H2a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62BD32065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VWK4FnS/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 934AE2065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyytt-0000GC-Lb
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 10:42:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50980)
+	id 1jyytv-0000MH-SN
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 10:42:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyrO-0004jD-Jp
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:39:42 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31261
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyr9-0004DM-Nx
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:39:27 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28717
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyrM-0005ju-QH
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:39:42 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1jyyr7-0005jA-QT
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 10:39:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595601580;
+ s=mimecast20190719; t=1595601565;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1sDRRmQOugDOxphOywKhw1N5ppoc8F1FHE/wSOqAP6k=;
- b=V4iq6H2a1GKrECtq4iPTrppyR4RwX629vm+HeglNoezvgQdkhy0hlZDmeKQGRm0l2Sc1Cv
- +QmgZMoRq42y5dZcHcbqbCX4TF6eLNkcwxQopOVv0FcEkAKarX+XdDSNylDUNv8YcdEhHQ
- sA3M9/lpYFtAPwS3dJdjSS0e8I6AYcE=
+ bh=8nRggL5zxzjIAsO7gyoMqTDoUEqTrKmVpKuZXCETtsg=;
+ b=VWK4FnS/WxqcVt2yjSdNqqDjFrRHxHa80eSsVno8vi1kqxUOR1u4hOTnVO8MGAkxteiwmN
+ H0AVRqZAceBSDxlJuRsN2dnyH1ijaWIH0U14swiE6qfDetwSyNzVLi+SqnyH7uCa3TOvvm
+ AXl241NwS8RtBRHVlqTk1KVk0wLdrhM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-HULqiz0lOGGi-bp7Q4c7cg-1; Fri, 24 Jul 2020 10:38:24 -0400
-X-MC-Unique: HULqiz0lOGGi-bp7Q4c7cg-1
+ us-mta-473-k-R5_GGuNtWpX1DMAVIBxQ-1; Fri, 24 Jul 2020 10:38:12 -0400
+X-MC-Unique: k-R5_GGuNtWpX1DMAVIBxQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74D49107ACCA;
- Fri, 24 Jul 2020 14:38:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B57E1C7468;
+ Fri, 24 Jul 2020 14:38:10 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-113-94.ams2.redhat.com [10.36.113.94])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D2FFC726A4;
- Fri, 24 Jul 2020 14:38:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6D71C710AC;
+ Fri, 24 Jul 2020 14:38:07 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RFCv3 7/9] s390x: prepare device memory address space
-Date: Fri, 24 Jul 2020 16:37:48 +0200
-Message-Id: <20200724143750.59836-8-david@redhat.com>
+Subject: [PATCH RFCv3 4/9] s390x: prepare for more diag500 hypercalls
+Date: Fri, 24 Jul 2020 16:37:45 +0200
+Message-Id: <20200724143750.59836-5-david@redhat.com>
 In-Reply-To: <20200724143750.59836-1-david@redhat.com>
 References: <20200724143750.59836-1-david@redhat.com>
 MIME-Version: 1.0
@@ -69,17 +69,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 06:44:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 00:00:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,141 +102,134 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's allocate the device memory information and setup the device
-memory address space. The RAM size returned via SCLP is not modified. Guest
-OSs which support memory devices (like virtio-mem) are expected to
-consult diag500(4).
+Let's generalize, abstacting the virtio bits. diag500 is now a generic
+hypercall to handle QEMU/KVM specific things. Explicitly specify all
+already defined subcodes, including legacy ones (so we know what we can
+use for new hypercalls). While at it, move exception handling into the
+handler.
+
+We'll rename the files separately, so git properly detects the rename.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c         | 37 ++++++++++++++++++++++++++++++
- hw/s390x/sclp.c                    |  6 ++++-
- include/hw/s390x/s390-virtio-ccw.h |  3 +++
- 3 files changed, 45 insertions(+), 1 deletion(-)
+ hw/s390x/s390-virtio-hcall.c | 14 +++++++-------
+ hw/s390x/s390-virtio-hcall.h | 12 ++++++------
+ target/s390x/kvm.c           | 15 +++------------
+ target/s390x/misc_helper.c   |  3 ++-
+ 4 files changed, 18 insertions(+), 26 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index b481e5e5bd..23b94256e0 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -115,6 +115,29 @@ static void subsystem_reset(void)
-     }
+diff --git a/hw/s390x/s390-virtio-hcall.c b/hw/s390x/s390-virtio-hcall.c
+index 5e14bd49b7..7c4ca5d3b2 100644
+--- a/hw/s390x/s390-virtio-hcall.c
++++ b/hw/s390x/s390-virtio-hcall.c
+@@ -1,5 +1,5 @@
+ /*
+- * Support for virtio hypercalls on s390
++ * Support for QEMU/KVM-specific hypercalls on s390
+  *
+  * Copyright 2012 IBM Corp.
+  * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
+@@ -44,18 +44,18 @@ static int handle_virtio_ccw_notify(uint64_t subch_id, uint64_t queue)
+     return 0;
  }
  
-+static void s390_device_memory_init(MachineState *machine)
-+{
-+    MemoryRegion *sysmem = get_system_memory();
-+
-+    machine->device_memory = g_malloc0(sizeof(*machine->device_memory));
-+
-+    /* initialize device memory address space */
-+    if (machine->ram_size < machine->maxram_size) {
-+        ram_addr_t device_mem_size = machine->maxram_size - machine->ram_size;
-+
-+        if (!QEMU_IS_ALIGNED(machine->maxram_size, MiB)) {
-+            error_report("maximum memory size must be aligned to 1 MB");
-+            exit(EXIT_FAILURE);
-+        }
-+
-+        machine->device_memory->base = machine->ram_size;
-+        memory_region_init(&machine->device_memory->mr, OBJECT(machine),
-+                           "device-memory", device_mem_size);
-+        memory_region_add_subregion(sysmem, machine->device_memory->base,
-+                                    &machine->device_memory->mr);
-+    }
-+}
-+
- static void s390_memory_init(MachineState *machine)
+-int s390_virtio_hypercall(CPUS390XState *env)
++void handle_diag_500(CPUS390XState *env, uintptr_t ra)
  {
-     MemoryRegion *sysmem = get_system_memory();
-@@ -149,6 +172,11 @@ static void s390_memory_init(MachineState *machine)
-     s390_skeys_init();
-     /* Initialize storage attributes device */
-     s390_stattrib_init();
-+
-+    /* Support for memory devices is glued to compat machines. */
-+    if (memory_devices_allowed()) {
-+        s390_device_memory_init(machine);
-+    }
+      const uint64_t subcode = env->regs[1];
+ 
+      switch (subcode) {
+-     case KVM_S390_VIRTIO_NOTIFY:
++     case DIAG500_VIRTIO_NOTIFY:
+          env->regs[2] = handle_virtio_notify(env->regs[2]);
+-         return 0;
+-     case KVM_S390_VIRTIO_CCW_NOTIFY:
++         break;
++     case DIAG500_VIRTIO_CCW_NOTIFY:
+          env->regs[2] = handle_virtio_ccw_notify(env->regs[2], env->regs[3]);
+-         return 0;
++         break;
+      default:
+-         return -EINVAL;
++         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+      }
+ }
+diff --git a/hw/s390x/s390-virtio-hcall.h b/hw/s390x/s390-virtio-hcall.h
+index 67e11ea39a..2214216ce8 100644
+--- a/hw/s390x/s390-virtio-hcall.h
++++ b/hw/s390x/s390-virtio-hcall.h
+@@ -1,5 +1,5 @@
+ /*
+- * Support for virtio hypercalls on s390x
++ * Support for QEMU/KVM-specific hypercalls on s390
+  *
+  * Copyright IBM Corp. 2012, 2017
+  * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
+@@ -12,10 +12,10 @@
+ #ifndef HW_S390_VIRTIO_HCALL_H
+ #define HW_S390_VIRTIO_HCALL_H
+ 
+-#include "standard-headers/asm-s390/virtio-ccw.h"
++#define DIAG500_VIRTIO_NOTIFY          0 /* legacy, implemented as a NOP */
++#define DIAG500_VIRTIO_RESET           1 /* legacy */
++#define DIAG500_VIRTIO_SET_STATUS      2 /* legacy */
++#define DIAG500_VIRTIO_CCW_NOTIFY      3 /* KVM_S390_VIRTIO_CCW_NOTIFY */
+ 
+-/* The only thing that we need from the old kvm_virtio.h file */
+-#define KVM_S390_VIRTIO_NOTIFY 0
+-
+-int s390_virtio_hypercall(CPUS390XState *env);
++void handle_diag_500(CPUS390XState *env, uintptr_t ra);
+ #endif /* HW_S390_VIRTIO_HCALL_H */
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index f2f75d2a57..dc00750387 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1551,18 +1551,9 @@ static int handle_e3(S390CPU *cpu, struct kvm_run *run, uint8_t ipbl)
+     return r;
  }
  
- static void s390_init_ipl_dev(const char *kernel_filename,
-@@ -569,6 +597,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-     s390mc->cpu_model_allowed = true;
-     s390mc->css_migration_enabled = true;
-     s390mc->hpage_1m_allowed = true;
-+    s390mc->memory_devices_allowed = true;
-     mc->init = ccw_init;
-     mc->reset = s390_machine_reset;
-     mc->hot_add_cpu = s390_hot_add_cpu;
-@@ -665,6 +694,11 @@ bool hpage_1m_allowed(void)
-     return get_machine_class()->hpage_1m_allowed;
+-static int handle_hypercall(S390CPU *cpu, struct kvm_run *run)
++static void handle_hypercall(S390CPU *cpu, struct kvm_run *run)
+ {
+-    CPUS390XState *env = &cpu->env;
+-    int ret;
+-
+-    ret = s390_virtio_hypercall(env);
+-    if (ret == -EINVAL) {
+-        kvm_s390_program_interrupt(cpu, PGM_SPECIFICATION);
+-        return 0;
+-    }
+-
+-    return ret;
++    handle_diag_500(&cpu->env, RA_IGNORED);
  }
  
-+bool memory_devices_allowed(void)
-+{
-+    return get_machine_class()->memory_devices_allowed;
-+}
-+
- static char *machine_get_loadparm(Object *obj, Error **errp)
- {
-     S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-@@ -783,8 +817,11 @@ static void ccw_machine_5_0_instance_options(MachineState *machine)
- 
- static void ccw_machine_5_0_class_options(MachineClass *mc)
- {
-+    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
-+
-     ccw_machine_5_1_class_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_5_0, hw_compat_5_0_len);
-+    s390mc->memory_devices_allowed = false;
- }
- DEFINE_CCW_MACHINE(5_0, "5.0", false);
- 
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index f59195e15a..316ff9c218 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -22,6 +22,7 @@
- #include "hw/s390x/event-facility.h"
- #include "hw/s390x/s390-pci-bus.h"
- #include "hw/s390x/ipl.h"
-+#include "hw/s390x/s390-virtio-ccw.h"
- 
- static inline SCLPDevice *get_sclp_device(void)
- {
-@@ -110,7 +111,10 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
-         read_info->rnsize2 = cpu_to_be32(rnsize);
-     }
- 
--    /* we don't support standby memory, maxram_size is never exposed */
-+    /*
-+     * We don't support standby memory. Currently, maxram_size is only
-+     * implicitly exposed via diag500(4) to indicate the device memory region.
-+     */
-     rnmax = machine->ram_size >> sclp->increment_size;
-     if (rnmax < 0x10000) {
-         read_info->rnmax = cpu_to_be16(rnmax);
-diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-index cd1dccc6e3..960eb9344f 100644
---- a/include/hw/s390x/s390-virtio-ccw.h
-+++ b/include/hw/s390x/s390-virtio-ccw.h
-@@ -41,6 +41,7 @@ typedef struct S390CcwMachineClass {
-     bool cpu_model_allowed;
-     bool css_migration_enabled;
-     bool hpage_1m_allowed;
-+    bool memory_devices_allowed;
- } S390CcwMachineClass;
- 
- /* runtime-instrumentation allowed by the machine */
-@@ -49,6 +50,8 @@ bool ri_allowed(void);
- bool cpu_model_allowed(void);
- /* 1M huge page mappings allowed by the machine */
- bool hpage_1m_allowed(void);
-+/* memory devices are allowed by the machine (device memory region created). */
-+bool memory_devices_allowed(void);
- 
- /**
-  * Returns true if (vmstate based) migration of the channel subsystem
+ static void kvm_handle_diag_288(S390CPU *cpu, struct kvm_run *run)
+@@ -1621,7 +1612,7 @@ static int handle_diag(S390CPU *cpu, struct kvm_run *run, uint32_t ipb)
+         kvm_handle_diag_308(cpu, run);
+         break;
+     case DIAG_KVM_HYPERCALL:
+-        r = handle_hypercall(cpu, run);
++        handle_hypercall(cpu, run);
+         break;
+     case DIAG_KVM_BREAKPOINT:
+         r = handle_sw_breakpoint(cpu, run);
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 58dbc023eb..cfcbfbe50c 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -119,8 +119,9 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uint32_t r3, uint32_t num)
+     case 0x500:
+         /* KVM hypercall */
+         qemu_mutex_lock_iothread();
+-        r = s390_virtio_hypercall(env);
++        handle_diag_500(env, GETPC());
+         qemu_mutex_unlock_iothread();
++        r = 0;
+         break;
+     case 0x44:
+         /* yield */
 -- 
 2.26.2
 
