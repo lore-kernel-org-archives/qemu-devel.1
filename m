@@ -2,99 +2,93 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19812C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C8AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:41:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5B44206EB
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:40:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF8CD206F0
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 16:41:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWtNhqU7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5B44206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jLJPYVYh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF8CD206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jz0jo-0002Rk-1m
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 12:40:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54616)
+	id 1jz0lH-0004dI-74
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 12:41:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jz0it-0000bW-4m
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jz0it-0000bb-5H
  for qemu-devel@nongnu.org; Fri, 24 Jul 2020 12:39:03 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50393)
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38934)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1jz0ir-0001UB-6M
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1jz0ir-0001UD-IT
  for qemu-devel@nongnu.org; Fri, 24 Jul 2020 12:39:02 -0400
-Received: by mail-wm1-x341.google.com with SMTP id c80so8500134wme.0
+Received: by mail-pl1-x641.google.com with SMTP id b9so4749920plx.6
  for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 09:39:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=M1ywS3JuuBHjGFiuytvjByOCh82CYAK+09EO/apj9e4=;
- b=CWtNhqU7B7++66aixkGS8feEqrWmv2yba9qfY4vrXYuI6yEtZ809COkcb/slMDmhAW
- Ck9yxfWOASYv5Vpy5+ufZR7x5VXMihpAFKPYTlAE86//PcJRWoIh82jeSqzX6OmW8SvX
- Rfa57cw6IMeOX5nCHbZL1WkJE3gfueT1miT55+dKKZL2qOOK0z2MTWguRlrbpitgZSHW
- Pm1+jGEhoXjiE4yfFEKSJmhHePkXgcjncAsNEGKe5R6ZkoTtC28lQZxXL421ltztJAaI
- OvzboutXkS4lUBd4MQEykzn6TNeWlk4qd2kDqS3qe3zm30GFgGq2yO4KM8yfPuiGIa2B
- dI9g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=lOHdNtnGRgA8GSOMatWc2CH3AkgDKMG7+oF07eCfw/c=;
+ b=jLJPYVYh6hin9xv3K0vjweMbM5AEPCEJEr/o+Z1tvwk/0HuJDhzzRMFrnDnQumwPVG
+ gKUlIPwyALqzN1UGy5o9cwC6aFw5fqF06i6hM/JaKfDcd4mH2azd9AMU2G7fefTurh80
+ ERcfxMt6BCVz78DCOLhrsuqobfAz2sBmp9kNi9fbrKN9cm8XYHxWz2IN6C724bbbfyat
+ 0xT3YzAZi3AF5Ny2XtkjRKWPaRG6j7DHwd633v5vRfjRUfitba5JAOnP1uSE7qBZPtQA
+ T9R2VDPc/WCr//R6oqkW+/wvbJ9kFVb+F7NFJ/mOBli/qKcYyDZMGkLUL2FVjvAsd/kn
+ hRcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=M1ywS3JuuBHjGFiuytvjByOCh82CYAK+09EO/apj9e4=;
- b=RoIBxLcoyVvi33/Lv0wlK3cUebbA4Jw7gqbxEhESMDj1jqCmm6mk9DgRRfuL+XX6Rc
- MjFe+Ik4nXDLGdJq5UpqMexriB7RRKIbyKSN8CtMJCssUOpCZLbkK2wa7vt30CjXyyV0
- VVkic1JLjY7HcwiSkXIj8TFeBaQeo+FkuYb/0ufCxqJK8NuEZUBoUZi7z6PUPkO24DPh
- 2LgRqDf71VsiIty36El08fFA8HzfPnpTR86PLjdRuXb2tySo4jCtzOIwuc/JzXFErC8/
- vZZcCikCIdu1qWZlXaGz7tesLVVvhJDyRs5eOc20RQgW5r7rMkiWvVUyF4PdGXlLg33E
- gPCg==
-X-Gm-Message-State: AOAM531QxidqT4KBfrlLib2il9VnXxjfo+wxObdwCjK5aBu/7ukcZKgF
- 3Raer900J/G3CG0YQiX/Q/g=
-X-Google-Smtp-Source: ABdhPJwJQPrIn7Exxay97zNsYjI5EAjJZPGwmSAMuICkDMKw/5hhkqbzrH/3KNA5gTx+Ld4o1Hd/Xw==
-X-Received: by 2002:a1c:3bc1:: with SMTP id i184mr9346983wma.119.1595608739137; 
- Fri, 24 Jul 2020 09:38:59 -0700 (PDT)
-Received: from [192.168.1.33] (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id j6sm2026187wro.25.2020.07.24.09.38.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=lOHdNtnGRgA8GSOMatWc2CH3AkgDKMG7+oF07eCfw/c=;
+ b=SKXyZyE/z9lLvka4+fTGJ4qI8E44UZomBm7mrNyIYZaM7GDeX9kgq90U2WCMC5gk4M
+ AxyWW5stIc9uLfsDBXPMWL4BhWfmnW19nK2GDqmPMB6zrKh1k23c6tbUufLICspaNEAU
+ 2+YGj4B1joCL6RJ6QMVzKmLI1vtw2MMpBrOLxeAWqmUKEp8MHMysfM+CWwkcG4unoSrs
+ rM97Sinx4Kt5sok5fkx3xMvTJ9h8fR72BMCGrTBxYVdHIrjqOg5uoP8YrWefzrMuL26L
+ 8cA7PIR5VVnxG3L1ypgDVef/K8OacLrveVRH4IQY1/5ybgzCpBPcRpbI+P9otaZHkhwl
+ Cwfw==
+X-Gm-Message-State: AOAM532HE7s/ESOfFq1NdoF3iHD3/4wV1dY0Jcdm4VlWaTZFIXgh3x4O
+ GmjTF9o0QRdx0IqFDo+YBzJ6UBkurQM=
+X-Google-Smtp-Source: ABdhPJyNZdOOCHqEGa6agTWPXMiiJCseXHK9+9EC6PoMDDdJMkfVcmvedfTTiBFnblZSfJrT6JNZqA==
+X-Received: by 2002:a17:902:e904:: with SMTP id
+ k4mr3448584pld.156.1595608738183; 
  Fri, 24 Jul 2020 09:38:58 -0700 (PDT)
-Subject: Re: [PATCH v2] gitlab-ci: Fix Avocado cache usage
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-References: <20200724074251.28782-1-f4bug@amsat.org>
- <ad3b1a85-3ac0-e21f-1d39-3e9dc6e9635a@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4dbee992-d14f-343f-2d04-60b4db411c3c@amsat.org>
-Date: Fri, 24 Jul 2020 18:38:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+Received: from localhost.localdomain (216-160-65-90.tukw.qwest.net.
+ [216.160.65.90])
+ by smtp.gmail.com with ESMTPSA id r191sm7261663pfr.181.2020.07.24.09.38.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Jul 2020 09:38:57 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/3] hw/arm/boot: Fix MTE for EL3 direct kernel boot
+Date: Fri, 24 Jul 2020 09:38:52 -0700
+Message-Id: <20200724163853.504655-3-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200724163853.504655-1-richard.henderson@linaro.org>
+References: <20200724163853.504655-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <ad3b1a85-3ac0-e21f-1d39-3e9dc6e9635a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,196 +101,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Willian Rampazzo <willianr@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Cleber Rosa <crosa@redhat.com>
+Cc: peter.maydell@linaro.org, vincenzo.frascino@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/24/20 5:52 PM, Wainer dos Santos Moschetta wrote:
-> Hi Philippe,
-> 
-> On 7/24/20 4:42 AM, Philippe Mathieu-Daudé wrote:
->> In commit 6957fd98dc ("gitlab: add avocado asset caching") we
->> tried to save the Avocado cache (as in commit c1073e44b4 with
->> Travis-CI) however it doesn't work as expected. For some reason
->> Avocado uses /root/avocado_cache/ which we can not select later.
->>
->> Manually generate a Avocado config to force the use of the
->> current directory.
->>
->> We add a new 'build-acceptance-cache' job that runs first,
->> (during the 'build' stage) to create/update the cache.
->>
->> The cache content is then pulled (but not updated) during the
->> 'test' stage.
->>
->> See:
->> - https://docs.gitlab.com/ee/ci/caching/
->> -
->> https://avocado-framework.readthedocs.io/en/latest/guides/writer/chapters/writing.html#fetching-asset-files
->>
->>
->> Reported-by: Thomas Huth <thuth@redhat.com>
->> Fixes: 6957fd98dc ("gitlab: add avocado asset caching")
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> Since v1:
->> - add a specific 'build-acceptance-cache' job
->>
->> Thomas prefers to use a different cache for each job.
->> Since I had this patch ready, I prefer to post it as
->> v2 and will work on a v3 using Thomas suggestion.
->>
->> Supersedes: <20200723200318.28214-1-f4bug@amsat.org>
->> Based-on: <20200724073524.26589-1-f4bug@amsat.org>
->>            "tests: Add 'fetch-acceptance' rule"
->> ---
->>   .gitlab-ci.yml | 61 ++++++++++++++++++++++++++++++++++++++++++--------
->>   1 file changed, 52 insertions(+), 9 deletions(-)
->>
->> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
->> index 362e5ee755..a8d8a7e849 100644
->> --- a/.gitlab-ci.yml
->> +++ b/.gitlab-ci.yml
->> @@ -8,11 +8,9 @@ stages:
->>     - build
->>     - test
->>   -# We assume GitLab has it's own caching set up for RPM/APT
->> repositories so we
->> -# just take care of avocado assets here.
->> -cache:
->> -  paths:
->> -    - $HOME/avocado/data/cache
->> +# We assume GitLab has it's own caching set up for RPM/APT repositories
->> +cache: &global_cache
->> +  policy: pull
->>     include:
->>     - local: '/.gitlab-ci.d/edk2.yml'
->> @@ -47,11 +45,52 @@ include:
->>       - find . -type f -exec touch {} +
->>       - make $MAKE_CHECK_ARGS
->>   -.post_acceptance_template: &post_acceptance
->> +.acceptance_template: &acceptance_definition
-> 
-> What if you:
-> 
-> - Keep the post_acceptance section which defines the common after_script
-> only.
-> 
-> - Create the acceptance_definition as you did, with before_script only.
-> This way it doesn't need to repeat the logic in build-acceptance-cache
-> job definition.
+When booting an EL3 cpu with -kernel, we set up EL3 and then
+drop down to EL2.  We need to enable access to v8.5-MemTag
+tag allocation at EL3 before doing so.
 
-See below [*].
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ hw/arm/boot.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> 
-> 
->> +  cache:
->> +    # inherit all global cache settings
->> +    <<: *global_cache
->> +    key: acceptance_cache
->> +    paths:
->> +      - $CI_PROJECT_DIR/avocado_cache
->> +    policy: pull
-> 
-> Isn't this policy inherited from global settings already?
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index c44fd3382d..3e9816af80 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -739,6 +739,9 @@ static void do_cpu_reset(void *opaque)
+                     if (cpu_isar_feature(aa64_pauth, cpu)) {
+                         env->cp15.scr_el3 |= SCR_API | SCR_APK;
+                     }
++                    if (cpu_isar_feature(aa64_mte, cpu)) {
++                        env->cp15.scr_el3 |= SCR_ATA;
++                    }
+                     /* AArch64 kernels never boot in secure mode */
+                     assert(!info->secure_boot);
+                     /* This hook is only supported for AArch32 currently:
+-- 
+2.25.1
 
-Uh, bug! I had it right and messed when cleaning before posting...
-This one is "pull-push" (while global_cache is pull).
-
-> 
->> +  before_script:
->> +    - JOBS=$(expr $(nproc) + 1)
->> +    - mkdir -p ~/.config/avocado
->> +    - echo "[datadir.paths]" > ~/.config/avocado/avocado.conf
->> +    - echo "cache_dirs = ['${CI_PROJECT_DIR}/avocado_cache']" >>
->> ~/.config/avocado/avocado.conf
->>     after_script:
->>       - cd build
->>       - python3 -c 'import json; r =
->> json.load(open("tests/results/latest/results.json"));
->> [print(t["logfile"]) for t in r["tests"] if t["status"] not in
->> ("PASS", "SKIP")]' | xargs cat
->> -    - du -chs $HOME/avocado/data/cache
->> +    - du -chs $CI_PROJECT_DIR/avocado_cache
->> +
->> +build-acceptance-cache:
->> +  stage: build
->> +  cache:
->> +    # inherit all global cache settings
->> +    <<: *global_cache
->> +    key: acceptance_cache
->> +    paths:
->> +      - $CI_PROJECT_DIR/avocado_cache
->> +    policy: pull-push
->> +  variables:
->> +    # any image should work
->> +    IMAGE: ubuntu2004
->> +    CONFIGURE_ARGS: --disable-user --disable-system
->> +      --disable-docs --disable-tools
->> +    MAKE_CHECK_ARGS: fetch-acceptance
->> +  image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
->> +  before_script:
->> +    - mkdir -p ~/.config/avocado
->> +    - echo "[datadir.paths]" > ~/.config/avocado/avocado.conf
->> +    - echo "cache_dirs = ['${CI_PROJECT_DIR}/avocado_cache']" >>
->> ~/.config/avocado/avocado.conf
->> +  script:
->> +    - mkdir build
->> +    - cd build
->> +    - ../configure --disable-user --disable-system --disable-docs
->> --disable-tools
-> Use the CONFIGURE_ARGS variable here, or not define it.
->> +    # ignore "asset fetched or already on cache" error
->> +    - make fetch-acceptance || true
-> 
-> Likewise for MAKE_CHECK_ARGS.
-
-[*] The point here is to not call 'make -j"$JOBS"'. Using
-variables for the same script seems over complicated IMO.
-
-> 
-> Regards,
-> 
-> Wainer
-> 
->> +  after_script:
->> +    - du -chs $CI_PROJECT_DIR/avocado_cache
->>     build-system-ubuntu-main:
->>     <<: *native_build_job_definition
->> @@ -76,13 +115,15 @@ check-system-ubuntu-main:
->>     acceptance-system-ubuntu-main:
->>     <<: *native_test_job_definition
->> +  <<: *acceptance_definition
->>     needs:
->>       - job: build-system-ubuntu-main
->>         artifacts: true
->> +    - job: build-acceptance-cache
->> +      artifacts: false
->>     variables:
->>       IMAGE: ubuntu2004
->>       MAKE_CHECK_ARGS: check-acceptance
->> -  <<: *post_acceptance
->>     build-system-fedora-alt:
->>     <<: *native_build_job_definition
->> @@ -107,13 +148,15 @@ check-system-fedora-alt:
->>     acceptance-system-fedora-alt:
->>     <<: *native_test_job_definition
->> +  <<: *acceptance_definition
->>     needs:
->>       - job: build-system-fedora-alt
->>         artifacts: true
->> +    - job: build-acceptance-cache
->> +      artifacts: false
->>     variables:
->>       IMAGE: fedora
->>       MAKE_CHECK_ARGS: check-acceptance
->> -  <<: *post_acceptance
->>     build-disabled:
->>     <<: *native_build_job_definition
-> 
 
