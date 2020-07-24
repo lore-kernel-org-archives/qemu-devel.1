@@ -2,93 +2,95 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C751C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 19:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE65C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 19:23:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FB242070B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 19:09:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B4172065E
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 19:23:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P5YDoHiM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FB242070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nsLPn2XX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B4172065E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jz343-0003h1-Ke
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 15:09:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33284)
+	id 1jz3IG-0000KW-CS
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 15:23:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jz33K-0002o1-1s
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 15:08:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54872
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1jz33I-0007PC-Ec
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 15:08:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595617695;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Q418/JyWX93wunp9vMKuDcKqXc6bT1nXAVowGAK5Zqg=;
- b=P5YDoHiMHms3xZVuodoUfb98qyye7ibzpobuAmfEMhLEcnwFcUTpk2FBeS8Ggfjj2taddU
- vLa3S7Q7+XXEAS2hcz8L1FNs/4aJQBV4pvPTXrJ4UkMHhXuUeOrK6pTzRne9JDsr5mC5jc
- XZdDCYO7Ge3n3AWcXtjup+JWCQQeQs0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-T07J30iXOVG286Ck29prwA-1; Fri, 24 Jul 2020 15:07:59 -0400
-X-MC-Unique: T07J30iXOVG286Ck29prwA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1481100CCC3;
- Fri, 24 Jul 2020 19:07:57 +0000 (UTC)
-Received: from [10.3.112.130] (ovpn-112-130.phx2.redhat.com [10.3.112.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1107537DD;
- Fri, 24 Jul 2020 19:07:53 +0000 (UTC)
-Subject: Re: [PATCH v3 20/21] qemu-iotests/199: add early shutdown case to
- bitmaps postcopy
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200724084327.15665-1-vsementsov@virtuozzo.com>
- <20200724084327.15665-21-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <766dca82-3b28-0c32-0de9-3e3f9a133c96@redhat.com>
-Date: Fri, 24 Jul 2020 14:07:53 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jz3Hf-0008CR-70
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 15:23:07 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45214)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1jz3Hd-0001Pt-JD
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 15:23:06 -0400
+Received: by mail-wr1-x442.google.com with SMTP id z18so5687061wrm.12
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 12:23:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=4+JW6DsLIDKiJyQ3lJleFJbrLCX8nVpqLZYAu0vMMGk=;
+ b=nsLPn2XXx7a2viIDMwqnSuNAACvQiSM2W+r+kQ6XsjTUtenqjz3CkW4VizAxJGLUZe
+ AWRCazKjXKamw2KpmFoj3uLKzBW7YrG2nNxYYj8Kv2DC4NkYghQZ/JHx5R6XweDFK9se
+ VN8vO1LZWbGhUbteRnTaIqDQtjcvpd2cYvSBOfPG0elqWtQYc4jzhJo6HXOylHvCeM+V
+ LGYAjEYWTmVdjFH6loxJEjRImhd8g9/nXNGLV4D3rFwExF/lD5lKU+eCg62gbfhJbyIl
+ dDsohjWBeJZDSEW2jmRNeAmxVzB+aofgdumI7VzupSmdiEecUyInBjbAootJsuUwIeoL
+ Qtzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=4+JW6DsLIDKiJyQ3lJleFJbrLCX8nVpqLZYAu0vMMGk=;
+ b=jypioDvgxKb+WmKc0rmOuPL0A+YuNkvSa8macAnK1AiaZEDDr7ZGnQHVnzCkdqKF7Q
+ BNMg/weJpu/vgeHHyKellkFRag9G1idFVDb38W9R4dbnlMoLJ67dmApx+F0GQ3umRLiQ
+ wAKLBaLqvwYZjNS5PPNjmVDDbrur3QZB+hq4vsX3jS38BaSWPY3r0ag/nVXZZh2n+W31
+ WjtuXHZtI3zYsBZnyLwJKxoA0nygETm9MewN7Ymp6M85vUs2udU+t6wcrn4fQ22ienBr
+ Uz0/g+XcQ4JlrzxV8lvQrmuWhv5+aTxGQoby0Ozl7N+BqdNPBP/lzT9SHTxdk1xEz+jJ
+ i/Zw==
+X-Gm-Message-State: AOAM532VHrr0inQO5dOxLY58el2HCZ+q5fYMQrf5Wh+Pwr6OMop7s4rq
+ iLg8Bi+1Mb5ZKq8gIYIUkJY+Ag==
+X-Google-Smtp-Source: ABdhPJzrg1IkZcV9+TN5WVcP3TlDvIJzlVwoNrn8i8/mxWCI2WgzmZNPTpgfrmm9XJ4FQ78DzikiMg==
+X-Received: by 2002:adf:cd12:: with SMTP id w18mr10042329wrm.352.1595618583185; 
+ Fri, 24 Jul 2020 12:23:03 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k4sm2416350wrd.72.2020.07.24.12.23.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 24 Jul 2020 12:23:01 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 123501FF7E;
+ Fri, 24 Jul 2020 20:23:01 +0100 (BST)
+References: <20200720154028.477457-1-richard.henderson@linaro.org>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH for-5.1?] target/i386: Save cc_op before loop insns
+In-reply-to: <20200720154028.477457-1-richard.henderson@linaro.org>
+Date: Fri, 24 Jul 2020 20:23:01 +0100
+Message-ID: <87mu3osooa.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200724084327.15665-21-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 08:23:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,38 +103,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, quintela@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org, mreitz@redhat.com,
- jsnow@redhat.com
+Cc: pbonzini@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/24/20 3:43 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Previous patches fixed two crashes which may occur on shutdown prior to
-> bitmaps postcopy finished. Check that it works now.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> We forgot to update cc_op before these branch insns,
+> which lead to losing track of the current eflags.
+>
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1888165
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->   tests/qemu-iotests/199     | 24 ++++++++++++++++++++++++
->   tests/qemu-iotests/199.out |  4 ++--
->   2 files changed, 26 insertions(+), 2 deletions(-)
+>  target/i386/translate.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/target/i386/translate.c b/target/i386/translate.c
+> index a1d31f09c1..caea6f5fb1 100644
+> --- a/target/i386/translate.c
+> +++ b/target/i386/translate.c
+> @@ -7148,6 +7148,7 @@ static target_ulong disas_insn(DisasContext *s,
+> CPUState *cpu)
 
-I've now confirmed that 18,19 don't expose any failures (but I'll leave 
-them where they are in the series), and 20 does expose a testsuite 
-failure if it is applied early; 20 and 21 are not fixed until 17 is 
-applied (although I did not try to further bisect if 20 in isolation 
-gets fixed sooner in the series).
+At first I thought that was too broad to go in disas_insn and then I
+realised it was one of those mega functions....
 
-So I'm adding to 20 and 21:
+>              l1 =3D gen_new_label();
+>              l2 =3D gen_new_label();
+>              l3 =3D gen_new_label();
+> +            gen_update_cc_op(s);
 
-Tested-by: Eric Blake <eblake@redhat.com>
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Seems legit:
 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+<snip>
+
+--=20
+Alex Benn=C3=A9e
 
