@@ -8,110 +8,113 @@ X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2D6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD58C433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:28:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E89132065C
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:22:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A5CC2065C
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:28:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="M3QZW0+p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E89132065C
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OlIQ0ikw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A5CC2065C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyuqg-0000cY-5v
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 06:22:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47262)
+	id 1jyuwC-0002Ol-Oj
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 06:28:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jyuq4-0000BI-Jh; Fri, 24 Jul 2020 06:22:04 -0400
-Received: from mail-eopbgr00137.outbound.protection.outlook.com
- ([40.107.0.137]:42800 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jyuvJ-0001qs-Ci; Fri, 24 Jul 2020 06:27:29 -0400
+Received: from mail-db8eur05on2113.outbound.protection.outlook.com
+ ([40.107.20.113]:9921 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1jyuq0-0008C0-IC; Fri, 24 Jul 2020 06:22:03 -0400
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1jyuvG-0000pw-8p; Fri, 24 Jul 2020 06:27:28 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yf8paoB7aFZvw/1pFCMd1VrYLpGxl2+VTB9Q0PkEknxj4hHu3feoXdqSPNYol+/ohp5xcfbhCvaPyfbF0ffXrI5PwZR5HxHzg/arTeNqbckA23qfCFQ+8QLnoZk6fXrGTMoDSvgEnTed5Bv5A6vE/eYkEEAd2uIsPG4rXURMu4jTAcNQxTmZYRcSqPSeSfg4SmkrxOw8jb4ZvG9EUWefh7XKgB8IfjskWc4QvOL3l+1wEJ7QvblruM7VxEuElLfxDH7mNVG4T1iJiX9kAVGwywBj6yocdsnoe4prGJ5/p5ztJpGPcgXBLTGRrDqNc6Jadze+yGA0ZSCWnW0sKvYM1Q==
+ b=Sm5IKdW/j9QfXQHRkv2d8Uxi75yJO6LWDpOci5tsargCFxmv9XIIcxs/RoWST9tgDFKBBSZxECIYF1QQsC4Ce5wuseJjN+jpAC7iY7qkrUeRMLPNtXroj7kVN7DnU6zkLqj7kV7PNL2IJq5G306yIjFsfcpg7fb7q2RrtLM6N+LcuTseilTt+O21Mdf6f+V4qdhI16h5f0aiT1ds8CMLOvfaqW88TT673AfYhHfWVp++/s6T2mmpMfMLl5J3qeckStDDyJPsXQmn8DucJh1+LBArFpdCuqoHjU9Ewn3G3stbtYyZ5zk5ohKGX4byoSeReUWAng5YRC88qASGdCqakg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vw9SOp0cGsRcA+cfJnr/XcR9GqLZP+6kHtqLSFBSIFU=;
- b=g2cT8w7yfVd8Bz1XsDyslvTSGTf4BnNcYDRf2L7NgnXMpQm8idSJr8N/S2m34IqOEzUzIjz8e2SC0QrXLaf4phwawhVinor2dsd671V8r2wXiyZKTS3gSktehzdwnIVetVSvOzvFpXvU1YuLGo1FCpSCSk897N9d6wdezxgDHCQPju+ekFVgMDc5rxm85ZdzoJo4ga+maeEMK48CCz2o36uGJquMJ2kFcQKoIo1Vr2IxbdCey5RxUAuuJoh01COySiDQlW/0M3u2CNFMs5Kpy5Ot6KI64fOCysYy2hxAGjxC0aNoASbVKTskFpV0AOfs7v4QcIBfhl//WPv6IqxoHg==
+ bh=98bfTot3O/+lDehVT18E5jLtqhf2ANoSAiyrvtU4Jhg=;
+ b=SFOPdrfasrdXYI9IBhBc62/Bn7cn2+X8zYDeoYqy6Mvmitm3Xv3n/ZLMkhx6rUW/Y7L/+ylraNZvRajWTeyX6bscNnr/shfijs3oJ+x1mWqfkbIWavrvI1Gg3TFTVdTcYcF3a7XqVRs7/DMjC45cH8UG4Le7a3fgpqYZobVxVHvI3ujkaPwMhGBEEX1kztjQ/WhNnDHcI83tXDEAdPZJySTuAyl6LZ8tMtNQuTAft3OGksMBAKQRO2asixN4xJQZL6OGyirbck7y0qLC0FgBHz85R3b6zPigilc7DJujLP1QA5d86uGsImPbrqIpYrHILWMQREV7+a8jwkzZ6W9yuQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vw9SOp0cGsRcA+cfJnr/XcR9GqLZP+6kHtqLSFBSIFU=;
- b=M3QZW0+pHo4LGdXYr511BOwTkSDHgQUrQ6C0/jONyaiHrtOOpGdYis8W46+gTgKUSKfqoOVHuwDX8z5b3HBxMhRhxEPDN/GkVU+Y5xkqTAKftmy+kiEOsKQWD0vGDBYm46192UzVUN++aJdCdyc/q5EFBMH5PjV+rnPmAzkL8Ww=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3895.eurprd08.prod.outlook.com (2603:10a6:20b:81::28)
+ bh=98bfTot3O/+lDehVT18E5jLtqhf2ANoSAiyrvtU4Jhg=;
+ b=OlIQ0ikw5OBUnQgm7pQZdLxDs6mmIMPD6xZkg1eyUm0xOLoVbxzh9ibNTpEYNJpieB8rVL7DlHYYmduxs/F6Tyk25m3ruMczS2jcSnT67xdn/Uw2PqHJOHz2hzCFAhXlGdypPXQm0AUIF5yzeoF2thS8rE/r/nNP/JrQpwQyTG0=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM6PR08MB5080.eurprd08.prod.outlook.com (2603:10a6:20b:e2::22)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.24; Fri, 24 Jul
- 2020 10:21:54 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a%4]) with mapi id 15.20.3216.024; Fri, 24 Jul 2020
- 10:21:54 +0000
-Subject: Re: [PATCH 1/3] block/nbd: allow drain during reconnect attempt
-To: qemu-block@nongnu.org
-References: <20200720090024.18186-1-vsementsov@virtuozzo.com>
- <20200720090024.18186-2-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <2992ec89-25b2-fcad-9a68-02b9e05cbf5c@virtuozzo.com>
-Date: Fri, 24 Jul 2020 13:21:52 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200720090024.18186-2-vsementsov@virtuozzo.com>
+ 2020 10:27:22 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3195.028; Fri, 24 Jul 2020
+ 10:27:22 +0000
+Subject: Re: [PATCH v7 33/47] mirror: Deal with filters
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-34-mreitz@redhat.com>
+ <b69b871a-4cc5-a09d-c20b-deaa7438afda@virtuozzo.com>
+ <bc5ef8af-6938-6abf-1232-e58c5caad38a@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <27bb3cef-f033-5a12-d0ce-38981c1a8c40@virtuozzo.com>
+Date: Fri, 24 Jul 2020 13:27:17 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <bc5ef8af-6938-6abf-1232-e58c5caad38a@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR04CA0138.eurprd04.prod.outlook.com (2603:10a6:207::22)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+X-ClientProxiedBy: AM4PR0302CA0029.eurprd03.prod.outlook.com
+ (2603:10a6:205:2::42) To AM6PR08MB4070.eurprd08.prod.outlook.com
+ (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.156) by
- AM3PR04CA0138.eurprd04.prod.outlook.com (2603:10a6:207::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3216.21 via Frontend Transport; Fri, 24 Jul 2020 10:21:54 +0000
-X-Originating-IP: [185.215.60.156]
+Received: from Admins-MacBook-Pro.local (109.252.114.82) by
+ AM4PR0302CA0029.eurprd03.prod.outlook.com (2603:10a6:205:2::42) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23 via Frontend
+ Transport; Fri, 24 Jul 2020 10:27:19 +0000
+X-Originating-IP: [109.252.114.82]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e4145d41-3edd-47cb-54a1-08d82fbb6361
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3895:
+X-MS-Office365-Filtering-Correlation-Id: ef252a00-d8eb-499b-bf53-08d82fbc2687
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5080:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB38954B7AE5FFD74171D5930DC1770@AM6PR08MB3895.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:338;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB5080EB6F9AF800C4EA0D33E9F4770@AM6PR08MB5080.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KHBiTvbyuphFU4mWLJ1L5k++GjBhUBn3Xy/ftLku2D2FVYKLgH2YzR+eKkown3Hq9I5iUf+BPE61eGdzM0WA/RxoLnYRrD6Jv2yGGgKfTQ4mpziLl3dBGbkXxWozT44Pq1ldxiFkZrlNYUUM+2x8kg9gTS6JkQQTSdNkCXfBapk3zyrJBnmQm7ZST91InxBcichEKMa9KxacF3n1GanzJhQqnJMWTV8Gnm1CM2fi1y4k3BLX8BBCjZnggH5NsQc0M3a5X5Lm7DgHjcjpUiQz7e4OCDxvPWZplBeLT0S61wPpzHB6MJyDsGjYuyCeUmRsvquUwmxZ9+9tVj1AqHwZT6tXe3Iu9McoR4CtZQwE4YlptX4sqqXFkXhpfgek8gQ7
+X-Microsoft-Antispam-Message-Info: iVCvdIlk99ziK2RCmWGIMafgfXOwU4FuOuhxlOtHRpIvOVfcFCKaD4Jsw8SD0IcbVSD0zB4CjNkjTSXu7RsbnDKUmTQliFAKo8a5q5kUnllwRHQB/+2lkQH/7pGnDV2QbMAiJiG9OP+Bf5ogrOa3CaI1K10txFL9XjphhwbXHGwvDAIfvJ6Yb/glX9BPWVx//cFvw6r/zyhDpf+uVZgBp2bEPeqiiolJofz3RO+ZJ3XAHpkVjgNsGOzv1qbi0s5aqvNLDZKvGEVNpwxXjyvTrrXBLIQ41SlsqvFuUfI9ntd0idBZjzuJzi7ghvm+3ErwfEbsUqLiqREwq7TTHHp9S8MunnxXIvQQGEKL3hchQ5ccg+IGnWUsNGuJvgnDX9o04hfdgu/i5uVhCGeGHgNbpg==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(346002)(396003)(39840400004)(136003)(376002)(366004)(8936002)(6486002)(4326008)(66476007)(66556008)(186003)(6916009)(86362001)(66946007)(26005)(36756003)(956004)(2616005)(31696002)(8676002)(16576012)(316002)(16526019)(31686004)(107886003)(2906002)(5660300002)(52116002)(83380400001)(478600001)(43740500002);
+ SFS:(4636009)(136003)(39850400004)(346002)(376002)(366004)(396003)(31686004)(2906002)(26005)(53546011)(36756003)(6506007)(52116002)(44832011)(86362001)(5660300002)(6512007)(6486002)(8676002)(66946007)(478600001)(316002)(83380400001)(956004)(8936002)(186003)(66556008)(66476007)(16526019)(4326008)(54906003)(31696002)(2616005)(21314003)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: Di4V8QAsCz55jiDxjqsv2hjGqIHbxSTBJw0G7Najcco5NA+ZCNSHyTtq2I6BQJeq4MvgGkW0wxFSkAGEq01HR/YhEqs3Ba4o6VUz9tmTuutPWQldrXonUly28KiQnBv3bmPqSaTUnxVkPFstvneS8AgGUrFQ6rt4iHq3TEoLVSlrdE+j3NxKftpuQkK8Kjw6+Nl00q9DffYKdTeZdgx9x9rdqCpR7Ms5chWSkC3t+tjLZheU2dm4mLgVxGjBVAN13p0LJiPrSdQ8ew1g4+pLtcoTUTnWyHAKCEpnNGtlPHwx2kWeGOatB0hwWSQdCj9n91yN/VQYczGZ8Z5aKygdv2MiAWN4fy8vtDWM1FXAwfS8oc1Jbo4SRQp5opx54ghUylD5VA78K213uUjZ36M5ZAm0dqk+cHenwj7U3d9kl2O/VBOF6K8PW291sDuHjVcwXMgiLgZapfArLzfpuuPo8t4t36mdeQ/rvE/5ed78kJdxdW2aHPcWj9XH21dGh+/j
+X-MS-Exchange-AntiSpam-MessageData: p2Qbe0oPurEaQrm/jLVj7eqf7LgbaarsugrRyXpq2EPRwN6eF+QLl3SOGa0GK9oxaQAqHwAljtyX71woFrjydl8aitzMbYwD1bAiMWLOjLULX2izRQfu51mAZ0bwhtsBczgPRojBikTh0j3thH+A7lkkIPRrvmBc4Q6FgrO4464Zg5OHhRzFhKvswlk2esmiILQTZtO9lJKdWOpvsojvN0n8lW4oebNs4Zvi493vH50u6CUhDyBaHnoQ+Bxk1uStE7Nfd61JRq8uDhlzUb10yZeDWZuy4o6OygLol2j+NNjwWjA+PSfgQsxZ49ALQpoN4XHV1fAKaWAzRkbQ00G4mWGoD/TChidd9rFpSmqV42z+sZQwsLHaExGcBejEud4w08STwKE5EtacJ7zQXXcx/cMED38GIlnVf0eTNrs4FCWKEb8xxwU7zYkxakbySQLwWk9Py+GXwkItqX6UMG+/NnjsoqVDY5bx802sFHDuV4MQ5G4xyg6Y0rtnw4ham7wW
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4145d41-3edd-47cb-54a1-08d82fbb6361
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef252a00-d8eb-499b-bf53-08d82fbc2687
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2020 10:21:54.8276 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2020 10:27:22.4320 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8X+lcPAApI0gSnojX3qlcnsNcor9LgudnCRqWSu4AFnFgSxBWyNIhe4D2pFcfC/omxt770LGbrQznsGJCXMhX6+cKV3kjJv3pwgTT+kjCuE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3895
-Received-SPF: pass client-ip=40.107.0.137;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 06:21:55
+X-MS-Exchange-CrossTenant-UserPrincipalName: jZyqrJ2Zo3bJMlt9ZHgZkCB39WX8MXAYXApZb8DtrYv+nstyoHUagIM/dlF5Ff95G/ouSHoqQ8Kdv17KwCF6PH48xJTSBxJL/sh+v1YUHpw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5080
+Received-SPF: pass client-ip=40.107.20.113;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 06:27:23
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -133,137 +136,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.07.2020 12:00, Vladimir Sementsov-Ogievskiy wrote:
-> It should be to reenter qio_channel_yield() on io/channel read/write
-> path, so it's safe to reduce in_flight and allow attaching new aio
-> context. And no problem to allow drain itself: connection attempt is
-> not a guest request. Moreover, if remote server is down, we can hang
-> in negotiation, blocking drain section and provoking a dead lock.
-> 
-> How to reproduce the dead lock:
-> 
-> 1. Create nbd-fault-injector.conf with the following contents:
-> 
-> [inject-error "mega1"]
-> event=data
-> io=readwrite
-> when=before
-> 
-> 2. In one terminal run nbd-fault-injector in a loop, like this:
-> 
-> n=1; while true; do
->      echo $n; ((n++));
->      ./nbd-fault-injector.py 127.0.0.1:10000 nbd-fault-injector.conf;
-> done
-> 
-> 3. In another terminal run qemu-io in a loop, like this:
-> 
-> n=1; while true; do
->      echo $n; ((n++));
->      ./qemu-io -c 'read 0 512' nbd+tcp://127.0.0.1:10000;
-> done
-> 
-> After some time, qemu-io will hang trying to drain, for example, like
-> this:
-> 
->   #3 aio_poll (ctx=0x55f006bdd890, blocking=true) at
->      util/aio-posix.c:600
->   #4 bdrv_do_drained_begin (bs=0x55f006bea710, recursive=false,
->      parent=0x0, ignore_bds_parents=false, poll=true) at block/io.c:427
->   #5 bdrv_drained_begin (bs=0x55f006bea710) at block/io.c:433
->   #6 blk_drain (blk=0x55f006befc80) at block/block-backend.c:1710
->   #7 blk_unref (blk=0x55f006befc80) at block/block-backend.c:498
->   #8 bdrv_open_inherit (filename=0x7fffba1563bc
->      "nbd+tcp://127.0.0.1:10000", reference=0x0, options=0x55f006be86d0,
->      flags=24578, parent=0x0, child_class=0x0, child_role=0,
->      errp=0x7fffba154620) at block.c:3491
->   #9 bdrv_open (filename=0x7fffba1563bc "nbd+tcp://127.0.0.1:10000",
->      reference=0x0, options=0x0, flags=16386, errp=0x7fffba154620) at
->      block.c:3513
->   #10 blk_new_open (filename=0x7fffba1563bc "nbd+tcp://127.0.0.1:10000",
->      reference=0x0, options=0x0, flags=16386, errp=0x7fffba154620) at
->      block/block-backend.c:421
-> 
-> And connection_co stack like this:
-> 
->   #0 qemu_coroutine_switch (from_=0x55f006bf2650, to_=0x7fe96e07d918,
->      action=COROUTINE_YIELD) at util/coroutine-ucontext.c:302
->   #1 qemu_coroutine_yield () at util/qemu-coroutine.c:193
->   #2 qio_channel_yield (ioc=0x55f006bb3c20, condition=G_IO_IN) at
->      io/channel.c:472
->   #3 qio_channel_readv_all_eof (ioc=0x55f006bb3c20, iov=0x7fe96d729bf0,
->      niov=1, errp=0x7fe96d729eb0) at io/channel.c:110
->   #4 qio_channel_readv_all (ioc=0x55f006bb3c20, iov=0x7fe96d729bf0,
->      niov=1, errp=0x7fe96d729eb0) at io/channel.c:143
->   #5 qio_channel_read_all (ioc=0x55f006bb3c20, buf=0x7fe96d729d28
->      "\300.\366\004\360U", buflen=8, errp=0x7fe96d729eb0) at
->      io/channel.c:247
->   #6 nbd_read (ioc=0x55f006bb3c20, buffer=0x7fe96d729d28, size=8,
->      desc=0x55f004f69644 "initial magic", errp=0x7fe96d729eb0) at
->      /work/src/qemu/master/include/block/nbd.h:365
->   #7 nbd_read64 (ioc=0x55f006bb3c20, val=0x7fe96d729d28,
->      desc=0x55f004f69644 "initial magic", errp=0x7fe96d729eb0) at
->      /work/src/qemu/master/include/block/nbd.h:391
->   #8 nbd_start_negotiate (aio_context=0x55f006bdd890,
->      ioc=0x55f006bb3c20, tlscreds=0x0, hostname=0x0,
->      outioc=0x55f006bf19f8, structured_reply=true,
->      zeroes=0x7fe96d729dca, errp=0x7fe96d729eb0) at nbd/client.c:904
->   #9 nbd_receive_negotiate (aio_context=0x55f006bdd890,
->      ioc=0x55f006bb3c20, tlscreds=0x0, hostname=0x0,
->      outioc=0x55f006bf19f8, info=0x55f006bf1a00, errp=0x7fe96d729eb0) at
->      nbd/client.c:1032
->   #10 nbd_client_connect (bs=0x55f006bea710, errp=0x7fe96d729eb0) at
->      block/nbd.c:1460
->   #11 nbd_reconnect_attempt (s=0x55f006bf19f0) at block/nbd.c:287
->   #12 nbd_co_reconnect_loop (s=0x55f006bf19f0) at block/nbd.c:309
->   #13 nbd_connection_entry (opaque=0x55f006bf19f0) at block/nbd.c:360
->   #14 coroutine_trampoline (i0=113190480, i1=22000) at
->      util/coroutine-ucontext.c:173
-> 
-> Note, that the hang may be
-> triggered by another bug, so the whole case is fixed only together with
-> commit "block/nbd: on shutdown terminate connection attempt".
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   block/nbd.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
-> 
-> diff --git a/block/nbd.c b/block/nbd.c
-> index 65a4f56924..49254f1c3c 100644
-> --- a/block/nbd.c
-> +++ b/block/nbd.c
-> @@ -280,7 +280,18 @@ static coroutine_fn void nbd_reconnect_attempt(BDRVNBDState *s)
->           s->ioc = NULL;
->       }
->   
-> +    bdrv_dec_in_flight(s->bs);
->       s->connect_status = nbd_client_connect(s->bs, &local_err);
-> +    s->wait_drained_end = true;
-> +    while (s->drained) {
-> +        /*
-> +         * We may be entered once from nbd_client_attach_aio_context_bh
-> +         * and then from nbd_client_co_drain_end. So here is a loop.
-> +         */
-> +        qemu_coroutine_yield();
-> +    }
-> +    bdrv_inc_in_flight(s->bs);
-
-My next version of non-blocking connect will need nbd_establish_connection() to be above bdrv_dec_in_flight(). So, I want to resend this anyway.
-
-> +
->       error_free(s->connect_err);
->       s->connect_err = NULL;
->       error_propagate(&s->connect_err, local_err);
-> 
+On 24.07.2020 12:49, Max Reitz wrote:
+> On 22.07.20 20:31, Andrey Shinkevich wrote:
+>> On 25.06.2020 18:22, Max Reitz wrote:
+>>> This includes some permission limiting (for example, we only need to
+>>> take the RESIZE permission for active commits where the base is smaller
+>>> than the top).
+>>>
+>>> Use this opportunity to rename qmp_drive_mirror()'s "source" BDS to
+>>> "target_backing_bs", because that is what it really refers to.
+>>>
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>>    qapi/block-core.json |   6 ++-
+>>>    block/mirror.c       | 118 +++++++++++++++++++++++++++++++++----------
+>>>    blockdev.c           |  36 +++++++++----
+>>>    3 files changed, 121 insertions(+), 39 deletions(-)
+>>>
+>> ...
+>>> diff --git a/block/mirror.c b/block/mirror.c
+>>> index 469acf4600..770de3b34e 100644
+>>> --- a/block/mirror.c
+>>> +++ b/block/mirror.c
+>>> @@ -42,6 +42,7 @@ typedef struct MirrorBlockJob {
+>>>        BlockBackend *target;
+>>>        BlockDriverState *mirror_top_bs;
+>>>        BlockDriverState *base;
+>>> +    BlockDriverState *base_overlay;
+>>>          /* The name of the graph node to replace */
+>>>        char *replaces;
+>>> @@ -677,8 +678,10 @@ static int mirror_exit_common(Job *job)
+>>>                                 &error_abort);
+>>>        if (!abort && s->backing_mode == MIRROR_SOURCE_BACKING_CHAIN) {
+>>>            BlockDriverState *backing = s->is_none_mode ? src : s->base;
+>>> -        if (backing_bs(target_bs) != backing) {
+>>> -            bdrv_set_backing_hd(target_bs, backing, &local_err);
+>>> +        BlockDriverState *unfiltered_target =
+>>> bdrv_skip_filters(target_bs);
+>>> +
+>>> +        if (bdrv_cow_bs(unfiltered_target) != backing) {
+>>
+>> I just worry about a filter node of the concurrent job right below the
+>> unfiltered_target.
+> Having a concurrent job on the target sounds extremely problematic in
+> itself (because at least for most of the mirror job, the target isn’t in
+> a consistent state).  Is that a real use case?
 
 
--- 
-Best regards,
-Vladimir
+It might be at the TestParallelOps of iotests #30 but I am not sure now. 
+I am going to apply my series with copy-on-read filter for the stream 
+job above this one and will see then.
+
+Andrey
+
+
+>
+>> The filter has unfiltered_target in its parent list.
+>> Will that filter node be replaced correctly then?
+> I’m also not quite sure what you mean.  We need to attach the source’s
+> backing chain to the target here, so we go down to the first node that
+> might accept COW backing files (by invoking bdrv_skip_filters()).  That
+> should be correct no matter what kind of filters are on it.
+
+
+I ment when a filter is removed with the bdrv_replace_node() afterwards. 
+As I mentioned above, I am going to test the case later.
+
+Andrey
+
+
+>>> +        /*
+>>> +         * The topmost node with
+>>> +         * bdrv_skip_filters(filtered_target) ==
+>>> bdrv_skip_filters(target)
+>>> +         */
+>>> +        filtered_target = bdrv_cow_bs(bdrv_find_overlay(bs, target));
+>>> +
+>>> +        assert(bdrv_skip_filters(filtered_target) ==
+>>> +               bdrv_skip_filters(target));
+>>> +
+>>> +        /*
+>>> +         * XXX BLK_PERM_WRITE needs to be allowed so we don't block
+>>> +         * ourselves at s->base (if writes are blocked for a node,
+>>> they are
+>>> +         * also blocked for its backing file). The other options
+>>> would be a
+>>> +         * second filter driver above s->base (== target).
+>>> +         */
+>>> +        iter_shared_perms = BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE;
+>>> +
+>>> +        for (iter = bdrv_filter_or_cow_bs(bs); iter != target;
+>>> +             iter = bdrv_filter_or_cow_bs(iter))
+>>> +        {
+>>> +            if (iter == filtered_target) {
+>>
+>> For one filter node only?
+> No, iter_shared_perms is never reset, so it retains the
+> BLK_PERM_CONSISTENT_READ flag until the end of the loop.
+
+
+Yes, that's right. Clear.
+
+Andrey
+
+
+>
+>>> +                /*
+>>> +                 * From here on, all nodes are filters on the base.
+>>> +                 * This allows us to share BLK_PERM_CONSISTENT_READ.
+>>> +                 */
+>>> +                iter_shared_perms |= BLK_PERM_CONSISTENT_READ;
+>>> +            }
+>>> +
+>>>                ret = block_job_add_bdrv(&s->common, "intermediate
+>>> node", iter, 0,
+>>> -                                     BLK_PERM_WRITE_UNCHANGED |
+>>> BLK_PERM_WRITE,
+>>> -                                     errp);
+>>> +                                     iter_shared_perms, errp);
+>>>                if (ret < 0) {
+>>>                    goto fail;
+>>>                }
+>> ...
+>>> @@ -3042,6 +3053,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error
+>>> **errp)
+>>>                                 " named node of the graph");
+>>>                goto out;
+>>>            }
+>>> +        replaces_node_name = arg->replaces;
+>>
+>> What is the idea behind the variables substitution?
+> Looks like a remnant from v6, where there was an
+>
+> if (arg->has_replaces) {
+>      ...
+>      replaces_node_name = arg->replaces;
+> } else if (unfiltered_bs != bs) {
+>      replaces_node_name = unfiltered_bs->node_name;
+> }
+>
+> But I moved that logic to blockdev_mirror_common() in this version.
+>
+> So it’s just useless now and replaces_node_name shouldn’t exist.
+>
+> Max
+>
 
