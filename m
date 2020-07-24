@@ -2,65 +2,90 @@ Return-Path: <SRS0=2cnN=BD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13006C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F4DC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:00:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC0A720674
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:00:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC0A720674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 2FF4320674
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 Jul 2020 10:00:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="REr7dpeQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FF4320674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jyuUx-0000u3-OT
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 06:00:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36744)
+	id 1jyuVA-0001Vh-76
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 06:00:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>)
- id 1jyuQx-0007hA-6S; Fri, 24 Jul 2020 05:56:07 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:51641)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>)
- id 1jyuQu-0003iH-Sw; Fri, 24 Jul 2020 05:56:06 -0400
-Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
- by isrv.corpit.ru (Postfix) with ESMTP id 8C03F4071A;
- Fri, 24 Jul 2020 12:55:53 +0300 (MSK)
-Received: from [192.168.177.99] (mjt.vpn.tls.msk.ru [192.168.177.99])
- by tsrv.corpit.ru (Postfix) with ESMTP id 5C66A93;
- Fri, 24 Jul 2020 12:55:54 +0300 (MSK)
-Subject: Re: [PATCH v2] configure: actually disable 'git_update' mode with
- --disable-git-update
-To: Dan Streetman <ddstreet@canonical.com>, qemu-trivial@nongnu.org
-References: <20200715205013.2367760-1-ddstreet@canonical.com>
- <20200716102213.2931209-1-ddstreet@canonical.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <e55fea6e-e403-166f-e693-9e73ae29e5cc@msgid.tls.msk.ru>
-Date: Fri, 24 Jul 2020 12:55:53 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jyuUQ-0000z9-F0
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:59:42 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33951)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jyuUO-0004V8-Mw
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 05:59:42 -0400
+Received: by mail-oi1-x243.google.com with SMTP id e4so7581647oib.1
+ for <qemu-devel@nongnu.org>; Fri, 24 Jul 2020 02:59:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=tY39xB/n/GnQoICRfIUv8CVPYwynRRrWDIdwPvr1Rb8=;
+ b=REr7dpeQfCcmwFOSBqWaLJ9ua1Ie0hoYujmEjCvIa6t8QBErIIVxpFegDeBWURs8to
+ l++uge+4clOCdK6F9tpokyhBIMSSluUEtl3ktsOTfdJ36qFhqS8PMKCJt0G4lZPzajoR
+ QNpH5pepKpp52wWn7OrH1eOtgYTTwhGi/sd5BjWKRJuD89XnBIGe8xrgnPvD2hFrfPoj
+ FMdbbBBGDtqB+R5ZS0GF2gMErVnTaq0NwluuKJSFzw7kwHMBXnkso2K9l4u6SYyX5nnb
+ Y7/JWcPTfZ5axlLL0XTbM2vUR16KbwTomJUjTVo6/nt5cqnOuDnvaP7UhLJrxROy3F9x
+ LqLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=tY39xB/n/GnQoICRfIUv8CVPYwynRRrWDIdwPvr1Rb8=;
+ b=EakioAm/bbAxaAkUVYRaxTbMDSmXhB17jGFvwGlfIPouM+WnaljAISynV1Rnyedgyj
+ U4BJ6q2F0om9Q2+EvnIVUgI0p+B+8QeD/aOROwk/rRAXByNHiBiQe4afPAtPMpeKN5U3
+ DHdY7ezdsIpLzSXYMHVZdyzONpHLZ4JJ3YZC4Ol/Ziz+VUpzyx8z7mYCyfXdfCFZUPE6
+ UIa+16xTSoHi5z2sIF5zp70EJNT1aJdI+ka8NM23fE5cUikwYpgoaMaUPW7dbZEYSkSB
+ 0rIyw//0atkkkSYWxLdck+23+D3ZxgSeU5wVbk7RpulYOjuNtSrIbAjH+6PXNh6LYxvK
+ cTkA==
+X-Gm-Message-State: AOAM533orO8gZSij9TgnN8eNANxcsqNOx85xoD1wNDV/D6E7CVUd/vgf
+ e3Bkv87YYdUjSYfdKeuZhy3b/dNqnMSvK/h05UaBIA==
+X-Google-Smtp-Source: ABdhPJwBxUCRqdn4AsEhTdz2ebDwCNWbftMdkFu+UNj3qRhL633BkQyXxbP1J8oi+MVzFbEDVhyhxULroHY1M/f1zXs=
+X-Received: by 2002:aca:2819:: with SMTP id 25mr6874111oix.48.1595584779353;
+ Fri, 24 Jul 2020 02:59:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200716102213.2931209-1-ddstreet@canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: none client-ip=86.62.121.231; envelope-from=mjt@tls.msk.ru;
- helo=isrv.corpit.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 05:55:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <20200724071657.21508-1-f4bug@amsat.org>
+ <5d8ade29-c085-9f6d-b896-fda48c1f5666@redhat.com>
+ <0ce8f279-1ef0-6d93-5fff-032783fba2b6@amsat.org>
+ <45942406-2ee2-150a-fb11-d485a12ca290@amsat.org>
+In-Reply-To: <45942406-2ee2-150a-fb11-d485a12ca290@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 Jul 2020 10:59:28 +0100
+Message-ID: <CAFEAcA9wXHK0h6kzfX_re=Q8P3Yv93c_WFQxjbEUnj_PhV-_bQ@mail.gmail.com>
+Subject: Re: [RFC PATCH] buildsys: Only build capstone if softmmu/user mode is
+ enabled
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,162 +98,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rafael David Tinoco <rafael.tinoco@canonical.com>,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi!
+On Fri, 24 Jul 2020 at 10:47, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>
+> On 7/24/20 11:38 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 7/24/20 9:56 AM, Thomas Huth wrote:
+> >> On 24/07/2020 09.16, Philippe Mathieu-Daud=C3=A9 wrote:
+> >>> At least one of softmmu or user mode has to be enabled to use
+> >>> capstone. If not, don't clone/built it.
+> >>>
+> >>> This save CI time for the tools/documentation-only build jobs.
 
-Dan, can you please resend this with To: qemu-devel@, maybe Cc: qemu-trivial@?
-It isn't exactly trivial and it needs some review from the developers.
+> >>> +if test -z "$capstone" && test $tcg =3D 'no' ; then # !tcg implies !=
+softmmu
+> >>> +  capstone=3D"no"
+> >>> +fi
+> >>
+> >> I don't think this is right. You could have a KVM-only build where you
+> >> still want to use the disassembler for the human monitor.
+> >
+> > I had the same question with KVM, I agree this is unclear, this is why
+> > I added RFC.
+> >
+> > Don't we have !softmmu implies !kvm?
+>
+> It works because it falls back to the old disas.c (if capstone is
+> here, use it, else fall-back).
+>
+> Does this means we can directly remove the capstone experiment &
+> submodule without waiting for the libllvm integration?
 
-Thanks,
+The theory (at least at the time) was that capstone was better
+than the internal disassembler for at least some targets.
+If we want to go from libllvm to capstone as our long term
+plan that's cool, but until we actually do that I don't think
+we should drop capstone.
 
-/mjt
+As far as this patch goes: if you want to disable capstone for
+the tools-and-docs-only setup then I think the right condition is
+if [ "$bsd_user" =3D "no" -a "$linux_user" =3D "no" -a "$softmmu" =3D "no" =
+] ; then
+  capstone=3Dno
+fi
 
-16.07.2020 13:22, Dan Streetman wrote:
-> The --disable-git-update configure param sets git_update=no, but
-> some later checks only look for the .git dir. This changes the
-> --enable-git-update to set git_update=yes but also fail if it
-> does not find a .git dir. Then all the later checks for the .git
-> dir can just be changed to a check for $git_update = "yes".
-> 
-> Also update the Makefile to skip the 'git_update' checks if it has
-> been disabled.
-> 
-> This is needed because downstream packagers, e.g. Debian, Ubuntu, etc,
-> also keep the source code in git, but do not want to enable the
-> 'git_update' mode; with the current code, that's not possible even
-> if the downstream package specifies --disable-git-update.
-> 
-> Signed-off-by: Dan Streetman <ddstreet@canonical.com>
-> ---
-> Changes in v2:
->  - change GIT_UPDATE default to "" if no .git found
->  - change Makefile to skip git update checks if GIT_UPDATE=no
-> 
->  Makefile  | 15 +++++++++------
->  configure | 21 +++++++++++++--------
->  2 files changed, 22 insertions(+), 14 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 32345c610e..9bcd3f9af4 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -25,6 +25,8 @@ git-submodule-update:
->  
->  .PHONY: git-submodule-update
->  
-> +# If --disable-git-update specified, skip these git checks
-> +ifneq (no,$(GIT_UPDATE))
->  git_module_status := $(shell \
->    cd '$(SRC_PATH)' && \
->    GIT="$(GIT)" ./scripts/git-submodule.sh status $(GIT_SUBMODULES); \
-> @@ -32,7 +34,12 @@ git_module_status := $(shell \
->  )
->  
->  ifeq (1,$(git_module_status))
-> -ifeq (no,$(GIT_UPDATE))
-> +ifeq (yes,$(GIT_UPDATE))
-> +git-submodule-update:
-> +	$(call quiet-command, \
-> +          (cd $(SRC_PATH) && GIT="$(GIT)" ./scripts/git-submodule.sh update $(GIT_SUBMODULES)), \
-> +          "GIT","$(GIT_SUBMODULES)")
-> +else
->  git-submodule-update:
->  	$(call quiet-command, \
->              echo && \
-> @@ -41,11 +48,7 @@ git-submodule-update:
->              echo "from the source directory checkout $(SRC_PATH)" && \
->              echo && \
->              exit 1)
-> -else
-> -git-submodule-update:
-> -	$(call quiet-command, \
-> -          (cd $(SRC_PATH) && GIT="$(GIT)" ./scripts/git-submodule.sh update $(GIT_SUBMODULES)), \
-> -          "GIT","$(GIT_SUBMODULES)")
-> +endif
->  endif
->  endif
->  
-> diff --git a/configure b/configure
-> index b751c853f5..eefda62210 100755
-> --- a/configure
-> +++ b/configure
-> @@ -318,7 +318,7 @@ then
->      git_submodules="$git_submodules tests/fp/berkeley-testfloat-3"
->      git_submodules="$git_submodules tests/fp/berkeley-softfloat-3"
->  else
-> -    git_update=no
-> +    git_update=""
->      git_submodules=""
->  
->      if ! test -f "$source_path/ui/keycodemapdb/README"
-> @@ -1603,7 +1603,12 @@ for opt do
->    ;;
->    --with-git=*) git="$optarg"
->    ;;
-> -  --enable-git-update) git_update=yes
-> +  --enable-git-update)
-> +      git_update=yes
-> +      if test ! -e "$source_path/.git"; then
-> +          echo "ERROR: cannot --enable-git-update without .git"
-> +          exit 1
-> +      fi
->    ;;
->    --disable-git-update) git_update=no
->    ;;
-> @@ -2017,7 +2022,7 @@ fi
->  # Consult white-list to determine whether to enable werror
->  # by default.  Only enable by default for git builds
->  if test -z "$werror" ; then
-> -    if test -e "$source_path/.git" && \
-> +    if test "$git_update" = "yes" && \
->          { test "$linux" = "yes" || test "$mingw32" = "yes"; }; then
->          werror="yes"
->      else
-> @@ -4418,10 +4423,10 @@ EOF
->      fdt=system
->    else
->        # have GIT checkout, so activate dtc submodule
-> -      if test -e "${source_path}/.git" ; then
-> +      if test "$git_update" = "yes" ; then
->            git_submodules="${git_submodules} dtc"
->        fi
-> -      if test -d "${source_path}/dtc/libfdt" || test -e "${source_path}/.git" ; then
-> +      if test -d "${source_path}/dtc/libfdt" || test "$git_update" = "yes" ; then
->            fdt=git
->            mkdir -p dtc
->            if [ "$pwd_is_source_path" != "y" ] ; then
-> @@ -5391,7 +5396,7 @@ case "$capstone" in
->    "" | yes)
->      if $pkg_config capstone; then
->        capstone=system
-> -    elif test -e "${source_path}/.git" && test $git_update = 'yes' ; then
-> +    elif test "$git_update" = "yes" ; then
->        capstone=git
->      elif test -e "${source_path}/capstone/Makefile" ; then
->        capstone=internal
-> @@ -6447,7 +6452,7 @@ case "$slirp" in
->    "" | yes)
->      if $pkg_config slirp; then
->        slirp=system
-> -    elif test -e "${source_path}/.git" && test $git_update = 'yes' ; then
-> +    elif test "$git_update" = "yes" ; then
->        slirp=git
->      elif test -e "${source_path}/slirp/Makefile" ; then
->        slirp=internal
-> @@ -6809,7 +6814,7 @@ if test "$cpu" = "s390x" ; then
->      roms="$roms s390-ccw"
->      # SLOF is required for building the s390-ccw firmware on s390x,
->      # since it is using the libnet code from SLOF for network booting.
-> -    if test -e "${source_path}/.git" ; then
-> +    if test "$git_update" = "yes" ; then
->        git_submodules="${git_submodules} roms/SLOF"
->      fi
->    fi
-> 
-
+thanks
+-- PMM
 
