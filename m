@@ -6,66 +6,65 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC9EC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 19:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CCECC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 19:55:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0F91206D7
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 19:51:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0F91206D7
+	by mail.kernel.org (Postfix) with ESMTPS id 4FC7820656
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 19:55:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FC7820656
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzQCU-0007bb-SI
-	for qemu-devel@archiver.kernel.org; Sat, 25 Jul 2020 15:51:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44980)
+	id 1jzQGc-000167-L9
+	for qemu-devel@archiver.kernel.org; Sat, 25 Jul 2020 15:55:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jzQBt-0007Ba-Ri
- for qemu-devel@nongnu.org; Sat, 25 Jul 2020 15:50:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52344)
+ id 1jzQFr-0000YT-Hn
+ for qemu-devel@nongnu.org; Sat, 25 Jul 2020 15:54:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52458)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jzQBq-0005Ac-LS
- for qemu-devel@nongnu.org; Sat, 25 Jul 2020 15:50:41 -0400
+ id 1jzQFp-0005UR-Ph
+ for qemu-devel@nongnu.org; Sat, 25 Jul 2020 15:54:47 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jzQBo-00065Z-9Z
- for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 19:50:36 +0000
+ id 1jzQFo-0006HA-MT
+ for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 19:54:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 477D52E805D
- for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 19:50:36 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 9C98E2E80D2
+ for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 19:54:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 25 Jul 2020 19:41:30 -0000
-From: Matthieu Bucchianeri <1888918@bugs.launchpad.net>
+Date: Sat, 25 Jul 2020 19:41:37 -0000
+From: Matthieu Bucchianeri <1611394@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
  assignee=matthieu.bucchianeri@leostella.com; 
-X-Launchpad-Bug-Tags: floating ppc spe
+X-Launchpad-Bug-Tags: embedded floating-point ppc
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: matthieu-bucchianeri
-X-Launchpad-Bug-Reporter: Matthieu Bucchianeri (matthieu-bucchianeri)
+X-Launchpad-Bug-Commenters: andreas-rasmusson matthieu-bucchianeri
+X-Launchpad-Bug-Reporter: Andreas Rasmusson (andreas-rasmusson)
 X-Launchpad-Bug-Modifier: Matthieu Bucchianeri (matthieu-bucchianeri)
-References: <159564442748.29789.2028598939567190639.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159570609092.17570.14179841616878290890.launchpad@soybean.canonical.com>
-Subject: [Bug 1888918] Re: qemu-system-ppc: Floating point instructions do not
- properly generate the SPE/Embedded Floating-Point Unavailable
- interrupt
+References: <20160809142016.20365.3095.malonedeb@wampee.canonical.com>
+Message-Id: <159570609787.30951.5981878549696934726.launchpad@gac.canonical.com>
+Subject: [Bug 1611394] Re: qemu-ppc: Scalar Single-Precision Floating-Point
+ instructions should not test MSR[SPV]
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e85d0ab92e2924d39b8285aeae075a01d25eff06";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 431bc376bd16eb76b85693d8c050b47db62f55ec
+X-Launchpad-Hash: 6e0392cf7af4353355374b06e0f05544dc3d1ef1
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/25 14:40:48
@@ -88,10 +87,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1888918 <1888918@bugs.launchpad.net>
+Reply-To: Bug 1611394 <1611394@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Matthieu Bucchianeri (matthieu-bucchianeri)
 
 ** Changed in: qemu
        Status: New =3D> In Progress
@@ -100,120 +102,51 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1888918
+https://bugs.launchpad.net/bugs/1611394
 
 Title:
-  qemu-system-ppc: Floating point instructions do not properly generate
-  the SPE/Embedded Floating-Point Unavailable interrupt
+  qemu-ppc: Scalar Single-Precision Floating-Point instructions should
+  not test  MSR[SPV]
 
 Status in QEMU:
   In Progress
 
 Bug description:
-  When emulating certain floating point instructions or vector
-  instructions on PowerPC machines, QEMU does not properly generate the
-  SPE/Embedded Floating-Point Unavailable interrupt.
+  According to "Signal Processing Engine (SPE) Programming Environments Man=
+ual" at
+  http://cache.nxp.com/files/32bit/doc/ref_manual/SPEPEM.pdf?fsrch=3D1&sr=
+=3D1&pageNum=3D1
 
-  As described in the Signal Processing Engine (SPE) Programming
-  Environments Manual, Rev. 0, available at https://www.nxp.com/docs/en
-  /reference-manual/SPEPEM.pdf:
+  c.f section 4.2.3  and also Figure 2-2.
 
-  > An SPE/embedded floating-point unavailable exception occurs on an attem=
-pt to execute any of the
-  > following instructions and MSR[SPV] is not set:
-  > * SPE instruction (except brinc)
-  > * An embedded scalar double-precision instruction
-  > * A vector single-precision floating-point instructions
-  > It is not used by embedded scalar single-precision floating-point instr=
-uctions
+  When MSR[SPV] is _NOT_ set, then the embedded scalar single-precision flo=
+ating-point instructions
+  should _NOT_ generate an Embedded Floating-Point Unavailable Interrupt.
 
-  This behavior was partially reported in Bug #1611394, however the
-  issue is larger than what is described in that bug. As mentioned in
-  that bug, some single-precision instructions generate the exception
-  (while they should not), which is incorrect but does not typically
-  produce an incorrect output. What is more of an issue is that several
-  double-precision and vector instructions do not generate the exception
-  (while they should), and this breaks support for lazy FPU/vector
-  context switching in Linux (for example).
+  =
 
-  The upper 32-bit of the double-precision/vector registers (which are
-  in fact hidden in the general purpose registers) is not properly
-  saved/restored, and this causes arithmetic errors. This was observed
-  very frequently on a commercial project that does a lot of double-
-  precision computations. The application works perfectly fine on an
-  MPC8548 CPU, but fails often with QEMU.
+  Hence, some tests for MSR[SPV] in file target-ppc/translate.c need to be =
+removed.
+  Namely, in the definitions of =
 
-  This is only an issue with full platform emulation - the SPE/Embedded
-  Floating-Point Unavailable interrupt is not relevant for application
-  emulation.
+  1. GEN_SPEFPUOP_ARITH2_32_32
+  2. gen_efsabs
+  3. gen_efsnabs
+  4. gen_efsneg
+  5. GEN_SPEFPUOP_COMP_32
 
-  The issue can be reproduced using the attached Linux program "spe-
-  bug.c". This program properly prints the number 42 (as the result of
-  some very simple double-precision computation) on real PowerPC
-  hardware, but prints an incorrect result (typically 0) on QEMU.
+  Note, the macro GEN_SPEFPUOP_CONV_32_32 is already correct.
 
-  This issue was first discovered in an older version of QEMU, but is
-  also reproduced in the latest:
+  One more thing, afaict the macro GEN_SPEFPUOP_CONV_32_64 is used by both
+  efs- and efd- instructions, and will need to be split in two versions.
+  The efs-use (i.e for efscfd) should be as it is today, but the use by efd=
+-instructions =
 
-  # git rev-parse HEAD
-  7adfbea8fd1efce36019a0c2f198ca73be9d3f18
-  # ppc-softmmu/qemu-system-ppc --version
-  QEMU emulator version 5.0.91 (v5.1.0-rc1-28-g7adfbea8fd-dirty)
-  Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+  (e.g efdctui) will need to add a test for MSR[SPV].
 
-  Upon further analysis a total of 39 instructions are misbehaving:
 
-  efsabs: raised: 1, expected: 0
-  efsnabs: raised: 1, expected: 0
-  efsneg: raised: 1, expected: 0
-  efdcfs: raised: 0, expected: 1
-  efdcfsf: raised: 0, expected: 1
-  efdcfsi: raised: 0, expected: 1
-  efdcfuf: raised: 0, expected: 1
-  efdcfui: raised: 0, expected: 1
-  efdctsf: raised: 0, expected: 1
-  efdctsi: raised: 0, expected: 1
-  efdctsiz: raised: 0, expected: 1
-  efdctuf: raised: 0, expected: 1
-  efdctui: raised: 0, expected: 1
-  efdctuiz: raised: 0, expected: 1
-  efscfd: raised: 0, expected: 1
-  evfscfsf: raised: 0, expected: 1
-  evfscfsi: raised: 0, expected: 1
-  evfscfuf: raised: 0, expected: 1
-  evfscfui: raised: 0, expected: 1
-  evfsctsf: raised: 0, expected: 1
-  evfsctsi: raised: 0, expected: 1
-  evfsctsiz: raised: 0, expected: 1
-  evfsctuf: raised: 0, expected: 1
-  evfsctui: raised: 0, expected: 1
-  evfsctuiz: raised: 0, expected: 1
-  brinc: raised: 0, expected: 1
-  efsadd: raised: 1, expected: 0
-  efsdiv: raised: 1, expected: 0
-  efsmul: raised: 1, expected: 0
-  efssub: raised: 1, expected: 0
-  evsplatfi: raised: 0, expected: 1
-  evsplati: raised: 0, expected: 1
-  efscmpeq: raised: 1, expected: 0
-  efscmpgt: raised: 1, expected: 0
-  efscmplt: raised: 1, expected: 0
-  efststeq: raised: 1, expected: 0
-  efststgt: raised: 1, expected: 0
-  efststlt: raised: 1, expected: 0
-  evsel: raised: 0, expected: 1
-
-  When "raised" is 0 and "expected" is 1, this means that the SPE/Embedded =
-Floating-Point Unavailable interrupt was not generated while it should have.
-  When "raised" is 1 and "expected" is 0, this means that the SPE/Embedded =
-Floating-Point Unavailable interrupt was generated while it should not have=
- (Bug #1611394).
-
-  A comprehensive program testing all the instructions listed in the
-  Signal Processing Engine (SPE) Programming Environments Manual, Rev. 0
-  is posted in the comments of this ticket, and can be used to reproduce
-  the issue, and validate the future fix.
+  (I've looked at today's HEAD-revision of target-ppc/translate.c).
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1888918/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1611394/+subscriptions
 
