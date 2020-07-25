@@ -7,55 +7,52 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6655BC433E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 13:54:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C736EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 13:54:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B3D520674
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 13:54:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B3D520674
+	by mail.kernel.org (Postfix) with ESMTPS id A087D20674
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 13:54:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A087D20674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzKdW-0005ba-GD
-	for qemu-devel@archiver.kernel.org; Sat, 25 Jul 2020 09:54:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42232)
+	id 1jzKdX-0005eL-Uo
+	for qemu-devel@archiver.kernel.org; Sat, 25 Jul 2020 09:54:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <hogan.wang@huawei.com>)
- id 1jzJhf-0003d1-Q5
- for qemu-devel@nongnu.org; Sat, 25 Jul 2020 08:55:03 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:39502 helo=huawei.com)
+ id 1jzJhe-0003co-MG
+ for qemu-devel@nongnu.org; Sat, 25 Jul 2020 08:55:02 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4221 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <hogan.wang@huawei.com>)
- id 1jzJhd-0006tf-SR
- for qemu-devel@nongnu.org; Sat, 25 Jul 2020 08:55:03 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id E0F37ED71C1FABDD0635;
- Sat, 25 Jul 2020 20:54:49 +0800 (CST)
-Received: from localhost (10.174.149.56) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Sat, 25 Jul 2020
- 20:54:44 +0800
+ id 1jzJhb-0006tc-CY
+ for qemu-devel@nongnu.org; Sat, 25 Jul 2020 08:55:02 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 4FB7046BB273FE90BEAA;
+ Sat, 25 Jul 2020 20:54:48 +0800 (CST)
+Received: from localhost (10.174.149.56) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Sat, 25 Jul 2020
+ 20:54:40 +0800
 From: Hogan Wang <hogan.wang@huawei.com>
 To: <marcel.apfelbaum@gmail.com>, <dgilbert@redhat.com>, <jusual@redhat.com>, 
  <mst@redhat.com>, <qemu-devel@nongnu.org>
-Subject: [PATCH v3 2/2] hw/pci-host: save/restore pci host config register for
- old ones
-Date: Sat, 25 Jul 2020 20:54:37 +0800
-Message-ID: <20200725125437.2825-2-hogan.wang@huawei.com>
+Subject: [PATCH v3 1/2] hw/pci-host: save/restore pci host config register
+Date: Sat, 25 Jul 2020 20:54:36 +0800
+Message-ID: <20200725125437.2825-1-hogan.wang@huawei.com>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200725125437.2825-1-hogan.wang@huawei.com>
-References: <20200725125437.2825-1-hogan.wang@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.149.56]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=hogan.wang@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/25 08:54:50
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=hogan.wang@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/25 08:54:49
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -81,138 +78,255 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The i440fx and q35 machines integrate i440FX or MCH PCI device by default.
-Refer to i440FX and ICH9-LPC spcifications, there are some reserved
-configuration registers can used to save/restore PCIHostState.config_reg.
-It's nasty but friendly to old ones.
+The pci host config register is used to save PCI address for
+read/write config data. If guest write a value to config register,
+and then pause the vcpu to migrate, After the migration, the guest
+continue to write pci config data, and the write data will be ignored
+because of new qemu process lost the config register state.
+
+Reproduction steps are:
+1. guest booting in seabios.
+2. guest enable the SMRAM in seabios:piix4_apmc_smm_setup, and then
+   expect to disable the SMRAM by pci_config_writeb.
+3. after guest write the pci host config register, and then pasued vcpu
+   to finish migration.
+4. guest write config data(0x0A) fail to disable the SMRAM becasue of
+   config register state lost.
+5. guest continue to boot and crash in ipxe option ROM due to SMRAM in
+   enabled state.
 
 Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
 ---
- hw/pci-host/i440fx.c | 31 +++++++++++++++++++++++++++++++
- hw/pci-host/q35.c    | 37 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 68 insertions(+)
+ hw/i386/pc.c               |  5 ++++-
+ hw/pci-host/i440fx.c       | 20 ++++++++++++++++++++
+ hw/pci-host/q35.c          | 19 +++++++++++++++++++
+ hw/pci/pci_host.c          | 11 +++++++++++
+ hw/pci/pcie_host.c         | 11 +++++++++++
+ include/hw/pci-host/q35.h  |  1 +
+ include/hw/pci/pci_host.h  | 10 ++++++++++
+ include/hw/pci/pcie_host.h | 10 ++++++++++
+ 8 files changed, 86 insertions(+), 1 deletion(-)
 
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 3d419d5991..517f185992 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -97,7 +97,10 @@
+ #include "fw_cfg.h"
+ #include "trace.h"
+ 
+-GlobalProperty pc_compat_5_0[] = {};
++GlobalProperty pc_compat_5_0[] = {
++    { "i440FX-pcihost", "migration-enabled", "off" },
++    { "q35-pcihost", "migration-enabled", "off" },
++};
+ const size_t pc_compat_5_0_len = G_N_ELEMENTS(pc_compat_5_0);
+ 
+ GlobalProperty pc_compat_4_2[] = {
 diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
-index c662903dbb..9e2cfdb052 100644
+index 8ed2417f0c..c662903dbb 100644
 --- a/hw/pci-host/i440fx.c
 +++ b/hw/pci-host/i440fx.c
-@@ -65,6 +65,14 @@ typedef struct I440FXState {
-  */
- #define I440FX_COREBOOT_RAM_SIZE 0x57
+@@ -49,6 +49,7 @@ typedef struct I440FXState {
+     Range pci_hole;
+     uint64_t pci_hole64_size;
+     bool pci_hole64_fix;
++    bool migration_enabled;
+     uint32_t short_root_bus;
+ } I440FXState;
  
-+/* Older I440FX machines (5.0 and older) not support i440FX-pcihost state
-+ * migration, use some reserved INTEL 82441 configuration registers to
-+ * save/restore i440FX-pcihost config register. Refer to [INTEL 440FX PCISET
-+ * 82441FX PCI AND MEMORY CONTROLLER (PMC) AND 82442FX DATA BUS ACCELERATOR
-+ * (DBX) Table 1. PMC Configuration Space]
-+ */
-+#define I440FX_PCI_HOST_CONFIG_REG 0x94
-+
- static void i440fx_update_memory_mappings(PCII440FXState *d)
- {
-     int i;
-@@ -99,8 +107,30 @@ static void i440fx_write_config(PCIDevice *dev,
- static int i440fx_post_load(void *opaque, int version_id)
- {
-     PCII440FXState *d = opaque;
-+    uint8_t *config;
-+    I440FXState *s = OBJECT_CHECK(I440FXState,
-+                                  object_resolve_path("/machine/i440fx", NULL),
-+                                  TYPE_PCI_HOST_BRIDGE);
+@@ -118,6 +119,23 @@ static const VMStateDescription vmstate_i440fx = {
+     }
+ };
  
-     i440fx_update_memory_mappings(d);
-+
-+    if (!s->migration_enabled) {
-+        config = &d->parent_obj.config[I440FX_PCI_HOST_CONFIG_REG];
-+        s->parent_obj.config_reg = pci_get_long(config);
-+    }
-+    return 0;
++static bool i440fx_pcihost_needed(void *opaque)
++{
++    I440FXState *s = opaque;
++    return s->migration_enabled;
 +}
 +
-+static int i440fx_pre_save(void *opaque)
-+{
-+    PCIDevice *d = opaque;
-+    I440FXState *s = OBJECT_CHECK(I440FXState,
-+                                  object_resolve_path("/machine/i440fx", NULL),
-+                                  TYPE_PCI_HOST_BRIDGE);
-+    if (!s->migration_enabled) {
-+        pci_set_long(&d->config[I440FX_PCI_HOST_CONFIG_REG],
-+                     s->parent_obj.config_reg);
++static const VMStateDescription vmstate_i440fx_pcihost = {
++    .name = "I440FX_PCIHost",
++    .needed = i440fx_pcihost_needed,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCI_HOST(parent_obj, I440FXState),
++        VMSTATE_END_OF_LIST()
 +    }
-     return 0;
- }
++};
++
+ static void i440fx_pcihost_get_pci_hole_start(Object *obj, Visitor *v,
+                                               const char *name, void *opaque,
+                                               Error **errp)
+@@ -387,6 +405,7 @@ static Property i440fx_props[] = {
+                      pci_hole64_size, I440FX_PCI_HOST_HOLE64_SIZE_DEFAULT),
+     DEFINE_PROP_UINT32("short_root_bus", I440FXState, short_root_bus, 0),
+     DEFINE_PROP_BOOL("x-pci-hole64-fix", I440FXState, pci_hole64_fix, true),
++    DEFINE_PROP_BOOL("migration-enabled", I440FXState, migration_enabled, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-@@ -108,6 +138,7 @@ static const VMStateDescription vmstate_i440fx = {
-     .name = "I440FX",
-     .version_id = 3,
-     .minimum_version_id = 3,
-+    .pre_save = i440fx_pre_save,
-     .post_load = i440fx_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
+@@ -398,6 +417,7 @@ static void i440fx_pcihost_class_init(ObjectClass *klass, void *data)
+     hc->root_bus_path = i440fx_pcihost_root_bus_path;
+     dc->realize = i440fx_pcihost_realize;
+     dc->fw_name = "pci";
++    dc->vmsd = &vmstate_i440fx_pcihost;
+     device_class_set_props(dc, i440fx_props);
+     /* Reason: needs to be wired up by pc_init1 */
+     dc->user_creatable = false;
 diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index bb41665da4..67e08dedc5 100644
+index b67cb9c29f..bb41665da4 100644
 --- a/hw/pci-host/q35.c
 +++ b/hw/pci-host/q35.c
-@@ -43,6 +43,15 @@
- 
- #define Q35_PCI_HOST_HOLE64_SIZE_DEFAULT (1ULL << 35)
- 
-+/* Older Q35 machines (5.0 and older) not support q35-pcihost state
-+ * migration, use some reserved INTEL MCH configuration registers to
-+ * save/restore q35-pcihost config register. Refer to [Intel 3 Series
-+ * Chipset Family Datasheet Table 5-1. DRAM Controller Register Address
-+ * Map (D0:F0)]
-+ */
-+#define Q35_PCI_HOST_CONFIG_REG 0x70
-+
-+
- static void q35_host_realize(DeviceState *dev, Error **errp)
- {
-     PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-@@ -532,7 +541,34 @@ static void mch_update(MCHPCIState *mch)
- static int mch_post_load(void *opaque, int version_id)
- {
-     MCHPCIState *mch = opaque;
-+    uint8_t *config;
-+    Q35PCIHost *s = OBJECT_CHECK(Q35PCIHost,
-+                                 object_resolve_path("/machine/q35", NULL),
-+                                 TYPE_PCI_HOST_BRIDGE);
-+    PCIHostState *pci = PCI_HOST_BRIDGE(s);
-+
-     mch_update(mch);
-+    if (!s->migration_enabled) {
-+        config = &mch->parent_obj.config[Q35_PCI_HOST_CONFIG_REG];
-+        pci->config_reg = pci_get_long(config);
-+    }
-+
-+    return 0;
-+}
-+
-+static int mch_pre_save(void *opaque)
-+{
-+    MCHPCIState *mch = opaque;
-+    uint8_t *config;
-+    Q35PCIHost *s = OBJECT_CHECK(Q35PCIHost,
-+                                 object_resolve_path("/machine/q35", NULL),
-+                                 TYPE_PCI_HOST_BRIDGE);
-+    PCIHostState *pci = PCI_HOST_BRIDGE(s);
-+
-+    if (!s->migration_enabled) {
-+        config = &mch->parent_obj.config[Q35_PCI_HOST_CONFIG_REG];
-+        pci_set_long(config, pci->config_reg);
-+    }
-     return 0;
+@@ -165,6 +165,23 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
+     visit_type_uint64(v, name, &value, errp);
  }
  
-@@ -540,6 +576,7 @@ static const VMStateDescription vmstate_mch = {
-     .name = "mch",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .pre_save = mch_pre_save,
-     .post_load = mch_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, MCHPCIState),
++static bool q35_host_needed(void *opaque)
++{
++    Q35PCIHost *s = opaque;
++    return s->migration_enabled;
++}
++
++static const VMStateDescription vmstate_q35_host = {
++    .name = "Q35_PCIHost",
++    .needed = q35_host_needed,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCIE_HOST(parent_obj, Q35PCIHost),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ /*
+  * NOTE: setting defaults for the mch.* fields in this table
+  * doesn't work, because mch is a separate QOM object that is
+@@ -184,6 +201,7 @@ static Property q35_host_props[] = {
+     DEFINE_PROP_SIZE(PCI_HOST_ABOVE_4G_MEM_SIZE, Q35PCIHost,
+                      mch.above_4g_mem_size, 0),
+     DEFINE_PROP_BOOL("x-pci-hole64-fix", Q35PCIHost, pci_hole64_fix, true),
++    DEFINE_PROP_BOOL("migration-enabled", Q35PCIHost, migration_enabled, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -194,6 +212,7 @@ static void q35_host_class_init(ObjectClass *klass, void *data)
+ 
+     hc->root_bus_path = q35_host_root_bus_path;
+     dc->realize = q35_host_realize;
++    dc->vmsd = &vmstate_q35_host;
+     device_class_set_props(dc, q35_host_props);
+     /* Reason: needs to be wired up by pc_q35_init */
+     dc->user_creatable = false;
+diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
+index ce7bcdb1d5..7cdd5a3ea3 100644
+--- a/hw/pci/pci_host.c
++++ b/hw/pci/pci_host.c
+@@ -24,6 +24,7 @@
+ #include "hw/pci/pci_host.h"
+ #include "qemu/module.h"
+ #include "hw/pci/pci_bus.h"
++#include "migration/vmstate.h"
+ #include "trace.h"
+ 
+ /* debug PCI */
+@@ -200,6 +201,16 @@ const MemoryRegionOps pci_host_data_be_ops = {
+     .endianness = DEVICE_BIG_ENDIAN,
+ };
+ 
++const VMStateDescription vmstate_pcihost = {
++    .name = "PCIHost",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(config_reg, PCIHostState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const TypeInfo pci_host_type_info = {
+     .name = TYPE_PCI_HOST_BRIDGE,
+     .parent = TYPE_SYS_BUS_DEVICE,
+diff --git a/hw/pci/pcie_host.c b/hw/pci/pcie_host.c
+index 3534006f99..a653c39bb7 100644
+--- a/hw/pci/pcie_host.c
++++ b/hw/pci/pcie_host.c
+@@ -24,6 +24,7 @@
+ #include "hw/pci/pcie_host.h"
+ #include "qemu/module.h"
+ #include "exec/address-spaces.h"
++#include "migration/vmstate.h"
+ 
+ /* a helper function to get a PCIDevice for a given mmconfig address */
+ static inline PCIDevice *pcie_dev_find_by_mmcfg_addr(PCIBus *s,
+@@ -121,6 +122,16 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
+     memory_region_transaction_commit();
+ }
+ 
++const VMStateDescription vmstate_pciehost = {
++    .name = "PCIEHost",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCI_HOST(pci, PCIExpressHost),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const TypeInfo pcie_host_type_info = {
+     .name = TYPE_PCIE_HOST_BRIDGE,
+     .parent = TYPE_PCI_HOST_BRIDGE,
+diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
+index 070305f83d..02906e8159 100644
+--- a/include/hw/pci-host/q35.h
++++ b/include/hw/pci-host/q35.h
+@@ -65,6 +65,7 @@ typedef struct Q35PCIHost {
+     /*< public >*/
+ 
+     bool pci_hole64_fix;
++    bool migration_enabled;
+     MCHPCIState mch;
+ } Q35PCIHost;
+ 
+diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+index 9ce088bd13..fc88305e04 100644
+--- a/include/hw/pci/pci_host.h
++++ b/include/hw/pci/pci_host.h
+@@ -70,4 +70,14 @@ extern const MemoryRegionOps pci_host_conf_be_ops;
+ extern const MemoryRegionOps pci_host_data_le_ops;
+ extern const MemoryRegionOps pci_host_data_be_ops;
+ 
++extern const VMStateDescription vmstate_pcihost;
++
++#define VMSTATE_PCI_HOST(_field, _state) {                           \
++    .name       = (stringify(_field)),                               \
++    .size       = sizeof(PCIHostState),                              \
++    .vmsd       = &vmstate_pcihost,                                  \
++    .flags      = VMS_STRUCT,                                        \
++    .offset     = vmstate_offset_value(_state, _field, PCIHostState),\
++}
++
+ #endif /* PCI_HOST_H */
+diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
+index 3f7b9886d1..e8856f03e9 100644
+--- a/include/hw/pci/pcie_host.h
++++ b/include/hw/pci/pcie_host.h
+@@ -78,4 +78,14 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
+                                          PCIE_MMCFG_DEVFN_MASK)
+ #define PCIE_MMCFG_CONFOFFSET(addr)     ((addr) & PCIE_MMCFG_CONFOFFSET_MASK)
+ 
++extern const VMStateDescription vmstate_pciehost;
++
++#define VMSTATE_PCIE_HOST(_field, _state) {                            \
++    .name       = (stringify(_field)),                                 \
++    .size       = sizeof(PCIExpressHost),                              \
++    .vmsd       = &vmstate_pciehost,                                   \
++    .flags      = VMS_STRUCT,                                          \
++    .offset     = vmstate_offset_value(_state, _field, PCIExpressHost),\
++}
++
+ #endif /* PCIE_HOST_H */
 -- 
 2.27.0
 
