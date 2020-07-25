@@ -2,66 +2,83 @@ Return-Path: <SRS0=thXK=BE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C736EC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 13:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0948CC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 14:20:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A087D20674
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 13:54:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A087D20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C2274206C1
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 14:20:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J+q2Ekn1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2274206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzKdX-0005eL-Uo
-	for qemu-devel@archiver.kernel.org; Sat, 25 Jul 2020 09:54:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42220)
+	id 1jzL2l-00039t-1N
+	for qemu-devel@archiver.kernel.org; Sat, 25 Jul 2020 10:20:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60350)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hogan.wang@huawei.com>)
- id 1jzJhe-0003co-MG
- for qemu-devel@nongnu.org; Sat, 25 Jul 2020 08:55:02 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4221 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hogan.wang@huawei.com>)
- id 1jzJhb-0006tc-CY
- for qemu-devel@nongnu.org; Sat, 25 Jul 2020 08:55:02 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 4FB7046BB273FE90BEAA;
- Sat, 25 Jul 2020 20:54:48 +0800 (CST)
-Received: from localhost (10.174.149.56) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Sat, 25 Jul 2020
- 20:54:40 +0800
-From: Hogan Wang <hogan.wang@huawei.com>
-To: <marcel.apfelbaum@gmail.com>, <dgilbert@redhat.com>, <jusual@redhat.com>, 
- <mst@redhat.com>, <qemu-devel@nongnu.org>
-Subject: [PATCH v3 1/2] hw/pci-host: save/restore pci host config register
-Date: Sat, 25 Jul 2020 20:54:36 +0800
-Message-ID: <20200725125437.2825-1-hogan.wang@huawei.com>
-X-Mailer: git-send-email 2.27.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jzL2C-0002e6-Jg
+ for qemu-devel@nongnu.org; Sat, 25 Jul 2020 10:20:20 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:46270)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jzL2A-0001kF-R4
+ for qemu-devel@nongnu.org; Sat, 25 Jul 2020 10:20:20 -0400
+Received: by mail-ot1-x335.google.com with SMTP id n24so9111059otr.13
+ for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 07:20:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=K4GdX75QZDQQXSWA0jOG833i4Irw+5g3QF+6YNRRxi0=;
+ b=J+q2Ekn1nKGA/vDPXrLLj2+2w9U3oEGIhnzN5/KSUqqGCnQQI2WFTommPuyoUIKoQJ
+ so2HlCWvEL52IPwAzncv8mDnalQOWiRpMhHPn1hqLOWpg9APUJm18HzvKPWs4t6By6CZ
+ ZPa9LFKFWXAUSw+JotQvruMlWbeNxYmFOWfjpshaVVcWDGIgwnrHbH9q/a/pOuplw2Mh
+ t30wUVzkYMXBNsDyxlewADFWPsPuHxoFuIQe5kVxCCQ9PYPE/FZj4RoWur16wQreWmlx
+ 1TBqj/2vhW5RSKLFTTYrIBxaEyKJafl09cvYJy6LKX75Y78F+YnGHfExK52ljtAyRTSD
+ NT/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=K4GdX75QZDQQXSWA0jOG833i4Irw+5g3QF+6YNRRxi0=;
+ b=RqhQ41gGSFjtmF451ClTRwlJYAfhtmryf5eOCGGOdcy5uOj+ZHKB/DE6gfTT6X/gp8
+ h1SzaKh+cbCz97fxKBpBWg9aE8NSeJFapIHRtPUIBsgvuv4Io5OFSuWlG12Q4ItytKus
+ CCVea6q6OrlZAwvgjMMP+emYtHi5u69nMjaMpDdBTTRRcKs0waKGw5MqhX9rq+FWNkK1
+ grbMjpTeLartFjr5qq0wmCMXwIFb5QWR6fyaIZif2BYM5LeJPxxcoQ6Y0ufVLLTomw4f
+ 0qGcT4PMQ/wRTjc82OayGwGiA47xnJk2V9H1s6XS0cf4d2/DdOHC3MSUiKbIPsltzjbT
+ +t2g==
+X-Gm-Message-State: AOAM5320fCXOhXLmIu17AnPxF04N80EQTHDTDdNTum5p+JfKj/DQa0nv
+ TNLbPn0IfYVx/rjHEdwjduB/9NiCRhVEF5tp/v9ygndP/1k=
+X-Google-Smtp-Source: ABdhPJzjD4NaIMGx5zVTB8W8DSSqD0Hhv5p75hVVpONQr9ENFlf5aILvOYH6AN856WuP/meIHDu+CjOLDQs3aWtoqu4=
+X-Received: by 2002:a05:6830:1bd3:: with SMTP id
+ v19mr13224505ota.91.1595686816924; 
+ Sat, 25 Jul 2020 07:20:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.149.56]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=hogan.wang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/25 08:54:49
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 25 Jul 2020 15:20:06 +0100
+Message-ID: <CAFEAcA__RiZoe9qRTT_ZCbm_FmXZMO2MseGkimtL459Uoaoi9A@mail.gmail.com>
+Subject: tests/vm/openbsd script (etc) excessive CPU usage
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::335;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x335.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Sat, 25 Jul 2020 09:54:04 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,262 +90,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wangxinxin.wang@huawei.com, weidong.huang@huawei.com, hogan.wang@huawei.com
+Cc: Fam Zheng <famz@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pci host config register is used to save PCI address for
-read/write config data. If guest write a value to config register,
-and then pause the vcpu to migrate, After the migration, the guest
-continue to write pci config data, and the write data will be ignored
-because of new qemu process lost the config register state.
+I noticed that when running the BSD VMs, the Python script that launches
+QEMU seems to eat CPU:
 
-Reproduction steps are:
-1. guest booting in seabios.
-2. guest enable the SMRAM in seabios:piix4_apmc_smm_setup, and then
-   expect to disable the SMRAM by pci_config_writeb.
-3. after guest write the pci host config register, and then pasued vcpu
-   to finish migration.
-4. guest write config data(0x0A) fail to disable the SMRAM becasue of
-   config register state lost.
-5. guest continue to boot and crash in ipxe option ROM due to SMRAM in
-   enabled state.
-
-Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
----
- hw/i386/pc.c               |  5 ++++-
- hw/pci-host/i440fx.c       | 20 ++++++++++++++++++++
- hw/pci-host/q35.c          | 19 +++++++++++++++++++
- hw/pci/pci_host.c          | 11 +++++++++++
- hw/pci/pcie_host.c         | 11 +++++++++++
- include/hw/pci-host/q35.h  |  1 +
- include/hw/pci/pci_host.h  | 10 ++++++++++
- include/hw/pci/pcie_host.h | 10 ++++++++++
- 8 files changed, 86 insertions(+), 1 deletion(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3d419d5991..517f185992 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -97,7 +97,10 @@
- #include "fw_cfg.h"
- #include "trace.h"
- 
--GlobalProperty pc_compat_5_0[] = {};
-+GlobalProperty pc_compat_5_0[] = {
-+    { "i440FX-pcihost", "migration-enabled", "off" },
-+    { "q35-pcihost", "migration-enabled", "off" },
-+};
- const size_t pc_compat_5_0_len = G_N_ELEMENTS(pc_compat_5_0);
- 
- GlobalProperty pc_compat_4_2[] = {
-diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
-index 8ed2417f0c..c662903dbb 100644
---- a/hw/pci-host/i440fx.c
-+++ b/hw/pci-host/i440fx.c
-@@ -49,6 +49,7 @@ typedef struct I440FXState {
-     Range pci_hole;
-     uint64_t pci_hole64_size;
-     bool pci_hole64_fix;
-+    bool migration_enabled;
-     uint32_t short_root_bus;
- } I440FXState;
- 
-@@ -118,6 +119,23 @@ static const VMStateDescription vmstate_i440fx = {
-     }
- };
- 
-+static bool i440fx_pcihost_needed(void *opaque)
-+{
-+    I440FXState *s = opaque;
-+    return s->migration_enabled;
-+}
-+
-+static const VMStateDescription vmstate_i440fx_pcihost = {
-+    .name = "I440FX_PCIHost",
-+    .needed = i440fx_pcihost_needed,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_HOST(parent_obj, I440FXState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static void i440fx_pcihost_get_pci_hole_start(Object *obj, Visitor *v,
-                                               const char *name, void *opaque,
-                                               Error **errp)
-@@ -387,6 +405,7 @@ static Property i440fx_props[] = {
-                      pci_hole64_size, I440FX_PCI_HOST_HOLE64_SIZE_DEFAULT),
-     DEFINE_PROP_UINT32("short_root_bus", I440FXState, short_root_bus, 0),
-     DEFINE_PROP_BOOL("x-pci-hole64-fix", I440FXState, pci_hole64_fix, true),
-+    DEFINE_PROP_BOOL("migration-enabled", I440FXState, migration_enabled, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -398,6 +417,7 @@ static void i440fx_pcihost_class_init(ObjectClass *klass, void *data)
-     hc->root_bus_path = i440fx_pcihost_root_bus_path;
-     dc->realize = i440fx_pcihost_realize;
-     dc->fw_name = "pci";
-+    dc->vmsd = &vmstate_i440fx_pcihost;
-     device_class_set_props(dc, i440fx_props);
-     /* Reason: needs to be wired up by pc_init1 */
-     dc->user_creatable = false;
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index b67cb9c29f..bb41665da4 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -165,6 +165,23 @@ static void q35_host_get_pci_hole64_end(Object *obj, Visitor *v,
-     visit_type_uint64(v, name, &value, errp);
- }
- 
-+static bool q35_host_needed(void *opaque)
-+{
-+    Q35PCIHost *s = opaque;
-+    return s->migration_enabled;
-+}
-+
-+static const VMStateDescription vmstate_q35_host = {
-+    .name = "Q35_PCIHost",
-+    .needed = q35_host_needed,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCIE_HOST(parent_obj, Q35PCIHost),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- /*
-  * NOTE: setting defaults for the mch.* fields in this table
-  * doesn't work, because mch is a separate QOM object that is
-@@ -184,6 +201,7 @@ static Property q35_host_props[] = {
-     DEFINE_PROP_SIZE(PCI_HOST_ABOVE_4G_MEM_SIZE, Q35PCIHost,
-                      mch.above_4g_mem_size, 0),
-     DEFINE_PROP_BOOL("x-pci-hole64-fix", Q35PCIHost, pci_hole64_fix, true),
-+    DEFINE_PROP_BOOL("migration-enabled", Q35PCIHost, migration_enabled, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -194,6 +212,7 @@ static void q35_host_class_init(ObjectClass *klass, void *data)
- 
-     hc->root_bus_path = q35_host_root_bus_path;
-     dc->realize = q35_host_realize;
-+    dc->vmsd = &vmstate_q35_host;
-     device_class_set_props(dc, q35_host_props);
-     /* Reason: needs to be wired up by pc_q35_init */
-     dc->user_creatable = false;
-diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
-index ce7bcdb1d5..7cdd5a3ea3 100644
---- a/hw/pci/pci_host.c
-+++ b/hw/pci/pci_host.c
-@@ -24,6 +24,7 @@
- #include "hw/pci/pci_host.h"
- #include "qemu/module.h"
- #include "hw/pci/pci_bus.h"
-+#include "migration/vmstate.h"
- #include "trace.h"
- 
- /* debug PCI */
-@@ -200,6 +201,16 @@ const MemoryRegionOps pci_host_data_be_ops = {
-     .endianness = DEVICE_BIG_ENDIAN,
- };
- 
-+const VMStateDescription vmstate_pcihost = {
-+    .name = "PCIHost",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(config_reg, PCIHostState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const TypeInfo pci_host_type_info = {
-     .name = TYPE_PCI_HOST_BRIDGE,
-     .parent = TYPE_SYS_BUS_DEVICE,
-diff --git a/hw/pci/pcie_host.c b/hw/pci/pcie_host.c
-index 3534006f99..a653c39bb7 100644
---- a/hw/pci/pcie_host.c
-+++ b/hw/pci/pcie_host.c
-@@ -24,6 +24,7 @@
- #include "hw/pci/pcie_host.h"
- #include "qemu/module.h"
- #include "exec/address-spaces.h"
-+#include "migration/vmstate.h"
- 
- /* a helper function to get a PCIDevice for a given mmconfig address */
- static inline PCIDevice *pcie_dev_find_by_mmcfg_addr(PCIBus *s,
-@@ -121,6 +122,16 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
-     memory_region_transaction_commit();
- }
- 
-+const VMStateDescription vmstate_pciehost = {
-+    .name = "PCIEHost",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_HOST(pci, PCIExpressHost),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const TypeInfo pcie_host_type_info = {
-     .name = TYPE_PCIE_HOST_BRIDGE,
-     .parent = TYPE_PCI_HOST_BRIDGE,
-diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-index 070305f83d..02906e8159 100644
---- a/include/hw/pci-host/q35.h
-+++ b/include/hw/pci-host/q35.h
-@@ -65,6 +65,7 @@ typedef struct Q35PCIHost {
-     /*< public >*/
- 
-     bool pci_hole64_fix;
-+    bool migration_enabled;
-     MCHPCIState mch;
- } Q35PCIHost;
- 
-diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
-index 9ce088bd13..fc88305e04 100644
---- a/include/hw/pci/pci_host.h
-+++ b/include/hw/pci/pci_host.h
-@@ -70,4 +70,14 @@ extern const MemoryRegionOps pci_host_conf_be_ops;
- extern const MemoryRegionOps pci_host_data_le_ops;
- extern const MemoryRegionOps pci_host_data_be_ops;
- 
-+extern const VMStateDescription vmstate_pcihost;
-+
-+#define VMSTATE_PCI_HOST(_field, _state) {                           \
-+    .name       = (stringify(_field)),                               \
-+    .size       = sizeof(PCIHostState),                              \
-+    .vmsd       = &vmstate_pcihost,                                  \
-+    .flags      = VMS_STRUCT,                                        \
-+    .offset     = vmstate_offset_value(_state, _field, PCIHostState),\
-+}
-+
- #endif /* PCI_HOST_H */
-diff --git a/include/hw/pci/pcie_host.h b/include/hw/pci/pcie_host.h
-index 3f7b9886d1..e8856f03e9 100644
---- a/include/hw/pci/pcie_host.h
-+++ b/include/hw/pci/pcie_host.h
-@@ -78,4 +78,14 @@ void pcie_host_mmcfg_update(PCIExpressHost *e,
-                                          PCIE_MMCFG_DEVFN_MASK)
- #define PCIE_MMCFG_CONFOFFSET(addr)     ((addr) & PCIE_MMCFG_CONFOFFSET_MASK)
- 
-+extern const VMStateDescription vmstate_pciehost;
-+
-+#define VMSTATE_PCIE_HOST(_field, _state) {                            \
-+    .name       = (stringify(_field)),                                 \
-+    .size       = sizeof(PCIExpressHost),                              \
-+    .vmsd       = &vmstate_pciehost,                                   \
-+    .flags      = VMS_STRUCT,                                          \
-+    .offset     = vmstate_offset_value(_state, _field, PCIExpressHost),\
-+}
-+
- #endif /* PCIE_HOST_H */
--- 
-2.27.0
+peter.m+ 19024  0.0  0.0  20296 11692 pts/12   S+   15:04   0:00
+   \_ make -C build vm-build-openbsd J=8 V=1
+peter.m+ 19858 98.8  0.0 126272 15220 pts/12   Sl+  15:04  12:04
+       \_ /usr/bin/python3 -B
+/home/peter.maydell/qemu-openbsd/tests/vm/openbsd --debug --jobs 8
+--verbose --efi-aarch64
+/home/peter.maydell/qemu-openbsd/build/pc-bios/edk2-aarch64-code.fd
+--image /home/peter.maydell/.cache/qemu-vm/images/openbsd.img
+--snapshot --build-qemu /home/peter.maydell/qemu-openbsd --
+peter.m+ 22878  711  3.2 10506236 3192896 pts/12 Sl+ 15:04  86:08
+            \_ qemu-system-x86_64 -display none -vga none -chardev
+socket,id=mon,path=/var/tmp/qemu-19858-monitor.sock -mon
+chardev=mon,mode=control -machine pc -chardev
+socket,id=console,path=/var/tmp/qemu-19858-console.sock,server,nowait
+-serial chardev:console -nodefaults -m 4G -cpu max -netdev
+user,id=vnet,hostfwd=:127.0.0.1:0-:22 -device
+virtio-net-pci,netdev=vnet -vnc 127.0.0.1:0,to=20 -smp 8 -enable-kvm
+-drive file=/home/peter.maydell/.cache/qemu-vm/images/openbsd.img,snapshot=on,if=none,id=drive0,cache=writeback
+-device virtio-blk,drive=drive0,bootindex=0 -drive
+file=/home/peter.maydell/qemu-openbsd/build/vm-test-g6q_po6_.tmp/data-993a1.tar,if=none,id=data-993a1,cache=writeback,format=raw
+-device virtio-blk,drive=data-993a1,serial=data-993a1,bootindex=1
+peter.m+ 29304  0.0  0.0  63612  4996 pts/12   S+   15:05   0:00
+           \_ ssh -t -o StrictHostKeyChecking=no -o
+UserKnownHostsFile=/dev/null -o ConnectTimeout=1 -p 38491 -i
+/home/peter.maydell/qemu-openbsd/build/vm-test-g6q_po6_.tmp/id_rsa -o
+SendEnv=https_proxy -o SendEnv=http_proxy -o SendEnv=ftp_proxy -o
+SendEnv=no_proxy qemu@127.0.0.1          set -e;         rm -rf
+/home/qemu/qemu-test.*         cd $(mktemp -d
+/home/qemu/qemu-test.XXXXXX);         mkdir src build; cd src;
+tar -xf /dev/rsd1c;         cd ../build         ../src/configure
+--cc=cc --python=python3 ;
 
 
+Notice that process 19858 (the python script) is at 98.8% CPU.
+This isn't specific to the OpenBSD script, the other BSD scripts
+do this too.
+
+Why is this script using so much CPU when it should basically just be
+waiting for the QEMU VM to finish ?
+
+I think this is probably a recent regression, though I'm not certain.
+
+thanks
+-- PMM
 
