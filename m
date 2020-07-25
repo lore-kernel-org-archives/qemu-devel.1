@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86723C433E5
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 03:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C07C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 03:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B25F206EB
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 03:03:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B25F206EB
+	by mail.kernel.org (Postfix) with ESMTPS id 8D6722067D
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 03:05:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D6722067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzATM-0001AC-Hw
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 23:03:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59964)
+	id 1jzAV2-0002ta-SY
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 23:05:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jzAQe-0004oN-IF
+ id 1jzAQe-0004nN-4o
  for qemu-devel@nongnu.org; Fri, 24 Jul 2020 23:00:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53222)
+Received: from indium.canonical.com ([91.189.90.7]:53206)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jzAQc-00019j-1Y
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 23:00:52 -0400
+ id 1jzAQb-00018K-Jx
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 23:00:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jzAQa-0000fH-Gz
- for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 03:00:48 +0000
+ id 1jzAQZ-0000fG-NC
+ for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 03:00:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 79C662E80D2
- for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 03:00:48 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 88BB42E806D
+ for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 03:00:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 25 Jul 2020 02:54:55 -0000
+Date: Sat, 25 Jul 2020 02:53:36 -0000
 From: Matthieu Bucchianeri <1888918@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,7 +54,7 @@ X-Launchpad-Bug-Commenters: matthieu-bucchianeri
 X-Launchpad-Bug-Reporter: Matthieu Bucchianeri (matthieu-bucchianeri)
 X-Launchpad-Bug-Modifier: Matthieu Bucchianeri (matthieu-bucchianeri)
 References: <159564442748.29789.2028598939567190639.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159564569524.29737.6631578581189131017.malone@chaenomeles.canonical.com>
+Message-Id: <159564561650.30581.10869572687954704995.malone@gac.canonical.com>
 Subject: [Bug 1888918] Re: qemu-ppc: Floating point instructions do not
  properly generate the SPE/Embedded Floating-Point Unavailable interrupt
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -63,7 +63,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e85d0ab92e2924d39b8285aeae075a01d25eff06";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 466862a449f734c1e8f8e825bc375798f755e7d0
+X-Launchpad-Hash: 30e90f41b13c014f5fc8397434806e8c9048c4af
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 22:40:49
@@ -91,8 +91,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I have already written a patch for this issue, that I will be submitting
-to the community in the next few days.
+Attaching the output of the test module run on QEMU. As shown in the
+description, 39 instructions do not comply with the rule described in
+the Signal Processing Engine (SPE) Programming Environments Manual, Rev.
+0.
+
+QEMU was run as follows:
+
+# qemu/ppc-softmmu/qemu-system-ppc -nographic -machine mpc8544ds -kernel
+buildroot/output/images/uImage -hda buildroot/output/images/rootfs.cpio
+-append "root=3D/dev/sda rw single"
+
+The Linux image is built using buildroot, and the selected configuration
+is qemu_ppc_mpc8544ds_defconfig with some very mild changes to setup an
+overlay and initramfs.
+
+Then, the module is loaded, output can be observed directly in the
+console, or using dmesg:
+
+# insmod spe-test.ko
+
+
+** Attachment added: "Results on QEMU"
+   https://bugs.launchpad.net/qemu/+bug/1888918/+attachment/5395641/+files/=
+result_qemu_no_fix.txt
 
 -- =
 
