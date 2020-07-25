@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D3FC433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 03:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A42AC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 03:03:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 496CC206EB
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 03:02:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 496CC206EB
+	by mail.kernel.org (Postfix) with ESMTPS id 4B275206EB
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 03:03:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B275206EB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzAS8-000734-HM
-	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 23:02:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59654)
+	id 1jzATI-00011x-F7
+	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 23:03:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1jzAPX-0002Ai-AE
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 22:59:43 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4156 helo=huawei.com)
+ id 1jzAPW-00029S-S0
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 22:59:42 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:33320 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1jzAPR-0000l8-4R
+ id 1jzAPU-0000m7-Qa
  for qemu-devel@nongnu.org; Fri, 24 Jul 2020 22:59:42 -0400
 Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 44B8CA8698CC032E273A;
+ by Forcepoint Email with ESMTP id 756EF6A0080683C96539;
  Sat, 25 Jul 2020 10:59:33 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS408-HUB.china.huawei.com
  (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Sat, 25 Jul 2020
  10:59:24 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [RFC PATCH 8/8] migration/dirtyrate: Implement
- qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
-Date: Sat, 25 Jul 2020 11:11:09 +0800
-Message-ID: <1595646669-109310-9-git-send-email-zhengchuan@huawei.com>
+Subject: [RFC PATCH 7/8] migration/dirtyrate: Implement calculate_dirtyrate()
+ function
+Date: Sat, 25 Jul 2020 11:11:08 +0800
+Message-ID: <1595646669-109310-8-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1595646669-109310-1-git-send-email-zhengchuan@huawei.com>
 References: <1595646669-109310-1-git-send-email-zhengchuan@huawei.com>
@@ -51,9 +51,9 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.101.6]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 22:59:33
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 22:59:28
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -81,136 +81,92 @@ Sender: "Qemu-devel"
 
 From: Zheng Chuan <zhengchuan@huawei.com>
 
-Implement qmp_cal_dirty_rate()/qmp_get_dirty_rate() function which could be called
-by libvirt api.
+Implement calculate_dirtyrate() function.
 
 Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
 Signed-off-by: YanYing Zhang <ann.zhuangyanying@huawei.com>
 ---
- migration/Makefile.objs |  1 +
- migration/dirtyrate.c   | 45 +++++++++++++++++++++++++++++++++++++++++++++
- qapi/migration.json     | 24 ++++++++++++++++++++++++
- qapi/pragma.json        |  3 ++-
- 4 files changed, 72 insertions(+), 1 deletion(-)
+ migration/dirtyrate.c | 53 +++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 47 insertions(+), 6 deletions(-)
 
-diff --git a/migration/Makefile.objs b/migration/Makefile.objs
-index 0fc619e..12ae98c 100644
---- a/migration/Makefile.objs
-+++ b/migration/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-y += qemu-file.o global_state.o
- common-obj-y += qemu-file-channel.o
- common-obj-y += xbzrle.o postcopy-ram.o
- common-obj-y += qjson.o
-+common-obj-y += dirtyrate.o
- common-obj-y += block-dirty-bitmap.o
- common-obj-y += multifd.o
- common-obj-y += multifd-zlib.o
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index d87e16d..5717521 100644
+index 00abfa7..d87e16d 100644
 --- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -31,6 +31,21 @@ CalculatingDirtyRateStage calculating_dirty_rate_stage = CAL_DIRTY_RATE_INIT;
-         INTERNAL_RAMBLOCK_FOREACH(block)                   \
-         if (!qemu_ram_is_migratable(block)) {} else
- 
-+static int64_t get_dirty_rate_info(void)
-+{
-+    int64_t dirty_rate = dirty_stat.dirty_rate;
-+    /*
-+     *    Return dirty_rate only when we get CAL_DIRTY_RATE_END.
-+     *    And we must initial calculating_dirty_rate_stage.
-+     */
-+    if (calculating_dirty_rate_stage == CAL_DIRTY_RATE_END) {
-+        calculating_dirty_rate_stage = CAL_DIRTY_RATE_INIT;
-+        return dirty_rate;
-+    }  else {
-+        return -1;
-+    }
-+}
-+
- static void reset_dirtyrate_stat(void)
- {
-     dirty_stat.total_dirty_samples = 0;
-@@ -377,3 +392,33 @@ void *get_dirtyrate_thread(void *arg)
- 
-     return NULL;
+@@ -161,6 +161,21 @@ alloc_block_dirty_info(int *block_index,
+     return block_dinfo;
  }
-+
-+void qmp_cal_dirty_rate(int64_t value, Error **errp)
+ 
++static void free_block_dirty_info(struct block_dirty_info *infos, int count)
 +{
-+    static struct dirtyrate_config dirtyrate_config;
-+    QemuThread thread;
++    int i;
 +
-+    /*
-+     * We don't begin calculating thread only when it's in calculating status.
-+     */
-+    if (calculating_dirty_rate_stage == CAL_DIRTY_RATE_ING) {
++    if (!infos) {
 +        return;
 +    }
 +
-+    /*
-+     * If we get CAL_DIRTY_RATE_END here, libvirtd may be restarted at last round,
-+     * we need to initial it.
-+     */
-+    if (calculating_dirty_rate_stage == CAL_DIRTY_RATE_END)
-+        calculating_dirty_rate_stage = CAL_DIRTY_RATE_INIT;
-+
-+    dirtyrate_config.sample_period_seconds = value;
-+    dirtyrate_config.sample_pages_per_gigabytes = sample_pages_per_gigabytes;
-+    qemu_thread_create(&thread, "get_dirtyrate", get_dirtyrate_thread,
-+                       (void *)&dirtyrate_config, QEMU_THREAD_DETACHED);
++    for (i = 0; i < count; i++) {
++        g_free(infos[i].sample_page_vfn);
++        g_free(infos[i].hash_result);
++    }
++    g_free(infos);
 +}
 +
-+int64_t qmp_get_dirty_rate(Error **errp)
+ static int ram_block_skip(RAMBlock *block)
+ {
+     if (!strstr(qemu_ram_get_idstr(block), "ram-node") &&
+@@ -278,12 +293,6 @@ static int compare_block_hash_info(struct block_dirty_info *info, int block_inde
+     return 0;
+ }
+ 
+-
+-static void calculate_dirtyrate(struct dirtyrate_config config, int64_t time)
+-{
+-    /* todo */
+-}
+-
+ /*
+  * There are multithread will write/read *calculating_dirty_rate_stage*,
+  * we can protect only one thread write/read it by libvirt api.
+@@ -320,6 +329,38 @@ static int64_t get_sample_gap_period(struct dirtyrate_config config)
+     return msec;
+ }
+ 
++static void calculate_dirtyrate(struct dirtyrate_config config, int64_t time)
 +{
-+    return get_dirty_rate_info();
++    struct block_dirty_info *block_dinfo = NULL;
++    int block_index = 0;
++    int64_t msec = time;
++    int64_t initial_time;
++
++    rcu_register_thread();
++    reset_dirtyrate_stat();
++    initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    rcu_read_lock();
++    if (record_block_hash_info(config, &block_dinfo, &block_index) < 0) {
++        goto out;
++    }
++    rcu_read_unlock();
++
++    msec = block_sample_gap_period(msec, initial_time);
++
++    rcu_read_lock();
++    if (compare_block_hash_info(block_dinfo, block_index) < 0) {
++        goto out;
++    }
++
++    update_dirtyrate(msec);
++
++out:
++    rcu_read_unlock();
++    free_block_dirty_info(block_dinfo, block_index + 1);
++    rcu_unregister_thread();
 +}
-diff --git a/qapi/migration.json b/qapi/migration.json
-index d500055..59f35bb 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1621,3 +1621,27 @@
- ##
- { 'event': 'UNPLUG_PRIMARY',
-   'data': { 'device-id': 'str' } }
 +
-+##
-+# @cal_dirty_rate:
-+#
-+# start calculating dirty rate for vm
-+#
-+# @value: time for sample dirty pages
-+#
-+# Since: 5.1
-+#
-+# Example:
-+#   {"command": "cal_dirty_rate", "data": {"value": 1} }
-+#
-+##
-+{ 'command': 'cal_dirty_rate', 'data': {'value': 'int64'} }
 +
-+##
-+# @get_dirty_rate:
-+#
-+# get dirty rate for vm
-+#
-+# Since: 5.1
-+##
-+{ 'command': 'get_dirty_rate', 'returns': 'int64' }
-diff --git a/qapi/pragma.json b/qapi/pragma.json
-index cffae27..ecd294b 100644
---- a/qapi/pragma.json
-+++ b/qapi/pragma.json
-@@ -10,7 +10,8 @@
-         'query-migrate-cache-size',
-         'query-tpm-models',
-         'query-tpm-types',
--        'ringbuf-read' ],
-+        'ringbuf-read',
-+        'get_dirty_rate' ],
-     'name-case-whitelist': [
-         'ACPISlotType',             # DIMM, visible through query-acpi-ospm-status
-         'CpuInfoMIPS',              # PC, visible through query-cpu
+ void *get_dirtyrate_thread(void *arg)
+ {
+     struct dirtyrate_config config = *(struct dirtyrate_config *)arg;
 -- 
 1.8.3.1
 
