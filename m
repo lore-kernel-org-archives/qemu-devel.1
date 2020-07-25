@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D40C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE034C433E3
 	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 00:24:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C74F4206E3
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 00:24:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C74F4206E3
+	by mail.kernel.org (Postfix) with ESMTPS id A4797206E3
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 00:24:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4797206E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jz7zZ-0003Kl-4N
+	id 1jz7zZ-0003N0-VE
 	for qemu-devel@archiver.kernel.org; Fri, 24 Jul 2020 20:24:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58980)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jz7xa-0000ss-DD
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 20:22:42 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58698)
+ id 1jz7xc-0000sy-1L
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 20:22:44 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58706)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1jz7xY-0007rg-9c
- for qemu-devel@nongnu.org; Fri, 24 Jul 2020 20:22:42 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ id 1jz7xY-0007rh-AE
+ for qemu-devel@nongnu.org; Fri, 24 Jul 2020 20:22:43 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06P02jJi102997; Fri, 24 Jul 2020 20:22:36 -0400
+ 06P02GeW036810; Fri, 24 Jul 2020 20:22:36 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32faj4ttpx-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32faepvfya-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Fri, 24 Jul 2020 20:22:36 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06P05NeW112688;
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06P0377h038899;
  Fri, 24 Jul 2020 20:22:36 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32faj4ttpk-1
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32faepvfy2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Fri, 24 Jul 2020 20:22:36 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06P0KKUf009049;
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06P0Je6C001774;
  Sat, 25 Jul 2020 00:22:35 GMT
 Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma03dal.us.ibm.com with ESMTP id 32brqaeaus-1
+ [9.57.198.24]) by ppma01wdc.us.ibm.com with ESMTP id 32brq9r8pr-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Sat, 25 Jul 2020 00:22:35 +0000
 Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
  [9.57.199.108])
  by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06P0MYWP53150152
+ 06P0MYLe37224760
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
  Sat, 25 Jul 2020 00:22:34 GMT
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 990A4B2067;
+ by IMSVA (Postfix) with ESMTP id BF8C6B2068;
  Sat, 25 Jul 2020 00:22:34 +0000 (GMT)
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8AF50B2066;
+ by IMSVA (Postfix) with ESMTP id B1F38B2066;
  Sat, 25 Jul 2020 00:22:34 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
  Sat, 25 Jul 2020 00:22:34 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v1 1/3] Revert "tpm: Clean up error reporting in
- tpm_init_tpmdev()"
-Date: Fri, 24 Jul 2020 20:22:26 -0400
-Message-Id: <20200725002228.2629410-2-stefanb@linux.vnet.ibm.com>
+Subject: [PULL v1 3/3] tpm_emulator: Report an error if chardev is missing
+Date: Fri, 24 Jul 2020 20:22:28 -0400
+Message-Id: <20200725002228.2629410-4-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200725002228.2629410-1-stefanb@linux.vnet.ibm.com>
 References: <20200725002228.2629410-1-stefanb@linux.vnet.ibm.com>
@@ -87,10 +86,10 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  2020-07-24 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  bulkscore=0 suspectscore=1
- phishscore=0 mlxlogscore=999 lowpriorityscore=0 mlxscore=0 clxscore=1015
- spamscore=0 adultscore=0 priorityscore=1501 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007240164
+ clxscore=1015 impostorscore=0 spamscore=0 lowpriorityscore=0 mlxscore=0
+ phishscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007240162
 Received-SPF: none client-ip=148.163.156.1;
  envelope-from=stefanb@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/24 20:22:38
@@ -113,171 +112,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Markus Armbruster <armbru@redhat.com>
+This patch fixes the odd error reporting when trying to send a file
+descriptor to the TPM emulator if one has not passed a valid chardev.
 
-This reverts commit d10e05f15d5c3dd5e5cc59c5dfff460d89d48580.
+$ x86_64-softmmu/qemu-system-x86_64 -tpmdev emulator,id=tpm0
+qemu-system-x86_64: -tpmdev emulator,id=tpm0: tpm-emulator: Failed to send CMD_SET_DATAFD: Success
+qemu-system-x86_64: -tpmdev emulator,id=tpm0: tpm-emulator: Could not cleanly shutdown the TPM: Success
 
-We report some -tpmdev failures, but then continue as if all was fine.
-Reproducer:
+This is the new error report:
 
-    $ qemu-system-x86_64 -nodefaults -S -display none -monitor stdio -chardev null,id=tpm0 -tpmdev emulator,id=tpm0,chardev=chrtpm -device tpm-tis,tpmdev=tpm0
-    qemu-system-x86_64: -tpmdev emulator,id=tpm0,chardev=chrtpm: tpm-emulator: tpm chardev 'chrtpm' not found.
-    qemu-system-x86_64: -tpmdev emulator,id=tpm0,chardev=chrtpm: tpm-emulator: Could not cleanly shutdown the TPM: No such file or directory
-    QEMU 5.0.90 monitor - type 'help' for more information
-    (qemu) qemu-system-x86_64: -device tpm-tis,tpmdev=tpm0: Property 'tpm-tis.tpmdev' can't find value 'tpm0'
-    $ echo $?
-    1
+$ x86_64-softmmu/qemu-system-x86_64 -tpmdev emulator,id=tpm0
+qemu-system-x86_64: -tpmdev emulator,id=tpm0: tpm-emulator: parameter 'chardev' is missing
 
-This is a regression caused by commit d10e05f15d "tpm: Clean up error
-reporting in tpm_init_tpmdev()".  It's incomplete: be->create(opts)
-continues to use error_report(), and we don't set an error when it
-fails.
+This change does not hide the display of supported TPM types if a non-existent type is passed:
 
-I figure converting the create() methods to Error would make some
-sense, but I'm not sure it's worth the effort right now.  Revert the
-broken commit instead, and add a comment to tpm_init_tpmdev().
+$ x86_64-softmmu/qemu-system-x86_64 -tpmdev nonexistent,id=tpm0
+qemu-system-x86_64: -tpmdev nonexistent,id=tpm0: Parameter 'type' expects a TPM backend type
+Supported TPM types (choose only one):
+ passthrough   Passthrough TPM backend driver
+    emulator   TPM emulator backend driver
 
-Straightforward conflict in tpm.c resolved.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/sysemu/tpm.h |  2 +-
- softmmu/vl.c         |  4 +++-
- stubs/tpm.c          |  3 ++-
- tpm.c                | 30 +++++++++++++++++++++---------
- 4 files changed, 27 insertions(+), 12 deletions(-)
+ backends/tpm/tpm_emulator.c | 38 ++++++++++++++++++++++---------------
+ 1 file changed, 23 insertions(+), 15 deletions(-)
 
-diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-index 03fb25941c..730c61ac97 100644
---- a/include/sysemu/tpm.h
-+++ b/include/sysemu/tpm.h
-@@ -16,7 +16,7 @@
- #include "qom/object.h"
+diff --git a/backends/tpm/tpm_emulator.c b/backends/tpm/tpm_emulator.c
+index 9605339f93..a9b0f55e67 100644
+--- a/backends/tpm/tpm_emulator.c
++++ b/backends/tpm/tpm_emulator.c
+@@ -549,27 +549,30 @@ err_exit:
+ static int tpm_emulator_handle_device_opts(TPMEmulator *tpm_emu, QemuOpts *opts)
+ {
+     const char *value;
++    Error *err = NULL;
++    Chardev *dev;
  
- int tpm_config_parse(QemuOptsList *opts_list, const char *optarg);
--void tpm_init(void);
-+int tpm_init(void);
- void tpm_cleanup(void);
- 
- typedef enum TPMVersion {
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 3416241557..660537a709 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -4258,7 +4258,9 @@ void qemu_init(int argc, char **argv, char **envp)
-                       user_creatable_add_opts_foreach,
-                       object_create_delayed, &error_fatal);
- 
--    tpm_init();
-+    if (tpm_init() < 0) {
-+        exit(1);
+     value = qemu_opt_get(opts, "chardev");
+-    if (value) {
+-        Error *err = NULL;
+-        Chardev *dev = qemu_chr_find(value);
+-
+-        if (!dev) {
+-            error_report("tpm-emulator: tpm chardev '%s' not found.", value);
+-            goto err;
+-        }
++    if (!value) {
++        error_report("tpm-emulator: parameter 'chardev' is missing");
++        goto err;
 +    }
  
-     blk_mig_init();
-     ram_mig_init();
-diff --git a/stubs/tpm.c b/stubs/tpm.c
-index 66c99d667d..9bded191d9 100644
---- a/stubs/tpm.c
-+++ b/stubs/tpm.c
-@@ -10,8 +10,9 @@
- #include "sysemu/tpm.h"
- #include "hw/acpi/tpm.h"
+-        if (!qemu_chr_fe_init(&tpm_emu->ctrl_chr, dev, &err)) {
+-            error_prepend(&err, "tpm-emulator: No valid chardev found at '%s':",
+-                          value);
+-            error_report_err(err);
+-            goto err;
+-        }
++    dev = qemu_chr_find(value);
++    if (!dev) {
++        error_report("tpm-emulator: tpm chardev '%s' not found", value);
++        goto err;
++    }
  
--void tpm_init(void)
-+int tpm_init(void)
+-        tpm_emu->options->chardev = g_strdup(value);
++    if (!qemu_chr_fe_init(&tpm_emu->ctrl_chr, dev, &err)) {
++        error_prepend(&err, "tpm-emulator: No valid chardev found at '%s':",
++                      value);
++        error_report_err(err);
++        goto err;
+     }
+ 
++    tpm_emu->options->chardev = g_strdup(value);
++
+     if (tpm_emulator_prepare_data_fd(tpm_emu) < 0) {
+         goto err;
+     }
+@@ -925,6 +928,11 @@ static void tpm_emulator_shutdown(TPMEmulator *tpm_emu)
  {
-+    return 0;
- }
+     ptm_res res;
  
- void tpm_cleanup(void)
-diff --git a/tpm.c b/tpm.c
-index fe03b24858..f6045bb6da 100644
---- a/tpm.c
-+++ b/tpm.c
-@@ -81,26 +81,33 @@ TPMBackend *qemu_find_tpm_be(const char *id)
- 
- static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
- {
-+    /*
-+     * Use of error_report() in a function with an Error ** parameter
-+     * is suspicious.  It is okay here.  The parameter only exists to
-+     * make the function usable with qemu_opts_foreach().  It is not
-+     * actually used.
-+     */
-     const char *value;
-     const char *id;
-     const TPMBackendClass *be;
-     TPMBackend *drv;
-+    Error *local_err = NULL;
-     int i;
- 
-     if (!QLIST_EMPTY(&tpm_backends)) {
--        error_setg(errp, "Only one TPM is allowed.");
-+        error_report("Only one TPM is allowed.");
-         return 1;
-     }
- 
-     id = qemu_opts_id(opts);
-     if (id == NULL) {
--        error_setg(errp, QERR_MISSING_PARAMETER, "id");
-+        error_report(QERR_MISSING_PARAMETER, "id");
-         return 1;
-     }
- 
-     value = qemu_opt_get(opts, "type");
-     if (!value) {
--        error_setg(errp, QERR_MISSING_PARAMETER, "type");
-+        error_report(QERR_MISSING_PARAMETER, "type");
-         tpm_display_backend_drivers();
-         return 1;
-     }
-@@ -108,14 +115,15 @@ static int tpm_init_tpmdev(void *dummy, QemuOpts *opts, Error **errp)
-     i = qapi_enum_parse(&TpmType_lookup, value, -1, NULL);
-     be = i >= 0 ? tpm_be_find_by_type(i) : NULL;
-     if (be == NULL) {
--        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "type",
--                   "a TPM backend type");
-+        error_report(QERR_INVALID_PARAMETER_VALUE,
-+                     "type", "a TPM backend type");
-         tpm_display_backend_drivers();
-         return 1;
-     }
- 
-     /* validate backend specific opts */
--    if (!qemu_opts_validate(opts, be->opts, errp)) {
-+    if (!qemu_opts_validate(opts, be->opts, &local_err)) {
-+        error_report_err(local_err);
-         return 1;
-     }
- 
-@@ -148,10 +156,14 @@ void tpm_cleanup(void)
-  * Initialize the TPM. Process the tpmdev command line options describing the
-  * TPM backend.
-  */
--void tpm_init(void)
-+int tpm_init(void)
- {
--    qemu_opts_foreach(qemu_find_opts("tpmdev"),
--                      tpm_init_tpmdev, NULL, &error_fatal);
-+    if (qemu_opts_foreach(qemu_find_opts("tpmdev"),
-+                          tpm_init_tpmdev, NULL, NULL)) {
-+        return -1;
++    if (!tpm_emu->options->chardev) {
++        /* was never properly initialized */
++        return;
 +    }
 +
-+    return 0;
- }
- 
- /*
+     if (tpm_emulator_ctrlcmd(tpm_emu, CMD_SHUTDOWN, &res, 0, sizeof(res)) < 0) {
+         error_report("tpm-emulator: Could not cleanly shutdown the TPM: %s",
+                      strerror(errno));
 -- 
 2.24.1
 
