@@ -2,85 +2,76 @@ Return-Path: <SRS0=thXK=BE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B21AC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 16:08:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44FACC433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 16:24:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4634D206D7
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 16:08:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EEE520674
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 Jul 2020 16:24:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nHUPrYbA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4634D206D7
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xklen1zS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EEE520674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzMio-0005JM-QO
-	for qemu-devel@archiver.kernel.org; Sat, 25 Jul 2020 12:08:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54880)
+	id 1jzMyB-0000tY-9U
+	for qemu-devel@archiver.kernel.org; Sat, 25 Jul 2020 12:24:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jzMgP-0001tZ-Qb
- for qemu-devel@nongnu.org; Sat, 25 Jul 2020 12:05:57 -0400
-Received: from mail-pl1-x632.google.com ([2607:f8b0:4864:20::632]:33858)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jzMxS-0000Rn-PN
+ for qemu-devel@nongnu.org; Sat, 25 Jul 2020 12:23:34 -0400
+Received: from mail-oo1-xc2f.google.com ([2607:f8b0:4864:20::c2f]:42363)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1jzMgN-0001si-TM
- for qemu-devel@nongnu.org; Sat, 25 Jul 2020 12:05:57 -0400
-Received: by mail-pl1-x632.google.com with SMTP id o1so6064365plk.1
- for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 09:05:55 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1jzMxR-0004sh-2z
+ for qemu-devel@nongnu.org; Sat, 25 Jul 2020 12:23:34 -0400
+Received: by mail-oo1-xc2f.google.com with SMTP id y9so2399967oot.9
+ for <qemu-devel@nongnu.org>; Sat, 25 Jul 2020 09:23:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Tn/0BiX/IEZ1RnYH9GODJ+VXClkGUOJZjcKmp7fXXkU=;
- b=nHUPrYbAyWW/qrnhxle3v9IaVNTptQIn0+Np29LdK3VhcMNM/69IfX+WkPNIS/k5xo
- f6CkqPasoGtKuKue+Y4OjOET5Mpd/OvfMNpZ6QvNu9Ds5zeKtTD0hQcA7oTjxXbQUOQR
- Zywonyjty/JVo+eW9s255rhVbzdpfM2j1pnV3t3JTeloINlxoIp0VqdJYIZssyK9Rq60
- cNlSBs71TO9KRNOw3hR14L/0syLz2az/HtnlDKUMA7NFWRMR0Yl+8Q3N6E6oTql1iMfg
- yz2vp5pv05W3UQtFIouN0AA5DDgMXJWPfympaQ5TtMnA+u4WPD2jT8JvOS1qRZq8Mwqc
- rP1A==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=SW5cWxj+4yTdrWwMXYJTqEUZQOkkVQZheG2HlhKaAI0=;
+ b=Xklen1zSdjkHb6amkCZ31+SZs6BucZisjPZYXHPmwMsS6f4yl5bNr9qWI7Xfi8Q6lB
+ NVafSTCidzYGUymI4rgHJgupl14oFxo/7yh17Cv5ASghSofr2ozKpCJDr3QcJNJQyhq6
+ a61nJdf8x6tzQlYr2ep0XGHpjgqiJUr2HaUIBRp2FoZ98PeXKr0rzEi5/G2letSIks/B
+ 0rN58iGEfMbvtKEgCRiBFbuhbNvo7D/mSuXvYc0D476uaJhv4AOFNLEXfTstF92Sm92e
+ uz421Q/e7Q9k61sYkGsp1YhyAQSW2SN70/APhHBVR6q6nooZsOFR87x0iAZ9Shx3VksV
+ AgXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Tn/0BiX/IEZ1RnYH9GODJ+VXClkGUOJZjcKmp7fXXkU=;
- b=eWTAfSc1VrPOzyzOcEHSe5p/2H/Yo+IVQqG3qdyEqRjbSULpNHp3oB4x3SO9Bh++7u
- cF8fa3sC2qlDsXsk1cH6jLADbbx/2UTH8a0LVbQmElAXBTMYJgwEJGWvKfBFVrRgDb8o
- AGdJw3Ox5dpFe5FcxgEe0Oim9B0H86gQGKUArebUkLyFxZ8+IE21F6VZTqP1CmnX6hzj
- B2+aNn9t9OIs9sPVgjMnIstmthpH/oqnUd5sRpqWMwejhd+I+bWOtV6o97nAPxJfT3lF
- YtPB6Fdm5opEotVVAgTc1q6f0A7+zksogiaYN75iPKCXD+vyaXR6zL2ovmUg9fg0jJ+b
- PV1Q==
-X-Gm-Message-State: AOAM533/6A9MOe9mzT6sF4zRlFC55I9Ek5qE9WBgdxz9cKi0uaxyDIlu
- GpYsQeemfMnGZl9Tx4WHbX3YGqI5MtY=
-X-Google-Smtp-Source: ABdhPJwH1UAz3Th2al7YTuB1qcJtVKYQ8fVORrBkTFIkFrBtkF6YfoDys1QHhnN1ElBD1yfnQP5xwQ==
-X-Received: by 2002:a17:90a:1589:: with SMTP id
- m9mr3308420pja.122.1595693153840; 
- Sat, 25 Jul 2020 09:05:53 -0700 (PDT)
-Received: from localhost.localdomain (216-160-65-90.tukw.qwest.net.
- [216.160.65.90])
- by smtp.gmail.com with ESMTPSA id e18sm9731801pff.37.2020.07.25.09.05.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 25 Jul 2020 09:05:53 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 3/3] target/i386: Save cc_op before loop insns
-Date: Sat, 25 Jul 2020 09:05:48 -0700
-Message-Id: <20200725160548.750749-4-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200725160548.750749-1-richard.henderson@linaro.org>
-References: <20200725160548.750749-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=SW5cWxj+4yTdrWwMXYJTqEUZQOkkVQZheG2HlhKaAI0=;
+ b=jEqhbIIQHaUV7eMEjebIQgmRhZFIVRzmcrk5a8fq7BWYrrh3vWVYcy5bn/8CEKF+BC
+ iekNArqeqYbrNSaJjyexJwl8tWqL4L7W9DczrZc6iGFj5s58HyZQeQaBndZGgMk0YkrX
+ cGGU4ka5uctoyGzT3Aaljbtcs4NjnaxtDbqhMw4bR5VTg8380n2h4Qcj8p4e6QWRYtzG
+ ZFjK2rHPHVxn5iPuLlKFOI28jp2gePAn7XiqmywBoabeNe/Fj0bQvlBLls+YhsTy9njN
+ IU/r6Ssg7OTJhf0fTvx3zfVoEzlGWCz1MXGY58TGevEMfIVEB+K3o2yWq3BJGeMaupwv
+ OyrQ==
+X-Gm-Message-State: AOAM5315CIM4LFKj7e1Xw1xim1KCNJLAdMqc02yE6JxvdY+n3YaVfThq
+ yOPNAt9A7HqmSpZpKlOp71qv8Q27RVM5NhfiZURN5Q==
+X-Google-Smtp-Source: ABdhPJy1/vASU1ZYa8gMOwkCcwZIRSzd5u3Sz6O/6QKGfii8RwIrXxYb5fjpN1mtsSMQY1jk/wgIW6PhNRs53A1WmDk=
+X-Received: by 2002:a4a:8dc1:: with SMTP id a1mr10744500ool.69.1595694211533; 
+ Sat, 25 Jul 2020 09:23:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::632;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x632.google.com
+References: <20200724134704.2248335-1-armbru@redhat.com>
+In-Reply-To: <20200724134704.2248335-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 25 Jul 2020 17:23:20 +0100
+Message-ID: <CAFEAcA-wSBw09m6KFwGnb1fOfB1khWDVXVGGT8fuw1LSYv7BDw@mail.gmail.com>
+Subject: Re: [PULL 0/4] Error reporting patches patches for 2020-07-24
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c2f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc2f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -88,8 +79,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,36 +93,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We forgot to update cc_op before these branch insns,
-which lead to losing track of the current eflags.
+On Fri, 24 Jul 2020 at 14:47, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit 09e0cd773723219d21655587954da2769f64ba01:
+>
+>   Merge remote-tracking branch 'remotes/alistair/tags/pull-riscv-to-apply-20200722-1' into staging (2020-07-23 19:00:42 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-error-2020-07-24
+>
+> for you to fetch changes up to 192cf54ac5408d21c20c17b3794a632970bbb880:
+>
+>   qapi/error: Check format string argument in error_*prepend() (2020-07-24 15:03:09 +0200)
+>
+> ----------------------------------------------------------------
+> Error reporting patches patches for 2020-07-24
+>
+> ----------------------------------------------------------------
 
-Buglink: https://bugs.launchpad.net/qemu/+bug/1888165
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200720154028.477457-1-richard.henderson@linaro.org>
----
- target/i386/translate.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index a1d31f09c1..caea6f5fb1 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -7148,6 +7148,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
-             l1 = gen_new_label();
-             l2 = gen_new_label();
-             l3 = gen_new_label();
-+            gen_update_cc_op(s);
-             b &= 3;
-             switch(b) {
-             case 0: /* loopnz */
--- 
-2.25.1
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
+
+-- PMM
 
