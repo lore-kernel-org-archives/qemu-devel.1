@@ -2,115 +2,100 @@ Return-Path: <SRS0=rO5d=BF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B391C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 04:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BEEC433E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 09:31:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F0C720674
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 04:08:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01F43206E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 09:31:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=leostella.onmicrosoft.com header.i=@leostella.onmicrosoft.com header.b="bUDye/t5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F0C720674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=leostella.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gPoJHwVM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01F43206E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzXxH-00086K-EK
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jul 2020 00:08:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33086)
+	id 1jzczq-00012d-8y
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jul 2020 05:31:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <matthieu.bucchianeri@leostella.com>)
- id 1jzXwb-0007Ef-1S; Sun, 26 Jul 2020 00:07:25 -0400
-Received: from mail-cy1usg02on0125.outbound.protection.office365.us
- ([23.103.209.125]:7968 helo=USG02-CY1-obe.outbound.protection.office365.us)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <matthieu.bucchianeri@leostella.com>)
- id 1jzXwY-0003KD-LD; Sun, 26 Jul 2020 00:07:24 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector5401; d=microsoft.com; cv=none;
- b=ZE6UEqqdCCSRvhMS5u+l7uXdS5ogjwaOgzTxZjHZ4/BZPjHHRgaKt+SDIsVZLO+zo6rYKaCD49QRMaxEGT0RRAZAOrA0Y6jDRee4IAEFBMl4BkYi7JG5NY1ZuKrgcna1OW+XKum1ybN+LhDiLpb8CadmuNue4KTwGrMJHyVZDGh+2PCM0aBpO/kd7+8BNyRqcyPNR55BLvilNU3t2eFNd6efvx7lbZBMvtcHaexw/aw2Rfab911zAJaPj86mVbiuQ3eJMwxRZQKiF/JG1eLKiX6wAXGJmXqAeaH2utAiXh/DfsrE6J2VVyDrQwadC0nOTdzzabFdbZf3WNlexrF9CA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector5401;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=waW4fAQEFrULDRToszuDG8PKK6locv7S73ragGWfh6k=;
- b=arC1mOVPB+YvxDiJbSNxocxFqIc1/wPWwFY6NtmP+/g3sfvNVV88bqt8Og/9Y2vVVk+ojrHK8Hh8BpVvd/mJ+Nq6Nz5iV5I3hA2t/kn81zO9fosOMmT6pnreDwOY2hYsiEIxKFdGSc758HXehIuuRL38Qi3Vx6U1yuHMOMsLlRzjmIxuORGqHsFGtjHC6jpgIP3vdXDE4LNT6en3JdAinUM+5dZItSMV1rhX9G0xCiPNOvcNPw/9Vv5JBbUfOuOUbNG/lJKZyr1bjKTQa+DlWHTkERMnHyd8RAW8rjitdxUJ6mQAmg7uAngTPdOs81WJ1+1ROq+0fr/6QwrB+zW2Xw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=leostella.com; dmarc=pass action=none
- header.from=leostella.com; dkim=pass header.d=leostella.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=leostella.onmicrosoft.com; s=selector1-leostella-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=waW4fAQEFrULDRToszuDG8PKK6locv7S73ragGWfh6k=;
- b=bUDye/t5QR2jJCQgY/6mhsNY2c77ZM3L77bFaH2b+k4j90/ZMO3umNrIf4k3Kz6Ru/WGL2LvYFvAZ9i0urE2dE9xMGNlCfjvLbVkugtV4XRWxituASFT7t49Qam04E6QUmPSZQ2lA5fwtWzPV2FEkkNJoWF+5vmNivSVBPrHE3c=
-Received: from SN5P110MB0543.NAMP110.PROD.OUTLOOK.COM (2001:489a:200:41c::10)
- by SN5P110MB0557.NAMP110.PROD.OUTLOOK.COM (2001:489a:200:41c::12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.28; Sun, 26 Jul
- 2020 04:07:15 +0000
-Received: from SN5P110MB0543.NAMP110.PROD.OUTLOOK.COM
- ([fe80::d0e1:84ad:f42:f6f2]) by SN5P110MB0543.NAMP110.PROD.OUTLOOK.COM
- ([fe80::d0e1:84ad:f42:f6f2%5]) with mapi id 15.20.3195.029; Sun, 26 Jul 2020
- 04:07:15 +0000
-From: Matthieu Bucchianeri <matthieu.bucchianeri@leostella.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org"
- <qemu-ppc@nongnu.org>
-Subject: RE: [PATCH] target/ppc: Fix SPE unavailable exception triggering
-Thread-Topic: [PATCH] target/ppc: Fix SPE unavailable exception triggering
-Thread-Index: AQHWYrfk1Mes9sSNm0m4bx3FUJe/kKkYyO+AgAB1XcA=
-Date: Sun, 26 Jul 2020 04:07:15 +0000
-Message-ID: <SN5P110MB0543740427336E63D9D1AC0384750@SN5P110MB0543.NAMP110.PROD.OUTLOOK.COM>
-References: <20200725191436.31828-1-matthieu.bucchianeri@leostella.com>
- <159571106877.5803.9650819864553051317@66eaa9a8a123>
-In-Reply-To: <159571106877.5803.9650819864553051317@66eaa9a8a123>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=leostella.com;
-x-originating-ip: [2601:601:f01:e820:3805:9c62:2079:6ea0]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c906d5e4-a7c6-4e77-0f83-08d83119618d
-x-ms-traffictypediagnostic: SN5P110MB0557:
-x-microsoft-antispam-prvs: <SN5P110MB05576F12069CCA5181C24E9184750@SN5P110MB0557.NAMP110.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN5P110MB0543.NAMP110.PROD.OUTLOOK.COM; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(346002)(366004)(508600001)(45080400002)(55016002)(9686003)(2906002)(83380400001)(110136005)(966005)(52536014)(5660300002)(33656002)(8676002)(7696005)(186003)(86362001)(66476007)(66556008)(64756008)(66946007)(76116006)(4326008)(71200400001)(66446008)(53546011)(8936002)(44832011)(6506007)(131093003);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jzcz2-0000VV-AU
+ for qemu-devel@nongnu.org; Sun, 26 Jul 2020 05:30:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32675
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jzcz0-0003Rg-98
+ for qemu-devel@nongnu.org; Sun, 26 Jul 2020 05:30:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595755813;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=G24wWmi+691+LcnaeuQUQXfGggczuGX5jNz1Y0OEfHs=;
+ b=gPoJHwVMLKNoWhBmDL9PPw0shxOf7+UuFeuiaDRrRl16Fuf+fYS/5HoW5gO8+36FTglPol
+ BoXDcGMu89Pdx7U7oMXasLk4Dd1Clk+Vg8RRbXYsoLCgBlJE8WLtABWqaCDq1XZHqbAxub
+ cE+gsD8C/6uBzrHpL6XpZUBbqutqoOE=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-6zLXK3-zNj-2VgyMAvhnUg-1; Sun, 26 Jul 2020 05:30:11 -0400
+X-MC-Unique: 6zLXK3-zNj-2VgyMAvhnUg-1
+Received: by mail-qt1-f198.google.com with SMTP id h10so9391478qtc.4
+ for <qemu-devel@nongnu.org>; Sun, 26 Jul 2020 02:30:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=G24wWmi+691+LcnaeuQUQXfGggczuGX5jNz1Y0OEfHs=;
+ b=nkXZHmpopJnmQIXFiHQZ4gGQ+QO9matDKbQZj3AOaz6QWZztqmqmZktyfDScRyOlM7
+ lhjTLrNDnL73Qp5xUg8ugcZSuE9wxPP+6wSSjmPdI5P45JYFU3w150OM2iT5Jvaz2Y8O
+ c92d7/wlhF0nLkUkom/6e8L4cWAJJtUzq6haSSFx725bO+htdiet8MskBA/KEB1/HvUa
+ VLq9AOJ0ypzUCSW2J043bkibaynxs9JABMSrMPoGVNqX8VGCon4JSWuYdToJ+dJYEDVp
+ 29Gd5rCkrflbjpnWLjT4zNbkBuL7s41D76Glm+1kiQGinQLOkJOc1a8Y+mbOitdGBfVc
+ bDbg==
+X-Gm-Message-State: AOAM530YR8gmoBlp+VMXcWTja8bKO1TW0hz5qDJ62j6RLRerBYqPDmYa
+ 6/IvGvu0W5UkfZ5womafwe9E0uDIVTce49+zapc0vNVnm6KKewOkglHF8vqRc7TRchOi5cYoyn5
+ ITNJFfCs6Zi7No3g=
+X-Received: by 2002:ac8:c7:: with SMTP id d7mr17211056qtg.235.1595755810966;
+ Sun, 26 Jul 2020 02:30:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyqA+DkLiXTd/TpmiWsJK1XPP43w3g6YpGSyFHoIVC7j/sNBaPb9/ZC1MkcUJKcARKKzDFRIg==
+X-Received: by 2002:ac8:c7:: with SMTP id d7mr17211042qtg.235.1595755810670;
+ Sun, 26 Jul 2020 02:30:10 -0700 (PDT)
+Received: from redhat.com (93-172-53-68.bb.netvision.net.il. [93.172.53.68])
+ by smtp.gmail.com with ESMTPSA id c70sm13022820qke.109.2020.07.26.02.30.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 26 Jul 2020 02:30:10 -0700 (PDT)
+Date: Sun, 26 Jul 2020 05:30:06 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Hogan Wang <hogan.wang@huawei.com>
+Subject: Re: [PATCH v3 2/2] hw/pci-host: save/restore pci host config
+ register for old ones
+Message-ID: <20200726052854-mutt-send-email-mst@kernel.org>
+References: <20200725125437.2825-1-hogan.wang@huawei.com>
+ <20200725125437.2825-2-hogan.wang@huawei.com>
 MIME-Version: 1.0
-X-OriginatorOrg: leostella.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN5P110MB0543.NAMP110.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: c906d5e4-a7c6-4e77-0f83-08d83119618d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2020 04:07:15.1743 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dbc51146-ab26-404b-9c4b-cce4f3331cc5
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN5P110MB0557
-Received-SPF: pass client-ip=23.103.209.125;
- envelope-from=matthieu.bucchianeri@leostella.com;
- helo=USG02-CY1-obe.outbound.protection.office365.us
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/26 00:07:19
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200725125437.2825-2-hogan.wang@huawei.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/26 05:30:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,102 +108,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jusual@redhat.com,
+ dgilbert@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGhpcyBsb29rcyBsaWtlIGFuIGluZnJhc3RydWN0dXJlIGlzc3VlLiBOb3RoaW5nIGluIHRoZSBs
-b2cgc2VlbXMgdG8gaW5kaWNhdGUgYW4gaXNzdWUuDQoNCmNoZWNrcGF0Y2ggd2FzIHJ1biBsb2Nh
-bGx5LCBhbmQgcGFzc2VkLg0KDQojIC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIDAwMDEtdGFyZ2V0
-LXBwYy1GaXgtU1BFLXVuYXZhaWxhYmxlLWV4Y2VwdGlvbi10cmlnZ2VyaW5nLnBhdGNoDQp0b3Rh
-bDogMCBlcnJvcnMsIDAgd2FybmluZ3MsIDE5MiBsaW5lcyBjaGVja2VkDQoNCjAwMDEtdGFyZ2V0
-LXBwYy1GaXgtU1BFLXVuYXZhaWxhYmxlLWV4Y2VwdGlvbi10cmlnZ2VyaW5nLnBhdGNoIGhhcyBu
-byBvYnZpb3VzIHN0eWxlIHByb2JsZW1zIGFuZCBpcyByZWFkeSBmb3Igc3VibWlzc2lvbi4NCg0K
-UGxlYXNlIGxldCBtZSBrbm93IGlmIGFueSBvdGhlciBhY3Rpb24gaXMgcmVxdWlyZWQuDQoNCi0t
-LS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBuby1yZXBseUBwYXRjaGV3Lm9yZyA8bm8t
-cmVwbHlAcGF0Y2hldy5vcmc+DQpTZW50OiBTYXR1cmRheSwgSnVseSAyNSwgMjAyMCAyOjA0IFBN
-DQpUbzogTWF0dGhpZXUgQnVjY2hpYW5lcmkgPG1hdHRoaWV1LmJ1Y2NoaWFuZXJpQGxlb3N0ZWxs
-YS5jb20+DQpDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBxZW11LXBwY0Bub25nbnUub3JnOyBN
-YXR0aGlldSBCdWNjaGlhbmVyaSA8bWF0dGhpZXUuYnVjY2hpYW5lcmlAbGVvc3RlbGxhLmNvbT47
-IGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdQ0KU3ViamVjdDogUmU6IFtQQVRDSF0gdGFyZ2V0
-L3BwYzogRml4IFNQRSB1bmF2YWlsYWJsZSBleGNlcHRpb24gdHJpZ2dlcmluZw0KDQogRXh0ZXJu
-YWwgTWVzc2FnZQ0KDQoNClBhdGNoZXcgVVJMOiBodHRwczovL3VzZzAyLnNhZmVsaW5rcy5wcm90
-ZWN0aW9uLm9mZmljZTM2NS51cy8/dXJsPWh0dHBzJTNBJTJGJTJGcGF0Y2hldy5vcmclMkZRRU1V
-JTJGMjAyMDA3MjUxOTE0MzYuMzE4MjgtMS1tYXR0aGlldS5idWNjaGlhbmVyaSU0MGxlb3N0ZWxs
-YS5jb20lMkYmYW1wO2RhdGE9MDIlN0MwMSU3Q21hdHRoaWV1LmJ1Y2NoaWFuZXJpJTQwbGVvc3Rl
-bGxhLmNvbSU3QzBlMGMzZmQ5ZmJmYjQzNDkzMzFjMDhkODMwZGU2MDBjJTdDZGJjNTExNDZhYjI2
-NDA0YjljNGJjY2U0ZjMzMzFjYzUlN0MxJTdDMCU3QzYzNzMxMzA3ODk0Mjc0ODgyMSZhbXA7c2Rh
-dGE9VnNzc3ZMNDAlMkJGNkFMQ04xaWZwZVRMelJRQnBGNHJxNE4lMkJZMXpDTXNDT2clM0QmYW1w
-O3Jlc2VydmVkPTANCg0KDQoNCkhpLA0KDQpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUg
-Y29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvciBtb3JlIGluZm9ybWF0
-aW9uOg0KDQpUeXBlOiBzZXJpZXMNCk1lc3NhZ2UtaWQ6IDIwMjAwNzI1MTkxNDM2LjMxODI4LTEt
-bWF0dGhpZXUuYnVjY2hpYW5lcmlAbGVvc3RlbGxhLmNvbQ0KU3ViamVjdDogW1BBVENIXSB0YXJn
-ZXQvcHBjOiBGaXggU1BFIHVuYXZhaWxhYmxlIGV4Y2VwdGlvbiB0cmlnZ2VyaW5nDQoNCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0NCiMhL2Jpbi9iYXNoDQpnaXQgcmV2LXBhcnNlIGJhc2UgPiAv
-ZGV2L251bGwgfHwgZXhpdCAwIGdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAg
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlIGdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0gLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayBiYXNlLi4NCj09PSBURVNUIFNDUklQVCBFTkQgPT09DQoNCkZyb20gaHR0cHM6Ly91c2cwMi5z
-YWZlbGlua3MucHJvdGVjdGlvbi5vZmZpY2UzNjUudXMvP3VybD1odHRwcyUzQSUyRiUyRmdpdGh1
-Yi5jb20lMkZwYXRjaGV3LXByb2plY3QlMkZxZW11JmFtcDtkYXRhPTAyJTdDMDElN0NtYXR0aGll
-dS5idWNjaGlhbmVyaSU0MGxlb3N0ZWxsYS5jb20lN0MwZTBjM2ZkOWZiZmI0MzQ5MzMxYzA4ZDgz
-MGRlNjAwYyU3Q2RiYzUxMTQ2YWIyNjQwNGI5YzRiY2NlNGYzMzMxY2M1JTdDMSU3QzAlN0M2Mzcz
-MTMwNzg5NDI3NDg4MjEmYW1wO3NkYXRhPTNLNWxoemhMUkhxS2NWaGF6YUZBN0w3SWJOTGlKZ3JC
-a2xpNjh2c1J2RTQlM0QmYW1wO3Jlc2VydmVkPTANCiAgIDdhZGZiZWEuLmIwY2UzZjAgIG1hc3Rl
-ciAgICAgLT4gbWFzdGVyDQpGcm9tIGh0dHBzOi8vdXNnMDIuc2FmZWxpbmtzLnByb3RlY3Rpb24u
-b2ZmaWNlMzY1LnVzLz91cmw9aHR0cHMlM0ElMkYlMkZnaXRodWIuY29tJTJGcGF0Y2hldy1wcm9q
-ZWN0JTJGcWVtdSZhbXA7ZGF0YT0wMiU3QzAxJTdDbWF0dGhpZXUuYnVjY2hpYW5lcmklNDBsZW9z
-dGVsbGEuY29tJTdDMGUwYzNmZDlmYmZiNDM0OTMzMWMwOGQ4MzBkZTYwMGMlN0NkYmM1MTE0NmFi
-MjY0MDRiOWM0YmNjZTRmMzMzMWNjNSU3QzElN0MwJTdDNjM3MzEzMDc4OTQyNzQ4ODIxJmFtcDtz
-ZGF0YT0zSzVsaHpoTFJIcUtjVmhhemFGQTdMN0liTkxpSmdyQmtsaTY4dnNSdkU0JTNEJmFtcDty
-ZXNlcnZlZD0wDQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwNzI1MTkxNDM2LjMx
-ODI4LTEtbWF0dGhpZXUuYnVjY2hpYW5lcmlAbGVvc3RlbGxhLmNvbSAtPiBwYXRjaGV3LzIwMjAw
-NzI1MTkxNDM2LjMxODI4LTEtbWF0dGhpZXUuYnVjY2hpYW5lcmlAbGVvc3RlbGxhLmNvbQ0KZmF0
-YWw6IGZhaWxlZCB0byB3cml0ZSByZWYtcGFjayBmaWxlDQpmYXRhbDogVGhlIHJlbW90ZSBlbmQg
-aHVuZyB1cCB1bmV4cGVjdGVkbHkgVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOg0K
-ICBGaWxlICJwYXRjaGV3LXRlc3RlcjIvc3JjL3BhdGNoZXctY2xpIiwgbGluZSA1MzEsIGluIHRl
-c3Rfb25lDQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8iXSwgclsiaGVhZCJdLCBs
-b2dmLCBUcnVlKQ0KICBGaWxlICJwYXRjaGV3LXRlc3RlcjIvc3JjL3BhdGNoZXctY2xpIiwgbGlu
-ZSA2MiwgaW4gZ2l0X2Nsb25lX3JlcG8NCiAgICBzdWJwcm9jZXNzLmNoZWNrX2NhbGwoY2xvbmVf
-Y21kLCBzdGRlcnI9bG9nZiwgc3Rkb3V0PWxvZ2YpDQogIEZpbGUgIi9vcHQvcmgvcmgtcHl0aG9u
-MzYvcm9vdC91c3IvbGliNjQvcHl0aG9uMy42L3N1YnByb2Nlc3MucHkiLCBsaW5lIDI5MSwgaW4g
-Y2hlY2tfY2FsbA0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpDQpz
-dWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydnaXQnLCAnY2xvbmUnLCAn
-LXEnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3BhdGNoZXctZ2l0LWNhY2hlL2h0dHBzZ2l0aHVi
-Y29tcGF0Y2hld3Byb2plY3RxZW11LTNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXhtdDdxMHM5L3NyYyddJyByZXR1
-cm5lZCBub24temVybyBleGl0IHN0YXR1cyAxMjguDQoNCg0KDQpUaGUgZnVsbCBsb2cgaXMgYXZh
-aWxhYmxlIGF0DQpodHRwczovL3VzZzAyLnNhZmVsaW5rcy5wcm90ZWN0aW9uLm9mZmljZTM2NS51
-cy8/dXJsPWh0dHAlM0ElMkYlMkZwYXRjaGV3Lm9yZyUyRmxvZ3MlMkYyMDIwMDcyNTE5MTQzNi4z
-MTgyOC0xLW1hdHRoaWV1LmJ1Y2NoaWFuZXJpJTQwbGVvc3RlbGxhLmNvbSUyRnRlc3RpbmcuY2hl
-Y2twYXRjaCUyRiUzRnR5cGUlM0RtZXNzYWdlJmFtcDtkYXRhPTAyJTdDMDElN0NtYXR0aGlldS5i
-dWNjaGlhbmVyaSU0MGxlb3N0ZWxsYS5jb20lN0MwZTBjM2ZkOWZiZmI0MzQ5MzMxYzA4ZDgzMGRl
-NjAwYyU3Q2RiYzUxMTQ2YWIyNjQwNGI5YzRiY2NlNGYzMzMxY2M1JTdDMSU3QzAlN0M2MzczMTMw
-Nzg5NDI3NTg4MTgmYW1wO3NkYXRhPVlVcjd0TUt1ZG5XWWM3MXphM3BYRlAlMkZMQ3BVd3hOUzlv
-WGIzeVZ2eUhaMCUzRCZhbXA7cmVzZXJ2ZWQ9MC4NCi0tLQ0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly91c2cwMi5zYWZlbGlua3MucHJvdGVjdGlvbi5v
-ZmZpY2UzNjUudXMvP3VybD1odHRwcyUzQSUyRiUyRnBhdGNoZXcub3JnJTJGJmFtcDtkYXRhPTAy
-JTdDMDElN0NtYXR0aGlldS5idWNjaGlhbmVyaSU0MGxlb3N0ZWxsYS5jb20lN0MwZTBjM2ZkOWZi
-ZmI0MzQ5MzMxYzA4ZDgzMGRlNjAwYyU3Q2RiYzUxMTQ2YWIyNjQwNGI5YzRiY2NlNGYzMzMxY2M1
-JTdDMSU3QzAlN0M2MzczMTMwNzg5NDI3NTg4MTgmYW1wO3NkYXRhPXdsRVdwa3lQdmdGc3klMkZU
-QXM0OTdTV3lHMCUyQiUyRm9CUzNPdUNLT3Z2U3ZOZEElM0QmYW1wO3Jlc2VydmVkPTBdLg0KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20NCkxlb1N0
-ZWxsYSwgTExDDQpBIGpvaW50IHZlbnR1cmUgb2YgVGhhbGVzIEFsZW5pYSBTcGFjZSBhbmQgU3Bh
-Y2VmbGlnaHQgSW5kdXN0cmllcw0KDQoxMjUwMSBFIE1hcmdpbmFsIFdheSBTIOKAoiBUdWt3aWxh
-LCBXQSA5ODE2OA0KDQpQcm9wcmlldGFyeSBEb2N1bWVudDogVGhpcyBkb2N1bWVudCBtYXkgY29u
-dGFpbiB0cmFkZSBzZWNyZXRzIG9yIG90aGVyd2lzZSBwcm9wcmlldGFyeSBhbmQgY29uZmlkZW50
-aWFsIGluZm9ybWF0aW9uIG93bmVkIGJ5IExlb1N0ZWxsYSBMTEMuIEl0IGlzIGludGVuZGVkIG9u
-bHkgZm9yIHRoZSBpbmRpdmlkdWFsIGFkZHJlc3NlZSBhbmQgbWF5IG5vdCBiZSBjb3BpZWQsIGRp
-c3RyaWJ1dGVkLCBvciBvdGhlcndpc2UgZGlzY2xvc2VkIHdpdGhvdXQgTGVvU3RlbGxhIExMQyBl
-eHByZXNzIHByaW9yIHdyaXR0ZW4gYXV0aG9yaXphdGlvbi4NCkV4cG9ydCBDb250cm9sbGVkOiBU
-aGlzIGRvY3VtZW50IG1heSBjb250YWluIHRlY2huaWNhbCBkYXRhIHdob3NlIGV4cG9ydCBpcyBy
-ZXN0cmljdGVkIGJ5IHRoZSBBcm1zIEV4cG9ydCBDb250cm9sIEFjdCAoVGl0bGUgMjIsIFUuUy5D
-LiwgU2VjIDI3NTEgZXQgc2VxLikgb3IgdGhlIEV4cG9ydCBBZG1pbmlzdHJhdGlvbiBBY3Qgb2Yg
-MTk3OSwgYXMgYW1lbmRlZCwgVGl0bGUgNTAsVS5TLkMuLCBhcHAgMjQwMSBldCBzZXEuIFZpb2xh
-dGlvbiBvZiB0aGVzZSBleHBvcnQgbGF3cyBhcmUgc3ViamVjdCB0byBzZXZlcmUgY3JpbWluYWwg
-cGVuYWx0aWVzLiBSZWNpcGllbnQgc2hhbGwgbm90IGV4cG9ydCwgcmUtZXhwb3J0LCBvciBvdGhl
-cndpc2UgdHJhbnNmZXIgb3Igc2hhcmUgdGhpcyBkb2N1bWVudCB0byBhbnkgZm9yZWlnbiBwZXJz
-b24gKGFzIGRlZmluZWQgYnkgVS5TLiBleHBvcnQgbGF3cykgd2l0aG91dCBhZHZhbmNlIHdyaXR0
-ZW4gYXV0aG9yaXphdGlvbiBmcm9tIExlb1N0ZWxsYSBMTEMuDQo=
+On Sat, Jul 25, 2020 at 08:54:37PM +0800, Hogan Wang wrote:
+> The i440fx and q35 machines integrate i440FX or MCH PCI device by default.
+> Refer to i440FX and ICH9-LPC spcifications, there are some reserved
+> configuration registers can used to save/restore PCIHostState.config_reg.
+> It's nasty but friendly to old ones.
+> 
+> Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
+
+Just to make sure, how was this tested?
+Did you test that migration to an old qemu e.g. the last release
+with an old machine type works with this patch?
+
+
+> ---
+>  hw/pci-host/i440fx.c | 31 +++++++++++++++++++++++++++++++
+>  hw/pci-host/q35.c    | 37 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 68 insertions(+)
+> 
+> diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+> index c662903dbb..9e2cfdb052 100644
+> --- a/hw/pci-host/i440fx.c
+> +++ b/hw/pci-host/i440fx.c
+> @@ -65,6 +65,14 @@ typedef struct I440FXState {
+>   */
+>  #define I440FX_COREBOOT_RAM_SIZE 0x57
+>  
+> +/* Older I440FX machines (5.0 and older) not support i440FX-pcihost state
+> + * migration, use some reserved INTEL 82441 configuration registers to
+> + * save/restore i440FX-pcihost config register. Refer to [INTEL 440FX PCISET
+> + * 82441FX PCI AND MEMORY CONTROLLER (PMC) AND 82442FX DATA BUS ACCELERATOR
+> + * (DBX) Table 1. PMC Configuration Space]
+> + */
+> +#define I440FX_PCI_HOST_CONFIG_REG 0x94
+> +
+>  static void i440fx_update_memory_mappings(PCII440FXState *d)
+>  {
+>      int i;
+> @@ -99,8 +107,30 @@ static void i440fx_write_config(PCIDevice *dev,
+>  static int i440fx_post_load(void *opaque, int version_id)
+>  {
+>      PCII440FXState *d = opaque;
+> +    uint8_t *config;
+> +    I440FXState *s = OBJECT_CHECK(I440FXState,
+> +                                  object_resolve_path("/machine/i440fx", NULL),
+> +                                  TYPE_PCI_HOST_BRIDGE);
+>  
+>      i440fx_update_memory_mappings(d);
+> +
+> +    if (!s->migration_enabled) {
+> +        config = &d->parent_obj.config[I440FX_PCI_HOST_CONFIG_REG];
+> +        s->parent_obj.config_reg = pci_get_long(config);
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int i440fx_pre_save(void *opaque)
+> +{
+> +    PCIDevice *d = opaque;
+> +    I440FXState *s = OBJECT_CHECK(I440FXState,
+> +                                  object_resolve_path("/machine/i440fx", NULL),
+> +                                  TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->migration_enabled) {
+> +        pci_set_long(&d->config[I440FX_PCI_HOST_CONFIG_REG],
+> +                     s->parent_obj.config_reg);
+> +    }
+>      return 0;
+>  }
+>  
+> @@ -108,6 +138,7 @@ static const VMStateDescription vmstate_i440fx = {
+>      .name = "I440FX",
+>      .version_id = 3,
+>      .minimum_version_id = 3,
+> +    .pre_save = i440fx_pre_save,
+>      .post_load = i440fx_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index bb41665da4..67e08dedc5 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -43,6 +43,15 @@
+>  
+>  #define Q35_PCI_HOST_HOLE64_SIZE_DEFAULT (1ULL << 35)
+>  
+> +/* Older Q35 machines (5.0 and older) not support q35-pcihost state
+> + * migration, use some reserved INTEL MCH configuration registers to
+> + * save/restore q35-pcihost config register. Refer to [Intel 3 Series
+> + * Chipset Family Datasheet Table 5-1. DRAM Controller Register Address
+> + * Map (D0:F0)]
+> + */
+> +#define Q35_PCI_HOST_CONFIG_REG 0x70
+> +
+> +
+>  static void q35_host_realize(DeviceState *dev, Error **errp)
+>  {
+>      PCIHostState *pci = PCI_HOST_BRIDGE(dev);
+> @@ -532,7 +541,34 @@ static void mch_update(MCHPCIState *mch)
+>  static int mch_post_load(void *opaque, int version_id)
+>  {
+>      MCHPCIState *mch = opaque;
+> +    uint8_t *config;
+> +    Q35PCIHost *s = OBJECT_CHECK(Q35PCIHost,
+> +                                 object_resolve_path("/machine/q35", NULL),
+> +                                 TYPE_PCI_HOST_BRIDGE);
+> +    PCIHostState *pci = PCI_HOST_BRIDGE(s);
+> +
+>      mch_update(mch);
+> +    if (!s->migration_enabled) {
+> +        config = &mch->parent_obj.config[Q35_PCI_HOST_CONFIG_REG];
+> +        pci->config_reg = pci_get_long(config);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int mch_pre_save(void *opaque)
+> +{
+> +    MCHPCIState *mch = opaque;
+> +    uint8_t *config;
+> +    Q35PCIHost *s = OBJECT_CHECK(Q35PCIHost,
+> +                                 object_resolve_path("/machine/q35", NULL),
+> +                                 TYPE_PCI_HOST_BRIDGE);
+> +    PCIHostState *pci = PCI_HOST_BRIDGE(s);
+> +
+> +    if (!s->migration_enabled) {
+> +        config = &mch->parent_obj.config[Q35_PCI_HOST_CONFIG_REG];
+> +        pci_set_long(config, pci->config_reg);
+> +    }
+>      return 0;
+>  }
+>  
+> @@ -540,6 +576,7 @@ static const VMStateDescription vmstate_mch = {
+>      .name = "mch",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> +    .pre_save = mch_pre_save,
+>      .post_load = mch_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_PCI_DEVICE(parent_obj, MCHPCIState),
+> -- 
+> 2.27.0
+> 
+
 
