@@ -2,66 +2,79 @@ Return-Path: <SRS0=rO5d=BF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE6FBC433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 10:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB01AC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 15:21:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEB29206D8
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 10:05:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB29206D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id BFC062065E
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 15:21:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFC062065E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzdXa-0005Pr-Rz
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jul 2020 06:05:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33530)
+	id 1jziT7-0000B2-Vt
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jul 2020 11:21:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jzdWt-0004nh-8v; Sun, 26 Jul 2020 06:05:15 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:57298)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1jzdWq-0006u8-27; Sun, 26 Jul 2020 06:05:14 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id E1ECA74638A;
- Sun, 26 Jul 2020 12:04:58 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 98BBB745712; Sun, 26 Jul 2020 12:04:58 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 94EED745702;
- Sun, 26 Jul 2020 12:04:58 +0200 (CEST)
-Date: Sun, 26 Jul 2020 12:04:58 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Matthieu Bucchianeri <matthieu.bucchianeri@leostella.com>
-Subject: Re: [PATCH] target/ppc: Fix SPE unavailable exception triggering
-In-Reply-To: <20200725191436.31828-1-matthieu.bucchianeri@leostella.com>
-Message-ID: <alpine.BSF.2.22.395.2007261202050.35472@zero.eik.bme.hu>
-References: <20200725191436.31828-1-matthieu.bucchianeri@leostella.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jziSF-0008CQ-RV
+ for qemu-devel@nongnu.org; Sun, 26 Jul 2020 11:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60942)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1jziSD-0001G3-HZ
+ for qemu-devel@nongnu.org; Sun, 26 Jul 2020 11:20:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1jziSA-0000Bk-6B
+ for <qemu-devel@nongnu.org>; Sun, 26 Jul 2020 15:20:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 2C28B2E80EC
+ for <qemu-devel@nongnu.org>; Sun, 26 Jul 2020 15:20:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-1406235146-1595757898=:35472"
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/26 06:04:59
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 26 Jul 2020 15:11:46 -0000
+From: Sanjay Basu <1856335@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: babumoger djdatte h-sieger janklos sanjaybmd
+X-Launchpad-Bug-Reporter: Damir (djdatte)
+X-Launchpad-Bug-Modifier: Sanjay Basu (sanjaybmd)
+References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
+Message-Id: <159577630694.30064.11723065171495313651.malone@gac.canonical.com>
+Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e85d0ab92e2924d39b8285aeae075a01d25eff06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1ff8148e75bab4e73f3ee785863d5e2f9ff5e0a0
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/26 11:20:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -70,272 +83,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+h-sieger,
+Your XML gave me very significant performance gains.
+Is there any way to do this with more than 24 assigned cores?
 
---3866299591-1406235146-1595757898=:35472
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+-- =
 
-On Sat, 25 Jul 2020, Matthieu Bucchianeri wrote:
-> When emulating certain floating point instructions or vector instructions on
-> PowerPC machines, QEMU did not properly generate the SPE/Embedded Floating-
-> Point Unavailable interrupt. See the buglink further below for references to
-> the relevant NXP documentation.
->
-> This patch fixes the behavior of some evfs* instructions that were
-> incorrectly emitting the interrupt.
->
-> More importantly, this patch fixes the behavior of several efd* and ev*
-> instructions that were not generating the interrupt. Triggering the
-> interrupt for these instructions fixes lazy FPU/vector context switching on
-> some operating systems like Linux.
->
-> Without this patch, the result of some double-precision arithmetic could be
-> corrupted due to the lack of proper saving and restoring of the upper
-> 32-bit part of the general-purpose registers.
->
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1888918
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1611394
-> Signed-off-by: Matthieu Bucchianeri <matthieu.bucchianeri@leostella.com>
-> ---
-> target/ppc/translate/spe-impl.inc.c | 101 ++++++++++++++++++----------
-> 1 file changed, 66 insertions(+), 35 deletions(-)
->
-> diff --git a/target/ppc/translate/spe-impl.inc.c b/target/ppc/translate/spe-impl.inc.c
-> index 36b4d5654d..2e6e799a25 100644
-> --- a/target/ppc/translate/spe-impl.inc.c
-> +++ b/target/ppc/translate/spe-impl.inc.c
-> @@ -349,14 +349,24 @@ static inline void gen_evmergelohi(DisasContext *ctx)
-> }
-> static inline void gen_evsplati(DisasContext *ctx)
-> {
-> -    uint64_t imm = ((int32_t)(rA(ctx->opcode) << 27)) >> 27;
-> +    uint64_t imm;
-> +    if (unlikely(!ctx->spe_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> +        return;
-> +    }
-> +    imm = ((int32_t)(rA(ctx->opcode) << 27)) >> 27;
->
->     tcg_gen_movi_tl(cpu_gpr[rD(ctx->opcode)], imm);
->     tcg_gen_movi_tl(cpu_gprh[rD(ctx->opcode)], imm);
-> }
-> static inline void gen_evsplatfi(DisasContext *ctx)
-> {
-> -    uint64_t imm = rA(ctx->opcode) << 27;
-> +    uint64_t imm;
-> +    if (unlikely(!ctx->spe_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> +        return;
-> +    }
-> +    imm = rA(ctx->opcode) << 27;
->
->     tcg_gen_movi_tl(cpu_gpr[rD(ctx->opcode)], imm);
->     tcg_gen_movi_tl(cpu_gprh[rD(ctx->opcode)], imm);
-> @@ -389,21 +399,37 @@ static inline void gen_evsel(DisasContext *ctx)
->
-> static void gen_evsel0(DisasContext *ctx)
-> {
-> +    if (unlikely(!ctx->spe_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> +        return;
-> +    }
->     gen_evsel(ctx);
-> }
->
-> static void gen_evsel1(DisasContext *ctx)
-> {
-> +    if (unlikely(!ctx->spe_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> +        return;
-> +    }
->     gen_evsel(ctx);
-> }
->
-> static void gen_evsel2(DisasContext *ctx)
-> {
-> +    if (unlikely(!ctx->spe_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> +        return;
-> +    }
->     gen_evsel(ctx);
-> }
->
-> static void gen_evsel3(DisasContext *ctx)
-> {
-> +    if (unlikely(!ctx->spe_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> +        return;
-> +    }
->     gen_evsel(ctx);
-> }
->
-> @@ -518,6 +544,11 @@ static inline void gen_evmwsmia(DisasContext *ctx)
-> {
->     TCGv_i64 tmp;
->
-> +    if (unlikely(!ctx->spe_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> +        return;
-> +    }
-> +
->     gen_evmwsmi(ctx);            /* rD := rA * rB */
->
->     tmp = tcg_temp_new_i64();
-> @@ -531,8 +562,13 @@ static inline void gen_evmwsmia(DisasContext *ctx)
->
-> static inline void gen_evmwsmiaa(DisasContext *ctx)
-> {
-> -    TCGv_i64 acc = tcg_temp_new_i64();
-> -    TCGv_i64 tmp = tcg_temp_new_i64();
-> +    TCGv_i64 acc;
-> +    TCGv_i64 tmp;
-> +
-> +    if (unlikely(!ctx->spe_enabled)) {
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> +        return;
-> +    }
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856335
 
-Isn't this missing here:
+Title:
+  Cache Layout wrong on many Zen Arch CPUs
 
-acc = tcg_temp_new_i64();
-tmp = tcg_temp_new_i64();
+Status in QEMU:
+  New
 
-You've removed allocating temps but this hunk does not add it back after 
-the exception unlike others in this patch.
+Bug description:
+  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
+  to always map Cache ass if it was an 4-Core per CCX CPU, which is
+  incorrect, and costs upwards 30% performance (more realistically 10%)
+  in L3 Cache Layout aware applications.
 
-Regards,
-BALATON Zoltan
+  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
 
->
->     gen_evmwsmi(ctx);           /* rD := rA * rB */
->
-> @@ -892,8 +928,14 @@ static inline void gen_##name(DisasContext *ctx)                              \
-> #define GEN_SPEFPUOP_CONV_32_64(name)                                         \
-> static inline void gen_##name(DisasContext *ctx)                              \
-> {                                                                             \
-> -    TCGv_i64 t0 = tcg_temp_new_i64();                                         \
-> -    TCGv_i32 t1 = tcg_temp_new_i32();                                         \
-> +    TCGv_i64 t0;                                                              \
-> +    TCGv_i32 t1;                                                              \
-> +    if (unlikely(!ctx->spe_enabled)) {                                        \
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
-> +        return;                                                               \
-> +    }                                                                         \
-> +    t0 = tcg_temp_new_i64();                                                  \
-> +    t1 = tcg_temp_new_i32();                                                  \
->     gen_load_gpr64(t0, rB(ctx->opcode));                                      \
->     gen_helper_##name(t1, cpu_env, t0);                                       \
->     tcg_gen_extu_i32_tl(cpu_gpr[rD(ctx->opcode)], t1);                        \
-> @@ -903,8 +945,14 @@ static inline void gen_##name(DisasContext *ctx)                              \
-> #define GEN_SPEFPUOP_CONV_64_32(name)                                         \
-> static inline void gen_##name(DisasContext *ctx)                              \
-> {                                                                             \
-> -    TCGv_i64 t0 = tcg_temp_new_i64();                                         \
-> -    TCGv_i32 t1 = tcg_temp_new_i32();                                         \
-> +    TCGv_i64 t0;                                                              \
-> +    TCGv_i32 t1;                                                              \
-> +    if (unlikely(!ctx->spe_enabled)) {                                        \
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
-> +        return;                                                               \
-> +    }                                                                         \
-> +    t0 = tcg_temp_new_i64();                                                  \
-> +    t1 = tcg_temp_new_i32();                                                  \
->     tcg_gen_trunc_tl_i32(t1, cpu_gpr[rB(ctx->opcode)]);                       \
->     gen_helper_##name(t0, cpu_env, t1);                                       \
->     gen_store_gpr64(rD(ctx->opcode), t0);                                     \
-> @@ -914,7 +962,12 @@ static inline void gen_##name(DisasContext *ctx)                              \
-> #define GEN_SPEFPUOP_CONV_64_64(name)                                         \
-> static inline void gen_##name(DisasContext *ctx)                              \
-> {                                                                             \
-> -    TCGv_i64 t0 = tcg_temp_new_i64();                                         \
-> +    TCGv_i64 t0;                                                              \
-> +    if (unlikely(!ctx->spe_enabled)) {                                        \
-> +        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
-> +        return;                                                               \
-> +    }                                                                         \
-> +    t0 = tcg_temp_new_i64();                                                  \
->     gen_load_gpr64(t0, rB(ctx->opcode));                                      \
->     gen_helper_##name(t0, cpu_env, t0);                                       \
->     gen_store_gpr64(rD(ctx->opcode), t0);                                     \
-> @@ -923,13 +976,8 @@ static inline void gen_##name(DisasContext *ctx)                              \
-> #define GEN_SPEFPUOP_ARITH2_32_32(name)                                       \
-> static inline void gen_##name(DisasContext *ctx)                              \
-> {                                                                             \
-> -    TCGv_i32 t0, t1;                                                          \
-> -    if (unlikely(!ctx->spe_enabled)) {                                        \
-> -        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
-> -        return;                                                               \
-> -    }                                                                         \
-> -    t0 = tcg_temp_new_i32();                                                  \
-> -    t1 = tcg_temp_new_i32();                                                  \
-> +    TCGv_i32 t0 = tcg_temp_new_i32();                                         \
-> +    TCGv_i32 t1 = tcg_temp_new_i32();                                         \
->     tcg_gen_trunc_tl_i32(t0, cpu_gpr[rA(ctx->opcode)]);                       \
->     tcg_gen_trunc_tl_i32(t1, cpu_gpr[rB(ctx->opcode)]);                       \
->     gen_helper_##name(t0, cpu_env, t0, t1);                                   \
-> @@ -958,13 +1006,8 @@ static inline void gen_##name(DisasContext *ctx)                              \
-> #define GEN_SPEFPUOP_COMP_32(name)                                            \
-> static inline void gen_##name(DisasContext *ctx)                              \
-> {                                                                             \
-> -    TCGv_i32 t0, t1;                                                          \
-> -    if (unlikely(!ctx->spe_enabled)) {                                        \
-> -        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
-> -        return;                                                               \
-> -    }                                                                         \
-> -    t0 = tcg_temp_new_i32();                                                  \
-> -    t1 = tcg_temp_new_i32();                                                  \
-> +    TCGv_i32 t0 = tcg_temp_new_i32();                                         \
-> +    TCGv_i32 t1 = tcg_temp_new_i32();                                         \
->                                                                               \
->     tcg_gen_trunc_tl_i32(t0, cpu_gpr[rA(ctx->opcode)]);                       \
->     tcg_gen_trunc_tl_i32(t1, cpu_gpr[rB(ctx->opcode)]);                       \
-> @@ -1074,28 +1117,16 @@ GEN_SPEFPUOP_ARITH2_32_32(efsmul);
-> GEN_SPEFPUOP_ARITH2_32_32(efsdiv);
-> static inline void gen_efsabs(DisasContext *ctx)
-> {
-> -    if (unlikely(!ctx->spe_enabled)) {
-> -        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> -        return;
-> -    }
->     tcg_gen_andi_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)],
->                     (target_long)~0x80000000LL);
-> }
-> static inline void gen_efsnabs(DisasContext *ctx)
-> {
-> -    if (unlikely(!ctx->spe_enabled)) {
-> -        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> -        return;
-> -    }
->     tcg_gen_ori_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)],
->                    0x80000000);
-> }
-> static inline void gen_efsneg(DisasContext *ctx)
-> {
-> -    if (unlikely(!ctx->spe_enabled)) {
-> -        gen_exception(ctx, POWERPC_EXCP_SPEU);
-> -        return;
-> -    }
->     tcg_gen_xori_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)],
->                     0x80000000);
-> }
-> --
-> 2.17.1
->
-> LeoStella, LLC
-> A joint venture of Thales Alenia Space and Spaceflight Industries
->
-> 12501 E Marginal Way S • Tukwila, WA 98168
->
-> Proprietary Document: This document may contain trade secrets or otherwise proprietary and confidential information owned by LeoStella LLC. It is intended only for the individual addressee and may not be copied, distributed, or otherwise disclosed without LeoStella LLC express prior written authorization.
-> Export Controlled: This document may contain technical data whose export is restricted by the Arms Export Control Act (Title 22, U.S.C., Sec 2751 et seq.) or the Export Administration Act of 1979, as amended, Title 50,U.S.C., app 2401 et seq. Violation of these export laws are subject to severe criminal penalties. Recipient shall not export, re-export, or otherwise transfer or share this document to any foreign person (as defined by U.S. export laws) without advance written authorization from LeoStella LLC.
->
->
---3866299591-1406235146-1595757898=:35472--
+  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
+/>
+
+  In windows, coreinfo reports correctly:
+
+  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
+
+  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
+/>
+
+  in windows, coreinfo reports incorrectly:
+
+  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
+
+  With newer Qemu there is a fix (that does behave correctly) in using the =
+dies parameter:
+  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
+
+  The problem is that the dies are exposed differently than how AMD does
+  it natively, they are exposed to Windows as sockets, which means, that
+  if you are nto a business user, you can't ever have a machine with
+  more than two CCX (6 cores) as consumer versions of Windows only
+  supports two sockets. (Should this be reported as a separate bug?)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
 
