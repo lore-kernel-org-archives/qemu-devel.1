@@ -2,47 +2,47 @@ Return-Path: <SRS0=rO5d=BF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CFB7C433E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 20:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B386C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 20:41:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7253C206E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 20:11:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7253C206E3
+	by mail.kernel.org (Postfix) with ESMTPS id 45F572065F
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 Jul 2020 20:41:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45F572065F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzmzi-0004XS-Nt
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jul 2020 16:11:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45700)
+	id 1jznSf-0001BH-Ea
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jul 2020 16:41:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jzmyv-0003Ya-TT
- for qemu-devel@nongnu.org; Sun, 26 Jul 2020 16:10:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58612)
+ id 1jznS2-0000l5-Gf
+ for qemu-devel@nongnu.org; Sun, 26 Jul 2020 16:40:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60236)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jzmyt-0003M1-Lw
- for qemu-devel@nongnu.org; Sun, 26 Jul 2020 16:10:49 -0400
+ id 1jznRz-0006zn-VD
+ for qemu-devel@nongnu.org; Sun, 26 Jul 2020 16:40:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jzmys-0004xS-12
- for <qemu-devel@nongnu.org>; Sun, 26 Jul 2020 20:10:46 +0000
+ id 1jznRy-0006hj-3o
+ for <qemu-devel@nongnu.org>; Sun, 26 Jul 2020 20:40:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 02DE22E8025
- for <qemu-devel@nongnu.org>; Sun, 26 Jul 2020 20:10:46 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id EC05A2E80EE
+ for <qemu-devel@nongnu.org>; Sun, 26 Jul 2020 20:40:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 26 Jul 2020 20:02:03 -0000
-From: Richard Henderson <1880287@bugs.launchpad.net>
+Date: Sun, 26 Jul 2020 20:32:30 -0000
+From: Laurent Vivier <1880287@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
@@ -51,11 +51,11 @@ X-Launchpad-Bug-Tags: linux-user tcg
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: hdeller rth
+X-Launchpad-Bug-Commenters: hdeller laurent-vivier rth
 X-Launchpad-Bug-Reporter: Helge Deller (hdeller)
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
 References: <159022297856.20775.958724179871171148.malonedeb@soybean.canonical.com>
-Message-Id: <159579372458.17412.5714266882128938679.launchpad@soybean.canonical.com>
+Message-Id: <159579555081.18322.5087961527090322026.malone@soybean.canonical.com>
 Subject: [Bug 1880287] Re: gcc crashes in hppa emulation
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -63,7 +63,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="e85d0ab92e2924d39b8285aeae075a01d25eff06";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 809055020d78c1bb990a41d7342a4af439842b2a
+X-Launchpad-Hash: db44f29782de18e3efca2dbd33314380cd740099
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/26 16:10:45
@@ -91,8 +91,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+Fixed here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D79826f99feb7
 
 -- =
 
