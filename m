@@ -2,106 +2,105 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0425C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 10:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA24C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 10:23:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69E9E2065E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 10:22:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmX+cSeL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69E9E2065E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 50B462075A
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 10:23:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50B462075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k00H6-0005Rl-L1
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 06:22:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59388)
+	id 1k00IJ-0006ko-C1
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 06:23:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k00GE-0004rb-PT
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 06:21:34 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58868
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k00GC-0004am-0V
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 06:21:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595845291;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dTdS2jgbCsHXN2gIHy8smHunZAoJ6NLAqIL1/NehehQ=;
- b=NmX+cSeL4LQ68qwTvsWdo03x0rlRU3ERAywUgFM4n18/MOOawYAGgA8rYA0smsIVeSEDDx
- YJbtNzfLzxkNRJgk7HbDbjLoHk2uNTnoiUSAJjZ0D5oqrRcXBjOFOiAwx+9EzthQcC8+Fv
- D0jLTVFOFYenFcjuodAlWlUfJuNyBQo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-ihaFkRvnNMalvLsQtZkVJQ-1; Mon, 27 Jul 2020 06:21:29 -0400
-X-MC-Unique: ihaFkRvnNMalvLsQtZkVJQ-1
-Received: by mail-wr1-f71.google.com with SMTP id m7so3747647wrb.20
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 03:21:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=dTdS2jgbCsHXN2gIHy8smHunZAoJ6NLAqIL1/NehehQ=;
- b=oOgo9mUpznjuQzJn3J2wlemUo6z9he4CZNAxDUZEptuS/fSI4hX26AwcnQoIB9VMqI
- mXCI/UZgG/Gz4UqTZ7M2CjZQvYIZJbh86Rfr6xzJ+T/gPfUBFs9lUpYYS8XygH+5Qxd+
- Lk+V7JJoc2QgH1j4EJdu15/fOS6tS86qfuAY8RYVLQsYcMj+3tPJ+3F5bXgDJu0oOIwh
- hFdH9hstxTlAVW3Z6gMbw8+P8ZoquBpPnxvRS/FylVR1KrkjbDf5iy2UyREpwDTF8UnO
- Eu+yGGKi38fEGO6cbdZIBLwa5r/DH37s+pAvUif4KcXHWhnXy7wcm6Lt8iqVPdAnQP+k
- Jitw==
-X-Gm-Message-State: AOAM5329z/860WuoPj8tkIxM0NKrxi0CMqzeylW6OXkLutOQo6G/kaju
- BFkjP1DFeY1XPqclzkO76ZJYzz2b/AQvScwkqC4fjyfnUlmaxFLyk7PQ1n0Fqm4OATMdFRAwyuE
- cJbPd2wt9Rx2ijrs=
-X-Received: by 2002:adf:f486:: with SMTP id l6mr15067534wro.265.1595845287758; 
- Mon, 27 Jul 2020 03:21:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJywCB3vjOQNKNMkdsjIsKHwpD5xuj7S0H+bGzlh9a7+j+t8FphlAYgnwi++HzA+ZPgmiKhkcQ==
-X-Received: by 2002:adf:f486:: with SMTP id l6mr15067519wro.265.1595845287571; 
- Mon, 27 Jul 2020 03:21:27 -0700 (PDT)
-Received: from redhat.com ([192.117.173.58])
- by smtp.gmail.com with ESMTPSA id t25sm4348585wmj.18.2020.07.27.03.21.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 03:21:26 -0700 (PDT)
-Date: Mon, 27 Jul 2020 06:21:24 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH] virtio-net: check the existence of peer before accesing
- its config
-Message-ID: <20200727061812-mutt-send-email-mst@kernel.org>
-References: <20200727074328.2279-1-jasowang@redhat.com>
- <20200727053954-mutt-send-email-mst@kernel.org>
- <b5a42ac8-b3cf-d52e-298a-d957a9e8cb1d@redhat.com>
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1k00HW-00069s-MQ; Mon, 27 Jul 2020 06:22:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24844)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1k00HU-0004nY-Ne; Mon, 27 Jul 2020 06:22:54 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06RA34sX183814; Mon, 27 Jul 2020 06:22:50 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32htsjv0n9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 27 Jul 2020 06:22:49 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06RA35Sp183844;
+ Mon, 27 Jul 2020 06:22:48 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.106])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32htsjv0mf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 27 Jul 2020 06:22:48 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+ by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06RAL1hf003364;
+ Mon, 27 Jul 2020 10:22:46 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by ppma04fra.de.ibm.com with ESMTP id 32gcpw998n-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 27 Jul 2020 10:22:46 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06RAMhuQ58785856
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 27 Jul 2020 10:22:43 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 802B0A404D;
+ Mon, 27 Jul 2020 10:22:43 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 07625A4057;
+ Mon, 27 Jul 2020 10:22:43 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.147.182])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 27 Jul 2020 10:22:42 +0000 (GMT)
+Date: Mon, 27 Jul 2020 12:22:41 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 1/1] s390x/s390-virtio-ccw: fix loadparm property getter
+Message-ID: <20200727122241.222e4127.pasic@linux.ibm.com>
+In-Reply-To: <0ce16e30-a5ea-f9ff-89a8-83c393b5118c@redhat.com>
+References: <20200723162717.88485-1-pasic@linux.ibm.com>
+ <0ce16e30-a5ea-f9ff-89a8-83c393b5118c@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <b5a42ac8-b3cf-d52e-298a-d957a9e8cb1d@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-27_06:2020-07-27,
+ 2020-07-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 suspectscore=0
+ priorityscore=1501 mlxlogscore=999 phishscore=0 lowpriorityscore=0
+ bulkscore=0 malwarescore=0 mlxscore=0 spamscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007270073
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 06:22:50
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,107 +113,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Cindy Lu <lulu@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 27, 2020 at 05:49:47PM +0800, Jason Wang wrote:
-> 
-> On 2020/7/27 下午5:41, Michael S. Tsirkin wrote:
-> > On Mon, Jul 27, 2020 at 03:43:28PM +0800, Jason Wang wrote:
-> > > We try to get config from peer unconditionally which may lead NULL
-> > > pointer dereference. Add a check before trying to access the config.
-> > > 
-> > > Fixes: 108a64818e69b ("vhost-vdpa: introduce vhost-vdpa backend")
-> > > Cc: Cindy Lu <lulu@redhat.com>
-> > > Tested-by: Cornelia Huck <cohuck@redhat.com>
-> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > I am a bit lost here. Isn't this invoked
-> > when guest attempts to read the config?
-> > With no peer, what do we return to guest?
-> 
-> 
-> With no peer, it just work as in the past (read from the qemu's own emulated
-> config space). With a vDPA as its peer, it tries to read it from vhost-vDPA.
-> 
-> 
-> > A code comment might be helpful here.
-> 
-> 
-> Does something like above help?
-> 
-> Thanks
+On Thu, 23 Jul 2020 18:37:50 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-I think this part of commit log caused confusion:
-
-	 Add a check before trying to access the config.
-
-looking more at the code, imho in fact here is a better description of
-what is going on:
-
-	We try to check whether a peer is VDPA in order to get config from
-	there - with no peer, this leads to a NULL
-	pointer dereference. Add a check before trying to access the peer
-	type. No peer means not VDPA.
-
-
+> On 23/07/2020 18.27, Halil Pasic wrote:
+> > The function machine_get_loadparm() is supposed to produce as C-string,
 > 
+> sed "s/ as / a /"
+>
+
+Nod.
+ 
+> > that is a null-terminated one, but it does not. ElectricFence can detect
+> 
+> maybe: sed "s/null/NUL/"
+> 
+
+https://en.wikipedia.org/wiki/Null-terminated_string
+
+but it does not matter to me all that much.
+
+> > this problem if the loadparm machine property is used.
 > > 
-> > > ---
-> > >   hw/net/virtio-net.c | 22 +++++++++++-----------
-> > >   1 file changed, 11 insertions(+), 11 deletions(-)
-> > > 
-> > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > > index 4895af1cbe..935b9ef5c7 100644
-> > > --- a/hw/net/virtio-net.c
-> > > +++ b/hw/net/virtio-net.c
-> > > @@ -125,6 +125,7 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-> > >   {
-> > >       VirtIONet *n = VIRTIO_NET(vdev);
-> > >       struct virtio_net_config netcfg;
-> > > +    NetClientState *nc = qemu_get_queue(n->nic);
-> > >       int ret = 0;
-> > >       memset(&netcfg, 0 , sizeof(struct virtio_net_config));
-> > > @@ -142,13 +143,12 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-> > >                    VIRTIO_NET_RSS_SUPPORTED_HASHES);
-> > >       memcpy(config, &netcfg, n->config_size);
-> > > -    NetClientState *nc = qemu_get_queue(n->nic);
-> > > -    if (nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-> > > +    if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-> > >           ret = vhost_net_get_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
-> > > -                             n->config_size);
-> > > -    if (ret != -1) {
-> > > -        memcpy(config, &netcfg, n->config_size);
-> > > -    }
-> > > +                                   n->config_size);
-> > > +        if (ret != -1) {
-> > > +            memcpy(config, &netcfg, n->config_size);
-> > > +        }
-> > >       }
-> > >   }
-> > > @@ -156,6 +156,7 @@ static void virtio_net_set_config(VirtIODevice *vdev, const uint8_t *config)
-> > >   {
-> > >       VirtIONet *n = VIRTIO_NET(vdev);
-> > >       struct virtio_net_config netcfg = {};
-> > > +    NetClientState *nc = qemu_get_queue(n->nic);
-> > >       memcpy(&netcfg, config, n->config_size);
-> > > @@ -166,11 +167,10 @@ static void virtio_net_set_config(VirtIODevice *vdev, const uint8_t *config)
-> > >           qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
-> > >       }
-> > > -    NetClientState *nc = qemu_get_queue(n->nic);
-> > > -    if (nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-> > > -        vhost_net_set_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
-> > > -                               0, n->config_size,
-> > > -                        VHOST_SET_CONFIG_TYPE_MASTER);
-> > > +    if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-> > > +        vhost_net_set_config(get_vhost_net(nc->peer),
-> > > +                             (uint8_t *)&netcfg, 0, n->config_size,
-> > > +                             VHOST_SET_CONFIG_TYPE_MASTER);
-> > >         }
-> > >   }
-> > > -- 
-> > > 2.20.1
+> > Let us make the returned string a null-terminated one.
+> 
+> dito
+> 
+> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > Fixes: 7104bae9de ("hw/s390x: provide loadparm property for the machine")
+> > ---
+> >  hw/s390x/s390-virtio-ccw.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> > index 8cc2f25d8a..e0e4a69ac8 100644
+> > --- a/hw/s390x/s390-virtio-ccw.c
+> > +++ b/hw/s390x/s390-virtio-ccw.c
+> > @@ -701,8 +701,12 @@ bool hpage_1m_allowed(void)
+> >  static char *machine_get_loadparm(Object *obj, Error **errp)
+> >  {
+> >      S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+> > +    char *loadparm_str;
+> >  
+> > -    return g_memdup(ms->loadparm, sizeof(ms->loadparm));
+> > +    /* make a null-terminated string */
+> 
+> maybe: sed "s/null/NUL/"
+> 
+> > +     loadparm_str = g_memdup(ms->loadparm, sizeof(ms->loadparm) + 1);
+> 
+> Wrong indentation.
 
+Nod.
+
+> 
+> > +    loadparm_str[sizeof(ms->loadparm)] = 0;
+> > +    return loadparm_str;
+> >  }
+> 
+> With the cosmetics fixed:
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+> 
+
+Thanks!
+
+Regards,
+Halil
 
