@@ -2,119 +2,85 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A2DC433EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2ED2C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:01:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CFEC2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:03:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CFEC2072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 78C612072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:01:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VkRftS9R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C612072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k09Lp-0007kD-Dh
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 16:03:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52408)
+	id 1k09J0-0005hI-Pw
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 16:01:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k09LF-0007K1-R9
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:03:21 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:40107)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k09LD-0006HQ-UT
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:03:21 -0400
-Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MBDvU-1k54lZ2vcc-00CeqS; Mon, 27 Jul 2020 22:03:15 +0200
-Subject: Re: [PATCH] linux-user: Ensure mmap_min_addr is non-zero
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200724212314.545877-1-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <ee0fb932-ccd9-7568-ea54-e5ef264dac5d@vivier.eu>
-Date: Mon, 27 Jul 2020 22:03:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k09Hy-0004mV-JR
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 15:59:58 -0400
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:43497)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k09Hv-0005nb-OQ
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 15:59:58 -0400
+Received: by mail-oi1-x231.google.com with SMTP id l84so2848119oig.10
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 12:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zg+1y4+2D4smFX9m4tEmf6VXptw05lqX7BqtWG0/O9U=;
+ b=VkRftS9ReUb3eIPqXFwk3McGuupzqZHJj11UjpDwiVKOy2A7/Wra/wKaS6qbHrJd3R
+ NYy6WeJdL282ynqw8JqeAMtrY4B0cJ8l9wPCuDkqVVKGxMzYkteGREN0h+GNjtQl9B9i
+ R70hXWorTxkZJ7TylRDRUl1g0IIx/Yc0YgXFDsB2LFmv82J1ryrlqU9X1x+yxgYkLLSZ
+ b8q9SxOo4pv6+nigyHGITXYOMgWNYro7QELkrhwvqd7TPARofDrfs9+cNmv60+Lqog2k
+ ICN1h5anp7Z2n7uUb2ma3OWbjVlhqfflMZ2E3TOAELGJLof8hN2O7YK4smn4bv0yC1zh
+ J23w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zg+1y4+2D4smFX9m4tEmf6VXptw05lqX7BqtWG0/O9U=;
+ b=QVpAp729b506VzW/b3SV+IHAcjvBMVewLrQ6TXcoUTtd7xxgnZzqqR9HjMhat6LYXq
+ iOGYA3lmygw7S3/BUemZv8FsNEF/40Pd8hV9dbCU0h0ftCXY5nLTNFn3tuxlRzZ0y0Y+
+ iTKtWywlXNypbQQD6KYUXw0tB9f7KB89CBkJKJ2IxgGDZ08el6zpEXk7kQmJxCu/J27J
+ uMiGr0ZWD0CZzdaG7VFvivKNpv6RkWiJcKjHGWDLquGqlVFt1DX29tyhwzCDK3amfeYz
+ GTyTdjK5Tfb+uU94N5mfBAn017OheKEOUpwHy270ClKjHghUIO7dlCCt53M4eUrDYSxE
+ CVsA==
+X-Gm-Message-State: AOAM530AVHuJcTxTR48DH6ybuEyPIHgdTSGjlFIlh0hdQuU9WJ0W7OXr
+ hwu7O90iwuakLYWKvJ183GvPmgwoinpAHLmJ6Yk/EQ==
+X-Google-Smtp-Source: ABdhPJy8UAr5GWMrWW488jEq4hMHTY7nSaALhy3mwW32S28hueWEQ0ESpS3Wu4rbXDvA6UPsOiqDO+ZKIU33nI/TciU=
+X-Received: by 2002:aca:4a96:: with SMTP id x144mr756534oia.163.1595879994417; 
+ Mon, 27 Jul 2020 12:59:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200724212314.545877-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:z4B8liKZx3FFdhqCoOhyYYZtiMtAZfTDaSYjmbVlN02j5ddu3q/
- Xs/FIZFjJfn7lA1pDiEjzhDttwgX0owOP6RPHD5X9C3DknPYVFuO6Ly4IszgW1zWNyoUAad
- Ii0SJHOsmHxCJKojFr6+Pwf2Ay0UGKrUfFezZA6tJlyCwv56DHbhTmrxsgY1K1H+ehq3iJb
- MAEQwisPq8J8lIf1oW1PA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gr74velpwNk=:5j04W0/B97dTZbZ2yonpLa
- PAM7TKZuNrlgVVxWvMuGbVVfDEMp8j8BocdXi+0sV/h7llOikoCMJIPp8JYXsQDqwZGQt5eto
- Il5GHNkiy75Ahv4k96URqFm06MlzgmfLCl5o1Iy8T1bPgUvflSfajdRv6d9P0weOhjDAEXZKr
- zRSsec/wTsBjEZB2vm5RI3UGhR/oIvccHdbHgCgeh3he5hQh/iq4GNBFkTA8T3DT2gZAA/yV/
- GnzmZVRxeCnZpJydyzvGCxJgGte49vaEsPwp8vHm0qDG2zvjBIr0kWi5XHj/OrSNdrcYo2QVl
- 9eYeeWmbjw2De0oAzeCTdCZaVVk5oQFbZKUbt06Ds1rwi7ZwMytGnX3aKeD2imy9Dp/pDMJW2
- tioQMK3l/JDUxid2qd6MQ3Y/qJml2s1/KTMuA9Quh4umgkTBY8U6GdXEXrD7oLW97+GhY1VTG
- iZmgJpJ9Cwqj2JOYtp012FAkOW/D2sSHrbEmg+41dwULXkoQBlCmkuZz9DuS3DDZo7+FwJHLW
- LBx2i3Wt5aPK85Ixda2S2Nf+Y9VReS2WLhgFpZAmNm0gjEMs391dww6iotlzWYpZb8P842hj/
- WgOPXE3zM6s8gB9KfxKGb/hUUu7mAfjjAHPlTmKtwB1oWKAVHlNCxln1z23IxPSgq6bJZ48Qe
- Xb0SmaNoJVew60mCHaqf6LkiXxAU5Uu8GJWqaYfyADeFqvnQqLodNkBsQwM/f/03TGeUgeDSc
- fxiBHinhl1vuG5Us1MghYxMPohBNkatGzCpyZV3zjwewU0Tq7NZZr1w9rAaamQELMHqYrARQo
- FGRN46PlA3CIJVflxL/RvRO1wRNfVaOamGUnblnMOxppItNxv0/Zzy8HFfOh5k1pRYnyJ2/
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 16:03:18
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
+References: <20200727140522.251815-1-cohuck@redhat.com>
+In-Reply-To: <20200727140522.251815-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Jul 2020 20:59:43 +0100
+Message-ID: <CAFEAcA-dUQjduVz=g6a=67Y+dQbbPHj1O6kxm+sEzv9=RZA3-Q@mail.gmail.com>
+Subject: Re: [PULL 0/2] some more s390x fixes
+To: Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::231;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x231.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,69 +93,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 24/07/2020 à 23:23, Richard Henderson a écrit :
-> When the chroot does not have /proc mounted, we can read neither
-> /proc/sys/vm/mmap_min_addr nor /proc/sys/maps.
-> 
-> The enforcement of mmap_min_addr in the host kernel is done by
-> the security module, and so does not apply to processes owned
-> by root.  Which leads pgd_find_hole_fallback to succeed in probing
-> a reservation at address 0.  Which confuses pgb_reserved_va to
-> believe that guest_base has not actually been initialized.
-> 
-> We don't actually want NULL addresses to become accessible, so
-> make sure that mmap_min_addr is initialized with a non-zero value.
-> 
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1888728
-> Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/main.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index 3597e99bb1..75c9785157 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -758,14 +758,26 @@ int main(int argc, char **argv, char **envp)
->  
->          if ((fp = fopen("/proc/sys/vm/mmap_min_addr", "r")) != NULL) {
->              unsigned long tmp;
-> -            if (fscanf(fp, "%lu", &tmp) == 1) {
-> +            if (fscanf(fp, "%lu", &tmp) == 1 && tmp != 0) {
->                  mmap_min_addr = tmp;
-> -                qemu_log_mask(CPU_LOG_PAGE, "host mmap_min_addr=0x%lx\n", mmap_min_addr);
-> +                qemu_log_mask(CPU_LOG_PAGE, "host mmap_min_addr=0x%lx\n",
-> +                              mmap_min_addr);
->              }
->              fclose(fp);
->          }
->      }
->  
-> +    /*
-> +     * We prefer to not make NULL pointers accessible to QEMU.
-> +     * If we're in a chroot with no /proc, fall back to 1 page.
-> +     */
-> +    if (mmap_min_addr == 0) {
-> +        mmap_min_addr = qemu_host_page_size;
-> +        qemu_log_mask(CPU_LOG_PAGE,
-> +                      "host mmap_min_addr=0x%lx (fallback)\n",
-> +                      mmap_min_addr);
-> +    }
-> +
->      /*
->       * Prepare copy of argv vector for target.
->       */
-> 
+On Mon, 27 Jul 2020 at 15:05, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> The following changes since commit 8ffa52c20d5693d454f65f2024a1494edfea65d4:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2020-07-23 13:38:21 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20200727
+>
+> for you to fetch changes up to d6645483285feaa0aa26fe2b0c3bac6989250d2f:
+>
+>   s390x/s390-virtio-ccw: fix loadparm property getter (2020-07-24 08:49:53 +0200)
+>
+> ----------------------------------------------------------------
+> fixes for protected virtualization and loadparm handling
+>
+> ----------------------------------------------------------------
 
-Applied to my linux-user-for-5.1 branch.
 
-Thanks,
-Laurent
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
+
+-- PMM
 
