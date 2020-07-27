@@ -2,80 +2,95 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE81C433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 22:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 471A7C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 22:24:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92F7A2075D
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 22:21:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92F7A2075D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 117E020809
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 22:24:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aSWD5U5l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 117E020809
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0BVB-0004NS-GH
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 18:21:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52148)
+	id 1k0BXc-0005fk-Ch
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 18:24:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k0BUJ-0003nS-MV
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 18:20:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33910)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k0BUH-0007Pd-KF
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 18:20:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k0BUF-0008Qj-Jl
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 22:20:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4869C2E80EE
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 22:20:47 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1k0BX3-0005DF-9c
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 18:23:41 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39704
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1k0BX0-0007em-F4
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 18:23:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595888616;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/WjBxlf3Xuoxy9j6KCZZCmLv8iGNmTmLnBbZHprfUFA=;
+ b=aSWD5U5lTsIBNgU2vT9nDzacxs4xHVtXvUQPdtmROnmnps+Txa+S7hS5AeV7irB2IdIO5r
+ s1W9k/JjruisW1iXKMEEQ0Dulhm7MOOrLMqQvH1G9nbkG5M/9mla/a9SvZ1zM9lWRYFOsc
+ vWEDANMZYc2tseFHtFkRTXH6m295no8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-oGpnXVEpN4e1Yi2ZO7gJcg-1; Mon, 27 Jul 2020 18:23:32 -0400
+X-MC-Unique: oGpnXVEpN4e1Yi2ZO7gJcg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 177BA1005504;
+ Mon, 27 Jul 2020 22:23:30 +0000 (UTC)
+Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4FF3790E69;
+ Mon, 27 Jul 2020 22:23:22 +0000 (UTC)
+Date: Mon, 27 Jul 2020 16:23:21 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200727162321.7097070e@x1.home>
+In-Reply-To: <20200727072440.GA28676@joy-OptiPlex-7040>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
+ <20200716083230.GA25316@joy-OptiPlex-7040>
+ <20200717101258.65555978@x1.home>
+ <20200721005113.GA10502@joy-OptiPlex-7040>
+ <20200727072440.GA28676@joy-OptiPlex-7040>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Jul 2020 22:13:46 -0000
-From: John Snow <1887309@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=jsnow@redhat.com; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr jnsnow philmd
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <159458555115.12636.15753095068884071065.malonedeb@gac.canonical.com>
-Message-Id: <159588802635.10618.10929745819095196189.malone@chaenomeles.canonical.com>
-Subject: [Bug 1887309] Re: Floating-point exception in ide_set_sector
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 590510715a63c5711c8020c97d697eed225ff047
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 16:15:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Received-SPF: pass client-ip=207.211.31.81;
+ envelope-from=alex.williamson@redhat.com; helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,154 +99,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1887309 <1887309@bugs.launchpad.net>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, eskultet@redhat.com, jian-feng.ding@intel.com,
+ dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+ bao.yumeng@zte.com.cn, smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+ berrange@redhat.com, cohuck@redhat.com, dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-New proposal: https://lists.gnu.org/archive/html/qemu-
-devel/2020-07/msg06974.html
+On Mon, 27 Jul 2020 15:24:40 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-(The root cause is that SRST is not handled correctly.)
+> > > As you indicate, the vendor driver is responsible for checking version
+> > > information embedded within the migration stream.  Therefore a
+> > > migration should fail early if the devices are incompatible.  Is it  
+> > but as I know, currently in VFIO migration protocol, we have no way to
+> > get vendor specific compatibility checking string in migration setup stage
+> > (i.e. .save_setup stage) before the device is set to _SAVING state.
+> > In this way, for devices who does not save device data in precopy stage,
+> > the migration compatibility checking is as late as in stop-and-copy
+> > stage, which is too late.
+> > do you think we need to add the getting/checking of vendor specific
+> > compatibility string early in save_setup stage?
+> >  
+> hi Alex,
+> after an offline discussion with Kevin, I realized that it may not be a
+> problem if migration compatibility check in vendor driver occurs late in
+> stop-and-copy phase for some devices, because if we report device
+> compatibility attributes clearly in an interface, the chances for
+> libvirt/openstack to make a wrong decision is little.
 
-More analysis in the replies to Philippe's patch:
-https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05949.html
+I think it would be wise for a vendor driver to implement a pre-copy
+phase, even if only to send version information and verify it at the
+target.  Deciding you have no device state to send during pre-copy does
+not mean your vendor driver needs to opt-out of the pre-copy phase
+entirely.  Please also note that pre-copy is at the user's discretion,
+we've defined that we can enter stop-and-copy at any point, including
+without a pre-copy phase, so I would recommend that vendor drivers
+validate compatibility at the start of both the pre-copy and the
+stop-and-copy phases.
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> John Snow (jnsnow)
+> so, do you think we are now arriving at an agreement that we'll give up
+> the read-and-test scheme and start to defining one interface (perhaps in
+> json format), from which libvirt/openstack is able to parse and find out
+> compatibility list of a source mdev/physical device?
 
-** Changed in: qemu
-       Status: Confirmed =3D> In Progress
+Based on the feedback we've received, the previously proposed interface
+is not viable.  I think there's agreement that the user needs to be
+able to parse and interpret the version information.  Using json seems
+viable, but I don't know if it's the best option.  Is there any
+precedent of markup strings returned via sysfs we could follow?
 
--- =
+Your idea of having both a "self" object and an array of "compatible"
+objects is perhaps something we can build on, but we must not assume
+PCI devices at the root level of the object.  Providing both the
+mdev-type and the driver is a bit redundant, since the former includes
+the latter.  We can't have vendor specific versioning schemes though,
+ie. gvt-version. We need to agree on a common scheme and decide which
+fields the version is relative to, ex. just the mdev type?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1887309
+I had also proposed fields that provide information to create a
+compatible type, for example to create a type_x2 device from a type_x1
+mdev type, they need to know to apply an aggregation attribute.  If we
+need to explicitly list every aggregation value and the resulting type,
+I think we run aground of what aggregation was trying to avoid anyway,
+so we might need to pick a language that defines variable substitution
+or some kind of tagging.  For example if we could define ${aggr} as an
+integer within a specified range, then we might be able to define a type
+relative to that value (type_x${aggr}) which requires an aggregation
+attribute using the same value.  I dunno, just spit balling.  Thanks,
 
-Title:
-  Floating-point exception in ide_set_sector
+Alex
 
-Status in QEMU:
-  In Progress
-
-Bug description:
-  Hello,
-  Here is a reproducer:
-  cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc,accel=3Dqtest\
-   -qtest null -nographic -vga qxl -qtest stdio -nodefaults\
-   -drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,for=
-mat=3Draw\
-   -drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,for=
-mat=3Draw\
-   -device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1
-  outw 0x176 0x3538
-  outl 0xcf8 0x80000903
-  outl 0xcfc 0x184275c
-  outb 0x376 0x2f
-  outb 0x376 0x0
-  outw 0x176 0xa1a4
-  outl 0xcf8 0x80000920
-  outb 0xcfc 0xff
-  outb 0xf8 0x9
-  EOF
-
-  The stack-trace:
-  =3D=3D16513=3D=3DERROR: UndefinedBehaviorSanitizer: FPE on unknown addres=
-s 0x556783603fdc (pc 0x556783603fdc bp 0x7fff82143b10 sp 0x7fff82143ab0 T16=
-513)
-      #0 0x556783603fdc in ide_set_sector /home/alxndr/Development/qemu/hw/=
-ide/core.c:626:26
-      #1 0x556783603fdc in ide_dma_cb /home/alxndr/Development/qemu/hw/ide/=
-core.c:883:9
-      #2 0x55678349d74d in dma_complete /home/alxndr/Development/qemu/dma-h=
-elpers.c:120:9
-      #3 0x55678349d74d in dma_blk_cb /home/alxndr/Development/qemu/dma-hel=
-pers.c:138:9
-      #4 0x556783962f25 in blk_aio_complete /home/alxndr/Development/qemu/b=
-lock/block-backend.c:1402:9
-      #5 0x556783962f25 in blk_aio_complete_bh /home/alxndr/Development/qem=
-u/block/block-backend.c:1412:5
-      #6 0x556783ac030f in aio_bh_call /home/alxndr/Development/qemu/util/a=
-sync.c:136:5
-      #7 0x556783ac030f in aio_bh_poll /home/alxndr/Development/qemu/util/a=
-sync.c:164:13
-      #8 0x556783a9a863 in aio_dispatch /home/alxndr/Development/qemu/util/=
-aio-posix.c:380:5
-      #9 0x556783ac1b4c in aio_ctx_dispatch /home/alxndr/Development/qemu/u=
-til/async.c:306:5
-      #10 0x7f4f1c0fe9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e9ed)
-      #11 0x556783acdccb in glib_pollfds_poll /home/alxndr/Development/qemu=
-/util/main-loop.c:219:9
-      #12 0x556783acdccb in os_host_main_loop_wait /home/alxndr/Development=
-/qemu/util/main-loop.c:242:5
-      #13 0x556783acdccb in main_loop_wait /home/alxndr/Development/qemu/ut=
-il/main-loop.c:518:11
-      #14 0x5567833613e5 in qemu_main_loop /home/alxndr/Development/qemu/so=
-ftmmu/vl.c:1664:9
-      #15 0x556783a07a4d in main /home/alxndr/Development/qemu/softmmu/main=
-.c:49:5
-      #16 0x7f4f1ac84e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #17 0x5567830a9089 in _start (/home/alxndr/Development/qemu/build/i38=
-6-softmmu/qemu-system-i386+0x7d2089)
-
-  With -trace ide*
-
-  12163@1594585516.671265:ide_reset IDEstate 0x56162a269058
-  [R +0.024963] outw 0x176 0x3538
-  12163@1594585516.673676:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
-; val 0x38; bus 0x56162a268c00 IDEState 0x56162a268c88
-  12163@1594585516.673683:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
-l 0x35; bus 0x56162a268c00 IDEState 0x56162a269058
-  12163@1594585516.673686:ide_exec_cmd IDE exec cmd: bus 0x56162a268c00; st=
-ate 0x56162a269058; cmd 0x35
-  OK
-  [S +0.025002] OK
-  [R +0.025012] outl 0xcf8 0x80000903
-  OK
-  [S +0.025018] OK
-  [R +0.025026] outl 0xcfc 0x184275c
-  OK
-  [S +0.025210] OK
-  [R +0.025219] outb 0x376 0x2f
-  12163@1594585516.673916:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
-; val 0x2f; bus 0x56162a268c00
-  OK
-  [S +0.025229] OK
-  [R +0.025234] outb 0x376 0x0
-  12163@1594585516.673928:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
-; val 0x00; bus 0x56162a268c00
-  OK
-  [S +0.025240] OK
-  [R +0.025246] outw 0x176 0xa1a4
-  12163@1594585516.673940:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
-; val 0xa4; bus 0x56162a268c00 IDEState 0x56162a269058
-  12163@1594585516.673943:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
-l 0xa1; bus 0x56162a268c00 IDEState 0x56162a268c88
-  12163@1594585516.673946:ide_exec_cmd IDE exec cmd: bus 0x56162a268c00; st=
-ate 0x56162a268c88; cmd 0xa1
-  OK
-  [S +0.025265] OK
-  [R +0.025270] outl 0xcf8 0x80000920
-  OK
-  [S +0.025274] OK
-  [R +0.025279] outb 0xcfc 0xff
-  OK
-  [S +0.025443] OK
-  [R +0.025451] outb 0xf8 0x9
-  12163@1594585516.674221:ide_dma_cb IDEState 0x56162a268c88; sector_num=3D=
-0 n=3D1 cmd=3DDMA READ
-  OK
-  [S +0.025724] OK
-  UndefinedBehaviorSanitizer:DEADLYSIGNAL
-  =3D=3D12163=3D=3DERROR: UndefinedBehaviorSanitizer: FPE on unknown addres=
-s 0x5616279cffdc (pc 0x5616279cffdc bp 0x7ffcdaabae90 sp 0x7ffcdaabae30 T12=
-163)
-
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1887309/+subscriptions
 
