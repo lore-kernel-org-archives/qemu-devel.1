@@ -2,90 +2,124 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB210C433EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B5F0C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:58:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFF732072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:57:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E78B42072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:58:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LPPB9ryT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFF732072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tgL73xfv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E78B42072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k09FD-00027N-QV
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 15:57:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50094)
+	id 1k09G4-00037v-7e
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 15:58:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47766)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1k09BA-0002b1-OR
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 15:52:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25305
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1k09B9-0004v3-2f
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 15:52:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595879574;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=V2MWuTAM3RtL8UFBs368jGyD/owBI/fNCsO4fD/G0Wk=;
- b=LPPB9ryTZ4pggF79EcUMDdCqm9VPajrf1tMQuafQhxGyh124y46ocu9VSqGHnwk8q5HQfV
- eHjA1QPoHUCPVvVrV/QCu9eu1k85l+NDjkYm50o6fBDV5rjWIAbjJlsv8pzM5yxbS8sAbu
- sE/n0aRY5SsHu5iTXOVLuYdaPpUFLjw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-CkEo3LiMNRioZ3LUs_hE4Q-1; Mon, 27 Jul 2020 15:52:50 -0400
-X-MC-Unique: CkEo3LiMNRioZ3LUs_hE4Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52BA0101C8A5;
- Mon, 27 Jul 2020 19:52:49 +0000 (UTC)
-Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
- (ovpn-119-72.rdu2.redhat.com [10.10.119.72])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D3B9B5DA33;
- Mon, 27 Jul 2020 19:52:44 +0000 (UTC)
-Subject: Re: [PATCH for 5.1] docs: fix trace docs build with sphinx 3.1.1
-To: Andreas Schwab <schwab@linux-m68k.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200714162659.1017432-1-berrange@redhat.com>
- <87blk257eg.fsf@igel.home>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <94143f30-d646-763d-5b10-ef0ca8b246ca@redhat.com>
-Date: Mon, 27 Jul 2020 15:52:44 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <87blk257eg.fsf@igel.home>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k091s-0002JA-0g; Mon, 27 Jul 2020 15:43:20 -0400
+Received: from mail-eopbgr80137.outbound.protection.outlook.com
+ ([40.107.8.137]:20036 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k091q-0003fu-Bn; Mon, 27 Jul 2020 15:43:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aDRk6OukzBRY5pJ0MewvXY7gs0dK79Xqf1GPF6s7meiVBSSXebHoXGjC/VcGS/mU6RDsCiV1NG5Cv0wNxydqQE0azMX3T4OP7HNaxbjv6RoQESejPMinn/8ivyxRV+s74vHrnF9Br7xt4JSFnCGDicyXtSpWupZqyWsXuRZC1FqIlG+vMZvFHURW/ErnShCMuWegRI7ba5QQ+VOQG5bKkRF5TiU/oRbr5P0bnQJt3HdDLHD/AqC+shRnvGtch39UwZiZQ7b4acxn/QxNHkJnWub/nRwvvlsyxrSE90GvYAUt+PZssHJkzSwrWsWsZZCyaRH7wQ/H99jjgr+wqU2UWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ucg/Ovsrzv5kYnL8Nj4xUSnnLkw3TIiil5s/HrmGgQI=;
+ b=EzZUDypVvD3qeWUePpBOm58bbfWdAcjtLFXv8wxkO4TPqK79AL26NlLPCIGA4D4hZmOtSiBT3gcgwkLpes8ymA/PAiukNd4U30ZdRjvD4BWOn411503PVAijjwJhTTBKKSvnYt2x55AkXEcPOFxbt/8smDth3QgA+bPHPXtG34XgoxZyh3rZHZmeGhX7LSnDueTnuBVFdJjgEwXJODY1Jvr2HSzR92M8024Fd3XIkwMRHOJEuvwnlidvd/lXUM6PU6OkPJUOceaRf981QPXI5TloKK4Jgjg51bEnwC7IthP9EOoptx6GhurgU2VnomyMO8dI+8XdApFvEi3voauwvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ucg/Ovsrzv5kYnL8Nj4xUSnnLkw3TIiil5s/HrmGgQI=;
+ b=tgL73xfvqX02BHvc9x6JJps6AWT+A7OT9O3zZiB/VCd8yEftyq8rH5gzDFej+1fKMtf9b2V/FPLbtFIBtcSbOYCsAOC9kC/MgaB+fRibBE6m7mdc+7qgeRps0Ov+vuk0QfdNWye3wCDENqpYJT30nqvdgdK1KXhmslYv4CbeIqM=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0802MB2610.eurprd08.prod.outlook.com (2603:10a6:203:97::7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23; Mon, 27 Jul
+ 2020 19:43:05 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%4]) with mapi id 15.20.3216.033; Mon, 27 Jul 2020
+ 19:43:05 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v4 16/21] migration/block-dirty-bitmap: cancel migration on
+ shutdown
+Date: Mon, 27 Jul 2020 22:42:31 +0300
+Message-Id: <20200727194236.19551-17-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200727194236.19551-1-vsementsov@virtuozzo.com>
+References: <20200727194236.19551-1-vsementsov@virtuozzo.com>
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 15:02:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR05CA0084.eurprd05.prod.outlook.com
+ (2603:10a6:208:136::24) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kvm.sw.ru (185.215.60.158) by
+ AM0PR05CA0084.eurprd05.prod.outlook.com (2603:10a6:208:136::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.20 via Frontend
+ Transport; Mon, 27 Jul 2020 19:43:04 +0000
+X-Mailer: git-send-email 2.21.0
+X-Originating-IP: [185.215.60.158]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 022c3600-9544-4f5d-8532-08d83265481f
+X-MS-TrafficTypeDiagnostic: AM5PR0802MB2610:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0802MB2610C67A0B343C4690C38730C1720@AM5PR0802MB2610.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:227;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Yykh9suNWZW+YWv6jCFitrxzPGfASOK4EJnncsHQpH5qQVuAlKu1rvLOvqz5U88LNQRpa4c/HejwPtlUqcdS8e5tpOeeC0MYyWJr9M5zNxytQmfmIic28FKg4GvZ8Zi03aobs6/TIqT2BgtixMiTlCdbK9ZRfPKwbZm/cOyxLZ9QqsOu4DvXLvu+bgN4+i9vIW3Qm7mJOTYUZlfBEx+tmyADMjRfpCjUcS7yfB3Q+zYlqtPmdY+bfj7UKX0ULr8kJrKhP07wvf5p4X/+PtaEQVsqf+XNVdyfWcHSD8Vse0HXO8QfQf3dv1/rt/uhQAcypeLH9mi6KxLrFn/ciAUKPg8riRUJQ6ifx3LnuSWrtVPz+14wQEuqtZcD7OmqtZL1
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(396003)(366004)(376002)(39850400004)(346002)(66556008)(1076003)(66476007)(6512007)(107886003)(86362001)(36756003)(52116002)(4326008)(26005)(2616005)(2906002)(66946007)(8676002)(7416002)(16526019)(6666004)(316002)(6916009)(6486002)(956004)(83380400001)(6506007)(5660300002)(478600001)(186003)(8936002)(14143004);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: cH7rg+B+HZSjbZ9J2gQCW94qCD83BrWIhESpy8b+MHnqxjg9tMIe4zeErbBoFaj4m6Khi6HRXYNysnIXzjlBHhV9EPjvtxuI5PLHJmzj9yKYDMT+HyVNGHJQavT7ioP5i8gAISC7h8XIh1H62IrmoYOuHouP5LmG1gMVSdmVC+NJSsPFyGDUzdTIC58z/RV5o6R9/gDr0NjxSNJ2Q/rt/ipcpDIPgwtYAL9HIkJqUoYDFKc+AgkdNCMS+rfq0YeLV268qhYtNKw6Ehe4hkYKaPijSIXqqZ2y3/VjsPDXQUl1dMug1QraUM5MJpbP1Wk17DNx6H9pZ9/QGwloPKVZroEpcmXlfH4O2tqRA907EY/QbHNm07zLZfG+gYZYIlXNAF3X4/XeibsOrptwYTAXy5YbMDt33OFbOhBgZzUMQ4gK/HOxFGOv/BpAXdrYDxG20IK/9Gab6orSRxwuL//r5jU9bDzZzIGE2D8mCLbyPgk=
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 022c3600-9544-4f5d-8532-08d83265481f
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 19:43:05.7868 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5aAdceozFGa6jBxpw5Za/JxM/r0mHMaLBlMqvUVfKV/Ms99RmQQ/wy+YLN3XqXKqNNH9chia6AyYrSd+FnOzuAL/UgXilGjtpHqpqFgoDXc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2610
+Received-SPF: pass client-ip=40.107.8.137;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 15:42:57
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,56 +132,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ stefanha@redhat.com, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ den@openvz.org, mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/26/20 4:49 PM, Andreas Schwab wrote:
-> On Jul 14 2020, Daniel P. Berrangé wrote:
-> 
->> In Fedora 33 rawhide, we now have sphinx 3.1.1, as opposed
->> to previous 2.2.2. This new version generates a warning on
->> the source:
->>
->> docs/qemu-option-trace.rst.inc:4:Malformed option description
->>    '[enable=]PATTERN', should look like "opt", "-opt args",
->>    "--opt args", "/opt args" or "+opt args"
->>
->> This turns into an error when QEMU passes -W to sphinx-build
->>
->> Strangely the previous 2.2.2 code has the exact same logic
->> for checking the syntax, but it is not being triggered. While
->> it is only complaining about the first option, I changed all
->> the options to give consistency.
->>
->> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> 
-> Running Sphinx v1.7.6
-> [...]
-> Warning, treated as error:
-> ../qemu-5.0.0/docs/qemu-option-trace.rst.inc:21:Duplicate explicit target name: "cmdoption-qemu-img-trace".
-> 
-> Andreas.
-> 
+If target is turned off prior to postcopy finished, target crashes
+because busy bitmaps are found at shutdown.
+Canceling incoming migration helps, as it removes all unfinished (and
+therefore busy) bitmaps.
 
-I ran into this before, I forget what causes it, or how I fixed it ...
+Similarly on source we crash in bdrv_close_all which asserts that all
+bdrv states are removed, because bdrv states involved into dirty bitmap
+migration are referenced by it. So, we need to cancel outgoing
+migration as well.
 
-Oh, it was part of the research I was doing into why we can't support 
-Sphinx prior to 1.6; and it's documented in conf.py:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ migration/migration.h          |  2 ++
+ migration/block-dirty-bitmap.c | 16 ++++++++++++++++
+ migration/migration.c          | 13 +++++++++++++
+ 3 files changed, 31 insertions(+)
 
-# Sphinx 1.5 and earlier can't build our docs because they are too 
-
-# picky about the syntax of the argument to the option:: directive 
-
-# (see Sphinx bugs #646, #3366). 
-
-needs_sphinx = '1.6'
-
-... Should we say goodbye to Sphinx 1.7.x, or is there a workaround that 
-keeps support from 1.6.1 through to 3.1.1?
-
---js
+diff --git a/migration/migration.h b/migration/migration.h
+index ab20c756f5..6c6a931d0d 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -335,6 +335,8 @@ void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+ void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
+ 
+ void dirty_bitmap_mig_before_vm_start(void);
++void dirty_bitmap_mig_cancel_outgoing(void);
++void dirty_bitmap_mig_cancel_incoming(void);
+ void migrate_add_address(SocketAddress *address);
+ 
+ int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque);
+diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+index 4e45e79251..36ca8be392 100644
+--- a/migration/block-dirty-bitmap.c
++++ b/migration/block-dirty-bitmap.c
+@@ -657,6 +657,22 @@ static void cancel_incoming_locked(DBMLoadState *s)
+     s->bitmaps = NULL;
+ }
+ 
++void dirty_bitmap_mig_cancel_outgoing(void)
++{
++    dirty_bitmap_do_save_cleanup(&dbm_state.save);
++}
++
++void dirty_bitmap_mig_cancel_incoming(void)
++{
++    DBMLoadState *s = &dbm_state.load;
++
++    qemu_mutex_lock(&s->lock);
++
++    cancel_incoming_locked(s);
++
++    qemu_mutex_unlock(&s->lock);
++}
++
+ static void dirty_bitmap_load_complete(QEMUFile *f, DBMLoadState *s)
+ {
+     GSList *item;
+diff --git a/migration/migration.c b/migration/migration.c
+index 1c61428988..8fe36339db 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -188,6 +188,19 @@ void migration_shutdown(void)
+      */
+     migrate_fd_cancel(current_migration);
+     object_unref(OBJECT(current_migration));
++
++    /*
++     * Cancel outgoing migration of dirty bitmaps. It should
++     * at least unref used block nodes.
++     */
++    dirty_bitmap_mig_cancel_outgoing();
++
++    /*
++     * Cancel incoming migration of dirty bitmaps. Dirty bitmaps
++     * are non-critical data, and their loss never considered as
++     * something serious.
++     */
++    dirty_bitmap_mig_cancel_incoming();
+ }
+ 
+ /* For outgoing */
+-- 
+2.21.0
 
 
