@@ -2,88 +2,86 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63CB1C433E8
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02834C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:01:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E8AA20729
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:49:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C141B20719
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:01:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GlIVpGK0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E8AA20729
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="USwvhyi8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C141B20719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k06Js-0005Vv-93
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 12:49:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38334)
+	id 1k06Um-0001Mp-3M
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 13:01:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k06JF-00054t-8a
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 12:49:05 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28003
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k06Tr-0000qA-7C
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:00:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60529
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k06JC-0007I5-0J
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 12:49:04 -0400
+ id 1k06Tn-0000GC-Er
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:00:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595868541;
+ s=mimecast20190719; t=1595869197;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=+D7pizJHpORJmx3M6KMDOPTA3zlsV6C9dfT+I6uFPLo=;
- b=GlIVpGK02xuwikFUJG7qN214ZXVCDkMVUqyrUoQqeN0N7S1X1Y9Tj1r6oxwjL5v4aLwQ3Q
- +Ei8CsgjaMky+DRfduNNzXuWcix3KhReVHR35RsrmWRuwt1MMl3rHCcBRk4bpG4U9vrWVS
- FlGfVhZClTITEXbxFj928B7G4a6+vMQ=
+ bh=PvzM6jVwFjDkOhkWkFVD6D5/DBGUnksaj7wsP6lKiJk=;
+ b=USwvhyi82DjU9Xrb+zrQ6unnENp4lqhUjC+c4lYg81wlcBHzmbP/ufDRyaWCjCOTjvAO1y
+ H9NkAflddXlkOjseo9hPj1hrZgsaMdO48OuMm8ECLEHataq0uyQ8gNIHJcBVVOZdxFDfjO
+ +ZRlgRpdX5LU8lyqvp0asan6SG2Toe0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-zzr0kZuKNRmL0pKEg8ZRjA-1; Mon, 27 Jul 2020 12:48:58 -0400
-X-MC-Unique: zzr0kZuKNRmL0pKEg8ZRjA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-136-pzGsIOb0OJSWzx215abtrw-1; Mon, 27 Jul 2020 12:59:55 -0400
+X-MC-Unique: pzGsIOb0OJSWzx215abtrw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E42759;
- Mon, 27 Jul 2020 16:48:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D38B800597;
+ Mon, 27 Jul 2020 16:59:54 +0000 (UTC)
 Received: from work-vm (ovpn-114-135.ams2.redhat.com [10.36.114.135])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 052C01002382;
- Mon, 27 Jul 2020 16:48:50 +0000 (UTC)
-Date: Mon, 27 Jul 2020 17:48:48 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F4F91972B;
+ Mon, 27 Jul 2020 16:59:38 +0000 (UTC)
+Date: Mon, 27 Jul 2020 17:59:35 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Subject: Re: [PATCH v0 3/4] migration: add background snapshot
-Message-ID: <20200727164848.GR3040@work-vm>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>, david@redhat.com,
+ zhang.zhanghailiang@huawei.com
+Subject: Re: [PATCH v0 0/4] background snapshot
+Message-ID: <20200727165935.GS3040@work-vm>
 References: <20200722081133.29926-1-dplotnikov@virtuozzo.com>
- <20200722081133.29926-4-dplotnikov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20200722081133.29926-4-dplotnikov@virtuozzo.com>
+In-Reply-To: <20200722081133.29926-1-dplotnikov@virtuozzo.com>
 User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:44:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,1056 +101,64 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
-> By the moment, making a vm snapshot may cause a significant vm downtime,
-> depending on the vm RAM size and the performance of disk storing
-> the vm snapshot. This happens because the VM has to be paused until all
-> vmstate including RAM is written.
+> Currently where is no way to make a vm snapshot without pausing a vm
+> for the whole time until the snapshot is done. So, the problem is
+> the vm downtime on snapshoting. The downtime value depends on the vmstate
+> size, the major part of which is RAM and the disk performance which is
+> used for the snapshot saving.
 > 
-> To reduce the downtime, the background snapshot capability is used.
-> With the capability enabled, the vm is paused for a small amount of time while
-> the smallest vmstate part (all, except RAM) is writen. RAM, the biggest part
-> of vmstate, is written with running VM.
+> The series propose a way to reduce the vm snapshot downtime. This is done
+> by saving RAM, the major part of vmstate, in the background when the vm
+> is running.
 > 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
+> The background snapshot uses linux UFFD write-protected mode for memory
+> page access intercepting. UFFD write-protected mode was added to the linux v5.7.
+> If UFFD write-protected mode isn't available the background snapshot rejects to
+> run.
+
+Hi Denis,
+  I see Peter has responded to most of your patches, but just anted to
+say thank you; but also to cc in a couple of other people;
+David Hildenbrand (who is interested in unusual memory stuff) and
+zhanghailiang who works on COLO which also does snapshotting and had
+long wanted to use WP.
+
+  2/4 was a bit big for my liking; please try and do it in smaller
+chunks!
+
+Dave
+
+> How to use:
+> 1. enable background snapshot capability
+>    virsh qemu-monitor-command vm --hmp migrate_set_capability background-snapshot on
+> 
+> 2. stop the vm
+>    virsh qemu-monitor-command vm --hmp stop
+> 
+> 3. Start the external migration to a file
+>    virsh qemu-monitor-command cent78-bs --hmp migrate exec:'cat > ./vm_state'
+> 
+> 4. Wait for the migration finish and check that the migration has completed state.
+> 
+> Denis Plotnikov (4):
+>   bitops: add some atomic versions of bitmap operations
+>   migration: add background snapshot capability
+>   migration: add background snapshot
+>   background snapshot: add trace events for page fault processing
+> 
+>  qapi/migration.json     |   7 +-
 >  include/exec/ramblock.h |   8 +
 >  include/exec/ramlist.h  |   2 +
+>  include/qemu/bitops.h   |  25 ++
+>  migration/migration.h   |   1 +
 >  migration/ram.h         |  19 +-
 >  migration/savevm.h      |   3 +
->  migration/migration.c   | 107 +++++++-
->  migration/ram.c         | 578 ++++++++++++++++++++++++++++++++++++++--
+>  migration/migration.c   | 142 +++++++++-
+>  migration/ram.c         | 582 ++++++++++++++++++++++++++++++++++++++--
 >  migration/savevm.c      |   1 -
->  7 files changed, 698 insertions(+), 20 deletions(-)
+>  migration/trace-events  |   2 +
+>  11 files changed, 771 insertions(+), 21 deletions(-)
 > 
-> diff --git a/include/exec/ramblock.h b/include/exec/ramblock.h
-> index 07d50864d8..421e128ef6 100644
-> --- a/include/exec/ramblock.h
-> +++ b/include/exec/ramblock.h
-> @@ -59,6 +59,14 @@ struct RAMBlock {
->       */
->      unsigned long *clear_bmap;
->      uint8_t clear_bmap_shift;
-> +
-> +    /* The following 3 elements are for background snapshot */
-> +    /* List of blocks used for background snapshot */
-> +    QLIST_ENTRY(RAMBlock) bgs_next;
-> +    /* Pages currently being copied */
-> +    unsigned long *touched_map;
-> +    /* Pages has been copied already */
-> +    unsigned long *copied_map;
->  };
->  #endif
->  #endif
-> diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-> index bc4faa1b00..74e2a1162c 100644
-> --- a/include/exec/ramlist.h
-> +++ b/include/exec/ramlist.h
-> @@ -44,6 +44,8 @@ typedef struct {
->      unsigned long *blocks[];
->  } DirtyMemoryBlocks;
->  
-> +typedef QLIST_HEAD(, RAMBlock) RamBlockList;
-> +
->  typedef struct RAMList {
->      QemuMutex mutex;
->      RAMBlock *mru_block;
-> diff --git a/migration/ram.h b/migration/ram.h
-> index 2eeaacfa13..769b8087ae 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -42,7 +42,8 @@ uint64_t ram_bytes_remaining(void);
->  uint64_t ram_bytes_total(void);
->  
->  uint64_t ram_pagesize_summary(void);
-> -int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
-> +int ram_save_queue_pages(RAMBlock *block, const char *rbname,
-> +                         ram_addr_t start, ram_addr_t len, void *page_copy);
->  void acct_update_position(QEMUFile *f, size_t size, bool zero);
->  void ram_debug_dump_bitmap(unsigned long *todump, bool expected,
->                             unsigned long pages);
-> @@ -69,4 +70,20 @@ void colo_flush_ram_cache(void);
->  void colo_release_ram_cache(void);
->  void colo_incoming_start_dirty_log(void);
->  
-> +/* for background snapshot */
-> +void ram_block_list_create(void);
-> +void ram_block_list_destroy(void);
-> +RAMBlock *ram_bgs_block_find(uint64_t address, ram_addr_t *page_offset);
-> +
-> +void *ram_page_buffer_get(void);
-> +int ram_page_buffer_free(void *buffer);
-> +
-> +int ram_block_list_set_readonly(void);
-> +int ram_block_list_set_writable(void);
-> +
-> +int ram_copy_page(RAMBlock *block, unsigned long page_nr, void **page_copy);
-> +int ram_process_page_fault(uint64_t address);
-> +
-> +int ram_write_tracking_start(void);
-> +void ram_write_tracking_stop(void);
->  #endif
-> diff --git a/migration/savevm.h b/migration/savevm.h
-> index ba64a7e271..4f4edffa85 100644
-> --- a/migration/savevm.h
-> +++ b/migration/savevm.h
-> @@ -64,5 +64,8 @@ int qemu_loadvm_state(QEMUFile *f);
->  void qemu_loadvm_state_cleanup(void);
->  int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
->  int qemu_load_device_state(QEMUFile *f);
-> +int qemu_savevm_state_complete_precopy_non_iterable(QEMUFile *f,
-> +                                                    bool in_postcopy,
-> +                                                    bool inactivate_disks);
->  
->  #endif
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 2ec0451abe..dc56e4974f 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -55,6 +55,7 @@
->  #include "net/announce.h"
->  #include "qemu/queue.h"
->  #include "multifd.h"
-> +#include "sysemu/cpus.h"
->  
->  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
->  
-> @@ -2473,7 +2474,7 @@ static void migrate_handle_rp_req_pages(MigrationState *ms, const char* rbname,
->          return;
->      }
->  
-> -    if (ram_save_queue_pages(rbname, start, len)) {
-> +    if (ram_save_queue_pages(NULL, rbname, start, len, NULL)) {
->          mark_source_rp_bad(ms);
->      }
->  }
-> @@ -3536,6 +3537,100 @@ static void *migration_thread(void *opaque)
->      return NULL;
->  }
->  
-> +static void *background_snapshot_thread(void *opaque)
-> +{
-> +    MigrationState *m = opaque;
-> +    QIOChannelBuffer *bioc;
-> +    QEMUFile *fb;
-> +    int res = 0;
-> +
-> +    rcu_register_thread();
-> +
-> +    qemu_file_set_rate_limit(m->to_dst_file, INT64_MAX);
-> +
-> +    qemu_mutex_lock_iothread();
-> +    vm_stop(RUN_STATE_PAUSED);
-> +
-> +    qemu_savevm_state_header(m->to_dst_file);
-> +    qemu_mutex_unlock_iothread();
-> +    qemu_savevm_state_setup(m->to_dst_file);
-> +    qemu_mutex_lock_iothread();
-> +
-> +    migrate_set_state(&m->state, MIGRATION_STATUS_SETUP,
-> +                      MIGRATION_STATUS_ACTIVE);
-> +
-> +    /*
-> +     * We want to save the vm state for the moment when the snapshot saving was
-> +     * called but also we want to write RAM content with vm running. The RAM
-> +     * content should appear first in the vmstate.
-> +     * So, we first, save non-ram part of the vmstate to the temporary, buffer,
-> +     * then write ram part of the vmstate to the migration stream with vCPUs
-> +     * running and, finally, write the non-ram part of the vmstate from the
-> +     * buffer to the migration stream.
-> +     */
-> +    bioc = qio_channel_buffer_new(4096);
-> +    qio_channel_set_name(QIO_CHANNEL(bioc), "vmstate-buffer");
-> +    fb = qemu_fopen_channel_output(QIO_CHANNEL(bioc));
-> +    object_unref(OBJECT(bioc));
-> +
-> +    if (ram_write_tracking_start()) {
-> +        goto failed_resume;
-> +    }
-> +
-> +    if (global_state_store()) {
-> +        goto failed_resume;
-> +    }
-> +
-> +    cpu_synchronize_all_states();
-> +
-> +    if (qemu_savevm_state_complete_precopy_non_iterable(fb, false, false)) {
-> +        goto failed_resume;
-> +    }
-> +
-> +    vm_start();
-> +    qemu_mutex_unlock_iothread();
-> +
-> +    while (!res) {
-> +        res = qemu_savevm_state_iterate(m->to_dst_file, false);
-> +
-> +        if (res < 0 || qemu_file_get_error(m->to_dst_file)) {
-> +            goto failed;
-> +        }
-> +    }
-> +
-> +    /*
-> +     * By this moment we have RAM content saved into the migration stream.
-> +     * The next step is to flush the non-ram content (vm devices state)
-> +     * right after the ram content. The device state was stored in
-> +     * the temporary buffer prior to the ram saving.
-> +     */
-> +    qemu_put_buffer(m->to_dst_file, bioc->data, bioc->usage);
-> +    qemu_fflush(m->to_dst_file);
-> +
-> +    if (qemu_file_get_error(m->to_dst_file)) {
-> +        goto failed;
-> +    }
-> +
-> +    migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
-> +                                 MIGRATION_STATUS_COMPLETED);
-> +    goto exit;
-> +
-> +failed_resume:
-> +    vm_start();
-> +    qemu_mutex_unlock_iothread();
-> +failed:
-> +    migrate_set_state(&m->state, MIGRATION_STATUS_ACTIVE,
-> +                      MIGRATION_STATUS_FAILED);
-> +exit:
-> +    ram_write_tracking_stop();
-> +    qemu_fclose(fb);
-> +    qemu_mutex_lock_iothread();
-> +    qemu_savevm_state_cleanup();
-> +    qemu_mutex_unlock_iothread();
-> +    rcu_unregister_thread();
-> +    return NULL;
-> +}
-> +
->  void migrate_fd_connect(MigrationState *s, Error *error_in)
->  {
->      Error *local_err = NULL;
-> @@ -3599,8 +3694,14 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
->          migrate_fd_cleanup(s);
->          return;
->      }
-> -    qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
-> -                       QEMU_THREAD_JOINABLE);
-> +    if (migrate_background_snapshot()) {
-> +        qemu_thread_create(&s->thread, "bg_snapshot",
-> +                           background_snapshot_thread, s,
-> +                           QEMU_THREAD_JOINABLE);
-> +    } else {
-> +        qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
-> +                           QEMU_THREAD_JOINABLE);
-> +    }
->      s->migration_thread_running = true;
->  }
->  
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 76d4fee5d5..f187b5b494 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -56,6 +56,12 @@
->  #include "savevm.h"
->  #include "qemu/iov.h"
->  #include "multifd.h"
-> +#include <sys/syscall.h>
-> +#include <sys/ioctl.h>
-> +#include <linux/userfaultfd.h>
-> +#include <sys/eventfd.h>
-> +#include <inttypes.h>
-> +#include <poll.h>
->  
->  /***********************************************************/
->  /* ram save/restore */
-> @@ -297,10 +303,27 @@ struct RAMSrcPageRequest {
->      RAMBlock *rb;
->      hwaddr    offset;
->      hwaddr    len;
-> +    void     *page_copy;
->  
->      QSIMPLEQ_ENTRY(RAMSrcPageRequest) next_req;
->  };
->  
-> +/* Page buffer used for background snapshot */
-> +typedef struct RAMPageBuffer {
-> +    /* Page buffer capacity in host pages */
-> +    int capacity;
-> +    /* Current number of pages in the buffer */
-> +    int used;
-> +    /* Mutex to protect the page buffer */
-> +    QemuMutex lock;
-> +    /* To notify the requestor when the page buffer can be accessed again */
-> +    /* Page buffer allows access when used < capacity */
-> +    QemuCond used_decreased_cond;
-> +} RAMPageBuffer;
-> +
-> +/* RAMPageBuffer capacity */
-> +#define PAGE_BUFFER_CAPACITY 1000
-> +
->  /* State of RAM for migration */
->  struct RAMState {
->      /* QEMUFile used for this migration */
-> @@ -354,6 +377,12 @@ struct RAMState {
->      /* Queue of outstanding page requests from the destination */
->      QemuMutex src_page_req_mutex;
->      QSIMPLEQ_HEAD(, RAMSrcPageRequest) src_page_requests;
-> +    /* For background snapshot */
-> +    /* Data buffer to store copies of ram pages on backgound snapshot */
-> +    RAMPageBuffer page_buffer;
-> +    QemuEvent page_copying_done;
-> +    /* The number of threads trying to make a page copy */
-> +    uint64_t page_copier_cnt;
->  };
->  typedef struct RAMState RAMState;
->  
-> @@ -410,6 +439,8 @@ struct PageSearchStatus {
->      unsigned long page;
->      /* Set once we wrap around */
->      bool         complete_round;
-> +    /* Pointer to the cached page */
-> +    void *page_copy;
->  };
->  typedef struct PageSearchStatus PageSearchStatus;
->  
-> @@ -1051,11 +1082,14 @@ static void migration_bitmap_sync_precopy(RAMState *rs)
->   * @file: the file where the data is saved
->   * @block: block that contains the page we want to send
->   * @offset: offset inside the block for the page
-> + * @page_copy: pointer to the page, if null the page pointer
-> + *             is calculated based on block and offset
->   */
->  static int save_zero_page_to_file(RAMState *rs, QEMUFile *file,
-> -                                  RAMBlock *block, ram_addr_t offset)
-> +                                  RAMBlock *block, ram_addr_t offset,
-> +                                  uint8_t *page_copy)
->  {
-> -    uint8_t *p = block->host + offset;
-> +    uint8_t *p = page_copy ? page_copy : block->host + offset;
->      int len = 0;
->  
->      if (is_zero_range(p, TARGET_PAGE_SIZE)) {
-> @@ -1074,10 +1108,13 @@ static int save_zero_page_to_file(RAMState *rs, QEMUFile *file,
->   * @rs: current RAM state
->   * @block: block that contains the page we want to send
->   * @offset: offset inside the block for the page
-> + * @page_copy: pointer to the page, if null the page pointer
-> + *             is calculated based on block and offset
->   */
-> -static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
-> +static int save_zero_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
-> +                          uint8_t *page_copy)
->  {
-> -    int len = save_zero_page_to_file(rs, rs->f, block, offset);
-> +    int len = save_zero_page_to_file(rs, rs->f, block, offset, page_copy);
->  
->      if (len) {
->          ram_counters.duplicate++;
-> @@ -1151,9 +1188,11 @@ static int save_normal_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
->      ram_counters.transferred += save_page_header(rs, rs->f, block,
->                                                   offset | RAM_SAVE_FLAG_PAGE);
->      if (async) {
-> -        qemu_put_buffer_async(rs->f, buf, TARGET_PAGE_SIZE,
-> -                              migrate_release_ram() &
-> -                              migration_in_postcopy());
-> +        bool may_free = migrate_background_snapshot() ||
-> +                        (migrate_release_ram() &&
-> +                         migration_in_postcopy());
-> +
-> +        qemu_put_buffer_async(rs->f, buf, TARGET_PAGE_SIZE, may_free);
->      } else {
->          qemu_put_buffer(rs->f, buf, TARGET_PAGE_SIZE);
->      }
-> @@ -1184,7 +1223,12 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
->      ram_addr_t offset = ((ram_addr_t)pss->page) << TARGET_PAGE_BITS;
->      ram_addr_t current_addr = block->offset + offset;
->  
-> -    p = block->host + offset;
-> +    if (pss->page_copy) {
-> +        p = pss->page_copy;
-> +    } else {
-> +        p = block->host + offset;
-> +    }
-> +
->      trace_ram_save_page(block->idstr, (uint64_t)offset, p);
->  
->      XBZRLE_cache_lock();
-> @@ -1229,7 +1273,7 @@ static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
->      bool zero_page = false;
->      int ret;
->  
-> -    if (save_zero_page_to_file(rs, f, block, offset)) {
-> +    if (save_zero_page_to_file(rs, f, block, offset, NULL)) {
->          zero_page = true;
->          goto exit;
->      }
-> @@ -1412,7 +1456,8 @@ static bool find_dirty_block(RAMState *rs, PageSearchStatus *pss, bool *again)
->   * @rs: current RAM state
->   * @offset: used to return the offset within the RAMBlock
->   */
-> -static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset)
-> +static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset,
-> +                              void **page_copy)
->  {
->      RAMBlock *block = NULL;
->  
-> @@ -1426,10 +1471,14 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset)
->                                  QSIMPLEQ_FIRST(&rs->src_page_requests);
->          block = entry->rb;
->          *offset = entry->offset;
-> +        *page_copy = entry->page_copy;
->  
->          if (entry->len > TARGET_PAGE_SIZE) {
->              entry->len -= TARGET_PAGE_SIZE;
->              entry->offset += TARGET_PAGE_SIZE;
-> +            if (entry->page_copy) {
-> +                entry->page_copy += TARGET_PAGE_SIZE / sizeof(void *);
-> +            }
->          } else {
->              memory_region_unref(block->mr);
->              QSIMPLEQ_REMOVE_HEAD(&rs->src_page_requests, next_req);
-> @@ -1456,9 +1505,10 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->      RAMBlock  *block;
->      ram_addr_t offset;
->      bool dirty;
-> +    void *page_copy;
->  
->      do {
-> -        block = unqueue_page(rs, &offset);
-> +        block = unqueue_page(rs, &offset, &page_copy);
->          /*
->           * We're sending this page, and since it's postcopy nothing else
->           * will dirty it, and we must make sure it doesn't get sent again
-> @@ -1502,6 +1552,7 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->           * really rare.
->           */
->          pss->complete_round = false;
-> +        pss->page_copy = page_copy;
->      }
->  
->      return !!block;
-> @@ -1536,12 +1587,17 @@ static void migration_page_queue_free(RAMState *rs)
->   *
->   * Returns zero on success or negative on error
->   *
-> + * @block: RAMBlock to use.
-> + *         When @block is provided, then @rbname is ignored.
->   * @rbname: Name of the RAMBLock of the request. NULL means the
->   *          same that last one.
->   * @start: starting address from the start of the RAMBlock
->   * @len: length (in bytes) to send
-> + * @page_copy: the page to copy to destination. If not specified,
-> + *             will use the page data specified by @start and @len.
->   */
-> -int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len)
-> +int ram_save_queue_pages(RAMBlock *block, const char *rbname,
-> +                         ram_addr_t start, ram_addr_t len, void *page_copy)
->  {
->      RAMBlock *ramblock;
->      RAMState *rs = ram_state;
-> @@ -1549,7 +1605,9 @@ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len)
->      ram_counters.postcopy_requests++;
->      RCU_READ_LOCK_GUARD();
->  
-> -    if (!rbname) {
-> +    if (block) {
-> +        ramblock = block;
-> +    } else if (!rbname) {
->          /* Reuse last RAMBlock */
->          ramblock = rs->last_req_rb;
->  
-> @@ -1584,6 +1642,7 @@ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len)
->      new_entry->rb = ramblock;
->      new_entry->offset = start;
->      new_entry->len = len;
-> +    new_entry->page_copy = page_copy;
->  
->      memory_region_ref(ramblock->mr);
->      qemu_mutex_lock(&rs->src_page_req_mutex);
-> @@ -1670,7 +1729,7 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->          return 1;
->      }
->  
-> -    res = save_zero_page(rs, block, offset);
-> +    res = save_zero_page(rs, block, offset, pss->page_copy);
->      if (res > 0) {
->          /* Must let xbzrle know, otherwise a previous (now 0'd) cached
->           * page would be stale
-> @@ -1680,7 +1739,12 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->              xbzrle_cache_zero_page(rs, block->offset + offset);
->              XBZRLE_cache_unlock();
->          }
-> -        ram_release_pages(block->idstr, offset, res);
-> +
-> +        if (pss->page_copy) {
-> +            qemu_madvise(pss->page_copy, TARGET_PAGE_SIZE, MADV_DONTNEED);
-> +        } else {
-> +            ram_release_pages(block->idstr, offset, res);
-> +        }
->          return res;
->      }
->  
-> @@ -1753,6 +1817,434 @@ static int ram_save_host_page(RAMState *rs, PageSearchStatus *pss,
->      return pages;
->  }
->  
-> +/* BackGround Snapshot Blocks */
-> +static RamBlockList bgs_blocks;
-> +
-> +static RamBlockList *ram_bgs_block_list_get(void)
-> +{
-> +    return &bgs_blocks;
-> +}
-> +
-> +void ram_block_list_create(void)
-> +{
-> +    RAMBlock *block = NULL;
-> +    RamBlockList *block_list = ram_bgs_block_list_get();
-> +
-> +    qemu_mutex_lock_ramlist();
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-> +        memory_region_ref(block->mr);
-> +        QLIST_INSERT_HEAD(block_list, block, bgs_next);
-> +    }
-> +    qemu_mutex_unlock_ramlist();
-> +}
-> +
-> +static int page_fault_fd;
-> +static int thread_quit_fd;
-> +static QemuThread page_fault_thread;
-> +
-> +static int mem_change_wp(void *addr, uint64_t length, bool protect)
-> +{
-> +    struct uffdio_writeprotect wp = { 0 };
-> +
-> +    assert(page_fault_fd);
-> +
-> +    if (protect) {
-> +        struct uffdio_register reg = { 0 };
-> +
-> +        reg.mode = UFFDIO_REGISTER_MODE_WP;
-> +        reg.range.start = (uint64_t) addr;
-> +        reg.range.len = length;
-> +
-> +        if (ioctl(page_fault_fd, UFFDIO_REGISTER, &reg)) {
-> +            error_report("Can't register memeory at %p len: %"PRIu64
-> +                         " for page fault interception", addr, length);
-> +            return -1;
-> +        }
-> +
-> +        wp.mode = UFFDIO_WRITEPROTECT_MODE_WP;
-> +    }
-> +
-> +    wp.range.start = (uint64_t) addr;
-> +    wp.range.len = length;
-> +
-> +    if (ioctl(page_fault_fd, UFFDIO_WRITEPROTECT, &wp)) {
-> +        error_report("Can't change protection at %p len: %"PRIu64,
-> +                     addr, length);
-> +        return -1;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static int ram_set_ro(void *addr, uint64_t length)
-> +{
-> +    return mem_change_wp(addr, length, true);
-> +}
-> +
-> +static int ram_set_rw(void *addr, uint64_t length)
-> +{
-> +    return mem_change_wp(addr, length, false);
-> +}
-> +
-> +int ram_block_list_set_readonly(void)
-> +{
-> +    RAMBlock *block = NULL;
-> +    RamBlockList *block_list = ram_bgs_block_list_get();
-> +    int ret = 0;
-> +
-> +    QLIST_FOREACH(block, block_list, bgs_next) {
-> +        ret = ram_set_ro(block->host, block->used_length);
-> +        if (ret) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    return ret;
-> +}
-> +
-> +int ram_block_list_set_writable(void)
-> +{
-> +    RAMBlock *block = NULL;
-> +    RamBlockList *block_list = ram_bgs_block_list_get();
-> +    int ret = 0;
-> +
-> +    QLIST_FOREACH(block, block_list, bgs_next) {
-> +        ret = ram_set_rw(block->host, block->used_length);
-> +        if (ret) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    return ret;
-> +}
-> +
-> +void ram_block_list_destroy(void)
-> +{
-> +    RAMBlock *next, *block;
-> +    RamBlockList *block_list = ram_bgs_block_list_get();
-> +
-> +    QLIST_FOREACH_SAFE(block, block_list, bgs_next, next) {
-> +        QLIST_REMOVE(block, bgs_next);
-> +        memory_region_unref(block->mr);
-> +    }
-> +}
-> +
-> +static void ram_page_buffer_decrease_used(void)
-> +{
-> +    qemu_mutex_lock(&ram_state->page_buffer.lock);
-> +    ram_state->page_buffer.used--;
-> +    qemu_cond_signal(&ram_state->page_buffer.used_decreased_cond);
-> +    qemu_mutex_unlock(&ram_state->page_buffer.lock);
-> +}
-> +
-> +static void ram_page_buffer_increase_used_wait(void)
-> +{
-> +    RAMState *rs = ram_state;
-> +
-> +    qemu_mutex_lock(&rs->page_buffer.lock);
-> +
-> +    if (rs->page_buffer.used == rs->page_buffer.capacity) {
-> +        qemu_cond_wait(&rs->page_buffer.used_decreased_cond,
-> +                       &rs->page_buffer.lock);
-> +    }
-> +
-> +    rs->page_buffer.used++;
-> +
-> +    qemu_mutex_unlock(&rs->page_buffer.lock);
-> +}
-> +
-> +void *ram_page_buffer_get(void)
-> +{
-> +    void *page;
-> +    ram_page_buffer_increase_used_wait();
-> +    page = mmap(0, TARGET_PAGE_SIZE, PROT_READ | PROT_WRITE,
-> +                MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-> +
-> +    if (page == MAP_FAILED) {
-> +        ram_page_buffer_decrease_used();
-> +        page = NULL;
-> +    }
-> +    return page;
-> +}
-> +
-> +int ram_page_buffer_free(void *buffer)
-> +{
-> +    ram_page_buffer_decrease_used();
-> +    return qemu_madvise(buffer, TARGET_PAGE_SIZE, MADV_DONTNEED);
-> +}
-> +
-> +RAMBlock *ram_bgs_block_find(uint64_t address, ram_addr_t *page_offset)
-> +{
-> +    RAMBlock *block = NULL;
-> +    RamBlockList *block_list = ram_bgs_block_list_get();
-> +
-> +    QLIST_FOREACH(block, block_list, bgs_next) {
-> +        uint64_t host = (uint64_t) block->host;
-> +        if (address - host < block->max_length) {
-> +            *page_offset = (address - host) & TARGET_PAGE_MASK;
-> +            return block;
-> +        }
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +/**
-> + * ram_copy_page: make a page copy
-> + *
-> + * Used in the background snapshot to make a copy of a memeory page.
-> + * Ensures that the memeory page is copied only once.
-> + * When a page copy is done, restores read/write access to the memory
-> + * page.
-> + * If a page is being copied by another thread, wait until the copying
-> + * ends and exit.
-> + *
-> + * Returns:
-> + *   -1 - on error
-> + *    0 - the page wasn't copied by the function call
-> + *    1 - the page has been copied
-> + *
-> + * @block:     RAM block to use
-> + * @page_nr:   the page number to copy
-> + * @page_copy: the pointer to return a page copy
-> + *
-> + */
-> +int ram_copy_page(RAMBlock *block, unsigned long page_nr,
-> +                          void **page_copy)
-> +{
-> +    void *host_page;
-> +    int res = 0;
-> +
-> +    atomic_inc(&ram_state->page_copier_cnt);
-> +
-> +    if (test_and_set_bit_atomic(page_nr, block->touched_map)) {
-> +        while (!test_bit_atomic(page_nr, block->copied_map)) {
-> +            /* the page is being copied -- wait for the end of the copying */
-> +            qemu_event_wait(&ram_state->page_copying_done);
-> +        }
-> +        goto out;
-> +    }
-> +
-> +    *page_copy = ram_page_buffer_get();
-> +    if (!*page_copy) {
-> +        res = -1;
-> +        goto out;
-> +    }
-> +
-> +    host_page = block->host + (page_nr << TARGET_PAGE_BITS);
-> +    memcpy(*page_copy, host_page, TARGET_PAGE_SIZE);
-> +
-> +    if (ram_set_rw(host_page, TARGET_PAGE_SIZE)) {
-> +        ram_page_buffer_free(*page_copy);
-> +        *page_copy = NULL;
-> +        res = -1;
-> +        goto out;
-> +    }
-> +
-> +    set_bit_atomic(page_nr, block->copied_map);
-> +    qemu_event_set(&ram_state->page_copying_done);
-> +    qemu_event_reset(&ram_state->page_copying_done);
-> +
-> +    res = 1;
-> +out:
-> +    atomic_dec(&ram_state->page_copier_cnt);
-> +    return res;
-> +}
-> +
-> +/**
-> + * ram_process_page_fault
-> + *
-> + * Used in the background snapshot to queue the copy of the memory
-> + * page for writing.
-> + *
-> + * Returns:
-> + *    0 > - on error
-> + *    0   - success
-> + *
-> + * @address:  address of the faulted page
-> + *
-> + */
-> +int ram_process_page_fault(uint64_t address)
-> +{
-> +    int ret;
-> +    void *page_copy = NULL;
-> +    unsigned long page_nr;
-> +    ram_addr_t offset;
-> +
-> +    RAMBlock *block = ram_bgs_block_find(address, &offset);
-> +
-> +    if (!block) {
-> +        return -1;
-> +    }
-> +
-> +    page_nr = offset >> TARGET_PAGE_BITS;
-> +
-> +    ret = ram_copy_page(block, page_nr, &page_copy);
-> +
-> +    if (ret < 0) {
-> +        return ret;
-> +    } else if (ret > 0) {
-> +        if (ram_save_queue_pages(block, NULL, offset,
-> +                                 TARGET_PAGE_SIZE, page_copy)) {
-> +            ram_page_buffer_free(page_copy);
-> +            return -1;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static int get_page_fault_fd(void)
-> +{
-> +    struct uffdio_api api_struct = { 0 };
-> +    uint64_t ioctl_mask = BIT(_UFFDIO_REGISTER) | BIT(_UFFDIO_UNREGISTER);
-> +    int ufd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
-> +
-> +    if (ufd == -1) {
-> +        error_report("UFFD: not supported");
-> +        return -1;
-> +    }
-> +
-> +    api_struct.api = UFFD_API;
-> +    api_struct.features = UFFD_FEATURE_PAGEFAULT_FLAG_WP;
-> +
-> +    if (ioctl(ufd, UFFDIO_API, &api_struct)) {
-> +        error_report("UFFD: API failed");
-> +        return -1;
-> +    }
-> +
-> +    if ((api_struct.ioctls & ioctl_mask) != ioctl_mask) {
-> +        error_report("UFFD: missing write-protected feature");
-> +        return -1;
-> +    }
-> +
-> +    return ufd;
-> +}
-> +
-> +static void *page_fault_thread_fn(void *unused)
-> +{
-> +    GPollFD fds[2] = {
-> +        {.fd = page_fault_fd, .events = POLLIN | POLLERR | POLLHUP },
-> +        {.fd = thread_quit_fd, .events = POLLIN | POLLERR | POLLHUP },
-> +    };
-> +
-> +    while (true) {
-> +        struct uffd_msg msg;
-> +        ssize_t len;
-> +        int ret;
-> +
-> +        ret = qemu_poll_ns(fds, 2, -1);
-> +
-> +        if (ret < 0) {
-> +            error_report("page fault: error on fd polling: %d", ret);
-> +            break;
-> +        }
-> +
-> +        if (fds[1].revents) {
-> +            break;
-> +        }
-> +again:
-> +        len = read(fds[0].fd, &msg, sizeof(msg));
-> +
-> +        if (len == 0) {
-> +            break;
-> +        }
-> +
-> +        if (len < 0) {
-> +            error_report("page fault: error on uffd reading: %d", -errno);
-> +            if (errno == EAGAIN) {
-> +                goto again;
-> +            } else {
-> +                break;
-> +            }
-> +        }
-> +
-> +        if (msg.event != UFFD_EVENT_PAGEFAULT) {
-> +            error_report("page fault: unknown event from uffd: %d",
-> +                         msg.event);
-> +            break;
-> +        }
-> +
-> +        if (!(msg.arg.pagefault.flags & UFFD_PAGEFAULT_FLAG_WP)) {
-> +            error_report("page fault: error. got address "
-> +                         "without write protection flag [0x%llx]",
-> +                         msg.arg.pagefault.address);
-> +            break;
-> +        }
-> +
-> +        if (ram_process_page_fault(msg.arg.pagefault.address) < 0) {
-> +            error_report("page fault: error on write protected page "
-> +                         "processing [0x%llx]",
-> +                         msg.arg.pagefault.address);
-> +            break;
-> +        }
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +static int page_fault_thread_start(void)
-> +{
-> +    page_fault_fd = get_page_fault_fd();
-> +    if (page_fault_fd == -1) {
-> +        page_fault_fd = 0;
-> +        error_report("page fault thread: can't initiate uffd");
-> +        return -1;
-> +    }
-> +
-> +    thread_quit_fd = eventfd(0, 0);
-> +    if (thread_quit_fd == -1) {
-> +        thread_quit_fd = 0;
-> +        error_report("page fault thread: can't initiate thread control fd");
-> +        return -1;
-> +    }
-> +
-> +    qemu_thread_create(&page_fault_thread, "pagefault_thrd",
-> +                       page_fault_thread_fn, (void *) 0,
-> +                       QEMU_THREAD_JOINABLE);
-> +
-> +    return 0;
-> +}
-> +
-> +static void page_fault_thread_stop(void)
-> +{
-> +    if (page_fault_fd) {
-> +        close(page_fault_fd);
-> +        page_fault_fd = 0;
-> +    }
-
-I think you need to do that after you've done the quit and join,
-otherwise the fault thread might still be reading this.
-
-> +    if (thread_quit_fd) {
-> +        uint64_t val = 1;
-> +        int ret;
-> +
-> +        ret = write(thread_quit_fd, &val, sizeof(val));
-> +        assert(ret == sizeof(val));
-> +
-> +        qemu_thread_join(&page_fault_thread);
-> +        close(thread_quit_fd);
-> +        thread_quit_fd = 0;
-> +    }
-> +}
-> +
-> +int ram_write_tracking_start(void)
-> +{
-> +    if (page_fault_thread_start()) {
-> +        return -1;
-> +    }
-> +
-> +    ram_block_list_create();
-> +    ram_block_list_set_readonly();
-> +
-> +    return 0;
-> +}
-> +
-> +void ram_write_tracking_stop(void)
-> +{
-> +    ram_block_list_set_writable();
-> +    page_fault_thread_stop();
-> +    ram_block_list_destroy();
-> +}
-> +
->  /**
->   * ram_find_and_save_block: finds a dirty page and sends it to f
->   *
-> @@ -1782,6 +2274,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->      pss.block = rs->last_seen_block;
->      pss.page = rs->last_page;
->      pss.complete_round = false;
-> +    pss.page_copy = NULL;
->  
->      if (!pss.block) {
->          pss.block = QLIST_FIRST_RCU(&ram_list.blocks);
-> @@ -1794,11 +2287,30 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
->          if (!found) {
->              /* priority queue empty, so just search for something dirty */
->              found = find_dirty_block(rs, &pss, &again);
-> +
-> +            if (found && migrate_background_snapshot()) {
-> +                /*
-> +                 * make a copy of the page and
-> +                 * pass it to the page search status
-> +                 */
-> +                int ret;
-> +                ret = ram_copy_page(pss.block, pss.page, &pss.page_copy);
-
-I'm a bit confused about why we hit this; the way I'd thought about your
-code was we turn on the write faulting, do one big save and then fixup
-the faults as the save is happening (doing the copies) as the writes
-hit; so when does this case hit?
-
-> +                if (ret == 0) {
-> +                    found = false;
-> +                    pages = 0;
-> +                } else if (ret < 0) {
-> +                    return ret;
-> +                }
-> +            }
->          }
->  
->          if (found) {
->              pages = ram_save_host_page(rs, &pss, last_stage);
->          }
-> +
-> +        if (pss.page_copy) {
-> +            ram_page_buffer_decrease_used();
-> +        }
->      } while (!pages && again);
->  
->      rs->last_seen_block = pss.block;
-> @@ -1858,6 +2370,18 @@ static void xbzrle_load_cleanup(void)
->  static void ram_state_cleanup(RAMState **rsp)
->  {
->      if (*rsp) {
-> +        if (migrate_background_snapshot()) {
-> +            qemu_mutex_destroy(&(*rsp)->page_buffer.lock);
-> +            qemu_cond_destroy(&(*rsp)->page_buffer.used_decreased_cond);
-> +            /* In case somebody is still waiting for the event */
-> +            /* make sure they have done with their copying routine */
-> +            while (atomic_read(&(*rsp)->page_copier_cnt)) {
-> +                qemu_event_set(&(*rsp)->page_copying_done);
-> +                qemu_event_reset(&(*rsp)->page_copying_done);
-> +            }
-> +            qemu_event_destroy(&(*rsp)->page_copying_done);
-> +        }
-> +
->          migration_page_queue_free(*rsp);
->          qemu_mutex_destroy(&(*rsp)->bitmap_mutex);
->          qemu_mutex_destroy(&(*rsp)->src_page_req_mutex);
-> @@ -1897,6 +2421,13 @@ static void ram_save_cleanup(void *opaque)
->          block->clear_bmap = NULL;
->          g_free(block->bmap);
->          block->bmap = NULL;
-> +
-> +        if (migrate_background_snapshot()) {
-> +            g_free(block->touched_map);
-> +            block->touched_map = NULL;
-> +            g_free(block->copied_map);
-> +            block->copied_map = NULL;
-> +        }
->      }
->  
->      xbzrle_cleanup();
-> @@ -1912,6 +2443,10 @@ static void ram_state_reset(RAMState *rs)
->      rs->last_version = ram_list.version;
->      rs->ram_bulk_stage = true;
->      rs->fpo_enabled = false;
-> +
-> +    /* page buffer capacity in number of pages */
-> +    rs->page_buffer.capacity = PAGE_BUFFER_CAPACITY;
-> +    rs->page_buffer.used = 0;
->  }
->  
->  #define MAX_WAIT 50 /* ms, half buffered_file limit */
-> @@ -2298,6 +2833,14 @@ static int ram_state_init(RAMState **rsp)
->       * This must match with the initial values of dirty bitmap.
->       */
->      (*rsp)->migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
-> +
-> +    if (migrate_background_snapshot()) {
-> +        qemu_mutex_init(&(*rsp)->page_buffer.lock);
-> +        qemu_cond_init(&(*rsp)->page_buffer.used_decreased_cond);
-> +        qemu_event_init(&(*rsp)->page_copying_done, false);
-> +        (*rsp)->page_copier_cnt = 0;
-> +    }
-> +
->      ram_state_reset(*rsp);
->  
->      return 0;
-> @@ -2338,6 +2881,11 @@ static void ram_list_init_bitmaps(void)
->              bitmap_set(block->bmap, 0, pages);
->              block->clear_bmap_shift = shift;
->              block->clear_bmap = bitmap_new(clear_bmap_size(pages, shift));
-> +
-> +            if (migrate_background_snapshot()) {
-> +                block->touched_map = bitmap_new(pages);
-> +                block->copied_map = bitmap_new(pages);
-> +            }
->          }
->      }
->  }
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 45c9dd9d8a..490414aff4 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1353,7 +1353,6 @@ int qemu_savevm_state_complete_precopy_iterable(QEMUFile *f, bool in_postcopy)
->      return 0;
->  }
->  
-> -static
->  int qemu_savevm_state_complete_precopy_non_iterable(QEMUFile *f,
->                                                      bool in_postcopy,
->                                                      bool inactivate_disks)
 > -- 
 > 2.17.0
 > 
