@@ -2,103 +2,125 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73BCDC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F31C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:36:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FA4E207FC
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:33:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E3112073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:36:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FpcgulD8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FA4E207FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="sSrIDHpw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E3112073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k03Fj-00005P-Gl
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 09:33:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56486)
+	id 1k03IO-0001a2-Kc
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 09:36:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57344)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k03Ew-00086P-Q7
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:32:26 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38308
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k03Eu-0007ia-VJ
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:32:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595856744;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RmXA8qhhnpj18aQGofBntySzakG3RcJAdmZwbk5uTJo=;
- b=FpcgulD8mv3Vq5mLxY9/L3bUpMyKHQrtL/QhMsGSqDikDJyp12GZUl04tfR91JTABZXuNs
- cDZaAq7uENVgRTYGs+bmHcAyD5Bbh22X4ETG8X9Gv3N27ngZTZ+gUNE/sX221Wf5PVUFOr
- ViJjhz4WDEs/5F0dbBNZT1OtbL7fK2o=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-H0pAeVg4Pfqqbd5M6CetVg-1; Mon, 27 Jul 2020 09:32:15 -0400
-X-MC-Unique: H0pAeVg4Pfqqbd5M6CetVg-1
-Received: by mail-wr1-f71.google.com with SMTP id f14so3917275wrm.22
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 06:32:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=JTdauwM5SHnHEcc7VfzWG2Gc3sibHwbFmlKOszL/LVU=;
- b=Tq0n9JrT5YTskBByjMWYvt3vfZ1Qw7Nv9bdJ050xZO+H8MWGCHxUCv0dKi8DH2C0Zj
- BNB2Y88CgD5/9nho/gEbMw43nSHjABREvRs12fiqDwrW6PSzNWlhCCL+xd1QV6GoW60C
- ihytVQmc75ogrk1stZqThCjxaJ43kHQ7ctbdzL4ueVdnPYaSVcgpftZi1a6Tj0YRH89K
- yP9LL0H2RMx2Mqkwhi5TTpLcvifk1AJIWpNlnri9eFvdrHeKo3jP7os9OFIEAbRTjo2W
- QU13kc25VZ0dNNXgnh1vv6AlzRlMn4sp/X3aZwiBMlhoLitDkGMPGsXF2vl+RoCoOYvD
- iDBA==
-X-Gm-Message-State: AOAM531K1LfftKaRfTC6HIHpoJJmYKEq3GFiIHX4+FHK3hmhIL6VdF9w
- 1LmLn7bLWtETkX5CnHdUE+2gQ/VLEzN1gR+nMVIh9v1bSO6fSfxMAjyivJUgrCrBOBDg6AKDEj/
- yorMuaNbVVvMGfOE=
-X-Received: by 2002:adf:82a5:: with SMTP id 34mr20611904wrc.266.1595856734711; 
- Mon, 27 Jul 2020 06:32:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxpM8sUlKgEsGb0x8kH4HvzQm1zx8qrACaNGmn3RZusv+azQdB5X/Q8iJCDjh6Wg8yKGHr/zA==
-X-Received: by 2002:adf:82a5:: with SMTP id 34mr20611882wrc.266.1595856734510; 
- Mon, 27 Jul 2020 06:32:14 -0700 (PDT)
-Received: from redhat.com ([192.117.173.58])
- by smtp.gmail.com with ESMTPSA id p14sm12559547wrg.96.2020.07.27.06.32.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 06:32:13 -0700 (PDT)
-Date: Mon, 27 Jul 2020 09:32:09 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v1 05/13] hw/virtio/pci: include vdev name in registered
- PCI sections
-Message-ID: <20200727093107-mutt-send-email-mst@kernel.org>
-References: <20200709141327.14631-1-alex.bennee@linaro.org>
- <20200709141327.14631-6-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k03Hk-00010j-9R; Mon, 27 Jul 2020 09:35:20 -0400
+Received: from mail-am6eur05on2103.outbound.protection.outlook.com
+ ([40.107.22.103]:60192 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k03Hh-00083E-JU; Mon, 27 Jul 2020 09:35:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eWUS2wGYCitqktBH8VqYK8yRN2ctWMgHwSOT8kPCn9l+vwaMJxPkWbBg9uC4oBLRAk6wW1J1YehEeGzJ7SF2i3vfPtBOFz3PUKJD+CSTZMwgpauWTMXw5lozD9UqHIDoWy9rYC8fqfPlQS2exxpi1OUY0EPqw12A+mxef0bIe0/D8eLIKBhVWJAqdn00hWhFI335xfSHWyBO5ZvUw+L/RvSeKkX/sFPYJkmcU/3RDnxDCDohVcDM10BlU0DtTJnqGurBp98rMqFrhMax3QOc+JyERecAWFT0uoOYv2XUyZmkj13GMjjkSIsVD4fsqm6/5hDw7Y7lPslDTgCrncoXRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p4XnNlFkYsHA1rI5yw3sKjTsoeQfi0iQc6RbJA1SnWk=;
+ b=B/7LayLFrlF8tNAHnwEZfCS14b0uIjm3o3DNBHCkmYZP/vQfTvg8N9DnpjpJLF/HW0gi7b9v7bVfffG6H3B0Sd1mOBttmSya4D4HHYSDjoYSkOLuM8FbZPCWUG2vSsroPA7UmQO586YagEfnC3B++y6LJNrMhKCssHvSWqNt5kpXxglxGk63bJnah1h78Hxs6cgNhl6qXbrJdemO8Wpt0XcJqgsRSZzf+WBhuaOMmGa6pM4XgOEMnP8vPJSkXRrW+BLaBj1zmoJo4ZUTI5qV3m2LdbwC8ptlqwTFFXrmSw9QzntHe3156qpRYVsX/R1QYrNf/qPKDX5SJw1VWHWXnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p4XnNlFkYsHA1rI5yw3sKjTsoeQfi0iQc6RbJA1SnWk=;
+ b=sSrIDHpwNYmpdL+ngb5luj9jvsbT2hATBP47YL/UNvWQdFYjeMCx4qzXUDFoAtwOVqBs/2fBIE8eRtyt3hxtBUYnZHEOKZUogP+x+GzwK3hi8XODAU+kY49ZyBlm8k9veVNgbjUdLqrWKkxHlm/TTRBnNuWCbIIS7GYasEy7TTg=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM6PR08MB3224.eurprd08.prod.outlook.com (2603:10a6:209:47::13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.24; Mon, 27 Jul
+ 2020 13:35:14 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3216.033; Mon, 27 Jul 2020
+ 13:35:14 +0000
+Subject: Re: [PATCH v7 43/47] iotests: Let complete_and_wait() work with commit
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-44-mreitz@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <c328a8ba-8041-ebd6-3765-94be19d0c53b@virtuozzo.com>
+Date: Mon, 27 Jul 2020 16:35:08 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <20200625152215.941773-44-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-GB
+X-ClientProxiedBy: AM4P190CA0003.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:200:56::13) To AM6PR08MB4070.eurprd08.prod.outlook.com
+ (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
-In-Reply-To: <20200709141327.14631-6-alex.bennee@linaro.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.82) by
+ AM4P190CA0003.EURP190.PROD.OUTLOOK.COM (2603:10a6:200:56::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3216.20 via Frontend Transport; Mon, 27 Jul 2020 13:35:12 +0000
+X-Originating-IP: [109.252.114.82]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 03820410-92c2-499d-56dd-08d83231e4a6
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3224:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3224023B833DA01362C89875F4720@AM6PR08MB3224.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:269;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SznxtrKAaXlvuSsdNX6WabHwxavDq7SGTDDMUEXvsDuMOjFNeIMsMGj2IlD9sxOTs9SLlhbkpZyp2aGCuF40u1b0ccvokgJgee2zsmYiyKR7ScTeJ7vA5eX3OM3huHAbIBM1wTgbKLFX/Remv7AAywiQEgYTLfP/cJxG0Xz2y0ykOs6yZQM9aqX2UkaTYsjVOch24U9GzJb5XfOgchaeoTdaCIz7EWYC7zLONgn2d0dUAs/f4BKeMr7Eurjs2SLN8QObAvPPXTAP2DpVm5QxQJ4FlX8s/yuUQJTCX1Ytw6FOswHogb5agsbJswf/MGaKAc6lsuCiX3Lo0CaDJbQLMdowM7byz+r8UNLrjwENZQGhs6wLDI9+5pz/TfEGhQWU
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(346002)(396003)(366004)(376002)(39840400004)(6506007)(5660300002)(66476007)(478600001)(83380400001)(54906003)(66556008)(53546011)(6512007)(66946007)(44832011)(316002)(36756003)(956004)(6666004)(26005)(52116002)(2906002)(2616005)(6486002)(186003)(16526019)(8676002)(4326008)(31686004)(8936002)(31696002)(86362001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: UePR2DtmDqF47T49bjuf3bKetFPd3gJloP6GRsfnr3Gw0mrhweCaBfbPYlryf+jlyYb2kREbnioWwVy2HUX7UC1t7H2dBzpIcAfmD9yeq3SzUbxpY2Rn6OZWU33+zL2e46RKBMJVlAeQjyvhiBdnAgPzjaq/i73ziv5qGyXztGrSdafY/VZUImsynjLbymtBR/pnYt7sfA1neN2yIPEV9the2vHAEUetsqwOxNIueYGEhxGVygR4FO/15VFi2cTlSFEZYH+pSjlCnQZuWLJae17VdK7SwGIj9kxg/q5veOJ9g2M1ZR8q/fVLJjk2vpuU5j0MdWkIYiCTbwjjlQ1HDC25BCSC+QHzOaimXFX2a/d9zjGeXuE4IfM8y9OdABxojjcOo/Yi1VGfYBxM4oVH1YG8cfy7zmvSSYr3CJBcEOFevV7hPbZdhfb39WnbxlWSQI6sgBaP4ljDxtJb6mGjGytJ5oNemRkXWLKf4nTb5+f8Y2U9DgcKrG/LgRPR3fb5
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03820410-92c2-499d-56dd-08d83231e4a6
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 13:35:14.5447 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EEexueqmf1iVRQxRseSH5Cvp+m61KyXJovuOTBfnGs6kORHIAzQThKcI6MZVYnEjH35Js0yk+13P5fIN/CkdmcG37JJ3QkXUPQfaNIA5D88=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3224
+Received-SPF: pass client-ip=40.107.22.103;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 09:35:15
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,109 +133,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, qemu-devel@nongnu.org, robhenry@microsoft.com,
- f4bug@amsat.org, aaron@os.amperecomputing.com, cota@braap.org,
- kuhn.chenqun@huawei.com, peter.puhov@linaro.org, aurelien@aurel32.net
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 09, 2020 at 03:13:19PM +0100, Alex Bennée wrote:
-> When viewing/debugging memory regions it is sometimes hard to figure
-> out which PCI device something belongs to. Make the names unique by
-> including the vdev name in the name string.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-
-So I don't know what's the plan here. I think ideally core would
-just do it for us automatically. Why not?
-If it can't my ack stands, anyway, pls
-merge with rest of the patches if that is deemed appropriate.
-
+On 25.06.2020 18:22, Max Reitz wrote:
+> complete_and_wait() and wait_ready() currently only work for mirror
+> jobs.  Let them work for active commit jobs, too.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
-> v2
->   - swap ()'s for an extra -
-> ---
->  hw/virtio/virtio-pci.c | 22 ++++++++++++++--------
->  1 file changed, 14 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index 8554cf2a038e..215e680c71f4 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -1406,7 +1406,8 @@ static void virtio_pci_device_write(void *opaque, hwaddr addr,
->      }
->  }
->  
-> -static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy)
-> +static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy,
-> +                                           const char *vdev_name)
->  {
->      static const MemoryRegionOps common_ops = {
->          .read = virtio_pci_common_read,
-> @@ -1453,36 +1454,41 @@ static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy)
->          },
->          .endianness = DEVICE_LITTLE_ENDIAN,
->      };
-> +    g_autoptr(GString) name = g_string_new(NULL);
->  
-> -
-> +    g_string_printf(name, "virtio-pci-common-%s", vdev_name);
->      memory_region_init_io(&proxy->common.mr, OBJECT(proxy),
->                            &common_ops,
->                            proxy,
-> -                          "virtio-pci-common",
-> +                          name->str,
->                            proxy->common.size);
->  
-> +    g_string_printf(name, "virtio-pci-isr-%s", vdev_name);
->      memory_region_init_io(&proxy->isr.mr, OBJECT(proxy),
->                            &isr_ops,
->                            proxy,
-> -                          "virtio-pci-isr",
-> +                          name->str,
->                            proxy->isr.size);
->  
-> +    g_string_printf(name, "virtio-pci-device-%s", vdev_name);
->      memory_region_init_io(&proxy->device.mr, OBJECT(proxy),
->                            &device_ops,
->                            virtio_bus_get_device(&proxy->bus),
-> -                          "virtio-pci-device",
-> +                          name->str,
->                            proxy->device.size);
->  
-> +    g_string_printf(name, "virtio-pci-notify-%s", vdev_name);
->      memory_region_init_io(&proxy->notify.mr, OBJECT(proxy),
->                            &notify_ops,
->                            virtio_bus_get_device(&proxy->bus),
-> -                          "virtio-pci-notify",
-> +                          name->str,
->                            proxy->notify.size);
->  
-> +    g_string_printf(name, "virtio-pci-notify-pio-%s", vdev_name);
->      memory_region_init_io(&proxy->notify_pio.mr, OBJECT(proxy),
->                            &notify_pio_ops,
->                            virtio_bus_get_device(&proxy->bus),
-> -                          "virtio-pci-notify-pio",
-> +                          name->str,
->                            proxy->notify_pio.size);
->  }
->  
-> @@ -1623,7 +1629,7 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
->  
->          struct virtio_pci_cfg_cap *cfg_mask;
->  
-> -        virtio_pci_modern_regions_init(proxy);
-> +        virtio_pci_modern_regions_init(proxy, vdev->name);
->  
->          virtio_pci_modern_mem_region_map(proxy, &proxy->common, &cap);
->          virtio_pci_modern_mem_region_map(proxy, &proxy->isr, &cap);
-> -- 
-> 2.20.1
+>   tests/qemu-iotests/iotests.py | 10 +++++++---
+>   1 file changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index 5ea4c4df8b..57b32d8ad3 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -932,8 +932,12 @@ class QMPTestCase(unittest.TestCase):
+>   
+>       def wait_ready(self, drive='drive0'):
+>           """Wait until a BLOCK_JOB_READY event, and return the event."""
+> -        f = {'data': {'type': 'mirror', 'device': drive}}
+> -        return self.vm.event_wait(name='BLOCK_JOB_READY', match=f)
+> +        return self.vm.events_wait([
+> +            ('BLOCK_JOB_READY',
+> +             {'data': {'type': 'mirror', 'device': drive}}),
+> +            ('BLOCK_JOB_READY',
+> +             {'data': {'type': 'commit', 'device': drive}})
+> +        ])
+>   
+>       def wait_ready_and_cancel(self, drive='drive0'):
+>           self.wait_ready(drive=drive)
+> @@ -952,7 +956,7 @@ class QMPTestCase(unittest.TestCase):
+>           self.assert_qmp(result, 'return', {})
+>   
+>           event = self.wait_until_completed(drive=drive, error=completion_error)
+> -        self.assert_qmp(event, 'data/type', 'mirror')
+> +        self.assertTrue(event['data']['type'] in ['mirror', 'commit'])
+>   
+>       def pause_wait(self, job_id='job0'):
+>           with Timeout(3, "Timeout waiting for job to pause"):
+
+
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+
 
 
