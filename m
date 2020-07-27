@@ -6,82 +6,68 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CECC8C433FE
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3EEC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:21:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DC8C20656
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:15:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57735206E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QYsMt/xA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DC8C20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="tKK4zD+i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57735206E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzzEU-0003Gt-RV
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 05:15:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59880)
+	id 1jzzKP-00050L-JM
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 05:21:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jzzDe-0002Zm-Sy
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:14:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31716
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jzzDc-0001qE-OJ
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:14:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595841287;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=clco6bdgQ+2ZMJtEcH2GjDDRuHPmfkEEVNQ4KUeFVZY=;
- b=QYsMt/xAQZbU/LA/1dgkyhUy+QaUiNUX6l1gLKLmfW1etb590WYBttcbfa3MijoVgX8ykm
- zrX73prcInMCeKMpunhLQceWrxIdrUs5sPXDx3uFngNF7XkpVds+FLs7DmvLKd0j6QZ7sN
- +FC7ZaGOzbQZtijlATy+EvyBrGbVmBc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-x2GtvwX_O1u0wLYGlaNUHQ-1; Mon, 27 Jul 2020 05:14:44 -0400
-X-MC-Unique: x2GtvwX_O1u0wLYGlaNUHQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8D8C186A822;
- Mon, 27 Jul 2020 09:14:42 +0000 (UTC)
-Received: from gondolin (ovpn-112-210.ams2.redhat.com [10.36.112.210])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7DD5C59;
- Mon, 27 Jul 2020 09:14:34 +0000 (UTC)
-Date: Mon, 27 Jul 2020 11:14:31 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH RFCv3 2/9] s390x/diag: no need to check for
- PGM_PRIVILEGED in diag308
-Message-ID: <20200727111431.1aec22c0.cohuck@redhat.com>
-In-Reply-To: <20200724143750.59836-3-david@redhat.com>
-References: <20200724143750.59836-1-david@redhat.com>
- <20200724143750.59836-3-david@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jzzJg-0004Po-Vw; Mon, 27 Jul 2020 05:21:05 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:58142)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1jzzJe-0002cq-HB; Mon, 27 Jul 2020 05:21:04 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 59CD8BF62F;
+ Mon, 27 Jul 2020 09:20:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
+ s=default; t=1595841659;
+ bh=oMOrA8tEQcE8nsD7gY1GtZVsj1oaxo6GbDcd5YE54IA=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=tKK4zD+iz3XvG9UOgVSQePn02a9auai/dSNsGoME2A42qIam40HlAGiqNCyTjCggs
+ W4YTOj26Ds3aldf08foRt2cN2cJVSwvIx6C1DK1l7rPUsWrkJdWkirM5N3xtmvlJkD
+ SXy12zRHd6Jk0ti5i4YTYIvi+2uVlt4TLGxrmj1WzZNBCRxiC8CGqcKxl2/1TLXEUA
+ YRRoyo9HCeyY9zTlxQls2DwchQxraMz4PaPMfspaDqVHKAMRWRcJFvCkVl1JL/D6BU
+ wDURGnmBVP+0J8BnG4fm/g1SVt+kmR4A7Ymf2A++aZ0/l2xqGwQFnBCp+gKVXyG2+z
+ kfQCcDZwNOZPw==
+Date: Mon, 27 Jul 2020 11:20:55 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 1/2] pci: pass along the return value of dma_memory_rw
+Message-ID: <20200727092055.GA52912@apples.localdomain>
+References: <20200629202053.1223342-1-its@irrelevant.dk>
+ <20200629202053.1223342-2-its@irrelevant.dk>
+ <20200722074834-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 00:16:29
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200722074834-mutt-send-email-mst@kernel.org>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 05:06:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,30 +80,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 24 Jul 2020 16:37:43 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> Whenever we reach this point via KVM or TCG, we already verified that we
-> are running in the supervisor state.
+On Jul 22 07:48, Michael S. Tsirkin wrote:
+> On Mon, Jun 29, 2020 at 10:20:52PM +0200, Klaus Jensen wrote:
+> > From: Klaus Jensen <k.jensen@samsung.com>
+> > 
+> > Some devices might want to know the return value of dma_memory_rw, so
+> > pass it along instead of ignoring it.
+> > 
+> > There are no existing users of the return value, so this patch should be
+> > safe.
+> > 
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> > Reviewed-by: Philippe Mathieu-DaudÃ© <philmd@redhat.com>
+> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > Acked-by: Keith Busch <kbusch@kernel.org>
 > 
-> TCG checks this via IF_PRIV, KVM checks this directly in the diag
-> instruction handler, before exiting to userspace.
 > 
-> Acked-by: Janosch Frank <frankja@linux.ibm.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/diag.c | 5 -----
->  1 file changed, 5 deletions(-)
+> Please feel free to merge this with the patch that uses the
+> return value.
+> 
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Hi Michael,
 
+Noted. The patch depends on another series that have not been merged
+yet, so this is why it is lying around and waiting to be added.
+
+
+Thanks,
+Klaus
 
