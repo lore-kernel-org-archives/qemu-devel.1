@@ -2,95 +2,87 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D4AC433ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BD9C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:49:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34C862072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:46:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10EC120714
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:49:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="beHnoIYI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34C862072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PzAJep4D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10EC120714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k02Wr-0006D9-HE
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:46:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41960)
+	id 1k02ZO-0007Oz-DE
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:49:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k02V7-0004rt-Ad
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:45:05 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25852
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k02Yk-0006sS-1u
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:48:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20339
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k02V5-0000nN-Lz
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:45:05 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k02Yi-0001GD-BY
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:48:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595853903;
+ s=mimecast20190719; t=1595854127;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=54hJJjuzume9o0f4GKMQ08xt2NNQS6Qm1dtaJetAJf0=;
- b=beHnoIYIeORk+kQOVrW5/PydBcahdqNl+HJwPr7hkQbLrl9n9+wXg5eluKSJAj/OvBeFeQ
- I13lqwYMhoGSA2tjSFFlgRPtsCk0xK2YfIxrOiOKZ9sUQ8g0/GMHoz03GOM7ctQfsXc0ms
- k39jhHD7P47zhyWqNAutIQuaACWE2BI=
+ bh=OlNpwuBHQ7FrhWkY4tftl0NywQcDVKcwzg7+6ThFeLw=;
+ b=PzAJep4DJGfrIHe44RcY3E/qkc/692YXXR6v+p14kce4K7sJL0T+wi7XqF1VXQFzp33Crh
+ mECVaC/9Z93T7QCUUo+y26edMRuqYrf2WschV/er0Gb3iFcRqv722WiJa7H25msqV/+2mq
+ OzxYbiPf4KPATag4BiqicSdMHsgcHtA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-Vre9UYK4NBGsVeoVTszj1Q-1; Mon, 27 Jul 2020 08:45:01 -0400
-X-MC-Unique: Vre9UYK4NBGsVeoVTszj1Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-108-ntllkeYxOTa86afcCfkwhw-1; Mon, 27 Jul 2020 08:48:44 -0400
+X-MC-Unique: ntllkeYxOTa86afcCfkwhw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65695E923
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 12:45:00 +0000 (UTC)
-Received: from [10.72.12.71] (ovpn-12-71.pek2.redhat.com [10.72.12.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6A18C726B8;
- Mon, 27 Jul 2020 12:44:50 +0000 (UTC)
-Subject: Re: [PATCH] virtio-net: check the existence of peer before accesing
- its config
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200727074328.2279-1-jasowang@redhat.com>
- <20200727053954-mutt-send-email-mst@kernel.org>
- <20200727115322.4e7fe1aa.cohuck@redhat.com>
- <20200727061112-mutt-send-email-mst@kernel.org>
- <0cad868a-7f64-47e0-f4bf-014a5fc1bcf6@redhat.com>
- <20200727073943-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <4ba92946-7b7f-e3af-3352-b8f780f952f4@redhat.com>
-Date: Mon, 27 Jul 2020 20:44:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBC438014D7;
+ Mon, 27 Jul 2020 12:48:42 +0000 (UTC)
+Received: from localhost (ovpn-114-74.ams2.redhat.com [10.36.114.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 670955DA6A;
+ Mon, 27 Jul 2020 12:48:42 +0000 (UTC)
+Date: Mon, 27 Jul 2020 13:48:40 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v7 0/7] coroutines: generate wrapper code
+Message-ID: <20200727124840.GC386429@stefanha-x1.localdomain>
+References: <20200610100336.23451-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20200727073943-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200610100336.23451-1-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="wxDdMuZNg1r63Hyj"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:44:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,64 +95,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Cindy Lu <lulu@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ crosa@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--wxDdMuZNg1r63Hyj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2020/7/27 下午7:41, Michael S. Tsirkin wrote:
-> On Mon, Jul 27, 2020 at 06:26:37PM +0800, Jason Wang wrote:
->> On 2020/7/27 下午6:13, Michael S. Tsirkin wrote:
->>> On Mon, Jul 27, 2020 at 11:53:22AM +0200, Cornelia Huck wrote:
->>>> On Mon, 27 Jul 2020 05:41:17 -0400
->>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>>>
->>>>> On Mon, Jul 27, 2020 at 03:43:28PM +0800, Jason Wang wrote:
->>>>>> We try to get config from peer unconditionally which may lead NULL
->>>>>> pointer dereference. Add a check before trying to access the config.
->>>>>>
->>>>>> Fixes: 108a64818e69b ("vhost-vdpa: introduce vhost-vdpa backend")
->>>>>> Cc: Cindy Lu <lulu@redhat.com>
->>>>>> Tested-by: Cornelia Huck <cohuck@redhat.com>
->>>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>>>> I am a bit lost here. Isn't this invoked
->>>>> when guest attempts to read the config?
->>>>> With no peer, what do we return to guest?
->>>> Same as with a non-vdpa peer? It's the dereference that needs to be
->>>> guarded.
->>> So vdpa has a GET_CONFIG ioctl which to me hints that a peer needs to be
->>> notified on get config calls.
->>> If we return config from qemu memory here, then I guess we
->>> need to call GET_CONFIG on connect and validate it -
->>> does this make sense?
->>>
->>> Cindy, Jason?
->>
->> For "connect" you meant connecting virtio-net to its peer (vDPA)? AFAIK, if
->> we start with no peer, there's no way to set a peer afterwards.
->>
->> Thanks
->
-> That would be a good sentence to add in a code comment:
->
-> /*
->   * Is this VDPA? No peer means not VDPA: there's no way to
->   * disconnect/reconnect a VDPA peer.
->   */
+On Wed, Jun 10, 2020 at 01:03:29PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi all!
+>=20
+> The aim of the series is to reduce code-duplication and writing
+> parameters structure-packing by hand around coroutine function wrappers.
+>=20
+> Benefits:
+>  - no code duplication
+>  - less indirection
 
+Please add documentation so others know when and how to use this.
 
-Sure.
+I suggest adding a docs/devel/coroutine-wrapper.rst document and adding
+a code comment to #define generated_co_wrapper pointing to the
+documentation.
 
-Thanks
+Please rename coroutine-wrapper.py to block-coroutine-wrapper.py since
+it is specific to the block layer.
 
+Stefan
 
->
->>>>> A code comment might be helpful here.
->>>>>
->>>>>> ---
->>>>>>    hw/net/virtio-net.c | 22 +++++++++++-----------
->>>>>>    1 file changed, 11 insertions(+), 11 deletions(-)
+--wxDdMuZNg1r63Hyj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8ezSgACgkQnKSrs4Gr
+c8iUWgf/TFjNoDEmMJV1nA7SCdUZ892ygSkl6ct6DynPpigTOcTzuU9gN4g2l2X5
+VW3TfkKvpDQDsYndiZClNpAGXI/FJY5O27r12MStJZwRwTuciXYZiMs/F1ToX2k1
+/ydCu/CD+PA+nxcvlpHlAzBX/6cklVWBkV1oWZ21lBvbJ5yMDIo9ZVQ9eTMYQIfb
+vCGMdNPAjHpasp+g5sLYhg9qHggoKLVzcwPPiMpesOiwWjn6pjnM0XW3lmgoIAxb
+099BQUawKItXGyPEtE/OJAx/SnPpPROVKFYeAaRCXRCjkGvNNy6u+Gi/Ap2uAiYl
+b6VTc+Xs7BTPmhOht5EuOQs5AHw1oA==
+=kuek
+-----END PGP SIGNATURE-----
+
+--wxDdMuZNg1r63Hyj--
 
 
