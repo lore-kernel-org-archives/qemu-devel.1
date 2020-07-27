@@ -2,81 +2,88 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8230C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:35:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4222DC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:42:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 818A62074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:35:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DD7020738
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:42:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zAlJbFq1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 818A62074F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dtArooMo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DD7020738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k08ub-00087f-Pn
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 15:35:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45978)
+	id 1k090i-000164-Cg
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 15:42:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k08tt-0007Hf-5C
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 15:35:05 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55831)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k0908-0000fc-Mt
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 15:41:32 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36089)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k08tr-0002fv-9f
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 15:35:04 -0400
-Received: by mail-wm1-x341.google.com with SMTP id 9so15154670wmj.5
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 12:35:02 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k0907-0003TS-0I
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 15:41:32 -0400
+Received: by mail-pf1-x443.google.com with SMTP id m8so2796728pfh.3
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 12:41:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=NE3BHoZcVo5rUaArzOLXnKqyeyPe9cLG2NZvnHPubpg=;
- b=zAlJbFq1ISIbewRaV9wsUZv89IstyJ0SLvWEn3/zVTko8JK3eoRdv2sl5JwXPNqfUP
- KH7Qqjfsn0eIgvPz7bSWZI5ab+xpXqqIRAHTAyIu7x+Kg6+lOf/uSOa24jF766/zxxHq
- OrMsBETtG/sEYT+ykW2jfShJ6PQHlghcb+NAQEcNjf7d4C+ySyp0jq5mRWqQV02wapBQ
- Yxq94HBkvoTdQuvJZA/CGhO8+PxrhT19kiky6z3jNQ1uR2Y/IjU6P0bBqjG8aimcOkcD
- CcCgjp6NAhgkyqKHVXC40LcxMEPfp95y1Xk1MhbI8tf8Xn6pDqOwGtpG/7yHugi5+2VI
- inbQ==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=4pqMNomJh7WNN6/o8pTGK9xDfjiIbi9zXVSzl6e9LRY=;
+ b=dtArooMoyDp1hpwFC8VPZNUgugGkeh/ycit9TQXYn9hPszEYc9OHCjX9a4t1vNw0RC
+ +XRtrE27Yy/Pzd/p6/QrfKkYMsDE0n/Q01g44pNsv8XQiFt7uncgG20Guo7NSnmrXMGn
+ JpSNV2VQfIHUd6xq4Slj9BWJl45/Se6wDm1rVZomh0P/I7cw1y6MvP3JbPB3tLDZCGpr
+ 0JJiMzKeYb3MyOhhxU2kYHTZhy6jZJcKOGhDnfi2QI8bUPmIFOJ9xMyPofacsoIpJgGp
+ Ym/GWBkjSNIK1ywuVEycW3XxQbkIaY7l44DUt8KstSIfbLMnyLV3Qd/GZf4O/RGkptGM
+ 6bUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=NE3BHoZcVo5rUaArzOLXnKqyeyPe9cLG2NZvnHPubpg=;
- b=QxQ7Kbjng1PXsiH+mAjgtSJLEl9Uo1IGZO5JS4yGyNyRlppOMw7Q0mAYUvKcy0aoR6
- VHKkAJKBqedqu1lEtFgqM2AnXce/3dBmSUmUake7NkOn3JQF1+gmGgG2ZROlr+C5myO6
- OGxNV9zW3XIbL7MIKvJiBTS/DbGBgdIb5qOVYKgYgMZ1+99Q6RNAYYWHVpz1VBMyEiNh
- RHy7PDrOipdzVnHvE1GJkcW0XrDa/lNuCFQjVrdBVkL7hlAtlUgzLyHqsMOGeUk6N3xF
- /ZQf4CCOOgWD7tNdsL0bMzPx/og6DOF1IKpKSWFdnVanNWbBQvA3b1Z3scLl/31k3utT
- fuqA==
-X-Gm-Message-State: AOAM532Ja/cCuSq32YQzX/4VTiuCn/LR1/hw7i0JnXIHcvErk1+8FjwN
- dcbgL0bjZk9ubvUiM/CfVpEa5g==
-X-Google-Smtp-Source: ABdhPJztLGsOUEIt08sjyX/zLBm6VdNly9fPWFNFHsVZoS1e16pCRXH6U7Uh2jDMHiXc3R0TH8ni/g==
-X-Received: by 2002:a1c:de85:: with SMTP id v127mr739995wmg.156.1595878501555; 
- Mon, 27 Jul 2020 12:35:01 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id g7sm13860319wrv.82.2020.07.27.12.34.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 12:34:59 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH for-5.1] hw/arm/nrf51_soc: Set system_clock_scale
-Date: Mon, 27 Jul 2020 20:34:58 +0100
-Message-Id: <20200727193458.31250-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ bh=4pqMNomJh7WNN6/o8pTGK9xDfjiIbi9zXVSzl6e9LRY=;
+ b=tIMk4LP6oRwcTdX1iaXpiTkTolklQDXlFZI6UFRs7ELHqZk7HH7UmJSwNAH04L9ii3
+ t7vX2P3qsorirHRS56BaPpS4QmmyfQKpOKja54MCHiPl5BZHB1XGzY0yJRluD0oh5HcV
+ 0tAb4pU+6hHxoimXkPGRli3ovFigXuFiU9x1eaYmfpypwTunzgdh1z3KZVifwQLhg78O
+ rHG2Gx1J9gxdtv++kD+DHMATAQt6XIDSdOI+e+F1TAmC35D/QlH9d7xmfL7MQU1GTo7D
+ V8fbGn+5A/RVagoKEM4nV2B2WpC7qT1rvlUoH3JblDmty++csFz9g2zjl6vzahvGPvm+
+ Vt+g==
+X-Gm-Message-State: AOAM533JNZYdGLlil447fHZRW5JkwO34fLDwpk90r6l7wG8ziyMLwmtI
+ 1Khb5YAwAaUOdZ033dqPzIZxPA==
+X-Google-Smtp-Source: ABdhPJzTcemAbgriuv1R8r69Tet7nh1BJv1jOFULFgjpONr1J6a9UpKoN6h7JI18N2tn1uMVfnHrsQ==
+X-Received: by 2002:a63:5a60:: with SMTP id k32mr20856559pgm.73.1595878889267; 
+ Mon, 27 Jul 2020 12:41:29 -0700 (PDT)
+Received: from [192.168.1.11] (216-160-65-90.tukw.qwest.net. [216.160.65.90])
+ by smtp.gmail.com with ESMTPSA id
+ s67sm6024906pfs.117.2020.07.27.12.41.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 27 Jul 2020 12:41:28 -0700 (PDT)
+Subject: Re: [PATCH] linux-user: Ensure mmap_min_addr is non-zero
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20200724212314.545877-1-richard.henderson@linaro.org>
+ <ed16b937-9f82-8221-0764-77e7fddbed96@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <74132eed-5c06-ac28-9482-fe6ebb28b777@linaro.org>
+Date: Mon, 27 Jul 2020 12:41:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <ed16b937-9f82-8221-0764-77e7fddbed96@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,55 +105,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joel Stanley <joel@jms.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: alex.bennee@linaro.org,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The nrf51 SoC model wasn't setting the system_clock_scale
-global.which meant that if guest code used the systick timer in "use
-the processor clock" mode it would hang because time never advances.
+On 7/27/20 4:19 AM, Laurent Vivier wrote:
+> Le 24/07/2020 à 23:23, Richard Henderson a écrit :
+>> When the chroot does not have /proc mounted, we can read neither
+>> /proc/sys/vm/mmap_min_addr nor /proc/sys/maps.
+>>
+>> The enforcement of mmap_min_addr in the host kernel is done by
+>> the security module, and so does not apply to processes owned
+>> by root.  Which leads pgd_find_hole_fallback to succeed in probing
+>> a reservation at address 0.  Which confuses pgb_reserved_va to
+>> believe that guest_base has not actually been initialized.
+>>
+>> We don't actually want NULL addresses to become accessible, so
+>> make sure that mmap_min_addr is initialized with a non-zero value.
+>>
+>> Buglink: https://bugs.launchpad.net/qemu/+bug/1888728
+>> Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  linux-user/main.c | 16 ++++++++++++++--
+>>  1 file changed, 14 insertions(+), 2 deletions(-)
+>>
+> 
+> Richard, do you want to add this fix in one of your branches PR?
 
-Set the global to match the documented CPU clock speed for this SoC.
+I don't have anything queued at the moment.  I thought I would be able to
+convince Alex to add it to his misc queue, but he sent that this morning.
 
-This SoC in fact doesn't have a SysTick timer (which is the only thing
-currently that cares about the system_clock_scale), because it's
-a configurable option in the Cortex-M0. However our Cortex-M0 and
-thus our nrf51 and our micro:bit board do provide a SysTick, so
-we ought to provide a functional one rather than a broken one.
+> In this case:
+> Acked-by: Laurent Vivier <laurent@vivier.eu>
+> 
+> Otherwise I can prepare a small one for linux-user, adding one or two
+> fixes...
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Tested with 'make check'/'make check-acceptance' only.
+Please go ahead.
 
- hw/arm/nrf51_soc.c | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index 45e6cc97d70..e15981e019f 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -32,6 +32,9 @@
- 
- #define BASE_TO_IRQ(base) ((base >> 12) & 0x1F)
- 
-+/* HCLK (the main CPU clock) on this SoC is always 16MHz */
-+#define HCLK_FRQ 16000000
-+
- static uint64_t clock_read(void *opaque, hwaddr addr, unsigned int size)
- {
-     qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx " [%u]\n",
-@@ -65,6 +68,8 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
-         return;
-     }
- 
-+    system_clock_scale = NANOSECONDS_PER_SECOND / HCLK_FRQ;
-+
-     object_property_set_link(OBJECT(&s->cpu), "memory", OBJECT(&s->container),
-                              &error_abort);
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->cpu), errp)) {
--- 
-2.20.1
-
+r~
 
