@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 533C9C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF94C433F1
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1814F20809
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:59:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A544520809
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:59:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjEe2R+z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1814F20809
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tig4AZJ1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A544520809
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0ADb-0001rh-9g
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 16:59:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35084)
+	id 1k0ADe-00020j-PD
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 16:59:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k0AAa-0005Lx-1L
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:56:24 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29231
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k0AAE-00050s-QQ
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:56:02 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27087
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k0AAT-0004xw-I2
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:56:23 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k0AAD-0004sd-5P
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:56:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595883376;
+ s=mimecast20190719; t=1595883360;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fVx0VAHepZVGUOdQt72FjQmlLnKaNCNllgZ9kWYIfkg=;
- b=GjEe2R+zGSqrQnFFWXLPGCcDSN4m7GHdKO9LmoHuRpwnSl5/+VTdObUtRMdC8jdy6QqZ3A
- d4/+MvccV1ZeWyEB2Gj7+nWLtLslvFQUMFD1HA4s1N1d60Z12RIQ65xkCHFDg1EH0soxLI
- f9ywAvcguMgYrMcg4L0jfJPmrC7Dg6A=
+ bh=c88SJ1ynOV3k49UvCPQbS7iGEmD+ITDXGccJB9WpNSQ=;
+ b=Tig4AZJ1kvZClzoZfdRCg7kTgsRf4a6Cf725/OIpetg9C1tWv+U4z3yFV0buWd9lMUaaqx
+ qFx4AcCTZ+KP9MOioUM2//Q3LKNafCzv+BrAinitXtt+zDF1un0TW76iVbEATlhpcnuScB
+ hiiC7A0FXm35wK0GQaI5niq3qOqwAuQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-DjFWZ96TPdeaV_Xv6jOI9Q-1; Mon, 27 Jul 2020 16:56:09 -0400
-X-MC-Unique: DjFWZ96TPdeaV_Xv6jOI9Q-1
+ us-mta-264-crgLTz4DNI-hhyJ0GgrmVA-1; Mon, 27 Jul 2020 16:55:56 -0400
+X-MC-Unique: crgLTz4DNI-hhyJ0GgrmVA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9995B101C8A0;
- Mon, 27 Jul 2020 20:56:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0236F8015F7;
+ Mon, 27 Jul 2020 20:55:55 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-118-248.rdu2.redhat.com [10.10.118.248])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 65EF419D82;
- Mon, 27 Jul 2020 20:56:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1EFC719945;
+ Mon, 27 Jul 2020 20:55:54 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/24] migration/block-dirty-bitmap: rename
- dirty_bitmap_mig_cleanup
-Date: Mon, 27 Jul 2020 15:55:29 -0500
-Message-Id: <20200727205543.206624-11-eblake@redhat.com>
+Subject: [PULL 05/24] qemu-iotests/199: improve performance: set bitmap by
+ discard
+Date: Mon, 27 Jul 2020 15:55:24 -0500
+Message-Id: <20200727205543.206624-6-eblake@redhat.com>
 In-Reply-To: <20200727205543.206624-1-eblake@redhat.com>
 References: <20200727205543.206624-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -80,7 +80,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,72 +93,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Block I/O path" <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>,
  Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- John Snow <jsnow@redhat.com>
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Rename dirty_bitmap_mig_cleanup to dirty_bitmap_do_save_cleanup, to
-stress that it is on save part.
+Discard dirties dirty-bitmap as well as write, but works faster. Let's
+use it instead.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20200727194236.19551-10-vsementsov@virtuozzo.com>
+Tested-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200727194236.19551-5-vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- migration/block-dirty-bitmap.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/199 | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
 
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 1d57bff4f6c7..01a536d7d3d3 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -259,7 +259,7 @@ static void send_bitmap_bits(QEMUFile *f, SaveBitmapState *dbms,
- }
+diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
+index dd6044768c76..190e820b8408 100755
+--- a/tests/qemu-iotests/199
++++ b/tests/qemu-iotests/199
+@@ -67,8 +67,10 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+         os.mkfifo(fifo)
+         qemu_img('create', '-f', iotests.imgfmt, disk_a, size)
+         qemu_img('create', '-f', iotests.imgfmt, disk_b, size)
+-        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk_a)
+-        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk_b)
++        self.vm_a = iotests.VM(path_suffix='a').add_drive(disk_a,
++                                                          'discard=unmap')
++        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk_b,
++                                                          'discard=unmap')
+         self.vm_b.add_incoming("exec: cat '" + fifo + "'")
+         self.vm_a.launch()
+         self.vm_b.launch()
+@@ -78,7 +80,7 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+         self.vm_b_events = []
 
- /* Called with iothread lock taken.  */
--static void dirty_bitmap_mig_cleanup(void)
-+static void dirty_bitmap_do_save_cleanup(void)
- {
-     SaveBitmapState *dbms;
+     def test_postcopy(self):
+-        write_size = 0x40000000
++        discard_size = 0x40000000
+         granularity = 512
+         chunk = 4096
 
-@@ -406,7 +406,7 @@ static int init_dirty_bitmap_migration(void)
+@@ -86,25 +88,32 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+                                name='bitmap', granularity=granularity)
+         self.assert_qmp(result, 'return', {})
 
- fail:
-     g_hash_table_destroy(handled_by_blk);
--    dirty_bitmap_mig_cleanup();
-+    dirty_bitmap_do_save_cleanup();
++        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
++                               node='drive0', name='bitmap')
++        empty_sha256 = result['return']['sha256']
++
+         s = 0
+-        while s < write_size:
+-            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
++        while s < discard_size:
++            self.vm_a.hmp_qemu_io('drive0', 'discard %d %d' % (s, chunk))
+             s += 0x10000
+         s = 0x8000
+-        while s < write_size:
+-            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
++        while s < discard_size:
++            self.vm_a.hmp_qemu_io('drive0', 'discard %d %d' % (s, chunk))
+             s += 0x10000
 
-     return -1;
- }
-@@ -445,7 +445,7 @@ static void bulk_phase(QEMUFile *f, bool limit)
- /* for SaveVMHandlers */
- static void dirty_bitmap_save_cleanup(void *opaque)
- {
--    dirty_bitmap_mig_cleanup();
-+    dirty_bitmap_do_save_cleanup();
- }
+         result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
+                                node='drive0', name='bitmap')
+         sha256 = result['return']['sha256']
 
- static int dirty_bitmap_save_iterate(QEMUFile *f, void *opaque)
-@@ -480,7 +480,7 @@ static int dirty_bitmap_save_complete(QEMUFile *f, void *opaque)
++        # Check, that updating the bitmap by discards works
++        assert sha256 != empty_sha256
++
+         result = self.vm_a.qmp('block-dirty-bitmap-clear', node='drive0',
+                                name='bitmap')
+         self.assert_qmp(result, 'return', {})
+         s = 0
+-        while s < write_size:
+-            self.vm_a.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
++        while s < discard_size:
++            self.vm_a.hmp_qemu_io('drive0', 'discard %d %d' % (s, chunk))
+             s += 0x10000
 
-     trace_dirty_bitmap_save_complete_finish();
+         caps = [{'capability': 'dirty-bitmaps', 'state': True},
+@@ -126,8 +135,8 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+         self.vm_b_events.append(event_resume)
 
--    dirty_bitmap_mig_cleanup();
-+    dirty_bitmap_do_save_cleanup();
-     return 0;
- }
+         s = 0x8000
+-        while s < write_size:
+-            self.vm_b.hmp_qemu_io('drive0', 'write %d %d' % (s, chunk))
++        while s < discard_size:
++            self.vm_b.hmp_qemu_io('drive0', 'discard %d %d' % (s, chunk))
+             s += 0x10000
 
+         match = {'data': {'status': 'completed'}}
 -- 
 2.27.0
 
