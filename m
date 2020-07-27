@@ -2,78 +2,84 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 464ECC433F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 07:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A6B3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 08:23:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10EEB2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 07:44:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B800820719
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 08:23:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1h+vup5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10EEB2072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YgDKrI5+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B800820719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzxoB-00012k-By
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 03:44:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37076)
+	id 1jzyQL-0001Jn-Vp
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 04:23:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jzxnQ-0000AS-SW
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 03:43:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45003
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jzyPk-0000ub-SK
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 04:23:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39784
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jzxnP-00069r-BT
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 03:43:40 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1jzyPh-0003nI-Kx
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 04:23:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595835818;
+ s=mimecast20190719; t=1595838192;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=NT+xOB7Pg6mr960cd2gbJQjs1WKr8VDlMHI97CwjdoI=;
- b=i1h+vup5yhdoqWF91M1GhOYhexGG19O2XkDI14ypCZqnOOl93yBCCsnA4IQasRDTktAM/S
- gtDSTEzHbHfKZ97OXiJxWFUl+mt+0dxE6lYIs0EY6OzGtMB17Pyv3vE2t62+5H6a9Z5PVr
- Vlf+0vRgdWkP5ATQp97cHffGDWCd25I=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=U87GZg/Wb+gIen5KO/WA5kewbqvVduaYpyz2iOZTAEc=;
+ b=YgDKrI5+BVIZ+U89qVsAS42cg8uWUGDkxkJfnnW+xi+JxKjKg2HC1caJeu6uYrfdKJgB/R
+ w5nto51PfeB4QTTYFcS8Vh9m/oL+kzUXFK6At/RfQrhls9vhDPPJ60rIuC0QJ8hcFChyb5
+ IxSFl13fbAACDLGvsTGVgDsHAAPcCK4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-b_qso_04MlKuM_0BC9yj8Q-1; Mon, 27 Jul 2020 03:43:36 -0400
-X-MC-Unique: b_qso_04MlKuM_0BC9yj8Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-310-snKCe1TgOYSaNAMZ7t3VxA-1; Mon, 27 Jul 2020 04:23:09 -0400
+X-MC-Unique: snKCe1TgOYSaNAMZ7t3VxA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82B1F80183C
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 07:43:35 +0000 (UTC)
-Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
- (ovpn-12-200.pek2.redhat.com [10.72.12.200])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7342E10013C4;
- Mon, 27 Jul 2020 07:43:30 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com
-Subject: [PATCH] virtio-net: check the existence of peer before accesing its
- config
-Date: Mon, 27 Jul 2020 15:43:28 +0800
-Message-Id: <20200727074328.2279-1-jasowang@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D7C0106B244;
+ Mon, 27 Jul 2020 08:23:08 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A58B960F96;
+ Mon, 27 Jul 2020 08:23:01 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 29BBA1138648; Mon, 27 Jul 2020 10:23:00 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Christophe de Dinechin <dinechin@redhat.com>
+Subject: Re: [PATCH v2 2/3] trace: Add support for recorder back-end
+References: <20200626162706.3304357-1-dinechin@redhat.com>
+ <20200626162706.3304357-3-dinechin@redhat.com>
+ <20200630130257.GP1370404@redhat.com>
+ <7ha6zq2zxr.fsf@turbo.dinechin.lan>
+ <87mu3qgwbx.fsf@dusky.pond.sub.org>
+ <7ha6zq2ooj.fsf@turbo.dinechin.lan>
+Date: Mon, 27 Jul 2020 10:23:00 +0200
+In-Reply-To: <7ha6zq2ooj.fsf@turbo.dinechin.lan> (Christophe de Dinechin's
+ message of "Thu, 23 Jul 2020 18:15:08 +0200")
+Message-ID: <87pn8h5puj.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:44:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -83,7 +89,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,79 +102,394 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Cindy Lu <lulu@redhat.com>
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David
+ Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We try to get config from peer unconditionally which may lead NULL
-pointer dereference. Add a check before trying to access the config.
+Christophe de Dinechin <dinechin@redhat.com> writes:
 
-Fixes: 108a64818e69b ("vhost-vdpa: introduce vhost-vdpa backend")
-Cc: Cindy Lu <lulu@redhat.com>
-Tested-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/net/virtio-net.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+> On 2020-07-23 at 16:06 CEST, Markus Armbruster wrote...
+>> Christophe de Dinechin <dinechin@redhat.com> writes:
+>>
+>>> On 2020-06-30 at 15:02 CEST, Daniel P. Berrang=C3=A9 wrote...
+>>>> On Fri, Jun 26, 2020 at 06:27:05PM +0200, Christophe de Dinechin wrote=
+:
+>>>>> The recorder library provides support for low-cost continuous
+>>>>> recording of events, which can then be replayed. This makes it
+>>>>> possible to collect data "after the fact",for example to show the
+>>>>> events that led to a crash.
+>>>>>
+>>>>> Recorder support in qemu is implemented using the existing tracing
+>>>>> interface. In addition, it is possible to individually enable
+>>>>> recorders that are not traces, although this is probably not
+>>>>> recommended.
+>>>>>
+>>>>> HMP COMMAND:
+>>>>> The 'recorder' hmp command has been added, which supports two
+>>>>> sub-commands:
+>>>>> - recorder dump: Dump the current state of the recorder. You can
+>>>>> - recorder trace: Set traces using the recorder_trace_set() syntax.
+>>>>>   You can use "recorder trace help" to list all available recorders.
+>>>>>
+>>>>> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+>>>>> ---
+>>>>>  configure                             |  5 +++
+>>>>>  hmp-commands.hx                       | 19 ++++++++--
+>>>>>  monitor/misc.c                        | 27 ++++++++++++++
+>>>>>  scripts/tracetool/backend/recorder.py | 51 +++++++++++++++++++++++++=
+++
+>>>>>  trace/Makefile.objs                   |  2 ++
+>>>>>  trace/control.c                       |  7 ++++
+>>>>>  trace/recorder.c                      | 22 ++++++++++++
+>>>>>  trace/recorder.h                      | 34 ++++++++++++++++++
+>>>>>  util/module.c                         |  8 +++++
+>>>>>  9 files changed, 173 insertions(+), 2 deletions(-)
+>>>>>  create mode 100644 scripts/tracetool/backend/recorder.py
+>>>>>  create mode 100644 trace/recorder.c
+>>>>>  create mode 100644 trace/recorder.h
+>>>>
+>>>>> +RECORDER_CONSTRUCTOR
+>>>>> +void recorder_trace_init(void)
+>>>>> +{
+>>>>> +    recorder_trace_set(getenv("RECORDER_TRACES"));
+>>>>> +
+>>>>> +    // Allow a dump in case we receive some unhandled signal
+>>>>> +    // For example, send USR2 to a hung process to get a dump
+>>>>> +    if (getenv("RECORDER_TRACES"))
+>>>>> +        recorder_dump_on_common_signals(0,0);
+>>>>> +}
+>>>>
+>>>> What is the syntax of this RECORDER_TRACES env variable,
+>>>
+>>> It's basically a colon-separated list of regexps,
+>>> e.g. ".*_error:.*_warning", with special syntax for some additional
+>>> functionality such as real-time graphing.
+>>>
+>>> Here are a few examples:
+>>>
+>>> - Activate the foo, bar and baz traces:
+>>>       foo:bar:baz
+>>>
+>>> - Activate all traces that contain "lock", as well as "recorder" trace:
+>>>       *lock.*:recorder
+>>>
+>>> - Deactivate traces ending in _error
+>>>       .*_error=3D0
+>>>
+>>> There are also a few tweaks and special names, for example you can adju=
+st
+>>> the output to show the function name and source code location as follow=
+s::
+>>>
+>>> - Show source information in the traces
+>>>       recorder_function:recorder_location
+>>>
+>>>   As is not very useful in qemu because it sohws the wrapper location:
+>>>      % RECORDER_TRACES=3Dvm_state_notify qemu-system-x86_64
+>>>      [35225 7.092175] vm_state_notify: running 1 reason 9 (running)
+>>>
+>>>      % RECORDER_TRACES=3Dvm_state_notify:recorder_function:recorder_loc=
+ation qemu-system-x86_64
+>>>      /home/ddd/Work/qemu/trace-root.h:346:_nocheck__trace_vm_state_noti=
+fy:[94277 0.294906] vm_state_notify: running 1 reason 9 (running)
+>>>
+>>>   This is not as good as what you get with "real" record entries:
+>>>      % RECORDER_TRACES=3Drecorder_function:recorder_location:recorder q=
+emu-system-x86_64
+>>>      recorder.c:2036:recorder_allocate_alt_stack:[29561 0.006434] recor=
+der: Set alt stack to 0x7fc567b87000 size 8192
+>>>
+>>> - Get some help on available traces:
+>>>       help
+>>>
+>>> - Enable real-time graphing for trace "perfdata"
+>>>       perfdata=3Dbytes,loops
+>>>
+>>> The last one assumes that you would have a record that looks like:
+>>>
+>>>      record(perfdata, "Transferred %lu bytes in %lu iterations",
+>>>             bytes, itercount);
+>>>
+>>> You could then have a real-time graph of the values for variables "byte=
+s"
+>>> and "itercount" using the recorder_scope program, and using the names y=
+ou
+>>> gave to the channels in your RECORDER_TRACES variable, i.e. bytes and l=
+oops:
+>>>
+>>>      recorder_scope bytes loops
+>>>
+>>> See man recorder_trace_set(3), recorder_scope(1) or
+>>> https://github.com/c3d/recorder#recorder-tracing for more information.
+>>>
+>>>
+>>>> and perhaps more importantly should we have this modelled as a command
+>>>> line arg instead of an env variable. We've generally been aiming to ge=
+t
+>>>> rid of env variables and have QAPI modelled CLI. QAPI modelling would =
+be
+>>>> particularly important if we want to expose the ablity to change setti=
+ngs
+>>>> on the fly via QMP.
+>>>
+>>> The rationale for the recorder using an environment variable is that it=
+ was
+>>> initially designed to be able to trace libraries, notably SPICE or the
+>>> recorder library itself. A single environment variable can be used to
+>>> activate traces in the main binary as well as in the libraries.
+>>
+>> Makes sense.
+>>
+>>> I'm certainly not against adding a command-line option to activate reco=
+rder
+>>> options specifically, but as I understand, the option -trace already ex=
+ists,
+>>> and its semantics is sufficiently different from the one in recorder
+>>> patterns that I decided to not connect the two for now. For example, to
+>>> disable trace foo, you'd pass "-foo" to the -trace option, but "foo=3D0=
+" to
+>>> RECORDER_TRACES. The parsing of graphing options and other related
+>>> recorder-specific stuff is a bit difficult to integrate with -trace too=
+.
+>>
+>> We need proper integration with the existing trace UI.
+>
+> I agree, but I don't think this belongs to this particular patch series.
+> See below why.
+>
+>>
+>> In particular, the ability to enable and disable trace events
+>> dynamically provided by QMP commands trace-event-get-state,
+>> trace-event-set-state, and HMP command trace-event is really useful.
+>
+> That ability exists, but given the many differences between the
+> recorder and other tracing mechanisms, I found it useful to add a specifi=
+c
+> "recorder" command.
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 4895af1cbe..935b9ef5c7 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -125,6 +125,7 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
- {
-     VirtIONet *n = VIRTIO_NET(vdev);
-     struct virtio_net_config netcfg;
-+    NetClientState *nc = qemu_get_queue(n->nic);
- 
-     int ret = 0;
-     memset(&netcfg, 0 , sizeof(struct virtio_net_config));
-@@ -142,13 +143,12 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-                  VIRTIO_NET_RSS_SUPPORTED_HASHES);
-     memcpy(config, &netcfg, n->config_size);
- 
--    NetClientState *nc = qemu_get_queue(n->nic);
--    if (nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-+    if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-         ret = vhost_net_get_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
--                             n->config_size);
--    if (ret != -1) {
--        memcpy(config, &netcfg, n->config_size);
--    }
-+                                   n->config_size);
-+        if (ret != -1) {
-+            memcpy(config, &netcfg, n->config_size);
-+        }
-     }
- }
- 
-@@ -156,6 +156,7 @@ static void virtio_net_set_config(VirtIODevice *vdev, const uint8_t *config)
- {
-     VirtIONet *n = VIRTIO_NET(vdev);
-     struct virtio_net_config netcfg = {};
-+    NetClientState *nc = qemu_get_queue(n->nic);
- 
-     memcpy(&netcfg, config, n->config_size);
- 
-@@ -166,11 +167,10 @@ static void virtio_net_set_config(VirtIODevice *vdev, const uint8_t *config)
-         qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
-     }
- 
--    NetClientState *nc = qemu_get_queue(n->nic);
--    if (nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
--        vhost_net_set_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
--                               0, n->config_size,
--                        VHOST_SET_CONFIG_TYPE_MASTER);
-+    if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-+        vhost_net_set_config(get_vhost_net(nc->peer),
-+                             (uint8_t *)&netcfg, 0, n->config_size,
-+                             VHOST_SET_CONFIG_TYPE_MASTER);
-       }
- }
- 
--- 
-2.20.1
+Precedence for commands specific to a trace backend: trace-file.
+
+Name yours trace-recorder?
+
+> For example, assuming I built with both recorder and log trace backends,
+> from the monitor, I can type:
+>
+>   trace-event kvm_run_exit on
+>
+> What I get then is something like that:
+>
+>   2091091@1595518935.441273:kvm_run_exit cpu_index 0, reason 2
+>   2091091@1595518935.441292:kvm_run_exit cpu_index 0, reason 2
+>   2091091@1595518935.441301:kvm_run_exit cpu_index 0, reason 2
+>   2091091@1595518935.441309:kvm_run_exit cpu_index 0, reason 2
+>   2091091@1595518935.441254:kvm_run_exit cpu_index 0, reason 2
+>
+> It would not be very useful to activate recorder traces as well when that
+> happens, which would have the undesired side effect of purging any
+> corresponding entry from a following recorder dump.
+
+I'm afraid I don't understand, because the gaps in my understanding of
+what the recorder can do are just too big.
+
+From your cover letter:
+
+    1. Flight recorder: Dump information on recent events in case of crash
+
+Define "recent events", please.  Is it all trace events (except for the
+ones disabled at build time, of course)?
+
+"Flight recorder" hints at recording in some ring buffer.  True?
+
+Can you explain the difference to trace backend "ftrace"?
+
+    2. Tracing: Individual traces can be enabled using environment variable=
+s
+
+I guess "individual traces" means "individual trace events".
+
+What does it mean to enable a trace event?  How does this affect the
+recorder's behavior?
+
+    3. Real-time graphing / control, using the recorder_scope application
+
+I'm ignoring this one for now.
+
+> There are, however, new monitor commands, so now I can do:
+>
+>   recorder trace kvm_run_exit
+>
+> I now get an output where each trace shows up twice.
+>
+>   [120139718 137.127269] kvm_run_exit: cpu_index 0, reason 2
+>   2091091@1595518954.209803:kvm_run_exit cpu_index 0, reason 2
+>   [120139734 137.127281] kvm_run_exit: cpu_index 0, reason 2
+>   2091091@1595518954.209814:kvm_run_exit cpu_index 0, reason 2
+>   [120139751 137.127293] kvm_run_exit: cpu_index 0, reason 2
+>
+>  I don't find particularly useful, so I don't think having that as the
+> normal behaviour would qualify as what you called proper integration.
+
+Well, I asked for it by configuring two trace backends, didn't I?
+
+If I configured just the recorder backend, would I get a useful trace?
+
+If yes, what's wrong with letting me control what's being traced with
+the common trace-event command in addition to a backend-specific
+command?
+
+> Having a separate recorder command, OTOH, allows me to also do things
+> that are not possible with other trace back-ends, and presumably never wi=
+ll
+
+I'm not arguing against an additional recorder command to control things
+only the recorder backend can do.
+
+> be, like:
+>
+>     recorder trace kvm_run_exit=3Dcpu,reason
+>
+> That configures things so that I can now do real-time graphing using
+> recorder-scope. The only output from qemu will be:
+>
+>   Creating new /tmp/recorder_share
+>
+> But I can now run somewhere else:
+>
+>    recorder_scope cpu reason
+>
+> and have a real-time view of what is happening in my qemu. Not particular=
+ly
+> interesting with existing instrumentation, which was not designed for
+> graphing, but that's easily changed.
+>
+> Another key feature I get from the new monitor command is
+>
+>   recorder dump
+>
+> Now the output will be something like (cut for brevity)
+>
+>   [150261271 461.814366] lock: Locked state 2 for 0x55d842d66d18
+>   [150261272 461.814366] qemu_mutex_unlock: released mutex 0x55d842d66d18=
+ (0x55d840d032c0:119)
+>   [150261273 461.814366] lock: Unkocked state 0 for 0x55d842d66d18
+>   [150261274 461.814367] lockcnt_fast_path_attempt: lockcnt 0x55d842b630e=
+c fast path 0->4
+>   [150261275 461.814367] lockcnt_fast_path_success: lockcnt 0x55d842b630e=
+c fast path 0->4 succeeded
+>   [150261276 461.814515] qemu_mutex_lock: waiting on mutex 0x55d842ded590=
+ (0x55d840c63019:161)
+>   [150261277 461.814515] lock: Locking state 1 for 0x55d842ded590
+>   [150261278 461.814515] qemu_mutex_locked: taken mutex 0x55d842ded590 (0=
+x55d840c63019:161)
+>   [150261279 461.814515] lock: Locked state 2 for 0x55d842ded590
+>   [150261280 461.814517] object_class_dynamic_cast_assert: 0x55d842dea5e0=
+->0x55d840cdfcc0 (0x55d840cdfcb1:114:0x55d840ce02a0)
+>   [150261281 461.814518] qemu_mutex_lock: waiting on mutex 0x55d842db27b8=
+ (0x55d840cdfcb1:118)
+>   [150261282 461.814518] lock: Locking state 1 for 0x55d842db27b8
+>   [150261283 461.814518] qemu_mutex_locked: taken mutex 0x55d842db27b8 (0=
+x55d840cdfcb1:118)
+>   [150261284 461.814518] lock: Locked state 2 for 0x55d842db27b8
+>   [150261285 461.814518] object_dynamic_cast_assert: 0x55d842dea5e0->0x7f=
+7f88f304d9 (0x7f7f88f304d0:1668:0x7f7f88f308c0)
+>   [150261286 461.814521] qemu_mutex_unlock: released mutex 0x55d842db27b8=
+ (0x55d840cdfcb1:143)
+>   [150261287 461.814521] lock: Unkocked state 0 for 0x55d842db27b8
+>   [150261288 461.814523] qemu_mutex_unlock: released mutex 0x55d842ded590=
+ (0x55d840c63019:172)
+>   [150261289 461.814523] lock: Unkocked state 0 for 0x55d842ded590
+>   [150261290 461.814524] monitor_suspend: mon 0x55d842ded530: 1
+>   [150261291 461.814525] handle_hmp_command: mon 0x55d842ded530 cmdline: =
+0x55d842e18d50
+>   [150261292 461.814537] recorder: Recorder dump
+>
+> Of course, in general, you will probably want to focus on some particular
+> trace after an event happened, e.g.
+>
+>   recorder dump qemu_mutex_unlock
+>
+> which will get you:
+>
+>   [150617808 508.134486] qemu_mutex_unlock: released mutex 0x55d842d66898=
+ (0x55d840d032c0:119)
+>   [150617814 508.134487] qemu_mutex_unlock: released mutex 0x55d842d66918=
+ (0x55d840d032c0:119)
+>   [150617820 508.134489] qemu_mutex_unlock: released mutex 0x55d842d66d18=
+ (0x55d840d032c0:119)
+>   [150617822 508.134494] qemu_mutex_unlock: released mutex 0x55d841360500=
+ (0x55d840b85f40:1790)
+>   [150617834 508.136546] qemu_mutex_unlock: released mutex 0x55d842d66d18=
+ (0x55d840d032c0:119)
+>   [150617848 508.136630] qemu_mutex_unlock: released mutex 0x55d842db27b8=
+ (0x55d840cdfcb1:143)
+>   [150617850 508.136631] qemu_mutex_unlock: released mutex 0x55d842ded590=
+ (0x55d840c63019:172)
+>
+> So as you can see, the usage pattern is IMO sufficiently different from t=
+he
+> existing tracing mechanism that slightly different commands and usage mod=
+els
+> may be warranted.
+
+Separate commands for sufficiently different usage patterns may make
+sense.  My question is whether the recorder backend can also support the
+same old usage patterns.
+
+Supporting the same old usage patterns is nice, because then I don't
+have to configure two trace backends, one for old usage patterns, and
+recorder for the recorder usage patterns.
+
+But then I'd like to be able to use the same old commands, too.
+
+> Does that interface make sense?
+>
+>
+> As an aside, if you have activated the recorder sharing mechanism by usin=
+g
+> some "recorder_name=3Drecorder_field,recorder_field" option, then you can
+> remote-control some aspects of qemu as well using recorder_scope. For
+> example, instead of using the monitor, you can use:
+>
+>   recorder_scope -c qemu_mutex_unlock
+>
+> Or
+>
+>   recorder_scope -c dump
+>
+>>
+>> Integration need not mean implement the existing interface slavishly!
+>> Feel free to evolve it.  For instance, the QMP commands provide
+>> "case-sensitive glob", while you have full regexps.  You could extend
+>> the commands to also accept regexps.
+>
+> Yes, as I have indicated in the cover letter, further integration is a to=
+pic
+> of interest. This is likely to require some relatively "minor" changes li=
+ke
+> the one you mentioned, as well as more significant ones.
+>
+> What I want to avoid is shooting for some "lowest common denominator" by
+> constraining the recorder library to just tracing. If this was just
+> functionally equivalent to the log trace backend, the recorder trace back=
+end
+> would add very little value and not be worth integrating.
+
+The point of integrating the recorder backends is of course gaining
+features the other backends don't already provide.  Additional features
+taking additional UI is fine.
+
+>> We can talk about leaving gaps for later.
+>>
+>> I recommend to start with QMP.
+>
+> Does the existing qmp integration work for you, or do you have suggestion=
+s
+> for reworking it?
+
+I'm afraid I need to learn a bit more before I can answer this.
 
 
