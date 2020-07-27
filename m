@@ -2,91 +2,102 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 995B5C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 15:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BB1C433E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 15:48:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24495206E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 15:46:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2AD9206E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 15:48:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MHzhRB3z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24495206E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J6whbW3x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2AD9206E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k05L1-0001tJ-0t
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 11:46:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49544)
+	id 1k05MC-0002sN-8H
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 11:48:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k05K8-0001MK-Ry
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 11:45:56 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37622)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k05K6-0005la-7W
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 11:45:56 -0400
-Received: by mail-wm1-x342.google.com with SMTP id k8so4932427wma.2
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 08:45:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=gRnzhB6CdonM/19XlgBuso003ocyxIuCfMZY1cNIpB4=;
- b=MHzhRB3zfJVi4fQ+QEDgvHdNbwvR9+a0EezGwoqUqosz8anZPTHzDEG+gBO5+R5XWY
- gjdnHakmAW3TirOCIiTFiOpZHT0Qdoi+ngUCL0RYeLc28igoTGodweKV4w+fBN5YDOkW
- r6UkUvD53DHHz1BhG7yhXI79TdC3ExPi8MRkMTsRH0y6plcjqMIQdbyua1ZQrli/2Erl
- vk461tR7FHfyIcU/RHqHNQX1Ud3W247IfqO33Si+WvhJdOVb/2njakvrYsbL/AAx1zhE
- SA69B59RLuAQUmI6NRFjeOpFo8XdRmeB5F/ggk6oXIkeP2gf9CHgYWmXxTELr+8tp/KR
- K/Fg==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k05LZ-0002Ob-Ue
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 11:47:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27095
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k05LW-00064c-GB
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 11:47:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595864840;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=4RDX39NUEU7bpwep5hs0kcjK1CmdqKe/p3D7N6dcXsk=;
+ b=J6whbW3xzIDekSLce3L7UYwu3aXuZXIYMtEg73PbQpIzNjgLlz87/Mimdf/+9Fbg/XK7TN
+ WI9JaWBtsugH1BHYv7QDSfMZmKZDBuXRTaja8i90ajaktXPHPx3MxXMPLqUD50czjhofON
+ xnakwr9G8PsVuWJ7RynjNJQgcyyy8mA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-37-ju1RycXaNemh3ViqhUftOw-1; Mon, 27 Jul 2020 11:47:18 -0400
+X-MC-Unique: ju1RycXaNemh3ViqhUftOw-1
+Received: by mail-wm1-f71.google.com with SMTP id y204so7993224wmd.2
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 08:47:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=gRnzhB6CdonM/19XlgBuso003ocyxIuCfMZY1cNIpB4=;
- b=KXNyGn/WvLAVupsBwuGl8YSAIYAdxz6fNuBuwCpLR7ybhmVjl0DbJODbPyT40cX3Fu
- OggBt95kjH/pCj9v+lcPicIeGDNaFWxEKjPtTD52jCi+IUN31BkU9KPlPd0SfQnYnmrS
- fqAtm6edNDjsYIpy/7OJ1ePCchFFxBzOJs+sdacENJsW9KmMO7kGD8QQg16fdMLVZrQU
- rLcFNjxFbEZxrIMH9wmyOCxhw7TszprEqrjCeBP8ZS7+wTgl3Puge3NGw/VSU2HlgUyY
- 3Td33tvblfIAdxuWAqJ+K1LvM0DTNsOkos/a3aY6bwlDf7iBlgXieNdPJgVsKhauhDzI
- izjA==
-X-Gm-Message-State: AOAM530p9lHDFNf3zXdf4B7iBovQ00zOTCJUwft6MkEsKaq2l53E2xdL
- es5q9eZsL8QrKVf7qkYrCLl4Bw==
-X-Google-Smtp-Source: ABdhPJwVWXK3Cuqbqb+OogcELW83CNA4VOae4Iw+5xTXzGDkzbBut6ZJ3jU3BiykFKZQ1i1Q+SJjfg==
-X-Received: by 2002:a1c:2805:: with SMTP id o5mr21465619wmo.25.1595864752140; 
- Mon, 27 Jul 2020 08:45:52 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id m126sm29155wmf.3.2020.07.27.08.45.51
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=4RDX39NUEU7bpwep5hs0kcjK1CmdqKe/p3D7N6dcXsk=;
+ b=A9Sc+CgsUqe540Cb/z23qqhfDbTcBysbEE9w7+YMbGWGHps1TMq6gqSaX5M13EvJV+
+ ZSn1a2Nd1TbiuvmCGdl+AGI4OPG34clWYQXdy0OLMyTtqIdQgGl2QDAtUgX1/U2hNzSX
+ fB8POs3BbfnLYswF8C96d7oOOk4ERoQ1FMTCazMvVo/QFN/PWAkPaM0dDV/EYy98RGk/
+ B4I+jNC2bxBZaheBfPd1xO8OKDr5UfCgzDA1ou4E/YEILS7HS88Wd5UkNUEHWSo5wlko
+ Yx15Icp4Ke/KDcRcIMpxvVSwQAyeWJFagxSC7Ru/mh/Wi9vaExqW50PNuBRYXiR6WsfN
+ /gqQ==
+X-Gm-Message-State: AOAM531rjXsYIlKDreWfwDcs7a+yDn/iRcI5NsynrWdnL1pN1O7re3VE
+ lGmkRYLnqGmd31oTsGRxOo7J1pCrTRGv0RxNeSBSAnCHnjH3jngr4WWXqC13hQoMlOLhz34RuqA
+ h2jNhs25uIpIeTR8=
+X-Received: by 2002:adf:b34a:: with SMTP id k10mr20616553wrd.402.1595864837460; 
+ Mon, 27 Jul 2020 08:47:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxS5Q+u5k+UfVFmSTRhRlApffIQu4oAvvGoTwTV9ELEhnusBcPgkyHWJry1gVwOwk+e3P1Pqg==
+X-Received: by 2002:adf:b34a:: with SMTP id k10mr20616521wrd.402.1595864837107; 
+ Mon, 27 Jul 2020 08:47:17 -0700 (PDT)
+Received: from redhat.com ([192.117.173.58])
+ by smtp.gmail.com with ESMTPSA id p8sm14009778wrq.9.2020.07.27.08.47.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 08:45:51 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH for-5.1] hw/timer/imx_epit: Avoid assertion when CR.SWR is
- written
-Date: Mon, 27 Jul 2020 16:45:50 +0100
-Message-Id: <20200727154550.3409-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ Mon, 27 Jul 2020 08:47:16 -0700 (PDT)
+Date: Mon, 27 Jul 2020 11:47:12 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Hogan Wang <hogan.wang@huawei.com>
+Subject: Re: [PATCH v4 2/2] hw/pci-host: save/restore pci host config
+ register for old ones
+Message-ID: <20200727102012-mutt-send-email-mst@kernel.org>
+References: <20200727084621.3279-1-hogan.wang@huawei.com>
+ <20200727084621.3279-2-hogan.wang@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <20200727084621.3279-2-hogan.wang@huawei.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 00:16:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,63 +110,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Chubb <peter.chubb@nicta.com.au>
+Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jusual@redhat.com,
+ dgilbert@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The imx_epit device has a software-controllable reset triggered by
-setting the SWR bit in the CR register. An error in commit cc2722ec83ad9
-means that we will end up assert()ing if the guest does this, because
-the code in imx_epit_write() starts ptimer transactions, and then
-imx_epit_reset() also starts ptimre transactions, triggering
-"ptimer_transaction_begin: Assertion `!s->in_transaction' failed".
+On Mon, Jul 27, 2020 at 04:46:21PM +0800, Hogan Wang wrote:
+> The i440fx and q35 machines integrate i440FX or MCH PCI device by default.
+> Refer to i440FX and ICH9-LPC spcifications, there are some reserved
+> configuration registers can used to save/restore PCIHostState.config_reg.
+> It's nasty but friendly to old ones.
+> 
+> Reproducer steps:
+> step 1. Make modifications to seabios and qemu for increase reproduction
+> efficiency, write 0xf0 to 0x402 port notify qemu to stop vcpu after
+> 0x0cf8 port wrote i440 configure register. qemu stop vcpu when catch
+> 0x402 port wrote 0xf0.
+> 
+> seabios:/src/hw/pci.c
+> @@ -52,6 +52,11 @@ void pci_config_writeb(u16 bdf, u32 addr, u8 val)
+>          writeb(mmconfig_addr(bdf, addr), val);
+>      } else {
+>          outl(ioconfig_cmd(bdf, addr), PORT_PCI_CMD);
+> +       if (bdf == 0 && addr == 0x72 && val == 0xa) {
+> +            dprintf(1, "stop vcpu\n");
+> +            outb(0xf0, 0x402); // notify qemu to stop vcpu
+> +            dprintf(1, "resume vcpu\n");
+> +        }
+>          outb(val, PORT_PCI_DATA + (addr & 3));
+>      }
+>  }
+> 
+> qemu:hw/char/debugcon.c
+> @@ -60,6 +61,9 @@ static void debugcon_ioport_write(void *opaque, hwaddr addr, uint64_t val,
+>      printf(" [debugcon: write addr=0x%04" HWADDR_PRIx " val=0x%02" PRIx64 "]\n", addr, val);
+>  #endif
+> 
+> +    if (ch == 0xf0) {
+> +        vm_stop(RUN_STATE_PAUSED);
+> +    }
+>      /* XXX this blocks entire thread. Rewrite to use
+>       * qemu_chr_fe_write and background I/O callbacks */
+>      qemu_chr_fe_write_all(&s->chr, &ch, 1);
+> 
+> step 2. start vm1 by the following command line, and then vm stopped.
+> $ qemu-system-x86_64 -machine pc-i440fx-5.0,accel=kvm\
+>  -netdev tap,ifname=tap-test,id=hostnet0,vhost=on,downscript=no,script=no\
+>  -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.0,addr=0x13,bootindex=3\
+>  -device cirrus-vga,id=video0,vgamem_mb=16,bus=pci.0,addr=0x2\
+>  -chardev file,id=seabios,path=/var/log/test.seabios,append=on\
+>  -device isa-debugcon,iobase=0x402,chardev=seabios\
+>  -monitor stdio
+> 
+> step 3. start vm2 to accept vm1 state.
+> $ qemu-system-x86_64 -machine pc-i440fx-5.0,accel=kvm\
+>  -netdev tap,ifname=tap-test1,id=hostnet0,vhost=on,downscript=no,script=no\
+>  -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.0,addr=0x13,bootindex=3\
+>  -device cirrus-vga,id=video0,vgamem_mb=16,bus=pci.0,addr=0x2\
+>  -chardev file,id=seabios,path=/var/log/test.seabios,append=on\
+>  -device isa-debugcon,iobase=0x402,chardev=seabios\
+>  -monitor stdio \
+>  -incoming tcp:127.0.0.1:8000
+> 
+> step 4. execute the following qmp command in vm1 to migrate.
+> (qemu) migrate tcp:127.0.0.1:8000
+> 
+> step 5. execute the following qmp command in vm2 to resume vcpu.
+> (qemu) cont
 
-The cleanest way to avoid this double-transaction is to move the
-start-transaction for the CR write handling down below the check of
-the SWR bit.
+Great report, I copied it to the previous patch too.
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1880424
-Fixes: cc2722ec83ad944505fe
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I don't have a test image for KZM so this is the minimal
-obviously-safe change. I'm pretty sure that actually we could
-add a "break" after the imx_epit_reset() call because all of
-the work done by the following code is duplicating the ptimer
-setup done by the reset function. But I'm not really happy making
-that change without a test image...
----
- hw/timer/imx_epit.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+> Before this patch, we can get KVM "emulation failure" error on vm2.
 
-diff --git a/hw/timer/imx_epit.c b/hw/timer/imx_epit.c
-index baf6338e1a6..4f51e6e12da 100644
---- a/hw/timer/imx_epit.c
-+++ b/hw/timer/imx_epit.c
-@@ -199,15 +199,18 @@ static void imx_epit_write(void *opaque, hwaddr offset, uint64_t value,
- 
-     switch (offset >> 2) {
-     case 0: /* CR */
--        ptimer_transaction_begin(s->timer_cmp);
--        ptimer_transaction_begin(s->timer_reload);
- 
-         oldcr = s->cr;
-         s->cr = value & 0x03ffffff;
-         if (s->cr & CR_SWR) {
-             /* handle the reset */
-             imx_epit_reset(DEVICE(s));
--        } else {
-+        }
-+
-+        ptimer_transaction_begin(s->timer_cmp);
-+        ptimer_transaction_begin(s->timer_reload);
-+
-+        if (!(s->cr & CR_SWR)) {
-             imx_epit_set_freq(s);
-         }
- 
--- 
-2.20.1
+we can get -> we get
+
+> This patch can fix it.
+
+-> this patch fixes it
+
+> 
+> Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
+> ---
+>  hw/pci-host/i440fx.c | 31 +++++++++++++++++++++++++++++++
+>  hw/pci-host/q35.c    | 30 ++++++++++++++++++++++++++++++
+>  2 files changed, 61 insertions(+)
+> 
+> diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+> index 8ed2417f0c..b78c8bc5f9 100644
+> --- a/hw/pci-host/i440fx.c
+> +++ b/hw/pci-host/i440fx.c
+> @@ -64,6 +64,14 @@ typedef struct I440FXState {
+>   */
+>  #define I440FX_COREBOOT_RAM_SIZE 0x57
+>  
+> +/* Older I440FX machines (5.0 and older) not support i440FX-pcihost state
+
+not support -> do not support
+
+> + * migration, use some reserved INTEL 82441 configuration registers to
+> + * save/restore i440FX-pcihost config register. Refer to [INTEL 440FX PCISET
+> + * 82441FX PCI AND MEMORY CONTROLLER (PMC) AND 82442FX DATA BUS ACCELERATOR
+> + * (DBX) Table 1. PMC Configuration Space]
+> + */
+> +#define I440FX_PCI_HOST_CONFIG_REG 0x94
+> +
+>  static void i440fx_update_memory_mappings(PCII440FXState *d)
+>  {
+>      int i;
+> @@ -98,8 +106,30 @@ static void i440fx_write_config(PCIDevice *dev,
+>  static int i440fx_post_load(void *opaque, int version_id)
+>  {
+>      PCII440FXState *d = opaque;
+> +    PCIDevice *dev;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/i440fx", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+>  
+>      i440fx_update_memory_mappings(d);
+> +
+> +    if (!s->mig_enabled) {
+> +        dev = PCI_DEVICE(d);
+> +        s->config_reg = pci_get_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG]);
+
+So I guess at this point we want to reset the register to 0,
+so it's not guest visible.
+
+
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int i440fx_pre_save(void *opaque)
+> +{
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/i440fx", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->mig_enabled) {
+> +        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG],
+> +                     s->config_reg);
+> +    }
+>      return 0;
+>  }
+
+
+And I guess we want a post_save hook to clear this?
+
+> @@ -107,6 +137,7 @@ static const VMStateDescription vmstate_i440fx = {
+>      .name = "I440FX",
+>      .version_id = 3,
+>      .minimum_version_id = 3,
+> +    .pre_save = i440fx_pre_save,
+>      .post_load = i440fx_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index b67cb9c29f..bed66be181 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -43,6 +43,15 @@
+>  
+>  #define Q35_PCI_HOST_HOLE64_SIZE_DEFAULT (1ULL << 35)
+>  
+> +/* Older Q35 machines (5.0 and older) not support q35-pcihost state
+
+not support -> do not support.
+
+> + * migration, use some reserved INTEL MCH configuration registers to
+> + * save/restore q35-pcihost config register. Refer to [Intel 3 Series
+> + * Chipset Family Datasheet Table 5-1. DRAM Controller Register Address
+> + * Map (D0:F0)]
+> + */
+> +#define Q35_PCI_HOST_CONFIG_REG 0x70
+> +
+> +
+
+extra empty line
+
+>  static void q35_host_realize(DeviceState *dev, Error **errp)
+>  {
+>      PCIHostState *pci = PCI_HOST_BRIDGE(dev);
+> @@ -513,7 +522,27 @@ static void mch_update(MCHPCIState *mch)
+>  static int mch_post_load(void *opaque, int version_id)
+>  {
+>      MCHPCIState *mch = opaque;
+> +    PCIDevice *dev;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/q35", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+>      mch_update(mch);
+> +    if (!s->mig_enabled) {
+> +        dev = PCI_DEVICE(mch);
+> +        s->config_reg = pci_get_long(&dev->config[Q35_PCI_HOST_CONFIG_REG]);
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int mch_pre_save(void *opaque)
+> +{
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/q35", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->mig_enabled) {
+> +        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], s->config_reg);
+> +    }
+>      return 0;
+>  }
+>  
+> @@ -521,6 +550,7 @@ static const VMStateDescription vmstate_mch = {
+>      .name = "mch",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> +    .pre_save = mch_pre_save,
+>      .post_load = mch_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_PCI_DEVICE(parent_obj, MCHPCIState),
+
+
+Same comments.
+
+> -- 
+> 2.27.0
+> 
 
 
