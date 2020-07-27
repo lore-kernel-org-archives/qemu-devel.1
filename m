@@ -2,79 +2,97 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69435C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 05:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3912C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 05:45:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37D7120714
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 05:02:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37D7120714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8C31C20714
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 05:45:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ygvl/bOi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C31C20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzvHo-000393-H0
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 01:02:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59746)
+	id 1jzvwd-0006Xn-R5
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 01:45:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jzvFt-0002Bb-N7
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 01:00:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49580)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jzvFr-0001VV-CY
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 01:00:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jzvFp-0008Vv-7s
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 05:00:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2C7032E80D2
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 05:00:49 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jzvvu-000678-Iq
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 01:44:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40475
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1jzvvs-0006SO-F1
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 01:44:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595828654;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=2tW6KTLisg/9PirvQtxka/z08LF+3mDsqLogCMs+fes=;
+ b=Ygvl/bOiAgXJtvWj7okn8YRKGZ/B0sjNZabie97FHdlA+yhPpWasJNqbAVg+5dKlzEwQ2S
+ CqAaRkrvnqaeQm70w4xmZv86YyxSChAWtlG+horoEQ5UVUhX88exzBck8hSLKThqiMzq1J
+ vNcd4SxUyXVJQ65emOZ5k4BWWbn1Osc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-426-n24MVglhOai1gQauPDGvmw-1; Mon, 27 Jul 2020 01:44:12 -0400
+X-MC-Unique: n24MVglhOai1gQauPDGvmw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE486800468;
+ Mon, 27 Jul 2020 05:44:10 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-156.ams2.redhat.com [10.36.112.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E1B1476216;
+ Mon, 27 Jul 2020 05:44:08 +0000 (UTC)
+Subject: Re: [PATCH 2/3] cirrus.yml: Compile macOS and FreeBSD with -Werror
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20200724143220.32751-1-thuth@redhat.com>
+ <20200724143220.32751-3-thuth@redhat.com>
+ <20200724144651.GG3146350@redhat.com>
+ <506e2579-410e-8553-6cbf-508793bb35a0@redhat.com>
+ <20200724164901.GO3146350@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5257b25f-62e8-4585-15f9-87ab5b99cf2d@redhat.com>
+Date: Mon, 27 Jul 2020 07:44:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Jul 2020 04:54:53 -0000
-From: Hgkamath <1889033@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: hgkamath
-X-Launchpad-Bug-Reporter: Hgkamath (hgkamath)
-X-Launchpad-Bug-Modifier: Hgkamath (hgkamath)
-Message-Id: <159582569332.29849.16382151377697591855.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1889033] [NEW] qemu-img permission denied on vmdk creation on
- CIFS share
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e85d0ab92e2924d39b8285aeae075a01d25eff06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b526a3479ed43beb325b7501a0cbc3d721ad32d7
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/26 23:20:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200724164901.GO3146350@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:44:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,250 +101,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1889033 <1889033@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 24/07/2020 18.49, Daniel P. Berrangé wrote:
+> On Fri, Jul 24, 2020 at 06:46:23PM +0200, Philippe Mathieu-Daudé wrote:
+>> On 7/24/20 4:46 PM, Daniel P. Berrangé wrote:
+>>> On Fri, Jul 24, 2020 at 04:32:19PM +0200, Thomas Huth wrote:
+>>>> Compiler warnings currently go unnoticed in our FreeBSD and macOS builds,
+>>>> since -Werror is only enabled for Linux and MinGW builds by default. So
+>>>> let's enable them here now, too.
+>>>> For macOS, that unfortunately means that we have to disable the vnc-sasl
+>>>> feature, since this is marked as deprecated in the macOS headers and thus
+>>>> generates a lot of deprecation warnings.
+>>>
+>>> I wonder if its possible to add
+>>>
+>>> #pragma GCC diagnostic push
+>>> #pragma GCC diagnostic ignored "-Wdeprecated"
+>>>
+>>> ...
+>>>
+>>> #pragma GCC diagnostic pop
+>>>
+>>> to silence just one source file ?
+>>
+>> 3 years ago Peter said:
+>>
+>> "The awkward part is
+>>  that it has to  be in force at the point where the deprecated
+>>  function is used, not where it's declared. So you can't just wrap
+>>  the #include of the ssl header in pragmas, you'd have to either
+>>  do it at every callsite or else over the whole .c file."
+> 
+> Nearly all our sasl code is isolated in ui/vnc-auth-sasl.c, so we
+> can just do pragma push/pop around that entire file.
+> 
+> There's then just two remaining cases in ui/vnc.c which are
+> easy enough to deal with, or we can move the calls out of vnc.c
+> into vnc-auth-sasl.c to fully isolate the code
 
+Sounds like it could be done, indeed. But I wonder whether we really
+really want to silence the warnings here? We'd hide the information to
+the users that sasl is apparently disliked by Apple and might get
+removed on macOS in the future.
 
-- on a CIFS mount qemu-img claims not to have permissions to write into a f=
-ile.
-- VMDK sparse file creation succeeds
-- VMDK Flat file creation create the flat-file, but fails to write the desc=
-ription-file
-- VMDK flat file creation succeeds on native linux mount such as ~/tmp or /=
-tmp
-- same effect as root or non-root
-- same effect with selinux setenforce 0
+Maybe we should rather change the "configure" script to disable sasl by
+default on macOS unless the user explicitely specified --enable-vnc-sasl ?
 
-a) I would have expected that the monolithic flat would have created only o=
-ne large file just like sparse, but it seems to create a description file, =
-in addition to the storing file.
-b) I am aware that qemu-img may have problem opening very large files on CI=
-FS, however, this file is not very large
+ Thomas
 
-Windows-10 latest updated 2004 19041.388
-Linux VM, Fedora-32 in Virtualbox 6.1.12 =
-
-# rpm -qa | grep  qemu-img
-qemu-img-4.2.0-7.fc32.x86_64
-
-mount options: =
-
-mount -t cifs //10.x,x,x/$shname  /mnt/hshare -o defaults,username=3Dgana,r=
-w,uid=3D1000,gid=3D1000,vers=3D3.0
-
-[root@fedora ~]# cd /mnt/hshare/some/folder/createvmdk/
-[root@fedora createvmdk]# qemu-img create -f vmdk test1.vmdk 100M -o subfor=
-mat=3DmonolithicFlat
-Formatting 'test1.vmdk', fmt=3Dvmdk size=3D104857600 compat6=3Doff hwversio=
-n=3Dundefined subformat=3DmonolithicFlat
-qemu-img: test1.vmdk: Could not write description: Permission denied
-[root@fedora createvmdk]# ls -l test1*.*
--rwxr-xr-x. 1 gana gana 104857600 Jul 26 23:02 test1-flat.vmdk
--rwxr-xr-x. 1 gana gana         0 Jul 26 23:02 test1.vmdk
-[root@fedora createvmdk]# du -k test1*.*
-0       test1-flat.vmdk
-0       test1.vmdk
-# (doesn't seem to be really flat)
-
-creation in /tmp works
-# cd /tmp
-[root@fedora tmp]# qemu-img create -f vmdk test1.vmdk 100M -o subformat=3Dm=
-onolithicFlat
-Formatting 'test1.vmdk', fmt=3Dvmdk size=3D104857600 compat6=3Doff hwversio=
-n=3Dundefined subformat=3DmonolithicFlat
-[root@fedora tmp]# ls -l /tmp/test1*.*
--rw-r--r--. 1 root root 104857600 Jul 26 22:43 /tmp/test1-flat.vmdk
--rw-r--r--. 1 root root       313 Jul 26 22:43 /tmp/test1.vmdk
-[root@fedora createvmdk]# du -k /tmp/test1*.*
-4       /tmp/test1-flat.vmdk
-4       /tmp/test1.vmdk
-
-[root@fedora createvmdk]# cat /tmp/test1.vmdk
-# Disk DescriptorFile
-version=3D1
-CID=3D5f13c13d
-parentCID=3Dffffffff
-createType=3D"monolithicFlat"
-
-# Extent description
-RW 204800 FLAT "test1-flat.vmdk" 0
-
-# The Disk Data Base
-#DDB
-
-ddb.virtualHWVersion =3D "4"
-ddb.geometry.cylinders =3D "203"
-ddb.geometry.heads =3D "16"
-ddb.geometry.sectors =3D "63"
-ddb.adapterType =3D "ide"
-
-
-On the other-hand creating a sparse file works
-cd /mnt/hshare/some/folder/createvmdk/
-[root@fedora createvmdk]# qemu-img create -f vmdk test2.vmdk 100M -o subfor=
-mat=3DmonolithicSparse
-Formatting 'test2.vmdk', fmt=3Dvmdk size=3D104857600 compat6=3Doff hwversio=
-n=3Dundefined subformat=3DmonolithicSparse
-[root@fedora createvmdk]# ls l test2*.*
--rwxr-xr-x. 1 gana gana     65536 Jul 26 22:52 test2.vmdk
-[root@fedora createvmdk]#  du -k  /tmp/test2*.*
-12      /tmp/test2.vmdk
-
-test2.vmdk is a binary file
-inside it, located among garbled ascii characters is an embedded VMDK descr=
-iption
-````
-# Disk DescriptorFile
-version=3D1
-CID=3Dcf302a20
-parentCID=3Dffffffff
-createType=3D"monolithicSparse"
-
-# Extent description
-RW 204800 SPARSE "test2.vmdk"
-
-# The Disk Data Base
-#DDB
-
-ddb.virtualHWVersion =3D "4"
-ddb.geometry.cylinders =3D "203"
-ddb.geometry.heads =3D "16"
-ddb.geometry.sectors =3D "63"
-ddb.adapterType =3D "ide"
-```
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1889033
-
-Title:
-  qemu-img permission denied on vmdk creation on CIFS share
-
-Status in QEMU:
-  New
-
-Bug description:
-  =
-
-  - on a CIFS mount qemu-img claims not to have permissions to write into a=
- file.
-  - VMDK sparse file creation succeeds
-  - VMDK Flat file creation create the flat-file, but fails to write the de=
-scription-file
-  - VMDK flat file creation succeeds on native linux mount such as ~/tmp or=
- /tmp
-  - same effect as root or non-root
-  - same effect with selinux setenforce 0
-
-  a) I would have expected that the monolithic flat would have created only=
- one large file just like sparse, but it seems to create a description file=
-, in addition to the storing file.
-  b) I am aware that qemu-img may have problem opening very large files on =
-CIFS, however, this file is not very large
-
-  Windows-10 latest updated 2004 19041.388
-  Linux VM, Fedora-32 in Virtualbox 6.1.12 =
-
-  # rpm -qa | grep  qemu-img
-  qemu-img-4.2.0-7.fc32.x86_64
-
-  mount options: =
-
-  mount -t cifs //10.x,x,x/$shname  /mnt/hshare -o defaults,username=3Dgana=
-,rw,uid=3D1000,gid=3D1000,vers=3D3.0
-
-  [root@fedora ~]# cd /mnt/hshare/some/folder/createvmdk/
-  [root@fedora createvmdk]# qemu-img create -f vmdk test1.vmdk 100M -o subf=
-ormat=3DmonolithicFlat
-  Formatting 'test1.vmdk', fmt=3Dvmdk size=3D104857600 compat6=3Doff hwvers=
-ion=3Dundefined subformat=3DmonolithicFlat
-  qemu-img: test1.vmdk: Could not write description: Permission denied
-  [root@fedora createvmdk]# ls -l test1*.*
-  -rwxr-xr-x. 1 gana gana 104857600 Jul 26 23:02 test1-flat.vmdk
-  -rwxr-xr-x. 1 gana gana         0 Jul 26 23:02 test1.vmdk
-  [root@fedora createvmdk]# du -k test1*.*
-  0       test1-flat.vmdk
-  0       test1.vmdk
-  # (doesn't seem to be really flat)
-
-  creation in /tmp works
-  # cd /tmp
-  [root@fedora tmp]# qemu-img create -f vmdk test1.vmdk 100M -o subformat=
-=3DmonolithicFlat
-  Formatting 'test1.vmdk', fmt=3Dvmdk size=3D104857600 compat6=3Doff hwvers=
-ion=3Dundefined subformat=3DmonolithicFlat
-  [root@fedora tmp]# ls -l /tmp/test1*.*
-  -rw-r--r--. 1 root root 104857600 Jul 26 22:43 /tmp/test1-flat.vmdk
-  -rw-r--r--. 1 root root       313 Jul 26 22:43 /tmp/test1.vmdk
-  [root@fedora createvmdk]# du -k /tmp/test1*.*
-  4       /tmp/test1-flat.vmdk
-  4       /tmp/test1.vmdk
-
-  [root@fedora createvmdk]# cat /tmp/test1.vmdk
-  # Disk DescriptorFile
-  version=3D1
-  CID=3D5f13c13d
-  parentCID=3Dffffffff
-  createType=3D"monolithicFlat"
-
-  # Extent description
-  RW 204800 FLAT "test1-flat.vmdk" 0
-
-  # The Disk Data Base
-  #DDB
-
-  ddb.virtualHWVersion =3D "4"
-  ddb.geometry.cylinders =3D "203"
-  ddb.geometry.heads =3D "16"
-  ddb.geometry.sectors =3D "63"
-  ddb.adapterType =3D "ide"
-
-  =
-
-  On the other-hand creating a sparse file works
-  cd /mnt/hshare/some/folder/createvmdk/
-  [root@fedora createvmdk]# qemu-img create -f vmdk test2.vmdk 100M -o subf=
-ormat=3DmonolithicSparse
-  Formatting 'test2.vmdk', fmt=3Dvmdk size=3D104857600 compat6=3Doff hwvers=
-ion=3Dundefined subformat=3DmonolithicSparse
-  [root@fedora createvmdk]# ls l test2*.*
-  -rwxr-xr-x. 1 gana gana     65536 Jul 26 22:52 test2.vmdk
-  [root@fedora createvmdk]#  du -k  /tmp/test2*.*
-  12      /tmp/test2.vmdk
-
-  test2.vmdk is a binary file
-  inside it, located among garbled ascii characters is an embedded VMDK des=
-cription
-  ````
-  # Disk DescriptorFile
-  version=3D1
-  CID=3Dcf302a20
-  parentCID=3Dffffffff
-  createType=3D"monolithicSparse"
-
-  # Extent description
-  RW 204800 SPARSE "test2.vmdk"
-
-  # The Disk Data Base
-  #DDB
-
-  ddb.virtualHWVersion =3D "4"
-  ddb.geometry.cylinders =3D "203"
-  ddb.geometry.heads =3D "16"
-  ddb.geometry.sectors =3D "63"
-  ddb.adapterType =3D "ide"
-  ```
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1889033/+subscriptions
 
