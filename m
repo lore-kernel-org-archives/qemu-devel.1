@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA3FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:37:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A90C433E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:38:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7DAD20714
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:37:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4335E20714
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:38:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DM3WCwv7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7DAD20714
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LwSJmrv6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4335E20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k02NJ-0007X4-11
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:37:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39062)
+	id 1k02OY-0000nt-IJ
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:38:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39064)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k02JB-0002no-K8
+ id 1k02JC-0002o5-B4
  for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:32:46 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:34506)
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50642)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k02J7-0007Sw-Qt
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:32:45 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id f7so14724188wrw.1
+ id 1k02J7-0007T4-Qt
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:32:46 -0400
+Received: by mail-wm1-x344.google.com with SMTP id c80so14006873wme.0
  for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 05:32:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8y6ixeIPgJW86fjgIL3Yvs/KvQizsaV1ZAK37O5WFus=;
- b=DM3WCwv71sJo7LObRORAeYVh+LMSx0nkIQA5OEYmXGC9KE6aVC9HbDFNb1OkVgXIgg
- kdhLMxacNe8u2Z6TedyPuT41tl5NWo2bnbUX06Esw3p2VRFHcJlUp1oXQjTHdMHd3Yla
- JoekFOsble9nEyLd96S9hyCTiQpXzlwa5JhihoBynbFeZXE7H8zJrhIsEqt3e8PAeGaF
- vZCgnygMP47IwcahfewsafNVuNypJaU6btd0s+Fm3pbh3NHoZbRwwmn/vrH8MIKHeKkG
- qZbGZI1PV8r7hJTP3BaMn7W2bgyTXWJx/S21QsFIN7A2q0B7oUd6tXO7X1kdWUxtTgeA
- P6eQ==
+ bh=tOI4eNCeOvJeLfp6drp84GLtLjEuFDD1qv2L6pFrH6Y=;
+ b=LwSJmrv6jhy4JDNIv539CsKeG1Avbu7HIGfZ/lW15nBAg/Xn/jDeQKPyaFk4P7kbBK
+ GGncrHjB4qRy4uilpxoYhUnXm4dyRG/xZLegHQPNxn2aPAOo5GiBymMp7/KJbsUJS9/C
+ 3ejlbixcMX9vfP/kgtorWPkCPCLiRFVteRfTFtxY7wT/wTddHlZfJ1hUKpsBrGBIrVNU
+ 9IZm/5yVWBU5lN8lHevGDTa3R0ySsFbrv6NRpfBFtQo7ZIfVcGErOgtdtULmeEC+jvW2
+ Sf9rJrDkh1HyVgmbUNrbrAyho5xugXoaEiy5N+gmSje9tSuj729oeT72gPeJsP+EgCzL
+ ebLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8y6ixeIPgJW86fjgIL3Yvs/KvQizsaV1ZAK37O5WFus=;
- b=mLygHTE6Y7YkMJw2rSxbmMzP59F7GUw+/6rXGqhuL9CfuxSlX4+0yQmxLLgO6YtjCu
- T/PkaxmuLX6mZcyhpIuBY7iriDKKGKLfzjiKKj9Kr8SzhURHeU1UUvxyN5GpcCTpDwJe
- FO+xgB9M7QxdXN2wmc3TXFSMgwtIItVdFql+DLpWOM+JK4oBZcn/p1ZQFYYqeNKMEnVg
- 5kYjE2583zl36uTxavG9WgXblJaTrthxlOWp5NDCVk4eZ9ZBeFly3YCqKQViAuxytdEo
- A3laDpRGbw9J7Cxp04dok9zUW1n5VGB0yZpj71cHCGZuLnLyd4V3T8tcMPiPuvG+gAxr
- HJRQ==
-X-Gm-Message-State: AOAM531oqF+lREaTCqowIrxLb1VxSxQYNO7fDVyWKxgKqxrOk67CAxB9
- 6rcDrkRnRhWvGKYnQ+lzsWqWaA==
-X-Google-Smtp-Source: ABdhPJx9zwS3YB8uXuH+1JOW4PrFuz0cAYPhC6/CSA6tKzEvgqeqwCNI+5FM/t0xkYmq9/hdEusezA==
-X-Received: by 2002:a5d:4611:: with SMTP id t17mr19041904wrq.243.1595853157251; 
- Mon, 27 Jul 2020 05:32:37 -0700 (PDT)
+ bh=tOI4eNCeOvJeLfp6drp84GLtLjEuFDD1qv2L6pFrH6Y=;
+ b=V1aXOWqSnohobd5tUtiYCH5Azw6s64yF+3WxaSQ1LqJWG5mbR1rSCBVsmNG+LPC7wS
+ 3NtHI9CtbIctCtbw/WV0qk009wLO2qHcFxrYP0/ux9rDNHGJHrqmi0Dri2ymPpLMOJeW
+ ZBpm26s49YYvtwM3R6e/Z1bv532eGWyC+WoGUI0BynCF5g78+HrBoAHsKpGLE0cBiG1g
+ rpTwRCUeiSJT844WbQi8wThGPp0Sjbai5ITebhLSg8WbzdkaPO7CbCBPIsxjGBGppXDn
+ JDRkMyCdzonyv2VUjc03QFNfdq3fmCafeOzKVQFSV9Wv4tbigueHtd8289gpxbNCYhp6
+ zWbw==
+X-Gm-Message-State: AOAM533Mq8BJ1Kbycxbayk5zX2O5jcypXQNrUBwa8eFtPKs9TGPvE/QI
+ bGRPZHcoSkOvmOakkD9KTKEmQQ==
+X-Google-Smtp-Source: ABdhPJzmUzfrTsX4fRtFgYM718NUN8VaAXHZgL5AtqWqxXFyhCh93q1N75gIO9scbQjXI/S+nqvUvA==
+X-Received: by 2002:a1c:e382:: with SMTP id a124mr20435395wmh.11.1595853158389; 
+ Mon, 27 Jul 2020 05:32:38 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z6sm12993226wrs.36.2020.07.27.05.32.35
+ by smtp.gmail.com with ESMTPSA id o126sm6776581wma.20.2020.07.27.05.32.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Mon, 27 Jul 2020 05:32:35 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C3E121FF9E;
+ by zen.linaroharston (Postfix) with ESMTP id D7CC61FF9F;
  Mon, 27 Jul 2020 13:23:58 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 15/16] python/qemu: Change ConsoleSocket to optionally drain
- socket.
-Date: Mon, 27 Jul 2020 13:23:56 +0100
-Message-Id: <20200727122357.31263-16-alex.bennee@linaro.org>
+Subject: [PULL 16/16] tests/vm: add shutdown timeout in basevm.py
+Date: Mon, 27 Jul 2020 13:23:57 +0100
+Message-Id: <20200727122357.31263-17-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200727122357.31263-1-alex.bennee@linaro.org>
 References: <20200727122357.31263-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,213 +103,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Robert Foley <robert.foley@linaro.org>
+ Robert Foley <robert.foley@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Robert Foley <robert.foley@linaro.org>
 
-The primary purpose of this change is to clean up
-machine.py's console_socket property to return a single type,
-a ConsoleSocket.
+We are adding the shutdown timeout to solve an issue
+we now see where the aarch64 VMs timeout on shutdown
+under TCG.
 
-ConsoleSocket now derives from a socket, which means that
-in the default case (of not draining), machine.py
-will see the same behavior as it did prior to ConsoleSocket.
+There is a new 3 second timeout in machine.py,
+which we override in basevm.py when shutting down.
 
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200717203041.9867-3-robert.foley@linaro.org>
-Message-Id: <20200724064509.331-16-alex.bennee@linaro.org>
+Message-Id: <20200717203041.9867-4-robert.foley@linaro.org>
+Message-Id: <20200724064509.331-17-alex.bennee@linaro.org>
 
-diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket.py
-index 09986bc2152..70869fbbdc4 100644
---- a/python/qemu/console_socket.py
-+++ b/python/qemu/console_socket.py
-@@ -13,68 +13,75 @@ which can drain a socket and optionally dump the bytes to file.
- # the COPYING file in the top-level directory.
- #
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 7acb48b8761..3fac20e929a 100644
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -80,6 +80,8 @@ class BaseVM(object):
+     arch = "#arch"
+     # command to halt the guest, can be overridden by subclasses
+     poweroff = "poweroff"
++    # Time to wait for shutdown to finish.
++    shutdown_timeout_default = 30
+     # enable IPv6 networking
+     ipv6 = True
+     # This is the timeout on the wait for console bytes.
+@@ -87,7 +89,7 @@ class BaseVM(object):
+     # Scale up some timeouts under TCG.
+     # 4 is arbitrary, but greater than 2,
+     # since we found we need to wait more than twice as long.
+-    tcg_ssh_timeout_multiplier = 4
++    tcg_timeout_multiplier = 4
+     def __init__(self, args, config=None):
+         self._guest = None
+         self._genisoimage = args.genisoimage
+@@ -141,9 +143,12 @@ class BaseVM(object):
+         if args.jobs and args.jobs > 1:
+             self._args += ["-smp", "%d" % args.jobs]
+         if kvm_available(self.arch):
++            self._shutdown_timeout = self.shutdown_timeout_default
+             self._args += ["-enable-kvm"]
+         else:
+             logging.info("KVM not available, not using -enable-kvm")
++            self._shutdown_timeout = \
++                self.shutdown_timeout_default * self.tcg_timeout_multiplier
+         self._data_args = []
  
--import asyncore
- import socket
- import threading
- from collections import deque
- import time
+         if self._config['qemu_args'] != None:
+@@ -423,7 +428,7 @@ class BaseVM(object):
+     def wait_ssh(self, wait_root=False, seconds=300, cmd="exit 0"):
+         # Allow more time for VM to boot under TCG.
+         if not kvm_available(self.arch):
+-            seconds *= self.tcg_ssh_timeout_multiplier
++            seconds *= self.tcg_timeout_multiplier
+         starttime = datetime.datetime.now()
+         endtime = starttime + datetime.timedelta(seconds=seconds)
+         cmd_success = False
+@@ -441,14 +446,14 @@ class BaseVM(object):
+             raise Exception("Timeout while waiting for guest ssh")
  
+     def shutdown(self):
+-        self._guest.shutdown()
++        self._guest.shutdown(timeout=self._shutdown_timeout)
  
--class ConsoleSocket(asyncore.dispatcher):
-+class ConsoleSocket(socket.socket):
-     """
-     ConsoleSocket represents a socket attached to a char device.
+     def wait(self):
+-        self._guest.wait()
++        self._guest.wait(timeout=self._shutdown_timeout)
  
--    Drains the socket and places the bytes into an in memory buffer
--    for later processing.
-+    Optionally (if drain==True), drains the socket and places the bytes
-+    into an in memory buffer for later processing.
+     def graceful_shutdown(self):
+         self.ssh_root(self.poweroff)
+-        self._guest.wait()
++        self._guest.wait(timeout=self._shutdown_timeout)
  
-     Optionally a file path can be passed in and we will also
-     dump the characters to this file for debugging purposes.
-     """
--    def __init__(self, address, file=None):
-+    def __init__(self, address, file=None, drain=False):
-         self._recv_timeout_sec = 300
-         self._sleep_time = 0.5
-         self._buffer = deque()
--        self._asyncore_thread = None
--        self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
--        self._sock.connect(address)
-+        socket.socket.__init__(self, socket.AF_UNIX, socket.SOCK_STREAM)
-+        self.connect(address)
-         self._logfile = None
-         if file:
-             self._logfile = open(file, "w")
--        asyncore.dispatcher.__init__(self, sock=self._sock)
-         self._open = True
--        self._thread_start()
-+        if drain:
-+            self._drain_thread = self._thread_start()
-+        else:
-+            self._drain_thread = None
- 
--    def _thread_start(self):
--        """Kick off a thread to wait on the asyncore.loop"""
--        if self._asyncore_thread is not None:
--            return
--        self._asyncore_thread = threading.Thread(target=asyncore.loop,
--                                                 kwargs={'timeout':1})
--        self._asyncore_thread.daemon = True
--        self._asyncore_thread.start()
-+    def _drain_fn(self):
-+        """Drains the socket and runs while the socket is open."""
-+        while self._open:
-+            try:
-+                self._drain_socket()
-+            except socket.timeout:
-+                # The socket is expected to timeout since we set a
-+                # short timeout to allow the thread to exit when
-+                # self._open is set to False.
-+                time.sleep(self._sleep_time)
- 
--    def handle_close(self):
--        """redirect close to base class"""
--        # Call the base class close, but not self.close() since
--        # handle_close() occurs in the context of the thread which
--        # self.close() attempts to join.
--        asyncore.dispatcher.close(self)
-+    def _thread_start(self):
-+        """Kick off a thread to drain the socket."""
-+        # Configure socket to not block and timeout.
-+        # This allows our drain thread to not block
-+        # on recieve and exit smoothly.
-+        socket.socket.setblocking(self, False)
-+        socket.socket.settimeout(self, 1)
-+        drain_thread = threading.Thread(target=self._drain_fn)
-+        drain_thread.daemon = True
-+        drain_thread.start()
-+        return drain_thread
- 
-     def close(self):
-         """Close the base object and wait for the thread to terminate"""
-         if self._open:
-             self._open = False
--            asyncore.dispatcher.close(self)
--            if self._asyncore_thread is not None:
--                thread, self._asyncore_thread = self._asyncore_thread, None
-+            if self._drain_thread is not None:
-+                thread, self._drain_thread = self._drain_thread, None
-                 thread.join()
-+            socket.socket.close(self)
-             if self._logfile:
-                 self._logfile.close()
-                 self._logfile = None
- 
--    def handle_read(self):
-+    def _drain_socket(self):
-         """process arriving characters into in memory _buffer"""
--        data = asyncore.dispatcher.recv(self, 1)
-+        data = socket.socket.recv(self, 1)
-         # latin1 is needed since there are some chars
-         # we are receiving that cannot be encoded to utf-8
-         # such as 0xe2, 0x80, 0xA6.
-@@ -85,27 +92,38 @@ class ConsoleSocket(asyncore.dispatcher):
-         for c in string:
-             self._buffer.extend(c)
- 
--    def recv(self, buffer_size=1):
-+    def recv(self, bufsize=1):
-         """Return chars from in memory buffer.
-            Maintains the same API as socket.socket.recv.
-         """
-+        if self._drain_thread is None:
-+            # Not buffering the socket, pass thru to socket.
-+            return socket.socket.recv(self, bufsize)
-         start_time = time.time()
--        while len(self._buffer) < buffer_size:
-+        while len(self._buffer) < bufsize:
-             time.sleep(self._sleep_time)
-             elapsed_sec = time.time() - start_time
-             if elapsed_sec > self._recv_timeout_sec:
-                 raise socket.timeout
--        chars = ''.join([self._buffer.popleft() for i in range(buffer_size)])
-+        chars = ''.join([self._buffer.popleft() for i in range(bufsize)])
-         # We choose to use latin1 to remain consistent with
-         # handle_read() and give back the same data as the user would
-         # receive if they were reading directly from the
-         # socket w/o our intervention.
-         return chars.encode("latin1")
- 
--    def set_blocking(self):
--        """Maintain compatibility with socket API"""
--        pass
-+    def setblocking(self, value):
-+        """When not draining we pass thru to the socket,
-+           since when draining we control socket blocking.
-+        """
-+        if self._drain_thread is None:
-+            socket.socket.setblocking(self, value)
- 
-     def settimeout(self, seconds):
--        """Set current timeout on recv"""
--        self._recv_timeout_sec = seconds
-+        """When not draining we pass thru to the socket,
-+           since when draining we control the timeout.
-+        """
-+        if seconds is not None:
-+            self._recv_timeout_sec = seconds
-+        if self._drain_thread is None:
-+            socket.socket.settimeout(self, seconds)
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index a09768e9f92..82f3731fc3f 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -23,7 +23,6 @@ import os
- import subprocess
- import shutil
- import signal
--import socket
- import tempfile
- from typing import Optional, Type
- from types import TracebackType
-@@ -673,12 +672,8 @@ class QEMUMachine:
-         Returns a socket connected to the console
-         """
-         if self._console_socket is None:
--            if self._drain_console:
--                self._console_socket = console_socket.ConsoleSocket(
--                    self._console_address,
--                    file=self._console_log_path)
--            else:
--                self._console_socket = socket.socket(socket.AF_UNIX,
--                                                     socket.SOCK_STREAM)
--                self._console_socket.connect(self._console_address)
-+            self._console_socket = console_socket.ConsoleSocket(
-+                self._console_address,
-+                file=self._console_log_path,
-+                drain=self._drain_console)
-         return self._console_socket
+     def qmp(self, *args, **kwargs):
+         return self._guest.qmp(*args, **kwargs)
 -- 
 2.20.1
 
