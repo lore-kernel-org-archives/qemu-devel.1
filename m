@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 520BCC433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8DEC433E5
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:44:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CDD32074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:44:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55A6620738
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:44:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="H0TvTa5Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CDD32074F
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DCiL8sKU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55A6620738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0933-0004nU-Bm
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 15:44:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47720)
+	id 1k093F-0005Jt-J2
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 15:44:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k091p-0002Ck-OS; Mon, 27 Jul 2020 15:43:17 -0400
+ id 1k091e-0001mO-6j; Mon, 27 Jul 2020 15:43:06 -0400
 Received: from mail-eopbgr80137.outbound.protection.outlook.com
  ([40.107.8.137]:20036 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k091n-0003fu-SP; Mon, 27 Jul 2020 15:43:17 -0400
+ id 1k091a-0003fu-6B; Mon, 27 Jul 2020 15:43:05 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Gc1AmhBb54F6F5XbbyPkjJAShoRMD0X8oi5wmVld4CEkutf/+dJGZ4QGHkD76gCrGWq3oYFy5pdC1lp7JVqR/Q/lamMoFFaa4h6FqCYJbVRffDhHxQjsIz4XW233vHQ+ADKEJQFwGU4Xq4FYeXnIfoOVERXG/jd0qr4dGAWsC1iQpIW2141azyrluGq6qAzRrGHP6pIz86G5F/sVk0U2g2CzjLNN+v1yJQoSE1W2rGz+cdCQ48YtotinsxgD9fI1gQ88A3s9h/ABH2utVJmgma/E+EsWsMi2rR8/05F9M3zKSSBIg09AdvB6+bm3Q/obToCsEL1o286NxiEMGEOUxw==
+ b=i9uTKMHucuhBz8vqTXEal0attFQDe/R7qU2eMcaYkRdsN0fwqVOvvCQ96rlcOq3Cu0Cnne00UJRdeRWgs7CFh5ozt+LcRCdS90OaYfAf237ng5i6yNtkdkdcDjAAOE5u51+Mrwzt3qQwDfBjYvgDY+1WQHuTPtVIxA4axLBPcR77Ej9LRBxNywAFGyLiV/9SBquVSEMS82oFyS5Ean0+nOwxV26Z3mDLjiW/FbCvgxkh2KVAVLUVAVPV03CvTFO3BcmF3rY/js95Xi6IXxLJWtDBRope0KTVUOWXOUXZETSAWqy1kaWapvtxW4hUiP7ouzye+g1GgbR87kVv/2pK+g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AJz/6uNkQvviCpEQRT82foNK1gNYcCC5arhGIcj14zU=;
- b=XN42O9oK3C/zxuVULzfnq3rjI6c08bWR9GLuFOuD48crvFdRNSs9h6f40AAVMwUsSI+5zUTDRefrMDLITaQ0IhAOL/t4Fa5YHVGAJE4IVMzEOkC1SGDi5kifzULJM1UAOaaIRcAfAxqy4Hzl7RiST1OjxLwmuSlxfyWN7VDOOQMPqeKgSKaJtA7eh/dCjTqHSif2gpJ0aWpN3wBxQ74MTGklireBs9sbfVzrESfCvpWtNT8XUkcjehf6fCQzuvOtkviD0/zvk1DXVWEuW+a6u2p8pL7fi58AjIAGU5MvfS/vLO7aVVQ0Onoed0K1LFUVrh1V5afqPpqmKjgGgqkPaQ==
+ bh=ag2OZSd4XEK0WPwnOZnDuD4ozl6LXYHngLXM4paMDsk=;
+ b=LV72lPy2ApkCW/Ych3YTGbEYakasv7Z7hsdlzDQ6x1vqvvPvWBAcrGty5/Wo1ljROPCsPfD8mWy6udgUsoJtaQmrGxV0G4gz1W2f/diGo0VyXSLXbLEKVwSipDDj4uxdFdXA910SUMnbygU5s/wxeL3WEE95AGc1j3hWHrFZJ/hgXZfsvlBZ1KuDytQcHTW48wWl44Lo8QDBRqlaXBu7lL8Gu/gQ4yW2fPoNQaBWMoYjtHAcAmjzdlniz1UskOGhmLgXH3pc0jtPDyHxATJElD5jBMbfH6f8pFQvMBf9ak+Od4HxEr47uLnOR+jq0kTnht1Pci81pWya42gNsjPssw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AJz/6uNkQvviCpEQRT82foNK1gNYcCC5arhGIcj14zU=;
- b=H0TvTa5YJyj5UelCJRqGia61ohiV6smJuXwT5kkUvW7ibb8PjSX1SDVQC9PLqxZ4RzLCSrgqc3edqo5ktWYvxR5u/bVD6GfCGfK9irnIuFaT70Of5C520HkolHEGQlfDXmhtcwIQgFUbu3EdUsBr00pjBLe08njz+h2Au3xp+3w=
+ bh=ag2OZSd4XEK0WPwnOZnDuD4ozl6LXYHngLXM4paMDsk=;
+ b=DCiL8sKUq4ZmBHP6SnKhfVxRLY5bLIcQoSwMe82DtAIP4g6A5qHs+ySKAFk0BtksxUTN2yyYpHWu+R1EeTDXacPgm0WP+1mGhsQ1RQIqXEoPUlzLwRWWku/MUZyRFbcUzyQbmP41U3+9qOfXxpHY3j7kezNOsUUTpUPSmJFsgxs=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM5PR0802MB2610.eurprd08.prod.outlook.com (2603:10a6:203:97::7)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23; Mon, 27 Jul
- 2020 19:43:03 +0000
+ 2020 19:42:54 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::8c0c:c056:97a5:484a%4]) with mapi id 15.20.3216.033; Mon, 27 Jul 2020
- 19:43:03 +0000
+ 19:42:54 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 14/21] migration/block-dirty-bitmap: keep bitmap state for
- all bitmaps
-Date: Mon, 27 Jul 2020 22:42:29 +0300
-Message-Id: <20200727194236.19551-15-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 05/21] qemu-iotests/199: change discard patterns
+Date: Mon, 27 Jul 2020 22:42:20 +0300
+Message-Id: <20200727194236.19551-6-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200727194236.19551-1-vsementsov@virtuozzo.com>
 References: <20200727194236.19551-1-vsementsov@virtuozzo.com>
@@ -79,33 +78,33 @@ Received: from kvm.sw.ru (185.215.60.158) by
  AM0PR05CA0084.eurprd05.prod.outlook.com (2603:10a6:208:136::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.20 via Frontend
- Transport; Mon, 27 Jul 2020 19:43:02 +0000
+ Transport; Mon, 27 Jul 2020 19:42:53 +0000
 X-Mailer: git-send-email 2.21.0
 X-Originating-IP: [185.215.60.158]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e3888acd-c3c5-4cae-9d37-08d8326546ee
+X-MS-Office365-Filtering-Correlation-Id: 36fba14b-bd13-4326-4e05-08d83265417a
 X-MS-TrafficTypeDiagnostic: AM5PR0802MB2610:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0802MB26102CB167FA1798CFA8C420C1720@AM5PR0802MB2610.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:28;
+X-Microsoft-Antispam-PRVS: <AM5PR0802MB26109455D206458B44F59CD0C1720@AM5PR0802MB2610.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:34;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HzsqA5fIADs8YzWXP7AKE2RQx8xHNeMMf/I5LdI/WzgnrI6W5GaAolw/raaeYfaqyzptIuBYajeJUeRxPg1rsqOLhKiY1D7xFAK4R4WDkm4P/irouGCQs9HKXJEqeN3lmuBxLnFOHzqNtEalnthcQS15VqZJ2vC/2i0PThbp+dDeAnCFs0K1yBQuGqWCDHSJTahmCOYJS+azFzv/eKUZtfsTEeCXBcPss0hA854Uei3OngO2v/657/inGtQBluU6Dm+VHcm1AMtYMEIW0rML6LUc2UDQuzo0JgkdX5BVydSzCXLM82q8O7v2q7uFN0c8Z6YPNX89zNPNd2xibWGPfItJJUzG6NrV94/c1vEffHPjF/MOVgZcLOL5l3MTlplg
+X-Microsoft-Antispam-Message-Info: +P4kbIcniExNK09Nbkuj4tE1NlMWvFCdlwy17JcxVnQumtm9WLTbQ423bl/4BdjTB7YWqbSp276EuTXJq4d+1iJfEubMOuKcuLcma32AWBpNTCnIfM4BYM0RoEpzVqPVeiFJwpcx+mGJcNEizatLa5O2ZCoPO4DlyxIm+57QPRo5d0XPC+jE+ZvwaUKfaBGgbt+qmKzV9+UsoPOYZJWPtFfD+K7+Phw5ShOIRJVMbRJ+o9Mky1fx+1UDxf3Mhe6YWLxfG6C71X6KN1xj5zosDQmV18C9AIe5lOEMJkWD2RW1j9E53pnTBJvpi539iG0P5BO44mc2j7NTwK8/GxtYFg==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(396003)(366004)(376002)(39850400004)(346002)(66556008)(1076003)(66476007)(6512007)(107886003)(86362001)(36756003)(52116002)(4326008)(26005)(2616005)(2906002)(66946007)(8676002)(7416002)(16526019)(6666004)(316002)(6916009)(6486002)(956004)(83380400001)(6506007)(5660300002)(478600001)(186003)(8936002)(14143004);
+ SFS:(4636009)(136003)(396003)(366004)(376002)(39840400004)(346002)(66556008)(1076003)(66476007)(6512007)(107886003)(86362001)(36756003)(52116002)(4326008)(26005)(2616005)(2906002)(66946007)(8676002)(7416002)(16526019)(6666004)(316002)(6916009)(6486002)(956004)(83380400001)(6506007)(5660300002)(478600001)(186003)(8936002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: cLz7ovySvytZiQtwlR7OAVKt40r9UEWgmYS7szEyFzdVS4KWWkb0S6fHEIcQyDgo5KPO+n7JDCpWPiYo3hZhlQcceGFr0vd3zd0jDk7mrQtpLM5y0Hp+y+gEuq06pffcMVkKIyzZrzKVArjoVoDYR6MXPlq/hvCx8tFPHKEo+I77iJXYiOkeLEefpxFhqVaCncIhob8w4/qQ47QCdMORFKSyBj4YL0wr7pqoAcGW3ibZWD/sGDXRTRn++0GYNPhmzpTbvdW7KJkI6AzxwIbyLl5qSIrCUaqKFqQVMZA1UAwkXizZZstIrBxhBrQV6ictv0hdeTJ4UyTIkozr5wW6WaV+8TpNFW8kmAYZy96e9OncNCa7JUN7jm6qw7DmLkzQBMTS4bmOFw9Qjm7lymP0cGv8+FMyiGkvBLrumVzVwF3zdLbBYHAmSophC+VAoEpUK4MROqgB+TY60OpGm/xEKgd1X3RLATRppm/Wv+oavfU=
+X-MS-Exchange-AntiSpam-MessageData: h5Ys0Yg20wy12YjWJy3lWRs323KMlaUlIlPEYuSqO6I0hhdGsbInoyLfWZ+9xwm2OFFlK20JhlMdZzWqdZrDJ4ZD0Y9rt51PNuY2z2WzCVVLtJeIrXWpXd5vro/RqEmY8wf/75tJXTySd6S7uDJFD7wGhPlpsIlHJeAadugG+ycmfWRd+ArCWgcwV44oePVVciGeAPVgLW1yVXZK/3AJFlMCo90kru3Nhu06wVPu9HqAVf83zWHoEGnq9QuNW+15YVSNw/nCSUZSN1ctXStYm3U4/3JME5kuPd30DA84jD5vD3NSSn2ITCEmBjxtAnMGyU8lfW6hmYO4bkn8XbbdV2+Uj8tzgv3g/tk1nBmr/JFmQaJiYoAQe+glbdctqbAZ09luacWk+c/AipH89hlVowt/1USQy03gbwQ4hqnINzV0V16ivugaDWIw2k/OZ7i2mEAc+JONAMydP7F0CV4EHZwnHpRbYpV9jpWu3j6PeJI=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3888acd-c3c5-4cae-9d37-08d8326546ee
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36fba14b-bd13-4326-4e05-08d83265417a
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 19:43:03.7726 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 19:42:54.6138 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IQS+IwAiG/slJuGqcQkopWCBUTehw6WtnEVz0tc/8cfLYBWsHDH/VfJn8MIQHJUeWljTIz0sDsIahusBIjth/R9Zfa8GefCAHFfXt8C+zWw=
+X-MS-Exchange-CrossTenant-UserPrincipalName: kAMOMymLql1iDMAr+2nzdAtz3lVO5QevTk6Q6v7BQtDwWosMy2+FgSLtzVuWeFCty+OXSVR4pL26Wq1zyCYMsFZ1jGe9VVj6GRrMg0NV5xc=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2610
 Received-SPF: pass client-ip=40.107.8.137;
  envelope-from=vsementsov@virtuozzo.com;
@@ -140,152 +139,104 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Keep bitmap state for disabled bitmaps too. Keep the state until the
-end of the process. It's needed for the following commit to implement
-bitmap postcopy canceling.
+iotest 199 works too long because of many discard operations. At the
+same time, postcopy period is very short, in spite of all these
+efforts.
 
-To clean-up the new list the following logic is used:
-We need two events to consider bitmap migration finished:
-1. chunk with DIRTY_BITMAP_MIG_FLAG_COMPLETE flag should be received
-2. dirty_bitmap_mig_before_vm_start should be called
-These two events may come in any order, so we understand which one is
-last, and on the last of them we remove bitmap migration state from the
-list.
+So, let's use less discards (and with more interesting patterns) to
+reduce test timing. In the next commit we'll increase postcopy period.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Tested-by: Eric Blake <eblake@redhat.com>
 ---
- migration/block-dirty-bitmap.c | 64 +++++++++++++++++++++++-----------
- 1 file changed, 43 insertions(+), 21 deletions(-)
+ tests/qemu-iotests/199 | 44 +++++++++++++++++++++++++-----------------
+ 1 file changed, 26 insertions(+), 18 deletions(-)
 
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 405a259296..eb4ffeac4d 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -132,6 +132,7 @@ typedef struct LoadBitmapState {
-     BlockDriverState *bs;
-     BdrvDirtyBitmap *bitmap;
-     bool migrated;
-+    bool enabled;
- } LoadBitmapState;
+diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
+index 190e820b84..da4dae01fb 100755
+--- a/tests/qemu-iotests/199
++++ b/tests/qemu-iotests/199
+@@ -30,6 +30,28 @@ size = '256G'
+ fifo = os.path.join(iotests.test_dir, 'mig_fifo')
  
- /* State of the dirty bitmap migration (DBM) during load process */
-@@ -142,8 +143,10 @@ typedef struct DBMLoadState {
-     BlockDriverState *bs;
-     BdrvDirtyBitmap *bitmap;
  
--    GSList *enabled_bitmaps;
--    QemuMutex lock; /* protect enabled_bitmaps */
-+    bool before_vm_start_handled; /* set in dirty_bitmap_mig_before_vm_start */
++GiB = 1024 * 1024 * 1024
 +
-+    GSList *bitmaps;
-+    QemuMutex lock; /* protect bitmaps */
- } DBMLoadState;
- 
- typedef struct DBMState {
-@@ -526,6 +529,7 @@ static int dirty_bitmap_load_start(QEMUFile *f, DBMLoadState *s)
-     Error *local_err = NULL;
-     uint32_t granularity = qemu_get_be32(f);
-     uint8_t flags = qemu_get_byte(f);
-+    LoadBitmapState *b;
- 
-     if (s->bitmap) {
-         error_report("Bitmap with the same name ('%s') already exists on "
-@@ -552,45 +556,59 @@ static int dirty_bitmap_load_start(QEMUFile *f, DBMLoadState *s)
- 
-     bdrv_disable_dirty_bitmap(s->bitmap);
-     if (flags & DIRTY_BITMAP_MIG_START_FLAG_ENABLED) {
--        LoadBitmapState *b;
--
-         bdrv_dirty_bitmap_create_successor(s->bitmap, &local_err);
-         if (local_err) {
-             error_report_err(local_err);
-             return -EINVAL;
-         }
--
--        b = g_new(LoadBitmapState, 1);
--        b->bs = s->bs;
--        b->bitmap = s->bitmap;
--        b->migrated = false;
--        s->enabled_bitmaps = g_slist_prepend(s->enabled_bitmaps, b);
-     }
- 
-+    b = g_new(LoadBitmapState, 1);
-+    b->bs = s->bs;
-+    b->bitmap = s->bitmap;
-+    b->migrated = false;
-+    b->enabled = flags & DIRTY_BITMAP_MIG_START_FLAG_ENABLED;
++discards1 = (
++    (0, GiB),
++    (2 * GiB + 512 * 5, 512),
++    (3 * GiB + 512 * 5, 512),
++    (100 * GiB, GiB)
++)
 +
-+    s->bitmaps = g_slist_prepend(s->bitmaps, b);
++discards2 = (
++    (3 * GiB + 512 * 8, 512),
++    (4 * GiB + 512 * 8, 512),
++    (50 * GiB, GiB),
++    (100 * GiB + GiB // 2, GiB)
++)
 +
-     return 0;
- }
- 
--void dirty_bitmap_mig_before_vm_start(void)
-+/*
-+ * before_vm_start_handle_item
-+ *
-+ * g_slist_foreach helper
-+ *
-+ * item is LoadBitmapState*
-+ * opaque is DBMLoadState*
-+ */
-+static void before_vm_start_handle_item(void *item, void *opaque)
- {
--    DBMLoadState *s = &dbm_state.load;
--    GSList *item;
--
--    qemu_mutex_lock(&s->lock);
--
--    for (item = s->enabled_bitmaps; item; item = g_slist_next(item)) {
--        LoadBitmapState *b = item->data;
-+    DBMLoadState *s = opaque;
-+    LoadBitmapState *b = item;
- 
-+    if (b->enabled) {
-         if (b->migrated) {
-             bdrv_enable_dirty_bitmap(b->bitmap);
-         } else {
-             bdrv_dirty_bitmap_enable_successor(b->bitmap);
-         }
-+    }
- 
-+    if (b->migrated) {
-+        s->bitmaps = g_slist_remove(s->bitmaps, b);
-         g_free(b);
-     }
-+}
- 
--    g_slist_free(s->enabled_bitmaps);
--    s->enabled_bitmaps = NULL;
-+void dirty_bitmap_mig_before_vm_start(void)
-+{
-+    DBMLoadState *s = &dbm_state.load;
-+    qemu_mutex_lock(&s->lock);
 +
-+    assert(!s->before_vm_start_handled);
-+    g_slist_foreach(s->bitmaps, before_vm_start_handle_item, s);
-+    s->before_vm_start_handled = true;
++def apply_discards(vm, discards):
++    for d in discards:
++        vm.hmp_qemu_io('drive0', 'discard {} {}'.format(*d))
++
++
+ def event_seconds(event):
+     return event['timestamp']['seconds'] + \
+         event['timestamp']['microseconds'] / 1000000.0
+@@ -80,9 +102,7 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+         self.vm_b_events = []
  
-     qemu_mutex_unlock(&s->lock);
- }
-@@ -607,11 +625,15 @@ static void dirty_bitmap_load_complete(QEMUFile *f, DBMLoadState *s)
-         bdrv_reclaim_dirty_bitmap(s->bitmap, &error_abort);
-     }
+     def test_postcopy(self):
+-        discard_size = 0x40000000
+         granularity = 512
+-        chunk = 4096
  
--    for (item = s->enabled_bitmaps; item; item = g_slist_next(item)) {
-+    for (item = s->bitmaps; item; item = g_slist_next(item)) {
-         LoadBitmapState *b = item->data;
+         result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
+                                name='bitmap', granularity=granularity)
+@@ -92,14 +112,7 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+                                node='drive0', name='bitmap')
+         empty_sha256 = result['return']['sha256']
  
-         if (b->bitmap == s->bitmap) {
-             b->migrated = true;
-+            if (s->before_vm_start_handled) {
-+                s->bitmaps = g_slist_remove(s->bitmaps, b);
-+                g_free(b);
-+            }
-             break;
-         }
-     }
+-        s = 0
+-        while s < discard_size:
+-            self.vm_a.hmp_qemu_io('drive0', 'discard %d %d' % (s, chunk))
+-            s += 0x10000
+-        s = 0x8000
+-        while s < discard_size:
+-            self.vm_a.hmp_qemu_io('drive0', 'discard %d %d' % (s, chunk))
+-            s += 0x10000
++        apply_discards(self.vm_a, discards1 + discards2)
+ 
+         result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
+                                node='drive0', name='bitmap')
+@@ -111,10 +124,8 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+         result = self.vm_a.qmp('block-dirty-bitmap-clear', node='drive0',
+                                name='bitmap')
+         self.assert_qmp(result, 'return', {})
+-        s = 0
+-        while s < discard_size:
+-            self.vm_a.hmp_qemu_io('drive0', 'discard %d %d' % (s, chunk))
+-            s += 0x10000
++
++        apply_discards(self.vm_a, discards1)
+ 
+         caps = [{'capability': 'dirty-bitmaps', 'state': True},
+                 {'capability': 'events', 'state': True}]
+@@ -134,10 +145,7 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+         event_resume = self.vm_b.event_wait('RESUME')
+         self.vm_b_events.append(event_resume)
+ 
+-        s = 0x8000
+-        while s < discard_size:
+-            self.vm_b.hmp_qemu_io('drive0', 'discard %d %d' % (s, chunk))
+-            s += 0x10000
++        apply_discards(self.vm_b, discards2)
+ 
+         match = {'data': {'status': 'completed'}}
+         event_complete = self.vm_b.event_wait('MIGRATION', match=match)
 -- 
 2.21.0
 
