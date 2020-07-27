@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDA4C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B455C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:28:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D11B12074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:27:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52D632074F
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:28:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z5fcyUrL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D11B12074F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XCyEgsUV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D632074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k02Df-0003hU-2U
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:27:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36986)
+	id 1k02F2-0005jc-KK
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:28:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k02Ar-00070I-Hx
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:09 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:40279)
+ id 1k02B0-0007Oc-I6
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:18 -0400
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:52691)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k02Ap-0006Qg-SC
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:09 -0400
-Received: by mail-wr1-x436.google.com with SMTP id l2so4115583wrc.7
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 05:24:07 -0700 (PDT)
+ id 1k02Ay-0006Ry-Q9
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:18 -0400
+Received: by mail-wm1-x330.google.com with SMTP id x5so13423843wmi.2
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 05:24:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PRLfK+qPAC6gSDd74XPBGh+NxN06ki9WKWBJWChAWs0=;
- b=z5fcyUrLACUZTWdlc4vMHpSStzN3FIcdIAMod3h5V4Cmtcd2iPCVN7uM+OedNYAGya
- qiERAyWYLM+eb9Wa/6W6jMX1oLUf2+WUCy22QYtvsPH3TFQhCvbrEQHzUO7v11thLVNL
- eMcnVSuwfL+b9QYwM6rsTXZ/GrFf12EYH59dFChKwiPomKV1CxVCJG+HqXq/E5E77s1x
- ydQ8SKofD97L//1aJKrmFyHG0u6x1dvnZr11PdviM71FC4DRVf8wFiDEmn3KRVrKQ6u5
- Oo7QwwpzzmU1oGiwHEfZY0vK+3G4rj7fycOZQcdaLrj7rPQjloqPX81U36wvtRh/Ikh8
- 9V6g==
+ bh=ei48b0uDUhSj4MD+V6eDHkE9M1JkoDFRqMV7PUyL3fQ=;
+ b=XCyEgsUVDcvczbvVMmV+bvSMdVel7YOM6/ooWYtSIfe2oyohh8Bk27/JQjv0QCTt3/
+ RGj9hDMkjHUPfg/rAod8VN+Sg8EkoPDuodzW2hQ4TXAuuALQRUh/IeohEXUGd1BbNPHF
+ ZXMIkYTWg+NdxRmJHl/uKt/10tcKcYed77apVQq2JkxiCxidd/lQ4z34lJW5Vd2jB2Vc
+ xkjtN91k0NF21DfKRUqyi45T6TJ7ISkkbjykE5REoXaJ5eJvOXtuhqOB3mNG57ioNy8N
+ Jk5B/NPGnNplnLGhXwYwywKglmMM7EZ+HoG1JEltYy5++Rc5wYsO5UTcwQ90jvtjsJrQ
+ mhiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=PRLfK+qPAC6gSDd74XPBGh+NxN06ki9WKWBJWChAWs0=;
- b=S467ZN5fWB0QmeX4xMR2oaD64uU+GZM+SsAk85b5k1NXqejQWA6jQgbLYaRqVBiUq9
- ba2B504I07mK6U6AZ5pHegF3v5r+gC8r8vrXsY418o1YFiIJCIDLt6DD4izxwkfW5tIE
- vO+lhKGzTZvzJN0RdMLMtY4nQ4ZWCe+KjWLWWokmYJ5dIvrJklLZcW3z1fg8bZslfZ8L
- I5WQCoZGPT0tUGGe+UVNHZDotw0ApNXhdtPt1T6474txsBe9P9JmeBEQ7RBCH+9jkclc
- AroH5TnQUS5KXmiZ/KQvXMlWEIBXtSeOJLCsm2dkHHNCrpr5rRF3v/OdnUOyr7iQv80v
- gNwQ==
-X-Gm-Message-State: AOAM532pBYfZFcLOdFsWUdEAAXY94HjB8E/vKh0XC9RW5dlerlWcm7wh
- R7ZyodLCgcqmtKTNhcuDxNHLEg==
-X-Google-Smtp-Source: ABdhPJy7KGkGQOLMdN5ycsanaSFDtnBwd55EsSTwoyF4XV29RlB91vBt1hCdctbtwdl2y1jwrSgcWA==
-X-Received: by 2002:a5d:658a:: with SMTP id q10mr19243983wru.1.1595852646497; 
- Mon, 27 Jul 2020 05:24:06 -0700 (PDT)
+ bh=ei48b0uDUhSj4MD+V6eDHkE9M1JkoDFRqMV7PUyL3fQ=;
+ b=gKw0qscBeXcTQHwWYLhd8difeCphkGoqpABieUWsAiID1+IMn7g8ofnJ1Pp2ngvMSH
+ g8nzdQaFCIDKMeaItB0ps1W/5OLWC0ZQXloM23/AM7aXvwdNg/lOeGYz0cxaJEIoQlEm
+ RlR99eBq1ai45nNT9rZgXE3ztjnj1NcMMt/kILmDgHXoSLbNQSEbMlbAYVgEfvgP8mfX
+ ZF6enwuq6Brip6k65pDFhMfB/ef+7Fc/GxxKodRovw5byFTgY4G1Eb9jNmSduwHUw1Nh
+ PuIf9QEHNRKtNFV3fWcIhccc0p8h20LzSAelZZwgpZnRI/ptFhDnoYXk2GeF0EwB/Nr8
+ cFSw==
+X-Gm-Message-State: AOAM532reQlqQOR7wlgnkfqAyKTwp/3VFJtSmg36KEeyIjzXegJ/i9dZ
+ R8KidKDslI7BDaNPiTgcQeOXyA==
+X-Google-Smtp-Source: ABdhPJxUMzrYyoF90OXICf9y/Cr5eLZFSTczNi1I5v9WXCkcwwLIRbXCbAc62AR7YXVp3/pFho1yRA==
+X-Received: by 2002:a1c:9e4c:: with SMTP id h73mr21829926wme.177.1595852655390; 
+ Mon, 27 Jul 2020 05:24:15 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 128sm1890066wmz.43.2020.07.27.05.23.59
+ by smtp.gmail.com with ESMTPSA id y203sm9379214wmc.29.2020.07.27.05.24.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 05:24:01 -0700 (PDT)
+ Mon, 27 Jul 2020 05:24:06 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EA0F61FF92;
- Mon, 27 Jul 2020 13:23:57 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 556111FF99;
+ Mon, 27 Jul 2020 13:23:58 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 06/16] accel/tcg: better handle memory constrained systems
-Date: Mon, 27 Jul 2020 13:23:47 +0100
-Message-Id: <20200727122357.31263-7-alex.bennee@linaro.org>
+Subject: [PULL 10/16] tests/docker: fix binfmt_misc image building
+Date: Mon, 27 Jul 2020 13:23:51 +0100
+Message-Id: <20200727122357.31263-11-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200727122357.31263-1-alex.bennee@linaro.org>
 References: <20200727122357.31263-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x436.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::330;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x330.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -89,8 +89,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,48 +103,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Robert Foley <robert.foley@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It turns out there are some 64 bit systems that have relatively low
-amounts of physical memory available to them (typically CI system).
-Even with swapping available a 1GB translation buffer that fills up
-can put the machine under increased memory pressure. Detect these low
-memory situations and reduce tb_size appropriately.
+When we updated the arguments for docker.py we missed a bit.
 
-Fixes: 600e17b2615 ("accel/tcg: increase default code gen buffer size for 64 bit")
+Fixes: dfae628459 ("docker.py/build: support -t and -f arguments")
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Robert Foley <robert.foley@linaro.org>
-Cc: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Message-Id: <20200724064509.331-7-alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200724064509.331-11-alex.bennee@linaro.org>
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 2afa46bd2b1..2d83013633b 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -976,7 +976,12 @@ static inline size_t size_code_gen_buffer(size_t tb_size)
- {
-     /* Size the buffer.  */
-     if (tb_size == 0) {
--        tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
-+        size_t phys_mem = qemu_get_host_physmem();
-+        if (phys_mem == 0) {
-+            tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
-+        } else {
-+            tb_size = MIN(DEFAULT_CODE_GEN_BUFFER_SIZE, phys_mem / 8);
-+        }
-     }
-     if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
-         tb_size = MIN_CODE_GEN_BUFFER_SIZE;
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index a104e9df281..9119dff97de 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -78,7 +78,7 @@ docker-binfmt-image-debian-%: $(DOCKER_FILES_DIR)/debian-bootstrap.docker
+ 			DEB_ARCH=$(DEB_ARCH)					\
+ 			DEB_TYPE=$(DEB_TYPE) 					\
+ 			$(if $(DEB_URL),DEB_URL=$(DEB_URL),)			\
+-			$(DOCKER_SCRIPT) build qemu/debian-$* $< 		\
++			$(DOCKER_SCRIPT) build -t qemu/debian-$* -f $< 		\
+ 			$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) 		\
+ 			$(if $(NOUSER),,--add-current-user) 			\
+ 			$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))	\
 -- 
 2.20.1
 
