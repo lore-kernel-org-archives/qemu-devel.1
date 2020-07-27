@@ -2,81 +2,81 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 458B2C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 21:49:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83089C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 21:55:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1262820729
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 21:49:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BD2E206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 21:55:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="RHkPcQvj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1262820729
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="TrjPv0/W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BD2E206D7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0B0O-00026D-6A
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 17:49:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45334)
+	id 1k0B5W-0005Sw-DZ
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 17:55:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k0Awt-0000RL-DZ
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 17:46:19 -0400
-Received: from mout.gmx.net ([212.227.15.18]:53125)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k0Awy-0000UW-TP
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 17:46:24 -0400
+Received: from mout.gmx.net ([212.227.15.18]:51963)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k0Awr-0002n9-Nn
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 17:46:19 -0400
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k0Awx-0002o1-3H
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 17:46:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1595886372;
- bh=z/QXmt5sYC3nu5t+U0TkgIU+Re5QzTPu4ajnWt9P04Y=;
+ s=badeba3b8450; t=1595886370;
+ bh=ICqOAwvmzBTR55lazeld9xGff0M2fFlPachgThOMd2M=;
  h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=RHkPcQvjODWQ2cuQciRWJcucv7o4m+MT4JBbmoLuLo6jHBEsM+pJEuLWCm1ijS23P
- 8o0lGfpPKCrvlav5lcbQ8rIkOepkr6wtWhhuhhXYuw6Jw8gRL5LjHPV+OeoZJ3kSHA
- DAzBrWZowTgQ83kjEHNJgrKNfLssAy4WKfNXSFd0=
+ b=TrjPv0/W6ADf7nXEGR3ciCjWVX8C2elGZpwBd6hctLwVPWQ3YtSDbddeBEHu0qx0c
+ hW3RtjfpnLou0YMjvnOH89E7HkAMoJv9pfY/ZrDGo/0hTUWpnmcJlVcUNU9CPWFg1T
+ Gmk0MaOVPl11Th5zBeViGvVO/76Tuope/9N9QGXU=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from ls3530.fritz.box ([92.116.179.161]) by mail.gmx.com (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mof9P-1kbTha3io5-00p94y; Mon, 27
- Jul 2020 23:46:11 +0200
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1M1HZo-1jxPnE1zTO-002pZz; Mon, 27
+ Jul 2020 23:46:10 +0200
 From: Helge Deller <deller@gmx.de>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/4] hw/hppa: Implement proper SeaBIOS version check
-Date: Mon, 27 Jul 2020 23:46:07 +0200
-Message-Id: <20200727214608.32710-4-deller@gmx.de>
+Subject: [PATCH 1/4] hw/hppa: Sync hppa_hardware.h file with SeaBIOS sources
+Date: Mon, 27 Jul 2020 23:46:05 +0200
+Message-Id: <20200727214608.32710-2-deller@gmx.de>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200727214608.32710-1-deller@gmx.de>
 References: <20200727214608.32710-1-deller@gmx.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:O7spXiDwdqgmeBPJbJcI3Vh+xMHeUdPff0YFZ4pMbAIgL7/Vvw7
- eFov5FByuSbj+RbKG0hTaw6Z61Pns5CS2gGgDcztfsllBlSwB+gVRCfEjjSf2tqLZ9XZYF0
- mKPlEdboXChRRvM+qEHjUOSsoiqtNI/Lk3vC1LFH9PeqTw+n8Dwm1xfWAUJ0/hCcjRfR3Xa
- 764Nq8oseZ7ahwjXILtdQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:rgnGuZuWpDQ=:rBsluiheM7iFuO97qZBYkM
- WPkfcvjbHW51v/0A+zy56Z6v0xleUjjjfzHorLfmGdNUP9+tFdf2XVaip4OqD47Wth+vZ6fz2
- mQQ4EoZstKLugY2By47Sy7k7gCh2oc0g1CAExOFeUlw3pZswn+7DdgJXVF5gkPD1iJ5jURPHV
- P2NAQkep8CODvSE4WudIL7PZF4PJ0PtDtuLEtnh++QPAgTXnEicjrWN32Fz3a6gYTq/17S0T0
- SljmHXTTC7Um+LeIdnKjlY/JtRYluEYcn6sRaWaoENgrFtLVd1DAzAoxupte9egO34q5vlS1I
- qoKpWd8Nv3Rls3yh9Rs78v3QNaiHteNygKoIgoBg2tastXdkADiTTFcooh6ojkRzvHog2hvuj
- PDh7wiIHhM3yAlfmJ2JFiKLo+8Ph4WIar74Yx/fSDQQDO72STrXtK0QT9bgQZ+AuNGFX/wRXa
- efkt0cOC8PeOaj1WnMN90EzWhmgetfI8kW50F75EAaiDxgGfnYUHJnkoTHlM3rpc+QvYMKL1A
- TUYO8CAiUsu/ieawY0v/YwhFFT0/U1y63jHP6oib69x2CcW5F8VCDm8X1Ai4/RgRDd72UHZr/
- /XKCbqaVIPIGgJ0u2uDflJJ995h5xbiSuh5c7NStVxWKqrVcnIGK4Z+HkY2PNo1hIybDXlJGT
- MYl+xxGROrongfW86eYNKXZ7vmWMOJeFKyC+rOKC+YXcyAawaRy3uj7QiGXq8OiV7JwZ629Au
- J58ki8kvEJA59tFvGNnuSRJJOE9qU8/KayT1Yh0FkpPOqMXGpHsrbumpKktiU4vRgT6crXREw
- heHv/Gm9ak6ZmzuXc3sLV1YnG7Wgi61g6DXjNnMUybm8ikrJOeB4mVEFAlxwb2tzyho1IILdj
- /Wp0jNh8GLy756i2Y9PkOqmGe0Ko6isRUHRaBBkrsjRiwVF/BEX7+yntT/i5M2lqa64CjZLbJ
- iByn+NGlVSRQ2AuHE7dLJC5ktisDdbHgeTyXiBEMr8OSiuH/CaYXGleTnUB2fvesVK+UVaJ5Y
- ysPLbZEPMeVV3h63GjTIiKw/AunHIII7+vFcQqxBbmQvoRx4wCae9ml3Ub1vQVdczuhVtICmi
- 8UHoQU61xzsz5GDluvWiOl4QEJkUT8jfpr9RH0/L+Anth/NFcjKyTB1xZHIlkq07PeSuAtipI
- ScDaWv/PivRhBPP4O/FjHtfzitWfeAsFJp75TL5u3Fjgi6Y2TErdnBYPE7jLYGd/gGjaMHTDy
- pJ5rtAjHWCcsP/1HO
+X-Provags-ID: V03:K1:EXnzO/XO43p3t7jNT089H2EH3CQ4+5GG35M5ztbf6kV5CtPbGzq
+ xAi+nw/MYDxKkkDboawUVR5jESvDqQMJiaGyCn75QaHuQrTwz8ngUmKPPdXaJJz8Ktf4426
+ ZbnG3n2/IygDUMUHM/2cXahZEyI/D8WbToPUhCUDuponidbUUAsgTydhIevTK3Tv2Byt8FE
+ 0ijLqB0kVUzx/kBn8etWg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:uI3MTDGJc64=:HsWGklhY0On1QAyDh8QEKx
+ PulLn7eq6rPxc14SVJru/gvrkzHQTxnaD385CtfMqiNvkgtL4tuhodlhu7TS9fbbELoQ8jRpU
+ lJUMEgRN15OcLWXkMW4A1Lsriw2NzCNlMsSjwWtV6djP62iz1ELXL78wdT/Tw6SQhJ42ee4Ol
+ gqJkMBnLtKztzf5ZxyNZ8DpVvrgO4B7uUjv4fjm/izGWmkdfpBHXjEGPn6CN45UPCsn80Rc+A
+ wXxFm5qJXgEyZYWBqbjzsmxYm570cSxkLoIK5fIPHu45yL7nGAwJG0aoCfIOPRV6EZO+26eqZ
+ T4KlWFlyrXgwMTOGTCVQeGMeb+kHCX2/61iRrpcqOB32k8DqaGnwU18D2lTkP4AndGoNQOVjD
+ X8XCJieVzIP5/FhMeYdzYF0+xeUr1tADF2j1HpAb7nParKycGXplIZZFd8YD9hQcLcZspv9a8
+ NcqsYbP+5nfbd7J5G/uF9TMbbVaN5LX45aTb42tzsr+2PlqqQQEuCtmife6PaRkCkV3UlKhBe
+ XzRl7hU9IWChs6JiIOM4TCS2WXW68KTo3EFB474zf6tP4qxvevkuq5pXxAk+k12e6M+hR9Jer
+ bobLLVVPkwg+d/KL2hpM9dw0hT+7cZ3LarZzKHeIj9CbfZJGD8PHU79UtWQVqTo+2l9xJkefw
+ A9gsofAWEI+x9X6yODL4DjBLW+8q/7lbhSes4wTGufZV7CtiREe5lMbTdXomjOGsKncD5XvUm
+ 5i+iwQu+eLSupdbaOK8Z1nDQDWc6k8j/QxdH1ytZ2ULzVYAUMGm1iy/wbPAsi32iRtu3SO6+i
+ v5BvcX/ye1guRjfcalubUEZPDVNFEJwkM9QN6ABdH2RuJYvNYoo0nsQOiMdttIU4OrokNsLAH
+ mTu27XKXtGeoNpxvMODdF5XlbSJFfYDhMPrdtFQbnl1VL0STnSGffjZG+Y1xnWbut1mUJGw+Z
+ nVGAfLagzhw1LunDtKkCpK4bXNRttAykPEyvvGcYWfGu5RWAhsEFXyYlvPidfLI7C3CN+q+nA
+ rTiwfqu+aIVeoZqbgKZoZ0tCiIUueSebEmFz4kyt90XgiLjKrrR7UXxFnlgRyNZlDRDaFTZBZ
+ CP8s1T1ybIZaspFCOLMrpIhILwApB9TI2ZDw0In1u7P+H4EmW+J8OBq25p2mlpuSbRmTfUS6q
+ exikyN23HA/XONxW/a33A+4AZVYRapPteA1n9+663CWrxyznxpdpXPoaugQvhmtWlzzIpVWrN
+ SYhbMzXBdTKElteJQ
 Received-SPF: pass client-ip=212.227.15.18; envelope-from=deller@gmx.de;
  helo=mout.gmx.net
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 17:46:15
@@ -104,68 +104,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's important that the SeaBIOS hppa firmware is at least at a minimal
-level to ensure proper interaction between qemu and firmware.
-
-Implement a proper firmware version check by telling SeaBIOS via the
-fw_cfg interface which minimal SeaBIOS version is required by this
-running qemu instance. If the firmware detects that it's too old, it
-will stop.
+The hppa_hardware.h file is shared with SeaBIOS. Sync it.
 
 Signed-off-by: Helge Deller <deller@gmx.de>
 =2D--
- hw/hppa/machine.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ hw/hppa/hppa_hardware.h | 6 ++++++
+ hw/hppa/lasi.c          | 2 --
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 49155537cd..90aeefe2a4 100644
-=2D-- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -25,6 +25,8 @@
+diff --git a/hw/hppa/hppa_hardware.h b/hw/hppa/hppa_hardware.h
+index 4a2fe2df60..cdb7fa6240 100644
+=2D-- a/hw/hppa/hppa_hardware.h
++++ b/hw/hppa/hppa_hardware.h
+@@ -17,6 +17,7 @@
+ #define LASI_UART_HPA   0xffd05000
+ #define LASI_SCSI_HPA   0xffd06000
+ #define LASI_LAN_HPA    0xffd07000
++#define LASI_RTC_HPA    0xffd09000
+ #define LASI_LPT_HPA    0xffd02000
+ #define LASI_AUDIO_HPA  0xffd04000
+ #define LASI_PS2KBD_HPA 0xffd08000
+@@ -37,10 +38,15 @@
+ #define PORT_PCI_CMD    (PCI_HPA + DINO_PCI_ADDR)
+ #define PORT_PCI_DATA   (PCI_HPA + DINO_CONFIG_DATA)
 
- #define MAX_IDE_BUS 2
++/* QEMU fw_cfg interface port */
++#define QEMU_FW_CFG_IO_BASE     (MEMORY_HPA + 0x80)
++
+ #define PORT_SERIAL1    (DINO_UART_HPA + 0x800)
+ #define PORT_SERIAL2    (LASI_UART_HPA + 0x800)
 
-+#define MIN_SEABIOS_HPPA_VERSION 1 /* require at least this fw version */
-+
- static ISABus *hppa_isa_bus(void)
- {
-     ISABus *isa_bus;
-@@ -56,6 +58,23 @@ static uint64_t cpu_hppa_to_phys(void *opaque, uint64_t=
- addr)
- static HPPACPU *cpu[HPPA_MAX_CPUS];
- static uint64_t firmware_entry;
+ #define HPPA_MAX_CPUS   8       /* max. number of SMP CPUs */
+ #define CPU_CLOCK_MHZ   250     /* emulate a 250 MHz CPU */
 
-+static FWCfgState *create_fw_cfg(MachineState *ms)
-+{
-+    FWCfgState *fw_cfg;
-+    uint64_t val;
++#define CPU_HPA_CR_REG  7       /* store CPU HPA in cr7 (SeaBIOS internal=
+) */
 +
-+    fw_cfg =3D fw_cfg_init_mem(QEMU_FW_CFG_IO_BASE, QEMU_FW_CFG_IO_BASE +=
- 4);
-+    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, ms->smp.cpus);
-+    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, HPPA_MAX_CPUS);
-+    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, ram_size);
-+
-+    val =3D cpu_to_le64(MIN_SEABIOS_HPPA_VERSION);
-+    fw_cfg_add_file(fw_cfg, "/etc/firmware-min-version",
-+                    g_memdup(&val, sizeof(val)), sizeof(val));
-+
-+    return fw_cfg;
-+}
-+
- static void machine_hppa_init(MachineState *machine)
- {
-     const char *kernel_filename =3D machine->kernel_filename;
-@@ -118,6 +137,9 @@ static void machine_hppa_init(MachineState *machine)
-                        115200, serial_hd(0), DEVICE_BIG_ENDIAN);
-     }
+ #endif
+diff --git a/hw/hppa/lasi.c b/hw/hppa/lasi.c
+index 19974034f3..ffcbb988b8 100644
+=2D-- a/hw/hppa/lasi.c
++++ b/hw/hppa/lasi.c
+@@ -54,8 +54,6 @@
+ #define LASI_CHIP(obj) \
+     OBJECT_CHECK(LasiState, (obj), TYPE_LASI_CHIP)
 
-+    /* fw_cfg configuration interface */
-+    create_fw_cfg(machine);
-+
-     /* SCSI disk setup. */
-     dev =3D DEVICE(pci_create_simple(pci_bus, -1, "lsi53c895a"));
-     lsi53c8xx_handle_legacy_cmdline(dev);
+-#define LASI_RTC_HPA    (LASI_HPA + 0x9000)
+-
+ typedef struct LasiState {
+     PCIHostState parent_obj;
+
 =2D-
 2.21.3
 
