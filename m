@@ -2,79 +2,79 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE76C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F36C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:39:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B50420729
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:34:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FC7220719
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:39:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XmIkZBLo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B50420729
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dkTWSd/N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FC7220719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k071C-0007Qn-Aq
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 13:34:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49662)
+	id 1k075s-0000Zb-E7
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 13:39:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k070Q-0006zH-Vj
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:33:43 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48111
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k075G-00007Y-L8
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:38:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44381
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k070L-0004bm-0U
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:33:41 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k075D-000597-UZ
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:38:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595871214;
+ s=mimecast20190719; t=1595871518;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0FD42sXIjEiZ5ZZ/4MVgBq5A5IyHDhvt1FXCACkYNmI=;
- b=XmIkZBLo9w9zSARC5oRK72aVOmHDuQjmvNoXhjJ126hyBKU56NA9zwj47yS8h7UP/eX69y
- uJimOlZsD68nKhDkQnVezF8lYr+EqYFT1Wj3S/XO5DRoPyR0xmkV2Y/ppBaJZ5UvyYM6ik
- 3ocaKMo0kDE3zdMU2LJawSQKBbPCQTw=
+ bh=9YTSVbn95aVpUowmRf/7dLNfwtpI8xIYUp4TNkjOJyU=;
+ b=dkTWSd/NA19ZVhZdbabistAmJlraHJ2GQkIXdQj7D6wG4b1m5JpDAAl3HApxL20bCyCv8S
+ ofQLG0K37X9Soliuc3bKdJRFBmxCfzQSXJarNkFbQzdvnZkV9q9X7jX9Tw4RE390l6ADmg
+ zh0z1Gi2+1n23lNnnTEDnDrfiH1NB6A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-Ejyrl7UBObGToMmxe3YKrw-1; Mon, 27 Jul 2020 13:33:31 -0400
-X-MC-Unique: Ejyrl7UBObGToMmxe3YKrw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-446-eG865qJlP_CL5JDLchyNag-1; Mon, 27 Jul 2020 13:38:37 -0400
+X-MC-Unique: eG865qJlP_CL5JDLchyNag-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 298CC801E6A;
- Mon, 27 Jul 2020 17:33:30 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E091D19931;
- Mon, 27 Jul 2020 17:33:28 +0000 (UTC)
-Date: Mon, 27 Jul 2020 19:33:26 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Vishnu Dixit <1888923@bugs.launchpad.net>
-Subject: Re: [Bug 1888923] [NEW] Configured Memory access latency and
- bandwidth not taking effect
-Message-ID: <20200727193326.03525888@redhat.com>
-In-Reply-To: <159566199879.4877.1642879405857907906.malonedeb@wampee.canonical.com>
-References: <159566199879.4877.1642879405857907906.malonedeb@wampee.canonical.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C00719057C8;
+ Mon, 27 Jul 2020 17:38:35 +0000 (UTC)
+Received: from work-vm (ovpn-114-135.ams2.redhat.com [10.36.114.135])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3838669326;
+ Mon, 27 Jul 2020 17:38:15 +0000 (UTC)
+Date: Mon, 27 Jul 2020 18:38:12 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Christophe de Dinechin <dinechin@redhat.com>
+Subject: Re: [PATCH 7/7] spice: Call qemu spice functions indirectly
+Message-ID: <20200727173812.GT3040@work-vm>
+References: <20200723174615.2370096-1-dinechin@redhat.com>
+ <20200723174615.2370096-8-dinechin@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200723174615.2370096-8-dinechin@redhat.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:46:13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:44:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -95,378 +95,366 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kraxel@redhat.com, Cleber Rosa <crosa@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 25 Jul 2020 07:26:38 -0000
-Vishnu Dixit <1888923@bugs.launchpad.net> wrote:
+* Christophe de Dinechin (dinechin@redhat.com) wrote:
+> In order to be able to move all of spice in a shared library that is
+> loaded dynamically only on demand, this commit puts the functions
+> called by the main binary in a QemuSpiceOps structure, and use static
+> inline stubs to preserve the call sites.
+> 
+> With these changes, the following shared libraries are no longer
+> necessary in the top-level qemu binary when building with CONFIG_MDULES:
+> 
+>         libspice-server.so.1 => /lib64/libspice-server.so.1 (HEX)
+>         libopus.so.0 => /lib64/libopus.so.0 (HEX)
+>         liblz4.so.1 => /lib64/liblz4.so.1 (HEX)
+>         libgstapp-1.0.so.0 => /lib64/libgstapp-1.0.so.0 (HEX)
+>         libgstvideo-1.0.so.0 => /lib64/libgstvideo-1.0.so.0 (HEX)
+>         libgstbase-1.0.so.0 => /lib64/libgstbase-1.0.so.0 (HEX)
+>         libgstreamer-1.0.so.0 => /lib64/libgstreamer-1.0.so.0 (HEX)
+>         libssl.so.1.1 => /lib64/libssl.so.1.1 (HEX)
+>         liborc-0.4.so.0 => /lib64/liborc-0.4.so.0 (HEX)
+> 
+> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
+> ---
+>  include/ui/qemu-spice.h | 74 +++++++++++++++++++----------------------
+>  monitor/hmp-cmds.c      | 13 ++++++++
+>  monitor/misc.c          |  2 +-
+>  monitor/qmp-cmds.c      |  6 ++--
+>  softmmu/vl.c            | 28 ++++++++++++++--
+>  ui/spice-core.c         | 33 ++++++++++++++++--
+>  6 files changed, 107 insertions(+), 49 deletions(-)
+> 
+> diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+> index d34cea2e0f..9721d8817e 100644
+> --- a/include/ui/qemu-spice.h
+> +++ b/include/ui/qemu-spice.h
+> @@ -25,21 +25,28 @@
+>  #include <spice.h>
+>  #include "qemu/config-file.h"
+>  
+> -extern int using_spice;
+> +#define using_spice     (qemu_spice.in_use())
+>  
+> -void qemu_spice_init(void);
+>  void qemu_spice_input_init(void);
+>  void qemu_spice_audio_init(void);
+> -void qemu_spice_display_init(void);
+> -int qemu_spice_display_add_client(int csock, int skipauth, int tls);
+>  int qemu_spice_add_interface(SpiceBaseInstance *sin);
+>  bool qemu_spice_have_display_interface(QemuConsole *con);
+>  int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *con);
+> +
+> +#if !defined(CONFIG_MODULES) || defined(BUILD_DSO)
+> +bool qemu_is_using_spice(void);
+> +void qemu_start_using_spice(void);
+> +void qemu_spice_init(void);
+> +void qemu_spice_display_init(void);
+> +int qemu_spice_display_add_client(int csock, int skipauth, int tls);
+>  int qemu_spice_set_passwd(const char *passwd,
+>                            bool fail_if_connected, bool disconnect_if_connected);
+>  int qemu_spice_set_pw_expire(time_t expires);
+>  int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
+>                              const char *subject);
+> +struct SpiceInfo *qemu_spice_query(Error **errp);
+> +#endif /* !CONFIG_MODULES || BUILD_DSO */
+> +
+>  
+>  #if !defined(SPICE_SERVER_VERSION) || (SPICE_SERVER_VERSION < 0xc06)
+>  #define SPICE_NEEDS_SET_MM_TIME 1
+> @@ -47,46 +54,33 @@ int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
+>  #define SPICE_NEEDS_SET_MM_TIME 0
+>  #endif
+>  
+> -#else  /* CONFIG_SPICE */
+> -
+> -#include "qemu/error-report.h"
+> -
+> -#define using_spice 0
+> -#define spice_displays 0
+> -static inline int qemu_spice_set_passwd(const char *passwd,
+> -                                        bool fail_if_connected,
+> -                                        bool disconnect_if_connected)
+> -{
+> -    return -1;
+> -}
+> -static inline int qemu_spice_set_pw_expire(time_t expires)
+> -{
+> -    return -1;
+> -}
+> -static inline int qemu_spice_migrate_info(const char *h, int p, int t,
+> -                                          const char *s)
+> -{
+> -    return -1;
+> -}
+> +#else /* !CONFIG_SPICE */
+>  
+> -static inline int qemu_spice_display_add_client(int csock, int skipauth,
+> -                                                int tls)
+> -{
+> -    return -1;
+> -}
+> +#define using_spice     0
+>  
+> -static inline void qemu_spice_display_init(void)
+> -{
+> -    /* This must never be called if CONFIG_SPICE is disabled */
+> -    error_report("spice support is disabled");
+> -    abort();
+> -}
+> +#endif /* CONFIG_SPICE */
+>  
+> -static inline void qemu_spice_init(void)
+> +/* Module high-level inteface for SPICE */
+> +struct QemuSpiceOps
+>  {
+> -}
+> -
+> -#endif /* CONFIG_SPICE */
+> +    bool (*in_use)(void);
+> +    void (*init)(void);
+> +    void (*display_init)(void);
+> +    int (*display_add_client)(int csock, int skipauth, int tls);
+> +
+> +    int (*set_passwd)(const char *passwd,
+> +                      bool fail_if_connected,
+> +                      bool disconnect_if_connected);
+> +    int (*set_pw_expire)(time_t expires);
+> +    int (*migrate_info)(const char *hostname,
+> +                        int port, int tls_port,
+> +                        const char *subject);
+> +    struct SpiceInfo * (*query)(Error **errp);
+> +};
+> +typedef struct QemuSpiceOps QemuSpiceOps;
+> +void qemu_spice_ops_register(QemuSpiceOps *ops);
+> +
+> +extern struct QemuSpiceOps qemu_spice;
+>  
+>  static inline bool qemu_using_spice(Error **errp)
+>  {
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index ae4b6a4246..8e10af188f 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -57,6 +57,7 @@
+>  
+>  #ifdef CONFIG_SPICE
+>  #include <spice/enums.h>
+> +#include "ui/qemu-spice.h"
+>  #endif
+>  
+>  void hmp_handle_error(Monitor *mon, Error *err)
+> @@ -573,6 +574,14 @@ void hmp_info_vnc(Monitor *mon, const QDict *qdict)
+>  #endif
+>  
+>  #ifdef CONFIG_SPICE
+> +SpiceInfo *qmp_query_spice(Error **errp)
+> +{
+> +    if (!using_spice) {
+> +        return NULL;
+> +    }
+> +    return qemu_spice.query(errp);
+> +}
+> +
 
-> Public bug reported:
->=20
-> I was trying to configure latencies and bandwidths between nodes in a
-> NUMA emulation using QEMU 5.0.0.
->=20
-> Host : Ubuntu 20.04 64 bit
-> Guest : Ubuntu 18.04 64 bit
->=20
-> The machine configured has 2 nodes. Each node has 2 CPUs and has been
-> allocated 3GB of memory. The memory access latencies and bandwidths for
-> a local access (i.e from initiator 0 to target 0, and from initiator 1
-> to target 1) are set as 40ns and 10GB/s respectively. The memory access
-> latencies and bandwidths for a remote access (i.e from initiator 1 to
-> target 0, and from initiator 0 to target 1) are set as 80ns and 5GB/s
-> respectively.
->=20
-> The command line launch is as follows.
->=20
-> sudo x86_64-softmmu/qemu-system-x86_64  \
-> -machine hmat=3Don \
-> -boot c \
-> -enable-kvm \
-> -m 6G,slots=3D2,maxmem=3D7G \
-> -object memory-backend-ram,size=3D3G,id=3Dm0 \
-> -object memory-backend-ram,size=3D3G,id=3Dm1 \
-> -numa node,nodeid=3D0,memdev=3Dm0 \
-> -numa node,nodeid=3D1,memdev=3Dm1 \
-> -smp 4,sockets=3D4,maxcpus=3D4  \
-> -numa cpu,node-id=3D0,socket-id=3D0 \
-> -numa cpu,node-id=3D0,socket-id=3D1 \
-> -numa cpu,node-id=3D1,socket-id=3D2 \
-> -numa cpu,node-id=3D1,socket-id=3D3 \
-> -numa dist,src=3D0,dst=3D1,val=3D20 \
-> -net nic \
-> -net user \
-> -hda testing.img \
-> -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D40 \
-> -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D10G \
-> -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D80 \
-> -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D5G \
-> -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D80 \
-> -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D5G \
-> -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D40 \
-> -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D10G \
->=20
-> Then the latencies and bandwidths between the nodes were tested using
-> the Intel Memory Latency Checker v3.9
-> (https://software.intel.com/content/www/us/en/develop/articles/intelr-
-> memory-latency-checker.html). But the obtained results did not match the
-> configuration. The following are the results obtained.
->=20
-> Latency_matrix with idle latencies (in ns)
->=20
-> Numa Node
-> . .0. . .1.
-> 0 36.2 36.4
-> 1 34.9 35.4
->=20
-> Bandwidth_matrix with memory bandwidths (in MB/s)
->=20
-> Numa Node
-> . . .0. . . .1.=20
-> 0 15167.1 15308.9
-> 1 15226.0 15234.0
->=20
-> A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D from=
- lmbench to
-> measure the memory read latencies. This also gave results which did not
-> match the config.
->=20
-> Any information on why the config latency and bandwidth values are not
-> applied, would be appreciated.
+It's a bit weird to put the qmp function in the hmp file.
 
-There is no information about host hardware, so I'd onldy hazard a guess
-that host is non NUMA machine so all guest RAM and CPUs are in the same
-latency domain, so that's why you are seeing pretty much the same timings.
+>  void hmp_info_spice(Monitor *mon, const QDict *qdict)
+>  {
+>      SpiceChannelList *chan;
+> @@ -599,6 +608,10 @@ void hmp_info_spice(Monitor *mon, const QDict *qdict)
+>  
+>      info = qmp_query_spice(NULL);
+>  
+> +    if (!info) {
+> +        monitor_printf(mon, "Server: not started\n");
+> +        goto out;
+> +    }
+>      if (!info->enabled) {
+>          monitor_printf(mon, "Server: disabled\n");
+>          goto out;
 
-QEMU nor KMV do not simullate HW latencies at all, all that is configured
-with '-numa hmat-lb' is intended for guest OS consumption as a hint for
-smarter memory allocation and it's on to user to pin CPUs and RAM to
-concrete host NUMA nodes and use  host's values in '-numa hmat-lb' to
-actually get performance benefits from it on 'NUMA' machine.
-On non NUMA host it's rather pointless except of the cases where one
-needs to fake NUMA config (like testing some aspects of NUMA related code
-in guest OS).
+Dave
 
->=20
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->=20
->=20
-> ** Tags: bandwidth hmat hmat-lb latency
->=20
-> ** Description changed:
->=20
->   I was trying to configure latencies and bandwidths between nodes in a
->   NUMA emulation using QEMU 5.0.0.
->  =20
->   Host : Ubuntu 20.04 64 bit
->   Guest : Ubuntu 18.04 64 bit
-> - =20
-> - The machine configured has 2 nodes. Each node has 2 CPUs and has been a=
-llocated 3GB of memory. The memory access latencies and bandwidths for a lo=
-cal access (i.e from initiator 0 to target 0, and from initiator 1 to targe=
-t 1) are set as 40ns and 10GB/s respectively. The memory access latencies a=
-nd bandwidths for a remote access (i.e from initiator 1 to target 0, and fr=
-om initiator 0 to target 1) are set as 80ns and 5GB/s respectively.=20
-> +=20
-> + The machine configured has 2 nodes. Each node has 2 CPUs and has been
-> + allocated 3GB of memory. The memory access latencies and bandwidths for
-> + a local access (i.e from initiator 0 to target 0, and from initiator 1
-> + to target 1) are set as 40ns and 10GB/s respectively. The memory access
-> + latencies and bandwidths for a remote access (i.e from initiator 1 to
-> + target 0, and from initiator 0 to target 1) are set as 80ns and 5GB/s
-> + respectively.
->  =20
->   The command line launch is as follows.
->  =20
->   sudo x86_64-softmmu/qemu-system-x86_64  \
->   -machine hmat=3Don \
->   -boot c \
->   -enable-kvm \
->   -m 6G,slots=3D2,maxmem=3D7G \
->   -object memory-backend-ram,size=3D3G,id=3Dm0 \
->   -object memory-backend-ram,size=3D3G,id=3Dm1 \
->   -numa node,nodeid=3D0,memdev=3Dm0 \
->   -numa node,nodeid=3D1,memdev=3Dm1 \
->   -smp 4,sockets=3D4,maxcpus=3D4  \
->   -numa cpu,node-id=3D0,socket-id=3D0 \
->   -numa cpu,node-id=3D0,socket-id=3D1 \
->   -numa cpu,node-id=3D1,socket-id=3D2 \
->   -numa cpu,node-id=3D1,socket-id=3D3 \
->   -numa dist,src=3D0,dst=3D1,val=3D20 \
->   -net nic \
->   -net user \
->   -hda testing.img \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->  =20
->   Then the latencies and bandwidths between the nodes were tested using
->   the Intel Memory Latency Checker v3.9
->   (https://software.intel.com/content/www/us/en/develop/articles/intelr-
->   memory-latency-checker.html). But the obtained results did not match th=
-e
->   configuration. The following are the results obtained.
->  =20
->   Latency_matrix with idle latencies (in ns)
->  =20
->   Numa
-> - Node  0     1
-> + lat node0 node1
->   0    36.2 36.4
->   1    34.9 35.4
->  =20
->   Bandwidth_matrix with memory bandwidths (in MB/s)
->  =20
-> - Numa
-> - Node 0       1
-> + Numa Node=20
-> + bw node0 .bw node1
->   0 15167.1 15308.9
->   1 15226.0 15234.0
->  =20
->   A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D fr=
-om lmbench to
->   measure the memory read latencies. This also gave results which did not
->   match the config.
->  =20
->   Any information on why the config latency and bandwidth values are not
->   applied, would be appreciated.
->=20
-> ** Description changed:
->=20
->   I was trying to configure latencies and bandwidths between nodes in a
->   NUMA emulation using QEMU 5.0.0.
->  =20
->   Host : Ubuntu 20.04 64 bit
->   Guest : Ubuntu 18.04 64 bit
->  =20
->   The machine configured has 2 nodes. Each node has 2 CPUs and has been
->   allocated 3GB of memory. The memory access latencies and bandwidths for
->   a local access (i.e from initiator 0 to target 0, and from initiator 1
->   to target 1) are set as 40ns and 10GB/s respectively. The memory access
->   latencies and bandwidths for a remote access (i.e from initiator 1 to
->   target 0, and from initiator 0 to target 1) are set as 80ns and 5GB/s
->   respectively.
->  =20
->   The command line launch is as follows.
->  =20
->   sudo x86_64-softmmu/qemu-system-x86_64  \
->   -machine hmat=3Don \
->   -boot c \
->   -enable-kvm \
->   -m 6G,slots=3D2,maxmem=3D7G \
->   -object memory-backend-ram,size=3D3G,id=3Dm0 \
->   -object memory-backend-ram,size=3D3G,id=3Dm1 \
->   -numa node,nodeid=3D0,memdev=3Dm0 \
->   -numa node,nodeid=3D1,memdev=3Dm1 \
->   -smp 4,sockets=3D4,maxcpus=3D4  \
->   -numa cpu,node-id=3D0,socket-id=3D0 \
->   -numa cpu,node-id=3D0,socket-id=3D1 \
->   -numa cpu,node-id=3D1,socket-id=3D2 \
->   -numa cpu,node-id=3D1,socket-id=3D3 \
->   -numa dist,src=3D0,dst=3D1,val=3D20 \
->   -net nic \
->   -net user \
->   -hda testing.img \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->  =20
->   Then the latencies and bandwidths between the nodes were tested using
->   the Intel Memory Latency Checker v3.9
->   (https://software.intel.com/content/www/us/en/develop/articles/intelr-
->   memory-latency-checker.html). But the obtained results did not match th=
-e
->   configuration. The following are the results obtained.
->  =20
->   Latency_matrix with idle latencies (in ns)
->  =20
-> - Numa
-> + Numa Node
->   lat node0 node1
->   0    36.2 36.4
->   1    34.9 35.4
->  =20
->   Bandwidth_matrix with memory bandwidths (in MB/s)
->  =20
-> - Numa Node=20
-> - bw node0 .bw node1
-> + Numa Node
-> + bw node0  bw node1
->   0 15167.1 15308.9
->   1 15226.0 15234.0
->  =20
->   A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D fr=
-om lmbench to
->   measure the memory read latencies. This also gave results which did not
->   match the config.
->  =20
->   Any information on why the config latency and bandwidth values are not
->   applied, would be appreciated.
->=20
-> ** Description changed:
->=20
->   I was trying to configure latencies and bandwidths between nodes in a
->   NUMA emulation using QEMU 5.0.0.
->  =20
->   Host : Ubuntu 20.04 64 bit
->   Guest : Ubuntu 18.04 64 bit
->  =20
->   The machine configured has 2 nodes. Each node has 2 CPUs and has been
->   allocated 3GB of memory. The memory access latencies and bandwidths for
->   a local access (i.e from initiator 0 to target 0, and from initiator 1
->   to target 1) are set as 40ns and 10GB/s respectively. The memory access
->   latencies and bandwidths for a remote access (i.e from initiator 1 to
->   target 0, and from initiator 0 to target 1) are set as 80ns and 5GB/s
->   respectively.
->  =20
->   The command line launch is as follows.
->  =20
->   sudo x86_64-softmmu/qemu-system-x86_64  \
->   -machine hmat=3Don \
->   -boot c \
->   -enable-kvm \
->   -m 6G,slots=3D2,maxmem=3D7G \
->   -object memory-backend-ram,size=3D3G,id=3Dm0 \
->   -object memory-backend-ram,size=3D3G,id=3Dm1 \
->   -numa node,nodeid=3D0,memdev=3Dm0 \
->   -numa node,nodeid=3D1,memdev=3Dm1 \
->   -smp 4,sockets=3D4,maxcpus=3D4  \
->   -numa cpu,node-id=3D0,socket-id=3D0 \
->   -numa cpu,node-id=3D0,socket-id=3D1 \
->   -numa cpu,node-id=3D1,socket-id=3D2 \
->   -numa cpu,node-id=3D1,socket-id=3D3 \
->   -numa dist,src=3D0,dst=3D1,val=3D20 \
->   -net nic \
->   -net user \
->   -hda testing.img \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->  =20
->   Then the latencies and bandwidths between the nodes were tested using
->   the Intel Memory Latency Checker v3.9
->   (https://software.intel.com/content/www/us/en/develop/articles/intelr-
->   memory-latency-checker.html). But the obtained results did not match th=
-e
->   configuration. The following are the results obtained.
->  =20
->   Latency_matrix with idle latencies (in ns)
->  =20
->   Numa Node
-> - lat node0 node1
-> - 0    36.2 36.4
-> - 1    34.9 35.4
-> + . .0. . .1.
-> + 0 36.2 36.4
-> + 1 34.9 35.4
->  =20
->   Bandwidth_matrix with memory bandwidths (in MB/s)
->  =20
->   Numa Node
-> - bw node0  bw node1
-> + . . .0. . . .1.=20
->   0 15167.1 15308.9
->   1 15226.0 15234.0
->  =20
->   A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D fr=
-om lmbench to
->   measure the memory read latencies. This also gave results which did not
->   match the config.
->  =20
->   Any information on why the config latency and bandwidth values are not
->   applied, would be appreciated.
->=20
+> diff --git a/monitor/misc.c b/monitor/misc.c
+> index e847b58a8c..88f8915734 100644
+> --- a/monitor/misc.c
+> +++ b/monitor/misc.c
+> @@ -443,7 +443,7 @@ void qmp_client_migrate_info(const char *protocol, const char *hostname,
+>              return;
+>          }
+>  
+> -        if (qemu_spice_migrate_info(hostname,
+> +        if (qemu_spice.migrate_info(hostname,
+>                                      has_port ? port : -1,
+>                                      has_tls_port ? tls_port : -1,
+>                                      cert_subject)) {
+> diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
+> index 864cbfa32e..9f9822b3f3 100644
+> --- a/monitor/qmp-cmds.c
+> +++ b/monitor/qmp-cmds.c
+> @@ -196,7 +196,7 @@ void qmp_set_password(const char *protocol, const char *password,
+>          if (!qemu_using_spice(errp)) {
+>              return;
+>          }
+> -        rc = qemu_spice_set_passwd(password, fail_if_connected,
+> +        rc = qemu_spice.set_passwd(password, fail_if_connected,
+>                                     disconnect_if_connected);
+>          if (rc != 0) {
+>              error_setg(errp, QERR_SET_PASSWD_FAILED);
+> @@ -242,7 +242,7 @@ void qmp_expire_password(const char *protocol, const char *whenstr,
+>          if (!qemu_using_spice(errp)) {
+>              return;
+>          }
+> -        rc = qemu_spice_set_pw_expire(when);
+> +        rc = qemu_spice.set_pw_expire(when);
+>          if (rc != 0) {
+>              error_setg(errp, QERR_SET_PASSWD_FAILED);
+>          }
+> @@ -339,7 +339,7 @@ void qmp_add_client(const char *protocol, const char *fdname,
+>          }
+>          skipauth = has_skipauth ? skipauth : false;
+>          tls = has_tls ? tls : false;
+> -        if (qemu_spice_display_add_client(fd, skipauth, tls) < 0) {
+> +        if (qemu_spice.display_add_client(fd, skipauth, tls) < 0) {
+>              error_setg(errp, "spice failed to add client");
+>              close(fd);
+>          }
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index bc0dcc4f58..8defda56c9 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -173,6 +173,30 @@ int icount_align_option;
+>  QemuUUID qemu_uuid;
+>  bool qemu_uuid_set;
+>  
+> +static bool qemu_is_not_using_spice(void)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void qemu_spice_init_no_op(void)
+> +{
+> +}
+> +
+> +/*
+> + * Only two fields are initialized, that can be used even when SPICE
+> + * is not configured or not loaded. Other functions are protected by
+> + * checking if using_spice.
+> + */
+> +QemuSpiceOps qemu_spice = {
+> +    .in_use             = qemu_is_not_using_spice,
+> +    .init               = qemu_spice_init_no_op,
+> +};
+> +
+> +void qemu_spice_ops_register(QemuSpiceOps *ops)
+> +{
+> +    memcpy(&qemu_spice, ops, sizeof(qemu_spice));
+> +}
+> +
+>  static NotifierList exit_notifiers =
+>      NOTIFIER_LIST_INITIALIZER(exit_notifiers);
+>  
+> @@ -4128,7 +4152,7 @@ void qemu_init(int argc, char **argv, char **envp)
+>      /* spice needs the timers to be initialized by this point */
+>      /* spice must initialize before audio as it changes the default auiodev */
+>      /* spice must initialize before chardevs (for spicevmc and spiceport) */
+> -    qemu_spice_init();
+> +    qemu_spice.init();
+>  
+>      qemu_opts_foreach(qemu_find_opts("object"),
+>                        user_creatable_add_opts_foreach,
+> @@ -4424,7 +4448,7 @@ void qemu_init(int argc, char **argv, char **envp)
+>  #endif
+>  
+>      if (using_spice) {
+> -        qemu_spice_display_init();
+> +        qemu_spice.display_init();
+>      }
+>  
+>      if (foreach_device_config(DEV_GDB, gdbserver_start) < 0) {
+> diff --git a/ui/spice-core.c b/ui/spice-core.c
+> index 37dd68f2ab..9d7ac70d92 100644
+> --- a/ui/spice-core.c
+> +++ b/ui/spice-core.c
+> @@ -48,7 +48,7 @@ static time_t auth_expires = TIME_MAX;
+>  static int spice_migration_completed;
+>  static int spice_display_is_running;
+>  static int spice_have_target_host;
+> -int using_spice = 0;
+> +static int is_using_spice;
+>  
+>  static QemuThread me;
+>  
+> @@ -503,7 +503,7 @@ static QemuOptsList qemu_spice_opts = {
+>      },
+>  };
+>  
+> -SpiceInfo *qmp_query_spice(Error **errp)
+> +SpiceInfo *qemu_spice_query(Error **errp)
+>  {
+>      QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
+>      int port, tls_port;
+> @@ -634,6 +634,16 @@ static void vm_change_state_handler(void *opaque, int running,
+>      }
+>  }
+>  
+> +bool qemu_is_using_spice(void)
+> +{
+> +    return is_using_spice;
+> +}
+> +
+> +void qemu_start_using_spice(void)
+> +{
+> +    is_using_spice = 1;
+> +}
+> +
+>  void qemu_spice_init(void)
+>  {
+>      QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
+> @@ -796,7 +806,7 @@ void qemu_spice_init(void)
+>          error_report("failed to initialize spice server");
+>          exit(1);
+>      };
+> -    using_spice = 1;
+> +    qemu_start_using_spice();
+>  
+>      migration_state.notify = migration_state_notifier;
+>      add_migration_state_change_notifier(&migration_state);
+> @@ -1000,3 +1010,20 @@ static void spice_register_config(void)
+>      qemu_add_opts(&qemu_spice_opts);
+>  }
+>  opts_init(spice_register_config);
+> +
+> +static QemuSpiceOps qemu_spice_ops = {
+> +    .in_use             = qemu_is_using_spice,
+> +    .init               = qemu_spice_init,
+> +    .display_init       = qemu_spice_display_init,
+> +    .display_add_client = qemu_spice_display_add_client,
+> +    .set_passwd         = qemu_spice_set_passwd,
+> +    .set_pw_expire      = qemu_spice_set_pw_expire,
+> +    .migrate_info       = qemu_spice_migrate_info,
+> +    .query              = qemu_spice_query,
+> +};
+> +
+> +static void spice_register_ops(void)
+> +{
+> +    qemu_spice_ops_register(&qemu_spice_ops);
+> +}
+> +type_init(spice_register_ops);
+> -- 
+> 2.26.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
