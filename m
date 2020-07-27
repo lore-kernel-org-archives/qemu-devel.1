@@ -2,84 +2,89 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B084EC43458
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C720C433E8
 	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 14:42:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 889E820714
+	by mail.kernel.org (Postfix) with ESMTPS id 5759C2083B
 	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 14:42:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 889E820714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OYGh+atc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5759C2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k04KY-00015n-RD
+	id 1k04KY-00014w-Jk
 	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 10:42:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54550)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k04Jr-0008Vk-3b
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 10:41:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60028)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k04Jc-00087h-M2
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 10:41:20 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46047)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k04Jp-0002Un-1Z
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 10:41:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k04Jk-0003C6-LK
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 14:41:28 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B10772E8142
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 14:41:23 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k04Ja-0002Qr-EK
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 10:41:20 -0400
+Received: by mail-ot1-x341.google.com with SMTP id h1so12445536otq.12
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 07:41:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=k0Nc/mzW4Au/cLCFSSt16cyxxq25OSsf6soFbxRpQoU=;
+ b=OYGh+atcPw8DAhWBx1kqldcXjp+SYb7b+9EdldBv0zHqSKKD2l0JOoOCE5agPwkwly
+ hvdRVmJtMqnYTH0wBCD02BAR4sJ/ci8oxOooh8+FkRh7YfADldFb+0QZ52HIAXZHEbio
+ SvoqYQ44eRHC/wk3kNb8+VziPZreaK00z+QpR/ADx7jzojnPN+6CAtj9VbeEsLQlo9K8
+ 8EzuKuh+yG/o3bHF81ZaWFMw0z/uzp4n9fG6pOVNejYMVOsXDFzq0koarojHhaft1IOj
+ 3hQwVMVTRjVDApEQ+1s/gd+NKvi9l/XEZuUHiwVFwa3ejeaYC4A6gZizvqJ63KilN2np
+ SfaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=k0Nc/mzW4Au/cLCFSSt16cyxxq25OSsf6soFbxRpQoU=;
+ b=Zlx0hzKQw3avYgmBWjcIo/bfLaQVJBhKvUAZ11gKTouKfIMQ6pD9ZoQxiEYSHA+4jc
+ 3ZDutNlb37CjMBneT4HKe8HDmNh6T4NNzllEx9mqPOoA/GHtJ1vmGIDYhw9aeFIn0rwd
+ 8t6sXWPPW+NjZC6APZmI+ze8asMR8uLgQr/fARWS2gTxOwGLy0za482q708zG5uAOHWy
+ LiB8KXgGcU+QAD8+m+26UdGl1rl5NMK5C3AoPeFQ8vhOJBtytD4kU7VTrZmjtwoduGUF
+ JLVgtaFMtSwRw1QpRbJyJ6I8GNnmHOuTI7FDcVexfjOMTH9TC4HsxfxUBu8Nmbgj3Gaf
+ b8SA==
+X-Gm-Message-State: AOAM530N3rsbUObY38n0Z0xHMNSWHRYkIVo2TORVhoJISDWDyF9XWWrA
+ 046kDzds+wy86x/7s+o2zRVVqqmCoPZnMcn1x6sitQ==
+X-Google-Smtp-Source: ABdhPJyX41GOo2exmAQYTvgs+WR1pjnn4nLR9zjXQ93tFGUKifn49PGwdL01iQSlU9mcFe7Cco6UnAE3upp8wWe4dDo=
+X-Received: by 2002:a9d:7303:: with SMTP id e3mr19686034otk.221.1595860876984; 
+ Mon, 27 Jul 2020 07:41:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Jul 2020 14:32:44 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1863526@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm nvic
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd pmaydell
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <158189363238.15370.16875925531014106433.malonedeb@soybean.canonical.com>
-Message-Id: <159586036593.29789.8085109342091080379.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1863526] Re: NVIC CCR register not 8-bit accessible using
- Cortex-M4
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e85d0ab92e2924d39b8285aeae075a01d25eff06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 31c154b416f4c650a068f0575509f26059b9b7c8
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 09:56:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <20200727130225.32640-1-zhukeqian1@huawei.com>
+In-Reply-To: <20200727130225.32640-1-zhukeqian1@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Jul 2020 15:41:06 +0100
+Message-ID: <CAFEAcA9vQMP0YLAuzdPW2m3RcRNySxA0gJQZmeXBUYRy4=Dk+w@mail.gmail.com>
+Subject: Re: [PATCH] bugfix: irq: Avoid covering object refcount of qemu_irq
+To: Keqian Zhu <zhukeqian1@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,59 +93,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1863526 <1863526@bugs.launchpad.net>
+Cc: Thomas Huth <thuth@redhat.com>, Esteban Bosse <estebanbosse@gmail.com>,
+ Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, yezengruan@huawei.com,
+ qemu-arm <qemu-arm@nongnu.org>, wanghaibin.wang@huawei.com,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Invalid
+On Mon, 27 Jul 2020 at 14:03, Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>
+> Avoid covering object refcount of qemu_irq, otherwise it may causes
+> memory leak.
+>
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>  hw/core/irq.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/core/irq.c b/hw/core/irq.c
+> index fb3045b912..59af4dfc74 100644
+> --- a/hw/core/irq.c
+> +++ b/hw/core/irq.c
+> @@ -125,7 +125,9 @@ void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler handler, int n)
+>      int i;
+>      qemu_irq *old_irqs = qemu_allocate_irqs(NULL, NULL, n);
+>      for (i = 0; i < n; i++) {
+> -        *old_irqs[i] = *gpio_in[i];
+> +        old_irqs[i]->handler = gpio_in[i]->handler;
+> +        old_irqs[i]->opaque = gpio_in[i]->opaque;
+> +
+>          gpio_in[i]->handler = handler;
+>          gpio_in[i]->opaque = &old_irqs[i];
+>      }
 
--- =
+This function is leaky by design, because it doesn't do anything
+with the old_irqs array and there's no function for un-intercepting
+the IRQs (which would need to free that memory). This is not ideal
+but OK because it's only used in the test suite.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1863526
+Is there a specific bug you're trying to fix here?
 
-Title:
-  NVIC CCR register not 8-bit accessible using Cortex-M4
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Head at commit b29c3e23f64938.
-
-  Running with '-d unimp,guest_errors -trace nvic\*' I get:
-
-  8871@1581892794.295746:nvic_sysreg_read NVIC sysreg read addr 0xd88 data =
-0xf00000 size 4
-  8871@1581892794.295752:nvic_sysreg_write NVIC sysreg write addr 0xd88 dat=
-a 0xf00000 size 4
-  8871@1581892794.297780:nvic_sysreg_write NVIC sysreg write addr 0xd08 dat=
-a 0x4200 size 4
-  8871@1581892794.298040:nvic_sysreg_write NVIC sysreg write addr 0xd15 dat=
-a 0x0 size 1
-  NVIC: Bad write of size 1 at offset 0xd15
-  8871@1581892794.298081:nvic_sysreg_write NVIC sysreg write addr 0xd16 dat=
-a 0x0 size 1
-  NVIC: Bad write of size 1 at offset 0xd16
-  8871@1581892794.298116:nvic_sysreg_write NVIC sysreg write addr 0xd17 dat=
-a 0x0 size 1
-  NVIC: Bad write of size 1 at offset 0xd17
-  8871@1581892794.298156:nvic_sysreg_write NVIC sysreg write addr 0xd18 dat=
-a 0x0 size 1
-  8871@1581892794.298161:nvic_set_prio NVIC set irq 4 secure-bank 0 priorit=
-y 0
-  8871@1581892794.298164:nvic_recompute_state NVIC state recomputed: vectpe=
-nding 0 vectpending_prio 256 exception_prio 256
-  8871@1581892794.298168:nvic_irq_update NVIC vectpending 0 pending prio 25=
-6 exception_prio 256: setting irq line to 0
-  8871@1581892794.298201:nvic_sysreg_write NVIC sysreg write addr 0xd19 dat=
-a 0x0 size 1
-  8871@1581892794.298206:nvic_set_prio NVIC set irq 5 secure-bank 0 priorit=
-y 0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1863526/+subscriptions
+thanks
+-- PMM
 
