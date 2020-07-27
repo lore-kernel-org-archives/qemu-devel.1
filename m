@@ -2,115 +2,116 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B5F0C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C60AC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:59:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E78B42072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:58:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E9F62072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 19:59:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tgL73xfv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E78B42072E
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="mIPf8icT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E9F62072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k09G4-00037v-7e
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 15:58:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47766)
+	id 1k09Hy-0004c8-CW
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 15:59:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k091s-0002JA-0g; Mon, 27 Jul 2020 15:43:20 -0400
-Received: from mail-eopbgr80137.outbound.protection.outlook.com
- ([40.107.8.137]:20036 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ id 1k09HN-0004B2-9Z; Mon, 27 Jul 2020 15:59:21 -0400
+Received: from mail-eopbgr70139.outbound.protection.outlook.com
+ ([40.107.7.139]:15926 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k091q-0003fu-Bn; Mon, 27 Jul 2020 15:43:19 -0400
+ id 1k09HK-0005jW-GD; Mon, 27 Jul 2020 15:59:20 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aDRk6OukzBRY5pJ0MewvXY7gs0dK79Xqf1GPF6s7meiVBSSXebHoXGjC/VcGS/mU6RDsCiV1NG5Cv0wNxydqQE0azMX3T4OP7HNaxbjv6RoQESejPMinn/8ivyxRV+s74vHrnF9Br7xt4JSFnCGDicyXtSpWupZqyWsXuRZC1FqIlG+vMZvFHURW/ErnShCMuWegRI7ba5QQ+VOQG5bKkRF5TiU/oRbr5P0bnQJt3HdDLHD/AqC+shRnvGtch39UwZiZQ7b4acxn/QxNHkJnWub/nRwvvlsyxrSE90GvYAUt+PZssHJkzSwrWsWsZZCyaRH7wQ/H99jjgr+wqU2UWg==
+ b=krwApBadNFDDwUV2DK1p8n463tusHaj0IhdJ3NPu5/cDgzYxGjT0xAI3FDwiHF/GVKWYa2ufbfx0DmPe0aTscu84UT7d/p60p87TrAKoDwx9qc31I51gAWXGqyvCZoL6xESF82DplpR27Yj8Wq5tecziqMudaj8609n3RmWprQ0dhIsYYzMoT+YBTGBR24z+d7KnizF4sE1CejvVvb0mKHlz7rDT4Xrd1ehwun6sV2XphA684MFU9B37kfwZEK53X1IpmpR+7WVC7EqRNpjrScZMzkh9DRz+24YgXykAcnAkYFRMRDfoAJf0/V2jwqO81FuvVeBz7DL3B0PBCRNapw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ucg/Ovsrzv5kYnL8Nj4xUSnnLkw3TIiil5s/HrmGgQI=;
- b=EzZUDypVvD3qeWUePpBOm58bbfWdAcjtLFXv8wxkO4TPqK79AL26NlLPCIGA4D4hZmOtSiBT3gcgwkLpes8ymA/PAiukNd4U30ZdRjvD4BWOn411503PVAijjwJhTTBKKSvnYt2x55AkXEcPOFxbt/8smDth3QgA+bPHPXtG34XgoxZyh3rZHZmeGhX7LSnDueTnuBVFdJjgEwXJODY1Jvr2HSzR92M8024Fd3XIkwMRHOJEuvwnlidvd/lXUM6PU6OkPJUOceaRf981QPXI5TloKK4Jgjg51bEnwC7IthP9EOoptx6GhurgU2VnomyMO8dI+8XdApFvEi3voauwvQ==
+ bh=3rUTy/77Efh6VkCSGLWgmB77EqZ32spwfhLMGjX69Ss=;
+ b=Qhxi1DZBKM8YIsPRddfZI+4QWW1k+g+kesxGTijqh9gRgAHOMx+jnmLzhrah6+VF9u/QaxRAv5MuxeECmjKbMI3u0TxqrLSiO+rEM1smIy57mekaCiy8UcEyegpPXbZgWzWnx5gMbvN9kk+CG+crFtE2N9yP6j5PbykFyGkCMbO/7ih4GyvUqNRAPWyra4fBg3FgaeU9I+jabsSpDz7N5DsELeo2+fr+7A8OcizcEI1irbjY4737+9b0FTj5MVX1oLwuNkOpbESoivDnF+Hrfl9WS0UWCOIytCB3oZjRFu+xcng8NaaWGQPfB/DTc8UQ36aGBIEgktcU1s+h9rXBeA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ucg/Ovsrzv5kYnL8Nj4xUSnnLkw3TIiil5s/HrmGgQI=;
- b=tgL73xfvqX02BHvc9x6JJps6AWT+A7OT9O3zZiB/VCd8yEftyq8rH5gzDFej+1fKMtf9b2V/FPLbtFIBtcSbOYCsAOC9kC/MgaB+fRibBE6m7mdc+7qgeRps0Ov+vuk0QfdNWye3wCDENqpYJT30nqvdgdK1KXhmslYv4CbeIqM=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+ bh=3rUTy/77Efh6VkCSGLWgmB77EqZ32spwfhLMGjX69Ss=;
+ b=mIPf8icTrsfbRaKvcFtfqy3lUft3BwElmwik+qT8ASEk7OPIyDOprh4KvXPSyOQ28eJ7fEaokmDT0MkVoqsrZenfqN2+yiM27jPApK/ZR03RXBf24gz2Yv+hHFUHap5j+YLp58oHJP5OcO3HQs6YK6SdHBhYhax5WBDFtPStids=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0802MB2610.eurprd08.prod.outlook.com (2603:10a6:203:97::7)
+ by AM6PR08MB4024.eurprd08.prod.outlook.com (2603:10a6:20b:a5::26)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23; Mon, 27 Jul
- 2020 19:43:05 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.24; Mon, 27 Jul
+ 2020 19:59:14 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::8c0c:c056:97a5:484a%4]) with mapi id 15.20.3216.033; Mon, 27 Jul 2020
- 19:43:05 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v4 16/21] migration/block-dirty-bitmap: cancel migration on
- shutdown
-Date: Mon, 27 Jul 2020 22:42:31 +0300
-Message-Id: <20200727194236.19551-17-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200727194236.19551-1-vsementsov@virtuozzo.com>
+ 19:59:14 +0000
+Subject: Re: [PATCH v4 for-5.1 00/21] Fix error handling during bitmap postcopy
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 References: <20200727194236.19551-1-vsementsov@virtuozzo.com>
+ <c61f9429-8f2c-836d-be76-34a32bfae470@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <390c86ef-78d0-17f8-a5d2-f0b533054ea4@virtuozzo.com>
+Date: Mon, 27 Jul 2020 22:59:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <c61f9429-8f2c-836d-be76-34a32bfae470@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR05CA0084.eurprd05.prod.outlook.com
- (2603:10a6:208:136::24) To AM7PR08MB5494.eurprd08.prod.outlook.com
+X-ClientProxiedBy: AM0PR01CA0107.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::48) To AM7PR08MB5494.eurprd08.prod.outlook.com
  (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.158) by
- AM0PR05CA0084.eurprd05.prod.outlook.com (2603:10a6:208:136::24) with
+Received: from [192.168.100.2] (185.215.60.158) by
+ AM0PR01CA0107.eurprd01.prod.exchangelabs.com (2603:10a6:208:10e::48) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.20 via Frontend
- Transport; Mon, 27 Jul 2020 19:43:04 +0000
-X-Mailer: git-send-email 2.21.0
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23 via Frontend
+ Transport; Mon, 27 Jul 2020 19:59:13 +0000
 X-Originating-IP: [185.215.60.158]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 022c3600-9544-4f5d-8532-08d83265481f
-X-MS-TrafficTypeDiagnostic: AM5PR0802MB2610:
+X-MS-Office365-Filtering-Correlation-Id: 807d0971-1c7f-46ff-5f4a-08d83267896d
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4024:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0802MB2610C67A0B343C4690C38730C1720@AM5PR0802MB2610.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:227;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB40248B5F50B5EC6BCAB81680C1720@AM6PR08MB4024.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:949;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Yykh9suNWZW+YWv6jCFitrxzPGfASOK4EJnncsHQpH5qQVuAlKu1rvLOvqz5U88LNQRpa4c/HejwPtlUqcdS8e5tpOeeC0MYyWJr9M5zNxytQmfmIic28FKg4GvZ8Zi03aobs6/TIqT2BgtixMiTlCdbK9ZRfPKwbZm/cOyxLZ9QqsOu4DvXLvu+bgN4+i9vIW3Qm7mJOTYUZlfBEx+tmyADMjRfpCjUcS7yfB3Q+zYlqtPmdY+bfj7UKX0ULr8kJrKhP07wvf5p4X/+PtaEQVsqf+XNVdyfWcHSD8Vse0HXO8QfQf3dv1/rt/uhQAcypeLH9mi6KxLrFn/ciAUKPg8riRUJQ6ifx3LnuSWrtVPz+14wQEuqtZcD7OmqtZL1
+X-Microsoft-Antispam-Message-Info: POarYCk5pW4aABKDh/DPq/Jb5RP4FrwZJlRLu2aaTTVvJEcc5WUggYDeFtDTwp6OGlIOYdN4qv7Wt7ZiqLpeCKTZj0M/B8yZCiagGJI4AKT4UaqgcOqZAg9fdGJcEszyIs8mDBfzRWNiFHRmGERbePgHSRr8xrOP2Dk/AuxsHjBQhii9AnHRWrCV1pLp19bclP+0wtNPLK8KlNRDqGely2+MfsxP8MPPAr/NolcULGRRDIbx9g32oCeuq7A/N0I4QiWHjgyEHi2ziIyIORuX5hyUyaeF56zDjtFS2j6qA/Qt1Qp+X4U+ab+wj0HkFey56XRq8ZqbL0lcRedpw+STVRFPampZSId6h2z2jP5CeGQbicmS9sPwQ55cozuQr9JG
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
- SFS:(4636009)(136003)(396003)(366004)(376002)(39850400004)(346002)(66556008)(1076003)(66476007)(6512007)(107886003)(86362001)(36756003)(52116002)(4326008)(26005)(2616005)(2906002)(66946007)(8676002)(7416002)(16526019)(6666004)(316002)(6916009)(6486002)(956004)(83380400001)(6506007)(5660300002)(478600001)(186003)(8936002)(14143004);
+ SFS:(4636009)(366004)(39840400004)(396003)(346002)(136003)(376002)(31696002)(8676002)(31686004)(86362001)(66556008)(8936002)(66946007)(83380400001)(478600001)(5660300002)(66476007)(4744005)(2906002)(107886003)(6486002)(4326008)(16576012)(316002)(36756003)(53546011)(16526019)(52116002)(956004)(186003)(26005)(7416002)(2616005)(43740500002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: cH7rg+B+HZSjbZ9J2gQCW94qCD83BrWIhESpy8b+MHnqxjg9tMIe4zeErbBoFaj4m6Khi6HRXYNysnIXzjlBHhV9EPjvtxuI5PLHJmzj9yKYDMT+HyVNGHJQavT7ioP5i8gAISC7h8XIh1H62IrmoYOuHouP5LmG1gMVSdmVC+NJSsPFyGDUzdTIC58z/RV5o6R9/gDr0NjxSNJ2Q/rt/ipcpDIPgwtYAL9HIkJqUoYDFKc+AgkdNCMS+rfq0YeLV268qhYtNKw6Ehe4hkYKaPijSIXqqZ2y3/VjsPDXQUl1dMug1QraUM5MJpbP1Wk17DNx6H9pZ9/QGwloPKVZroEpcmXlfH4O2tqRA907EY/QbHNm07zLZfG+gYZYIlXNAF3X4/XeibsOrptwYTAXy5YbMDt33OFbOhBgZzUMQ4gK/HOxFGOv/BpAXdrYDxG20IK/9Gab6orSRxwuL//r5jU9bDzZzIGE2D8mCLbyPgk=
+X-MS-Exchange-AntiSpam-MessageData: jdqDFIFyQq1VMdDy2X3HoJ4uKh1s8oyl39Lkmi0LkGN2cpp6bxhx+eEBInZITTY6mlqp2O8keXIgXxmRlXm8pJkbDrMyBmcnL3arXOsuC1fltrJbK7MvWYKdlzn70h2mxZ4qfQd/44qOx73Waf00esw+IfQIen1h2KQxJLgk4p7qrL/e7RJSd9eceC0nrYQ15Dd6T1FRW1S9X615nb5gwMLTNxanJ8D5NVagRex3JXVTkvMPrExNvslgpnUZ+gM/KLfrXY4Y8Ccytyl5WiQhaXmWWj8aW3VeoHZLvEd4RsV6LuBhCv3R5XyQmX6RUmuIzOba+ib+VU7j39+G18bXZ2z4f2Z8IbV5rrbRROtAA6kcw9pKYeqRdxECSO+e9abyzoOGXsBySJ3+Q80sVkJSR43yWLYsUV90AKsLwRUGCPOxA6rUnimT/zVj+jrdz76EgynVsbhgVo7h4zGE2HAE2E25k0GiGa4tC0S2FTLqvJg=
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 022c3600-9544-4f5d-8532-08d83265481f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 807d0971-1c7f-46ff-5f4a-08d83267896d
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 19:43:05.7868 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 19:59:14.2816 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5aAdceozFGa6jBxpw5Za/JxM/r0mHMaLBlMqvUVfKV/Ms99RmQQ/wy+YLN3XqXKqNNH9chia6AyYrSd+FnOzuAL/UgXilGjtpHqpqFgoDXc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2610
-Received-SPF: pass client-ip=40.107.8.137;
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7rjFN7pQFwC5Wa57ibULdYKtyUnHAIT4dsuWLe+pfnZ0BJZLOzSLUX7ftTOr0Yk3RrOzLKlSultSXPd/TA0bzxiSgJw+3YSw/35f6rN/RLU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4024
+Received-SPF: pass client-ip=40.107.7.139;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 15:42:57
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 15:59:15
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -37
 X-Spam_score: -3.8
@@ -132,97 +133,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- stefanha@redhat.com, Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+Cc: kwolf@redhat.com, fam@euphon.net, quintela@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com,
  den@openvz.org, mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If target is turned off prior to postcopy finished, target crashes
-because busy bitmaps are found at shutdown.
-Canceling incoming migration helps, as it removes all unfinished (and
-therefore busy) bitmaps.
+27.07.2020 22:53, Eric Blake wrote:
+> On 7/27/20 2:42 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> v4:
+>>
+>> 01: typo in commit msg
+>> 07: reword commit msg, add Eric's r-b
+>> 10: add Dr. David's r-b
+>> 15: add check for buf_size
+>>      use g_autofree (and fix introduced in v3)
+>>      use QEMU_LOCK_GUARD
+>> 17: fix commit msg, add Eric's r-b
+>> 20-21: add Eric's t-b
+> 
+> What timing!  I was literally in the middle of composing my pull request when this landed in my inbox; I'll refresh my local contents to pick this up (and see if you tweaked anything differently than I did).
+> 
+> Therefore, my pull request is now shifted by an hour or two, but will still come today ;)
+> 
 
-Similarly on source we crash in bdrv_close_all which asserts that all
-bdrv states are removed, because bdrv states involved into dirty bitmap
-migration are referenced by it. So, we need to cancel outgoing
-migration as well.
+Sorry :). Thanks for your work!
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- migration/migration.h          |  2 ++
- migration/block-dirty-bitmap.c | 16 ++++++++++++++++
- migration/migration.c          | 13 +++++++++++++
- 3 files changed, 31 insertions(+)
-
-diff --git a/migration/migration.h b/migration/migration.h
-index ab20c756f5..6c6a931d0d 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -335,6 +335,8 @@ void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
- void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
- 
- void dirty_bitmap_mig_before_vm_start(void);
-+void dirty_bitmap_mig_cancel_outgoing(void);
-+void dirty_bitmap_mig_cancel_incoming(void);
- void migrate_add_address(SocketAddress *address);
- 
- int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque);
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 4e45e79251..36ca8be392 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -657,6 +657,22 @@ static void cancel_incoming_locked(DBMLoadState *s)
-     s->bitmaps = NULL;
- }
- 
-+void dirty_bitmap_mig_cancel_outgoing(void)
-+{
-+    dirty_bitmap_do_save_cleanup(&dbm_state.save);
-+}
-+
-+void dirty_bitmap_mig_cancel_incoming(void)
-+{
-+    DBMLoadState *s = &dbm_state.load;
-+
-+    qemu_mutex_lock(&s->lock);
-+
-+    cancel_incoming_locked(s);
-+
-+    qemu_mutex_unlock(&s->lock);
-+}
-+
- static void dirty_bitmap_load_complete(QEMUFile *f, DBMLoadState *s)
- {
-     GSList *item;
-diff --git a/migration/migration.c b/migration/migration.c
-index 1c61428988..8fe36339db 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -188,6 +188,19 @@ void migration_shutdown(void)
-      */
-     migrate_fd_cancel(current_migration);
-     object_unref(OBJECT(current_migration));
-+
-+    /*
-+     * Cancel outgoing migration of dirty bitmaps. It should
-+     * at least unref used block nodes.
-+     */
-+    dirty_bitmap_mig_cancel_outgoing();
-+
-+    /*
-+     * Cancel incoming migration of dirty bitmaps. Dirty bitmaps
-+     * are non-critical data, and their loss never considered as
-+     * something serious.
-+     */
-+    dirty_bitmap_mig_cancel_incoming();
- }
- 
- /* For outgoing */
 -- 
-2.21.0
-
+Best regards,
+Vladimir
 
