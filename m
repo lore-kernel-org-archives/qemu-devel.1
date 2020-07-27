@@ -2,83 +2,115 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 741CCC433EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0813C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:10:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41569205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:06:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j/+ZYx8m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41569205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C33E1205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:10:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C33E1205CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physik.fu-berlin.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k00xX-0005ke-DO
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 07:06:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48116)
+	id 1k011n-0006qQ-2c
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 07:10:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <willreli@gmail.com>)
- id 1k00x1-0005KM-Hc
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:05:47 -0400
-Received: from mail-ej1-x62c.google.com ([2a00:1450:4864:20::62c]:45225)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <willreli@gmail.com>)
- id 1k00wz-00051d-QO
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:05:47 -0400
-Received: by mail-ej1-x62c.google.com with SMTP id g7so8341881ejw.12
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 04:05:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=UZJjTg4osQS6Rvb2UzqflUqekKgYRlGzgmRinEALU1I=;
- b=j/+ZYx8m0LGAXFJPNzb2yhCp2k7z3tPKeImCXmk0iDNkYKT6Nmpg1LrvjqqGSmxkMh
- LG5w+BvhiKZIUZQC9FTUiGzFeORFblAFJi4owMxlEwmXXDQsU4s6aAezXsRyyYRbGWxU
- ToJYNcHOrLfPAFoLspPmWbT3EMX0ivAToVzpEJGRnyQy+ulb1ODRVJg4rQKHi5/r8G8z
- Ei9CVIRqZ9aMvRXIXJQ3VV/tWTPNWlSwQ+O1YwV0a4hmyCpuKLBh9fs9/zTd01AKYJDZ
- 4xWqM2k7yqmResBSYKzSkM+MJilq6K2F8GXbvJP12xLEEJwrQyRsU8YtKBU06YLuPPgX
- EWMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=UZJjTg4osQS6Rvb2UzqflUqekKgYRlGzgmRinEALU1I=;
- b=Ux4grdqfqqvLGnXNxyG0nBxmDYR+0YtW5PhEtD37PgAaxVLaYw5Ji3m2/1G2DADbnN
- 2KmuWCn4kwkUHGGavjDRJBIePMljkgGs+voYr9WAnEGMZVOLv4MwfNKkh163FYT2Nhz7
- LQdMDqqtYc7lO919vjR5HnPKsxO4mU0K4dGdSgMxPEF3XHYVMp58+tL9T69IVSsPKcOa
- 66un5wO+2oIPwMDZkvgP8EO+9WCz0YV65VkiuzkQg/D2KoDbdCHBVIoeY3mzO4OBDM6o
- R5QtdJ/f/VEWL+HnuhSdtqRQGaTV1CFty5DvIkTxzgPRRPrZZn7fOIxI2ZKjN9nTxKru
- ZlDw==
-X-Gm-Message-State: AOAM533m4VQEKkhCkUQpqm52/Ts95c3Qf9GifpDkzS/E5WywBKONKEc9
- s/CzGabJJ7QIWoiE1Sl8BeJS6lOC21J+hyCnevULQfU1
-X-Google-Smtp-Source: ABdhPJyFnig8tc5H3Ll8BniolXtG8pn0AeL+x3bsng5+z5UZYWp91HOcqml10qFfAbv95lIQzsM/9dYRBwBednVlid4=
-X-Received: by 2002:a17:906:1b0a:: with SMTP id
- o10mr11955688ejg.463.1595847943553; 
- Mon, 27 Jul 2020 04:05:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <glaubitz@zedat.fu-berlin.de>)
+ id 1k010p-0006Nu-Vx
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:09:44 -0400
+Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:51515)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <glaubitz@zedat.fu-berlin.de>)
+ id 1k010n-0005I9-Hi
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:09:43 -0400
+Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
+ by outpost.zedat.fu-berlin.de (Exim 4.93) with esmtps (TLS1.2)
+ tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+ (envelope-from <glaubitz@zedat.fu-berlin.de>)
+ id 1k010g-001Ybx-F5; Mon, 27 Jul 2020 13:09:34 +0200
+Received: from port-92-193-246-219.dynamic.as20676.net ([92.193.246.219]
+ helo=[192.168.178.129]) by inpost2.zedat.fu-berlin.de (Exim 4.93)
+ with esmtpsa (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+ (envelope-from <glaubitz@physik.fu-berlin.de>)
+ id 1k010g-002jN0-6s; Mon, 27 Jul 2020 13:09:34 +0200
+Subject: Re: [PATCH] linux-user: Ensure mmap_min_addr is non-zero
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200724212314.545877-1-richard.henderson@linaro.org>
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Autocrypt: addr=glaubitz@physik.fu-berlin.de; keydata=
+ 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
+ scOkTAZQGVpD/8AaLH4v1w==
+Message-ID: <6af1135d-fcb1-06f8-baac-160ee5866e11@physik.fu-berlin.de>
+Date: Mon, 27 Jul 2020 13:09:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-From: William Lima Reiznautt <willreli@gmail.com>
-Date: Mon, 27 Jul 2020 08:05:32 -0300
-Message-ID: <CAO4s5Y90ZTYLbt1M_JDOJx1wmOY43PEu+cFSw0SHY5BOEqk3pA@mail.gmail.com>
-Subject: Live Migration (L2 network)
-To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="000000000000ca888405ab6a4d9b"
-Received-SPF: pass client-ip=2a00:1450:4864:20::62c;
- envelope-from=willreli@gmail.com; helo=mail-ej1-x62c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -1
-X-Spam_score: -0.2
-X-Spam_bar: /
-X-Spam_report: (-0.2 / 5.0 requ) BAYES_40=-0.001, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200724212314.545877-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Original-Sender: glaubitz@physik.fu-berlin.de
+X-Originating-IP: 92.193.246.219
+Received-SPF: pass client-ip=130.133.4.66;
+ envelope-from=glaubitz@zedat.fu-berlin.de; helo=outpost1.zedat.fu-berlin.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 07:09:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,56 +123,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alex.bennee@linaro.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ca888405ab6a4d9b
-Content-Type: text/plain; charset="UTF-8"
+Hi!
 
-Hi folks,
+On 7/24/20 11:23 PM, Richard Henderson wrote:
+> When the chroot does not have /proc mounted, we can read neither
+> /proc/sys/vm/mmap_min_addr nor /proc/sys/maps.
+> 
+> The enforcement of mmap_min_addr in the host kernel is done by
+> the security module, and so does not apply to processes owned
+> by root.  Which leads pgd_find_hole_fallback to succeed in probing
+> a reservation at address 0.  Which confuses pgb_reserved_va to
+> believe that guest_base has not actually been initialized.
+> 
+> We don't actually want NULL addresses to become accessible, so
+> make sure that mmap_min_addr is initialized with a non-zero value.
+> 
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1888728
+> Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/main.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 3597e99bb1..75c9785157 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -758,14 +758,26 @@ int main(int argc, char **argv, char **envp)
+>  
+>          if ((fp = fopen("/proc/sys/vm/mmap_min_addr", "r")) != NULL) {
+>              unsigned long tmp;
+> -            if (fscanf(fp, "%lu", &tmp) == 1) {
+> +            if (fscanf(fp, "%lu", &tmp) == 1 && tmp != 0) {
+>                  mmap_min_addr = tmp;
+> -                qemu_log_mask(CPU_LOG_PAGE, "host mmap_min_addr=0x%lx\n", mmap_min_addr);
+> +                qemu_log_mask(CPU_LOG_PAGE, "host mmap_min_addr=0x%lx\n",
+> +                              mmap_min_addr);
+>              }
+>              fclose(fp);
+>          }
+>      }
+>  
+> +    /*
+> +     * We prefer to not make NULL pointers accessible to QEMU.
+> +     * If we're in a chroot with no /proc, fall back to 1 page.
+> +     */
+> +    if (mmap_min_addr == 0) {
+> +        mmap_min_addr = qemu_host_page_size;
+> +        qemu_log_mask(CPU_LOG_PAGE,
+> +                      "host mmap_min_addr=0x%lx (fallback)\n",
+> +                      mmap_min_addr);
+> +    }
+> +
+>      /*
+>       * Prepare copy of argv vector for target.
+>       */
+> 
 
-I hope everything is well.
+This fixes the problem for me, therefore:
 
-Sorry about that doubt in this channel.
+Tested-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-I have a doubt about live migration interacting with layer 2 network, when
-the live migration is running. How does the qemu signal the switch network
-that the qemu instance changes port ? Because when the qemu migration to
-another port switch, the switch has a time to understand that flow is
-changed.
+Adrian
 
-I saw the dump traffic in live migration and I noticed that one packet
-(RARP). "This packet is created by qemu."
-
-Does anyone know if there is documentation on this?
-
-Thanks
-
-- - -
-William Lima Reiznautt
-willreli@gmail.com
-www.ic.unicamp.br/~william
-
---000000000000ca888405ab6a4d9b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi folks,<div><br></div><div>I hope everything is well.</d=
-iv><div><br></div><div>Sorry about that doubt in this channel.<br clear=3D"=
-all"><div></div></div><div><br></div><div>I have a doubt about live migrati=
-on interacting with layer 2 network, when the live migration is running. Ho=
-w does the qemu signal the switch network that the qemu instance changes po=
-rt ? Because when the qemu migration to another port switch, the switch has=
- a time to understand that flow is changed.=C2=A0<br><div><br></div><div>I =
-saw the dump traffic in live migration and I noticed that one packet (RARP)=
-. &quot;This packet is created by qemu.&quot;</div><div><br></div><div>Does=
- anyone know if there is documentation on this?</div></div><div><br></div><=
-div>Thanks</div><div><br></div><div dir=3D"ltr" class=3D"gmail_signature" d=
-ata-smartmail=3D"gmail_signature">- - - <br>William Lima Reiznautt<br><a hr=
-ef=3D"mailto:willreli@gmail.com" target=3D"_blank">willreli@gmail.com</a><b=
-r><a href=3D"https://www.ic.unicamp.br/~william" target=3D"_blank">www.ic.u=
-nicamp.br/~william</a><br><br></div></div>
-
---000000000000ca888405ab6a4d9b--
+-- 
+ .''`.  John Paul Adrian Glaubitz
+: :' :  Debian Developer - glaubitz@debian.org
+`. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
+  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
 
