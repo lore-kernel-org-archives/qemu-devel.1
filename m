@@ -2,88 +2,85 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A93C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4992C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29762206E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:52:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8267E2075A
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:59:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwIJjcHL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29762206E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UVSAdh5R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8267E2075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k02cd-0000lS-F2
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:52:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44344)
+	id 1k02j7-0003fE-PN
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:59:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k02br-0008PA-9C
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:52:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53600
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k02bp-0001n8-I9
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:52:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595854320;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=ziK62NPFE+h1hWBxVnfPWzQnp4NkUiewSsIzh0Y7llY=;
- b=dwIJjcHLlXxlZgnD9Jz4JPkHtUBUj91OPcuDxjYGlX4a9TEq6jAych49+wUmJWGEMHTqHU
- HA2LByaSUft67cPinPyue0cvzAHLxVBEIU652x9tFTlomiJNYh5m37fJCHTe00HGnWa2C9
- oSyJgpKX8ZjE4Wh3UOzxsXd32O3nt4U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-RxHKDfm7NBmm8XEoBsrGeA-1; Mon, 27 Jul 2020 08:51:58 -0400
-X-MC-Unique: RxHKDfm7NBmm8XEoBsrGeA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA60B1005510
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 12:51:57 +0000 (UTC)
-Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
- (ovpn-12-71.pek2.redhat.com [10.72.12.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8711710013C0;
- Mon, 27 Jul 2020 12:51:52 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	qemu-devel@nongnu.org
-Subject: [PATCH V2] virtio-net: check the existence of peer before accessing
- vDPA config
-Date: Mon, 27 Jul 2020 20:51:50 +0800
-Message-Id: <20200727125150.4687-1-jasowang@redhat.com>
+ (Exim 4.90_1) (envelope-from <pratkpranav@gmail.com>)
+ id 1jzyA3-0007Eu-RG
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 04:07:03 -0400
+Received: from mail-oo1-xc2f.google.com ([2607:f8b0:4864:20::c2f]:39286)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pratkpranav@gmail.com>)
+ id 1jzyA1-0001Ye-H0
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 04:07:03 -0400
+Received: by mail-oo1-xc2f.google.com with SMTP id x1so798158oox.6
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 01:07:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=7OkWUtl9SZVc1PlWzRN/hhPIxrUZC/JPyp+gftJ91CQ=;
+ b=UVSAdh5R4uB4tjg9MQf9yupg79Q7unlQofUZ+AcC3peEWg5qZn71XDERyKK+MRFVpA
+ 5yIv74duf+aE4MSPOfN5KxhCyV1V1vMbA6xgLCepE/FMhB8SSJTOah7BGmkzH7XckVQB
+ acGFADuz7flofIQmTClPxxNBuk5cKgQ3T1ncipAEjHKZIT4dxEckhoYCQ6CwomtsMm5s
+ I2n49GqaANevPegpFZ7m9F79DQLnZno4c7wXIyfCZJc7XTBw6hz7U0LV7HwfqZWOkUZd
+ ceSJgb2FBoHVQ6xeKIT4sjUPXZRWFGy2u9PbzoKBgLZmOddS+9dvJxt+HNgp+G1Ob2Td
+ 3TWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=7OkWUtl9SZVc1PlWzRN/hhPIxrUZC/JPyp+gftJ91CQ=;
+ b=pFngQx68styjHKVdHAFgzDpidHqc4PGr/yPlXjpBZWJSIMrvB2BSZVwaF/FlPut2+7
+ OHil43jkm8DkQgRSQBkDSEEzbhh4VpllP46G7W/h1ZcW/lDPWR7nf+5hUNJK2piBXdFl
+ BqTGRksmKLLmIydbAIYKPgXlcY/Uhp41z70xA7i0bk3B6XLM/xhJ4qG+w3BSVLWtYf0R
+ 7arF2xYj56qHiBfYgq2C5VCfJKuDHl3lnuaPt8VvPdoKVnX6thgTl2JmWmpbqAXze0kT
+ ckhg28dnCxMuoP7Z8bBuONcaAgdMoPBSU2kVfiyR/Q5jhemi6byWGYXnl+kpbAF7snzr
+ zDbQ==
+X-Gm-Message-State: AOAM531RLhH15K2Z9Ane9bsZZoZsyBEHuWLH6VDiny2/r06TgMaJMdyg
+ TcDwxdquukPjuwh3i+eumz4kU/tBmYnqt8rrmyv2Q6rVFqY=
+X-Google-Smtp-Source: ABdhPJwun8WVlUkbLGoz0p6Gb/Sg/wSLeaSMdULMO7lHx8WFTPj/pXj76xQV6hqpowYXBCnuTvTvkKJ4RHMztcnLqEU=
+X-Received: by 2002:a4a:d74d:: with SMTP id h13mr19862687oot.56.1595837220048; 
+ Mon, 27 Jul 2020 01:07:00 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:46:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+From: Pratik Pranav <pratkpranav@gmail.com>
+Date: Mon, 27 Jul 2020 13:36:21 +0530
+Message-ID: <CA+qpawCEFXbDdmvmXxOnxxU2rHhKJ8QqW3Ze7mb6E2fdXqgNKg@mail.gmail.com>
+Subject: Problem with msix interrupts
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="0000000000009ed06b05ab67cefb"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c2f;
+ envelope-from=pratkpranav@gmail.com; helo=mail-oo1-xc2f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, T_REMOTE_IMAGE=0.01,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Mon, 27 Jul 2020 08:58:53 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,93 +92,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, Cindy Lu <lulu@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We try to check whether a peer is VDPA in order to get config from
-there - with no peer, this leads to a NULL
-pointer dereference. Add a check before trying to access the peer
-type. No peer means not VDPA.
+--0000000000009ed06b05ab67cefb
+Content-Type: text/plain; charset="UTF-8"
 
-Fixes: 108a64818e69b ("vhost-vdpa: introduce vhost-vdpa backend")
-Cc: Cindy Lu <lulu@redhat.com>
-Tested-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
-Changes from V1:
-- Tweak the log
-- Add the comment in the code
----
- hw/net/virtio-net.c | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
+Hi,
+I have a problem with MSI-X interrupt delivery between different VM guests
+on QEMU. Could you tell me whether QEMU needs KVM for interrupt delivery
+between QEMU guests?
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 4895af1cbe..a1fe9e9285 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -125,6 +125,7 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
- {
-     VirtIONet *n = VIRTIO_NET(vdev);
-     struct virtio_net_config netcfg;
-+    NetClientState *nc = qemu_get_queue(n->nic);
- 
-     int ret = 0;
-     memset(&netcfg, 0 , sizeof(struct virtio_net_config));
-@@ -142,13 +143,16 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-                  VIRTIO_NET_RSS_SUPPORTED_HASHES);
-     memcpy(config, &netcfg, n->config_size);
- 
--    NetClientState *nc = qemu_get_queue(n->nic);
--    if (nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-+    /*
-+     * Is this VDPA? No peer means not VDPA: there's no way to
-+     * disconnect/reconnect a VDPA peer.
-+     */
-+    if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-         ret = vhost_net_get_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
--                             n->config_size);
--    if (ret != -1) {
--        memcpy(config, &netcfg, n->config_size);
--    }
-+                                   n->config_size);
-+        if (ret != -1) {
-+            memcpy(config, &netcfg, n->config_size);
-+        }
-     }
- }
- 
-@@ -156,6 +160,7 @@ static void virtio_net_set_config(VirtIODevice *vdev, const uint8_t *config)
- {
-     VirtIONet *n = VIRTIO_NET(vdev);
-     struct virtio_net_config netcfg = {};
-+    NetClientState *nc = qemu_get_queue(n->nic);
- 
-     memcpy(&netcfg, config, n->config_size);
- 
-@@ -166,11 +171,14 @@ static void virtio_net_set_config(VirtIODevice *vdev, const uint8_t *config)
-         qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
-     }
- 
--    NetClientState *nc = qemu_get_queue(n->nic);
--    if (nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
--        vhost_net_set_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
--                               0, n->config_size,
--                        VHOST_SET_CONFIG_TYPE_MASTER);
-+    /*
-+     * Is this VDPA? No peer means not VDPA: there's no way to
-+     * disconnect/reconnect a VDPA peer.
-+     */
-+    if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-+        vhost_net_set_config(get_vhost_net(nc->peer),
-+                             (uint8_t *)&netcfg, 0, n->config_size,
-+                             VHOST_SET_CONFIG_TYPE_MASTER);
-       }
- }
- 
--- 
-2.20.1
+I am currently using an ivshmem driver to work on a messaging layer between
+two VMs, one running on qemu-system-x86 and another on qemu-system-aarch64.
+When I try to interrupt the x86 VM from ARM VM, it gets interrupted but
+doesn't occur the other way. When I removed KVM from x86, I couldn't even
+interrupt x86.
 
+Yours Sincerely,
+Pratik Pranav
+
+[image: photo]
+Pratik Pranav
+Student, Computer Science and Engineering at  Indian Institute of
+Technology, Delhi
+A  Satpura Hostel, IIT Delhi, Hauz Khas, New Delhi-110016
+M  8936051771  <8936051771>
+E  cs1180368@cse.iitd.ac.in  <cs1180368@cse.iitd.ac.in>
+<http://www.linkedin.com/in/pratik-pranav-92629616b/>
+
+--0000000000009ed06b05ab67cefb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Hi,<br>I have a problem with MSI-X interrupt delivery betw=
+een different VM guests on QEMU. Could you tell me whether QEMU needs KVM f=
+or interrupt delivery between QEMU guests?<br><br>I am currently using an i=
+vshmem driver to work on a messaging layer between two VMs, one running on =
+qemu-system-x86 and another on qemu-system-aarch64. When I try to interrupt=
+ the x86 VM from ARM VM, it gets interrupted but doesn&#39;t occur the othe=
+r way. When I removed KVM from x86, I couldn&#39;t even interrupt x86.<br><=
+br>Yours Sincerely,<br>Pratik Pranav<div><br clear=3D"all"><div><div dir=3D=
+"ltr" class=3D"gmail_signature" data-smartmail=3D"gmail_signature"><div dir=
+=3D"ltr"><div><table style=3D"max-width:600px;direction:ltr">
+			<tbody><tr><td>=20
+			 <table style=3D"max-width:440px;padding-bottom:10px;margin-bottom:8px" =
+border=3D"0" cellpadding=3D"0" cellspacing=3D"0"> <tbody><tr> <td> <table b=
+order=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"display:inline-fle=
+x"> <tbody><tr> <td valign=3D"top" style=3D"vertical-align:top"> <table bor=
+der=3D"0" cellpadding=3D"0" cellspacing=3D"0"> <tbody><tr> <td> <img src=3D=
+"https://d36urhup7zbd7q.cloudfront.net/be596108-86aa-4cbd-8344-fb168a5004e4=
+/IMG_20191006_132415.format_png.resize_200x.jpeg#logo" alt=3D"photo" width=
+=3D"96" height=3D"110" style=3D"vertical-align:initial;border-radius:4px;ma=
+x-width:120px"> </td> </tr> </tbody></table> </td> <td valign=3D"top" style=
+=3D"vertical-align:top;padding-left:12px"> <table border=3D"0" cellpadding=
+=3D"0" cellspacing=3D"0"> <tbody><tr> <td style=3D"padding-bottom:7px"> <ta=
+ble border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" style=
+=3D"line-height:1.6;font-family:sans-serif;font-size:11px;color:rgb(78,75,7=
+6);padding-left:2px;font-weight:normal;width:100%"> <tbody><tr> <td> <span =
+style=3D"font-family:sans-serif;color:rgb(69,102,142);padding:0px;margin:0p=
+x;font-size:12px;font-weight:bold">Pratik Pranav</span><br> <span style=3D"=
+color:rgb(69,102,142);font-family:sans-serif;font-size:12px">Student, Compu=
+ter Science and Engineering </span> <span style=3D"color:rgb(69,102,142);fo=
+nt-family:sans-serif;font-size:12px">at=C2=A0 </span><span style=3D"color:r=
+gb(69,102,142);font-family:sans-serif;font-size:12px">Indian Institute of T=
+echnology, Delhi</span> </td> </tr> </tbody></table> </td> </tr> <tr> <td s=
+tyle=3D"border-top:5px solid rgb(69,102,142);line-height:0px">  </td> </tr>=
+ <tr> <td style=3D"padding-bottom:7px;padding-top:5px;width:328px" width=3D=
+"328"> <table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100=
+%" style=3D"line-height:1.6;font-family:sans-serif;font-size:11px;color:rgb=
+(78,75,76);padding-left:2px;font-weight:normal;width:100%"> <tbody><tr> <td=
+> <span style=3D"color:rgb(69,102,142);font-family:sans-serif;font-weight:b=
+old;font-size:12px">A=C2=A0</span> <span style=3D"font-size:12px;font-famil=
+y:arial,serif"> Satpura Hostel, IIT Delhi, Hauz Khas, New Delhi-110016</spa=
+n> </td> </tr> <tr> <td> <table align=3D"left" border=3D"0" cellpadding=3D"=
+0" cellspacing=3D"0"> <tbody><tr> <td>  <span style=3D"display:inline-flex"=
+> <span style=3D"color:rgb(69,102,142);font-family:sans-serif;font-weight:b=
+old;font-size:12px">M=C2=A0</span> <a href=3D"tel:8936051771" style=3D"text=
+-decoration:none;font-family:sans-serif;font-size:12px;color:rgb(78,75,76)"=
+ target=3D"_blank"> 8936051771=C2=A0 </a> </span> </td> </tr> </tbody></tab=
+le> <table align=3D"left" border=3D"0" cellpadding=3D"0" cellspacing=3D"0">=
+ <tbody><tr> <td>  <span style=3D"display:inline-flex"> <span style=3D"colo=
+r:rgb(69,102,142);font-family:sans-serif;font-weight:bold;font-size:12px">E=
+=C2=A0</span> <a href=3D"mailto:cs1180368@cse.iitd.ac.in" style=3D"text-dec=
+oration:none;font-family:sans-serif;font-size:12px;color:rgb(78,75,76)" tar=
+get=3D"_blank"> cs1180368@cse.iitd.ac.in=C2=A0 </a> </span> </td> </tr> </t=
+body></table> </td> </tr> <tr> <td> </td> </tr> </tbody></table> </td> </tr=
+> </tbody></table> </td> </tr> <tr> <td colspan=3D"2"> <table border=3D"0" =
+cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" style=3D"line-height:1.6=
+;font-family:sans-serif;font-size:11px;color:rgb(78,75,76);padding-left:2px=
+;font-weight:bold;width:100%"> <tbody><tr> <td style=3D"padding-top:7px"> <=
+table border=3D"0" cellpadding=3D"0" cellspacing=3D"0"><tbody><tr style=3D"=
+padding-top:10px"><td align=3D"left" style=3D"padding-right:5px;text-align:=
+center;padding-top:0px"> <a href=3D"http://www.linkedin.com/in/pratik-prana=
+v-92629616b/" target=3D"_blank"><img src=3D"https://cdn.gifo.wisestamp.com/=
+social/linkedin/0077b5/16/0.png"></a></td></tr></tbody></table> </td> </tr>=
+ </tbody></table> </td> </tr> <tr> <td style=3D"padding-top:6px" colspan=3D=
+"2"> </td> </tr> </tbody></table> </td> </tr> </tbody></table> <table cellp=
+adding=3D"0" cellspacing=3D"0" border=3D"0"><tbody><tr><td></td></tr></tbod=
+y></table></td></tr></tbody></table>
+		=09
+	=09
+	</div></div></div></div></div></div>
+
+--0000000000009ed06b05ab67cefb--
 
