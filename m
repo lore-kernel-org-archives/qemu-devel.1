@@ -2,86 +2,83 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,LOTS_OF_MONEY,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A8EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:56:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC55C433F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:57:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F9682070A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:56:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gZC16hEo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F9682070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43BE32070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:57:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43BE32070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k03c7-0007kb-MG
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 09:56:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36012)
+	id 1k03cl-0008Uh-FY
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 09:57:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k03Ya-0002OT-JB
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:52:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40305
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k03YY-0002ku-RN
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:52:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595857962;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=V1Ntmau5AmiCck2EFx/beOtbabitqggOG9E7BuM5e/s=;
- b=gZC16hEooV7evOqxSNdixXTlkfXiakJjmP5DBxAUg6jJtgzrGUkhpDPLH3QgfLCD97+7dj
- sd14Y0+1QrGQ3YtNhVJfZj7+pNcdqCGcSj3D2i8xHwZdb8J7CKhLoB9YFhgRX/UGO9DP/5
- aPZ0N1rtZq1e8wviVmDyFoMT2yUwksY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-u_bKYlUUNqi2Bfz1zyYguw-1; Mon, 27 Jul 2020 09:52:40 -0400
-X-MC-Unique: u_bKYlUUNqi2Bfz1zyYguw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D61480183C;
- Mon, 27 Jul 2020 13:52:39 +0000 (UTC)
-Received: from localhost (ovpn-113-45.ams2.redhat.com [10.36.113.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BF4F471D0C;
- Mon, 27 Jul 2020 13:52:38 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH] iotests/197: Fix for compat=0.10
-Date: Mon, 27 Jul 2020 15:52:37 +0200
-Message-Id: <20200727135237.1096841-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k03br-0007az-HG
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:56:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49292)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k03bo-0003hY-EX
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:56:07 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k03bj-0005In-7i
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 13:55:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8EA9B2E80EE
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 13:55:58 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 00:16:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- LOTS_OF_MONEY=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 27 Jul 2020 13:46:00 -0000
+From: Peter Maydell <1863526@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm nvic
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philmd pmaydell
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <158189363238.15370.16875925531014106433.malonedeb@soybean.canonical.com>
+Message-Id: <159585756050.30951.98796134374753641.malone@gac.canonical.com>
+Subject: [Bug 1863526] Re: NVIC CCR register not 8-bit accessible using
+ Cortex-M4
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e85d0ab92e2924d39b8285aeae075a01d25eff06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: b177f8009aa891df2765cb84d1fb0ebb72571c33
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 09:56:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,41 +87,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1863526 <1863526@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Writing zeroes to a qcow2 v2 images without a backing file results in an
-unallocated cluster as of 61b3043965.  197 has a test for COR-ing a
-cluster on an image without a backing file, which means that the data
-will be zero, so now on a v2 image that cluster will just stay
-unallocated, and so the test fails.  Just force compat=1.1 for that
-particular case to enforce the cluster to get allocated.
+Architecturally the CCR is not byte-accessible. The v7M Arm ARM defines
+in B3.1.1 "General rules for PPB register accesses" that unless
+otherwise stated, register support word accesses only, and the CCR
+register definition does not say that byte access is supported. This is
+true also in v8M, where the CCR register definition explicitly marks
+halfword and byte accesses to CCR as UNPREDICTABLE.
 
-Fixes: 61b3043965fe3552ee2684a97e7cc809ca7a71b3
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/197 | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+So this looks like buggy guest code to me...
 
-diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
-index 95f05b0e34..121959a09c 100755
---- a/tests/qemu-iotests/197
-+++ b/tests/qemu-iotests/197
-@@ -112,7 +112,9 @@ echo
- echo '=== Partial final cluster ==='
- echo
- 
--_make_test_img 1024
-+# Force compat=1.1, because writing zeroes on a v2 image without a
-+# backing file would just result in an unallocated cluster
-+_make_test_img -o compat=1.1 1024
- $QEMU_IO -f $IMGFMT -C -c 'read 0 1024' "$TEST_IMG" | _filter_qemu_io
- $QEMU_IO -f $IMGFMT -c map "$TEST_IMG"
- _check_test_img
--- 
-2.26.2
 
+** Changed in: qemu
+       Status: New =3D> Incomplete
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863526
+
+Title:
+  NVIC CCR register not 8-bit accessible using Cortex-M4
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Head at commit b29c3e23f64938.
+
+  Running with '-d unimp,guest_errors -trace nvic\*' I get:
+
+  8871@1581892794.295746:nvic_sysreg_read NVIC sysreg read addr 0xd88 data =
+0xf00000 size 4
+  8871@1581892794.295752:nvic_sysreg_write NVIC sysreg write addr 0xd88 dat=
+a 0xf00000 size 4
+  8871@1581892794.297780:nvic_sysreg_write NVIC sysreg write addr 0xd08 dat=
+a 0x4200 size 4
+  8871@1581892794.298040:nvic_sysreg_write NVIC sysreg write addr 0xd15 dat=
+a 0x0 size 1
+  NVIC: Bad write of size 1 at offset 0xd15
+  8871@1581892794.298081:nvic_sysreg_write NVIC sysreg write addr 0xd16 dat=
+a 0x0 size 1
+  NVIC: Bad write of size 1 at offset 0xd16
+  8871@1581892794.298116:nvic_sysreg_write NVIC sysreg write addr 0xd17 dat=
+a 0x0 size 1
+  NVIC: Bad write of size 1 at offset 0xd17
+  8871@1581892794.298156:nvic_sysreg_write NVIC sysreg write addr 0xd18 dat=
+a 0x0 size 1
+  8871@1581892794.298161:nvic_set_prio NVIC set irq 4 secure-bank 0 priorit=
+y 0
+  8871@1581892794.298164:nvic_recompute_state NVIC state recomputed: vectpe=
+nding 0 vectpending_prio 256 exception_prio 256
+  8871@1581892794.298168:nvic_irq_update NVIC vectpending 0 pending prio 25=
+6 exception_prio 256: setting irq line to 0
+  8871@1581892794.298201:nvic_sysreg_write NVIC sysreg write addr 0xd19 dat=
+a 0x0 size 1
+  8871@1581892794.298206:nvic_set_prio NVIC set irq 5 secure-bank 0 priorit=
+y 0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863526/+subscriptions
 
