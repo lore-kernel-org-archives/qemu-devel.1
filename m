@@ -7,83 +7,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82459C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:45:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DDDC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:49:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A6CB206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:45:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C20B206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:49:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bA4PMPY5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A6CB206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Al0UbE7L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C20B206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzzh4-0005mo-KJ
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 05:45:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38310)
+	id 1jzzlI-0007GQ-Ii
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 05:49:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jzzgQ-0005HT-FV
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:44:34 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44129
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jzzkL-0006Qm-2j
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:48:37 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54964
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1jzzgO-0005t6-RJ
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:44:34 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1jzzkJ-0006MK-FA
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:48:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595843071;
+ s=mimecast20190719; t=1595843314;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EqgHuQDBC2z1a17S9O8w9lXpAFcGcy+hvIUsaf7JH84=;
- b=bA4PMPY5X8z58Dks1w63Ku7OsaR5Jqsu5u73AfZ40gauisq+Xd2Aepf41sMAnMr3d9ea+y
- V10F9iU6IoOXSzBPQsf3Txj1qAzxplWxIBBq2nuiD3pu3D0Unvd7VGJK79v3OM09goPhfC
- KAzsH5fxLYitbV686q/iXU7euvIYXLI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-aTeYoT-pNqCmYxCHzm0gnw-1; Mon, 27 Jul 2020 05:44:27 -0400
-X-MC-Unique: aTeYoT-pNqCmYxCHzm0gnw-1
-Received: by mail-wm1-f72.google.com with SMTP id l5so7614547wml.7
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 02:44:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=EqgHuQDBC2z1a17S9O8w9lXpAFcGcy+hvIUsaf7JH84=;
- b=D4fP1pi3l0Y7Owu0+A7/lltra8oQhVYv6fcfUCW8+XaPiNjgiOjRg1M7ETne6ig0Gy
- Lt3sPc/IO/Zx14K61IevuJ868WDsQpbsYD4Zag6tm1eLaSOMkos/qdgd3HmWUS3aqWjW
- ySjbgEg4pJ0pRgU5hdvNsCV/hN47G+5/FsDShIqrM8W5yxEU1V+lFgWkQ3+0WgCg0hU+
- ghqwA8rXD3nyMnl3Uv5HDcDX9BGPSndVnfyNCmiv3VMz8oglgRBvfl+caMBqoQu556m+
- 4MurjjxmnBCO3dQ6NJuQhWD3Ii4I8aGuCBR/SfedyECipocymUjo3DJCR7Zeaeq7i0Fe
- hukg==
-X-Gm-Message-State: AOAM530kQv3fXL4VN6yqSrFeb8svCci5gIGdAdwQVTlTYnGEDr99P3SH
- ndu1YWv9uUHMmk7GaPpGqqhC413SthOYoe7ds3ld7HBlNqmK+vBfY30yNlRjFB3V20HSt3GYDGs
- yU4loLWPC56CnYPs=
-X-Received: by 2002:adf:e845:: with SMTP id d5mr13456885wrn.228.1595843066490; 
- Mon, 27 Jul 2020 02:44:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIWYvZrxGeFrVrDwHWQ2CM57aGuF9fi5FJGrB8GZ3HBW2HS57hvgch72P1+aAk2IFwueh9yg==
-X-Received: by 2002:adf:e845:: with SMTP id d5mr13456868wrn.228.1595843066336; 
- Mon, 27 Jul 2020 02:44:26 -0700 (PDT)
-Received: from redhat.com ([192.117.173.58])
- by smtp.gmail.com with ESMTPSA id n12sm11534063wrg.77.2020.07.27.02.44.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 02:44:23 -0700 (PDT)
-Date: Mon, 27 Jul 2020 05:44:20 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: Re: [PATCH] qemu-options.hx: Fix typo for netdev documentation
-Message-ID: <20200727054335-mutt-send-email-mst@kernel.org>
-References: <20200727045925.29375-1-tianjia.zhang@linux.alibaba.com>
+ bh=1LRocDF+CSq3+GEkDiyyfvh80yFLsWe+HJ9Xa5sVbvM=;
+ b=Al0UbE7L+AhumZVH2N5osS8hF3Ca17LgJYvzA3Mttp6WqLJiagG9n72ToA4m+2xE7NjkbM
+ KhWqBWtVpU04iN/jGzZAPOVRs52/KJ20NkzDMdXIGuTAetZP9OfRa8DzhYuIqVCacheGud
+ AnpUBSMMssoL4AWjhmW45UgOYDFDyGw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-437-LPTX_KolOKS6TNW1KyVAvw-1; Mon, 27 Jul 2020 05:48:32 -0400
+X-MC-Unique: LPTX_KolOKS6TNW1KyVAvw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D18F7E921;
+ Mon, 27 Jul 2020 09:48:30 +0000 (UTC)
+Received: from gondolin (ovpn-112-210.ams2.redhat.com [10.36.112.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CD28C1C4;
+ Mon, 27 Jul 2020 09:48:21 +0000 (UTC)
+Date: Mon, 27 Jul 2020 11:48:19 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH RFCv3 6/9] s390x/diag: subcode to query device memory
+ region
+Message-ID: <20200727114819.3f816010.cohuck@redhat.com>
+In-Reply-To: <20200724143750.59836-7-david@redhat.com>
+References: <20200724143750.59836-1-david@redhat.com>
+ <20200724143750.59836-7-david@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200727045925.29375-1-tianjia.zhang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -106,40 +95,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kraxel@redhat.com,
- pbonzini@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 27, 2020 at 12:59:25PM +0800, Tianjia Zhang wrote:
-> This patch fixes the netdev document description typo in qemu-option.hx.
+On Fri, 24 Jul 2020 16:37:47 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> A guest OS that is aware of memory devices (placed into the device
+> memory region located in guest physical address space) has to know at least
+> the end address of the device memory region during boot, for example, to
+> prepare the kernel virtual address space accordingly (e.g., select page
+> table hierarchy). The device memory region is located above the SCLP
+> maximum storage increment.
 > 
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> Let's provide a new diag500 subcode to query the location of the device
+> memory region under QEMU/KVM. This way, esp. Linux who's wants to support
+> virtio-based memory devices can query the location of this region and
+> derive the maximum possible PFN.
+> 
+> Let's use a specification exception in case no such memory region
+> exists (e.g., maxmem wasn't specified, or on old QEMU machines). We'll
+> unlock this with future patches that prepare and instanciate the device
+> memory region.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Specification exception on old machines seems reasonable. But maybe
+newer machines can use a different return value for "no memory regions"?
 
-Trivial tree? Jason's ?
-
+> 
+> Memory managed by memory devices should never be detected and used
+> without having proper support for them in the guest (IOW, a driver that
+> detects and handles the devices). It's not exposed via other HW/firmware
+> interfaces (e.g., SCLP, diag260). In the near future, the focus is on
+> supporting virtio-based memory devices like vitio-mem. Other memory devices
+> are imaginable in the future (e.g., expose DIMMs via a KVM-specific
+> interface to s390x guests).
+> 
+> Note: We don't want to include the device memory region within the
+> SCLP-defined maximum storage increment, because especially older
+> guests will will sense (via tprot) accessible memory within this range.
+> If an unmodified guest would detect and use device memory, it could end
+> badly. The memory might have different semantics (e.g., a disk provided
+> via virtio-pmem a.k.a. DAX) and might require a handshake first (e.g.,
+> unplugged memory part of virtio-mem in some cases), before memory that
+> might look accessible can actually be used without surprises.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  qemu-options.hx | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 708583b4ce..92556ed96d 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -2684,7 +2684,7 @@ SRST
->      disable script execution.
+>  hw/s390x/s390-hypercall.c | 18 ++++++++++++++++++
+>  hw/s390x/s390-hypercall.h |  1 +
+>  2 files changed, 19 insertions(+)
+
+(...)
+
+> diff --git a/hw/s390x/s390-hypercall.h b/hw/s390x/s390-hypercall.h
+> index e6b958db41..1b179d7d99 100644
+> --- a/hw/s390x/s390-hypercall.h
+> +++ b/hw/s390x/s390-hypercall.h
+> @@ -16,6 +16,7 @@
+>  #define DIAG500_VIRTIO_RESET           1 /* legacy */
+>  #define DIAG500_VIRTIO_SET_STATUS      2 /* legacy */
+>  #define DIAG500_VIRTIO_CCW_NOTIFY      3 /* KVM_S390_VIRTIO_CCW_NOTIFY */
+> +#define DIAG500_DEVICE_MEMORY_REGION   4
+
+Regardless what we end up with, this needs to be specified
+somewhere(tm).
+
 >  
->      If running QEMU as an unprivileged user, use the network helper
-> -    helper to configure the TAP interface and attach it to the bridge.
-> +    to configure the TAP interface and attach it to the bridge.
->      The default network helper executable is
->      ``/path/to/qemu-bridge-helper`` and the default bridge device is
->      ``br0``.
-> -- 
-> 2.17.1
+>  void handle_diag_500(CPUS390XState *env, uintptr_t ra);
+>  #endif /* HW_S390_HYPERCALL_H */
 
 
