@@ -2,99 +2,85 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D94C0C433FC
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 14:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D385C433F2
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 14:39:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98ED4206E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 14:36:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03BF4206E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 14:39:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fxOStfay"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98ED4206E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1aEADQ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03BF4206E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k04F0-00023z-Tn
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 10:36:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52962)
+	id 1k04HO-0003uJ-9O
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 10:39:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1k04EL-0001Xv-CO
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 10:35:53 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47722
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1k04EJ-0001kh-57
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 10:35:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595860549;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=d83cj2LPRwhgcj6x8+6QYcZRmsl/UBRQRjJoX6b281A=;
- b=fxOStfayHY658acE9ixIcDGMnve+Y0xpdoxDPcVMdpdRIfmGfKPVR/XjMcoKu/p1l3cpuW
- o+xRaam7qNlc8/AsJAEC3AjJ5kUaTLdAejOJ3rHXUK7BzdeZ6kthCLFivnAqgEYZZAJumk
- OjQU/zjS5Et8B0P5InuDK7QNehBgHCM=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-p7aYU5dQN1SFBlu4TiL35Q-1; Mon, 27 Jul 2020 10:35:46 -0400
-X-MC-Unique: p7aYU5dQN1SFBlu4TiL35Q-1
-Received: by mail-oi1-f197.google.com with SMTP id j17so8807823oig.8
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 07:35:46 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1k04GY-0002ce-AS; Mon, 27 Jul 2020 10:38:10 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36097)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1k04GW-0001wC-V8; Mon, 27 Jul 2020 10:38:10 -0400
+Received: by mail-oi1-x244.google.com with SMTP id s144so4584208oie.3;
+ Mon, 27 Jul 2020 07:38:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=NqnmO5m4f6KLp7y2Sqo4eQ7ncsiIIY83YKWr8V6ikSo=;
+ b=K1aEADQ03rrQyFaaUQyQIxBysSGblWgAO3rEkmx1I9RIag/GqkeKdIqzU6aCJfyETa
+ kILGV82UgJkhcM0Cg7GnSDt6UZXQacaEnDFVQPGnS96if/RD5iMY/SPTJgcdfP5UulBy
+ O92k27UzpMwqTptK3aoFcn1ihcRFw6xmDXH9qyFy4cEWsnrcbuo9/vAGz49yyVi0ZGf6
+ tpoDj56SgGoVjNarbNPi08cRFIuPhUfVwy8SzQ90PN42kPZmkJd1mggjEQe7C/tBQdiD
+ BSI+tldaVXltlIR35GIqNWygUhdBSidK0iM748OfbSscgKdT2hBYd/BVrvOGZBgP5nZA
+ xUsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=d83cj2LPRwhgcj6x8+6QYcZRmsl/UBRQRjJoX6b281A=;
- b=IjHFpzNKj6t3pwilmcbY82mhPHwguUTUVMRMtJ0IvSa5TOEJLJXI8S3ZdvPBuut7bS
- Io9ms62A7KEk/Eqycb/i69H1QnhoIUY1E8FxE/epJNgj554u9ILrOEEsgOhuUyZ4GYmu
- TfSktmRs5w2K5JpsfQcupHOSHP8NpvGlExaB1SyU2Wzyv54P4BLGpgvuC4UcMpWjotSL
- PWIbTtQVzqxDVLzbVCi+5P3hOhi148Ttw+u6+beLwrWiBB1kvgHimRFGvHfmrdonwaW3
- wKmEjR5tZEWJHH3xZvxDskpguQ7JgYdrmU3SA9UzsF23aCCk+xD0B2NTSOakeirw5Mj/
- BZPA==
-X-Gm-Message-State: AOAM530RSY4yyN1M6obnauzIMPEp0y0ruHly2KhS0Ew0RJTOlMu/vzmc
- snrTIeJxSzeVpSw6KHweCbyUu/WNVJCTXH4FPehbVaxpOU6tPFst0f7f8kqzNi0b0feeMPrFXPr
- 9nFyvZY0brLS4TRXZhX3lKwtOZ9VG8Ug=
-X-Received: by 2002:a4a:5249:: with SMTP id d70mr8467632oob.16.1595860545456; 
- Mon, 27 Jul 2020 07:35:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyMBJspTpnYNdj4wzt5lRxz+iRLPbxxRvVXc62j6ZGwj0rfyKrUzN071uzdJQzTftvNHiVHg6Xju77UigCHspc=
-X-Received: by 2002:a4a:5249:: with SMTP id d70mr8467602oob.16.1595860545144; 
- Mon, 27 Jul 2020 07:35:45 -0700 (PDT)
+ bh=NqnmO5m4f6KLp7y2Sqo4eQ7ncsiIIY83YKWr8V6ikSo=;
+ b=Y/8LXNkmshmJmSjbyjrcNmVayRpvK79VA8uun7q1E3QV7v7PGx6ikjWZ07RIjvDDGu
+ 0jCb1wnUPdmAWS/YxFeZoD8QRc2hT9/ThDdscqMk9Rk7QxgyZKGaH4tJ/7i0ehXK3+r6
+ +YPUcQg5KuPjdk/Tzcsq15ViqiXeqhMYmw6NNwO5q/KyGWvurennwaK6bC2qy/cEBb2G
+ NooN205p6/XdvyLMPDSrcAP23u+FRQeF5Fl7qfM8gCcNPXYCmZxt43/JhBfYgSw1Fu/U
+ WvmwcGwbEOpw8Di7wShyu9aWklDyHsr364humN0NrPrX+wTlqpqIt7cFFOkjkuE08erh
+ 4vEw==
+X-Gm-Message-State: AOAM531n+Nzi48YBHcZbQM5VGfIzFLAUjOTyGzFrlJFFj19Bwjk8hjCz
+ p46lAdHnvBLdWPb6Zn56YBAAt3Jlc3Js88DtMIk=
+X-Google-Smtp-Source: ABdhPJxxAGb4t7/S3SJMP+8QsFekHMVOJT1yVR2dLBt8eT6hcHVew8L1KuUWP8hMkbArZCvDqsL1nTewpH1ZMsdT27Q=
+X-Received: by 2002:aca:494d:: with SMTP id w74mr18790305oia.97.1595860687436; 
+ Mon, 27 Jul 2020 07:38:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200726152532.256261-1-nsoffer@redhat.com>
- <20200726152532.256261-3-nsoffer@redhat.com>
- <b0e61f48-d272-0aa5-3698-5d17a1de0774@redhat.com>
- <b4c0408f-da30-259f-b175-15e709ee987c@redhat.com>
-In-Reply-To: <b4c0408f-da30-259f-b175-15e709ee987c@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Mon, 27 Jul 2020 17:35:28 +0300
-Message-ID: <CAMRbyytButqSyqAXVFgMzMKoaRUYfCYWAUAoFQs9TXS0PSrX0Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] qemu-iotests: Test convert to qcow2 compressed to NBD
-To: Eric Blake <eblake@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20200727130225.32640-1-zhukeqian1@huawei.com>
+In-Reply-To: <20200727130225.32640-1-zhukeqian1@huawei.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 27 Jul 2020 22:37:31 +0800
+Message-ID: <CAKXe6S+L=Uze9Eo8jmPgpCDob_S_fXzvquHw2D974_5+haKdsw@mail.gmail.com>
+Subject: Re: [PATCH] bugfix: irq: Avoid covering object refcount of qemu_irq
+To: Keqian Zhu <zhukeqian1@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=nsoffer@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,131 +93,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Nir Soffer <nirsof@gmail.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Esteban Bosse <estebanbosse@gmail.com>,
+ Qemu Developers <qemu-devel@nongnu.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, yezengruan@huawei.com,
+ qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ wanghaibin.wang@huawei.com,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 27, 2020 at 5:14 PM Eric Blake <eblake@redhat.com> wrote:
+Keqian Zhu <zhukeqian1@huawei.com> =E4=BA=8E2020=E5=B9=B47=E6=9C=8827=E6=97=
+=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=889:03=E5=86=99=E9=81=93=EF=BC=9A
 >
-> On 7/27/20 5:04 AM, Max Reitz wrote:
-> > On 26.07.20 17:25, Nir Soffer wrote:
-> >> Add test for "qemu-img convert -O qcow2 -c" to NBD target. The use cas=
-e
-> >> is writing compressed disk content to OVA archive.
-> >>
-> >> Signed-off-by: Nir Soffer <nsoffer@redhat.com>
-> >> ---
+> Avoid covering object refcount of qemu_irq, otherwise it may causes
+> memory leak.
+
+Any reproducer?
+
+Thanks,
+Li Qiang
+
 >
-> >
-> >> +# The use case is writing qcow2 image directly into a tar file. Code =
-to create
-> >> +# real tar file not included.
-> >> +#
-> >> +# offset    content
-> >> +# -------------------------------
-> >> +#      0    first memebr header
-> >
-> > *member
-
-Sorry for the typos, I need to setup automated spelling check :-)
-
-> >
-> >> +#    512    first member data
-> >> +#   1024    second memeber header
-> >
-> > *member
-> >
-> >> +#   1536    second member data
-> >> +
-> >> +tar_file =3D file_path("test.tar")
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>  hw/core/irq.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
-> I guess it's okay that you don't create a real tar file here, but
-> listing the commands to create it (even as a comment) is better than
-> just saying "trust me".  And it doesn't seem like that much more work -
-> it looks like the key to your test is that you created a tar file
-> containing two files, where the first file was less than 512 bytes and
-> the second file is your target destination that you will be rewriting.
-
-The real code is more complicated, something like:
-
-    offset =3D tar.fileobj.tell() + BLOCK_SIZE
-
-    with open(tar.name, "r+") as f:
-        f.truncate(offset + measure["required"])
-
-    convert_image(image, tar.name, offset)
-
-    check =3D check_image(tar.name, offset)
-    size =3D check["image-end-offset"]
-
-    member =3D tarfile.TarInfo(name)
-    member.size =3D size
-    tar.addfile(member)
-
-    tar_size =3D offset + round_up(size)
-
-    tar.fileobj.seek(tar_size)
-    with open(tar.name, "r+") as f:
-        f.truncate(tar_size)
-
-I'm not sure it helps qemu developers working on these tests.
-
-> >> +out =3D qemu_img_pipe("measure", "-O", "qcow2", "--output", "json", s=
-rc_disk)
-> >> +measure =3D json.loads(out)
-> >> +qemu_img_create("-f", "raw", tar_file, str(measure["required"]))
-> >
-> > Should this be measure["required"] + 1536?
+> diff --git a/hw/core/irq.c b/hw/core/irq.c
+> index fb3045b912..59af4dfc74 100644
+> --- a/hw/core/irq.c
+> +++ b/hw/core/irq.c
+> @@ -125,7 +125,9 @@ void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_ir=
+q_handler handler, int n)
+>      int i;
+>      qemu_irq *old_irqs =3D qemu_allocate_irqs(NULL, NULL, n);
+>      for (i =3D 0; i < n; i++) {
+> -        *old_irqs[i] =3D *gpio_in[i];
+> +        old_irqs[i]->handler =3D gpio_in[i]->handler;
+> +        old_irqs[i]->opaque =3D gpio_in[i]->opaque;
+> +
+>          gpio_in[i]->handler =3D handler;
+>          gpio_in[i]->opaque =3D &old_irqs[i];
+>      }
+> --
+> 2.19.1
 >
-> The test works without it (because of compression), but yes, if you are
-> going to test writing into an offset, you should oversize your file by
-> that same offset.
-
-Right, in the real code using this I indeed use offset + required.
-
-> >> +
-> >> +nbd_sock =3D file_path("nbd-sock", base_dir=3Diotests.sock_dir)
-> >> +nbd_uri =3D "nbd+unix:///exp?socket=3D" + nbd_sock
-> >> +
-> >> +# Use raw format to allow creating qcow2 directy into tar file.
-> >> +qemu_nbd(
-> >> +    "--socket", nbd_sock,
-> >> +    "--persistent",
-> >> +    "--export-name", "exp",
-> >> +    "--format", "raw",
-> >> +    "--offset", "1536",
-> >> +    tar_file)
-> >> +
-> >> +iotests.log("=3D=3D=3D Target image info =3D=3D=3D")
-> >> +qemu_img_log("info", nbd_uri)
-> >> +
-> >> +# Write image into the tar file. In a real applicatio we would write =
-a tar
-> >
-> > *application
-> >
->
-> >> +=3D=3D=3D Converted image check =3D=3D=3D
-> >> +No errors were found on the image.
-> >> +1/160 =3D 0.62% allocated, 100.00% fragmented, 100.00% compressed clu=
-sters
-> >> +Image end offset: 393216
-> >
-> > I hope none of this is fs-dependant.  (I don=E2=80=99t think it is, but=
- who
-> > knows.  I suppose we=E2=80=99ll find out.)
->
-> Indeed - time to see what CI thinks of this.
->
-> At any rate, given the urgency of getting pull requests for -rc2 in
-> before slamming Peter tomorrow, I'll probably try to touch up the issues
-> Max pointed out and queue it today.
-
-Thanks Max and Eric.
-
-Should I post a fixed version later today?
-
 
