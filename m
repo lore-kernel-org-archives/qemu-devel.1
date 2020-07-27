@@ -2,122 +2,93 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A338CC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD691C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:16:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6540B20729
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85BC420729
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 20:16:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="zh1jR/0G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6540B20729
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y7dOEqVc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85BC420729
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k09Vw-0006qw-Nh
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 16:14:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54748)
+	id 1k09Xj-0000HG-Ps
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 16:16:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1k09VK-0006Qb-4B
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:13:46 -0400
-Received: from mail-eopbgr30095.outbound.protection.outlook.com
- ([40.107.3.95]:31319 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1k09VI-0007yz-7Q
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:13:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z2+KPGJzHYznfY+P8m6VIXcz5uiNYHoZvAnT45ChtApq78ypppHNDqJvxLQd8SHwLY9CRUhSsHAS+ub+fZY2OaZ+DzEYX5NUS2hJzinuTQZ+tMsMZJl4aYcddRLMN3jSgv+iZ7eX4A+UT0a9H9QmEWv1aAjJNCH5k01KuTT4A1KqKmTAU31bE0dsuA+tjBMTjoFTAcvODhIj9VJZPKZVEiDPEkB8YvzClyTcrgsM8Qf7xgA9Ud4HlinTJqKSb8F7uLWY/XPW+rT9rRnlVUbAjnJkV55hxM34OQaZjzVhK7cEcGOnc1Ah8ALkpH7YlVcmKUlrz3DkjTAlBqrr/eWtGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vWIossPqprj7tkV9Ad3miOlwzJFCl/hivAYP/nu2ISg=;
- b=RONSVQWMJeIIN6VhwO/8A6kXNQBtSUIOZVgKVmMJYY6hSDpbAzvX54x2uNXBL5JUYh7lzjZpsnpre5bCpXxO/yXfahPQsli+qQ6UKNkLQH0PWnPTFBAqe2uuZAqnzvGgnD+QaoNmbn3lnA3LEILXtSnKsakzewyusQxZZgBmEeXI9v1dVb4VfLdJeCQuuK1WBZsF/fuPpjnEfOQSuWV99tTXogmHboPj4mrH9uoQfwkTkN9HZJSex6XjAt6v9v9hx03YNWNzXsDuLB8D487tgglsyHGOVM9IUiXR1jUf1s2OaJjpfNBX1E0cnn+eXk+V3NelGRYLc6AFsN4sHY3l8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
- dkim=pass header.d=syrmia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vWIossPqprj7tkV9Ad3miOlwzJFCl/hivAYP/nu2ISg=;
- b=zh1jR/0GH+xgdiyUF37N1BODEcNrNRUmrPceOZv5LCxFvF/5XbWnJuLb29uxgjFHkgZTWnQ6lfKYVjuBzRGoDG/9sC4gdvIIo5gf2Ji8qi34xCdvGIWQoCIII+lPU9iX7v6IcqAXuFZc2a3sH7+N6gZXtXs6mntHgSNSsNKzvjs=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
- by AM7PR03MB6263.eurprd03.prod.outlook.com (2603:10a6:20b:133::9)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.24; Mon, 27 Jul
- 2020 20:13:39 +0000
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618]) by AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618%7]) with mapi id 15.20.3216.033; Mon, 27 Jul 2020
- 20:13:39 +0000
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] linux-user: Fix 'clock_nanosleep()' implementation
-Date: Mon, 27 Jul 2020 22:13:26 +0200
-Message-Id: <20200727201326.401519-1-Filip.Bozuta@syrmia.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: GV0P278CA0018.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:710:26::28) To AM6PR03MB5233.eurprd03.prod.outlook.com
- (2603:10a6:20b:d1::19)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k09Vo-0006uz-Op
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:14:16 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52585
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k09Vn-00080N-4z
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 16:14:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595880854;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HwqyojKaNFiDvTHphjix7QdNCXyf6E4WoS4snBduGCQ=;
+ b=Y7dOEqVcJL4/nv2D8jpC3fGyAqOOaURwv8yFtE0/LIej3Q+WHINzlOL2djSjh4ytZbRfts
+ W/E53XMoAp1imm5maKGPMzG+aiSHUU/BXRBJLVz8eMxRR96Z/tT8KFzjUXnlVpAzWclHJq
+ ybzl5iQ5Eeyy2WBdtwk5BUrNz7HoQ9s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-1Ikx3IafMMSb1Bl56WSBrw-1; Mon, 27 Jul 2020 16:14:07 -0400
+X-MC-Unique: 1Ikx3IafMMSb1Bl56WSBrw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11168805723;
+ Mon, 27 Jul 2020 20:14:06 +0000 (UTC)
+Received: from [10.10.118.248] (ovpn-118-248.rdu2.redhat.com [10.10.118.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CEEF610013C0;
+ Mon, 27 Jul 2020 20:14:01 +0000 (UTC)
+Subject: Re: [PATCH v4 15/21] migration/block-dirty-bitmap: relax error
+ handling in incoming part
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20200727194236.19551-1-vsementsov@virtuozzo.com>
+ <20200727194236.19551-16-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b7879bea-0869-f005-0345-7320bf818a74@redhat.com>
+Date: Mon, 27 Jul 2020 15:14:00 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (147.91.217.235) by
- GV0P278CA0018.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:26::28) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3216.21 via Frontend Transport; Mon, 27 Jul 2020 20:13:39 +0000
-X-Mailer: git-send-email 2.25.1
-X-Originating-IP: [147.91.217.235]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 353496b0-5624-442d-52ec-08d832698d3e
-X-MS-TrafficTypeDiagnostic: AM7PR03MB6263:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR03MB6263C0D3A9648FA9EC79ACDBEB720@AM7PR03MB6263.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rI80vZOy6mnIlByje09FfueGBM5pCN2gAYQG2W2SfZFvMmmQZa4oEo8ejl8NAiDO90sPDclvXV/uOqVWiYu0+5EAWETiec3qcSq7kZjmCHj46JWFw8IXFHbCrmnO1oNPDgLJOCa+7CzBx1OPPoHOeWH/10Agk1p60Xlb2Fd+GJARZAH/AuHj1hmQkwXGjUcj7GX9y8ZbdfgjfaXHll39TyYq65bbRfrQmOKJyGdXrJwz1Lsddo/NUj88iHe095NN49nol9qfD6ppg0bhmusblJcYf4IXmIhd0ufz4bX843ZTDtAve9dJjLie5mqqRE2huBsNMbv/LJrhHFX/eKmOVSkhczWaAPgOnqA03mXnNvU7gRadfQvx9FqikjMRBQSEbiv7QqCahETRWZ+2bb4QkYlR2zkp3spZWojc2086nrY8xaMp+PA285u0jO2lei9y78XK7rewwrNPDrJjLxI7fA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(346002)(376002)(39830400003)(396003)(366004)(136003)(8676002)(966005)(6666004)(4326008)(5660300002)(316002)(956004)(36756003)(16526019)(107886003)(2616005)(186003)(54906003)(83380400001)(52116002)(1076003)(6916009)(69590400007)(6512007)(8936002)(6486002)(6506007)(508600001)(66946007)(86362001)(26005)(66476007)(66556008)(2906002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: IKMs2yA5VhKNGTi8MTrZVV2BTqmB2DlufTLcUBWcuaoIPZh4Ogrn2m1QkB0uV8FW6nTh99kFDJ0dWgJvL5pYeWtDfx3ZHpqrlAewhWhn1sE2aJROdsFZA7b9lHd/hxmIv2MWKBwV1AWPB0c+TL1eLOVAARngS/Rtr4aXbVg2tIIXYSqnx8bB0SD1PPSjneLwAfaDPtztk898xW1BS5wpyHYwJyTjQv1YafR+cyZqT6JamaRHC8Ppr7UTCRAvFkaeCvObw+4IKhfHHk6J1DrWySdzi2pWtscCPZDpwHT7NUj8kmK2ZbNbfuyJBGU9Jm/vGDoIE7AWgZ8TAw0ivznrC3CLq4fsPB+W6Nhyd8QB+seboNDK1o+JPoecmAoeZfcld0O2CU9vgXiwziS1Ohuix2TkTEme5JTL3fC25Jj223tOK+8iNKop8EItWeFz3cvIZFUrW9+EB8bImhN5nrbxK5MdLSf/KvmurlCtrHuu4xU=
-X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 353496b0-5624-442d-52ec-08d832698d3e
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5233.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 20:13:39.8110 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0H/tB+q9qFnbcvw3fuQetgQS52YxBe8g94m7HEV4+mBAKyYBbiqPQUwwwQOszPA7UE5ZzI6dzAsmmbN1OGap1Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR03MB6263
-Received-SPF: pass client-ip=40.107.3.95; envelope-from=Filip.Bozuta@syrmia.com;
- helo=EUR03-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 16:13:42
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- RCVD_IN_SORBS_WEB=1.5, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200727194236.19551-16-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,56 +101,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: kwolf@redhat.com, fam@euphon.net, quintela@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, stefanha@redhat.com,
+ den@openvz.org, mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implementation of syscall 'clock_nanosleep()' in 'syscall.c' uses
-functions 'target_to_host_timespec()' and 'host_to_target_timespec()'
-to transfer the value of 'struct timespec' between target and host.
-However, the implementation doesn't check whether this conversion
-succeeds and thus can return an unaproppriate error instead of 'EFAULT'
-that is expected. This was confirmed with the modified LTP test suite
-where testcases with bad 'struct timespec' adress for 'clock_nanosleep()'
-were added. This modified LTP suite can be found at:
-https://github.com/bozutaf/ltp
+On 7/27/20 2:42 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Bitmaps data is not critical, and we should not fail the migration (or
+> use postcopy recovering) because of dirty-bitmaps migration failure.
+> Instead we should just lose unfinished bitmaps.
+> 
+> Still we have to report io stream violation errors, as they affect the
+> whole migration stream.
+> 
 
-(Patch with this new test case will be sent to LTP mailing list soon)
+I'm amending this to also add:
 
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
----
- linux-user/syscall.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+While touching this, tighten code that was previously blindly calling 
+malloc on a size read from the migration stream, as a corrupted stream 
+(perhaps from a malicious user) should not be able to convince us to 
+allocate an inordinate amount of memory.
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f5c4f6b95d..9f06dde947 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -11828,7 +11828,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR_clock_nanosleep:
-     {
-         struct timespec ts;
--        target_to_host_timespec(&ts, arg3);
-+        if (target_to_host_timespec(&ts, arg3)) {
-+            return -TARGET_EFAULT;
-+        }
-         ret = get_errno(safe_clock_nanosleep(arg1, arg2,
-                                              &ts, arg4 ? &ts : NULL));
-         /*
-@@ -11836,8 +11838,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-          * with error -TARGET_EINTR and if arg4 is not NULL and arg2 is not
-          * TIMER_ABSTIME, it returns the remaining unslept time in arg4.
-          */
--        if (ret == -TARGET_EINTR && arg4 && arg2 != TIMER_ABSTIME) {
--            host_to_target_timespec(arg4, &ts);
-+        if (ret == -TARGET_EINTR && arg4 && arg2 != TIMER_ABSTIME &&
-+            host_to_target_timespec(arg4, &ts)) {
-+              return -TARGET_EFAULT;
-         }
- 
-         return ret;
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   migration/block-dirty-bitmap.c | 164 +++++++++++++++++++++++++--------
+>   1 file changed, 127 insertions(+), 37 deletions(-)
+> 
+
+> @@ -650,15 +695,46 @@ static int dirty_bitmap_load_bits(QEMUFile *f, DBMLoadState *s)
+>   
+>       if (s->flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
+>           trace_dirty_bitmap_load_bits_zeroes();
+> -        bdrv_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte, nr_bytes,
+> -                                             false);
+> +        if (!s->cancelled) {
+> +            bdrv_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte,
+> +                                                 nr_bytes, false);
+> +        }
+>       } else {
+>           size_t ret;
+> -        uint8_t *buf;
+> +        g_autofree uint8_t *buf = NULL;
+>           uint64_t buf_size = qemu_get_be64(f);
+> -        uint64_t needed_size =
+> -            bdrv_dirty_bitmap_serialization_size(s->bitmap,
+> -                                                 first_byte, nr_bytes);
+> +        uint64_t needed_size;
+> +
+> +        /*
+> +         * Actual check for buf_size is done a bit later. We can't do it in
+
+s/Actual/The actual/
+
+> +         * cancelled mode as we don't have the bitmap to check the constraints
+> +         * (so, we do allocate buffer and read prior to the check). On the other
+> +         * hand, we shouldn't blindly g_malloc the number from the stream.
+> +         * Actually one chunk should not be larger thatn CHUNK_SIZE. Let's allow
+
+than
+
+> +         * a bit larger (which means that bitmap migration will fail anyway and
+> +         * the whole migration will most probably fail soon due to broken
+> +         * stream).
+> +         */
+> +        if (buf_size > 10 * CHUNK_SIZE) {
+> +            error_report("Bitmap migration stream requests too large buffer "
+> +                         "size to allocate");
+
+Bitmap migration stream buffer allocation request is too large
+
+I'll make those touchups.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.25.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
