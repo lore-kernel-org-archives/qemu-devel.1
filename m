@@ -2,81 +2,82 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D21C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 23:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8DAC4345A
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 23:30:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FEDC208E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 23:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2187020809
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 23:30:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pNgzBvLd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FEDC208E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B7JYZ4eH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2187020809
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0CTp-0008Uu-HN
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 19:24:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35174)
+	id 1k0CZy-0002vq-DJ
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 19:30:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1k0CT1-0007Er-7K
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 19:23:35 -0400
-Received: from mail-oo1-xc30.google.com ([2607:f8b0:4864:20::c30]:43341)
+ id 1k0CYo-0001yR-5t; Mon, 27 Jul 2020 19:29:34 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34800)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1k0CSz-00060B-G7
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 19:23:34 -0400
-Received: by mail-oo1-xc30.google.com with SMTP id z10so597713ooi.10
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 16:23:33 -0700 (PDT)
+ id 1k0CYm-00072f-Nl; Mon, 27 Jul 2020 19:29:33 -0400
+Received: by mail-oi1-x244.google.com with SMTP id q4so4116226oia.1;
+ Mon, 27 Jul 2020 16:29:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=wuQZwfssSAsYztJ3hgK0A+C7+4FbLE10/5wG+EJMbpU=;
- b=pNgzBvLdF84dOrviSw0i4irLw8H/4wb4P6xc37nfe7j58nl09H1k9swD/3bqqE3KzI
- EuMVOvmttJQEjwjc54ZYBPVMTIr2ddkGSC2yYklHnmHH8+C3g2BriO9bVexpye0y4vEm
- 5CDtK3S+gZpN6see5VI50XAOLt93J9OEmqRQRAoY6ffqjlAKDZTJrC2bx7wBl/RbG15R
- E0/Ek3SEw7Z5r5ukrcc5cmGGtHl4Lkqk1yY9eM53DYcwQeZdWVQF2C1jdKQ8k+aA+g7S
- PiifTeyYMOU6GqQkY1L5aNRHki6cKs4KZeM6CVZsPsV6uzEIv34OunI3gq6KjgUZc+QZ
- zxCg==
+ h=sender:mime-version:content-transfer-encoding:to:from:in-reply-to
+ :cc:references:message-id:user-agent:subject:date;
+ bh=PbOFtq4EVL8HMfXcVPjsoJQLl3EKrYvQnhatQPGSjvc=;
+ b=B7JYZ4eHgfBTuz1EaSA6t6CSyCUcHhmArF1fYl4FpyH8ZulBKNv+4EyCFMxMGZgHAR
+ zlFHhI4wugYiLTLM5TQf9dcNAoE7rQE6zXD3VJKxP2S3Rbv/xZ9RnQiH67pltInvVqSJ
+ juZ52W4TTZj7GVoIsK3YYkQjPapii6F3ONPJXAdH0lTPkCYd4ramxixdbgZu4HqEyrtd
+ eqXtt5GtHizbgzs7uCXFtQTbZuG4zM6a/f7xMTjXFjfUDOw2FevmmW8Lvqb+bLwXa96C
+ 5nItoNhDXGmiAYzrs/fyowE7QLEtMThNqWRnJVOKCz9YBVko8eJk3oJnP2ELLYDDU8ea
+ xw7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=wuQZwfssSAsYztJ3hgK0A+C7+4FbLE10/5wG+EJMbpU=;
- b=dqTDARBb4lSOdSH3rmNw/UFcZqM/gAGt/Tm3dRd/hardIpfmZ8OCKKU0PGi1OBa1TX
- GZ6F6FRHOLOd/JP1PZuIrfFmhd3HSHapvIXrRDsBTSuLM2dXbL6i21S+Ju6ZIOTQWwLy
- phz7IHcsX+hB27OvLSkNnulsFErkMtswUXz1Ei02lun3/+E2Wzs4YyP5TNlVDFlE4CeP
- Js+hVFyZ9k1LGrWi0OEJhFWMFU4xWx664yz161LlOu+SAIFd+gZwgm5c0pGZO7j4sK3A
- jvt11dbatsXLcVCuGGiTVhuwN8pIWkWfW8UAGbkU0ikqGXaFK1MJObbDKOGKX3f0GMZ5
- EOpA==
-X-Gm-Message-State: AOAM533oROI4SIcKJ2pCuEwfuSRfvjTuSFCt4gfnUpH7tDMflAkyipC5
- mtFAJuC3rJMRGzQNsPL3QsI4DRbY
-X-Google-Smtp-Source: ABdhPJxlMxmU88eFfMfOthsbHp9kPLIFU2jJWX2heQHuDC53lD5kQ8p83o0TRb4uvtWr3IaymuIiBQ==
-X-Received: by 2002:a4a:d74d:: with SMTP id h13mr22794219oot.56.1595892212098; 
- Mon, 27 Jul 2020 16:23:32 -0700 (PDT)
+ h=x-gm-message-state:sender:mime-version:content-transfer-encoding:to
+ :from:in-reply-to:cc:references:message-id:user-agent:subject:date;
+ bh=PbOFtq4EVL8HMfXcVPjsoJQLl3EKrYvQnhatQPGSjvc=;
+ b=IvC+zp1zcAFdpnXn87hbybFYzw6QDzJrg8hAdEEw2WZbfdiCemR21u9iSJ2LFcqOXx
+ Ha0KfZxPnfNb/trizGtGtJQTC4BAWR5jAFBsVZSh3PndXmyfxNAvyIe+QeHVr/SCSsfo
+ 9byNc8DF9UtAyjpngNUMCBjxqKl/XvDR85Kd92g5l986cFT0QEFb5XVdoTEJJAFQg2EL
+ f9LQPlpOOTHLI/T43jUObtz2i/XKEWKDvmBkb+DECXDnhoDAKvRKg5pZAYi0bLYnVYEE
+ TgDJ5yeIiK2aMcBydgvI4Zm/b3wKdCoavO6x4uooj57yn6pXUitmRnrmdQ6FNUTPmJx8
+ mABg==
+X-Gm-Message-State: AOAM532PKRqJjzWuujy1EBrlKn8yQAwwM4xKyxj/1mDsFOBv30wCnWGn
+ h2ExSq0RZwspMMdwgfGOgQI=
+X-Google-Smtp-Source: ABdhPJxPpamKcMzRygZ/mCmA1M2nFocudL69OKkIK8HFHanJJb+S5QY433SA7/8w8uD+SDrUJQeL6Q==
+X-Received: by 2002:aca:c356:: with SMTP id t83mr1304220oif.25.1595892571159; 
+ Mon, 27 Jul 2020 16:29:31 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id f26sm2737338oop.46.2020.07.27.16.23.31
+ by smtp.gmail.com with ESMTPSA id r22sm2669551ooq.37.2020.07.27.16.29.30
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 27 Jul 2020 16:23:31 -0700 (PDT)
+ Mon, 27 Jul 2020 16:29:30 -0700 (PDT)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL for-5.1 1/2] qga-win: fix "guest-get-fsinfo" wrong filesystem
- type
-Date: Mon, 27 Jul 2020 18:22:36 -0500
-Message-Id: <20200727232237.31024-2-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200727232237.31024-1-mdroth@linux.vnet.ibm.com>
-References: <20200727232237.31024-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c30;
- envelope-from=flukshun@gmail.com; helo=mail-oo1-xc30.google.com
+In-Reply-To: <20200722044028.4059-1-thuth@redhat.com>
+References: <20200722044028.4059-1-thuth@redhat.com>
+Message-ID: <159589255850.31322.957505175034587602@sif>
+User-Agent: alot/0.7
+Subject: Re: [PATCH v2 0/4] Allow guest-get-fsinfo also for non-PCI devices
+Date: Mon, 27 Jul 2020 18:29:18 -0500
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -98,110 +99,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Basil Salman <bsalman@redhat.com>,
- Basil Salman <basil@daynix.com>
+Cc: qemu-s390x@nongnu.org,
+ =?utf-8?b?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
+ =?utf-8?q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Basil Salman <bsalman@redhat.com>
+Quoting Thomas Huth (2020-07-21 23:40:24)
+> The information that can be retrieved via UDEV is also usable for non-PCI
+> devices. So let's allow build_guest_fsinfo_for_real_device() on non-PCI
+> devices, too. This is required to fix the bug that CCW devices show up
+> without "Target" when running libvirt's "virsh domfsinfo" command (see
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1755075 for details).
+> =
 
-This patch handles the case where unmounted volumes exist,
-where in that case GetVolumePathNamesForVolumeName returns
-empty path, GetVolumeInformation will use the current working
-directory instead.
-This patch fixes the issue by opening a handle to the volumes,
-and using GetVolumeInformationByHandleW instead.
+> v2:
+>  - Use g_new0 instead of g_malloc0 (as suggested by Daniel)
+>  - Init fields to -1 explicitely, not via memset (Daniel)
+>  - Add the fourth patch to also fill in virtio information on s390x
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1746667
+Thanks, patches 2-4 applied to qga-staging tree for 5.2:
+  https://github.com/mdroth/qemu/commits/qga-staging
 
-Signed-off-by: Basil Salman <bsalman@redhat.com>
-Signed-off-by: Basil Salman <basil@daynix.com>
-*fix crash when guest_build_fsinfo() sets errp multiple times
-*make new error message more distinct from existing ones
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- qga/commands-win32.c | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+I've sent a pull request for 5.1 with patch 1/4
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index aaa71f147b..15c9d7944b 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -958,11 +958,13 @@ static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
- {
-     DWORD info_size;
-     char mnt, *mnt_point;
-+    wchar_t wfs_name[32];
-     char fs_name[32];
--    char vol_info[MAX_PATH+1];
-+    wchar_t vol_info[MAX_PATH + 1];
-     size_t len;
-     uint64_t i64FreeBytesToCaller, i64TotalBytes, i64FreeBytes;
-     GuestFilesystemInfo *fs = NULL;
-+    HANDLE hLocalDiskHandle = NULL;
- 
-     GetVolumePathNamesForVolumeName(guid, (LPCH)&mnt, 0, &info_size);
-     if (GetLastError() != ERROR_MORE_DATA) {
-@@ -977,18 +979,27 @@ static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
-         goto free;
-     }
- 
-+    hLocalDiskHandle = CreateFile(guid, 0 , 0, NULL, OPEN_EXISTING,
-+                                  FILE_ATTRIBUTE_NORMAL |
-+                                  FILE_FLAG_BACKUP_SEMANTICS, NULL);
-+    if (INVALID_HANDLE_VALUE == hLocalDiskHandle) {
-+        error_setg_win32(errp, GetLastError(), "failed to get handle for volume");
-+        goto free;
-+    }
-+
-     len = strlen(mnt_point);
-     mnt_point[len] = '\\';
-     mnt_point[len+1] = 0;
--    if (!GetVolumeInformation(mnt_point, vol_info, sizeof(vol_info), NULL, NULL,
--                              NULL, (LPSTR)&fs_name, sizeof(fs_name))) {
-+
-+    if (!GetVolumeInformationByHandleW(hLocalDiskHandle, vol_info,
-+                                       sizeof(vol_info), NULL, NULL, NULL,
-+                                       (LPWSTR) & wfs_name, sizeof(wfs_name))) {
-         if (GetLastError() != ERROR_NOT_READY) {
-             error_setg_win32(errp, GetLastError(), "failed to get volume info");
-         }
-         goto free;
-     }
- 
--    fs_name[sizeof(fs_name) - 1] = 0;
-     fs = g_malloc(sizeof(*fs));
-     fs->name = g_strdup(guid);
-     fs->has_total_bytes = false;
-@@ -1007,9 +1018,11 @@ static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
-             fs->has_used_bytes = true;
-         }
-     }
-+    wcstombs(fs_name, wfs_name, sizeof(wfs_name));
-     fs->type = g_strdup(fs_name);
-     fs->disk = build_guest_disk_info(guid, errp);
- free:
-+    CloseHandle(hLocalDiskHandle);
-     g_free(mnt_point);
-     return fs;
- }
-@@ -1027,8 +1040,12 @@ GuestFilesystemInfoList *qmp_guest_get_fsinfo(Error **errp)
-     }
- 
-     do {
--        GuestFilesystemInfo *info = build_guest_fsinfo(guid, errp);
--        if (info == NULL) {
-+        Error *local_err = NULL;
-+        GuestFilesystemInfo *info = build_guest_fsinfo(guid, &local_err);
-+        if (local_err) {
-+            g_debug("failed to get filesystem info, ignoring error: %s",
-+                    error_get_pretty(local_err));
-+            error_free(local_err);
-             continue;
-         }
-         new = g_malloc(sizeof(*ret));
--- 
-2.17.1
+> =
 
+> Thomas Huth (4):
+>   qga/qapi-schema: Document -1 for invalid PCI address fields
+>   qga/commands-posix: Rework build_guest_fsinfo_for_real_device()
+>     function
+>   qga/commands-posix: Move the udev code from the pci to the generic
+>     function
+>   qga/commands-posix: Support fsinfo for non-PCI virtio devices, too
+> =
+
+>  qga/commands-posix.c | 157 ++++++++++++++++++++++++++++++-------------
+>  qga/qapi-schema.json |   2 +-
+>  2 files changed, 110 insertions(+), 49 deletions(-)
+> =
+
+> -- =
+
+> 2.18.1
+>=20
 
