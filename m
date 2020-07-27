@@ -2,107 +2,91 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C6DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 15:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 995B5C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 15:46:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E3FC206E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 15:41:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E3FC206E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 24495206E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 15:46:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MHzhRB3z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24495206E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k05G3-0000FB-Q1
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 11:41:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48374)
+	id 1k05L1-0001tJ-0t
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 11:46:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pmorel@linux.ibm.com>)
- id 1k05FE-0008DY-Fq; Mon, 27 Jul 2020 11:40:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30122)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pmorel@linux.ibm.com>)
- id 1k05FC-0004vE-9i; Mon, 27 Jul 2020 11:40:52 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06RFWdrH117955; Mon, 27 Jul 2020 11:40:46 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32hvhdtfy5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 27 Jul 2020 11:40:46 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06RFWfXj118105;
- Mon, 27 Jul 2020 11:40:45 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.72])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32hvhdtfws-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 27 Jul 2020 11:40:45 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
- by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06RFRRNK012640;
- Mon, 27 Jul 2020 15:40:43 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma06fra.de.ibm.com with ESMTP id 32gcye9ey1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 27 Jul 2020 15:40:43 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06RFee4N26214806
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 27 Jul 2020 15:40:40 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3E74FAE053;
- Mon, 27 Jul 2020 15:40:40 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A9991AE057;
- Mon, 27 Jul 2020 15:40:39 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.17.84])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 27 Jul 2020 15:40:39 +0000 (GMT)
-Subject: Re: [RFC PATCH] s390x/pci: vfio-pci breakage with disabled mem
- enforcement
-To: Alex Williamson <alex.williamson@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>
-References: <1595517236-17823-1-git-send-email-mjrosato@linux.ibm.com>
- <20200723102916.7cf15b43@w520.home>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <0481c77e-f71f-886b-9b0a-41529eb139ee@linux.ibm.com>
-Date: Mon, 27 Jul 2020 17:40:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k05K8-0001MK-Ry
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 11:45:56 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37622)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k05K6-0005la-7W
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 11:45:56 -0400
+Received: by mail-wm1-x342.google.com with SMTP id k8so4932427wma.2
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 08:45:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=gRnzhB6CdonM/19XlgBuso003ocyxIuCfMZY1cNIpB4=;
+ b=MHzhRB3zfJVi4fQ+QEDgvHdNbwvR9+a0EezGwoqUqosz8anZPTHzDEG+gBO5+R5XWY
+ gjdnHakmAW3TirOCIiTFiOpZHT0Qdoi+ngUCL0RYeLc28igoTGodweKV4w+fBN5YDOkW
+ r6UkUvD53DHHz1BhG7yhXI79TdC3ExPi8MRkMTsRH0y6plcjqMIQdbyua1ZQrli/2Erl
+ vk461tR7FHfyIcU/RHqHNQX1Ud3W247IfqO33Si+WvhJdOVb/2njakvrYsbL/AAx1zhE
+ SA69B59RLuAQUmI6NRFjeOpFo8XdRmeB5F/ggk6oXIkeP2gf9CHgYWmXxTELr+8tp/KR
+ K/Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=gRnzhB6CdonM/19XlgBuso003ocyxIuCfMZY1cNIpB4=;
+ b=KXNyGn/WvLAVupsBwuGl8YSAIYAdxz6fNuBuwCpLR7ybhmVjl0DbJODbPyT40cX3Fu
+ OggBt95kjH/pCj9v+lcPicIeGDNaFWxEKjPtTD52jCi+IUN31BkU9KPlPd0SfQnYnmrS
+ fqAtm6edNDjsYIpy/7OJ1ePCchFFxBzOJs+sdacENJsW9KmMO7kGD8QQg16fdMLVZrQU
+ rLcFNjxFbEZxrIMH9wmyOCxhw7TszprEqrjCeBP8ZS7+wTgl3Puge3NGw/VSU2HlgUyY
+ 3Td33tvblfIAdxuWAqJ+K1LvM0DTNsOkos/a3aY6bwlDf7iBlgXieNdPJgVsKhauhDzI
+ izjA==
+X-Gm-Message-State: AOAM530p9lHDFNf3zXdf4B7iBovQ00zOTCJUwft6MkEsKaq2l53E2xdL
+ es5q9eZsL8QrKVf7qkYrCLl4Bw==
+X-Google-Smtp-Source: ABdhPJwVWXK3Cuqbqb+OogcELW83CNA4VOae4Iw+5xTXzGDkzbBut6ZJ3jU3BiykFKZQ1i1Q+SJjfg==
+X-Received: by 2002:a1c:2805:: with SMTP id o5mr21465619wmo.25.1595864752140; 
+ Mon, 27 Jul 2020 08:45:52 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id m126sm29155wmf.3.2020.07.27.08.45.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Jul 2020 08:45:51 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH for-5.1] hw/timer/imx_epit: Avoid assertion when CR.SWR is
+ written
+Date: Mon, 27 Jul 2020 16:45:50 +0100
+Message-Id: <20200727154550.3409-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200723102916.7cf15b43@w520.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-27_10:2020-07-27,
- 2020-07-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0
- lowpriorityscore=0 phishscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999
- clxscore=1011 mlxscore=0 priorityscore=1501 suspectscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007270105
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=pmorel@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 11:40:46
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,103 +99,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: schnelle@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- qemu-s390x@nongnu.org, rth@twiddle.net
+Cc: Peter Chubb <peter.chubb@nicta.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The imx_epit device has a software-controllable reset triggered by
+setting the SWR bit in the CR register. An error in commit cc2722ec83ad9
+means that we will end up assert()ing if the guest does this, because
+the code in imx_epit_write() starts ptimer transactions, and then
+imx_epit_reset() also starts ptimre transactions, triggering
+"ptimer_transaction_begin: Assertion `!s->in_transaction' failed".
 
+The cleanest way to avoid this double-transaction is to move the
+start-transaction for the CR write handling down below the check of
+the SWR bit.
 
-On 2020-07-23 18:29, Alex Williamson wrote:
-> On Thu, 23 Jul 2020 11:13:55 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> 
->> I noticed that after kernel commit abafbc55 'vfio-pci: Invalidate mmaps
->> and block MMIO access on disabled memory' vfio-pci via qemu on s390x
->> fails spectacularly, with errors in qemu like:
->>
->> qemu-system-s390x: vfio_region_read(0001:00:00.0:region0+0x0, 4) failed: Input/output error
->>
->>  From read to bar 0 originating out of hw/s390x/s390-pci-inst.c:zpci_read_bar().
->>
->> So, I'm trying to figure out how to get vfio-pci happy again on s390x.  From
->> a bit of tracing, we seem to be triggering the new trap in
->> __vfio_pci_memory_enabled().  Sure enough, if I just force this function to
->> return 'true' as a test case, things work again.
->> The included patch attempts to enforce the setting, which restores everything
->> to working order but also triggers vfio_bar_restore() in the process....  So
->> this isn't the right answer, more of a proof-of-concept.
->>
->> @Alex: Any guidance on what needs to happen to make qemu-s390x happy with this
->> recent kernel change?
-> 
-> Bummer!  I won't claim to understand s390 PCI, but if we have a VF
-> exposed to the "host" (ie. the first level where vfio-pci is being
-> used), but we can't tell that it's a VF, how do we know whether the
-> memory bit in the command register is unimplemented because it's a VF
-> or unimplemented because the device doesn't support MMIO?  How are the
-> device ID, vendor ID, and BAR registers virtualized to the host?  Could
-> the memory enable bit also be emulated by that virtualization, much
-> like vfio-pci does for userspace?  If the other registers are
-> virtualized, but these command register bits are left unimplemented, do
-> we need code to deduce that we have a VF based on the existence of MMIO
-> BARs, but lack of memory enable bit?  Thanks,
-> 
-> Alex
+Fixes: https://bugs.launchpad.net/qemu/+bug/1880424
+Fixes: cc2722ec83ad944505fe
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I don't have a test image for KZM so this is the minimal
+obviously-safe change. I'm pretty sure that actually we could
+add a "break" after the imx_epit_reset() call because all of
+the work done by the following code is duplicating the ptimer
+setup done by the reset function. But I'm not really happy making
+that change without a test image...
+---
+ hw/timer/imx_epit.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-Alex, Matt,
-
-in s390 we have the possibility to assign a virtual function to a 
-logical partition as function 0.
-In this case it can not be treated as a virtual function but must be 
-treated as a physical function.
-This is currently working very well.
-However, these functions do not set PCI_COMMAND_MEMORY as we need.
-
-Shouldn't we fix this inside the kernel, to keep older QMEU working?
-
-Then would it be OK to add a new bit/boolean inside the 
-pci_dev/vfio_pci_device like, is_detached_vfn, that we could set during 
-enumeration and test inside __vfio_pci_memory_enabled() to return true?
-
-In the enumeration we have the possibility to know if the function is a 
-HW/Firmware virtual function on devfn 0 or if it is created by SRIOV.
-
-It seems an easy fix without side effects.
-
-What do you think?
-
-
-> 
->> @Nilkas/@Pierre: I wonder if this might be related to host device is_virtfn?
->> I note that my host device lspci output looks like:
->>
->> 0000:00:00.0 Ethernet controller: Mellanox Technologies MT27710 Family [ConnectX-4 Lx Virtual Function]
->>
->> But the device is not marked as is_virtfn..  Otherwise, Alex's fix
->> from htps://lkml.org/lkml/2020/6/25/628 should cover the case.
->>
-
-I do not think we can fix this problem by forcing the is_virtfn bit.
-AFAIU, our HW virtual function works a lot like a physical function.
-
->>
->>
->> Matthew Rosato (1):
->>    s390x/pci: Enforce PCI_COMMAND_MEMORY for vfio-pci
->>
->>   hw/s390x/s390-pci-inst.c | 10 ++++++++++
->>   1 file changed, 10 insertions(+)
->>
-> 
-> 
-
-Regards,
-Pierre
-
+diff --git a/hw/timer/imx_epit.c b/hw/timer/imx_epit.c
+index baf6338e1a6..4f51e6e12da 100644
+--- a/hw/timer/imx_epit.c
++++ b/hw/timer/imx_epit.c
+@@ -199,15 +199,18 @@ static void imx_epit_write(void *opaque, hwaddr offset, uint64_t value,
+ 
+     switch (offset >> 2) {
+     case 0: /* CR */
+-        ptimer_transaction_begin(s->timer_cmp);
+-        ptimer_transaction_begin(s->timer_reload);
+ 
+         oldcr = s->cr;
+         s->cr = value & 0x03ffffff;
+         if (s->cr & CR_SWR) {
+             /* handle the reset */
+             imx_epit_reset(DEVICE(s));
+-        } else {
++        }
++
++        ptimer_transaction_begin(s->timer_cmp);
++        ptimer_transaction_begin(s->timer_reload);
++
++        if (!(s->cr & CR_SWR)) {
+             imx_epit_set_freq(s);
+         }
+ 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.20.1
+
 
