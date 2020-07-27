@@ -2,102 +2,125 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 531E7C433E5
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:23:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A90C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D2D52074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:23:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4ED0C2070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:28:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPXipP3k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D2D52074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IYQTCmZm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ED0C2070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0360-0002bQ-Dz
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 09:23:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54118)
+	id 1k03Ba-0004Hs-LB
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 09:28:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k0358-00021m-Ra
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:22:18 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49948
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k0357-0006MW-AM
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:22:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595856136;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=NUQB4tpRp+4qJdSr6XrP8pxvz9rSAPts+mXUPB0rTkk=;
- b=NPXipP3k/z8tjRcXmiuh9lMPoEckJ6wivY8sQ96xFJaJ8b4yJqSRn9obUC9eIIX5Wdcl6p
- 4tdX7OoziNg8OtBNBKJcgka2vfrRdTXgyo6noFevDduXbzR2GDX0e4KiIsfuhqKZg0SaSf
- hjk3aa7QdVeeq6EA3HXhKQpnaxVp0wY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-bEMz7XTPP-6elDE1Ln4xrQ-1; Mon, 27 Jul 2020 09:22:12 -0400
-X-MC-Unique: bEMz7XTPP-6elDE1Ln4xrQ-1
-Received: by mail-wr1-f69.google.com with SMTP id 89so3931229wrr.15
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 06:22:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=NUQB4tpRp+4qJdSr6XrP8pxvz9rSAPts+mXUPB0rTkk=;
- b=myjcvmD8b0/53Z/dcQO/Br0oXwvoJYy98yHdEbD9X5SzmkUBxzbNAQr4YB0ftRLoMV
- TC3KgYBzUWQWNNuqC7GtYdlsgobCQckVkmf2bPFOnFRZNMdk5gzfDoJntEfC0XXMeKDM
- FS1nqHduO+qcH/4h0tZWB6zVRLci9/f/h8VxziI6hqCVUGT3W2gNDPzixeLUkUGtOq/D
- 1Kjp7Ru0BhEuibvmj4xw6vBH3PoyLm/jhXLhZwteiV4pDg1BRgRdxBtjRl7R6G2OnRPK
- stdV82Di7NYKr0fFQU8C0RhyH5jblKexZ6TD0h+/AuLMNwhHcElnYrBM0/ykWeD5VAHK
- Vq1Q==
-X-Gm-Message-State: AOAM532FYELuXmnVYCIgyyaO0fGqdH7y43wx/maeqmNZh8CfKqNcfdyn
- ygEz0fkydgTQL3cvpecOhN6tdNs1BbLlSwn1qPehRDhlKgVUYznT27y+/vsAccSls3xUSnLnz4M
- F+eQVlfdzf2b8mzo=
-X-Received: by 2002:adf:f3cb:: with SMTP id g11mr19880196wrp.268.1595856131472; 
- Mon, 27 Jul 2020 06:22:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwKzz85sI5UnIXc17wUUbmVW4T6ErO9y9RHYBuEVNrwQWDNgLDeKh5uap+T+cFH+1YbDmAFzg==
-X-Received: by 2002:adf:f3cb:: with SMTP id g11mr19880184wrp.268.1595856131304; 
- Mon, 27 Jul 2020 06:22:11 -0700 (PDT)
-Received: from redhat.com ([192.117.173.58])
- by smtp.gmail.com with ESMTPSA id v67sm9169007wma.46.2020.07.27.06.22.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 06:22:10 -0700 (PDT)
-Date: Mon, 27 Jul 2020 09:22:05 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v7 12/21] multi-process: Connect Proxy Object with device
- in the remote process
-Message-ID: <20200727092043-mutt-send-email-mst@kernel.org>
-References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
- <20f42fce1b701586a23c9abdb3b53d080845e94a.1593273671.git.elena.ufimtseva@oracle.com>
- <20200701092043.GE126613@stefanha-x1.localdomain>
- <BE91B4AA-7E18-47CE-8747-97152D6462CC@oracle.com>
- <20200727131829.GD386429@stefanha-x1.localdomain>
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k03B0-0003nu-3w; Mon, 27 Jul 2020 09:28:22 -0400
+Received: from mail-eopbgr10106.outbound.protection.outlook.com
+ ([40.107.1.106]:12385 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k03Aw-00074Y-WB; Mon, 27 Jul 2020 09:28:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YKLO5q3aLqCu7RJHtdxv7uKSKeDG6WsjssXsr9jjt5hk1BvvP5ziWCkcjs/3IWRy7fVqXNU9aflftzLtUyrz4e9OWjpmH/nfeBk/7gS3VGuzRsh9EYBy7a3aETD6+v8EgQHh81L0LGCnJKBdQhloVh1WmdnHcEDw43BsXaHGYVj5tC1Zhl2h9BFX+5sL9y8+7DYwSNu3osymimGX0Zy8/AbAeB0w2NACszvXFojWeMuY6WSaOQriSSyX1MSQol86qVmDe4jdWMP2ZTuUt7hFQx1tE24vHMTyOr5qj7dOj6cp0Ft/RLRa1lmuN550jWK4FqaZvyVCrmRWWZEMo21vqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u5AYrrVJYZsPDRTmWNH6bA68k9RPb33EaiGnh7xtu/I=;
+ b=hOHyvVQAZcBwgqz3n1hvtu6CKT+FyPTl0d7L7e5KkoJ3ERNOk1/Et1v7IgPVL1/ZAD7ileLKQRfwJcjGHBTXN5UEQD4itova2i6MNAKs4TX+2w0XPYfDqz2+PIjGH8Aup4CGPViLkVE5I7JQh9uSo5Y4rDDCn6mBNfM3B0qvmG6+oXU5CZ9LYMQoQi6fhiFOa/CQS9sNl3J/a+fxLUDIvteV2XD8+kulKj5gWmUPV6iz8AdlHtP8crVsp/o5z4+sV8Z4HzW4+GMi6nZqHIBWtBTrsL9LeqNk468nDI/KQsczX2CYZEHw1Eca3FO9xYHxMyM3Ja5srQKoKt3k4axb1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u5AYrrVJYZsPDRTmWNH6bA68k9RPb33EaiGnh7xtu/I=;
+ b=IYQTCmZmWu4eoyTPN8k81Jk4yxJ5gqmfKDlL0y5v59S3KTptFWanuTbqD2YFIS3V5NoiRcqnZpklRrBdzYqYSyNHzL9r1P7rW0+ZjxBV79q8sKISmM5H1/UNfJNRRVyXW+DmcEAl3XdH48R2wzzCHjFWpCI2Pz6CqbuV26qZNGU=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM6PR08MB3224.eurprd08.prod.outlook.com (2603:10a6:209:47::13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.24; Mon, 27 Jul
+ 2020 13:28:14 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3216.033; Mon, 27 Jul 2020
+ 13:28:14 +0000
+Subject: Re: [PATCH v7 42/47] iotests: Test that qcow2's data-file is flushed
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-43-mreitz@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <081ee25b-556d-0f52-a471-ccb773eb04e3@virtuozzo.com>
+Date: Mon, 27 Jul 2020 16:28:04 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <20200625152215.941773-43-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-GB
+X-ClientProxiedBy: AM3PR03CA0059.eurprd03.prod.outlook.com
+ (2603:10a6:207:5::17) To AM6PR08MB4070.eurprd08.prod.outlook.com
+ (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
-In-Reply-To: <20200727131829.GD386429@stefanha-x1.localdomain>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.82) by
+ AM3PR03CA0059.eurprd03.prod.outlook.com (2603:10a6:207:5::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3216.20 via Frontend Transport; Mon, 27 Jul 2020 13:28:10 +0000
+X-Originating-IP: [109.252.114.82]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6807b232-4aba-4310-cd8f-08d83230ea52
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3224:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB32245A3D9D8AC370447B2B19F4720@AM6PR08MB3224.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: H9ZBwiNAkz/fuwrk/S126OOUQ/jAevIdzOsN73z28oGwZTFZEnZ/sYDv2MKBmVfBSTzjYGUL6rjKTvnT2xeqnRt4oj5tMe4b01NVrdg3DhyQ3XHjvSJVEsVQ05CeJupdNptZnwskcqpBD7n8nCCZ3pBWAiiFO7+4zRkidzsxWQKogmt9WyEh0MjrJPuOOk21+LzXXplErb0AdpnlcbtY5XS/5hnXqIJOL00OgtLI/F/Byqv4sVehGzORr5RX8GVhusupsfa2xmEYjKnQaopqihJqhiI5GCMPYiDa19vilX6HKxUaG09DAtFmKIxjwABAg3IC/1s7HC8fCfTwRoTNLPlJOJs1p6ed8NOIsPFR41uZ9LNi9ZM0BpZktls16ad+getJu55bZzBSCH2cw9vDUQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(346002)(396003)(366004)(376002)(39840400004)(6506007)(5660300002)(66476007)(478600001)(54906003)(66556008)(53546011)(6512007)(66946007)(44832011)(316002)(36756003)(956004)(6666004)(26005)(52116002)(2906002)(2616005)(6486002)(186003)(16526019)(8676002)(4326008)(31686004)(8936002)(31696002)(86362001)(21314003)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: AD7vOUhh0WIiLJL+fluF8zCRxmLabbt28keRNP6JhVIzAFBFkcieRJg4FRwgQegPvjtksmbbrqgv4J1loSuiy1Te62C6cpBf8axUmVmKPN+4Xd3qNeBSylIiDBjf354Q7IyIq+LwCOD25uC5WbjgjB8F1Oc+XDKqTWdgG4+BPxjrcXyrkQD5m4Jf0gkoHul2hd+aGy/dJLnXBAkofaZV2RG0b3QNIXYZ4ge6NR92ghVB/A8pMbyaSszO5NWJ/izojUhW9ssiCBxUx+0u+CH7GQrn4mReIop0GVq2W4OW3GoSdXTQ7C/V5HS8ZuV2hbvuBQvatt98ncyinbWFvF2HFtrKImhqz4zKPwBASjT8pW0Fl//nA2cOdBCDBupjf9hWuRJTfaNnvrcJDB8XoX368bLem1WssuVwXWh6hLRvjaKSx00Lkkh6lqWVE/uL94MZArPXLAh8E4wTvPq7KEbQ0gaH+2+EeTy204MYe4O+VGWbi4FhFNRHG4zRW0xEaX1x
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6807b232-4aba-4310-cd8f-08d83230ea52
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 13:28:14.6407 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tsNAgrAasSeoLBOyjQ7ALmo00CWpQKsKW07D0fYkg9JTWDNWTtUZwnkwMPyfCiDYbOWpGZQUUsKtckWMI6G9y+M3h/RAPbPcRplHoPOEWfA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3224
+Received-SPF: pass client-ip=40.107.1.106;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 09:28:16
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,47 +133,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>, fam@euphon.net,
- swapnil.ingle@nutanix.com, John G Johnson <john.g.johnson@oracle.com>,
- qemu-devel@nongnu.org, kraxel@redhat.com, Jag Raman <jag.raman@oracle.com>,
- quintela@redhat.com, armbru@redhat.com, kanth.ghatraju@oracle.com,
- felipe@nutanix.com, thuth@redhat.com, ehabkost@redhat.com,
- konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
- thanos.makatos@nutanix.com, rth@twiddle.net, kwolf@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
- marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 27, 2020 at 02:18:29PM +0100, Stefan Hajnoczi wrote:
-> I suggest dropping multi-device support for now. It will be implemented
-> differently with VFIO-over-socket anyway, so it's not worth investing
-> much time into.
+On 25.06.2020 18:22, Max Reitz wrote:
+> Flushing a qcow2 node must lead to the data-file node being flushed as
+> well.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   tests/qemu-iotests/244     | 49 ++++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/244.out |  7 ++++++
+>   2 files changed, 56 insertions(+)
+>
+> diff --git a/tests/qemu-iotests/244 b/tests/qemu-iotests/244
+> index efe3c0428b..f2b2dddf1c 100755
+> --- a/tests/qemu-iotests/244
+> +++ b/tests/qemu-iotests/244
+> @@ -217,6 +217,55 @@ $QEMU_IMG amend -f $IMGFMT -o "data_file=blkdebug::$TEST_IMG.data" "$TEST_IMG"
+>   $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n -C "$TEST_IMG.src" "$TEST_IMG"
+>   $QEMU_IMG compare -f $IMGFMT -F $IMGFMT "$TEST_IMG.src" "$TEST_IMG"
+>   
+> +echo
+> +echo "=== Flushing should flush the data file ==="
+> +echo
+> +
+> +# We are going to flush a qcow2 file with a blkdebug node inserted
+> +# between the qcow2 node and its data file node.  The blkdebug node
+> +# will return an error for all flushes and so we if the data file is
+> +# flushed, we will see qemu-io return an error.
+> +
+> +# We need to write something or the flush will not do anything; we
+> +# also need -t writeback so the write is not done as a FUA write
+> +# (which would then fail thanks to the implicit flush)
+> +$QEMU_IO -c 'write 0 512' -c flush \
+> +    -t writeback \
+> +    "json:{
+> +         'driver': 'qcow2',
+> +         'file': {
+> +             'driver': 'file',
+> +             'filename': '$TEST_IMG'
+> +         },
+> +         'data-file': {
+> +             'driver': 'blkdebug',
+> +             'inject-error': [{
+> +                 'event': 'none',
+> +                 'iotype': 'flush'
+> +             }],
+> +             'image': {
+> +                 'driver': 'file',
+> +                 'filename': '$TEST_IMG.data'
+> +             }
+> +         }
+> +     }" \
+> +    | _filter_qemu_io
+> +
+> +result=${PIPESTATUS[0]}
+> +echo
+> +
+> +case $result in
+> +    0)
+> +        echo "ERROR: qemu-io succeeded, so the data file was not flushed"
+> +        ;;
+> +    1)
+> +        echo "Success: qemu-io failed, so the data file was flushed"
+> +        ;;
+> +    *)
+> +        echo "ERROR: qemu-io returned unknown exit code $result"
+> +        ;;
+> +esac
+> +
+>   # success, all done
+>   echo "*** done"
+>   rm -f $seq.full
+> diff --git a/tests/qemu-iotests/244.out b/tests/qemu-iotests/244.out
+> index dbab7359a9..7269b4295a 100644
+> --- a/tests/qemu-iotests/244.out
+> +++ b/tests/qemu-iotests/244.out
+> @@ -131,4 +131,11 @@ Offset          Length          Mapped to       File
+>   Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 data_file=TEST_DIR/t.IMGFMT.data
+>   Images are identical.
+>   Images are identical.
+> +
+> +=== Flushing should flush the data file ===
+> +
+> +wrote 512/512 bytes at offset 0
+> +512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +
+> +Success: qemu-io failed, so the data file was flushed
+>   *** done
 
-I'm not sure I buy the VFIO-over-socket yet. It seems a weirdly QEMU
-specific IPC mechanism. However ...
 
-> The main socket approach needs authentication support if multiple guests
-> share a remote device emulation process. Otherwise guest A can access
-> guest B's devices.
-> 
-> It's simpler if each device has a separate UNIX domain socket. It is not
-> necessary to modify lsi53c895a in order to do this. Either the socket
-> can be associated with the remote PCIe port (although I think the
-> current code implements the older PCI Local Bus instead of PCIe) or a
-> separate -object mpqlink,device=lsi1,fd=4 object can be defined (I think
-> that's the syntax I've shared in the past).
-> 
-> For now though, just using the -machine remote,fd=4 approach is fine -
-> but limited to 1 device.
-> 
-> Stefan
-
-I agree to all of the above. Starting with a single fd is a good idea.
-
--- 
-MST
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
 
 
