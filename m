@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE78C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD621C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:52:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 728292070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:46:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B57A2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:52:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dtAp3EiH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 728292070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FHuE0QPu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B57A2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k07Cv-00050a-KC
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 13:46:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52156)
+	id 1k07II-0006sm-Ns
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 13:52:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k07C9-0004CE-GA
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:45:49 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:45493)
+ id 1k07HS-000683-Bb
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:51:18 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:46907)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k07C7-0006Bk-Vd
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:45:49 -0400
-Received: by mail-ej1-x644.google.com with SMTP id g7so9655511ejw.12
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 10:45:46 -0700 (PDT)
+ id 1k07HQ-0006nE-SL
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:51:18 -0400
+Received: by mail-ej1-x643.google.com with SMTP id l4so17891168ejd.13
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 10:51:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=OGCemuoCnniJTddIL0pVvSa/2sbZNppcufLQWxfQwd8=;
- b=dtAp3EiHMN1+5Ntxbtup7mh1PjUBCnBQGqqiNkEu7U7708w4hudOrN+OKDcTq/+PLu
- 1jkVGlkc/i+0OQ8qqrPteURDUMh36F2x0pfeRQ7B7G5edKhzqV5qPLjJny6uzzFjpB0B
- XI6JvtWtf7pF3xpvAEp/qyKv76w0pil4VcYX7kYp4NILJIO1YH9lAtscJK00JKQJr00i
- oPGpsIFIYKPZwRKflVr+njxae8K7XmhRCGXtOCliVgmWR9K9B77oBKzB2oFWcM/+07YX
- FQGREsAzYpJgalY3pBsWcFmuyPRRg39/XdxKu5d6ytGPUZlkRTGr1/QU2gjjlx/m3raP
- Qjqg==
+ bh=gDx7vRp/dC5Z+gEH9ieQ1MOATOcdTERt+j/Nr4IggWM=;
+ b=FHuE0QPu7Zk0wyiEDY6BU4qIiW3D3bhym7uXTqXYCwlc37iejEBOWuinYgeSokW0yx
+ xDQce9w260gp4izvEo0KB7sKvuGXK06iYQAi4W4G4vBfILSViKn1bPjxqcEKF4TBR2Ff
+ +ffj8ZrbTZS2ePMB3v/HmsFbrpXL4AQ7bZpjqAZf1fcMoHfTefvgJ3Lze+iAYVmBqzbp
+ z+t1UsMQhe1OSXak+aIq9kKXnW9ZNoe7j2phMxG4KDgOq40NIsWteTaDzb6XIMVF7Zk4
+ fhNSM+wnI4C6tteSvJUySS+6yiS3+/xnSnswdqrwOuvU7zzPSbEgnYsMtY9KbuSgXeoE
+ 64Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :mime-version:content-transfer-encoding;
- bh=OGCemuoCnniJTddIL0pVvSa/2sbZNppcufLQWxfQwd8=;
- b=spML7meMbmniWHnx8ZtfhkQCU+eSKJtfkdE2yh2ApaYiOuH1BGdca7m3z8OsmWpeNU
- 38AhMjdpLY1KVN756S7khhvy1/KOAeYN2aAti+CdZ/u8Jdm96g2vHpsb5NtSVYcz4/9V
- Hg+tjWMgJTk8OLH7pVWLzKmx955SyVL5q5rMl3ZPfISPJgRlJzK3mgNU8uaqO0Zr3LyI
- Mb/dwBJ6SXpsHE/AlNpZ40KOWnOJ0cKP4T1E+O47hjZ342N21H0e93lgdoDTGzqH+8fn
- OH+NKarX2qBqwxcMOx3rNEx3BZiS5EJVPbMMvNFWaI/+F3+xs82aFbpnoaE18EgUSW11
- VkQA==
-X-Gm-Message-State: AOAM531irfW8s7g+WZ6X9DlS1JwXH2jSY/47w8St9bT6F1hhuPzURGB+
- 1Ke099I4pndSxXa4aC8Bhn/wYplz
-X-Google-Smtp-Source: ABdhPJztc8CmgW3k40JQJ9gKBv96ZMPEtOQES9Gd1vxnaGaSr+y1N5ZpHjHzJUr9vAXLx+Ws8D+Ncg==
-X-Received: by 2002:a17:906:f181:: with SMTP id
- gs1mr22913793ejb.293.1595871945798; 
- Mon, 27 Jul 2020 10:45:45 -0700 (PDT)
+ bh=gDx7vRp/dC5Z+gEH9ieQ1MOATOcdTERt+j/Nr4IggWM=;
+ b=eccnQuSkc1yzKwu7jZZFjcn7VO8gSMxEpfnMAaIbvAq9qhY+KPDKt4Y42XLQrMOjwX
+ DjerGdEMzw1M0J5+Stse14KPy1aemc/uQfzI+Lr1uq66aFrKvcGlYFhayvRc78erWr/D
+ GMEsBT3hwFJBV27YP120eqIwPDUVEgLCenX2pVWoi1B2Kg17Irp+1IRnSKg1Q6Z0Pmjp
+ /jcR229wxKqyOvYwuLJSQBsr1nQwkDZVQJoMPHLzJSymAT6RfrRK5PDwUznOLA98lLTF
+ KFn+kCLa1iLpefztb0MrI8eIuUvtRi9SnZnjm0WkplWhWJLppPJJhgnZdmDJHy3g6gT4
+ 3G9w==
+X-Gm-Message-State: AOAM5318sIKGDUnP7OJbD+ylNk4Qh8nmJmruFe1+yyf7Biyc6zltcG6T
+ B1JffQqoCqAFDCT00GjYFdPfcmkK
+X-Google-Smtp-Source: ABdhPJwDZZTiGPKp6Dk9uVIdQqvDgVWPk2j0Qn1Q0M1nSkJ5KeQagiMEc5x1KroOrIQ9OyLbAL0qYw==
+X-Received: by 2002:a17:906:85d6:: with SMTP id
+ i22mr4045364ejy.194.1595872275056; 
+ Mon, 27 Jul 2020 10:51:15 -0700 (PDT)
 Received: from x1w.redhat.com (214.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id e10sm6679406edu.51.2020.07.27.10.45.44
+ by smtp.gmail.com with ESMTPSA id w3sm7877927edq.65.2020.07.27.10.51.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 10:45:44 -0700 (PDT)
+ Mon, 27 Jul 2020 10:51:14 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2] memory: Display bigger regions first in 'info mtree'
- output
-Date: Mon, 27 Jul 2020 19:45:43 +0200
-Message-Id: <20200727174543.4219-1-f4bug@amsat.org>
+Subject: [PATCH-for-5.2 v4] hw/core/qdev: Increase qdev_realize() kindness
+Date: Mon, 27 Jul 2020 19:51:12 +0200
+Message-Id: <20200727175112.6820-1-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -102,36 +101,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Peter Xu <peterx@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When different regions have the same address, we currently
-sort them by the priority. Also sort them by the region
-size.
+Since commit 510ef98dca5, qdev_realize() aborts if bus-less
+device is realized on a bus. While commits 514db7710b..007d1dbf72
+took care of converting all mainstream uses, QEMU forks weren't
+converted.
+
+These forks are usually maintained by hobbyist with interest in
+following mainstream development, but with limited time, so usually
+rebase from time to time. To avoid them to spend time on debugging
+and reading git-log history, display a kind hint about what is wrong.
+
+Before:
+
+  qemu-system-mipsel: hw/core/qdev.c:376: qdev_realize: Assertion `!DEVICE_GET_CLASS(dev)->bus_type' failed.
+  Aborted (core dumped)
+
+After:
+
+  Unexpected error in qdev_realize() at hw/core/qdev.c:376:
+  qemu-system-mipsel: Unexpected bus 'System' for bus-less device 'unimplemented-device'
+  Aborted (core dumped)
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- softmmu/memory.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/core/qdev.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index af25987518..c28dcaf4d6 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -2960,7 +2960,8 @@ static void mtree_print_mr(const MemoryRegion *mr, unsigned int level,
-         QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
-             if (new_ml->mr->addr < ml->mr->addr ||
-                 (new_ml->mr->addr == ml->mr->addr &&
--                 new_ml->mr->priority > ml->mr->priority)) {
-+                 (MR_SIZE(new_ml->mr->size) > MR_SIZE(ml->mr->size) ||
-+                  new_ml->mr->priority > ml->mr->priority))) {
-                 QTAILQ_INSERT_BEFORE(ml, new_ml, mrqueue);
-                 new_ml = NULL;
-                 break;
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 2131c7f951..a16f1270f1 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -392,8 +392,11 @@ bool qdev_realize(DeviceState *dev, BusState *bus, Error **errp)
+ 
+     if (bus) {
+         qdev_set_parent_bus(dev, bus);
+-    } else {
+-        assert(!DEVICE_GET_CLASS(dev)->bus_type);
++    } else if (DEVICE_GET_CLASS(dev)->bus_type) {
++        error_setg(errp, "Unexpected bus '%s' for bus-less device '%s'",
++                   DEVICE_GET_CLASS(dev)->bus_type,
++                   object_get_typename(OBJECT(dev)));
++        return false;
+     }
+ 
+     object_property_set_bool(OBJECT(dev), true, "realized", &err);
 -- 
 2.21.3
 
