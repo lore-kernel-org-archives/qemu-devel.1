@@ -6,79 +6,85 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24635C433E5
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 290E8C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:21:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2514206D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:19:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E46C62070A
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 13:21:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gXwFbDZL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2514206D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OwiqbYSE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E46C62070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k032F-0008BV-8b
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 09:19:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53336)
+	id 1k033z-0000kv-7B
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 09:21:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k031i-0007lH-De
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:18:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32146
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k033D-0000Dx-2k
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:20:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28812
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k031g-0005xh-OI
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:18:46 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k033A-00067U-Mx
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 09:20:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595855923;
+ s=mimecast20190719; t=1595856016;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=xLuhxXYa2IWvZP4jLP4cim7yq3VenN8tkJZWxiVg+jw=;
- b=gXwFbDZLNeVwm5TfBnvkQmP4sZ8hOQJBjCRZo8Qx4zaQB550Eg+PLX3TeKidjsUj2QB3uE
- gYbn3fyRTE6fmpTh6PYObZhMgNjZreDshPZcZ6wIg5y3vBHe9MAd8nkUo7V/ZNmvkqQFk4
- YcB7qh3dD3Tz/ySrxzi+mqjLUnaVrpY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-20CCsXeEPzu2KRH6mnwkCQ-1; Mon, 27 Jul 2020 09:18:39 -0400
-X-MC-Unique: 20CCsXeEPzu2KRH6mnwkCQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 694F159;
- Mon, 27 Jul 2020 13:18:37 +0000 (UTC)
-Received: from localhost (ovpn-114-74.ams2.redhat.com [10.36.114.74])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE97860BF4;
- Mon, 27 Jul 2020 13:18:30 +0000 (UTC)
-Date: Mon, 27 Jul 2020 14:18:29 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jag Raman <jag.raman@oracle.com>
-Subject: Re: [PATCH v7 12/21] multi-process: Connect Proxy Object with device
- in the remote process
-Message-ID: <20200727131829.GD386429@stefanha-x1.localdomain>
-References: <cover.1593273671.git.elena.ufimtseva@oracle.com>
- <20f42fce1b701586a23c9abdb3b53d080845e94a.1593273671.git.elena.ufimtseva@oracle.com>
- <20200701092043.GE126613@stefanha-x1.localdomain>
- <BE91B4AA-7E18-47CE-8747-97152D6462CC@oracle.com>
+ bh=jrcXXs1yEh3OOU7gsBHcqIm2H/mCao8DCc7NJB9MyZo=;
+ b=OwiqbYSEXhDcP89ir2Zv0uOJXyhAsgXRfQ4qYLKimI5+Sgqca2Lsd7rv9bAYbDOQ/xgEjO
+ gCxdoepw98p9v7QN5FwyiWcOml6LBwFBklJ+oae9DTQGvZF03g/sbH6tfjQtw/LYr239QR
+ npH4QI4bIz0KMyGJPhpTlfVPsFCo2UU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-498-_V8MRfr1MqKq-WdqXkmcuw-1; Mon, 27 Jul 2020 09:20:14 -0400
+X-MC-Unique: _V8MRfr1MqKq-WdqXkmcuw-1
+Received: by mail-wm1-f70.google.com with SMTP id z10so1475994wmi.8
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 06:20:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=jrcXXs1yEh3OOU7gsBHcqIm2H/mCao8DCc7NJB9MyZo=;
+ b=MeOWZRC5FM/Si4Ss8IBR+VZb+AWbubiwpRCxkeFa4Sl6TfDr/jaIVi8hiL/2fItsBx
+ fPTctTpAEcpw5Ke1rflpw3q1OoFdMwG6aIeL8ZyuC7I5f/331Md08//i58OUTBLgm+EL
+ LW8uS9TMP2BxNLPvpXHwxtC81+KOtGZPKIUPVQphGgFmFh0aw29EokGQz4dSxXpFBzOU
+ mrDc+tWgx4iydBTo9ys1U33r56c26rSDfLUzChtnbVd7DNob5IcjxS3DITsUK8f0J+UT
+ yi/YK/82Ke9ouW5dYQPgtnRFb1P3r+eQ/wcTa2MjOBKzoZ+pdbxYIlT3Fsf40k66NSGK
+ PaoA==
+X-Gm-Message-State: AOAM530YJp6ChiBWG7q9TTrotEPgoNeunPjt+WG/rckbx437WxiLQ95I
+ zf1PaM8ThDl0T31snRF7wxIYHpPw4XHqjou2XuLpRL9LB68xRE+ZgBQwP9FZ+6XBcGBS0u/gVsj
+ K+RfQ7rSBGbIDzd0=
+X-Received: by 2002:a5d:6744:: with SMTP id l4mr19561179wrw.105.1595856013021; 
+ Mon, 27 Jul 2020 06:20:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwSBThggsrJZriFpBWQw3ZuCiBOGxeOAD0Q2DvgupYYrG4n+9tsPPrb1lvAkxFF1Nsz0qHTmQ==
+X-Received: by 2002:a5d:6744:: with SMTP id l4mr19561146wrw.105.1595856012762; 
+ Mon, 27 Jul 2020 06:20:12 -0700 (PDT)
+Received: from redhat.com ([192.117.173.58])
+ by smtp.gmail.com with ESMTPSA id t202sm18264236wmt.20.2020.07.27.06.20.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Jul 2020 06:20:12 -0700 (PDT)
+Date: Mon, 27 Jul 2020 09:20:09 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: Re: [RFC] ivshmem v2: Shared memory device specification
+Message-ID: <20200727091802-mutt-send-email-mst@kernel.org>
+References: <f109fe5a-92eb-e5a5-bb83-ada42b3a9b61@siemens.com>
 MIME-Version: 1.0
-In-Reply-To: <BE91B4AA-7E18-47CE-8747-97152D6462CC@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+In-Reply-To: <f109fe5a-92eb-e5a5-bb83-ada42b3a9b61@siemens.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Q0rSlbzrZN6k9QnT"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:44:14
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:46:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -99,97 +105,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>, fam@euphon.net,
- swapnil.ingle@nutanix.com, John G Johnson <john.g.johnson@oracle.com>,
- qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com, mst@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, felipe@nutanix.com,
- thuth@redhat.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
- dgilbert@redhat.com, liran.alon@oracle.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>, liang yan <lyan@suse.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ "virtio-comment@lists.oasis-open.org" <virtio-comment@lists.oasis-open.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Q0rSlbzrZN6k9QnT
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, May 25, 2020 at 09:58:28AM +0200, Jan Kiszka wrote:
+> #### Vendor Specific Capability (ID 09h)
+> 
+> This capability must always be present.
+> 
+> | Offset | Register            | Content                                        |
+> |-------:|:--------------------|:-----------------------------------------------|
+> |    00h | ID                  | 09h                                            |
+> |    01h | Next Capability     | Pointer to next capability or 00h              |
+> |    02h | Length              | 20h if Base Address is present, 18h otherwise  |
+> |    03h | Privileged Control  | Bit 0 (read/write): one-shot interrupt mode    |
+> |        |                     | Bits 1-7: Reserved (0 on read, writes ignored) |
+> |    04h | State Table Size    | 32-bit size of read-only State Table           |
+> |    08h | R/W Section Size    | 64-bit size of common read/write section       |
+> |    10h | Output Section Size | 64-bit size of output sections                 |
+> |    18h | Base Address        | optional: 64-bit base address of shared memory |
+> 
+> All registers are read-only. Writes are ignored, except to bit 0 of
+> the Privileged Control register.
 
-On Fri, Jul 24, 2020 at 12:57:22PM -0400, Jag Raman wrote:
-> > On Jul 1, 2020, at 5:20 AM, Stefan Hajnoczi <stefanha@redhat.com> wrote=
-:
-> > On Sat, Jun 27, 2020 at 10:09:34AM -0700, elena.ufimtseva@oracle.com wr=
-ote:
-> > In a 1:1 model the CONNECT_DEV message is not necessary because each
-> > socket is already associated with a specific remote device (e.g. qemu -=
-M
-> > remote -object mplink,dev=3Dlsi-scsi-1,sockpath=3D/tmp/lsi-scsi-1.sock)=
-.
-> > Connecting to the socket already indicates which device we are talking
-> > to.
-> >=20
-> > The N:1 model will work but it's more complex. There is a main socket
-> > that is used for CONNECT_DEV (anything else?) and we need to worry abou=
-t
-> > the lifecycle of the per-device sockets that are passed over the main
-> > socket.
->=20
-> The main socket is only used for CONNECT_DEV. The CONNECT_DEV
-> message sticks a fd to the remote device.
->=20
-> We are using the following command-line in the remote process:
-> qemu-system-x86_64 -machine remote,fd=3D4 -device lsi53c895a,id=3Dlsi1 ..=
-.
->=20
-> The alternative approach would be to let the orchestrator to assign fds f=
-or
-> each remote device. In this approach, we would specify an =E2=80=98fd=E2=
-=80=99 for each
-> device object like below:
-> qemu-system-x86_64 -machine remote -device lsi53c895a,id=3Dlsi1,fd=3D4 =
-=E2=80=A6
->=20
-> The alternative approach would entail changes to the DeviceState struct
-> and qdev_device_add() function, which we thought is not preferable. Could
-> you please share your thoughts on this?
 
-I suggest dropping multi-device support for now. It will be implemented
-differently with VFIO-over-socket anyway, so it's not worth investing
-much time into.
+Is there value in making this follow the virtio vendor-specific
+capability format? That will cost several extra bytes - do you envision
+having many of these in the config space?
+Also, do we want to define an extended capability format in case this
+is a pci extended capability?
 
-The main socket approach needs authentication support if multiple guests
-share a remote device emulation process. Otherwise guest A can access
-guest B's devices.
-
-It's simpler if each device has a separate UNIX domain socket. It is not
-necessary to modify lsi53c895a in order to do this. Either the socket
-can be associated with the remote PCIe port (although I think the
-current code implements the older PCI Local Bus instead of PCIe) or a
-separate -object mpqlink,device=3Dlsi1,fd=3D4 object can be defined (I thin=
-k
-that's the syntax I've shared in the past).
-
-For now though, just using the -machine remote,fd=3D4 approach is fine -
-but limited to 1 device.
-
-Stefan
-
---Q0rSlbzrZN6k9QnT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8e1CUACgkQnKSrs4Gr
-c8hvtAf/Sxd0kEVrgv0E5LixbooDEOXaqtDIjxOe5e0zCjmywBQAy3q8TPj2ene/
-Mzm1e49XV+jtutouNvjT13FO+rATFK/yvk/BFTKn1W+VvnHJE1rxWyR4SFaQlYqd
-IribPCA8mnXsjyYGo8DqxKZwArLeJdz14kzn67KI7SB6/Rf4hrXbd8WCwfaK0s3j
-rmddAPtudNUWGlfEeuqaYmJqCheccY/IaxIGR3nAEXknVGAvABRxaYLtTnJA+7QK
-jbamwKsqhcZpRVYom/7jNqGeUr7wpqc5an7vzWdk9KY9830QdBBpZScXBqvnHVVO
-7vTWseJHw3Jf4wQyQOm36FUUzP3chQ==
-=D98U
------END PGP SIGNATURE-----
-
---Q0rSlbzrZN6k9QnT--
+-- 
+MST
 
 
