@@ -2,86 +2,86 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 323CFC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F34B7C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:25:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF8EC2074F
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1BA32074F
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:25:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n6QKODt+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF8EC2074F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ivz7bepB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1BA32074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k02Bo-0008U4-5x
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:25:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36926)
+	id 1k02Bq-0000Co-Vj
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:25:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k02Am-0006qK-Hu
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:04 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:44849)
+ id 1k02Ao-0006uP-UA
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:06 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40034)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k02Aj-0006Pc-DE
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:04 -0400
-Received: by mail-wr1-x431.google.com with SMTP id b6so14672675wrs.11
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 05:24:01 -0700 (PDT)
+ id 1k02An-0006QD-8h
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:06 -0400
+Received: by mail-wr1-x442.google.com with SMTP id l2so4115412wrc.7
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 05:24:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=MaB6EkUcV7cS8jhBR3D/MkieWNjgmYqTc6CjEYzz2lI=;
- b=n6QKODt+W0JzwxucAFN4utcBzGXEUJGsYUW2i2SMAGguOEqYkMvwngszmX1J9rtLwt
- V9nIuJlRfUPS0TVD4jp1roqNk21u4z2UX03yHAIbAxaabQy1IsFH6usCK07dhHfUk4gG
- B22ZpHlSLVrqx0vpE/m1iI6dh9ohC+tX+qQSJqCoAV2twQOUNlr6o12d9KA0RnEVwyro
- Z4ZuaOeXxh6/6qAl/z3uPVcPJplgGT/MiH81HROHSisnzzVB82T5btbswKOlp0Mdq7Z9
- x6fqwB4Z0/RKeuRSJWmCpRLx4TXUN3JfzNejIANRvjBCgvC5ldXRJYwyZ82PoL4XTqDU
- pCcA==
+ bh=4DkH+HsKr59a1msZyNsGwSRnaJGoXL2y3SWKWzOhSpU=;
+ b=Ivz7bepBEmniKPvFEH8tB/o+eAqzW/oFlp7mg/i9blICyxhA1aNpA+DxYBbf/JF94G
+ g8RXFZ0+oGq148PVBbjW0n8MEaLcgda8xj8ovrO+uNF25Fl8EbNoGd+zjtKHiJREwKAW
+ bKEpeJjwniXV3d3DHWFXtaU9+2yjPOvq8iUYVVq3EYetCBjqLtni4x1P3y99/6WIgSpl
+ gGpi6RYAp5PcoP8U/naRBC7foGjpTybY2Wj82Rdpl0q1v2M08OS2MBXPIXrxCdru+4B6
+ oRrPx+FT/GbgH6Ha12Wf1p2NIDxeFiz1I1yB9f6OOSnlcrku421dI9z0A2EJHWLTXkf7
+ wNUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=MaB6EkUcV7cS8jhBR3D/MkieWNjgmYqTc6CjEYzz2lI=;
- b=LZB+MlHTXBjx05Ekv4flZkLBFTnoq4tYgEu+KiNHNEz+92TAwkmYeGxVyST54hyZ4D
- 9Q/ABGljjvx4m6nicqclfcm61cGVpqvFKKnjgS0KGwbANp7dHtQzIpZnk/Yeb/6FkGoB
- YgrDRfyq4q/vvp+5QSRFjP2c4jgqbc21w7/Il8988bzB96+pBnDmZIJxL2T2S4t9Serg
- QmMJbPnK45XLBxNXakcgNlXGs+Ujq5Ogjeo5F6P7f8C1Ax05XRblyf/yDkwtRsNp0CKE
- 7M/KluCR6SsugVGYrxHoFwXEbFqEUAWYcooM4XoqPsg1uo55ymrhqpoc8pKUsE7VICSk
- M/cw==
-X-Gm-Message-State: AOAM530IoJse8xsqq6kLhHQcUOvgy9pL//ihN6IvlsfhABqpjsH08VgT
- BaVEieGC2Ix3G1kwqxDSMd44MIq4jiw=
-X-Google-Smtp-Source: ABdhPJxIs1HOaDtOPikSF4Eg+N8kRtuGyovAAfCrdpp++Nw6smyzpDEXHG4IJTPSWUC7y+RbS9m1wQ==
-X-Received: by 2002:a5d:5647:: with SMTP id j7mr19578441wrw.242.1595852640076; 
- Mon, 27 Jul 2020 05:24:00 -0700 (PDT)
+ bh=4DkH+HsKr59a1msZyNsGwSRnaJGoXL2y3SWKWzOhSpU=;
+ b=qV+JhOOehBj+V356wl4S7i7K1RQVzHitq/EyvEQBY84/0H0Ydzh+OUY3YuokvMI48D
+ EWOpQikQ3PVAt6HlhxWDhdfrt4m8ou2ph3cK8I+zZNh7P3HhrNAV99W0woQ6OgRPbmpA
+ 13NXtZjCsx+b/LxmC6mcORKH0U6do03iNyIRcNswdX5ldKpSBjHqQpuALeyPJM1kKuRD
+ tBHxBP1I7K1K904oL2VJFVghuyjmJHpaTjfOLgqduW+kTx8iQ23HNlXtF0BH3w76De9P
+ nKpC4v1QzDli2tpxpcvLkFyxDdZz4COuEKaB56PvkLvRWlUyMfw4j6lOiRvkMfECee07
+ KubQ==
+X-Gm-Message-State: AOAM532YJf46Q7byhBDp7zzo9sq3za+cyAB0DvBTpJo1j0YltkzFdUEC
+ RMxqNfMyMFZQ7aQGx+y8Hub9mQ==
+X-Google-Smtp-Source: ABdhPJykbFGse0w4a1U7AyiEGiSv5IcVBq0AKQLXLP1rPFj2U/2VXOatAlmpT6QBWO4qbG9LJ2kjmQ==
+X-Received: by 2002:adf:83c5:: with SMTP id 63mr19833097wre.321.1595852643909; 
+ Mon, 27 Jul 2020 05:24:03 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o2sm3934205wmh.5.2020.07.27.05.23.57
+ by smtp.gmail.com with ESMTPSA id z11sm12067528wrw.93.2020.07.27.05.23.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 05:23:58 -0700 (PDT)
+ Mon, 27 Jul 2020 05:24:00 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 793AE1FF87;
+ by zen.linaroharston (Postfix) with ESMTP id BC7A21FF90;
  Mon, 27 Jul 2020 13:23:57 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 01/16] shippable: add one more qemu to registry url
-Date: Mon, 27 Jul 2020 13:23:42 +0100
-Message-Id: <20200727122357.31263-2-alex.bennee@linaro.org>
+Subject: [PULL 04/16] util: add qemu_get_host_physmem utility function
+Date: Mon, 27 Jul 2020 13:23:45 +0100
+Message-Id: <20200727122357.31263-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200727122357.31263-1-alex.bennee@linaro.org>
 References: <20200727122357.31263-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::431;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x431.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,35 +103,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Stefan Weil <sw@weilnetz.de>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Christian Ehrhardt <christian.ehrhardt@canonical.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The registry url is <project>/<repo>/qemu/<image>
+This will be used in a future patch. For POSIX systems _SC_PHYS_PAGES
+isn't standardised but at least appears in the man pages for
+Open/FreeBSD. The result is advisory so any users of it shouldn't just
+fail if we can't work it out.
 
-Perhaps we should rationalise that some day but for now.
+The win32 stub currently returns 0 until someone with a Windows system
+can develop and test a patch.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200724064509.331-2-alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Message-Id: <20200724064509.331-5-alex.bennee@linaro.org>
 
-diff --git a/.shippable.yml b/.shippable.yml
-index f6b742432e5..89d8be4291b 100644
---- a/.shippable.yml
-+++ b/.shippable.yml
-@@ -27,7 +27,7 @@ env:
-       TARGET_LIST=ppc64-softmmu,ppc64-linux-user,ppc64abi32-linux-user
- build:
-   pre_ci_boot:
--    image_name: registry.gitlab.com/qemu-project/qemu/${IMAGE}
-+    image_name: registry.gitlab.com/qemu-project/qemu/qemu/${IMAGE}
-     image_tag: latest
-     pull: true
-     options: "-e HOME=/root"
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 45c217aa280..0b1298b3c91 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -668,4 +668,16 @@ static inline void qemu_reset_optind(void)
+  */
+ char *qemu_get_host_name(Error **errp);
+ 
++/**
++ * qemu_get_host_physmem:
++ *
++ * Operating system agnostic way of querying host memory.
++ *
++ * Returns amount of physical memory on the system. This is purely
++ * advisery and may return 0 if we can't work it out. At the other
++ * end we saturate to SIZE_MAX if you are lucky enough to have that
++ * much memory.
++ */
++size_t qemu_get_host_physmem(void);
++
+ #endif
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index d9236746248..ad8001a4ad8 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -841,3 +841,18 @@ char *qemu_get_host_name(Error **errp)
+ 
+     return g_steal_pointer(&hostname);
+ }
++
++size_t qemu_get_host_physmem(void)
++{
++#ifdef _SC_PHYS_PAGES
++    long pages = sysconf(_SC_PHYS_PAGES);
++    if (pages > 0) {
++        if (pages > SIZE_MAX / qemu_real_host_page_size) {
++            return SIZE_MAX;
++        } else {
++            return pages * qemu_real_host_page_size;
++        }
++    }
++#endif
++    return 0;
++}
+diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+index 7eedbe5859a..31030463cc9 100644
+--- a/util/oslib-win32.c
++++ b/util/oslib-win32.c
+@@ -828,3 +828,9 @@ char *qemu_get_host_name(Error **errp)
+ 
+     return g_utf16_to_utf8(tmp, size, NULL, NULL, NULL);
+ }
++
++size_t qemu_get_host_physmem(void)
++{
++    /* currently unimplemented */
++    return 0;
++}
 -- 
 2.20.1
 
