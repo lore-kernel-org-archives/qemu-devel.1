@@ -2,95 +2,90 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 504EFC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6644DC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:35:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19FE020663
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:34:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30AFC20714
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 12:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gqQHbu9C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19FE020663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I5rEUd2I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30AFC20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k02Kr-0004Jm-EH
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:34:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37150)
+	id 1k02Lt-0005oO-GM
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 08:35:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k02B4-0007UW-Ey
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:24 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45947)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k02B2-0006SQ-SU
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:24:22 -0400
-Received: by mail-wr1-x444.google.com with SMTP id z18so11111917wrm.12
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 05:24:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=rLNmNXPwsek6Q6dP3H8DkSo9b+2a+VCiz0OAeSbTq64=;
- b=gqQHbu9CU8GC8dEucl7MtjH6MmL/xPXpYh3QqF71Q8SpSL5VcHnlbey+Qob+y6rJvE
- n8eWPy4Dz7SAlLCmAukC/6H8kYH8HjVegw/Z/Z4djMZaS3aQMC8V48UNQ75yJFzkmpbv
- 1GWvbMPY73S5ql1IH1Gay641Nu0EIgzH93oEjhA7J1JBxg6wxTCptMffzbOlryUoMBPu
- 0P9xOToM8h/gEyl/NnGiM0rRdoGFDTqxyURJSS0BM6/+AGwTA1J0tzZ2bNSV3vgQJj9M
- qPyGdAtd7cnwySlRhoOgatvI0syCbM05qnZzntHI9sk0NctA/yk8TeQJVlqhpPp9y41+
- 9riQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=rLNmNXPwsek6Q6dP3H8DkSo9b+2a+VCiz0OAeSbTq64=;
- b=MU+iAM9flakoicIykhiJ9+w6yAaNaGGzgCdqLOeh9S9h1KUaCe3SDTRMefyAOldOlG
- 2ET6jOqzyYiydKtCmokwv3Wti3WJ+1YN3LR5EtLIgpp/gsNuUF0lNUc3IzLBiSYptbAW
- RbmDm6JQrlL4fKl2USI5AIk7mTYcSuHqmVMCehjV1zlhK591Y/iwifFN0dibSHon5elQ
- 76UoRIpSIJN24RAtaG1VND27fh7dqPqFoUyoLLb362nnLjQd2xNq5aDkDI5N6RVoaM9U
- lLpi4R9BcXakRkDLpcQZ0m/kW6HUOEjl7lSLkvCXCQUXvgZuEyvdVcFkOUH1rkKY2rS3
- tOeg==
-X-Gm-Message-State: AOAM530gD5+iA942cNxc7UepuZE/OPmRLlYuLCzANgsY1Z223Ybg3crk
- 9ouOuzw70+AvHZWREdNZuWTbfA==
-X-Google-Smtp-Source: ABdhPJxaHn1H3+Vs7Ff+dbLfdUpNbBTJoyExT75f4g2wo6XK7aox0o6p7DBbNAnTcTtDOUQb7hY7ow==
-X-Received: by 2002:adf:b352:: with SMTP id k18mr21051035wrd.386.1595852659480; 
- Mon, 27 Jul 2020 05:24:19 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b186sm18759864wme.1.2020.07.27.05.24.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Jul 2020 05:24:09 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 91EE91FF9C;
- Mon, 27 Jul 2020 13:23:58 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 13/16] linux-user, ppc: fix clock_nanosleep() for linux-user-ppc
-Date: Mon, 27 Jul 2020 13:23:54 +0100
-Message-Id: <20200727122357.31263-14-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200727122357.31263-1-alex.bennee@linaro.org>
-References: <20200727122357.31263-1-alex.bennee@linaro.org>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k02GP-0008R8-4i
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:29:53 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21340
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k02GM-00070c-75
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 08:29:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595852988;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=F4uavNF+nYeIfbchy/Gnexd3ES9/AHoWblRFnJoTCPA=;
+ b=I5rEUd2IuGbq0iHYpw6zDhq5hfCT6v9De41rUb+sf4++1rquQ43P3dF0HaV7fvyjQpRXTA
+ 8xHuwssKHR/1ZNmMsz/rrOGL5gmmRvRV15uAxzg77kghpm2iyRcmL/rC9++vq0IivsNzgb
+ /cWqxt7QZJICKybUYwjfkwTpAP/rMXU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-313-aOR3GZT8Mj2cGLnXAL6lWw-1; Mon, 27 Jul 2020 08:29:46 -0400
+X-MC-Unique: aOR3GZT8Mj2cGLnXAL6lWw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A2F080BCAD;
+ Mon, 27 Jul 2020 12:29:44 +0000 (UTC)
+Received: from localhost (ovpn-114-74.ams2.redhat.com [10.36.114.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 24E215DA6A;
+ Mon, 27 Jul 2020 12:29:40 +0000 (UTC)
+Date: Mon, 27 Jul 2020 13:29:39 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: Re: [virtio-comment] [RFC] ivshmem v2: Shared memory device
+ specification
+Message-ID: <20200727122939.GB386429@stefanha-x1.localdomain>
+References: <f109fe5a-92eb-e5a5-bb83-ada42b3a9b61@siemens.com>
+ <20200715132748.GA20677@stefanha-x1.localdomain>
+ <88a33034-783a-07d2-85e0-c1a1ecd2721f@siemens.com>
+ <20200723065423.GE268427@stefanha-x1.localdomain>
+ <10df6427-eab0-d3b8-4624-ede98ff7ef09@siemens.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <10df6427-eab0-d3b8-4624-ede98ff7ef09@siemens.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="4SFOXa2GPu3tIq4H"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 03:37:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,45 +98,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>, liang yan <lyan@suse.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ "virtio-comment@lists.oasis-open.org" <virtio-comment@lists.oasis-open.org>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Laurent Vivier <laurent@vivier.eu>
+--4SFOXa2GPu3tIq4H
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Our safe_clock_nanosleep() returns -1 and updates errno.
+On Thu, Jul 23, 2020 at 09:02:09AM +0200, Jan Kiszka wrote:
+> On 23.07.20 08:54, Stefan Hajnoczi wrote:
+> > On Fri, Jul 17, 2020 at 06:15:58PM +0200, Jan Kiszka wrote:
+> > > On 15.07.20 15:27, Stefan Hajnoczi wrote:
+> > > > On Mon, May 25, 2020 at 09:58:28AM +0200, Jan Kiszka wrote:
+> >=20
+> > Thanks for the responses. It would be great to update the spec with
+> > these clarifications.
+> >=20
+> > > > > If BAR 2 is not present, the shared memory region is not relocata=
+ble
+> > > > > by the user. In that case, the hypervisor has to implement the Ba=
+se
+> > > > > Address register in the vendor-specific capability.
+> > > >=20
+> > > > What does relocatable mean in this context?
+> > >=20
+> > > That the guest can decide (via BAR) where the resource should show up=
+ in the
+> > > physical guest address space. We do not want to support this in setup=
+s like
+> > > for static partitioning hypervisors, and then we use that side-channe=
+l
+> > > read-only configuration.
+> >=20
+> > I see. I'm not sure what is vendor-specific about non-relocatable share=
+d
+> > memory. I guess it could be added to the spec too?
+>=20
+> That "vendor-specific" comes from the PCI spec which - to my understandin=
+g -
+> provides us no other means to introduce registers to the config space tha=
+t
+> are outside of the PCI spec. I could introduce a name for the ivshmem ven=
+dor
+> cap and use that name here - would that be better?
 
-We don't need to update the CRF bit in syscall.c because it will
-be updated in ppc/cpu_loop.c as the return value is negative.
+Sounds good.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200722174612.2917566-3-laurent@vivier.eu>
-Message-Id: <20200724064509.331-14-alex.bennee@linaro.org>
+--4SFOXa2GPu3tIq4H
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 43a6e283961..f5c4f6b95db 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -11840,13 +11840,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             host_to_target_timespec(arg4, &ts);
-         }
- 
--#if defined(TARGET_PPC)
--        /* clock_nanosleep is odd in that it returns positive errno values.
--         * On PPC, CR0 bit 3 should be set in such a situation. */
--        if (ret && ret != -TARGET_ERESTARTSYS) {
--            ((CPUPPCState *)cpu_env)->crf[0] |= 1;
--        }
--#endif
-         return ret;
-     }
- #endif
--- 
-2.20.1
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8eyLMACgkQnKSrs4Gr
+c8iz3gf+PR7V8VCympAWs+Z7xHZgGlFUy375IgC6F5z+6fundn/iK0s7G4F+x5yO
+H3NmnoiUpdobJ52yzuTaft5DEsdL8GZ3AoDeCNp0TzU+89PFsXzDeozT9v3FGagz
+GLnwzyCpWZ8qfbEJSUeKk549gfdqunLm6liqo3h6yiBlAs6dYAnh9RppXFxVdmLw
+ydiDM+1kLBmsU5SCM8x1Uq2DNyPPySQukuCqUMQe8ssbI3L52y5+k/xverd44fUR
+rGYc2n3Z6pZ+prPkRRkUKycP0H9csQyTIcIs7PKGMhPKOMqoXCe174y4dro4GrAb
++HGBBvp2fW5ztZHRP20XjqrWhotyow==
+=AR2l
+-----END PGP SIGNATURE-----
+
+--4SFOXa2GPu3tIq4H--
 
 
