@@ -2,126 +2,102 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93838C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EDBCC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:44:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59AB820714
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:44:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07FC820714
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:44:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aBLuV23d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59AB820714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAW5Wi9J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07FC820714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k01YB-0000w2-Lb
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 07:44:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56396)
+	id 1k01YO-00016U-AY
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 07:44:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1k01XC-00009z-HZ
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:43:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28397
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k01XH-0000Ez-Jf
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:43:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46468
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1k01XA-0001La-9v
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:43:10 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k01XF-0001MO-Cz
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:43:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595850186;
+ s=mimecast20190719; t=1595850192;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vFUdqLAMwgGKOiMx57/vySDQcZMv92uRnhLMT/gIXY8=;
- b=aBLuV23dzi6JNiKNtnhPiGxEQpZmoB9AJ4Ggx48s8+iYWr79mVqCUksmLnTKTzK4IfrBsg
- uhkp+h180WNiWKEldv6hYCMvutW9AmUwgkawBm6LJlGXIRzyKhDA+Ep025z/VZlmAQz3SH
- giu9oBb5W6Y4fKoDEDsn4drevrXUH7Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-O8pfRTXDMzC4klpDdalHGw-1; Mon, 27 Jul 2020 07:43:04 -0400
-X-MC-Unique: O8pfRTXDMzC4klpDdalHGw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03DD21DE6
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 11:43:04 +0000 (UTC)
-Received: from [10.36.114.48] (ovpn-114-48.ams2.redhat.com [10.36.114.48])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D62C890E62;
- Mon, 27 Jul 2020 11:42:58 +0000 (UTC)
-Subject: Re: [PATCH v1] virtio-mem-pci: force virtio version 1
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200708143619.38743-1-david@redhat.com>
- <d9cfad16-5b62-483a-c049-4dbaec51cd3e@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <2a7d938b-cd30-4598-b151-d16dc0a2f46b@redhat.com>
-Date: Mon, 27 Jul 2020 13:42:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ in-reply-to:in-reply-to:references:references;
+ bh=KYKgnA1Gkt6PJhzJqbW0Noa5lI5h7jdroe646HK+Mog=;
+ b=KAW5Wi9JfqAlR3xxeMH8OY+B/Zg5IUmLhEwxZY+N9txh3JGqjE88hjOkG9Hnxmi+BtBo1z
+ IUSHM1HiFtSAwt8WXObqfUtiH2UWOOx9eZ2Qyefh48pyrXeYFi1K5q6zykkROXJ/Nu0w2n
+ 1Nu/Wy4iX5S6WMLEvSURLfhunykBgow=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-EWDk-wbqMG-A5TCmdg91_w-1; Mon, 27 Jul 2020 07:43:10 -0400
+X-MC-Unique: EWDk-wbqMG-A5TCmdg91_w-1
+Received: by mail-wm1-f72.google.com with SMTP id l5so7729075wml.7
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 04:43:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=KYKgnA1Gkt6PJhzJqbW0Noa5lI5h7jdroe646HK+Mog=;
+ b=l0mj7xm3Wbr1SJNyQrJOIruht932byQ6F7jAoCh2gJJpLo+itfK5hKBmxqd8mqnxOz
+ r6Kab7PxZyINpEitMT4ECcRbmkUAoCNBaN3/Q6zEcK/p6thY7EF0BDiNeQjAEIAg7y/g
+ xP6ZTK+4svYUgOBK579UI7ODqg27fis2fUWBdPpEYqade3CNuZ/nAvLb34uljeRcklFf
+ KtxZyxCiOhHgnoaTiZdY8TVHhypNKgs7YY273bVo41kSPdd7TDMNdqHUSgRI76786wPD
+ WmFu/22QOfLyOhkw3pdXdPuHnZxDgw6DDFNH/LxfDR6JBnUVaFxTm3LuDI+O3fCmutBi
+ OpTQ==
+X-Gm-Message-State: AOAM532uvCbthZGEDoF5YG9jkkeiOD8lynMfj0GS0eN1OcqKNcCBa6cz
+ CuP4WPbvhF3q17tVqaBB35SSaIP4dcEXxvyW9WnlUlWZlZNlmC8bpYOJkdWn0ZDvKYN92LHIntY
+ lcnR54Jlm5OSLZyU=
+X-Received: by 2002:a5d:54c7:: with SMTP id x7mr21614489wrv.39.1595850189753; 
+ Mon, 27 Jul 2020 04:43:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxczFfYqnaWkTqKTkulbUrM5x6A2JJPlmQHe/QhemWqkEjIP+kX0gx8HhNLdl1KxJso6mFFKw==
+X-Received: by 2002:a5d:54c7:: with SMTP id x7mr21614467wrv.39.1595850189489; 
+ Mon, 27 Jul 2020 04:43:09 -0700 (PDT)
+Received: from redhat.com ([192.117.173.58])
+ by smtp.gmail.com with ESMTPSA id 88sm12844052wrk.43.2020.07.27.04.43.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Jul 2020 04:43:08 -0700 (PDT)
+Date: Mon, 27 Jul 2020 07:43:05 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [BUG] vhost-vdpa: qemu-system-s390x crashes with second
+ virtio-net-ccw device
+Message-ID: <20200727074221-mutt-send-email-mst@kernel.org>
+References: <20200724152718.4e1cbc9e.cohuck@redhat.com>
+ <20200724092906-mutt-send-email-mst@kernel.org>
+ <20200724165627.70c6dfd6.cohuck@redhat.com>
+ <20200724111512-mutt-send-email-mst@kernel.org>
+ <20200724173448.18773aec.cohuck@redhat.com>
+ <5a0dfa0b-5a1d-e7d2-1785-8cca6ddb9db8@redhat.com>
+ <20200727084310.7d29ec6d.cohuck@redhat.com>
+ <676ce079-adf6-a279-c2ea-68f43146e2ac@redhat.com>
+ <20200727104148.4ae49715.cohuck@redhat.com>
+ <fe474426-bb3e-5021-7d43-f3d0812dcaa4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d9cfad16-5b62-483a-c049-4dbaec51cd3e@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <fe474426-bb3e-5021-7d43-f3d0812dcaa4@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=david@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 00:16:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -131,7 +107,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -144,56 +120,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Cindy Lu <lulu@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22.07.20 16:22, David Hildenbrand wrote:
-> On 08.07.20 16:36, David Hildenbrand wrote:
->> Let's force virtio version 1. While at it, use qdev_realize() to set
->> the parent bus and realize - like most other virtio-*-pci
->> implementations.
->>
->> Fixes: 0b9a2443a48b ("virtio-pci: Proxy for virtio-mem")
->> Cc: Cornelia Huck <cohuck@redhat.com>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/virtio/virtio-mem-pci.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/virtio/virtio-mem-pci.c b/hw/virtio/virtio-mem-pci.c
->> index 1a8e854123..831022aa86 100644
->> --- a/hw/virtio/virtio-mem-pci.c
->> +++ b/hw/virtio/virtio-mem-pci.c
->> @@ -21,8 +21,8 @@ static void virtio_mem_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->>      VirtIOMEMPCI *mem_pci = VIRTIO_MEM_PCI(vpci_dev);
->>      DeviceState *vdev = DEVICE(&mem_pci->vdev);
->>  
->> -    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
->> -    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
->> +    virtio_pci_force_virtio_1(vpci_dev);
->> +    qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
->>  }
->>  
->>  static void virtio_mem_pci_set_addr(MemoryDeviceState *md, uint64_t addr,
->>
+On Mon, Jul 27, 2020 at 04:51:23PM +0800, Jason Wang wrote:
 > 
-> Ping @mst
+> On 2020/7/27 下午4:41, Cornelia Huck wrote:
+> > On Mon, 27 Jul 2020 15:38:12 +0800
+> > Jason Wang <jasowang@redhat.com> wrote:
+> > 
+> > > On 2020/7/27 下午2:43, Cornelia Huck wrote:
+> > > > On Sat, 25 Jul 2020 08:40:07 +0800
+> > > > Jason Wang <jasowang@redhat.com> wrote:
+> > > > > On 2020/7/24 下午11:34, Cornelia Huck wrote:
+> > > > > > On Fri, 24 Jul 2020 11:17:57 -0400
+> > > > > > "Michael S. Tsirkin"<mst@redhat.com>  wrote:
+> > > > > > > On Fri, Jul 24, 2020 at 04:56:27PM +0200, Cornelia Huck wrote:
+> > > > > > > > On Fri, 24 Jul 2020 09:30:58 -0400
+> > > > > > > > "Michael S. Tsirkin"<mst@redhat.com>  wrote:
+> > > > > > > > > On Fri, Jul 24, 2020 at 03:27:18PM +0200, Cornelia Huck wrote:
+> > > > > > > > > > When I start qemu with a second virtio-net-ccw device (i.e. adding
+> > > > > > > > > > -device virtio-net-ccw in addition to the autogenerated device), I get
+> > > > > > > > > > a segfault. gdb points to
+> > > > > > > > > > 
+> > > > > > > > > > #0  0x000055d6ab52681d in virtio_net_get_config (vdev=<optimized out>,
+> > > > > > > > > >        config=0x55d6ad9e3f80 "RT") at /home/cohuck/git/qemu/hw/net/virtio-net.c:146
+> > > > > > > > > > 146	    if (nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
+> > > > > > > > > > 
+> > > > > > > > > > (backtrace doesn't go further)
+> > > > > > > > The core was incomplete, but running under gdb directly shows that it
+> > > > > > > > is just a bog-standard config space access (first for that device).
+> > > > > > > > 
+> > > > > > > > The cause of the crash is that nc->peer is not set... no idea how that
+> > > > > > > > can happen, not that familiar with that part of QEMU. (Should the code
+> > > > > > > > check, or is that really something that should not happen?)
+> > > > > > > > 
+> > > > > > > > What I don't understand is why it is set correctly for the first,
+> > > > > > > > autogenerated virtio-net-ccw device, but not for the second one, and
+> > > > > > > > why virtio-net-pci doesn't show these problems. The only difference
+> > > > > > > > between -ccw and -pci that comes to my mind here is that config space
+> > > > > > > > accesses for ccw are done via an asynchronous operation, so timing
+> > > > > > > > might be different.
+> > > > > > > Hopefully Jason has an idea. Could you post a full command line
+> > > > > > > please? Do you need a working guest to trigger this? Does this trigger
+> > > > > > > on an x86 host?
+> > > > > > Yes, it does trigger with tcg-on-x86 as well. I've been using
+> > > > > > 
+> > > > > > s390x-softmmu/qemu-system-s390x -M s390-ccw-virtio,accel=tcg -cpu qemu,zpci=on
+> > > > > > -m 1024 -nographic -device virtio-scsi-ccw,id=scsi0,devno=fe.0.0001
+> > > > > > -drive file=/path/to/image,format=qcow2,if=none,id=drive-scsi0-0-0-0
+> > > > > > -device scsi-hd,bus=scsi0.0,channel=0,scsi-id=0,lun=0,drive=drive-scsi0-0-0-0,id=scsi0-0-0-0,bootindex=1
+> > > > > > -device virtio-net-ccw
+> > > > > > 
+> > > > > > It seems it needs the guest actually doing something with the nics; I
+> > > > > > cannot reproduce the crash if I use the old advent calendar moon buggy
+> > > > > > image and just add a virtio-net-ccw device.
+> > > > > > 
+> > > > > > (I don't think it's a problem with my local build, as I see the problem
+> > > > > > both on my laptop and on an LPAR.)
+> > > > > It looks to me we forget the check the existence of peer.
+> > > > > 
+> > > > > Please try the attached patch to see if it works.
+> > > > Thanks, that patch gets my guest up and running again. So, FWIW,
+> > > > 
+> > > > Tested-by: Cornelia Huck <cohuck@redhat.com>
+> > > > 
+> > > > Any idea why this did not hit with virtio-net-pci (or the autogenerated
+> > > > virtio-net-ccw device)?
+> > > 
+> > > It can be hit with virtio-net-pci as well (just start without peer).
+> > Hm, I had not been able to reproduce the crash with a 'naked' -device
+> > virtio-net-pci. But checking seems to be the right idea anyway.
 > 
+> 
+> Sorry for being unclear, I meant for networking part, you just need start
+> without peer, and you need a real guest (any Linux) that is trying to access
+> the config space of virtio-net.
+> 
+> Thanks
 
-With Conny's patches in, simple virtio-mem examples currently fail with
+A pxe guest will do it, but that doesn't support ccw, right?
 
-qemu-system-x86_64: -device
-virtio-mem-pci,id=vm0,memdev=mem0,node=0,requested-size=300M: device is
-modern-only, use disable-legacy=on
+I'm still unclear why this triggers with ccw but not pci -
+any idea?
 
-So we really want this in QEMU 5.1
-
--- 
-Thanks,
-
-David / dhildenb
+> 
+> > 
+> > > For autogenerated virtio-net-cww, I think the reason is that it has
+> > > already had a peer set.
+> > Ok, that might well be.
+> > 
+> > 
 
 
