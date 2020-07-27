@@ -2,79 +2,73 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38602C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 03:21:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CF2C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 03:33:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0879020658
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 03:21:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0879020658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0CC79206D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 03:33:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fzjfPkvV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CC79206D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzthX-0005nw-6c
-	for qemu-devel@archiver.kernel.org; Sun, 26 Jul 2020 23:21:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43582)
+	id 1jztss-0000Cd-AA
+	for qemu-devel@archiver.kernel.org; Sun, 26 Jul 2020 23:33:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jztgx-0005NE-Ek
- for qemu-devel@nongnu.org; Sun, 26 Jul 2020 23:20:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39816)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1jztgv-0006Nk-11
- for qemu-devel@nongnu.org; Sun, 26 Jul 2020 23:20:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1jztgs-0000rD-Lh
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 03:20:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A0F0A2E8050
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 03:20:38 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jztsE-00087a-VU; Sun, 26 Jul 2020 23:32:23 -0400
+Received: from ozlabs.org ([203.11.71.1]:42421)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1jztsC-0007mi-70; Sun, 26 Jul 2020 23:32:22 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BFQN70JDVz9sRR; Mon, 27 Jul 2020 13:32:06 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1595820727;
+ bh=uJn5ORwu0qPSWmqnRqmzpk9jmmLyYU1l667TuWDKoX8=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=fzjfPkvVnsMS90UtfM3HBijPkTNj4eWRAc39fp5vKb/U3IINMWQdobUapaE2CMr23
+ HM7HL2aKQui4nnNDGbvXjBn3xN51d4sDEaQp020fwGQ64j0VumLzBek4RJlGQZtq2P
+ LCeK/1NsB8CSVaxWKSK5Wbb7AducT25iNHNlc47Y=
+Date: Mon, 27 Jul 2020 13:29:04 +1000
+From: "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+To: Matthieu Bucchianeri <matthieu.bucchianeri@leostella.com>
+Subject: Re: [PATCH] target/ppc: Fix SPE unavailable exception triggering
+Message-ID: <20200727032904.GD84173@umbus.fritz.box>
+References: <20200725191436.31828-1-matthieu.bucchianeri@leostella.com>
+ <alpine.BSF.2.22.395.2007261202050.35472@zero.eik.bme.hu>
+ <SN5P110MB05433223A83842B1686867CB84750@SN5P110MB0543.NAMP110.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Jul 2020 03:11:46 -0000
-From: Jason Wang <1888601@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h jasowang skaegi
-X-Launchpad-Bug-Reporter: Simon Kaegi (skaegi)
-X-Launchpad-Bug-Modifier: Jason Wang (jasowang)
-References: <159547584008.11100.1316842366379773629.malonedeb@wampee.canonical.com>
-Message-Id: <159581950616.29737.2652732353819406905.malone@chaenomeles.canonical.com>
-Subject: [Bug 1888601] Re: QEMU v5.1.0-rc0/rc1 hang with nested virtualization
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e85d0ab92e2924d39b8285aeae075a01d25eff06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: db4c22e3c2cc98204a6620aaa02cac4094b61b8d
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/26 23:20:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="q9KOos5vDmpwPx9o"
+Content-Disposition: inline
+In-Reply-To: <SN5P110MB05433223A83842B1686867CB84750@SN5P110MB0543.NAMP110.PROD.OUTLOOK.COM>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/26 23:32:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,111 +77,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1888601 <1888601@bugs.launchpad.net>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yon can get the calltrace by:
 
-1) compile the qemu with --enable-debug
-2) using gdb -p $pid_of_qemu when you see the hang
-3) thread apply all bt
+--q9KOos5vDmpwPx9o
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks
+On Sun, Jul 26, 2020 at 04:59:16PM +0000, Matthieu Bucchianeri wrote:
+> Hello Balaton,
+>=20
+> Thank you for your thorough review! See my response below.
+>=20
+> > > static inline void gen_evmwsmiaa(DisasContext *ctx) {
+> > > -    TCGv_i64 acc =3D tcg_temp_new_i64();
+> > > -    TCGv_i64 tmp =3D tcg_temp_new_i64();
+> > > +    TCGv_i64 acc;
+> > > +    TCGv_i64 tmp;
+> > > +
+> > > +    if (unlikely(!ctx->spe_enabled)) {
+> > > +        gen_exception(ctx, POWERPC_EXCP_SPEU);
+> > > +        return;
+> > > +    }
+> >
+> > Isn't this missing here:
+> >
+> > acc =3D tcg_temp_new_i64();
+> > tmp =3D tcg_temp_new_i64();
+> >
+> > You've removed allocating temps but this hunk does not add it back afte=
+r the
+> > exception unlike others in this patch.
+>=20
+> I should have probably mentioned somewhere that this patch also
+> fixes a resource leak in that function. It is not very obvious
+> when looking at it as a patch, but if you take a look at the
+> original code, you will see that I removed these allocations on
+> purpose:
+>=20
+>
+>https://github.com/qemu/qemu/blob/d577dbaac7553767232faabb6a3e291aebd348ae=
+/target/ppc/translate/spe-impl.inc.c#L532
 
--- =
+Ok, can you please split the memory leak fix into a separate patch to
+make this easier to review.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1888601
+>=20
+> > static inline void gen_evmwsmiaa(DisasContext *ctx)
+> > {
+> >     TCGv_i64 acc =3D tcg_temp_new_i64();
+> >     TCGv_i64 tmp =3D tcg_temp_new_i64();
+> >
+> >     gen_evmwsmi(ctx);           /* rD :=3D rA * rB */
+> >
+> >     acc =3D tcg_temp_new_i64();
+> >     tmp =3D tcg_temp_new_i64();
+>=20
+> I apologize for not making this any more clear in my description.
+>=20
+> Let me know if this looks correct now, with the full context in mind.
+>=20
+> Thanks.
+>=20
+> LeoStella, LLC
+> A joint venture of Thales Alenia Space and Spaceflight Industries
+>=20
+> 12501 E Marginal Way S =E2=80=A2 Tukwila, WA 98168
+>=20
+> Proprietary Document: This document may contain trade secrets or otherwis=
+e proprietary and confidential information owned by LeoStella LLC. It is in=
+tended only for the individual addressee and may not be copied, distributed=
+, or otherwise disclosed without LeoStella LLC express prior written author=
+ization.
+> Export Controlled: This document may contain technical data whose export =
+is restricted by the Arms Export Control Act (Title 22, U.S.C., Sec 2751 et=
+ seq.) or the Export Administration Act of 1979, as amended, Title 50,U.S.C=
+=2E, app 2401 et seq. Violation of these export laws are subject to severe =
+criminal penalties. Recipient shall not export, re-export, or otherwise tra=
+nsfer or share this document to any foreign person (as defined by U.S. expo=
+rt laws) without advance written authorization from LeoStella LLC.
 
-Title:
-  QEMU v5.1.0-rc0/rc1 hang with nested virtualization
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Status in QEMU:
-  New
+--q9KOos5vDmpwPx9o
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  We're running Kata Containers using QEMU and with v5.1.0rc0 and rc1
-  have noticed a problem at startup where QEMu appears to hang. We are
-  not seeing this problem on our bare metal nodes and only on a VSI that
-  supports nested virtualization.
+-----BEGIN PGP SIGNATURE-----
 
-  We unfortunately see nothing at all in the QEMU logs to help
-  understand the problem and a hung process is just a guess at this
-  point.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8eSf0ACgkQbDjKyiDZ
+s5KP1A//QJAVt3wEuta/P2NaO3xXXLZhUfLkRTss75JLQbqQ6LZQ93RLbObw+AXS
+BHNDwLkr8SF+9clIO6SgyfYsy16pGXGXAgo1F6Pcx+OYfzZcmXrqr4yzVLYNQ2zF
+T+e7THPQ5sYKn+2hWi2x0QcFBmzH+mLtjRGtA/A30S3Ix8i0IjVLyZVh5mfSJP/w
+LoeQBUw0FIMx6AuLyBR2/8nfH412S/ZsDEUpMKkJXh4Njhw/qj12W91GUVMplPZ2
+MM4bEGE6CIY6C5I2Baim+r9BeQ24xcG+zaeG7H9G2+I/ryCyeSCnJQjzbDJv0W8q
+0hTiwdiNtfdDpOLj9n5COhJqEqIhIitESefR7GHEcA03Z/PuEHp4p9GZWaKrl1ia
+hVrPKxGCbJzM5wdW2KWeb34uwafztBtvZRevdRWDIK2czjLao3tJ+sQLA2zH2/rd
+bJTBqMrU6hiUQRtokBtcyaF7zisI1Z2dHMHpC6O99QjmqewWPnGLTM01OuQROD+R
+WzRJjagFkMBajIA/AHuerrlhoEOUSosG2PvP2JBLX+s/NPgDPnALvezs1vUTOX1L
+Cr5JPwnBX3KRqkmLv0wsGDi20HRC1PxU7c8oBdJPIqV/6DglCH9ti2MzpbldaiWs
++/7q/tpSAAUBl0Fs7fVymsk4PEtsEZynezDG5UnuBTIxJ83kMbA=
+=mM0x
+-----END PGP SIGNATURE-----
 
-  Using git bisect we first see the problem with...
-
-  ---
-
-  f19bcdfedd53ee93412d535a842a89fa27cae7f2 is the first bad commit
-  commit f19bcdfedd53ee93412d535a842a89fa27cae7f2
-  Author: Jason Wang <jasowang@redhat.com>
-  Date:   Wed Jul 1 22:55:28 2020 +0800
-
-  =C2=A0=C2=A0=C2=A0=C2=A0virtio-pci: implement queue_enabled method
-
-  =C2=A0=C2=A0=C2=A0=C2=A0With version 1, we can detect whether a queue is =
-enabled via
-  =C2=A0=C2=A0=C2=A0=C2=A0queue_enabled.
-
-  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Jason Wang <jasowang@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Cindy Lu <lulu@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <20200701145538.22333-5-lulu@redhat.c=
-om>
-  =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-  =C2=A0=C2=A0=C2=A0=C2=A0Acked-by: Jason Wang <jasowang@redhat.com>
-
-  =C2=A0hw/virtio/virtio-pci.c | 13 +++++++++++++
-  =C2=A01 file changed, 13 insertions(+)
-
-  ---
-
-  Reverting this commit (on top of 5.1.0-rc1) seems to work and prevent
-  the hanging.
-
-  ---
-
-  Here's how kata ends up launching qemu in our environment --
-  /opt/kata/bin/qemu-system-x86_64 -name sandbox-849df14c6065931adedb9d18bc=
-9260a6d896f1814a8c5cfa239865772f1b7a5f -uuid 6bec458e-1da7-4847-a5d7-5ab31d=
-4d2465 -machine pc,accel=3Dkvm,kernel_irqchip -cpu host,pmu=3Doff -qmp unix=
-:/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5=
-f/qmp.sock,server,nowait -m 4096M,slots=3D10,maxmem=3D30978M -device pci-br=
-idge,bus=3Dpci.0,id=3Dpci-bridge-0,chassis_nr=3D1,shpc=3Don,addr=3D2,romfil=
-e=3D -device virtio-serial-pci,disable-modern=3Dtrue,id=3Dserial0,romfile=
-=3D -device virtconsole,chardev=3Dcharconsole0,id=3Dconsole0 -chardev socke=
-t,id=3Dcharconsole0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f=
-1814a8c5cfa239865772f1b7a5f/console.sock,server,nowait -device virtio-scsi-=
-pci,id=3Dscsi0,disable-modern=3Dtrue,romfile=3D -object rng-random,id=3Drng=
-0,filename=3D/dev/urandom -device virtio-rng-pci,rng=3Drng0,romfile=3D -dev=
-ice virtserialport,chardev=3Dcharch0,id=3Dchannel0,name=3Dagent.channel.0 -=
-chardev socket,id=3Dcharch0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
-0a6d896f1814a8c5cfa239865772f1b7a5f/kata.sock,server,nowait -chardev socket=
-,id=3Dchar-396c5c3e19e29353,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
-0a6d896f1814a8c5cfa239865772f1b7a5f/vhost-fs.sock -device vhost-user-fs-pci=
-,chardev=3Dchar-396c5c3e19e29353,tag=3DkataShared,romfile=3D -netdev tap,id=
-=3Dnetwork-0,vhost=3Don,vhostfds=3D3:4,fds=3D5:6 -device driver=3Dvirtio-ne=
-t-pci,netdev=3Dnetwork-0,mac=3D52:ac:2d:02:1f:6f,disable-modern=3Dtrue,mq=
-=3Don,vectors=3D6,romfile=3D -global kvm-pit.lost_tick_policy=3Ddiscard -vg=
-a none -no-user-config -nodefaults -nographic -daemonize -object memory-bac=
-kend-file,id=3Ddimm1,size=3D4096M,mem-path=3D/dev/shm,share=3Don -numa node=
-,memdev=3Ddimm1 -kernel /opt/kata/share/kata-containers/vmlinuz-5.7.9-74 -i=
-nitrd /opt/kata/share/kata-containers/kata-containers-initrd_alpine_1.11.2-=
-6_agent.initrd -append tsc=3Dreliable no_timer_check rcupdate.rcu_expedited=
-=3D1 i8042.direct=3D1 i8042.dumbkbd=3D1 i8042.nopnp=3D1 i8042.noaux=3D1 nor=
-eplace-smp reboot=3Dk console=3Dhvc0 console=3Dhvc1 iommu=3Doff cryptomgr.n=
-otests net.ifnames=3D0 pci=3Dlastbus=3D0 debug panic=3D1 nr_cpus=3D4 agent.=
-use_vsock=3Dfalse scsi_mod.scan=3Dnone init=3D/usr/bin/kata-agent -pidfile =
-/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5f=
-/pid -D /run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa23986577=
-2f1b7a5f/qemu.log -smp 2,cores=3D1,threads=3D1,sockets=3D4,maxcpus=3D4
-
-  ---
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1888601/+subscriptions
+--q9KOos5vDmpwPx9o--
 
