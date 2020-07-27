@@ -2,128 +2,105 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADDC8C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:29:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FEE4C433EB
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:38:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 660E020663
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:29:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EFE152072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 11:38:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="hUUvpnKr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660E020663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W37v9Dpq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE152072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k01Jp-00033S-Nj
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 07:29:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53446)
+	id 1k01Ss-0005tn-7C
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 07:38:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k01JC-0002TR-KQ; Mon, 27 Jul 2020 07:28:42 -0400
-Received: from mail-eopbgr80103.outbound.protection.outlook.com
- ([40.107.8.103]:7284 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k01JA-0007zO-Aw; Mon, 27 Jul 2020 07:28:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SYJ2QC+noEOlJowLePHizOUBy5zQh0+s58U5/OH+O+4KmxksaGD1YoNq13RmK+UKPoKIqByEfPEeUErFZ+JQJA3ljA70TYp2DVSgJF6BjUg1LzL2SzYI0sK6udQAGu/mXBzZCVJnh1r2N00FQl4tkxZKIoUvxkW051lLrTbf7f/MxmAJsneh60gxSEiIYxHEJQfrutPMKclbFOsdMgPFwWTAsiK7X9QdudvY6WSCIr1usnBknFS7sCQl+YHhABgqC0Bt/Huyh6J2WhB4XA23wvwZZeiElzRyqLAIhWEvF5olEyzLmmv+N3mDCv2Cri/NZlKFgW3/LPs1OjogD0IxPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NsFoWWsxWzDBNFZA86zU8L7NRRBmnAntjuGh7cK5WP8=;
- b=IqvKxk27ad4qvo666b0ZLLlR5CgHLgZZ31++WUHMBSU4rRqKuxU3BmOQwn5iH5s8OJv5f+6DMsGyZFfmMJHfxCtVUmfiQFbCBLzsOoZcIvGVBHD4xicYMmv1lBWCD9HizHk1CsRDQN1Ge3njZSPdf7swbo2p4tcjwcTJpZKDtJ1bwjdaUyMAMLJGUQVW48EJliJJeJrqdls8/222ylxtBOU3pA1uPMX+SggFHULHI2imcmGzznaardNpWus8eH7PExIPcaOxATHSYdbr2KdkmVAe3FLbMbLbG8n8YGnRKSmF7wOdu825H51DXE51MWIm4S06kfznJe+4D6mPg7NccQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NsFoWWsxWzDBNFZA86zU8L7NRRBmnAntjuGh7cK5WP8=;
- b=hUUvpnKr+7mHVaruNmX++J6TH62OUncX6mde2ysCRi8kn+FBNp2ZCsnnlaLFBhirxKD0JO7sHmh3yDNSpy6grSHQah8tkVN/sTN5M9y3sAVcrNRoYQIO2D7knzMN5ARIh1Zr/CzAYoD7MGDMg2pNdBhyFaCcg9c0LeT8ozxZmk8=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4951.eurprd08.prod.outlook.com (2603:10a6:20b:eb::29)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.21; Mon, 27 Jul
- 2020 11:28:36 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a%4]) with mapi id 15.20.3216.033; Mon, 27 Jul 2020
- 11:28:36 +0000
-Subject: Re: [PATCH v3 15/21] migration/block-dirty-bitmap: relax error
- handling in incoming part
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20200724084327.15665-1-vsementsov@virtuozzo.com>
- <20200724084327.15665-16-vsementsov@virtuozzo.com>
- <20200727112337.GK3040@work-vm>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <dc79f27c-bb9d-e5f8-d29b-730d0e30df21@virtuozzo.com>
-Date: Mon, 27 Jul 2020 14:28:34 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200727112337.GK3040@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR06CA0106.eurprd06.prod.outlook.com
- (2603:10a6:208:fa::47) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k01SG-0005Uj-KW
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:38:04 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42582
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k01SD-0000bg-Pe
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 07:38:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595849880;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0FGlcWjU6+C8AuCIhiYFdIDdPXmGBRQurVOK6ah65XI=;
+ b=W37v9DpqJqZAxk3klmgbfSlg3GttjNtouVwc8Y8tQD9HZK8wY/fFSdTkra8ME8wxpNhW2o
+ y/NPQuXwDSfQEiMAHOqv2qX5Gcfmo0gPIntFylDVUSzdCyiuUezzn+RVFGLwPzxEqomZDT
+ NWfgkohPVZ61Nz1DppTauTB5gP1dzgU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-XAB0IcVQMjKXBFANzExJcQ-1; Mon, 27 Jul 2020 07:37:58 -0400
+X-MC-Unique: XAB0IcVQMjKXBFANzExJcQ-1
+Received: by mail-wm1-f69.google.com with SMTP id q15so6994935wmj.6
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 04:37:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=deFielYPvv/bZiEsafzeHFqZbfMpQ2UPhHPLYdTxIHk=;
+ b=YO+WxzK7r7ycRgxDd/erAtMLdQ93DqKuyP0u/mZP4VIwwyaAa++LF9A82P9uF9dnFj
+ 2jncI256Zc1f78Z7mpo1Jc10uzK0mUAb111h7+rLD6qnQ+wtEqpuQ9SGIWtsCnRaXDpf
+ o399rB6RReV/cZK526ozlqkYs2tJuuneay5PynaTFOwIZQWAe3mHBaqMt+AlPdEdLT+A
+ d0WkDlO/muer0QbqN/fNEoiwpMLcdx7UOw58PG05bbJ6w7HYj9LePiMq5oeRppluWELj
+ xsUCNR4sGI7OT/odLGge74bsGO4UaVOjHfcvBbf3XVUzsjV7VFPT2wGZ3Ql8yK1Uvbmv
+ VdLA==
+X-Gm-Message-State: AOAM533QAfIHZwNMd/i3Kv7Ux+1KYYIsj/7/yA6ZtYMJmbntjWZck4GT
+ BT+dmm8Z+YK+++l7kxHxua4QeM59oWHhl13OpH7a/LZMrrfUBqYlP33rdkumCUwopvSmI+zvlrv
+ OKxFeYM6h+k/Pf2o=
+X-Received: by 2002:a7b:cd83:: with SMTP id y3mr19753131wmj.105.1595849877539; 
+ Mon, 27 Jul 2020 04:37:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyC8LSTipBXGm9Ul9bRoWq+upyHZ0Ut55gzk1Ap5DgK521C422fnI/j9iNt+GCvNHP+Fcg+iw==
+X-Received: by 2002:a7b:cd83:: with SMTP id y3mr19753104wmj.105.1595849877185; 
+ Mon, 27 Jul 2020 04:37:57 -0700 (PDT)
+Received: from redhat.com ([192.117.173.58])
+ by smtp.gmail.com with ESMTPSA id n3sm12564666wre.29.2020.07.27.04.37.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Jul 2020 04:37:56 -0700 (PDT)
+Date: Mon, 27 Jul 2020 07:37:49 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: Inter-VM device emulation (call on Mon 20th July 2020)
+Message-ID: <20200727073311-mutt-send-email-mst@kernel.org>
+References: <86d42090-f042-06a1-efba-d46d449df280@arrikto.com>
+ <20200715112342.GD18817@stefanha-x1.localdomain>
+ <CAJSP0QU78mAK-DiOYXvTOEa3=CAEy1rQtyTBe5rrKDs=yfptAg@mail.gmail.com>
+ <874kq1w3bz.fsf@linaro.org>
+ <20200727101403.GF380177@stefanha-x1.localdomain>
+ <87h7tt45dr.fsf@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.2] (185.215.60.158) by
- AM0PR06CA0106.eurprd06.prod.outlook.com (2603:10a6:208:fa::47) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3216.23 via Frontend Transport; Mon, 27 Jul 2020 11:28:35 +0000
-X-Originating-IP: [185.215.60.158]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d583fdf5-90f9-4db9-9521-08d8322033a6
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4951:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4951FDAAD7C9C9D3A95859DEC1720@AM6PR08MB4951.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:220;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kcH1rHc8HyPUR3Fw/0YigHd+QXzSvejYc9f2gYyg5jDgUEUNSUPjNEHt2DDWBpVZKMiUEDgHE5zWyHdAHXfXh5hHOVc1Sp9ID+EoRuu0dMQthLLIe5PzxjtOsCzWJsHgvyo3jesv+gEdXmKSgZcirC3ucviyzTelCk11HSRDAIkTP69nIsk7nfy8goT7HnQkG82HdTTAt+v+Or4QY0Mcj7u3vO+hxekzviIYYFqWpWQgakGeDmz2yyd1KLWm3H7afYS0XzeTp/RpZ/X1XJI+krfyM/hcoYYaw4Bz0ziE9297D+tG7oQ7uV1Hp9Y8eGYxgqqd7jTa0OJY9sIwUT8L/POZY4YwtIOKwFOZQDMkIv+9zj8s7usuEK2Sw70nlX2iqbT9r/lxtYetVrLUp0BsBw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(396003)(366004)(39840400004)(346002)(376002)(136003)(66946007)(66476007)(66556008)(478600001)(7416002)(4326008)(6916009)(107886003)(8936002)(83380400001)(52116002)(6486002)(86362001)(31696002)(5660300002)(2616005)(16576012)(31686004)(316002)(36756003)(2906002)(8676002)(956004)(16526019)(26005)(186003)(14143004)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: RYYZD6BHLwRjN/fD+gfqiLwj9oCR7SMrrzRdACZtejbnjQ5vDpe4IYtyVjkIQjUj9luwgXXhrx7t7ICSgGr4jiTYYcAlRxrH1zSmd7pID94lxVQVd7KFnd2zPWVoil3d2Pj6JTKOdflYVApGFL4l13Sj6Jrq0IY4W0rsi4OjjnmTpgSDiiR+uJzulExNdZq7ClXiHRMhaDdzLFfhSmVo9g0g2UixCrRDvTlmRlbVUCf03UHPS1lgLS/tQz127cnrgSM1/3S/C2APCn0KHPNyiXN3L7GoxPmAaqXFsVUs7NBPnrJAniPDq5RdYZIarnGOxjXnNZzFo1boQQRcKruBvNcXcoBqNZ/LbZdWnX+BHgPTbPMRgB//rlp2lNnBYK6EiWW8UWyMlQ/1/BcPg9gQRN1RVU3ycyTCsODTSvj+kaH1NcepQ8fV4mf5FXt0ttXnvtJiaMvrWQD6zO//uv5o6EGfMgNce9G0ywX1H/9JyB9O86MLC3Y8mPyM5nUQdKNO
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d583fdf5-90f9-4db9-9521-08d8322033a6
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 11:28:36.0549 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m+8qbmb4QvMiO3XKwiZMoHBCATnd61ZHddYbko+AoREXHZ0WX7SOz9SMe7ImG0kkKY1eT0nxw5By1t5HJFPyTIB0Zs3lyiEQHofOeCkweQE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4951
-Received-SPF: pass client-ip=40.107.8.103;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 07:28:37
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <87h7tt45dr.fsf@linaro.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:46:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,297 +113,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
- quintela@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org,
- jsnow@redhat.com
+Cc: "John G. Johnson" <john.g.johnson@oracle.com>,
+ Jag Raman <jag.raman@oracle.com>, Andra-Irina Paraschiv <andraprs@amazon.com>,
+ kvm <kvm@vger.kernel.org>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Eric Auger <eric.auger@redhat.com>,
+ Maxime Coquelin <maxime.coquelin@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ Nikos Dragazis <ndragazis@arrikto.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-27.07.2020 14:23, Dr. David Alan Gilbert wrote:
-> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->> Bitmaps data is not critical, and we should not fail the migration (or
->> use postcopy recovering) because of dirty-bitmaps migration failure.
->> Instead we should just lose unfinished bitmaps.
->>
->> Still we have to report io stream violation errors, as they affect the
->> whole migration stream.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   migration/block-dirty-bitmap.c | 152 +++++++++++++++++++++++++--------
->>   1 file changed, 117 insertions(+), 35 deletions(-)
->>
->> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
->> index eb4ffeac4d..c24d4614bf 100644
->> --- a/migration/block-dirty-bitmap.c
->> +++ b/migration/block-dirty-bitmap.c
->> @@ -145,6 +145,15 @@ typedef struct DBMLoadState {
->>   
->>       bool before_vm_start_handled; /* set in dirty_bitmap_mig_before_vm_start */
->>   
->> +    /*
->> +     * cancelled
->> +     * Incoming migration is cancelled for some reason. That means that we
->> +     * still should read our chunks from migration stream, to not affect other
->> +     * migration objects (like RAM), but just ignore them and do not touch any
->> +     * bitmaps or nodes.
->> +     */
->> +    bool cancelled;
->> +
->>       GSList *bitmaps;
->>       QemuMutex lock; /* protect bitmaps */
->>   } DBMLoadState;
->> @@ -531,6 +540,10 @@ static int dirty_bitmap_load_start(QEMUFile *f, DBMLoadState *s)
->>       uint8_t flags = qemu_get_byte(f);
->>       LoadBitmapState *b;
->>   
->> +    if (s->cancelled) {
->> +        return 0;
->> +    }
->> +
->>       if (s->bitmap) {
->>           error_report("Bitmap with the same name ('%s') already exists on "
->>                        "destination", bdrv_dirty_bitmap_name(s->bitmap));
->> @@ -613,13 +626,47 @@ void dirty_bitmap_mig_before_vm_start(void)
->>       qemu_mutex_unlock(&s->lock);
->>   }
->>   
->> +static void cancel_incoming_locked(DBMLoadState *s)
->> +{
->> +    GSList *item;
->> +
->> +    if (s->cancelled) {
->> +        return;
->> +    }
->> +
->> +    s->cancelled = true;
->> +    s->bs = NULL;
->> +    s->bitmap = NULL;
->> +
->> +    /* Drop all unfinished bitmaps */
->> +    for (item = s->bitmaps; item; item = g_slist_next(item)) {
->> +        LoadBitmapState *b = item->data;
->> +
->> +        /*
->> +         * Bitmap must be unfinished, as finished bitmaps should already be
->> +         * removed from the list.
->> +         */
->> +        assert(!s->before_vm_start_handled || !b->migrated);
->> +        if (bdrv_dirty_bitmap_has_successor(b->bitmap)) {
->> +            bdrv_reclaim_dirty_bitmap(b->bitmap, &error_abort);
->> +        }
->> +        bdrv_release_dirty_bitmap(b->bitmap);
->> +    }
->> +
->> +    g_slist_free_full(s->bitmaps, g_free);
->> +    s->bitmaps = NULL;
->> +}
->> +
->>   static void dirty_bitmap_load_complete(QEMUFile *f, DBMLoadState *s)
->>   {
->>       GSList *item;
->>       trace_dirty_bitmap_load_complete();
->> -    bdrv_dirty_bitmap_deserialize_finish(s->bitmap);
->>   
->> -    qemu_mutex_lock(&s->lock);
->> +    if (s->cancelled) {
->> +        return;
->> +    }
->> +
->> +    bdrv_dirty_bitmap_deserialize_finish(s->bitmap);
->>   
->>       if (bdrv_dirty_bitmap_has_successor(s->bitmap)) {
->>           bdrv_reclaim_dirty_bitmap(s->bitmap, &error_abort);
->> @@ -637,8 +684,6 @@ static void dirty_bitmap_load_complete(QEMUFile *f, DBMLoadState *s)
->>               break;
->>           }
->>       }
->> -
->> -    qemu_mutex_unlock(&s->lock);
->>   }
->>   
->>   static int dirty_bitmap_load_bits(QEMUFile *f, DBMLoadState *s)
->> @@ -650,15 +695,32 @@ static int dirty_bitmap_load_bits(QEMUFile *f, DBMLoadState *s)
->>   
->>       if (s->flags & DIRTY_BITMAP_MIG_FLAG_ZEROES) {
->>           trace_dirty_bitmap_load_bits_zeroes();
->> -        bdrv_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte, nr_bytes,
->> -                                             false);
->> +        if (!s->cancelled) {
->> +            bdrv_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte,
->> +                                                 nr_bytes, false);
->> +        }
->>       } else {
->>           size_t ret;
->>           uint8_t *buf;
->>           uint64_t buf_size = qemu_get_be64(f);
->> -        uint64_t needed_size =
->> -            bdrv_dirty_bitmap_serialization_size(s->bitmap,
->> -                                                 first_byte, nr_bytes);
->> +        uint64_t needed_size;
->> +
->> +        buf = g_malloc(buf_size);
->> +        ret = qemu_get_buffer(f, buf, buf_size);
->> +        if (ret != buf_size) {
->> +            error_report("Failed to read bitmap bits");
->> +            g_free(buf);
->> +            return -EIO;
->> +        }
->> +
->> +        if (s->cancelled) {
->> +            g_free(buf);
->> +            return 0;
->> +        }
->> +
->> +        needed_size = bdrv_dirty_bitmap_serialization_size(s->bitmap,
->> +                                                           first_byte,
->> +                                                           nr_bytes);
->>   
->>           if (needed_size > buf_size ||
->>               buf_size > QEMU_ALIGN_UP(needed_size, 4 * sizeof(long))
->> @@ -667,15 +729,8 @@ static int dirty_bitmap_load_bits(QEMUFile *f, DBMLoadState *s)
->>               error_report("Migrated bitmap granularity doesn't "
->>                            "match the destination bitmap '%s' granularity",
->>                            bdrv_dirty_bitmap_name(s->bitmap));
->> -            return -EINVAL;
->> -        }
->> -
->> -        buf = g_malloc(buf_size);
->> -        ret = qemu_get_buffer(f, buf, buf_size);
->> -        if (ret != buf_size) {
->> -            error_report("Failed to read bitmap bits");
->> -            g_free(buf);
->> -            return -EIO;
->> +            cancel_incoming_locked(s);
->> +            return 0;
->>           }
->>   
->>           bdrv_dirty_bitmap_deserialize_part(s->bitmap, buf, first_byte, nr_bytes,
->> @@ -700,14 +755,16 @@ static int dirty_bitmap_load_header(QEMUFile *f, DBMLoadState *s)
->>               error_report("Unable to read node name string");
->>               return -EINVAL;
->>           }
->> -        s->bs = bdrv_lookup_bs(s->node_name, s->node_name, &local_err);
->> -        if (!s->bs) {
->> -            error_report_err(local_err);
->> -            return -EINVAL;
->> +        if (!s->cancelled) {
->> +            s->bs = bdrv_lookup_bs(s->node_name, s->node_name, &local_err);
->> +            if (!s->bs) {
->> +                error_report_err(local_err);
->> +                cancel_incoming_locked(s);
->> +            }
->>           }
->> -    } else if (!s->bs && !nothing) {
->> +    } else if (!s->bs && !nothing && !s->cancelled) {
->>           error_report("Error: block device name is not set");
->> -        return -EINVAL;
->> +        cancel_incoming_locked(s);
->>       }
->>   
->>       if (s->flags & DIRTY_BITMAP_MIG_FLAG_BITMAP_NAME) {
->> @@ -715,24 +772,38 @@ static int dirty_bitmap_load_header(QEMUFile *f, DBMLoadState *s)
->>               error_report("Unable to read bitmap name string");
->>               return -EINVAL;
->>           }
->> -        s->bitmap = bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
->> -
->> -        /* bitmap may be NULL here, it wouldn't be an error if it is the
->> -         * first occurrence of the bitmap */
->> -        if (!s->bitmap && !(s->flags & DIRTY_BITMAP_MIG_FLAG_START)) {
->> -            error_report("Error: unknown dirty bitmap "
->> -                         "'%s' for block device '%s'",
->> -                         s->bitmap_name, s->node_name);
->> -            return -EINVAL;
->> +        if (!s->cancelled) {
->> +            s->bitmap = bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
->> +
->> +            /*
->> +             * bitmap may be NULL here, it wouldn't be an error if it is the
->> +             * first occurrence of the bitmap
->> +             */
->> +            if (!s->bitmap && !(s->flags & DIRTY_BITMAP_MIG_FLAG_START)) {
->> +                error_report("Error: unknown dirty bitmap "
->> +                             "'%s' for block device '%s'",
->> +                             s->bitmap_name, s->node_name);
->> +                cancel_incoming_locked(s);
->> +            }
->>           }
->> -    } else if (!s->bitmap && !nothing) {
->> +    } else if (!s->bitmap && !nothing && !s->cancelled) {
->>           error_report("Error: block device name is not set");
->> -        return -EINVAL;
->> +        cancel_incoming_locked(s);
->>       }
->>   
->>       return 0;
->>   }
->>   
->> +/*
->> + * dirty_bitmap_load
->> + *
->> + * Load sequence of dirty bitmap chunks. Return error only on fatal io stream
->> + * violations. On other errors just cancel bitmaps incoming migration and return
->> + * 0.
->> + *
->> + * Note, than when incoming bitmap migration is canceled, we still must read all
->> + * our chunks (and just ignore them), to not affect other migration objects.
->> + */
->>   static int dirty_bitmap_load(QEMUFile *f, void *opaque, int version_id)
->>   {
->>       DBMLoadState *s = &((DBMState *)opaque)->load;
->> @@ -741,12 +812,19 @@ static int dirty_bitmap_load(QEMUFile *f, void *opaque, int version_id)
->>       trace_dirty_bitmap_load_enter();
->>   
->>       if (version_id != 1) {
->> +        qemu_mutex_lock(&s->lock);
->> +        cancel_incoming_locked(s);
->> +        qemu_mutex_unlock(&s->lock);
->>           return -EINVAL;
->>       }
->>   
->>       do {
->> +        qemu_mutex_lock(&s->lock);
+On Mon, Jul 27, 2020 at 11:30:24AM +0100, Alex Bennée wrote:
 > 
-> Would QEMU_LOCK_GUARD(&s->lock)  work there?
-> It avoids the need to catch the unlock on each of the failure cases.
+> Stefan Hajnoczi <stefanha@redhat.com> writes:
 > 
-
-Yes it should work, thanks. I just didn't know about this thing.
-
-
+> > On Tue, Jul 21, 2020 at 11:49:04AM +0100, Alex Bennée wrote:
+> >> Stefan Hajnoczi <stefanha@gmail.com> writes:
+> >> > 2. Alexander Graf's idea for a new Linux driver that provides an
+> >> > enforcing software IOMMU. This would be a character device driver that
+> >> > is mmapped by the device emulation process (either vhost-user-style on
+> >> > the host or another VMM for inter-VM device emulation). The Driver VMM
+> >> > can program mappings into the device and the page tables in the device
+> >> > emulation process will be updated. This way the Driver VMM can share
+> >> > memory specific regions of guest RAM with the device emulation process
+> >> > and revoke those mappings later.
+> >> 
+> >> I'm wondering if there is enough plumbing on the guest side so a guest
+> >> can use the virtio-iommu to mark out exactly which bits of memory the
+> >> virtual device can have access to? At a minimum the virtqueues need to
+> >> be accessible and for larger transfers maybe a bounce buffer. However
+> >> for speed you want as wide as possible mapping but no more. It would be
+> >> nice for example if a block device could load data directly into the
+> >> guests block cache (zero-copy) but without getting a view of the kernels
+> >> internal data structures.
+> >
+> > Maybe Jean-Philippe or Eric can answer that?
+> >
+> >> Another thing that came across in the call was quite a lot of
+> >> assumptions about QEMU and Linux w.r.t virtio. While our project will
+> >> likely have Linux as a guest OS we are looking specifically at enabling
+> >> virtio for Type-1 hypervisors like Xen and the various safety certified
+> >> proprietary ones. It is unlikely that QEMU would be used as the VMM for
+> >> these deployments. We want to work out what sort of common facilities
+> >> hypervisors need to support to enable virtio so the daemons can be
+> >> re-usable and maybe setup with a minimal shim for the particular
+> >> hypervisor in question.
+> >
+> > The vhost-user protocol together with the backend program conventions
+> > define the wire protocol and command-line interface (see
+> > docs/interop/vhost-user.rst).
+> >
+> > vhost-user is already used by other VMMs today. For example,
+> > cloud-hypervisor implements vhost-user.
 > 
->>           ret = dirty_bitmap_load_header(f, s);
->>           if (ret < 0) {
->> +            cancel_incoming_locked(s);
->> +            qemu_mutex_unlock(&s->lock);
->>               return ret;
->>           }
->>   
->> @@ -763,8 +841,12 @@ static int dirty_bitmap_load(QEMUFile *f, void *opaque, int version_id)
->>           }
->>   
->>           if (ret) {
->> +            cancel_incoming_locked(s);
->> +            qemu_mutex_unlock(&s->lock);
->>               return ret;
->>           }
->> +
->> +        qemu_mutex_unlock(&s->lock);
->>       } while (!(s->flags & DIRTY_BITMAP_MIG_FLAG_EOS));
->>   
->>       trace_dirty_bitmap_load_success();
->> -- 
->> 2.21.0
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Ohh that's a new one for me. I see it is a KVM only project but it's
+> nice to see another VMM using the common rust-vmm backend. There is
+> interest in using rust-vmm to implement VMMs for type-1 hypervisors but
+> we need to work out if there are two many type-2 concepts backed into
+> the lower level rust crates.
 > 
+> > I'm sure there is room for improvement, but it seems like an incremental
+> > step given that vhost-user already tries to cater for this scenario.
+> >
+> > Are there any specific gaps you have identified?
+> 
+> Aside from the desire to limit the shared memory footprint between the
+> backend daemon and a guest not yet.
 
+So it's certainly nice for security but not really a requirement for a
+type-1 HV, right?
 
--- 
-Best regards,
-Vladimir
+> I suspect the eventfd mechanism might just end up being simulated by the
+> VMM as a result of whatever comes from the type-1 interface indicating a
+> doorbell has been rung. It is after all just a FD you consume numbers
+> over right?
+
+Does not even have to be numbers. We need a way to be woken up, a way to
+stop/start listening for wakeups and a way to detect that there was a
+wakeup while we were not listening.
+
+Though there are special tricks for offloads where we poke through
+layers in order to map things directly to hardware.
+
+> Not all setups will have an equivalent of a Dom0 "master" guest to do
+> orchestration. Highly embedded are likely to have fixed domains created
+> as the firmware/hypervisor start up.
+> 
+> >
+> > Stefan
+> 
+> 
+> -- 
+> Alex Bennée
+
 
