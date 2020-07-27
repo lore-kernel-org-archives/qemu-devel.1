@@ -2,81 +2,129 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE16DC433F2
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CB92C433E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:46:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A723120719
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:42:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A723120719
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E03F42070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 17:46:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="dYCeXNy7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E03F42070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k078R-0002Mo-VM
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 13:42:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51086)
+	id 1k07CX-0004Ub-5b
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 13:46:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k077R-0001Wm-Cw
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:40:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49482)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k077M-0005Nt-SO
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 13:40:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k077J-0005t2-VM
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 17:40:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BA2EE2E8010
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 17:40:49 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k07Bd-0003ff-Lx; Mon, 27 Jul 2020 13:45:18 -0400
+Received: from mail-vi1eur05on2104.outbound.protection.outlook.com
+ ([40.107.21.104]:59873 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k07BZ-00062q-TJ; Mon, 27 Jul 2020 13:45:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nMzXIy4PgjrUlF2rJBc1yyUOOgDDeCLQv695a/ISOBKmbMXVjnf/DsOOkax7fXmSOqmch9LblnCn3kgJqxbpCdvaVkpqP6cGRGNT8kSF6wh4d1ORcDq4L2tk5WtncUaQSUGXhCJGzYt19nn461cq2pkjrbhvmZFjgmyj3ynUEdzfgwfNrnpy/10xG3evMi1Wo0Evv6/Gr8T1/+oq9YvGTRkepPYEemWyz6zQ4Kg23/pftRYpx20k//hFxcvCFNSCnMVztLe4+wUNoX2QDRzmJ06GGQSJpaOJ0pUETB8wrkRGYvgifiCOEbYUCE6RFpsM/QwQP3ffcfW9SO7P7YVteA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ceBaObO+imxY0tzqUt3SM/M90klFkZkQyAZNlK0TMYk=;
+ b=JSzmXiZHvV+jWr12QzXNYf0Udup/pBUqjW164p6ZzhX1UtYCS+mcozFRFoB+MW+L7mLKc7AzWAmgGdSOZlrKZgwRpKceIlnAUD9Re0fdOgai361bPWz/sIRaEwKIlvQ3Q95RbsDC5v3USray6J/1ElIMQCSQ8QDw3EXA3WXdonhs37KHABu1xGaO8PcBwyl5L4VmPaxdh4YHDHrBRDC3j9vtD7zPjp+1e+2FflEEubCZs7AF0bbzpp7jWiwPnq7n0jr3Z/buxTmif9yHlf7QBFi9J5dgo+fh3nYfovQ/y7BTfB3tadR5aOU0zI2kd7PI0inVIXhX3Y1DyR4bEdhT8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ceBaObO+imxY0tzqUt3SM/M90klFkZkQyAZNlK0TMYk=;
+ b=dYCeXNy7zGNKHqtHr+sf5hgL7YIgs2hLNetJs6+oMpIQ+tJGhxUQcPs+nAJDtUKMTifImUjtHMkLFnUaeFD6AyE+CFwGo6RPxlW3ko4ZMrXeVEDMKcz2Rq1jkTZh0JYMr7ozJBJ6U3o5CQVNq9W+5fYy6kIqtWTbIv7ldTSqgDk=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM5PR0801MB1651.eurprd08.prod.outlook.com (2603:10a6:203:39::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.20; Mon, 27 Jul
+ 2020 17:45:10 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3216.033; Mon, 27 Jul 2020
+ 17:45:09 +0000
+Subject: Re: [PATCH v7 44/47] iotests: Add filter commit test cases
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-45-mreitz@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <2c1c30da-a1e5-3bc6-0620-50ebdccb7dfc@virtuozzo.com>
+Date: Mon, 27 Jul 2020 20:45:04 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <20200625152215.941773-45-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-GB
+X-ClientProxiedBy: AM0P190CA0028.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::38) To AM6PR08MB4070.eurprd08.prod.outlook.com
+ (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Jul 2020 17:33:26 -0000
-From: Igor <1888923@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: bandwidth hmat hmat-lb latency
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: imammedo rvdixit23
-X-Launchpad-Bug-Reporter: Vishnu Dixit (rvdixit23)
-X-Launchpad-Bug-Modifier: Igor (imammedo)
-References: <159566199879.4877.1642879405857907906.malonedeb@wampee.canonical.com>
-Message-ID: <20200727193326.03525888@redhat.com>
-Subject: Re: [Bug 1888923] [NEW] Configured Memory access latency and
- bandwidth not taking effect
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8cb5db235a874be10808287b7bd02f8e6dc596d8
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 13:40:50
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.82) by
+ AM0P190CA0028.EURP190.PROD.OUTLOOK.COM (2603:10a6:208:190::38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3216.22 via Frontend Transport; Mon, 27 Jul 2020 17:45:05 +0000
+X-Originating-IP: [109.252.114.82]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c0ec9041-e94e-48a1-760b-08d83254ce7b
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB1651:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB165184A09D265DCD1F6C5935F4720@AM5PR0801MB1651.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:873;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: c5KLil4Vag03FnXGylGPOdRCVkZUC08Z2FaGULlMQGFmXdGnsQ+/RMszFDZyqCzPWbH996ovt7/aWMShbJaSlbUwFzYrB/cVfo+ihaF7r3L/9J4Dzj9/pCJF4ht48rMNe6F3fwt/j3eoqbmNBRI82uDlKPnZiVDjC8pznTu805HDh3tfwM4zGLF3pbL+nRfpCXl124UaJRuDGiZhCgb1pomeiDCEb8NnohV76EngJE91RL3tQ7nV2sYILHoNsxl9x7BZT4wSq0t0NC7rxi1LVrFh07UZirwfSVNAVKCT/qWXib8SDVpqfgiGLczlQ0+mPLBUu2ZtHfqZaMWSWU3UFl2Mcir5nblrf2Shvv12yYJ1ZQnTFG04X181bFOINYy/
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(376002)(346002)(39840400004)(366004)(396003)(6506007)(83380400001)(36756003)(52116002)(53546011)(31696002)(31686004)(66476007)(66556008)(86362001)(66946007)(5660300002)(4326008)(2906002)(186003)(54906003)(6512007)(6486002)(478600001)(316002)(2616005)(26005)(956004)(8936002)(8676002)(16526019)(44832011)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: LN7a18njthA1RQKf53sncTaKYjlObQfAwM2l04BRXLUXsunCMD6Eh5mS5AQk1VUpmJzbQWIH/aNmuwggsAEYXaQc0OMIz0VUduB4A3PXxWIiB67j+MCUT/bRHEsrft0v4AqGSNl4u9MQ/HUJuCD0705iUfRmOpPV+DWPOArEIMNyuSU4spgqzRz5nnkn5QD9krIzPibivKvw+2YPTwKYndLGaggwJURHH8QNfJxbsEM4AHOiAdjmRV/sPW1vhWxm09zeGqwUK7+h7p7yJQMvIVQQqBdchMk3q73GOBJKhuQN5UqzHfkYXAD16CNYMPhd6ew3bgl9BzuoDPznjiGWi//6ND7k50SvQlbQLDmh/yFV8SdXD9xAacNRX4GFB2XsG7OJLB+kcRxi8SPC90IOpSzfSGYiTE7IevSJyU80wtYjBx1bVJcRbINZHc3JhzenM9jdJeUUQx91+cWwOq9oAjXhpTKZvqM3x51qydTw3rpMWSRW1AZSNOrxjLcMXBYf
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0ec9041-e94e-48a1-760b-08d83254ce7b
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2020 17:45:09.7813 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3c9wMwrUYF0FA64HY9iglcnOSafDqWQQSTvbu6nm/hQCoYNKgldIs09Qzhrp2/NNMkaPh1/TUkjlv91ZPpysbYN0ZeA4+5SlnsWv8Hcqrrk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1651
+Received-SPF: pass client-ip=40.107.21.104;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 13:45:10
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,531 +133,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1888923 <1888923@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200727173326.Py2JCwoJFIEjS0y6E1YgfSVDauo4MlxgMwBIrMDUmB8@z>
 
-On Sat, 25 Jul 2020 07:26:38 -0000
-Vishnu Dixit <1888923@bugs.launchpad.net> wrote:
-
-> Public bug reported:
-> =
-
-> I was trying to configure latencies and bandwidths between nodes in a
-> NUMA emulation using QEMU 5.0.0.
-> =
-
-> Host : Ubuntu 20.04 64 bit
-> Guest : Ubuntu 18.04 64 bit
-> =
-
-> The machine configured has 2 nodes. Each node has 2 CPUs and has been
-> allocated 3GB of memory. The memory access latencies and bandwidths for
-> a local access (i.e from initiator 0 to target 0, and from initiator 1
-> to target 1) are set as 40ns and 10GB/s respectively. The memory access
-> latencies and bandwidths for a remote access (i.e from initiator 1 to
-> target 0, and from initiator 0 to target 1) are set as 80ns and 5GB/s
-> respectively.
-> =
-
-> The command line launch is as follows.
-> =
-
-> sudo x86_64-softmmu/qemu-system-x86_64  \
-> -machine hmat=3Don \
-> -boot c \
-> -enable-kvm \
-> -m 6G,slots=3D2,maxmem=3D7G \
-> -object memory-backend-ram,size=3D3G,id=3Dm0 \
-> -object memory-backend-ram,size=3D3G,id=3Dm1 \
-> -numa node,nodeid=3D0,memdev=3Dm0 \
-> -numa node,nodeid=3D1,memdev=3Dm1 \
-> -smp 4,sockets=3D4,maxcpus=3D4  \
-> -numa cpu,node-id=3D0,socket-id=3D0 \
-> -numa cpu,node-id=3D0,socket-id=3D1 \
-> -numa cpu,node-id=3D1,socket-id=3D2 \
-> -numa cpu,node-id=3D1,socket-id=3D3 \
-> -numa dist,src=3D0,dst=3D1,val=3D20 \
-> -net nic \
-> -net user \
-> -hda testing.img \
-> -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D40 \
-> -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D10G \
-> -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D80 \
-> -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D5G \
-> -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D80 \
-> -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D5G \
-> -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D40 \
-> -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D10G \
-> =
-
-> Then the latencies and bandwidths between the nodes were tested using
-> the Intel Memory Latency Checker v3.9
-> (https://software.intel.com/content/www/us/en/develop/articles/intelr-
-> memory-latency-checker.html). But the obtained results did not match the
-> configuration. The following are the results obtained.
-> =
-
-> Latency_matrix with idle latencies (in ns)
-> =
-
-> Numa Node
-> . .0. . .1.
-> 0 36.2 36.4
-> 1 34.9 35.4
-> =
-
-> Bandwidth_matrix with memory bandwidths (in MB/s)
-> =
-
-> Numa Node
-> . . .0. . . .1. =
-
-> 0 15167.1 15308.9
-> 1 15226.0 15234.0
-> =
-
-> A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D from=
- lmbench to
-> measure the memory read latencies. This also gave results which did not
-> match the config.
-> =
-
-> Any information on why the config latency and bandwidth values are not
-> applied, would be appreciated.
-
-There is no information about host hardware, so I'd onldy hazard a guess
-that host is non NUMA machine so all guest RAM and CPUs are in the same
-latency domain, so that's why you are seeing pretty much the same timings.
-
-QEMU nor KMV do not simullate HW latencies at all, all that is configured
-with '-numa hmat-lb' is intended for guest OS consumption as a hint for
-smarter memory allocation and it's on to user to pin CPUs and RAM to
-concrete host NUMA nodes and use  host's values in '-numa hmat-lb' to
-actually get performance benefits from it on 'NUMA' machine.
-On non NUMA host it's rather pointless except of the cases where one
-needs to fake NUMA config (like testing some aspects of NUMA related code
-in guest OS).
-
-> =
-
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
-> =
-
-> =
-
-> ** Tags: bandwidth hmat hmat-lb latency
-> =
-
-> ** Description changed:
-> =
-
->   I was trying to configure latencies and bandwidths between nodes in a
->   NUMA emulation using QEMU 5.0.0.
->   =
-
->   Host : Ubuntu 20.04 64 bit
->   Guest : Ubuntu 18.04 64 bit
-> -  =
-
-> - The machine configured has 2 nodes. Each node has 2 CPUs and has been a=
-llocated 3GB of memory. The memory access latencies and bandwidths for a lo=
-cal access (i.e from initiator 0 to target 0, and from initiator 1 to targe=
-t 1) are set as 40ns and 10GB/s respectively. The memory access latencies a=
-nd bandwidths for a remote access (i.e from initiator 1 to target 0, and fr=
-om initiator 0 to target 1) are set as 80ns and 5GB/s respectively. =
-
-> + =
-
-> + The machine configured has 2 nodes. Each node has 2 CPUs and has been
-> + allocated 3GB of memory. The memory access latencies and bandwidths for
-> + a local access (i.e from initiator 0 to target 0, and from initiator 1
-> + to target 1) are set as 40ns and 10GB/s respectively. The memory access
-> + latencies and bandwidths for a remote access (i.e from initiator 1 to
-> + target 0, and from initiator 0 to target 1) are set as 80ns and 5GB/s
-> + respectively.
->   =
-
->   The command line launch is as follows.
->   =
-
->   sudo x86_64-softmmu/qemu-system-x86_64  \
->   -machine hmat=3Don \
->   -boot c \
->   -enable-kvm \
->   -m 6G,slots=3D2,maxmem=3D7G \
->   -object memory-backend-ram,size=3D3G,id=3Dm0 \
->   -object memory-backend-ram,size=3D3G,id=3Dm1 \
->   -numa node,nodeid=3D0,memdev=3Dm0 \
->   -numa node,nodeid=3D1,memdev=3Dm1 \
->   -smp 4,sockets=3D4,maxcpus=3D4  \
->   -numa cpu,node-id=3D0,socket-id=3D0 \
->   -numa cpu,node-id=3D0,socket-id=3D1 \
->   -numa cpu,node-id=3D1,socket-id=3D2 \
->   -numa cpu,node-id=3D1,socket-id=3D3 \
->   -numa dist,src=3D0,dst=3D1,val=3D20 \
->   -net nic \
->   -net user \
->   -hda testing.img \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->   =
-
->   Then the latencies and bandwidths between the nodes were tested using
->   the Intel Memory Latency Checker v3.9
->   (https://software.intel.com/content/www/us/en/develop/articles/intelr-
->   memory-latency-checker.html). But the obtained results did not match the
->   configuration. The following are the results obtained.
->   =
-
->   Latency_matrix with idle latencies (in ns)
->   =
-
->   Numa
-> - Node  0     1
-> + lat node0 node1
->   0    36.2 36.4
->   1    34.9 35.4
->   =
-
->   Bandwidth_matrix with memory bandwidths (in MB/s)
->   =
-
-> - Numa
-> - Node 0       1
-> + Numa Node =
-
-> + bw node0 .bw node1
->   0 15167.1 15308.9
->   1 15226.0 15234.0
->   =
-
->   A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D fr=
-om lmbench to
->   measure the memory read latencies. This also gave results which did not
->   match the config.
->   =
-
->   Any information on why the config latency and bandwidth values are not
->   applied, would be appreciated.
-> =
-
-> ** Description changed:
-> =
-
->   I was trying to configure latencies and bandwidths between nodes in a
->   NUMA emulation using QEMU 5.0.0.
->   =
-
->   Host : Ubuntu 20.04 64 bit
->   Guest : Ubuntu 18.04 64 bit
->   =
-
->   The machine configured has 2 nodes. Each node has 2 CPUs and has been
->   allocated 3GB of memory. The memory access latencies and bandwidths for
->   a local access (i.e from initiator 0 to target 0, and from initiator 1
->   to target 1) are set as 40ns and 10GB/s respectively. The memory access
->   latencies and bandwidths for a remote access (i.e from initiator 1 to
->   target 0, and from initiator 0 to target 1) are set as 80ns and 5GB/s
->   respectively.
->   =
-
->   The command line launch is as follows.
->   =
-
->   sudo x86_64-softmmu/qemu-system-x86_64  \
->   -machine hmat=3Don \
->   -boot c \
->   -enable-kvm \
->   -m 6G,slots=3D2,maxmem=3D7G \
->   -object memory-backend-ram,size=3D3G,id=3Dm0 \
->   -object memory-backend-ram,size=3D3G,id=3Dm1 \
->   -numa node,nodeid=3D0,memdev=3Dm0 \
->   -numa node,nodeid=3D1,memdev=3Dm1 \
->   -smp 4,sockets=3D4,maxcpus=3D4  \
->   -numa cpu,node-id=3D0,socket-id=3D0 \
->   -numa cpu,node-id=3D0,socket-id=3D1 \
->   -numa cpu,node-id=3D1,socket-id=3D2 \
->   -numa cpu,node-id=3D1,socket-id=3D3 \
->   -numa dist,src=3D0,dst=3D1,val=3D20 \
->   -net nic \
->   -net user \
->   -hda testing.img \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->   =
-
->   Then the latencies and bandwidths between the nodes were tested using
->   the Intel Memory Latency Checker v3.9
->   (https://software.intel.com/content/www/us/en/develop/articles/intelr-
->   memory-latency-checker.html). But the obtained results did not match the
->   configuration. The following are the results obtained.
->   =
-
->   Latency_matrix with idle latencies (in ns)
->   =
-
-> - Numa
-> + Numa Node
->   lat node0 node1
->   0    36.2 36.4
->   1    34.9 35.4
->   =
-
->   Bandwidth_matrix with memory bandwidths (in MB/s)
->   =
-
-> - Numa Node =
-
-> - bw node0 .bw node1
-> + Numa Node
-> + bw node0  bw node1
->   0 15167.1 15308.9
->   1 15226.0 15234.0
->   =
-
->   A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D fr=
-om lmbench to
->   measure the memory read latencies. This also gave results which did not
->   match the config.
->   =
-
->   Any information on why the config latency and bandwidth values are not
->   applied, would be appreciated.
-> =
-
-> ** Description changed:
-> =
-
->   I was trying to configure latencies and bandwidths between nodes in a
->   NUMA emulation using QEMU 5.0.0.
->   =
-
->   Host : Ubuntu 20.04 64 bit
->   Guest : Ubuntu 18.04 64 bit
->   =
-
->   The machine configured has 2 nodes. Each node has 2 CPUs and has been
->   allocated 3GB of memory. The memory access latencies and bandwidths for
->   a local access (i.e from initiator 0 to target 0, and from initiator 1
->   to target 1) are set as 40ns and 10GB/s respectively. The memory access
->   latencies and bandwidths for a remote access (i.e from initiator 1 to
->   target 0, and from initiator 0 to target 1) are set as 80ns and 5GB/s
->   respectively.
->   =
-
->   The command line launch is as follows.
->   =
-
->   sudo x86_64-softmmu/qemu-system-x86_64  \
->   -machine hmat=3Don \
->   -boot c \
->   -enable-kvm \
->   -m 6G,slots=3D2,maxmem=3D7G \
->   -object memory-backend-ram,size=3D3G,id=3Dm0 \
->   -object memory-backend-ram,size=3D3G,id=3Dm1 \
->   -numa node,nodeid=3D0,memdev=3Dm0 \
->   -numa node,nodeid=3D1,memdev=3Dm1 \
->   -smp 4,sockets=3D4,maxcpus=3D4  \
->   -numa cpu,node-id=3D0,socket-id=3D0 \
->   -numa cpu,node-id=3D0,socket-id=3D1 \
->   -numa cpu,node-id=3D1,socket-id=3D2 \
->   -numa cpu,node-id=3D1,socket-id=3D3 \
->   -numa dist,src=3D0,dst=3D1,val=3D20 \
->   -net nic \
->   -net user \
->   -hda testing.img \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D80 \
->   -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D5G \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-latency,latency=3D40 \
->   -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Da=
-ccess-bandwidth,bandwidth=3D10G \
->   =
-
->   Then the latencies and bandwidths between the nodes were tested using
->   the Intel Memory Latency Checker v3.9
->   (https://software.intel.com/content/www/us/en/develop/articles/intelr-
->   memory-latency-checker.html). But the obtained results did not match the
->   configuration. The following are the results obtained.
->   =
-
->   Latency_matrix with idle latencies (in ns)
->   =
-
->   Numa Node
-> - lat node0 node1
-> - 0    36.2 36.4
-> - 1    34.9 35.4
-> + . .0. . .1.
-> + 0 36.2 36.4
-> + 1 34.9 35.4
->   =
-
->   Bandwidth_matrix with memory bandwidths (in MB/s)
->   =
-
->   Numa Node
-> - bw node0  bw node1
-> + . . .0. . . .1. =
-
->   0 15167.1 15308.9
->   1 15226.0 15234.0
->   =
-
->   A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D fr=
-om lmbench to
->   measure the memory read latencies. This also gave results which did not
->   match the config.
->   =
-
->   Any information on why the config latency and bandwidth values are not
->   applied, would be appreciated.
+On 25.06.2020 18:22, Max Reitz wrote:
+> This patch adds some tests on how commit copes with filter nodes.
 >
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   tests/qemu-iotests/040     | 177 +++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/040.out |   4 +-
+>   2 files changed, 179 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+> index 32c82b4ec6..e7fa244738 100755
+> --- a/tests/qemu-iotests/040
+> +++ b/tests/qemu-iotests/040
+> @@ -713,6 +713,183 @@ class TestErrorHandling(iotests.QMPTestCase):
+>           self.assertTrue(iotests.compare_images(mid_img, backing_img, fmt2='raw'),
+>                           'target image does not match source after commit')
+>   
+> +class TestCommitWithFilters(iotests.QMPTestCase):
+> +    img0 = os.path.join(iotests.test_dir, '0.img')
+> +    img1 = os.path.join(iotests.test_dir, '1.img')
+> +    img2 = os.path.join(iotests.test_dir, '2.img')
+> +    img3 = os.path.join(iotests.test_dir, '3.img')
+> +
+> +    def do_test_io(self, read_or_write):
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1888923
+The method defenition could be moved down after the ones of setUp() and 
+tearDown().
 
-Title:
-  Configured Memory access latency and bandwidth not taking effect
 
-Status in QEMU:
-  New
+> +        for index, pattern_file in enumerate(self.pattern_files):
+> +            result = qemu_io('-f', iotests.imgfmt,
+> +                             '-c', '{} -P {} {}M 1M'.format(read_or_write,
+> +                                                            index + 1, index),
 
-Bug description:
-  I was trying to configure latencies and bandwidths between nodes in a
-  NUMA emulation using QEMU 5.0.0.
 
-  Host : Ubuntu 20.04 64 bit
-  Guest : Ubuntu 18.04 64 bit
+The Python3 format string f'{rad_or_write} ..' might be used instead of 
+the .format one.
 
-  The machine configured has 2 nodes. Each node has 2 CPUs and has been
-  allocated 3GB of memory. The memory access latencies and bandwidths
-  for a local access (i.e from initiator 0 to target 0, and from
-  initiator 1 to target 1) are set as 40ns and 10GB/s respectively. The
-  memory access latencies and bandwidths for a remote access (i.e from
-  initiator 1 to target 0, and from initiator 0 to target 1) are set as
-  80ns and 5GB/s respectively.
+Andrey
 
-  The command line launch is as follows.
 
-  sudo x86_64-softmmu/qemu-system-x86_64  \
-  -machine hmat=3Don \
-  -boot c \
-  -enable-kvm \
-  -m 6G,slots=3D2,maxmem=3D7G \
-  -object memory-backend-ram,size=3D3G,id=3Dm0 \
-  -object memory-backend-ram,size=3D3G,id=3Dm1 \
-  -numa node,nodeid=3D0,memdev=3Dm0 \
-  -numa node,nodeid=3D1,memdev=3Dm1 \
-  -smp 4,sockets=3D4,maxcpus=3D4  \
-  -numa cpu,node-id=3D0,socket-id=3D0 \
-  -numa cpu,node-id=3D0,socket-id=3D1 \
-  -numa cpu,node-id=3D1,socket-id=3D2 \
-  -numa cpu,node-id=3D1,socket-id=3D3 \
-  -numa dist,src=3D0,dst=3D1,val=3D20 \
-  -net nic \
-  -net user \
-  -hda testing.img \
-  -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D40 \
-  -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D10G \
-  -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D80 \
-  -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D5G \
-  -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D80 \
-  -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D5G \
-  -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-latency,latency=3D40 \
-  -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
-ess-bandwidth,bandwidth=3D10G \
+> +                             pattern_file)
+> +            self.assertFalse('Pattern verification failed' in result)
+> +
+> +    def setUp(self):
 
-  Then the latencies and bandwidths between the nodes were tested using
-  the Intel Memory Latency Checker v3.9
-  (https://software.intel.com/content/www/us/en/develop/articles/intelr-
-  memory-latency-checker.html). But the obtained results did not match
-  the configuration. The following are the results obtained.
+...
 
-  Latency_matrix with idle latencies (in ns)
 
-  Numa Node
-  . .0. . .1.
-  0 36.2 36.4
-  1 34.9 35.4
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
-  Bandwidth_matrix with memory bandwidths (in MB/s)
 
-  Numa Node
-  . . .0. . . .1. =
-
-  0 15167.1 15308.9
-  1 15226.0 15234.0
-
-  A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D from=
- lmbench to
-  measure the memory read latencies. This also gave results which did
-  not match the config.
-
-  Any information on why the config latency and bandwidth values are not
-  applied, would be appreciated.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1888923/+subscriptions
 
