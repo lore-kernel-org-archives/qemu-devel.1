@@ -2,80 +2,82 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E167C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3DAC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:27:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCA31206E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:26:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66D6320719
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:27:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fgBbOtqQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA31206E7
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VL2us8VM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66D6320719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k05wu-0004Rx-4m
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 12:26:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59346)
+	id 1k05yL-0005gf-MR
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 12:27:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k05w4-0003sY-Ni
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 12:25:08 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46019)
+ id 1k05xH-0004tF-17
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 12:26:23 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55364)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k05w3-0003D6-0Z
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 12:25:08 -0400
-Received: by mail-ot1-x342.google.com with SMTP id h1so12719610otq.12
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 09:25:06 -0700 (PDT)
+ id 1k05xF-0003XT-4x
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 12:26:22 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 9so14692373wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 09:26:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=X1tUj9iOGSXwys1DTzj/R4q5ca6RREikxzkmG4NDDus=;
- b=fgBbOtqQnKkpzkufmeA1UxQ25Kz/I25KVzhJTCdZIM8LjcvuAbt4L1FaUx35BRQZeV
- GeiyJozfefS+YMvk7LvDhKR7NzjQl+H1sJAHClSLANtNfDybYIpBhBoxCWhGC5ys+6N8
- CwzoqSOHe4ewD+WXVI+UUnbmc669Q0QvZi1h7DMG1+b57Me1MeR41XolHJcRnLKLTJb+
- O7h+ej/hZ+sTmb8ELs4lwvaENhFYSlhT3FDbq+iaHvvsgtutf7BJYOSr1DRtGP5rued3
- th/nyc/dO50ZQr+nhx0iigwnV8Zt9hM+JffJyVlA71G6AkkcSufYqJLAJc5sd+cRnGB2
- xZPw==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ZKtxYGps5VFXsStAbHuqacbKwp4q81OIlKsuS5wAl+8=;
+ b=VL2us8VMejHzZOFPHGi4LXD2WIw+WIvRsYOcjemVjYX+S5Qwedyw0b7MpSdx4vA5aE
+ Z7o35QMusBvPTCHMmM0YXNWfmPj/7xpqKuS/xQK1o0B75emfHYxS3hp19n0ai9DT/jmy
+ UbGOCIz3edOQ7VCjf7Gc5+D17eGY37wH4lBPZGlvtxIzuv3Oz8XouuSCfAtFc5B//r9o
+ tEe/FEKg0MBLuZ5sl4OwDnwXFICG3wNTTqTFpikyasetlcf591ioqzKf43YRypR4wfV1
+ llZeyK2r8zGdvczO9PAOJ1RROd/aCBMdUtTYP+Y5+fI7CkTT3GDZjsz9rHxyeY76PTfs
+ Yhzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=X1tUj9iOGSXwys1DTzj/R4q5ca6RREikxzkmG4NDDus=;
- b=ApyLts3d3V0tlQQSo/OgixfPC4PTbmliaMH42GA1Mg6SUE8swIG/bBHhj9I5677cU+
- ybovMFikSwoD9JxJvzLBZ1Glslu+M06HJrU/hCFJFnw+eCfRozGAXv/XevW0UnXxEH6M
- CW9yFJLqPPajuKcmOoYIshFqxHBhqLdwtt/7LHB4ZmhYCj9/nDIlMyKqhAk76XmPjBqn
- u0c5SP5OSMJ016iiKAneUNRXG9GumlzC3kd7JLl3XOzUnsghB8aDKkSeN4vl3p0Z0quT
- nAP3ev7CjKR1/u0dIJ2YBI0adm5oxsYwtVo2KFE1mEJnfwtdabKTuZCINC0S0z2kKUY6
- cTHQ==
-X-Gm-Message-State: AOAM531nEPv08UEiERnmFSU7EGg4DAtkvFdHIXDB3DbYUDW+CROVDfwE
- PzPv8ZLaYxHiYjtBAHoyJmKG9BN45DLtlNb8gPrUkQ==
-X-Google-Smtp-Source: ABdhPJxU6JT0Qe7s8ZbYKRttVEyYmd7+J9KG/F7Gf2B3wa4qZkF1/LNwPSChVEnMuWr//4XdoFKO2ZNIllplhRI0VMU=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id
- v19mr20925866ota.91.1595867105204; 
- Mon, 27 Jul 2020 09:25:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200727122357.31263-1-alex.bennee@linaro.org>
-In-Reply-To: <20200727122357.31263-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ZKtxYGps5VFXsStAbHuqacbKwp4q81OIlKsuS5wAl+8=;
+ b=Pk4fZUjlMMKrQ4ipDQYyhaM5+SBPuehYAxUKf+wp5xJKqgz2WGspg6OZJMU8tLYsI4
+ 2h7NMeFIgm6F9d/Npym6LtPdbzaqcGsKlwm2E3L8GiMFvqDB8KIo9+xiK4BLSgHd7oED
+ Lddg1arCcH2XdNcanjDGSpn5i0/+BrZYtZKU7rbSrwWDVE58fzgC4yp7f0ysKbmzV1H0
+ 16Rgd+EpcCjAbyEUoiEaSUMFqSAW0B33yU5xgUYqS5SkNRqgtU8xcvY1xMhDzmTbaKMS
+ cUXOSQ+1aNXKa3Fcfj9+J6zH4fHUhpGIpHKwWo67WBVHF+bfubJRfzK8sNjUF123qKv1
+ o/Bw==
+X-Gm-Message-State: AOAM531c+bAB4RiZmB7zsG7U0HwLmOnZuP4cbA2OkydiITn5BZXPRk68
+ AQ9HJPGNAbyVlifqcsu4rosOgJJJ6W9Q7w==
+X-Google-Smtp-Source: ABdhPJwdvcGztkaQ0D5FIuH7Qr2rxjrxQv4QWrkJV4oEmC+HvdLrAjz7/xh5RuhabUHXGjnAiEbrtg==
+X-Received: by 2002:a1c:7fd3:: with SMTP id a202mr79168wmd.67.1595867179573;
+ Mon, 27 Jul 2020 09:26:19 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id g16sm12875278wrs.88.2020.07.27.09.26.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 27 Jul 2020 09:26:18 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Jul 2020 17:24:54 +0100
-Message-ID: <CAFEAcA9n2L0YpwBWpSfSBC6gCNvwSLeKijzAAvq8rqssHBhtpA@mail.gmail.com>
-Subject: Re: [PULL 00/16] various fixes for rc2 (semihosting, tcg, docker,
- tests/vm)
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH for-5.1] hw/arm/netduino2,
+ netduinoplus2: Set system_clock_scale
+Date: Mon, 27 Jul 2020 17:26:17 +0100
+Message-Id: <20200727162617.26227-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -83,8 +85,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,45 +99,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 27 Jul 2020 at 13:23, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> The following changes since commit 194f8ca825854abef3aceca1ed7eb5a53b0875=
-1f:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20200725' into =
-staging (2020-07-26 17:17:58 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-fixes-for-rc2-270720-1
->
-> for you to fetch changes up to 4a70232b1d26b0d73e1bce60b2c3bdb7e4279d16:
->
->   tests/vm: add shutdown timeout in basevm.py (2020-07-27 09:41:58 +0100)
->
-> ----------------------------------------------------------------
-> Various fixes for rc2:
->
->   - get shippable working again
->   - semihosting bug fixes
->   - tweak tb-size handling for low memory machines
->   - i386 compound literal float fix
->   - linux-user MAP_FIXED->MAP_NOREPLACE on fallback
->   - docker binfmt_misc fixes
->   - linux-user nanosleep fix
->   - tests/vm drain console fixes
+The netduino2 and netduinoplus2 boards forgot to set the system_clock_scale
+global, which meant that if guest code used the systick timer in "use
+the processor clock" mode it would hang because time never advances.
 
+Set the global to match the documented CPU clock speed of these boards.
+Judging by the data sheet this is slightly simplistic because the
+SoC allows configuration of the SYSCLK source and frequency via the
+RCC (reset and clock control) module, but we don't model that.
 
-Applied, thanks.
+Fixes: https://bugs.launchpad.net/qemu/+bug/1876187
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+NB: tested with "make check" only...
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
+ hw/arm/netduino2.c     | 10 ++++++++++
+ hw/arm/netduinoplus2.c | 10 ++++++++++
+ 2 files changed, 20 insertions(+)
 
--- PMM
+diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
+index 79e19392b56..8f103341443 100644
+--- a/hw/arm/netduino2.c
++++ b/hw/arm/netduino2.c
+@@ -30,10 +30,20 @@
+ #include "hw/arm/stm32f205_soc.h"
+ #include "hw/arm/boot.h"
+ 
++/* Main SYSCLK frequency in Hz (120MHz) */
++#define SYSCLK_FRQ 120000000ULL
++
+ static void netduino2_init(MachineState *machine)
+ {
+     DeviceState *dev;
+ 
++    /*
++     * TODO: ideally we would model the SoC RCC and let it handle
++     * system_clock_scale, including its ability to define different
++     * possible SYSCLK sources.
++     */
++    system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
++
+     dev = qdev_new(TYPE_STM32F205_SOC);
+     qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m3"));
+     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+diff --git a/hw/arm/netduinoplus2.c b/hw/arm/netduinoplus2.c
+index 958d21dd9f9..68abd3ec69d 100644
+--- a/hw/arm/netduinoplus2.c
++++ b/hw/arm/netduinoplus2.c
+@@ -30,10 +30,20 @@
+ #include "hw/arm/stm32f405_soc.h"
+ #include "hw/arm/boot.h"
+ 
++/* Main SYSCLK frequency in Hz (168MHz) */
++#define SYSCLK_FRQ 168000000ULL
++
+ static void netduinoplus2_init(MachineState *machine)
+ {
+     DeviceState *dev;
+ 
++    /*
++     * TODO: ideally we would model the SoC RCC and let it handle
++     * system_clock_scale, including its ability to define different
++     * possible SYSCLK sources.
++     */
++    system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
++
+     dev = qdev_new(TYPE_STM32F405_SOC);
+     qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m4"));
+     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+-- 
+2.20.1
+
 
