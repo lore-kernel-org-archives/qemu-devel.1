@@ -2,83 +2,78 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14166C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54ED8C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:52:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D19CE20672
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:51:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DCEE2074F
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 09:52:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZLqq1VAX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D19CE20672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYC5vXdp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DCEE2074F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1jzzmm-0000ZW-65
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 05:51:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39576)
+	id 1jzzoY-0001bJ-Dh
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 05:52:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jzzlf-00085l-D9
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:49:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44166
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jzznl-00017e-82
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:52:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28974
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1jzzld-0006Rs-OR
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:49:59 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1jzznj-0006ls-Ii
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 05:52:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595843397;
+ s=mimecast20190719; t=1595843526;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=COGym/nbml5D3yPiSuh3NU5NBGAzuqHHeWZXFQuOHEY=;
- b=ZLqq1VAXUTJHQ82KE2gg+7EKtwd+fA37+0dqekM7WUM81d2jA6aQHtfNDSPyR7paLLiRvG
- rzLlzjYpwy2DKJxqTzhoalij10TM8Gsd5JweZVpqF8FTcNDUC8nQ+tEwTsvTq/lu+DLSid
- ruuUz17Js+VqUDFFg99yxQrLJPM/Qkc=
+ bh=UYvUHP1p0h8U8f9tNI0L0NvII6qftKDfhgkNO1cuR9E=;
+ b=ZYC5vXdprasd2HOu9+jgsdtfudTIKxbC2F5VzxBySvKHtBUDlCHjOTyDsj9sD/1KhEyKfL
+ 2pgUnpdbP47BzbyYv95haddfcQy9l5tJF/k+yYYCHTc/i99o+EUOXqAi464COx2vv1lv17
+ iPltw/fCfN01tFgUOKiKkU61SSswOZ4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-GOHVvdy-P32vBw1Nh493uA-1; Mon, 27 Jul 2020 05:49:55 -0400
-X-MC-Unique: GOHVvdy-P32vBw1Nh493uA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-484-9_eEvXklMF-_J3NGllcXhg-1; Mon, 27 Jul 2020 05:52:02 -0400
+X-MC-Unique: 9_eEvXklMF-_J3NGllcXhg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CA59106B248
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 09:49:54 +0000 (UTC)
-Received: from [10.72.12.200] (ovpn-12-200.pek2.redhat.com [10.72.12.200])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 40DD85FC36;
- Mon, 27 Jul 2020 09:49:48 +0000 (UTC)
-Subject: Re: [PATCH] virtio-net: check the existence of peer before accesing
- its config
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200727074328.2279-1-jasowang@redhat.com>
- <20200727053954-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <b5a42ac8-b3cf-d52e-298a-d957a9e8cb1d@redhat.com>
-Date: Mon, 27 Jul 2020 17:49:47 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 439AD80046F;
+ Mon, 27 Jul 2020 09:52:01 +0000 (UTC)
+Received: from work-vm (ovpn-114-135.ams2.redhat.com [10.36.114.135])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EAC572699;
+ Mon, 27 Jul 2020 09:51:55 +0000 (UTC)
+Date: Mon, 27 Jul 2020 10:51:53 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v3 10/21] migration/block-dirty-bitmap: move mutex init
+ to dirty_bitmap_mig_init
+Message-ID: <20200727095153.GG3040@work-vm>
+References: <20200724084327.15665-1-vsementsov@virtuozzo.com>
+ <20200724084327.15665-11-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20200727053954-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+In-Reply-To: <20200724084327.15665-11-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:44:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -101,101 +96,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Cindy Lu <lulu@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
+ quintela@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> No reasons to keep two public init functions.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
-On 2020/7/27 下午5:41, Michael S. Tsirkin wrote:
-> On Mon, Jul 27, 2020 at 03:43:28PM +0800, Jason Wang wrote:
->> We try to get config from peer unconditionally which may lead NULL
->> pointer dereference. Add a check before trying to access the config.
->>
->> Fixes: 108a64818e69b ("vhost-vdpa: introduce vhost-vdpa backend")
->> Cc: Cindy Lu <lulu@redhat.com>
->> Tested-by: Cornelia Huck <cohuck@redhat.com>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> I am a bit lost here. Isn't this invoked
-> when guest attempts to read the config?
-> With no peer, what do we return to guest?
+Yes so I think that means the initialisation of that lock is a little
+later in startup, but OK
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-With no peer, it just work as in the past (read from the qemu's own 
-emulated config space). With a vDPA as its peer, it tries to read it 
-from vhost-vDPA.
-
-
-> A code comment might be helpful here.
-
-
-Does something like above help?
-
-Thanks
-
-
->
->> ---
->>   hw/net/virtio-net.c | 22 +++++++++++-----------
->>   1 file changed, 11 insertions(+), 11 deletions(-)
->>
->> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->> index 4895af1cbe..935b9ef5c7 100644
->> --- a/hw/net/virtio-net.c
->> +++ b/hw/net/virtio-net.c
->> @@ -125,6 +125,7 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
->>   {
->>       VirtIONet *n = VIRTIO_NET(vdev);
->>       struct virtio_net_config netcfg;
->> +    NetClientState *nc = qemu_get_queue(n->nic);
->>   
->>       int ret = 0;
->>       memset(&netcfg, 0 , sizeof(struct virtio_net_config));
->> @@ -142,13 +143,12 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
->>                    VIRTIO_NET_RSS_SUPPORTED_HASHES);
->>       memcpy(config, &netcfg, n->config_size);
->>   
->> -    NetClientState *nc = qemu_get_queue(n->nic);
->> -    if (nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
->> +    if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
->>           ret = vhost_net_get_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
->> -                             n->config_size);
->> -    if (ret != -1) {
->> -        memcpy(config, &netcfg, n->config_size);
->> -    }
->> +                                   n->config_size);
->> +        if (ret != -1) {
->> +            memcpy(config, &netcfg, n->config_size);
->> +        }
->>       }
->>   }
->>   
->> @@ -156,6 +156,7 @@ static void virtio_net_set_config(VirtIODevice *vdev, const uint8_t *config)
->>   {
->>       VirtIONet *n = VIRTIO_NET(vdev);
->>       struct virtio_net_config netcfg = {};
->> +    NetClientState *nc = qemu_get_queue(n->nic);
->>   
->>       memcpy(&netcfg, config, n->config_size);
->>   
->> @@ -166,11 +167,10 @@ static void virtio_net_set_config(VirtIODevice *vdev, const uint8_t *config)
->>           qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
->>       }
->>   
->> -    NetClientState *nc = qemu_get_queue(n->nic);
->> -    if (nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
->> -        vhost_net_set_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
->> -                               0, n->config_size,
->> -                        VHOST_SET_CONFIG_TYPE_MASTER);
->> +    if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
->> +        vhost_net_set_config(get_vhost_net(nc->peer),
->> +                             (uint8_t *)&netcfg, 0, n->config_size,
->> +                             VHOST_SET_CONFIG_TYPE_MASTER);
->>         }
->>   }
->>   
->> -- 
->> 2.20.1
+> ---
+>  migration/migration.h          | 1 -
+>  migration/block-dirty-bitmap.c | 6 +-----
+>  migration/migration.c          | 2 --
+>  3 files changed, 1 insertion(+), 8 deletions(-)
+> 
+> diff --git a/migration/migration.h b/migration/migration.h
+> index f617960522..ab20c756f5 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -335,7 +335,6 @@ void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
+>  void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
+>  
+>  void dirty_bitmap_mig_before_vm_start(void);
+> -void init_dirty_bitmap_incoming_migration(void);
+>  void migrate_add_address(SocketAddress *address);
+>  
+>  int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque);
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+> index 01a536d7d3..4b67e4f4fb 100644
+> --- a/migration/block-dirty-bitmap.c
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -148,11 +148,6 @@ typedef struct LoadBitmapState {
+>  static GSList *enabled_bitmaps;
+>  QemuMutex finish_lock;
+>  
+> -void init_dirty_bitmap_incoming_migration(void)
+> -{
+> -    qemu_mutex_init(&finish_lock);
+> -}
+> -
+>  static uint32_t qemu_get_bitmap_flags(QEMUFile *f)
+>  {
+>      uint8_t flags = qemu_get_byte(f);
+> @@ -801,6 +796,7 @@ static SaveVMHandlers savevm_dirty_bitmap_handlers = {
+>  void dirty_bitmap_mig_init(void)
+>  {
+>      QSIMPLEQ_INIT(&dirty_bitmap_mig_state.dbms_list);
+> +    qemu_mutex_init(&finish_lock);
+>  
+>      register_savevm_live("dirty-bitmap", 0, 1,
+>                           &savevm_dirty_bitmap_handlers,
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 2ed9923227..1c61428988 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -165,8 +165,6 @@ void migration_object_init(void)
+>      qemu_sem_init(&current_incoming->postcopy_pause_sem_dst, 0);
+>      qemu_sem_init(&current_incoming->postcopy_pause_sem_fault, 0);
+>  
+> -    init_dirty_bitmap_incoming_migration();
+> -
+>      if (!migration_object_check(current_migration, &err)) {
+>          error_report_err(err);
+>          exit(1);
+> -- 
+> 2.21.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
