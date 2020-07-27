@@ -2,88 +2,107 @@ Return-Path: <SRS0=cfdO=BG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2CEFC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DEB9C433E5
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:38:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C9C320729
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:37:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Grg3ttvZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C9C320729
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0417020729
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 16:38:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0417020729
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k067g-00016z-OQ
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 12:37:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34386)
+	id 1k068z-00028I-88
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 12:38:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k066y-0000eA-Kv
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 12:36:24 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48663
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k066v-0005MC-VF
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 12:36:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595867779;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/xhto1tB5l5+bFJBKJYK4eVjHyHAxqb5LKdDUfWup1U=;
- b=Grg3ttvZYIhboVbyouZk9N0Xhh/qyq//F7BfGZMbKcklPV00YIxVW3xL+DBPlTfyy6StIa
- laJErEXIIQgwK4eDVGoqoZvMn+WlT/bbO7p5BoBYU3U77bA7Tb+vXpWPTH7P7VkSnCvw13
- +MYAYgniUQzymDCQirOxcJgN2KElcqc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-11C5Fy5-MAa9EARv9_LnSQ-1; Mon, 27 Jul 2020 12:36:16 -0400
-X-MC-Unique: 11C5Fy5-MAa9EARv9_LnSQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD31580BCAE;
- Mon, 27 Jul 2020 16:36:15 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3BAC01001B2C;
- Mon, 27 Jul 2020 16:36:14 +0000 (UTC)
-Date: Mon, 27 Jul 2020 18:36:12 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v2 3/3] hw/386: Fix uninitialized memory with -device
- and CPU hotplug
-Message-ID: <20200727183612.684fe574@redhat.com>
-In-Reply-To: <159362467562.36204.11074523095942812006.stgit@naples-babu.amd.com>
-References: <159362436285.36204.986406297373871949.stgit@naples-babu.amd.com>
- <159362467562.36204.11074523095942812006.stgit@naples-babu.amd.com>
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1k068O-0001dq-KK; Mon, 27 Jul 2020 12:37:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36226)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1k068M-0005cJ-NF; Mon, 27 Jul 2020 12:37:52 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06RGasEd047857; Mon, 27 Jul 2020 12:37:48 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32htsc5a8k-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 27 Jul 2020 12:37:48 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06RG3sDh051104;
+ Mon, 27 Jul 2020 12:37:47 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32htsc5a83-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 27 Jul 2020 12:37:47 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06RG9btN032309;
+ Mon, 27 Jul 2020 16:37:46 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma05wdc.us.ibm.com with ESMTP id 32gcy9ajss-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 27 Jul 2020 16:37:46 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
+ [9.57.199.108])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06RGbjPG14221966
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 27 Jul 2020 16:37:45 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 20EB7B2067;
+ Mon, 27 Jul 2020 16:37:45 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BDAFDB2064;
+ Mon, 27 Jul 2020 16:37:42 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.15.127])
+ by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+ Mon, 27 Jul 2020 16:37:42 +0000 (GMT)
+Subject: Re: [RFC PATCH] s390x/pci: vfio-pci breakage with disabled mem
+ enforcement
+To: Pierre Morel <pmorel@linux.ibm.com>,
+ Alex Williamson <alex.williamson@redhat.com>
+References: <1595517236-17823-1-git-send-email-mjrosato@linux.ibm.com>
+ <20200723102916.7cf15b43@w520.home>
+ <0481c77e-f71f-886b-9b0a-41529eb139ee@linux.ibm.com>
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <2a76a044-10ea-b77a-0c20-64748ea7a86c@linux.ibm.com>
+Date: Mon, 27 Jul 2020 12:37:41 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 01:46:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <0481c77e-f71f-886b-9b0a-41529eb139ee@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-27_11:2020-07-27,
+ 2020-07-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 phishscore=0
+ spamscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
+ impostorscore=0 bulkscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007270111
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 12:37:48
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,126 +115,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, ehabkost@redhat.com,
- rth@twiddle.net
+Cc: schnelle@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 01 Jul 2020 12:31:15 -0500
-Babu Moger <babu.moger@amd.com> wrote:
-
-> Noticed the following command failure while testing CPU hotplug.
+On 7/27/20 11:40 AM, Pierre Morel wrote:
 > 
-> $ qemu-system-x86_64 -machine q35,accel=kvm -smp 1,maxcpus=2,
->   cores=1, threads=1,sockets=2 -cpu EPYC -device EPYC-x86_64-
->   cpu,core-id=0,socket-id=1,thread-id=0
 > 
->   qemu-system-x86_64: -device EPYC-x86_64-cpu,core-id=0,socket-id=1,
->   thread-id=0: Invalid CPU [socket: 21855, die: 0, core: 0, thread: 0]
->   with APIC ID 21855, valid index range 0:1
+> On 2020-07-23 18:29, Alex Williamson wrote:
+>> On Thu, 23 Jul 2020 11:13:55 -0400
+>> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+>>
+>>> I noticed that after kernel commit abafbc55 'vfio-pci: Invalidate mmaps
+>>> and block MMIO access on disabled memory' vfio-pci via qemu on s390x
+>>> fails spectacularly, with errors in qemu like:
+>>>
+>>> qemu-system-s390x: vfio_region_read(0001:00:00.0:region0+0x0, 4) 
+>>> failed: Input/output error
+>>>
+>>>  From read to bar 0 originating out of 
+>>> hw/s390x/s390-pci-inst.c:zpci_read_bar().
+>>>
+>>> So, I'm trying to figure out how to get vfio-pci happy again on 
+>>> s390x.  From
+>>> a bit of tracing, we seem to be triggering the new trap in
+>>> __vfio_pci_memory_enabled().  Sure enough, if I just force this 
+>>> function to
+>>> return 'true' as a test case, things work again.
+>>> The included patch attempts to enforce the setting, which restores 
+>>> everything
+>>> to working order but also triggers vfio_bar_restore() in the 
+>>> process....  So
+>>> this isn't the right answer, more of a proof-of-concept.
+>>>
+>>> @Alex: Any guidance on what needs to happen to make qemu-s390x happy 
+>>> with this
+>>> recent kernel change?
+>>
+>> Bummer!  I won't claim to understand s390 PCI, but if we have a VF
+>> exposed to the "host" (ie. the first level where vfio-pci is being
+>> used), but we can't tell that it's a VF, how do we know whether the
+>> memory bit in the command register is unimplemented because it's a VF
+>> or unimplemented because the device doesn't support MMIO?  How are the
+>> device ID, vendor ID, and BAR registers virtualized to the host?  Could
+>> the memory enable bit also be emulated by that virtualization, much
+>> like vfio-pci does for userspace?  If the other registers are
+>> virtualized, but these command register bits are left unimplemented, do
+>> we need code to deduce that we have a VF based on the existence of MMIO
+>> BARs, but lack of memory enable bit?  Thanks,
+>>
+>> Alex
 > 
-> This happens because APIC ID is calculated using uninitialized memory.
-> This is happening after the addition of new field node_id in X86CPUTopoIDs
-> structure. The node_id field is uninitialized while calling
-> apicid_from_topo_ids. The problem is discussed in the thread below.
-> https://lore.kernel.org/qemu-devel/20200602171838.GG577771@habkost.net/
+> Alex, Matt,
 > 
-> Fix the problem by initializing the node_id from the device being added.
+> in s390 we have the possibility to assign a virtual function to a 
+> logical partition as function 0.
+> In this case it can not be treated as a virtual function but must be 
+> treated as a physical function.
+> This is currently working very well.
+> However, these functions do not set PCI_COMMAND_MEMORY as we need.
 > 
-> Fixes:
-> Link: https://bugzilla.redhat.com/show_bug.cgi?id=1828750
+
+Thanks for the explanation.
+
+> Shouldn't we fix this inside the kernel, to keep older QMEU working?
+
+Yes, ideally.
+
 > 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
->  hw/i386/pc.c |   10 ++++++++++
->  1 file changed, 10 insertions(+)
+> Then would it be OK to add a new bit/boolean inside the 
+> pci_dev/vfio_pci_device like, is_detached_vfn, that we could set during 
+> enumeration and test inside __vfio_pci_memory_enabled() to return true?
 > 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index e613b2299f..aa9fb48834 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1553,6 +1553,15 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->              cpu->die_id = 0;
->          }
->  
-so this is from 
- 'if (cpu->apic_id == UNASSIGNED_APIC_ID) {'
-branch, meaning cpu comes from -device/device_add
+> In the enumeration we have the possibility to know if the function is a 
+> HW/Firmware virtual function on devfn 0 or if it is created by SRIOV.
+> 
+> It seems an easy fix without side effects.
+> 
+> What do you think?
+> 
 
-> +        /*
-> +         * If node_id is not set, initialize it to zero for now. If the user
-> +         * does not pass the correct node in case of numa configuration, it
-> +         * will be rejected eventually.
-> +         */
-> +        if (cpu->node_id < 0) {
-which means that user hasn't provided 'node-id',
-in which case we should error out asking for specifying NUMA node-id along with other options
+ From my perspective at least, this would resolve the issue and is 
+in-line with the sort of suggestion Alex floated the other day of "do
+we need code to deduce that we have a VF based on the existence of MMIO
+BARs, but lack of memory enable bit?" -- it just sounds like a different 
+way of coming to the conclusion.  Effectively we need a way to say: 'for 
+the purposes of memory_enable detection, treat this thing like a virtual 
+function because it is one, even though it doesn't always act like one'
 
-(1)
-However that's not enough since by contract query-hotpluggbale-cpus shall provide all attributes
-necessary to hotplug CPU, which makes node-id is not an optional in case of EPYC cpu.
-So we need to initialize ms->possible_cpus->cpus[i].props.[has_]node_id by the time
-we start creating CPUs.
-
-here are 2 variants:
-(2)
-  * single node:
-      nodes_per_pkg 1 and ms->smp.sockets == 1
-
-    since it's the only node and mapping of RAM/CPU is unambigiuos,
-    we can deal with it by moving auto_enable_numa into MachineState
-    and enabling it in case EPYC CPU is used
-
-  * multiple nodes:
-      - ms->smp.sockets > 1
-      - nodes_per_pkg > 1
-    we can't make up NUMA nodes automatically, and have to ask user to use -numa options
-    to provide nodes along with CPU/RAM mapping. So in case NUMA wasn't configured
-    explicitly, we can only error out. (that also applies to CPU created implicitly by board '-smp X')
-
-(3) Once user supplied mapping we need to checks that it matches EPYC topology,
-
-
-(4) As for CPUID, current code in CPUID_Fn8000001E_ECX
-      if (nodes <= 4) { /* here nodes is nodes_per_pkg */
-         / goes by stricly spec /
-         *ecx = ((nodes - 1) << 8) | (topo_ids.pkg_id << 2) | topo_ids.node_id;
-         /* makes up system wide NUMA node IDs which happen to match system wide
-            NUMA node IDs created by -numa, when -smp + -numa produces nodes_per_pkg is in that range,
-            basically user has no idea when this happens
-          */
-      } else {
-         /* makeup new algorithm system wide NUMA node IDs generation for out of spec behaviour */
-      }
-     
-    problem with both branches is that might lead to inconsistentcy between system wide
-    NUMA node id in CPUID_Fn8000001E_ECX and the one configured with -numa which goes to
-    SRAT ACPI table and should go to CPU::node-id property.
-
-    Considering that out of spec behaviour is allowed we probably schould replace both branches
-    with
-       *ecx = ((nodes - 1) << 8) | cpu->node_id;
-    which ensures consistency of system wide NUMA node ids and add checks for max nodes/max node id.
-
-checks could be done early in cpu's realize() function.
-
-
-
-> +            cpu->node_id = 0;
-> +        }
-
->          if (cpu->socket_id < 0) {
->              error_setg(errp, "CPU socket-id is not set");
->              return;
-> @@ -1587,6 +1596,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->          }
->  
->          topo_ids.pkg_id = cpu->socket_id;
-> +        topo_ids.node_id = cpu->node_id;
->          topo_ids.die_id = cpu->die_id;
->          topo_ids.core_id = cpu->core_id;
->          topo_ids.smt_id = cpu->thread_id;
+> 
+>>
+>>> @Nilkas/@Pierre: I wonder if this might be related to host device 
+>>> is_virtfn?
+>>> I note that my host device lspci output looks like:
+>>>
+>>> 0000:00:00.0 Ethernet controller: Mellanox Technologies MT27710 
+>>> Family [ConnectX-4 Lx Virtual Function]
+>>>
+>>> But the device is not marked as is_virtfn..  Otherwise, Alex's fix
+>>> from htps://lkml.org/lkml/2020/6/25/628 should cover the case.
+>>>
+> 
+> I do not think we can fix this problem by forcing the is_virtfn bit.
+> AFAIU, our HW virtual function works a lot like a physical function.
+> 
+>>>
+>>>
+>>> Matthew Rosato (1):
+>>>    s390x/pci: Enforce PCI_COMMAND_MEMORY for vfio-pci
+>>>
+>>>   hw/s390x/s390-pci-inst.c | 10 ++++++++++
+>>>   1 file changed, 10 insertions(+)
+>>>
+>>
+>>
+> 
+> Regards,
+> Pierre
 > 
 
 
