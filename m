@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDBEC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 22:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE81C433E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 22:21:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FEBF20809
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 22:16:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FEBF20809
+	by mail.kernel.org (Postfix) with ESMTPS id 92F7A2075D
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 Jul 2020 22:21:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92F7A2075D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0BPz-0002Rg-HG
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 18:16:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51212)
+	id 1k0BVB-0004NS-GH
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 18:21:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k0BPO-00021J-Nb
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 18:15:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60860)
+ id 1k0BUJ-0003nS-MV
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 18:20:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33910)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k0BPM-0006qT-Ia
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 18:15:46 -0400
+ id 1k0BUH-0007Pd-KF
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 18:20:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k0BPL-0007fb-A7
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 22:15:43 +0000
+ id 1k0BUF-0008Qj-Jl
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 22:20:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4A5FD2E80EC
- for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 22:15:43 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 4869C2E80EE
+ for <qemu-devel@nongnu.org>; Mon, 27 Jul 2020 22:20:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Jul 2020 22:09:44 -0000
-From: John Snow <1878253@bugs.launchpad.net>
+Date: Mon, 27 Jul 2020 22:13:46 -0000
+From: John Snow <1887309@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
@@ -50,20 +50,19 @@ X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr jnsnow
+X-Launchpad-Bug-Commenters: a1xndr jnsnow philmd
 X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
 X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <158930706000.2313.17393615876486439811.malonedeb@gac.canonical.com>
-Message-Id: <159588778497.5293.7666623647926770705.malone@soybean.canonical.com>
-Subject: [Bug 1878253] Re: null-ptr dereference in address_space_to_flatview
- through ide
+References: <159458555115.12636.15753095068884071065.malonedeb@gac.canonical.com>
+Message-Id: <159588802635.10618.10929745819095196189.malone@chaenomeles.canonical.com>
+Subject: [Bug 1887309] Re: Floating-point exception in ide_set_sector
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1e5c2ca4b8c7d1490dd80296d6018365f402cf7f
+X-Launchpad-Hash: 590510715a63c5711c8020c97d697eed225ff047
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 16:15:46
@@ -85,116 +84,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878253 <1878253@bugs.launchpad.net>
+Reply-To: Bug 1887309 <1887309@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Proposed fix: https://lists.gnu.org/archive/html/qemu-
+New proposal: https://lists.gnu.org/archive/html/qemu-
 devel/2020-07/msg06974.html
+
+(The root cause is that SRST is not handled correctly.)
+
+More analysis in the replies to Philippe's patch:
+https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05949.html
 
 ** Changed in: qemu
      Assignee: (unassigned) =3D> John Snow (jnsnow)
 
 ** Changed in: qemu
-       Status: New =3D> In Progress
+       Status: Confirmed =3D> In Progress
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878253
+https://bugs.launchpad.net/bugs/1887309
 
 Title:
-  null-ptr dereference in address_space_to_flatview through ide
+  Floating-point exception in ide_set_sector
 
 Status in QEMU:
   In Progress
 
 Bug description:
   Hello,
-  While fuzzing, I found an input that triggers a null-ptr dereference in
-  address_space_to_flatview through ide:
-
-  =3D=3D31699=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x00000=
-0000020 (pc 0x55e0f562bafd bp 0x7ffee92355b0 sp 0x7ffee92354e0 T0)
-  =3D=3D31699=3D=3DThe signal is caused by a READ memory access.
-  =3D=3D31699=3D=3DHint: address points to the zero page.
-      #0 0x55e0f562bafd in address_space_to_flatview /home/alxndr/Developme=
-nt/qemu/include/exec/memory.h:693:12
-      #1 0x55e0f562bafd in address_space_write /home/alxndr/Development/qem=
-u/exec.c:3267:14
-      #2 0x55e0f562dd9c in address_space_unmap /home/alxndr/Development/qem=
-u/exec.c:3592:9
-      #3 0x55e0f5ab8277 in dma_memory_unmap /home/alxndr/Development/qemu/i=
-nclude/sysemu/dma.h:145:5
-      #4 0x55e0f5ab8277 in dma_blk_unmap /home/alxndr/Development/qemu/dma-=
-helpers.c:104:9
-      #5 0x55e0f5ab8277 in dma_blk_cb /home/alxndr/Development/qemu/dma-hel=
-pers.c:139:5
-      #6 0x55e0f617a6b8 in blk_aio_complete /home/alxndr/Development/qemu/b=
-lock/block-backend.c:1398:9
-      #7 0x55e0f617a6b8 in blk_aio_complete_bh /home/alxndr/Development/qem=
-u/block/block-backend.c:1408:5
-      #8 0x55e0f6355efb in aio_bh_call /home/alxndr/Development/qemu/util/a=
-sync.c:136:5
-      #9 0x55e0f6355efb in aio_bh_poll /home/alxndr/Development/qemu/util/a=
-sync.c:164:13
-      #10 0x55e0f63608ce in aio_dispatch /home/alxndr/Development/qemu/util=
-/aio-posix.c:380:5
-      #11 0x55e0f635799a in aio_ctx_dispatch /home/alxndr/Development/qemu/=
-util/async.c:306:5
-      #12 0x7f16e85d69ed in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e9ed)
-      #13 0x55e0f635e384 in glib_pollfds_poll /home/alxndr/Development/qemu=
-/util/main-loop.c:219:9
-      #14 0x55e0f635e384 in os_host_main_loop_wait /home/alxndr/Development=
-/qemu/util/main-loop.c:242:5
-      #15 0x55e0f635e384 in main_loop_wait /home/alxndr/Development/qemu/ut=
-il/main-loop.c:518:11
-      #16 0x55e0f593d676 in qemu_main_loop /home/alxndr/Development/qemu/so=
-ftmmu/vl.c:1664:9
-      #17 0x55e0f6267c6a in main /home/alxndr/Development/qemu/softmmu/main=
-.c:49:5
-      #18 0x7f16e7186e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #19 0x55e0f55727b9 in _start (/home/alxndr/Development/qemu/build/i38=
-6-softmmu/qemu-system-i386+0x9027b9)
-
-  AddressSanitizer can not provide additional info.
-  SUMMARY: AddressSanitizer: SEGV /home/alxndr/Development/qemu/include/exe=
-c/memory.h:693:12 in address_space_to_flatview
-
-  I can reproduce it in qemu 5.0 using:
-
-  cat << EOF | ~/Development/qemu/build/i386-softmmu/qemu-system-i386 -M pc=
- -nographic -drive file=3Dnull-co://,if=3Dide,cache=3Dwriteback,format=3Dra=
-w -nodefaults -display none -nographic -qtest stdio -monitor none -serial n=
-one
+  Here is a reproducer:
+  cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc,accel=3Dqtest\
+   -qtest null -nographic -vga qxl -qtest stdio -nodefaults\
+   -drive if=3Dnone,id=3Ddrive0,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -drive if=3Dnone,id=3Ddrive1,file=3Dnull-co://,file.read-zeroes=3Don,for=
+mat=3Draw\
+   -device ide-cd,drive=3Ddrive0 -device ide-hd,drive=3Ddrive1
+  outw 0x176 0x3538
+  outl 0xcf8 0x80000903
+  outl 0xcfc 0x184275c
+  outb 0x376 0x2f
+  outb 0x376 0x0
+  outw 0x176 0xa1a4
   outl 0xcf8 0x80000920
-  outl 0xcfc 0xc001
-  outl 0xcf8 0x80000924
-  outl 0xcf8 0x80000904
-  outw 0xcfc 0x7
-  outb 0x1f7 0xc8
-  outw 0x3f6 0xe784
-  outw 0x3f6 0xeb01
-  outb 0xc005 0x21
-  write 0x2103 0x1 0x4e
-  outb 0xc000 0x1b
-  outw 0x1f7 0xff35
+  outb 0xcfc 0xff
+  outb 0xf8 0x9
   EOF
 
-  I also attached the traces to this launchpad report, in case the
-  formatting is broken:
+  The stack-trace:
+  =3D=3D16513=3D=3DERROR: UndefinedBehaviorSanitizer: FPE on unknown addres=
+s 0x556783603fdc (pc 0x556783603fdc bp 0x7fff82143b10 sp 0x7fff82143ab0 T16=
+513)
+      #0 0x556783603fdc in ide_set_sector /home/alxndr/Development/qemu/hw/=
+ide/core.c:626:26
+      #1 0x556783603fdc in ide_dma_cb /home/alxndr/Development/qemu/hw/ide/=
+core.c:883:9
+      #2 0x55678349d74d in dma_complete /home/alxndr/Development/qemu/dma-h=
+elpers.c:120:9
+      #3 0x55678349d74d in dma_blk_cb /home/alxndr/Development/qemu/dma-hel=
+pers.c:138:9
+      #4 0x556783962f25 in blk_aio_complete /home/alxndr/Development/qemu/b=
+lock/block-backend.c:1402:9
+      #5 0x556783962f25 in blk_aio_complete_bh /home/alxndr/Development/qem=
+u/block/block-backend.c:1412:5
+      #6 0x556783ac030f in aio_bh_call /home/alxndr/Development/qemu/util/a=
+sync.c:136:5
+      #7 0x556783ac030f in aio_bh_poll /home/alxndr/Development/qemu/util/a=
+sync.c:164:13
+      #8 0x556783a9a863 in aio_dispatch /home/alxndr/Development/qemu/util/=
+aio-posix.c:380:5
+      #9 0x556783ac1b4c in aio_ctx_dispatch /home/alxndr/Development/qemu/u=
+til/async.c:306:5
+      #10 0x7f4f1c0fe9ed in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x4e9ed)
+      #11 0x556783acdccb in glib_pollfds_poll /home/alxndr/Development/qemu=
+/util/main-loop.c:219:9
+      #12 0x556783acdccb in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/util/main-loop.c:242:5
+      #13 0x556783acdccb in main_loop_wait /home/alxndr/Development/qemu/ut=
+il/main-loop.c:518:11
+      #14 0x5567833613e5 in qemu_main_loop /home/alxndr/Development/qemu/so=
+ftmmu/vl.c:1664:9
+      #15 0x556783a07a4d in main /home/alxndr/Development/qemu/softmmu/main=
+.c:49:5
+      #16 0x7f4f1ac84e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
+0/csu/../csu/libc-start.c:308:16
+      #17 0x5567830a9089 in _start (/home/alxndr/Development/qemu/build/i38=
+6-softmmu/qemu-system-i386+0x7d2089)
 
-  qemu-system-i386 -M pc -nographic -drive file=3Dnull-
-  co://,if=3Dide,cache=3Dwriteback,format=3Draw -nodefaults -display none
-  -nographic -qtest stdio -monitor none -serial none < attachment
+  With -trace ide*
 
-  Please let me know if I can provide any further info.
+  12163@1594585516.671265:ide_reset IDEstate 0x56162a269058
+  [R +0.024963] outw 0x176 0x3538
+  12163@1594585516.673676:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
+; val 0x38; bus 0x56162a268c00 IDEState 0x56162a268c88
+  12163@1594585516.673683:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
+l 0x35; bus 0x56162a268c00 IDEState 0x56162a269058
+  12163@1594585516.673686:ide_exec_cmd IDE exec cmd: bus 0x56162a268c00; st=
+ate 0x56162a269058; cmd 0x35
+  OK
+  [S +0.025002] OK
+  [R +0.025012] outl 0xcf8 0x80000903
+  OK
+  [S +0.025018] OK
+  [R +0.025026] outl 0xcfc 0x184275c
+  OK
+  [S +0.025210] OK
+  [R +0.025219] outb 0x376 0x2f
+  12163@1594585516.673916:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
+; val 0x2f; bus 0x56162a268c00
+  OK
+  [S +0.025229] OK
+  [R +0.025234] outb 0x376 0x0
+  12163@1594585516.673928:ide_cmd_write IDE PIO wr @ 0x376 (Device Control)=
+; val 0x00; bus 0x56162a268c00
+  OK
+  [S +0.025240] OK
+  [R +0.025246] outw 0x176 0xa1a4
+  12163@1594585516.673940:ide_ioport_write IDE PIO wr @ 0x176 (Device/Head)=
+; val 0xa4; bus 0x56162a268c00 IDEState 0x56162a269058
+  12163@1594585516.673943:ide_ioport_write IDE PIO wr @ 0x177 (Command); va=
+l 0xa1; bus 0x56162a268c00 IDEState 0x56162a268c88
+  12163@1594585516.673946:ide_exec_cmd IDE exec cmd: bus 0x56162a268c00; st=
+ate 0x56162a268c88; cmd 0xa1
+  OK
+  [S +0.025265] OK
+  [R +0.025270] outl 0xcf8 0x80000920
+  OK
+  [S +0.025274] OK
+  [R +0.025279] outb 0xcfc 0xff
+  OK
+  [S +0.025443] OK
+  [R +0.025451] outb 0xf8 0x9
+  12163@1594585516.674221:ide_dma_cb IDEState 0x56162a268c88; sector_num=3D=
+0 n=3D1 cmd=3DDMA READ
+  OK
+  [S +0.025724] OK
+  UndefinedBehaviorSanitizer:DEADLYSIGNAL
+  =3D=3D12163=3D=3DERROR: UndefinedBehaviorSanitizer: FPE on unknown addres=
+s 0x5616279cffdc (pc 0x5616279cffdc bp 0x7ffcdaabae90 sp 0x7ffcdaabae30 T12=
+163)
+
   -Alex
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878253/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1887309/+subscriptions
 
