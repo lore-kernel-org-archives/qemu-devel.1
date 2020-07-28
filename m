@@ -2,77 +2,81 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3E6C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 332AAC433E5
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:33:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4025D20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:32:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0360220663
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:33:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XBzHuoK7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4025D20663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZlsYGMxy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0360220663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Qen-0004cg-ER
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:32:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59546)
+	id 1k0Qf9-0005Tp-86
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:33:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1k0Qdj-0003Br-33
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:31:35 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41372
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k0QdR-0002we-Mu
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:31:17 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33624
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1k0Qdg-0001jV-8R
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:31:34 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k0QdO-0001iQ-KV
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:31:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595946691;
+ s=mimecast20190719; t=1595946673;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HavDs4TdbWRcgCjIP//IJUjb5X1vWRc5f/SAV3XXkvE=;
- b=XBzHuoK7YW1ZCJ1ZItOz2S7zIjay3eV3w9rnB513rSj5HxSrdroDIAf0EVsYCXlY/VY7BB
- BFQx3pjzsjlLTwiGcUEMptM/BzZpPdGYLuk7k5sBNIEIXoOP6M9Do6cMr0EgWoapisGLe7
- yDuMHht7C3xv6gtm/I7XH+uDJpUhKkY=
+ bh=CjHJG/ECf1n3Mxn4cuFbc95VKla+EWw2jzs1p1KqLzc=;
+ b=ZlsYGMxyDA5QBgR816Y9RI/7RS4Qn2iEDy6XbgSdHJ5LDRk9lzfKiKwOeW6k2cRpjklZoD
+ ALWQCIfCloIatJWpnMyFHNpImFILXspA5Tco/J7h74zPvUVO69KCB9SF0eUHj/646Zk1YF
+ xAufW+vHqwzg74qhVWdV6oTaqOBT6TA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-xKN85W_FNXSsvHzSCy_zFA-1; Tue, 28 Jul 2020 10:31:29 -0400
-X-MC-Unique: xKN85W_FNXSsvHzSCy_zFA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-321-q0h3u4vIPJScTsXOGSfcTA-1; Tue, 28 Jul 2020 10:31:11 -0400
+X-MC-Unique: q0h3u4vIPJScTsXOGSfcTA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9044F8064AF;
- Tue, 28 Jul 2020 14:31:28 +0000 (UTC)
-Received: from localhost (unknown [10.36.110.39])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 78FC15DA6A;
- Tue, 28 Jul 2020 14:31:27 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/2] slirp: update to latest stable-4.2 branch
-Date: Tue, 28 Jul 2020 18:31:08 +0400
-Message-Id: <20200728143108.2192896-3-marcandre.lureau@redhat.com>
-In-Reply-To: <20200728143108.2192896-1-marcandre.lureau@redhat.com>
-References: <20200728143108.2192896-1-marcandre.lureau@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A170193F56C;
+ Tue, 28 Jul 2020 14:31:10 +0000 (UTC)
+Received: from [10.10.118.248] (ovpn-118-248.rdu2.redhat.com [10.10.118.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D72190E84;
+ Tue, 28 Jul 2020 14:30:58 +0000 (UTC)
+Subject: Re: [PATCH v2 1/4] block: nbd: Fix convert qcow2 compressed to nbd
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20200727215846.395443-1-nsoffer@redhat.com>
+ <20200727215846.395443-2-nsoffer@redhat.com>
+ <627189f3-7cc3-a316-9b06-7e39179f69a8@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <6037c80a-03ec-67bc-6cd4-38b799b86ffe@redhat.com>
+Date: Tue, 28 Jul 2020 09:30:57 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <627189f3-7cc3-a316-9b06-7e39179f69a8@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81;
- envelope-from=marcandre.lureau@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:31:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,47 +99,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Dr. David Alan Gilbert (1):
-      ip_stripoptions use memmove
+On 7/28/20 8:15 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 28.07.2020 00:58, Nir Soffer wrote:
+>> When converting to qcow2 compressed format, the last step is a special
+>> zero length compressed write, ending in call to bdrv_co_truncate(). This
+>> call always fails for the nbd driver since it does not implement
+>> bdrv_co_truncate().
+>>
 
-Jindrich Novy (4):
-      Fix possible infinite loops and use-after-free
-      Use secure string copy to avoid overflow
-      Be sure to initialize sockaddr structure
-      Check lseek() for failure
+>> +static int coroutine_fn nbd_co_truncate(BlockDriverState *bs, int64_t 
+>> offset,
+>> +                                        bool exact, PreallocMode 
+>> prealloc,
+>> +                                        BdrvRequestFlags flags, Error 
+>> **errp)
+>> +{
+>> +    BDRVNBDState *s = bs->opaque;
+>> +
+>> +    if (offset != s->info.size && exact) {
+>> +        error_setg(errp, "Cannot resize NBD nodes");
+>> +        return -ENOTSUP;
+>> +    }
+>> +
+>> +    if (offset > s->info.size) {
+>> +        error_setg(errp, "Cannot grow NBD nodes");
+>> +        return -EINVAL;
+>> +    }
+> 
+> I think that ENOTSUP actually is valid error code for both cases.. NBD 
+> protocol has experimental extension NBD_CMD_RESIZE, so one day we'll 
+> implement this. So, I think, it's not invalid, but just not supported 
+> yet. Still, not a big deal, so with ENOTSUP or EINVAL:
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Marc-André Lureau (2):
-      util: do not silently truncate
-      Merge branch 'stable-4.2' into 'stable-4.2'
+Indeed, if we ever get around to fully specifying how NBD_CMD_RESIZE 
+should even work, we'll be revisiting this code to implement that.
 
-Philippe Mathieu-Daudé (3):
-      Fix win32 builds by using the SLIRP_PACKED definition
-      Fix constness warnings
-      Remove unnecessary break
+> 
+> Also, may be better to manage it in generic layer:
+> If driver doesn't implement bdrv_co_truncate handler (or return 
+> ENOTSUP), and we are truncating to the same size, or to smaller size 
+> with exact=false, we just report success? Then we'll drop same code from 
+> file-posix.c
 
-Ralf Haferkamp (2):
-      Drop bogus IPv6 messages
-      Fix MTU check
+That was also my question on v1; but given the closeness to the release, 
+this is a minimal change appropriate for -rc2, while changing the 
+generic layer may have unintended consequences.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
----
- slirp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/slirp b/slirp
-index 2faae0f778..ce94eba204 160000
---- a/slirp
-+++ b/slirp
-@@ -1 +1 @@
--Subproject commit 2faae0f778f818fadc873308f983289df697eb93
-+Subproject commit ce94eba2042d52a0ba3d9e252ebce86715e94275
 -- 
-2.28.0.rc2.1.g3d20111cbd
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
