@@ -2,98 +2,79 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C043EC433EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D32C433E5
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:49:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88ED9206D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:43:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CDC9206D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:49:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i9qdNVhz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88ED9206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZBPIHdMJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CDC9206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Qom-0005nn-Rk
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:43:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34200)
+	id 1k0QvD-0001a0-Q4
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:49:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k0QoC-0005MU-PD
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:42:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54150
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k0Qr8-000719-Ek
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:45:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22210
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k0QoA-0003Bj-Ts
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:42:24 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k0Qr5-0003Yb-Ix
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:45:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595947342;
+ s=mimecast20190719; t=1595947522;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HFNqJumkzP4J5RG1BBm7mf9F9wyk4Vpuo8se6fclE+U=;
- b=i9qdNVhzPHze8s0vnbfRKk03jFe92XsdZ+/j2SZMNOeBiU6+M4J/NyW1+uKG1I7FSUNABZ
- ghr2bob8QPuek0/Gl4sKydyDTyNPtyoUZxwroICIxeUUSWlDoOPexm+2IoWNMcNVAH8O1t
- kF2uNKdd6ZwKQmK8Se/6jWIraOntNDw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-bDwEr-veOnSVEPoJ0Szqjw-1; Tue, 28 Jul 2020 10:42:18 -0400
-X-MC-Unique: bDwEr-veOnSVEPoJ0Szqjw-1
-Received: by mail-wm1-f72.google.com with SMTP id t26so8328598wmn.4
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 07:42:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HFNqJumkzP4J5RG1BBm7mf9F9wyk4Vpuo8se6fclE+U=;
- b=CA2VAowsW9uswlPgsPn3qIuX0ViGBaDXnBW5MWiS5OJL691hDcvuEqhEUdR2vLakrg
- WGsFTP7bVWxcKbPlX6HvgaTo8tTcIE9FOEjAqa/efL5sGSCTOfTkH86U//1rB8XHqlgJ
- 2wIHt0lq8yN7gc4D3Uay8xdjaTLjvaz/pFPGHvNx4/Mbht6JyYL7xlik6K/nNJcQ3/Sj
- 0ThaOS6hD1ZrB61HIuMv2t4l7UzQ6LjoVAtwaIR/NXRYNBIKF+GMbt0vS6MOgSGXD0/G
- A4L7uyTgmAiaSQANujzsZc2UFpxgvonTL6fsVBdSdsnUL6DIKC48NL0DJWIBTbbseLGZ
- BFgg==
-X-Gm-Message-State: AOAM5334RVHHsMO8saRMvfKFIjCH8YxTD9WWETjmXxZgMs1VhIugaTxP
- DnEl4QJsNXiIrbF5UtO9TaMxINEN3JZkM7BUR+GhAsohnybza0Gid+Bsqrd4Wby6T0lfFVeIAVx
- zdLAVSV0QJh25Wak=
-X-Received: by 2002:adf:fb87:: with SMTP id a7mr25230301wrr.390.1595947336718; 
- Tue, 28 Jul 2020 07:42:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxavYZkHDtNyZ7roE9L9IypCr40rlA4II5cZBkyZEW7eKU81B4gtUPAc/cfy68/X7/zWFmaeg==
-X-Received: by 2002:adf:fb87:: with SMTP id a7mr25230278wrr.390.1595947336420; 
- Tue, 28 Jul 2020 07:42:16 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:80b0:f446:bb61:1dbb?
- ([2001:b07:6468:f312:80b0:f446:bb61:1dbb])
- by smtp.gmail.com with ESMTPSA id m8sm17749385wro.75.2020.07.28.07.42.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 28 Jul 2020 07:42:15 -0700 (PDT)
-Subject: Re: [PATCH v1 1/2] qemu-timer: gracefully handle the end of time
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200728141005.28664-1-alex.bennee@linaro.org>
- <20200728141005.28664-2-alex.bennee@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f48c70d8-b506-e86c-e0dd-9e0ed2db3d91@redhat.com>
-Date: Tue, 28 Jul 2020 16:42:14 +0200
+ bh=bL/gBNlRFjMp9o+dNvFBzHggRQlsmx6krk5RNr5RiRQ=;
+ b=ZBPIHdMJu8ZcsGRxWc5hEcLT08gXLpFyijvVuQl44jtEU4W/MKsyf9CXpjVI8JUDdUu5yB
+ SFAMmKGmRSkBeglYPApYb7tA1n1F6SZuWLwMhVqbbIT6GfCVh6y+9pDUfsZYnE/daiyv2W
+ +7M/CDtLXzQ/8lpz/olgXl0XxGVxn1s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251-fnu4x7ESMAax0j71is7Jnw-1; Tue, 28 Jul 2020 10:45:18 -0400
+X-MC-Unique: fnu4x7ESMAax0j71is7Jnw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77ECC100AA22;
+ Tue, 28 Jul 2020 14:45:17 +0000 (UTC)
+Received: from [10.10.118.248] (ovpn-118-248.rdu2.redhat.com [10.10.118.248])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DD925DA74;
+ Tue, 28 Jul 2020 14:45:16 +0000 (UTC)
+Subject: Re: [PATCH v2 4/4] iotests: Test convert to qcow2 compressed to NBD
+To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20200727215846.395443-1-nsoffer@redhat.com>
+ <20200727215846.395443-5-nsoffer@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <3dc15aa8-161d-7ea7-32d1-13c72ef8f3f0@redhat.com>
+Date: Tue, 28 Jul 2020 09:45:15 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200728141005.28664-2-alex.bennee@linaro.org>
+In-Reply-To: <20200727215846.395443-5-nsoffer@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:28:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -103,7 +84,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,33 +97,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pavel.dovgaluk@ispras.ru, boost.lists@gmail.com, victor.clement@openwide.fr,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ vsementsov@virtuozzo.com, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28/07/20 16:10, Alex Bennée wrote:
-> +    /*
-> +     * Check to see if we have run out of time. Most of our time
-> +     * sources are nanoseconds since epoch (some time around the fall
-> +     * of Babylon 5, the start of the Enterprises five year mission
-> +     * and just before the arrival of the great evil ~ 2262CE).
-> +     * Although icount based time is ns since the start of emulation
-> +     * it is able to skip forward if the device is sleeping (think IoT
-> +     * device with a very long heartbeat). Either way we don't really
-> +     * handle running out of time so lets catch it and report it here.
-> +     */
-> +    if (current_time == INT64_MAX) {
-> +        qemu_handle_outa_time();
-> +        goto out;
-> +    }
-> +
+On 7/27/20 4:58 PM, Nir Soffer wrote:
+> Add test for "qemu-img convert -O qcow2 -c" to NBD target. The tests
+> create a OVA file and write compressed qcow2 disk content directly into
+> the OVA file via qemu-nbd.
+> 
+> Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+> ---
+>   tests/qemu-iotests/302     | 127 +++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/302.out |  31 +++++++++
+>   tests/qemu-iotests/group   |   1 +
+>   3 files changed, 159 insertions(+)
+>   create mode 100755 tests/qemu-iotests/302
+>   create mode 100644 tests/qemu-iotests/302.out
+> 
 
-Doing this here is a bit dangerous, I'd rather do nothing here and
-detect the situation in cpus.c where we can do
-qemu_system_shutdown_request() (and also do nothing).
+Tested-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Paolo
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
