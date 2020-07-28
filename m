@@ -4,69 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D44C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 05:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7486C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:00:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E55320658
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 05:59:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FEFD20658
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:00:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O6a82oKF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E55320658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TXSYyWse"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FEFD20658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Ie0-0002lv-Dw
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 01:59:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45618)
+	id 1k0If8-0004iJ-RR
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 02:00:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k0Id3-0001Sv-I3
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 01:58:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38614
+ id 1k0Icv-0001IF-11
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 01:58:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42413
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k0Id1-0007Bg-W2
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 01:58:21 -0400
+ id 1k0Ict-0007Ak-CX
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 01:58:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595915899;
+ s=mimecast20190719; t=1595915890;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=BizKAjSDHwqLVrq96cuiIXoDoNkf2Pbi3L5JlP/JAHo=;
- b=O6a82oKFwGMeEhCRzI4wI+bfYB49kfxgRGeiCbA2LIHYJ1eOxZcV0eqX6gjaavqFIGC9U+
- 81lM4JqssiWH0L89JGPmkna26JPTvzbLZXHDGNm1AmLiySAwnikFTqel8q53puPHclyp54
- hFR951Uibl6ITiJ/X3yBcaZ6BU0BjJI=
+ references:references; bh=CGeSDBMl3BFyH1Hw0ys+QbRfN+ErqYRaEUNFg8limbg=;
+ b=TXSYyWseZeowOH4SlzsarXfo60L5UgtUZW9lyPwyWHSmBX1FrsaHmvOwYWcKmpujjpjwNo
+ C93FAA/W8Jzs4XphnmzC3nM0ADudPHC4rKb5HSFJIyIXgHR++ePXmkLpfX1mSBI5yMuIkR
+ cIc8dVzFWuq2P2SAyx7jQwZQgPPIHuI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-rG0HKfY3Psqa8S7ykjuuww-1; Tue, 28 Jul 2020 01:58:15 -0400
-X-MC-Unique: rG0HKfY3Psqa8S7ykjuuww-1
+ us-mta-313-IVwM-EkHPCKM9P8RDwq38A-1; Tue, 28 Jul 2020 01:58:06 -0400
+X-MC-Unique: IVwM-EkHPCKM9P8RDwq38A-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73A091005504;
- Tue, 28 Jul 2020 05:58:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 129C558;
+ Tue, 28 Jul 2020 05:58:05 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-13-130.pek2.redhat.com
  [10.72.13.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1BA021002388;
- Tue, 28 Jul 2020 05:58:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 621581001281;
+ Tue, 28 Jul 2020 05:58:03 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL 4/4] net: forbid the reentrant RX
-Date: Tue, 28 Jul 2020 13:57:58 +0800
-Message-Id: <1595915878-22568-5-git-send-email-jasowang@redhat.com>
+Subject: [PULL 1/4] virtio-pci: fix wrong index in virtio_pci_queue_enabled
+Date: Tue, 28 Jul 2020 13:57:55 +0800
+Message-Id: <1595915878-22568-2-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1595915878-22568-1-git-send-email-jasowang@redhat.com>
 References: <1595915878-22568-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -93,38 +91,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The memory API allows DMA into NIC's MMIO area. This means the NIC's
-RX routine must be reentrant. Instead of auditing all the NIC, we can
-simply detect the reentrancy and return early. The queue->delivering
-is set and cleared by qemu_net_queue_deliver() for other queue helpers
-to know whether the delivering in on going (NIC's receive is being
-called). We can check it and return early in qemu_net_queue_flush() to
-forbid reentrant RX.
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
 
+https://bugzilla.redhat.com/show_bug.cgi?id=1702608
+
+Fixes: f19bcdfedd53 ("virtio-pci: implement queue_enabled method")
+Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/queue.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/virtio/virtio-pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/queue.c b/net/queue.c
-index 0164727..19e32c8 100644
---- a/net/queue.c
-+++ b/net/queue.c
-@@ -250,6 +250,9 @@ void qemu_net_queue_purge(NetQueue *queue, NetClientState *from)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index ada1101..2b1f9cc 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1113,7 +1113,7 @@ static bool virtio_pci_queue_enabled(DeviceState *d, int n)
+     VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
  
- bool qemu_net_queue_flush(NetQueue *queue)
- {
-+    if (queue->delivering)
-+        return false;
-+
-     while (!QTAILQ_EMPTY(&queue->packets)) {
-         NetPacket *packet;
-         int ret;
+     if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+-        return proxy->vqs[vdev->queue_sel].enabled;
++        return proxy->vqs[n].enabled;
+     }
+ 
+     return virtio_queue_enabled(vdev, n);
 -- 
 2.7.4
 
