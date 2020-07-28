@@ -2,108 +2,81 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77FD1C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 01:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1783CC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 01:26:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 304B620714
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 01:11:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JTiFTXid"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 304B620714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id DFEF920829
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 01:26:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFEF920829
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0E92-0007De-Fh
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 21:11:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44034)
+	id 1k0EO7-0006Wf-88
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 21:26:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <krish.sadhukhan@oracle.com>)
- id 1k0DD4-0003jc-EV
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 20:11:10 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:36692)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <krish.sadhukhan@oracle.com>)
- id 1k0DD0-0003Se-MZ
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 20:11:10 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06S07acF098851;
- Tue, 28 Jul 2020 00:11:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=gzG26fUgybyS8dix7buhvOlYBPA8wprnYlxU/Q8JmzY=;
- b=JTiFTXidXKVs3NeSuNTGVDF+YdBGoQSxmwIJVr+4+/F9o82pxhYyfIYcFYxoJhpQp3Ei
- ohkuDRkrV2NFbcr+QKeKBkxSOcOh+a6GXsNrNG596+3lOhsK7Y7LkUF8Dqpli1ANhITW
- 40Ca211UBG/kBlJCE1mLlh+rzzapAsYxLH6zReHncpfwaw4LGhi5ehgSUcRxz4TjyRxB
- k0M2V3zS/q/+3g7/noE2RrNvk9RU6EWKIx3VNQHIOsVEd3eXA7wHkOLb/t20RrVdNrj1
- ESljplQcUn3B8gEwvhLPzu3P7FI9pOsMjQqX59BA+JVt8/lgkBdTC0jHAgX6P7amWtbZ ew== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2120.oracle.com with ESMTP id 32hu1jcgnf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Tue, 28 Jul 2020 00:11:01 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06S08elK157415;
- Tue, 28 Jul 2020 00:11:01 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 32hu5rvkmm-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 28 Jul 2020 00:11:01 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06S0B0kE020208;
- Tue, 28 Jul 2020 00:11:00 GMT
-Received: from nsvm-sadhukhan.osdevelopmeniad.oraclevcn.com (/100.100.231.196)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 27 Jul 2020 17:10:59 -0700
-From: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To: kvm@vger.kernel.org
-Subject: [PATCH 1/6 v3] KVM: x86: Change names of some of the kvm_x86_ops
- functions to make them more semantical and readable
-Date: Tue, 28 Jul 2020 00:10:45 +0000
-Message-Id: <1595895050-105504-2-git-send-email-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1595895050-105504-1-git-send-email-krish.sadhukhan@oracle.com>
-References: <1595895050-105504-1-git-send-email-krish.sadhukhan@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9695
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- phishscore=0 bulkscore=0
- malwarescore=0 suspectscore=4 spamscore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007270165
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9695
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011
- mlxlogscore=999
- malwarescore=0 impostorscore=0 priorityscore=1501 spamscore=0 phishscore=0
- suspectscore=4 bulkscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007270165
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=krish.sadhukhan@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 20:11:04
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -53
-X-Spam_score: -5.4
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0ENV-00066B-GD
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 21:26:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42858)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0ENT-0003uX-7z
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 21:26:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k0ENR-000774-1u
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 01:25:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 046ED2E80EE
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 01:25:57 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Jul 2020 01:11:39 -0000
+From: John Snow <1681439@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=jsnow@redhat.com; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr bugs-syssec janitor jnsnow kempniu th-huth
+X-Launchpad-Bug-Reporter: =?utf-8?b?TWljaGHFgiBLxJlwaWXFhCAoa2VtcG5pdSk=?=
+X-Launchpad-Bug-Modifier: John Snow (jnsnow)
+References: <20170410132346.31250.84835.malonedeb@wampee.canonical.com>
+Message-Id: <159589869923.9862.12491854264782196101.malone@chaenomeles.canonical.com>
+Subject: [Bug 1681439] Re: qemu-system-x86_64: hw/ide/core.c:685:
+ ide_cancel_dma_sync: Assertion `s->bus->dma->aiocb == NULL' failed.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 65d61b2984fb3cdb3edd7551bd5024d4cabeb130
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 21:25:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
 X-Spam_bar: -----
-X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Mon, 27 Jul 2020 21:08:14 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -112,382 +85,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, vkuznets@redhat.com, qemu-devel@nongnu.org,
- sean.j.christopherson@intel.com, jmattson@google.com
+Reply-To: Bug 1681439 <1681439@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- arch/arm64/include/asm/kvm_host.h   |  2 +-
- arch/mips/include/asm/kvm_host.h    |  2 +-
- arch/powerpc/include/asm/kvm_host.h |  2 +-
- arch/s390/kvm/kvm-s390.c            |  2 +-
- arch/x86/include/asm/kvm_host.h     | 12 ++++++------
- arch/x86/kvm/svm/svm.c              | 12 ++++++------
- arch/x86/kvm/vmx/vmx.c              |  8 ++++----
- arch/x86/kvm/x86.c                  | 28 ++++++++++++++--------------
- include/linux/kvm_host.h            |  2 +-
- include/uapi/linux/kvm.h            |  6 +++---
- tools/include/uapi/linux/kvm.h      |  6 +++---
- virt/kvm/kvm_main.c                 |  4 ++--
- 12 files changed, 43 insertions(+), 43 deletions(-)
+The qtest reproducers are so nice.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c3e6fcc6..f5be4fa 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -545,7 +545,7 @@ static inline bool kvm_arch_requires_vhe(void)
- 
- void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
- 
--static inline void kvm_arch_hardware_unsetup(void) {}
-+static inline void kvm_arch_hardware_teardown(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 363e7a89..95cea05 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -1178,7 +1178,7 @@ extern int kvm_mips_trans_mtc0(union mips_instruction inst, u32 *opc,
- extern int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu,
- 			     struct kvm_mips_interrupt *irq);
- 
--static inline void kvm_arch_hardware_unsetup(void) {}
-+static inline void kvm_arch_hardware_teardown(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot) {}
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 7e2d061..892b0e2 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -856,7 +856,7 @@ struct kvm_vcpu_arch {
- #define __KVM_HAVE_CREATE_DEVICE
- 
- static inline void kvm_arch_hardware_disable(void) {}
--static inline void kvm_arch_hardware_unsetup(void) {}
-+static inline void kvm_arch_hardware_teardown(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index d47c197..5cdddd9 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -312,7 +312,7 @@ int kvm_arch_hardware_setup(void *opaque)
- 	return 0;
- }
- 
--void kvm_arch_hardware_unsetup(void)
-+void kvm_arch_hardware_teardown(void)
- {
- 	gmap_unregister_pte_notifier(&gmap_notifier);
- 	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index be5363b..ccad66d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1080,7 +1080,7 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
- struct kvm_x86_ops {
- 	int (*hardware_enable)(void);
- 	void (*hardware_disable)(void);
--	void (*hardware_unsetup)(void);
-+	void (*hardware_teardown)(void);
- 	bool (*cpu_has_accelerated_tpr)(void);
- 	bool (*has_emulated_msr)(u32 index);
- 	void (*cpuid_update)(struct kvm_vcpu *vcpu);
-@@ -1141,7 +1141,7 @@ struct kvm_x86_ops {
- 	 */
- 	void (*tlb_flush_guest)(struct kvm_vcpu *vcpu);
- 
--	enum exit_fastpath_completion (*run)(struct kvm_vcpu *vcpu);
-+	enum exit_fastpath_completion (*vcpu_run)(struct kvm_vcpu *vcpu);
- 	int (*handle_exit)(struct kvm_vcpu *vcpu,
- 		enum exit_fastpath_completion exit_fastpath);
- 	int (*skip_emulated_instruction)(struct kvm_vcpu *vcpu);
-@@ -1150,8 +1150,8 @@ struct kvm_x86_ops {
- 	u32 (*get_interrupt_shadow)(struct kvm_vcpu *vcpu);
- 	void (*patch_hypercall)(struct kvm_vcpu *vcpu,
- 				unsigned char *hypercall_addr);
--	void (*set_irq)(struct kvm_vcpu *vcpu);
--	void (*set_nmi)(struct kvm_vcpu *vcpu);
-+	void (*inject_irq)(struct kvm_vcpu *vcpu);
-+	void (*inject_nmi)(struct kvm_vcpu *vcpu);
- 	void (*queue_exception)(struct kvm_vcpu *vcpu);
- 	void (*cancel_injection)(struct kvm_vcpu *vcpu);
- 	int (*interrupt_allowed)(struct kvm_vcpu *vcpu, bool for_injection);
-@@ -1258,8 +1258,8 @@ struct kvm_x86_ops {
- 	void (*enable_smi_window)(struct kvm_vcpu *vcpu);
- 
- 	int (*mem_enc_op)(struct kvm *kvm, void __user *argp);
--	int (*mem_enc_reg_region)(struct kvm *kvm, struct kvm_enc_region *argp);
--	int (*mem_enc_unreg_region)(struct kvm *kvm, struct kvm_enc_region *argp);
-+	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
-+	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
- 
- 	int (*get_msr_feature)(struct kvm_msr_entry *entry);
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c0da4dd..24755eb 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3969,7 +3969,7 @@ static int svm_vm_init(struct kvm *kvm)
- }
- 
- static struct kvm_x86_ops svm_x86_ops __initdata = {
--	.hardware_unsetup = svm_hardware_teardown,
-+	.hardware_teardown = svm_hardware_teardown,
- 	.hardware_enable = svm_hardware_enable,
- 	.hardware_disable = svm_hardware_disable,
- 	.cpu_has_accelerated_tpr = svm_cpu_has_accelerated_tpr,
-@@ -4016,15 +4016,15 @@ static int svm_vm_init(struct kvm *kvm)
- 	.tlb_flush_gva = svm_flush_tlb_gva,
- 	.tlb_flush_guest = svm_flush_tlb,
- 
--	.run = svm_vcpu_run,
-+	.vcpu_run = svm_vcpu_run,
- 	.handle_exit = handle_exit,
- 	.skip_emulated_instruction = skip_emulated_instruction,
- 	.update_emulated_instruction = NULL,
- 	.set_interrupt_shadow = svm_set_interrupt_shadow,
- 	.get_interrupt_shadow = svm_get_interrupt_shadow,
- 	.patch_hypercall = svm_patch_hypercall,
--	.set_irq = svm_set_irq,
--	.set_nmi = svm_inject_nmi,
-+	.inject_irq = svm_set_irq,
-+	.inject_nmi = svm_inject_nmi,
- 	.queue_exception = svm_queue_exception,
- 	.cancel_injection = svm_cancel_injection,
- 	.interrupt_allowed = svm_interrupt_allowed,
-@@ -4080,8 +4080,8 @@ static int svm_vm_init(struct kvm *kvm)
- 	.enable_smi_window = enable_smi_window,
- 
- 	.mem_enc_op = svm_mem_enc_op,
--	.mem_enc_reg_region = svm_register_enc_region,
--	.mem_enc_unreg_region = svm_unregister_enc_region,
-+	.mem_enc_register_region = svm_register_enc_region,
-+	.mem_enc_unregister_region = svm_unregister_enc_region,
- 
- 	.need_emulation_on_page_fault = svm_need_emulation_on_page_fault,
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index cb22f33..90d91524 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7844,7 +7844,7 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- }
- 
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
--	.hardware_unsetup = hardware_unsetup,
-+	.hardware_teardown = hardware_unsetup,
- 
- 	.hardware_enable = hardware_enable,
- 	.hardware_disable = hardware_disable,
-@@ -7889,15 +7889,15 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- 	.tlb_flush_gva = vmx_flush_tlb_gva,
- 	.tlb_flush_guest = vmx_flush_tlb_guest,
- 
--	.run = vmx_vcpu_run,
-+	.vcpu_run = vmx_vcpu_run,
- 	.handle_exit = vmx_handle_exit,
- 	.skip_emulated_instruction = vmx_skip_emulated_instruction,
- 	.update_emulated_instruction = vmx_update_emulated_instruction,
- 	.set_interrupt_shadow = vmx_set_interrupt_shadow,
- 	.get_interrupt_shadow = vmx_get_interrupt_shadow,
- 	.patch_hypercall = vmx_patch_hypercall,
--	.set_irq = vmx_inject_irq,
--	.set_nmi = vmx_inject_nmi,
-+	.inject_irq = vmx_inject_irq,
-+	.inject_nmi = vmx_inject_nmi,
- 	.queue_exception = vmx_queue_exception,
- 	.cancel_injection = vmx_cancel_injection,
- 	.interrupt_allowed = vmx_interrupt_allowed,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3b92db4..7cc164b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5256,13 +5256,13 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		r = 0;
- 		break;
- 	}
--	case KVM_MEMORY_ENCRYPT_OP: {
-+	case KVM_MEM_ENC_OP: {
- 		r = -ENOTTY;
- 		if (kvm_x86_ops.mem_enc_op)
- 			r = kvm_x86_ops.mem_enc_op(kvm, argp);
- 		break;
- 	}
--	case KVM_MEMORY_ENCRYPT_REG_REGION: {
-+	case KVM_MEM_ENC_REGISTER_REGION: {
- 		struct kvm_enc_region region;
- 
- 		r = -EFAULT;
-@@ -5270,11 +5270,11 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 			goto out;
- 
- 		r = -ENOTTY;
--		if (kvm_x86_ops.mem_enc_reg_region)
--			r = kvm_x86_ops.mem_enc_reg_region(kvm, &region);
-+		if (kvm_x86_ops.mem_enc_register_region)
-+			r = kvm_x86_ops.mem_enc_register_region(kvm, &region);
- 		break;
- 	}
--	case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
-+	case KVM_MEM_ENC_UNREGISTER_REGION: {
- 		struct kvm_enc_region region;
- 
- 		r = -EFAULT;
-@@ -5282,8 +5282,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 			goto out;
- 
- 		r = -ENOTTY;
--		if (kvm_x86_ops.mem_enc_unreg_region)
--			r = kvm_x86_ops.mem_enc_unreg_region(kvm, &region);
-+		if (kvm_x86_ops.mem_enc_unregister_region)
-+			r = kvm_x86_ops.mem_enc_unregister_region(kvm, &region);
- 		break;
- 	}
- 	case KVM_HYPERV_EVENTFD: {
-@@ -7788,10 +7788,10 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
- 	 */
- 	else if (!vcpu->arch.exception.pending) {
- 		if (vcpu->arch.nmi_injected) {
--			kvm_x86_ops.set_nmi(vcpu);
-+			kvm_x86_ops.inject_nmi(vcpu);
- 			can_inject = false;
- 		} else if (vcpu->arch.interrupt.injected) {
--			kvm_x86_ops.set_irq(vcpu);
-+			kvm_x86_ops.inject_irq(vcpu);
- 			can_inject = false;
- 		}
- 	}
-@@ -7867,7 +7867,7 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
- 		if (r) {
- 			--vcpu->arch.nmi_pending;
- 			vcpu->arch.nmi_injected = true;
--			kvm_x86_ops.set_nmi(vcpu);
-+			kvm_x86_ops.inject_nmi(vcpu);
- 			can_inject = false;
- 			WARN_ON(kvm_x86_ops.nmi_allowed(vcpu, true) < 0);
- 		}
-@@ -7881,7 +7881,7 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
- 			goto busy;
- 		if (r) {
- 			kvm_queue_interrupt(vcpu, kvm_cpu_get_interrupt(vcpu), false);
--			kvm_x86_ops.set_irq(vcpu);
-+			kvm_x86_ops.inject_irq(vcpu);
- 			WARN_ON(kvm_x86_ops.interrupt_allowed(vcpu, true) < 0);
- 		}
- 		if (kvm_cpu_has_injectable_intr(vcpu))
-@@ -8517,7 +8517,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
- 	}
- 
--	exit_fastpath = kvm_x86_ops.run(vcpu);
-+	exit_fastpath = kvm_x86_ops.vcpu_run(vcpu);
- 
- 	/*
- 	 * Do this here before restoring debug registers on the host.  And
-@@ -9793,9 +9793,9 @@ int kvm_arch_hardware_setup(void *opaque)
- 	return 0;
- }
- 
--void kvm_arch_hardware_unsetup(void)
-+void kvm_arch_hardware_teardown(void)
- {
--	kvm_x86_ops.hardware_unsetup();
-+	kvm_x86_ops.hardware_teardown();
- }
- 
- int kvm_arch_check_processor_compat(void *opaque)
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d564855..b49312c 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -894,7 +894,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
- int kvm_arch_hardware_enable(void);
- void kvm_arch_hardware_disable(void);
- int kvm_arch_hardware_setup(void *opaque);
--void kvm_arch_hardware_unsetup(void);
-+void kvm_arch_hardware_teardown(void);
- int kvm_arch_check_processor_compat(void *opaque);
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 4fdf303..cb6f153 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1469,15 +1469,15 @@ struct kvm_s390_ucas_mapping {
- #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
- #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
- /* Memory Encryption Commands */
--#define KVM_MEMORY_ENCRYPT_OP      _IOWR(KVMIO, 0xba, unsigned long)
-+#define KVM_MEM_ENC_OP	            _IOWR(KVMIO, 0xba, unsigned long)
- 
- struct kvm_enc_region {
- 	__u64 addr;
- 	__u64 size;
- };
- 
--#define KVM_MEMORY_ENCRYPT_REG_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
--#define KVM_MEMORY_ENCRYPT_UNREG_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
-+#define KVM_MEM_ENC_REGISTER_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
-+#define KVM_MEM_ENC_UNREGISTER_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
- 
- /* Available with KVM_CAP_HYPERV_EVENTFD */
- #define KVM_HYPERV_EVENTFD        _IOW(KVMIO,  0xbd, struct kvm_hyperv_eventfd)
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 4fdf303..c341b2c 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -1469,15 +1469,15 @@ struct kvm_s390_ucas_mapping {
- #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
- #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
- /* Memory Encryption Commands */
--#define KVM_MEMORY_ENCRYPT_OP      _IOWR(KVMIO, 0xba, unsigned long)
-+#define KVM_MEM_ENC_OP              _IOWR(KVMIO, 0xba, unsigned long)
- 
- struct kvm_enc_region {
- 	__u64 addr;
- 	__u64 size;
- };
- 
--#define KVM_MEMORY_ENCRYPT_REG_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
--#define KVM_MEMORY_ENCRYPT_UNREG_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
-+#define KVM_MEM_ENC_REGISTER_REGION    _IOR(KVMIO, 0xbb, struct kvm_enc_region)
-+#define KVM_MEM_ENC_UNREGISTER_REGION  _IOR(KVMIO, 0xbc, struct kvm_enc_region)
- 
- /* Available with KVM_CAP_HYPERV_EVENTFD */
- #define KVM_HYPERV_EVENTFD        _IOW(KVMIO,  0xbd, struct kvm_hyperv_eventfd)
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a852af5..4625f3a 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4786,7 +4786,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
- 	unregister_reboot_notifier(&kvm_reboot_notifier);
- 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
- out_free_2:
--	kvm_arch_hardware_unsetup();
-+	kvm_arch_hardware_teardown();
- out_free_1:
- 	free_cpumask_var(cpus_hardware_enabled);
- out_free_0:
-@@ -4808,7 +4808,7 @@ void kvm_exit(void)
- 	unregister_reboot_notifier(&kvm_reboot_notifier);
- 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
- 	on_each_cpu(hardware_disable_nolock, NULL, 1);
--	kvm_arch_hardware_unsetup();
-+	kvm_arch_hardware_teardown();
- 	kvm_arch_exit();
- 	kvm_irqfd_exit();
- 	free_cpumask_var(cpus_hardware_enabled);
--- 
-1.8.3.1
+writel 0x0 0xffffffff
 
+outw 0x171 0x32a
+  features :=3D 0x2a    b8cb
+  count :=3D 0x03;      b8cb
+outw 0x176 0x3570
+  device :=3D 0x70     (select device1)   b8cb
+  command :=3D 0x35    (DMA WRITE EXT)    8f98
+
+outl 0xcf8 0x80000903
+outl 0xcfc 0x4e002700
+outl 0xcf8 0x80000920
+outb 0xcfc 0x5e
+
+outb 0x58 0xe1
+  bmdma_cmd_writeb val =3D 0xe1 [1110 0001]
+                           DMA READ ^  ^ DMA Start
+outw 0x57 0x0
+  bmdma_cmd_writeb val =3D 0x00 [0000 0000]
+                                       ^ DMA Cancel
+EOF
+
+
+This should be a straightforward DMA cancel. I added some more traces;
+
+# After the 0x35 command write:
+ide_exec_cmd IDE exec cmd: bus 0x561808b0ecc0; state 0x561808b0f118; cmd 0x=
+35
+ide_sector_start_dma IDEState 0x561808b0f118;
+ide_start_dma IDEState 0x561808b0f118;
+
+# After the 0xe1 bmdma kick:
+ide_dma_cb_entry IDEState 0x561808b0f118; ret 0;
+ide_dma_cb IDEState 0x561808b0f118; sector_num=3D1 n=3D259 cmd=3DDMA WRITE
+ide_dma_cb_next IDEState 0x561808b0f118;
+
+So far, pretty normal. IDE calls the HBA's DMA start, but the HBA
+doesn't have DMA enabled, so it stalls. Later, when we turn on DMA, the
+HBA engages the DMA callback and sets up the first transfer. This sets
+s->bus->dma->aiocb.
+
+Then, we try to cancel DMA:
+
+ide_cancel_dma_sync IDEState 0x561808b0f118;
+ide_cancel_dma_sync_remaining draining all remaining requests
+1343877@1595891049.469050:dma_blk_cb dbs=3D0x55baededdc50 ret=3D0
+1343877@1595891049.469054:dma_map_wait dbs=3D0x55baededdc50
+qemu-system-i386: /home/jsnow/src/qemu/hw/ide/core.c:732: void ide_cancel_d=
+ma_sync(IDEState *): Assertion `s->bus->dma->aiocb =3D=3D NULL' failed.
+
+We still have a DMA callback out, so we try to synchronously cancel it;
+but the blk_drain doesn't appear to be effective!
+
+We apparently wind up here:
+
+    if (dbs->iov.size =3D=3D 0) {
+        trace_dma_map_wait(dbs);
+        dbs->bh =3D aio_bh_new(dbs->ctx, reschedule_dma, dbs);
+        cpu_register_map_client(dbs->bh);
+        return;
+    }
+
+
+... The DMA simply re-schedules itself (?) when iov.size is zero. unfortuna=
+tely for us, that means that the original point of scheduling the drain doe=
+sn't work, because the DMA never returns all the way to the IDE device emul=
+ation code.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1681439
+
+Title:
+  qemu-system-x86_64: hw/ide/core.c:685: ide_cancel_dma_sync: Assertion
+  `s->bus->dma->aiocb =3D=3D NULL' failed.
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  Since upgrading to QEMU 2.8.0, my Windows 7 64-bit virtual machines
+  started crashing due to the assertion quoted in the summary failing.
+  The assertion in question was added by commit 9972354856 ("block: add
+  BDS field to count in-flight requests").  My tests show that setting
+  discard=3Dunmap is needed to reproduce the issue.  Speaking of
+  reproduction, it is a bit flaky, because I have been unable to come up
+  with specific instructions that would allow the issue to be triggered
+  outside of my environment, but I do have a semi-sane way of testing that
+  appears to depend on a specific initial state of data on the underlying
+  storage volume, actions taken within the VM and waiting for about 20
+  minutes.
+
+  Here is the shortest QEMU command line that I managed to reproduce the
+  bug with:
+
+      qemu-system-x86_64 \
+          -machine pc-i440fx-2.7,accel=3Dkvm \
+          -m 3072 \
+          -drive file=3D/dev/lvm/qemu,format=3Draw,if=3Dide,discard=3Dunmap=
+ \
+  	-netdev tap,id=3Dhostnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhos=
+t=3Don \
+          -device virtio-net-pci,netdev=3Dhostnet0 \
+  	-vnc :0
+
+  The underlying storage (/dev/lvm/qemu) is a thin LVM snapshot.
+
+  QEMU was compiled using:
+
+      ./configure --python=3D/usr/bin/python2.7 --target-list=3Dx86_64-soft=
+mmu
+      make -j3
+
+  My virtualization environment is not really a critical one and
+  reproduction is not that much of a hassle, so if you need me to gather
+  further diagnostic information or test patches, I will be happy to help.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1681439/+subscriptions
 
