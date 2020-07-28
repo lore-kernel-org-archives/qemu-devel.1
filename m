@@ -2,100 +2,87 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C731C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0663AC433EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:30:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECE1E2075D
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:29:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="gHmUNT7Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE1E2075D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id D2C4E2075D
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:30:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2C4E2075D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Kze-0000GZ-92
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 04:29:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49928)
+	id 1k0L0F-00018v-5u
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 04:30:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1k0KwU-0003vV-LK
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:26:34 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:38925)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0KzV-0000Hg-7D
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:29:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47604)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1k0KwS-0000q4-MP
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:26:34 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id f9so4955279pju.4
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 01:26:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=UC0InaM2Av4NdGRB30AcNgGF6NmB2i/F1RQN192G0E0=;
- b=gHmUNT7Z0hYepK/a/IHgsaHkPfHTaZxEsXHq32AMZzjwvJ2IOrH0ATFeylOFqHKfXf
- t9oZqyOR8XMUsKY7DlXMMQZdyZNBWChkncRgeqy+ND71AgYtthjW6vGtt7307l29xoRR
- 4c/ih7hQW+DNqJzkIA31xpO1re6Ukrocb0Zp5o2Bu8MSiclpfuh3U2gTQyWI8i62Kobk
- HRqK6VP7uchy14bjAPiQZ/W75IJejkPZJEoIJ/fwi9R6T6Lv564N4qmePGihG/5qatVv
- Q9PLEustxY945RbmoIi5XShbPU6JMpJR48m0joisdfKJPbIRZhHIia27XiZFSFOQp4vD
- NmPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=UC0InaM2Av4NdGRB30AcNgGF6NmB2i/F1RQN192G0E0=;
- b=bYA5D+IF5rvkUiwZVr0sNEh6d1zle5xxhrhj9hCKsxblXC/KMQFYxOHA8+r9D0r6YC
- YMxGlm/g4iQPQWN+Wtb2gXqxLebeI+GygWF975hO5kEZSoCBIHVgijydYAGk0LmHVI25
- cXprxg/Sc1B1LqLXBh+RIvsp3/M/S6yRm/XRKbEghwCl96TeN2GcfKrEri4tyA4+v5Ph
- erzMxToNsKCyXBIyYr9b6Q+2QgdCZ4KDPWnykkX10kdq3ngSj8B2NdRPwnhQYOde4dj2
- a+Ro93fPIXBLu+yO5/WxI1RWYZpV4YBw6NOFwE58i5Ke6U5f/V9fdVDohMYoiZyn7PGy
- Jxwg==
-X-Gm-Message-State: AOAM531VzgneNsN8MKXxQ5YA3dHR9xWvXfoSqmK5W1TKbChtxh+bZJ11
- IOIJWJxJr222Gm9RsMGcEUks1A==
-X-Google-Smtp-Source: ABdhPJw7Wf/PUWOtDu/gHK+DK+I1oe0f4LPcvGnR5zBPgQ9DldM3nWupgVC7g+6FUAXx5nwd4LxPPw==
-X-Received: by 2002:a17:90a:ea83:: with SMTP id
- h3mr3524636pjz.176.1595924791246; 
- Tue, 28 Jul 2020 01:26:31 -0700 (PDT)
-Received: from hsinchu02.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id h2sm17599747pfk.93.2020.07.28.01.26.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jul 2020 01:26:30 -0700 (PDT)
-From: Zong Li <zong.li@sifive.com>
-To: palmer@dabbelt.com, Alistair.Francis@wdc.com, bmeng.cn@gmail.com,
- sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org
-Subject: [PATCH v6 4/4] target/riscv: Change the TLB page size depends on PMP
- entries.
-Date: Tue, 28 Jul 2020 16:26:17 +0800
-Message-Id: <6b0bf48662ef26ab4c15381a08e78a74ebd7ca79.1595924470.git.zong.li@sifive.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <cover.1595924470.git.zong.li@sifive.com>
-References: <cover.1595924470.git.zong.li@sifive.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0KzP-00017m-Mv
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:29:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k0KzO-0007um-3u
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 08:29:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1A0942E8106
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 08:29:34 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=zong.li@sifive.com; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Jul 2020 08:15:37 -0000
+From: Thomas Huth <1390520@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Wishlist; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=libvirt; component=main;
+ status=Confirmed; importance=Wishlist; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=trusty;
+ sourcepackage=libvirt; component=main; status=Won't Fix; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: arges fifo++ guitarrero janitor jnsnow paelzer
+ serge-hallyn stefan-kuhn-da
+X-Launchpad-Bug-Reporter: wolfgang (guitarrero)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20141107160655.5759.49372.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159592413878.10400.1782307773325334587.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1390520] Re: virtual machine fails to start with connected audio
+ cd
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 446d4e36a2fcc810b093ba6a21c0cfd370f792c5
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 02:15:06
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -104,125 +91,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zong Li <zong.li@sifive.com>
+Reply-To: Bug 1390520 <1390520@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The minimum granularity of PMP is 4 bytes, it is small than 4KB page
-size, therefore, the pmp checking would be ignored if its range doesn't
-start from the alignment of one page. This patch detects the pmp entries
-and sets the small page size to TLB if there is a PMP entry which cover
-the page size.
+** Changed in: qemu
+   Importance: Undecided =3D> Wishlist
 
-Signed-off-by: Zong Li <zong.li@sifive.com>
----
- target/riscv/cpu_helper.c | 10 ++++++--
- target/riscv/pmp.c        | 52 +++++++++++++++++++++++++++++++++++++++
- target/riscv/pmp.h        |  2 ++
- 3 files changed, 62 insertions(+), 2 deletions(-)
+-- =
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 2f337e418c..fd1d373b6f 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -693,6 +693,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     bool first_stage_error = true;
-     int ret = TRANSLATE_FAIL;
-     int mode = mmu_idx;
-+    target_ulong tlb_size = 0;
- 
-     env->guest_phys_fault_addr = 0;
- 
-@@ -784,8 +785,13 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     }
- 
-     if (ret == TRANSLATE_SUCCESS) {
--        tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
--                     prot, mmu_idx, TARGET_PAGE_SIZE);
-+        if (pmp_is_range_in_tlb(env, pa & TARGET_PAGE_MASK, &tlb_size)) {
-+            tlb_set_page(cs, address & ~(tlb_size - 1), pa & ~(tlb_size - 1),
-+                         prot, mmu_idx, tlb_size);
-+        } else {
-+            tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
-+                         prot, mmu_idx, TARGET_PAGE_SIZE);
-+        }
-         return true;
-     } else if (probe) {
-         return false;
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index aeba796484..adadf6e9ba 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -393,3 +393,55 @@ target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index)
- 
-     return val;
- }
-+
-+/*
-+ * Calculate the TLB size if the start address or the end address of
-+ * PMP entry is presented in thie TLB page.
-+ */
-+static target_ulong pmp_get_tlb_size(CPURISCVState *env, int pmp_index,
-+    target_ulong tlb_sa, target_ulong tlb_ea)
-+{
-+    target_ulong pmp_sa = env->pmp_state.addr[pmp_index].sa;
-+    target_ulong pmp_ea = env->pmp_state.addr[pmp_index].ea;
-+
-+    if (pmp_sa >= tlb_sa && pmp_ea <= tlb_ea) {
-+        return pmp_ea - pmp_sa + 1;
-+    }
-+
-+    if (pmp_sa >= tlb_sa && pmp_sa <= tlb_ea && pmp_ea >= tlb_ea) {
-+        return tlb_ea - pmp_sa + 1;
-+    }
-+
-+    if (pmp_ea <= tlb_ea && pmp_ea >= tlb_sa && pmp_sa <= tlb_sa) {
-+        return pmp_ea - tlb_sa + 1;
-+    }
-+
-+    return 0;
-+}
-+
-+/*
-+ * Check is there a PMP entry whcih range covers this page. If so,
-+ * try to find the minimum granularity for the TLB size.
-+ */
-+bool pmp_is_range_in_tlb(CPURISCVState *env, hwaddr tlb_sa,
-+    target_ulong *tlb_size)
-+{
-+    int i;
-+    target_ulong val;
-+    target_ulong tlb_ea = (tlb_sa + TARGET_PAGE_SIZE - 1);
-+
-+    for (i = 0; i < MAX_RISCV_PMPS; i++) {
-+        val = pmp_get_tlb_size(env, i, tlb_sa, tlb_ea);
-+        if (val) {
-+            if (*tlb_size == 0 || *tlb_size > val) {
-+                *tlb_size = val;
-+            }
-+        }
-+    }
-+
-+    if (*tlb_size != 0) {
-+        return true;
-+    }
-+
-+    return false;
-+}
-diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
-index 8e19793132..c70f2ea4c4 100644
---- a/target/riscv/pmp.h
-+++ b/target/riscv/pmp.h
-@@ -60,5 +60,7 @@ void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
- target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index);
- bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-     target_ulong size, pmp_priv_t priv, target_ulong mode);
-+bool pmp_is_range_in_tlb(CPURISCVState *env, hwaddr tlb_sa,
-+    target_ulong *tlb_size);
- 
- #endif
--- 
-2.27.0
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1390520
 
+Title:
+  virtual machine fails to start with connected audio cd
+
+Status in QEMU:
+  New
+Status in libvirt package in Ubuntu:
+  Confirmed
+Status in libvirt source package in Trusty:
+  Won't Fix
+
+Bug description:
+  when connecting a data cd with a virtual machine (IDE CDROM 1), the virtu=
+al machine starts up and the data cd is accessable (for example to install =
+software package or drivers),
+  but connecting an audio cd the following error appears:
+
+  -------------------------------------------------------------------------=
+------------------------------------------------------
+  cannot read header '/dev/sr0': Input/output error
+
+  Traceback (most recent call last):
+    File "/usr/share/virt-manager/virtManager/details.py", line 2530, in _c=
+hange_config_helper
+      func(*args)
+    File "/usr/share/virt-manager/virtManager/domain.py", line 850, in hotp=
+lug_storage_media
+      self.attach_device(devobj)
+    File "/usr/share/virt-manager/virtManager/domain.py", line 798, in atta=
+ch_device
+      self._backend.attachDevice(devxml)
+    File "/usr/lib/python2.7/dist-packages/libvirt.py", line 493, in attach=
+Device
+      if ret =3D=3D -1: raise libvirtError ('virDomainAttachDevice() failed=
+', dom=3Dself)
+  libvirtError: cannot read header '/dev/sr0': Input/output error
+  -------------------------------------------------------------------------=
+---------------------------------------------------
+
+  Description:    Ubuntu 14.04.1 LTS
+  Release:        14.04
+
+  qemu:
+    Installiert:           2.0.0+dfsg-2ubuntu1.6
+    Installationskandidat: 2.0.0+dfsg-2ubuntu1.6
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1390520/+subscriptions
 
