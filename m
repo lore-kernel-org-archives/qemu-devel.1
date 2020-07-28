@@ -2,61 +2,80 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E02C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 12:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 894CDC433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 13:12:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E05A20672
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 12:57:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E05A20672
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 54533206D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 13:12:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y4Odnk50"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54533206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0PAB-0000Qa-Ih
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 08:56:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60830)
+	id 1k0PP6-0003lu-IS
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 09:12:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>)
- id 1k0P9P-0007yz-JU; Tue, 28 Jul 2020 08:56:11 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48878)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>)
- id 1k0P9N-0004if-Ts; Tue, 28 Jul 2020 08:56:11 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 15C65ACB5;
- Tue, 28 Jul 2020 12:56:19 +0000 (UTC)
-Subject: Re: [PATCH for-5.1 2/2] iotests/028: Add test for cross-base-EOF reads
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200728120806.265916-1-mreitz@redhat.com>
- <20200728120806.265916-3-mreitz@redhat.com>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <aff4715f-7061-0b50-4975-0cc64db5723f@suse.de>
-Date: Tue, 28 Jul 2020 14:56:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k0POQ-0003Gd-QR
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 09:11:42 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50162
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k0POO-0006yC-LH
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 09:11:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595941899;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=gVQ8qgCj17cx9v5D9tR3+t6OmTfBo0qCDtQrd09v7eI=;
+ b=Y4Odnk50clu14O3uCNLDaKXObupn3n6YLiw/93Nj9y9a1zCCbfl2muZzk6BtfHqtsDFiYF
+ IugSd59//W1ApVLHADtZPm9rb3KtGcIRYdCha4Y+EB31SBE4cff0t3hahjYd2gENK9jlbK
+ dqL369XVL/Ygd8L0xEhKMYwaSvLZUjU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-Cvb8Zaw-PtGvt2jiiCHHrg-1; Tue, 28 Jul 2020 09:11:37 -0400
+X-MC-Unique: Cvb8Zaw-PtGvt2jiiCHHrg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DBCD80183C;
+ Tue, 28 Jul 2020 13:11:36 +0000 (UTC)
+Received: from localhost (ovpn-112-145.ams2.redhat.com [10.36.112.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CF0E46FEC6;
+ Tue, 28 Jul 2020 13:11:35 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2] iotests/197: Fix for non-qcow2 formats
+Date: Tue, 28 Jul 2020 15:11:34 +0200
+Message-Id: <20200728131134.902519-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200728120806.265916-3-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 01:54:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 06:02:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,73 +89,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-stable@nongnu.org, qemu-devel@nongnu.org, Bruce Rogers <brogers@suse.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tested-by: Claudio Fontana <cfontana@suse.de>
+While 197 is very much a qcow2 test, and it looks like the partial
+cluster case at the end (introduced in b0ddcbbb36a66a6) is specifically
+a qcow2 case, the whole test scripts actually marks itself to work with
+generic formats (and generic protocols, even).
 
-On 7/28/20 2:08 PM, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/028     | 19 +++++++++++++++++++
->  tests/qemu-iotests/028.out | 11 +++++++++++
->  2 files changed, 30 insertions(+)
-> 
-> diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-> index 5d043cef92..6dd3ae09a3 100755
-> --- a/tests/qemu-iotests/028
-> +++ b/tests/qemu-iotests/028
-> @@ -142,6 +142,25 @@ TEST_IMG="${TEST_IMG}.copy" io_zero readv $(( offset + 32 * 1024 )) 512 1024 32
->  
->  _check_test_img
->  
-> +echo
-> +echo '=== Reading across backing EOF in one operation ==='
-> +echo
-> +
-> +# Use a cluster boundary as the base end here
-> +base_size=$((3 * 1024 * 1024 * 1024))
-> +
-> +TEST_IMG="$TEST_IMG.base" _make_test_img $base_size
-> +_make_test_img -b "$TEST_IMG.base" -F $IMGFMT $image_size
-> +
-> +# Write 16 times 42 at the end of the base image
-> +$QEMU_IO -c "write -P 42 $((base_size - 16)) 16" "$TEST_IMG.base" \
-> +    | _filter_qemu_io
-> +
-> +# Read 32 bytes across the base EOF from the top;
-> +# should be 16 times 0x2a, then 16 times 0x00
-> +$QEMU_IO -c "read -v $((base_size - 16)) 32" "$TEST_IMG" \
-> +    | _filter_qemu_io
-> +
->  # success, all done
->  echo "*** done"
->  rm -f $seq.full
-> diff --git a/tests/qemu-iotests/028.out b/tests/qemu-iotests/028.out
-> index 12f82c6a6c..5a68de5c46 100644
-> --- a/tests/qemu-iotests/028.out
-> +++ b/tests/qemu-iotests/028.out
-> @@ -730,4 +730,15 @@ read 512/512 bytes at offset 3221257728
->  read 512/512 bytes at offset 3221258752
->  512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  No errors were found on the image.
-> +
-> +=== Reading across backing EOF in one operation ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=3221225472
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=4294968832 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
-> +wrote 16/16 bytes at offset 3221225456
-> +16 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +bffffff0:  2a 2a 2a 2a 2a 2a 2a 2a 2a 2a 2a 2a 2a 2a 2a 2a  ................
-> +c0000000:  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> +read 32/32 bytes at offset 3221225456
-> +32 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  *** done
-> 
+Said partial cluster case happened to work with non-qcow2 formats as
+well (mostly by accident), but 1855536256 broke that, because it sets
+the compat option, which does not work for non-qcow2 formats.
+
+So go the whole way and force IMGFMT=qcow2 and IMGPROTO=file, as done in
+other places in this test.
+
+Fixes: 1855536256eb0a5708b04b85f744de69559ea323
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+v2:
+- Add --no-opts to the _make_test_img line so this passes for formats
+  that have some default non-empty $IMGOPTS (like vmdk)
+---
+ tests/qemu-iotests/197     | 8 +++++---
+ tests/qemu-iotests/197.out | 2 +-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
+index 121959a09c..a161c89816 100755
+--- a/tests/qemu-iotests/197
++++ b/tests/qemu-iotests/197
+@@ -114,9 +114,11 @@ echo
+ 
+ # Force compat=1.1, because writing zeroes on a v2 image without a
+ # backing file would just result in an unallocated cluster
+-_make_test_img -o compat=1.1 1024
+-$QEMU_IO -f $IMGFMT -C -c 'read 0 1024' "$TEST_IMG" | _filter_qemu_io
+-$QEMU_IO -f $IMGFMT -c map "$TEST_IMG"
++# (Also, note that this is really a pure qcow2 test.)
++IMGPROTO=file IMGFMT=qcow2 TEST_IMG_FILE="$TEST_WRAP" \
++    _make_test_img --no-opts -o compat=1.1 1024
++$QEMU_IO -f qcow2 -C -c 'read 0 1024' "$TEST_WRAP" | _filter_qemu_io
++$QEMU_IO -f qcow2 -c map "$TEST_WRAP"
+ _check_test_img
+ 
+ # success, all done
+diff --git a/tests/qemu-iotests/197.out b/tests/qemu-iotests/197.out
+index 7ca46be6e4..ad414c3b0e 100644
+--- a/tests/qemu-iotests/197.out
++++ b/tests/qemu-iotests/197.out
+@@ -26,7 +26,7 @@ Images are identical.
+ 
+ === Partial final cluster ===
+ 
+-Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1024
++Formatting 'TEST_DIR/t.wrap.IMGFMT', fmt=IMGFMT size=1024
+ read 1024/1024 bytes at offset 0
+ 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ 1 KiB (0x400) bytes     allocated at offset 0 bytes (0x0)
+-- 
+2.26.2
 
 
