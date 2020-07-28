@@ -2,102 +2,82 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F48C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95303C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:21:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91CDD207F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:20:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DDct2mh5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91CDD207F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6A4352070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:21:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A4352070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0JuW-0005Jz-Rh
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 03:20:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34378)
+	id 1k0JvU-0006MS-Ow
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 03:21:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k0Jth-0004sN-8m
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:19:37 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55835
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k0Jtf-0000Tu-Jm
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:19:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595920773;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=etsKp6eUHvowZpjko+WHii8IkNFTldq5c81krElRdoU=;
- b=DDct2mh5OJ6oGrpf9vYz1N30ERI0ZrTQU9g0XWnPO9voh0V2lwF931+Ta72qotEbR3cCba
- +NkbePJG5wafhKWfsSaxGvJ6FaaW5CqaK0PGzorW+M3z9QTZzrjZKbu8xNGqDIVY/oPj12
- eOdLzEjmc/A5Ub13bHiHG76l2IkIEGw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-WYehxzBXMGiaRgiYBGYhPw-1; Tue, 28 Jul 2020 03:19:31 -0400
-X-MC-Unique: WYehxzBXMGiaRgiYBGYhPw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC9D458;
- Tue, 28 Jul 2020 07:19:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 68C8019C66;
- Tue, 28 Jul 2020 07:19:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E290F1132FD2; Tue, 28 Jul 2020 09:19:28 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: sysbus_create_simple Vs qdev_create
-References: <CA+aXn+EkkyiXmKpNhbggy0pjKVpiHxa+TUqEnZLB4v_D=T+7tA@mail.gmail.com>
- <CA+aXn+HHXAmT6Ljj2tpovGAYSurHKSdtUL3y-89t31B0e7jpsA@mail.gmail.com>
- <adb25c78-2edc-115a-5264-ca9f97864ec7@redhat.com>
- <87365t18mp.fsf@dusky.pond.sub.org>
- <CA+aXn+Guvt34PDD=N3FsD5w1C-aDXZ7gS8H_AZN-JEM8j8wBiQ@mail.gmail.com>
- <87lfjkvo81.fsf@dusky.pond.sub.org>
- <20200716222130.GO1274972@habkost.net>
- <87tuy6k9pa.fsf@dusky.pond.sub.org>
- <20200717162312.GR1274972@habkost.net>
- <87r1t6hc0f.fsf@dusky.pond.sub.org>
- <20200720155955.GV1274972@habkost.net>
- <87v9ihbe6u.fsf@dusky.pond.sub.org>
- <50e31ece-215c-a632-e5a2-86ae7ab3abab@redhat.com>
-Date: Tue, 28 Jul 2020 09:19:28 +0200
-In-Reply-To: <50e31ece-215c-a632-e5a2-86ae7ab3abab@redhat.com> (Paolo
- Bonzini's message of "Mon, 27 Jul 2020 16:29:43 +0200")
-Message-ID: <87lfj4f6nz.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0Juo-0005my-BS
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36790)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0Jul-0000k2-D5
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:20:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k0Juj-0000fJ-7C
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 07:20:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 2B8872E80D2
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 07:20:41 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 00:06:48
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Jul 2020 07:05:53 -0000
+From: Thomas Huth <1888923@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: bandwidth hmat hmat-lb latency
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: imammedo rvdixit23
+X-Launchpad-Bug-Reporter: Vishnu Dixit (rvdixit23)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <159566199879.4877.1642879405857907906.malonedeb@wampee.canonical.com>
+Message-Id: <159591995442.4950.15737201959046694076.launchpad@soybean.canonical.com>
+Subject: [Bug 1888923] Re: Configured Memory access latency and bandwidth not
+ taking effect
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 320c71f297a396876913c478b35dcea7bd955953
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 02:15:06
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -106,116 +86,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?utf-8?Q?Berrang?= =?utf-8?Q?=C3=A9?=" <berrange@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Dau?= =?utf-8?Q?d=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Pratik Parvati <pratikp@vayavyalabs.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1888923 <1888923@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-> On 21/07/20 08:00, Markus Armbruster wrote:
->>> They are already mirrored as links, and guess what's the link
->>> name: "child[...]".
->> You're right, except for the link name: it's parent_bus.
->
-> There's links in both directions.
->
->> So the qtree is actually embedded in the QOM graph: it's the device and
->> bus nodes connected by the child edges from device to provided bus and
->> parent_bus link egdes from device to bus it's plugged into, except the
->> latter are backward rather than forward.
->> 
->> Strange: even bus-less devices have this parent_bus link, and its value
->> is "" (the underlying pointer is null, and null gets mapped to "", for
->> better or worse).
->> 
->> Should the property be limited to devices that actually have a parent
->> bus?
->
-> Yes, it could be done.
->
->>>> I don't know why the rebase of qdev onto QOM was done that way.  Perhaps
->>>> Paolo remembers.
->>> I'm guessing this is because QOM parent/child relationships
->>> represent ownership, while there's no ownership relationship
->>> between buses and devices.
->>
->> Plausible.  I guess the separate qtree was kept even though it's
->> redundant with the QOM graph because switching its users to the QOM
->> graph would be work.
->
-> No, it was kept because:
->
-> 1) the QOM graph wasn't embedding the qdev tree at the time.  That was
-> added later.
->
-> 2) the composition tree generally mirrors things that are born and die
-> at the same time, and creating children is generally reserved to the
-> object itself.
+-- =
 
-Yes.  Notable exceptions: containers /machine/peripheral,
-/machine/peripheral-anon, /machine/unattached.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888923
 
->                 Children are usually embedded directly in a struct, for
-> example.
+Title:
+  Configured Memory access latency and bandwidth not taking effect
 
-We sometimes use object_new() + object_property_add_child() instead.
-Extra indirection.  I guess we'd be better off without the extra
-indirection most of the time.  Implementation detail.
+Status in QEMU:
+  Invalid
 
-We sometimes use object_new() without object_property_add_child(), and
-have qdev_realize() put the device in the /machine/unattached orphanage.
-Meh.  I guess the orphanage feature exists to make conversion to QOM
-slightly easier.  Could we ban its use for new boards at least?
+Bug description:
+  I was trying to configure latencies and bandwidths between nodes in a
+  NUMA emulation using QEMU 5.0.0.
 
->           Instead, peripherals are not created by the bus, they are
-> created by the device_add monitor command and the like.
+  Host : Ubuntu 20.04 64 bit
+  Guest : Ubuntu 18.04 64 bit
 
-Plugged devices (the ones created with -device / device_add) have
-/machine/peripheral or /machine/peripheral-anon as QOM parent.
+  The machine configured has 2 nodes. Each node has 2 CPUs and has been
+  allocated 3GB of memory. The memory access latencies and bandwidths
+  for a local access (i.e from initiator 0 to target 0, and from
+  initiator 1 to target 1) are set as 40ns and 10GB/s respectively. The
+  memory access latencies and bandwidths for a remote access (i.e from
+  initiator 1 to target 0, and from initiator 0 to target 1) are set as
+  80ns and 5GB/s respectively.
 
-> 3) accessing the QOM graph is slow (it requires hash table lookups,
-> string comparisons and all that), so the pointers that cache the
-> parent-child links are needed for use in hot paths.
+  The command line launch is as follows.
 
-True, but only because QOM's design opts for generality, efficiency be
-damned :)
+  sudo x86_64-softmmu/qemu-system-x86_64  \
+  -machine hmat=3Don \
+  -boot c \
+  -enable-kvm \
+  -m 6G,slots=3D2,maxmem=3D7G \
+  -object memory-backend-ram,size=3D3G,id=3Dm0 \
+  -object memory-backend-ram,size=3D3G,id=3Dm1 \
+  -numa node,nodeid=3D0,memdev=3Dm0 \
+  -numa node,nodeid=3D1,memdev=3Dm1 \
+  -smp 4,sockets=3D4,maxcpus=3D4  \
+  -numa cpu,node-id=3D0,socket-id=3D0 \
+  -numa cpu,node-id=3D0,socket-id=3D1 \
+  -numa cpu,node-id=3D1,socket-id=3D2 \
+  -numa cpu,node-id=3D1,socket-id=3D3 \
+  -numa dist,src=3D0,dst=3D1,val=3D20 \
+  -net nic \
+  -net user \
+  -hda testing.img \
+  -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
+ess-latency,latency=3D40 \
+  -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
+ess-bandwidth,bandwidth=3D10G \
+  -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
+ess-latency,latency=3D80 \
+  -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
+ess-bandwidth,bandwidth=3D5G \
+  -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
+ess-latency,latency=3D80 \
+  -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
+ess-bandwidth,bandwidth=3D5G \
+  -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
+ess-latency,latency=3D40 \
+  -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
+ess-bandwidth,bandwidth=3D10G \
 
-The QOM graph's edges are properties.
+  Then the latencies and bandwidths between the nodes were tested using
+  the Intel Memory Latency Checker v3.9
+  (https://software.intel.com/content/www/us/en/develop/articles/intelr-
+  memory-latency-checker.html). But the obtained results did not match
+  the configuration. The following are the results obtained.
 
-The child edges form the QOM composition tree.  The property contains
-the child in ObjectProperty member @opaque.  To go from parent to child,
-you have to get the property by name (hash table lookup), then follow
-@opaque.  Except that would be too simple (and way too efficient), so we
-convert pointers to QOM path names and back with visitors for accessing
-a single child, or iterate over all properties (hash table iteration)
-for accessing all children.
+  Latency_matrix with idle latencies (in ns)
 
-There is also a pointer from child back to parent, which is not a
-property.  That one is actually fast and easy to use from C.
+  Numa Node
+  . .0. . .1.
+  0 36.2 36.4
+  1 34.9 35.4
 
-The remaining QOM graph edges are link edges.  Compared to child edges,
-there's a further indirection through the LinkProperty struct, and no
-support for iterating over link edge targets.
+  Bandwidth_matrix with memory bandwidths (in MB/s)
 
-This design supports adding arbitrary children and links at run time,
-with the actual object none the wiser.
+  Numa Node
+  . . .0. . . .1. =
 
-A less general and more efficient design would put pointers right into
-the objects' structs, then wrap what we call class properties around the
-pointers.  C code for specific objects could then simply follow the
-pointers.  Generic code could still use properties.  If efficiency
-matters there, we could avoid the detour through path names.
+  0 15167.1 15308.9
+  1 15226.0 15234.0
 
-Properties backed by a (pointer-valued) struct member are less general,
-of course: you can't add this kind of property without first adding the
-struct member.  The property needs to be declared at compile time rather
-than built at run time.
+  A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D from=
+ lmbench to
+  measure the memory read latencies. This also gave results which did
+  not match the config.
 
-I never quite understood why we need to build properties at run time.
-It's makes reasoning about properties harder, and introspection brittle.
+  Any information on why the config latency and bandwidth values are not
+  applied, would be appreciated.
 
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888923/+subscriptions
 
