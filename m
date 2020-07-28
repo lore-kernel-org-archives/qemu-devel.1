@@ -2,69 +2,82 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 558FEC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 01:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B7A2C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 01:36:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2414820838
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 01:37:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2414820838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id E1F3B20838
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 01:36:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1F3B20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0EYg-0002dw-Ep
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 21:37:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57128)
+	id 1k0EXg-0001Aw-6o
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 21:36:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
- id 1k0EXX-0001D0-6L; Mon, 27 Jul 2020 21:36:23 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:33762 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhukeqian1@huawei.com>)
- id 1k0EXV-00058e-Cz; Mon, 27 Jul 2020 21:36:22 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 0BD3A25CBDE627D941BF;
- Tue, 28 Jul 2020 09:36:16 +0800 (CST)
-Received: from [10.174.187.22] (10.174.187.22) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 28 Jul 2020 09:36:06 +0800
-Subject: Re: [PATCH] bugfix: irq: Avoid covering object refcount of qemu_irq
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200727130225.32640-1-zhukeqian1@huawei.com>
- <CAFEAcA9vQMP0YLAuzdPW2m3RcRNySxA0gJQZmeXBUYRy4=Dk+w@mail.gmail.com>
-From: zhukeqian <zhukeqian1@huawei.com>
-Message-ID: <d8b6e214-a729-26a6-ae2f-f6b59091b613@huawei.com>
-Date: Tue, 28 Jul 2020 09:36:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0EWu-0000Lb-RL
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 21:35:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44572)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0EWs-00052H-Tp
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 21:35:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k0EWq-0008Cs-Lq
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 01:35:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 92B612E80EE
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 01:35:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9vQMP0YLAuzdPW2m3RcRNySxA0gJQZmeXBUYRy4=Dk+w@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.22]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhukeqian1@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 21:36:16
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Jul 2020 01:27:17 -0000
+From: John Snow <1883739@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=jsnow@redhat.com; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bugs-syssec jnsnow
+X-Launchpad-Bug-Reporter: Bugs SysSec (bugs-syssec)
+X-Launchpad-Bug-Modifier: John Snow (jnsnow)
+X-Launchpad-Bug-Duplicate: 1777315
+References: <159232297702.28606.15425668787325606341.malonedeb@soybean.canonical.com>
+Message-Id: <159589963744.3412.2947305099743233679.launchpad@gac.canonical.com>
+Subject: [Bug 1883739] Re: ide_dma_cb: Assertion `prep_size >= 0 && prep_size
+ <= n * 512' failed.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 140e62e6c0e5b1204e4c134c59a7635d8b44b18c
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 21:25:57
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,65 +86,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Esteban Bosse <estebanbosse@gmail.com>,
- Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, yezengruan@huawei.com,
- qemu-arm <qemu-arm@nongnu.org>, wanghaibin.wang@huawei.com,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Reply-To: Bug 1883739 <1883739@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+*** This bug is a duplicate of bug 1777315 ***
+    https://bugs.launchpad.net/bugs/1777315
 
-On 2020/7/27 22:41, Peter Maydell wrote:
-> On Mon, 27 Jul 2020 at 14:03, Keqian Zhu <zhukeqian1@huawei.com> wrote:
->>
->> Avoid covering object refcount of qemu_irq, otherwise it may causes
->> memory leak.
->>
->> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->> ---
->>  hw/core/irq.c | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/core/irq.c b/hw/core/irq.c
->> index fb3045b912..59af4dfc74 100644
->> --- a/hw/core/irq.c
->> +++ b/hw/core/irq.c
->> @@ -125,7 +125,9 @@ void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler handler, int n)
->>      int i;
->>      qemu_irq *old_irqs = qemu_allocate_irqs(NULL, NULL, n);
->>      for (i = 0; i < n; i++) {
->> -        *old_irqs[i] = *gpio_in[i];
->> +        old_irqs[i]->handler = gpio_in[i]->handler;
->> +        old_irqs[i]->opaque = gpio_in[i]->opaque;
->> +
->>          gpio_in[i]->handler = handler;
->>          gpio_in[i]->opaque = &old_irqs[i];
->>      }
-> 
-> This function is leaky by design, because it doesn't do anything
-> with the old_irqs array and there's no function for un-intercepting
-> the IRQs (which would need to free that memory). This is not ideal
-> but OK because it's only used in the test suite.
-One of our internal self-developed module also use this function, and we
-implemented a function to remove intercepting, so there is no memory leak
-after this bugfix.
+** This bug has been marked a duplicate of bug 1777315
+   Denial of service
 
-I suggest to merge this bugfix to prepare for future code which may invoke
-this function.
+-- =
 
-> 
-> Is there a specific bug you're trying to fix here?
-The memory leak is reported by ASAN.
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1883739
 
-Thanks,
-Keqian
-> thanks
-> -- PMM
-> .
-> 
+Title:
+  ide_dma_cb: Assertion `prep_size >=3D 0 && prep_size <=3D n * 512' failed.
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  To reproduce run the QEMU with the following command line:
+  ```
+  qemu-system-x86_64 -cdrom hypertrash.iso -nographic -m 100 -enable-kvm -n=
+et none -drive id=3Ddisk,file=3Dhda.img,if=3Dnone -device ahci,id=3Dahci -d=
+evice ide-hd,drive=3Ddisk,bus=3Dahci.0
+  ```
+
+  QEMU Version:
+  ```
+  # qemu-5.0.0
+  $ ./configure --target-list=3Dx86_64-softmmu --enable-sanitizers; make
+  $ x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 5.0.0
+  Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+  ```
+
+  To create disk image run:
+  ```
+  dd if=3D/dev/zero of=3Dhda.img bs=3D1024 count=3D1024
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1883739/+subscriptions
 
