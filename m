@@ -7,65 +7,64 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6918C433F1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2036BC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:33:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ECD0207E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:37:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ECD0207E8
+	by mail.kernel.org (Postfix) with ESMTPS id E587F20792
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:33:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E587F20792
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0JEc-0005Kd-PX
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 02:37:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50872)
+	id 1k0JAp-0007mP-3s
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 02:33:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1k0J5q-0001N2-9Q
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:28:06 -0400
-Received: from mga09.intel.com ([134.134.136.24]:37270)
+ id 1k0J5f-000171-4R
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:27:55 -0400
+Received: from mga11.intel.com ([192.55.52.93]:41265)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1k0J5o-0002B0-9s
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:28:05 -0400
-IronPort-SDR: 1LexbXZzBZp0DA2pVHbv4Kdm4TxJOXzYFRSYlEqOOgW09N648YQ2XWuPYnNuv4W+9jjkcUsx2B
- s5a5L6R2zZPQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="152412067"
-X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="152412067"
+ id 1k0J5a-0002At-UT
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:27:54 -0400
+IronPort-SDR: X2VwYHWph6vups1BSsJKma9jw/U8K/IIQYSKS7yeDaevxdd2oLHB+doX+aiJLNn0y73lCmD+BB
+ eOKnhmU8Ezag==
+X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="149021037"
+X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="149021037"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 27 Jul 2020 23:27:55 -0700
-IronPort-SDR: ejMU6DzdEDW/ABSoGRiipppTxqc9OzO7XfaQxChOAC7EQJFA5skIXq+AIvA81uV11Q6WgEXI9m
- S2V3TpLbWJQw==
+ by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 27 Jul 2020 23:27:36 -0700
+IronPort-SDR: gjiCFW7yS1WHS4TgbI/iVZNh8UNwneCKfXy6nGYMmpwpFVATz/Oy9i9dqz4+k+yuiseWErmGI8
+ Oe5AmSEsCs1Q==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="394233075"
+X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="394232840"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2020 23:27:54 -0700
+ by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2020 23:27:35 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com,
  jasowang@redhat.com
-Subject: [RFC v9 21/25] vfio: add support for flush iommu stage-1 cache
-Date: Mon, 27 Jul 2020 23:34:14 -0700
-Message-Id: <1595918058-33392-22-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v9 06/25] vfio: pass nesting requirement into vfio_get_group()
+Date: Mon, 27 Jul 2020 23:33:59 -0700
+Message-Id: <1595918058-33392-7-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
 References: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
-Received-SPF: pass client-ip=134.134.136.24; envelope-from=yi.l.liu@intel.com;
- helo=mga09.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 02:27:45
+Received-SPF: pass client-ip=192.55.52.93; envelope-from=yi.l.liu@intel.com;
+ helo=mga11.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 02:27:41
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -68
 X-Spam_score: -6.9
 X-Spam_bar: ------
 X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,10 +86,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds flush_stage1_cache() definition in HostIOMUContextClass.
-And adds corresponding implementation in VFIO. This is to expose a way
-for vIOMMU to flush stage-1 cache in host side since guest owns stage-1
-translation structures in dual stage DMA translation configuration.
+This patch passes the nesting requirement into vfio_get_group() to
+indicate whether VFIO_TYPE1_NESTING_IOMMU is required.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -99,112 +96,110 @@ Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
 Cc: David Gibson <david@gibson.dropbear.id.au>
 Cc: Alex Williamson <alex.williamson@redhat.com>
-Acked-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/iommu/host_iommu_context.c         | 19 +++++++++++++++++++
- hw/vfio/common.c                      | 24 ++++++++++++++++++++++++
- include/hw/iommu/host_iommu_context.h |  8 ++++++++
- 3 files changed, 51 insertions(+)
+ hw/vfio/ap.c                  | 2 +-
+ hw/vfio/ccw.c                 | 2 +-
+ hw/vfio/common.c              | 3 ++-
+ hw/vfio/pci.c                 | 9 ++++++++-
+ hw/vfio/platform.c            | 2 +-
+ include/hw/vfio/vfio-common.h | 3 ++-
+ 6 files changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/hw/iommu/host_iommu_context.c b/hw/iommu/host_iommu_context.c
-index c43965c..a3f7706 100644
---- a/hw/iommu/host_iommu_context.c
-+++ b/hw/iommu/host_iommu_context.c
-@@ -113,6 +113,25 @@ int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-     return hicxc->unbind_stage1_pgtbl(iommu_ctx, unbind);
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index b9330a8..2101a1c 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -82,7 +82,7 @@ static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
+ 
+     g_free(group_path);
+ 
+-    return vfio_get_group(groupid, &address_space_memory, errp);
++    return vfio_get_group(groupid, &address_space_memory, false, errp);
  }
  
-+int host_iommu_ctx_flush_stage1_cache(HostIOMMUContext *iommu_ctx,
-+                                 struct iommu_cache_invalidate_info *cache)
-+{
-+    HostIOMMUContextClass *hicxc;
-+
-+    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-+
-+    if (!hicxc) {
-+        return -EINVAL;
-+    }
-+
-+    if (!(iommu_ctx->flags & HOST_IOMMU_NESTING) ||
-+        !hicxc->flush_stage1_cache) {
-+        return -EINVAL;
-+    }
-+
-+    return hicxc->flush_stage1_cache(iommu_ctx, cache);
-+}
-+
- void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-                          const char *mrtypename,
-                          uint64_t flags,
+ static void vfio_ap_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index ff7f369..30d00a7 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -621,7 +621,7 @@ static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
+         return NULL;
+     }
+ 
+-    return vfio_get_group(groupid, &address_space_memory, errp);
++    return vfio_get_group(groupid, &address_space_memory, false, errp);
+ }
+ 
+ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
 diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 3f09e74..97b8200 100644
+index 3335714..80d7a00 100644
 --- a/hw/vfio/common.c
 +++ b/hw/vfio/common.c
-@@ -1275,6 +1275,29 @@ static int vfio_host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-     return ret;
+@@ -1457,7 +1457,8 @@ static void vfio_disconnect_container(VFIOGroup *group)
+     }
  }
  
-+static int vfio_host_iommu_ctx_flush_stage1_cache(HostIOMMUContext *iommu_ctx,
-+                                    struct iommu_cache_invalidate_info *cache)
-+{
-+    VFIOContainer *container = container_of(iommu_ctx,
-+                                            VFIOContainer, iommu_ctx);
-+    struct vfio_iommu_type1_nesting_op *op;
-+    unsigned long argsz;
-+    int ret = 0;
-+
-+    argsz = sizeof(*op) + sizeof(*cache);
-+    op = g_malloc0(argsz);
-+    op->argsz = argsz;
-+    op->flags = VFIO_IOMMU_NESTING_OP_CACHE_INVLD;
-+    memcpy(&op->data, cache, sizeof(*cache));
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_NESTING_OP, op)) {
-+        ret = -errno;
-+        error_report("%s: iommu cache flush failed: %m", __func__);
+-VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
++VFIOGroup *vfio_get_group(int groupid, AddressSpace *as,
++                          bool want_nested, Error **errp)
+ {
+     VFIOGroup *group;
+     char path[32];
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 2e561c0..8cd1e72 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2714,6 +2714,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     int groupid;
+     int i, ret;
+     bool is_mdev;
++    bool want_nested;
+ 
+     if (!vdev->vbasedev.sysfsdev) {
+         if (!(~vdev->host.domain || ~vdev->host.bus ||
+@@ -2771,7 +2772,13 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+ 
+     trace_vfio_realize(vdev->vbasedev.name, groupid);
+ 
+-    group = vfio_get_group(groupid, pci_device_iommu_address_space(pdev), errp);
++    if (pci_device_get_iommu_attr(pdev,
++                         IOMMU_WANT_NESTING, &want_nested)) {
++        want_nested = false;
 +    }
-+    g_free(op);
-+    return ret;
-+}
 +
- /**
-  * Get iommu info from host. Caller of this funcion should free
-  * the memory pointed by the returned pointer stored in @info
-@@ -2023,6 +2046,7 @@ static void vfio_host_iommu_context_class_init(ObjectClass *klass,
-     hicxc->pasid_free = vfio_host_iommu_ctx_pasid_free;
-     hicxc->bind_stage1_pgtbl = vfio_host_iommu_ctx_bind_stage1_pgtbl;
-     hicxc->unbind_stage1_pgtbl = vfio_host_iommu_ctx_unbind_stage1_pgtbl;
-+    hicxc->flush_stage1_cache = vfio_host_iommu_ctx_flush_stage1_cache;
- }
++    group = vfio_get_group(groupid, pci_device_iommu_address_space(pdev),
++                           want_nested, errp);
+     if (!group) {
+         goto error;
+     }
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index ac2cefc..7ad7702 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -580,7 +580,7 @@ static int vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
  
- static const TypeInfo vfio_host_iommu_context_info = {
-diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
-index 2883ed8..40e860a 100644
---- a/include/hw/iommu/host_iommu_context.h
-+++ b/include/hw/iommu/host_iommu_context.h
-@@ -64,6 +64,12 @@ typedef struct HostIOMMUContextClass {
-     /* Undo a previous bind. @unbind specifies the unbind info. */
-     int (*unbind_stage1_pgtbl)(HostIOMMUContext *iommu_ctx,
-                                struct iommu_gpasid_bind_data *unbind);
-+    /*
-+     * Propagate stage-1 cache flush to host IOMMU, cache
-+     * info specifid in @cache
-+     */
-+    int (*flush_stage1_cache)(HostIOMMUContext *iommu_ctx,
-+                              struct iommu_cache_invalidate_info *cache);
- } HostIOMMUContextClass;
+     trace_vfio_platform_base_device_init(vbasedev->name, groupid);
  
- /*
-@@ -85,6 +91,8 @@ int host_iommu_ctx_bind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-                                      struct iommu_gpasid_bind_data *bind);
- int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-                                  struct iommu_gpasid_bind_data *unbind);
-+int host_iommu_ctx_flush_stage1_cache(HostIOMMUContext *iommu_ctx,
-+                               struct iommu_cache_invalidate_info *cache);
- 
- void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-                          const char *mrtypename,
+-    group = vfio_get_group(groupid, &address_space_memory, errp);
++    group = vfio_get_group(groupid, &address_space_memory, false, errp);
+     if (!group) {
+         return -ENOENT;
+     }
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index c78f3ff..bdb09f4 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -174,7 +174,8 @@ void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled);
+ void vfio_region_exit(VFIORegion *region);
+ void vfio_region_finalize(VFIORegion *region);
+ void vfio_reset_handler(void *opaque);
+-VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
++VFIOGroup *vfio_get_group(int groupid, AddressSpace *as,
++                          bool want_nested, Error **errp);
+ void vfio_put_group(VFIOGroup *group);
+ int vfio_get_device(VFIOGroup *group, const char *name,
+                     VFIODevice *vbasedev, Error **errp);
 -- 
 2.7.4
 
