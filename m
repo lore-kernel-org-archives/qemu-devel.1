@@ -2,83 +2,87 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E538C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 15:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DD9C433F1
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 15:38:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42FE2206D8
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 15:36:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42FE2206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C0422078E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 15:38:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="abkk2UTz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C0422078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Ree-00043d-FZ
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 11:36:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49782)
+	id 1k0RgF-00051q-9g
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 11:38:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1k0Re3-0003ZA-PB
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 11:35:59 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:44861)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
- (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1k0Re1-0003vk-Nu
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 11:35:59 -0400
-Received: from mail-vk1-f200.google.com ([209.85.221.200])
- by youngberry.canonical.com with esmtps
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
- (envelope-from <christian.ehrhardt@canonical.com>)
- id 1k0Rdy-0006dB-Tj
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 15:35:55 +0000
-Received: by mail-vk1-f200.google.com with SMTP id b128so6606975vka.17
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 08:35:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1k0Rfe-0004a7-T3; Tue, 28 Jul 2020 11:37:38 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:33530)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1k0Rfb-0004Hu-Rj; Tue, 28 Jul 2020 11:37:38 -0400
+Received: by mail-il1-x141.google.com with SMTP id p16so5762514ile.0;
+ Tue, 28 Jul 2020 08:37:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZzqjNDHjyBP72RmWzIfEhocBh3SxGafaKx89XkWeqb8=;
+ b=abkk2UTz6XGzoCZenSFYzUR2bd4W6Lv2Mm31X0sjjg5ZJnwGziSzgo8meiEs6LArGo
+ AAEB/FGwe6kWtSJJDuhe5GAODmAQgDMmdiHXLLtyEiMZKGYgylSTKnaTreseszUGhLtl
+ WASjHB9QtOc9dbstSf+luZTJeQq2QswC2rwlXHYMeOLyIQZUa01z3HN18hpbFLjp1TMU
+ uDoLDyOvCnj33EY6w/IGGHazVTvqMWxEZjugAdn8s9WXAPJW1JAuE/H+NcShFBrqa2Ri
+ Fonkdei8BHSrqyheLi9USO0ql7a+d53QIGxyDjWPUrtRE0GVnr2mOrDRwDOXFTdZS77y
+ XZpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=mFDQCktakhwVAEppX4yHYmu7f/9fuhVpPW+ZcqQ6Fy8=;
- b=P/SLq9YfcJN1WiVQpcm5iKYwLD6NTOxC3FR4a6h84XQWrkqLMNWfk2WfKTX9TPjxhX
- 0mkx7Q6AcNuLQSwJa9zIB5kcgDcLChmXmPx7oV5HIq8S0GwD5o3fW7Qa9SlFak3PsFY/
- Pb/bWxUW4Ctn9lbqFoxO/8Q/6USjnpvHNJoIzE98USRghMLv91EQuPJDSTMAUstzUZ1B
- iq6Jdjl116YcHyuaFYQ8QAugviQ/N9mjvIYKIvmsUfyHxYkTxVTMFOczgfd1/D6WY9d4
- g1nTdFrM+46OINMygsq9llBDvH8nAfUtvHA+diPvU2/p/Q/S9Hqox62DgbxYhTF5sFNH
- OoBw==
-X-Gm-Message-State: AOAM530aPHxbWIsbJpMA7rJO4hlT9txVEs+BcHxw6L3YmmQB5dte2JWa
- gUdPz4kbOBTrbyjRTbQnq3NyjJlNlHDAGsElvD4TmhaoyKCSu7MMCfheEBKQsP72OdPxMkhZB1B
- pd+3GPuZl8T3Al/ZPbkKpCyg2CZZy88R9BZuC0A3IwHtDeLWe
-X-Received: by 2002:a67:7c11:: with SMTP id x17mr9279186vsc.155.1595950552987; 
- Tue, 28 Jul 2020 08:35:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxE4hXpi8ZhRKdev1JBjeH+pRijExT2OH39RSepmAtVrJyzxl1lmb4TLg3Z0GKc4Fnlhw5epC7fwhgP8irY1WY=
-X-Received: by 2002:a67:7c11:: with SMTP id x17mr9279153vsc.155.1595950552621; 
- Tue, 28 Jul 2020 08:35:52 -0700 (PDT)
+ bh=ZzqjNDHjyBP72RmWzIfEhocBh3SxGafaKx89XkWeqb8=;
+ b=diMmpYNzmDJkQJQ/v8gTpGMeAivjrSmGScxwfJoHYahdmfw5uJq05wBg2DM3F15jxu
+ WCgLi40At/I8e5RvjZ1c3JdS+K4SP5G3SeMRW6m7mowZiBa1yWuiPcNUM1iYDZWBD/ge
+ zJuXr1DvrecPf0G1oGHf20Urw7eSCDDD2/iS9YLfkNcIB1bvw8Apqrvzt98Gi+YkK/ik
+ WbRkevIPIOzSXX+hcsfzn8s69mCqSMkpw0qTm4z+NhmTWAuZcPBLecdp9/6fg0XQuALR
+ LAo6/Bmlkur7l3h/JKlo/ejYxojxix+wVNV00MKSfECcszrhu0LtzvnYTfKi0dqohiCG
+ sv9g==
+X-Gm-Message-State: AOAM5331FHRLNos6GlQVT3+nhVdSPh+UdUc7gHGDfzahn4w4I1HrKMS0
+ fWy8r9IiXmnu3RsbiD+l74TzM83FP6bTiosAyYA=
+X-Google-Smtp-Source: ABdhPJwWxjePzJ66TEsbJxkga/vT72cLAojkLfoiwgnSrghQ+7q38Uj6AeAdcv+XrWf1ohFYInZrGKGkTgPZ/EsZG10=
+X-Received: by 2002:a92:cf50:: with SMTP id c16mr9482823ilr.131.1595950654700; 
+ Tue, 28 Jul 2020 08:37:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200727122357.31263-1-alex.bennee@linaro.org>
- <20200727122357.31263-7-alex.bennee@linaro.org>
-In-Reply-To: <20200727122357.31263-7-alex.bennee@linaro.org>
-From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Date: Tue, 28 Jul 2020 17:35:26 +0200
-Message-ID: <CAATJJ0+umgefGS-sfAxbt1QhWwO4j5hcL0_Mq918wKc=_u7ZJg@mail.gmail.com>
-Subject: Re: [PULL 06/16] accel/tcg: better handle memory constrained systems
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000c4bd7605ab8231b7"
-Received-SPF: none client-ip=91.189.89.112;
- envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 11:35:55
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <1594878971-26050-1-git-send-email-bmeng.cn@gmail.com>
+ <1594878971-26050-8-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1594878971-26050-8-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 28 Jul 2020 08:27:16 -0700
+Message-ID: <CAKmqyKOFXGbW3ubNc4RHOh_4ujDSqKS_3GGMnyno2S7gDL-+Ow@mail.gmail.com>
+Subject: Re: [PATCH v5 7/7] Makefile: Ship the generic platform bios ELF
+ images for RISC-V
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,175 +95,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Robert Foley <robert.foley@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Anup Patel <anup@brainfault.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c4bd7605ab8231b7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jul 27, 2020 at 2:24 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
-
-> It turns out there are some 64 bit systems that have relatively low
-> amounts of physical memory available to them (typically CI system).
-> Even with swapping available a 1GB translation buffer that fills up
-> can put the machine under increased memory pressure. Detect these low
-> memory situations and reduce tb_size appropriately.
+On Wed, Jul 15, 2020 at 11:01 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> Fixes: 600e17b2615 ("accel/tcg: increase default code gen buffer size for
-> 64 bit")
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Robert Foley <robert.foley@linaro.org>
-> Cc: BALATON Zoltan <balaton@eik.bme.hu>
-> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-> Message-Id: <20200724064509.331-7-alex.bennee@linaro.org>
+> From: Bin Meng <bin.meng@windriver.com>
 >
+> At present only the generic platform fw_dynamic bios BIN images
+> are included in the 'make install' target for 'virt' and 'sifive_u'
+> machines. This updates the install blob list to include ELF images
+> which are needed by the 'spike' machine.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
-I beg your pardon for the late reply, but I was out a week.
-I see this is already the pull request and my former feedback was included
-- thanks.
+This commit should be squashed into patch 5.
 
-Never the less I took the chance to test it in the context that I found and
-reported the initial bug.
-If only to show that I didn't fire&forget this case :-)
+Do you want me to do that when applying?
 
-We know there is quite some noise/deviation, but I only ran single tests as
-the problem was easily visible despite the noise. Amount of memory qemu
-settles on:
+Alistair
 
-Host 32G, Guest 512M
-4.2        633M
-5.0       1672M
-5.0+ Fix  1670M
-
-Host 1.5G, Guest 512M
-4.2        692M
-5.0       16xxM (OOM)
-5.0+ Fix   766M
-
-So we seem to have achieved that small environments no more break (a very
-small amount of very densely sized systems might still) but at the same
-time get the bigger cache for any normal/large system.
-Tested-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Reviewed-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-
-
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 2afa46bd2b1..2d83013633b 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -976,7 +976,12 @@ static inline size_t size_code_gen_buffer(size_t
-> tb_size)
->  {
->      /* Size the buffer.  */
->      if (tb_size =3D=3D 0) {
-> -        tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
-> +        size_t phys_mem =3D qemu_get_host_physmem();
-> +        if (phys_mem =3D=3D 0) {
-> +            tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
-> +        } else {
-> +            tb_size =3D MIN(DEFAULT_CODE_GEN_BUFFER_SIZE, phys_mem / 8);
-> +        }
->      }
->      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
->          tb_size =3D MIN_CODE_GEN_BUFFER_SIZE;
+>
+> ---
+>
+> Changes in v5:
+> - Ship generic fw_dynamic.elf images in the Makefile
+>
+> Changes in v3:
+> - change fw_jump to fw_dynamic in the Makefile
+>
+> Changes in v2:
+> - new patch: Makefile: Ship the generic platform bios images for RISC-V
+>
+>  Makefile | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index a6d6234..142c545 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -841,7 +841,8 @@ u-boot.e500 u-boot-sam460-20100605.bin \
+>  qemu_vga.ndrv \
+>  edk2-licenses.txt \
+>  hppa-firmware.img \
+> -opensbi-riscv32-generic-fw_dynamic.bin opensbi-riscv64-generic-fw_dynamic.bin
+> +opensbi-riscv32-generic-fw_dynamic.bin opensbi-riscv64-generic-fw_dynamic.bin \
+> +opensbi-riscv32-generic-fw_dynamic.elf opensbi-riscv64-generic-fw_dynamic.elf
+>
+>
+>  DESCS=50-edk2-i386-secure.json 50-edk2-x86_64-secure.json \
 > --
-> 2.20.1
+> 2.7.4
 >
 >
-
---=20
-Christian Ehrhardt
-Staff Engineer, Ubuntu Server
-Canonical Ltd
-
---000000000000c4bd7605ab8231b7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Jul 27, 2020 at 2:24 PM Alex =
-Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@linar=
-o.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
-1ex">It turns out there are some 64 bit systems that have relatively low<br=
->
-amounts of physical memory available to them (typically CI system).<br>
-Even with swapping available a 1GB translation buffer that fills up<br>
-can put the machine under increased memory pressure. Detect these low<br>
-memory situations and reduce tb_size appropriately.<br>
-<br>
-Fixes: 600e17b2615 (&quot;accel/tcg: increase default code gen buffer size =
-for 64 bit&quot;)<br>
-Signed-off-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.or=
-g" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
-Reviewed-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@lina=
-ro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
-Reviewed-by: Robert Foley &lt;<a href=3D"mailto:robert.foley@linaro.org" ta=
-rget=3D"_blank">robert.foley@linaro.org</a>&gt;<br>
-Cc: BALATON Zoltan &lt;<a href=3D"mailto:balaton@eik.bme.hu" target=3D"_bla=
-nk">balaton@eik.bme.hu</a>&gt;<br>
-Cc: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canonical.c=
-om" target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt;<br>
-Message-Id: &lt;<a href=3D"mailto:20200724064509.331-7-alex.bennee@linaro.o=
-rg" target=3D"_blank">20200724064509.331-7-alex.bennee@linaro.org</a>&gt;<b=
-r></blockquote><div><br></div><div>I beg your pardon for the late reply, bu=
-t I was out a week.</div><div>I see this is already the pull request and my=
- former feedback was included - thanks.</div><div><br></div><div>Never the =
-less I took the chance to test it in the context that I found and reported =
-the initial bug.</div><div>If only to show that I didn&#39;t fire&amp;forge=
-t this case=C2=A0:-)</div><div><br></div><div>We know there is quite some n=
-oise/deviation, but I only ran single tests as the problem was easily visib=
-le despite the noise. Amount of memory qemu settles on:<br><br>Host 32G, Gu=
-est 512M<br>4.2 =C2=A0 =C2=A0 =C2=A0 =C2=A0633M<br>5.0 =C2=A0 =C2=A0 =C2=A0=
- 1672M<br>5.0+ Fix =C2=A01670M<br><br>Host 1.5G, Guest 512M<br>4.2 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0692M<br>5.0 =C2=A0 =C2=A0 =C2=A0 16xxM (OOM)<br>5.0+ Fi=
-x =C2=A0 766M<br></div><div><br></div><div>So we seem to have achieved that=
- small environments no more break (a very small amount of very densely size=
-d systems might still) but at the same time get the bigger cache for any no=
-rmal/large system.</div><div>Tested-by: Christian Ehrhardt &lt;<a href=3D"m=
-ailto:christian.ehrhardt@canonical.com">christian.ehrhardt@canonical.com</a=
->&gt;</div><div>Reviewed-by:=C2=A0Christian Ehrhardt &lt;<a href=3D"mailto:=
-christian.ehrhardt@canonical.com">christian.ehrhardt@canonical.com</a>&gt;<=
-br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin=
-:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
->
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c<br>
-index 2afa46bd2b1..2d83013633b 100644<br>
---- a/accel/tcg/translate-all.c<br>
-+++ b/accel/tcg/translate-all.c<br>
-@@ -976,7 +976,12 @@ static inline size_t size_code_gen_buffer(size_t tb_si=
-ze)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0/* Size the buffer.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0if (tb_size =3D=3D 0) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 size_t phys_mem =3D qemu_get_host_physmem();<b=
-r>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (phys_mem =3D=3D 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D DEFAULT_CODE_GEN_BUF=
-FER_SIZE;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D MIN(DEFAULT_CODE_GEN=
-_BUFFER_SIZE, phys_mem / 8);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0if (tb_size &lt; MIN_CODE_GEN_BUFFER_SIZE) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tb_size =3D MIN_CODE_GEN_BUFFER_SIZE;<br>
--- <br>
-2.20.1<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">Christian Ehrhardt<br>Staff Engineer, Ubuntu Ser=
-ver<br>Canonical Ltd</div></div>
-
---000000000000c4bd7605ab8231b7--
 
