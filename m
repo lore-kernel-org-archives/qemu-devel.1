@@ -2,86 +2,96 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD028C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E88CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:12:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 779772065C
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:10:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 488FF2065C
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:12:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WyhCfl6h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779772065C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CiCDC7uL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 488FF2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0SBr-0003AQ-Cy
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 12:10:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60326)
+	id 1k0SDB-0004DJ-Iw
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 12:12:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60676)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1k0SB2-0002Pz-P7
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:10:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26461
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1k0SB0-0000nN-L0
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:10:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595952601;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=iqd87XIaNvrpF5Ax+ULRDBB8xQkomL9GuLbu4PiEfl4=;
- b=WyhCfl6hSrybAdyCoZlgxNcbdJn0OA9r9937KUdnywXma4sIshVtNPuje9YFR8sO0T6Jrc
- ROwnU0SXMnTWofe5AAjKWwBsyvtEOQ5vfRnVWGJfUYVQYBpft3d/XQ76TNvA8E+n9w0q9f
- mztPhC6zyWperHkWJZm/k805ol+VTZo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-xhn1gmctN-i9RClxvH-53Q-1; Tue, 28 Jul 2020 12:10:00 -0400
-X-MC-Unique: xhn1gmctN-i9RClxvH-53Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11DD919057B8;
- Tue, 28 Jul 2020 16:09:59 +0000 (UTC)
-Received: from titinator (ovpn-114-132.ams2.redhat.com [10.36.114.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7F80E76216;
- Tue, 28 Jul 2020 16:09:57 +0000 (UTC)
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-2-mreitz@redhat.com>
- <12e568be-f931-fc16-0ca2-a7ec54e538ea@virtuozzo.com>
-User-agent: mu4e 1.5.2; emacs 26.3
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v7 01/47] block: Add child access functions
-In-reply-to: <12e568be-f931-fc16-0ca2-a7ec54e538ea@virtuozzo.com>
-Date: Tue, 28 Jul 2020 18:09:55 +0200
-Message-ID: <ly1rkvhb8s.fsf@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k0SCG-0003aY-A8
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:11:20 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37344)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k0SCE-000136-H1
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:11:19 -0400
+Received: by mail-wm1-x344.google.com with SMTP id k8so95553wma.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 09:11:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=9fcA43p5Zyv/yaGKg2BoUOe5ZdmHBDfute646ZCEFA4=;
+ b=CiCDC7uL9ta2V4++jzN9jEaym9bP9p8H2NxIsA5ow3W8rPlXM3G/VcfLhvg+daRAlq
+ YpIbKmuV9xrCnJi6FvaTr4ce6eMh369ecwu/GO/AN7/sHALpT0qwsF+IIYH9IsPrNglo
+ LoFnzI8Hh4nj1wI1RHEsmTvJvi7sU1GKzobGWCHHHjEYPhUti9eU1HypAQsj504v+P9U
+ sfniZsCeX/GMhbP/3r08NEJV88fF30pIhdzDJM1q0rInTPthOfcA62S8Cgz2tXPr7PJN
+ 8scxZA+CwxXS0Eou1JL8m3slgfMuozSXzBZ6Wn44oE04CyRd8oEcoexjCdz4S3VBN8Cm
+ fwqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=9fcA43p5Zyv/yaGKg2BoUOe5ZdmHBDfute646ZCEFA4=;
+ b=XY+nvqCob8DUCemalDyjlPIEHvT1V58uAJrBTPmGZgqUvPexbVnioetZepIR1vWj3L
+ 9UgMnwDqtG5z07dgGjFcfMv/XB2ZZPN6kYeJJ4phXLZvSXvhvtlkteET8blku0dtrGrD
+ Uwt0838zC2+ESq4T3dmAP4sV5BxaNZq7XBfjfLCpYGAafS8xi0x+ydwxm/SCmZ2VnLym
+ lyams/exXruyuiLMV+1t9Ajyc1YoCerSfgp6Zfina0sYMDg7gG6hZLUREqnnbwK49n5h
+ 9KvcBkh46dHuwOSOxQv32TG9ebW7+Oy5npAEtNkFc+LT3qi9gskWFGffVRg+5DigTGph
+ VrCw==
+X-Gm-Message-State: AOAM533rHiEvGFnubEaOM24sVtDhm/yp+nE/lQ8EvN61uznBA6U/iVV4
+ V4YqxMf46qhyaJ+0ip/LuQiyyg==
+X-Google-Smtp-Source: ABdhPJz88M7/DOBM+t/bU6x0Pgl8kjudMBkfZqQPOkjBNODdCBcZwXfqspje4g1RfKJ9k1uSLL8azQ==
+X-Received: by 2002:a7b:c0c8:: with SMTP id s8mr4849741wmh.4.1595952676828;
+ Tue, 28 Jul 2020 09:11:16 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z127sm5230763wme.44.2020.07.28.09.11.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Jul 2020 09:11:15 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0111F1FF7E;
+ Tue, 28 Jul 2020 17:11:14 +0100 (BST)
+References: <20200728141005.28664-1-alex.bennee@linaro.org>
+ <20200728141005.28664-3-alex.bennee@linaro.org>
+ <CAFEAcA_MT8U6uUYhNVDc1-AkxPPL22pBevNDSbB2ZwQQ94OPmw@mail.gmail.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v1 2/2] target/arm: only set the nexttick timer if !ISTATUS
+In-reply-to: <CAFEAcA_MT8U6uUYhNVDc1-AkxPPL22pBevNDSbB2ZwQQ94OPmw@mail.gmail.com>
+Date: Tue, 28 Jul 2020 17:11:14 +0100
+Message-ID: <87lfj339i5.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dinechin@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:31:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,87 +105,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Igor R <boost.lists@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Victor CLEMENT <victor.clement@openwide.fr>, "open
+ list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ Pavel Dovgaluk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020-07-13 at 11:06 CEST, Vladimir Sementsov-Ogievskiy wrote...
-> 25.06.2020 18:21, Max Reitz wrote:
->> There are BDS children that the general block layer code can access,
->> namely bs->file and bs->backing.  Since the introduction of filters and
->> external data files, their meaning is not quite clear.  bs->backing can
->> be a COW source, or it can be a filtered child; bs->file can be a
->> filtered child, it can be data and metadata storage, or it can be just
->> metadata storage.
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On Tue, 28 Jul 2020 at 15:10, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
 >>
->> This overloading really is not helpful.  This patch adds functions that
->> retrieve the correct child for each exact purpose.  Later patches in
->> this series will make use of them.  Doing so will allow us to handle
->> filter nodes in a meaningful way.
+>> Otherwise we have an unfortunate interaction with -count sleep=3Doff
+>> which means we fast forward time when we don't need to. The easiest
+>> way to trigger it was to attach to the gdbstub and place a break point
+>> at the timers IRQ routine. Once the timer fired setting the next event
+>> at INT_MAX then qemu_start_warp_timer would skip to the end.
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 >> ---
->
-> [..]
->
->> +/*
->> + * Return the primary child of this node: For filters, that is the
->> + * filtered child.  For other nodes, that is usually the child storing
->> + * metadata.
->> + * (A generally more helpful description is that this is (usually) the
->> + * child that has the same filename as @bs.)
->> + *
->> + * Drivers do not necessarily have a primary child; for example quorum
->> + * does not.
->> + */
->> +BdrvChild *bdrv_primary_child(BlockDriverState *bs)
->> +{
->> +    BdrvChild *c;
->> +
->> +    QLIST_FOREACH(c, &bs->children, next) {
->> +        if (c->role & BDRV_CHILD_PRIMARY) {
->> +            return c;
->> +        }
->> +    }
->> +
->> +    return NULL;
->> +}
+>>  target/arm/helper.c | 35 ++++++++++++++++++++++-------------
+>>  1 file changed, 22 insertions(+), 13 deletions(-)
 >>
+>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>> index c69a2baf1d3..ec1b84cf0fd 100644
+>> --- a/target/arm/helper.c
+>> +++ b/target/arm/helper.c
+>> @@ -2683,7 +2683,7 @@ static void gt_recalc_timer(ARMCPU *cpu, int timer=
+idx)
+>>          uint64_t count =3D gt_get_countervalue(&cpu->env);
+>>          /* Note that this must be unsigned 64 bit arithmetic: */
+>>          int istatus =3D count - offset >=3D gt->cval;
+>> -        uint64_t nexttick;
+>> +        uint64_t nexttick =3D 0;
+>>          int irqstate;
+>>
+>>          gt->ctl =3D deposit32(gt->ctl, 2, 1, istatus);
+>> @@ -2692,21 +2692,30 @@ static void gt_recalc_timer(ARMCPU *cpu, int tim=
+eridx)
+>>          qemu_set_irq(cpu->gt_timer_outputs[timeridx], irqstate);
+>>
+>>          if (istatus) {
+>> -            /* Next transition is when count rolls back over to zero */
+>> -            nexttick =3D UINT64_MAX;
+>> +            /*
+>> +             * The IRQ status of the timer will persist until:
+>> +             *   - CVAL is changed or
+>> +             *   - ENABLE is changed
+>> +             *
+>> +             * There is no point re-arming the timer for some far
+>> +             * flung future - currently it just is.
+>> +             */
+>> +            timer_del(cpu->gt_timer[timeridx]);
 >
-> Suggest squash-in to also assert that not more than one primary child:
-> --- a/block.c
-> +++ b/block.c
-> @@ -6998,13 +6998,14 @@ BdrvChild *bdrv_filter_or_cow_child(BlockDriverState *bs)
->    */
->   BdrvChild *bdrv_primary_child(BlockDriverState *bs)
->   {
-> -    BdrvChild *c;
-> +    BdrvChild *c, *found = NULL;
->
->       QLIST_FOREACH(c, &bs->children, next) {
->           if (c->role & BDRV_CHILD_PRIMARY) {
-> -            return c;
-> +            assert(!found);
-> +            found = c;
->           }
->       }
->
-> -    return NULL;
-> +    return c;
+> Why do we delete the timer for this case of "next time we need to
+> know is massively in the future"...
 
-Shouldn't that be "return found"?
->   }
+It's not really - it's happening now and it will continue to happen
+until the IRQ is serviced or we change the CVAL at which point we can
+calculate the next time we need it.
+
 >
+>>          } else {
+>>              /* Next transition is when we hit cval */
+>>              nexttick =3D gt->cval + offset;
+>> -        }
+>> -        /* Note that the desired next expiry time might be beyond the
+>> -         * signed-64-bit range of a QEMUTimer -- in this case we just
+>> -         * set the timer for as far in the future as possible. When the
+>> -         * timer expires we will reset the timer for any remaining peri=
+od.
+>> -         */
+>> -        if (nexttick > INT64_MAX / gt_cntfrq_period_ns(cpu)) {
+>> -            timer_mod_ns(cpu->gt_timer[timeridx], INT64_MAX);
+>> -        } else {
+>> -            timer_mod(cpu->gt_timer[timeridx], nexttick);
+>> +
+>> +            /*
+>> +             * It is possible the next tick is beyond the
+>> +             * signed-64-bit range of a QEMUTimer but currently the
+>> +             * timer system doesn't support a run time of more the 292
+>> +             * odd years so we set it to INT_MAX in this case.
+>> +             */
+>> +            if (nexttick > INT64_MAX / gt_cntfrq_period_ns(cpu)) {
+>> +                timer_mod_ns(cpu->gt_timer[timeridx], INT64_MAX);
 >
-> with or without:
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ...but here we handle the similar case by "set a timeout for
+> INT64_MAX" ?
+
+Yeah we could just swallow it up and report something to say it's not
+going to happen because it's beyond the horizon of what QEMUTimer can
+deal with.
+
+>
+>> +            } else {
+>> +                timer_mod(cpu->gt_timer[timeridx], nexttick);
+>> +            }
+>>          }
+>>          trace_arm_gt_recalc(timeridx, irqstate, nexttick);
+>>      } else {
+>> --
+>
+> thanks
+> -- PMM
 
 
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
-
+--=20
+Alex Benn=C3=A9e
 
