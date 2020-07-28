@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0299AC433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC13C433EB
 	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 12:35:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D008B2070B
+	by mail.kernel.org (Postfix) with ESMTPS id E9FE620775
 	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 12:35:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D008B2070B
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9FE620775
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0OpW-00062i-3j
+	id 1k0OpW-00062m-6y
 	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 08:35:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55726)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0Oob-0004f9-Uv
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 08:34:41 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:35975)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0Ooc-0004gn-Sp
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 08:34:42 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:54541)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0Ooa-0001sk-08
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 08:34:41 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0Ooa-0001sm-7H
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 08:34:42 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MsZeX-1kuPoN0yOB-00txhg; Tue, 28 Jul 2020 14:34:36 +0200
+ id 1M8QFi-1k4mWj1x8y-004UeB; Tue, 28 Jul 2020 14:34:37 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/3] linux-user: Ensure mmap_min_addr is non-zero
-Date: Tue, 28 Jul 2020 14:34:30 +0200
-Message-Id: <20200728123432.501354-2-laurent@vivier.eu>
+Subject: [PULL 3/3] linux-user: Use getcwd syscall directly
+Date: Tue, 28 Jul 2020 14:34:32 +0200
+Message-Id: <20200728123432.501354-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200728123432.501354-1-laurent@vivier.eu>
 References: <20200728123432.501354-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Y2ExmyX9KMXPBHInR9cJgIGGafjMGPxin0bASUuAkr8/70Pz4Em
- raz9/VAxgZJXZJxjlStLDW9ANTbxeoxFfzJspUeSzfgrBqJ99NpX9h1jhb3M65hW6vF+u4B
- 3nPGO8g6EqAMgShCaDBXcUj9zAeycj5OfwIe4oaDES89alsWNvKoO2G0sabytEEW10hgtki
- aD/IcpIf2mu/qAJMMP93w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:b1BCzJtxbZE=:PD6/Q5pEJLLVllme/haQCH
- UH/eLgAww0XTykMUKveg7nJsC7TuJg7zBYiL+ji0BZpDNgFxLSxYvFVpki/r4sjNk+tIPdzPD
- zdG3mOBNwOF/6QIlm+qO6Ql6Q73xZuws2ejPTTWgJ/bejvtVA0lp63TZdJgQtR2E9pVW6+Laj
- 6ZfS7Q0VMokFlWRqCp44+SY+cWrtyRQ4axmM6OcI0GNgQWHy36jtJGHIjFrznZWv7V5Dajnyu
- Oii7ntwZtjsTCxv3EdnGHFzwL+XbOmdDxo8czPIBol8eqZ7DhfICWefje9ivhFjEH7F93n7nB
- TXwApsRXrRINYvT28BQ/1vy3VE7LJE/qCOEOUUKL18T0+A+fSxkZc7YxcelbZaw+tKrSMD1uH
- MkEa4Uk9M6Bw5eWty+IhvKIy8hh/+Oz3Mkm2CDjQy9u1YI52LXIkidBDMzYoE39/5OEG8+xEo
- vqBpJVrg+OGm/9wDMfMC8bbuC4LBh4Rin6LTHqq9IJomBWoUjtxAV5rNrkIr9pMkRTiaJMJPW
- mxTyivnrlabLRwnu9mIUtjmukH7MprHpazaomNkEsH1buKbXJ13DRsKqBbz2SoMMqsnTxE8Y1
- 2+ZyUwoHKkaANDYNFeNVDS04gJ/2shG0tmuGhACt7QtKYsqfBWfUxz2lgbR39MN9kPPIP3/zZ
- Df5aDRV077tKhe5a1j2bzrbP5gc2bKgNgxgdc2iMeX6uNkE+Y7nL3szg91xa3cBxRWvAw7Tkh
- BD3a8RHNmu5DdkKwOUsO0kNxhOwNQUi3I4RMIqgadX0eP1Roq/b0xuNc04gN8pNeHYrwU3VtT
- Met0NlwlqgUMdDU5/9YNYZVV8sdr/t3k8zVDpcRL7pWogEwUKUBQijQ/H3xguxtv5lacyCj
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:/m6m+2UHQjNwnywy/aks4shhDodjDeEv9vteG/MbstapZS/HIu7
+ blVEWtpyRiB1kdUsP26SAM+6V1YTZfnSdIKtwSiAPNx9+SyVn76cqwfnvQsTh6JC2jBDuvY
+ jkJxzxBwUAFKU1ZvwSKfiH0YjW0GeemzSoufCN4Cx+6EgU8wMeHn4mXJ0b+Jir7Cm68/vCG
+ FWh0gOXHVO7FbN6o47vNA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:wUMztYL5bCM=:3VjB2dsjuQubdg87GLs29Y
+ xpfXruzuEiwxie7RF9pCRp+6Et4un740ca6dT2jDkg1uc31b15rBtTidzdW0a/UZcS1KVAd9H
+ b4U/JEdWqBmR8gTbXonijEdErXYn8vWE1Xo63Kuqe5U2XwuFt43QJlsKZ5XdHzvSc8y5E8+Y5
+ 9flaeksbgrKDqOdEd3tTRAof2eMMrVk1tjB6osgyDZo77WKhnjD9u0eiAowE5yicTbbrmIY8f
+ qfVSrWEdZ9YRLCU7hRXUmtaX3V3O/erN2eNN3Tfp8DhMY0swmMBnS1JUDaHMXjqiSbkccrZDC
+ kx5skjOzPqVBeBZNAmDodO1EPEJPiWprdNbeUe8wr2ut8pOnoi8tDmjnMe+CC9tOB2V13ghJv
+ uJcnN4+INKZ3935h3Nlr5OHhn0j/s07sxE4yEnix9MtSu7JTUcEfDtST9UpKDEFYWFJ18H1dD
+ 6u4CuPxrEnOFfmwbRpw4jBt5ummsqAqbmrNP3VgM9WDjErFlE/tZIR2TkF2IYojvu1YVmulLL
+ 5AlY++QDxB8gvgo0vhuFcSj9u04F6tzOd6kdQGOTfF3IP7kuGQFbMtdym/jP83c5f+zCk29uS
+ lpSbmFx9xTah91RIM9bgm8VXovSBKgz903KrDwbS+mObHTTZbp6Y/IDUtVH/LdPuDu+6h29yE
+ ulJepmCZ8pX+T/hp4Pp7wkHP6HvvSx6nRd36y4nyyDqNcYcvFABMpqV0ipiXk8uwiRKSCrb7x
+ zSqHyvpQ6CpIDEGq1QHmptPEabBgzMLWjU86d8zc/M7q5XhuyPwZx4sG9eyipVwqIt/7Z7661
+ 189qycuYmsQeaL2cn9xDq4ej6V75WotUSZGNEEZw4B0y5yaaS9X/QUvBvA2AHEtZdOLBQVm
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 08:34:38
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -82,71 +82,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: Andreas Schwab <schwab@suse.de>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Andreas Schwab <schwab@suse.de>
 
-When the chroot does not have /proc mounted, we can read neither
-/proc/sys/vm/mmap_min_addr nor /proc/sys/maps.
+The glibc getcwd function returns different errors than the getcwd
+syscall, which triggers an assertion failure in the glibc getcwd function
+when running under the emulation.
 
-The enforcement of mmap_min_addr in the host kernel is done by
-the security module, and so does not apply to processes owned
-by root.  Which leads pgd_find_hole_fallback to succeed in probing
-a reservation at address 0.  Which confuses pgb_reserved_va to
-believe that guest_base has not actually been initialized.
+When the syscall returns ENAMETOOLONG, the glibc wrapper uses a fallback
+implementation that potentially handles an unlimited path length, and
+returns with ERANGE if the provided buffer is too small.  The qemu
+emulation cannot distinguish the two cases, and thus always returns ERANGE.
+This is unexpected by the glibc wrapper.
 
-We don't actually want NULL addresses to become accessible, so
-make sure that mmap_min_addr is initialized with a non-zero value.
-
-Buglink: https://bugs.launchpad.net/qemu/+bug/1888728
-Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200724212314.545877-1-richard.henderson@linaro.org>
+Signed-off-by: Andreas Schwab <schwab@suse.de>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <mvmmu3qplvi.fsf@suse.de>
+[lv: updated description]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/main.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ linux-user/syscall.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 3597e99bb10a..75c97851579e 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -758,14 +758,26 @@ int main(int argc, char **argv, char **envp)
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index c1ebf7b8f384..945fc252791c 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -388,14 +388,7 @@ static bitmask_transtbl fcntl_flags_tbl[] = {
+   { 0, 0, 0, 0 }
+ };
  
-         if ((fp = fopen("/proc/sys/vm/mmap_min_addr", "r")) != NULL) {
-             unsigned long tmp;
--            if (fscanf(fp, "%lu", &tmp) == 1) {
-+            if (fscanf(fp, "%lu", &tmp) == 1 && tmp != 0) {
-                 mmap_min_addr = tmp;
--                qemu_log_mask(CPU_LOG_PAGE, "host mmap_min_addr=0x%lx\n", mmap_min_addr);
-+                qemu_log_mask(CPU_LOG_PAGE, "host mmap_min_addr=0x%lx\n",
-+                              mmap_min_addr);
-             }
-             fclose(fp);
-         }
-     }
+-static int sys_getcwd1(char *buf, size_t size)
+-{
+-  if (getcwd(buf, size) == NULL) {
+-      /* getcwd() sets errno */
+-      return (-1);
+-  }
+-  return strlen(buf)+1;
+-}
++_syscall2(int, sys_getcwd1, char *, buf, size_t, size)
  
-+    /*
-+     * We prefer to not make NULL pointers accessible to QEMU.
-+     * If we're in a chroot with no /proc, fall back to 1 page.
-+     */
-+    if (mmap_min_addr == 0) {
-+        mmap_min_addr = qemu_host_page_size;
-+        qemu_log_mask(CPU_LOG_PAGE,
-+                      "host mmap_min_addr=0x%lx (fallback)\n",
-+                      mmap_min_addr);
-+    }
-+
-     /*
-      * Prepare copy of argv vector for target.
-      */
+ #ifdef TARGET_NR_utimensat
+ #if defined(__NR_utimensat)
 -- 
 2.26.2
 
