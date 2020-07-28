@@ -2,110 +2,69 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA05C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F63C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:16:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93A272070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:15:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93A272070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id EF1C3206F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:16:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF1C3206F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0QNr-0000F9-Ts
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:15:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54656)
+	id 1k0QPV-0001cf-Ij
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:16:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55238)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <schnelle@linux.ibm.com>)
- id 1k0QMp-0007ar-BG; Tue, 28 Jul 2020 10:14:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6830)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k0QOC-0000dl-6b
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:15:32 -0400
+Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:55216)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <schnelle@linux.ibm.com>)
- id 1k0QMn-0007Cu-AE; Tue, 28 Jul 2020 10:14:07 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06SE44dB149426; Tue, 28 Jul 2020 10:14:03 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32jkw53t3j-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Jul 2020 10:14:03 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06SE4KkN150244;
- Tue, 28 Jul 2020 10:14:03 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32jkw53t2r-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Jul 2020 10:14:02 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06SE5pJ7018110;
- Tue, 28 Jul 2020 14:14:01 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com
- (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
- by ppma03ams.nl.ibm.com with ESMTP id 32gcpx3vjq-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Jul 2020 14:14:00 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06SEDwrN32702950
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 28 Jul 2020 14:13:58 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0BA07AE051;
- Tue, 28 Jul 2020 14:13:58 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6335EAE04D;
- Tue, 28 Jul 2020 14:13:57 +0000 (GMT)
-Received: from oc5500677777.ibm.com (unknown [9.145.68.234])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 28 Jul 2020 14:13:57 +0000 (GMT)
-Subject: Re: [RFC PATCH] s390x/pci: vfio-pci breakage with disabled mem
- enforcement
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1595517236-17823-1-git-send-email-mjrosato@linux.ibm.com>
- <20200723102916.7cf15b43@w520.home>
- <0481c77e-f71f-886b-9b0a-41529eb139ee@linux.ibm.com>
- <20200727104754.4337818c@x1.home>
- <f152965e-ed8c-a34b-e13d-7859c06afd85@linux.ibm.com>
- <20200728065215.21a7f5af@x1.home>
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-Message-ID: <2f3cd133-e0bc-8923-3016-db2414acef90@linux.ibm.com>
-Date: Tue, 28 Jul 2020 16:13:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k0QO8-0007Lp-6N
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:15:31 -0400
+Received: from player799.ha.ovh.net (unknown [10.108.57.50])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 881A128F0DE
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 16:15:23 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player799.ha.ovh.net (Postfix) with ESMTPSA id F21B114C4A6ED;
+ Tue, 28 Jul 2020 14:15:07 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-98R002c2846e45-abce-40ea-b9b6-ba6f467127c4,
+ 96196EA346850768E7E70500A314E772A5EF2CEB) smtp.auth=groug@kaod.org
+Date: Tue, 28 Jul 2020 16:15:06 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH] hw: add compat machines for 5.2
+Message-ID: <20200728161506.259ef93d@bahia.lan>
+In-Reply-To: <20200728094645.272149-1-cohuck@redhat.com>
+References: <20200728094645.272149-1-cohuck@redhat.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200728065215.21a7f5af@x1.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-28_11:2020-07-28,
- 2020-07-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 adultscore=0
- impostorscore=0 suspectscore=0 spamscore=0 mlxlogscore=999
- priorityscore=1501 bulkscore=0 lowpriorityscore=0 clxscore=1015
- phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2006250000 definitions=main-2007280103
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=schnelle@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:14:03
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Ovh-Tracer-Id: 3673248448625154498
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedriedvgdejvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=178.32.119.138; envelope-from=groug@kaod.org;
+ helo=6.mo5.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:15:24
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,111 +77,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pierre Morel <pmorel@linux.ibm.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, david@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- qemu-s390x@nongnu.org, rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 28 Jul 2020 11:46:45 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
+> Add 5.2 machine types for arm/i440fx/q35/s390x/spapr.
+> 
 
-On 7/28/20 2:52 PM, Alex Williamson wrote:
-> On Tue, 28 Jul 2020 11:33:55 +0200
-> Niklas Schnelle <schnelle@linux.ibm.com> wrote:
+Heh, you win the race for adding new machine types again :)
+
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/arm/virt.c              |  9 ++++++++-
+>  hw/core/machine.c          |  3 +++
+>  hw/i386/pc.c               |  3 +++
+>  hw/i386/pc_piix.c          | 14 +++++++++++++-
+>  hw/i386/pc_q35.c           | 13 ++++++++++++-
+>  hw/ppc/spapr.c             | 15 +++++++++++++--
+
+For ppc parts:
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
+>  include/hw/boards.h        |  3 +++
+>  include/hw/i386/pc.h       |  3 +++
+>  9 files changed, 71 insertions(+), 6 deletions(-)
 > 
->> On 7/27/20 6:47 PM, Alex Williamson wrote:
->>> On Mon, 27 Jul 2020 17:40:39 +0200
->>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>   
->>>> On 2020-07-23 18:29, Alex Williamson wrote:  
->>>>> On Thu, 23 Jul 2020 11:13:55 -0400
->>>>> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
->>>>>     
->>>>>> I noticed that after kernel commit abafbc55 'vfio-pci: Invalidate mmaps
->>>>>> and block MMIO access on disabled memory' vfio-pci via qemu on s390x
->>>>>> fails spectacularly, with errors in qemu like:  
->> ... snip ...
->>>>
->>>> Alex, Matt,
->>>>
->>>> in s390 we have the possibility to assign a virtual function to a 
->>>> logical partition as function 0.
->>>> In this case it can not be treated as a virtual function but must be 
->>>> treated as a physical function.
->>>> This is currently working very well.
->>>> However, these functions do not set PCI_COMMAND_MEMORY as we need.  
->>>
->>> Where is the vendor and device ID virtualization done for these
->>> devices, we can't have a PF with IDs 0000:0000.  
->> Pierre doesn't mean the Device/Vendor IDs he means it has devfn == 0
->> so it is the mandatory function zero on it's PCI bus, where until recently
->> we always had only one function per bus but with the recent multi-function
->> support it can act more like on other platforms with several PCI functions
->> sharing the same Bus e.g. a PF and the VFs created through sriov_numvfs.
->> That's why I'm saying that having devfn == 0 should not be very special for a VF
->> passed to a VM and I really don't see where it would not act like a VF passed
->> from any other Hypervisor.
-> 
-> My question is relative to other registers on VFs that are not
-> implemented in hardware, not the device address.  In addition to the
-> memory bit of the command register, SR-IOV VFs do not implement the
-> vendor and device IDs, these are to be virtualized from the values
-> provided in the PF SR-IOV capability.  It wouldn't make much sense to
-> expose a device with no PCI vendor or device ID, so I assume the z/VM
-> hypervisor is virtualizing these, but not the memory bit.
-Ahh, yes I see. On Z these are actually already virtualized at the LPAR
-level as part of the firmware based scanning I mentioned that is the
-reason for pdev->no_vf_scan. This is true even for VFs created
-through sriov_numvfs in the host which is why I did not realize these
-don't come from hardware, even though looking at drivers/pci/iov.c it's
-pretty obvious and I did touch that code before. Sorry for the confusion.
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index ecfee362a182..acf9bfbeceaf 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -2546,10 +2546,17 @@ static void machvirt_machine_init(void)
+>  }
+>  type_init(machvirt_machine_init);
 >  
->> The only really tricky part in my opinion is where during the "probing"
->> we do set is_virtfn so it happens both for VFs passed-through from z/VM
->> or LPAR and VFs created through sriov_numvfs which unlike on other platforms
->> are also scanned by Firmware (pdev->no_vf_scan disables the Linux side scanning).
->> With the fix I'm currently testing I had to do this in pcibios_enable_device()
->> because I also create sysfs links between VFs and their parent PFs and those
->> need the sysfs entries to be already created, which makes the more apropriately
->> sound pcibios_bus_add_device() too early.
-> 
-> 
-> I don't think it would be wise to set is_virtfn without a physfn being
-> present in the OS view.  I believe pci_dev.is_virtfn implies
-> pci_dev.physfn points to the PF device.  Thanks> 
-> Alex
-Thank you a lot for that hint, you're absolutely right, while the
-drivers do work with is_virtfn == 1 && physffn == NULL
-vfio-pci gets very confused. And sorry Pierre for doubting
-your is_virtfn_detached idea, this thing really is confusing.
-> 
->>>> Shouldn't we fix this inside the kernel, to keep older QMEU working?
->>>>
->>>> Then would it be OK to add a new bit/boolean inside the 
->>>> pci_dev/vfio_pci_device like, is_detached_vfn, that we could set during 
->>>> enumeration and test inside __vfio_pci_memory_enabled() to return true?  
->>>
->>> Probably each instance of is_virtfn in vfio-pci should be looked at to
->>> see if it applies to s390.  If we're going to recognize this as a VF,
->>> I'd rather we complete the emulation that the lower level hypervisor
->>> has missed.  If we can enable all the is_virtfn code on s390, then we
->>> should probably cache is_virtfn on the vfio_pci_device object and allow
->>> s390 a place to set it once at probe or enable time.
->>>   
->>>> In the enumeration we have the possibility to know if the function is a 
->>>> HW/Firmware virtual function on devfn 0 or if it is created by SRIOV.
->>>>
->>>> It seems an easy fix without side effects.
->>>>
->>>> What do you think?  
->>>
->>> It sure seems preferable to recognize that it is a VF in the kernel
->>> than to require userspace to have arch specific hacks.  Thanks,
->>>
->>> Alex
->>>   
->>
-> 
+> +static void virt_machine_5_2_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_VIRT_MACHINE_AS_LATEST(5, 2)
+> +
+>  static void virt_machine_5_1_options(MachineClass *mc)
+>  {
+> +    virt_machine_5_2_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+>  }
+> -DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
+> +DEFINE_VIRT_MACHINE(5, 1)
+>  
+>  static void virt_machine_5_0_options(MachineClass *mc)
+>  {
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 2f881d6d75b8..a24fe18ab6a6 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -28,6 +28,9 @@
+>  #include "hw/mem/nvdimm.h"
+>  #include "migration/vmstate.h"
+>  
+> +GlobalProperty hw_compat_5_1[] = {};
+> +const size_t hw_compat_5_1_len = G_N_ELEMENTS(hw_compat_5_1);
+> +
+>  GlobalProperty hw_compat_5_0[] = {
+>      { "virtio-balloon-device", "page-poison", "false" },
+>      { "vmport", "x-read-set-eax", "off" },
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 3d419d599127..1733b5341a62 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -97,6 +97,9 @@
+>  #include "fw_cfg.h"
+>  #include "trace.h"
+>  
+> +GlobalProperty pc_compat_5_1[] = {};
+> +const size_t pc_compat_5_1_len = G_N_ELEMENTS(pc_compat_5_1);
+> +
+>  GlobalProperty pc_compat_5_0[] = {};
+>  const size_t pc_compat_5_0_len = G_N_ELEMENTS(pc_compat_5_0);
+>  
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index b789e83f9acb..c5ba70ca17cb 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -426,7 +426,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_VMBUS_BRIDGE);
+>  }
+>  
+> -static void pc_i440fx_5_1_machine_options(MachineClass *m)
+> +static void pc_i440fx_5_2_machine_options(MachineClass *m)
+>  {
+>      PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>      pc_i440fx_machine_options(m);
+> @@ -435,6 +435,18 @@ static void pc_i440fx_5_1_machine_options(MachineClass *m)
+>      pcmc->default_cpu_version = 1;
+>  }
+>  
+> +DEFINE_I440FX_MACHINE(v5_2, "pc-i440fx-5.2", NULL,
+> +                      pc_i440fx_5_2_machine_options);
+> +
+> +static void pc_i440fx_5_1_machine_options(MachineClass *m)
+> +{
+> +    pc_i440fx_5_2_machine_options(m);
+> +    m->alias = NULL;
+> +    m->is_default = false;
+> +    compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+> +    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
+> +}
+> +
+>  DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
+>                        pc_i440fx_5_1_machine_options);
+>  
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index a3e607a544a5..0cb9c18cd44d 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -353,7 +353,7 @@ static void pc_q35_machine_options(MachineClass *m)
+>      m->max_cpus = 288;
+>  }
+>  
+> -static void pc_q35_5_1_machine_options(MachineClass *m)
+> +static void pc_q35_5_2_machine_options(MachineClass *m)
+>  {
+>      PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>      pc_q35_machine_options(m);
+> @@ -361,6 +361,17 @@ static void pc_q35_5_1_machine_options(MachineClass *m)
+>      pcmc->default_cpu_version = 1;
+>  }
+>  
+> +DEFINE_Q35_MACHINE(v5_2, "pc-q35-5.2", NULL,
+> +                   pc_q35_5_2_machine_options);
+> +
+> +static void pc_q35_5_1_machine_options(MachineClass *m)
+> +{
+> +    pc_q35_5_2_machine_options(m);
+> +    m->alias = NULL;
+> +    compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+> +    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
+> +}
+> +
+>  DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
+>                     pc_q35_5_1_machine_options);
+>  
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 0ae293ec9431..1c8d0981b382 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4579,15 +4579,26 @@ static void spapr_machine_latest_class_options(MachineClass *mc)
+>      }                                                                \
+>      type_init(spapr_machine_register_##suffix)
+>  
+> +/*
+> + * pseries-5.2
+> + */
+> +static void spapr_machine_5_2_class_options(MachineClass *mc)
+> +{
+> +    /* Defaults for the latest behaviour inherited from the base class */
+> +}
+> +
+> +DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
+> +
+>  /*
+>   * pseries-5.1
+>   */
+>  static void spapr_machine_5_1_class_options(MachineClass *mc)
+>  {
+> -    /* Defaults for the latest behaviour inherited from the base class */
+> +    spapr_machine_5_2_class_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+>  }
+>  
+> -DEFINE_SPAPR_MACHINE(5_1, "5.1", true);
+> +DEFINE_SPAPR_MACHINE(5_1, "5.1", false);
+>  
+>  /*
+>   * pseries-5.0
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 403d30e13bca..3dc22737a389 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -804,14 +804,26 @@ bool css_migration_enabled(void)
+>      }                                                                         \
+>      type_init(ccw_machine_register_##suffix)
+>  
+> +static void ccw_machine_5_2_instance_options(MachineState *machine)
+> +{
+> +}
+> +
+> +static void ccw_machine_5_2_class_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_CCW_MACHINE(5_2, "5.2", true);
+> +
+>  static void ccw_machine_5_1_instance_options(MachineState *machine)
+>  {
+> +    ccw_machine_5_2_instance_options(machine);
+>  }
+>  
+>  static void ccw_machine_5_1_class_options(MachineClass *mc)
+>  {
+> +    ccw_machine_5_2_class_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+>  }
+> -DEFINE_CCW_MACHINE(5_1, "5.1", true);
+> +DEFINE_CCW_MACHINE(5_1, "5.1", false);
+>  
+>  static void ccw_machine_5_0_instance_options(MachineState *machine)
+>  {
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 426ce5f625a4..bc5b82ad209e 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -319,6 +319,9 @@ struct MachineState {
+>      } \
+>      type_init(machine_initfn##_register_types)
+>  
+> +extern GlobalProperty hw_compat_5_1[];
+> +extern const size_t hw_compat_5_1_len;
+> +
+>  extern GlobalProperty hw_compat_5_0[];
+>  extern const size_t hw_compat_5_0_len;
+>  
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 3d7ed3a55e30..fe52e165b27c 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -193,6 +193,9 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
+>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>                         const CPUArchIdList *apic_ids, GArray *entry);
+>  
+> +extern GlobalProperty pc_compat_5_1[];
+> +extern const size_t pc_compat_5_1_len;
+> +
+>  extern GlobalProperty pc_compat_5_0[];
+>  extern const size_t pc_compat_5_0_len;
+>  
+
 
