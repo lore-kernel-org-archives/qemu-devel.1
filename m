@@ -2,85 +2,83 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 748F1C433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 15:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E538C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 15:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40756206D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 15:33:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsvX8jEP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40756206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42FE2206D8
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 15:36:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42FE2206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Rbr-0001qo-Hm
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 11:33:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48898)
+	id 1k0Ree-00043d-FZ
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 11:36:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k0Rb9-0000vR-CV; Tue, 28 Jul 2020 11:32:59 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:35779)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k0Rb7-0003M7-PF; Tue, 28 Jul 2020 11:32:59 -0400
-Received: by mail-io1-xd42.google.com with SMTP id s189so13929831iod.2;
- Tue, 28 Jul 2020 08:32:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aFiggvsybxP7Q+K3MUxmqRhc2eENIdqqqh2Sgg6FwSA=;
- b=HsvX8jEPFGV1imUvxGXB6TqbHibeXL99BAweT80B49/e6Silh0P87mtljdW7uS7zz7
- njG/bQ65jmYThbJm7IhazJxFaeoOR05jphXbfktp/UOXX3biVeMnhfaXL9FEwEws6Jgr
- LfmVvSM2xZIS5MSDFre+ExrlwWS7O2DWzBkSNqln4LQRP3by6tSEiKFJSkwE+PUANGGk
- wehp9VtXOodEWpjdcxAdYSMP37O7kz+EQF+NVdzUgeE15Wod9LxG7bKiIb9LGyf68VWI
- h7CmjtqE/nznt6Dgq13bY3NcNzYeY1stkT5rWWPOWRyxJ3uajXpUDB30gMzTJCca1brm
- 6EpQ==
+ (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1k0Re3-0003ZA-PB
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 11:35:59 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:44861)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_CBC_SHA1:128)
+ (Exim 4.90_1) (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1k0Re1-0003vk-Nu
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 11:35:59 -0400
+Received: from mail-vk1-f200.google.com ([209.85.221.200])
+ by youngberry.canonical.com with esmtps
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
+ (envelope-from <christian.ehrhardt@canonical.com>)
+ id 1k0Rdy-0006dB-Tj
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 15:35:55 +0000
+Received: by mail-vk1-f200.google.com with SMTP id b128so6606975vka.17
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 08:35:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=aFiggvsybxP7Q+K3MUxmqRhc2eENIdqqqh2Sgg6FwSA=;
- b=Cez/u8JIuvvCI4e835ACSSC0WjoDuEI8ZEEB7hlEXJE2Z1Z4XUVPxf+9jLysWAxNnq
- deQ7EA0paha0eZVLcxNfYPss6iUNX+9IWEac1eKAY9J++QjLRQrpC28fMaGu4k/jmql5
- jjklKL2JeOsCTkotSk5KJrUrEGZV+RC6NHQQICFHdJzEo3TmWIydXVFOQhEM9qETKgZU
- r5eKAbF6vusexnznLs8GC7izjpFZEGC/p5oeVLdajGBJMJo/5PbbjLe0GX9ZYpriAoPB
- 1UprjtJC3ajlF9ZTxHcZdp6PJ9mlepv3u3RMQwH49Rb+iqc0+0Ax/1xEwa0zC97x6oA3
- avFA==
-X-Gm-Message-State: AOAM530VDZRZHvKK/fUcLe6j5PDoOVk/B6r0gi9HFvHgSuiYSOCDXM5e
- VEx84PSLCvABChpxbjjGXbGRGLLuHZhBskMoBPc=
-X-Google-Smtp-Source: ABdhPJxoj7UHLrYCkgoHrAXLwuILv1cnBNW9I9zIU1rE4GFVStbxrpSGQDZ2xi5a+lLTMdvZH1b5bD/99osMfo4fJPE=
-X-Received: by 2002:a02:5b83:: with SMTP id g125mr33368303jab.91.1595950376114; 
- Tue, 28 Jul 2020 08:32:56 -0700 (PDT)
+ bh=mFDQCktakhwVAEppX4yHYmu7f/9fuhVpPW+ZcqQ6Fy8=;
+ b=P/SLq9YfcJN1WiVQpcm5iKYwLD6NTOxC3FR4a6h84XQWrkqLMNWfk2WfKTX9TPjxhX
+ 0mkx7Q6AcNuLQSwJa9zIB5kcgDcLChmXmPx7oV5HIq8S0GwD5o3fW7Qa9SlFak3PsFY/
+ Pb/bWxUW4Ctn9lbqFoxO/8Q/6USjnpvHNJoIzE98USRghMLv91EQuPJDSTMAUstzUZ1B
+ iq6Jdjl116YcHyuaFYQ8QAugviQ/N9mjvIYKIvmsUfyHxYkTxVTMFOczgfd1/D6WY9d4
+ g1nTdFrM+46OINMygsq9llBDvH8nAfUtvHA+diPvU2/p/Q/S9Hqox62DgbxYhTF5sFNH
+ OoBw==
+X-Gm-Message-State: AOAM530aPHxbWIsbJpMA7rJO4hlT9txVEs+BcHxw6L3YmmQB5dte2JWa
+ gUdPz4kbOBTrbyjRTbQnq3NyjJlNlHDAGsElvD4TmhaoyKCSu7MMCfheEBKQsP72OdPxMkhZB1B
+ pd+3GPuZl8T3Al/ZPbkKpCyg2CZZy88R9BZuC0A3IwHtDeLWe
+X-Received: by 2002:a67:7c11:: with SMTP id x17mr9279186vsc.155.1595950552987; 
+ Tue, 28 Jul 2020 08:35:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxE4hXpi8ZhRKdev1JBjeH+pRijExT2OH39RSepmAtVrJyzxl1lmb4TLg3Z0GKc4Fnlhw5epC7fwhgP8irY1WY=
+X-Received: by 2002:a67:7c11:: with SMTP id x17mr9279153vsc.155.1595950552621; 
+ Tue, 28 Jul 2020 08:35:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <1595227748-24720-1-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1595227748-24720-1-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 28 Jul 2020 08:22:37 -0700
-Message-ID: <CAKmqyKPSaB_GVM7K6BTzFApSEBWE0xE4_wXi0GbHnwfT0kRXig@mail.gmail.com>
-Subject: Re: [PATCH] hw/riscv: sifive_u: Add a dummy L2 cache controller device
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <20200727122357.31263-1-alex.bennee@linaro.org>
+ <20200727122357.31263-7-alex.bennee@linaro.org>
+In-Reply-To: <20200727122357.31263-7-alex.bennee@linaro.org>
+From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Date: Tue, 28 Jul 2020 17:35:26 +0200
+Message-ID: <CAATJJ0+umgefGS-sfAxbt1QhWwO4j5hcL0_Mq918wKc=_u7ZJg@mail.gmail.com>
+Subject: Re: [PULL 06/16] accel/tcg: better handle memory constrained systems
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000c4bd7605ab8231b7"
+Received-SPF: none client-ip=91.189.89.112;
+ envelope-from=christian.ehrhardt@canonical.com; helo=youngberry.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 11:35:55
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,110 +91,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Robert Foley <robert.foley@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jul 19, 2020 at 11:50 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> From: Bin Meng <bin.meng@windriver.com>
->
-> It is enough to simply map the SiFive FU540 L2 cache controller
-> into the MMIO space using create_unimplemented_device(), with an
-> FDT fragment generated, to make the latest upstream U-Boot happy.
->
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+--000000000000c4bd7605ab8231b7
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+On Mon, Jul 27, 2020 at 2:24 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
 
-Applied to riscv-to-apply.next tree for 5.2.
+> It turns out there are some 64 bit systems that have relatively low
+> amounts of physical memory available to them (typically CI system).
+> Even with swapping available a 1GB translation buffer that fills up
+> can put the machine under increased memory pressure. Detect these low
+> memory situations and reduce tb_size appropriately.
+>
+> Fixes: 600e17b2615 ("accel/tcg: increase default code gen buffer size for
+> 64 bit")
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Robert Foley <robert.foley@linaro.org>
+> Cc: BALATON Zoltan <balaton@eik.bme.hu>
+> Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+> Message-Id: <20200724064509.331-7-alex.bennee@linaro.org>
+>
 
-Alistair
+I beg your pardon for the late reply, but I was out a week.
+I see this is already the pull request and my former feedback was included
+- thanks.
 
-> ---
->
->  hw/riscv/sifive_u.c         | 22 ++++++++++++++++++++++
->  include/hw/riscv/sifive_u.h |  4 ++++
->  2 files changed, 26 insertions(+)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 6487d5e..f771cb0 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -72,6 +72,7 @@ static const struct MemmapEntry {
->      [SIFIVE_U_DEBUG] =    {        0x0,      0x100 },
->      [SIFIVE_U_MROM] =     {     0x1000,     0xf000 },
->      [SIFIVE_U_CLINT] =    {  0x2000000,    0x10000 },
-> +    [SIFIVE_U_L2CC] =     {  0x2010000,     0x1000 },
->      [SIFIVE_U_L2LIM] =    {  0x8000000,  0x2000000 },
->      [SIFIVE_U_PLIC] =     {  0xc000000,  0x4000000 },
->      [SIFIVE_U_PRCI] =     { 0x10000000,     0x1000 },
-> @@ -302,6 +303,24 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      qemu_fdt_setprop_string(fdt, nodename, "compatible", "gpio-restart");
->      g_free(nodename);
->
-> +    nodename = g_strdup_printf("/soc/cache-controller@%lx",
-> +        (long)memmap[SIFIVE_U_L2CC].base);
-> +    qemu_fdt_add_subnode(fdt, nodename);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> +        0x0, memmap[SIFIVE_U_L2CC].base,
-> +        0x0, memmap[SIFIVE_U_L2CC].size);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "interrupts",
-> +        SIFIVE_U_L2CC_IRQ0, SIFIVE_U_L2CC_IRQ1, SIFIVE_U_L2CC_IRQ2);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-> +    qemu_fdt_setprop(fdt, nodename, "cache-unified", NULL, 0);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "cache-size", 2097152);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "cache-sets", 1024);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "cache-level", 2);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "cache-block-size", 64);
-> +    qemu_fdt_setprop_string(fdt, nodename, "compatible",
-> +                            "sifive,fu540-c000-ccache");
-> +    g_free(nodename);
-> +
->      phy_phandle = phandle++;
->      nodename = g_strdup_printf("/soc/ethernet@%lx",
->          (long)memmap[SIFIVE_U_GEM].base);
-> @@ -732,6 +751,9 @@ static void sifive_u_soc_realize(DeviceState *dev, Error **errp)
->
->      create_unimplemented_device("riscv.sifive.u.dmc",
->          memmap[SIFIVE_U_DMC].base, memmap[SIFIVE_U_DMC].size);
-> +
-> +    create_unimplemented_device("riscv.sifive.u.l2cc",
-> +        memmap[SIFIVE_U_L2CC].base, memmap[SIFIVE_U_L2CC].size);
->  }
->
->  static Property sifive_u_soc_props[] = {
-> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-> index aba4d01..d3c0c00 100644
-> --- a/include/hw/riscv/sifive_u.h
-> +++ b/include/hw/riscv/sifive_u.h
-> @@ -71,6 +71,7 @@ enum {
->      SIFIVE_U_DEBUG,
->      SIFIVE_U_MROM,
->      SIFIVE_U_CLINT,
-> +    SIFIVE_U_L2CC,
->      SIFIVE_U_L2LIM,
->      SIFIVE_U_PLIC,
->      SIFIVE_U_PRCI,
-> @@ -86,6 +87,9 @@ enum {
->  };
->
->  enum {
-> +    SIFIVE_U_L2CC_IRQ0 = 1,
-> +    SIFIVE_U_L2CC_IRQ1 = 2,
-> +    SIFIVE_U_L2CC_IRQ2 = 3,
->      SIFIVE_U_UART0_IRQ = 4,
->      SIFIVE_U_UART1_IRQ = 5,
->      SIFIVE_U_GPIO_IRQ0 = 7,
+Never the less I took the chance to test it in the context that I found and
+reported the initial bug.
+If only to show that I didn't fire&forget this case :-)
+
+We know there is quite some noise/deviation, but I only ran single tests as
+the problem was easily visible despite the noise. Amount of memory qemu
+settles on:
+
+Host 32G, Guest 512M
+4.2        633M
+5.0       1672M
+5.0+ Fix  1670M
+
+Host 1.5G, Guest 512M
+4.2        692M
+5.0       16xxM (OOM)
+5.0+ Fix   766M
+
+So we seem to have achieved that small environments no more break (a very
+small amount of very densely sized systems might still) but at the same
+time get the bigger cache for any normal/large system.
+Tested-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Reviewed-by: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+
+
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 2afa46bd2b1..2d83013633b 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -976,7 +976,12 @@ static inline size_t size_code_gen_buffer(size_t
+> tb_size)
+>  {
+>      /* Size the buffer.  */
+>      if (tb_size =3D=3D 0) {
+> -        tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
+> +        size_t phys_mem =3D qemu_get_host_physmem();
+> +        if (phys_mem =3D=3D 0) {
+> +            tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
+> +        } else {
+> +            tb_size =3D MIN(DEFAULT_CODE_GEN_BUFFER_SIZE, phys_mem / 8);
+> +        }
+>      }
+>      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
+>          tb_size =3D MIN_CODE_GEN_BUFFER_SIZE;
 > --
-> 2.7.4
+> 2.20.1
 >
 >
+
+--=20
+Christian Ehrhardt
+Staff Engineer, Ubuntu Server
+Canonical Ltd
+
+--000000000000c4bd7605ab8231b7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Jul 27, 2020 at 2:24 PM Alex =
+Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@linar=
+o.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
+1ex">It turns out there are some 64 bit systems that have relatively low<br=
+>
+amounts of physical memory available to them (typically CI system).<br>
+Even with swapping available a 1GB translation buffer that fills up<br>
+can put the machine under increased memory pressure. Detect these low<br>
+memory situations and reduce tb_size appropriately.<br>
+<br>
+Fixes: 600e17b2615 (&quot;accel/tcg: increase default code gen buffer size =
+for 64 bit&quot;)<br>
+Signed-off-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.or=
+g" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
+Reviewed-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@lina=
+ro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
+Reviewed-by: Robert Foley &lt;<a href=3D"mailto:robert.foley@linaro.org" ta=
+rget=3D"_blank">robert.foley@linaro.org</a>&gt;<br>
+Cc: BALATON Zoltan &lt;<a href=3D"mailto:balaton@eik.bme.hu" target=3D"_bla=
+nk">balaton@eik.bme.hu</a>&gt;<br>
+Cc: Christian Ehrhardt &lt;<a href=3D"mailto:christian.ehrhardt@canonical.c=
+om" target=3D"_blank">christian.ehrhardt@canonical.com</a>&gt;<br>
+Message-Id: &lt;<a href=3D"mailto:20200724064509.331-7-alex.bennee@linaro.o=
+rg" target=3D"_blank">20200724064509.331-7-alex.bennee@linaro.org</a>&gt;<b=
+r></blockquote><div><br></div><div>I beg your pardon for the late reply, bu=
+t I was out a week.</div><div>I see this is already the pull request and my=
+ former feedback was included - thanks.</div><div><br></div><div>Never the =
+less I took the chance to test it in the context that I found and reported =
+the initial bug.</div><div>If only to show that I didn&#39;t fire&amp;forge=
+t this case=C2=A0:-)</div><div><br></div><div>We know there is quite some n=
+oise/deviation, but I only ran single tests as the problem was easily visib=
+le despite the noise. Amount of memory qemu settles on:<br><br>Host 32G, Gu=
+est 512M<br>4.2 =C2=A0 =C2=A0 =C2=A0 =C2=A0633M<br>5.0 =C2=A0 =C2=A0 =C2=A0=
+ 1672M<br>5.0+ Fix =C2=A01670M<br><br>Host 1.5G, Guest 512M<br>4.2 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0692M<br>5.0 =C2=A0 =C2=A0 =C2=A0 16xxM (OOM)<br>5.0+ Fi=
+x =C2=A0 766M<br></div><div><br></div><div>So we seem to have achieved that=
+ small environments no more break (a very small amount of very densely size=
+d systems might still) but at the same time get the bigger cache for any no=
+rmal/large system.</div><div>Tested-by: Christian Ehrhardt &lt;<a href=3D"m=
+ailto:christian.ehrhardt@canonical.com">christian.ehrhardt@canonical.com</a=
+>&gt;</div><div>Reviewed-by:=C2=A0Christian Ehrhardt &lt;<a href=3D"mailto:=
+christian.ehrhardt@canonical.com">christian.ehrhardt@canonical.com</a>&gt;<=
+br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin=
+:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
+>
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c<br>
+index 2afa46bd2b1..2d83013633b 100644<br>
+--- a/accel/tcg/translate-all.c<br>
++++ b/accel/tcg/translate-all.c<br>
+@@ -976,7 +976,12 @@ static inline size_t size_code_gen_buffer(size_t tb_si=
+ze)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0/* Size the buffer.=C2=A0 */<br>
+=C2=A0 =C2=A0 =C2=A0if (tb_size =3D=3D 0) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 size_t phys_mem =3D qemu_get_host_physmem();<b=
+r>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (phys_mem =3D=3D 0) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D DEFAULT_CODE_GEN_BUF=
+FER_SIZE;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D MIN(DEFAULT_CODE_GEN=
+_BUFFER_SIZE, phys_mem / 8);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0if (tb_size &lt; MIN_CODE_GEN_BUFFER_SIZE) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tb_size =3D MIN_CODE_GEN_BUFFER_SIZE;<br>
+-- <br>
+2.20.1<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">Christian Ehrhardt<br>Staff Engineer, Ubuntu Ser=
+ver<br>Canonical Ltd</div></div>
+
+--000000000000c4bd7605ab8231b7--
 
