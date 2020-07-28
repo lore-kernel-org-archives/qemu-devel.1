@@ -7,65 +7,64 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94ED6C433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B361EC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:31:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A3A020792
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:32:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3A020792
+	by mail.kernel.org (Postfix) with ESMTPS id 8824C20792
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:31:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8824C20792
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0J9o-0006dv-L4
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 02:32:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50688)
+	id 1k0J9Y-0006KL-Py
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 02:31:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1k0J5d-00013r-Ch
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:27:53 -0400
-Received: from mga09.intel.com ([134.134.136.24]:37275)
+ id 1k0J5b-00011f-Mj
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:27:51 -0400
+Received: from mga12.intel.com ([192.55.52.136]:57952)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1k0J5a-0002BO-Pa
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:27:53 -0400
-IronPort-SDR: wQY0vSt1A4bfOhM253Sr7R9yFSY+D7XrJWCr+uXUEj5RKOP0WD//kh0uXzkouExawtsXbTpazg
- PPymhAblXPNg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="152412043"
-X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="152412043"
+ id 1k0J5X-0002Ah-Rj
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:27:51 -0400
+IronPort-SDR: tbf9DNCrMHgwNc2jeMLTFMO06Cvmtm56orKtjGyfR9wIEvO/+7RBM6RRMdXAkBAn5xPXCRNBBw
+ yws3/V6iRoew==
+X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="130720417"
+X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="130720417"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 27 Jul 2020 23:27:47 -0700
-IronPort-SDR: tZCaCAC6/MTVH0Unmv3qE2NHH8R6UTqHKVlW3uYVr+eSEZpVpwqIWEElzoiEiyccjewNUs/eO8
- +YtF2OfRehtw==
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 27 Jul 2020 23:27:41 -0700
+IronPort-SDR: ZZBh2i2ZiLLbFq2GI8n1scT1MUTr2ELDtZKZ6a62v2422P609PZmiTGok7fQ4Y3rhkjetKls9u
+ qv8FmENxgEzw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="394232947"
+X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="394232901"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2020 23:27:45 -0700
+ by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2020 23:27:40 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com,
  jasowang@redhat.com
-Subject: [RFC v9 14/25] intel_iommu: process PASID cache invalidation
-Date: Mon, 27 Jul 2020 23:34:07 -0700
-Message-Id: <1595918058-33392-15-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v9 11/25] vfio/common: provide PASID alloc/free hooks
+Date: Mon, 27 Jul 2020 23:34:04 -0700
+Message-Id: <1595918058-33392-12-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
 References: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
-Received-SPF: pass client-ip=134.134.136.24; envelope-from=yi.l.liu@intel.com;
- helo=mga09.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 02:27:45
+Received-SPF: pass client-ip=192.55.52.136; envelope-from=yi.l.liu@intel.com;
+ helo=mga12.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 02:27:42
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,137 +78,154 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- eric.auger@redhat.com, yi.y.sun@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
- david@gibson.dropbear.id.au
+ hao.wu@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds PASID cache invalidation handling. When guest enabled
-PASID usages (e.g. SVA), guest software should issue a proper PASID
-cache invalidation when caching-mode is exposed. This patch only adds
-the draft handling of pasid cache invalidation. Detailed handling will
-be added in subsequent patches.
+This patch defines vfio_host_iommu_context_info, implements the PASID
+alloc/free hooks defined in HostIOMMUContextClass.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
-rfcv4 (v1) -> rfcv5 (v2):
-*) remove vtd_pasid_cache_gsi(), vtd_pasid_cache_psi()
-   and vtd_pasid_cache_dsi()
----
- hw/i386/intel_iommu.c          | 40 +++++++++++++++++++++++++++++++++++-----
- hw/i386/intel_iommu_internal.h | 12 ++++++++++++
- hw/i386/trace-events           |  3 +++
- 3 files changed, 50 insertions(+), 5 deletions(-)
+ hw/vfio/common.c                      | 66 +++++++++++++++++++++++++++++++++++
+ include/hw/iommu/host_iommu_context.h |  3 ++
+ include/hw/vfio/vfio-common.h         |  4 +++
+ 3 files changed, 73 insertions(+)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 191d124..7efa98c 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2395,6 +2395,37 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
-     return true;
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index af91eca..41aaf41 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1183,6 +1183,50 @@ static int vfio_get_iommu_type(VFIOContainer *container,
+     return ret;
  }
  
-+static bool vtd_process_pasid_desc(IntelIOMMUState *s,
-+                                   VTDInvDesc *inv_desc)
++static int vfio_host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx,
++                                           uint32_t min, uint32_t max,
++                                           uint32_t *pasid)
 +{
-+    if ((inv_desc->val[0] & VTD_INV_DESC_PASIDC_RSVD_VAL0) ||
-+        (inv_desc->val[1] & VTD_INV_DESC_PASIDC_RSVD_VAL1) ||
-+        (inv_desc->val[2] & VTD_INV_DESC_PASIDC_RSVD_VAL2) ||
-+        (inv_desc->val[3] & VTD_INV_DESC_PASIDC_RSVD_VAL3)) {
-+        error_report_once("non-zero-field-in-pc_inv_desc hi: 0x%" PRIx64
-+                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
-+        return false;
++    VFIOContainer *container = container_of(iommu_ctx,
++                                            VFIOContainer, iommu_ctx);
++    struct vfio_iommu_type1_pasid_request req;
++    int ret = 0;
++
++    req.argsz = sizeof(req);
++    req.flags = VFIO_IOMMU_FLAG_ALLOC_PASID;
++    req.range.min = min;
++    req.range.max = max;
++
++    ret = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
++    if (ret < 0) {
++        error_report("%s: alloc failed (%m)", __func__);
++        return ret;
 +    }
-+
-+    switch (inv_desc->val[0] & VTD_INV_DESC_PASIDC_G) {
-+    case VTD_INV_DESC_PASIDC_DSI:
-+        break;
-+
-+    case VTD_INV_DESC_PASIDC_PASID_SI:
-+        break;
-+
-+    case VTD_INV_DESC_PASIDC_GLOBAL:
-+        break;
-+
-+    default:
-+        error_report_once("invalid-inv-granu-in-pc_inv_desc hi: 0x%" PRIx64
-+                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
-+        return false;
-+    }
-+
-+    return true;
++    *pasid = ret;
++    return 0;
 +}
 +
- static bool vtd_process_inv_iec_desc(IntelIOMMUState *s,
-                                      VTDInvDesc *inv_desc)
++static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
++                                          uint32_t pasid)
++{
++    VFIOContainer *container = container_of(iommu_ctx,
++                                            VFIOContainer, iommu_ctx);
++    struct vfio_iommu_type1_pasid_request req;
++
++    int ret = 0;
++
++    req.argsz = sizeof(req);
++    req.flags = VFIO_IOMMU_FLAG_FREE_PASID;
++    req.range.min = pasid;
++    req.range.max = pasid + 1;
++
++    ret = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
++    if (ret) {
++        error_report("%s: free failed (%m)", __func__);
++    }
++    return ret;
++}
++
+ static int vfio_init_container(VFIOContainer *container, int group_fd,
+                                bool want_nested, Error **errp)
  {
-@@ -2501,12 +2532,11 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
-         }
-         break;
- 
--    /*
--     * TODO: the entity of below two cases will be implemented in future series.
--     * To make guest (which integrates scalable mode support patch set in
--     * iommu driver) work, just return true is enough so far.
--     */
-     case VTD_INV_DESC_PC:
-+        trace_vtd_inv_desc("pasid-cache", inv_desc.val[1], inv_desc.val[0]);
-+        if (!vtd_process_pasid_desc(s, &inv_desc)) {
-+            return false;
-+        }
-         break;
- 
-     case VTD_INV_DESC_PIOTLB:
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 64ac0a8..22d0bc5 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -445,6 +445,18 @@ typedef union VTDInvDesc VTDInvDesc;
-         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
-         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- 
-+#define VTD_INV_DESC_PASIDC_G          (3ULL << 4)
-+#define VTD_INV_DESC_PASIDC_PASID(val) (((val) >> 32) & 0xfffffULL)
-+#define VTD_INV_DESC_PASIDC_DID(val)   (((val) >> 16) & VTD_DOMAIN_ID_MASK)
-+#define VTD_INV_DESC_PASIDC_RSVD_VAL0  0xfff000000000ffc0ULL
-+#define VTD_INV_DESC_PASIDC_RSVD_VAL1  0xffffffffffffffffULL
-+#define VTD_INV_DESC_PASIDC_RSVD_VAL2  0xffffffffffffffffULL
-+#define VTD_INV_DESC_PASIDC_RSVD_VAL3  0xffffffffffffffffULL
+@@ -1802,3 +1846,25 @@ int vfio_eeh_as_op(AddressSpace *as, uint32_t op)
+     }
+     return vfio_eeh_container_op(container, op);
+ }
 +
-+#define VTD_INV_DESC_PASIDC_DSI        (0ULL << 4)
-+#define VTD_INV_DESC_PASIDC_PASID_SI   (1ULL << 4)
-+#define VTD_INV_DESC_PASIDC_GLOBAL     (3ULL << 4)
++static void vfio_host_iommu_context_class_init(ObjectClass *klass,
++                                                       void *data)
++{
++    HostIOMMUContextClass *hicxc = HOST_IOMMU_CONTEXT_CLASS(klass);
 +
- /* Information about page-selective IOTLB invalidate */
- struct VTDIOTLBPageInvInfo {
-     uint16_t domain_id;
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 71536a7..f7cd4e5 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -22,6 +22,9 @@ vtd_inv_qi_head(uint16_t head) "read head %d"
- vtd_inv_qi_tail(uint16_t head) "write tail %d"
- vtd_inv_qi_fetch(void) ""
- vtd_context_cache_reset(void) ""
-+vtd_pasid_cache_gsi(void) ""
-+vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation domain 0x%"PRIx16
-+vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
- vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
- vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu8" devfn %"PRIu8" not present"
- vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
++    hicxc->pasid_alloc = vfio_host_iommu_ctx_pasid_alloc;
++    hicxc->pasid_free = vfio_host_iommu_ctx_pasid_free;
++}
++
++static const TypeInfo vfio_host_iommu_context_info = {
++    .parent = TYPE_HOST_IOMMU_CONTEXT,
++    .name = TYPE_VFIO_HOST_IOMMU_CONTEXT,
++    .class_init = vfio_host_iommu_context_class_init,
++};
++
++static void vfio_register_types(void)
++{
++    type_register_static(&vfio_host_iommu_context_info);
++}
++
++type_init(vfio_register_types)
+diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
+index 35c4861..227c433 100644
+--- a/include/hw/iommu/host_iommu_context.h
++++ b/include/hw/iommu/host_iommu_context.h
+@@ -33,6 +33,9 @@
+ #define TYPE_HOST_IOMMU_CONTEXT "qemu:host-iommu-context"
+ #define HOST_IOMMU_CONTEXT(obj) \
+         OBJECT_CHECK(HostIOMMUContext, (obj), TYPE_HOST_IOMMU_CONTEXT)
++#define HOST_IOMMU_CONTEXT_CLASS(klass) \
++        OBJECT_CLASS_CHECK(HostIOMMUContextClass, (klass), \
++                         TYPE_HOST_IOMMU_CONTEXT)
+ #define HOST_IOMMU_CONTEXT_GET_CLASS(obj) \
+         OBJECT_GET_CLASS(HostIOMMUContextClass, (obj), \
+                          TYPE_HOST_IOMMU_CONTEXT)
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index bdb09f4..a5eaf35 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -26,12 +26,15 @@
+ #include "qemu/notify.h"
+ #include "ui/console.h"
+ #include "hw/display/ramfb.h"
++#include "hw/iommu/host_iommu_context.h"
+ #ifdef CONFIG_LINUX
+ #include <linux/vfio.h>
+ #endif
+ 
+ #define VFIO_MSG_PREFIX "vfio %s: "
+ 
++#define TYPE_VFIO_HOST_IOMMU_CONTEXT "qemu:vfio-host-iommu-context"
++
+ enum {
+     VFIO_DEVICE_TYPE_PCI = 0,
+     VFIO_DEVICE_TYPE_PLATFORM = 1,
+@@ -71,6 +74,7 @@ typedef struct VFIOContainer {
+     MemoryListener listener;
+     MemoryListener prereg_listener;
+     unsigned iommu_type;
++    HostIOMMUContext iommu_ctx;
+     Error *error;
+     bool initialized;
+     unsigned long pgsizes;
 -- 
 2.7.4
 
