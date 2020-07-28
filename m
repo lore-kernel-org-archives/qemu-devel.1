@@ -2,109 +2,90 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B2CFC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB650C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:03:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0AC820775
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:00:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0AC820775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 99CCE20775
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:03:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YrV9B8/r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99CCE20775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0LSy-0001Yf-2t
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 05:00:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56028)
+	id 1k0LWE-00032l-Sr
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 05:03:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <schnelle@linux.ibm.com>)
- id 1k0LSG-00017U-6n; Tue, 28 Jul 2020 04:59:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57664)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <schnelle@linux.ibm.com>)
- id 1k0LSD-0004pY-5F; Tue, 28 Jul 2020 04:59:23 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06S89IlU038839; Tue, 28 Jul 2020 04:59:18 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32j213yaa4-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Jul 2020 04:59:17 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06S8A3WF040471;
- Tue, 28 Jul 2020 04:59:17 -0400
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.108])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32j213ya8k-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Jul 2020 04:59:17 -0400
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
- by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06S8pFok015516;
- Tue, 28 Jul 2020 08:59:14 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma05fra.de.ibm.com with ESMTP id 32gcqk1y6n-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Jul 2020 08:59:14 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 06S8vk0F66388256
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 28 Jul 2020 08:57:46 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D5C64AE051;
- Tue, 28 Jul 2020 08:59:11 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3A1F5AE059;
- Tue, 28 Jul 2020 08:59:11 +0000 (GMT)
-Received: from oc5500677777.ibm.com (unknown [9.145.68.234])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 28 Jul 2020 08:59:11 +0000 (GMT)
-Subject: Re: [RFC PATCH] s390x/pci: vfio-pci breakage with disabled mem
- enforcement
-To: Pierre Morel <pmorel@linux.ibm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>
-References: <1595517236-17823-1-git-send-email-mjrosato@linux.ibm.com>
- <20200723102916.7cf15b43@w520.home>
- <0481c77e-f71f-886b-9b0a-41529eb139ee@linux.ibm.com>
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-Message-ID: <c0c5d214-4578-1cf2-6b72-e8b312e541b3@linux.ibm.com>
-Date: Tue, 28 Jul 2020 10:59:10 +0200
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k0LVZ-0002UD-Ll
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 05:02:49 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31787
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k0LVX-0005Jm-3M
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 05:02:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595926965;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WJZmsGpvIYXxGLW6A5hhSBkKhBOX5jJRVfVdEaPY5I0=;
+ b=YrV9B8/r7rNvCe25cz1MTyFbYgGmq/ieMmg8WR/5cK8+9M8hmeP/8uqnusftEYyhY6ngZv
+ q61BgaJiuz+E2swVFkeotwAo0dkPTE6tPoFK1XpKssJIYpkg/90b0t1Ufh8qoa8R2Y2scA
+ 74og97yi1dknCGLcta4+Yoi9EwYC97Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-Daoe-UDCP1ev4MuwBsGCIg-1; Tue, 28 Jul 2020 05:02:42 -0400
+X-MC-Unique: Daoe-UDCP1ev4MuwBsGCIg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 307B0106B244;
+ Tue, 28 Jul 2020 09:02:41 +0000 (UTC)
+Received: from [10.72.13.242] (ovpn-13-242.pek2.redhat.com [10.72.13.242])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D4BA5D9CD;
+ Tue, 28 Jul 2020 09:02:39 +0000 (UTC)
+Subject: Re: [PULL 0/4] Net patches
+To: peter.maydell@linaro.org
+References: <1595915878-22568-1-git-send-email-jasowang@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <3fb598f8-93f2-2a11-d5b2-1da85b6bb7b3@redhat.com>
+Date: Tue, 28 Jul 2020 17:02:38 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <0481c77e-f71f-886b-9b0a-41529eb139ee@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1595915878-22568-1-git-send-email-jasowang@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-28_01:2020-07-27,
- 2020-07-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 adultscore=0
- clxscore=1015 priorityscore=1501 phishscore=0 bulkscore=0
- lowpriorityscore=0 spamscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007280056
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=schnelle@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 04:59:18
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 00:06:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,82 +98,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- rth@twiddle.net
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+On 2020/7/28 下午1:57, Jason Wang wrote:
+> The following changes since commit 9303ecb658a0194560d1eecde165a1511223c2d8:
+>
+>    Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200727' into staging (2020-07-27 17:25:06 +0100)
+>
+> are available in the git repository at:
+>
+>    https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 7142cad78d6bf4a1cbcb09d06b39935a7998c24e:
+>
+>    net: forbid the reentrant RX (2020-07-28 13:50:41 +0800)
+>
+> ----------------------------------------------------------------
+> Want to send earlier but most patches just come.
+>
+> - fix vhost-vdpa issues when no peer
+> - fix virtio-pci queue enabling check
+> - forbid reentrant RX
+>
+> ----------------------------------------------------------------
+> Jason Wang (2):
+>        virtio-net: check the existence of peer before accessing vDPA config
+>        net: forbid the reentrant RX
+>
+> Laurent Vivier (1):
+>        virtio-pci: fix virtio_pci_queue_enabled()
 
-On 7/27/20 5:40 PM, Pierre Morel wrote:
-> 
-> 
-> On 2020-07-23 18:29, Alex Williamson wrote:
->> On Thu, 23 Jul 2020 11:13:55 -0400
->> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
->>
->>> I noticed that after kernel commit abafbc55 'vfio-pci: Invalidate mmaps
->>> and block MMIO access on disabled memory' vfio-pci via qemu on s390x
->>> fails spectacularly, with errors in qemu like:
->>>
->>> qemu-system-s390x: vfio_region_read(0001:00:00.0:region0+0x0, 4) failed: Input/output error
->>>
->>>  From read to bar 0 originating out of hw/s390x/s390-pci-inst.c:zpci_read_bar().
->>>
->>> So, I'm trying to figure out how to get vfio-pci happy again on s390x.  From
->>> a bit of tracing, we seem to be triggering the new trap in
->>> __vfio_pci_memory_enabled().  Sure enough, if I just force this function to
->>> return 'true' as a test case, things work again.
->>> The included patch attempts to enforce the setting, which restores everything
->>> to working order but also triggers vfio_bar_restore() in the process....  So
->>> this isn't the right answer, more of a proof-of-concept.
->>>
->>> @Alex: Any guidance on what needs to happen to make qemu-s390x happy with this
->>> recent kernel change?
->>
->> Bummer!  I won't claim to understand s390 PCI, but if we have a VF
->> exposed to the "host" (ie. the first level where vfio-pci is being
->> used), but we can't tell that it's a VF, how do we know whether the
->> memory bit in the command register is unimplemented because it's a VF
->> or unimplemented because the device doesn't support MMIO?  How are the
->> device ID, vendor ID, and BAR registers virtualized to the host?  Could
->> the memory enable bit also be emulated by that virtualization, much
->> like vfio-pci does for userspace?  If the other registers are
->> virtualized, but these command register bits are left unimplemented, do
->> we need code to deduce that we have a VF based on the existence of MMIO
->> BARs, but lack of memory enable bit?  Thanks,
->>
->> Alex
-> 
-> Alex, Matt,
-> 
-> in s390 we have the possibility to assign a virtual function to a logical partition as function 0.
-> In this case it can not be treated as a virtual function but must be treated as a physical function.
-> This is currently working very well.
-Can you explain why it must be treated as a physical function and must not have is_virtfn set?
-I'm currently reworking my fix for PF/VF linking not happening for all ways to attach a
-VF and in that I intend to set is_virtfn = 1 also for VFs that are not linked with a PF
-including those attached to an LPAR.
 
-So far I really can not see a reason why that should not work since I was wrong before
-and Firmware does tell us that these are indeed VFs (zdev->is_physfn == 0).
-AFAIK on nearly all platforms guests will often have a VF as function zero on a bus
-because that is what I expect to happen if you pass it through as a PCI function.
-So unless I'm missing something, that just makes LPAR look more like a QEMU guest on
-another platform which is very likely much more well tested than treating a VF as
-a PF as we have been doing.
-> However, these functions do not set PCI_COMMAND_MEMORY as we need.
-> 
-> Shouldn't we fix this inside the kernel, to keep older QMEU working?
-> 
-> Then would it be OK to add a new bit/boolean inside the pci_dev/vfio_pci_device like, is_detached_vfn, that we could set during enumeration and test inside __vfio_pci_memory_enabled() to return true?
-This does not make sense to me, as I wrote above it's totally normal for VMs to see VFs detached
-from the PF as they are passed-through to a QEMU guest so IMHO that's already covered by the meaning
-of is_virtfn.
-> 
-> In the enumeration we have the possibility to know if the function is a HW/Firmware virtual function on devfn 0 or if it is created by SRIOV.
-> 
+Just notice this has been merged.
+
+Will send a V2.
+
+Thanks
+
+
+>
+> Yuri Benditovich (1):
+>        virtio-pci: fix wrong index in virtio_pci_queue_enabled
+>
+>   hw/net/virtio-net.c        | 30 +++++++++++++++++++-----------
+>   hw/virtio/virtio-pci.c     |  4 ++--
+>   hw/virtio/virtio.c         |  7 ++++++-
+>   include/hw/virtio/virtio.h |  1 +
+>   net/queue.c                |  3 +++
+>   5 files changed, 31 insertions(+), 14 deletions(-)
+>
+>
 
 
