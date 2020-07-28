@@ -2,99 +2,85 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 262C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF21CC433E5
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:01:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4A1F2074F
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:01:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9BAC2053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:01:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hU0kLmtX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4A1F2074F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KiIDFb/i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9BAC2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Syg-00020e-6E
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 13:01:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46806)
+	id 1k0Sz8-0002Ge-TT
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 13:01:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mcascell@redhat.com>)
- id 1k0SxY-0001AZ-FF
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:00:12 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44654
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mcascell@redhat.com>)
- id 1k0SxW-0008IT-Do
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:00:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595955609;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=9cZzSn4IjU36micyQk1wsFI1iJ4axgLvgIp1B4iNxt0=;
- b=hU0kLmtXtVweVYdwCSJtfU2E9YlV3AGb39kQ6tvI2/vRKjoPgCia5/cko7I1Uq7mCcYZsk
- xWS4Nzqyca1zNhpWj0f00RJ/F8JgkO6qp9tMEIcMiVqgtLZ0dXFW6XQZrJGBu7GGVn6+o5
- 1IskiPa/VTuQZTacCaupZIvJTwUM++E=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-I_GqSLthNUy0d9lSWKIKBg-1; Tue, 28 Jul 2020 13:00:04 -0400
-X-MC-Unique: I_GqSLthNUy0d9lSWKIKBg-1
-Received: by mail-ej1-f72.google.com with SMTP id d16so7440522eje.20
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 10:00:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k0Sxj-0001IF-DT
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:00:23 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:36853)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k0Sxh-0008Mf-JE
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:00:23 -0400
+Received: by mail-ot1-x332.google.com with SMTP id l27so8238366oti.3
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 10:00:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=nXB9Cv4+vnMFrgEgMskTzBJJWd3aWy2ktDJsBIIomrE=;
+ b=KiIDFb/iH4Lst3qQudDsGE0bj/v5Ajf/dPCVblWMeutplisNCUM+J+/J91NXjrzoCU
+ aCGPYkIEWRmFgFh0Y8n3YEiHfuzD1gjigruNKpJ48gTir43r7P7U4jv+OMldRSVi9Y3l
+ 7WkbEFOifSMaawkLbWcVKWuRCdIbaDbX6mdBd4BIxIv/VzT/3lzdDPqjKG/sakmDh+dD
+ qHFIU9yfU98eKYKiOG9TYd3O4ejqH50a3OENliN+KKwaqRgkzXCDuSJA3FMo/HF1XsEG
+ tiesb6RB/wXfyigoxs4sq3K0e7/b9JAK1dypqtYYyyxE66CchMNX8uiwehfagcYRQFWV
+ pk5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=9cZzSn4IjU36micyQk1wsFI1iJ4axgLvgIp1B4iNxt0=;
- b=tkpxB9wm5CSsgNS2a4LALqhmilVKrm/CCsWLFhogVu88ZRDXKyKWqNzYpum4iXK776
- 6V7INkdxcEkUxSlvEQUzylkZNeGXAfKdMKuEyvv/sxKUa3NNyG6QUi40TNl5DMjCnd1q
- PWkWlVU3hF47L9OR80r/pXPMeolhZgtnyfO3UVDb3GVBD/wdSiVp3AugqRctwX+A6U3x
- OMaOHjx2uO5EQG/eWMafyrhLEnsG9ME9/2zn19OD2Tn1CWpByHj492T4yiRd90DNSh2B
- F5WjL/2RFhEMjQoB20oSMA58T7x6znZffQnPBnXwg3dmRGAKuRafMxeWXBpmMs3MsC4F
- 1GqQ==
-X-Gm-Message-State: AOAM531l22Ol6AudkvUSaYwYkoBAGYo6npXLfjnjXNyyvBpmBvaFsxNT
- 9s2wuXzZfjjM/aQkCXf5EiVNIERdpthgyCym4tAOq0S0OHWmmfnOC00QqXQmc61hta8wT+01/ln
- IDFBI7tOUzte7zF9Cqod2gKuwZlZLXbg=
-X-Received: by 2002:a17:906:388b:: with SMTP id
- q11mr454869ejd.100.1595955603559; 
- Tue, 28 Jul 2020 10:00:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIy2QqBGkRM7m8AHoZOATC+ZgSUWMEm3DrSZTzak+TuOZ0jGMk6/RW19TTIwTJ2UehyLXgoSWyi/n5SH+UlJA=
-X-Received: by 2002:a17:906:388b:: with SMTP id
- q11mr454848ejd.100.1595955603218; 
- Tue, 28 Jul 2020 10:00:03 -0700 (PDT)
+ bh=nXB9Cv4+vnMFrgEgMskTzBJJWd3aWy2ktDJsBIIomrE=;
+ b=VHR45Vr48XaMTfmrLbvw5m+PPIaz5F/ijky9hTMMMsEqw4bF8DSQqUawQ1w4Eo8AOR
+ BmeDM+p7ymTxMVwHz5oZ90rYPCfgKSUew5VbmYlDlOjDpPlQNTTwB1Ts1XhtnPQdScF8
+ 3+0X4WsOU1wivFDFK9Bz878vBDYtBsKmqpm1vvovahIsc9AxgXPH/4J9Nzqf4o4EJnIB
+ nL/k9Ht6UXnTWbpnNTFYOREXHdAEDr8d0SCke8GkvQ+8IQOhE/ZFUGqYzoM8CXTk1Nme
+ obyNXPhtEyf7NDR2wQmySuucqNn2OeRCT0TRup+btABrwv5mBrmpSYLn1gSzCSKYEsQI
+ 5vFA==
+X-Gm-Message-State: AOAM533nP65hQRAD1trNYhp+Ov88XEGFm4y8A+TkWgKmBQxQygkT1blm
+ t97+z3f9zyfauCDNGApm5bxZ25sY5XMQYam3gOTPqQ==
+X-Google-Smtp-Source: ABdhPJxnwejqmd49ehtkzmN9LrgMFZ8NL4khXzdb4Hom0+q2N5rYoBV/0jL9bOJWp0DVotBbdJEwmhKAO0o0i3AaFbo=
+X-Received: by 2002:a9d:7303:: with SMTP id e3mr24044880otk.221.1595955619920; 
+ Tue, 28 Jul 2020 10:00:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200727170838.1101775-1-mcascell@redhat.com>
- <20200727172929.5nnasrbvp2gg3yyv@mozz.bu.edu>
-In-Reply-To: <20200727172929.5nnasrbvp2gg3yyv@mozz.bu.edu>
-From: Mauro Matteo Cascella <mcascell@redhat.com>
-Date: Tue, 28 Jul 2020 18:59:52 +0200
-Message-ID: <CAA8xKjVMnF3KZPcaiVgWr_1fN-=CKvNQj+WQ0azyqPTGLpsf7Q@mail.gmail.com>
-Subject: Re: [PATCH 0/2] assertion failure in net_tx_pkt_add_raw_fragment() in
- hw/net/net_tx_pkt.c
-To: Alexander Bulekov <alxndr@bu.edu>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <20200728123432.501354-1-laurent@vivier.eu>
+In-Reply-To: <20200728123432.501354-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Jul 2020 18:00:08 +0100
+Message-ID: <CAFEAcA8d_iGpZT1c0W6D7+EhHjHcdL+yjBnC66Jom_aQ6A_Usw@mail.gmail.com>
+Subject: Re: [PULL 0/3] Linux user for 5.1 patches
+To: Laurent Vivier <laurent@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mcascell@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:31:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::332;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x332.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,80 +93,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, ziming zhang <ezrakiez@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you Alexander for testing the patch and providing the
-reproducer. I think you should be credited, along with Ziming, for
-independently reporting the same issue.
-
-On Mon, Jul 27, 2020 at 7:40 PM Alexander Bulekov <alxndr@bu.edu> wrote:
+On Tue, 28 Jul 2020 at 13:36, Laurent Vivier <laurent@vivier.eu> wrote:
 >
-> I sent a reproducer for the to the list some time ago, but never created
-> a Launchpad bug...
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg701930.html
+> The following changes since commit 9303ecb658a0194560d1eecde165a1511223c2d8:
 >
-> Anyways.. I can confirm that I can't reproduce the issue with these
-> patches.
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200727' into staging (2020-07-27 17:25:06 +0100)
 >
-> Minimized Reproducer:
-> cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc-q35-5.0 -nographic \
-> -display none -serial none -monitor none -qtest stdio
-> outl 0xcf8 0x80001010
-> outl 0xcfc 0xe1020000
-> outl 0xcf8 0x80001004
-> outw 0xcfc 0x7
-> write 0xe10207e8 0x4 0x25ff13ff
-> write 0xe10200b8 0x7 0xe3055e411b0202
-> write 0xe1020100 0x5 0x5e411b0202
-> write 0xe1020110 0x4 0x1b0202e1
-> write 0xe1020118 0x4 0x06fff105
-> write 0xe1020128 0x7 0xf3055e411b0202
-> write 0xe1020402 0x2 0x5e41
-> write 0xe1020420 0x4 0x1b0202e1
-> write 0xe1020428 0x4 0x06ff6105
-> write 0xe1020438 0x1 0x63
-> write 0xe1020439 0x1 0x05
-> EOF
+> are available in the Git repository at:
 >
-> -Alex
+>   git://github.com/vivier/qemu.git tags/linux-user-for-5.1-pull-request
 >
-> On 200727 1908, Mauro Matteo Cascella wrote:
-> > An assertion failure issue was reported by Mr. Ziming Zhang (CC'd).
-> > It occurs in the code that processes network packets while adding data
-> > fragments into packet context. This flaw could potentially be abused by
-> > a malicious guest to abort the QEMU process on the host. This two patch
-> > series does a couple of things:
-> >
-> > - introduces a new function in net_tx_pkt.{c,h} to check the maximum number
-> >   of data fragments
-> > - adds a check in both e1000e and vmxnet3 devices to skip the packet if the
-> >   current data fragment exceeds max_raw_frags, preventing
-> >   net_tx_pkt_add_raw_fragment() to be called with an invalid raw_frags
-> >
-> > Mauro Matteo Cascella (2):
-> >   hw/net/net_tx_pkt: add function to check pkt->max_raw_frags
-> >   hw/net: check max_raw_frags in e1000e and vmxnet3 devices
-> >
-> >  hw/net/e1000e_core.c | 3 ++-
-> >  hw/net/net_tx_pkt.c  | 5 +++++
-> >  hw/net/net_tx_pkt.h  | 8 ++++++++
-> >  hw/net/vmxnet3.c     | 3 ++-
-> >  4 files changed, 17 insertions(+), 2 deletions(-)
-> >
-> > --
-> > 2.26.2
-> >
-> >
+> for you to fetch changes up to 0f6bb1958f3aae0171996941df7fb7ea7536bb12:
 >
+>   linux-user: Use getcwd syscall directly (2020-07-27 22:05:34 +0200)
+>
+> ----------------------------------------------------------------
+> linux-user 20200728
+>
+> Fix "pgb_reserved_va: Assertion `guest_base != 0' failed." error
+> Fix rt_sigtimedwait() errno
+> Fix getcwd() errno
 
 
--- 
-Mauro Matteo Cascella, Red Hat Product Security
-6F78 E20B 5935 928C F0A8  1A9D 4E55 23B8 BB34 10B0
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
+
+-- PMM
 
