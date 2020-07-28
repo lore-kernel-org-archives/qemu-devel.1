@@ -2,96 +2,74 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5E3C433E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 12:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0299AC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 12:35:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAAA2206D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 12:30:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vn4SzqSy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAAA2206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id D008B2070B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 12:35:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D008B2070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Oki-00036I-6y
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 08:30:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54670)
+	id 1k0OpW-00062i-3j
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 08:35:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k0Ojq-0002Ph-Ij; Tue, 28 Jul 2020 08:29:46 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46349)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k0Ojp-0001Ja-1D; Tue, 28 Jul 2020 08:29:46 -0400
-Received: by mail-wr1-x444.google.com with SMTP id r12so18062911wrj.13;
- Tue, 28 Jul 2020 05:29:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Sh13qteGxNk/+YTEg4Jt3fxwUcvVSdSZGbREo+9eVTg=;
- b=Vn4SzqSywkB1QxQADgHZbYorccCfGa4oIJyn0gq7YWMdSL5i0LAR2V4s/tuIq7SPoo
- UQgB2qA1GEB+hXOW3FLeL/m5XYhz+VwSVDHuqAPYu+Pk26umJuyKJGlgUldti5q914wj
- /N7PF8SZxIYh3W5jHOZqIK3o1zx/YBR+cRaPJgrM4RYCHKM3LLKZvmFR7pWZWykzky96
- ZiBLtJmn3LdDs8+fyfxQ0StRmSEaNM5j6zuul9NP7x80njhX1b4vEyaMUtL0nFZEcPBs
- oC3EmBEtX1m7zUKGE9T0ToNcx5E+Gf0CVM1azgcvXPmTwzWWvO2/zq+O0CdoPoFCg2e7
- xoLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Sh13qteGxNk/+YTEg4Jt3fxwUcvVSdSZGbREo+9eVTg=;
- b=G0bpcuQXrSRLzAe74mE57yPvCol7aBGXXuUYf3nBnJQNgjGqp/+a5U3qE60G1EZdnK
- X6/iqNqhPECfHB+OpGFUgQN7RmD1zd/yA0RLhBBn+zpDSJhyV38SptMXBGFEkXn7p8IB
- zqRWmUNFDjKFUX0dXTvEzWFlv2yTbmlIdjrTz0hTwsUFeCTaJUrSnVgZuOHiI70ONgOy
- /CVxHiLlQAVPDdPVz8dWu9MmpLaKG7kRJc3lJSKj6QuUC3IpwFi52hDku+nqeSJk3z6N
- JUMxum8Oi43u583L5rocbFAOlKapBz1/ksrQUNBcpyXkMoY1+QN0M/m29lKfzcstFefJ
- opYQ==
-X-Gm-Message-State: AOAM531xojmS63TzBuXLIUnzZ+vddQP631xlmKJkP8xn/kvBAu0Jo5BF
- 0d+yggvTLgTH9pUKoiemK8QT9hGj
-X-Google-Smtp-Source: ABdhPJyRp3c7NGG9Ckemyhnu6lL09WvdMEM97R36/JSGaeAAE2PiEQoB9DvXNkvRkP3sFpshfhaZyA==
-X-Received: by 2002:adf:de08:: with SMTP id b8mr23433973wrm.4.1595939383101;
- Tue, 28 Jul 2020 05:29:43 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id r16sm17458842wrr.13.2020.07.28.05.29.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 28 Jul 2020 05:29:42 -0700 (PDT)
-Subject: Re: [PATCH for-5.1? 0/3] Fix AIRCR.SYSRESETREQ for most M-profile
- boards
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200728103744.6909-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <47817541-68e3-12f8-27b4-552af8389907@amsat.org>
-Date: Tue, 28 Jul 2020 14:29:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0Oob-0004f9-Uv
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 08:34:41 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:35975)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0Ooa-0001sk-08
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 08:34:41 -0400
+Received: from localhost.localdomain ([82.252.135.186]) by
+ mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MsZeX-1kuPoN0yOB-00txhg; Tue, 28 Jul 2020 14:34:36 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 1/3] linux-user: Ensure mmap_min_addr is non-zero
+Date: Tue, 28 Jul 2020 14:34:30 +0200
+Message-Id: <20200728123432.501354-2-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200728123432.501354-1-laurent@vivier.eu>
+References: <20200728123432.501354-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20200728103744.6909-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Provags-ID: V03:K1:Y2ExmyX9KMXPBHInR9cJgIGGafjMGPxin0bASUuAkr8/70Pz4Em
+ raz9/VAxgZJXZJxjlStLDW9ANTbxeoxFfzJspUeSzfgrBqJ99NpX9h1jhb3M65hW6vF+u4B
+ 3nPGO8g6EqAMgShCaDBXcUj9zAeycj5OfwIe4oaDES89alsWNvKoO2G0sabytEEW10hgtki
+ aD/IcpIf2mu/qAJMMP93w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:b1BCzJtxbZE=:PD6/Q5pEJLLVllme/haQCH
+ UH/eLgAww0XTykMUKveg7nJsC7TuJg7zBYiL+ji0BZpDNgFxLSxYvFVpki/r4sjNk+tIPdzPD
+ zdG3mOBNwOF/6QIlm+qO6Ql6Q73xZuws2ejPTTWgJ/bejvtVA0lp63TZdJgQtR2E9pVW6+Laj
+ 6ZfS7Q0VMokFlWRqCp44+SY+cWrtyRQ4axmM6OcI0GNgQWHy36jtJGHIjFrznZWv7V5Dajnyu
+ Oii7ntwZtjsTCxv3EdnGHFzwL+XbOmdDxo8czPIBol8eqZ7DhfICWefje9ivhFjEH7F93n7nB
+ TXwApsRXrRINYvT28BQ/1vy3VE7LJE/qCOEOUUKL18T0+A+fSxkZc7YxcelbZaw+tKrSMD1uH
+ MkEa4Uk9M6Bw5eWty+IhvKIy8hh/+Oz3Mkm2CDjQy9u1YI52LXIkidBDMzYoE39/5OEG8+xEo
+ vqBpJVrg+OGm/9wDMfMC8bbuC4LBh4Rin6LTHqq9IJomBWoUjtxAV5rNrkIr9pMkRTiaJMJPW
+ mxTyivnrlabLRwnu9mIUtjmukH7MprHpazaomNkEsH1buKbXJ13DRsKqBbz2SoMMqsnTxE8Y1
+ 2+ZyUwoHKkaANDYNFeNVDS04gJ/2shG0tmuGhACt7QtKYsqfBWfUxz2lgbR39MN9kPPIP3/zZ
+ Df5aDRV077tKhe5a1j2bzrbP5gc2bKgNgxgdc2iMeX6uNkE+Y7nL3szg91xa3cBxRWvAw7Tkh
+ BD3a8RHNmu5DdkKwOUsO0kNxhOwNQUi3I4RMIqgadX0eP1Roq/b0xuNc04gN8pNeHYrwU3VtT
+ Met0NlwlqgUMdDU5/9YNYZVV8sdr/t3k8zVDpcRL7pWogEwUKUBQijQ/H3xguxtv5lacyCj
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 08:34:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,62 +82,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/28/20 12:37 PM, Peter Maydell wrote:
-> QEMU's NVIC device provides an outbound qemu_irq "SYSRESETREQ" which
-> it signals when the guest sets the SYSRESETREQ bit in the AIRCR
-> register.  This matches the hardware design (where the CPU has a
-> signal of this name and it is up to the SoC to connect that up to an
-> actual reset mechanism), but in QEMU it mostly results in duplicated
-> code in SoC objects and bugs where SoC model implementors forget to
-> wire up the SYSRESETREQ line.
-> 
-> This patchseries provides a default behaviour for the case where
-> SYSRESETREQ is not actually connected to anything: use
-> qemu_system_reset_request() to perform a system reset. This is a
-> much more plausible default than "do nothing". It allows us to
-> allow us to remove the implementations of SYSRESETREQ handling from
-> the boards which currently hook up a reset function that just
-> does that (stellaris, emcraft-sf2), and also fixes the bugs
-> in these board models which forgot to wire up the signal:
-> 
->  * microbit
->  * mps2-an385
->  * mps2-an505
->  * mps2-an511
->  * mps2-an521
->  * musca-a
->  * musca-b1
->  * netduino
->  * netduinoplus2
-> 
-> [I admit that I have not specifically checked for datasheets
-> and errata notes for all these boards to confirm that AIRCR.SYSRESETREQ
-> really does reset the system or to look for more complex
-> reset-control logic... As an example, though, the SSE-200 used in
-> the mps2-an521 and the musca boards has a RESET_MASK register in the
-> system control block that allows a guest to suppress reset requests from
-> one or both CPUs. Since we don't model that register, "always reset"
-> is still closer to reasonable behaviour than "do nothing".]
-> 
-> We still allow the board to wire up the signal if it needs to, in case
-> we need to model more complicated reset controller logic (eg if we
-> wanted to get that SSE-200 corner case right in future) or to model
-> buggy SoC hardware which forgot to wire up the line itself. But
-> defaulting to "reset the system" is going to be correct much more
-> often than "do nothing".
-> 
-> Patch 1 introduces a new API for "check whether my qemu_irq is
-> actually connected to anything" (the test is trivial but the
-> encapsulation seems worthwhile); patch 2 provides the new default
-> and patch 3 removes the now-unnecessary SYSRESETREQ handlers in
-> board/SoC code.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Good cleanup!
+When the chroot does not have /proc mounted, we can read neither
+/proc/sys/vm/mmap_min_addr nor /proc/sys/maps.
 
-Series:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+The enforcement of mmap_min_addr in the host kernel is done by
+the security module, and so does not apply to processes owned
+by root.  Which leads pgd_find_hole_fallback to succeed in probing
+a reservation at address 0.  Which confuses pgb_reserved_va to
+believe that guest_base has not actually been initialized.
+
+We don't actually want NULL addresses to become accessible, so
+make sure that mmap_min_addr is initialized with a non-zero value.
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1888728
+Reported-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Tested-by: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Acked-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200724212314.545877-1-richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/main.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 3597e99bb10a..75c97851579e 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -758,14 +758,26 @@ int main(int argc, char **argv, char **envp)
+ 
+         if ((fp = fopen("/proc/sys/vm/mmap_min_addr", "r")) != NULL) {
+             unsigned long tmp;
+-            if (fscanf(fp, "%lu", &tmp) == 1) {
++            if (fscanf(fp, "%lu", &tmp) == 1 && tmp != 0) {
+                 mmap_min_addr = tmp;
+-                qemu_log_mask(CPU_LOG_PAGE, "host mmap_min_addr=0x%lx\n", mmap_min_addr);
++                qemu_log_mask(CPU_LOG_PAGE, "host mmap_min_addr=0x%lx\n",
++                              mmap_min_addr);
+             }
+             fclose(fp);
+         }
+     }
+ 
++    /*
++     * We prefer to not make NULL pointers accessible to QEMU.
++     * If we're in a chroot with no /proc, fall back to 1 page.
++     */
++    if (mmap_min_addr == 0) {
++        mmap_min_addr = qemu_host_page_size;
++        qemu_log_mask(CPU_LOG_PAGE,
++                      "host mmap_min_addr=0x%lx (fallback)\n",
++                      mmap_min_addr);
++    }
++
+     /*
+      * Prepare copy of argv vector for target.
+      */
+-- 
+2.26.2
+
 
