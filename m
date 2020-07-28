@@ -2,92 +2,82 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E49F9C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:49:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F80C433EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:51:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF89B20775
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:49:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cLevW/xz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF89B20775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B21C20656
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:51:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B21C20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0NB9-0005Xx-20
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:49:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56642)
+	id 1k0NCm-0006bT-IK
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:51:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0NAb-00057T-SW
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:49:17 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21218
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0NAZ-0004Ku-QS
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:49:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595933354;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DmT1eI01BzeIIMsat94yL5ZlTrQNy/w8csJXnhioZjk=;
- b=cLevW/xzLi87DWB9ebdU8pCs8oJPMKro+hK5DbXxxPeetqA0As47rPpK4sLyxWylv7OVGb
- ODcTCMkQ5yc3CysXgB64npElSqxCYZFJ5rbAh4LujPiBReUs7Xx/D1Cm8EoQle3sHOYiFg
- Fk3WeW7LBk23qNy/IC8fz/c8+S89dy0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-ZzZV_khqNK-cJj7nTf0Xeg-1; Tue, 28 Jul 2020 06:49:05 -0400
-X-MC-Unique: ZzZV_khqNK-cJj7nTf0Xeg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1784E107ACCA;
- Tue, 28 Jul 2020 10:49:04 +0000 (UTC)
-Received: from gondolin (ovpn-113-21.ams2.redhat.com [10.36.113.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 212CC712C2;
- Tue, 28 Jul 2020 10:48:52 +0000 (UTC)
-Date: Tue, 28 Jul 2020 12:48:50 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [RFC v2 2/3] libvhost-user: handle endianness as mandated by
- the spec
-Message-ID: <20200728124850.7c15eade.cohuck@redhat.com>
-In-Reply-To: <20200721184456.1305ca0b.pasic@linux.ibm.com>
-References: <20200717092929.19453-1-mhartmay@linux.ibm.com>
- <20200717092929.19453-3-mhartmay@linux.ibm.com>
- <20200721093942-mutt-send-email-mst@kernel.org>
- <20200721184456.1305ca0b.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0NCD-000691-La
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:50:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49416)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0NCA-0004hq-TD
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:50:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k0NC8-0001cD-EE
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 10:50:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5305B2E80EE
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 10:50:52 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 06:02:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Jul 2020 10:40:15 -0000
+From: Vishnu Dixit <1888923@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: bandwidth hmat hmat-lb latency
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: imammedo rvdixit23
+X-Launchpad-Bug-Reporter: Vishnu Dixit (rvdixit23)
+X-Launchpad-Bug-Modifier: Vishnu Dixit (rvdixit23)
+References: <159566199879.4877.1642879405857907906.malonedeb@wampee.canonical.com>
+Message-Id: <159593281561.15668.14229096865504497995.malone@wampee.canonical.com>
+Subject: [Bug 1888923] Re: Configured Memory access latency and bandwidth not
+ taking effect
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ca59848aa441a63e8dd09dfcf7cb73535f142d4c
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 02:15:06
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,61 +86,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Marc Hartmayer <mhartmay@linux.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Reply-To: Bug 1888923 <1888923@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 Jul 2020 18:44:56 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+It indeed was a non NUMA machine
 
-> On Tue, 21 Jul 2020 09:40:10 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Fri, Jul 17, 2020 at 11:29:28AM +0200, Marc Hartmayer wrote:  
-> > > Since virtio existed even before it got standardized, the virtio
-> > > standard defines the following types of virtio devices:
-> > > 
-> > >  + legacy device (pre-virtio 1.0)
-> > >  + non-legacy or VIRTIO 1.0 device
-> > >  + transitional device (which can act both as legacy and non-legacy)
-> > > 
-> > > Virtio 1.0 defines the fields of the virtqueues as little endian,
-> > > while legacy uses guest's native endian [1]. Currently libvhost-user
-> > > does not handle virtio endianness at all, i.e. it works only if the
-> > > native endianness matches with whatever is actually needed. That means
-> > > things break spectacularly on big-endian targets. Let us handle virtio
-> > > endianness for non-legacy as required by the virtio specification
-> > > [1]. We will fence non-legacy virtio devices with the upcoming patch.
-> > > 
-> > > [1] https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-210003
-> > > 
-> > > Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> > > 
-> > > ---
-> > > Note: As we don't support legacy virtio devices    
-> > 
-> > Who's "we" in this sentence? vhost user supports legacy generally ...  
-> 
-> In that sentence "we" is the library "libvhost-user". I would like
-> to avoid s390x being an oddball regarding this. Marc's previous
-> version made an attempt at correct endianness handling for legacy
-> and non-legacy. That spawned a discussion on how we don't want
-> legacy devices in this context. This series makes what seemed to be the
-> consensus reached in that discussion explicit: namely that libvhost-user
-> does not support legacy-virtio.
+-- =
 
-Can someone please clarify what libvhost-user actually supports?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888923
 
-virtio-fs is clearly non-legacy only, but in the changelog I also see a
-mention of scsi, and that one probably does support legacy?
+Title:
+  Configured Memory access latency and bandwidth not taking effect
 
-Can we make a distinction along the lines of:
-- if we are non-legacy, we support any endianness;
-- if we are legacy, we support little endian host/guest only?
+Status in QEMU:
+  Invalid
 
+Bug description:
+  I was trying to configure latencies and bandwidths between nodes in a
+  NUMA emulation using QEMU 5.0.0.
+
+  Host : Ubuntu 20.04 64 bit
+  Guest : Ubuntu 18.04 64 bit
+
+  The machine configured has 2 nodes. Each node has 2 CPUs and has been
+  allocated 3GB of memory. The memory access latencies and bandwidths
+  for a local access (i.e from initiator 0 to target 0, and from
+  initiator 1 to target 1) are set as 40ns and 10GB/s respectively. The
+  memory access latencies and bandwidths for a remote access (i.e from
+  initiator 1 to target 0, and from initiator 0 to target 1) are set as
+  80ns and 5GB/s respectively.
+
+  The command line launch is as follows.
+
+  sudo x86_64-softmmu/qemu-system-x86_64  \
+  -machine hmat=3Don \
+  -boot c \
+  -enable-kvm \
+  -m 6G,slots=3D2,maxmem=3D7G \
+  -object memory-backend-ram,size=3D3G,id=3Dm0 \
+  -object memory-backend-ram,size=3D3G,id=3Dm1 \
+  -numa node,nodeid=3D0,memdev=3Dm0 \
+  -numa node,nodeid=3D1,memdev=3Dm1 \
+  -smp 4,sockets=3D4,maxcpus=3D4  \
+  -numa cpu,node-id=3D0,socket-id=3D0 \
+  -numa cpu,node-id=3D0,socket-id=3D1 \
+  -numa cpu,node-id=3D1,socket-id=3D2 \
+  -numa cpu,node-id=3D1,socket-id=3D3 \
+  -numa dist,src=3D0,dst=3D1,val=3D20 \
+  -net nic \
+  -net user \
+  -hda testing.img \
+  -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
+ess-latency,latency=3D40 \
+  -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
+ess-bandwidth,bandwidth=3D10G \
+  -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
+ess-latency,latency=3D80 \
+  -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
+ess-bandwidth,bandwidth=3D5G \
+  -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
+ess-latency,latency=3D80 \
+  -numa hmat-lb,initiator=3D1,target=3D0,hierarchy=3Dmemory,data-type=3Dacc=
+ess-bandwidth,bandwidth=3D5G \
+  -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
+ess-latency,latency=3D40 \
+  -numa hmat-lb,initiator=3D1,target=3D1,hierarchy=3Dmemory,data-type=3Dacc=
+ess-bandwidth,bandwidth=3D10G \
+
+  Then the latencies and bandwidths between the nodes were tested using
+  the Intel Memory Latency Checker v3.9
+  (https://software.intel.com/content/www/us/en/develop/articles/intelr-
+  memory-latency-checker.html). But the obtained results did not match
+  the configuration. The following are the results obtained.
+
+  Latency_matrix with idle latencies (in ns)
+
+  Numa Node
+  . .0. . .1.
+  0 36.2 36.4
+  1 34.9 35.4
+
+  Bandwidth_matrix with memory bandwidths (in MB/s)
+
+  Numa Node
+  . . .0. . . .1. =
+
+  0 15167.1 15308.9
+  1 15226.0 15234.0
+
+  A test was also conducted with the tool =E2=80=9Clat_mem_rd=E2=80=9D from=
+ lmbench to
+  measure the memory read latencies. This also gave results which did
+  not match the config.
+
+  Any information on why the config latency and bandwidth values are not
+  applied, would be appreciated.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888923/+subscriptions
 
