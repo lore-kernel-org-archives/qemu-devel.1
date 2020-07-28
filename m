@@ -2,89 +2,78 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF21CC433E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF6EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9BAC2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:01:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KiIDFb/i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9BAC2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1507F20809
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:16:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1507F20809
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Sz8-0002Ge-TT
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 13:01:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46876)
+	id 1k0TDN-0007aL-A6
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 13:16:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0Sxj-0001IF-DT
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:00:23 -0400
-Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:36853)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0TCX-0006vm-Jt
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:15:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43866)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0Sxh-0008Mf-JE
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:00:23 -0400
-Received: by mail-ot1-x332.google.com with SMTP id l27so8238366oti.3
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 10:00:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nXB9Cv4+vnMFrgEgMskTzBJJWd3aWy2ktDJsBIIomrE=;
- b=KiIDFb/iH4Lst3qQudDsGE0bj/v5Ajf/dPCVblWMeutplisNCUM+J+/J91NXjrzoCU
- aCGPYkIEWRmFgFh0Y8n3YEiHfuzD1gjigruNKpJ48gTir43r7P7U4jv+OMldRSVi9Y3l
- 7WkbEFOifSMaawkLbWcVKWuRCdIbaDbX6mdBd4BIxIv/VzT/3lzdDPqjKG/sakmDh+dD
- qHFIU9yfU98eKYKiOG9TYd3O4ejqH50a3OENliN+KKwaqRgkzXCDuSJA3FMo/HF1XsEG
- tiesb6RB/wXfyigoxs4sq3K0e7/b9JAK1dypqtYYyyxE66CchMNX8uiwehfagcYRQFWV
- pk5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nXB9Cv4+vnMFrgEgMskTzBJJWd3aWy2ktDJsBIIomrE=;
- b=VHR45Vr48XaMTfmrLbvw5m+PPIaz5F/ijky9hTMMMsEqw4bF8DSQqUawQ1w4Eo8AOR
- BmeDM+p7ymTxMVwHz5oZ90rYPCfgKSUew5VbmYlDlOjDpPlQNTTwB1Ts1XhtnPQdScF8
- 3+0X4WsOU1wivFDFK9Bz878vBDYtBsKmqpm1vvovahIsc9AxgXPH/4J9Nzqf4o4EJnIB
- nL/k9Ht6UXnTWbpnNTFYOREXHdAEDr8d0SCke8GkvQ+8IQOhE/ZFUGqYzoM8CXTk1Nme
- obyNXPhtEyf7NDR2wQmySuucqNn2OeRCT0TRup+btABrwv5mBrmpSYLn1gSzCSKYEsQI
- 5vFA==
-X-Gm-Message-State: AOAM533nP65hQRAD1trNYhp+Ov88XEGFm4y8A+TkWgKmBQxQygkT1blm
- t97+z3f9zyfauCDNGApm5bxZ25sY5XMQYam3gOTPqQ==
-X-Google-Smtp-Source: ABdhPJxnwejqmd49ehtkzmN9LrgMFZ8NL4khXzdb4Hom0+q2N5rYoBV/0jL9bOJWp0DVotBbdJEwmhKAO0o0i3AaFbo=
-X-Received: by 2002:a9d:7303:: with SMTP id e3mr24044880otk.221.1595955619920; 
- Tue, 28 Jul 2020 10:00:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0TCV-0002GL-NN
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:15:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k0TCT-00038r-Qj
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 17:15:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C53542E80DB
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 17:15:37 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200728123432.501354-1-laurent@vivier.eu>
-In-Reply-To: <20200728123432.501354-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Jul 2020 18:00:08 +0100
-Message-ID: <CAFEAcA8d_iGpZT1c0W6D7+EhHjHcdL+yjBnC66Jom_aQ6A_Usw@mail.gmail.com>
-Subject: Re: [PULL 0/3] Linux user for 5.1 patches
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::332;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x332.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Jul 2020 17:05:59 -0000
+From: Robert <1889288@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ubuntu-10-rmn30
+X-Launchpad-Bug-Reporter: Robert (ubuntu-10-rmn30)
+X-Launchpad-Bug-Modifier: Robert (ubuntu-10-rmn30)
+Message-Id: <159595596008.2765.9252796063113419577.malonedeb@gac.canonical.com>
+Subject: [Bug 1889288] [NEW] aarch64 BICS instruciton doesn't set flags
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: c28a01e35bc437f4646c63485ef0074317d7939d
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 13:15:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,37 +82,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1889288 <1889288@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jul 2020 at 13:36, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit 9303ecb658a0194560d1eecde165a1511223c2d8:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200727' into staging (2020-07-27 17:25:06 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-5.1-pull-request
->
-> for you to fetch changes up to 0f6bb1958f3aae0171996941df7fb7ea7536bb12:
->
->   linux-user: Use getcwd syscall directly (2020-07-27 22:05:34 +0200)
->
-> ----------------------------------------------------------------
-> linux-user 20200728
->
-> Fix "pgb_reserved_va: Assertion `guest_base != 0' failed." error
-> Fix rt_sigtimedwait() errno
-> Fix getcwd() errno
+Public bug reported:
 
+When reading the source for translate-a64.c here:
 
-Applied, thanks.
+https://github.com/qemu/qemu/blob/a466dd084f51cdc9da2e99361f674f98d7218559/=
+target/arm/translate-a64.c#L4783
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
+I noticed that it does not appear to call gen_logic_CC for the BICS
+instruction so is not setting the flags as required. I haven't tried to
+produce a test case for it but it seems like it might be a bug.
 
--- PMM
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1889288
+
+Title:
+  aarch64 BICS instruciton doesn't set flags
+
+Status in QEMU:
+  New
+
+Bug description:
+  When reading the source for translate-a64.c here:
+
+  https://github.com/qemu/qemu/blob/a466dd084f51cdc9da2e99361f674f98d721855=
+9/target/arm/translate-a64.c#L4783
+
+  I noticed that it does not appear to call gen_logic_CC for the BICS
+  instruction so is not setting the flags as required. I haven't tried
+  to produce a test case for it but it seems like it might be a bug.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1889288/+subscriptions
 
