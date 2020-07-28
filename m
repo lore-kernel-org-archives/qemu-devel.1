@@ -2,85 +2,94 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD9BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE29C433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:26:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7511E20775
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:20:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE97720775
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:26:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gViAEQM0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7511E20775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vm+E7Tl2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE97720775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0MiP-0003Fc-QQ
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:20:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48850)
+	id 1k0Moz-0005pV-56
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:26:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0Mhq-0002ie-2Q
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:19:34 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42972)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0Mhn-0008K6-CG
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:19:33 -0400
-Received: by mail-oi1-x242.google.com with SMTP id j7so609883oij.9
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 03:19:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=MZLqhHPbd1yGJM3lp3wAUsZ/dHhC4BUDsaOMlyyZJ1I=;
- b=gViAEQM0Z5itVcQrR5B0BpgY4ssFOKmKRy/AU/Elkm1Oc3dp0EHvNCzTg1ru5IwJoF
- fyWU/Wia1B0zmQ2XR1kizSBgv+7AoSpV5KCn/wgFcToe3uAh1Vms8kzCWYXC9YFS80N+
- ZPIKz2Ez0WwRpUCCTLUrVo+7+a/2z/8/ooCYh9aJEOPYVIbBo5itSM3dSTM8nV52EHrO
- LO2gz2H+/Y+1hko0yX9dxY7fFC0SqS1bqGqofkiDdtozDiFMKiS0zsS2LjnYoWQe0RAe
- SI1199dMZao820nU9/0xDfkC+curgxP1j8tLn2q79+mzYOLR8aruZ5B0/tChASFd9f5U
- hGxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=MZLqhHPbd1yGJM3lp3wAUsZ/dHhC4BUDsaOMlyyZJ1I=;
- b=nwLjgF/KA1mPdlwYAJOyjpxFemJVnxBKMWmH0HxWGv94Bt0FpLS+zc9TO53cKPhgbz
- Abthy0nnMvCFqGGlhREc30JTZOmrfGSurY1vcZgqIU0iR0xJ90w7r7JBkQgGJkAd+HNO
- PwvV+qcXvd6wvaSQlRcF3inVxpJT/VvECznPO9nHC25pizhL3RALNFHKioM7XBFdYnEl
- a7HAkglG0BCYkZN3MI1rN9yqfxSa1MqcWYQkc2JRvoPmp55fPCO5ujmQjtheBhWUgkDc
- DKmNa7YlG6qbxSZtMhzlKx75k+/K6VUYdasUBJqkCG4RcdahezuZoDZHCHg+BuSH3iPG
- IXWA==
-X-Gm-Message-State: AOAM532zjR7x/cTbwLAtX1XruN2iZOS3e8NuYrSRw5FeLEVO0r9CJCGp
- bhhuXQejG33PIwsRvWqT964wO8KPT0Ga1pkNPSEhOA==
-X-Google-Smtp-Source: ABdhPJzSJ/fVsGWiy1C9D/z6W4cZdsyMPPtAdZ0yS70Pn+9zD4dlPmRwXVN30uHc8i/epy4R+DHUG+uDk21dEB9AW+0=
-X-Received: by 2002:aca:4a96:: with SMTP id x144mr2831511oia.163.1595931570077; 
- Tue, 28 Jul 2020 03:19:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k0Mo9-00057Q-0M
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:26:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52310
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k0Mo6-0000xp-Ou
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:26:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595931962;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=WNLIeXCN6eXSxaZZQAkHQkExbFpOF7bmusJP5+uJRAs=;
+ b=Vm+E7Tl2w9h/PwBEQ+PMOBGPinbqxCGSXM0QjC7hz0aARo4Qd9SPt/xsc9C/no/lVqnBkV
+ h6XC2FcYc76kVuimT3L3ZTuGrx2IlBqSCTUF3jFBtQ0ILzj5dAIyQv8TtpcLzFGB+UZcLi
+ yHo3uuG97HJeFYt83Y4a/lZ0z1pB9dU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137-Eu5-5nG-MCqSGmx38qIXWg-1; Tue, 28 Jul 2020 06:25:58 -0400
+X-MC-Unique: Eu5-5nG-MCqSGmx38qIXWg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3042B107ACCA;
+ Tue, 28 Jul 2020 10:25:56 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-161.ams2.redhat.com [10.36.112.161])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9578490E68;
+ Tue, 28 Jul 2020 10:25:49 +0000 (UTC)
+Subject: Re: [PATCH] hw: add compat machines for 5.2
+To: Cornelia Huck <cohuck@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Halil Pasic
+ <pasic@linux.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20200728094645.272149-1-cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <8582a5ad-f712-13f5-8534-1089c23e3a4c@redhat.com>
+Date: Tue, 28 Jul 2020 12:25:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20200727143812.1101547-1-mreitz@redhat.com>
-In-Reply-To: <20200727143812.1101547-1-mreitz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Jul 2020 11:19:19 +0100
-Message-ID: <CAFEAcA_8hhEUJdxGzmjVjG+CFosAtDf9GAR0D2x+-k_mU7Gfug@mail.gmail.com>
-Subject: Re: [PULL 0/3] Block patches for 5.1
-To: Max Reitz <mreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <20200728094645.272149-1-cohuck@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 23:55:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,38 +102,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 27 Jul 2020 at 15:38, Max Reitz <mreitz@redhat.com> wrote:
->
-> The following changes since commit 4215d3413272ad6d1c6c9d0234450b602e46a74c:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-5.1-20200727' into staging (2020-07-27 09:33:04 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/XanClic/qemu.git tags/pull-block-2020-07-27
->
-> for you to fetch changes up to 1855536256eb0a5708b04b85f744de69559ea323:
->
->   iotests/197: Fix for compat=0.10 (2020-07-27 16:35:17 +0200)
->
-> ----------------------------------------------------------------
-> Block patches for 5.1:
-> - Coverity fix
-> - iotests fix for rx and avr
-> - iotests fix for qcow2 -o compat=0.10
->
+On 28/07/2020 11.46, Cornelia Huck wrote:
+> Add 5.2 machine types for arm/i440fx/q35/s390x/spapr.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  hw/arm/virt.c              |  9 ++++++++-
+>  hw/core/machine.c          |  3 +++
+>  hw/i386/pc.c               |  3 +++
+>  hw/i386/pc_piix.c          | 14 +++++++++++++-
+>  hw/i386/pc_q35.c           | 13 ++++++++++++-
+>  hw/ppc/spapr.c             | 15 +++++++++++++--
+>  hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
+>  include/hw/boards.h        |  3 +++
+>  include/hw/i386/pc.h       |  3 +++
+>  9 files changed, 71 insertions(+), 6 deletions(-)
 
+For the generic and s390x part:
 
-Applied, thanks.
+Acked-by: Thomas Huth <thuth@redhat.com>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
-
--- PMM
 
