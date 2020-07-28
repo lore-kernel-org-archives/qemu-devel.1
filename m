@@ -2,87 +2,127 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29BC0C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F484C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E676220775
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 088632074F
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:50:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CZcmuQz0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E676220775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fI1Ih1UY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 088632074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0MF9-0007Jh-7b
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 05:49:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40766)
+	id 1k0MGB-00008X-7k
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 05:50:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0MES-0006m8-1s
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 05:49:12 -0400
-Received: from mail-oo1-xc44.google.com ([2607:f8b0:4864:20::c44]:38685)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0MEP-00047E-1L
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 05:49:11 -0400
-Received: by mail-oo1-xc44.google.com with SMTP id n21so2808122ooj.5
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 02:49:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TdyyyqywWUMdnHNVZWGjksiBBFcyc3F5QM+a5cnsI6M=;
- b=CZcmuQz0+fChzJYgANcCMKOFWNVO3nbzqpsuahJiXsM/laZXIVdLxMRAHt4npoyRCl
- 70G3mD52PI70p0JWv0qRLs8sRNY6sA4RyQWGw0MhGSduBQkCTvCGR1jNVR9bi0lH5ybf
- Evlj0B7Upx7JgYHHY58hGzlQsFFUm3zQDtIkvPv/D7MBcmSNVl2fyfmzl/Gd7vstKUNC
- +Q6IlTvmK7gSlUG/vvNFgj3BYV4Qi54EAJFd1o5lKGeBn9brO4CCmePhvSA0P6cG2H3w
- AdS7niyV6lK1U7v/HaBiz2L7Nt4FroG0yuyFvZ0kWuIOOyQABdSk5N4wb458V5r3HnkS
- 7XJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TdyyyqywWUMdnHNVZWGjksiBBFcyc3F5QM+a5cnsI6M=;
- b=qQuTdcLN1OpDBuGn2QB6JUxLNELrAChfUjEGpTLIOU6MdnuDNX62B2vE57zISeS2tC
- TW48E7dcXIkHS4vmSzvjtvbfq2ZYDnhMz7gucNLBKr5edEGe+TJ7do7508e0FL0z9Dhv
- dzcYvgJe5V/80neoYHh3Tl5mQLIFkr/t7ajItqkAvrwU/48EudJtdXCD36dsDLLou3sC
- BXCSUDIQ3ZVkYXVmfL6JDaZSXf2V9s1KdVfHLiFtC2LaUJLzHmtwgd55D0cx7ndSvWSY
- FPBocbTG4oOmNCbnCnttfOq9SAhIvrpF1rnJ/W1HObbxP06eF7bGxMMvX3av+o+RIPyc
- 4gkA==
-X-Gm-Message-State: AOAM53351n/YreZ3BQyjie/l9li1Efg1hea/vQ9IY39A4WFtf5gUjTwY
- s3dhRM/gx6te6wdHMA1MdIHSWeK/YSMPliyEyiZ/zQ==
-X-Google-Smtp-Source: ABdhPJzzTQ/jXcq8/sKyHn3ybKUlbopQPDUo3bwsPERxQxQKwZLXW9tA7zh/rQ5blb36xDnR9nHsYE7zDQh583J4Np4=
-X-Received: by 2002:a4a:4c44:: with SMTP id a65mr16107989oob.20.1595929747785; 
- Tue, 28 Jul 2020 02:49:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1k0MF3-0007Mx-1m
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 05:49:49 -0400
+Received: from mail-eopbgr80111.outbound.protection.outlook.com
+ ([40.107.8.111]:1974 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1k0MEz-0004AQ-V0
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 05:49:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aZymozHT9d/7KBlicKjs0TIHJ3V9Asm9JUA9H7ToI2TDtKLuNdupNN4xRCamSdrKu8Knio+ZtaCyeguaVwsvfi15CQBLUD0dF2OPzSoqJQ/UAok2QL2g+P7kqFvwX3L6SJZuypaxf8BonTzaveHSghJDojuxdbOLdcsQNpUCTx1Uxc0aoHs6Us0RSti/5MKDaJOWdGtPt93zuyQf2zkpixxMN9LV7VU/xCrMLruVbv1M2i5X+IZOpq0cXLGRZ991nMUAlnrmpajvSLCBu1hlsdtOEhi4+tmXdtSXaRWGohstNWWHrtmm0Ck+AKnhfK3hW1TGEwU8wIntiVrzH6Y7Lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=anPZ7t3cGvtb4IvvAGHgOQoF8f4AU5pHmQJ+X3rrV04=;
+ b=Sk+v/LCuhMxvI0DK0OTmJr/bzC6QIDlHNkpE4wLw2oTNcbI1yQgJ/hxiMXfKCO7Zk7C/9o0+OqwxOzNW6yvN+o76Rr2bWfKedXq1CfRFoVX7+wP0H9kXdT05nLP9EbAJzJKvJFRoYtCual/i88cH3tzPwtocZRGff1rYTz0huZ41TV6Tg1m9blCLo6Og+cXGIYA+pUtWyCPUAo1j3QI5Rp0tNJVmOeax1/AZhGLUftVZ/e4xs6to+im1F4tZrRoG/sL4zvhYYgDjv1WDzFT7fMDq2H6w72kD7lCB26701w/K0tUd68IvDzodU1sRsUGfHJRiT2vFDndoge78wP7ooQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=anPZ7t3cGvtb4IvvAGHgOQoF8f4AU5pHmQJ+X3rrV04=;
+ b=fI1Ih1UYHQzBvBodA7BZE/eaqnymD/JeKdWAqJpBUvhITIaljvknwuIBbGiCKfjw9l8V3ENgP/HjcoOSlj546c6ZcN43I7foDUIyDsJx8dG+YrXEfwKuQFzDKFbeq5p4eS4zJ8CT6VNI8dwUXTq7XOPNrcphA+zKsRthH3r/9a0=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
+ by AM0PR08MB3058.eurprd08.prod.outlook.com (2603:10a6:208:5a::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.16; Tue, 28 Jul
+ 2020 09:34:39 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::5d21:ce58:6f11:b5dd]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::5d21:ce58:6f11:b5dd%7]) with mapi id 15.20.3216.034; Tue, 28 Jul 2020
+ 09:34:39 +0000
+Subject: Re: [PATCH v0 3/4] migration: add background snapshot
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200722081133.29926-1-dplotnikov@virtuozzo.com>
+ <20200722081133.29926-4-dplotnikov@virtuozzo.com>
+ <20200727164848.GR3040@work-vm>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <092ca853-d4ec-788d-6f26-7361714b8dea@virtuozzo.com>
+Date: Tue, 28 Jul 2020 12:34:34 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200727164848.GR3040@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: HE1PR0301CA0018.eurprd03.prod.outlook.com
+ (2603:10a6:3:76::28) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
 MIME-Version: 1.0
-References: <20200727130225.32640-1-zhukeqian1@huawei.com>
- <CAFEAcA9vQMP0YLAuzdPW2m3RcRNySxA0gJQZmeXBUYRy4=Dk+w@mail.gmail.com>
- <92e8dc9b-deed-afb8-89ae-f50b68bbafa8@redhat.com>
-In-Reply-To: <92e8dc9b-deed-afb8-89ae-f50b68bbafa8@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Jul 2020 10:48:56 +0100
-Message-ID: <CAFEAcA8myew9LM=ARwSwJybzWQu5=uOn55VrF=SX2xZr=bkRFA@mail.gmail.com>
-Subject: Re: [PATCH] bugfix: irq: Avoid covering object refcount of qemu_irq
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c44;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.0.102] (178.34.150.43) by
+ HE1PR0301CA0018.eurprd03.prod.outlook.com (2603:10a6:3:76::28) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3216.21 via Frontend Transport; Tue, 28 Jul 2020 09:34:37 +0000
+X-Originating-IP: [178.34.150.43]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7e82b824-dd56-4452-4cb5-08d832d972d6
+X-MS-TrafficTypeDiagnostic: AM0PR08MB3058:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR08MB3058936B1074E47075AEFBF8CF730@AM0PR08MB3058.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yQXukdVWkMhLyxJaDSTmyuIxhfq+qnHN7n/2r7nChausYddE/jhvxZeoiKk05s9nVRJoRVGNttaLaElCzKp6JiDtMKm1uUBEPf7vVPkydx1E+DDBbMlPeSkDV+TXnimRtss/vVFr30edtWgsnubEda0FXcIOeGE7iGRm/Bi2YM9DA1YnltDm5FiCC5yUG3WT5jmBUjYPmiOjFwEEjUgpXQb3ZKuDuuVF1JJKrT2EX+49ljmzsGUaTo8FNA2ipTQkp2s73SxqqNeHk2sYtGAC68/ha+SkxGCDvCwiGnc6dhCUMLVKbSDS1TFK9VWLBxXiIIvOwp/MfPgA8N0qOF47jN3CUSL6JfD8bhx7mf0KG5eCRA99JIzWq3DEbB7olOrd
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(346002)(376002)(396003)(39850400004)(366004)(66946007)(66476007)(66556008)(478600001)(16576012)(316002)(5660300002)(2906002)(6916009)(6486002)(86362001)(83380400001)(31686004)(6666004)(186003)(16526019)(8676002)(107886003)(36756003)(26005)(8936002)(956004)(2616005)(52116002)(53546011)(4326008)(31696002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: NXZ2eoEgNRV5ChtUZdAxNpJPqH7Ngi3jqY9+wBSCNw5zRlH9Z+hfjqI9h3nyHSuRew7C9mPNWZYEsAmKk9HkNCZfaen1yqorCeF/wPw//IkucB1ZR4Zuw1XPkvzMtKj3N4P57IJAlWiHcSVNqzjINyfEFTwpbR7StV88Y/0KyNiAz0EnMI8A0jvT4ufMPnZwIlLfRTw67IbTfIBBR/Jv/fMPetEjqxRViZ1/FlXzpqKDQ69FDhylBKWM/ZX04YIgoAd83aitEj/mtYJdCQyEgOIviRTfsphijjA9ygeMiqzaRKBmYI5f8ZJYFYlI1H4YRxbJ1Fc4yc6HgyIHnKihDtOj5iGn5k5gAFzv4qX3lugKHGcU7Fsr0dsl7qBHggsVGxSu3XJmP/oDzTl0bGIPpFJXempnyakxM8lGKX9tmKmK3qrOEfyArPViDK/RVsxC1ETmkWBtd2XGNB7t88t++Mm5dpcKObpj5kejGC5JC1m5yw8cyhqyedE+SO8iwTl3ArCeg0NHe8cuAtXoSH2mPL3JqcfdhlBYJ56iYFxJvP/GQpZZZnz2Yt1dmHYk/wWy6hq8DYUoenVlfRZAl9TgCjUp0WYeY5SI4OAT4V4ouvd+eaO2dOliTjcIW0EhdJdZ3YcpUre6KVJQswVJZEg8ow==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e82b824-dd56-4452-4cb5-08d832d972d6
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR08MB3745.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2020 09:34:39.0203 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +3J0kjUXwgEyVS++dJpU80uif/MHD6sZkPPxMY6x7FQRUhk/Aj1A10GtJChI/49dPJzMNzf7u3X98UJ8K20LSQrebazY5gx5QKA4JXgkVrs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3058
+Received-SPF: pass client-ip=40.107.8.111;
+ envelope-from=dplotnikov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 05:49:43
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,79 +135,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Esteban Bosse <estebanbosse@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, yezengruan@huawei.com,
- qemu-arm <qemu-arm@nongnu.org>, wanghaibin.wang@huawei.com,
- Paolo Bonzini <pbonzini@redhat.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ armbru@redhat.com, den@openvz.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jul 2020 at 09:48, Thomas Huth <thuth@redhat.com> wrote:
+
+
+On 27.07.2020 19:48, Dr. David Alan Gilbert wrote:
+> * Denis Plotnikov (dplotnikov@virtuozzo.com) wrote:
+...
+>> +static void page_fault_thread_stop(void)
+>> +{
+>> +    if (page_fault_fd) {
+>> +        close(page_fault_fd);
+>> +        page_fault_fd = 0;
+>> +    }
+> I think you need to do that after you've done the quit and join,
+> otherwise the fault thread might still be reading this.
+
+Seems to be so
 >
-> On 27/07/2020 16.41, Peter Maydell wrote:
-> > On Mon, 27 Jul 2020 at 14:03, Keqian Zhu <zhukeqian1@huawei.com> wrote:
-> >>
-> >> Avoid covering object refcount of qemu_irq, otherwise it may causes
-> >> memory leak.
-> >>
-> >> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> >> ---
-> >>  hw/core/irq.c | 4 +++-
-> >>  1 file changed, 3 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/core/irq.c b/hw/core/irq.c
-> >> index fb3045b912..59af4dfc74 100644
-> >> --- a/hw/core/irq.c
-> >> +++ b/hw/core/irq.c
-> >> @@ -125,7 +125,9 @@ void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler handler, int n)
-> >>      int i;
-> >>      qemu_irq *old_irqs = qemu_allocate_irqs(NULL, NULL, n);
-> >>      for (i = 0; i < n; i++) {
-> >> -        *old_irqs[i] = *gpio_in[i];
-> >> +        old_irqs[i]->handler = gpio_in[i]->handler;
-> >> +        old_irqs[i]->opaque = gpio_in[i]->opaque;
-> >> +
-> >>          gpio_in[i]->handler = handler;
-> >>          gpio_in[i]->opaque = &old_irqs[i];
-> >>      }
-> >
-> > This function is leaky by design, because it doesn't do anything
-> > with the old_irqs array and there's no function for un-intercepting
-> > the IRQs (which would need to free that memory). This is not ideal
-> > but OK because it's only used in the test suite.
+>> +    if (thread_quit_fd) {
+>> +        uint64_t val = 1;
+>> +        int ret;
+>> +
+>> +        ret = write(thread_quit_fd, &val, sizeof(val));
+>> +        assert(ret == sizeof(val));
+>> +
+>> +        qemu_thread_join(&page_fault_thread);
+>> +        close(thread_quit_fd);
+>> +        thread_quit_fd = 0;
+>> +    }
+>> +}
+...
+>>   /**
+>>    * ram_find_and_save_block: finds a dirty page and sends it to f
+>>    *
+>> @@ -1782,6 +2274,7 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>>       pss.block = rs->last_seen_block;
+>>       pss.page = rs->last_page;
+>>       pss.complete_round = false;
+>> +    pss.page_copy = NULL;
+>>   
+>>       if (!pss.block) {
+>>           pss.block = QLIST_FIRST_RCU(&ram_list.blocks);
+>> @@ -1794,11 +2287,30 @@ static int ram_find_and_save_block(RAMState *rs, bool last_stage)
+>>           if (!found) {
+>>               /* priority queue empty, so just search for something dirty */
+>>               found = find_dirty_block(rs, &pss, &again);
+>> +
+>> +            if (found && migrate_background_snapshot()) {
+>> +                /*
+>> +                 * make a copy of the page and
+>> +                 * pass it to the page search status
+>> +                 */
+>> +                int ret;
+>> +                ret = ram_copy_page(pss.block, pss.page, &pss.page_copy);
+> I'm a bit confused about why we hit this; the way I'd thought about your
+> code was we turn on the write faulting, do one big save and then fixup
+> the faults as the save is happening (doing the copies) as the writes
+> hit; so when does this case hit?
+
+To make it more clear, let me draw the whole picture:
+
+When we do background snapshot, the vm is paused untill all vmstate 
+EXCEPT ram is saved.
+RAM isn't written at all. That vmstate part is saved in the temporary 
+buffer.
+
+Then all the RAM is marked as read-only and the vm is un-paused. Note 
+that at this moment all vm's vCPUs are
+running and can touch any part of memory.
+After that, the migration thread starts writing the ram content. Once a 
+memory chunk is written, the write protection is removed for that chunk.
+If a vCPU wants to write to a memory page which is write protected 
+(hasn't been written yet), this write is intercepted, the memory page is 
+copied
+and queued for writing, the memory page write access is restored. The 
+intention behind of that, is to allow vCPU to work with a memory page as 
+soon as possible.
+
+Once all the RAM has been written, the rest of the vmstate is written 
+from the buffer. This needs to be so because some of the emulated 
+devices, saved in that
+buffered vmstate part, expects the RAM content to be available first on 
+its loading.
+
+I hope this description will make things more clear.
+If not, please let me know, so I could add more details.
+
+Denis
+
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 >
-> I think this could better be done without calling qemu_allocate_irqs():
-> Simply call qemu_allocate_irq() (without "s" at the end) within the
-> for-loop for each irq instead. What do you think?
 
-Well, what are we trying to do with the function? I think that
-your suggestion still doesn't really fix the leak in the sense
-that there's no mechanism for undoing the operation and freeing
-the memory allocated by qemu_allocate_irq(). The whole concept
-of the function is pretty dubious because it's arbitrarily
-re-plugging IRQs, which in the whole of the rest of QEMU are
-assumed to be something that's wired up by board code or by
-an SoC device that "owns" the two devices it's connecting.
-That's fine for test-case purposes, and for the qtest code that
-is the only in-tree user of this function we could construct a
-(nominally) leak-free version of the function by having it return
-some kind of handle that could be passed to a
-qemu_irq_remove_intercept_in() to clean up [this would fix a
-Coverity nag, which would be the main benefit...].
-
-I agree that copying the refcount here looks wrong, but in
-what situation is the refcount on any of the qemu_irqs
-involved changing anyway?
-
-For non-testing uses of this function it gets trickier (what if the
-device on one end or the other is destroyed while the intercept is
-in place, for instance?) So I'm a bit sceptical of ideas about
-extending the uses of this function to non-test-code, and I think
-I'd want to see what the intended non-test uses were...
-
-thanks
--- PMM
 
