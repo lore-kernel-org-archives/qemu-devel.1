@@ -4,73 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AE7BC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 257C3C433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:45:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCF9D21D95
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:45:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E06EA21D95
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:45:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KvpBUi2W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF9D21D95
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J5P+CFHi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E06EA21D95
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0KIf-0004j6-1W
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 03:45:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40696)
+	id 1k0KIh-0004pi-W2
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 03:45:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k0KHc-00035g-4J
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:44:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36704
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k0KHd-00037F-OM
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:44:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26252
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k0KHa-0003vu-Aw
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:44:19 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k0KHa-0003vy-MJ
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:44:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595922257;
+ s=mimecast20190719; t=1595922258;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LpkaFcYQYHx+zZ+8hZ4X47r+pwThvDrfZySDw4Bws40=;
- b=KvpBUi2WVciix//u0t9Gxd326gq8JN49HXZNEyi6MSUZwCmZXEJoRBXyAYqEva2WsTEE3O
- 4nU9pNWOsdIvFNzi84NgB3MbK1mYIqlrGO9bDTDbgkaQj29DnOxCCeDcwCv2o0Wo8i4HZ1
- vEcV1G+fj9q48SnRborwhjPB65kegbU=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=waDjD2k4wbcEEooY16aDO8nCZE9+WKrw74rLvXqBHNA=;
+ b=J5P+CFHidkDEZeX8rX6oYjKuW6KJ6tffMG3Rrnm8w711lE61eACs73BHZOecb/3yEP51SH
+ 2IQThqz+ttgQTb6bj751QWv9z49rweAx1OFkqXVOFC9EqpWIcmqoT9dca5SPMby/odcCqO
+ 0JAMZvWul0nwcbXB6jEdGhUchAX0Buc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-ylzLbyqgMhiubtCumDHCFg-1; Tue, 28 Jul 2020 03:44:13 -0400
-X-MC-Unique: ylzLbyqgMhiubtCumDHCFg-1
+ us-mta-445-Q_oYvcnANOy40NkqBMGvsg-1; Tue, 28 Jul 2020 03:44:16 -0400
+X-MC-Unique: Q_oYvcnANOy40NkqBMGvsg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12B9A800597;
- Tue, 28 Jul 2020 07:44:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B575C1005504;
+ Tue, 28 Jul 2020 07:44:14 +0000 (UTC)
 Received: from thuth.com (ovpn-112-161.ams2.redhat.com [10.36.112.161])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 19AFF726B6;
- Tue, 28 Jul 2020 07:44:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 72470726B9;
+ Tue, 28 Jul 2020 07:44:12 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 1/4] configure: Fix atomic64 test for --enable-werror on
- macOS
-Date: Tue, 28 Jul 2020 09:44:02 +0200
-Message-Id: <20200728074405.13118-2-thuth@redhat.com>
+Subject: [PATCH v2 2/4] cirrus.yml: Compile FreeBSD with -Werror
+Date: Tue, 28 Jul 2020 09:44:03 +0200
+Message-Id: <20200728074405.13118-3-thuth@redhat.com>
 In-Reply-To: <20200728074405.13118-1-thuth@redhat.com>
 References: <20200728074405.13118-1-thuth@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 23:55:28
@@ -102,57 +97,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When using --enable-werror for the macOS builders in the Cirrus-CI,
-the atomic64 test is currently failing, and config.log shows a bunch
-of error messages like this:
+Compiler warnings currently go unnoticed in our FreeBSD builds, since
+-Werror is only enabled for Linux and MinGW builds by default. So let's
+enable them here now, too.
 
- config-temp/qemu-conf.c:6:7: error: implicit declaration of function
- '__atomic_load_8' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-  y = __atomic_load_8(&x, 0);
-      ^
- config-temp/qemu-conf.c:6:7: error: this function declaration is not a
- prototype [-Werror,-Wstrict-prototypes]
-
-Seems like these __atomic_*_8 functions are available in one of the
-libraries there, so that the test links and passes there when not
-using --enable-werror. But there does not seem to be a valid prototype
-for them in any of the header files, so that the test fails when using
---enable-werror.
-
-Fix it by using the "official" built-in functions instead (see e.g.
-https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html).
-We are not using the *_8 variants in QEMU anyway.
-
-Suggested-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Ed Maste <emaste@freebsd.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- configure | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ .cirrus.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index 2acc4d1465..6fbc72c794 100755
---- a/configure
-+++ b/configure
-@@ -5919,11 +5919,11 @@ int main(void)
- {
-   uint64_t x = 0, y = 0;
- #ifdef __ATOMIC_RELAXED
--  y = __atomic_load_8(&x, 0);
--  __atomic_store_8(&x, y, 0);
--  __atomic_compare_exchange_8(&x, &y, x, 0, 0, 0);
--  __atomic_exchange_8(&x, y, 0);
--  __atomic_fetch_add_8(&x, y, 0);
-+  y = __atomic_load_n(&x, __ATOMIC_RELAXED);
-+  __atomic_store_n(&x, y, __ATOMIC_RELAXED);
-+  __atomic_compare_exchange_n(&x, &y, x, 0, __ATOMIC_RELAXED, __ATOMIC_RELAXED);
-+  __atomic_exchange_n(&x, y, __ATOMIC_RELAXED);
-+  __atomic_fetch_add(&x, y, __ATOMIC_RELAXED);
- #else
-   typedef char is_host64[sizeof(void *) >= sizeof(uint64_t) ? 1 : -1];
-   __sync_lock_test_and_set(&x, y);
+diff --git a/.cirrus.yml b/.cirrus.yml
+index f287d23c5b..b50da72eec 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -12,7 +12,7 @@ freebsd_12_task:
+   script:
+     - mkdir build
+     - cd build
+-    - ../configure || { cat config.log; exit 1; }
++    - ../configure --enable-werror || { cat config.log; exit 1; }
+     - gmake -j8
+     - gmake V=1 check
+ 
 -- 
 2.18.1
 
