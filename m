@@ -2,86 +2,84 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C54C433E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 13:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D637C433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 13:50:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93B54206F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 13:53:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55DC8206D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 13:50:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x/Ub+YUI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93B54206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GiM8G3fw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55DC8206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Q30-0006iM-Tm
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 09:53:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48996)
+	id 1k0Q0Q-00038f-J9
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 09:50:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0Q2H-0006DP-LM
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 09:52:53 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45381)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0Q2C-0004Ny-QE
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 09:52:53 -0400
-Received: by mail-oi1-x241.google.com with SMTP id j11so17484946oiw.12
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 06:52:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tbppK52n3H9pWzeUVQb33/TDF6fZaPSYmG0qcIei3hw=;
- b=x/Ub+YUIS6uGtxIjMSTT61IDC6d2UlPFWGGIvf9MrzWFxb27iKFpRL461Apv+NpjaA
- iZ1LUP0S/lEXLT/le/JzO1+LI3vC/oPws/SyCP4Z2OpYx/qVjjFJoHR3xZ4uBaFyUCsy
- 8RY5eIyRz41aE6kTZwqlIa+5/rcJxkrLBGL5+695bz6Ze9MxWegDN/UOJO3lBxabVxsO
- OfMKbFS2RhoUxXNTj85lQL6dOEPlZTujreUrK2476FHrM3VuID68KNQHC3yDbGNeAu9S
- Fn0gQApf1bNomw2GMNDBmW1aocpYxxf0R4TAQlhX+sl9y23NuQrORSifMwFoIZXvSThl
- 2ZBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tbppK52n3H9pWzeUVQb33/TDF6fZaPSYmG0qcIei3hw=;
- b=DlSWZjkBrAV7/nvGs5X/1st+0usIcn9FNec+JvU4rIX+YiOkin22LYhqH/+66TdfkP
- hAEBspIkW3rf3p6Q5KTltMyFdZSSLtHEJs68wCbvGyFEOD9rHbBAOmNw9miUKD9CpagP
- polKlzS907GnpyblMQqJyteTHJPRiunw+/4QwqkkPGunFWn8vhhCcblNufda8bg8XteV
- XZpFk6s8QK8OvmRHVTbegrxKQSTt3axbFWtjJR313o1c9JzYLCYXLhdEgWOHjL3akw75
- czyeDYArGMnqmcVF0opjLsb5hxcmrfgPBGs7olA0fnyW44PO3BeQ3DY19QVLO6AWSVGW
- 0tKQ==
-X-Gm-Message-State: AOAM5304C3U31nj3tVDKD1kmtvK3+x1nud8ujmhrF8kniLLdxMUQzMFG
- gNhYUB4kUv/ut9VqROZNJxOM3epkDuuwC2IuLGTskw==
-X-Google-Smtp-Source: ABdhPJxKKglY96Rl4MiZpcLd1k5WwpPze7wAzwVEeSyz1fRU5GvIcu5mW8Ki3olmjmFK7Eyb1x1prZHtIDHf/mtaCxI=
-X-Received: by 2002:aca:2819:: with SMTP id 25mr3333679oix.48.1595944367476;
- Tue, 28 Jul 2020 06:52:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k0PzH-0001O2-MU
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 09:49:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35132
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k0PzF-0003xI-RT
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 09:49:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595944184;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to; bh=5ZyevTFA0A+T1irRP2Heall65qhALB5ppulMHCnQmtY=;
+ b=GiM8G3fwbTB/cAubMfFcgTkFFZOUrgCRzpUL1zOK7YcOCuYvGPRPK8DpmCYIqMx/eR092Q
+ IvoUx/yc0km3m1Lk7qYr5pa2KSehyddDtSWsy50oxDJsCf5E8uqA8XSESZa5BlTVP7iYLN
+ jAuIqGauuN2mHyiBQDZBFtRGU4cmmdE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-146-7PtklTnkMq69WznBD8HSRA-1; Tue, 28 Jul 2020 09:49:42 -0400
+X-MC-Unique: 7PtklTnkMq69WznBD8HSRA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B8E580BCAC;
+ Tue, 28 Jul 2020 13:49:41 +0000 (UTC)
+Received: from localhost (ovpn-115-19.ams2.redhat.com [10.36.115.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C801819D7C;
+ Tue, 28 Jul 2020 13:49:37 +0000 (UTC)
+Date: Tue, 28 Jul 2020 14:49:36 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: jwsu1986@gmail.com
+Subject: Re: virtio-fs performance
+Message-ID: <20200728134936.GA21660@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <20200727140522.251815-1-cohuck@redhat.com>
- <20200727140522.251815-3-cohuck@redhat.com>
-In-Reply-To: <20200727140522.251815-3-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Jul 2020 14:52:36 +0100
-Message-ID: <CAFEAcA_1xECE+ESWoioHFSF_mwDG11NrR2=J3NWx2X+OGg3SZw@mail.gmail.com>
-Subject: Re: [PULL 2/2] s390x/s390-virtio-ccw: fix loadparm property getter
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <CAFKS8hWbckrE_cyJCf0pgFresD-JQk66wo-6uJA=Gu2MhReHVw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 06:02:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,60 +92,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 27 Jul 2020 at 15:05, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> From: Halil Pasic <pasic@linux.ibm.com>
->
-> The function machine_get_loadparm() is supposed to produce a C-string,
-> that is a NUL-terminated one, but it does not. ElectricFence can detect
-> this problem if the loadparm machine property is used.
->
-> Let us make the returned string a NUL-terminated one.
->
-> Fixes: 7104bae9de ("hw/s390x: provide loadparm property for the machine")
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Message-Id: <20200723162717.88485-1-pasic@linux.ibm.com>
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 8cc2f25d8a6a..403d30e13bca 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -701,8 +701,12 @@ bool hpage_1m_allowed(void)
->  static char *machine_get_loadparm(Object *obj, Error **errp)
->  {
->      S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-> +    char *loadparm_str;
->
-> -    return g_memdup(ms->loadparm, sizeof(ms->loadparm));
-> +    /* make a NUL-terminated string */
-> +    loadparm_str = g_memdup(ms->loadparm, sizeof(ms->loadparm) + 1);
-> +    loadparm_str[sizeof(ms->loadparm)] = 0;
-> +    return loadparm_str;
+--bp/iNruPH9dso1Pn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hi. Coverity points out (CID 1431058) that this code now
-reads off the end of the ms->loadparm buffer, because
-g_memdup() is going to read and copy 9 bytes (size + 1)
-and the array itself is only 8 bytes.
+> I'm trying and testing the virtio-fs feature in QEMU v5.0.0.
+> My host and guest OS are both ubuntu 18.04 with kernel 5.4, and the
+> underlying storage is one single SSD.
+>=20
+> The configuations are:
+> (1) virtiofsd
+> ./virtiofsd -o=20
+> source=3D/mnt/ssd/virtiofs,cache=3Dauto,flock,posix_lock,writeback,xattr
+> --thread-pool-size=3D1 --socket-path=3D/tmp/vhostqemu
+>=20
+> (2) qemu
+> qemu-system-x86_64 \
+> -enable-kvm \
+> -name ubuntu \
+> -cpu Westmere \
+> -m 4096 \
+> -global kvm-apic.vapic=3Dfalse \
+> -netdev tap,id=3Dhn0,vhost=3Doff,br=3Dbr0,helper=3D/usr/local/libexec/qem=
+u-bridge-helper
+> \
+> -device e1000,id=3De0,netdev=3Dhn0 \
+> -blockdev '{"node-name": "disk0", "driver": "qcow2",
+> "refcount-cache-size": 1638400, "l2-cache-size": 6553600, "file": {
+> "driver": "file", "filename": "'${imagefolder}\/ubuntu.qcow2'"}}' \
+> -device virtio-blk,drive=3Ddisk0,id=3Ddisk0 \
+> -chardev socket,id=3Dch0,path=3D/tmp/vhostqemu \
+> -device vhost-user-fs-pci,chardev=3Dch0,tag=3Dmyfs \
+> -object memory-backend-memfd,id=3Dmem,size=3D4G,share=3Don \
+> -numa node,memdev=3Dmem \
+> -qmp stdio \
+> -vnc :0
+>=20
+> (3) guest
+> mount -t virtiofs myfs /mnt/virtiofs
+>=20
+> I tried to change virtiofsd's --thread-pool-size value and test the
+> storage performance by fio.
+> Before each read/write/randread/randwrite test, the pagecaches of
+> guest and host are dropped.
+>=20
+> ```
+> RW=3D"read" # or write/randread/randwrite
+> fio --name=3Dtest --rw=3D$RW --bs=3D4k --numjobs=3D1 --ioengine=3Dlibaio
+> --runtime=3D60 --direct=3D0 --iodepth=3D64 --size=3D10g
+> --filename=3D/mnt/virtiofs/testfile
+> done
+> ```
+>=20
+> --thread-pool-size=3D64 (default)
+>     seq read: 305 MB/s
+>     seq write: 118 MB/s
+>     rand 4KB read: 2222 IOPS
+>     rand 4KB write: 21100 IOPS
+>=20
+> --thread-pool-size=3D1
+>     seq read: 387 MB/s
+>     seq write: 160 MB/s
+>     rand 4KB read: 2622 IOPS
+>     rand 4KB write: 30400 IOPS
+>=20
+> The results show the performance using default-pool-size (64) is
+> poorer than using single thread.
+> Is it due to the lock contention of the multiple threads?
+> When can virtio-fs get better performance using multiple threads?
+>=20
+>=20
+> I also tested the performance that guest accesses host's files via
+> NFSv4/CIFS network filesystem.
+> The "seq read" and "randread" performance of virtio-fs are also worse
+> than the NFSv4 and CIFS.
+>=20
+> NFSv4:
+>   seq write: 244 MB/s
+>   rand 4K read: 4086 IOPS
+>=20
+> I cannot figure out why the perf of NFSv4/CIFS with the network stack
+> is better than virtio-fs.
+> Is it expected? Or, do I have an incorrect configuration?
 
-I don't think you can use g_memdup() here -- you need to
-allocate the memory with g_malloc() and then fill it with
-memcpy(), something like:
+No, I remember benchmarking the thread pool and did not see such a big
+difference.
 
-    loadparm_str = g_malloc(sizeof(ms->loadparm) + 1);
-    memcpy(loadparm_str, ms->loadparm, sizeof(ms->loadparm));
-    loadparm_str[sizeof(ms->loadparm)] = 0;
+Please use direct=3D1 so that each I/O results in a virtio-fs request.
+Otherwise the I/O pattern is not directly controlled by the benchmark
+but by the page cache (readahead, etc).
 
-thanks
--- PMM
+Using numactl(8) or taskset(1) to launch virtiofsd allows you to control
+NUMA and CPU scheduling properties. For example, you could force all 64
+threads to run on the same host CPU using taskset to see if that helps
+this I/O bound workload.
+
+fio can collect detailed statistics on queue depths and a latency
+histogram. It would be interesting to compare the --thread-pool-size=3D64
+and --thread-pool-size=3D1 numbers.
+
+Comparing the "perf record -e kvm:kvm_exit" counts between the two might
+also be interesting.
+
+Stefan
+
+--bp/iNruPH9dso1Pn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8gLPAACgkQnKSrs4Gr
+c8gjegf8Df/59da0oKXZgqtOYrjLMp/b4LKjG7pvRgSill4J8rxGVW2ABdp7cquh
+mc7nOiMU3NwOnh6bn9PkQ1v590QI9KcSGeaGy8T4Z+MbEx4BqkNuZ+dHNsid7KuK
+QbSQxxPrT16sktgjQnFIT+G3JF3jvkoaQvS1n3zB7IV7SzOZyDvycgERRLzVVdYh
+fy9hWFLf6dTRUeraxFG/cHX1KUmFnbEpPFQqKVYx7f4RZ5KIzgnV0zCvudTNOhup
+aJ57dETC5CukcklT3Nn5mnLRRircE99n8bWjL7/2X2jv8aAl89wcL5klixdZNU8G
+CLL2XAY/06/ZyyE9xPyQbNfBHJWAaw==
+=Zc/F
+-----END PGP SIGNATURE-----
+
+--bp/iNruPH9dso1Pn--
+
 
