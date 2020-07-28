@@ -2,114 +2,128 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A898C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB03C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:06:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14D0B206D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:01:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2550E2065C
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:06:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GIiejBUZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D0B206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QRNiZNAd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2550E2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0QAS-00006w-8K
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:01:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50754)
+	id 1k0QF1-0001mu-9J
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:06:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k0Q9b-00083S-Uv
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:00:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48250
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k0Q9a-0005TD-CN
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:00:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595944825;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=XdRx9RfntRvN1LAdfUlY4UXQyYIsAs8rH8Ht/mUNM3M=;
- b=GIiejBUZZq/3gDy6Uh6GmX2wKEH2QyepuRB1S7lD5Hj9GsjB3vElOw4r2w5EqVZUfD3bxh
- kjgDgFDfwDetLHAShI/3kRl6tOgLdlt6zDgXCaFH9a3TMfQCcgOVVGYtgMTbZ/XpU5i3Hp
- TW1VCknmoErtkIAm3dg61gAPceNdN7M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-VQmQ6mGQNQeqdg_SzDcbvQ-1; Tue, 28 Jul 2020 10:00:20 -0400
-X-MC-Unique: VQmQ6mGQNQeqdg_SzDcbvQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D348E101C8AB;
- Tue, 28 Jul 2020 14:00:19 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-145.ams2.redhat.com
- [10.36.112.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A2B060BF4;
- Tue, 28 Jul 2020 14:00:18 +0000 (UTC)
-Subject: Re: [PATCH v7 44/47] iotests: Add filter commit test cases
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k0QEG-0001Bd-4P; Tue, 28 Jul 2020 10:05:16 -0400
+Received: from mail-eopbgr80107.outbound.protection.outlook.com
+ ([40.107.8.107]:34183 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k0QED-000623-5h; Tue, 28 Jul 2020 10:05:15 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i9WE0EWfzb0ta5YIHN6thYXCuvLzFgzVpwUTKw89NCnB5XltDCukIX2gP4WPFPOb5UGApaAtkf5vxY36R19OzJ2ryLEEZU6tBzFu+PfDw8vNlyT5gaVpQRR3/KT1I6TX+MUOfaAN0mUxQz2jumEc8mIlYSkoq107CWRzfLl66GcfBo7/dE8pIDNsay+O/n3TQFQngcqTHPGsZ7SqiasnIjENRBr96pcOYxGhIJ6IoNakjfH7wCsmNPctQj/c1LGPFekClh2SqBv+EQGtd6PbP1o9A/llPZ6DXFujFzEmJ9o2O9oSblJkcakRedoXmnpesh1TugKO5qPdwtj/+V+zQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dQXQD+UC1UHHZQS6dUrTljqE53m11OchRfdJCxQfI0w=;
+ b=adcKrgq0hbthe657Inbnn57a1fUvHVQwBJUZpnzFvojaFxlBLWDH+nmHX9XMyqMSUeE8YRwYFRLKVjAQTZHgrYv8Vb9vQUvwKq6B5jXA1DHLuEQl6xFV070J2+ByWiTg72X/UafrlkAHaviWL3KyK5uXql70l8l/e8YLwnEfTtEFwl2jbLOphn1ZT/ogD2ZdKtnTURO/GSbaMtg1lH09LvIwdG60BO3epK/jm4ly3BLfqHI4Gn/WCiByzs2FliZHIlHxwDgsXslKtjcws10mPOwShxnPhd/TUH61nOn1kBWXOqxGFEMAFERiEjEGixNT5r0rO0yBEdgqczahuzJ9PQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dQXQD+UC1UHHZQS6dUrTljqE53m11OchRfdJCxQfI0w=;
+ b=QRNiZNAdF3lDIhGGADyd86qRoUbZKlDm5TjSwQWamjsd7462lF6zUtmbfAV1jQx3laXRM398twHQ6CyXdCOkk/5M1fQKCaF7hPMurBao65bGY4Mal/7mGGgT/K3dsMxsJ0PUIGRNAXP5LWov6NXj/bpxwtuveIb4IWfhyTrAs1U=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3381.eurprd08.prod.outlook.com (2603:10a6:20b:43::26)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23; Tue, 28 Jul
+ 2020 14:05:09 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%4]) with mapi id 15.20.3216.033; Tue, 28 Jul 2020
+ 14:05:09 +0000
+Subject: Re: [PATCH v11 10/11] qcow2_format.py: introduce
+ Qcow2HeaderExtensionsDoc class
 To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-45-mreitz@redhat.com>
- <2c1c30da-a1e5-3bc6-0620-50ebdccb7dfc@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6a0540c2-d6f2-a59d-0ba0-11572f9897e6@redhat.com>
-Date: Tue, 28 Jul 2020 16:00:16 +0200
+References: <1594973699-781898-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1594973699-781898-11-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <db73d013-832d-234c-7828-80d8b1ed962e@virtuozzo.com>
+ <d2752450-0c26-a40e-3dc8-e095e7009919@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <1f85fa4c-97d3-8514-cbe5-f1cab1438eb5@virtuozzo.com>
+Date: Tue, 28 Jul 2020 17:05:07 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
+In-Reply-To: <d2752450-0c26-a40e-3dc8-e095e7009919@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM3PR07CA0113.eurprd07.prod.outlook.com
+ (2603:10a6:207:7::23) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <2c1c30da-a1e5-3bc6-0620-50ebdccb7dfc@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="tCypa2MSY19Upn9GHsvccJ2BBVXPIcL9S"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 06:05:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.2] (185.215.60.158) by
+ AM3PR07CA0113.eurprd07.prod.outlook.com (2603:10a6:207:7::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3239.10 via Frontend Transport; Tue, 28 Jul 2020 14:05:08 +0000
+X-Originating-IP: [185.215.60.158]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 74a45056-7954-4797-2b1c-08d832ff3cee
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3381:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB33816C391004DD3C9E14FEE5C1730@AM6PR08MB3381.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: OwjnTGSyZKAN8iDHX/vmIQc8I1AOsCi6JL0EWUCDJvQv+R3vndsRNpRRblz8jSjh+aHQTWZwVZhvprw0PmGmDKhroJNfMZnMQPBSY7WlFX6Dbj4AStNonSYu0Jy6MjAi+3SQnrIFOw84cKDL4F6Si8rdki29wzeR6bDM9cTL5MHpoKu8AbF6W/eoqmxuETpjlWpuxWrLoRlj+6SZZNyOroU3i5+q838x7p7zYqx2Izs/asC0/RyeqncKpddd2Ejl5Da633X+QWYm2+Fmm8CF4Xj8A1JTih98rz5lnmuqUlTGel2afh1FmD0Zk08sA/FLNvPNgyXRuNup3ZkqllLKWm5Dlj5Ne0rpQfrBTTOf8xxBAekB6xCRpsK7NMDaREr9
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39850400004)(366004)(376002)(346002)(136003)(396003)(53546011)(66556008)(86362001)(5660300002)(16576012)(66476007)(478600001)(31686004)(52116002)(956004)(36756003)(2616005)(4326008)(6486002)(19627235002)(26005)(316002)(66946007)(16526019)(8936002)(107886003)(186003)(31696002)(2906002)(8676002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: qmVDfRa+TuBhDddWRllI8dXEbqBr0g5WtG5s5Vo8HlObcO4+Ved+ugixP+sXlQ0GAhGLip/Cc0hIxbBq+LFsUxRS2FMZ2sfDtz2TY4HZtWBxR62LDZ15NQCH82VZ7LfOYxHoeqMYOj3tY7H1HkVC4df2g4qTgkeEt98Kt9TeUMrJlPl4+37/a+wyHSL4lP3gU97fvQEIKtB555TnUe04/ONyIq6h1OFu6j8G7uKKdqIJSk51qNX1DZfJW1V/19X0emll5jkXug/M/r5H5GSQdEK0QexQSrN5EQtcViH0XeARVq1L9fFNr3dg5Tn+/CNt9hhx9Rt+m9m3Zg+4dOSxpbB9b0ZtmbzPF4Ti75JDsPCdbrDaRlc6X6ka3T4v0FmtKU5C8AIca6IXE8GSEGb+7eje7tsHRldSOzOrMZBJsvU8lykI+pdtvSehyx3Af3BlXxlfNlbj9MYze8MttYXjGuFt4rJrPs+Zi681Vr/FfttIrjwZTxhfCkz1s7Rsn9HH
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74a45056-7954-4797-2b1c-08d832ff3cee
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2020 14:05:09.5127 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9WMKRiqF5l351rWwnDS397/K9ricu3yRfIXkix48wYB9v0F4Hy1k+aSpD/PTv+eYR7a12+BrmzEfnIte09guawphchqQ/pHCp7gAF4/WOe4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3381
+Received-SPF: pass client-ip=40.107.8.107;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:05:10
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,119 +136,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tCypa2MSY19Upn9GHsvccJ2BBVXPIcL9S
-Content-Type: multipart/mixed; boundary="iQz2pz1rHUVm2IQldPZf82CXMg4knMzNF"
-
---iQz2pz1rHUVm2IQldPZf82CXMg4knMzNF
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 27.07.20 19:45, Andrey Shinkevich wrote:
-> On 25.06.2020 18:22, Max Reitz wrote:
->> This patch adds some tests on how commit copes with filter nodes.
+28.07.2020 16:27, Andrey Shinkevich wrote:
+> On 28.07.2020 14:36, Vladimir Sementsov-Ogievskiy wrote:
+>> 17.07.2020 11:14, Andrey Shinkevich wrote:
+>>> Per original script design, QcowHeader class may dump the QCOW2 header
+>>> info separately from the QCOW2 extensions info. To implement the
+>>> to_dict() method for dumping extensions, let us introduce the class
+>>> Qcow2HeaderExtensionsDoc.
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 tests/qemu-iotests/040=C2=A0=C2=A0=C2=A0=C2=A0 | 177 ++++++++++++=
-+++++++++++++++++++++++++
->> =C2=A0 tests/qemu-iotests/040.out |=C2=A0=C2=A0 4 +-
->> =C2=A0 2 files changed, 179 insertions(+), 2 deletions(-)
+>> I think, when dumping to qcow2, no needs to omit extensions, let's just always dump them.
 >>
->> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
->> index 32c82b4ec6..e7fa244738 100755
->> --- a/tests/qemu-iotests/040
->> +++ b/tests/qemu-iotests/040
->> @@ -713,6 +713,183 @@ class TestErrorHandling(iotests.QMPTestCase):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertTrue(i=
-otests.compare_images(mid_img, backing_img,
->> fmt2=3D'raw'),
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 'target image does not match source after
->> commit')
->> =C2=A0 +class TestCommitWithFilters(iotests.QMPTestCase):
->> +=C2=A0=C2=A0=C2=A0 img0 =3D os.path.join(iotests.test_dir, '0.img')
->> +=C2=A0=C2=A0=C2=A0 img1 =3D os.path.join(iotests.test_dir, '1.img')
->> +=C2=A0=C2=A0=C2=A0 img2 =3D os.path.join(iotests.test_dir, '2.img')
->> +=C2=A0=C2=A0=C2=A0 img3 =3D os.path.join(iotests.test_dir, '3.img')
->> +
->> +=C2=A0=C2=A0=C2=A0 def do_test_io(self, read_or_write):
->=20
->=20
-> The method defenition could be moved down after the ones of setUp() and
-> tearDown().
+> 
+> Do you like to eliminate the command 'dump-header-exts' and the relevant handler 'cmd_dump_header_exts' from the script qcow2.py ?
+> 
 
-Yes, but it=E2=80=99s used by setUp(), so I thought maybe it=E2=80=99s nice=
-r to place it
-first.
+No, what already works should work of course. But we can not support -j for them. Still, not problem to support it. I just don't like this patch with an extra class. See my later comment, we can easily support json without this class.
 
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for index, pattern_file in e=
-numerate(self.pattern_files):
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 resu=
-lt =3D qemu_io('-f', iotests.imgfmt,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 '-c', '{} -P {} {}M
->> 1M'.format(read_or_write,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 index +
->> 1, index),
->=20
->=20
-> The Python3 format string f'{rad_or_write} ..' might be used instead of
-> the .format one.
-
-Ah, sure.  The test is a bit older already, from when we didn=E2=80=99t yet=
- use
-format strings as often in the iotests. :)
-
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 pattern_file)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self=
-.assertFalse('Pattern verification failed' in result)
->> +
->> +=C2=A0=C2=A0=C2=A0 def setUp(self):
->=20
-> ...
->=20
->=20
-> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->=20
->=20
+> 
+> 
+>>>
+>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>> ---
+>>>   tests/qemu-iotests/qcow2_format.py | 9 +++++++++
+>>>   1 file changed, 9 insertions(+)
+>>>
+>>> diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+>>> index 19d29b8..d2a8659 100644
+>>> --- a/tests/qemu-iotests/qcow2_format.py
+>>> +++ b/tests/qemu-iotests/qcow2_format.py
+>>> @@ -248,6 +248,15 @@ class Qcow2BitmapTable:
+>>>           return dict(entries=self.entries)
+>>>     +class Qcow2HeaderExtensionsDoc:
+>>> +
+>>> +    def __init__(self, extensions):
+>>> +        self.extensions = extensions
+>>> +
+>>> +    def to_dict(self):
+>>> +        return dict(Header_extensions=self.extensions)
+>>
+>> s/H/h/
+>>
+>>> +
+>>> +
+>>>   QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
+>>>
+>>
+>>
+>>
 
 
-
---iQz2pz1rHUVm2IQldPZf82CXMg4knMzNF--
-
---tCypa2MSY19Upn9GHsvccJ2BBVXPIcL9S
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8gL3AACgkQ9AfbAGHV
-z0AwUggAqJMiQAxn477NrET4kk302zpWMaUdAYJ5KvDTBYDhV5OA8FVstGxPmdy3
-onRQqLfCkuALu3v2MYpLPcd2Z3R7/wv2O3xv/zOdYXsNbXkc0ayXKMY6kzaLRdLJ
-RQSwYYVIRvXhyatjgFsNrZkY9BsT6E7e47NH58DHnbmc/RzJ6WPDYnI+vjMPPRie
-FauRVk2yPSRS6ZzBR/7UYGgbxbsRCXliRZhpAuvE7COcwFP6MZz+ofYIGipENk5L
-BbCNq4YMgwZYA52c1Zo+tHdBf1fpoGVvvIyFC+ZzdHiUJ2NKFsMv0Fl+waMl8ZKG
-Yn5m2vRCG1f1nLVgpvD6V6VFKGR8Kw==
-=A4aj
------END PGP SIGNATURE-----
-
---tCypa2MSY19Upn9GHsvccJ2BBVXPIcL9S--
-
+-- 
+Best regards,
+Vladimir
 
