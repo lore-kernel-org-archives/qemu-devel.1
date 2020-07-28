@@ -2,69 +2,88 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F63C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52301C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:18:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF1C3206F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:16:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF1C3206F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 19916206F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:18:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cpcwFmQz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19916206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0QPV-0001cf-Ij
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:16:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55238)
+	id 1k0QQa-0002ee-D3
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:18:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k0QOC-0000dl-6b
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:15:32 -0400
-Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:55216)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k0QO8-0007Lp-6N
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:15:31 -0400
-Received: from player799.ha.ovh.net (unknown [10.108.57.50])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id 881A128F0DE
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 16:15:23 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player799.ha.ovh.net (Postfix) with ESMTPSA id F21B114C4A6ED;
- Tue, 28 Jul 2020 14:15:07 +0000 (UTC)
-Authentication-Results: garm.ovh; auth=pass
- (GARM-98R002c2846e45-abce-40ea-b9b6-ba6f467127c4,
- 96196EA346850768E7E70500A314E772A5EF2CEB) smtp.auth=groug@kaod.org
-Date: Tue, 28 Jul 2020 16:15:06 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH] hw: add compat machines for 5.2
-Message-ID: <20200728161506.259ef93d@bahia.lan>
-In-Reply-To: <20200728094645.272149-1-cohuck@redhat.com>
-References: <20200728094645.272149-1-cohuck@redhat.com>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k0QPb-0001sM-FD
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:16:59 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42134)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k0QPZ-0007hd-8r
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:16:59 -0400
+Received: by mail-oi1-x243.google.com with SMTP id j7so1201291oij.9
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 07:16:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=rdnN0X/ThvV/+IE7SkFHAJZ+z5tKV4xGikHJFATXOCs=;
+ b=cpcwFmQz7KxMstz7oLTWoG1iu8b0+rKoSHzeMYUbxl0TWa4xrq5zgPWmFdASDIA67M
+ ctZktKcW4BVKrEk8OSqmjVVK6zrK2QONP4yLD3l0PYXYDkT7i7ER20XPirk4jgrMenrg
+ umOXyn+zk9JqrwYaOJV/crB6dPbMNv2N1jm3yGQi7BBtp9HMPXxThEXvCoOIoL1j3x34
+ o8SRcqR+Wp7qqWtkMCqNA1NkkN+TdLfTmB1a+36oFvjQTOltGQUIpZeOp3BsMo40BshL
+ oYjduV/WlUcvB4kt8UemPZvHzjrPKFMvdTMLPSIOXxUtzM5qSiA/+bpsr3DEjcosjxV6
+ GqsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=rdnN0X/ThvV/+IE7SkFHAJZ+z5tKV4xGikHJFATXOCs=;
+ b=eO1phi5T/5WUC4T/XYLRqO4SJh4U+0xn+6DzusAatgLsYfZFc+DHLsDAtNpZWVpSdI
+ 2pkQPdLINEipnjsbsRP8z9X29FUXl9C3Xhc89++6gyuvPsR5ij6ItrxtucKqH9ej2tBI
+ 3LlGbKmi0gwkt8gEDl7Q3q+JDV2NuCSamVXjCPsziUGLo7G7E4C8X1jk8DwKK6b9fTw1
+ 3nnGvvl6f8nkuCEPcn6TrRgsGM4UO0bklhP7S76CYlt2gLBAooDr/O5zzqSyM+0UioES
+ F+aJQa0jdKMQFjmgApAt6Cy3Fg6Ti33iWl7Pnkpcvc+xO3ALVXjZgo78TvN7w72WThEu
+ 6+xg==
+X-Gm-Message-State: AOAM531pSCsygVk403M1xkp8IvBcsAl8eeqUKARy8h74GjneV5sxxFbT
+ Yc8WVaPtcHQ44pivQ86ic3UldT/dToL9N31jVAas9g==
+X-Google-Smtp-Source: ABdhPJx5vCUJ8gMSKJL23ElN8AZ9XZIpjANZSA5ybwdbo3vr3t1Z4kP3ilISomYYGTJCqn7A4YYdhNCHE8W08s8b+Lc=
+X-Received: by 2002:aca:4a96:: with SMTP id x144mr3615537oia.163.1595945815872; 
+ Tue, 28 Jul 2020 07:16:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 3673248448625154498
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedriedvgdejvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehkefhtdehgeehheejledufeekhfdvleefvdeihefhkefhudffhfeuuedvffdthfenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=178.32.119.138; envelope-from=groug@kaod.org;
- helo=6.mo5.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:15:24
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20200728141005.28664-1-alex.bennee@linaro.org>
+ <20200728141005.28664-3-alex.bennee@linaro.org>
+In-Reply-To: <20200728141005.28664-3-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Jul 2020 15:16:44 +0100
+Message-ID: <CAFEAcA_MT8U6uUYhNVDc1-AkxPPL22pBevNDSbB2ZwQQ94OPmw@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] target/arm: only set the nexttick timer if !ISTATUS
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,248 +96,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Igor R <boost.lists@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Victor CLEMENT <victor.clement@openwide.fr>,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ Pavel Dovgaluk <pavel.dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jul 2020 11:46:45 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> Add 5.2 machine types for arm/i440fx/q35/s390x/spapr.
-> 
-
-Heh, you win the race for adding new machine types again :)
-
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+On Tue, 28 Jul 2020 at 15:10, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> Otherwise we have an unfortunate interaction with -count sleep=3Doff
+> which means we fast forward time when we don't need to. The easiest
+> way to trigger it was to attach to the gdbstub and place a break point
+> at the timers IRQ routine. Once the timer fired setting the next event
+> at INT_MAX then qemu_start_warp_timer would skip to the end.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->  hw/arm/virt.c              |  9 ++++++++-
->  hw/core/machine.c          |  3 +++
->  hw/i386/pc.c               |  3 +++
->  hw/i386/pc_piix.c          | 14 +++++++++++++-
->  hw/i386/pc_q35.c           | 13 ++++++++++++-
->  hw/ppc/spapr.c             | 15 +++++++++++++--
+>  target/arm/helper.c | 35 ++++++++++++++++++++++-------------
+>  1 file changed, 22 insertions(+), 13 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index c69a2baf1d3..ec1b84cf0fd 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -2683,7 +2683,7 @@ static void gt_recalc_timer(ARMCPU *cpu, int timeri=
+dx)
+>          uint64_t count =3D gt_get_countervalue(&cpu->env);
+>          /* Note that this must be unsigned 64 bit arithmetic: */
+>          int istatus =3D count - offset >=3D gt->cval;
+> -        uint64_t nexttick;
+> +        uint64_t nexttick =3D 0;
+>          int irqstate;
+>
+>          gt->ctl =3D deposit32(gt->ctl, 2, 1, istatus);
+> @@ -2692,21 +2692,30 @@ static void gt_recalc_timer(ARMCPU *cpu, int time=
+ridx)
+>          qemu_set_irq(cpu->gt_timer_outputs[timeridx], irqstate);
+>
+>          if (istatus) {
+> -            /* Next transition is when count rolls back over to zero */
+> -            nexttick =3D UINT64_MAX;
+> +            /*
+> +             * The IRQ status of the timer will persist until:
+> +             *   - CVAL is changed or
+> +             *   - ENABLE is changed
+> +             *
+> +             * There is no point re-arming the timer for some far
+> +             * flung future - currently it just is.
+> +             */
+> +            timer_del(cpu->gt_timer[timeridx]);
 
-For ppc parts:
+Why do we delete the timer for this case of "next time we need to
+know is massively in the future"...
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+>          } else {
+>              /* Next transition is when we hit cval */
+>              nexttick =3D gt->cval + offset;
+> -        }
+> -        /* Note that the desired next expiry time might be beyond the
+> -         * signed-64-bit range of a QEMUTimer -- in this case we just
+> -         * set the timer for as far in the future as possible. When the
+> -         * timer expires we will reset the timer for any remaining perio=
+d.
+> -         */
+> -        if (nexttick > INT64_MAX / gt_cntfrq_period_ns(cpu)) {
+> -            timer_mod_ns(cpu->gt_timer[timeridx], INT64_MAX);
+> -        } else {
+> -            timer_mod(cpu->gt_timer[timeridx], nexttick);
+> +
+> +            /*
+> +             * It is possible the next tick is beyond the
+> +             * signed-64-bit range of a QEMUTimer but currently the
+> +             * timer system doesn't support a run time of more the 292
+> +             * odd years so we set it to INT_MAX in this case.
+> +             */
+> +            if (nexttick > INT64_MAX / gt_cntfrq_period_ns(cpu)) {
+> +                timer_mod_ns(cpu->gt_timer[timeridx], INT64_MAX);
 
->  hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
->  include/hw/boards.h        |  3 +++
->  include/hw/i386/pc.h       |  3 +++
->  9 files changed, 71 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index ecfee362a182..acf9bfbeceaf 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2546,10 +2546,17 @@ static void machvirt_machine_init(void)
->  }
->  type_init(machvirt_machine_init);
->  
-> +static void virt_machine_5_2_options(MachineClass *mc)
-> +{
-> +}
-> +DEFINE_VIRT_MACHINE_AS_LATEST(5, 2)
-> +
->  static void virt_machine_5_1_options(MachineClass *mc)
->  {
-> +    virt_machine_5_2_options(mc);
-> +    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
->  }
-> -DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
-> +DEFINE_VIRT_MACHINE(5, 1)
->  
->  static void virt_machine_5_0_options(MachineClass *mc)
->  {
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 2f881d6d75b8..a24fe18ab6a6 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -28,6 +28,9 @@
->  #include "hw/mem/nvdimm.h"
->  #include "migration/vmstate.h"
->  
-> +GlobalProperty hw_compat_5_1[] = {};
-> +const size_t hw_compat_5_1_len = G_N_ELEMENTS(hw_compat_5_1);
-> +
->  GlobalProperty hw_compat_5_0[] = {
->      { "virtio-balloon-device", "page-poison", "false" },
->      { "vmport", "x-read-set-eax", "off" },
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 3d419d599127..1733b5341a62 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -97,6 +97,9 @@
->  #include "fw_cfg.h"
->  #include "trace.h"
->  
-> +GlobalProperty pc_compat_5_1[] = {};
-> +const size_t pc_compat_5_1_len = G_N_ELEMENTS(pc_compat_5_1);
-> +
->  GlobalProperty pc_compat_5_0[] = {};
->  const size_t pc_compat_5_0_len = G_N_ELEMENTS(pc_compat_5_0);
->  
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index b789e83f9acb..c5ba70ca17cb 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -426,7 +426,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
->      machine_class_allow_dynamic_sysbus_dev(m, TYPE_VMBUS_BRIDGE);
->  }
->  
-> -static void pc_i440fx_5_1_machine_options(MachineClass *m)
-> +static void pc_i440fx_5_2_machine_options(MachineClass *m)
->  {
->      PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
->      pc_i440fx_machine_options(m);
-> @@ -435,6 +435,18 @@ static void pc_i440fx_5_1_machine_options(MachineClass *m)
->      pcmc->default_cpu_version = 1;
->  }
->  
-> +DEFINE_I440FX_MACHINE(v5_2, "pc-i440fx-5.2", NULL,
-> +                      pc_i440fx_5_2_machine_options);
-> +
-> +static void pc_i440fx_5_1_machine_options(MachineClass *m)
-> +{
-> +    pc_i440fx_5_2_machine_options(m);
-> +    m->alias = NULL;
-> +    m->is_default = false;
-> +    compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
-> +    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
-> +}
-> +
->  DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
->                        pc_i440fx_5_1_machine_options);
->  
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index a3e607a544a5..0cb9c18cd44d 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -353,7 +353,7 @@ static void pc_q35_machine_options(MachineClass *m)
->      m->max_cpus = 288;
->  }
->  
-> -static void pc_q35_5_1_machine_options(MachineClass *m)
-> +static void pc_q35_5_2_machine_options(MachineClass *m)
->  {
->      PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
->      pc_q35_machine_options(m);
-> @@ -361,6 +361,17 @@ static void pc_q35_5_1_machine_options(MachineClass *m)
->      pcmc->default_cpu_version = 1;
->  }
->  
-> +DEFINE_Q35_MACHINE(v5_2, "pc-q35-5.2", NULL,
-> +                   pc_q35_5_2_machine_options);
-> +
-> +static void pc_q35_5_1_machine_options(MachineClass *m)
-> +{
-> +    pc_q35_5_2_machine_options(m);
-> +    m->alias = NULL;
-> +    compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
-> +    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
-> +}
-> +
->  DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
->                     pc_q35_5_1_machine_options);
->  
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0ae293ec9431..1c8d0981b382 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4579,15 +4579,26 @@ static void spapr_machine_latest_class_options(MachineClass *mc)
->      }                                                                \
->      type_init(spapr_machine_register_##suffix)
->  
-> +/*
-> + * pseries-5.2
-> + */
-> +static void spapr_machine_5_2_class_options(MachineClass *mc)
-> +{
-> +    /* Defaults for the latest behaviour inherited from the base class */
-> +}
-> +
-> +DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
-> +
->  /*
->   * pseries-5.1
->   */
->  static void spapr_machine_5_1_class_options(MachineClass *mc)
->  {
-> -    /* Defaults for the latest behaviour inherited from the base class */
-> +    spapr_machine_5_2_class_options(mc);
-> +    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
->  }
->  
-> -DEFINE_SPAPR_MACHINE(5_1, "5.1", true);
-> +DEFINE_SPAPR_MACHINE(5_1, "5.1", false);
->  
->  /*
->   * pseries-5.0
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 403d30e13bca..3dc22737a389 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -804,14 +804,26 @@ bool css_migration_enabled(void)
->      }                                                                         \
->      type_init(ccw_machine_register_##suffix)
->  
-> +static void ccw_machine_5_2_instance_options(MachineState *machine)
-> +{
-> +}
-> +
-> +static void ccw_machine_5_2_class_options(MachineClass *mc)
-> +{
-> +}
-> +DEFINE_CCW_MACHINE(5_2, "5.2", true);
-> +
->  static void ccw_machine_5_1_instance_options(MachineState *machine)
->  {
-> +    ccw_machine_5_2_instance_options(machine);
->  }
->  
->  static void ccw_machine_5_1_class_options(MachineClass *mc)
->  {
-> +    ccw_machine_5_2_class_options(mc);
-> +    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
->  }
-> -DEFINE_CCW_MACHINE(5_1, "5.1", true);
-> +DEFINE_CCW_MACHINE(5_1, "5.1", false);
->  
->  static void ccw_machine_5_0_instance_options(MachineState *machine)
->  {
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 426ce5f625a4..bc5b82ad209e 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -319,6 +319,9 @@ struct MachineState {
->      } \
->      type_init(machine_initfn##_register_types)
->  
-> +extern GlobalProperty hw_compat_5_1[];
-> +extern const size_t hw_compat_5_1_len;
-> +
->  extern GlobalProperty hw_compat_5_0[];
->  extern const size_t hw_compat_5_0_len;
->  
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 3d7ed3a55e30..fe52e165b27c 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -193,6 +193,9 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
->  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
->                         const CPUArchIdList *apic_ids, GArray *entry);
->  
-> +extern GlobalProperty pc_compat_5_1[];
-> +extern const size_t pc_compat_5_1_len;
-> +
->  extern GlobalProperty pc_compat_5_0[];
->  extern const size_t pc_compat_5_0_len;
->  
+...but here we handle the similar case by "set a timeout for
+INT64_MAX" ?
 
+> +            } else {
+> +                timer_mod(cpu->gt_timer[timeridx], nexttick);
+> +            }
+>          }
+>          trace_arm_gt_recalc(timeridx, irqstate, nexttick);
+>      } else {
+> --
+
+thanks
+-- PMM
 
