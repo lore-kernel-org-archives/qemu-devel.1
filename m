@@ -2,76 +2,106 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D637C433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 13:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A898C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:01:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55DC8206D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 13:50:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14D0B206D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:01:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GiM8G3fw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55DC8206D4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GIiejBUZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D0B206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Q0Q-00038f-J9
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 09:50:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48150)
+	id 1k0QAS-00006w-8K
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:01:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k0PzH-0001O2-MU
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 09:49:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35132
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k0Q9b-00083S-Uv
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:00:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48250
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k0PzF-0003xI-RT
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 09:49:47 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k0Q9a-0005TD-CN
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:00:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595944184;
+ s=mimecast20190719; t=1595944825;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to; bh=5ZyevTFA0A+T1irRP2Heall65qhALB5ppulMHCnQmtY=;
- b=GiM8G3fwbTB/cAubMfFcgTkFFZOUrgCRzpUL1zOK7YcOCuYvGPRPK8DpmCYIqMx/eR092Q
- IvoUx/yc0km3m1Lk7qYr5pa2KSehyddDtSWsy50oxDJsCf5E8uqA8XSESZa5BlTVP7iYLN
- jAuIqGauuN2mHyiBQDZBFtRGU4cmmdE=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=XdRx9RfntRvN1LAdfUlY4UXQyYIsAs8rH8Ht/mUNM3M=;
+ b=GIiejBUZZq/3gDy6Uh6GmX2wKEH2QyepuRB1S7lD5Hj9GsjB3vElOw4r2w5EqVZUfD3bxh
+ kjgDgFDfwDetLHAShI/3kRl6tOgLdlt6zDgXCaFH9a3TMfQCcgOVVGYtgMTbZ/XpU5i3Hp
+ TW1VCknmoErtkIAm3dg61gAPceNdN7M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-7PtklTnkMq69WznBD8HSRA-1; Tue, 28 Jul 2020 09:49:42 -0400
-X-MC-Unique: 7PtklTnkMq69WznBD8HSRA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-250-VQmQ6mGQNQeqdg_SzDcbvQ-1; Tue, 28 Jul 2020 10:00:20 -0400
+X-MC-Unique: VQmQ6mGQNQeqdg_SzDcbvQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B8E580BCAC;
- Tue, 28 Jul 2020 13:49:41 +0000 (UTC)
-Received: from localhost (ovpn-115-19.ams2.redhat.com [10.36.115.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C801819D7C;
- Tue, 28 Jul 2020 13:49:37 +0000 (UTC)
-Date: Tue, 28 Jul 2020 14:49:36 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: jwsu1986@gmail.com
-Subject: Re: virtio-fs performance
-Message-ID: <20200728134936.GA21660@stefanha-x1.localdomain>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D348E101C8AB;
+ Tue, 28 Jul 2020 14:00:19 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-145.ams2.redhat.com
+ [10.36.112.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A2B060BF4;
+ Tue, 28 Jul 2020 14:00:18 +0000 (UTC)
+Subject: Re: [PATCH v7 44/47] iotests: Add filter commit test cases
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-45-mreitz@redhat.com>
+ <2c1c30da-a1e5-3bc6-0620-50ebdccb7dfc@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <6a0540c2-d6f2-a59d-0ba0-11572f9897e6@redhat.com>
+Date: Tue, 28 Jul 2020 16:00:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CAFKS8hWbckrE_cyJCf0pgFresD-JQk66wo-6uJA=Gu2MhReHVw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <2c1c30da-a1e5-3bc6-0620-50ebdccb7dfc@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 06:02:02
+ protocol="application/pgp-signature";
+ boundary="tCypa2MSY19Upn9GHsvccJ2BBVXPIcL9S"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 06:05:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -79,7 +109,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,131 +122,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, qemu-discuss@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--tCypa2MSY19Upn9GHsvccJ2BBVXPIcL9S
+Content-Type: multipart/mixed; boundary="iQz2pz1rHUVm2IQldPZf82CXMg4knMzNF"
+
+--iQz2pz1rHUVm2IQldPZf82CXMg4knMzNF
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-> I'm trying and testing the virtio-fs feature in QEMU v5.0.0.
-> My host and guest OS are both ubuntu 18.04 with kernel 5.4, and the
-> underlying storage is one single SSD.
->=20
-> The configuations are:
-> (1) virtiofsd
-> ./virtiofsd -o=20
-> source=3D/mnt/ssd/virtiofs,cache=3Dauto,flock,posix_lock,writeback,xattr
-> --thread-pool-size=3D1 --socket-path=3D/tmp/vhostqemu
->=20
-> (2) qemu
-> qemu-system-x86_64 \
-> -enable-kvm \
-> -name ubuntu \
-> -cpu Westmere \
-> -m 4096 \
-> -global kvm-apic.vapic=3Dfalse \
-> -netdev tap,id=3Dhn0,vhost=3Doff,br=3Dbr0,helper=3D/usr/local/libexec/qem=
-u-bridge-helper
-> \
-> -device e1000,id=3De0,netdev=3Dhn0 \
-> -blockdev '{"node-name": "disk0", "driver": "qcow2",
-> "refcount-cache-size": 1638400, "l2-cache-size": 6553600, "file": {
-> "driver": "file", "filename": "'${imagefolder}\/ubuntu.qcow2'"}}' \
-> -device virtio-blk,drive=3Ddisk0,id=3Ddisk0 \
-> -chardev socket,id=3Dch0,path=3D/tmp/vhostqemu \
-> -device vhost-user-fs-pci,chardev=3Dch0,tag=3Dmyfs \
-> -object memory-backend-memfd,id=3Dmem,size=3D4G,share=3Don \
-> -numa node,memdev=3Dmem \
-> -qmp stdio \
-> -vnc :0
->=20
-> (3) guest
-> mount -t virtiofs myfs /mnt/virtiofs
->=20
-> I tried to change virtiofsd's --thread-pool-size value and test the
-> storage performance by fio.
-> Before each read/write/randread/randwrite test, the pagecaches of
-> guest and host are dropped.
->=20
-> ```
-> RW=3D"read" # or write/randread/randwrite
-> fio --name=3Dtest --rw=3D$RW --bs=3D4k --numjobs=3D1 --ioengine=3Dlibaio
-> --runtime=3D60 --direct=3D0 --iodepth=3D64 --size=3D10g
-> --filename=3D/mnt/virtiofs/testfile
-> done
-> ```
->=20
-> --thread-pool-size=3D64 (default)
->     seq read: 305 MB/s
->     seq write: 118 MB/s
->     rand 4KB read: 2222 IOPS
->     rand 4KB write: 21100 IOPS
->=20
-> --thread-pool-size=3D1
->     seq read: 387 MB/s
->     seq write: 160 MB/s
->     rand 4KB read: 2622 IOPS
->     rand 4KB write: 30400 IOPS
->=20
-> The results show the performance using default-pool-size (64) is
-> poorer than using single thread.
-> Is it due to the lock contention of the multiple threads?
-> When can virtio-fs get better performance using multiple threads?
+On 27.07.20 19:45, Andrey Shinkevich wrote:
+> On 25.06.2020 18:22, Max Reitz wrote:
+>> This patch adds some tests on how commit copes with filter nodes.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 tests/qemu-iotests/040=C2=A0=C2=A0=C2=A0=C2=A0 | 177 ++++++++++++=
++++++++++++++++++++++++++
+>> =C2=A0 tests/qemu-iotests/040.out |=C2=A0=C2=A0 4 +-
+>> =C2=A0 2 files changed, 179 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+>> index 32c82b4ec6..e7fa244738 100755
+>> --- a/tests/qemu-iotests/040
+>> +++ b/tests/qemu-iotests/040
+>> @@ -713,6 +713,183 @@ class TestErrorHandling(iotests.QMPTestCase):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assertTrue(i=
+otests.compare_images(mid_img, backing_img,
+>> fmt2=3D'raw'),
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 'target image does not match source after
+>> commit')
+>> =C2=A0 +class TestCommitWithFilters(iotests.QMPTestCase):
+>> +=C2=A0=C2=A0=C2=A0 img0 =3D os.path.join(iotests.test_dir, '0.img')
+>> +=C2=A0=C2=A0=C2=A0 img1 =3D os.path.join(iotests.test_dir, '1.img')
+>> +=C2=A0=C2=A0=C2=A0 img2 =3D os.path.join(iotests.test_dir, '2.img')
+>> +=C2=A0=C2=A0=C2=A0 img3 =3D os.path.join(iotests.test_dir, '3.img')
+>> +
+>> +=C2=A0=C2=A0=C2=A0 def do_test_io(self, read_or_write):
 >=20
 >=20
-> I also tested the performance that guest accesses host's files via
-> NFSv4/CIFS network filesystem.
-> The "seq read" and "randread" performance of virtio-fs are also worse
-> than the NFSv4 and CIFS.
->=20
-> NFSv4:
->   seq write: 244 MB/s
->   rand 4K read: 4086 IOPS
->=20
-> I cannot figure out why the perf of NFSv4/CIFS with the network stack
-> is better than virtio-fs.
-> Is it expected? Or, do I have an incorrect configuration?
+> The method defenition could be moved down after the ones of setUp() and
+> tearDown().
 
-No, I remember benchmarking the thread pool and did not see such a big
-difference.
+Yes, but it=E2=80=99s used by setUp(), so I thought maybe it=E2=80=99s nice=
+r to place it
+first.
 
-Please use direct=3D1 so that each I/O results in a virtio-fs request.
-Otherwise the I/O pattern is not directly controlled by the benchmark
-but by the page cache (readahead, etc).
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for index, pattern_file in e=
+numerate(self.pattern_files):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 resu=
+lt =3D qemu_io('-f', iotests.imgfmt,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 '-c', '{} -P {} {}M
+>> 1M'.format(read_or_write,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 index +
+>> 1, index),
+>=20
+>=20
+> The Python3 format string f'{rad_or_write} ..' might be used instead of
+> the .format one.
 
-Using numactl(8) or taskset(1) to launch virtiofsd allows you to control
-NUMA and CPU scheduling properties. For example, you could force all 64
-threads to run on the same host CPU using taskset to see if that helps
-this I/O bound workload.
+Ah, sure.  The test is a bit older already, from when we didn=E2=80=99t yet=
+ use
+format strings as often in the iotests. :)
 
-fio can collect detailed statistics on queue depths and a latency
-histogram. It would be interesting to compare the --thread-pool-size=3D64
-and --thread-pool-size=3D1 numbers.
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 pattern_file)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self=
+.assertFalse('Pattern verification failed' in result)
+>> +
+>> +=C2=A0=C2=A0=C2=A0 def setUp(self):
+>=20
+> ...
+>=20
+>=20
+> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>=20
+>=20
 
-Comparing the "perf record -e kvm:kvm_exit" counts between the two might
-also be interesting.
 
-Stefan
 
---bp/iNruPH9dso1Pn
+--iQz2pz1rHUVm2IQldPZf82CXMg4knMzNF--
+
+--tCypa2MSY19Upn9GHsvccJ2BBVXPIcL9S
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8gLPAACgkQnKSrs4Gr
-c8gjegf8Df/59da0oKXZgqtOYrjLMp/b4LKjG7pvRgSill4J8rxGVW2ABdp7cquh
-mc7nOiMU3NwOnh6bn9PkQ1v590QI9KcSGeaGy8T4Z+MbEx4BqkNuZ+dHNsid7KuK
-QbSQxxPrT16sktgjQnFIT+G3JF3jvkoaQvS1n3zB7IV7SzOZyDvycgERRLzVVdYh
-fy9hWFLf6dTRUeraxFG/cHX1KUmFnbEpPFQqKVYx7f4RZ5KIzgnV0zCvudTNOhup
-aJ57dETC5CukcklT3Nn5mnLRRircE99n8bWjL7/2X2jv8aAl89wcL5klixdZNU8G
-CLL2XAY/06/ZyyE9xPyQbNfBHJWAaw==
-=Zc/F
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8gL3AACgkQ9AfbAGHV
+z0AwUggAqJMiQAxn477NrET4kk302zpWMaUdAYJ5KvDTBYDhV5OA8FVstGxPmdy3
+onRQqLfCkuALu3v2MYpLPcd2Z3R7/wv2O3xv/zOdYXsNbXkc0ayXKMY6kzaLRdLJ
+RQSwYYVIRvXhyatjgFsNrZkY9BsT6E7e47NH58DHnbmc/RzJ6WPDYnI+vjMPPRie
+FauRVk2yPSRS6ZzBR/7UYGgbxbsRCXliRZhpAuvE7COcwFP6MZz+ofYIGipENk5L
+BbCNq4YMgwZYA52c1Zo+tHdBf1fpoGVvvIyFC+ZzdHiUJ2NKFsMv0Fl+waMl8ZKG
+Yn5m2vRCG1f1nLVgpvD6V6VFKGR8Kw==
+=A4aj
 -----END PGP SIGNATURE-----
 
---bp/iNruPH9dso1Pn--
+--tCypa2MSY19Upn9GHsvccJ2BBVXPIcL9S--
 
 
