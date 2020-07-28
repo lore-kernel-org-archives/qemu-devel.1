@@ -2,84 +2,82 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE6FCC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECEDC433EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:07:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6D6221D95
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 07:47:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C55FD20656
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:07:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bOcJONic"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6D6221D95
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gszE7Z0o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C55FD20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0KL8-0000X0-2l
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 03:47:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41402)
+	id 1k0Ke0-0005rQ-10
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 04:07:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46258)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k0KJx-0007nw-IJ
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:46:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47565
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1k0KdF-0005Q9-9f
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:06:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20251
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k0KJv-0004Jh-Qy
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 03:46:45 -0400
+ (Exim 4.90_1) (envelope-from <mprivozn@redhat.com>)
+ id 1k0KdC-00076R-7r
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:06:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595922403;
+ s=mimecast20190719; t=1595923597;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=izcsI4BKHIW+6sl6qugHgw6wvnZ0LvO0RJ8uH9UBtQs=;
- b=bOcJONicFEVaBp6/S7UiaLEV2oFHlAPNLNFIm0mH+Pmg/EEj6P7QGtsKIvPBxCCmJdssRj
- dVaBoOOYJft9vAbG+MzUhk24gC4ZfF+8AeKezkv86HJ7KiJrSqLaBdkZsd5MeAzQE60+Eh
- aw9xx1sFXg/KymxXpdhKRYfwdCC+cxw=
+ bh=g62gKk23pwaPZr1jd3oGgtEgsDFXSjFHy5b+HvjXMpY=;
+ b=gszE7Z0ovnWCI+pjfQ/M2DTRPc27xsEJac4CpxAIfiRYwf2f9pOtgIx1Lo9tVw6yOhc4wX
+ 7LFuCUDAurXfcHHswJmCD+6DGrIcJZQf0DnbFq/HI7eS+PhXZgRyRIdGnQwFMCapfbv9ad
+ VcOVEaKhjYco1zRpey1lMj2BfOOI/z8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-W09igTNiPzyN_bM1_UnoGQ-1; Tue, 28 Jul 2020 03:46:38 -0400
-X-MC-Unique: W09igTNiPzyN_bM1_UnoGQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-451-gPAc6BT3MTuEaTQgMlvRTg-1; Tue, 28 Jul 2020 04:05:30 -0400
+X-MC-Unique: gPAc6BT3MTuEaTQgMlvRTg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC7351009600;
- Tue, 28 Jul 2020 07:46:37 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BA20410013C4;
- Tue, 28 Jul 2020 07:46:37 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 74A371132FD2; Tue, 28 Jul 2020 09:46:36 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3] hw/core/qdev: Increase qdev_realize() kindness
-References: <20200707033326.19178-1-f4bug@amsat.org>
- <4e472f6a-e6b3-910b-97fe-0526d1f560a1@redhat.com>
- <f8505888-abe4-5f55-0ff0-b167064909a8@amsat.org>
-Date: Tue, 28 Jul 2020 09:46:36 +0200
-In-Reply-To: <f8505888-abe4-5f55-0ff0-b167064909a8@amsat.org> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 27 Jul 2020 19:55:03
- +0200")
-Message-ID: <878sf4f5er.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFEA4107B814
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 08:05:28 +0000 (UTC)
+Received: from [10.40.195.1] (unknown [10.40.195.1])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E3C915D9CD;
+ Tue, 28 Jul 2020 08:05:27 +0000 (UTC)
+Subject: Re: [PATCH v2 0/2] qmp: Expose MachineClass::default_ram_id
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <cover.1590481402.git.mprivozn@redhat.com>
+ <20200727184109.GB225270@habkost.net>
+From: Michal Privoznik <mprivozn@redhat.com>
+Message-ID: <f820a890-da1f-9a0a-2484-6a1ffeafefb3@redhat.com>
+Date: Tue, 28 Jul 2020 10:05:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200727184109.GB225270@habkost.net>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 23:55:28
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mprivozn@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 00:06:48
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -87,8 +85,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,63 +98,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+On 7/27/20 8:41 PM, Eduardo Habkost wrote:
+> Hi Michal,
+> 
+> It looks like this has fallen through the cracks, my apologies.
+> 
+> I'm queueing this for 5.2.  I assume this is the latest version,
+> correct?
+> 
 
-> On 7/7/20 11:47 AM, Paolo Bonzini wrote:
->> On 07/07/20 05:33, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Since commit 510ef98dca5, qdev_realize() aborts if bus-less device
->>> is realized on a bus. While commits 514db7710b..007d1dbf72 took
->>> care of converting all mainstream uses, QEMU forks weren't. These
->>> forks are usually maintained by hobbyist with interest in following
->>> mainstream development, but with limited time, so usually rebase
->>> from time to time. To avoid them to spend time on debugging and
->>> reading git-log history, display a kind hint about what is wrong.
->>>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>> ---
->>> Since v2:
->>> - scratch __func__ (armbru)
->>> - reword to justify this is not an impossible case (armbru)
->>> ---
->>>  hw/core/qdev.c | 7 +++++--
->>>  1 file changed, 5 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
->>> index 2131c7f951..a16f1270f1 100644
->>> --- a/hw/core/qdev.c
->>> +++ b/hw/core/qdev.c
->>> @@ -392,8 +392,11 @@ bool qdev_realize(DeviceState *dev, BusState *bus,=
- Error **errp)
->>> =20
->>>      if (bus) {
->>>          qdev_set_parent_bus(dev, bus);
->>> -    } else {
->>> -        assert(!DEVICE_GET_CLASS(dev)->bus_type);
->>> +    } else if (DEVICE_GET_CLASS(dev)->bus_type) {
->>> +        error_setg(errp, "Unexpected bus '%s' for bus-less device '%s'=
-",
->>> +                   DEVICE_GET_CLASS(dev)->bus_type,
->>> +                   object_get_typename(OBJECT(dev)));
->>> +        return false;
->>>      }
->>> =20
->>>      object_property_set_bool(OBJECT(dev), true, "realized", &err);
->>>
->>=20
->> Queued, thanks.
->
-> Thanks! I haven't see that and sent a v4 with example included &
-> typo fixed, if possible can you take it instead?
-> https://patchew.org/QEMU/20200727175112.6820-1-f4bug@amsat.org/
+Yes. No worries, I forgot about it too :-) If I remembered, I would have 
+pinged.
 
-Please also consider my objection in reply to v4.
+Michal
 
 
