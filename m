@@ -2,81 +2,74 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 483E6C433E8
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A06C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:29:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DB0D21883
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:15:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DB0D21883
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3FF1220792
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 06:29:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FF1220792
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Iu1-0007ba-DM
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 02:15:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48294)
+	id 1k0J73-0002gK-E1
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 02:29:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k0ItL-00074x-Aa
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:15:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56110)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k0ItH-0000fd-Sr
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:15:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k0ItF-0002ep-Mw
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 06:15:05 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8F4D02E8010
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 06:15:05 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 28 Jul 2020 06:03:07 -0000
-From: Thomas Huth <1256122@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: vfio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: anti-connard th-huth
-X-Launchpad-Bug-Reporter: Val532 (anti-connard)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20131128221327.32583.75260.malonedeb@gac.canonical.com>
-Message-Id: <159591618801.10780.12415904591479534493.malone@chaenomeles.canonical.com>
-Subject: [Bug 1256122] Re: vfio bug with all no VGA card
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7e6fbdecae8ca909fbfdde773b06d689927609bb
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 02:15:06
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
+ id 1k0J5b-00011M-7t
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:27:51 -0400
+Received: from mga11.intel.com ([192.55.52.93]:41264)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
+ id 1k0J5X-0002Al-9Z
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 02:27:50 -0400
+IronPort-SDR: hv1l0LPjegNVhp2UlYwC+w/sFH7R+McTfu7mnU0aWzC01d10OqeRFAs9L+/jxXGyDfi/iospsT
+ q86+iMCkun/g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9695"; a="149021022"
+X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="149021022"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 27 Jul 2020 23:27:31 -0700
+IronPort-SDR: iGDIAniPXISiidO0tcU6dHofc6XBpr10GOuaS5u6bEw2jRc5hsdfy+Q1893yAkHKU2fcEMdCMo
+ A3n9U8WD9GIw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,405,1589266800"; d="scan'208";a="394232781"
+Received: from jacob-builder.jf.intel.com ([10.7.199.155])
+ by fmsmga001.fm.intel.com with ESMTP; 27 Jul 2020 23:27:30 -0700
+From: Liu Yi L <yi.l.liu@intel.com>
+To: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com,
+ jasowang@redhat.com
+Subject: [RFC v9 01/25] scripts/update-linux-headers: Import iommu.h
+Date: Mon, 27 Jul 2020 23:33:54 -0700
+Message-Id: <1595918058-33392-2-git-send-email-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
+References: <1595918058-33392-1-git-send-email-yi.l.liu@intel.com>
+Received-SPF: pass client-ip=192.55.52.93; envelope-from=yi.l.liu@intel.com;
+ helo=mga11.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 02:27:41
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,55 +78,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1256122 <1256122@bugs.launchpad.net>
+Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, Cornelia Huck <cohuck@redhat.com>, eric.auger@redhat.com,
+ yi.y.sun@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+ pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU? Or could we close this ticket nowadays?
+From: Eric Auger <eric.auger@redhat.com>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Update the script to import the new iommu.h uapi header.
 
--- =
+Cc: Kevin Tian <kevin.tian@intel.com>
+Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Yi Sun <yi.y.sun@linux.intel.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ scripts/update-linux-headers.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1256122
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 29c27f4..5b64ee3 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -141,7 +141,7 @@ done
+ 
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+-for header in kvm.h vfio.h vfio_ccw.h vhost.h \
++for header in kvm.h vfio.h vfio_ccw.h vhost.h iommu.h \
+               psci.h psp-sev.h userfaultfd.h mman.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
+-- 
+2.7.4
 
-Title:
-  vfio bug with all no VGA card
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hello,
-
-  I whant to report to you a realy big bug.
-
-  vfio passthrough work only with VGA card ! When i try to use vfio with
-  any other PCI or PCI-E card it does not work.
-
-  When i use vfio for VGA i can reboot (or shutdown and start again) my
-  VM with out problem, but for any other PCI card the VM refuse to
-  reboot.
-
-  In dmesg i have this error :
-
-  dmar: DRHD: handling fault status reg 2
-  dmar: DMAR:[DMA Read] Request device [xx:xx.x] fault addr 2affde000
-  DMAR:[fault reason 06] PTE Read access is not set
-
-  and some time the same but for Write and not Read.
-
-  I found a kind of work around but it's ugly. Just detach your devices
-  from vfio, re-atach to his normal driver and bind again to vfio.
-
-  For information i use an Asrock Z87 Extrem 6 with a CoreI5 4570S
-  My kernel is 3.12 and Qemu is 1.7-rc0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1256122/+subscriptions
 
