@@ -2,92 +2,86 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FC2C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 19:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D857CC433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 19:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52B18207F5
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 19:44:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61986206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 19:55:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="WcL3QMmd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52B18207F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gYve6vBX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61986206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0VWq-0005PU-DP
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 15:44:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35426)
+	id 1k0VhE-0001B0-Gu
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 15:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k0VOO-0001Fg-SI
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 15:36:04 -0400
-Received: from mout.gmx.net ([212.227.15.18]:56733)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k0VON-0005i6-1N
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 15:36:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1595964955;
- bh=9cHFcYkhREm/XKFlpMeM2pJowRIOAkKoOTQvH5tpvRQ=;
- h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=WcL3QMmdq/toVX/XFR74B7CnI4w41g9EyiWLrVJdG2tbMAUcCsvNHSHaAfWhwvATu
- zhOkW/kMM/P0Q3XuKu2qp6p9HaB1uiQSBS/10FXBGt9AEQnQUqVUq65TdZt9OgzuY2
- LBtTcNXNX6jA9LcxOYNdZ5OlrD/WVQ9VX8rU7B/k=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530.fritz.box ([92.116.138.108]) by mail.gmx.com (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MiacH-1kg8vl3MQB-00fl0A; Tue, 28
- Jul 2020 21:35:54 +0200
-From: Helge Deller <deller@gmx.de>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL 4/4] hw/display/artist.c: fix out of bounds check
-Date: Tue, 28 Jul 2020 21:35:50 +0200
-Message-Id: <20200728193550.3578-5-deller@gmx.de>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200728193550.3578-1-deller@gmx.de>
-References: <20200728193550.3578-1-deller@gmx.de>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k0VV7-0005Ay-Ps
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 15:43:01 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:38489)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k0VV5-0006xY-4N
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 15:43:01 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id q9so120521oth.5
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 12:42:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=R1+mBmee8uodhwtXvu2etQOtQiChgLRNxwoqIWSN4F0=;
+ b=gYve6vBXaYooixLL8fxQP07rtdkwQ7j6tN4mnuxm1yXyPvu6ePXdSfcqoor2CTkIJF
+ cb4Et8r0H+Fr43aFAKLPfVyrZtR2vJ/IL8T36SU1UCCwCo0kAzteXXhuZaMewTi/QuGN
+ EQGvit90V4bxUX9C9Id5vZdvK1OMfHTtg0VOuVPQv9H3VM4RuaT54nSB/Np2J6k7ucpb
+ SI1+W2nDjMcg9zkUdbZVzztQV20SOkBCpUbdJyLBmk6HIW6d+nq1hr2Q2z7TBGk5V01O
+ SzBZkHsJII6/CIZfXqdfmvzFW45ERHoL8R8sr6uHYtFYSb5ZUpkf54esO3My+7u365Nr
+ Zp4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=R1+mBmee8uodhwtXvu2etQOtQiChgLRNxwoqIWSN4F0=;
+ b=heCVaf5YE4NTomO6eTxyAT4wm0AJ247YrhVrOHBFR2Rfks3iG0Etc9ltyZGOcV/1G4
+ 0mQ4/AkIja1xRFJ4JSS2aPiNRH7gEVFJA7RZze+rDp6shOTcGVi28cti4KDhG4m6RQu1
+ yos3axQjUvaRzMoafzQi68JiKcT2YEj6Oj9L+uGB6+HhJBYBw9o0UrjW43MGWhuAS62W
+ MVZd5VxninbV8/d3+/mbxb4UNAw3vap/WTiufqk92YnjtGjhwUlLgqwaKjk4ocnlZFay
+ YOBhJBVAJ4pi33nbK2YoMGxk0OrUScbn+x50zvcwAXP30iEPmeJDFDrShTf+oCyJin1K
+ ST6g==
+X-Gm-Message-State: AOAM533GfUS8bLlDh2F4mhmDDx0oSuEShTEuAZkioJnOfnPkFB0ObCYk
+ UXlwaPuhH7VA6uFXMSCsrx/4DrgDscS1McQDG4AsSw==
+X-Google-Smtp-Source: ABdhPJy7NcPck4ufjupaOWb1wHo0dOkXiWg52LI725hDIgZK8TWQj4eGGS+MYknn7UD7Oh5mfI+jtCdAQxvWf1GDJvk=
+X-Received: by 2002:a9d:7303:: with SMTP id e3mr24572123otk.221.1595965377639; 
+ Tue, 28 Jul 2020 12:42:57 -0700 (PDT)
 MIME-Version: 1.0
+References: <20200728143108.2192896-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20200728143108.2192896-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Jul 2020 20:42:46 +0100
+Message-ID: <CAFEAcA9z8_8KCNe68JVW-ibELEukrqsyTnMDAwQyD3Pv69QMjA@mail.gmail.com>
+Subject: Re: [PULL 0/2] Update slirp (+ debug test-serial)
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:LGaJml0GLvbGQRMhjogaFfwQp4ZT/JuBFoBlq9WFE5xvGkeBwfb
- s6DJEw4PL/wM2NweBNZ9FbfuIZry7DgczD0VgDEXsgnFTRTFn7slj2vFgrOL7Pdbg79A1eO
- /7NmPqYDWLRx/yEpBBJKz0qwuhkxSSdN/YJAmc1UosGoFse9xxMfWtZQaugLfvy16Xn+i5P
- y35QKtkhcdHkmoa4UAbQA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:xqfOICqRK5o=:rGY3Lg7KDMynLjul0ainlw
- l8X3Wa+hj66CulPIr1LAXtZ1/qv/Nd5VBj7wpzGyD+vaVS4KAJA1M7t2+IYyei6VNpBp7WPwO
- aoIcWX1SS3HGD1U1i8C337FH65s9dP+6JuNa9+5HGIoJIil9uv6im8GVbIc1UHS+fvsNInc1e
- PRvHcyRAd6+551oju1EOA2TSV03Pek/YcQTOMO1MuyGtqtzLt41eJx6pbUMznVKREtfcGkg4M
- kpkJ0s54GiD344KIEpYbl8moZitqR8vqul2LHNCjntoliFJEWPThhI0sdwTEE4mgJ8RG5LNPM
- 5fJDTldrqFBllRuAaFLMw5zBuBGoDGWyhZ0axtTDOVLPU4oRhuBzts21+4knfYgyAiDv91Zn7
- aEf2NHgKF90DYk0MIeO5jlHrR6b9IkvFxax93f8eqUHTMto6u0SKPAZnKrveMhJ0Vbn0c8MdP
- EO3UwwSeWqEICVlgWgdl7IT2odrPnFvS+StL5yuBFeJ79mQ40pHzfj/tJsdSxQKr1qE256cjU
- KyByl42/81E8xXIv8XmguL0a6eAdLUR2yPuMA+QNR0ag1rlM1Y3rffiiKsCkzeUv+X3Yv6gip
- CkhR78Ply5IO+wE65hJ/YyNb+5yY+drPRQk9Jh+l7Mx5vbr07cbwp9TQA8aF02hMb49jwN0/L
- eUUmG5jwQWAPWn6qYyx+HdooCGnHhUkiflhkN4ujvsTOq/YmaVhdoxUYtK5iZiPAvkJwEPVzk
- mFhUJIEvzoqdYQyttWZClc2fIXndlu+6PxYUEtDZZfyG0KBlykLFj2BadypjYinhYNxaMFjkM
- e9D9I2GgUCLhv0zTf2Xdll7UDdKj4jtnCiJ9y7w3l70hRpssC0UZLEP2h2HuL7Ih7cH5GHPHK
- 89XtcRRSCfTdLU1FYDqVEHTcF6BbwsV6V/Fmw+/XX5APtv9trz0hbZripnuDE3sgy9y5CysZ7
- Q6YT4qPfwcrnQ4omyJK/01zf3MXQSERiGKkMPYdU9w0vX0alya4lHS5K6QRr7lzbVmltm0l+L
- 15V6BlptfeUqZsm2WJbUCXmefs6EmEX+WAZeGvCZbVqjI11TjY2oNLa2nJ6fdZHZjGTAIsQFM
- 2bcv5D/QAKduGm8nol6tZPRHFSovEgOwcCYQkJnKt1eT/hKxCtQHknHTFurGGy9CQwPkkNXJw
- Mk0K301DtgTKysnQJRqLgFJWQjB3gKVAwhuVttbl/BY9qb29ogzbCIySeM3zPYBDJVjc+PkCs
- 1j4KxzcAF2PIzr2Jc
-Received-SPF: pass client-ip=212.227.15.18; envelope-from=deller@gmx.de;
- helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 15:35:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=2607:f8b0:4864:20::32f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x32f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,88 +95,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sven Schnelle <svens@stackframe.org>
+On Tue, 28 Jul 2020 at 15:31, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> The following changes since commit 264991512193ee50e27d43e66f832d5041cf3b=
+28:
+>
+>   Merge remote-tracking branch 'remotes/ericb/tags/pull-bitmaps-2020-07-2=
+7' into staging (2020-07-28 14:38:17 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/elmarco/qemu.git tags/slirp-pull-request
+>
+> for you to fetch changes up to 9c15f57891af7c2cb3baf2d66a1b1f3f87a665ba:
+>
+>   slirp: update to latest stable-4.2 branch (2020-07-28 18:27:59 +0400)
+>
+> ----------------------------------------------------------------
+> slirp: update to latest stable-4.2 branch
+>
+> ----------------------------------------------------------------
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
-Signed-off-by: Helge Deller <deller@gmx.de>
-=2D--
- hw/display/artist.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/hw/display/artist.c b/hw/display/artist.c
-index 6261bfe65b..46043ec895 100644
-=2D-- a/hw/display/artist.c
-+++ b/hw/display/artist.c
-@@ -340,14 +340,13 @@ static void vram_bit_write(ARTISTState *s, int posx,=
- int posy, bool incr_x,
- {
-     struct vram_buffer *buf;
-     uint32_t vram_bitmask =3D s->vram_bitmask;
--    int mask, i, pix_count, pix_length, offset, height, width;
-+    int mask, i, pix_count, pix_length, offset, width;
-     uint8_t *data8, *p;
+Applied, thanks.
 
-     pix_count =3D vram_write_pix_per_transfer(s);
-     pix_length =3D vram_pixel_length(s);
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
-     buf =3D vram_write_buffer(s);
--    height =3D buf->height;
-     width =3D buf->width;
-
-     if (s->cmap_bm_access) {
-@@ -367,20 +366,13 @@ static void vram_bit_write(ARTISTState *s, int posx,=
- int posy, bool incr_x,
-         pix_count =3D size * 8;
-     }
-
--    if (posy * width + posx + pix_count > buf->size) {
--        qemu_log("write outside bounds: wants %dx%d, max size %dx%d\n",
--                 posx, posy, width, height);
--        return;
--    }
--
--
-     switch (pix_length) {
-     case 0:
-         if (s->image_bitmap_op & 0x20000000) {
-             data &=3D vram_bitmask;
-         }
-
--        for (i =3D 0; i < pix_count; i++) {
-+        for (i =3D 0; i < pix_count && offset + i < buf->size; i++) {
-             artist_rop8(s, p + offset + pix_count - 1 - i,
-                         (data & 1) ? (s->plane_mask >> 24) : 0);
-             data >>=3D 1;
-@@ -398,7 +390,9 @@ static void vram_bit_write(ARTISTState *s, int posx, i=
-nt posy, bool incr_x,
-         for (i =3D 3; i >=3D 0; i--) {
-             if (!(s->image_bitmap_op & 0x20000000) ||
-                 s->vram_bitmask & (1 << (28 + i))) {
--                artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i)]);
-+                if (offset + 3 - i < buf->size) {
-+                    artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i)])=
-;
-+                }
-             }
-         }
-         memory_region_set_dirty(&buf->mr, offset, 3);
-@@ -420,7 +414,7 @@ static void vram_bit_write(ARTISTState *s, int posx, i=
-nt posy, bool incr_x,
-             break;
-         }
-
--        for (i =3D 0; i < pix_count; i++) {
-+        for (i =3D 0; i < pix_count && offset + i < buf->size; i++) {
-             mask =3D 1 << (pix_count - 1 - i);
-
-             if (!(s->image_bitmap_op & 0x20000000) ||
-=2D-
-2.21.3
-
+-- PMM
 
