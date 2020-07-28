@@ -2,86 +2,94 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9B0C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 126C5C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:17:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA8A820792
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:16:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDE3F2065C
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:17:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dt8hLf2v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA8A820792
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ILsmPP4z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE3F2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0SH1-00085p-5B
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 12:16:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33654)
+	id 1k0SII-0000hG-4t
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 12:17:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0SFs-0007EH-Pk
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:15:04 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41969)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0SFr-0001MZ-1d
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:15:04 -0400
-Received: by mail-ot1-x343.google.com with SMTP id a65so6112611otc.8
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 09:15:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=YKuV9mT4W6LVxvir/cBkccFXpVVJTl97kX7s4byRvnk=;
- b=Dt8hLf2v6jNQwE7OcabwIOfZqrnemU5/dKabTbfz34VkH8y4of0ZUsoiy7uHu5yLPe
- TDObSMGWwAwFLfLEGabOyRMuwfLwXRZa9oRJwzINO9K6O9JUbEdxKzjYnlUSBZhIE09J
- 7v2dLZjr7q+qvXqh1abbzK/eN+/sQE8Y5CgWhXGGMIzslj24WTrY2X8i3IbYQfXvaDhy
- wtxT3eEUYPgG5PiIdsOV820rjnE343dKdUOOlerYfcr5Ms9uhqVrycGwIz0qc4sAoauO
- 2Tq7m3ZoexYS+2yHZqm2IfRQQtX3qeqId93F7fqRcIpe1teFqEV5mSDLP4Q5A2HOHzFK
- UW5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=YKuV9mT4W6LVxvir/cBkccFXpVVJTl97kX7s4byRvnk=;
- b=YSrqQ8s4KcubRw/v0U6b6xE61Q1x3sXRMTLRq+aMEyeyYvf4NfNf+1hDyfiLRXWrJe
- OjQ5AXMfKJx8dSxKbXHiSbfLyr5i3uFUoICnm5rNDH2S875Ye9Yprlb2gJFNpbkfnyWk
- 3TKZuElv30GTslKZ+lg7orcUc98flz6pCOZMv+7V0kv8ZCh4QHFFO+Uaz99StZZYxL/h
- jTel+abaCo2kXZE/SyUqS9cCvG8FJy5jra96UYM/wFpT2sRIF5Doe3Li4trqtp9nbakS
- 71uYM3y3M2nGVmmr32IKUWsw/iTMPltGRjL5Hrez50/VTcklvGDRnZRBIgs6IdBR/0FF
- 0bWA==
-X-Gm-Message-State: AOAM533ezIntZVIrdpVYznGeXn17sMdAOd1HEYTUPZOo8Zt46plN6QCk
- 1G2AoL07a62ltYUJAWyFmojZUBk9yR6W0lKqhrLFqQ==
-X-Google-Smtp-Source: ABdhPJy8ezAat9cCKmtpWItkz+Vz0p7uXrSt8wbjoD4y47bcUQKt6TEmgmyip1YnqOppozDKSLxJaBx7nbpbcPtYYcs=
-X-Received: by 2002:a05:6830:1bd3:: with SMTP id
- v19mr24926834ota.91.1595952901625; 
- Tue, 28 Jul 2020 09:15:01 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k0SGY-0007xK-RC
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:15:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44278
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k0SGX-0001dt-0e
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:15:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595952944;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yMpjBF9fcK+6hE9WqUcO5bVU3zLWoR7DRhRRm1viStI=;
+ b=ILsmPP4zjxNUGfS4bhawTdQsdBv6B7H/3dt0ZI/LF/E+zCF8ZS5Xz0Kw5wfHk1q7nLXL+3
+ KQt2Ge9nJhEcLReZ1OhGtPBvjKHIqDf+QFfk5PN7G8Z7vRnj23vWDdomlTOGY01Wi4RnbG
+ nBGmYIWKPP3MPxYuRmcou0YIGvwzEwo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-342-JuJbfCkLM-6yWJFRPjvZew-1; Tue, 28 Jul 2020 12:15:38 -0400
+X-MC-Unique: JuJbfCkLM-6yWJFRPjvZew-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9955D80BCAB;
+ Tue, 28 Jul 2020 16:15:37 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DDEEA70A18;
+ Tue, 28 Jul 2020 16:15:19 +0000 (UTC)
+Date: Tue, 28 Jul 2020 17:15:17 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Subject: Re: [PATCH v2 0/2] QEMU Gating CI
+Message-ID: <20200728161517.GD3443476@redhat.com>
+References: <20200709024657.2500558-1-crosa@redhat.com>
+ <CAFEAcA9qdYm+a-PTPE-Vbhmp4iZ5Bo0Gt-2RcCrO7CS2yp9_CA@mail.gmail.com>
+ <20200720172210.GA3987025@localhost.localdomain>
+ <CAFEAcA8BD3BoJB9FAmeuZc8fKFNZywJT2LdGON670uM8ATdhZw@mail.gmail.com>
+ <20200728145134.GB3443476@redhat.com>
+ <20200728161306.GB389264@localhost.localdomain>
 MIME-Version: 1.0
-References: <1595927419-27346-1-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1595927419-27346-1-git-send-email-jasowang@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Jul 2020 17:14:50 +0100
-Message-ID: <CAFEAcA-AJ62Uq+JYkPSR8b=BASxGrEoAcWtne6+01Z8NimJrSA@mail.gmail.com>
-Subject: Re: [PULL V2 0/3] Net patches
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200728161306.GB389264@localhost.localdomain>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:31:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,49 +102,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jul 2020 at 10:10, Jason Wang <jasowang@redhat.com> wrote:
->
-> The following changes since commit 93ea484375ab473379dd9c836261ef484bd71ab1:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2020-07-27 21:00:01 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/jasowang/qemu.git tags/net-pull-request
->
-> for you to fetch changes up to 22dc8663d9fc7baa22100544c600b6285a63c7a3:
->
->   net: forbid the reentrant RX (2020-07-28 16:57:58 +0800)
->
-> ----------------------------------------------------------------
-> Want to send earlier but most patches just come.
->
-> - fix vhost-vdpa issues when no peer
-> - fix virtio-pci queue enabling index value
-> - forbid reentrant RX
->
-> Changes from V1:
->
-> - drop the patch that has been merged
->
-> ----------------------------------------------------------------
-> Jason Wang (2):
->       virtio-net: check the existence of peer before accessing vDPA config
->       net: forbid the reentrant RX
->
-> Yuri Benditovich (1):
->       virtio-pci: fix wrong index in virtio_pci_queue_enabled
+On Tue, Jul 28, 2020 at 12:13:06PM -0400, Cleber Rosa wrote:
+> On Tue, Jul 28, 2020 at 03:51:34PM +0100, Daniel P. Berrangé wrote:
+> > On Tue, Jul 28, 2020 at 03:48:38PM +0100, Peter Maydell wrote:
+> > > On Mon, 20 Jul 2020 at 18:22, Cleber Rosa <crosa@redhat.com> wrote:
+> > > > Sure.  It's important that PATCH 2/2 in this series is included in a
+> > > > branch that you need to push to the "staging" branch on the
+> > > > https://gitlab.com/qemu-project/qemu repo (it could be just that one
+> > > > patch).  Then, you can run:
+> > > >
+> > > >   ./scripts/ci/gitlab-pipeline-status --verbose -w
+> > > >
+> > > > And that should be it.  You can drop '--verbose' if you just want the
+> > > > final outcome as the result.
+> > > 
+> > > I tried this (local branch named "staging", pushed to gitlab
+> > > remote "staging" branch), but it said:
+> > > 
+> > > e104462:bionic:qemu$ ./scripts/ci/gitlab-pipeline-status --verbose -w
+> > > ERROR: No pipeline found
+> > > failure
+> > > 
+> > > It does seem to have kicked off the pipeline on gitlab though:
+> > > https://gitlab.com/qemu-project/qemu/-/pipelines/171671136/builds
+> > > OTOH I can't see anything on that web page that suggests that
+> > > it's submitting jobs to the s390 or aarch64 boxes -- is it
+> > > intended to?
+> > 
+> > It looks like those jobs are all in the "test" stage of the pipeline, so
+> > it is waiting for the earlier stages to complete before running the jobs.
+> >
+> 
+> Hi Daniel,
+> 
+> Right.  IIUC the criteria for putting jobs in the test stage at the
+> moment is "if they include running tests (in addition to builds) they
+> should be in test".  Looking at that from this perspective, they're in
+> the right place.
+> 
+> But, these jobs don't depend on anything else, including container
+> builds, so there's no reason to have them wait for so long to run.
+> The solution may be to rename the first stage (containers) to something
+> more generic (and unfortunately less descriptive) so that all of them
+> will run concurrently and earlier.
 
+Just add 'needs: []'  to any jobs that don't depend on earlier jobs.
 
-Applied, thanks.
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
-
--- PMM
 
