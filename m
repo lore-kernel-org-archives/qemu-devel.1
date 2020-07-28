@@ -2,67 +2,90 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9634C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 03:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D13C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 03:56:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD01E2072E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 03:28:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD01E2072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 51E2E20759
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 03:56:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iYkzFMqP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51E2E20759
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0GHo-00062g-UE
-	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 23:28:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48992)
+	id 1k0Gis-00033h-Im
+	for qemu-devel@archiver.kernel.org; Mon, 27 Jul 2020 23:56:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hogan.wang@huawei.com>)
- id 1k0GHD-0005cs-GE
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 23:27:39 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4223 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hogan.wang@huawei.com>)
- id 1k0GH7-00058L-Oj
- for qemu-devel@nongnu.org; Mon, 27 Jul 2020 23:27:39 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 30AB9680864D43480137;
- Tue, 28 Jul 2020 11:27:26 +0800 (CST)
-Received: from localhost (10.174.149.56) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Tue, 28 Jul 2020
- 11:27:16 +0800
-From: Hogan Wang <hogan.wang@huawei.com>
-To: <marcel.apfelbaum@gmail.com>, <dgilbert@redhat.com>, <jusual@redhat.com>, 
- <mst@redhat.com>, <qemu-devel@nongnu.org>
-Subject: [PATCH v5] hw/pci-host: save/restore pci host config register for old
- ones
-Date: Tue, 28 Jul 2020 11:27:09 +0800
-Message-ID: <20200728032709.3552-1-hogan.wang@huawei.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200727102012-mutt-send-email-mst@kernel.org>
-References: <20200727102012-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k0GiD-0002XL-Aq
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 23:55:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39955
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k0GiA-0008ID-9e
+ for qemu-devel@nongnu.org; Mon, 27 Jul 2020 23:55:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595908528;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ynpCO4uyr/8A3lGbL6JNSrbQSI0Cz1oD4mjLWJYAXDI=;
+ b=iYkzFMqPxC2V7Hr6DS0jkQ6hIFVTr9K8D5gI0cH/YOVXCScoVdpvydLGpkPzwxRX2Ard5M
+ lOCqSzVL2XAIinYqHD2e1Et9VKoL9Bc11xnmT02N8t3DoIHADAt17ycWvY5+iOBBZ/62Gd
+ BtohhMs8gR7+9Bz1MxX/o6kNouYdIDk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-8oe0LFtfNSGjyKLsikHQZw-1; Mon, 27 Jul 2020 23:55:26 -0400
+X-MC-Unique: 8oe0LFtfNSGjyKLsikHQZw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F41D9186A835
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 03:55:25 +0000 (UTC)
+Received: from [10.72.13.242] (ovpn-13-242.pek2.redhat.com [10.72.13.242])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 05F8D726BE;
+ Tue, 28 Jul 2020 03:55:17 +0000 (UTC)
+Subject: Re: [PATCH] virtio-pci: fix virtio_pci_queue_enabled()
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200727153319.43716-1-lvivier@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <f208ec76-56b7-cd65-c20b-2d7bb1b665dc@redhat.com>
+Date: Tue, 28 Jul 2020 11:55:16 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20200727153319.43716-1-lvivier@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.149.56]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=hogan.wang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 23:27:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 23:55:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,227 +98,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wangxinxin.wang@huawei.com, weidong.huang@huawei.com, hogan.wang@huawei.com
+Cc: Cindy Lu <lulu@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The i440fx and q35 machines integrate i440FX or MCH PCI device by default.
-Refer to i440FX and ICH9-LPC spcifications, there are some reserved
-configuration registers can used to save/restore PCIHostState.config_reg.
-It's nasty but friendly to old ones.
 
-Reproducer steps:
-step 1. Make modifications to seabios and qemu for increase reproduction
-efficiency, write 0xf0 to 0x402 port notify qemu to stop vcpu after
-0x0cf8 port wrote i440 configure register. qemu stop vcpu when catch
-0x402 port wrote 0xf0.
+On 2020/7/27 下午11:33, Laurent Vivier wrote:
+> In legacy mode, virtio_pci_queue_enabled() falls back to
+> virtio_queue_enabled() to know if the queue is enabled.
+>
+> But virtio_queue_enabled() calls again virtio_pci_queue_enabled()
+> if k->queue_enabled is set. This ends in a crash after a stack
+> overflow.
+>
+> The problem can be reproduced with
+> "-device virtio-net-pci,disable-legacy=off,disable-modern=true
+>   -net tap,vhost=on"
+>
+> And a look to the backtrace is very explicit:
+>
+>      ...
+>      #4  0x000000010029a438 in virtio_queue_enabled ()
+>      #5  0x0000000100497a9c in virtio_pci_queue_enabled ()
+>      ...
+>      #130902 0x000000010029a460 in virtio_queue_enabled ()
+>      #130903 0x0000000100497a9c in virtio_pci_queue_enabled ()
+>      #130904 0x000000010029a460 in virtio_queue_enabled ()
+>      #130905 0x0000000100454a20 in vhost_net_start ()
+>      ...
+>
+> This patch fixes the problem by introducing a new function
+> for the legacy case and calls it from virtio_pci_queue_enabled().
+> It also calls it from virtio_queue_enabled() to avoid code duplication.
+>
+> Fixes: f19bcdfedd53 ("virtio-pci: implement queue_enabled method")
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Cindy Lu <lulu@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-seabios:/src/hw/pci.c
-@@ -52,6 +52,11 @@ void pci_config_writeb(u16 bdf, u32 addr, u8 val)
-         writeb(mmconfig_addr(bdf, addr), val);
-     } else {
-         outl(ioconfig_cmd(bdf, addr), PORT_PCI_CMD);
-+       if (bdf == 0 && addr == 0x72 && val == 0xa) {
-+            dprintf(1, "stop vcpu\n");
-+            outb(0xf0, 0x402); // notify qemu to stop vcpu
-+            dprintf(1, "resume vcpu\n");
-+        }
-         outb(val, PORT_PCI_DATA + (addr & 3));
-     }
- }
 
-qemu:hw/char/debugcon.c
-@@ -60,6 +61,9 @@ static void debugcon_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-     printf(" [debugcon: write addr=0x%04" HWADDR_PRIx " val=0x%02" PRIx64 "]\n", addr, val);
- #endif
+Queued for rc2.
 
-+    if (ch == 0xf0) {
-+        vm_stop(RUN_STATE_PAUSED);
-+    }
-     /* XXX this blocks entire thread. Rewrite to use
-      * qemu_chr_fe_write and background I/O callbacks */
-     qemu_chr_fe_write_all(&s->chr, &ch, 1);
+Thanks
 
-step 2. start vm1 by the following command line, and then vm stopped.
-$ qemu-system-x86_64 -machine pc-i440fx-5.0,accel=kvm\
- -netdev tap,ifname=tap-test,id=hostnet0,vhost=on,downscript=no,script=no\
- -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.0,addr=0x13,bootindex=3\
- -device cirrus-vga,id=video0,vgamem_mb=16,bus=pci.0,addr=0x2\
- -chardev file,id=seabios,path=/var/log/test.seabios,append=on\
- -device isa-debugcon,iobase=0x402,chardev=seabios\
- -monitor stdio
 
-step 3. start vm2 to accept vm1 state.
-$ qemu-system-x86_64 -machine pc-i440fx-5.0,accel=kvm\
- -netdev tap,ifname=tap-test1,id=hostnet0,vhost=on,downscript=no,script=no\
- -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.0,addr=0x13,bootindex=3\
- -device cirrus-vga,id=video0,vgamem_mb=16,bus=pci.0,addr=0x2\
- -chardev file,id=seabios,path=/var/log/test.seabios,append=on\
- -device isa-debugcon,iobase=0x402,chardev=seabios\
- -monitor stdio \
- -incoming tcp:127.0.0.1:8000
-
-step 4. execute the following qmp command in vm1 to migrate.
-(qemu) migrate tcp:127.0.0.1:8000
-
-step 5. execute the following qmp command in vm2 to resume vcpu.
-(qemu) cont
-
-Before this patch, we get KVM "emulation failure" error on vm2.
-This patch fixes it.
-
-Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
----
- hw/pci-host/i440fx.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
- hw/pci-host/q35.c    | 44 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 90 insertions(+)
-
-diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
-index 8ed2417f0c..419e27c21a 100644
---- a/hw/pci-host/i440fx.c
-+++ b/hw/pci-host/i440fx.c
-@@ -64,6 +64,14 @@ typedef struct I440FXState {
-  */
- #define I440FX_COREBOOT_RAM_SIZE 0x57
- 
-+/* Older I440FX machines (5.0 and older) do not support i440FX-pcihost state
-+ * migration, use some reserved INTEL 82441 configuration registers to
-+ * save/restore i440FX-pcihost config register. Refer to [INTEL 440FX PCISET
-+ * 82441FX PCI AND MEMORY CONTROLLER (PMC) AND 82442FX DATA BUS ACCELERATOR
-+ * (DBX) Table 1. PMC Configuration Space]
-+ */
-+#define I440FX_PCI_HOST_CONFIG_REG 0x94
-+
- static void i440fx_update_memory_mappings(PCII440FXState *d)
- {
-     int i;
-@@ -98,15 +106,53 @@ static void i440fx_write_config(PCIDevice *dev,
- static int i440fx_post_load(void *opaque, int version_id)
- {
-     PCII440FXState *d = opaque;
-+    PCIDevice *dev;
-+    PCIHostState *s = OBJECT_CHECK(PCIHostState,
-+                                   object_resolve_path("/machine/i440fx", NULL),
-+                                   TYPE_PCI_HOST_BRIDGE);
- 
-     i440fx_update_memory_mappings(d);
-+
-+    if (!s->mig_enabled) {
-+        dev = PCI_DEVICE(d);
-+        s->config_reg = pci_get_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG]);
-+        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG], 0);
-+    }
-+    return 0;
-+}
-+
-+static int i440fx_pre_save(void *opaque)
-+{
-+    PCIDevice *dev = opaque;
-+    PCIHostState *s = OBJECT_CHECK(PCIHostState,
-+                                   object_resolve_path("/machine/i440fx", NULL),
-+                                   TYPE_PCI_HOST_BRIDGE);
-+    if (!s->mig_enabled) {
-+        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG],
-+                     s->config_reg);
-+    }
-+    return 0;
-+}
-+
-+static int i440fx_post_save(void *opaque)
-+{
-+    PCIDevice *dev = opaque;
-+    PCIHostState *s = OBJECT_CHECK(PCIHostState,
-+                                   object_resolve_path("/machine/i440fx", NULL),
-+                                   TYPE_PCI_HOST_BRIDGE);
-+    if (!s->mig_enabled) {
-+        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG], 0);
-+    }
-     return 0;
- }
- 
-+
- static const VMStateDescription vmstate_i440fx = {
-     .name = "I440FX",
-     .version_id = 3,
-     .minimum_version_id = 3,
-+    .pre_save = i440fx_pre_save,
-+    .post_save = i440fx_post_save,
-     .post_load = i440fx_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index b67cb9c29f..d87f892945 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -43,6 +43,14 @@
- 
- #define Q35_PCI_HOST_HOLE64_SIZE_DEFAULT (1ULL << 35)
- 
-+/* Older Q35 machines (5.0 and older) do not support q35-pcihost state
-+ * migration, use some reserved INTEL MCH configuration registers to
-+ * save/restore q35-pcihost config register. Refer to [Intel 3 Series
-+ * Chipset Family Datasheet Table 5-1. DRAM Controller Register Address
-+ * Map (D0:F0)]
-+ */
-+#define Q35_PCI_HOST_CONFIG_REG 0x70
-+
- static void q35_host_realize(DeviceState *dev, Error **errp)
- {
-     PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-@@ -513,14 +521,50 @@ static void mch_update(MCHPCIState *mch)
- static int mch_post_load(void *opaque, int version_id)
- {
-     MCHPCIState *mch = opaque;
-+    PCIDevice *dev;
-+    PCIHostState *s = OBJECT_CHECK(PCIHostState,
-+                                   object_resolve_path("/machine/q35", NULL),
-+                                   TYPE_PCI_HOST_BRIDGE);
-     mch_update(mch);
-+    if (!s->mig_enabled) {
-+        dev = PCI_DEVICE(mch);
-+        s->config_reg = pci_get_long(&dev->config[Q35_PCI_HOST_CONFIG_REG]);
-+        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], 0);
-+    }
-+    return 0;
-+}
-+
-+static int mch_pre_save(void *opaque)
-+{
-+    PCIDevice *dev = opaque;
-+    PCIHostState *s = OBJECT_CHECK(PCIHostState,
-+                                   object_resolve_path("/machine/q35", NULL),
-+                                   TYPE_PCI_HOST_BRIDGE);
-+    if (!s->mig_enabled) {
-+        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], s->config_reg);
-+    }
-     return 0;
- }
- 
-+static int mch_post_save(void *opaque)
-+{
-+    PCIDevice *dev = opaque;
-+    PCIHostState *s = OBJECT_CHECK(PCIHostState,
-+                                   object_resolve_path("/machine/q35", NULL),
-+                                   TYPE_PCI_HOST_BRIDGE);
-+    if (!s->mig_enabled) {
-+        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], 0);
-+    }
-+    return 0;
-+}
-+
-+
- static const VMStateDescription vmstate_mch = {
-     .name = "mch",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .pre_save = mch_pre_save,
-+    .post_save = mch_post_save,
-     .post_load = mch_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_PCI_DEVICE(parent_obj, MCHPCIState),
--- 
-2.27.0
-
+> ---
+>   hw/virtio/virtio-pci.c     | 2 +-
+>   hw/virtio/virtio.c         | 7 ++++++-
+>   include/hw/virtio/virtio.h | 1 +
+>   3 files changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index ada1101d07bf..4ad3ad81a2cf 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1116,7 +1116,7 @@ static bool virtio_pci_queue_enabled(DeviceState *d, int n)
+>           return proxy->vqs[vdev->queue_sel].enabled;
+>       }
+>   
+> -    return virtio_queue_enabled(vdev, n);
+> +    return virtio_queue_enabled_legacy(vdev, n);
+>   }
+>   
+>   static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 546a198e79b0..e98302521769 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -3309,6 +3309,11 @@ hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n)
+>       return vdev->vq[n].vring.desc;
+>   }
+>   
+> +bool virtio_queue_enabled_legacy(VirtIODevice *vdev, int n)
+> +{
+> +    return virtio_queue_get_desc_addr(vdev, n) != 0;
+> +}
+> +
+>   bool virtio_queue_enabled(VirtIODevice *vdev, int n)
+>   {
+>       BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
+> @@ -3317,7 +3322,7 @@ bool virtio_queue_enabled(VirtIODevice *vdev, int n)
+>       if (k->queue_enabled) {
+>           return k->queue_enabled(qbus->parent, n);
+>       }
+> -    return virtio_queue_get_desc_addr(vdev, n) != 0;
+> +    return virtio_queue_enabled_legacy(vdev, n);
+>   }
+>   
+>   hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n)
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 198ffc762678..e424df12cf6d 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -295,6 +295,7 @@ typedef struct VirtIORNGConf VirtIORNGConf;
+>                         VIRTIO_F_RING_PACKED, false)
+>   
+>   hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
+> +bool virtio_queue_enabled_legacy(VirtIODevice *vdev, int n);
+>   bool virtio_queue_enabled(VirtIODevice *vdev, int n);
+>   hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
+>   hwaddr virtio_queue_get_used_addr(VirtIODevice *vdev, int n);
 
 
