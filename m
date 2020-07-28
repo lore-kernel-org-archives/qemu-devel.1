@@ -2,86 +2,108 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3732AC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B92AC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:34:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01D5120714
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:27:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eRqUuFEn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D5120714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E3F9B20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 09:34:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3F9B20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Ltp-0005L7-BT
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 05:27:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35604)
+	id 1k0M0Y-00080Y-7T
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 05:34:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37432)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0LtI-0004v2-K5
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 05:27:20 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:39446)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0LtG-0001Ay-Ob
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 05:27:20 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w17so16885784oie.6
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 02:27:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=0jlqF1vNQDLT4jtpLs7LnhRZhztTYxX9+FwYb5e1cXw=;
- b=eRqUuFEncWn7FuFUnXBers8AJ9XN0eRqhILUyjbnliu64xB8yyByOZvCMI8cIVmplA
- ym5Oxrcg+dSpxd2RBRjREgyV/ymKJDz8B4vMzGuXGq3h5dIOW0dUitokRqDa9tEBn+Sj
- Zag69kqe1yR3RsBzVRNoHcGdu9bU7JANw0ruGcMwpI7Z0oL0IEXLyGn+XzCt2qEFHn9t
- MOmppHvcvytbbG3ruItt/Tone39XjHwj5rIRgK+PHa+G0cjBsGDrx57lgtIob0Zr/z+m
- k2T5DMBv0uxS2s1jdwvMvoC90YECmFkKNcebLbdwSdUuA7PrFdI6hOhdbPO3KdnlCFxJ
- y8Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=0jlqF1vNQDLT4jtpLs7LnhRZhztTYxX9+FwYb5e1cXw=;
- b=VyqsusKKsSzQxSq6PF2zkmpeJqNrM7peBvX2EDodJ9IoZ9tcFHAkJ4iIdMYdy8ReZT
- 4Jg34ZY6MRUKlWtxAzHOtMAthUyPLYGz02kWh2D1ssm/S6TE4G/7+aQz0uCExe3kzHNS
- H4EeLSjO3mNlpZD6mujKFwZ8ywWt+893L3CiCOGTvZW1UKd5+qAoKBgSn2lQl8dd6jbE
- UWHMQMCFe+3dxmtaV1goikQDSdUbgqmuP9gf/Yt6Az/qJ5f+PRb48qzo5263vCVcNNWT
- QtBE0VWwiOW+YzZ1X64yaFFY06FuYcreZbGUOYvYl+eI+prFSsaLRpuQCJuN6Xup8n0V
- Fsaw==
-X-Gm-Message-State: AOAM5318kfKcfn9e6H8mFR2VzhzZtEtJcgbQwf9Lb6TqVd1hC2mJJZdA
- EpjC4aGhynf1XtEihiG3dj4aj0AAKviQapRk9yfDtQ==
-X-Google-Smtp-Source: ABdhPJx7pJQRRKQTwke8VyQeZ02E0pIOiXvGYB2MeLNmSe8kmmcIflbUUPw95KHqQOILTAurpITPfgKIJUh6zSV6dIo=
-X-Received: by 2002:aca:4a96:: with SMTP id x144mr2689821oia.163.1595928437503; 
- Tue, 28 Jul 2020 02:27:17 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <schnelle@linux.ibm.com>)
+ id 1k0Lzs-0007AG-VB; Tue, 28 Jul 2020 05:34:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40566)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <schnelle@linux.ibm.com>)
+ id 1k0Lzq-00029Z-Tu; Tue, 28 Jul 2020 05:34:08 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06S9VpR9055906; Tue, 28 Jul 2020 05:34:04 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32jgkj1sb3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 28 Jul 2020 05:34:04 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06S9Vv8C056483;
+ Tue, 28 Jul 2020 05:34:02 -0400
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.102])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32jgkj1s9b-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 28 Jul 2020 05:34:02 -0400
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+ by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06S9QmHI020793;
+ Tue, 28 Jul 2020 09:33:59 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com
+ (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+ by ppma06ams.nl.ibm.com with ESMTP id 32gcqgk8mb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 28 Jul 2020 09:33:59 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 06S9XuVi64160048
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 28 Jul 2020 09:33:56 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 45B7AAE053;
+ Tue, 28 Jul 2020 09:33:56 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9BCC9AE059;
+ Tue, 28 Jul 2020 09:33:55 +0000 (GMT)
+Received: from oc5500677777.ibm.com (unknown [9.145.68.234])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 28 Jul 2020 09:33:55 +0000 (GMT)
+Subject: Re: [RFC PATCH] s390x/pci: vfio-pci breakage with disabled mem
+ enforcement
+To: Alex Williamson <alex.williamson@redhat.com>,
+ Pierre Morel <pmorel@linux.ibm.com>
+References: <1595517236-17823-1-git-send-email-mjrosato@linux.ibm.com>
+ <20200723102916.7cf15b43@w520.home>
+ <0481c77e-f71f-886b-9b0a-41529eb139ee@linux.ibm.com>
+ <20200727104754.4337818c@x1.home>
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+Message-ID: <f152965e-ed8c-a34b-e13d-7859c06afd85@linux.ibm.com>
+Date: Tue, 28 Jul 2020 11:33:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200728091828.21702-1-paul@xen.org>
-In-Reply-To: <20200728091828.21702-1-paul@xen.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Jul 2020 10:27:06 +0100
-Message-ID: <CAFEAcA_wKTFWk9Uk5HMabqfa6QkkTAdzBotmnrA_EH1BR4XjYg@mail.gmail.com>
-Subject: Re: [PATCH] configure: define CONFIG_XEN when Xen is enabled
-To: Paul Durrant <paul@xen.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200727104754.4337818c@x1.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-28_01:2020-07-28,
+ 2020-07-28 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 adultscore=0
+ lowpriorityscore=0 mlxscore=0 spamscore=0 clxscore=1015 malwarescore=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007280069
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=schnelle@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 04:59:18
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,71 +117,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- Paul Durrant <pdurrant@amazon.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Anthony Perard <anthony.perard@citrix.com>,
- "open list:X86" <xen-devel@lists.xenproject.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>, david@redhat.com,
+ cohuck@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jul 2020 at 10:19, Paul Durrant <paul@xen.org> wrote:
->
-> From: Paul Durrant <pdurrant@amazon.com>
->
-> The recent commit da278d58a092 "accel: Move Xen accelerator code under
-> accel/xen/" introduced a subtle semantic change, making xen_enabled() alw=
-ays
-> return false unless CONFIG_XEN is defined prior to inclusion of sysemu/xe=
-n.h,
-> which appears to be the normal case. This causes various use-cases of QEM=
-U
-> with Xen to break.
->
-> This patch makes sure that CONFIG_XEN is defined if --enable-xen is passe=
-d
-> to configure.
->
-> Fixes: da278d58a092 ("accel: Move Xen accelerator code under accel/xen/")
-> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-> ---
-> Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> ---
->  configure | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/configure b/configure
-> index 2acc4d1465..f1b9d129fd 100755
-> --- a/configure
-> +++ b/configure
-> @@ -7434,6 +7434,7 @@ if test "$virglrenderer" =3D "yes" ; then
->    echo "VIRGL_LIBS=3D$virgl_libs" >> $config_host_mak
->  fi
->  if test "$xen" =3D "yes" ; then
-> +  echo "CONFIG_XEN=3Dy" >> $config_host_mak
->    echo "CONFIG_XEN_BACKEND=3Dy" >> $config_host_mak
->    echo "CONFIG_XEN_CTRL_INTERFACE_VERSION=3D$xen_ctrl_version" >> $confi=
-g_host_mak
->  fi
 
-Configure already defines CONFIG_XEN as a target-specific
-config define in config-target.mak for the specific targets
-that Xen will work for (ie if you build --enable-xen for
-x86_64-softmmu and ppc64-softmmu then CONFIG_XEN is set for
-the former and not the latter). This patch makes it a
-build-wide config setting by putting it in config-host.mak.
 
-We should figure out which of those two is correct and do
-just one of them, not do both at the same time.
+On 7/27/20 6:47 PM, Alex Williamson wrote:
+> On Mon, 27 Jul 2020 17:40:39 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> On 2020-07-23 18:29, Alex Williamson wrote:
+>>> On Thu, 23 Jul 2020 11:13:55 -0400
+>>> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+>>>   
+>>>> I noticed that after kernel commit abafbc55 'vfio-pci: Invalidate mmaps
+>>>> and block MMIO access on disabled memory' vfio-pci via qemu on s390x
+>>>> fails spectacularly, with errors in qemu like:
+... snip ...
+>>
+>> Alex, Matt,
+>>
+>> in s390 we have the possibility to assign a virtual function to a 
+>> logical partition as function 0.
+>> In this case it can not be treated as a virtual function but must be 
+>> treated as a physical function.
+>> This is currently working very well.
+>> However, these functions do not set PCI_COMMAND_MEMORY as we need.
+> 
+> Where is the vendor and device ID virtualization done for these
+> devices, we can't have a PF with IDs 0000:0000.
+Pierre doesn't mean the Device/Vendor IDs he means it has devfn == 0
+so it is the mandatory function zero on it's PCI bus, where until recently
+we always had only one function per bus but with the recent multi-function
+support it can act more like on other platforms with several PCI functions
+sharing the same Bus e.g. a PF and the VFs created through sriov_numvfs.
+That's why I'm saying that having devfn == 0 should not be very special for a VF
+passed to a VM and I really don't see where it would not act like a VF passed
+from any other Hypervisor.
 
-Since CONFIG_HAX, CONFIG_KVM and other accelerator-type
-config defines are also per-target, I suspect that the
-correct fix for this bug is not in configure but elsewhere.
-
-thanks
--- PMM
+The only really tricky part in my opinion is where during the "probing"
+we do set is_virtfn so it happens both for VFs passed-through from z/VM
+or LPAR and VFs created through sriov_numvfs which unlike on other platforms
+are also scanned by Firmware (pdev->no_vf_scan disables the Linux side scanning).
+With the fix I'm currently testing I had to do this in pcibios_enable_device()
+because I also create sysfs links between VFs and their parent PFs and those
+need the sysfs entries to be already created, which makes the more apropriately
+sound pcibios_bus_add_device() too early.
+> 
+>> Shouldn't we fix this inside the kernel, to keep older QMEU working?
+>>
+>> Then would it be OK to add a new bit/boolean inside the 
+>> pci_dev/vfio_pci_device like, is_detached_vfn, that we could set during 
+>> enumeration and test inside __vfio_pci_memory_enabled() to return true?
+> 
+> Probably each instance of is_virtfn in vfio-pci should be looked at to
+> see if it applies to s390.  If we're going to recognize this as a VF,
+> I'd rather we complete the emulation that the lower level hypervisor
+> has missed.  If we can enable all the is_virtfn code on s390, then we
+> should probably cache is_virtfn on the vfio_pci_device object and allow
+> s390 a place to set it once at probe or enable time.
+> 
+>> In the enumeration we have the possibility to know if the function is a 
+>> HW/Firmware virtual function on devfn 0 or if it is created by SRIOV.
+>>
+>> It seems an easy fix without side effects.
+>>
+>> What do you think?
+> 
+> It sure seems preferable to recognize that it is a VF in the kernel
+> than to require userspace to have arch specific hacks.  Thanks,
+> 
+> Alex
+> 
 
