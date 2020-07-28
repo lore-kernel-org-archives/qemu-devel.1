@@ -2,86 +2,92 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BD8C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:34:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A6AC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:38:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 835A420792
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:34:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14C6D20786
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:38:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IieVOdUH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 835A420792
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UpRgv6PC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14C6D20786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Mvp-00037h-RC
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:34:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51924)
+	id 1k0N0Y-00069b-A1
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:38:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0Mu3-000159-Ec
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:32:12 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45588
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0Mu1-0001zw-Id
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:32:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595932328;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=o2IiINGgl+4WOMVRXCsvIQxzqLWlCEUnL71ntQV405o=;
- b=IieVOdUHsY3jfkIxY7xO5oLVDkvHuFMnsimeUAjs3okDeSnpg4iYUz46+t4LujO2i2S4NX
- rBZ9EHaAOmnRygyj1gNzVFyX8ZFn7xl7qbr54wU+M90TOYi0J8EhqbuNKmSW+uySjA39p3
- 9tbAGKXtUeD8piksBjqOeP3gAe5Cv7M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-8weZ_ZBZMZSYFye6FB1Myw-1; Tue, 28 Jul 2020 06:32:07 -0400
-X-MC-Unique: 8weZ_ZBZMZSYFye6FB1Myw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D97A805723;
- Tue, 28 Jul 2020 10:32:06 +0000 (UTC)
-Received: from gondolin (ovpn-113-21.ams2.redhat.com [10.36.113.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9335E726BA;
- Tue, 28 Jul 2020 10:31:53 +0000 (UTC)
-Date: Tue, 28 Jul 2020 12:31:51 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: Re: [RFC v2 1/3] virtio: add vhost-user-fs-ccw device
-Message-ID: <20200728123151.468c252b.cohuck@redhat.com>
-In-Reply-To: <20200717092929.19453-2-mhartmay@linux.ibm.com>
-References: <20200717092929.19453-1-mhartmay@linux.ibm.com>
- <20200717092929.19453-2-mhartmay@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0MzH-0004TV-2x; Tue, 28 Jul 2020 06:37:35 -0400
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:39637)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0MzF-0002j4-Ib; Tue, 28 Jul 2020 06:37:34 -0400
+Received: by mail-wm1-x32b.google.com with SMTP id t142so11312266wmt.4;
+ Tue, 28 Jul 2020 03:37:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=auj3sQMa8Sg6EHOHIY6/vd+MYwdtq8kIo7akGMM8QCY=;
+ b=UpRgv6PCsj4twVHvqpoHMReQEWCufLK/hUTP4JGcdLcdQtZlMwJ0x0LyCC8sMsiqHo
+ hpV4dEtPiCgRol26uIRKH2hg2G21Z1tQ9DVEyjmVYjYzvIlJT0UcoNWLPKfXC1al2S7k
+ KBXicsB/nFTH/Q678dE94A/GX71MYPa7ZORhR5sjylaKSi3Og5fz7A6itENPbsBp6RhW
+ IZq7XQpH1CPZVpQ0GwjuCG+TLSEL5Ivo4vmELO5y9QDRAFtE5E6rdGeIxKozsTRl13FH
+ ny04guiYHgNVwttwobjqMIBu1lJy7FPa/6ThNtbhtMQkYo93T20v6t35J40g8htdzz8K
+ fAIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=auj3sQMa8Sg6EHOHIY6/vd+MYwdtq8kIo7akGMM8QCY=;
+ b=SNkxIkoWRq0JGbVzjOowVhmUBWbAtzrgcLNeBhW3DsFiHVuMitnpTGqMFXN5jH1sxP
+ RCImoWV7IB6u2iSpKZPC+NCb9yBkbSfgOghltiACqMnhFhtOKxkTtkI+Lv2QmbjRdl0k
+ 0TJTURMySGQpFy7NQaEi+PCVHNOevwQILu7Wo6eRorWeEIXq8IPlFNbfJKOImFPfU9CD
+ BD2aGINLI61g3lKo84leSgtoOTPfEPyIlAnabDWh/9KxvT/2wyRM61HMiHtCxynFNXZU
+ woT2mHoUB2ns0RYnEzaE6CGz5EdlFauLh8l3LsG/+NF+58n5qIf6GOUN1b6L3sfIAlcL
+ rXVg==
+X-Gm-Message-State: AOAM5338gFPdsAQVMbe6rD/3lKHYH+DGNip4ydJvOHLNE1ibAXBoLTPT
+ fsLVPQM06Hh+cWp5cRQwjfQ=
+X-Google-Smtp-Source: ABdhPJycXJo7uh092jy6siXJ+6GPfxvxgP2vkE6yYmTN0BAyzXNXNzy8YuZtH4nNFUDaBi/4INsYMw==
+X-Received: by 2002:a1c:c256:: with SMTP id s83mr3639046wmf.17.1595932651740; 
+ Tue, 28 Jul 2020 03:37:31 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id g3sm18661341wrb.59.2020.07.28.03.37.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Jul 2020 03:37:30 -0700 (PDT)
+Date: Tue, 28 Jul 2020 11:37:29 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Asmita Jha <asmita.jha82@gmail.com>
+Subject: Re: Qemu installation error from source
+Message-ID: <20200728103729.GD10336@stefanha-x1.localdomain>
+References: <CAKKBCQoBmk3rA=Ht=AVZkOUc0zDVJCVyX1GLbEWK97hodOfqDA@mail.gmail.com>
+ <20200629131227.GL31392@stefanha-x1.localdomain>
+ <CAKKBCQrhrYNULaV2q9YGd1vxeeCrexVy_cMbQBjJKxaRKYvf3Q@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 00:06:48
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="a2FkP9tdjPU2nyhF"
+Content-Disposition: inline
+In-Reply-To: <CAKKBCQrhrYNULaV2q9YGd1vxeeCrexVy_cMbQBjJKxaRKYvf3Q@mail.gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x32b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,118 +100,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, "Michael
- S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 17 Jul 2020 11:29:27 +0200
-Marc Hartmayer <mhartmay@linux.ibm.com> wrote:
 
-> From: Halil Pasic <pasic@linux.ibm.com>
-> 
-> Wire up the CCW device for vhost-user-fs.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> ---
->  hw/s390x/Makefile.objs       |  1 +
->  hw/s390x/vhost-user-fs-ccw.c | 73 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 74 insertions(+)
->  create mode 100644 hw/s390x/vhost-user-fs-ccw.c
-> 
+--a2FkP9tdjPU2nyhF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-(...)
+On Wed, Jul 01, 2020 at 06:04:33AM +0530, Asmita Jha wrote:
+> Thanks  for your response. I am not sure I compiled libbz2.
+> Because while installing qemu from source , I just followed the steps as
+> mentioned in wiki.
+> I am noob in this field.
+>=20
+> I tried using ./configure --static, it gave an error as attached in
+> screenshot.
 
-> diff --git a/hw/s390x/vhost-user-fs-ccw.c b/hw/s390x/vhost-user-fs-ccw.c
-> new file mode 100644
-> index 000000000000..88a7a11a34b4
-> --- /dev/null
-> +++ b/hw/s390x/vhost-user-fs-ccw.c
-> @@ -0,0 +1,73 @@
-> +/*
-> + * Ccw transport wiring for vhost-user-fs
+In the screenshot the linker cannot find the library dependencies needed
+to build QEMU.
 
-"virtio ccw vhost-user-fs implementation" ?
+There are Dockerfiles that show how to build QEMU on a number of Linux
+distributions. For example, the Fedora Dockerfile is here:
+tests/docker/dockerfiles/fedora.docker
 
-> + *
-> + * Copyright 2020 IBM Corp.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include "hw/qdev-properties.h"
-> +#include "qapi/error.h"
-> +#include "hw/virtio/vhost-user-fs.h"
-> +#include "virtio-ccw.h"
-> +
-> +typedef struct VHostUserFSCcw {
-> +    VirtioCcwDevice parent_obj;
-> +    VHostUserFS vdev;
-> +} VHostUserFSCcw;
-> +
-> +#define TYPE_VHOST_USER_FS_CCW "vhost-user-fs-ccw"
-> +#define VHOST_USER_FS_CCW(obj) \
-> +        OBJECT_CHECK(VHostUserFSCcw, (obj), TYPE_VHOST_USER_FS_CCW)
-> +
-> +
-> +static Property vhost_user_fs_ccw_properties[] = {
-> +    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
-> +                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
-> +    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
-> +                       VIRTIO_CCW_MAX_REV),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void vhost_user_fs_ccw_realize(VirtioCcwDevice *ccw_dev, Error **errp)
-> +{
-> +    VHostUserFSCcw *dev = VHOST_USER_FS_CCW(ccw_dev);
-> +    DeviceState *vdev = DEVICE(&dev->vdev);
-> +
-> +    qdev_realize(vdev, BUS(&ccw_dev->bus), errp);
-> +}
-> +
-> +static void vhost_user_fs_ccw_instance_init(Object *obj)
-> +{
-> +    VHostUserFSCcw *dev = VHOST_USER_FS_CCW(obj);
-> +
+This could help you in setting up the environment (which packages are
+needed, etc).
 
-This needs
+Stefan
 
-    ccw_dev->force_revision_1 = true;
+--a2FkP9tdjPU2nyhF
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-> +                                TYPE_VHOST_USER_FS);
-> +}
-> +
-> +static void vhost_user_fs_ccw_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
-> +
-> +    k->realize = vhost_user_fs_ccw_realize;
-> +    device_class_set_props(dc,vhost_user_fs_ccw_properties);
-> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-> +}
-> +
-> +static const TypeInfo vhost_user_fs_ccw = {
-> +    .name          = TYPE_VHOST_USER_FS_CCW,
-> +    .parent        = TYPE_VIRTIO_CCW_DEVICE,
-> +    .instance_size = sizeof(VHostUserFSCcw),
-> +    .instance_init = vhost_user_fs_ccw_instance_init,
-> +    .class_init    = vhost_user_fs_ccw_class_init,
-> +};
-> +
-> +static void vhost_user_fs_ccw_register(void)
-> +{
-> +    type_register_static(&vhost_user_fs_ccw);
-> +}
-> +
-> +type_init(vhost_user_fs_ccw_register)
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8f/+kACgkQnKSrs4Gr
+c8gN5ggAjm1II0svUf41aUvq60JWEJE5vMPKMUBQH91AVJXIXgTw0pFJ4a+w9Aro
++p2oyXoq4faJnAk6pERYw8sSXCQX2Ji+ePezILMQHPokKqvnjfcgmDsTb936bmYi
+lmGaQ3TucZNTEjJiP3omQ/SPNs0LcXnx9Tg6sbzHzs4aBuM6exA2pxI1avXokm72
+mBkb10lepjTpfgkFXvuh4QhOV1Xx40r/dyfiQFzB5lUwYT3kTLmxH+tuactAAKAV
+DYN2Uu3tz31TFIgp4H2fUDcjfo3TWdfUDS+0/BEAqO42LAxYmXAJteQUCdrxOclR
+14OhM4TxM1ONa7+oErylWEbollWTaA==
+=VtAB
+-----END PGP SIGNATURE-----
+
+--a2FkP9tdjPU2nyhF--
 
