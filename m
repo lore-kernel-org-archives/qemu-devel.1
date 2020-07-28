@@ -2,89 +2,80 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA32C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C7CC433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:26:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C97620663
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:25:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aZoWz07k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C97620663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6AF0020663
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 14:26:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF0020663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0QXW-0006Rp-Dd
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:25:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57974)
+	id 1k0QYv-0007fI-IY
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 10:26:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0QWk-0005bG-JD
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:24:22 -0400
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:42655)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0QY5-0007CA-5O
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:25:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37872)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k0QWi-0000ep-SH
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:24:22 -0400
-Received: by mail-ot1-x334.google.com with SMTP id v21so7725275otj.9
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 07:24:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3OQ6jVrw7zQ6gyFk/7e3khyoijomitBo4MSyvy9u4Tc=;
- b=aZoWz07khFMZ53iWSUmn6Ju9zeneFJuI7Xw9VADJbDw9wUIfMZ9wpyn59j1bVf06m2
- SgcnK79IqNZOzUijTc3MbTiIN2BJpuWHXFTkEg0w1If+wW91HlDS0x0R5IE8pWTsOSet
- j1dk88XwjZ3/OIDw9HcAh5EXIAoeAg0jJVYNh/1X4FPaS1xqkawhtGXE/mTkzKQMWjZV
- b/zAnbi3nZFDbSQehAS2sW6amGdGGWzZXkI6J1asaZw1w3g7mhjRMriSFT7yoHH6kTLo
- Zs4h1BYyAHOYiCqDUKy6O9aXNOkvFX6eIYkAYTecwaWfZWzBYNLpWhKXgeBDm2ToS01v
- qT5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3OQ6jVrw7zQ6gyFk/7e3khyoijomitBo4MSyvy9u4Tc=;
- b=RNDP0fIDjGTeUCo1NVhRZItxW92rdzLOXjd0XgKT8DjjGzOENXJ8rfTan6tT80rkR4
- ImHPO1CFpj500X5Uw77ke5Wre2L8WVXfqUmcd0qKzEmzd/pjyIDJh5FdzlIauEyR6PpQ
- DGXn9sIdvT/6zuDxidAAo7wtuvW9n7NZmvFSTT5tc8oy/8P2wIL/S2JxL28ulwjgAeIv
- 1APuNMy74S98o5rmlHK74RsSoqJ08n+8B48B9XOr5YE3XPANPLJtllNoetVMVatYTsdS
- nyY2iXfI2L+0s9OO0/8G8YYl2jfNizOtc+Lo7iA2XVNNfjKBj/8AJxmPd3WZ3oSL6DdR
- Zjtw==
-X-Gm-Message-State: AOAM533U1DcyDWDlGrrm+zvWO5RCv8lCTHberlpixPJV2xhChf5sWGpg
- 0Utw61rjQgCc4gDkEPi0EvookerFZyEFzxhrD9qGQj6y
-X-Google-Smtp-Source: ABdhPJw4rqBCrGh2QYlkCTigNN7Fr/DwjsRjHxECfg1bn3bVRpf7X/K5wWtnYcHlqEpwz9F5tP7W+ZtaaB1PYnaDMUw=
-X-Received: by 2002:a9d:7303:: with SMTP id e3mr23458182otk.221.1595946259535; 
- Tue, 28 Jul 2020 07:24:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0QY3-0000vC-9K
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 10:25:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k0QY1-00081e-H3
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 14:25:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5BCBE2E80D2
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 14:25:41 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200727205543.206624-1-eblake@redhat.com>
-In-Reply-To: <20200727205543.206624-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Jul 2020 15:24:08 +0100
-Message-ID: <CAFEAcA_G6pd1QuSUpLimcxFUJK7X6YCiQLpOLn3kQgmefK91DA@mail.gmail.com>
-Subject: Re: [PULL 00/24] bitmaps patches for -rc2, 2020-07-27
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::334;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x334.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 Jul 2020 14:16:18 -0000
+From: Max Reitz <1888467@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: arrowfeng xanclic
+X-Launchpad-Bug-Reporter: dunfeng zhang (arrowfeng)
+X-Launchpad-Bug-Modifier: Max Reitz (xanclic)
+References: <159540494097.10238.3390638369680947345.malonedeb@gac.canonical.com>
+Message-Id: <159594577845.3099.16156744700849425786.malone@gac.canonical.com>
+Subject: [Bug 1888467] Re: qemu-img http convert bug
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: afb54d690fe480dfd8dd2e07b7dc1d3fbd2120eb
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:25:41
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,38 +84,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1888467 <1888467@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 27 Jul 2020 at 21:58, Eric Blake <eblake@redhat.com> wrote:
->
-> The following changes since commit 9303ecb658a0194560d1eecde165a1511223c2d8:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200727' into staging (2020-07-27 17:25:06 +0100)
->
-> are available in the Git repository at:
->
->   https://repo.or.cz/qemu/ericb.git tags/pull-bitmaps-2020-07-27
->
-> for you to fetch changes up to 37931e006f05cb768b78dcc47453b13f76ea43c5:
->
->   migration: Fix typos in bitmap migration comments (2020-07-27 15:42:21 -0500)
->
-> ----------------------------------------------------------------
-> bitmaps patches for 2020-07-27
->
-> - Improve handling of various post-copy bitmap migration scenarios. A lost
-> bitmap should merely mean that the next backup must be full rather than
-> incremental, rather than abruptly breaking the entire guest migration.
-> - Associated iotest improvements
+Because nobody has implemented it so far.
 
+-- =
 
-Applied, thanks.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888467
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
-for any user-visible changes.
+Title:
+  qemu-img http convert bug
 
--- PMM
+Status in QEMU:
+  New
+
+Bug description:
+  Hello, Why the file sizes of http conversion and local conversion are
+  inconsistent?
+
+  Use the http method of qemu-img for conversion. The size of some formats =
+after conversion is different from the local method of qemu-img. Such as vh=
+d, vdi. qcow2 and vmdk are normal=E3=80=82
+  My image size is 40 G, raw format.
+
+  The source is the same file, but the access method is different
+  http method of qemu-img=EF=BC=9A qemu-img convert -f raw -O vdi http://xx=
+x xxx.vdi=EF=BC=8819G=EF=BC=8Cafter conversion=EF=BC=89
+  local method of qemu-img=EF=BC=9A qemu-img convert -f raw -O vdi xxx.raw =
+xxx.vdi=EF=BC=883G=EF=BC=8Cafter conversion=EF=BC=89
+
+  thank you
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888467/+subscriptions
 
