@@ -2,102 +2,64 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A976FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 23:05:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CAE8C4345E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 23:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78D312075D
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 23:05:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78D312075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02F3020829
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 23:06:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02F3020829
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=members.leeds.ac.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Yeg-0005oI-P3
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 19:05:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40386)
+	id 1k0Yfg-0006lg-5C
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 19:06:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1k0Yds-0005Bh-Dq; Tue, 28 Jul 2020 19:04:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5926)
+ (Exim 4.90_1) (envelope-from <T.E.Baldwin99@members.leeds.ac.uk>)
+ id 1k0YeR-0005pA-1w
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 19:04:51 -0400
+Received: from [31.132.33.241] (port=47098 helo=pi.majoroak.me.uk)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1k0Ydq-0003Ta-2I; Tue, 28 Jul 2020 19:04:16 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06SN2wfO055069; Tue, 28 Jul 2020 19:03:38 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32hs1dfnam-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Jul 2020 19:03:38 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06SN2whd055056;
- Tue, 28 Jul 2020 19:03:38 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32hs1dfna5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Jul 2020 19:03:38 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06SMsU3V015338;
- Tue, 28 Jul 2020 23:03:36 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
- [9.57.198.28]) by ppma03dal.us.ibm.com with ESMTP id 32gcy74e4h-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 28 Jul 2020 23:03:36 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06SN3abQ30474616
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 28 Jul 2020 23:03:36 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0B533AC062;
- Tue, 28 Jul 2020 23:03:36 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 403C3AC060;
- Tue, 28 Jul 2020 23:03:29 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.163.54.39])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
- Tue, 28 Jul 2020 23:03:28 +0000 (GMT)
-References: <20200723025657.644724-1-bauerman@linux.ibm.com>
- <20200723025657.644724-4-bauerman@linux.ibm.com>
- <20200727152828.133ee76a@bahia.lan>
-User-agent: mu4e 1.2.0; emacs 26.3
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v3 3/8] ppc/spapr: Use start-powered-off CPUState property
-In-reply-to: <20200727152828.133ee76a@bahia.lan>
-Date: Tue, 28 Jul 2020 20:03:24 -0300
-Message-ID: <87bljzuts3.fsf@morokweng.localdomain>
+ (Exim 4.90_1) (envelope-from <T.E.Baldwin99@members.leeds.ac.uk>)
+ id 1k0YeP-0003W1-3A
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 19:04:50 -0400
+Received: from [2001:470:1f09:8f6:2e0:4cff:fe39:267e]
+ (helo=localhost.localdomain)
+ by pi.majoroak.me.uk with esmtp (Exim 4.92)
+ (envelope-from <T.E.Baldwin99@members.leeds.ac.uk>)
+ id 1k0YMa-0000mh-VC; Tue, 28 Jul 2020 23:46:37 +0100
+From: Timothy E Baldwin <T.E.Baldwin99@members.leeds.ac.uk>
+To: Laurent Vivier <laurent@vivier.eu>,
+	qemu-devel@nongnu.org
+Date: Tue, 28 Jul 2020 23:46:15 +0100
+Message-Id: <20200728224615.326675-1-T.E.Baldwin99@members.leeds.ac.uk>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-28_17:2020-07-28,
- 2020-07-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- priorityscore=1501 suspectscore=0 impostorscore=0 bulkscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=999 phishscore=0 spamscore=0
- clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007280164
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 19:04:11
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:470:1f09:8f6:2e0:4cff:fe39:267e
+X-SA-Exim-Mail-From: T.E.Baldwin99@members.leeds.ac.uk
+Subject: [PATCH] linux-user: Correctly start brk after executable
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on pi.majoroak.me.uk)
+X-Host-Lookup-Failed: Reverse DNS lookup failed for 31.132.33.241 (failed)
+Received-SPF: none client-ip=31.132.33.241;
+ envelope-from=T.E.Baldwin99@members.leeds.ac.uk; helo=pi.majoroak.me.uk
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 18:46:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, RDNS_NONE=0.793,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,65 +72,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>, Paolo
- Bonzini <pbonzini@redhat.com>, David
- Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Timothy E Baldwin <T.E.Baldwin99@members.leeds.ac.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+info->brk was erroneously set to the end of highest addressed
+writable segment which could result it in overlapping the executable.
 
-Greg Kurz <groug@kaod.org> writes:
+As per load_elf_binary in fs/binfmt_elf.c in Linux, it should be
+set to end of highest addressed segment.
 
-> On Wed, 22 Jul 2020 23:56:52 -0300
-> Thiago Jung Bauermann <bauerman@linux.ibm.com> wrote:
->
->> PowerPC sPAPR CPUs start in the halted state, and spapr_reset_vcpu()
->> attempts to implement this by setting CPUState::halted to 1. But that's too
->> late for the case of hotplugged CPUs in a machine configure with 2 or more
->> threads per core.
->> 
->> By then, other parts of QEMU have already caused the vCPU to run in an
->> unitialized state a couple of times. For example, ppc_cpu_reset() calls
->> ppc_tlb_invalidate_all(), which ends up calling async_run_on_cpu(). This
->> kicks the new vCPU while it has CPUState::halted = 0, causing QEMU to issue
->> a KVM_RUN ioctl on the new vCPU before the guest is able to make the
->> start-cpu RTAS call to initialize its register state.
->> 
->> This problem doesn't seem to cause visible issues for regular guests, but
->> on a secure guest running under the Ultravisor it does. The Ultravisor
->> relies on being able to snoop on the start-cpu RTAS call to map vCPUs to
->> guests, and this issue causes it to see a stray vCPU that doesn't belong to
->> any guest.
->> 
->> Fix by setting the start-powered-off CPUState property in
->> spapr_create_vcpu(), which makes cpu_common_reset() initialize
->> CPUState::halted to 1 at an earlier moment.
->> 
->> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
->> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
->> ---
->
-> Thanks for doing this ! I remember seeing partly initialized CPUs being
-> kicked in the past, which is clearly wrong but I never got time to find
-> a proper fix (especially since it didn't seem to break anything).
->
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Timothy E Baldwin <T.E.Baldwin99@members.leeds.ac.uk>
+---
+ linux-user/elfload.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-Thanks for confirming the issue, and for reviewing the code.
-
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 7e7f642332..d5d444f698 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2564,9 +2564,9 @@ static void load_elf_image(const char *image_name, int image_fd,
+                 if (vaddr_ef > info->end_data) {
+                     info->end_data = vaddr_ef;
+                 }
+-                if (vaddr_em > info->brk) {
+-                    info->brk = vaddr_em;
+-                }
++            }
++            if (vaddr_em > info->brk) {
++                info->brk = vaddr_em;
+             }
+         } else if (eppnt->p_type == PT_INTERP && pinterp_name) {
+             char *interp_name;
+@@ -2621,7 +2621,6 @@ static void load_elf_image(const char *image_name, int image_fd,
+     if (info->end_data == 0) {
+         info->start_data = info->end_code;
+         info->end_data = info->end_code;
+-        info->brk = info->end_code;
+     }
+ 
+     if (qemu_log_enabled()) {
 -- 
-Thiago Jung Bauermann
-IBM Linux Technology Center
+2.25.1
+
+Given an executable with a read-write segment between 2 executable segments
+qemu was unmapping most of the execuateble instead of area reserved for brk
+at the end of the execuatable.
 
