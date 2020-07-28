@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED272C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8403CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 18:27:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF09C20786
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 17:23:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FCD220714
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 18:27:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="jlKxYnll"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF09C20786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="S0dM821O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FCD220714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0TKW-0002Lu-Ut
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 13:23:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53774)
+	id 1k0UKO-0004Tt-DV
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 14:27:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1k0TJi-0001c0-0A
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:23:06 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:17449)
+ id 1k0UJG-0003Ye-Sp
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 14:26:42 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:39156)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1k0TJZ-0003EE-Ns
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 13:23:05 -0400
+ id 1k0UJE-0003om-RB
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 14:26:42 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1595956983; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1595960800; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=D+LJ0iOnqFrgj299yTq/k/N6lfibNIuGDmh/U9akQgU=;
- b=jlKxYnllbyouXOtYfDTyXDx+wEa+LsRQb5GgpqNO+LfqJONt52zFKMKLk/FxosXyHl0Ys2H7
- TQP5BKmJqgekPGuGEsoUkPFyBy7oNpe4wS/s5c1UVVtHA16kSwkSAMVpHrazxJrHt3zGhjAI
- HuD8WejG4ABDI0Y3d22Z8/A0S5A=
+ Sender; bh=vrlBjpSRb4q0QZ7lMaZkNR0SHFx5OQyjxZaCEe35sjQ=;
+ b=S0dM821Onrdrkk3KIb3SCM5JKn0vpdliMiZaF4lsZE8z4Z7y2x38OVhDUa4PNolcbVs3wX1t
+ TtFyOoRNAFBksl/2x8X8JqsriF+HZINRL4secuM3wXq4/PTEuNoNH3pKV4sJvtfa2D7m0Tl4
+ qe9gf4VeEWa4R8ETbMILbmuR+ys=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (66.90.74.34.bc.googleusercontent.com
- [34.74.90.66]) by smtp-out-n17.prod.us-west-2.postgun.com with SMTP id
- 5f205ecd49176bd382174433 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Tue, 28 Jul 2020 17:22:21 GMT
-Date: Tue, 28 Jul 2020 17:22:20 +0000
-Message-ID: <5f205ecca8551_26923fb27dc04da085569@sidekiq-catchall-02-sv-gprd.mail>
-Subject: QEMU | Pipeline #171722122 has failed for master | a466dd08
+Received: from mg.gitlab.com (70.90.74.34.bc.googleusercontent.com
+ [34.74.90.70]) by smtp-out-n10.prod.us-west-2.postgun.com with SMTP id
+ 5f206ddf634c4259e39d9e71 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Tue, 28 Jul 2020 18:26:39 GMT
+Date: Tue, 28 Jul 2020 18:26:38 +0000
+Message-ID: <5f206dde31b17_15803f9a6871ec7884965@sidekiq-catchall-01-sv-gprd.mail>
+Subject: QEMU | Pipeline #171749063 has failed for master | 0a58e39f
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5f205ecc9a227_26923fb27dc04da085492";
+ boundary="--==_mimepart_5f206dde2519d_15803f9a6871ec788483c";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 171722122
+X-GitLab-Pipeline-Id: 171749063
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -99,7 +99,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5f205ecc9a227_26923fb27dc04da085492
+----==_mimepart_5f206dde2519d_15803f9a6871ec788483c
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -111,38 +111,38 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: a466dd08 ( https://gitlab.com/qemu-project/qemu/-/commit/a466dd08=
-4f51cdc9da2e99361f674f98d7218559 )
-Commit Message: Merge remote-tracking branch 'remotes/jasowang/...
+Commit: 0a58e39f ( https://gitlab.com/qemu-project/qemu/-/commit/0a58e39f=
+e90c50b313a5148c095f8dbb6111a6d6 )
+Commit Message: Merge remote-tracking branch 'remotes/vivier2/t...
 Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-Pipeline #171722122 ( https://gitlab.com/qemu-project/qemu/-/pipelines/17=
-1722122 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+Pipeline #171749063 ( https://gitlab.com/qemu-project/qemu/-/pipelines/17=
+1749063 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 1 failed build.
 
-Job #660111763 ( https://gitlab.com/qemu-project/qemu/-/jobs/660111763/ra=
+Job #660213052 ( https://gitlab.com/qemu-project/qemu/-/jobs/660213052/ra=
 w )
 
 Stage: build
 Name: build-tcg-disabled
-Trace: 192      ...        [16:36:31]             ...              =
+Trace: 192      ...        [17:38:47]             ...              =
 
-192      =1B[32mpass      =1B[0m [16:36:31] [16:36:31]   0s              =
+192      =1B[32mpass      =1B[0m [17:38:47] [17:38:47]   0s              =
  =
 
-194      ...        [16:36:31]             ...              =
+194      ...        [17:38:47]             ...              =
 
-194      =1B[32mpass      =1B[0m [16:36:31] [16:36:31]   0s              =
+194      =1B[32mpass      =1B[0m [17:38:47] [17:38:47]   0s              =
  =
 
-197      ...        [16:36:31]             ...              =
+197      ...        [17:38:47]             ...              =
 
-197      =1B[1m=1B[31mfail      =1B[0m [16:36:31] [16:38:23]             =
+197      =1B[1m=1B[31mfail      =1B[0m [17:38:47] [17:40:29]             =
        output mismatch (see 197.out.bad)
---- /builds/qemu-project/qemu/tests/qemu-iotests/197.out	2020-07-28 16:26=
-:40.000000000 +0000
+--- /builds/qemu-project/qemu/tests/qemu-iotests/197.out	2020-07-28 17:28=
+:21.000000000 +0000
 +++ /builds/qemu-project/qemu/build/tests/qemu-iotests/197.out.bad	2020-0=
-7-28 16:38:22.000000000 +0000
+7-28 17:40:28.000000000 +0000
 @@ -26,9 +26,9 @@
  =
 
@@ -157,54 +157,54 @@ Trace: 192      ...        [16:36:31]             ...              =
 +4 GiB (0x100000000) bytes     allocated at offset 0 bytes (0x0)
  No errors were found on the image.
  *** done
-208      ...        [16:38:23]             ...              =
+208      ...        [17:40:29]             ...              =
 
-208      =1B[32mpass      =1B[0m [16:38:23] [16:38:27]   4s              =
+208      =1B[32mpass      =1B[0m [17:40:29] [17:40:33]   4s              =
  =
 
-215      ...        [16:38:27]             ...              =
+215      ...        [17:40:33]             ...              =
 
-215      =1B[32mpass      =1B[0m [16:38:27] [16:40:04]  96s              =
+215      =1B[32mpass      =1B[0m [17:40:33] [17:42:12]  98s              =
  =
 
-221      ...        [16:40:04]             ...              =
+221      ...        [17:42:12]             ...              =
 
-221      =1B[32mpass      =1B[0m [16:40:04] [16:40:04]   0s              =
+221      =1B[32mpass      =1B[0m [17:42:12] [17:42:12]   0s              =
  =
 
-222      ...        [16:40:04]             ...              =
+222      ...        [17:42:12]             ...              =
 
-222      =1B[32mpass      =1B[0m [16:40:04] [16:40:08]   4s              =
+222      =1B[32mpass      =1B[0m [17:42:12] [17:42:16]   4s              =
  =
 
-226      ...        [16:40:08]             ...              =
+226      ...        [17:42:16]             ...              =
 
-226      =1B[32mpass      =1B[0m [16:40:08] [16:40:08]   0s              =
+226      =1B[32mpass      =1B[0m [17:42:16] [17:42:17]   1s              =
  =
 
-227      ...        [16:40:08]             ...              =
+227      ...        [17:42:17]             ...              =
 
-227      =1B[32mpass      =1B[0m [16:40:08] [16:40:08]   0s              =
+227      =1B[32mpass      =1B[0m [17:42:17] [17:42:17]   0s              =
  =
 
-236      ...        [16:40:08]             ...              =
+236      ...        [17:42:17]             ...              =
 
-236      =1B[32mpass      =1B[0m [16:40:08] [16:40:08]   0s              =
+236      =1B[32mpass      =1B[0m [17:42:17] [17:42:17]   0s              =
  =
 
-253      ...        [16:40:08]             ...              =
+253      ...        [17:42:17]             ...              =
 
-253      =1B[32mpass      =1B[0m [16:40:08] [16:40:09]   1s              =
+253      =1B[32mpass      =1B[0m [17:42:17] [17:42:17]   0s              =
  =
 
-277      ...        [16:40:09]             ...              =
+277      ...        [17:42:17]             ...              =
 
-277      =1B[32mpass      =1B[0m [16:40:09] [16:40:10]   1s              =
+277      =1B[32mpass      =1B[0m [17:42:17] [17:42:19]   2s              =
  =
 
 Failures: 197
 Failed 1 of 47 iotests
-section_end:1595954427:step_script
+section_end:1595958160:step_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
@@ -216,7 +216,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5f205ecc9a227_26923fb27dc04da085492
+----==_mimepart_5f206dde2519d_15803f9a6871ec788483c
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -231,7 +231,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #171722122 has failed for master | a466dd08</title=
+<title>QEMU | Pipeline #171749063 has failed for master | 0a58e39f</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -399,17 +399,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/a466dd084f51cdc9=
-da2e99361f674f98d7218559" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/0a58e39fe90c50b3=
+13a5148c095f8dbb6111a6d6" style=3D"color: #3777b0; text-decoration: none;=
 ">
-a466dd08
+0a58e39f
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-Merge remote-tracking branch 'remotes/jasowang/...
+Merge remote-tracking branch 'remotes/vivier2/t...
 </div>
 </td>
 </tr>
@@ -466,9 +466,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/171722122" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/171749063" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#171722122
+#171749063
 </a>
 triggered by
 </td>
@@ -545,7 +545,7 @@ build
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/660111763" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/660213052" style=3D=
 "color: #3777b0; text-decoration: none;">
 build-tcg-disabled
 </a>
@@ -559,21 +559,21 @@ sans-serif; padding: 0 0 16px;">
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
 ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>192      =
-...        [16:36:31]             ...              =
+...        [17:38:47]             ...              =
 
-192      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:36:31] [16:36:31]   0s               <br />194      ...        [16:36:31=
+192      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:38:47] [17:38:47]   0s               <br />194      ...        [17:38:47=
 ]             ...              =
 
-194      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:36:31] [16:36:31]   0s               <br />197      ...        [16:36:31=
+194      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:38:47] [17:38:47]   0s               <br />197      ...        [17:38:47=
 ]             ...              =
 
 197      </span><span class=3D"term-fg-l-red term-bold">fail      </span>=
-<span> [16:36:31] [16:38:23]                    output mismatch (see 197.=
+<span> [17:38:47] [17:40:29]                    output mismatch (see 197.=
 out.bad)<br />--- /builds/qemu-project/qemu/tests/qemu-iotests/197.out	20=
-20-07-28 16:26:40.000000000 +0000<br />+++ /builds/qemu-project/qemu/buil=
-d/tests/qemu-iotests/197.out.bad	2020-07-28 16:38:22.000000000 +0000<br /=
+20-07-28 17:28:21.000000000 +0000<br />+++ /builds/qemu-project/qemu/buil=
+d/tests/qemu-iotests/197.out.bad	2020-07-28 17:40:28.000000000 +0000<br /=
 >@@ -26,9 +26,9 @@<br /> <br /> =3D=3D=3D Partial final cluster =3D=3D=3D=
 <br /> <br />-Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1024<br=
  />+qemu-img: TEST_DIR/t.IMGFMT: Invalid parameter 'compat'<br /> read 10=
@@ -581,42 +581,42 @@ d/tests/qemu-iotests/197.out.bad	2020-07-28 16:38:22.000000000 +0000<br /=
  XXX ops/sec)<br />-1 KiB (0x400) bytes     allocated at offset 0 bytes (=
 0x0)<br />+4 GiB (0x100000000) bytes     allocated at offset 0 bytes (0x0=
 )<br /> No errors were found on the image.<br /> *** done<br />208      .=
-..        [16:38:23]             ...              =
+..        [17:40:29]             ...              =
 
-208      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:38:23] [16:38:27]   4s               <br />215      ...        [16:38:27=
+208      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:40:29] [17:40:33]   4s               <br />215      ...        [17:40:33=
 ]             ...              =
 
-215      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:38:27] [16:40:04]  96s               <br />221      ...        [16:40:04=
+215      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:40:33] [17:42:12]  98s               <br />221      ...        [17:42:12=
 ]             ...              =
 
-221      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:40:04] [16:40:04]   0s               <br />222      ...        [16:40:04=
+221      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:42:12] [17:42:12]   0s               <br />222      ...        [17:42:12=
 ]             ...              =
 
-222      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:40:04] [16:40:08]   4s               <br />226      ...        [16:40:08=
+222      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:42:12] [17:42:16]   4s               <br />226      ...        [17:42:16=
 ]             ...              =
 
-226      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:40:08] [16:40:08]   0s               <br />227      ...        [16:40:08=
+226      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:42:16] [17:42:17]   1s               <br />227      ...        [17:42:17=
 ]             ...              =
 
-227      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:40:08] [16:40:08]   0s               <br />236      ...        [16:40:08=
+227      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:42:17] [17:42:17]   0s               <br />236      ...        [17:42:17=
 ]             ...              =
 
-236      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:40:08] [16:40:08]   0s               <br />253      ...        [16:40:08=
+236      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:42:17] [17:42:17]   0s               <br />253      ...        [17:42:17=
 ]             ...              =
 
-253      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:40:08] [16:40:09]   1s               <br />277      ...        [16:40:09=
+253      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:42:17] [17:42:17]   0s               <br />277      ...        [17:42:17=
 ]             ...              =
 
-277      </span><span class=3D"term-fg-green">pass      </span><span> [16=
-:40:09] [16:40:10]   1s               <br />Failures: 197<br />Failed 1 o=
+277      </span><span class=3D"term-fg-green">pass      </span><span> [17=
+:42:17] [17:42:19]   2s               <br />Failures: 197<br />Failed 1 o=
 f 47 iotests<br /></span><span class=3D"term-fg-l-red term-bold">ERROR: J=
 ob failed: exit code 1<br /></span></pre>
 </td>
@@ -666,5 +666,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5f205ecc9a227_26923fb27dc04da085492--
+----==_mimepart_5f206dde2519d_15803f9a6871ec788483c--
 
