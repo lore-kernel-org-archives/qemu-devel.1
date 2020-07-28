@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E08C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11900C433EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:05:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44CD820714
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0C6320714
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:05:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R3YZimto"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44CD820714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ekUDuI0e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0C6320714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0MUA-0001I6-GP
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:05:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45052)
+	id 1k0MUc-00027V-5u
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:05:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k0MTX-0000jy-Gc
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:04:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56880
- helo=us-smtp-1.mimecast.com)
+ id 1k0MTr-000141-Dt
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:05:07 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47185)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k0MTV-0006EO-Qe
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:04:47 -0400
+ id 1k0MTp-0006Fr-NI
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:05:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595930685;
+ s=mimecast20190719; t=1595930705;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9m/FMAr5lnUKJBhKjF8HplC/RJcFybJYECHTmYdB/P4=;
- b=R3YZimtoHM+fAEEmjQVnMoJ15AgUsYs3paMZSDcTMTzJupXAE4ghV2VRr+6Kiyqr/FUMJa
- BUoA2oBBFSgjMQc/LPYOvNYa/h/grmY/sRmjwqhJvyb47lT4z2zAt1i6ut1zp6zbJ6w4TC
- pZRXbGJ/8R9RixKKQSDwhWQn0ii7HOU=
+ bh=PlCWr2/i/Mw1M5Qepw8cA3/IS27+JTxaImn2H8LSijE=;
+ b=ekUDuI0eSHeYLCjJq9eDDUNm6BApPVZnAlT20KXagF1jLiaGgBfrFq5EcH351yoI3aJe27
+ 3BAo13FVm/mM/XDc6sqziVqchyOc2XpX7Hwrn+KoYSpH6BQwUNjCJ5TP/yA/Zr45T8rptK
+ iZmCSB8lsgvx+1JD+KLIf5iZTkZdqxc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-fK6hNX5aOF-XANcqQU8yeQ-1; Tue, 28 Jul 2020 06:04:43 -0400
-X-MC-Unique: fK6hNX5aOF-XANcqQU8yeQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-7-VwwBUQMeO6u0nGR7fBNeyw-1; Tue, 28 Jul 2020 06:05:01 -0400
+X-MC-Unique: VwwBUQMeO6u0nGR7fBNeyw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B35F4101C8A6;
- Tue, 28 Jul 2020 10:04:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92BF7800460;
+ Tue, 28 Jul 2020 10:05:00 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.110.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A5EFC171F9;
- Tue, 28 Jul 2020 10:04:39 +0000 (UTC)
-Date: Tue, 28 Jul 2020 11:04:36 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B536060FC2;
+ Tue, 28 Jul 2020 10:04:58 +0000 (UTC)
+Date: Tue, 28 Jul 2020 11:04:55 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2 3/4] cirrus.yml: Compile macOS with -Werror
-Message-ID: <20200728100436.GE3430616@redhat.com>
+Subject: Re: [PATCH v2 4/4] cirrus.yml: Update the macOS jobs to Catalina
+Message-ID: <20200728100455.GF3430616@redhat.com>
 References: <20200728074405.13118-1-thuth@redhat.com>
- <20200728074405.13118-4-thuth@redhat.com>
+ <20200728074405.13118-5-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200728074405.13118-4-thuth@redhat.com>
+In-Reply-To: <20200728074405.13118-5-thuth@redhat.com>
 User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/27 23:55:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 00:06:48
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -108,20 +109,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 28, 2020 at 09:44:04AM +0200, Thomas Huth wrote:
-> Compiler warnings currently go unnoticed in our macOS builds, since -Werror
-> is only enabled for Linux and MinGW builds by default. So let's enable them
-> here now, too.
-> Unfortunately, the sasl header is marked as deprecated in the macOS headers
-> and thus generates a lot of deprecation warnings. Thus we have to also use
-> -Wno-error=deprecated-declarations to be able to compile the code here.
+On Tue, Jul 28, 2020 at 09:44:05AM +0200, Thomas Huth wrote:
+> When looking at the CI jobs on cirrus-ci.com, it seems like the mojave-based
+> images have been decomissioned a while ago already, since apparently all our
+> jobs get automatically upgraded to catalina. So let's update our YML script
+> accordingly to avoid confusion.
 > 
+> Reviewed-by: Ed Maste <emaste@freebsd.org>
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  .cirrus.yml | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  .cirrus.yml | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+
 
 Regards,
 Daniel
