@@ -2,99 +2,95 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D02DBC433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F008C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:15:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98B0B20714
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:10:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49BD320714
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 10:15:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M1NjIiBc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98B0B20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+o5V7df"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49BD320714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0MZ6-0006JK-UO
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:10:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46278)
+	id 1k0MeG-00005O-JX
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 06:15:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k0MYA-0005Ng-8L
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:09:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29589
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k0MY7-0006u5-DZ
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:09:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595930970;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=BhUW9ESioUiSA1BxCHyRzLsoe5bVOy2Ifgl37qfIfW8=;
- b=M1NjIiBcjrot7DWhYtF7aKO/qSfinOA8LevBZzsPan0Mgj49Al0NeqNbtcZRx5QrmQBRXo
- dxBEVNer32uiZinbJIYLTo2uedbvtVL8CiJy75F9Ycvatp7nV6ZxvlQCrtlonk50acMBic
- T+JlF6CRHB5IF/gqOdbUotbhDRgTjfY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-U_OYnENiNLiJvY542YaO1A-1; Tue, 28 Jul 2020 06:09:28 -0400
-X-MC-Unique: U_OYnENiNLiJvY542YaO1A-1
-Received: by mail-wm1-f70.google.com with SMTP id h205so8702012wmf.0
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 03:09:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0MdS-0007wQ-8N
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:15:02 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52516)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0MdM-0007nU-TL
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 06:15:01 -0400
+Received: by mail-wm1-x344.google.com with SMTP id x5so16215085wmi.2
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 03:14:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=rISWK7UcsiLy5BuCD8i8FN0MEbzCB7tBIEsOzUU+L04=;
+ b=q+o5V7df3RDNtgJJtKyClMmkg5VlnZWMh/jIfRg04ozGzFFzuF//MfVBHaCIYW9QRu
+ 4viXSh5g8U/iCchsX35V7ryRFFszJJqdVygX4halgHBBPmPOlUcFoWzqSFy2h8yMtMzj
+ W7u2HMSnu10FKdQhpdoGDdSbt/qlgb4CDMRZgq3B6y/eIX4h+2nqXkhnkPR3+txp8Zqw
+ E1WeAElE4MDyOZEIEOTemoaXhQXI1+/+Q9c4YtoDxveipmPofNvd+qiXr5DSNDLpnuo8
+ ZwmZ8xJrEBXKxL9i2iHAncRrQVkqx+FlSagJjcGQVgIUL+aLhqx1IE2iV1GOgDxRTC54
+ iZ/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=BhUW9ESioUiSA1BxCHyRzLsoe5bVOy2Ifgl37qfIfW8=;
- b=qa5cCIbYsO/Tza0tdrHIDZkAJ+TOMX40v6MYuSU4CxFwsq8JxsxFEn+GXMhMzJ/FYS
- Amg1nKT66er1xRmOD0Ijpp3aDkWNWxZYFueC0OG6yxx29rabiCI8549/3/BfRV5F7daj
- mpA4DjuBPe1Rw1KFfwKWiNRburwag4gdVYD9pU3eYZ1zMF9NItF04xNyKr/qZvm+Wshk
- NLg6Cjora74zBcT4AmhQxN9o4ko7wsiYYdQJaDZQKjQV9uZj/99HoSHroeDhZV+XHjM8
- i+fsb203nVZR9e8azGRF100/S3/XOV9vMMo2LcuDZeLtdOLkQ2nquXNWLKvPpa0gRlvI
- LPZA==
-X-Gm-Message-State: AOAM530Yyoj2a9drq1/UqIewN45OxOBVZKmpytmJQcdWwW9+b1h8MEsk
- ncnum+s/JyCJKypXlAoEBTbnwGOIXGESCYEKF4C27vZePCStZUunhKWM6RQlDSXHHpsSIGxBRCL
- jf37naO0TRJyuvv4=
-X-Received: by 2002:a7b:cc12:: with SMTP id f18mr3138784wmh.129.1595930967308; 
- Tue, 28 Jul 2020 03:09:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyBky3N1fiOwAUAbRDwFfDOzU+3zWFKcPh/zvwPQji/U4MbFglqtL0NILX0yFEK52pUUrByrA==
-X-Received: by 2002:a7b:cc12:: with SMTP id f18mr3138766wmh.129.1595930967114; 
- Tue, 28 Jul 2020 03:09:27 -0700 (PDT)
-Received: from localhost.localdomain (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id t202sm3475876wmt.20.2020.07.28.03.09.26
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=rISWK7UcsiLy5BuCD8i8FN0MEbzCB7tBIEsOzUU+L04=;
+ b=Ku7kJtupwyK+aX2guHgqCpaz3WaZWwtG2KpqqAiMKVuVK/f+XyzSu5U1cdmqRDUVFZ
+ 67TUwKRU9lvl9Kn8hzBUTLvIERCtsFlH2Jo+QFkEoqahlEEXKeTj6vlGowaBzEePClB5
+ rENsts+f4UQe2tKUUtMWgO4pJbGGxBCBzvOgOYj8an4jfBHp5zFkywZW9wSnUVEvYz+y
+ 24KpxVLdeAOgA4zX/cnJY3CcmMq21Q21Qvr3PFoN8xO5as6U+UXrYHf/UvfNJIh/hTr/
+ gOSaHjX/MRWCDGYA3IPJWfJWPbggCNg+C0yVV5gEEPJyBe1AQ2gXYF33tZ7DUUeMq7uf
+ WduA==
+X-Gm-Message-State: AOAM5300iF2jp5Rnd2prsuyRPfssOEisZb4HNMAmS1o+FeOw8iOnFop1
+ T0qo3DRITUoXDW2tEWBHJYA=
+X-Google-Smtp-Source: ABdhPJwHiWlbGG3qrzVEVl8FgOPQkP8qtHzXCsaX3t31j4B8vKe2D5+2Ssx4jx6rQx63OLibdHglaA==
+X-Received: by 2002:a1c:e304:: with SMTP id a4mr3308267wmh.11.1595931294407;
+ Tue, 28 Jul 2020 03:14:54 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id o126sm3696263wma.20.2020.07.28.03.14.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jul 2020 03:09:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1] accel/xen: Fix xen_enabled() behavior on
- target-agnostic objects
-Date: Tue, 28 Jul 2020 12:09:25 +0200
-Message-Id: <20200728100925.10454-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
+ Tue, 28 Jul 2020 03:14:53 -0700 (PDT)
+Date: Tue, 28 Jul 2020 11:14:52 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Michael Tokarev <mjt@tls.msk.ru>
+Subject: Re: [PATCH] Makefile: Compute libraries for libqemuutil.a and
+ libvhost-user.a
+Message-ID: <20200728101452.GB10336@stefanha-x1.localdomain>
+References: <20200616161814.891053-1-dinechin@redhat.com>
+ <20200623144415.GP36568@stefanha-x1.localdomain>
+ <ly1rlvd2en.fsf@redhat.com>
+ <be57d624-f3b1-7abf-39fe-6568e95805f8@msgid.tls.msk.ru>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 06:05:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="CUfgB8w4ZwR/yMy5"
+Content-Disposition: inline
+In-Reply-To: <be57d624-f3b1-7abf-39fe-6568e95805f8@msgid.tls.msk.ru>
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,72 +104,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
- Paul Durrant <pdurrant@amazon.com>, xen-devel@lists.xenproject.org,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Christophe de Dinechin <dinechin@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CONFIG_XEN is generated by configure and stored in "config-target.h",
-which is (obviously) only include for target-specific objects.
-This is a problem for target-agnostic objects as CONFIG_XEN is never
-defined and xen_enabled() is always inlined as 'false'.
 
-Fix by following the KVM schema, defining CONFIG_XEN_IS_POSSIBLE
-when we don't know to force the call of the non-inlined function,
-returning the xen_allowed boolean.
+--CUfgB8w4ZwR/yMy5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: da278d58a092 ("accel: Move Xen accelerator code under accel/xen/")
-Reported-by: Paul Durrant <pdurrant@amazon.com>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- include/sysemu/xen.h | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+On Thu, Jul 02, 2020 at 04:06:32PM +0300, Michael Tokarev wrote:
+> 01.07.2020 12:12, Christophe de Dinechin wrote:
+> ..
+> >>>  # Build libraries
+> >>>
+> >>> +libqemuutil.a-libs +=3D $(call extract-libs, $(util-obj-y) $(trace-o=
+bj-y) $(stub-obj-y))
+> >>> +libvhost-user.a-libs +=3D $(call extract-libs, $(libvhost-user-obj-y=
+) $(util-obj-y) $(stub-obj-y))
+> ..
+> >> Another thing I wonder about: the purpose of the .a files is to compile
+> >> all object files and only link those .o files needed by the program
+> >> (i.e. a subset of the .a file).
+> >=20
+> > I believe that what you are saying is that by passing the required libr=
+aries
+> > automatically, the binaries that use libqemuutil.a will inherit undesir=
+ed
+> > ldd dependencies. Indeed, a quick experiment shows that if you pass a -l
+> > option, the library dependency is recorded even if no symbol in that li=
+brary
+> > is used. I saw no obvious linker option to address that.
+>=20
+> There's --as-needed and --no-as-needed ld flag (used with cc as -Wl,--as-=
+needed),
+> which is designed for this very case.
 
-diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
-index 1ca292715e..385a1fa2bf 100644
---- a/include/sysemu/xen.h
-+++ b/include/sysemu/xen.h
-@@ -8,7 +8,15 @@
- #ifndef SYSEMU_XEN_H
- #define SYSEMU_XEN_H
- 
--#ifdef CONFIG_XEN
-+#ifdef NEED_CPU_H
-+# ifdef CONFIG_XEN
-+#  define CONFIG_XEN_IS_POSSIBLE
-+# endif
-+#else
-+# define CONFIG_XEN_IS_POSSIBLE
-+#endif
-+
-+#ifdef CONFIG_XEN_IS_POSSIBLE
- 
- bool xen_enabled(void);
- 
-@@ -18,7 +26,7 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-                    struct MemoryRegion *mr, Error **errp);
- #endif
- 
--#else /* !CONFIG_XEN */
-+#else /* !CONFIG_XEN_IS_POSSIBLE */
- 
- #define xen_enabled() 0
- #ifndef CONFIG_USER_ONLY
-@@ -33,6 +41,6 @@ static inline void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
- }
- #endif
- 
--#endif /* CONFIG_XEN */
-+#endif /* CONFIG_XEN_IS_POSSIBLE */
- 
- #endif
--- 
-2.21.3
+Nice, sounds like a solution. So -Wl,--as-needed should be at the end of
+the command-line followed by $(libqemuutil.a-libs).
 
+Stefan
+
+--CUfgB8w4ZwR/yMy5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8f+psACgkQnKSrs4Gr
+c8j3+ggAr+paS2hBMuERteeMuSyh6neYdFpJyC20YwWOVc26AGOyx1w0BToYEPwr
+CZwu3EQ4pPBtWhubgNiZiTL2nemSiUlev+fabW7NJy75YcmpvPodHvKYfl1HO/WK
+s7ufUnrLmur3qpUhFk+znjQRMioZOxkRDk4BZSyQPsIa4RzcXipDegwq9agH+xtl
+HpHHzJxrY3bv1PF2PI29w+2qPQGsnf6yB4t3fqU1Ae06uVFW+SBUO2EjZhv7buOs
+9r4Si9YNCeKK5cXxJ1I6ye2wW3+qQv+meqlqAs3EmYqO9nU5oM6PPwVVZ/XU19fa
+ses5wUJoBjG1f/tiHImg79NyiEX0DQ==
+=oX+k
+-----END PGP SIGNATURE-----
+
+--CUfgB8w4ZwR/yMy5--
 
