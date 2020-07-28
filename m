@@ -7,69 +7,71 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6E2C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 11:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C562CC433E5
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 11:37:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 977542065C
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 11:36:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 926C0206D4
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 11:37:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gliThXb1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 977542065C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EuTnwCPF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 926C0206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0Nub-0006sC-TE
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 07:36:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39674)
+	id 1k0NvX-0008ND-Qi
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 07:37:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k0NtS-0005cG-49
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 07:35:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42137
+ id 1k0Nty-0006K1-6D
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 07:36:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53666
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k0NtP-0002H3-P0
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 07:35:37 -0400
+ id 1k0Ntv-0002MB-6z
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 07:36:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1595936133;
+ s=mimecast20190719; t=1595936166;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=biCO1tIoW5FR2VBsAofJ7NQ4ssVcNdyZf1oahNpNN3w=;
- b=gliThXb150RcKit1ZHMHL4ewvSmX/gbKhnXHMf/qR7DucLKjCq0F3oOF+CGKX7+ziZJq6i
- 6BuIy30zRDodeQ5mMJLyVZpDXjI8vw6jznak/9zp+zmd3+5BS7OD0/6iLZt1nJqIQT3b9F
- dcwj/d2Hh9oU5dr5IPE87t6LwoG8U2U=
+ bh=wMqhzE+S9oR1YMXqhq1BnEaokUrYMTNG5WKLwVuwXRQ=;
+ b=EuTnwCPFKZObFGX5Om3G1YVJBtPl2pUPb81KvXdOW26nBELIEvHEUCusnBkd2pyMrpfs5k
+ cZR3EiGuyfD3vaQzs3ooeh5IvyDEsNkDK8YSbq3TevncphOx+XiGRQjrSnz50ynqg3zY1A
+ gruaUCjUPMMwghAQ0mGENLZcJQ+X25w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-S_bNUdgbNceMZ6retdF0Mg-1; Tue, 28 Jul 2020 07:35:31 -0400
-X-MC-Unique: S_bNUdgbNceMZ6retdF0Mg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-100-s3D4N8ewPheyXIWR0imDNw-1; Tue, 28 Jul 2020 07:36:04 -0400
+X-MC-Unique: s3D4N8ewPheyXIWR0imDNw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2F688064AF;
- Tue, 28 Jul 2020 11:35:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EA31102C848;
+ Tue, 28 Jul 2020 11:36:03 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.110.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C51C5DA33;
- Tue, 28 Jul 2020 11:35:25 +0000 (UTC)
-Date: Tue, 28 Jul 2020 12:35:22 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B24A60BF4;
+ Tue, 28 Jul 2020 11:35:58 +0000 (UTC)
+Date: Tue, 28 Jul 2020 12:35:55 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH v5 2/7] block/nbd.c: Add yank feature
-Message-ID: <20200728113522.GB3437398@redhat.com>
+Subject: Re: [PATCH v5 3/7] chardev/char-socket.c: Add yank feature
+Message-ID: <20200728113555.GC3437398@redhat.com>
 References: <cover.1592923201.git.lukasstraub2@web.de>
- <3971e5cdc40d18e16c499560e2bf3ac8e5e42e26.1592923201.git.lukasstraub2@web.de>
+ <f98dad765c275daa6b822eba1ad27f8ca74b35d3.1592923201.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-In-Reply-To: <3971e5cdc40d18e16c499560e2bf3ac8e5e42e26.1592923201.git.lukasstraub2@web.de>
+In-Reply-To: <f98dad765c275daa6b822eba1ad27f8ca74b35d3.1592923201.git.lukasstraub2@web.de>
 User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -108,15 +110,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 23, 2020 at 04:42:45PM +0200, Lukas Straub wrote:
-> Register a yank function which shuts down the socket and sets
-> s->state = NBD_CLIENT_QUIT. This is the same behaviour as if an
-> error occured.
+On Tue, Jun 23, 2020 at 04:42:48PM +0200, Lukas Straub wrote:
+> Register a yank function to shutdown the socket on yank.
 > 
 > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 > ---
->  block/nbd.c | 101 +++++++++++++++++++++++++++++++++-------------------
->  1 file changed, 64 insertions(+), 37 deletions(-)
+>  chardev/char-socket.c | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
