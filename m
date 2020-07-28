@@ -2,85 +2,83 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E12C433F1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B2FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DBCD2075D
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:27:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEEFC2075D
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 08:27:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="gSGX97x+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DBCD2075D
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ns2h7Dvp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEEFC2075D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0KxI-0005Ej-Sw
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 04:27:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49906)
+	id 1k0KxX-0005hg-1g
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 04:27:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1k0KwS-0003pq-5X
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:26:32 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33106)
+ id 1k0KwM-0003fg-1z
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:26:26 -0400
+Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:38427)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <zong.li@sifive.com>)
- id 1k0KwQ-0000ph-IK
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:26:31 -0400
-Received: by mail-pl1-x642.google.com with SMTP id t1so348306plq.0
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 01:26:30 -0700 (PDT)
+ id 1k0KwK-0000oW-8j
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 04:26:25 -0400
+Received: by mail-pg1-x533.google.com with SMTP id e8so11444327pgc.5
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 01:26:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=PMPZNC54WFXLzT2HiWdjfPndP8TkMz19Jn6EwJG2AFc=;
- b=gSGX97x+US9ilo8NDO3o9WZrYxXIJBLGGLMkAAULkK0jMmzqf7CAgTxLxm9DJbge1P
- QBSnKlY3R5N6NzbacQskOT3hRLuI0zE53t4hKWXWo7ZX6V1f2Wc5789ol+msOw+WYX+I
- V+cZSfvy1pccsBLhNZYFyXUfIDnOoI0y3wNIXg9QqJdxFojnUMsZD1mOIsfJt4USUpT5
- CMwp0NmjlX0yKWl83bzUXbRTn6HtxFUAl42333s63X7yEGMuSQBMui/fKkNNhADovPjI
- q7ZA38wZxI3R4LnxlwU6x/+vALD3PapPYq/KC83Kd28e6Jjbr4Vk2EZZMGzgFrgNCDE8
- 6BdQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=P7CEjkScGiX3F/aHH/ElgOi/6qZ/atlZLd1boZ9oeYs=;
+ b=ns2h7DvpJVu2lbvSd2+vRq5us9GZLWDF/B09iAuhT2pIctflpmBIBLp4ID+nybDRHo
+ KKC8WVVPy8soaEOEDBISIxF2EXKP34PhWtluBXJ39MYgEWiurpl2ZEd3gI/o6ZBhDdHB
+ LtPaABGR2iG+JfJoJl1VTLszSFSWMm+qPs7JUBZomUeNBD/2yBuCYkFkTj5gP9Y83qIg
+ YfcJO/UKYugl7zT/4FleWvaySzCKuQCv2DJiht+mLqodZqLSksdQE2tHi5QfYZ0+k5Az
+ UfzEUfSrzNcohGNg4467wCP3y2x64JkIfEn18wmH3ZIR+77taScychUUpZXCfHzdoVxt
+ /vmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=PMPZNC54WFXLzT2HiWdjfPndP8TkMz19Jn6EwJG2AFc=;
- b=e8pjgVtiksYS1Y7zqdEaZukmdsP3NmWqBEJolWPT8zIc6OBvfAyR0LoW0qz32IhKLu
- rEzKOOZ84rINvlKRP+OCavCnJgdU5YoyCP3tZ6thsjgyrfCAMCSb1HNsDR0aFjIXO+E7
- +RmBlL/P5P11VKbYTDt0qto8xAGRZ9prDYZVQzMK36nF/40wpBa87tBEyAlFbOswv9df
- 5D2jTJjOeK9EmZnV+zj8PEIJUUbr2RDyXabL08iAmJL7D37IB3/ueUxwa+uqfjpGNkPx
- wn3LVEzXWdFna1du9klrsAlHPug74q6XFWoSGepM0T7QTe8QhEeA7BzSwl+EDcIFzG1c
- GGGQ==
-X-Gm-Message-State: AOAM532HYe3oXFWAB0CzVocXTkPRz+h7rkvhmRW8PfW1rcXBwuhp+NR+
- kGggeAxDIt5AbQxg21oXnxCssg==
-X-Google-Smtp-Source: ABdhPJze6gyBY7ObJJbFhPylgZ8Z6i79vFvUiKZVgggDq+RZInxVraUNYrreGND5o0A17nc7SB4AGw==
-X-Received: by 2002:a17:90a:d42:: with SMTP id 2mr3328011pju.15.1595924789289; 
- Tue, 28 Jul 2020 01:26:29 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=P7CEjkScGiX3F/aHH/ElgOi/6qZ/atlZLd1boZ9oeYs=;
+ b=nO7ia/wFj0YdXLusPw9ymUTcE1xwsjvmRFFhthvMOer8HrN01jtWB0JhdZHJ/66g/y
+ RtsKCHBrVWz0We377p+zYSnhMvaFRgBLYlLL2nURTOqhDRAn7/4d31yJWdd4u8ZEkpWq
+ tK2fxJ2vDFQFCeFfIjejapzZiFZ+7QSj4gxXkWL4bynf2hP+USSRkERkfvzWxbkdQdDZ
+ Zh14beW5La+jbdMTmyE3+wsTPoY3AcnU7iHJf+81vWnuAAyCsmKjsrvcR3B3mDlHbSvB
+ CH1KTFcGhz7eSNc5TmRoBU1Fd1anqx2Z/42KB0U8D7AmToXCQDD2aXNirBPAoBJ33/Zr
+ G2jQ==
+X-Gm-Message-State: AOAM533e96BoauWI7To51Qh7SeoY09Sw+Z1KNjvCPVP3gKMz+j8PSoDP
+ 8OBqddaWT8s2bQG2eE7556JMZw==
+X-Google-Smtp-Source: ABdhPJx1phqc7k2CDwDk3l4K3ALQQ6uZKBZXxxXcTBFx+tD9rPTG3i8oTCesaUc4TzgR6FzMM+pzEw==
+X-Received: by 2002:a62:6dc7:: with SMTP id i190mr23993096pfc.16.1595924782806; 
+ Tue, 28 Jul 2020 01:26:22 -0700 (PDT)
 Received: from hsinchu02.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id h2sm17599747pfk.93.2020.07.28.01.26.27
+ by smtp.gmail.com with ESMTPSA id h2sm17599747pfk.93.2020.07.28.01.26.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Jul 2020 01:26:28 -0700 (PDT)
+ Tue, 28 Jul 2020 01:26:22 -0700 (PDT)
 From: Zong Li <zong.li@sifive.com>
 To: palmer@dabbelt.com, Alistair.Francis@wdc.com, bmeng.cn@gmail.com,
  sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
  qemu-riscv@nongnu.org, qemu-devel@nongnu.org
-Subject: [PATCH v6 3/4] target/riscv: Fix the translation of physical address
-Date: Tue, 28 Jul 2020 16:26:16 +0800
-Message-Id: <370a983d0f9e8a9a927b9bb8af5e7bc84b1bf9b1.1595924470.git.zong.li@sifive.com>
+Subject: [PATCH v6 0/4] Fix some PMP implementations
+Date: Tue, 28 Jul 2020 16:26:13 +0800
+Message-Id: <cover.1595924470.git.zong.li@sifive.com>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <cover.1595924470.git.zong.li@sifive.com>
-References: <cover.1595924470.git.zong.li@sifive.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=zong.li@sifive.com; helo=mail-pl1-x642.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::533;
+ envelope-from=zong.li@sifive.com; helo=mail-pg1-x533.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,40 +105,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The real physical address should add the 12 bits page offset. It also
-causes the PMP wrong checking due to the minimum granularity of PMP is
-4 byte, but we always get the physical address which is 4KB alignment,
-that means, we always use the start address of the page to check PMP for
-all addresses which in the same page.
+This patch set contains the fixes for wrong index of pmpcfg CSR on rv64,
+and the pmp range in CSR function table. After 3rd version of this patch
+series, we also fix the PMP issues such as wrong physical address
+translation and wrong ignoring PMP checking.
 
-Signed-off-by: Zong Li <zong.li@sifive.com>
----
- target/riscv/cpu_helper.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Changed in v6:
+ - Mask low 12 bits of return value of riscv_cpu_get_phys_page_debug.
+   Suggested by Alistair Francis.
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 75d2ae3434..2f337e418c 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -543,7 +543,8 @@ restart:
-             /* for superpage mappings, make a fake leaf PTE for the TLB's
-                benefit. */
-             target_ulong vpn = addr >> PGSHIFT;
--            *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
-+            *physical = ((ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT) |
-+                        (addr & ~TARGET_PAGE_MASK);
- 
-             /* set permissions on the TLB entry */
-             if ((pte & PTE_R) || ((pte & PTE_X) && mxr)) {
-@@ -630,7 +631,7 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-         }
-     }
- 
--    return phys_addr;
-+    return phys_addr & TARGET_PAGE_MASK;
- }
- 
- void riscv_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
+Changed in v5:
+ - Pick the suggestion which was lost in last version.
+
+Changed in v4:
+ - Refine the implementation. Suggested by Bin Meng.
+ - Add fix for PMP checking was ignored.
+
+Changed in v3:
+ - Refine the implementation. Suggested by Bin Meng.
+ - Add fix for wrong physical address translation.
+
+Changed in v2:
+ - Move out the shifting operation from loop. Suggested by Bin Meng.
+
+Zong Li (4):
+  target/riscv: Fix the range of pmpcfg of CSR funcion table
+  target/riscv/pmp.c: Fix the index offset on RV64
+  target/riscv: Fix the translation of physical address
+  target/riscv: Change the TLB page size depends on PMP entries.
+
+ target/riscv/cpu_helper.c | 15 +++++++---
+ target/riscv/csr.c        |  2 +-
+ target/riscv/pmp.c        | 63 ++++++++++++++++++++++++++++++++++++++-
+ target/riscv/pmp.h        |  2 ++
+ 4 files changed, 76 insertions(+), 6 deletions(-)
+
 -- 
 2.27.0
 
