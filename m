@@ -2,89 +2,107 @@ Return-Path: <SRS0=L+nc=BH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E57BBC433EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A575C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:59:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EC902053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A8CA2074F
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 Jul 2020 16:59:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AHXuQnTZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EC902053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fOC5miKn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A8CA2074F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0SuQ-0007Ig-VI
-	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 12:56:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45908)
+	id 1k0Swe-0000dV-Ij
+	for qemu-devel@archiver.kernel.org; Tue, 28 Jul 2020 12:59:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1k0Std-0006sg-I9
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:56:09 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:37973)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
- id 1k0Stb-0007rm-32
- for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:56:09 -0400
-Received: by mail-lj1-x241.google.com with SMTP id x9so21924221ljc.5
- for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 09:56:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=nvn7R6SfJtyV8QqDR0pA0+ttW8Cfh2YydDiV0z9ajHU=;
- b=AHXuQnTZYngCF+j3hzTtP/XnQOb1JABoDvU9C8CuJ1v8nZHiCQbLqSnH7n8UYXmoKF
- mjyXoAIgidNXWzu+vUp8ibX9Cb+V9JDfihxSZLVqnEKXU46L/61HXCtqs/dUkJ254Ik3
- PU2wES9tNH2BLGxnsvGARKGsKa3kNdtIAL1gniEpColTMKfAcVQpnCCp2PShNaNo0gHo
- QsvJLnUlGc9DhINs6lh5Pl2jOAGTIl1DTHB4Af9L8m8d39/u3r89n1qvxEhkHi8h5/ot
- dB3rNPu3mqFtsYlAhKdkPBnNt8iW3yNU7Bl8GrMDPdALjxfkKB7LIkaaHMrkeXzlM8pX
- 62rA==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k0Svu-0008D9-Tn
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:58:30 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49610
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k0Svt-00088L-5K
+ for qemu-devel@nongnu.org; Tue, 28 Jul 2020 12:58:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1595955507;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=boTmbFwOx6jY1sJGsQU6oAsDMrcnfqRPBEOAdSH2vVo=;
+ b=fOC5miKnD1en5N/Rqx5xXp1jUgDq35BHoySiN1e36fPgetrQlzsCFffXL0xYQakVWRtO8S
+ 7/581eGqUSCUtT0BXADm9bLcatlgb+EfY3wQ1uJffxy4l1EJWMy1xvoAIAoSFAlYpDU3Re
+ QXriWUNY/OMW3nr1lltqYEpXhZNW8Ps=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-jjaMYpZcPJ6q3m9I1jzgAQ-1; Tue, 28 Jul 2020 12:58:25 -0400
+X-MC-Unique: jjaMYpZcPJ6q3m9I1jzgAQ-1
+Received: by mail-wm1-f70.google.com with SMTP id b13so56812wme.9
+ for <qemu-devel@nongnu.org>; Tue, 28 Jul 2020 09:58:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=nvn7R6SfJtyV8QqDR0pA0+ttW8Cfh2YydDiV0z9ajHU=;
- b=frOI82b6gzTNmWag6k1bY8fT9ElAndJPSSBKY+NzHcp92m58PvvHbrhfytKlyestoa
- 8kAk7Gr5v9OtX6j4DJY2gqnF0YGWlEZFpdQWf0d/mTsWY29Zjzk/f8D7H+VqYD3tqKtK
- FAgVVaa9k3QVs36szj3YVgAwwdcqLLbpNTxfLAFe7gawCTgAmzif4aQOntmw0OCKEu5x
- nSHeaf3aTv3Wbjg+Sssmrv6XL1Ox7EP7ZEGkUpVxiQqX8f2OY98snvmFPRkYiWBP4tjy
- deGgvMN8qC92YKa1G1IJGfwRd9KkWTXsa5DIVCE5i7czzd4L2cBwpnWErPdVJPob0miu
- kyDA==
-X-Gm-Message-State: AOAM531wT0eHA792aUXRAmtxYRTRessT9x+SXl+/whAo18NRzhSs78gK
- QJc0i/ED9eGKPhWuYTfPCRU4fmQaK6UU087wwQo=
-X-Google-Smtp-Source: ABdhPJwJob31tBR4OpY6S7Pi9V85ygJy6L2Sl6RQn96MAIGtzhpOtpM3StTq80SBJ1vBnW1gmRsrGHuytwOzYCJa1+E=
-X-Received: by 2002:a2e:908a:: with SMTP id l10mr5329745ljg.409.1595955364151; 
- Tue, 28 Jul 2020 09:56:04 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=boTmbFwOx6jY1sJGsQU6oAsDMrcnfqRPBEOAdSH2vVo=;
+ b=FxeepPAUPzhQw955ckQvaIbB1d2qmhgIBTTfqwH01Rqsi//S5VywJ5Di2tmlUJyFfc
+ j4LJ4GFrjtmx+/nrRAVxZCv53pHydr/1e3XNbuBucemiVqK+e0WlGvQA9He8wvVSHwjK
+ 5lukCJFqvrLH+dpk/7LJZbeHOgRyzlvIUIacwtsouTFc+xllL/4pU45PPMhBETE9Luwa
+ kl+of5phVvLiGKIpvpA98sNVaU26FlBs5VbrfnRNlRQUhDE07OsNLO+Ku3FJuxJT5KHx
+ MyaA4QxpEwU5LYK6GXfpzdsWp6DcGa++cbGZnZtpwt0w0bAfkZtCUT98Bq0Xv2e0+IO+
+ goMQ==
+X-Gm-Message-State: AOAM533inR1lFewL8HNSP/sQtzK4wZkeYfBvLgvPmzrNeOR12M/j7x/y
+ UkeNHurc7SZkrxXeMAhFKMcwyXmswWViDNMxtMW2q/Go1scfT4xM9kxGh9ZahstsSI/M/ZVw+kf
+ ZVKkIFpg70ffjYKg=
+X-Received: by 2002:a1c:9cd4:: with SMTP id f203mr5003357wme.155.1595955504234; 
+ Tue, 28 Jul 2020 09:58:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx0iZlTuVg7LvsZAhRsaOGQ/KgHhzfxFkZVAFhWTRTfFvyf24zdDNP2AxjPZ0BEukq0Tv3NGQ==
+X-Received: by 2002:a1c:9cd4:: with SMTP id f203mr5003342wme.155.1595955503998; 
+ Tue, 28 Jul 2020 09:58:23 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.170.5])
+ by smtp.gmail.com with ESMTPSA id m126sm5254928wmf.3.2020.07.28.09.58.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 28 Jul 2020 09:58:23 -0700 (PDT)
+Subject: Re: [PATCH v1 1/2] qemu-timer: gracefully handle the end of time
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200728141005.28664-1-alex.bennee@linaro.org>
+ <20200728141005.28664-2-alex.bennee@linaro.org>
+ <f48c70d8-b506-e86c-e0dd-9e0ed2db3d91@redhat.com> <87o8nz39mt.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <859f63e1-684a-f8b8-22a5-770f6cbb150f@redhat.com>
+Date: Tue, 28 Jul 2020 18:58:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200716103921.6605-1-ahmedkhaledkaraman@gmail.com>
- <20200716103921.6605-3-ahmedkhaledkaraman@gmail.com>
- <CAHiYmc7fWTVv7jvF6716nuXzHZ+BrSQS+eQAemoCg=1T2h_9Xw@mail.gmail.com>
-In-Reply-To: <CAHiYmc7fWTVv7jvF6716nuXzHZ+BrSQS+eQAemoCg=1T2h_9Xw@mail.gmail.com>
-From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Date: Tue, 28 Jul 2020 18:55:28 +0200
-Message-ID: <CALTWKrVqYfrOUJQWNBhTNmwh_jB1ysV+nbf7==bSveovh9hSKA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] scripts/performance: Add list_helpers.py script
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <87o8nz39mt.fsf@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 11:04:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,355 +115,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ldoktor@redhat.com" <ldoktor@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>,
- "crosa@redhat.com" <crosa@redhat.com>,
- "alex.bennee@linaro.org" <alex.bennee@linaro.org>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: pavel.dovgaluk@ispras.ru, boost.lists@gmail.com, qemu-devel@nongnu.org,
+ victor.clement@openwide.fr, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 28, 2020 at 12:30 PM Aleksandar Markovic
-<aleksandar.qemu.devel@gmail.com> wrote:
->
->
->
-> On Thursday, July 16, 2020, Ahmed Karaman <ahmedkhaledkaraman@gmail.com> =
-wrote:
+On 28/07/20 18:08, Alex Bennée wrote:
+> 
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+>> On 28/07/20 16:10, Alex Bennée wrote:
+>>> +    /*
+>>> +     * Check to see if we have run out of time. Most of our time
+>>> +     * sources are nanoseconds since epoch (some time around the fall
+>>> +     * of Babylon 5, the start of the Enterprises five year mission
+>>> +     * and just before the arrival of the great evil ~ 2262CE).
+>>> +     * Although icount based time is ns since the start of emulation
+>>> +     * it is able to skip forward if the device is sleeping (think IoT
+>>> +     * device with a very long heartbeat). Either way we don't really
+>>> +     * handle running out of time so lets catch it and report it here.
+>>> +     */
+>>> +    if (current_time == INT64_MAX) {
+>>> +        qemu_handle_outa_time();
+>>> +        goto out;
+>>> +    }
+>>> +
 >>
->> Python script that prints executed helpers of a QEMU invocation.
->>
->
-> Hi, Ahmed.
->
-> You outlined the envisioned user workflow regarding this script in your r=
-eport. As I understand it, it generally goes like this:
->
-> 1) The user first discovers helpers, and their performance data.
-> 2) The user examines the callees of a particular helper of choice (usuall=
-y, the most instruction-consuming helper).
-> 3) The user perhaps further examines a callee of a particular callee of t=
-he particular helper.
-> 4) The user continues this way until the conclusion can be drawn, or maxi=
-mal depth is reached.
->
-> The procedure might be time consuming since each step requires running an=
- emulation of the test program.
->
-> This makes me think that the faster and easier tool for the user (but, to=
- some, not that great, extent, harder for you) would be improved list_helpe=
-rs.py (and list_fn_calees.py) that provides list of all callees for all hel=
-pers, in the tree form (so, callees of callees, callees of callees of calle=
-es, etc.), rather than providing just a list of immediate callees, like it =
-currently does.
->
-> I think you can provide such functionality relatively easily using recurs=
-ion. See, let's say:
->
-> https://realpython.com/python-thinking-recursively/
->
-> Perhaps you can have a switch (let's say, --tree <yes|no>) that specifies=
- whether the script outputs just immediate callee list, or entire callee tr=
-ee.
+>> Doing this here is a bit dangerous, I'd rather do nothing here and
+>> detect the situation in cpus.c where we can do
+>> qemu_system_shutdown_request() (and also do nothing).
+> 
+> You mean in notify_aio_contexts()? Sure we can do that.
 
-I have to say, this is a very nice suggestion. I will start working on it!
+Yes, that would work.  I think qemu_clock_deadline_ns_all would already
+return -1 so that you'd have a zero-instruction budget from
+tcg_get_icount_limit.
 
->
-> Thanks,
-> Aleksandar
->
->>
->> Syntax:
->> list_helpers.py [-h] -- \
->>                <qemu executable> [<qemu executable options>] \
->>                <target executable> [<target executable options>]
->>
->> [-h] - Print the script arguments help message.
->>
->> Example of usage:
->> list_helpers.py -- qemu-mips coulomb_double-mips -n10
->>
->> Example output:
->>  Total number of instructions: 108,933,695
->>
->>  Executed QEMU Helpers:
->>
->>  No. Ins     Percent  Calls Ins/Call Helper Name             Source File
->>  --- ------- ------- ------ -------- --------------------    -----------=
-----
->>    1 183,021  0.168%  1,305      140 helper_float_sub_d      <qemu>/targ=
-et/mips/fpu_helper.c
->>    2 177,111  0.163%    770      230 helper_float_madd_d     <qemu>/targ=
-et/mips/fpu_helper.c
->>    3 171,537  0.157%  1,014      169 helper_float_mul_d      <qemu>/targ=
-et/mips/fpu_helper.c
->>    4 157,298  0.144%  2,443       64 helper_lookup_tb_ptr    <qemu>/acce=
-l/tcg/tcg-runtime.c
->>    5 138,123  0.127%    897      153 helper_float_add_d      <qemu>/targ=
-et/mips/fpu_helper.c
->>    6  47,083  0.043%    207      227 helper_float_msub_d     <qemu>/targ=
-et/mips/fpu_helper.c
->>    7  24,062  0.022%    487       49 helper_cmp_d_lt         <qemu>/targ=
-et/mips/fpu_helper.c
->>    8  22,910  0.021%    150      152 helper_float_div_d      <qemu>/targ=
-et/mips/fpu_helper.c
->>    9  15,497  0.014%    321       48 helper_cmp_d_eq         <qemu>/targ=
-et/mips/fpu_helper.c
->>   10   9,100  0.008%     52      175 helper_float_trunc_w_d  <qemu>/targ=
-et/mips/fpu_helper.c
->>   11   7,059  0.006%     10      705 helper_float_sqrt_d     <qemu>/targ=
-et/mips/fpu_helper.c
->>   12   3,000  0.003%     40       75 helper_cmp_d_ule        <qemu>/targ=
-et/mips/fpu_helper.c
->>   13   2,720  0.002%     20      136 helper_float_cvtd_w     <qemu>/targ=
-et/mips/fpu_helper.c
->>   14   2,477  0.002%     27       91 helper_swl              <qemu>/targ=
-et/mips/op_helper.c
->>   15   2,000  0.002%     40       50 helper_cmp_d_le         <qemu>/targ=
-et/mips/fpu_helper.c
->>   16   1,800  0.002%     40       45 helper_cmp_d_un         <qemu>/targ=
-et/mips/fpu_helper.c
->>   17   1,164  0.001%     12       97 helper_raise_exception_ <qemu>/targ=
-et/mips/op_helper.c
->>   18     720  0.001%     10       72 helper_cmp_d_ult        <qemu>/targ=
-et/mips/fpu_helper.c
->>   19     560  0.001%    140        4 helper_cfc1             <qemu>/targ=
-et/mips/fpu_helper.c
->>
->> Signed-off-by: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
->> ---
->>  scripts/performance/list_helpers.py | 207 ++++++++++++++++++++++++++++
->>  1 file changed, 207 insertions(+)
->>  create mode 100755 scripts/performance/list_helpers.py
->>
->> diff --git a/scripts/performance/list_helpers.py b/scripts/performance/l=
-ist_helpers.py
->> new file mode 100755
->> index 0000000000..a97c7ed4fe
->> --- /dev/null
->> +++ b/scripts/performance/list_helpers.py
->> @@ -0,0 +1,207 @@
->> +#!/usr/bin/env python3
->> +
->> +#  Print the executed helpers of a QEMU invocation.
->> +#
->> +#  Syntax:
->> +#  list_helpers.py [-h] -- \
->> +#                 <qemu executable> [<qemu executable options>] \
->> +#                 <target executable> [<target executable options>]
->> +#
->> +#  [-h] - Print the script arguments help message.
->> +#
->> +#  Example of usage:
->> +#  list_helpers.py -- qemu-mips coulomb_double-mips
->> +#
->> +#  This file is a part of the project "TCG Continuous Benchmarking".
->> +#
->> +#  Copyright (C) 2020  Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
->> +#  Copyright (C) 2020  Aleksandar Markovic <aleksandar.qemu.devel@gmail=
-.com>
->> +#
->> +#  This program is free software: you can redistribute it and/or modify
->> +#  it under the terms of the GNU General Public License as published by
->> +#  the Free Software Foundation, either version 2 of the License, or
->> +#  (at your option) any later version.
->> +#
->> +#  This program is distributed in the hope that it will be useful,
->> +#  but WITHOUT ANY WARRANTY; without even the implied warranty of
->> +#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
->> +#  GNU General Public License for more details.
->> +#
->> +#  You should have received a copy of the GNU General Public License
->> +#  along with this program. If not, see <https://www.gnu.org/licenses/>=
-.
->> +
->> +import argparse
->> +import os
->> +import subprocess
->> +import sys
->> +import tempfile
->> +
->> +
->> +def find_JIT_line(callgrind_data):
->> +    """
->> +    Search for the line with the JIT call in the callgrind_annotate
->> +    output when ran using --tre=3Dcalling.
->> +    All the helpers should be listed after that line.
->> +
->> +    Parameters:
->> +    callgrind_data (list): callgrind_annotate output
->> +
->> +    Returns:
->> +    (int): Line number of JIT call
->> +    """
->> +    line =3D -1
->> +    for i in range(len(callgrind_data)):
->> +        split_line =3D callgrind_data[i].split()
->> +        if len(split_line) > 2 and \
->> +                split_line[1] =3D=3D "*" and \
->> +                split_line[-1] =3D=3D "[???]":
->> +            line =3D i
->> +            break
->> +    return line
->> +
->> +
->> +def get_helpers(JIT_line, callgrind_data):
->> +    """
->> +    Get all helpers data given the line number of the JIT call.
->> +
->> +    Parameters:
->> +    JIT_line (int): Line number of the JIT call
->> +    callgrind_data (list): callgrind_annotate output
->> +
->> +    Returns:
->> +    (list):[[number_of_instructions(int), helper_name(str),
->> +             number_of_calls(int), source_file(str)]]
->> +    """
->> +    helpers =3D []
->> +    next_helper =3D JIT_line + 1
->> +    while (callgrind_data[next_helper] !=3D "\n"):
->> +        split_line =3D callgrind_data[next_helper].split()
->> +        number_of_instructions =3D int(split_line[0].replace(",", ""))
->> +        source_file =3D split_line[2].split(":")[0]
->> +        callee_name =3D split_line[2].split(":")[1]
->> +        number_of_calls =3D int(split_line[3][1:-2])
->> +        helpers.append([number_of_instructions, callee_name,
->> +                        number_of_calls, source_file])
->> +        next_helper +=3D 1
->> +    return sorted(helpers, reverse=3DTrue)
->> +
->> +
->> +def main():
->> +    # Parse the command line arguments
->> +    parser =3D argparse.ArgumentParser(
->> +        usage=3D"list_helpers.py [-h] -- "
->> +        "<qemu executable> [<qemu executable options>] "
->> +        "<target executable> [<target executable options>]")
->> +
->> +    parser.add_argument("command", type=3Dstr, nargs=3D"+", help=3Dargp=
-arse.SUPPRESS)
->> +
->> +    args =3D parser.parse_args()
->> +
->> +    # Extract the needed variables from the args
->> +    command =3D args.command
->> +
->> +    # Insure that valgrind is installed
->> +    check_valgrind =3D subprocess.run(
->> +        ["which", "valgrind"], stdout=3Dsubprocess.DEVNULL)
->> +    if check_valgrind.returncode:
->> +        sys.exit("Please install valgrind before running the script.")
->> +
->> +    # Save all intermediate files in a temporary directory
->> +    with tempfile.TemporaryDirectory() as tmpdirname:
->> +        # callgrind output file path
->> +        data_path =3D os.path.join(tmpdirname, "callgrind.data")
->> +        # callgrind_annotate output file path
->> +        annotate_out_path =3D os.path.join(tmpdirname, "callgrind_annot=
-ate.out")
->> +
->> +        # Run callgrind
->> +        callgrind =3D subprocess.run((["valgrind",
->> +                                     "--tool=3Dcallgrind",
->> +                                     "--callgrind-out-file=3D" + data_p=
-ath]
->> +                                    + command),
->> +                                   stdout=3Dsubprocess.DEVNULL,
->> +                                   stderr=3Dsubprocess.PIPE)
->> +        if callgrind.returncode:
->> +            sys.exit(callgrind.stderr.decode("utf-8"))
->> +
->> +        # Save callgrind_annotate output
->> +        with open(annotate_out_path, "w") as output:
->> +            callgrind_annotate =3D subprocess.run(
->> +                ["callgrind_annotate", data_path,
->> +                    "--threshold=3D100", "--tree=3Dcalling"],
->> +                stdout=3Doutput,
->> +                stderr=3Dsubprocess.PIPE)
->> +            if callgrind_annotate.returncode:
->> +                sys.exit(callgrind_annotate.stderr.decode("utf-8"))
->> +
->> +        # Read the callgrind_annotate output to callgrind_data[]
->> +        callgrind_data =3D []
->> +        with open(annotate_out_path, "r") as data:
->> +            callgrind_data =3D data.readlines()
->> +
->> +        # Line number with the total number of instructions
->> +        total_instructions_line_number =3D 20
->> +        # Get the total number of instructions
->> +        total_instructions_line_data =3D \
->> +            callgrind_data[total_instructions_line_number]
->> +        total_instructions =3D total_instructions_line_data.split()[0]
->> +
->> +        print("Total number of instructions: {}\n".format(total_instruc=
-tions))
->> +
->> +        # Remove commas and convert to int
->> +        total_instructions =3D int(total_instructions.replace(",", ""))
->> +
->> +        # Line number with the JIT call
->> +        JIT_line =3D find_JIT_line(callgrind_data)
->> +        if JIT_line =3D=3D -1:
->> +            sys.exit("Couldn't locate the JIT call ... Exiting")
->> +
->> +        # Get helpers
->> +        helpers =3D get_helpers(JIT_line, callgrind_data)
->> +
->> +        print("Executed QEMU Helpers:\n")
->> +
->> +        # Print table header
->> +        print("{:>4}  {:>15}  {:>10}  {:>15}  {:>10}  {:<25}  {}".
->> +              format(
->> +                  "No.",
->> +                  "Instructions",
->> +                  "Percentage",
->> +                  "Calls",
->> +                  "Ins/Call",
->> +                  "Helper Name",
->> +                  "Source File")
->> +              )
->> +
->> +        print("{:>4}  {:>15}  {:>10}  {:>15}  {:>10}  {:<25}  {}".
->> +              format(
->> +                  "-" * 4,
->> +                  "-" * 15,
->> +                  "-" * 10,
->> +                  "-" * 15,
->> +                  "-" * 10,
->> +                  "-" * 25,
->> +                  "-" * 30)
->> +              )
->> +
->> +        for (index, callee) in enumerate(helpers, start=3D1):
->> +            instructions =3D callee[0]
->> +            percentage =3D (callee[0] / total_instructions) * 100
->> +            calls =3D callee[2]
->> +            instruction_per_call =3D int(callee[0] / callee[2])
->> +            helper_name =3D callee[1]
->> +            source_file =3D callee[3]
->> +            # Print extracted data
->> +            print("{:>4}  {:>15}  {:>9.3f}%  {:>15}  {:>10}  {:<25}  {}=
-".
->> +                  format(
->> +                      index,
->> +                      format(instructions, ","),
->> +                      round(percentage, 3),
->> +                      format(calls, ","),
->> +                      format(instruction_per_call, ","),
->> +                      helper_name,
->> +                      source_file)
->> +                  )
->> +
->> +
->> +if __name__ =3D=3D "__main__":
->> +    main()
->> --
->> 2.17.1
->>
+Paolo
 
-Best regards,
-Ahmed Karaman
 
