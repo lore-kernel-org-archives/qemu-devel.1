@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A13C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CCEC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:13:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63C102075D
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:13:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EC232075D
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:13:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="XAxFTAWg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63C102075D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="yzfaZoJe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EC232075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0uKU-0001le-Ch
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:13:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53930)
+	id 1k0uKX-0001rb-FU
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:13:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1k0uED-0007ix-Hb; Wed, 29 Jul 2020 18:07:13 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:34780)
+ id 1k0uDq-0006r3-Fn; Wed, 29 Jul 2020 18:06:50 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:34720)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1k0uEB-00005r-1D; Wed, 29 Jul 2020 18:07:13 -0400
+ id 1k0uDo-0008VQ-Jn; Wed, 29 Jul 2020 18:06:50 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 56562BFD4E;
- Wed, 29 Jul 2020 22:06:47 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id A934EBFB31;
+ Wed, 29 Jul 2020 22:06:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
- s=default; t=1596060407;
- bh=In+W9d6jq8FcrhxR45in/yXcS+6CaDfCmR2mUITM45E=;
+ s=default; t=1596060405;
+ bh=36KolzdIFQtbbT6iYuN8iBHW7GoHLWnrJfB04X+Vqy0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=XAxFTAWgIbmvYoAbn5Y67cJvfY33jUZryb8bUnABmLeZdp0zIv9vTkDof+dZNXwpk
- pafsSPrJWt/xGVGZ0USX7NIvHYZO61l9Kt8KQAbYHf461duuC5fiv7g+FTaTDYBiq+
- 76GisOYmHLqLFeBTXD1rAMolYcLtaXUgsb/nSOezsJ9hQPYNqYRU5UdihdDfkm0V05
- oUJPP+ceDewbBK8eFW9lLCGtFxc/uXWAnKoxuTrFvTL9MUqfx2wkf/MbCvep4OsNec
- ElrXKueoLfOVk/hI6PO7CJZ6vbquC1y0PKpO4hAt7MKhwEpRw6X+G+nMKB4bKAkJzT
- JP7FiTukfhqaw==
+ b=yzfaZoJet0EW/Ng3tOfsFlIVGVLuBuqEgCIXBTS1+oZf4PTtqOJe7l6plPIge8DEu
+ tG6++IbuEzi2ghDL9hkogBHgfwdBohLdBT8OQKN91rpNuTqNdl/hHJyYzy2AATlWFl
+ 9malE190aqTx5Lz9eXS2USrlz/MN4bl01xxqsSYlVbJ2Y0ZJqgLdh/anmSg+3HhVFn
+ Kz+9tQBPCiZ+ZO/ORHv8zS40cdf8OKPjtAXGE2bzSSegfegxv+hrEQL0h/G/OhQWbw
+ diMq3dSHQ6k2SMuhJ8Zd8VFBHx993nCfu1SiYP87ccpJrJfWTLI4RWASWkUSO37MoI
+ OixhyetC4FxYg==
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 11/16] hw/block/nvme: add check for mdts
-Date: Thu, 30 Jul 2020 00:06:33 +0200
-Message-Id: <20200729220638.344477-12-its@irrelevant.dk>
+Subject: [PATCH v2 05/16] hw/block/nvme: destroy request iov before reuse
+Date: Thu, 30 Jul 2020 00:06:27 +0200
+Message-Id: <20200729220638.344477-6-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200729220638.344477-1-its@irrelevant.dk>
 References: <20200729220638.344477-1-its@irrelevant.dk>
@@ -90,125 +90,29 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Add 'mdts' device parameter to control the Maximum Data Transfer Size of
-the controller and check that it is respected.
+Make sure the request iov is destroyed before reuse; fixing a memory
+leak.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
 ---
- hw/block/nvme.c       | 30 +++++++++++++++++++++++++++++-
- hw/block/nvme.h       |  1 +
- hw/block/trace-events |  1 +
- 3 files changed, 31 insertions(+), 1 deletion(-)
+ hw/block/nvme.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index c35b35ed41c4..60034ea62ca8 100644
+index a9d9a2912655..8f8257e06eed 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -20,7 +20,8 @@
-  *      -device nvme,drive=<drive_id>,serial=<serial>,id=<id[optional]>, \
-  *              cmb_size_mb=<cmb_size_mb[optional]>, \
-  *              [pmrdev=<mem_backend_file_id>,] \
-- *              max_ioqpairs=<N[optional]>
-+ *              max_ioqpairs=<N[optional]>, \
-+ *              mdts=<N[optional]>
-  *
-  * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
-  * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-@@ -555,6 +556,17 @@ static void nvme_clear_events(NvmeCtrl *n, uint8_t event_type)
+@@ -554,6 +554,10 @@ static void nvme_rw_cb(void *opaque, int ret)
+     if (req->qsg.nalloc) {
+         qemu_sglist_destroy(&req->qsg);
      }
++    if (req->iov.nalloc) {
++        qemu_iovec_destroy(&req->iov);
++    }
++
+     nvme_enqueue_req_completion(cq, req);
  }
  
-+static inline uint16_t nvme_check_mdts(NvmeCtrl *n, size_t len)
-+{
-+    uint8_t mdts = n->params.mdts;
-+
-+    if (mdts && len > n->page_size << mdts) {
-+        return NVME_INVALID_FIELD | NVME_DNR;
-+    }
-+
-+    return NVME_SUCCESS;
-+}
-+
- static inline uint16_t nvme_check_bounds(NvmeCtrl *n, NvmeNamespace *ns,
-                                          uint64_t slba, uint32_t nlb)
- {
-@@ -648,6 +660,13 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
- 
-     trace_pci_nvme_rw(is_write ? "write" : "read", nlb, data_size, slba);
- 
-+    status = nvme_check_mdts(n, data_size);
-+    if (status) {
-+        trace_pci_nvme_err_mdts(nvme_cid(req), data_size);
-+        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
-+        return status;
-+    }
-+
-     status = nvme_check_bounds(n, ns, slba, nlb);
-     if (status) {
-         trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
-@@ -941,6 +960,7 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-     uint32_t numdl, numdu;
-     uint64_t off, lpol, lpou;
-     size_t   len;
-+    uint16_t status;
- 
-     numdl = (dw10 >> 16);
-     numdu = (dw11 & 0xffff);
-@@ -956,6 +976,12 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
- 
-     trace_pci_nvme_get_log(nvme_cid(req), lid, lsp, rae, len, off);
- 
-+    status = nvme_check_mdts(n, len);
-+    if (status) {
-+        trace_pci_nvme_err_mdts(nvme_cid(req), len);
-+        return status;
-+    }
-+
-     switch (lid) {
-     case NVME_LOG_ERROR_INFO:
-         return nvme_error_info(n, cmd, rae, len, off, req);
-@@ -2284,6 +2310,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     id->ieee[0] = 0x00;
-     id->ieee[1] = 0x02;
-     id->ieee[2] = 0xb3;
-+    id->mdts = n->params.mdts;
-     id->ver = cpu_to_le32(NVME_SPEC_VER);
-     id->oacs = cpu_to_le16(0);
- 
-@@ -2403,6 +2430,7 @@ static Property nvme_props[] = {
-     DEFINE_PROP_UINT16("msix_qsize", NvmeCtrl, params.msix_qsize, 65),
-     DEFINE_PROP_UINT8("aerl", NvmeCtrl, params.aerl, 3),
-     DEFINE_PROP_UINT32("aer_max_queued", NvmeCtrl, params.aer_max_queued, 64),
-+    DEFINE_PROP_UINT8("mdts", NvmeCtrl, params.mdts, 7),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 5519b5cc7686..137cd8c2bf20 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -11,6 +11,7 @@ typedef struct NvmeParams {
-     uint32_t cmb_size_mb;
-     uint8_t  aerl;
-     uint32_t aer_max_queued;
-+    uint8_t  mdts;
- } NvmeParams;
- 
- typedef struct NvmeAsyncEvent {
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index f20c59a4b542..82c123230780 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -85,6 +85,7 @@ pci_nvme_mmio_shutdown_set(void) "shutdown bit set"
- pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
- 
- # nvme traces for error conditions
-+pci_nvme_err_mdts(uint16_t cid, size_t len) "cid %"PRIu16" len %"PRIu64""
- pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
- pci_nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null or not page aligned: 0x%"PRIx64""
- pci_nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x%"PRIx64""
 -- 
 2.27.0
 
