@@ -2,72 +2,91 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0881BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 19:03:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC4BCC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 19:06:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9B972082E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 19:03:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8FC82075F
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 19:06:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="C9aaTxni"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9B972082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dxEWRLfk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8FC82075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0rMI-0002aP-2n
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 15:03:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45590)
+	id 1k0rPl-0003rW-2c
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 15:06:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1k0rLd-00025S-3C; Wed, 29 Jul 2020 15:02:41 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:34278)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1k0rLZ-0001TO-CV; Wed, 29 Jul 2020 15:02:40 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 75250BF616;
- Wed, 29 Jul 2020 19:02:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
- s=default; t=1596049354;
- bh=HDn/fsoI0LT+XpknII3lRMyqCtKZCBk8ktNX1QR08vM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=C9aaTxnij84bqk9v5w1p4yFPR89RNSI5W1f7O22xx/zUDH3YU5kbCAXmvn/r/tBz1
- IWXV0xl8ZR9zvrVH/RnrySbDWdHYTHhKxI+vDyOppbXWBROeWSZVv2lx9WO/fzgKlG
- ZH+YuyM+zKg8KHfpvSbA+uC+cw7JEfVzSM2aLC/MSQqH7gzMIt0G7Gwf0bLG34hV8+
- CYCXK5X9v9ORw2hqN8EJTsEw75dgqplTBpMKI6kKiA55RNeRAmjyik1Ro+zyu4LJhf
- dISkDHp+lDe8PTGkdD50XWmV3aWsVsf17TPmMn+pGnxA4X7/PS2xwlhogMsSXBgdJB
- RNbzqEOolwpbw==
-Date: Wed, 29 Jul 2020 21:02:33 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 12/16] hw/block/nvme: refactor NvmeRequest clearing
-Message-ID: <20200729190233.GD213853@apples.localdomain>
-References: <20200720113748.322965-1-its@irrelevant.dk>
- <20200720113748.322965-13-its@irrelevant.dk>
- <1878330443116667e7394dac111976f8697408fe.camel@redhat.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k0rOx-0003SX-7W
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 15:06:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52741
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k0rOt-0001wB-L4
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 15:06:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596049562;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ca9dscgcddexdObJpd5QQhSPQ+WwpPoZ2RB8A6YFvAY=;
+ b=dxEWRLfk/28zHNGbxp8XYziwsFJftNYz7qVDM5/fU59G4qSjz1qfrL/1MOuC6pQpQH5evS
+ mB1XZ5o3YiQdkL+DxC1FmCPIrmbbemSy+tyQMOL31fC8kwzdYFZayQEmsXXfmOo+yR/Hg/
+ uCF+/FlXxEe4UQZW/Wjwnr8/y9xeAeo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-D4Lhtv2aOSKh8ZWF8OM4VQ-1; Wed, 29 Jul 2020 15:06:00 -0400
+X-MC-Unique: D4Lhtv2aOSKh8ZWF8OM4VQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15A0959;
+ Wed, 29 Jul 2020 19:05:58 +0000 (UTC)
+Received: from work-vm (ovpn-112-51.ams2.redhat.com [10.36.112.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 93AFD8A177;
+ Wed, 29 Jul 2020 19:05:43 +0000 (UTC)
+Date: Wed, 29 Jul 2020 20:05:41 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200729190540.GK2795@work-vm>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
+ <20200716083230.GA25316@joy-OptiPlex-7040>
+ <20200717101258.65555978@x1.home>
+ <20200721005113.GA10502@joy-OptiPlex-7040>
+ <20200727072440.GA28676@joy-OptiPlex-7040>
+ <20200727162321.7097070e@x1.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1878330443116667e7394dac111976f8697408fe.camel@redhat.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 14:23:15
+In-Reply-To: <20200727162321.7097070e@x1.home>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:27:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,66 +99,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>, eskultet@redhat.com,
+ jian-feng.ding@intel.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+ bao.yumeng@zte.com.cn, smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+ berrange@redhat.com, cohuck@redhat.com, dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jul 29 20:47, Maxim Levitsky wrote:
-> On Mon, 2020-07-20 at 13:37 +0200, Klaus Jensen wrote:
-> > From: Klaus Jensen <k.jensen@samsung.com>
-> > 
-> > Move clearing of the structure from "clear before use" to "clear
-> > after use".
-> > 
-> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> > ---
-> >  hw/block/nvme.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > index e2932239c661..431f26c2f589 100644
-> > --- a/hw/block/nvme.c
-> > +++ b/hw/block/nvme.c
-> > @@ -209,6 +209,11 @@ static void nvme_irq_deassert(NvmeCtrl *n, NvmeCQueue *cq)
-> >      }
-> >  }
-> >  
-> > +static void nvme_req_clear(NvmeRequest *req)
-> > +{
-> > +    memset(&req->cqe, 0x0, sizeof(req->cqe));
-> > +}
-> > +
-> >  static uint16_t nvme_map_addr_cmb(NvmeCtrl *n, QEMUIOVector *iov, hwaddr addr,
-> >                                    size_t len)
-> >  {
-> > @@ -458,6 +463,7 @@ static void nvme_post_cqes(void *opaque)
-> >          nvme_inc_cq_tail(cq);
-> >          pci_dma_write(&n->parent_obj, addr, (void *)&req->cqe,
-> >              sizeof(req->cqe));
-> > +        nvme_req_clear(req);
+* Alex Williamson (alex.williamson@redhat.com) wrote:
+> On Mon, 27 Jul 2020 15:24:40 +0800
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> Don't we need some barrier here to avoid reordering the writes?
-> pci_dma_write does seem to include a barrier prior to the write it does
-> but not afterward.
+> > > > As you indicate, the vendor driver is responsible for checking version
+> > > > information embedded within the migration stream.  Therefore a
+> > > > migration should fail early if the devices are incompatible.  Is it  
+> > > but as I know, currently in VFIO migration protocol, we have no way to
+> > > get vendor specific compatibility checking string in migration setup stage
+> > > (i.e. .save_setup stage) before the device is set to _SAVING state.
+> > > In this way, for devices who does not save device data in precopy stage,
+> > > the migration compatibility checking is as late as in stop-and-copy
+> > > stage, which is too late.
+> > > do you think we need to add the getting/checking of vendor specific
+> > > compatibility string early in save_setup stage?
+> > >  
+> > hi Alex,
+> > after an offline discussion with Kevin, I realized that it may not be a
+> > problem if migration compatibility check in vendor driver occurs late in
+> > stop-and-copy phase for some devices, because if we report device
+> > compatibility attributes clearly in an interface, the chances for
+> > libvirt/openstack to make a wrong decision is little.
 > 
+> I think it would be wise for a vendor driver to implement a pre-copy
+> phase, even if only to send version information and verify it at the
+> target.  Deciding you have no device state to send during pre-copy does
+> not mean your vendor driver needs to opt-out of the pre-copy phase
+> entirely.  Please also note that pre-copy is at the user's discretion,
+> we've defined that we can enter stop-and-copy at any point, including
+> without a pre-copy phase, so I would recommend that vendor drivers
+> validate compatibility at the start of both the pre-copy and the
+> stop-and-copy phases.
 
+That's quite curious; from a migration point of view I'd expect if you
+did want to skip pre-copy, that you'd go through the motions of entering
+it and then not saving any data and then going to stop-and-copy,
+rather than having two flows.
 
-> Also what is the motivation of switching the order?
+Note that failing at a late stage of stop-and-copy is a pain; if you've
+just spent an hour migrating your huge busy VM over, you're going to be
+pretty annoyed when it goes pop near the end.
 
-This was just preference. But I did not consider that I would be
-breaking any DMA rules here.
+Dave
 
-> I think somewhat that it is a good thing to clear a buffer,
-> before it is setup.
+> > so, do you think we are now arriving at an agreement that we'll give up
+> > the read-and-test scheme and start to defining one interface (perhaps in
+> > json format), from which libvirt/openstack is able to parse and find out
+> > compatibility list of a source mdev/physical device?
 > 
+> Based on the feedback we've received, the previously proposed interface
+> is not viable.  I think there's agreement that the user needs to be
+> able to parse and interpret the version information.  Using json seems
+> viable, but I don't know if it's the best option.  Is there any
+> precedent of markup strings returned via sysfs we could follow?
+> 
+> Your idea of having both a "self" object and an array of "compatible"
+> objects is perhaps something we can build on, but we must not assume
+> PCI devices at the root level of the object.  Providing both the
+> mdev-type and the driver is a bit redundant, since the former includes
+> the latter.  We can't have vendor specific versioning schemes though,
+> ie. gvt-version. We need to agree on a common scheme and decide which
+> fields the version is relative to, ex. just the mdev type?
+> 
+> I had also proposed fields that provide information to create a
+> compatible type, for example to create a type_x2 device from a type_x1
+> mdev type, they need to know to apply an aggregation attribute.  If we
+> need to explicitly list every aggregation value and the resulting type,
+> I think we run aground of what aggregation was trying to avoid anyway,
+> so we might need to pick a language that defines variable substitution
+> or some kind of tagging.  For example if we could define ${aggr} as an
+> integer within a specified range, then we might be able to define a type
+> relative to that value (type_x${aggr}) which requires an aggregation
+> attribute using the same value.  I dunno, just spit balling.  Thanks,
+> 
+> Alex
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-I'll reverse my preference and keep the status quo since I have no
-better motivation than personal preference.
-
-The introduction of nvme_req_clear is just in preparation for
-consolidating more cleanup here, but I'll drop this patch and introduce
-nvme_req_clear later.
 
