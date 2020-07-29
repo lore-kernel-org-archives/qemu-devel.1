@@ -4,86 +4,100 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4182CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 13:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD7DC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:04:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A4B92083E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 13:58:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07BBD2067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:04:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSvUVLD9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A4B92083E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUQSmUMq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07BBD2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0mbX-0002zy-9z
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 09:58:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50412)
+	id 1k0mhP-0005L1-AO
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:04:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1k0mag-0001Z4-By
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 09:57:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27403
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k0mgl-0004sV-Ru
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:04:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46050
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1k0mad-0005GF-4h
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 09:57:54 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k0mgj-00060w-Ai
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:04:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596031069;
+ s=mimecast20190719; t=1596031447;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7yJ1iH0CYopzN1xqwRMo6jREFfHfTBwgxYHAkYKBdgM=;
- b=hSvUVLD9W3Vx2CXBTwA1XG7nJR8iy09MB5uOdIxP2nFKI29DzObyCGYfYAiQo1xW6zTpRm
- sxtBWFuzPByTU9mBwUZrSDn77al4lhZy5xiy/hyy+UGvzK7WsS46yAyerNOqjA7s6qn0jI
- b7GowQaVnD1uO62UStgHoaK7eA1jP40=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-W1uUwzDeMD2Xx3SZbuy4mQ-1; Wed, 29 Jul 2020 09:57:47 -0400
-X-MC-Unique: W1uUwzDeMD2Xx3SZbuy4mQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3E408912F3;
- Wed, 29 Jul 2020 13:57:45 +0000 (UTC)
-Received: from starship (unknown [10.35.206.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BF22610013C4;
- Wed, 29 Jul 2020 13:57:41 +0000 (UTC)
-Message-ID: <0d7e4cb66c28d89b4bd5362d3f133f02287fac13.camel@redhat.com>
-Subject: Re: [PATCH 02/16] hw/block/nvme: add mapping helpers
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Klaus Jensen <its@irrelevant.dk>, qemu-devel@nongnu.org
-Date: Wed, 29 Jul 2020 16:57:40 +0300
-In-Reply-To: <20200720113748.322965-3-its@irrelevant.dk>
-References: <20200720113748.322965-1-its@irrelevant.dk>
- <20200720113748.322965-3-its@irrelevant.dk>
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
+ bh=q0k9Y1oe3IQrtQjeGqy2ltCobmL4xziSrjwu0r2ZlGo=;
+ b=jUQSmUMqxTSozGlMzMX4CPCrb7Qm4AYYASBG9S6S9tGc16Uew6ds/1rDqGWEpDq/g51G3O
+ 9tTbIvjA5/NRediFVPqZSnl6GoA7nCHdwWMvxC214EMHGrM8SwC2hSgyjHVe0/Hj51sAOV
+ kNLGmQweUG1GflhsN5fvPPmQ6D96DGQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-9MhEqm3qMCG6AYU8N9peIA-1; Wed, 29 Jul 2020 10:04:06 -0400
+X-MC-Unique: 9MhEqm3qMCG6AYU8N9peIA-1
+Received: by mail-wm1-f70.google.com with SMTP id u14so618194wml.0
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 07:04:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=q0k9Y1oe3IQrtQjeGqy2ltCobmL4xziSrjwu0r2ZlGo=;
+ b=E2dCyvvsRpL9m946BrmmZ9Y1gIH1XBgskO4DqcJKsXXElz/h/qjPhiiMNKDuQB80PZ
+ Sv/pzxnQUZmqD5F6r2Ow58OdWWfapJflR/X7XDZvKkv6Wuk34y1oKWaEOKEhgK8K3UUz
+ e188flAYWyQ5P8cYlOcSFjLSocqc5iIin6LY5t6jliNsESsgoTn81ah0+7iBx7tdAZnh
+ yVFSxXdu8ZPRegGt1NsUEnzRRZrOlL8xwJbQJyQdDdInggAbAPECtybt9w0ulHlAAnMg
+ BFo0d8PZJkVfjf5hWiC1j3DK4bkmpD98Slo+AJf/9q5mO2/Px5/LNvednbkUB286HH90
+ TN1Q==
+X-Gm-Message-State: AOAM530VG8mcfJAbi73YR2zI6kL6OftQ1TQbh1Pcj3k67H5iNpQzNV63
+ viFtAEewvPGi5mcYLxWPu5/E23V1EHG4jjkd78uolonjaGvzZExYCmzheZxUibjh4/QDciqnOc9
+ pcUZA6jSZQ4a9cd8=
+X-Received: by 2002:a1c:ba42:: with SMTP id k63mr8642068wmf.31.1596031444550; 
+ Wed, 29 Jul 2020 07:04:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxbK9EsA6Trhm4x1EgHzcf1qd/Qvbd3uvZKLv2iE7BaUbE7T83rD+vDkIxIkxG06ucGU5RapQ==
+X-Received: by 2002:a1c:ba42:: with SMTP id k63mr8642040wmf.31.1596031444140; 
+ Wed, 29 Jul 2020 07:04:04 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
+ by smtp.gmail.com with ESMTPSA id y84sm5492993wmg.38.2020.07.29.07.04.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Jul 2020 07:04:02 -0700 (PDT)
+Date: Wed, 29 Jul 2020 10:04:00 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Hogan Wang <hogan.wang@huawei.com>
+Subject: Re: [PATCH v5] hw/pci-host: save/restore pci host config register
+ for old ones
+Message-ID: <20200729100259-mutt-send-email-mst@kernel.org>
+References: <20200727102012-mutt-send-email-mst@kernel.org>
+ <20200728032709.3552-1-hogan.wang@huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200728032709.3552-1-hogan.wang@huawei.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlevitsk@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:27:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:17:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,237 +110,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Klaus Jensen <k.jensen@samsung.com>,
- Keith Busch <kbusch@kernel.org>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jusual@redhat.com,
+ dgilbert@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2020-07-20 at 13:37 +0200, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
+On Tue, Jul 28, 2020 at 11:27:09AM +0800, Hogan Wang wrote:
+> The i440fx and q35 machines integrate i440FX or MCH PCI device by default.
+> Refer to i440FX and ICH9-LPC spcifications, there are some reserved
+> configuration registers can used to save/restore PCIHostState.config_reg.
+> It's nasty but friendly to old ones.
 > 
-> Add nvme_map_addr, nvme_map_addr_cmb and nvme_addr_to_cmb helpers and
-> use them in nvme_map_prp.
+> Reproducer steps:
+> step 1. Make modifications to seabios and qemu for increase reproduction
+> efficiency, write 0xf0 to 0x402 port notify qemu to stop vcpu after
+> 0x0cf8 port wrote i440 configure register. qemu stop vcpu when catch
+> 0x402 port wrote 0xf0.
 > 
-> This fixes a bug where in the case of a CMB transfer, the device would
-> map to the buffer with a wrong length.
-> 
-> Fixes: b2b2b67a00574 ("nvme: Add support for Read Data and Write Data in CMBs.")
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> ---
->  hw/block/nvme.c       | 109 +++++++++++++++++++++++++++++++++++-------
->  hw/block/trace-events |   2 +
->  2 files changed, 94 insertions(+), 17 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 4d7b730a62b6..9b1a080cdc70 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -109,6 +109,11 @@ static uint16_t nvme_sqid(NvmeRequest *req)
->      return le16_to_cpu(req->sq->sqid);
->  }
->  
-> +static inline void *nvme_addr_to_cmb(NvmeCtrl *n, hwaddr addr)
-> +{
-> +    return &n->cmbuf[addr - n->ctrl_mem.addr];
-I would add an assert here just in case we do out of bounds array access.
-> +}
-> +
->  static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
->  {
->      hwaddr low = n->ctrl_mem.addr;
-> @@ -120,7 +125,7 @@ static bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
->  static void nvme_addr_read(NvmeCtrl *n, hwaddr addr, void *buf, int size)
->  {
->      if (n->bar.cmbsz && nvme_addr_is_cmb(n, addr)) {
-> -        memcpy(buf, (void *)&n->cmbuf[addr - n->ctrl_mem.addr], size);
-> +        memcpy(buf, nvme_addr_to_cmb(n, addr), size);
-OK.
->          return;
->      }
->  
-> @@ -203,29 +208,91 @@ static void nvme_irq_deassert(NvmeCtrl *n, NvmeCQueue *cq)
->      }
->  }
->  
-> +static uint16_t nvme_map_addr_cmb(NvmeCtrl *n, QEMUIOVector *iov, hwaddr addr,
-> +                                  size_t len)
-> +{
-> +    if (!len) {
-> +        return NVME_SUCCESS;
-> +    }
-> +
-> +    trace_pci_nvme_map_addr_cmb(addr, len);
-> +
-> +    if (!nvme_addr_is_cmb(n, addr) || !nvme_addr_is_cmb(n, addr + len - 1)) {
-> +        return NVME_DATA_TRAS_ERROR;
-> +    }
-> +
-> +    qemu_iovec_add(iov, nvme_addr_to_cmb(n, addr), len);
-> +
-> +    return NVME_SUCCESS;
-> +}
-OK
-> +
-> +static uint16_t nvme_map_addr(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
-> +                              hwaddr addr, size_t len)
-> +{
-> +    if (!len) {
-> +        return NVME_SUCCESS;
-> +    }
-> +
-> +    trace_pci_nvme_map_addr(addr, len);
-> +
-> +    if (nvme_addr_is_cmb(n, addr)) {
-> +        if (qsg && qsg->sg) {
-> +            return NVME_INVALID_USE_OF_CMB | NVME_DNR;
-> +        }
-> +
-> +        assert(iov);
-> +
-> +        if (!iov->iov) {
-> +            qemu_iovec_init(iov, 1);
-> +        }
-> +
-> +        return nvme_map_addr_cmb(n, iov, addr, len);
-> +    }
-> +
-> +    if (iov && iov->iov) {
-> +        return NVME_INVALID_USE_OF_CMB | NVME_DNR;
-> +    }
-> +
-> +    assert(qsg);
-> +
-> +    if (!qsg->sg) {
-> +        pci_dma_sglist_init(qsg, &n->parent_obj, 1);
-> +    }
-> +
-> +    qemu_sglist_add(qsg, addr, len);
-> +
-> +    return NVME_SUCCESS;
-> +}
-OK
-> +
->  static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->                               uint64_t prp2, uint32_t len, NvmeCtrl *n)
->  {
->      hwaddr trans_len = n->page_size - (prp1 % n->page_size);
->      trans_len = MIN(len, trans_len);
->      int num_prps = (len >> n->page_bits) + 1;
-> +    uint16_t status;
->  
->      if (unlikely(!prp1)) {
->          trace_pci_nvme_err_invalid_prp();
->          return NVME_INVALID_FIELD | NVME_DNR;
-> -    } else if (n->bar.cmbsz && prp1 >= n->ctrl_mem.addr &&
-> -               prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)) {
-> -        qsg->nsg = 0;
-> +    }
-> +
-> +    if (nvme_addr_is_cmb(n, prp1)) {
->          qemu_iovec_init(iov, num_prps);
-> -        qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 - n->ctrl_mem.addr], trans_len);
+> seabios:/src/hw/pci.c
+> @@ -52,6 +52,11 @@ void pci_config_writeb(u16 bdf, u32 addr, u8 val)
+>          writeb(mmconfig_addr(bdf, addr), val);
 >      } else {
->          pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
-> -        qemu_sglist_add(qsg, prp1, trans_len);
+>          outl(ioconfig_cmd(bdf, addr), PORT_PCI_CMD);
+> +       if (bdf == 0 && addr == 0x72 && val == 0xa) {
+> +            dprintf(1, "stop vcpu\n");
+> +            outb(0xf0, 0x402); // notify qemu to stop vcpu
+> +            dprintf(1, "resume vcpu\n");
+> +        }
+>          outb(val, PORT_PCI_DATA + (addr & 3));
 >      }
-> +
-> +    status = nvme_map_addr(n, qsg, iov, prp1, trans_len);
-> +    if (status) {
-> +        goto unmap;
+>  }
+> 
+> qemu:hw/char/debugcon.c
+> @@ -60,6 +61,9 @@ static void debugcon_ioport_write(void *opaque, hwaddr addr, uint64_t val,
+>      printf(" [debugcon: write addr=0x%04" HWADDR_PRIx " val=0x%02" PRIx64 "]\n", addr, val);
+>  #endif
+> 
+> +    if (ch == 0xf0) {
+> +        vm_stop(RUN_STATE_PAUSED);
 > +    }
+>      /* XXX this blocks entire thread. Rewrite to use
+>       * qemu_chr_fe_write and background I/O callbacks */
+>      qemu_chr_fe_write_all(&s->chr, &ch, 1);
+> 
+> step 2. start vm1 by the following command line, and then vm stopped.
+> $ qemu-system-x86_64 -machine pc-i440fx-5.0,accel=kvm\
+>  -netdev tap,ifname=tap-test,id=hostnet0,vhost=on,downscript=no,script=no\
+>  -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.0,addr=0x13,bootindex=3\
+>  -device cirrus-vga,id=video0,vgamem_mb=16,bus=pci.0,addr=0x2\
+>  -chardev file,id=seabios,path=/var/log/test.seabios,append=on\
+>  -device isa-debugcon,iobase=0x402,chardev=seabios\
+>  -monitor stdio
+> 
+> step 3. start vm2 to accept vm1 state.
+> $ qemu-system-x86_64 -machine pc-i440fx-5.0,accel=kvm\
+>  -netdev tap,ifname=tap-test1,id=hostnet0,vhost=on,downscript=no,script=no\
+>  -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.0,addr=0x13,bootindex=3\
+>  -device cirrus-vga,id=video0,vgamem_mb=16,bus=pci.0,addr=0x2\
+>  -chardev file,id=seabios,path=/var/log/test.seabios,append=on\
+>  -device isa-debugcon,iobase=0x402,chardev=seabios\
+>  -monitor stdio \
+>  -incoming tcp:127.0.0.1:8000
+> 
+> step 4. execute the following qmp command in vm1 to migrate.
+> (qemu) migrate tcp:127.0.0.1:8000
+> 
+> step 5. execute the following qmp command in vm2 to resume vcpu.
+> (qemu) cont
+> 
+> Before this patch, we get KVM "emulation failure" error on vm2.
+> This patch fixes it.
+> 
+> Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
+> ---
+>  hw/pci-host/i440fx.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
+>  hw/pci-host/q35.c    | 44 ++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 90 insertions(+)
+> 
+> diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+> index 8ed2417f0c..419e27c21a 100644
+> --- a/hw/pci-host/i440fx.c
+> +++ b/hw/pci-host/i440fx.c
+> @@ -64,6 +64,14 @@ typedef struct I440FXState {
+>   */
+>  #define I440FX_COREBOOT_RAM_SIZE 0x57
+>  
+> +/* Older I440FX machines (5.0 and older) do not support i440FX-pcihost state
+> + * migration, use some reserved INTEL 82441 configuration registers to
+> + * save/restore i440FX-pcihost config register. Refer to [INTEL 440FX PCISET
+> + * 82441FX PCI AND MEMORY CONTROLLER (PMC) AND 82442FX DATA BUS ACCELERATOR
+> + * (DBX) Table 1. PMC Configuration Space]
+> + */
+> +#define I440FX_PCI_HOST_CONFIG_REG 0x94
 > +
->      len -= trans_len;
->      if (len) {
->          if (unlikely(!prp2)) {
->              trace_pci_nvme_err_invalid_prp2_missing();
-> +            status = NVME_INVALID_FIELD | NVME_DNR;
->              goto unmap;
->          }
->          if (len > n->page_size) {
-> @@ -242,6 +309,7 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->                  if (i == n->max_prp_ents - 1 && len > n->page_size) {
->                      if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
->                          trace_pci_nvme_err_invalid_prplist_ent(prp_ent);
-> +                        status = NVME_INVALID_FIELD | NVME_DNR;
->                          goto unmap;
->                      }
+>  static void i440fx_update_memory_mappings(PCII440FXState *d)
+>  {
+>      int i;
+> @@ -98,15 +106,53 @@ static void i440fx_write_config(PCIDevice *dev,
+>  static int i440fx_post_load(void *opaque, int version_id)
+>  {
+>      PCII440FXState *d = opaque;
+> +    PCIDevice *dev;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/i440fx", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
 >  
-> @@ -255,14 +323,14 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->  
->                  if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
->                      trace_pci_nvme_err_invalid_prplist_ent(prp_ent);
-> +                    status = NVME_INVALID_FIELD | NVME_DNR;
->                      goto unmap;
->                  }
->  
->                  trans_len = MIN(len, n->page_size);
-> -                if (qsg->nsg){
-> -                    qemu_sglist_add(qsg, prp_ent, trans_len);
-> -                } else {
-> -                    qemu_iovec_add(iov, (void *)&n->cmbuf[prp_ent - n->ctrl_mem.addr], trans_len);
-> +                status = nvme_map_addr(n, qsg, iov, prp_ent, trans_len);
-> +                if (status) {
-> +                    goto unmap;
->                  }
->                  len -= trans_len;
->                  i++;
-> @@ -270,20 +338,27 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->          } else {
->              if (unlikely(prp2 & (n->page_size - 1))) {
->                  trace_pci_nvme_err_invalid_prp2_align(prp2);
-> +                status = NVME_INVALID_FIELD | NVME_DNR;
->                  goto unmap;
->              }
-> -            if (qsg->nsg) {
-> -                qemu_sglist_add(qsg, prp2, len);
-> -            } else {
-> -                qemu_iovec_add(iov, (void *)&n->cmbuf[prp2 - n->ctrl_mem.addr], trans_len);
-> +            status = nvme_map_addr(n, qsg, iov, prp2, len);
-> +            if (status) {
-> +                goto unmap;
->              }
->          }
->      }
->      return NVME_SUCCESS;
->  
-> - unmap:
-> -    qemu_sglist_destroy(qsg);
-> -    return NVME_INVALID_FIELD | NVME_DNR;
-> +unmap:
-> +    if (iov && iov->iov) {
-> +        qemu_iovec_destroy(iov);
+>      i440fx_update_memory_mappings(d);
+> +
+> +    if (!s->mig_enabled) {
+
+Thinking more about it, I think we should rename mig_enabled to
+config_reg_mig_enabled or something like this.
+
+
+> +        dev = PCI_DEVICE(d);
+> +        s->config_reg = pci_get_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG]);
+> +        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG], 0);
 > +    }
+> +    return 0;
+> +}
 > +
-> +    if (qsg && qsg->sg) {
-> +        qemu_sglist_destroy(qsg);
+> +static int i440fx_pre_save(void *opaque)
+> +{
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/i440fx", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->mig_enabled) {
+> +        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG],
+> +                     s->config_reg);
 > +    }
+> +    return 0;
+> +}
 > +
-> +    return status;
+> +static int i440fx_post_save(void *opaque)
+> +{
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/i440fx", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->mig_enabled) {
+> +        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG], 0);
+> +    }
+>      return 0;
 >  }
 >  
->  static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index 7b7303cab1dd..f3b2d004e078 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -33,6 +33,8 @@ pci_nvme_irq_msix(uint32_t vector) "raising MSI-X IRQ vector %u"
->  pci_nvme_irq_pin(void) "pulsing IRQ pin"
->  pci_nvme_irq_masked(void) "IRQ is masked"
->  pci_nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=0x%"PRIx64" prp2=0x%"PRIx64""
-> +pci_nvme_map_addr(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
-> +pci_nvme_map_addr_cmb(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
->  pci_nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8""
->  pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8""
->  pci_nvme_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
+> +
 
-Looks good. I could have missed something, but compared to older version of similiar code I reviewed, 
-this looks much better and easy to t understand.
+Extra empty line.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Best regards,
-	Maxim Levitsky
+>  static const VMStateDescription vmstate_i440fx = {
+>      .name = "I440FX",
+>      .version_id = 3,
+>      .minimum_version_id = 3,
+> +    .pre_save = i440fx_pre_save,
+> +    .post_save = i440fx_post_save,
+>      .post_load = i440fx_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index b67cb9c29f..d87f892945 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -43,6 +43,14 @@
+>  
+>  #define Q35_PCI_HOST_HOLE64_SIZE_DEFAULT (1ULL << 35)
+>  
+> +/* Older Q35 machines (5.0 and older) do not support q35-pcihost state
+> + * migration, use some reserved INTEL MCH configuration registers to
+> + * save/restore q35-pcihost config register. Refer to [Intel 3 Series
+> + * Chipset Family Datasheet Table 5-1. DRAM Controller Register Address
+> + * Map (D0:F0)]
+> + */
+> +#define Q35_PCI_HOST_CONFIG_REG 0x70
+> +
+>  static void q35_host_realize(DeviceState *dev, Error **errp)
+>  {
+>      PCIHostState *pci = PCI_HOST_BRIDGE(dev);
+> @@ -513,14 +521,50 @@ static void mch_update(MCHPCIState *mch)
+>  static int mch_post_load(void *opaque, int version_id)
+>  {
+>      MCHPCIState *mch = opaque;
+> +    PCIDevice *dev;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/q35", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+>      mch_update(mch);
+> +    if (!s->mig_enabled) {
+> +        dev = PCI_DEVICE(mch);
+> +        s->config_reg = pci_get_long(&dev->config[Q35_PCI_HOST_CONFIG_REG]);
+> +        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], 0);
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int mch_pre_save(void *opaque)
+> +{
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/q35", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->mig_enabled) {
+> +        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], s->config_reg);
+> +    }
+>      return 0;
+>  }
+>  
+> +static int mch_post_save(void *opaque)
+> +{
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/q35", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->mig_enabled) {
+> +        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], 0);
+> +    }
+> +    return 0;
+> +}
+> +
+> +
+>  static const VMStateDescription vmstate_mch = {
+>      .name = "mch",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> +    .pre_save = mch_pre_save,
+> +    .post_save = mch_post_save,
+>      .post_load = mch_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_PCI_DEVICE(parent_obj, MCHPCIState),
+> -- 
+> 2.27.0
+> 
 
 
