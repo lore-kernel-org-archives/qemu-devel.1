@@ -2,68 +2,71 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 873F6C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29559C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:07:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57CD22070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:04:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57CD22070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE2C0206D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:07:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="o6hGZQ8r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE2C0206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0uBF-00066S-I2
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:04:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52740)
+	id 1k0uEn-00005b-4G
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:07:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53658)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1k0u8V-0003MV-9U; Wed, 29 Jul 2020 18:01:20 -0400
-Received: from mga11.intel.com ([192.55.52.93]:41639)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1k0uDn-0006oL-87; Wed, 29 Jul 2020 18:06:47 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:34626)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrzej.jakowski@linux.intel.com>)
- id 1k0u8P-0007ro-Vr; Wed, 29 Jul 2020 18:01:18 -0400
-IronPort-SDR: zzT09mbtrBHNCit/tRuCuW3Zj6DNBgw6P2OAMUZN0hqgswVSbbDMCSEZxDTTL8wZz3eYe9S+58
- MwJoI41VHUsQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9697"; a="149342742"
-X-IronPort-AV: E=Sophos;i="5.75,412,1589266800"; d="scan'208";a="149342742"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Jul 2020 15:01:11 -0700
-IronPort-SDR: RiZ58BlH/zkJseVlsG8cbk9wPTm6XwUW3OPAUnhtODa829kJKsg0PLkbqytF66Kfa/FzU6xzWT
- 0qfRy81evwCg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,412,1589266800"; d="scan'208";a="304361597"
-Received: from ajakowsk-mobl1.amr.corp.intel.com (HELO localhost.localdomain)
- ([10.209.191.249])
- by orsmga002.jf.intel.com with ESMTP; 29 Jul 2020 15:01:09 -0700
-From: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
-To: kbusch@kernel.org,
-	kwolf@redhat.com,
-	mreitz@redhat.com
-Subject: [PATCH v6] nvme: allow cmb and pmr emulation on same device
-Date: Wed, 29 Jul 2020 15:01:05 -0700
-Message-Id: <20200729220107.37758-1-andrzej.jakowski@linux.intel.com>
-X-Mailer: git-send-email 2.25.4
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1k0uDl-0008U6-7i; Wed, 29 Jul 2020 18:06:46 -0400
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 6750CBFAB3;
+ Wed, 29 Jul 2020 22:06:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
+ s=default; t=1596060403;
+ bh=s+3GwpffDUyM2zAU6NIPG+bARhXR6wqmuJDvWfqlYUk=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=o6hGZQ8rBTOF/4htVKvePeImiDgsRHzaSmRoPuGy5T1kTMkhjDjF+dcZxEj+9oMrF
+ xIbsW+Zchpn97Z/eb98dhHPpNIX2JJityRsessqNwRfWtmtsSwGOuk04hQMN6hhkyc
+ qFo+KQaZd/QV7BHUdZydQqEy2Vst8NGcObIZTV9++gSgzmT5glT9R7Reisz1XLGIjk
+ p/NQKJjYgQpftTvWZRpqA9nqqma7IjembB7JeAhCuDLBA/d8Fey7czIKC6hwwlRxg0
+ YsAkcS/B3OyEjIsQ28MKJjLjwmyREmyrGouHXGH6iQFwhuCu3zbX9bMR2a66ni5LUO
+ 2SdkfpHYnpdqg==
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 01/16] hw/block/nvme: memset preallocated requests
+ structures
+Date: Thu, 30 Jul 2020 00:06:23 +0200
+Message-Id: <20200729220638.344477-2-its@irrelevant.dk>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200729220638.344477-1-its@irrelevant.dk>
+References: <20200729220638.344477-1-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=192.55.52.93;
- envelope-from=andrzej.jakowski@linux.intel.com; helo=mga11.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 18:01:11
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 14:23:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,59 +79,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
+ Andrzej Jakowski <andrzej.jakowski@linux.intel.com>,
+ Minwoo Im <minwoo.im.dev@gmail.com>, Keith Busch <kbusch@kernel.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Resending series recently posted on mailing list related to nvme device
-extension with couple of fixes after review.
+From: Klaus Jensen <k.jensen@samsung.com>
 
-This patch series does following:
- - Fixes problem where CMBS bit was not set in controller capabilities
-   register, so support for CMB was not correctly advertised to guest.
-   This is resend of patch that has been submitted and reviewed by
-   Klaus [1]
- - Introduces BAR4 sharing between MSI-X vectors and CMB. This allows
-   to have CMB and PMR emulated on the same device. This extension
-   was indicated by Keith [2]
+This is preparatory to subsequent patches that change how QSGs/IOVs are
+handled. It is important that the qsg and iov members of the NvmeRequest
+are initially zeroed.
 
-v6:
- - instead of using memory_region_to_absolute_addr() function local helper has
-   been defined (nvme_cmb_to_absolute_addr()) to calculate absolute address of
-   CMB in simplified way. Also a number of code style changes has been done
-   (function rename, use literal instead of macro definition, etc.)
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ hw/block/nvme.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v5:
- - fixed problem introduced in v4 where CMB buffer was represented as
-   subregion of BAR4 memory region. In that case CMB address was used
-   incorrectly as it was relative to BAR4 and not absolute. Appropriate
-   changes were added to v5 to calculate CMB address properly ([6])
-
-v4:
- - modified BAR4 initialization, so now it consists of CMB, MSIX and
-   PBA memory regions overlapping on top of it. This reduces patch
-   complexity significantly (Klaus [5])
-
-v3:
- - code style fixes including: removal of spurious line break, moving
-   define into define section and code alignment (Klaus [4])
- - removed unintended code reintroduction (Klaus [4])
-
-v2:
- - rebase on Kevin's latest block branch (Klaus [3])
- - improved comments section (Klaus [3])
- - simplified calculation of BAR4 size (Klaus [3])
-
-v1:
- - initial push of the patch
-
-[1]: https://lore.kernel.org/qemu-devel/20200408055607.g2ii7gwqbnv6cd3w@apples.localdomain/
-[2]: https://lore.kernel.org/qemu-devel/20200330165518.GA8234@redsun51.ssa.fujisawa.hgst.com/
-[3]: https://lore.kernel.org/qemu-devel/20200605181043.28782-1-andrzej.jakowski@linux.intel.com/
-[4]: https://lore.kernel.org/qemu-devel/20200618092524.posxi5mysb3jjtpn@apples.localdomain/
-[5]: https://lore.kernel.org/qemu-devel/20200626055033.6vxqvi4s5pll7som@apples.localdomain/
-[6]: https://lore.kernel.org/qemu-devel/9143a543-d32d-f3e7-c37b-b3df7f853952@linux.intel.com/
-
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index a1fd1fe14ba7..25b87486ea5a 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -653,7 +653,7 @@ static void nvme_init_sq(NvmeSQueue *sq, NvmeCtrl *n, uint64_t dma_addr,
+     sq->size = size;
+     sq->cqid = cqid;
+     sq->head = sq->tail = 0;
+-    sq->io_req = g_new(NvmeRequest, sq->size);
++    sq->io_req = g_new0(NvmeRequest, sq->size);
+ 
+     QTAILQ_INIT(&sq->req_list);
+     QTAILQ_INIT(&sq->out_req_list);
+-- 
+2.27.0
 
 
