@@ -2,78 +2,92 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7213C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B15C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:17:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B21652070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:17:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1724D2070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:17:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L/6SM1TO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B21652070B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WwjiGH5P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1724D2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0mtR-0006WO-0i
+	id 1k0mtR-0006WK-8M
 	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:17:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55686)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k0msG-0005dH-R2
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:16:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30668
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k0msD-0005cx-NM
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:16:03 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40779
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k0msF-0008IU-5S
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:16:04 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k0msB-0008I5-NX
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:16:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596032161;
+ s=mimecast20190719; t=1596032158;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DFlYn9tn9jzZBL+1B+PdrV3QGyq4zE9DGD8h5DXbYCE=;
- b=L/6SM1TOfvX2D9lJD4cAw5wtTOpc3JlHj+YUxVVQQV/L5a4bBAun2uardvDoe/MA1/hNxZ
- +zOhap5ASql1JPMnRvK3ph94CHJFIJo+09U19jNKiSi0IuwWDi0aUfdpPQJkUmHMJW2nfS
- xG5rArjnrfg4YzxJmWZFULycR3e0yCA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-D4CxC4e0OhK6bcXdJ7KWTA-1; Wed, 29 Jul 2020 10:16:00 -0400
-X-MC-Unique: D4CxC4e0OhK6bcXdJ7KWTA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 191EC800472;
- Wed, 29 Jul 2020 14:15:58 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 73B685F7D8;
- Wed, 29 Jul 2020 14:15:51 +0000 (UTC)
-Date: Wed, 29 Jul 2020 16:15:47 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: Re: [PATCH v5 2/2] hw: hyperv: vmbus: Fix 32bit compilation
-Message-ID: <20200729161547.691f2396@redhat.com>
-In-Reply-To: <CAHiYmc7oo3Vn1RaP+UiuQqJVS2OJXgoqyNPvbY+gAGjn_dD=8w@mail.gmail.com>
-References: <20200715084326.678715-1-arilou@gmail.com>
- <20200715084326.678715-3-arilou@gmail.com>
- <CAHiYmc7oo3Vn1RaP+UiuQqJVS2OJXgoqyNPvbY+gAGjn_dD=8w@mail.gmail.com>
+ bh=bH7VY3Hwrnao+IfvDBQJlXh7mn6Pu2IQGYb/DjC6oUw=;
+ b=WwjiGH5PSL1/uTL9JiOMmnWc4z5UG0ZY7MuU4vRrmDWnyKCvCmR0jN8OVq9jjUB4YyUXVK
+ v5EKnE5q1Ljn32nWTtxn01UacQ4fjIZqxWGU8XZQNNfbQ2lxehjRtvLDRpGBKOjAsrn9DE
+ akqhJgxWXM3VpZTN4el6kq9aGw6wUK4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-5EbWXgFoNO-fT2nskMvu6g-1; Wed, 29 Jul 2020 10:15:53 -0400
+X-MC-Unique: 5EbWXgFoNO-fT2nskMvu6g-1
+Received: by mail-wr1-f70.google.com with SMTP id f7so6723566wrs.8
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 07:15:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=bH7VY3Hwrnao+IfvDBQJlXh7mn6Pu2IQGYb/DjC6oUw=;
+ b=eVEkYB/XHELvGoA6Zm/fbWNee0Acrenlk2fltfDC30yr71uQBgSGhXyEeM/Vnyq8C/
+ oRKp5sW8byWKbWeZ5eyaJT/hj9qZ8R3zMxESWZHso6RpjyvQN1eI1wOylytiT3JwRCmf
+ kV4Sux+eaeEqgMZI9ZzYZ86L3qMioi6nxn9z5HsAdViOAbenJec8UrTE62EECqp+QJDO
+ VrbOGETmW/CUeXRADaumk7UcMQu4XbnK1VPozTTAspdgegy4vivQxAFQpvOd1o685Ogc
+ IosGMT3Bb0yYTV2JJBOEIyiH96aAU7tc7QHllCCQk2pNjBkXMf0+Cmmo+7efkGbcN3wV
+ DFbQ==
+X-Gm-Message-State: AOAM533mpUK1sJukHY5y85Ru7smv7raZSl5xH/ZydpZ4ty08BIGd8IKc
+ WbJQQvl7rkwYXOMsJrbLNP64LEoDLx0kj8nVugFB7xdT8j2TOS4BqEqRsitg7irU/jcQGUP1+P1
+ 2dSu4FnmJkpcOyEI=
+X-Received: by 2002:adf:d84c:: with SMTP id k12mr29548857wrl.250.1596032152521; 
+ Wed, 29 Jul 2020 07:15:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJygLUT7BduEfNCx5ctazGsBsTSomS/rgEtnt++E7k9i+yCRzA4dRGHp1dknzXjG4qnBGUbKOg==
+X-Received: by 2002:adf:d84c:: with SMTP id k12mr29548844wrl.250.1596032152324; 
+ Wed, 29 Jul 2020 07:15:52 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
+ by smtp.gmail.com with ESMTPSA id g7sm5553730wrv.82.2020.07.29.07.15.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Jul 2020 07:15:51 -0700 (PDT)
+Date: Wed, 29 Jul 2020 10:15:48 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [RFC 0/2] virtio-rng: add a control queue
+Message-ID: <20200729101522-mutt-send-email-mst@kernel.org>
+References: <20200123151700.1367857-1-lvivier@redhat.com>
+ <20200124110240.GH736986@stefanha-x1.localdomain>
+ <e4b0d666-c2a8-6d95-28f4-b51fe80ef73a@redhat.com>
+ <20200129154300.GB157595@stefanha-x1.localdomain>
+ <eeb362c9-24e8-49ef-4194-617e8a2881a9@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <eeb362c9-24e8-49ef-4194-617e8a2881a9@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:27:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,56 +110,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
- Jon Doron <arilou@gmail.com>, mst@redhat.com,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "rvkagan@yandex-team.ru" <rvkagan@yandex-team.ru>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "vkuznets@redhat.com" <vkuznets@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Amit Shah <amit@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 25 Jul 2020 14:16:08 +0200
-Aleksandar Markovic <aleksandar.qemu.devel@gmail.com> wrote:
-
-> On Wednesday, July 15, 2020, Jon Doron <arilou@gmail.com> wrote:
-
-Michael,
-
-could you merge it via your tree please?
-
+On Tue, Jul 28, 2020 at 03:45:26PM +0200, Laurent Vivier wrote:
+> On 29/01/2020 16:43, Stefan Hajnoczi wrote:
+> > On Fri, Jan 24, 2020 at 03:05:18PM +0100, Laurent Vivier wrote:
+> >> On 24/01/2020 12:02, Stefan Hajnoczi wrote:
+> >>> On Thu, Jan 23, 2020 at 04:16:58PM +0100, Laurent Vivier wrote:
+> >>>> The kernel needs sometime to be able to cancel an ongoing command.
+> >>>>
+> >>>> For instance, if the virtio-rng device uses the egd backend
+> >>>> and this backend doesn't provide data, the buffer provided by the
+> >>>> kernel is kept as long as it is needed.
+> >>>>
+> >>>> On the kernel side, a read blocks until the buffer returns from QEMU.
+> >>>>
+> >>>> As the read is done with a mutex held, all the hw_random interface
+> >>>> hangs and we cannot switch to another hw_random backend.
+> >>>>
+> >>>> So this series adds a control queue to the virtio-rng device to allow
+> >>>> to flush the virtio-rng input queue to release the kernel mutex and
+> >>>> to allow to switch to another device.
+> >>>>
+> >>>> The kernel side series can be found at:
+> >>>>
+> >>>> https://github.com/vivier/linux/commits/virtio-rng-ctrl
+> >>>>
+> >>>> Laurent Vivier (2):
+> >>>>   virtio-rng: prepare the introduction of a control queue
+> >>>>   virtio-rng: add a control queue
+> >>>>
+> >>>>  hw/core/machine.c                           |  1 +
+> >>>>  hw/virtio/trace-events                      |  6 ++
+> >>>>  hw/virtio/virtio-rng.c                      | 99 ++++++++++++++++++---
+> >>>>  include/hw/virtio/virtio-rng.h              |  5 +-
+> >>>>  include/standard-headers/linux/virtio_rng.h | 14 +++
+> >>>>  5 files changed, 111 insertions(+), 14 deletions(-)
+> >>>
+> >>> Where can I find the VIRTIO specification for this new virtqueue?
+> >>
+> >> I didn't update the specs.
+> >>
+> >> Is https://github.com/oasis-tcs/virtio-spec.git the document to update?
+> > 
+> > Yes, please.
 > 
-> > Signed-off-by: Jon Doron <arilou@gmail.com>
-> > ---
-> >  hw/hyperv/vmbus.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
-> > index 34392e892a..c28bb4201b 100644
-> > --- a/hw/hyperv/vmbus.c
-> > +++ b/hw/hyperv/vmbus.c
-> > @@ -383,7 +383,8 @@ static ssize_t gpadl_iter_io(GpadlIter *iter, void
-> > *buf, uint32_t len)
-> >              }
-> >          }
-> >
-> > -        p = (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) |
-> > off_in_page);
-> > +        p = (void *)(uintptr_t)(((uintptr_t)iter->map &
-> > TARGET_PAGE_MASK) |
-> > +                off_in_page);
-> >          if (iter->dir == DMA_DIRECTION_FROM_DEVICE) {
-> >              memcpy(p, buf, cplen);
-> >          } else {
-> > --
-> > 2.24.1
-> >
-> >
-> >  
-> Tested-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> I've updated the specs,
 > 
-> It looks to me this patch should definitely be selected for 5.1.?
+> Following
+> https://github.com/oasis-tcs/virtio-spec/blob/master/CONTRIBUTING.md,
+> I've opened an issue:
+> 
+> https://github.com/oasis-tcs/virtio-spec/issues/83
+> 
+> Is this the good process?
+> 
+> Thanks,
+> Laurent
+
+
+It's ok but you also need to send spec patches by mail so
+people can review.
 
 
