@@ -2,130 +2,77 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36134C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:58:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E607CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:15:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF9562075D
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:58:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1630206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:15:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ImfIGLaI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9562075D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R8Y9tgfv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1630206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0hvO-0005ET-5D
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 04:58:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34026)
+	id 1k0iBP-0008IX-Vf
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 05:15:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1k0hul-0004n2-3o
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:58:19 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:52916)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1k0iAd-0007hD-86
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:14:43 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:26825)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1k0huj-0005tp-9i
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:58:18 -0400
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1k0iAa-0007y1-Ay
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:14:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596013096;
+ s=mimecast20190719; t=1596014078;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ATwg+RSDVBV28PIF7Fnc5aNz68PE110+SfeCsnKKGrg=;
- b=ImfIGLaIyHkTjWVWjlooKplxxiBD5KTB8P5unhvzimD3IW4Xi9WoGci40FMo0Be87sTcFB
- k3vGt0TYudNgCsjp4yB9mtNOscN2LSxH0SN3YQ5bjI2gLUzQsmtPfd+vhlhErjOOWoiLt9
- B6lVmAniQMYdJZ3QqHKftkFJmaHE4sc=
+ in-reply-to:in-reply-to:references:references;
+ bh=S0wYc4/LcohKZOXFczZ4OthMXa1CAhR8XwV9mi1xZug=;
+ b=R8Y9tgfvT4ksPlzNP+xoLmjuhCFnmTs1Oanrqu4YOH+Fn9J3jXoaKbl7QJRwM+kddvWmPi
+ XijIGzrBphhL5fbWBz2epuxerPCe0x+7Lh+IRkZX8hziXtpOeD4QftPEa7fho8AcfLQbo4
+ RttuBYur/4/y9c6ZGAMU7MYAz13ctaE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-bSCgPL82M7ecvjHT14UthA-1; Wed, 29 Jul 2020 04:58:14 -0400
-X-MC-Unique: bSCgPL82M7ecvjHT14UthA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-338-sHLvp8g0O5C_0B2ysRrwQQ-1; Wed, 29 Jul 2020 05:14:36 -0400
+X-MC-Unique: sHLvp8g0O5C_0B2ysRrwQQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C530318C63CF;
- Wed, 29 Jul 2020 08:58:12 +0000 (UTC)
-Received: from [10.36.114.111] (ovpn-114-111.ams2.redhat.com [10.36.114.111])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 035CC7854D;
- Wed, 29 Jul 2020 08:58:00 +0000 (UTC)
-Subject: Re: [PATCH RFCv3 6/9] s390x/diag: subcode to query device memory
- region
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200724143750.59836-1-david@redhat.com>
- <20200724143750.59836-7-david@redhat.com>
- <20200727114819.3f816010.cohuck@redhat.com>
- <963e5931-117e-48cb-b829-d630abff9e42@redhat.com>
- <20200727120930.7b8803e4.cohuck@redhat.com>
- <520ac822-df67-b33a-378f-a8f91a3bed2f@redhat.com>
- <20200727111546.GA13770@osiris>
- <68205bc1-1ac4-a023-0531-aa1a0c91e17d@redhat.com>
- <20200728091014.173a7d18.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <3f337e2d-fc46-b842-cbca-cc4036bf8fe0@redhat.com>
-Date: Wed, 29 Jul 2020 10:57:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BCBB8015CE;
+ Wed, 29 Jul 2020 09:14:35 +0000 (UTC)
+Received: from starship (unknown [10.35.206.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 531EA7191D;
+ Wed, 29 Jul 2020 09:14:31 +0000 (UTC)
+Message-ID: <f91f8732ffb3f0dc8862005da8339fd1c416cde8.camel@redhat.com>
+Subject: Re: [PATCH v3 06/18] hw/block/nvme: mark fw slot 1 as read-only
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+Date: Wed, 29 Jul 2020 12:14:30 +0300
+In-Reply-To: <20200706061303.246057-7-its@irrelevant.dk>
+References: <20200706061303.246057-1-its@irrelevant.dk>
+ <20200706061303.246057-7-its@irrelevant.dk>
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
 MIME-Version: 1.0
-In-Reply-To: <20200728091014.173a7d18.cohuck@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.74; envelope-from=david@redhat.com;
+Received-SPF: pass client-ip=63.128.21.74; envelope-from=mlevitsk@redhat.com;
  helo=us-smtp-delivery-74.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 01:09:48
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -135,7 +82,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -148,61 +95,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28.07.20 09:10, Cornelia Huck wrote:
-> On Mon, 27 Jul 2020 14:02:47 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On Mon, 2020-07-06 at 08:12 +0200, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
 > 
->> On 27.07.20 13:15, Heiko Carstens wrote:
->>> On Mon, Jul 27, 2020 at 12:12:02PM +0200, David Hildenbrand wrote:  
->>>>>>>> +#define DIAG500_DEVICE_MEMORY_REGION   4    
->>>>>>>
->>>>>>> Regardless what we end up with, this needs to be specified
->>>>>>> somewhere(tm).  
->>>>>>
->>>>>> Yeah, there, we should also document the existing subcodes. What would
->>>>>> be the right place for this? The kernel feels somewhat wrong to me.  
->>>>>
->>>>> The still supported subcode 3 is properly specified in the virtio spec.
->>>>> That's not a good place for that new one, though.
->>>>>
->>>>> QEMU is probably a better place than the kernel to specify stuff,
->>>>> although it's not really ideal, either. OTOH, do we ever expect other
->>>>> hypervisors to implement this new subcode?  
->>>>
->>>> cloud-hypervisor implements virtio-mem. If it were ever to support s390x
->>>> (guess it does not yet), it would also want to implement that one. But
->>>> then, it can just look at QEMU doc I guess :)  
->>>
->>> It must be well defined and easy to find also for kernel developers
->>> who actually have to care about memory detection code :)  
->>
->> So I'd suggest documenting it in QEMU (docs/specs ...) for now, and
->> referencing it from the relevant Linux patch - other suggestions?
+> Mark firmware slot 1 as read-only and only support that slot.
 > 
-> That's probably the easiest way for now... the kernel's s390-diag.rst
-> should also point to it.
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> ---
+>  hw/block/nvme.c      | 3 ++-
+>  include/block/nvme.h | 4 ++++
+>  2 files changed, 6 insertions(+), 1 deletion(-)
 > 
-> However, I think we really need a central place for definitions that
-> are not just a Linux/QEMU interface, but can potentially also be used
-> by other hypervisors/guests. Nothing as complicated as an OASIS spec,
-> but maybe a git??b project?
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index a330ccf91620..b6bc75eb61a2 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -62,6 +62,7 @@
+>  #define NVME_TEMPERATURE 0x143
+>  #define NVME_TEMPERATURE_WARNING 0x157
+>  #define NVME_TEMPERATURE_CRITICAL 0x175
+> +#define NVME_NUM_FW_SLOTS 1
+>  
+>  #define NVME_GUEST_ERR(trace, fmt, ...) \
+>      do { \
+> @@ -1666,7 +1667,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+>       * inconsequential.
+>       */
+>      id->acl = 3;
+> -    id->frmw = 7 << 1;
+> +    id->frmw = (NVME_NUM_FW_SLOTS << 1) | NVME_FRMW_SLOT1_RO;
 
-Sounds good. Maintainers? I can volunteer (+setup/create initial
-version), but would be good to have other QEMU/KVM maintainers there as
-well.
+Offtopic:
+They didn't make this one 0 based value, and yet ask for at least 1 slot. 
+Just to keep us entertained I guess :-)
 
--- 
-Thanks,
+>      id->lpa = 1 << 0;
+>  
+>      /* recommended default value (~70 C) */
+> diff --git a/include/block/nvme.h b/include/block/nvme.h
+> index d2c457695b38..d639e8bbee92 100644
+> --- a/include/block/nvme.h
+> +++ b/include/block/nvme.h
+> @@ -842,6 +842,10 @@ enum NvmeIdCtrlOncs {
+>      NVME_ONCS_TIMESTAMP     = 1 << 6,
+>  };
+>  
+> +enum NvmeIdCtrlFrmw {
+> +    NVME_FRMW_SLOT1_RO = 1 << 0,
+> +};
+> +
+>  #define NVME_CTRL_SQES_MIN(sqes) ((sqes) & 0xf)
+>  #define NVME_CTRL_SQES_MAX(sqes) (((sqes) >> 4) & 0xf)
+>  #define NVME_CTRL_CQES_MIN(cqes) ((cqes) & 0xf)
 
-David / dhildenb
+Looks good,
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
 
