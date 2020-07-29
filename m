@@ -2,86 +2,86 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A82C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2FC9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:19:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 508DF20656
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC2A120656
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:19:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ho444FRQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 508DF20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iooUtnXb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC2A120656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0uPo-0003IX-Im
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:19:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55552)
+	id 1k0uPw-0003Wb-0c
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:19:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k0uLV-0003eh-KB
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 18:14:45 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41367
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k0uLS-0001B1-BE
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 18:14:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596060880;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jhjZBzKdUPWmQBoGYYNmaWrngqD0E272Oq6g881pzZA=;
- b=Ho444FRQkwAr264d9A0hYBt09+WzksEIw3DSNR5y+iZDns+Ad8ErFi3g4myqm2GVJU55gM
- nQ7mPcedSC63omr8g28jLv8WVlR/QJrhbGt7YlfaW9YWXoETd5CnyFjtI5XHu00hPq2Uef
- uCIZGTjyzrxaOQkJORtr/AFvhtXLNxs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-rQpeOYq-ObySeWVV-Vg0BA-1; Wed, 29 Jul 2020 18:14:38 -0400
-X-MC-Unique: rQpeOYq-ObySeWVV-Vg0BA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D5C959
- for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 22:14:38 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-116-149.rdu2.redhat.com [10.10.116.149])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4F9971DB;
- Wed, 29 Jul 2020 22:14:32 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id D090D223D08; Wed, 29 Jul 2020 18:14:31 -0400 (EDT)
-From: Vivek Goyal <vgoyal@redhat.com>
+ (Exim 4.90_1) (envelope-from <e.emanuelegiuseppe@gmail.com>)
+ id 1k0uOc-0001bq-Vd
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 18:17:58 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:44968)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <e.emanuelegiuseppe@gmail.com>)
+ id 1k0uOb-0001iP-8M
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 18:17:58 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id b6so23036511wrs.11
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 15:17:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=k/Yx5yOHpsjSDbCkwhAkr4UfKKLqMqfAkrAKDj7bYGo=;
+ b=iooUtnXbJg8RZ60tB+u+uT5ZCG98pX0gh8nWR/OUIvMJ69Ph7o8tcMPOzrHcXRaEni
+ nO4IyHJUMAVKR/AWWj1fXnTqZWLNqrdSDDPYOWYx9WOz4ZcFgJrCogo4mJyz9zFJBEyG
+ LhRRk3XS/4zFnxPHOxDWq6QSdj+/33DEnyvlgGk/jDZ/oP9svrg2ZhoRFaZ81MNF0Xd7
+ 7Bbr1/ORZLn8SUUR5eS4jgKR5w+hfqoin+rPzzfss0+CbDSMcFzTycZ6LShlfjF2INty
+ XcsBWtyxAQSFtwSQIzQLkGawR+NbeCC8/FqIy+z+FnXHcmAnjrmFbQOesJu1piYhmtZp
+ 4o6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=k/Yx5yOHpsjSDbCkwhAkr4UfKKLqMqfAkrAKDj7bYGo=;
+ b=udx/zbhnKhXTJ+evGrB0UbF55G4rhC/UIL570RP+kT9Y12RJX0ohbU+nS0UMX5kIvW
+ 7kp8+49C9XsfRXnMPoDmiYIGW/tu7Un/mcyXznS2wmv3zeuaU+C2ooG0ufLSDIn8kLfn
+ w34s7hYx5q7maU9TBmILoKB1NfcG1NWAbpz/sOrrH96t3RXOERqLrsHK7dXcfQhhEfLJ
+ 6ej/CGZdT41mphCAf9zXJSywy4RUGyXi1ANFi96V+fQLIhAHhHnD+qop+vm8zrUggwZ/
+ K7zDZh7+XBEKTfRjrLf9xF2+sv4rI495cmNHMAEFdnul3grOeV9QIqeIGHqqkNz+O9s+
+ oXFA==
+X-Gm-Message-State: AOAM530VWkWhQbd8DVO79DZX0q/P8R9qNzaJA5xO3KYFRzfjyr4LokWQ
+ 0JU+yjzE/QTIJDlTCYpf5SaNmtw9nkQ=
+X-Google-Smtp-Source: ABdhPJzxw8pKLo8hhy2Y4YNb4GJrhK/bHmahJqHb/z6Z5ZLObbWgg+vlsXb0U2dnhLoQ1JHYI70gsg==
+X-Received: by 2002:a5d:6646:: with SMTP id f6mr31661499wrw.155.1596061074991; 
+ Wed, 29 Jul 2020 15:17:54 -0700 (PDT)
+Received: from emanuele-MacBookPro.station
+ (net-130-25-47-175.cust.vodafonedsl.it. [130.25.47.175])
+ by smtp.gmail.com with ESMTPSA id r16sm9150057wrr.13.2020.07.29.15.17.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Jul 2020 15:17:54 -0700 (PDT)
+From: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/5] virtiofsd: Open lo->source while setting up root in
- sandbox=NONE mode
-Date: Wed, 29 Jul 2020 18:14:09 -0400
-Message-Id: <20200729221410.147556-5-vgoyal@redhat.com>
-In-Reply-To: <20200729221410.147556-1-vgoyal@redhat.com>
-References: <20200729221410.147556-1-vgoyal@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=vgoyal@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:18:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Subject: [PATCH] pci_dma_rw: return correct value instead of 0
+Date: Thu, 30 Jul 2020 00:17:32 +0200
+Message-Id: <20200729221732.29041-1-e.emanuelegiuseppe@gmail.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
+ envelope-from=e.emanuelegiuseppe@gmail.com; helo=mail-wr1-x42a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,37 +95,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, vromanso@redhat.com, dgilbert@redhat.com,
- virtio-fs@redhat.com, stefanha@redhat.com, vgoyal@redhat.com
+Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In sandbox=NONE mode, lo->source points to the directory which is being
-exported. We have not done any chroot()/pivot_root(). So open lo->source.
+pci_dma_rw currently always returns 0, regardless
+of the result of dma_memory_rw. Adjusted to return
+the correct value.
 
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+Signed-off-by: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ include/hw/pci/pci.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 76ef891105..a6fa816b6c 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -3209,7 +3209,10 @@ static void setup_root(struct lo_data *lo, struct lo_inode *root)
-     int fd, res;
-     struct stat stat;
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index c1bf7d5356..41c4ab5932 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -787,8 +787,7 @@ static inline AddressSpace *pci_get_address_space(PCIDevice *dev)
+ static inline int pci_dma_rw(PCIDevice *dev, dma_addr_t addr,
+                              void *buf, dma_addr_t len, DMADirection dir)
+ {
+-    dma_memory_rw(pci_get_address_space(dev), addr, buf, len, dir);
+-    return 0;
++    return dma_memory_rw(pci_get_address_space(dev), addr, buf, len, dir);
+ }
  
--    fd = open("/", O_PATH);
-+    if (lo->sandbox == SANDBOX_NONE)
-+        fd = open(lo->source, O_PATH);
-+    else
-+        fd = open("/", O_PATH);
-     if (fd == -1) {
-         fuse_log(FUSE_LOG_ERR, "open(%s, O_PATH): %m\n", lo->source);
-         exit(1);
+ static inline int pci_dma_read(PCIDevice *dev, dma_addr_t addr,
 -- 
-2.25.4
+2.17.1
 
 
