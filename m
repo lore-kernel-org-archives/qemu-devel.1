@@ -2,132 +2,79 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E615DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 12:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74402C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 12:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE6BC206D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 12:56:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Klw3RYDS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE6BC206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A971206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 12:56:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A971206D4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0ld9-0007jg-08
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 08:56:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33538)
+	id 1k0ldZ-00005C-Ks
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 08:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1k0lbj-0006wT-Qh
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 08:54:56 -0400
-Received: from mail-eopbgr60091.outbound.protection.outlook.com
- ([40.107.6.91]:9344 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1k0lbh-0004eM-9x
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 08:54:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SH5b0/f3tQNy6opawY7vW9gK29Ov6IuxrSK5yroFfqbgNZ72K5mevgIkiPX24ulxRxA/dEiT8WAMjDypXUqPplIQxMmQZ0Ee/xgUUEklIQusfAeMMYzzWLMJI05zdQi1U0ymy3ggdTVel1TT3lKWktTdTHAbQTjtPtBWQlhBGdIM4FBqKBnpcmZ0CQCcX2UPxrJ16LDAcIsea4jA8VtqaT94EleD/TFOP8O77ALt20vcv+9YBpDgtc6cOhVpuvFoKumCrP1hTx5OmAe8UrVEOLJcsxCMt/GFjk0x0yUOMzBLg8iKnebQuSXcmWkjZgVL/uUFZlOuRqvpkWWzHj3K/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NXzQRyNsB+FnvjVKKu1k1CE9fjLTYKlkVKF9vm9aiD4=;
- b=R02MxXJ0tRMDLssvc4/R5p0dW9NC+FqvNhZf9Ss2NRmOkJLZRlUtehCjYXCfxcahc/H5oZoUQBZu9uc3hpvE09EYa5ET5Jw3aT/C1XeSTHJsLAnp9fhKUrsnwO7PtXRW0P/mVU+lgIbhlrTXhDlpbplec+AVqZTU3t4kd6/F3CUfBfwPvBE9lqUjQ6SgUTvUtLDaaoAOBmz+aEzPfXaIK7iF5cQx7lI+PuMCGU7Qg7Z1QQdCoBmX6+1d6eDQQ7BcuB4RWnv8czUX0gfuh8J68+Y+ODfYeiRjdVemqERw4ABVCtgK0IooBkDoQm3JdWRQxkVvUYwildc4yid9pF4/5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NXzQRyNsB+FnvjVKKu1k1CE9fjLTYKlkVKF9vm9aiD4=;
- b=Klw3RYDSQ/KivMT0Saj3IjYdt9m/NSdC4sez+TK8rgxqzsfPf3PqG4d1uEcwzHmZV5tcEwETURZpq8KtvBU9X8wstWcZaCaDZHUud8oZIbu5oozTUzeQIWMBlCWqd9Jry9bxkkPneMUNJHF8FtAYveoDGNcG62Fej9x9VzN4qRM=
-Authentication-Results: mail.ru; dkim=none (message not signed)
- header.d=none;mail.ru; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (2603:10a6:208:ff::27)
- by AM0PR08MB3252.eurprd08.prod.outlook.com (2603:10a6:208:5e::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.26; Wed, 29 Jul
- 2020 12:54:50 +0000
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::5d21:ce58:6f11:b5dd]) by AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::5d21:ce58:6f11:b5dd%7]) with mapi id 15.20.3216.034; Wed, 29 Jul 2020
- 12:54:50 +0000
-Subject: Re: [PATCH v0 3/4] migration: add background snapshot
-To: Peter Xu <peterx@redhat.com>
-References: <20200722081133.29926-1-dplotnikov@virtuozzo.com>
- <20200722081133.29926-4-dplotnikov@virtuozzo.com>
- <20200724000826.GA865413@xz-x1>
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-ID: <f025a2c9-fe4e-5d0d-5fb8-bed35da77952@virtuozzo.com>
-Date: Wed, 29 Jul 2020 15:54:46 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200724000826.GA865413@xz-x1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: AM0PR10CA0003.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::13) To AM0PR08MB3745.eurprd08.prod.outlook.com
- (2603:10a6:208:ff::27)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0lca-0007eP-Qo
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 08:55:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40424)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k0lcV-00050d-7x
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 08:55:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k0lcS-0006eI-Tu
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 12:55:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id DC0BD2E8076
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 12:55:40 +0000 (UTC)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.102] (178.34.161.51) by
- AM0PR10CA0003.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.16 via Frontend
- Transport; Wed, 29 Jul 2020 12:54:49 +0000
-X-Originating-IP: [178.34.161.51]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6f358315-50c2-4593-926c-08d833be9453
-X-MS-TrafficTypeDiagnostic: AM0PR08MB3252:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR08MB3252CC3CB2953347B9C31BD3CF700@AM0PR08MB3252.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /7BxdahwHMEQhkIBSZQRvPeEPhfBrOBFyj/romSBvOKE63VUJsgecux1SicIp69k9qdYlM1IpnlfxR9MEaHblo/bYAGgEjgtSXH4WBanrQEdyG9DlHrL9P5OHlqI6oj/Bry5vfUCvLd4RuIxsABDThilZ3D7fxRS/8OTvTA9jYs38DELMQscgGrKGZPC4ZDQbR2ywlCUuISEHG+fB31CAWI5hzxzFQ1VnhpT6ZP0+U0oFX2MoELdRGsoKmujIwYlYO9NfON16Itq+SAmFEZ9ZWrJ+ljtCJfO6DEaeLu3yUjXTuKoBHYCbdeQSN8fvZx4oDTiQ6a3bxnwOvOst6OEHVLozaZfRV1gX089eQeZpqzsFhSOGCnW1fGRe59ldGbT
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM0PR08MB3745.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(396003)(136003)(366004)(376002)(346002)(39830400003)(86362001)(53546011)(2906002)(2616005)(956004)(52116002)(31686004)(6916009)(478600001)(6486002)(26005)(16576012)(5660300002)(36756003)(4326008)(83380400001)(8936002)(31696002)(8676002)(316002)(66946007)(66476007)(16526019)(186003)(6666004)(66556008)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: L+xh15KC6Nb4dWwkmYUcSggbxf7wcBnO4q2oPDwx1zUbTt0dwGFb36lpbN28aPvnGVOYkzQ3MwMqT95/z4iLrRz54F5B+liZc4u7vlkwatSsVL8g0LaOM6pTVyHPPqn0PLLMphaxn07bV9dNUR16SYQfI7gSMPlvMfHi3zhnvlsQ6GpqXJQC/AS5kEyG/7s5z0you0pMe6LmwsJyedBMyhA38/yADvnbcDJ264rpSsSNpKuC+6gCCnQTcXdYZcYWOM8+PNmNWY004X/oEcTrgBLAQVUHj++vr3uhP7m2OGg7wGiMoG9Y7BElTyGyN5ChOBwpQa4gLZ1zfpaRidDdhDXNWIt73/zC/8u6Sv/dIw5j6CdGJnGLA8rwLnvrauuYPQPDeM90QfFdc1MLDjBHOEoq1k+UwjrA9Cv+ZVobcNj8NzVGZOPMFYHuY87cLtJKOm4pfBKta65dlkZ4BxBwTl9fpRb5tp04LhroZaM4OOE=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f358315-50c2-4593-926c-08d833be9453
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR08MB3745.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2020 12:54:49.9612 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L+78NQ5OeCsYHUCAeHrceOMZ9eM0vWAwUm+yJ6owSXK30Slt2oQmt2njpvnlQo4Yy3nIaBtsxPP84qyyHVSDFHYEiZNjZuCGMxELdwaIZjQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3252
-Received-SPF: pass client-ip=40.107.6.91;
- envelope-from=dplotnikov@virtuozzo.com;
- helo=EUR04-DB3-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 08:54:51
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 Jul 2020 12:42:00 -0000
+From: Bernhard Urban-Forster <1889411@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: lewurm-gmx
+X-Launchpad-Bug-Reporter: Bernhard Urban-Forster (lewurm-gmx)
+X-Launchpad-Bug-Modifier: Bernhard Urban-Forster (lewurm-gmx)
+Message-Id: <159602652086.4898.17497826293618974596.malonedeb@soybean.canonical.com>
+Subject: [Bug 1889411] [NEW] RISC-V: Unable to unwind the stack upon signals
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ff8a4bf6fc8d3976630ea53f010f358dcc981671
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 08:55:41
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -136,147 +83,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: den_plotnic@mail.ru, quintela@redhat.com, armbru@redhat.com,
- qemu-devel@nongnu.org, pbonzini@redhat.com, den@openvz.org,
- dgilbert@redhat.com
+Reply-To: Bug 1889411 <1889411@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Public bug reported:
+
+Consider the following program:
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+#include <stdio.h>
+#include <stdlib.h>
+
+#define NOINLINE __attribute__ ((noinline))
+
+void NOINLINE abort_me(void) { abort(); /* trigger SIGABRT */ }
+
+void NOINLINE level1(void) { abort_me(); }
+
+void NOINLINE level2(void) { level1(); }
+
+void NOINLINE level3(void) { level2(); }
+
+void NOINLINE level4(void) { level3();}
+
+int main(void) {
+	level4();
+	return 0;
+}
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+$ riscv64-linux-gnu-gcc -march=3Drv64imafdc -O0 -g c.c
+$ qemu-riscv64 -g 31337 ./c &
+$ riscv64-unknown-linux-gnu-gdb -q -ex 'target remote localhost:31337' -ex =
+'b abort_me' -ex c -ex bt ./c
+Reading symbols from c...
+Remote debugging using localhost:31337
+Reading symbols from /home/lewurm/riscv/sysroot/lib/ld-linux-riscv64-lp64d.=
+so.1...
+0x0000004000804f30 in _start () from /home/lewurm/riscv/sysroot/lib/ld-linu=
+x-riscv64-lp64d.so.1
+Breakpoint 1 at 0x4000000632: file c.c, line 7.
+Continuing.
+
+Breakpoint 1, abort_me () at c.c:7
+7               abort(); /* trigger SIGABRT */
+#0  abort_me () at c.c:7
+#1  0x0000004000000642 in level1 () at c.c:11
+#2  0x0000004000000658 in level2 () at c.c:15
+#3  0x000000400000066e in level3 () at c.c:19
+#4  0x0000004000000684 in level4 () at c.c:23
+#5  0x000000400000069a in main () at c.c:27
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+So far so good, I get a proper backtrace as expected. If I let the
+signal trigger however, gdb is not able to unwind the stack:
+
+(gdb) c
+Continuing.
+
+Program received signal SIGABRT, Aborted.
+0x0000004000858074 in ?? ()
+(gdb) bt
+#0  0x0000004000858074 in ?? ()
 
 
-On 24.07.2020 03:08, Peter Xu wrote:
-> On Wed, Jul 22, 2020 at 11:11:32AM +0300, Denis Plotnikov wrote:
->> +/**
->> + * ram_copy_page: make a page copy
->> + *
->> + * Used in the background snapshot to make a copy of a memeory page.
->> + * Ensures that the memeory page is copied only once.
->> + * When a page copy is done, restores read/write access to the memory
->> + * page.
->> + * If a page is being copied by another thread, wait until the copying
->> + * ends and exit.
->> + *
->> + * Returns:
->> + *   -1 - on error
->> + *    0 - the page wasn't copied by the function call
->> + *    1 - the page has been copied
->> + *
->> + * @block:     RAM block to use
->> + * @page_nr:   the page number to copy
->> + * @page_copy: the pointer to return a page copy
->> + *
->> + */
->> +int ram_copy_page(RAMBlock *block, unsigned long page_nr,
->> +                          void **page_copy)
->> +{
->> +    void *host_page;
->> +    int res = 0;
->> +
->> +    atomic_inc(&ram_state->page_copier_cnt);
->> +
->> +    if (test_and_set_bit_atomic(page_nr, block->touched_map)) {
->> +        while (!test_bit_atomic(page_nr, block->copied_map)) {
->> +            /* the page is being copied -- wait for the end of the copying */
->> +            qemu_event_wait(&ram_state->page_copying_done);
->> +        }
->> +        goto out;
->> +    }
->> +
->> +    *page_copy = ram_page_buffer_get();
->> +    if (!*page_copy) {
->> +        res = -1;
->> +        goto out;
->> +    }
->> +
->> +    host_page = block->host + (page_nr << TARGET_PAGE_BITS);
->> +    memcpy(*page_copy, host_page, TARGET_PAGE_SIZE);
->> +
->> +    if (ram_set_rw(host_page, TARGET_PAGE_SIZE)) {
->> +        ram_page_buffer_free(*page_copy);
->> +        *page_copy = NULL;
->> +        res = -1;
->> +        goto out;
->> +    }
->> +
->> +    set_bit_atomic(page_nr, block->copied_map);
->> +    qemu_event_set(&ram_state->page_copying_done);
->> +    qemu_event_reset(&ram_state->page_copying_done);
->> +
->> +    res = 1;
->> +out:
->> +    atomic_dec(&ram_state->page_copier_cnt);
->> +    return res;
->> +}
-> Is ram_set_rw() be called on the page only if a page fault triggered?
-> Shouldn't we also do that even in the background thread when we proactively
-> copying the pages?
-Yes, we should. It's a bug.
->
-> Besides current solution, do you think we can make it simpler by only deliver
-> the fault request to the background thread?  We can let the background thread
-> to do all the rests and IIUC we can drop all the complicated sync bitmaps and
-> so on by doing so.  The process can look like:
->
->    - background thread runs the general precopy migration, and,
->
->      - it only does the ram_bulk_stage, which is the first loop, because for
->        snapshot no reason to send a page twice..
->
->      - After copy one page, do ram_set_rw() always, so accessing of this page
->        will never trigger write-protect page fault again,
->
->      - take requests from the unqueue_page() just like what's done in this
->        series, but instead of copying the page, the page request should look
->        exactly like the postcopy one.  We don't need copy_page because the page
->        won't be changed before we unprotect it, so it shiould be safe.  These
->        pages will still be with high priority because when queued it means vcpu
->        writed to this protected page and fault in userfaultfd.  We need to
->        migrate these pages first to unblock them.
->
->    - the fault handler thread only needs to do:
->
->      - when get a uffd-wp message, translate into a postcopy-like request
->        (calculate ramblock and offset), then queue it.  That's all.
->
-> I believe we can avoid the copy_page parameter that was passed around, and we
-> can also save the two extra bitmaps and the complicated synchronizations.
->
-> Do you think this would work?
+I get the same behaviour for SIGSEGV and SIGILL, I didn't try other
+signals. Apparently this scenario works on real hardware (see linked gdb
+issue below), and presumably it would work with system qemu (I haven't
+tested that yet though). So my guess is that qemu does something
+differently around signal handling than the linux kernel.
 
-Yes, it would. This scheme is much simpler. I like it, in general.
 
-I use such a complicated approach to reduce all possible vCPU delays:
-if the storage where the snapshot is being saved is quite slow, it could 
-lead
-to vCPU freezing until the page is fully written to the storage.
-So, with the current approach, if not take into account a number of page 
-copies limitation,
-the worst case is all VM's ram is copied and then written to the storage.
-Other words, the current scheme provides minimal vCPU delays and thus 
-minimal VM cpu
-performance slowdown with the cost of host's memory consumption.
-The new scheme is simple, doesn't consume extra host memory but can 
-freeze vCPUs for
-longer time r because:
-* usually memory page coping is faster then memory page writing to a 
-storage (think of HDD disk)
-* writing page to a disk depends on disk performance and current disk load
+Full reproducer: https://gist.github.com/lewurm/befb9ddf5894bad9628b1df7725=
+8598b
+RISC-V GDB issue: https://github.com/riscv/riscv-binutils-gdb/issues/223
 
-So it seems that we have two different strategies:
-1. lower CPU delays
-2. lower memory usage
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-To be honest I would start from the yours scheme as it much simler and 
-the other if needed in the future.
+-- =
 
-What do you think?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1889411
 
-Denis
+Title:
+  RISC-V: Unable to unwind the stack upon signals
 
-> Besides, have we disabled dirty tracking of memslots?  IIUC that's not needed
-> for background snapshot too, so neither do we need dirty tracking nor do we
-> need to sync the dirty bitmap from outside us (kvm/vhost/...).
->
+Status in QEMU:
+  New
 
+Bug description:
+  Consider the following program:
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  #include <stdio.h>
+  #include <stdlib.h>
+
+  #define NOINLINE __attribute__ ((noinline))
+
+  void NOINLINE abort_me(void) { abort(); /* trigger SIGABRT */ }
+
+  void NOINLINE level1(void) { abort_me(); }
+
+  void NOINLINE level2(void) { level1(); }
+
+  void NOINLINE level3(void) { level2(); }
+
+  void NOINLINE level4(void) { level3();}
+
+  int main(void) {
+  	level4();
+  	return 0;
+  }
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  $ riscv64-linux-gnu-gcc -march=3Drv64imafdc -O0 -g c.c
+  $ qemu-riscv64 -g 31337 ./c &
+  $ riscv64-unknown-linux-gnu-gdb -q -ex 'target remote localhost:31337' -e=
+x 'b abort_me' -ex c -ex bt ./c
+  Reading symbols from c...
+  Remote debugging using localhost:31337
+  Reading symbols from /home/lewurm/riscv/sysroot/lib/ld-linux-riscv64-lp64=
+d.so.1...
+  0x0000004000804f30 in _start () from /home/lewurm/riscv/sysroot/lib/ld-li=
+nux-riscv64-lp64d.so.1
+  Breakpoint 1 at 0x4000000632: file c.c, line 7.
+  Continuing.
+
+  Breakpoint 1, abort_me () at c.c:7
+  7               abort(); /* trigger SIGABRT */
+  #0  abort_me () at c.c:7
+  #1  0x0000004000000642 in level1 () at c.c:11
+  #2  0x0000004000000658 in level2 () at c.c:15
+  #3  0x000000400000066e in level3 () at c.c:19
+  #4  0x0000004000000684 in level4 () at c.c:23
+  #5  0x000000400000069a in main () at c.c:27
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  So far so good, I get a proper backtrace as expected. If I let the
+  signal trigger however, gdb is not able to unwind the stack:
+
+  (gdb) c
+  Continuing.
+
+  Program received signal SIGABRT, Aborted.
+  0x0000004000858074 in ?? ()
+  (gdb) bt
+  #0  0x0000004000858074 in ?? ()
+
+
+  I get the same behaviour for SIGSEGV and SIGILL, I didn't try other
+  signals. Apparently this scenario works on real hardware (see linked
+  gdb issue below), and presumably it would work with system qemu (I
+  haven't tested that yet though). So my guess is that qemu does
+  something differently around signal handling than the linux kernel.
+
+  =
+
+  Full reproducer: https://gist.github.com/lewurm/befb9ddf5894bad9628b1df77=
+258598b
+  RISC-V GDB issue: https://github.com/riscv/riscv-binutils-gdb/issues/223
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1889411/+subscriptions
 
