@@ -2,100 +2,97 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0164EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EEAC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:13:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFCCA2070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:12:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 230ED2070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:13:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HtV4r50s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFCCA2070B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gt0X+2AR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 230ED2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0mp1-00021q-Su
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:12:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54116)
+	id 1k0mpt-000369-Bl
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:13:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k0mnX-0008As-5o
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:11:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20113
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1k0mok-0001sa-C5
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:12:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51837
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k0mnT-0007Zk-Et
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:11:10 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1k0moh-0007j3-F1
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:12:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596031866;
+ s=mimecast20190719; t=1596031942;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=41rKLPHfRjo1IrFanpHQc1/6wKqY0LgZwOqqRKXyEMI=;
- b=HtV4r50sfUOnCTHgosNu+iSE9ZUtqVb7Du0i39R+525dYH7eImaXbGC/u2kdLNNAndUXHI
- Wx4pRYaF/DHFdvwJ2mvDdUDU/sze96BZR6Vf7M1IBomfhPbBzAJYOATG2vNpEkcsQwjHx7
- NyywaFiai5pRyIgagricbaCvrYgFfIA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-jqYgd_exOFC7Yj5BswZj3w-1; Wed, 29 Jul 2020 10:11:02 -0400
-X-MC-Unique: jqYgd_exOFC7Yj5BswZj3w-1
-Received: by mail-wr1-f72.google.com with SMTP id f14so6684967wrm.22
- for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 07:11:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=41rKLPHfRjo1IrFanpHQc1/6wKqY0LgZwOqqRKXyEMI=;
- b=Xcga/wHas+fSBKwseJuOZqGrXosgz18ZHd1706XGSGsS1EoLtUcBkFgzWp9RYrgAnJ
- ZeYkksrDInoguGbbceXxHhu03QekJ6TdCfU3MAwGuRHqQrZzQDTwoUfFa0j7oYzUBZef
- nQlJaxFsA152Jr6imHLnj6UWHNawYCN8aCtQyfYdi/pBd9qZqy2KQRUqr/l74XYr95SL
- lv9PZ87+feN7mYWpf5nKx8lkeefluYslaRxmL/BymekmEFla5t6Vto1rk6VZMlrL3MI3
- swIOxHRLt+qVjAtuZRM/DlrPnlLr8He/edF1ifSpMgE7B3hpfkJ4bxGp1lKb0/q0u2Fw
- ZNHQ==
-X-Gm-Message-State: AOAM531+GRRstua6GoGw6ZxwpckJyDxAgzRe3OAFLaPysyNDljxpbj1R
- VRAURG1QhhyELGKmupAAEKGWnlZU/1qYuvoNgCOryXMXpKUf+FQcIFo3oiDx+aVSyuxx3PwNgJz
- yS8wHikMEJvhMhiE=
-X-Received: by 2002:a1c:81c8:: with SMTP id c191mr8812275wmd.23.1596031860853; 
- Wed, 29 Jul 2020 07:11:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWWXkqLLztVnY+xmpeNnOzeUkXWmAHwZeiLTeCiJlrmVdYg+dq4uDDsd4C1lELiVJxxZwm9A==
-X-Received: by 2002:a1c:81c8:: with SMTP id c191mr8812250wmd.23.1596031860525; 
- Wed, 29 Jul 2020 07:11:00 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
- by smtp.gmail.com with ESMTPSA id p6sm4988552wru.33.2020.07.29.07.10.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jul 2020 07:10:59 -0700 (PDT)
-Date: Wed, 29 Jul 2020 10:10:56 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH] hw: add compat machines for 5.2
-Message-ID: <20200729101032-mutt-send-email-mst@kernel.org>
-References: <20200728094645.272149-1-cohuck@redhat.com>
+ bh=4K2PYbh56+H98+KzbVF2TraRLsMvRA+0Y6yS8P9YG78=;
+ b=gt0X+2ARIK/CGXMUG3fRdiGzfOqDpLoiR++Dg32kCUgMYKnji8q7Eft1K/5b+SFeTOY12o
+ 0NW0B+H2DufEWDUyYDjx/1OTdcA981828lSQM+z+kwQP2tWpq2IQ+onSi+f9cIgTwVk55C
+ 3prrKkwYx3paK6HTojvjNCd7Sm3zm3I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-r_4nS9KWNDyBOdQ4YHxrmg-1; Wed, 29 Jul 2020 10:12:19 -0400
+X-MC-Unique: r_4nS9KWNDyBOdQ4YHxrmg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4D671DE1;
+ Wed, 29 Jul 2020 14:12:17 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D959B6FEC6;
+ Wed, 29 Jul 2020 14:12:15 +0000 (UTC)
+Date: Wed, 29 Jul 2020 16:12:13 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
+ CpuInstanceProperties
+Message-ID: <20200729161213.3daa3933@redhat.com>
+In-Reply-To: <5df170bd-ea91-8347-a2cf-7ac234248197@amd.com>
+References: <159362436285.36204.986406297373871949.stgit@naples-babu.amd.com>
+ <159362466108.36204.3751851750959980962.stgit@naples-babu.amd.com>
+ <20200713110822.5495e1c6@redhat.com>
+ <78809d9f-a491-8c99-3f35-7f012c7d75bf@amd.com>
+ <20200713181740.16a357a6@redhat.com>
+ <47dc6238-bb71-d679-f58a-f574eb36d572@amd.com>
+ <20200713193221.27674630@redhat.com>
+ <4003b476-afdb-74a1-4f9f-1387aae6c4e8@amd.com>
+ <20200724190518.0f7a2b6b@redhat.com>
+ <5b32c961-4fd0-8b8c-4475-eafff2ae48a9@amd.com>
+ <20200727191416.2bf6e34a@redhat.com>
+ <5df170bd-ea91-8347-a2cf-7ac234248197@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20200728094645.272149-1-cohuck@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:27:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:17:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,247 +105,356 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 28, 2020 at 11:46:45AM +0200, Cornelia Huck wrote:
-> Add 5.2 machine types for arm/i440fx/q35/s390x/spapr.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+On Mon, 27 Jul 2020 18:59:42 -0500
+Babu Moger <babu.moger@amd.com> wrote:
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > -----Original Message-----
+> > From: Igor Mammedov <imammedo@redhat.com>
+> > Sent: Monday, July 27, 2020 12:14 PM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; ehabkost@redhat.com;
+> > rth@twiddle.net
+> > Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
+> > CpuInstanceProperties
+> >=20
+> > On Mon, 27 Jul 2020 10:49:08 -0500
+> > Babu Moger <babu.moger@amd.com> wrote:
+> >  =20
+> > > > -----Original Message-----
+> > > > From: Igor Mammedov <imammedo@redhat.com>
+> > > > Sent: Friday, July 24, 2020 12:05 PM
+> > > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > > Cc: qemu-devel@nongnu.org; pbonzini@redhat.com; =20
+> > ehabkost@redhat.com; =20
+> > > > rth@twiddle.net
+> > > > Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
+> > > > CpuInstanceProperties
+> > > >
+> > > > On Mon, 13 Jul 2020 14:30:29 -0500
+> > > > Babu Moger <babu.moger@amd.com> wrote:
+> > > > =20
+> > > > > > -----Original Message-----
+> > > > > > From: Igor Mammedov <imammedo@redhat.com>
+> > > > > > Sent: Monday, July 13, 2020 12:32 PM
+> > > > > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > > > > Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com;
+> > > > > > qemu- devel@nongnu.org
+> > > > > > Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids from
+> > > > > > CpuInstanceProperties
+> > > > > >
+> > > > > > On Mon, 13 Jul 2020 11:43:33 -0500 Babu Moger
+> > > > > > <babu.moger@amd.com> wrote:
+> > > > > > =20
+> > > > > > > On 7/13/20 11:17 AM, Igor Mammedov wrote: =20
+> > > > > > > > On Mon, 13 Jul 2020 10:02:22 -0500 Babu Moger
+> > > > > > > > <babu.moger@amd.com> wrote:
+> > > > > > > > =20
+> > > > > > > >>> -----Original Message-----
+> > > > > > > >>> From: Igor Mammedov <imammedo@redhat.com>
+> > > > > > > >>> Sent: Monday, July 13, 2020 4:08 AM
+> > > > > > > >>> To: Moger, Babu <Babu.Moger@amd.com>
+> > > > > > > >>> Cc: pbonzini@redhat.com; rth@twiddle.net;
+> > > > > > > >>> ehabkost@redhat.com;
+> > > > > > > >>> qemu- devel@nongnu.org
+> > > > > > > >>> Subject: Re: [PATCH v2 1/3] hw/i386: Initialize topo_ids
+> > > > > > > >>> from CpuInstanceProperties =20
+> > > > > > > > [...] =20
+> > > > > > > >>>> +
+> > > > > > > >>>> +/*
+> > > > > > > >>>> + * Initialize topo_ids from CpuInstanceProperties
+> > > > > > > >>>> + * node_id in CpuInstanceProperties(or in CPU device) i=
+s
+> > > > > > > >>>> +a sequential
+> > > > > > > >>>> + * number, but while building the topology =20
+> > > > > > > >>> =20
+> > > > > > > >>>> we need to separate it for
+> > > > > > > >>>> + * each socket(mod nodes_per_pkg). =20
+> > > > > > > >>> could you clarify a bit more on why this is necessary? =
+=20
+> > > > > > > >>
+> > > > > > > >> If you have two sockets and 4 numa nodes, node_id in
+> > > > > > > >> CpuInstanceProperties will be number sequentially as 0, 1,=
+ 2, 3.
+> > > > > > > >> But in EPYC topology, it will be  0, 1, 0, 1( Basically mo=
+d
+> > > > > > > >> % number of nodes =20
+> > > > > > per socket). =20
+> > > > > > > >
+> > > > > > > > I'm confused, let's suppose we have 2 EPYC sockets with 2
+> > > > > > > > nodes per socket so APIC id woulbe be composed like:
+> > > > > > > >
+> > > > > > > >  1st socket
+> > > > > > > >    pkg_id(0) | node_id(0)
+> > > > > > > >    pkg_id(0) | node_id(1)
+> > > > > > > >
+> > > > > > > >  2nd socket
+> > > > > > > >    pkg_id(1) | node_id(0)
+> > > > > > > >    pkg_id(1) | node_id(1)
+> > > > > > > >
+> > > > > > > > if that's the case, then EPYC's node_id here doesn't look
+> > > > > > > > like a NUMA node in the sense it's usually used (above
+> > > > > > > > config would have 4 different memory controllers =3D> 4 con=
+ventional =20
+> > NUMA nodes). =20
+> > > > > > >
+> > > > > > > EPIC model uses combination of socket id and node id to
+> > > > > > > identify the numa nodes. So, it internally uses all the infor=
+mation. =20
+> > > > > >
+> > > > > > well with above values, EPYC's node_id doesn't look like it's
+> > > > > > specifying a machine numa node, but rather a node index within
+> > > > > > single socket. In which case, it doesn't make much sense callin=
+g
+> > > > > > it NUMA node_id, it's rather some index within a socket. (it
+> > > > > > starts looking like terminology is all mixed up)
+> > > > > >
+> > > > > > If you have access to a milti-socket EPYC machine, can you dump
+> > > > > > and post here its apic ids, pls? =20
+> > > > >
+> > > > > Here is the output from my EPYC machine with 2 sockets and totall=
+y
+> > > > > 8 nodes(SMT disabled). The cpus 0-31 are in socket 0 and  cpus
+> > > > > 32-63 in socket 1.
+> > > > >
+> > > > > # lscpu
+> > > > > Architecture:        x86_64
+> > > > > CPU op-mode(s):      32-bit, 64-bit
+> > > > > Byte Order:          Little Endian
+> > > > > CPU(s):              64
+> > > > > On-line CPU(s) list: 0-63
+> > > > > Thread(s) per core:  1
+> > > > > Core(s) per socket:  32
+> > > > > Socket(s):           2
+> > > > > NUMA node(s):        8
+> > > > > Vendor ID:           AuthenticAMD
+> > > > > CPU family:          23
+> > > > > Model:               1
+> > > > > Model name:          AMD Eng Sample: 1S1901A4VIHF5_30/19_N
+> > > > > Stepping:            2
+> > > > > CPU MHz:             2379.233
+> > > > > CPU max MHz:         1900.0000
+> > > > > CPU min MHz:         1200.0000
+> > > > > BogoMIPS:            3792.81
+> > > > > Virtualization:      AMD-V
+> > > > > L1d cache:           32K
+> > > > > L1i cache:           64K
+> > > > > L2 cache:            512K
+> > > > > L3 cache:            8192K
+> > > > > NUMA node0 CPU(s):   0-7
+> > > > > NUMA node1 CPU(s):   8-15
+> > > > > NUMA node2 CPU(s):   16-23
+> > > > > NUMA node3 CPU(s):   24-31
+> > > > > NUMA node4 CPU(s):   32-39
+> > > > > NUMA node5 CPU(s):   40-47
+> > > > > NUMA node6 CPU(s):   48-55
+> > > > > NUMA node7 CPU(s):   56-63
+> > > > >
+> > > > > Here is the output of #cpuid  -l 0x8000001e  -r =20
+> > > >
+> > > >
+> > > > (1) =20
+> > > > > You may want to refer
+> > > > > =20
+> > https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fwww=
+. =20
+> > > > > =20
+> > > > =20
+> > amd.com%2Fsystem%2Ffiles%2FTechDocs%2F54945_3.03_ppr_ZP_B2_pub.zip& =20
+> > > > amp =20
+> > > > > =20
+> > > > =20
+> > ;data=3D02%7C01%7Cbabu.moger%40amd.com%7Ceacf7e8facbc4ae2eee808d82 =20
+> > > > ff3ca9 =20
+> > > > > =20
+> > > > =20
+> > 0%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C6373120714103223 =20
+> > > > 35&amp; =20
+> > > > > =20
+> > > > =20
+> > sdata=3D%2Fdr93YVlwSq82%2FwRh2NU21Zkw4HJ%2B%2FVVYxAkhCCKJ4w%3D&a =20
+> > > > mp;reser =20
+> > > > > ved=3D0 (section 2.1.12.2.1.3 ApicId Enumeration Requirements).
+> > > > > Note that this is a general guideline. We tried to generalize in
+> > > > > qemu as much as possible. It is bit complex. =20
+> > > >
+> > > >
+> > > > =20
+> > > > > CPU 0:
+> > > > >    0x8000001e 0x00: eax=3D0x00000000 ebx=3D0x00000100 ecx=3D0x000=
+00300
+> > > > > edx=3D0x00000000 =20
+> > > > [...] =20
+> > > > > CPU 63:
+> > > > >    0x8000001e 0x00: eax=3D0x0000007e ebx=3D0x0000011f ecx=3D0x000=
+00307
+> > > > > edx=3D0x00000000
+> > > > > =20
+> > > > > > =20
+> > > > > > > =20
+> > > > > > > >
+> > > > > > > > I wonder if linux guest actually uses node_id encoded in
+> > > > > > > > apic id for configuring/checking numa structures, or it jus=
+t
+> > > > > > > > uses whatever ACPI SRAT table provided.
+> > > > > > > > =20
+> > > > > > > >>>> + */
+> > > > > > > >>>> +static inline void x86_init_topo_ids(X86CPUTopoInfo =20
+> > *topo_info, =20
+> > > > > > > >>>> +                                     CpuInstancePropert=
+ies props,
+> > > > > > > >>>> +                                     X86CPUTopoIDs *top=
+o_ids) {
+> > > > > > > >>>> +    topo_ids->smt_id =3D props.has_thread_id ? props.th=
+read_id : 0;
+> > > > > > > >>>> +    topo_ids->core_id =3D props.has_core_id ? props.cor=
+e_id : 0;
+> > > > > > > >>>> +    topo_ids->die_id =3D props.has_die_id ? props.die_i=
+d : 0;
+> > > > > > > >>>> +    topo_ids->node_id =3D props.has_node_id ?
+> > > > > > > >>>> +                        props.node_id %
+> > > > > > > >>>> +MAX(topo_info->nodes_per_pkg, 1) : 0; =20
+> > > >
+> > > > It looks like I was wrong pushing system wide NUMA node-id into API=
+C
+> > > > ID (choosen naming is confusing a bit), per [1] mentioned above, EP=
+YC's =20
+> > node-id is: =20
+> > > >
+> > > > =E2=80=A2 ApicId[6] =3D Socket ID.
+> > > > * ApicId[5:4]=3D Node ID.
+> > > > =E2=80=A2 ApicId[3] =3D Logical CCX L3 complex ID =E2=80=A2 ApicId[=
+2:0]=3D (SMT) ?
+> > > > {LogicalCoreID[1:0],ThreadId} : {1'b0,LogicalCoreID[1:0]}
+> > > >
+> > > > which is can hold only 0-3 values, and defined as:
+> > > >
+> > > > "A node, is an integrated circuit device that includes one to 8
+> > > > cores (one or two Core Complexes)."
+> > > >
+> > > > spec also mentions it indirectly as die-id if one looks at
+> > > > CPUID_Fn8000001E_EBX [Core Identifiers] (Core::X86::Cpuid::CoreId) =
+...
+> > > >   CoreId =3D ({2'b0, DieId[1:0], LogicalComplexId[0],
+> > > > LogicalThreadId[2:0]} >> SMT
+> > > >
+> > > > and in
+> > > > (2)
+> > > > CPUID_Fn8000001E_ECX [Node Identifiers] (Core::X86::Cpuid::NodeId) =
+...
+> > > >   {5'b00000,1'b[SOCKET_ID],2'b[DIE_ID]}
+> > > >
+> > > > Question is why we did not reuse topo_ids->die_id instead of adding
+> > > > confusing topo_ids->node_id in the first place? =20
+> > >
+> > > Initially, I thought about it. But Intel uses die_id differently than=
+ AMD.
+> > > So, did not want complicate things.
+> > > If we take that route then we need to re-arrange the numa code as we
+> > > need to numa information to calculate the die id. So, did not want to
+> > > mix up things.
+> > > =20
+> > > >
+> > > > Also looking APIC ID and SRAT table provided here,
+> > > > CPUID_Fn8000001E_ECX corresponds to NUMA node id (i.e. what -numa i=
+n
+> > > > QEMU used for) and Node ID embeded into ApicId[5:4] is basically di=
+e-id.
+> > > >
+> > > > Difference between die-id implemented in QEMU and EPYC's die id
+> > > > (topo_ids- =20
+> > > > >node_id) is that the former doesn't require numa config (maybe it
+> > > > >should, but =20
+> > > > ship'salready sailed) and gets number of dies from '-smp dies=3DX' =
+CLI
+> > > > option, while for EPYC we calculate topo_ids->node_id implicitly
+> > > > from number of numa nodes and sockets, which implicitly requires
+> > > > that machine 'must' be configured with -numa options.
+> > > >
+> > > > Maybe we should drop this implicit calculation along with
+> > > > topo_ids->node_id and reuse '-smp dies=3DX' plus extra checks for E=
+PYC
+> > > > to ask for -numa if there is more than 1 die and if we need to be
+> > > > really strict, add checks for limit of dies/cores within socket/die
+> > > > according to spec[2] so encoded APIC ID and CPUID_8000001E match th=
+e =20
+> > spec. =20
+> > >
+> > > There will be complications when user configures with both die_id and
+> > > numa_id. It will complicate things further. I will have to look
+> > > closely at the code if it is feasible. =20
+> >=20
+> > it's worth a try.
+> > conseptionally die_id in intel/amd is the same. Most likely intel has a=
+ dedicated
+> > memory controller on each die so it still should form a NUMA node. But =
+that
+> > aspect probably was ignored while implementing it in QEMU so ping of
+> > configuring QEMU right is on user's shoulders (there is no checks whats=
+oever if
+> > cpu belonging to specific die is on right NUMA node). =20
+>=20
+> So you are suggesting to use die_id to build the topology for EPYC. Also
+> initialize die_id based on the numa information. Re-arrange the numa code
+> to make sure we have all the information before we build the topology. An=
+d
+> then remove the node_id inside X86CPUTopoIDs. Is that the plan?
+reusing die_id might simplify logic and at very least we won't have 2 very =
+similar
+fields to deal with. With die_id it should be conditional on EPYC.
+
+Regardless of using die_id, we should
+
+(1) error out if tolopolgy will require more than 1 numa node and no numa c=
+onfig was provided.
+(2) for 1 NUMA node use autonuma to create 1 node implicitly, that requres =
+converting
+static MachineClass::auto_enable_numa into an instance specific value, i.e.=
+ moving it
+into MachineState, so that we can change it at runtime depending on CPU typ=
+e.
+(3) use NUMA id from CPU::node-id for CPUID_8000001E and have a checks that=
+ will ensure
+    that used value is possible to fit in CPUID leaf.
+
+   =20
 
 
-We merge this kind of thing after the release, right?
-
-
-> ---
->  hw/arm/virt.c              |  9 ++++++++-
->  hw/core/machine.c          |  3 +++
->  hw/i386/pc.c               |  3 +++
->  hw/i386/pc_piix.c          | 14 +++++++++++++-
->  hw/i386/pc_q35.c           | 13 ++++++++++++-
->  hw/ppc/spapr.c             | 15 +++++++++++++--
->  hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
->  include/hw/boards.h        |  3 +++
->  include/hw/i386/pc.h       |  3 +++
->  9 files changed, 71 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index ecfee362a182..acf9bfbeceaf 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2546,10 +2546,17 @@ static void machvirt_machine_init(void)
->  }
->  type_init(machvirt_machine_init);
->  
-> +static void virt_machine_5_2_options(MachineClass *mc)
-> +{
-> +}
-> +DEFINE_VIRT_MACHINE_AS_LATEST(5, 2)
-> +
->  static void virt_machine_5_1_options(MachineClass *mc)
->  {
-> +    virt_machine_5_2_options(mc);
-> +    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
->  }
-> -DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
-> +DEFINE_VIRT_MACHINE(5, 1)
->  
->  static void virt_machine_5_0_options(MachineClass *mc)
->  {
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 2f881d6d75b8..a24fe18ab6a6 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -28,6 +28,9 @@
->  #include "hw/mem/nvdimm.h"
->  #include "migration/vmstate.h"
->  
-> +GlobalProperty hw_compat_5_1[] = {};
-> +const size_t hw_compat_5_1_len = G_N_ELEMENTS(hw_compat_5_1);
-> +
->  GlobalProperty hw_compat_5_0[] = {
->      { "virtio-balloon-device", "page-poison", "false" },
->      { "vmport", "x-read-set-eax", "off" },
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 3d419d599127..1733b5341a62 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -97,6 +97,9 @@
->  #include "fw_cfg.h"
->  #include "trace.h"
->  
-> +GlobalProperty pc_compat_5_1[] = {};
-> +const size_t pc_compat_5_1_len = G_N_ELEMENTS(pc_compat_5_1);
-> +
->  GlobalProperty pc_compat_5_0[] = {};
->  const size_t pc_compat_5_0_len = G_N_ELEMENTS(pc_compat_5_0);
->  
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index b789e83f9acb..c5ba70ca17cb 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -426,7 +426,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
->      machine_class_allow_dynamic_sysbus_dev(m, TYPE_VMBUS_BRIDGE);
->  }
->  
-> -static void pc_i440fx_5_1_machine_options(MachineClass *m)
-> +static void pc_i440fx_5_2_machine_options(MachineClass *m)
->  {
->      PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
->      pc_i440fx_machine_options(m);
-> @@ -435,6 +435,18 @@ static void pc_i440fx_5_1_machine_options(MachineClass *m)
->      pcmc->default_cpu_version = 1;
->  }
->  
-> +DEFINE_I440FX_MACHINE(v5_2, "pc-i440fx-5.2", NULL,
-> +                      pc_i440fx_5_2_machine_options);
-> +
-> +static void pc_i440fx_5_1_machine_options(MachineClass *m)
-> +{
-> +    pc_i440fx_5_2_machine_options(m);
-> +    m->alias = NULL;
-> +    m->is_default = false;
-> +    compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
-> +    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
-> +}
-> +
->  DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
->                        pc_i440fx_5_1_machine_options);
->  
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index a3e607a544a5..0cb9c18cd44d 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -353,7 +353,7 @@ static void pc_q35_machine_options(MachineClass *m)
->      m->max_cpus = 288;
->  }
->  
-> -static void pc_q35_5_1_machine_options(MachineClass *m)
-> +static void pc_q35_5_2_machine_options(MachineClass *m)
->  {
->      PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
->      pc_q35_machine_options(m);
-> @@ -361,6 +361,17 @@ static void pc_q35_5_1_machine_options(MachineClass *m)
->      pcmc->default_cpu_version = 1;
->  }
->  
-> +DEFINE_Q35_MACHINE(v5_2, "pc-q35-5.2", NULL,
-> +                   pc_q35_5_2_machine_options);
-> +
-> +static void pc_q35_5_1_machine_options(MachineClass *m)
-> +{
-> +    pc_q35_5_2_machine_options(m);
-> +    m->alias = NULL;
-> +    compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
-> +    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
-> +}
-> +
->  DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
->                     pc_q35_5_1_machine_options);
->  
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 0ae293ec9431..1c8d0981b382 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4579,15 +4579,26 @@ static void spapr_machine_latest_class_options(MachineClass *mc)
->      }                                                                \
->      type_init(spapr_machine_register_##suffix)
->  
-> +/*
-> + * pseries-5.2
-> + */
-> +static void spapr_machine_5_2_class_options(MachineClass *mc)
-> +{
-> +    /* Defaults for the latest behaviour inherited from the base class */
-> +}
-> +
-> +DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
-> +
->  /*
->   * pseries-5.1
->   */
->  static void spapr_machine_5_1_class_options(MachineClass *mc)
->  {
-> -    /* Defaults for the latest behaviour inherited from the base class */
-> +    spapr_machine_5_2_class_options(mc);
-> +    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
->  }
->  
-> -DEFINE_SPAPR_MACHINE(5_1, "5.1", true);
-> +DEFINE_SPAPR_MACHINE(5_1, "5.1", false);
->  
->  /*
->   * pseries-5.0
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 403d30e13bca..3dc22737a389 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -804,14 +804,26 @@ bool css_migration_enabled(void)
->      }                                                                         \
->      type_init(ccw_machine_register_##suffix)
->  
-> +static void ccw_machine_5_2_instance_options(MachineState *machine)
-> +{
-> +}
-> +
-> +static void ccw_machine_5_2_class_options(MachineClass *mc)
-> +{
-> +}
-> +DEFINE_CCW_MACHINE(5_2, "5.2", true);
-> +
->  static void ccw_machine_5_1_instance_options(MachineState *machine)
->  {
-> +    ccw_machine_5_2_instance_options(machine);
->  }
->  
->  static void ccw_machine_5_1_class_options(MachineClass *mc)
->  {
-> +    ccw_machine_5_2_class_options(mc);
-> +    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
->  }
-> -DEFINE_CCW_MACHINE(5_1, "5.1", true);
-> +DEFINE_CCW_MACHINE(5_1, "5.1", false);
->  
->  static void ccw_machine_5_0_instance_options(MachineState *machine)
->  {
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 426ce5f625a4..bc5b82ad209e 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -319,6 +319,9 @@ struct MachineState {
->      } \
->      type_init(machine_initfn##_register_types)
->  
-> +extern GlobalProperty hw_compat_5_1[];
-> +extern const size_t hw_compat_5_1_len;
-> +
->  extern GlobalProperty hw_compat_5_0[];
->  extern const size_t hw_compat_5_0_len;
->  
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 3d7ed3a55e30..fe52e165b27c 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -193,6 +193,9 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
->  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
->                         const CPUArchIdList *apic_ids, GArray *entry);
->  
-> +extern GlobalProperty pc_compat_5_1[];
-> +extern const size_t pc_compat_5_1_len;
-> +
->  extern GlobalProperty pc_compat_5_0[];
->  extern const size_t pc_compat_5_0_len;
->  
-> -- 
-> 2.25.4
+> > What AMD has implemented on top of that in CPU hw, is to expose NUMA no=
+de
+> > id in CPUID_8000001E. I don't know why it was done as usually it's ACPI=
+ tables
+> > that describe relations between nodes so for OS this info almost useles=
+s (I'd
+> > guess it's faster to use CPUID instead of fetching pre-cpu variable but=
+ that's
+> > pretty much it from OS point of view)
+> >  =20
+> > > =20
+> > > >
+> > > >
+> > > > =20
+> > > > > > > >>>> +    topo_ids->pkg_id =3D props.has_socket_id ? props.so=
+cket_id :
+> > > > > > > >>>> +0; }
+> > > > > > > >>>>  /*
+> > > > > > > >>>>   * Make APIC ID for the CPU 'cpu_index'
+> > > > > > > >>>>   *
+> > > > > > > >>>> =20
+> > > > > > > >> =20
+> > > > > > > > =20
+> > > > > > > =20
+> > > > >
+> > > > > =20
+> > > =20
+>=20
+>=20
 
 
