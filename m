@@ -2,71 +2,97 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C307C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 17:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B910C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 17:27:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 435EC207F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 17:25:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 082AF207F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 17:27:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="aLWCM92c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 435EC207F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SAiPi74f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 082AF207F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0ppp-0000GG-IC
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 13:25:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47712)
+	id 1k0pri-0001Iz-B9
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 13:27:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1k0pp8-0008F8-BC
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 13:25:02 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:58003)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1k0pp6-0003xj-0G
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 13:25:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=QmeyV490Z7mAS7iFL6fIvV+ITrvU1gUOptIGxLZrfuM=; b=aLWCM92ck6tFuWJP0g+Gqwn4Wx
- jjI4E1ryiJv4A9sLARkZ1+SoMZlHdgrDANl5+eKYeEvcWdSaPgUMFp2T4bVO5Lno6l1J5CKqJyY6g
- n8RQMZvaUE9WcWC7EN65+ql4MS/tlo0kwEc7uL6A5pDG9MIMhxtEaUpRA1v1FPbZhyhc8AAQ9eEyJ
- gqHUOm/2NUx1prQ94ubXnWP4EZdHJ4MF/rj/+2T6xnv5Pd5l/XGkCx3d8D/qbzgqn0NHnYYqdStcP
- UV2lGOVK14YHAo0x7zpUnx89fW/7wWVTh1TqFDTB6GqS8Px9oHKzdcxs35ZlJ0+pa3ZChO3XyHkJd
- pA0j/faA==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v8 1/7] tests/virtio-9p: added split readdir tests
-Date: Wed, 29 Jul 2020 19:24:54 +0200
-Message-ID: <1840276.exGcvpJF7P@silver>
-In-Reply-To: <20200729174254.58aaccc6@bahia.lan>
-References: <cover.1596012787.git.qemu_oss@crudebyte.com>
- <569b2e05ab1d0223b14a12dfbdf3ad5e8b3ac131.1596012787.git.qemu_oss@crudebyte.com>
- <20200729174254.58aaccc6@bahia.lan>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k0pqw-0000sO-8e
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 13:26:54 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:51319)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k0pqu-0004JR-El
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 13:26:53 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id c6so2185732pje.1
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 10:26:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=am6nnQbLfL/llaSst+wCAdzlD0lYQ3PtpBlX5HMohsg=;
+ b=SAiPi74f9Y5LjEXSHBkXYAfmSwtbjfN/IFyHpsq/bWJnOk0HMZEs0EhgToNTsJTNZz
+ KGsPBzobkk+3Vc4AEGKHhJ6sbIktQIwpupQ0Ot/MDgbuBA28yVmtnYxZJeH61vqlLkYJ
+ 4RGSFbpSnHshNRVTSHVaAhXhw9VNw7/SSW3Q4JvynuyN+hpJw6QzN8w9lnde8pMF6aIh
+ SXUQ7GUsYcxJpBdTGGW7Vljc3c8e4xhCN3MZX9Km089z9tl50FJO62Wql5ge8rMB72Gk
+ PyFqFETSrj0bbJ+plwdeSwvGFFlzNCsY6WSge1D/CpacvFXtP3OEbUM3jebriHNbNNKA
+ Fzog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=am6nnQbLfL/llaSst+wCAdzlD0lYQ3PtpBlX5HMohsg=;
+ b=RAOj/+he95aApW7ROF1WuBvIIxziXorLTRbm9WQc025gcEjYSFvBVWBbXzfbVeOOLL
+ ICdDfOeF0LQWYEbub1HKO7esqp243C2adWcVm5fTgKuMI+yoIClX7li87YNRqHj9rNEj
+ Ga5ivo+A//mEbbhqzhGe+hSTMM/LlFwTiEsePhgWq1L5ZsHFgcnM6+cThmmr5gg1oHjC
+ znOMIRkmJ+98QYUOlLXhjJo/k4WRWBeQpe+7YtdDZ1ULOp9+Wz+RBNXtQg4mJrAwaN34
+ Jm+xOPjdliCR3JEYjfu0FdQSAHO3lZbeZ1kUFcxyimirLKGtnxv/gkdfEHq7fLJBqELQ
+ I0MQ==
+X-Gm-Message-State: AOAM5309ZYZdal26icFLGvMbTZgUMr6riTCH1o/jgJ8kAqnHfSkuuKDE
+ dJSnvPA4XeWS2LMVql3jpKBTUA==
+X-Google-Smtp-Source: ABdhPJx7zCt5Iz2KruipSR5y4TrB/fP88Qj0YsJwAK0wleCNefcwUPcwd440NMxSZg5noPq40rQ0LQ==
+X-Received: by 2002:a17:90b:3750:: with SMTP id
+ ne16mr10713741pjb.6.1596043610724; 
+ Wed, 29 Jul 2020 10:26:50 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id w17sm3017398pge.10.2020.07.29.10.26.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 29 Jul 2020 10:26:50 -0700 (PDT)
+Subject: Re: [PATCH 4/4] hw/display/artist.c: fix out of bounds check
+To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
+References: <20200727214608.32710-1-deller@gmx.de>
+ <20200727214608.32710-5-deller@gmx.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <767c4e05-6018-7f99-4401-cbc1480c3d28@linaro.org>
+Date: Wed, 29 Jul 2020 10:26:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 13:24:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+In-Reply-To: <20200727214608.32710-5-deller@gmx.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,233 +105,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mittwoch, 29. Juli 2020 17:42:54 CEST Greg Kurz wrote:
-> On Wed, 29 Jul 2020 10:10:23 +0200
+On 7/27/20 2:46 PM, Helge Deller wrote:
+> -        for (i = 0; i < pix_count; i++) {
+> +        for (i = 0; i < pix_count && offset + i < buf->size; i++) {
+>              artist_rop8(s, p + offset + pix_count - 1 - i,
+>                          (data & 1) ? (s->plane_mask >> 24) : 0);
+>              data >>= 1;
+
+This doesn't look right.
+
+You're writing to "offset + pix_count - 1 - i" and yet you're checking bounds
+vs "offset + i".
+
+This could be fixed by computing the complete offset into a local variable and
+then have an inner if to avoid the write, as you do for the second loop.
+
+But it would be better to precompute the correct loop bounds.
+
+
+r~
+
+
+> @@ -398,7 +390,9 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+>          for (i = 3; i >= 0; i--) {
+>              if (!(s->image_bitmap_op & 0x20000000) ||
+>                  s->vram_bitmask & (1 << (28 + i))) {
+> -                artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i)]);
+> +                if (offset + 3 - i < buf->size) {
+> +                    artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i)]);
+> +                }
+>              }
+>          }
+>          memory_region_set_dirty(&buf->mr, offset, 3);
+> @@ -420,7 +414,7 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+>              break;
+>          }
 > 
-> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > The previous, already existing 'basic' readdir test simply used a
-> > 'count' parameter big enough to retrieve all directory entries with a
-> > single Treaddir request.
-> > 
-> > In the 3 new 'split' readdir tests added by this patch, directory
-> > entries are retrieved, split over several Treaddir requests by picking
-> > small 'count' parameters which force the server to truncate the
-> > response. So the test client sends as many Treaddir requests as
-> > necessary to get all directory entries.
-> > 
-> > The following 3 new tests are added (executed in this sequence):
-> > 
-> > 1. Split readdir test with count=512
-> > 2. Split readdir test with count=256
-> > 3. Split readdir test with count=128
-> > 
-> > This test case sequence is chosen because the smaller the 'count' value,
-> > the higher the chance of errors in case of implementation bugs on server
-> > side.
-> > 
-> > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > ---
+> -        for (i = 0; i < pix_count; i++) {
+> +        for (i = 0; i < pix_count && offset + i < buf->size; i++) {
+>              mask = 1 << (pix_count - 1 - i);
 > 
-> The existing fs_readdir() function for the 'basic' test is a subset
-> of the new fs_readdir_split() introduced by this patch (quite visible
-> if you sdiff the code).
-> 
-> To avoid code duplication, I would have probably tried to do the changes
-> in fs_readdir() and implement the 'basic' test as:
-> 
-> static void fs_readdir_basic(void *obj, void *data,
->                              QGuestAllocator *t_alloc)
-> {
->     /*
->      * submit count = msize - 11, because 11 is the header size of Rreaddir
->      */
->     fs_readdir(obj, data, t_alloc, P9_MAX_SIZE - 11);
-> }
-
-You are right of course; there is code duplication. My thought was to preserve 
-the simple readdir test code (at least at this initial stage) as it is really 
-very simple and easy to understand.
-
-The split readdir test code is probably already a tad more tedious to read.
-
-I keep it in mind though and probably deduplicate this test code a bit later 
-on. But I think it makes sense to start off with this version for now.
-
-> but anyway this looks good to me so:
-> 
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-
-Thanks!
-
-> >  tests/qtest/virtio-9p-test.c | 108 +++++++++++++++++++++++++++++++++++
-> >  1 file changed, 108 insertions(+)
-> > 
-> > diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-> > index 2167322985..de30b717b6 100644
-> > --- a/tests/qtest/virtio-9p-test.c
-> > +++ b/tests/qtest/virtio-9p-test.c
-> > @@ -578,6 +578,7 @@ static bool fs_dirents_contain_name(struct V9fsDirent
-> > *e, const char* name)> 
-> >      return false;
-> >  
-> >  }
-> > 
-> > +/* basic readdir test where reply fits into a single response message */
-> > 
-> >  static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-> >  {
-> >  
-> >      QVirtio9P *v9p = obj;
-> > 
-> > @@ -631,6 +632,89 @@ static void fs_readdir(void *obj, void *data,
-> > QGuestAllocator *t_alloc)> 
-> >      g_free(wnames[0]);
-> >  
-> >  }
-> > 
-> > +/* readdir test where overall request is split over several messages */
-> > +static void fs_readdir_split(void *obj, void *data, QGuestAllocator
-> > *t_alloc, +                             uint32_t count)
-> > +{
-> > +    QVirtio9P *v9p = obj;
-> > +    alloc = t_alloc;
-> > +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-> > +    uint16_t nqid;
-> > +    v9fs_qid qid;
-> > +    uint32_t nentries, npartialentries;
-> > +    struct V9fsDirent *entries, *tail, *partialentries;
-> > +    P9Req *req;
-> > +    int fid;
-> > +    uint64_t offset;
-> > +
-> > +    fs_attach(v9p, NULL, t_alloc);
-> > +
-> > +    fid = 1;
-> > +    offset = 0;
-> > +    entries = NULL;
-> > +    nentries = 0;
-> > +    tail = NULL;
-> > +
-> > +    req = v9fs_twalk(v9p, 0, fid, 1, wnames, 0);
-> > +    v9fs_req_wait_for_reply(req, NULL);
-> > +    v9fs_rwalk(req, &nqid, NULL);
-> > +    g_assert_cmpint(nqid, ==, 1);
-> > +
-> > +    req = v9fs_tlopen(v9p, fid, O_DIRECTORY, 0);
-> > +    v9fs_req_wait_for_reply(req, NULL);
-> > +    v9fs_rlopen(req, &qid, NULL);
-> > +
-> > +    /*
-> > +     * send as many Treaddir requests as required to get all directory
-> > +     * entries
-> > +     */
-> > +    while (true) {
-> > +        npartialentries = 0;
-> > +        partialentries = NULL;
-> > +
-> > +        req = v9fs_treaddir(v9p, fid, offset, count, 0);
-> > +        v9fs_req_wait_for_reply(req, NULL);
-> > +        v9fs_rreaddir(req, &count, &npartialentries, &partialentries);
-> > +        if (npartialentries > 0 && partialentries) {
-> > +            if (!entries) {
-> > +                entries = partialentries;
-> > +                nentries = npartialentries;
-> > +                tail = partialentries;
-> > +            } else {
-> > +                tail->next = partialentries;
-> > +                nentries += npartialentries;
-> > +            }
-> > +            while (tail->next) {
-> > +                tail = tail->next;
-> > +            }
-> > +            offset = tail->offset;
-> > +        } else {
-> > +            break;
-> > +        }
-> > +    }
-> > +
-> > +    g_assert_cmpint(
-> > +        nentries, ==,
-> > +        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
-> > +    );
-> > +
-> > +    /*
-> > +     * Check all file names exist in returned entries, ignore their order
-> > +     * though.
-> > +     */
-> > +    g_assert_cmpint(fs_dirents_contain_name(entries, "."), ==, true);
-> > +    g_assert_cmpint(fs_dirents_contain_name(entries, ".."), ==, true);
-> > +    for (int i = 0; i < QTEST_V9FS_SYNTH_READDIR_NFILES; ++i) {
-> > +        char *name = g_strdup_printf(QTEST_V9FS_SYNTH_READDIR_FILE, i);
-> > +        g_assert_cmpint(fs_dirents_contain_name(entries, name), ==,
-> > true);
-> > +        g_free(name);
-> > +    }
-> > +
-> > +    v9fs_free_dirents(entries);
-> > +
-> > +    g_free(wnames[0]);
-> > +}
-> > +
-> > 
-> >  static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator
-> >  *t_alloc) {
-> >  
-> >      QVirtio9P *v9p = obj;
-> > 
-> > @@ -793,6 +877,24 @@ static void fs_flush_ignored(void *obj, void *data,
-> > QGuestAllocator *t_alloc)> 
-> >      g_free(wnames[0]);
-> >  
-> >  }
-> > 
-> > +static void fs_readdir_split_128(void *obj, void *data,
-> > +                                 QGuestAllocator *t_alloc)
-> > +{
-> > +    fs_readdir_split(obj, data, t_alloc, 128);
-> > +}
-> > +
-> > +static void fs_readdir_split_256(void *obj, void *data,
-> > +                                 QGuestAllocator *t_alloc)
-> > +{
-> > +    fs_readdir_split(obj, data, t_alloc, 256);
-> > +}
-> > +
-> > +static void fs_readdir_split_512(void *obj, void *data,
-> > +                                 QGuestAllocator *t_alloc)
-> > +{
-> > +    fs_readdir_split(obj, data, t_alloc, 512);
-> > +}
-> > +
-> > 
-> >  static void register_virtio_9p_test(void)
-> >  {
-> >  
-> >      qos_add_test("config", "virtio-9p", pci_config, NULL);
-> > 
-> > @@ -810,6 +912,12 @@ static void register_virtio_9p_test(void)
-> > 
-> >      qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
-> >      
-> >                   NULL);
-> >      
-> >      qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
-> > 
-> > +    qos_add_test("fs/readdir/split_512", "virtio-9p",
-> > +                 fs_readdir_split_512, NULL);
-> > +    qos_add_test("fs/readdir/split_256", "virtio-9p",
-> > +                 fs_readdir_split_256, NULL);
-> > +    qos_add_test("fs/readdir/split_128", "virtio-9p",
-> > +                 fs_readdir_split_128, NULL);
-> > 
-> >  }
-> >  
-> >  libqos_init(register_virtio_9p_test);
-
-
-
+>              if (!(s->image_bitmap_op & 0x20000000) ||
 
