@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 733E0C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4B9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:23:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38E0320FC3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:19:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38E0320FC3
+	by mail.kernel.org (Postfix) with ESMTPS id 32AE22075D
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:23:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32AE22075D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0onI-0001rH-Gy
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:19:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60128)
+	id 1k0ora-00037g-FH
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:23:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0omk-0001QJ-6h
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:18:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:60247)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0oqo-0002dS-TX
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:22:42 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:50409)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0omi-0003EU-2w
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:18:29 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k0oqh-0003ku-Dv
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:22:42 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MS3zP-1kC8Vv0rhj-00TSFP; Wed, 29 Jul 2020 18:18:24 +0200
-Subject: Re: [PATCH v2 1/4] linux-user: Add support for a group of btrfs inode
- ioctls
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MXXhv-1kHel42Uff-00Z03J; Wed, 29 Jul 2020 18:22:25 +0200
+Subject: Re: [PATCH v2 2/4] linux-user: Add support for two btrfs ioctls used
+ for subvolume
 To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
 References: <20200717144435.268166-1-Filip.Bozuta@syrmia.com>
- <20200717144435.268166-2-Filip.Bozuta@syrmia.com>
+ <20200717144435.268166-3-Filip.Bozuta@syrmia.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <86b2596c-2afa-a4a3-ad5e-2d030727b542@vivier.eu>
-Date: Wed, 29 Jul 2020 18:18:19 +0200
+Message-ID: <23adeefb-63d5-71fc-8e84-ec05f0ae56ac@vivier.eu>
+Date: Wed, 29 Jul 2020 18:22:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200717144435.268166-2-Filip.Bozuta@syrmia.com>
+In-Reply-To: <20200717144435.268166-3-Filip.Bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SGa2Hw8Z+sLq3ao52qzjxYOnIYIADC8YJC+/fMohqCggWVNETXz
- OY4yIAZlzJepCQ0+e+AdUZu3Vz0R/aOctOa0pKSjN91seX1sRSHzO0PeKgMUZQUhg0hiJgn
- frhQ8B17aA1oCQv32G4ikqg1nzxXRC0YptWUBR8yzYBN22DBPpfwCAIqcT42BtUcK3szAB0
- n2TE+pXTahQkV8zhv3hpw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:XxTTGWJmmtE=:LXP3z4SQOt9WNS/rzlDOz3
- m3HtPMgewVcn2VzQ093wXuJUraBV1WVzSeoLjFCxduiBWpwh1lPbV5xpC1qTDMlcuJFV/gQL7
- 0AP9zgzTh+5QU0wYl3fHabSXKB6LejGVCxgUDpkrrpdVzTiDQ82B6jzZ446vYB6u7yvtSOQSX
- iOTzCuLcVotZYP5zqwZ36gbJS9WIF+Onz9/Ii7oUC9MIgxgNwCYbLNOPDD01IFRULZ0ohYSFh
- dSTRG8dIbTUPHR02NmLC5zfXmXU8E+uqyZaERIZ8oXv9TLMsyzdytoxp1w1o8M424yZjHF7LU
- LPjFFS32qdKQQ7A12khXvmKDKYVf0wIY35Yhz1jIQtKHeo92QKI9pyLpjzzXchwtD6mlOKAk0
- B7afiM90ZeVSEhjbmpcykEpe715RqYMVwaN/u/aguKlvaOcss+esB2d30a1tueRxzfFet4dMN
- dFhMCCQ9ORBNsyqG8dxFR3XxQQK19VakNA9MDVqKbwb/lucfxnhn5qQLCfIF5I7I8Yww3aX1h
- EJi21cppXEDhFLXCZw/ijscSgqX3uL1+OOg1CWq+DLC1X45RPhh0ccds90gvbTsxLmE/IuPFt
- ZNqZUFXnom27IxYbDzg2BKvEUjcrFuLFGbawZ8XEw1FU11U50MqnUjWy7cRbSAbaWORbp7WiG
- NZ6Jdc1kCIkp2CKDSvxJ19RsQqZdw/KBsOJeX//Ms9qSF3Cd+yprDj38VmsCYO+zzY7TBIzmH
- czXIZrBfbeHYBvbSoIaLKsla5TXwleIjBA1mqHK/G07yHrw5HWGYhtAtjYDKs9yRt2PayFbQM
- 6kQc4ov8iVkPoQZfrWuzZDspn1GyllZ+YODrwGl1lrsMf2kIm59xO9y6k5CeFlii0Ar7RIe
-Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:WEFi3qDVeP59kfTMDXAW0kK1Cr7LkQfmr5Sev1KxlfHD224ihQi
+ Rs1Ktyiwi3lFBzURD7WD36r1OvDKTBJkSoqbfTzyIObl/gXozJX7QbvhIkdnQl4gsdcQpb4
+ C/we++/3kvIij2OMofU/Vem3Gyx6aOE66LC1Y0v1zR2VPmrBl0PM/mK4t0qEhDXlRABH+xB
+ rvUTvw64eSFLtxkTiMYhA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:LnYRaNFL9O0=:qti7TXbzAF0LvLjArhTuTK
+ VT+1P+Vg4GqHapKU/ejjLVEYDkuz2gVza0rL9ZK63TR3+vXmKj/Po3qyo6WrpdQcUbIW7YoHL
+ vn5j8ZR+weGUAy50YdZy9D0funzicUDHeFtXP1/Gp3CgPvGAw5ySEOmfI0JEBtLFvFlyznGhM
+ POZg2ZQJor3e7wNkMLBzTsjszMR3aSlj4bumjM+eKRbAMfbJhvc6jk3Kr/7Wjo5pVWXhHU+75
+ wUfN1/cOEKe2uLVxTTT/cYUov1awDm2fgKZS3D9GEnZd+AEn2jR5k+HIXNtYBY6FQIazdRpAZ
+ O7HOBweX2WGi7p5Lcx98HV3LwdwyIvk9VGdyttm0fFEqt3gTABemnnCgMkL4ulOBzUGY5FiH0
+ HFR3EjGJawIie1BxzQ2omSg2NKz3qnMoJtePGkBBTggKNCZ2h6n18PMKrm0oFS9GarB8oq43i
+ 05X4+isp8J9zp9MKU5X7NfDYbDe8fKcOdSX8O8CpGoJlfEn1KVTRke1ZDyP1scmoaVjsnC0a2
+ JW0Hb3Rh0rhgkIeLF0r8c75FJ2bPFsEDQKsiJS652P7noL1JKDRTA5cbeMRRECnmnOrtoCE2v
+ dJouVLp2nQNapygyS54dQQ8JfICRbeMGqZt1uLC+4uOA6F0XZlZqoMh2hLKUfs2mQGUjCqe3l
+ g5i8mzG1ondiEjggsp5yNtd1nguM/A8/fAc5hVMX390ZOkbngV+5V7UBNZFak+i/dcyL+25a/
+ jzGb9GxNjmk9BxgSRpbJcDOXeKu03YM5Icaga5/p8OVcLUI+NJimhBvV087eUjpAwSogOcZaJ
+ JzA/7yhMf+rdgZssJmvmd3F24d9lBS5cbiTV4ugXf+MBuOwpPXQRHYwcuXIFnlgi2RTyPrG
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 12:18:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 12:22:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -135,194 +135,106 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 17/07/2020 à 16:44, Filip Bozuta a écrit :
-> This patch implements functionality of following ioctls:
+> This patch implements functionality for following ioctl:
 > 
-> BTRFS_IOC_INO_LOOKUP - Reading tree root id and path
+> BTRFS_IOC_DEFAULT_SUBVOL - Setting a default subvolume
 > 
->     Read tree root id and path for a given file or directory.
->     The name and tree root id are returned in an ioctl's third
->     argument that represents a pointer to a following type:
+>     Set a default subvolume for a btrfs filesystem. The third
+>     ioctl's argument is a '__u64' (unsigned long long) which
+>     represents the id of a subvolume that is to be set as
+>     the default.
 > 
->     struct btrfs_ioctl_ino_lookup_args {
-> 	__u64 treeid;
-> 	__u64 objectid;
-> 	char name[BTRFS_INO_LOOKUP_PATH_MAX];
->     };
+> BTRFS_IOC_GET_SUBVOL_ROOTREF - Getting tree and directory id of subvolumes
 > 
->     Before calling this ioctl, field 'objectid' should be filled
->     with the object id value for which the tree id and path are
->     to be read. Value 'BTRFS_FIRST_FREE_OBJECTID' represents the
->     object id for the first available btrfs object (directory or
->     file).
+>     Read tree and directory id of subvolumes from a btrfs
+>     filesystem. The tree and directory id's are returned in the
+>     ioctl's third argument which represents a pointer to a
+>     following type:
 > 
-> BTRFS_IOC_INO_PATHS - Reading paths to all files
+>     struct btrfs_ioctl_get_subvol_rootref_args {
+> 		/* in/out, minimum id of rootref's treeid to be searched */
+> 		__u64 min_treeid;
 > 
->     Read path to all files with a certain inode number. The paths
->     are returned in the ioctl's third argument which represents
->     a pointer to a following type:
+> 		/* out */
+> 		struct {
+> 			__u64 treeid;
+> 			__u64 dirid;
+> 		} rootref[BTRFS_MAX_ROOTREF_BUFFER_NUM];
 > 
->     struct btrfs_ioctl_ino_path_args {
-> 	__u64				inum;		/* in */
-> 	__u64				size;		/* in */
-> 	__u64				reserved[4];
-> 	/* struct btrfs_data_container	*fspath;	   out */
-> 	__u64				fspath;		/* out */
+> 		/* out, number of found items */
+> 		__u8 num_items;
+> 		__u8 align[7];
 >      };
 > 
->      Before calling this ioctl, the 'inum' and 'size' field should
->      be filled with the aproppriate inode number and size of the
->      directory where file paths should be looked for. For now, the
->      paths are returned in an '__u64' (unsigned long long) value
->      'fspath'.
-> 
-> BTRFS_IOC_LOGICAL_INO - Reading inode numbers
-> 
->      Read inode numbers for files on a certain logical adress. The
->      inode numbers are returned in the ioctl's third argument which
->      represents a pointer to a following type:
-> 
->      struct btrfs_ioctl_logical_ino_args {
-> 	__u64				logical;	/* in */
-> 	__u64				size;		/* in */
-> 	__u64				reserved[3];	/* must be 0 for now */
-> 	__u64				flags;		/* in, v2 only */
-> 	/* struct btrfs_data_container	*inodes;	out   */
-> 	__u64				inodes;
->      };
-> 
->      Before calling this ioctl, the 'logical' and 'size' field should
->      be filled with the aproppriate logical adress and size of where
->      the inode numbers of files should be looked for. For now, the
->      inode numbers are returned in an '__u64' (unsigned long long)
->      value 'inodes'.
-> 
-> BTRFS_IOC_LOGICAL_INO_V2 - Reading inode numbers
-> 
->      Same as the above mentioned ioctl except that it allows passing
->      a flags 'BTRFS_LOGICAL_INO_ARGS_IGNORE_OFFSET'.
-> 
-> BTRFS_IOC_INO_LOOKUP_USER - Reading subvolume name and path
-> 
->      Read name and path of a subvolume. The tree root id and
->      path are read in an ioctl's third argument which represents a
->      pointer to a following type:
-> 
->      struct btrfs_ioctl_ino_lookup_user_args {
-> 	/* in, inode number containing the subvolume of 'subvolid' */
-> 	__u64 dirid;
-> 	/* in */
-> 	__u64 treeid;
-> 	/* out, name of the subvolume of 'treeid' */
-> 	char name[BTRFS_VOL_NAME_MAX + 1];
-> 	/*
-> 	 * out, constructed path from the directory with which the ioctl is
-> 	 * called to dirid
-> 	 */
-> 	char path[BTRFS_INO_LOOKUP_USER_PATH_MAX];
->      };
-> 
->      Before calling this ioctl, the 'dirid' and 'treeid' field should
->      be filled with aproppriate values which represent the inode number
->      of the directory that contains the subvolume and treeid of the
->      subvolume.
+>      Before calling this ioctl, 'min_treeid' field should be filled
+>      with value that represent the minimum value for the tree id.
 > 
 > Implementation notes:
 > 
->      All of the ioctls in this patch use structure types as third arguments.
->      That is the reason why aproppriate thunk definitions were added in file
->      'syscall_types.h'.
+>     Ioctl BTRFS_IOC_GET_SUBVOL_ROOTREF uses the above mentioned structure
+>     type as third argument. That is the reason why a aproppriate thunk
+>     structure definition is added in file 'syscall_types.h'.
 > 
 > Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > ---
->  linux-user/ioctls.h        | 20 ++++++++++++++++++++
->  linux-user/syscall_defs.h  | 10 ++++++++++
->  linux-user/syscall_types.h | 24 ++++++++++++++++++++++++
->  3 files changed, 54 insertions(+)
+>  linux-user/ioctls.h        |  7 +++++++
+>  linux-user/syscall_defs.h  |  4 ++++
+>  linux-user/syscall_types.h | 11 +++++++++++
+>  3 files changed, 22 insertions(+)
 > 
-...
-
+> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+> index a7f5664487..2c553103e6 100644
+> --- a/linux-user/ioctls.h
+> +++ b/linux-user/ioctls.h
+> @@ -206,6 +206,9 @@
+>       IOCTL(BTRFS_IOC_INO_LOOKUP, IOC_RW,
+>             MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_args)))
+>  #endif
+> +#ifdef BTRFS_IOC_DEFAULT_SUBVOL
+> +     IOCTL(BTRFS_IOC_DEFAULT_SUBVOL, IOC_W, MK_PTR(TYPE_ULONGLONG))
+> +#endif
+>  #ifdef BTRFS_IOC_SUBVOL_GETFLAGS
+>       IOCTL(BTRFS_IOC_SUBVOL_GETFLAGS, IOC_R, MK_PTR(TYPE_ULONGLONG))
+>  #endif
+> @@ -248,6 +251,10 @@
+>       IOCTL(BTRFS_IOC_GET_SUBVOL_INFO, IOC_R,
+>             MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_info_args)))
+>  #endif
+> +#ifdef BTRFS_IOC_GET_SUBVOL_ROOTREF
+> +     IOCTL(BTRFS_IOC_GET_SUBVOL_ROOTREF, IOC_RW,
+> +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_rootref_args)))
+> +#endif
+>  #ifdef BTRFS_IOC_INO_LOOKUP_USER
+>       IOCTL(BTRFS_IOC_INO_LOOKUP_USER, IOC_RW,
+>             MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_user_args)))
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 9db6f46cba..7bb105428b 100644
+> index 7bb105428b..f4b4fc4a20 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -982,12 +982,18 @@ struct target_rtc_pll_info {
->                                                 14, struct btrfs_ioctl_vol_args)
->  #define TARGET_BTRFS_IOC_SNAP_DESTROY           TARGET_IOW(BTRFS_IOCTL_MAGIC, \
+> @@ -984,6 +984,8 @@ struct target_rtc_pll_info {
 >                                                 15, struct btrfs_ioctl_vol_args)
-> +#define TARGET_BTRFS_IOC_INO_LOOKUP             TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
-> +                                        18, struct btrfs_ioctl_ino_lookup_args)
+>  #define TARGET_BTRFS_IOC_INO_LOOKUP             TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
+>                                          18, struct btrfs_ioctl_ino_lookup_args)
+> +#define TARGET_BTRFS_IOC_DEFAULT_SUBVOL         TARGET_IOW(BTRFS_IOCTL_MAGIC, \
+> +                                                           19, abi_ullong)
 >  #define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, \
 >                                                             25, abi_ullong)
 >  #define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, \
->                                                             26, abi_ullong)
->  #define TARGET_BTRFS_IOC_DEV_INFO               TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
->                                            30, struct btrfs_ioctl_dev_info_args)
-> +#define TARGET_BTRFS_IOC_INO_PATHS              TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
-> +                                          35, struct btrfs_ioctl_ino_path_args)
-> +#define TARGET_BTRFS_IOC_LOGICAL_INO            TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
-> +                                       36, struct btrfs_ioctl_logical_ino_args)
->  #define TARGET_BTRFS_IOC_GET_DEV_STATS          TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
->                                            52, struct btrfs_ioctl_get_dev_stats)
->  #define TARGET_BTRFS_IOC_GET_FEATURES           TARGET_IOR(BTRFS_IOCTL_MAGIC, \
-> @@ -996,8 +1002,12 @@ struct target_rtc_pll_info {
->                                         57, struct btrfs_ioctl_feature_flags[2])
->  #define TARGET_BTRFS_IOC_GET_SUPPORTED_FEATURES TARGET_IOR(BTRFS_IOCTL_MAGIC, \
->                                         57, struct btrfs_ioctl_feature_flags[3])
-> +#define TARGET_BTRFS_IOC_LOGICAL_INO_V2         TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
-> +                                       59, struct btrfs_ioctl_logical_ino_args)
+> @@ -1006,6 +1008,8 @@ struct target_rtc_pll_info {
+>                                         59, struct btrfs_ioctl_logical_ino_args)
 >  #define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IOR(BTRFS_IOCTL_MAGIC, \
 >                                     60, struct btrfs_ioctl_get_subvol_info_args)
-> +#define TARGET_BTRFS_IOC_INO_LOOKUP_USER        TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
-> +                                   62, struct btrfs_ioctl_ino_lookup_user_args)
+> +#define TARGET_BTRFS_IOC_GET_SUBVOL_ROOTREF     TARGET_IOWR(BTRFS_IOCTL_MAGIC,\
+> +                                61, struct btrfs_ioctl_get_subvol_rootref_args)
 
-Use the 'U' variant.
+This one needs TARGET_IOWRU(), the first one can be kept as it uses
+abi_ullong.
 
->  
->  /* usb ioctls */
->  #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
-> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index e26ab01e8f..980c29000a 100644
-> --- a/linux-user/syscall_types.h
-> +++ b/linux-user/syscall_types.h
-> @@ -349,6 +349,30 @@ STRUCT(btrfs_ioctl_get_subvol_info_args,
->         MK_STRUCT(STRUCT_btrfs_ioctl_timespec), /* rtime */
->         MK_ARRAY(TYPE_ULONGLONG, 8)) /* reserved */
->  
-> +STRUCT(btrfs_ioctl_ino_lookup_args,
-> +       TYPE_ULONGLONG, /* treeid */
-> +       TYPE_ULONGLONG, /* objectid */
-> +       MK_ARRAY(TYPE_CHAR, BTRFS_INO_LOOKUP_PATH_MAX)) /* name */
-> +
-> +STRUCT(btrfs_ioctl_ino_path_args,
-> +       TYPE_ULONGLONG, /* inum */
-> +       TYPE_ULONGLONG, /* size */
-> +       TYPE_ULONGLONG, /* reserved */
+with that changed:
 
-This is reserved[4], use MK_ARRAY() here
-
-> +       TYPE_ULONGLONG) /* fspath */
-> +
-> +STRUCT(btrfs_ioctl_logical_ino_args,
-> +       TYPE_ULONGLONG, /* logical */
-> +       TYPE_ULONGLONG, /* size */
-> +       TYPE_ULONGLONG, /* reserved */
-
-reserved[3]
-
-> +       TYPE_ULONGLONG, /* flags */
-> +       TYPE_ULONGLONG) /* inodes */
-> +
-> +STRUCT(btrfs_ioctl_ino_lookup_user_args,
-> +       TYPE_ULONGLONG, /* dirid */
-> +       TYPE_ULONGLONG, /* treeid */
-> +       MK_ARRAY(TYPE_CHAR, BTRFS_VOL_NAME_MAX + 1), /* name */
-> +       MK_ARRAY(TYPE_CHAR, BTRFS_INO_LOOKUP_USER_PATH_MAX)) /* path */
-> +
->  STRUCT(btrfs_ioctl_dev_info_args,
->         TYPE_ULONGLONG, /* devid */
->         MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* uuid */
-> 
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
 Thanks,
 Laurent
+
 
