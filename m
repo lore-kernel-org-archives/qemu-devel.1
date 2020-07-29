@@ -2,89 +2,90 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B4DC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 12:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4D1C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 13:03:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0BA72083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 12:59:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9369206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 13:03:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cC4jpAP+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0BA72083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C9lar+7a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9369206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0lfs-0001ih-Se
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 08:59:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34538)
+	id 1k0lk3-0003AM-W5
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 09:03:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1k0ler-0000rr-3P; Wed, 29 Jul 2020 08:58:09 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:38551)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0ljQ-0002e4-0b; Wed, 29 Jul 2020 09:02:52 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:54517)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1k0lep-0005NF-20; Wed, 29 Jul 2020 08:58:08 -0400
-Received: by mail-qk1-x744.google.com with SMTP id e13so22024385qkg.5;
- Wed, 29 Jul 2020 05:58:05 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0ljO-0005z2-Ex; Wed, 29 Jul 2020 09:02:51 -0400
+Received: by mail-wm1-x331.google.com with SMTP id d190so2643981wmd.4;
+ Wed, 29 Jul 2020 06:02:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=tacrXF8Cqw/PfCf1apftjZUDdgnYMST1U29DEc3AYZ4=;
- b=cC4jpAP+vJWCPz55baON+B0yKv1zP4zgXgLyMooHQyBDIb7ZyQC6czivtN/CHlFm8/
- vKjDm8xMYoztLoAEprlWJHrPPTX6qjkoJL80K9/oRrHaUtywoj2YWQMJdYCtrg5lOyrG
- CIieqtDvyOAHqhf+4HXd7WQnsA8fCJzAd93O+AAoHa2doOXODYrjGa4CGb5d6nLBhNl/
- A10He/OiySbBUme+9nUkzpjyIM4NLeX9nJMu543Wrc9gxVXJtcQ0jTo69pKj47uotLk6
- FNKCNpD/EhaFwKJ6UjM4xEezcgVWCjHjmvft2MchNMjOhzXGmGrS5bSafBG1JW9oyRLV
- wSDA==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=UiAAUsgoxESRAYasZa3Rjo2Nv16PISfy3RzxxRZSHy8=;
+ b=C9lar+7a9IzEqAfsHLPr4U7m5KKzinVfze4e9PJpIVveRVtHJY3E7txgZPtnejQuei
+ IF15CusP8GmvXxGUdR4nW3JZErcc3LsUPEvXEq6jZAFBqVYvcqNNiJSY9X55s3T69Mwf
+ CudF2BgvyfNvZlVoIPfEoFLxfMhifAieDcK8nUwSMQePKFNCwe4oh6pntiwPz0+xwbZL
+ wo2+ZeoX72kw79H3z4DNOMtYxZ3IizSMrLuKTubQoj2dLvst522EO8MwYuuEhM5cL7Cw
+ 1k4CRsNSIh5blvs3SfvKYB76Mln14x6Bk3rgWSo2xlPgDSTl8D2lTKRT2BlcBQP77zZQ
+ c/KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=tacrXF8Cqw/PfCf1apftjZUDdgnYMST1U29DEc3AYZ4=;
- b=l94RMgFY7PRHgkEA4jOX+zNY46jZuCBTy4qIxslghRF7tgN6UHAxO5gLawiZs6f9PI
- 0l98Bpr+9z2ILvxaymxeCjv37Frj2JB47ALRFc6qWHm9Br3n7Cto3/r13mW9urrpplRS
- iaZHiqz973Jf4i++YEzxsEOnMQ8OqOOcIFT8tEcvzK30vmRdJa+/Z6XxW1xbnHNdtrEr
- j9xxOS9IcJNOdISIN9H89A62edixDym36G3i2rmfVKDJwEI8UmLUgd97PIFTRGAkdMq0
- aVX/+too9TLl3wVjc6nSk/4bvX9hyOznN1NsoVniEw9RVVzGbnb/oaWo2TQW7vBWosIl
- ZUXA==
-X-Gm-Message-State: AOAM533pM0v+eQL96Sxu6UPQkG4tqDE6p0aB/sykJByxB1Km1EZJMX4f
- LVOlzRpdpCDg+tbN5dNJaGQTOU5MTWc=
-X-Google-Smtp-Source: ABdhPJzwBELEpbLFU7bC380tsHntFL9qPS4Kh1lgcyoyIIJ4W+Qmq6XFH7KIKKjOKEx32KvWJJMZuw==
-X-Received: by 2002:a37:9004:: with SMTP id s4mr32406109qkd.286.1596027484659; 
- Wed, 29 Jul 2020 05:58:04 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c7:fea0:f34f:387b:ebfa:f155])
- by smtp.gmail.com with ESMTPSA id x137sm1490122qkb.47.2020.07.29.05.58.02
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=UiAAUsgoxESRAYasZa3Rjo2Nv16PISfy3RzxxRZSHy8=;
+ b=Dh/MzB/brafLlB9h+xhUtKW3t8cY7YHiskb1L8VX6Fzz7+oRO/790095ycibUEPQFe
+ zuMmQY/zlMnJRQkgiH1cEcfFqQJgfyM8lS5XXA3LgaMFlQouAldJpLTEGk+DsC11v1s0
+ 6Zw2y/zztM9scrlqZ86LdUyPtWU4n184jgHccpoktuYpbmAFivDnnR112BbEWY7JY5+V
+ XLnaa8i/7EsAQgTYZySHYB27Ndn4x/c6mdZY3axZwV4da1At5XyXNW/DJfVmOzl09RSb
+ wm8hmxp4fv5mt7AtaqgrW5S5KV/Jr+SktYyO86roU/F6OcQytUMAxTNol1I+Xp1oW9UH
+ zNhQ==
+X-Gm-Message-State: AOAM533exh8erwxvyshp7Ms4PY486l1was2rQcepD9HAeE9qsyxVwrXl
+ t32ITfum3CXAhjTQcztLQfo=
+X-Google-Smtp-Source: ABdhPJy7sh40lOmTZhkMgurgyJBmdShX18znPH7GKIAk2WGYLcP48p48jrZsituJtokj0OBpv2j1FA==
+X-Received: by 2002:a1c:660a:: with SMTP id a10mr8163866wmc.115.1596027768388; 
+ Wed, 29 Jul 2020 06:02:48 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id t17sm4901057wmj.34.2020.07.29.06.02.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jul 2020 05:58:04 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/1] docs: adding NUMA documentation for pseries
-Date: Wed, 29 Jul 2020 09:57:56 -0300
-Message-Id: <20200729125756.224846-1-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
+ Wed, 29 Jul 2020 06:02:47 -0700 (PDT)
+Date: Wed, 29 Jul 2020 14:02:45 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: anthony smith <backtogeek@gmail.com>
+Subject: Re: Disk cache defaults
+Message-ID: <20200729130245.GH37763@stefanha-x1.localdomain>
+References: <CAPf-64Wni=_9byuHt9HyFnZ6PwTF3wp17oEMF2ok-Tvk6UG0RQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::744;
- envelope-from=danielhb413@gmail.com; helo=mail-qk1-x744.google.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Rn7IEEq3VEzCw+ji"
+Content-Disposition: inline
+In-Reply-To: <CAPf-64Wni=_9byuHt9HyFnZ6PwTF3wp17oEMF2ok-Tvk6UG0RQ@mail.gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::331;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x331.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,225 +98,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a new documentation file, ppc-spapr-numa.rst,
-informing what developers and user can expect of the NUMA distance
-support for the pseries machine, up to QEMU 5.1.
 
-In the (hopefully soon) future, when we rework the NUMA mechanics
-of the pseries machine to at least attempt to contemplate user
-choice, this doc will be extended to inform about the new
-support.
+--Rn7IEEq3VEzCw+ji
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
----
- docs/specs/ppc-spapr-numa.rst | 191 ++++++++++++++++++++++++++++++++++
- 1 file changed, 191 insertions(+)
- create mode 100644 docs/specs/ppc-spapr-numa.rst
+On Wed, Jul 22, 2020 at 07:14:59AM +0100, anthony smith wrote:
+> Appreciate any assistance even if the answer is just "Not possible" so I
+> can at least drop this search for answers.
 
-diff --git a/docs/specs/ppc-spapr-numa.rst b/docs/specs/ppc-spapr-numa.rst
-new file mode 100644
-index 0000000000..e762038022
---- /dev/null
-+++ b/docs/specs/ppc-spapr-numa.rst
-@@ -0,0 +1,191 @@
-+
-+NUMA mechanics for sPAPR (pseries machines)
-+============================================
-+
-+NUMA in sPAPR works different than the System Locality Distance
-+Information Table (SLIT) in ACPI. The logic is explained in the LOPAPR
-+1.1 chapter 15, "Non Uniform Memory Access (NUMA) Option". This
-+document aims to complement this specification, providing details
-+of the elements that impacts how QEMU views NUMA in pseries.
-+
-+Associativity and ibm,associativity property
-+--------------------------------------------
-+
-+Associativity is defined as a group of platform resources that has
-+similar mean performance (or in our context here, distance) relative to
-+everyone else outside of the group.
-+
-+The format of the ibm,associativity property varies with the value of
-+bit 0 of byte 5 of the ibm,architecture-vec-5 property. The format with
-+bit 0 equal to zero is deprecated. The current format, with the bit 0
-+with the value of one, makes ibm,associativity property represent the
-+physical hierarchy of the platform, as one or more lists that starts
-+with the highest level grouping up to the smallest. Considering the
-+following topology:
-+
-+::
-+
-+    Mem M1 ---- Proc P1    |
-+    -----------------      | Socket S1  ---|
-+          chip C1          |               |
-+                                           | HW module 1 (MOD1)
-+    Mem M2 ---- Proc P2    |               |
-+    -----------------      | Socket S2  ---|
-+          chip C2          |
-+
-+The ibm,associativity property for the processors would be:
-+
-+* P1: {MOD1, S1, C1, P1}
-+* P2: {MOD1, S2, C2, P2}
-+
-+Each allocable resource has an ibm,associativity property. The LOPAPR
-+specification allows multiple lists to be present in this property,
-+considering that the same resource can have multiple connections to the
-+platform.
-+
-+Relative Performance Distance and ibm,associativity-reference-points
-+--------------------------------------------------------------------
-+
-+The ibm,associativity-reference-points property is an array that is used
-+to define the relevant performance/distance  related boundaries, defining
-+the NUMA levels for the platform.
-+
-+The definition of its elements also varies with the value of bit 0 of byte 5
-+of the ibm,architecture-vec-5 property. The format with bit 0 equal to zero
-+is also deprecated. With the current format, each integer of the
-+ibm,associativity-reference-points represents an 1 based ordinal index (i.e.
-+the first element is 1) of the ibm,associativity array. The first
-+boundary is the most significant to application performance, followed by
-+less significant boundaries. Allocated resources that belongs to the
-+same performance boundaries are expected to have relative NUMA distance
-+that matches the relevancy of the boundary itself. Resources that belongs
-+to the same first boundary will have the shortest distance from each
-+other. Subsequent boundaries represents greater distances and degraded
-+performance.
-+
-+Using the previous example, the following setting reference points defines
-+three NUMA levels:
-+
-+* ibm,associativity-reference-points = {0x3, 0x2, 0x1}
-+
-+The first NUMA level (0x3) is interpreted as the third element of each
-+ibm,associativity array, the second level is the second element and
-+the third level is the first element. Let's also consider that elements
-+belonging to the first NUMA level have distance equal to 10 from each
-+other, and each NUMA level doubles the distance from the previous. This
-+means that the second would be 20 and the third level 40. For the P1 and
-+P2 processors, we would have the following NUMA levels:
-+
-+::
-+
-+  * ibm,associativity-reference-points = {0x3, 0x2, 0x1}
-+
-+  * P1: associativity{MOD1, S1, C1, P1}
-+
-+  First NUMA level (0x3) => associativity[2] = C1
-+  Second NUMA level (0x2) => associativity[1] = S1
-+  Third NUMA level (0x1) => associativity[0] = MOD1
-+
-+  * P2: associativity{MOD1, S2, C2, P2}
-+
-+  First NUMA level (0x3) => associativity[2] = C2
-+  Second NUMA level (0x2) => associativity[1] = S2
-+  Third NUMA level (0x1) => associativity[0] = MOD1
-+
-+  P1 and P2 have the same third NUMA level, MOD1: Distance between them = 40
-+
-+Changing the ibm,associativity-reference-points array changes the performance
-+distance attributes for the same associativity arrays, as the following
-+example illustrates:
-+
-+::
-+
-+  * ibm,associativity-reference-points = {0x2}
-+
-+  * P1: associativity{MOD1, S1, C1, P1}
-+
-+  First NUMA level (0x2) => associativity[1] = S1
-+
-+  * P2: associativity{MOD1, S2, C2, P2}
-+
-+  First NUMA level (0x2) => associativity[1] = S2
-+
-+  P1 and P2 does not have a common performance boundary. Since this is a one level
-+  NUMA configuration, distance between them is one boundary above the first
-+  level, 20.
-+
-+
-+In a hypothetical platform where all resources inside the same hardware module
-+is considered to be on the same performance boundary:
-+
-+::
-+
-+  * ibm,associativity-reference-points = {0x1}
-+
-+  * P1: associativity{MOD1, S1, C1, P1}
-+
-+  First NUMA level (0x1) => associativity[0] = MOD0
-+
-+  * P2: associativity{MOD1, S2, C2, P2}
-+
-+  First NUMA level (0x1) => associativity[0] = MOD0
-+
-+  P1 and P2 belongs to the same first order boundary. The distance between then
-+  is 10.
-+
-+
-+How the pseries Linux guest calculates NUMA distances
-+=====================================================
-+
-+Another key difference between ACPI SLIT and the LOPAPR regarding NUMA is
-+how the distances are expressed. The SLIT table provides the NUMA distance
-+value between the relevant resources. LOPAPR does not provide a standard
-+way to calculate it. We have the ibm,associativity for each resource, which
-+provides a common-performance hierarchy,  and the ibm,associativity-reference-points
-+array that tells which level of associativity is considered to be relevant
-+or not.
-+
-+The result is that each OS is free to implement and to interpret the distance
-+as it sees fit. For the pseries Linux guest, each level of NUMA duplicates
-+the distance of the previous level, and the maximum amount of levels is
-+limited to MAX_DISTANCE_REF_POINTS = 4 (from arch/powerpc/mm/numa.c in the
-+kernel tree). This results in the following distances:
-+
-+* both resources in the first NUMA level: 10
-+* resources one NUMA level apart: 20
-+* resources two NUMA levels apart: 40
-+* resources three NUMA levels apart: 80
-+* resources four NUMA levels apart: 160
-+
-+
-+Consequences for QEMU NUMA tuning
-+---------------------------------
-+
-+The way the pseries Linux guest calculates NUMA distances has a direct effect
-+on what QEMU users can expect when doing NUMA tuning. As of QEMU 5.1, this is
-+the default ibm,associativity-reference-points being used in the pseries
-+machine:
-+
-+ibm,associativity-reference-points = {0x4, 0x4, 0x2}
-+
-+The first and second level are equal, 0x4, and a third one was added in
-+commit a6030d7e0b35 exclusively for NVLink GPUs support. This means that
-+regardless of how the ibm,associativity properties are being created in
-+the device tree, the pseries Linux guest will only recognize three scenarios
-+as far as NUMA distance goes:
-+
-+* if the resources belongs to the same first NUMA level = 10
-+* second level is skipped since it's equal to the first
-+* all resources that aren't a NVLink GPU, it is guaranteed that they will belong
-+  to the same third NUMA level, having distance = 40
-+* for NVLink GPUs, distance = 80 from everything else
-+
-+In short, we can summarize the NUMA distances seem in pseries Linux guests, using
-+QEMU up to 5.1, as follows:
-+
-+* local distance, i.e. the distance of the resource to its own NUMA node: 10
-+* if it's a NVLink GPU device, distance: 80
-+* every other resource, distance: 40
-+
-+This also means that user input in QEMU command line does not change the
-+NUMA distancing inside the guest for the pseries machine.
--- 
-2.26.2
+You can create an /etc/qemu/qemu.conf file but I don't remember if there
+is syntax to set -drive cache=none.
 
+CCing Kevin Wolf and Markus Armbruster for ideas.
+
+The hacky "solution" is to write a wrapper script (e.g. a shell script)
+that modifies QEMU command-line arguments to use cache=none if no
+explicit cache= option was given:
+
+  $ cat qemu-wrapper.sh
+  #!/bin/bash
+  # Add QEMU -drive cache=none
+
+  declare -a opts
+
+  i=0
+  is_drive=0
+  for opt in "$@"; do
+    if [ "$is_drive" -eq 1 ]; then
+      opt="$opt,cache=none" # TODO skip if cache= is already in opts?
+    fi
+    opts[$i]="$opt"
+    if [ "$opt" = "-drive" ]; then
+      is_drive=1
+    else
+      is_drive=0
+    fi
+    i=$((i + 1))
+  done
+
+  exec /usr/bin/qemu-system-x86_64 "${opts[@]}"
+
+--Rn7IEEq3VEzCw+ji
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8hc3UACgkQnKSrs4Gr
+c8ivgAf8DiEUYK/yt9VXrjGGc+aZK2D8Qk/t4fehzzb7C+pcigZu/QYW/HHfM6cW
+aPrk8W1JBTQDCot+FwcuiiQ2h1JMa/VFayGGkz7KZjz5Qj3ztoSv7epmekhpQYsK
+31AmeMG0ABtKGG1woZsocU3I60m04qrbhbHi7CGJMJjQFXi2BUWbPDYHlaihuZXu
+TSyvjXshtqXK44j0YP377lD+VDahSjS7eVa4/CNwC8oZi8HL7q6CL4yoP/5k7VjC
+1WMGSqZU55FDoJ/FEv/LI7shgz6qg8kClBZ0hTSvL4+mHbZmTANV/8JJ14cd/Jud
+PJbO8VwLXpUoowrT+Z4g1UfDOI+Wfg==
+=DSbJ
+-----END PGP SIGNATURE-----
+
+--Rn7IEEq3VEzCw+ji--
 
