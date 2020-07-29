@@ -2,86 +2,71 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF5F1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 17:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C307C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 17:25:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA9AB2075D
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 17:18:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 435EC207F5
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 17:25:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YyZW9F/d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA9AB2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="aLWCM92c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 435EC207F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0pik-0006zX-2u
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 13:18:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45678)
+	id 1k0ppp-0000GG-IC
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 13:25:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0pi2-0006Ws-RD
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 13:17:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48137
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0pi0-00031R-OU
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 13:17:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596043059;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yvY4v1UXxFxH4msWGqeU5QfEkZLsOOVM0r6pGE3/5cU=;
- b=YyZW9F/dKSepo5PcX3sOvndju0MdzvfuoFz3iw6040VFR8og5HEyO1UjHqbj8d82S6Vx8J
- JwL+qvpN8C+d8ynXdXrB2fYuEpEZObTMGI7bTx/pfsNZ2bB2HhV58IU8RNPBBv63P4NUyT
- o3iOpDUZ3eCAzQnQICwSP5Fa6XYbvPY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-foL5Kip8P3qKC3OOtl-KTA-1; Wed, 29 Jul 2020 13:17:35 -0400
-X-MC-Unique: foL5Kip8P3qKC3OOtl-KTA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F061E1005510;
- Wed, 29 Jul 2020 17:17:33 +0000 (UTC)
-Received: from gondolin (ovpn-113-17.ams2.redhat.com [10.36.113.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0CDFE712FF;
- Wed, 29 Jul 2020 17:17:31 +0000 (UTC)
-Date: Wed, 29 Jul 2020 19:17:29 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Subject: Re: [PATCH for-5.2 0/6] Continue booting in case the first device
- is not bootable
-Message-ID: <20200729191729.0e40d4a6.cohuck@redhat.com>
-In-Reply-To: <5c860673-9c0c-79fe-2804-4864856257f5@linux.ibm.com>
-References: <20200728183734.7838-1-thuth@redhat.com>
- <5c860673-9c0c-79fe-2804-4864856257f5@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1k0pp8-0008F8-BC
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 13:25:02 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:58003)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1k0pp6-0003xj-0G
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 13:25:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=QmeyV490Z7mAS7iFL6fIvV+ITrvU1gUOptIGxLZrfuM=; b=aLWCM92ck6tFuWJP0g+Gqwn4Wx
+ jjI4E1ryiJv4A9sLARkZ1+SoMZlHdgrDANl5+eKYeEvcWdSaPgUMFp2T4bVO5Lno6l1J5CKqJyY6g
+ n8RQMZvaUE9WcWC7EN65+ql4MS/tlo0kwEc7uL6A5pDG9MIMhxtEaUpRA1v1FPbZhyhc8AAQ9eEyJ
+ gqHUOm/2NUx1prQ94ubXnWP4EZdHJ4MF/rj/+2T6xnv5Pd5l/XGkCx3d8D/qbzgqn0NHnYYqdStcP
+ UV2lGOVK14YHAo0x7zpUnx89fW/7wWVTh1TqFDTB6GqS8Px9oHKzdcxs35ZlJ0+pa3ZChO3XyHkJd
+ pA0j/faA==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v8 1/7] tests/virtio-9p: added split readdir tests
+Date: Wed, 29 Jul 2020 19:24:54 +0200
+Message-ID: <1840276.exGcvpJF7P@silver>
+In-Reply-To: <20200729174254.58aaccc6@bahia.lan>
+References: <cover.1596012787.git.qemu_oss@crudebyte.com>
+ <569b2e05ab1d0223b14a12dfbdf3ad5e8b3ac131.1596012787.git.qemu_oss@crudebyte.com>
+ <20200729174254.58aaccc6@bahia.lan>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 13:17:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 13:24:55
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,67 +79,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Collin Walling <walling@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[restored cc:s]
-
-On Wed, 29 Jul 2020 13:42:05 +0200
-Viktor Mihajlovski <mihajlov@linux.ibm.com> wrote:
-
-> On 7/28/20 8:37 PM, Thomas Huth wrote:
-> > If the user did not specify a "bootindex" property, the s390-ccw bios
-> > tries to find a bootable device on its own. Unfortunately, it alwasy
-> > stops at the very first device that it can find, no matter whether it's
-> > bootable or not. That causes some weird behavior, for example while
-> > 
-> >   qemu-system-s390x -hda bootable.qcow2
-> > 
-> > boots perfectly fine, the bios refuses to work if you just specify
-> > a virtio-scsi controller in front of it:
-> > 
-> >   qemu-system-s390x -device virtio-scsi -hda bootable.qcow2
-> > 
-> > Since this is quite uncomfortable and confusing for the users, and
-> > all major firmwares on other architectures correctly boot in such
-> > cases, too, let's also try to teach the s390-ccw bios how to boot
-> > in such cases.
-> > 
-> > For this, we have to get rid of the various panic()s and IPL_assert()
-> > statements at the "low-level" function and let the main code handle
-> > the decision instead whether a boot from a device should fail or not,
-> > so that the main code can continue searching in case it wants to.
-> >   
+On Mittwoch, 29. Juli 2020 17:42:54 CEST Greg Kurz wrote:
+> On Wed, 29 Jul 2020 10:10:23 +0200
 > 
-> Looking at it from an architectural perspective: If an IPL Information 
-> Block specifying the boot device has been set and can be retrieved using 
-> Diagnose 308 it has to be respected, even if the device doesn't contain 
-> a bootable program. The boot has to fail in this case.
+> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > The previous, already existing 'basic' readdir test simply used a
+> > 'count' parameter big enough to retrieve all directory entries with a
+> > single Treaddir request.
+> > 
+> > In the 3 new 'split' readdir tests added by this patch, directory
+> > entries are retrieved, split over several Treaddir requests by picking
+> > small 'count' parameters which force the server to truncate the
+> > response. So the test client sends as many Treaddir requests as
+> > necessary to get all directory entries.
+> > 
+> > The following 3 new tests are added (executed in this sequence):
+> > 
+> > 1. Split readdir test with count=512
+> > 2. Split readdir test with count=256
+> > 3. Split readdir test with count=128
+> > 
+> > This test case sequence is chosen because the smaller the 'count' value,
+> > the higher the chance of errors in case of implementation bugs on server
+> > side.
+> > 
+> > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > ---
 > 
-> I had not the bandwidth to follow all code paths, but I gather that this 
-> is still the case with the series. So one can argue that these changes 
-> are taking care of an undefined situation (real hardware will always 
-> have the IPIB set).
+> The existing fs_readdir() function for the 'basic' test is a subset
+> of the new fs_readdir_split() introduced by this patch (quite visible
+> if you sdiff the code).
 > 
-> As long as the architecture is not violated, I can live with the 
-> proposed changes. I however would like to point out that this only 
-> covers a corner case (no -boot or -device ..,bootindex specified). A VM 
-> defined and started with libvirt will always specify the boot device. 
-> Please don't create the impression that this patches will lead to the 
-> same behavior as on other platforms. It is still not possible to have an 
-> order list of potential boot devices in an architecture compliant way.
+> To avoid code duplication, I would have probably tried to do the changes
+> in fs_readdir() and implement the 'basic' test as:
+> 
+> static void fs_readdir_basic(void *obj, void *data,
+>                              QGuestAllocator *t_alloc)
+> {
+>     /*
+>      * submit count = msize - 11, because 11 is the header size of Rreaddir
+>      */
+>     fs_readdir(obj, data, t_alloc, P9_MAX_SIZE - 11);
+> }
 
-Yes, libvirt will always add this parameter. Still, I've seen confusion
-generated by this behaviour, so this change sounds like a good idea to
-me.
+You are right of course; there is code duplication. My thought was to preserve 
+the simple readdir test code (at least at this initial stage) as it is really 
+very simple and easy to understand.
 
-(Is there any possibility to enhance the architecture to provide a list
-of devices in the future?)
+The split readdir test code is probably already a tad more tedious to read.
+
+I keep it in mind though and probably deduplicate this test code a bit later 
+on. But I think it makes sense to start off with this version for now.
+
+> but anyway this looks good to me so:
+> 
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+
+Thanks!
+
+> >  tests/qtest/virtio-9p-test.c | 108 +++++++++++++++++++++++++++++++++++
+> >  1 file changed, 108 insertions(+)
+> > 
+> > diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+> > index 2167322985..de30b717b6 100644
+> > --- a/tests/qtest/virtio-9p-test.c
+> > +++ b/tests/qtest/virtio-9p-test.c
+> > @@ -578,6 +578,7 @@ static bool fs_dirents_contain_name(struct V9fsDirent
+> > *e, const char* name)> 
+> >      return false;
+> >  
+> >  }
+> > 
+> > +/* basic readdir test where reply fits into a single response message */
+> > 
+> >  static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
+> >  {
+> >  
+> >      QVirtio9P *v9p = obj;
+> > 
+> > @@ -631,6 +632,89 @@ static void fs_readdir(void *obj, void *data,
+> > QGuestAllocator *t_alloc)> 
+> >      g_free(wnames[0]);
+> >  
+> >  }
+> > 
+> > +/* readdir test where overall request is split over several messages */
+> > +static void fs_readdir_split(void *obj, void *data, QGuestAllocator
+> > *t_alloc, +                             uint32_t count)
+> > +{
+> > +    QVirtio9P *v9p = obj;
+> > +    alloc = t_alloc;
+> > +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
+> > +    uint16_t nqid;
+> > +    v9fs_qid qid;
+> > +    uint32_t nentries, npartialentries;
+> > +    struct V9fsDirent *entries, *tail, *partialentries;
+> > +    P9Req *req;
+> > +    int fid;
+> > +    uint64_t offset;
+> > +
+> > +    fs_attach(v9p, NULL, t_alloc);
+> > +
+> > +    fid = 1;
+> > +    offset = 0;
+> > +    entries = NULL;
+> > +    nentries = 0;
+> > +    tail = NULL;
+> > +
+> > +    req = v9fs_twalk(v9p, 0, fid, 1, wnames, 0);
+> > +    v9fs_req_wait_for_reply(req, NULL);
+> > +    v9fs_rwalk(req, &nqid, NULL);
+> > +    g_assert_cmpint(nqid, ==, 1);
+> > +
+> > +    req = v9fs_tlopen(v9p, fid, O_DIRECTORY, 0);
+> > +    v9fs_req_wait_for_reply(req, NULL);
+> > +    v9fs_rlopen(req, &qid, NULL);
+> > +
+> > +    /*
+> > +     * send as many Treaddir requests as required to get all directory
+> > +     * entries
+> > +     */
+> > +    while (true) {
+> > +        npartialentries = 0;
+> > +        partialentries = NULL;
+> > +
+> > +        req = v9fs_treaddir(v9p, fid, offset, count, 0);
+> > +        v9fs_req_wait_for_reply(req, NULL);
+> > +        v9fs_rreaddir(req, &count, &npartialentries, &partialentries);
+> > +        if (npartialentries > 0 && partialentries) {
+> > +            if (!entries) {
+> > +                entries = partialentries;
+> > +                nentries = npartialentries;
+> > +                tail = partialentries;
+> > +            } else {
+> > +                tail->next = partialentries;
+> > +                nentries += npartialentries;
+> > +            }
+> > +            while (tail->next) {
+> > +                tail = tail->next;
+> > +            }
+> > +            offset = tail->offset;
+> > +        } else {
+> > +            break;
+> > +        }
+> > +    }
+> > +
+> > +    g_assert_cmpint(
+> > +        nentries, ==,
+> > +        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
+> > +    );
+> > +
+> > +    /*
+> > +     * Check all file names exist in returned entries, ignore their order
+> > +     * though.
+> > +     */
+> > +    g_assert_cmpint(fs_dirents_contain_name(entries, "."), ==, true);
+> > +    g_assert_cmpint(fs_dirents_contain_name(entries, ".."), ==, true);
+> > +    for (int i = 0; i < QTEST_V9FS_SYNTH_READDIR_NFILES; ++i) {
+> > +        char *name = g_strdup_printf(QTEST_V9FS_SYNTH_READDIR_FILE, i);
+> > +        g_assert_cmpint(fs_dirents_contain_name(entries, name), ==,
+> > true);
+> > +        g_free(name);
+> > +    }
+> > +
+> > +    v9fs_free_dirents(entries);
+> > +
+> > +    g_free(wnames[0]);
+> > +}
+> > +
+> > 
+> >  static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator
+> >  *t_alloc) {
+> >  
+> >      QVirtio9P *v9p = obj;
+> > 
+> > @@ -793,6 +877,24 @@ static void fs_flush_ignored(void *obj, void *data,
+> > QGuestAllocator *t_alloc)> 
+> >      g_free(wnames[0]);
+> >  
+> >  }
+> > 
+> > +static void fs_readdir_split_128(void *obj, void *data,
+> > +                                 QGuestAllocator *t_alloc)
+> > +{
+> > +    fs_readdir_split(obj, data, t_alloc, 128);
+> > +}
+> > +
+> > +static void fs_readdir_split_256(void *obj, void *data,
+> > +                                 QGuestAllocator *t_alloc)
+> > +{
+> > +    fs_readdir_split(obj, data, t_alloc, 256);
+> > +}
+> > +
+> > +static void fs_readdir_split_512(void *obj, void *data,
+> > +                                 QGuestAllocator *t_alloc)
+> > +{
+> > +    fs_readdir_split(obj, data, t_alloc, 512);
+> > +}
+> > +
+> > 
+> >  static void register_virtio_9p_test(void)
+> >  {
+> >  
+> >      qos_add_test("config", "virtio-9p", pci_config, NULL);
+> > 
+> > @@ -810,6 +912,12 @@ static void register_virtio_9p_test(void)
+> > 
+> >      qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
+> >      
+> >                   NULL);
+> >      
+> >      qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
+> > 
+> > +    qos_add_test("fs/readdir/split_512", "virtio-9p",
+> > +                 fs_readdir_split_512, NULL);
+> > +    qos_add_test("fs/readdir/split_256", "virtio-9p",
+> > +                 fs_readdir_split_256, NULL);
+> > +    qos_add_test("fs/readdir/split_128", "virtio-9p",
+> > +                 fs_readdir_split_128, NULL);
+> > 
+> >  }
+> >  
+> >  libqos_init(register_virtio_9p_test);
+
+
 
 
