@@ -2,88 +2,69 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E18DBC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9866C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:06:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACA4E20809
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:05:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zfwf/mlv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACA4E20809
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8EDA120809
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:06:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EDA120809
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0oa9-0003CO-UP
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:05:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55836)
+	id 1k0obL-0005JP-Qu
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:06:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1k0oWz-0006wD-Nf
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:02:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55557
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dinechin@redhat.com>)
- id 1k0oWx-0000u1-QL
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:02:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596038530;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=92MyhSeistOJZvnkvNBQ5DUgEsXmlH27mjnQIJee6OM=;
- b=Zfwf/mlvXHB9L2imiRVqC220EQCC4XYEswfsbSpPXNQaLMB1jpeY72b1khlKek/ay5u8dV
- ZlD0z/ilBcvcyLjnhuDq+V71xUYAZdtDkb6hriDuzOwWlqVyav6yugKfRUXQG4piJzrFNC
- O4e9n5oI0V3yrcZn2sw1c65cbj905So=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-skv8hwvHM5eUQfdGePkYSg-1; Wed, 29 Jul 2020 12:02:08 -0400
-X-MC-Unique: skv8hwvHM5eUQfdGePkYSg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E77EA800465;
- Wed, 29 Jul 2020 16:02:07 +0000 (UTC)
-Received: from titinator (ovpn-114-132.ams2.redhat.com [10.36.114.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB8B761799;
- Wed, 29 Jul 2020 16:01:59 +0000 (UTC)
-References: <20200723174615.2370096-1-dinechin@redhat.com>
- <20200723174615.2370096-3-dinechin@redhat.com>
- <84be9a34-9f87-1660-3a43-aea72d9496cd@redhat.com>
-User-agent: mu4e 1.5.2; emacs 26.3
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 2/7] build: fix device module builds
-In-reply-to: <84be9a34-9f87-1660-3a43-aea72d9496cd@redhat.com>
-Date: Wed, 29 Jul 2020 18:01:57 +0200
-Message-ID: <lyy2n2e2dm.fsf@redhat.com>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k0oXo-0000Ck-C3
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:03:04 -0400
+Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:53413)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k0oXl-0000yB-VW
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:03:04 -0400
+Received: from player738.ha.ovh.net (unknown [10.110.103.199])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 185ED1484F9
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 18:02:58 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player738.ha.ovh.net (Postfix) with ESMTPSA id 37CAA14EAC07F;
+ Wed, 29 Jul 2020 16:02:57 +0000 (UTC)
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-101G0043a443b77-d367-4d3e-afbf-9c8801dfa8f7,A40F6FE0CFFE28C23AB4AFBB3D5D665E11D39731)
+ smtp.auth=groug@kaod.org
+Date: Wed, 29 Jul 2020 18:02:56 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v8 3/7] 9pfs: split out fs driver core of v9fs_co_readdir()
+Message-ID: <20200729180256.23eca3e0@bahia.lan>
+In-Reply-To: <a426ee06e77584fa2d8253ce5d8bea519eb3ffd4.1596012787.git.qemu_oss@crudebyte.com>
+References: <cover.1596012787.git.qemu_oss@crudebyte.com>
+ <a426ee06e77584fa2d8253ce5d8bea519eb3ffd4.1596012787.git.qemu_oss@crudebyte.com>
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dinechin@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:18:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 11363144814084397376
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrieeggdeliecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheekhfdtheegheehjeeludefkefhvdelfedvieehhfekhfdufffhueeuvdfftdfhnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=46.105.43.93; envelope-from=groug@kaod.org;
+ helo=6.mo173.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 12:02:59
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,91 +78,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, "Dr. David
- Alan Gilbert" <dgilbert@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- kraxel@redhat.com, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 29 Jul 2020 10:11:54 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-On 2020-07-28 at 18:37 CEST, Philippe Mathieu-Daud=C3=A9 wrote...
-> On 7/23/20 7:46 PM, Christophe de Dinechin wrote:
->> From: Gerd Hoffmann <kraxel@redhat.com>
->>
->> See comment.  Feels quite hackish.  Better ideas anyone?
->
-> I don't understand this patch, how is it related to the rest of
-> your series?
+> The implementation of v9fs_co_readdir() has two parts: the outer
+> part is executed by main I/O thread, whereas the inner part is
+> executed by fs driver on a background I/O thread.
+> 
+> Move the inner part to its own new, private function do_readdir(),
+> so it can be shared by another upcoming new function.
+> 
+> This is just a preparatory patch for the subsequent patch, with the
+> purpose to avoid the next patch to clutter the overall diff.
+> 
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> ---
+>  hw/9pfs/codir.c | 37 +++++++++++++++++++++++--------------
+>  1 file changed, 23 insertions(+), 14 deletions(-)
+> 
+> diff --git a/hw/9pfs/codir.c b/hw/9pfs/codir.c
+> index 73f9a751e1..ff57fb8619 100644
+> --- a/hw/9pfs/codir.c
+> +++ b/hw/9pfs/codir.c
+> @@ -18,28 +18,37 @@
+>  #include "qemu/main-loop.h"
+>  #include "coth.h"
+>  
+> +/*
+> + * This must solely be executed on a background IO thread.
+> + */
 
-It's a leftover from an earlier workaround. For some reason, only some
-spurious submodule changes remained over time. That patch can now be
-dropped, I believe.
+Well, technically this function could be called from any context
+but of course calling it from the main I/O thread when handling
+T_readdir would make the request synchronous, which is certainly
+not what we want. So I'm not sure this comment brings much.
 
->
->>
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> Signed-off-by: Christophe de Dinechin <dinechin@redhat.com>
->> ---
->>  dtc           | 2 +-
->>  roms/SLOF     | 2 +-
->>  roms/openbios | 2 +-
->>  roms/opensbi  | 2 +-
->>  roms/seabios  | 2 +-
->>  slirp         | 2 +-
->>  6 files changed, 6 insertions(+), 6 deletions(-)
->>
->> diff --git a/dtc b/dtc
->> index 85e5d83984..88f18909db 160000
->> --- a/dtc
->> +++ b/dtc
->> @@ -1 +1 @@
->> -Subproject commit 85e5d839847af54efab170f2b1331b2a6421e647
->> +Subproject commit 88f18909db731a627456f26d779445f84e449536
->> diff --git a/roms/SLOF b/roms/SLOF
->> index e18ddad851..9546892a80 160000
->> --- a/roms/SLOF
->> +++ b/roms/SLOF
->> @@ -1 +1 @@
->> -Subproject commit e18ddad8516ff2cfe36ec130200318f7251aa78c
->> +Subproject commit 9546892a80d5a4c73deea6719de46372f007f4a6
->> diff --git a/roms/openbios b/roms/openbios
->> index 75fbb41d28..7e5b89e429 160000
->> --- a/roms/openbios
->> +++ b/roms/openbios
->> @@ -1 +1 @@
->> -Subproject commit 75fbb41d2857d93208c74a8e0228b29fd7bf04c0
->> +Subproject commit 7e5b89e4295063d8eba55b9c8ce8bc681c2d129a
->> diff --git a/roms/opensbi b/roms/opensbi
->> index 9f1b72ce66..be92da280d 160000
->> --- a/roms/opensbi
->> +++ b/roms/opensbi
->> @@ -1 +1 @@
->> -Subproject commit 9f1b72ce66d659e91013b358939e832fb27223f5
->> +Subproject commit be92da280d87c38a2e0adc5d3f43bab7b5468f09
->> diff --git a/roms/seabios b/roms/seabios
->> index 88ab0c1552..f21b5a4aeb 160000
->> --- a/roms/seabios
->> +++ b/roms/seabios
->> @@ -1 +1 @@
->> -Subproject commit 88ab0c15525ced2eefe39220742efe4769089ad8
->> +Subproject commit f21b5a4aeb020f2a5e2c6503f906a9349dd2f069
->> diff --git a/slirp b/slirp
->> index 2faae0f778..126c04acba 160000
->> --- a/slirp
->> +++ b/slirp
->> @@ -1 +1 @@
->> -Subproject commit 2faae0f778f818fadc873308f983289df697eb93
->> +Subproject commit 126c04acbabd7ad32c2b018fe10dfac2a3bc1210
->>
+Anyway, the code change is okay so:
 
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
+> +static int do_readdir(V9fsPDU *pdu, V9fsFidState *fidp, struct dirent **dent)
+> +{
+> +    int err = 0;
+> +    V9fsState *s = pdu->s;
+> +    struct dirent *entry;
+> +
+> +    errno = 0;
+> +    entry = s->ops->readdir(&s->ctx, &fidp->fs);
+> +    if (!entry && errno) {
+> +        *dent = NULL;
+> +        err = -errno;
+> +    } else {
+> +        *dent = entry;
+> +    }
+> +    return err;
+> +}
+> +
+>  int coroutine_fn v9fs_co_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
+>                                   struct dirent **dent)
+>  {
+>      int err;
+> -    V9fsState *s = pdu->s;
+>  
+>      if (v9fs_request_cancelled(pdu)) {
+>          return -EINTR;
+>      }
+> -    v9fs_co_run_in_worker(
+> -        {
+> -            struct dirent *entry;
+> -
+> -            errno = 0;
+> -            entry = s->ops->readdir(&s->ctx, &fidp->fs);
+> -            if (!entry && errno) {
+> -                err = -errno;
+> -            } else {
+> -                *dent = entry;
+> -                err = 0;
+> -            }
+> -        });
+> +    v9fs_co_run_in_worker({
+> +        err = do_readdir(pdu, fidp, dent);
+> +    });
+>      return err;
+>  }
+>  
 
 
