@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38872C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B3AC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:55:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01D22206F5
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40CDA2053B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:55:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="PypMtBZV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D22206F5
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="T4HVIo3G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40CDA2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0imy-0006O2-A6
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 05:54:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50440)
+	id 1k0io6-0007IK-HT
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 05:55:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <a426ee06e77584fa2d8253ce5d8bea519eb3ffd4@lizzy.crudebyte.com>)
- id 1k0imC-0005my-2d
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:53:32 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:40351)
+ (envelope-from <4d34d332e1aaa8a2cf8dc0b5da4fd7727f2a86e8@lizzy.crudebyte.com>)
+ id 1k0inC-0006mX-M6
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:54:34 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:52617)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <a426ee06e77584fa2d8253ce5d8bea519eb3ffd4@lizzy.crudebyte.com>)
- id 1k0imA-0005XD-Fy
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:53:31 -0400
+ (envelope-from <4d34d332e1aaa8a2cf8dc0b5da4fd7727f2a86e8@lizzy.crudebyte.com>)
+ id 1k0inB-0005b8-05
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:54:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=7YfBaX+4mZIaB/1KGeVpeZ5wEcuMfcWwYHidz6lYcoU=; b=PypMt
- BZVlA48zbxiit1W8HI/R8ejsFU+1+8JnKYJOggcND1eroxKdTvpFiGsqtExMFTSvTdIoLAaXNaM4P
- qj6x6xbV4Z3xs4OGgWwR7pGXmwvvapigjfIoELoo+Bvrv27mXYJu5QwywK7ctA5OfolIomtaba/7N
- EZmK6PJKF4BaDiF9kJSbA3ayNHRiLDKZx//E5T4CHS6RFykz7zSim5QNNmYgeuH0URl2IBZNbnhyL
- G1KawCLL8FjNpJYXsTVhtBUE5AEMHqOztuyJ5zYcBgKnUlhtlTzNjUxFMhsUkXAnPo390+1mrZbcC
- kg9SjsNNW/mWAM5HYFLAjumgfeZzg==;
-Message-Id: <a426ee06e77584fa2d8253ce5d8bea519eb3ffd4.1596012787.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=dniHciHWD1s2sUmY62gnL597ZGnuF2fTUNk4k5tqqLE=; b=T4HVI
+ o3G/b2kvUTzD/Trl662Id6d+vin4uY7aXwVFcv/nxvI0Ve+oe+cqFtfMgGiwhuEFnWQsxmzTge5gz
+ ISv9up9d5pvuWYLfr1aoTIZrT4UJsK5inm8Q0nvTXnF3GnamsYKy5HUwInZpRw73PdjIGC2CD+m89
+ dFD2aQx4I1MZ4AJXp2df+2E/YL7am1wX57oI9t5TA4BmIxun7jUXNh8aMjmYiHVN1NYjUKjx28Boc
+ VBE3nOon17A2CeaODFPAH5MuuQtiKFIHdEgq6o3jZHFcwDxsssgh/Q5kug5j57K9fJVd7Kfm7/oAq
+ kagJpAPYHKuHfAR923qTxp0IKXB1A==;
+Message-Id: <4d34d332e1aaa8a2cf8dc0b5da4fd7727f2a86e8.1596012787.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1596012787.git.qemu_oss@crudebyte.com>
 References: <cover.1596012787.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Wed, 29 Jul 2020 10:11:54 +0200
-Subject: [PATCH v8 3/7] 9pfs: split out fs driver core of v9fs_co_readdir()
+Date: Wed, 29 Jul 2020 10:42:28 +0200
+Subject: [PATCH v8 7/7] 9pfs: clarify latency of v9fs_co_run_in_worker()
 To: qemu-devel@nongnu.org
 Cc: Greg Kurz <groug@kaod.org>
 Received-SPF: none client-ip=91.194.90.13;
- envelope-from=a426ee06e77584fa2d8253ce5d8bea519eb3ffd4@lizzy.crudebyte.com;
+ envelope-from=4d34d332e1aaa8a2cf8dc0b5da4fd7727f2a86e8@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 05:20:03
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
@@ -80,77 +80,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The implementation of v9fs_co_readdir() has two parts: the outer
-part is executed by main I/O thread, whereas the inner part is
-executed by fs driver on a background I/O thread.
-
-Move the inner part to its own new, private function do_readdir(),
-so it can be shared by another upcoming new function.
-
-This is just a preparatory patch for the subsequent patch, with the
-purpose to avoid the next patch to clutter the overall diff.
+As we just fixed a severe performance issue with Treaddir request
+handling, clarify this overall issue as a comment on
+v9fs_co_run_in_worker() with the intention to hopefully prevent
+such performance mistakes in future (and fixing other yet
+outstanding ones).
 
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- hw/9pfs/codir.c | 37 +++++++++++++++++++++++--------------
- 1 file changed, 23 insertions(+), 14 deletions(-)
+ hw/9pfs/coth.h | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/hw/9pfs/codir.c b/hw/9pfs/codir.c
-index 73f9a751e1..ff57fb8619 100644
---- a/hw/9pfs/codir.c
-+++ b/hw/9pfs/codir.c
-@@ -18,28 +18,37 @@
- #include "qemu/main-loop.h"
- #include "coth.h"
+diff --git a/hw/9pfs/coth.h b/hw/9pfs/coth.h
+index fd4a45bc7c..c51289903d 100644
+--- a/hw/9pfs/coth.h
++++ b/hw/9pfs/coth.h
+@@ -19,7 +19,7 @@
+ #include "qemu/coroutine.h"
+ #include "9p.h"
  
-+/*
-+ * This must solely be executed on a background IO thread.
-+ */
-+static int do_readdir(V9fsPDU *pdu, V9fsFidState *fidp, struct dirent **dent)
-+{
-+    int err = 0;
-+    V9fsState *s = pdu->s;
-+    struct dirent *entry;
-+
-+    errno = 0;
-+    entry = s->ops->readdir(&s->ctx, &fidp->fs);
-+    if (!entry && errno) {
-+        *dent = NULL;
-+        err = -errno;
-+    } else {
-+        *dent = entry;
-+    }
-+    return err;
-+}
-+
- int coroutine_fn v9fs_co_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-                                  struct dirent **dent)
- {
-     int err;
--    V9fsState *s = pdu->s;
- 
-     if (v9fs_request_cancelled(pdu)) {
-         return -EINTR;
-     }
--    v9fs_co_run_in_worker(
--        {
--            struct dirent *entry;
--
--            errno = 0;
--            entry = s->ops->readdir(&s->ctx, &fidp->fs);
--            if (!entry && errno) {
--                err = -errno;
--            } else {
--                *dent = entry;
--                err = 0;
--            }
--        });
-+    v9fs_co_run_in_worker({
-+        err = do_readdir(pdu, fidp, dent);
-+    });
-     return err;
- }
- 
+-/*
++/**
+  * we want to use bottom half because we want to make sure the below
+  * sequence of events.
+  *
+@@ -28,6 +28,16 @@
+  *   3. Enter the coroutine in the worker thread.
+  * we cannot swap step 1 and 2, because that would imply worker thread
+  * can enter coroutine while step1 is still running
++ *
++ * @b PERFORMANCE @b CONSIDERATIONS: As a rule of thumb, keep in mind
++ * that hopping between threads adds @b latency! So when handling a
++ * 9pfs request, avoid calling v9fs_co_run_in_worker() too often, because
++ * this might otherwise sum up to a significant, huge overall latency for
++ * providing the response for just a single request. For that reason it
++ * is highly recommended to fetch all data from fs driver with a single
++ * fs driver request on a background I/O thread (bottom half) in one rush
++ * first and then eventually assembling the final response from that data
++ * on main I/O thread (top half).
+  */
+ #define v9fs_co_run_in_worker(code_block)                               \
+     do {                                                                \
 -- 
 2.20.1
 
