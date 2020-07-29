@@ -6,65 +6,76 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84AAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D758C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:14:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF9DB2074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:11:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5756F2074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:14:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ptn5UpYL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF9DB2074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Znm4w4Je"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5756F2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0j3a-00065o-0u
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 06:11:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55046)
+	id 1k0j61-0007MX-J5
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 06:14:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0j2y-0005az-22
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:10:52 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:41004)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0j5O-0006ug-Pg
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:13:22 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52343)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0j2w-0007wb-HM
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:10:51 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0j5N-0008Jp-9e
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:13:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596017450;
+ s=mimecast20190719; t=1596017600;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oTwA86jxFWRLsqgY9r7L3tocABvLyNGv8Y2Ww8jHxc8=;
- b=Ptn5UpYLQthHkNgPgov4/bRIeMudnxmzHDhVFcZGMUgtUx0o2r4/0fHfB9oCYe0q0Ud68s
- 5AxZsFb0w5Oj+c9Zpx0Kg8LwckQ/1sLK3GMlmWk33lmTf0sCp7CYlvmDyMPVD8XJz694RW
- stpYl8t2t3DQ57w8Ye8kqJPqcRL6HPs=
+ bh=odfJ3bBclk2MMjV8q2jEs3bZ/Ku4061gJdV8lqP3cJE=;
+ b=Znm4w4Jetyc2xMVlmIM9nndqRM0/eoAlJ5/HJ4PZNOsSe//hFcIx5PYLJ8o5eU2QHgNyUl
+ sOWPpxsUtKNlWvmPTh/RVrrMaLB0w1jIfkDtdCswIj1LFmNl6ryI+jjMupBFqzoWiUFR1S
+ y7j3xFldmlvezaN/a9W/2FQT1fTOnfk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-hi9BhViKN1qPoLRrW-atTg-1; Wed, 29 Jul 2020 06:10:46 -0400
-X-MC-Unique: hi9BhViKN1qPoLRrW-atTg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-363-CEp5ZunKPNC2hakoX1v1cQ-1; Wed, 29 Jul 2020 06:13:16 -0400
+X-MC-Unique: CEp5ZunKPNC2hakoX1v1cQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62464800685;
- Wed, 29 Jul 2020 10:10:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C4E658;
+ Wed, 29 Jul 2020 10:13:15 +0000 (UTC)
 Received: from gondolin (ovpn-113-17.ams2.redhat.com [10.36.113.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E5E28A162;
- Wed, 29 Jul 2020 10:10:42 +0000 (UTC)
-Date: Wed, 29 Jul 2020 12:10:39 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7B9E610013D7;
+ Wed, 29 Jul 2020 10:13:07 +0000 (UTC)
+Date: Wed, 29 Jul 2020 12:13:05 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH for-5.2 0/6] Continue booting in case the first device
- is not bootable
-Message-ID: <20200729121039.1a044564.cohuck@redhat.com>
-In-Reply-To: <20200728183734.7838-1-thuth@redhat.com>
-References: <20200728183734.7838-1-thuth@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH RFCv3 6/9] s390x/diag: subcode to query device memory
+ region
+Message-ID: <20200729121305.19564c4f.cohuck@redhat.com>
+In-Reply-To: <ccf008cb-1812-6598-fc65-d7e3c0edce03@redhat.com>
+References: <20200724143750.59836-1-david@redhat.com>
+ <20200724143750.59836-7-david@redhat.com>
+ <20200727114819.3f816010.cohuck@redhat.com>
+ <963e5931-117e-48cb-b829-d630abff9e42@redhat.com>
+ <20200727120930.7b8803e4.cohuck@redhat.com>
+ <520ac822-df67-b33a-378f-a8f91a3bed2f@redhat.com>
+ <20200727111546.GA13770@osiris>
+ <68205bc1-1ac4-a023-0531-aa1a0c91e17d@redhat.com>
+ <20200728091014.173a7d18.cohuck@redhat.com>
+ <3f337e2d-fc46-b842-cbca-cc4036bf8fe0@redhat.com>
+ <20200729113737.39621d48.cohuck@redhat.com>
+ <ccf008cb-1812-6598-fc65-d7e3c0edce03@redhat.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -92,70 +103,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
- Collin Walling <walling@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
- qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x@nongnu.org, Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jul 2020 20:37:28 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On Wed, 29 Jul 2020 11:57:04 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> If the user did not specify a "bootindex" property, the s390-ccw bios
-> tries to find a bootable device on its own. Unfortunately, it alwasy
-> stops at the very first device that it can find, no matter whether it's
-> bootable or not. That causes some weird behavior, for example while
+> On 29.07.20 11:37, Cornelia Huck wrote:
+> > On Wed, 29 Jul 2020 10:57:58 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 28.07.20 09:10, Cornelia Huck wrote:  
+> >   
+> >>> However, I think we really need a central place for definitions that
+> >>> are not just a Linux/QEMU interface, but can potentially also be used
+> >>> by other hypervisors/guests. Nothing as complicated as an OASIS spec,
+> >>> but maybe a git??b project?    
+> >>
+> >> Sounds good. Maintainers? I can volunteer (+setup/create initial
+> >> version), but would be good to have other QEMU/KVM maintainers there as
+> >> well.  
+> > 
+> > Count me in. Best as a collection of rst or markdown documents, I guess?
+> >   
 > 
->  qemu-system-s390x -hda bootable.qcow2
-> 
-> boots perfectly fine, the bios refuses to work if you just specify
-> a virtio-scsi controller in front of it:
-> 
->  qemu-system-s390x -device virtio-scsi -hda bootable.qcow2
-> 
-> Since this is quite uncomfortable and confusing for the users, and
-> all major firmwares on other architectures correctly boot in such
-> cases, too, let's also try to teach the s390-ccw bios how to boot
-> in such cases.
+> Yes, alternatively, gitlab/github pages? (which essentially convert
+> markdown in the repository to html - both is accessible)
 
-I think this makes sense: If you IPL an LPAR or a z/VM guest, you are
-always required to explicitly specify a device to load from (at least
-as far as I remember). For QEMU, we have decided to allow starting
-without an explicitly specified boot device as well, so we have already
-deviated from the other s390 procedures. Let's just make that case
-behave the same as everywhere else.
+I guess anything that is (a) easily editable, (b) easily accessible on
+the web, and (c) easily downloadable is fine with me.
 
 > 
-> For this, we have to get rid of the various panic()s and IPL_assert()
-> statements at the "low-level" function and let the main code handle
-> the decision instead whether a boot from a device should fail or not,
-> so that the main code can continue searching in case it wants to.
+> > gitlab or github? Either would be fine with me.  
 > 
->  Thomas
-> 
-> Thomas Huth (6):
->   pc-bios/s390-ccw/Makefile: Compile with -std=gnu99, -fwrapv and
->     -fno-common
->   pc-bios/s390-ccw: Move ipl-related code from main() into a separate
->     function
->   pc-bios/s390-ccw: Move the inner logic of find_subch() to a separate
->     function
->   pc-bios/s390-ccw: Do not bail out early if not finding a SCSI disk
->   pc-bios/s390-ccw: Scan through all boot devices if none has been
->     specified
->   pc-bios/s390-ccw: Allow booting in case the first virtio-blk disk is
->     bad
-> 
->  pc-bios/s390-ccw/Makefile        |   7 +-
->  pc-bios/s390-ccw/bootmap.c       |  34 ++++--
->  pc-bios/s390-ccw/main.c          | 172 +++++++++++++++++++------------
->  pc-bios/s390-ccw/s390-ccw.h      |   2 +-
->  pc-bios/s390-ccw/virtio-blkdev.c |   7 +-
->  pc-bios/s390-ccw/virtio-scsi.c   |  25 +++--
->  pc-bios/s390-ccw/virtio-scsi.h   |   2 +-
->  7 files changed, 157 insertions(+), 92 deletions(-)
+> Same on my side.
 > 
 
 
