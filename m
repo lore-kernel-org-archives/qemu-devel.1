@@ -2,79 +2,87 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 518FCC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B606DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:35:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2954E2076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:16:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2954E2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7EE252076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:35:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RC9hP3ae"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EE252076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0hGg-0007k1-Dc
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 04:16:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51784)
+	id 1k0hYi-0002ZA-NG
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 04:35:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55700)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k0hG6-0007KX-WB
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:16:19 -0400
-Received: from mga01.intel.com ([192.55.52.88]:52111)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k0hG3-00008f-QD
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:16:18 -0400
-IronPort-SDR: wGbWRx4a0oUw7aExuSIH/gltE5G5b5FHzgBTJ87nA8yTpiN4ZEbHoWO5ROtmOUFoQQqxvF/8i6
- wRFABqiugEiQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9696"; a="169495745"
-X-IronPort-AV: E=Sophos;i="5.75,409,1589266800"; d="scan'208";a="169495745"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Jul 2020 01:16:08 -0700
-IronPort-SDR: 1dL7eESQy3S4CzfY0WiUsDLDiOlAS45EurNMq3Y+lv4o7dmE0K2wEsCoqwcOeE19T0vO6BzkO6
- fFnV9lZCim5Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,409,1589266800"; d="scan'208";a="434613735"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by orsmga004.jf.intel.com with ESMTP; 29 Jul 2020 01:16:02 -0700
-Date: Wed, 29 Jul 2020 16:05:03 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200729080503.GB28676@joy-OptiPlex-7040>
-References: <20200713232957.GD5955@joy-OptiPlex-7040>
- <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
- <20200716083230.GA25316@joy-OptiPlex-7040>
- <20200717101258.65555978@x1.home>
- <20200721005113.GA10502@joy-OptiPlex-7040>
- <20200727072440.GA28676@joy-OptiPlex-7040>
- <20200727162321.7097070e@x1.home>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k0hXv-00027r-38
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:34:43 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:46565)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k0hXs-0002F4-5U
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:34:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596011678;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=9ZMb709yA4p6c9Hn833N9EKyhsWbnguEHtpWpOQpFAE=;
+ b=RC9hP3aePI8Eq7qXI91u9dGKHYgS27mKBzUUH7173YsewkWarq4qLC2qrjgBbASeX7rPjt
+ PNxdusClvVYpZr3HYfpU4xARKbHSnJ/aI+7pHp7CIj1QHE9A8Ed6tqGW/1hbHf3t5GAZwr
+ bgjkNhUTHcgYBFZizgVSi+wqa0EcAYw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-zjEKd030Mq2s9_wga1yjoQ-1; Wed, 29 Jul 2020 04:34:36 -0400
+X-MC-Unique: zjEKd030Mq2s9_wga1yjoQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D586D18C63C1
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 08:34:35 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DD3D86842F;
+ Wed, 29 Jul 2020 08:34:32 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 78A2F1132FD2; Wed, 29 Jul 2020 10:34:31 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: Missing qapi_free_Type in error case for qapi generated code?
+References: <ly4kprhd8e.fsf@redhat.com>
+ <fe8f0bd6-ed47-08b8-d7c9-fc40c32b0bb2@redhat.com>
+Date: Wed, 29 Jul 2020 10:34:31 +0200
+In-Reply-To: <fe8f0bd6-ed47-08b8-d7c9-fc40c32b0bb2@redhat.com> (Eric Blake's
+ message of "Tue, 28 Jul 2020 10:44:21 -0500")
+Message-ID: <87eeouafe0.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200727162321.7097070e@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.88; envelope-from=yan.y.zhao@intel.com;
- helo=mga01.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 04:16:09
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.74; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-74.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 03:32:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,190 +95,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, eskultet@redhat.com, jian-feng.ding@intel.com,
- dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
- bao.yumeng@zte.com.cn, smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
- berrange@redhat.com, cohuck@redhat.com, dinechin@redhat.com, devel@ovirt.org
+Cc: Christophe de Dinechin <dinechin@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 27, 2020 at 04:23:21PM -0600, Alex Williamson wrote:
-> On Mon, 27 Jul 2020 15:24:40 +0800
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > > > As you indicate, the vendor driver is responsible for checking version
-> > > > information embedded within the migration stream.  Therefore a
-> > > > migration should fail early if the devices are incompatible.  Is it  
-> > > but as I know, currently in VFIO migration protocol, we have no way to
-> > > get vendor specific compatibility checking string in migration setup stage
-> > > (i.e. .save_setup stage) before the device is set to _SAVING state.
-> > > In this way, for devices who does not save device data in precopy stage,
-> > > the migration compatibility checking is as late as in stop-and-copy
-> > > stage, which is too late.
-> > > do you think we need to add the getting/checking of vendor specific
-> > > compatibility string early in save_setup stage?
-> > >  
-> > hi Alex,
-> > after an offline discussion with Kevin, I realized that it may not be a
-> > problem if migration compatibility check in vendor driver occurs late in
-> > stop-and-copy phase for some devices, because if we report device
-> > compatibility attributes clearly in an interface, the chances for
-> > libvirt/openstack to make a wrong decision is little.
-> 
-> I think it would be wise for a vendor driver to implement a pre-copy
-> phase, even if only to send version information and verify it at the
-> target.  Deciding you have no device state to send during pre-copy does
-> not mean your vendor driver needs to opt-out of the pre-copy phase
-> entirely.  Please also note that pre-copy is at the user's discretion,
-> we've defined that we can enter stop-and-copy at any point, including
-> without a pre-copy phase, so I would recommend that vendor drivers
-> validate compatibility at the start of both the pre-copy and the
-> stop-and-copy phases.
+Eric Blake <eblake@redhat.com> writes:
+
+> On 7/28/20 10:26 AM, Christophe de Dinechin wrote:
+>> The qapi generated code for qmp_marshal_query_spice seems to be missing a
+>> resource deallocation for "retval". For example, for SpiceInfo:
+>>
 >
-ok. got it!
+>>      retval = qmp_query_spice(&err);
+>>      error_propagate(errp, err);
+>>      if (err) {
+>> /* retval not freed here */
+>
+> Because it should be NULL here.  Returning an error AND an object is
+> frowned on.
 
-> > so, do you think we are now arriving at an agreement that we'll give up
-> > the read-and-test scheme and start to defining one interface (perhaps in
-> > json format), from which libvirt/openstack is able to parse and find out
-> > compatibility list of a source mdev/physical device?
-> 
-> Based on the feedback we've received, the previously proposed interface
-> is not viable.  I think there's agreement that the user needs to be
-> able to parse and interpret the version information.  Using json seems
-> viable, but I don't know if it's the best option.  Is there any
-> precedent of markup strings returned via sysfs we could follow?
-I found some examples of using formatted string under /sys, mostly under
-tracing. maybe we can do a similar implementation.
+It's forbidden, actually.  The QMP handler must either succeed and
+return a value, or fail cleanly.
 
-#cat /sys/kernel/debug/tracing/events/kvm/kvm_mmio/format
+Since it has to return a value even when it fails, it returns an error
+value then.  "Cleanly" means the error value does not require cleanup.
 
-name: kvm_mmio
-ID: 32
-format:
-        field:unsigned short common_type;       offset:0;       size:2; signed:0;
-        field:unsigned char common_flags;       offset:2;       size:1; signed:0;
-        field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
-        field:int common_pid;   offset:4;       size:4; signed:1;
+The generated marshalling function relies on this: it *ignores* the
+error value.
 
-        field:u32 type; offset:8;       size:4; signed:0;
-        field:u32 len;  offset:12;      size:4; signed:0;
-        field:u64 gpa;  offset:16;      size:8; signed:0;
-        field:u64 val;  offset:24;      size:8; signed:0;
+>> /* Missing: qapi_free_SpiceInfo(retval); */
+>>          goto out;
+>>      }
+>>
+>>      qmp_marshal_output_SpiceInfo(retval, ret, errp);
+>
+> And here, retval was non-NULL, but is cleaned as a side-effect of
+> qmp_marshal_output_SpiceInfo.
+>
+>>
+>> out:
+>
+> So no matter how you get to the label, retval is no longer valid
+> memory that can be leaked.
+>
+>>      visit_free(v);
+>>      v = qapi_dealloc_visitor_new();
+>>      visit_start_struct(v, NULL, NULL, 0, NULL);
+>>      visit_end_struct(v, NULL);
+>>      visit_free(v);
+>> }
+>> #endif /* defined(CONFIG_SPICE) */
+>>
+>> Questions:
+>>
+>> - Is the query code supposed to always return NULL in case of error?
+>
+> Yes.  If not, that is a bug in qmp_query_spice.
 
-print fmt: "mmio %s len %u gpa 0x%llx val 0x%llx", __print_symbolic(REC->type, { 0, "unsatisfied-read" }, { 1, "read" }, { 2, "write" }), REC->len, REC->gpa, REC->val
+Correct.
 
+>> In the
+>>    case of hmp_info_spice, there is no check for info==NULL, so on the
 
-#cat /sys/devices/pci0000:00/0000:00:02.0/uevent
-DRIVER=vfio-pci
-PCI_CLASS=30000
-PCI_ID=8086:591D
-PCI_SUBSYS_ID=8086:2212
-PCI_SLOT_NAME=0000:00:02.0
-MODALIAS=pci:v00008086d0000591Dsv00008086sd00002212bc03sc00i00
+I'm blind.  Where?
 
-> 
-> Your idea of having both a "self" object and an array of "compatible"
-> objects is perhaps something we can build on, but we must not assume
-> PCI devices at the root level of the object.  Providing both the
-> mdev-type and the driver is a bit redundant, since the former includes
-> the latter.  We can't have vendor specific versioning schemes though,
-> ie. gvt-version. We need to agree on a common scheme and decide which
-> fields the version is relative to, ex. just the mdev type?
-what about making all comparing fields vendor specific?
-userspace like openstack only needs to parse and compare if target
-device is within source compatible list without understanding the meaning
-of each field.
+>>    contrary, it seems to indicate that a non-null result is always expected,
+>>    and that function does call qapi_free_SpiceInfo
+>
+> Calling qapi_free_SpiceInfo(NULL) is a safe no-op.  Or if you expect
+> the function to always succeed, you could pass &error_abort as the
+> errp parameter.
+>
+>>
+>> - If not, is there an existing shortcut to generate the correct deallocation
+>>    code for return types that need it? You can't just use
+>>    qapi_free_%(c_type)s because that would generate an extra * character,
+>>    i.e. I get "SpiceInfo *" and not "SpiceInfo".
+>
+> Ah, you're debating about editing scripts/qapi/commands.py.  If
+> anything, an edit to add 'assert(!retval)' if qmp_COMMAND failed might
+> be smarter than trying to add code to free retval.
 
-> I had also proposed fields that provide information to create a
-> compatible type, for example to create a type_x2 device from a type_x1
-> mdev type, they need to know to apply an aggregation attribute.  If we
-> need to explicitly list every aggregation value and the resulting type,
-> I think we run aground of what aggregation was trying to avoid anyway,
-> so we might need to pick a language that defines variable substitution
-> or some kind of tagging.  For example if we could define ${aggr} as an
-> integer within a specified range, then we might be able to define a type
-> relative to that value (type_x${aggr}) which requires an aggregation
-> attribute using the same value.  I dunno, just spit balling.  Thanks,
-what about a migration_compatible attribute under device node like
-below?
+This is more complicated than it may seem.
 
-#cat /sys/bus/pci/devices/0000\:00\:02.0/UUID1/migration_compatible
-SELF:
-	device_type=pci
-	device_id=8086591d
-	mdev_type=i915-GVTg_V5_2
-	aggregator=1
-	pv_mode="none+ppgtt+context"
-	interface_version=3
-COMPATIBLE:
-	device_type=pci
-	device_id=8086591d
-	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-	aggregator={val1}/2
-	pv_mode={val2:string:"none+ppgtt","none+context","none+ppgtt+context"} 
-	interface_version={val3:int:2,3}
-COMPATIBLE:
-	device_type=pci
-	device_id=8086591d
-	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-	aggregator={val1}/2
-	pv_mode=""  #"" meaning empty, could be absent in a compatible device
-	interface_version=1
+The "natural" error value for a pointer-valued function is NULL.  I'm
+confident the handlers use it.  assert(!retval) should work.
 
+For functions returning something else, people may have different ideas
+on what to return on error.  To make assert(!retval) work, they need to
+return something "falsish".  I'm not ready to bet my own money on all of
+them doing that.
 
-#cat /sys/bus/pci/devices/0000\:00\:02.0/UUID2/migration_compatible
-SELF:
-	device_type=pci
-	device_id=8086591d
-	mdev_type=i915-GVTg_V5_4
-	aggregator=2
-	interface_version=1
-COMPATIBLE: 
-	device_type=pci
-	device_id=8086591d
-	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-	aggregator={val1}/2
-	interface_version=1
+Aside: only functions in pragma returns-whitelist can return
+non-pointer.
 
+>> - If not, is there any good way to know if the type is a pointer type?
+>>    (A quick look in cripts/qapi/types.py does not show anything obvious)
 
-Notes:
-- A COMPATIBLE object is a line starting with COMPATIBLE.
-  It specifies a list of compatible devices that are allowed to migrate
-  in.
-  The reason to allow multiple COMPATIBLE objects is that when it
-  is hard to express a complex compatible logic in one COMPATIBLE
-  object, a simple enumeration is still a fallback.
-  in the above example, device UUID2 is in the compatible list of
-  device UUID1, but device UUID1 is not in the compatible list of device
-  UUID2, so device UUID2 is able to migrate to device UUID1, but device
-  UUID1 is not able to migrate to device UUID2.
+No clean way exists, simply because there has been no need.  So far,
+we've always found a reasonable way to generate code that works whether
+types are pointers in C or not.
 
-- fields under each object are of "and" relationship to each other,  meaning
-  all fields of SELF object of a target device must be equal to corresponding
-  fields of a COMPATIBLE object of source device, otherwise it is regarded as not
-  compatible.
+> Look at scripts/qapi/schema.py; each QAPI metatype has implementations
+> of .c_name and .c_type that determine how to represent that QAPI
+> object in C.  You probably want c_name instead of c_type when
+> constructing the name of a qapi_free_FOO function, but that goes back
+> to my question of whether such a call is even needed.
 
-- each field, however, is able to specify multiple allowed values, using
-  variables as explained below.
+Method c_name() returns a string you can interpolate into C identifiers.
 
-- variables are represented with {}, the first appearance of one variable
-  specifies its type and allowed list. e.g.
-  {val1:int:1,2,4,8} represents var1 whose type is integer and allowed
-  values are 1, 2, 4, 8.
+Method c_type() returns a string you can use as C type in generated
+code.
 
-- vendors are able to specify which fields are within the comparing list
-  and which fields are not. e.g. for physical VF migration, it may not
-  choose mdev_type as a comparing field, and maybe use driver name instead.
- 
-
-Thanks
-Yan
-
+The QAPI scripts could use more comments.
 
 
