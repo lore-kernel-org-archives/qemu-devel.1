@@ -2,84 +2,87 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ADD8C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D97E5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:33:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33B24207E8
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:31:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A949822B43
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:33:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJDETA2L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B24207E8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1kN3ifX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A949822B43
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0n7J-00065q-Ge
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:31:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59516)
+	id 1k0n99-0007BE-Uh
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:33:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60288)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k0n61-0005X8-Ui
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:30:17 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38606
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1k0n8U-0006jC-48
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:32:50 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20727
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k0n5y-0001zu-Dd
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:30:17 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1k0n8P-0002RR-Un
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:32:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596033013;
+ s=mimecast20190719; t=1596033164;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=mIDkxltvDEgv5aPG58kveP5LTo4gYeFZX+YY/uQFJnI=;
- b=cJDETA2LUM28FWk1FSJ+uT3WU0oX6vvMBVh0KMd1rIDr7tQ9d79VsF+Mndnla9awCSk/hi
- 8idBzffmgx8R04CgOTfVQ46GyIh8Z1ytNk8iPLYQlReLXD2DKTo3BQh9WZdzs7VPCcZseG
- sfIFhRm8xQbBIXYzj4eNFbxdwGedGG0=
+ bh=LKKOJoH79LnQqm0NV+mp2kAX3wkkSa5wHFM6gaio/z0=;
+ b=b1kN3ifX4PIBJ9kjw508YS/cbkjPL0VrkxpSLpzB1Xi/1vpB4uX9VOgHCb95nXogAh2ary
+ uK3/Vic+B1ASJj35qT4Gmvti1IzJUIzoA0cvjS+P4UJbjv01n3q+GKVMEH6R8sMJOJ0TY+
+ 20kAubxdKc5T0vZ5ufgN++w/9x2b8eI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-Z5C3pzp8MgyyUeZSBrMc-A-1; Wed, 29 Jul 2020 10:29:58 -0400
-X-MC-Unique: Z5C3pzp8MgyyUeZSBrMc-A-1
+ us-mta-76-e-kau4nVNfeIu5_ddGuaOw-1; Wed, 29 Jul 2020 10:32:43 -0400
+X-MC-Unique: e-kau4nVNfeIu5_ddGuaOw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 974AF106B242;
- Wed, 29 Jul 2020 14:29:57 +0000 (UTC)
-Received: from localhost (ovpn-112-185.ams2.redhat.com [10.36.112.185])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4E88D5DA73;
- Wed, 29 Jul 2020 14:29:54 +0000 (UTC)
-Date: Wed, 29 Jul 2020 15:29:53 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Daniel Walsh <dwalsh@redhat.com>
-Subject: Re: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and print an
- error
-Message-ID: <20200729142953.GE52286@stefanha-x1.localdomain>
-References: <20200727190223.422280-1-stefanha@redhat.com>
- <20200727190223.422280-4-stefanha@redhat.com>
- <OSBPR01MB45826073E5A54CF869E56721E5730@OSBPR01MB4582.jpnprd01.prod.outlook.com>
- <CALDPj7syG0KPhtZEma5n403=YFZ2ptcD4MtP=GdrY9n1eUs5Eg@mail.gmail.com>
- <20200728153219.GC21660@stefanha-x1.localdomain>
- <c5b15243-200b-fa17-27b5-1b27dbddbe6d@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5360C801504;
+ Wed, 29 Jul 2020 14:32:42 +0000 (UTC)
+Received: from localhost (ovpn-120-33.rdu2.redhat.com [10.10.120.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1740C5DA6A;
+ Wed, 29 Jul 2020 14:32:41 +0000 (UTC)
+Date: Wed, 29 Jul 2020 10:32:41 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: sysbus_create_simple Vs qdev_create
+Message-ID: <20200729143241.GS225270@habkost.net>
+References: <87tuy6k9pa.fsf@dusky.pond.sub.org>
+ <20200717162312.GR1274972@habkost.net>
+ <87r1t6hc0f.fsf@dusky.pond.sub.org>
+ <20200720155955.GV1274972@habkost.net>
+ <87v9ihbe6u.fsf@dusky.pond.sub.org>
+ <50e31ece-215c-a632-e5a2-86ae7ab3abab@redhat.com>
+ <87lfj4f6nz.fsf@dusky.pond.sub.org>
+ <759959d1-f320-734a-ac5e-a60db6b1bc23@redhat.com>
+ <20200728224733.GP225270@habkost.net>
+ <422d7879-3fdc-d38e-259f-2477b9d3c169@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c5b15243-200b-fa17-27b5-1b27dbddbe6d@redhat.com>
+In-Reply-To: <422d7879-3fdc-d38e-259f-2477b9d3c169@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="FEz7ebHBGB6b2e8X"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:27:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:18:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -100,66 +103,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "vromanso@redhat.com" <vromanso@redhat.com>,
- "mpatel@redhat.com" <mpatel@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "virtio-fs@redhat.com" <virtio-fs@redhat.com>,
- "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>,
- Roman Mohr <rmohr@redhat.com>, "vgoyal@redhat.com" <vgoyal@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Pratik Parvati <pratikp@vayavyalabs.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---FEz7ebHBGB6b2e8X
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, Jul 29, 2020 at 11:54:35AM +0200, Paolo Bonzini wrote:
+> On 29/07/20 00:47, Eduardo Habkost wrote:
+[...]
+> > Do we really need need QOM children to be accessible using the QOM
+> > property API?
+> > 
+> > Using the same code for both user-configurable properties and for
+> > the list of children of a QOM object might have saved some time
+> > years ago, but I'm not sure this is still a necessary or useful
+> > abstraction.
+> 
+> The main thing we get from it is that the QOM paths treat children and
+> links the same, and links are properties.  To be honest it's not a
+> feature that is very much developed, so perhaps we can remove it but we
+> need to evaluate the impact of losing it.
 
-On Tue, Jul 28, 2020 at 03:15:25PM -0400, Daniel Walsh wrote:
-> On 7/28/20 11:32, Stefan Hajnoczi wrote:
-> > On Tue, Jul 28, 2020 at 12:00:20PM +0200, Roman Mohr wrote:
-> >> On Tue, Jul 28, 2020 at 3:07 AM misono.tomohiro@fujitsu.com <
-> >> misono.tomohiro@fujitsu.com> wrote:
-> >>
-> >>>> Subject: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and print=
- an
-> >>> error
-> >> "Just" pointing docker to a different seccomp.json file is something w=
-hich
-> >> k8s users/admin in many cases can't do.
-> > There is a Moby PR to change the default seccomp.json file here but it'=
-s
-> > unclear if it will be merged:
-> > https://github.com/moby/moby/pull/41244
-> >
-> > Stefan
->=20
-> Why not try Podman?
+Are link properties usable by -device/device_add/-object/object-add?
 
-Absolutely, Podman allows unshare(2) in its default seccomp policy so it
-does not have this problem.
-
-I think Roman's point was mainly about the upstream user experience
-where Docker is common.
-
-Stefan
-
---FEz7ebHBGB6b2e8X
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8hh+AACgkQnKSrs4Gr
-c8j8nQgAp70hD2BPLqDLm5JIwSXUuitCFEM/4u7WRCIu4k+IHcAdopIHEolwkQ3p
-p05v4mTk69BwTNbFfKwzX2o8yXu/sjT96BqZqDtcJIoGH4vZd5l1yiqefGD8VvQM
-qvTqOw8P3oXeY/H4WsluTbsQfL6aKuWjuBdSReOoTrUqfXnvH+Y2N3Y+yPIuFWeF
-7Fnak1afGTeShhTWyDCLgomu1fwgdVSLZUt56bJ7ARaBkgr0YRsykdXUP4c1KkUO
-93LoEW1Vwoxm/J+yziECd02oruuu9SM1M5CY/FOGxS7kBiebs683tI3Cq2zfBE4c
-a3Yff6jYM4fFFN62MpB95KJ2JFenmg==
-=eINk
------END PGP SIGNATURE-----
-
---FEz7ebHBGB6b2e8X--
+-- 
+Eduardo
 
 
