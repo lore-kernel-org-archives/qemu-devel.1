@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE934C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4E9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:17:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98EED20656
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:16:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 379B120656
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:17:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="WUlsjtqN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98EED20656
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="TS9+H+kM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 379B120656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0uNG-0006sY-I9
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:16:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53958)
+	id 1k0uNl-0007XJ-ET
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:17:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1k0uEF-0007ol-Rn; Wed, 29 Jul 2020 18:07:15 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:34816)
+ id 1k0uED-0007iU-Aw; Wed, 29 Jul 2020 18:07:13 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:34778)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1k0uEB-00006G-MO; Wed, 29 Jul 2020 18:07:15 -0400
+ id 1k0uEA-00005o-UU; Wed, 29 Jul 2020 18:07:12 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 73A1CBFD9F;
- Wed, 29 Jul 2020 22:06:49 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id C145DBFD63;
+ Wed, 29 Jul 2020 22:06:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
- s=default; t=1596060409;
- bh=0aZGxNIy2sKIVXnWhFQQC8kNTLa7eTsFuV5UrjAGizc=;
+ s=default; t=1596060408;
+ bh=eNlataF+0J7DJqtc2N5ssxzGdukz9hyR6Q933SUCGV4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=WUlsjtqNVN3TKfe7Is3Z30/6WKm6nvQDEthXxywq2RCEMsOCP3iW8KuJ69JVAn4It
- B9bPg4BHhlxwrxcHUIdK1MrWgmGFNVd2EXb9Im7QMdfEPOTihrxF2VKO2H9i0JCBhC
- I/1UCZRaaTdBZUFoY/z6lO7mvV0MDhUPi3+YarssKWNVW2WSd0N09B/nyGp0mq4fSX
- VZ3LHURuLWyhPrTqoXobBrAeLU54elzDlhwIDRPYrgq8HSuoVlPZhFBVvd9Rj83Djk
- lEn0mFMduEnGePJB32zgtKRIZUhDrdJShCEc2L8ablw8p75oczLGJTzXaI3ZV0akA8
- rO5/HYbdt66Aw==
+ b=TS9+H+kMAUfTx7pBvfs8hiubYjAZaORVc8D+4yHjIXzd8e1Bm4sYe1WEsoe7jsB2G
+ Os8HBlOT282lPZTSByhAXBsN/cvNC9ziayR3hAS7R5i8yW26FVW420oCSr1dLQtHpS
+ 0OD1qkQQ+wqoCARQXZUKh+L5dxFTVDSTXEcbk48UvaHuRk6mwC5eVudR5v9Lgod1J2
+ 6E2iSFaa/2SX9dAwNkoqnTiw4EyJ+A9YxcmNVo/cMmu2C7xn99T5MFrIxO2WsVZOqk
+ VA66UAb4IOB2rSwR7nI7Hnfk18ZSy65rhB2staO0mn0Mxn3u1qfPjpXKVdBx0/vdWv
+ DOc7yY2JHWeaw==
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 16/16] hw/block/nvme: remove explicit qsg/iov parameters
-Date: Thu, 30 Jul 2020 00:06:38 +0200
-Message-Id: <20200729220638.344477-17-its@irrelevant.dk>
+Subject: [PATCH v2 12/16] hw/block/nvme: be consistent about zeros vs zeroes
+Date: Thu, 30 Jul 2020 00:06:34 +0200
+Message-Id: <20200729220638.344477-13-its@irrelevant.dk>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200729220638.344477-1-its@irrelevant.dk>
 References: <20200729220638.344477-1-its@irrelevant.dk>
@@ -90,59 +90,96 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Since nvme_map_prp always operate on the request-scoped qsg/iovs, just
-pass a single pointer to the NvmeRequest instead of two for each of the
-qsg and iov.
+The NVM Express specification generally uses 'zeroes' and not 'zeros',
+so let us align with it.
 
-Suggested-by: Minwoo Im <minwoo.im.dev@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- hw/block/nvme.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ block/nvme.c         | 4 ++--
+ hw/block/nvme.c      | 8 ++++----
+ include/block/nvme.h | 4 ++--
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/block/nvme.c b/block/nvme.c
+index c1c4c07ac6cc..05485fdd1189 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -537,7 +537,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+                           s->page_size / sizeof(uint64_t) * s->page_size);
+ 
+     oncs = le16_to_cpu(idctrl->oncs);
+-    s->supports_write_zeroes = !!(oncs & NVME_ONCS_WRITE_ZEROS);
++    s->supports_write_zeroes = !!(oncs & NVME_ONCS_WRITE_ZEROES);
+     s->supports_discard = !!(oncs & NVME_ONCS_DSM);
+ 
+     memset(resp, 0, 4096);
+@@ -1201,7 +1201,7 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
+     }
+ 
+     NvmeCmd cmd = {
+-        .opcode = NVME_CMD_WRITE_ZEROS,
++        .opcode = NVME_CMD_WRITE_ZEROES,
+         .nsid = cpu_to_le32(s->nsid),
+         .cdw10 = cpu_to_le32((offset >> s->blkshift) & 0xFFFFFFFF),
+         .cdw11 = cpu_to_le32(((offset >> s->blkshift) >> 32) & 0xFFFFFFFF),
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 55b1a68ced8c..aea8a8b6946c 100644
+index 60034ea62ca8..2acde838986c 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -284,8 +284,8 @@ static uint16_t nvme_map_addr(NvmeCtrl *n, QEMUSGList *qsg, QEMUIOVector *iov,
-     return NVME_SUCCESS;
+@@ -616,7 +616,7 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     return NVME_NO_COMPLETE;
  }
  
--static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
--                             uint64_t prp2, uint32_t len, NvmeCtrl *n)
-+static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
-+                             uint32_t len, NvmeRequest *req)
+-static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
++static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+     NvmeRequest *req)
  {
-     hwaddr trans_len = n->page_size - (prp1 % n->page_size);
-     trans_len = MIN(len, trans_len);
-@@ -293,6 +293,9 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
-     uint16_t status;
-     bool prp_list_in_cmb = false;
+     NvmeRwCmd *rw = (NvmeRwCmd *)cmd;
+@@ -716,8 +716,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+     switch (cmd->opcode) {
+     case NVME_CMD_FLUSH:
+         return nvme_flush(n, ns, cmd, req);
+-    case NVME_CMD_WRITE_ZEROS:
+-        return nvme_write_zeros(n, ns, cmd, req);
++    case NVME_CMD_WRITE_ZEROES:
++        return nvme_write_zeroes(n, ns, cmd, req);
+     case NVME_CMD_WRITE:
+     case NVME_CMD_READ:
+         return nvme_rw(n, ns, cmd, req);
+@@ -2337,7 +2337,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+     id->sqes = (0x6 << 4) | 0x6;
+     id->cqes = (0x4 << 4) | 0x4;
+     id->nn = cpu_to_le32(n->num_namespaces);
+-    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP |
++    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROES | NVME_ONCS_TIMESTAMP |
+                            NVME_ONCS_FEATURES);
  
-+    QEMUSGList *qsg = &req->qsg;
-+    QEMUIOVector *iov = &req->iov;
-+
-     trace_pci_nvme_map_prp(trans_len, len, prp1, prp2, num_prps);
+     subnqn = g_strdup_printf("nqn.2019-08.org.qemu:%s", n->params.serial);
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 370df7fc0570..65e68a82c897 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -460,7 +460,7 @@ enum NvmeIoCommands {
+     NVME_CMD_READ               = 0x02,
+     NVME_CMD_WRITE_UNCOR        = 0x04,
+     NVME_CMD_COMPARE            = 0x05,
+-    NVME_CMD_WRITE_ZEROS        = 0x08,
++    NVME_CMD_WRITE_ZEROES       = 0x08,
+     NVME_CMD_DSM                = 0x09,
+ };
  
-     if (unlikely(!prp1)) {
-@@ -386,7 +389,7 @@ static uint16_t nvme_dma_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
- {
-     uint16_t status = NVME_SUCCESS;
- 
--    status = nvme_map_prp(&req->qsg, &req->iov, prp1, prp2, len, n);
-+    status = nvme_map_prp(n, prp1, prp2, len, req);
-     if (status) {
-         return status;
-     }
-@@ -431,7 +434,7 @@ static uint16_t nvme_map_dptr(NvmeCtrl *n, size_t len, NvmeRequest *req)
-     uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
-     uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
- 
--    return nvme_map_prp(&req->qsg, &req->iov, prp1, prp2, len, n);
-+    return nvme_map_prp(n, prp1, prp2, len, req);
- }
- 
- static void nvme_post_cqes(void *opaque)
+@@ -838,7 +838,7 @@ enum NvmeIdCtrlOncs {
+     NVME_ONCS_COMPARE       = 1 << 0,
+     NVME_ONCS_WRITE_UNCORR  = 1 << 1,
+     NVME_ONCS_DSM           = 1 << 2,
+-    NVME_ONCS_WRITE_ZEROS   = 1 << 3,
++    NVME_ONCS_WRITE_ZEROES  = 1 << 3,
+     NVME_ONCS_FEATURES      = 1 << 4,
+     NVME_ONCS_RESRVATIONS   = 1 << 5,
+     NVME_ONCS_TIMESTAMP     = 1 << 6,
 -- 
 2.27.0
 
