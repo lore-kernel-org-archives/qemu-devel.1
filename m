@@ -2,93 +2,93 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C204C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A13C433E8
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:11:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCB1A20809
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:10:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3866822BEA
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:11:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PALqLT6T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB1A20809
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CjdLBVgG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3866822BEA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0of4-000275-42
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:10:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57382)
+	id 1k0ogA-00046u-G5
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:11:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k0odU-0008Q2-Qf
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:08:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33095
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k0odT-0001jQ-34
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:08:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596038933;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=78E3fGZ7St2u5uOPvZ7eGWxD+MGNH7LaE2HDTwkBAhU=;
- b=PALqLT6T2TcJa6IayYpef4gS0Ens5iOj+ktkWUw3HLR1gm/ruMu+QaP1KwjJZCP/pFGJlM
- 9DPWmH9AJg8U/MnL3Tsj0OeeDEtnPDPAk2trr3UKsOGamXpMBz5/ZWwnrMxNmaANF/5OMr
- pXYUhrkxmFwAS5YFfQ/cbwQ2Z4iXd/s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-n6NZHoE1N2yW5Fvl3Syb1Q-1; Wed, 29 Jul 2020 12:08:52 -0400
-X-MC-Unique: n6NZHoE1N2yW5Fvl3Syb1Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1524179EC3;
- Wed, 29 Jul 2020 16:08:51 +0000 (UTC)
-Received: from localhost (ovpn-120-33.rdu2.redhat.com [10.10.120.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AD5B76842F;
- Wed, 29 Jul 2020 16:08:50 +0000 (UTC)
-Date: Wed, 29 Jul 2020 12:08:49 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: sysbus_create_simple Vs qdev_create
-Message-ID: <20200729160849.GW225270@habkost.net>
-References: <87r1t6hc0f.fsf@dusky.pond.sub.org>
- <20200720155955.GV1274972@habkost.net>
- <87v9ihbe6u.fsf@dusky.pond.sub.org>
- <50e31ece-215c-a632-e5a2-86ae7ab3abab@redhat.com>
- <87lfj4f6nz.fsf@dusky.pond.sub.org>
- <759959d1-f320-734a-ac5e-a60db6b1bc23@redhat.com>
- <20200728224733.GP225270@habkost.net>
- <422d7879-3fdc-d38e-259f-2477b9d3c169@redhat.com>
- <20200729143241.GS225270@habkost.net>
- <78767e1f-4124-cb6e-ead6-25fd415027c7@redhat.com>
+ (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
+ id 1k0ofR-00039F-Jb; Wed, 29 Jul 2020 12:10:57 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34398)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
+ id 1k0ofP-00029W-Uc; Wed, 29 Jul 2020 12:10:57 -0400
+Received: by mail-pg1-x543.google.com with SMTP id t6so14494909pgq.1;
+ Wed, 29 Jul 2020 09:10:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=6VlteQIR5hamU+sbAzhLAfC6Zan+9VrHdIHrzKJwS+E=;
+ b=CjdLBVgGDGrk7sniHS2VU5UzMXH/pBIhvnpfZCPy+X9xdQ/q8YElCBWagYSudCsCd1
+ IDyqPfOA/qybRVTXHynuug7P0SmzfFxJPiZk2FzZA4rxo1yL29klt3bCmx9YK9nJK2QA
+ MZfgbyQFiocQtzGErue29Thhg2eGFnLDPKObY0bSFEldTX/MsU3tjIxNW5sJF2wEbwoV
+ +LTPlU2xfhTb/ZkfEYqTteOk+JogfstZHuDjZ/gKwpzwjEkYMmRnf+w4/ONe1LkseKU1
+ bIwXFWHBV9YrUrr8EdKSBBHemVf5cwq6nW9ACy8uGhWWLxwWWhRzMcl5Rpcg8GmytxzZ
+ WWgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=6VlteQIR5hamU+sbAzhLAfC6Zan+9VrHdIHrzKJwS+E=;
+ b=HPbxjljUrr02QzE5ah4VCaJaC0IyRTAwEQtx5TUgOaGVuXqMA27senDd7HtyI8Mpmw
+ mgBtcS0yyozqhBi83gmEnsjnXwt+MDbPcmXk+QAyFpT2jYTtSWN8LUCyMka4OmCcZ3aF
+ 9DppxuKLAPQKd9VRsWtaDlN5xUgJfp0jAfWl4SJIhzuiV/Fc1Z5QWnkxc9frdbMBgcFk
+ 6Godc+KeDuzq986QK/w7fKIo19TUNvocvcznl1JqDgVZA0t8u5qrT/1tic8LzEJf2Mrh
+ w7kTK9+tapQGRC2zszN37GOQLjtfCEYOsaPZ//DAE+X0tHKgaPvKpYIOJpy5MgzA9QWs
+ FJ3Q==
+X-Gm-Message-State: AOAM531RXawDqZ4qOUvrX5M069i1DH2gjp4k8zYuKaPrNLJxJujriTfv
+ 0GygZpbf2xToz+IGtirsQuo=
+X-Google-Smtp-Source: ABdhPJzg7HGE/I/+Z/FMb/yltCGmniw3pAy8SZvTe3nfbIfv1fqchk9DY64HwlcSCEtisAJGnrE9XQ==
+X-Received: by 2002:a05:6a00:2b0:: with SMTP id
+ q16mr31936546pfs.79.1596039054203; 
+ Wed, 29 Jul 2020 09:10:54 -0700 (PDT)
+Received: from localhost ([211.108.35.36])
+ by smtp.gmail.com with ESMTPSA id z20sm2485069pjr.43.2020.07.29.09.10.53
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Wed, 29 Jul 2020 09:10:53 -0700 (PDT)
+Date: Thu, 30 Jul 2020 01:10:51 +0900
+From: Minwoo Im <minwoo.im.dev@gmail.com>
+To: Klaus Jensen <its@irrelevant.dk>
+Subject: Re: [PATCH 15/16] hw/block/nvme: remove NvmeCmd parameter
+Message-ID: <20200729161051.GN14876@localhost.localdomain>
+References: <20200720113748.322965-1-its@irrelevant.dk>
+ <20200720113748.322965-16-its@irrelevant.dk>
 MIME-Version: 1.0
-In-Reply-To: <78767e1f-4124-cb6e-ead6-25fd415027c7@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:27:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200720113748.322965-16-its@irrelevant.dk>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=minwoo.im.dev@gmail.com; helo=mail-pg1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,42 +101,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Pratik Parvati <pratikp@vayavyalabs.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 29, 2020 at 06:01:31PM +0200, Paolo Bonzini wrote:
-> On 29/07/20 16:32, Eduardo Habkost wrote:
-> > On Wed, Jul 29, 2020 at 11:54:35AM +0200, Paolo Bonzini wrote:
-> >> On 29/07/20 00:47, Eduardo Habkost wrote:
-> > [...]
-> >>> Do we really need need QOM children to be accessible using the QOM
-> >>> property API?
-> >>>
-> >>> Using the same code for both user-configurable properties and for
-> >>> the list of children of a QOM object might have saved some time
-> >>> years ago, but I'm not sure this is still a necessary or useful
-> >>> abstraction.
-> >>
-> >> The main thing we get from it is that the QOM paths treat children and
-> >> links the same, and links are properties.  To be honest it's not a
-> >> feature that is very much developed, so perhaps we can remove it but we
-> >> need to evaluate the impact of losing it.
-> > 
-> > Are link properties usable by -device/device_add/-object/object-add?
+On 20-07-20 13:37:47, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> Not sure exactly what you mean, but there is DEFINE_PROP_LINK and it's
-> used to link devices to objects.  Is it ever used with an actual path
-> rather than just the id of something in /objects?  Probably not.
+> Keep a copy of the raw nvme command in the NvmeRequest and remove the
+> now redundant NvmeCmd parameter.
+> 
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 
-I mean: are link properties settable from the command line or
-QMP, as an argument to -device/device_add/-object/object-add?
+I would really have suggested this change from 13th patch!
 
--- 
-Eduardo
+Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
 
+Thanks,
 
