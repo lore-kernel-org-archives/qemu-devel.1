@@ -2,93 +2,96 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3081EC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22409C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:42:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFEAB2075D
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:38:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF299206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:42:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RXP/8XjZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFEAB2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aug9XIhC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF299206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0iXy-0006m5-6i
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 05:38:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46304)
+	id 1k0ibu-00083t-7g
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 05:42:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0iX7-0006IZ-0W
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:37:57 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:46650)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0iX5-0003SI-HE
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:37:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596015474;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6WSq4nGbBEkBFMNKrBzHxHbboQs0BVVpuazhSeKzVI0=;
- b=RXP/8XjZceodXck+5DEpMJ+jHqve1iVFsVvxRCjusQNMyMhM+WIjqYukBMEf9QLQl4Qunv
- NsTPw7nkyPhtQidP4MH6rKBLmxTsOg+XMikID/1vzPSkFOwwCDrt0wb+xBZ+TghL0Oj2NK
- jYNfkBNeJelPqe2s2+xAeOMRd1in51Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-RhMbLJLQPZGvQISXJHeeWQ-1; Wed, 29 Jul 2020 05:37:49 -0400
-X-MC-Unique: RhMbLJLQPZGvQISXJHeeWQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1F438017FB;
- Wed, 29 Jul 2020 09:37:47 +0000 (UTC)
-Received: from gondolin (ovpn-113-17.ams2.redhat.com [10.36.113.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F1D0F19D7C;
- Wed, 29 Jul 2020 09:37:40 +0000 (UTC)
-Date: Wed, 29 Jul 2020 11:37:37 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH RFCv3 6/9] s390x/diag: subcode to query device memory
- region
-Message-ID: <20200729113737.39621d48.cohuck@redhat.com>
-In-Reply-To: <3f337e2d-fc46-b842-cbca-cc4036bf8fe0@redhat.com>
-References: <20200724143750.59836-1-david@redhat.com>
- <20200724143750.59836-7-david@redhat.com>
- <20200727114819.3f816010.cohuck@redhat.com>
- <963e5931-117e-48cb-b829-d630abff9e42@redhat.com>
- <20200727120930.7b8803e4.cohuck@redhat.com>
- <520ac822-df67-b33a-378f-a8f91a3bed2f@redhat.com>
- <20200727111546.GA13770@osiris>
- <68205bc1-1ac4-a023-0531-aa1a0c91e17d@redhat.com>
- <20200728091014.173a7d18.cohuck@redhat.com>
- <3f337e2d-fc46-b842-cbca-cc4036bf8fe0@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0ibJ-0007dV-SO
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:42:17 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34386)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0ibI-000428-5s
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:42:17 -0400
+Received: by mail-wm1-x343.google.com with SMTP id g10so1769748wmc.1
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 02:42:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=vz7wp36EtTBX+0pdF91SG6j/vIUUVxEELFnyzyNN2MA=;
+ b=aug9XIhCF7a3EzbDdSt5OBxrfNAGuALzZK6XoKVcZyFwURTG5gdO4+ODVFErc9/zpG
+ VJVyO5LALPS25eqbJXpZRK9lQzA07RuQiR5KMea7DcJeqRsWRDp9NKGaV35RXxr89AcG
+ ixyA2G5icL6JE5t6wUGIr1c4IPgec3sJrw8hEVaH7/Tt4kQSb2mtNzLzqEz3m6TufQsh
+ LwLBpnK9Yjc95CrEhjM7Ix1iaTWsqPuhZ0YOouGFaOUsyoqs8PQYLZ5oOs6zTXEErlsT
+ j3Ol8dvMTlAbD8kng6q9DaGqY6ej3GBcU9dKFWU2GTggCDQV7MNEq+U11Oz5VhQIh0yL
+ NPJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=vz7wp36EtTBX+0pdF91SG6j/vIUUVxEELFnyzyNN2MA=;
+ b=NZPmX9L7+aYbz9puaIVltDww92ppqVFyL7KY5E1wcIA0dIHvBOw8gUN2FXQ7Oc9LMa
+ h66F00lZI4n1JgyWrj5ArQZksTsJ6NCvLyYzil7ufXODtpOTnCoWEpBNTrzTi/H7IECu
+ uPvay3QaqqrG6ro2esOEm7+4pjTDZ+btT8mzbF3vhRcQQ5JizFEfdbp7G0vaw+AR8IBP
+ HaaghRlR0AOKN4V1g2SPvl6CHNp42LdziAqJGscVAaUTEzVfyUpzmYAWDMguiRdufRGC
+ Jr8icJ4SuZN1CYNky9aNPoXb5m9Lrc+66fBuCKZrQUNJh47Lswmlg08XSOijjYZBdcHP
+ bmwA==
+X-Gm-Message-State: AOAM531Smq1NwvPCE/C3UKRfvuzs7o3aJMx3JyOXniMBBCJOzvns52YF
+ gxEmuMnWfMsgoQlob2+MUZk=
+X-Google-Smtp-Source: ABdhPJwSzHvZFdLQiXegk2Q3aFnmX5PE3xBpG+3kNaGyyWT46JhUMCWvV8KmBVwMcWP5JDDpoXeFhw==
+X-Received: by 2002:a1c:ed05:: with SMTP id l5mr8012149wmh.85.1596015734693;
+ Wed, 29 Jul 2020 02:42:14 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id n12sm4725464wrg.77.2020.07.29.02.42.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Jul 2020 02:42:13 -0700 (PDT)
+Date: Wed, 29 Jul 2020 10:42:12 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [RFC 0/2] virtio-rng: add a control queue
+Message-ID: <20200729094212.GB35835@stefanha-x1.localdomain>
+References: <20200123151700.1367857-1-lvivier@redhat.com>
+ <20200124110240.GH736986@stefanha-x1.localdomain>
+ <e4b0d666-c2a8-6d95-28f4-b51fe80ef73a@redhat.com>
+ <20200129154300.GB157595@stefanha-x1.localdomain>
+ <eeb362c9-24e8-49ef-4194-617e8a2881a9@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.74; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-74.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 03:32:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="xgyAXRrhYN0wYx8y"
+Content-Disposition: inline
+In-Reply-To: <eeb362c9-24e8-49ef-4194-617e8a2881a9@redhat.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,31 +104,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Amit Shah <amit@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 29 Jul 2020 10:57:58 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> On 28.07.20 09:10, Cornelia Huck wrote:
+--xgyAXRrhYN0wYx8y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > However, I think we really need a central place for definitions that
-> > are not just a Linux/QEMU interface, but can potentially also be used
-> > by other hypervisors/guests. Nothing as complicated as an OASIS spec,
-> > but maybe a git??b project?  
-> 
-> Sounds good. Maintainers? I can volunteer (+setup/create initial
-> version), but would be good to have other QEMU/KVM maintainers there as
-> well.
+On Tue, Jul 28, 2020 at 03:45:26PM +0200, Laurent Vivier wrote:
+> On 29/01/2020 16:43, Stefan Hajnoczi wrote:
+> > On Fri, Jan 24, 2020 at 03:05:18PM +0100, Laurent Vivier wrote:
+> >> On 24/01/2020 12:02, Stefan Hajnoczi wrote:
+> >>> On Thu, Jan 23, 2020 at 04:16:58PM +0100, Laurent Vivier wrote:
+> >>>> The kernel needs sometime to be able to cancel an ongoing command.
+> >>>>
+> >>>> For instance, if the virtio-rng device uses the egd backend
+> >>>> and this backend doesn't provide data, the buffer provided by the
+> >>>> kernel is kept as long as it is needed.
+> >>>>
+> >>>> On the kernel side, a read blocks until the buffer returns from QEMU.
+> >>>>
+> >>>> As the read is done with a mutex held, all the hw_random interface
+> >>>> hangs and we cannot switch to another hw_random backend.
+> >>>>
+> >>>> So this series adds a control queue to the virtio-rng device to allow
+> >>>> to flush the virtio-rng input queue to release the kernel mutex and
+> >>>> to allow to switch to another device.
+> >>>>
+> >>>> The kernel side series can be found at:
+> >>>>
+> >>>> https://github.com/vivier/linux/commits/virtio-rng-ctrl
+> >>>>
+> >>>> Laurent Vivier (2):
+> >>>>   virtio-rng: prepare the introduction of a control queue
+> >>>>   virtio-rng: add a control queue
+> >>>>
+> >>>>  hw/core/machine.c                           |  1 +
+> >>>>  hw/virtio/trace-events                      |  6 ++
+> >>>>  hw/virtio/virtio-rng.c                      | 99 ++++++++++++++++++=
+---
+> >>>>  include/hw/virtio/virtio-rng.h              |  5 +-
+> >>>>  include/standard-headers/linux/virtio_rng.h | 14 +++
+> >>>>  5 files changed, 111 insertions(+), 14 deletions(-)
+> >>>
+> >>> Where can I find the VIRTIO specification for this new virtqueue?
+> >>
+> >> I didn't update the specs.
+> >>
+> >> Is https://github.com/oasis-tcs/virtio-spec.git the document to update?
+> >=20
+> > Yes, please.
+>=20
+> I've updated the specs,
+>=20
+> Following
+> https://github.com/oasis-tcs/virtio-spec/blob/master/CONTRIBUTING.md,
+> I've opened an issue:
+>=20
+> https://github.com/oasis-tcs/virtio-spec/issues/83
+>=20
+> Is this the good process?
 
-Count me in. Best as a collection of rst or markdown documents, I guess?
+Please post spec changes to the virtio-comment@lists.oasis-open.org
+mailing list:
+https://github.com/oasis-tcs/virtio-spec/#providing-feedback
 
-gitlab or github? Either would be fine with me.
+Thanks,
+Stefan
 
+--xgyAXRrhYN0wYx8y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8hRHQACgkQnKSrs4Gr
+c8jx7QgAgO6Pzak09keIRWKobhm6bYa1Z/kf1PH5gJonm0oRWFQkTg+qtmfWsYy6
+TmU8KX4vzIRUaJ2t0c66ybrAwFYU2F7Ez8C6Y0J1RtrpqAQTg0rhrtfeBPm/PvDr
+JcU5bdEvZzeZ1QQFz25wS7xPHPf07BWeeKnWhcuS9VcAN3xnmFQaiXy02Wzfsdes
+M2/4gFE6UXaaD+JsvqpSv1xf9j9AFXwqsfXNa6ys6WdcpvIiZQrau15cAnXvSz8K
++3iE0vxwapRW9eiJ/OU+bppBrYXRwGerZRd+FeQ/ovkhIXV3RqlUKK8+BZiEyd7G
+5GAtWZkqOYOi+l1See2QlaYEgU10kA==
+=/htO
+-----END PGP SIGNATURE-----
+
+--xgyAXRrhYN0wYx8y--
 
