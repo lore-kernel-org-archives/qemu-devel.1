@@ -2,116 +2,92 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 446ECC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EFB6C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:10:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 112D720809
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:09:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF91920809
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:10:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZpqjOi5v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 112D720809
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZoVuJWDS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF91920809
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0oeP-0001BF-Ch
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:09:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57316)
+	id 1k0oem-0001S7-2g
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:10:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k0od2-00085n-ON
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:08:28 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24702
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k0ocz-0001h1-5C
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:08:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596038903;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=swsbPGm2x5Xh7g1u+3v/v/jGI6JViJcKp4FFD1Ba9qQ=;
- b=ZpqjOi5vYrfj8kvlPCAPcTm8lA8eFeFBH17oL3nkMl/6M94561zpmwsTzz5QUP4f3lvvaq
- CVUZlIC5rbqOxBNWWgS7cle2CB3FmCMX+H+2oY8AATqtjFLhqMHfxT6phNfAMJKWj1xS/w
- AifB0tNJjoYuKNoBc2yRNSslkjxtMuU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-9zde2vy5M3GV_rE7i0k72A-1; Wed, 29 Jul 2020 12:08:20 -0400
-X-MC-Unique: 9zde2vy5M3GV_rE7i0k72A-1
-Received: by mail-ej1-f69.google.com with SMTP id l18so8630821ejn.17
- for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 09:08:20 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
+ id 1k0odZ-00006x-LC; Wed, 29 Jul 2020 12:09:01 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:51836)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
+ id 1k0odX-0001jg-E8; Wed, 29 Jul 2020 12:09:01 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id c6so2073834pje.1;
+ Wed, 29 Jul 2020 09:08:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=csSZOmvSSx/QlFiwOlQbEiM0aa69VOcweqdB9TSOImE=;
+ b=ZoVuJWDS6BFJSakTe+mzbNqh4gXdS089CI5g/UBm5kfB9mp1MOVHPDNQLUHDu1kMzd
+ i52cC0wUbz9ihp29MJw81WdwmWFmr49yzvrqR3krgdHRkOV+i4JBl5JtYp74aSUnxjue
+ LOfwshWXvS0xKs3Ab2x+K5W/YdaTbXD/JIruY+L7gky5c5lbv006j4X3oQMYqzF+KDbO
+ 091Irurw2zCs2Tz0Sqix1YGf1qcJ5N0AyVV0czH7Npv2XVF6sd0OBPfbuXbL3stHMJS4
+ sRRlbB5021aOzd1tRbpZzxrNzYmws6usvBl+ErBPx/3jzJKbkRjxj5Yjkolv8GAM4EyC
+ 0DcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=swsbPGm2x5Xh7g1u+3v/v/jGI6JViJcKp4FFD1Ba9qQ=;
- b=gUY2qIQyCt5twJNqx7h7xWuOs4eQ6NBdzUBSM3ZUAuUNxOJ2YgeOEJU1x1PvgJBDJZ
- Ncw8fbGZDwuYtU5InA/O+PgF3l4Y5OqeWr4p2gBd/kze0QvSrxT5IwUaEmDo9dOULCBw
- NjaKCX+4hCdD/1sJ8GPwTspY+cWd5TY9PgAuM+QzrykA3+S2dqrCe9TKKFmueIJPagq/
- 1nX10Hhv+9PmhljFEtuKvnqh43UkOh5R8kAkZJjFDFAg5XNuXR4VG2GIMDov3foq+2qD
- 3JvJRQ6F0GAgxs4d79nPXZOxotCdSr1r2rATLtuBx7vMRiapCco9F4r0uWfxtmrLJSOc
- PySg==
-X-Gm-Message-State: AOAM533UMqNL1sEqQiiy+3AtcdtNYEK+JQprGnsE4ft0uk1ZVjbwZJgX
- C2/4eJ5CEJhSP/waf0wYu5F0ugShE0qWI5NCItucJugwPVZ60AKfJTd1R5HSOU7ifXBHkYBZ7Fs
- NRcj9gA3ZDjw4otI=
-X-Received: by 2002:a17:906:a3d6:: with SMTP id
- ca22mr770731ejb.78.1596038899251; 
- Wed, 29 Jul 2020 09:08:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyeQSu9/HovDkcvw2kOc6rb/wCdcDUTu2EYeoq5z9niNXm1d57ac7nUFxnJVZNjBIm9H/93nw==
-X-Received: by 2002:a17:906:a3d6:: with SMTP id
- ca22mr770704ejb.78.1596038899012; 
- Wed, 29 Jul 2020 09:08:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:101f:6e7:e073:454c?
- ([2001:b07:6468:f312:101f:6e7:e073:454c])
- by smtp.gmail.com with ESMTPSA id mf17sm1945228ejb.56.2020.07.29.09.08.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Jul 2020 09:08:18 -0700 (PDT)
-Subject: Re: sysbus_create_simple Vs qdev_create
-To: Markus Armbruster <armbru@redhat.com>
-References: <87lfjkvo81.fsf@dusky.pond.sub.org>
- <20200716222130.GO1274972@habkost.net> <87tuy6k9pa.fsf@dusky.pond.sub.org>
- <20200717162312.GR1274972@habkost.net> <87r1t6hc0f.fsf@dusky.pond.sub.org>
- <20200720155955.GV1274972@habkost.net> <87v9ihbe6u.fsf@dusky.pond.sub.org>
- <50e31ece-215c-a632-e5a2-86ae7ab3abab@redhat.com>
- <87lfj4f6nz.fsf@dusky.pond.sub.org>
- <759959d1-f320-734a-ac5e-a60db6b1bc23@redhat.com>
- <20200728224733.GP225270@habkost.net>
- <422d7879-3fdc-d38e-259f-2477b9d3c169@redhat.com>
- <87zh7i5uj5.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6ee49ad2-8b6b-cb6f-c3c9-b440631cfc75@redhat.com>
-Date: Wed, 29 Jul 2020 18:08:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=csSZOmvSSx/QlFiwOlQbEiM0aa69VOcweqdB9TSOImE=;
+ b=oVls51Ec9Lgt2nKydVFsbAelKAJ6QWZCpjL6wD3Hurm2zp0x8XYOCL6MKi9WfJ+LVd
+ XgDkcKbtTyqwwMFX7JJmVH6yF9y/7xJX0mUWKS9FWPH8Uf35UNokVnDP6ZUBt5Z5rLF4
+ qjKD5C8Q3auh+qVaZrsHZMeTouXG6S/zS68NCt/wxtoFFX+xwpXpXOqpTJP6ZhzUvO9N
+ izq9o3OhbcWxLrOu66IGAwF2zPwy/jB3pgOrPqM1tilXwKzWeZ6kqK2k9zJ4CP/cSsaI
+ WEAgpu6ci+UANfx4wgPWC4g8Jy418mM2DbyPIUhWhBVs7ubobBFMnZzfOwdNzaJJpHBp
+ B+8g==
+X-Gm-Message-State: AOAM531u5hm0mqAYEPju45pNgXMzS5zuIL0fOu19+eF75UDHwV/aLXd6
+ pT4Jfy3aNAdDeP38vPRJLJQ=
+X-Google-Smtp-Source: ABdhPJyuiaq+AeLP0RaNQ5EH/FLiUiVMaUkOerWbxn9FxbTp+RiNKL5ihPIi8YGKzAd6MgaFdIlkHA==
+X-Received: by 2002:a17:902:968a:: with SMTP id
+ n10mr28738425plp.67.1596038937572; 
+ Wed, 29 Jul 2020 09:08:57 -0700 (PDT)
+Received: from localhost ([211.108.35.36])
+ by smtp.gmail.com with ESMTPSA id q22sm2852821pgn.91.2020.07.29.09.08.56
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Wed, 29 Jul 2020 09:08:57 -0700 (PDT)
+Date: Thu, 30 Jul 2020 01:08:55 +0900
+From: Minwoo Im <minwoo.im.dev@gmail.com>
+To: Klaus Jensen <its@irrelevant.dk>
+Subject: Re: [PATCH 14/16] hw/block/nvme: consolidate qsg/iov clearing
+Message-ID: <20200729160855.GM14876@localhost.localdomain>
+References: <20200720113748.322965-1-its@irrelevant.dk>
+ <20200720113748.322965-15-its@irrelevant.dk>
 MIME-Version: 1.0
-In-Reply-To: <87zh7i5uj5.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:18:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Disposition: inline
+In-Reply-To: <20200720113748.322965-15-its@irrelevant.dk>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=minwoo.im.dev@gmail.com; helo=mail-pj1-x1044.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -125,63 +101,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Pratik Parvati <pratikp@vayavyalabs.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/07/20 15:18, Markus Armbruster wrote:
->> Even code riddled by backwards-compatibility special cases, such as
->> -accel and -machine, can share code between themselves and -object to
->> some extent; this is thanks to functions such as object_property_parse,
->> whose parsing is deferred to visitors and hence to QAPI.
->
-> QOM relies on QAPI visitors to access properties.  There is no
-> integration with the QAPI schema.
-
-Indeed it doesn't use _all_ of the QAPI goodies.  It does use visitors
-and it's a major feature of QOM.
-
-> Going through a visitor enables property access from QMP, HMP and CLI.
+On 20-07-20 13:37:46, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> Access from C *also* goes through a visitor.  We typically go from C
-> type to QObject and back.  Comically inefficient (which hardly matters),
-> verbose to use and somewhat hard to understand (which does).
-
-It's verbose in the getters/setters, but we have wrappers such as
-object_property_set_str, object_property_set_bool etc. that do not make
-it too hard to understand.
-
-> Compare to what QOM replaced: qdev.  Properties are a layer on top of
-> ordinary C.  From C, you can either use the C layer (struct members,
-> basically), or the property layer for C (functions taking C types, no
-> conversion to string and back under the hood), or the "text" layer
-> (parse from text / format to text).
+> Always destroy the request qsg/iov at the end of request use.
 > 
-> My point is not that qdev was great and QOM is terrible.  There are
-> reasons we replaced qdev with QOM.  My point is QOM doesn't *have* to be
-> the way it is.  It is the way it is because we made it so.
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> ---
+>  hw/block/nvme.c | 48 +++++++++++++++++-------------------------------
+>  1 file changed, 17 insertions(+), 31 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 54cd20f1ce22..b53afdeb3fb6 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -213,6 +213,14 @@ static void nvme_req_clear(NvmeRequest *req)
+>  {
+>      req->ns = NULL;
+>      memset(&req->cqe, 0x0, sizeof(req->cqe));
+> +
+> +    if (req->qsg.sg) {
+> +        qemu_sglist_destroy(&req->qsg);
+> +    }
+> +
+> +    if (req->iov.iov) {
+> +        qemu_iovec_destroy(&req->iov);
+> +    }
 
-QOM didn't only replace qdev: it also removed the need to have a command
-line option du jour for any new concept, e.g. all the TLS stuff, RNG
-backends, RAM backends, etc.
+Oh okay.  This looks like update for the previous patch in this series.
+And I also agree on starting to make focus on nvme_req_clear() for
+wrap-up.
 
-It didn't succeed (at all) in deprecating chardev/netdev/device etc.,
-but this is a very underappreciated part of QOM, and this is why I think
-it's appropriate to say QOM is "C with classes and CLI/RPC
-serialization", as opposed for example to "C with classes and multi
-programming language interface" that is GObject.
+Looks good to me.
 
-> I've long had the nagging feeling that if we had special-cased
-> containers, children and links, we could have made a QOM that was easier
-> to reason about, and much easier to integrate with a QAPI schema.
-
-That's at least plausible.  But I have a nagging feeling that it would
-only cover 99% of what we're doing with QOM. :)
-
-Paolo
-
+Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
 
