@@ -2,94 +2,90 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B25BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:17:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF69C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:25:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56A132074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:17:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74E1D206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:25:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBtQbyod"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A132074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UH1Ek5kJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74E1D206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0j9G-00007u-HX
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 06:17:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56806)
+	id 1k0jHX-0002Lt-E8
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 06:25:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1k0j8W-00087o-Hq
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:16:36 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37938)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1k0j8U-0000Ss-K9
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:16:36 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a14so21101539wra.5
- for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 03:16:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=8uWkdfkp4X5NJOBKPmtfC9riOfG48fZvrnOEFsfWFQo=;
- b=eBtQbyodUlu7e5DvAGFDreK4RUZq1zF7JGb8Qy6306bOO+SQdZ1awzXpL38bIdHwXG
- AhqoSdQdRTk0Xz40rs/tE8ITfNJsGjwmzqoREJf0ie91gEzcCYXkKaT5gwUjaKPDgLMn
- XRAj261AoKyg1mV0bzyIBD9uipDIWR0keVFuAubPSkamiGfy3ygEJIUqOO22+Tf0BWJq
- tPrHJF34vDsNjU6KscoGJWiRSQuG/hwGG1F2MRRgk161+wzQ2EVdyGPYmv0cZ+r1JuTq
- BDKDIQR3aMq2jS1jToJxZHqA84SCQgenp+SUEv8TfFyn40KCfe0tZszF6eG2jwztVtbJ
- biLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=8uWkdfkp4X5NJOBKPmtfC9riOfG48fZvrnOEFsfWFQo=;
- b=MoUdt2NU6oKPHnCSquGIPCv0L+EKuJrt8dUJ22Z7QVJLGZyK++b9vazZ4ovpynRRpT
- dPqhy+1FqBwH+KL3cPfgK/ljegdwwCOp1JyjPIR/apzua8IGHvbenYOHjuGHtqgyFmmG
- KGzSzGfYLzvD9QXDt82vUzFDTctkIMmg8Qkd39tUYQWBXXQuGwNQIQnCkQIrHJt9DVc/
- 6WjYNDZqtZFpywnUjCrmkvx643vO/PQWhQNWuvJawJGj280rt7fabMAsaRD5v9ujvwVr
- +3swpVMWsqhHFucSnQD/Y2JeBDrDA/ef1Q4rWz8iJdsUdsJvTJsIC+25igyPp4jQQjP9
- vz2A==
-X-Gm-Message-State: AOAM532MZpxS8mU69Zfr5ajmHq/TQlTTOahwGxfKtGkZ9gh/xiOG6xlk
- fXHi2itdbuFlI3HsgvccfaU=
-X-Google-Smtp-Source: ABdhPJx60yUfZEawuNrdJkbyaI58DdJkIY1JW0UxdfFShWBQ3trpCsQ6bES1kdsHn4s0Dc36OtPZCw==
-X-Received: by 2002:adf:bbc1:: with SMTP id z1mr28539715wrg.173.1596017792491; 
- Wed, 29 Jul 2020 03:16:32 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id v15sm4204275wrm.23.2020.07.29.03.16.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Jul 2020 03:16:31 -0700 (PDT)
-Date: Wed, 29 Jul 2020 11:16:29 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Cleber Rosa <crosa@redhat.com>
-Subject: Re: [PATCH v2 2/2] GitLab Gating CI: initial set of jobs,
- documentation and scripts
-Message-ID: <20200729101629.GA37763@stefanha-x1.localdomain>
-References: <20200709024657.2500558-1-crosa@redhat.com>
- <20200709024657.2500558-3-crosa@redhat.com>
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1k0jGE-0001Zz-Bq
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:24:34 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:28305)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1k0jGB-0001ar-Kr
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:24:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596018269;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YqrfYWXUO1P/BhbL7xonNC5v0VDRbG83EKDbbPQT5Es=;
+ b=UH1Ek5kJEvGXAs8P5WRZkhvQglt3Kz1iEKdoaoXmi909eVuIu5BgBV/P5UFidoqhcJdt00
+ a1WPH4zfuLxrw6o2Nim/pG5s46qZHt6NBrwSE8GjIZm4oz2g/PEwwTrc6b5k2F/QKSzOtH
+ lcaY54KpAE8j3aFvRHb+YiUPwNLeLEo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-54-tZckU2w_OxipmD1magtZiw-1; Wed, 29 Jul 2020 06:24:27 -0400
+X-MC-Unique: tZckU2w_OxipmD1magtZiw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2163780183C;
+ Wed, 29 Jul 2020 10:24:26 +0000 (UTC)
+Received: from starship (unknown [10.35.206.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 27D1C60CD1;
+ Wed, 29 Jul 2020 10:24:22 +0000 (UTC)
+Message-ID: <83668810d0578034fd094623ed39cf4a2bcc9abc.camel@redhat.com>
+Subject: Re: [PATCH v3 07/18] hw/block/nvme: add support for the get log
+ page command
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+Date: Wed, 29 Jul 2020 13:24:21 +0300
+In-Reply-To: <20200706061303.246057-8-its@irrelevant.dk>
+References: <20200706061303.246057-1-its@irrelevant.dk>
+ <20200706061303.246057-8-its@irrelevant.dk>
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
-Content-Disposition: inline
-In-Reply-To: <20200709024657.2500558-3-crosa@redhat.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=stefanha@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.74; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-74.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 01:09:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,162 +98,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---wac7ysb48OaltWcw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jul 08, 2020 at 10:46:57PM -0400, Cleber Rosa wrote:
-
-Awesome, thanks for creating this stuff! Minor suggestions:
-
-> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> index c1ff24370b..f8dab788ea 100644
-> --- a/docs/devel/testing.rst
-> +++ b/docs/devel/testing.rst
-> @@ -1003,3 +1003,150 @@ exercise as many corner cases as possible. It is =
-a useful test suite
->  to run to exercise QEMU's linux-user code::
-> =20
->    https://linux-test-project.github.io/
+On Mon, 2020-07-06 at 08:12 +0200, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
+> 
+> Add support for the Get Log Page command and basic implementations of
+> the mandatory Error Information, SMART / Health Information and Firmware
+> Slot Information log pages.
+> 
+> In violation of the specification, the SMART / Health Information log
+> page does not persist information over the lifetime of the controller
+> because the device has no place to store such persistent state.
+> 
+> Note that the LPA field in the Identify Controller data structure
+> intentionally has bit 0 cleared because there is no namespace specific
+> information in the SMART / Health information log page.
+> 
+> Required for compliance with NVMe revision 1.3d. See NVM Express 1.3d,
+> Section 5.14 ("Get Log Page command").
+> 
+> Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> Acked-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  hw/block/nvme.c       | 140 +++++++++++++++++++++++++++++++++++++++++-
+>  hw/block/nvme.h       |   2 +
+>  hw/block/trace-events |   2 +
+>  include/block/nvme.h  |   8 ++-
+>  4 files changed, 149 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index b6bc75eb61a2..7cb3787638f6 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -606,6 +606,140 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *cmd)
+>      return NVME_SUCCESS;
+>  }
+>  
+> +static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
+> +                                uint64_t off, NvmeRequest *req)
+> +{
+> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+> +    uint32_t nsid = le32_to_cpu(cmd->nsid);
 > +
-> +CI
-> +=3D=3D
+> +    uint32_t trans_len;
+> +    time_t current_ms;
+> +    uint64_t units_read = 0, units_written = 0;
+> +    uint64_t read_commands = 0, write_commands = 0;
+> +    NvmeSmartLog smart;
+> +    BlockAcctStats *s;
 > +
-> +QEMU has configurations enabled for a number of different CI services.
-> +The most update information about them and their status can be found
-> +at::
+> +    if (nsid && nsid != 0xffffffff) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+Correct.
 > +
-> +   https://wiki.qemu.org/Testing/CI
+> +    s = blk_get_stats(n->conf.blk);
 > +
-> +Gating CI
-> +----------
+> +    units_read = s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
+> +    units_written = s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
+> +    read_commands = s->nr_ops[BLOCK_ACCT_READ];
+> +    write_commands = s->nr_ops[BLOCK_ACCT_WRITE];
 > +
-> +A Pull Requests will only to be merged if they successfully go through
-> +a different set of CI jobs.  GitLab's CI is the service/framework used
-
-s/A Pull Requests/Pull Requests/
-s/will only to be merged/will only be merged/
-
-I suggest simplifying the first sentence:
-
-  Code is only merged after passing the "gating" set of CI jobs.
-
-Whether they are called Pull Requests or Merge Requests shouldn't matter
-:).
-
-> +for executing the gating jobs.
+> +    if (off > sizeof(smart)) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
 > +
-> +The architecture of GitLab's CI service allows different machines to be
-> +setup with GitLab's "agent", called gitlab-runner, which will take care
-
-s/setup/set up/ throughout this document
-https://grammarist.com/spelling/set-up-vs-setup/
-
-> +of running jobs created by events such as a push to a branch.
+> +    trans_len = MIN(sizeof(smart) - off, buf_len);
 > +
-> +Even though gitlab-runner can execute jobs on environments such as
-> +containers, this initial implementation assumes the shell executor is
-> +used, effectively running jobs on the same machine (be them physical
-
-s/them/they/
-
-> +or virtual) the gitlab-runner agent is running.  This means those
-
-s/the/where the/
-
-> +machines must be setup in advance, with the requirements matching the
-> +jobs expected to be executed there.
+> +    memset(&smart, 0x0, sizeof(smart));
 > +
-> +Machine configuration for gating jobs
-> +-------------------------------------
+> +    smart.data_units_read[0] = cpu_to_le64(units_read / 1000);
+> +    smart.data_units_written[0] = cpu_to_le64(units_written / 1000);
+Tiny nitpick - the spec asks the value to be rounded up
+
+> +    smart.host_read_commands[0] = cpu_to_le64(read_commands);
+> +    smart.host_write_commands[0] = cpu_to_le64(write_commands);
 > +
-> +The GitLab's CI architecture allows different parties to provide
-> +different machines that will run different jobs.  At this point, QEMU
-> +will deploy a limited set of machines and jobs.  Documentation and/or
-> +scripts to setup those machines is located under::
+> +    smart.temperature = cpu_to_le16(n->temperature);
 > +
-> +  scripts/ci/setup
+> +    if ((n->temperature >= n->features.temp_thresh_hi) ||
+> +        (n->temperature <= n->features.temp_thresh_low)) {
+> +        smart.critical_warning |= NVME_SMART_TEMPERATURE;
+> +    }
 > +
-> +Ansible playbooks have been provided to perform two different tasks
-> +related to setting gitlab-runner and the build environment.
-
-s/setting/setting up/
-
+> +    current_ms = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+> +    smart.power_on_hours[0] =
+> +        cpu_to_le64((((current_ms - n->starttime_ms) / 1000) / 60) / 60);
 > +
-> +Other organizations involved in QEMU development may, in the near
-> +future, contribute their own setup documentation/scripts under
+> +    return nvme_dma_read_prp(n, (uint8_t *) &smart + off, trans_len, prp1,
+> +                             prp2);
+> +}
+> +
+> +static uint16_t nvme_fw_log_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
+> +                                 uint64_t off, NvmeRequest *req)
+> +{
+> +    uint32_t trans_len;
+> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+> +    NvmeFwSlotInfoLog fw_log = {
+> +        .afi = 0x1,
+> +    };
+> +
+> +    strpadcpy((char *)&fw_log.frs1, sizeof(fw_log.frs1), "1.0", ' ');
 
-Comments about relative time lack context in a long-lived document like
-this one:
-s/in the near future//
+I always thought that firmware log can be just zeroed out, but this is correct
+now that I checked the spec again.
+> +
+> +    if (off > sizeof(fw_log)) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+> +    trans_len = MIN(sizeof(fw_log) - off, buf_len);
+> +
+> +    return nvme_dma_read_prp(n, (uint8_t *) &fw_log + off, trans_len, prp1,
+> +                             prp2);
+> +}
+> +
+> +static uint16_t nvme_error_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_len,
+> +                                uint64_t off, NvmeRequest *req)
+> +{
+> +    uint32_t trans_len;
+> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+> +    NvmeErrorLog errlog;
+> +
+> +    if (off > sizeof(errlog)) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +
+> +    memset(&errlog, 0x0, sizeof(errlog));
+> +
+> +    trans_len = MIN(sizeof(errlog) - off, buf_len);
+> +
+> +    return nvme_dma_read_prp(n, (uint8_t *)&errlog, trans_len, prp1, prp2);
+Looks good.
+> +}
+> +
+> +static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> +{
+> +    uint32_t dw10 = le32_to_cpu(cmd->cdw10);
+> +    uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+> +    uint32_t dw12 = le32_to_cpu(cmd->cdw12);
+> +    uint32_t dw13 = le32_to_cpu(cmd->cdw13);
+> +    uint8_t  lid = dw10 & 0xff;
+> +    uint8_t  lsp = (dw10 >> 8) & 0xf;
+> +    uint8_t  rae = (dw10 >> 15) & 0x1;
+> +    uint32_t numdl, numdu;
+> +    uint64_t off, lpol, lpou;
+> +    size_t   len;
+> +
+Nitpick: don't we want to check NSID=0 || NSID=0xFFFFFFFF here too?
 
-> diff --git a/scripts/ci/setup/build-environment.yml b/scripts/ci/setup/bu=
-ild-environment.yml
-> new file mode 100644
-> index 0000000000..89b35386c7
-> --- /dev/null
-> +++ b/scripts/ci/setup/build-environment.yml
-> @@ -0,0 +1,217 @@
-> +---
-> +- name: Installation of basic packages to build QEMU
-> +  hosts: all
-> +  vars_files:
-> +    - vars.yml
-> +  tasks:
-> +    - name: Install basic packages to build QEMU on Ubuntu 18.04/20.04
-> +      apt:
-> +        update_cache: yes
-> +        # This matches the packages on tests/docker/Dockerfiles/ubuntu18=
-04.docker
+> +    numdl = (dw10 >> 16);
+> +    numdu = (dw11 & 0xffff);
+> +    lpol = dw12;
+> +    lpou = dw13;
+> +
+> +    len = (((numdu << 16) | numdl) + 1) << 2;
+> +    off = (lpou << 32ULL) | lpol;
+> +
+> +    if (off & 0x3) {
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+Looks OK
+> +
+> +    trace_pci_nvme_get_log(nvme_cid(req), lid, lsp, rae, len, off);
+> +
+> +    switch (lid) {
+> +    case NVME_LOG_ERROR_INFO:
+> +        return nvme_error_info(n, cmd, len, off, req);
+> +    case NVME_LOG_SMART_INFO:
+> +        return nvme_smart_info(n, cmd, len, off, req);
+> +    case NVME_LOG_FW_SLOT_INFO:
+> +        return nvme_fw_log_info(n, cmd, len, off, req);
+> +    default:
+> +        trace_pci_nvme_err_invalid_log_page(nvme_cid(req), lid);
+> +        return NVME_INVALID_FIELD | NVME_DNR;
+> +    }
+> +}
+> +
+>  static void nvme_free_cq(NvmeCQueue *cq, NvmeCtrl *n)
+>  {
+>      n->cq[cq->cqid] = NULL;
+> @@ -960,6 +1094,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          return nvme_del_sq(n, cmd);
+>      case NVME_ADM_CMD_CREATE_SQ:
+>          return nvme_create_sq(n, cmd);
+> +    case NVME_ADM_CMD_GET_LOG_PAGE:
+> +        return nvme_get_log(n, cmd, req);
+>      case NVME_ADM_CMD_DELETE_CQ:
+>          return nvme_del_cq(n, cmd);
+>      case NVME_ADM_CMD_CREATE_CQ:
+> @@ -1511,7 +1647,9 @@ static void nvme_init_state(NvmeCtrl *n)
+>      n->namespaces = g_new0(NvmeNamespace, n->num_namespaces);
+>      n->sq = g_new0(NvmeSQueue *, n->params.max_ioqpairs + 1);
+>      n->cq = g_new0(NvmeCQueue *, n->params.max_ioqpairs + 1);
+> +    n->temperature = NVME_TEMPERATURE;
+>      n->features.temp_thresh_hi = NVME_TEMPERATURE_WARNING;
+> +    n->starttime_ms = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
+>  }
+>  
+>  static void nvme_init_blk(NvmeCtrl *n, Error **errp)
+> @@ -1668,7 +1806,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+>       */
+>      id->acl = 3;
+>      id->frmw = (NVME_NUM_FW_SLOTS << 1) | NVME_FRMW_SLOT1_RO;
+> -    id->lpa = 1 << 0;
+> +    id->lpa = NVME_LPA_EXTENDED;
+>  
+>      /* recommended default value (~70 C) */
+>      id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index e3a2c907e210..8228978e93de 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -98,6 +98,8 @@ typedef struct NvmeCtrl {
+>      uint32_t    irq_status;
+>      uint64_t    host_timestamp;                 /* Timestamp sent by the host */
+>      uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
+> +    uint64_t    starttime_ms;
+> +    uint16_t    temperature;
+>  
+>      HostMemoryBackend *pmrdev;
+>  
+> diff --git a/hw/block/trace-events b/hw/block/trace-events
+> index c40c0d2e4b28..3330d74e48db 100644
+> --- a/hw/block/trace-events
+> +++ b/hw/block/trace-events
+> @@ -45,6 +45,7 @@ pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
+>  pci_nvme_identify_ctrl(void) "identify controller"
+>  pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
+>  pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
+> +pci_nvme_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
+>  pci_nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
+>  pci_nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
+>  pci_nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
+> @@ -94,6 +95,7 @@ pci_nvme_err_invalid_create_cq_qflags(uint16_t qflags) "failed creating completi
+>  pci_nvme_err_invalid_identify_cns(uint16_t cns) "identify, invalid cns=0x%"PRIx16""
+>  pci_nvme_err_invalid_getfeat(int dw10) "invalid get features, dw10=0x%"PRIx32""
+>  pci_nvme_err_invalid_setfeat(uint32_t dw10) "invalid set features, dw10=0x%"PRIx32""
+> +pci_nvme_err_invalid_log_page(uint16_t cid, uint16_t lid) "cid %"PRIu16" lid 0x%"PRIx16""
+>  pci_nvme_err_startfail_cq(void) "nvme_start_ctrl failed because there are non-admin completion queues"
+>  pci_nvme_err_startfail_sq(void) "nvme_start_ctrl failed because there are non-admin submission queues"
+>  pci_nvme_err_startfail_nbarasq(void) "nvme_start_ctrl failed because the admin submission queue address is null"
+> diff --git a/include/block/nvme.h b/include/block/nvme.h
+> index d639e8bbee92..49ce97ae1ab4 100644
+> --- a/include/block/nvme.h
+> +++ b/include/block/nvme.h
+> @@ -704,9 +704,9 @@ typedef struct NvmeErrorLog {
+>      uint8_t     resv[35];
+>  } NvmeErrorLog;
+>  
+> -typedef struct NvmeSmartLog {
+> +typedef struct QEMU_PACKED NvmeSmartLog {
+>      uint8_t     critical_warning;
+> -    uint8_t     temperature[2];
+> +    uint16_t    temperature;
+>      uint8_t     available_spare;
+>      uint8_t     available_spare_threshold;
+>      uint8_t     percentage_used;
+> @@ -846,6 +846,10 @@ enum NvmeIdCtrlFrmw {
+>      NVME_FRMW_SLOT1_RO = 1 << 0,
+>  };
+>  
+> +enum NvmeIdCtrlLpa {
+> +    NVME_LPA_EXTENDED = 1 << 2,
+> +};
+> +
+>  #define NVME_CTRL_SQES_MIN(sqes) ((sqes) & 0xf)
+>  #define NVME_CTRL_SQES_MAX(sqes) (((sqes) >> 4) & 0xf)
+>  #define NVME_CTRL_CQES_MIN(cqes) ((cqes) & 0xf)
 
-These comments will not age well :). If you really want to leave a note
-then I suggest "Originally from
-tests/docker/Dockerfiles/ubuntu1804.docker".
+Other than few nitpicks that don't matter much,
 
-> diff --git a/scripts/ci/setup/inventory b/scripts/ci/setup/inventory
-> new file mode 100644
-> index 0000000000..8bb7ba6b33
-> --- /dev/null
-> +++ b/scripts/ci/setup/inventory
-> @@ -0,0 +1,2 @@
-> +[local]
-> +localhost
-> diff --git a/scripts/ci/setup/vars.yml b/scripts/ci/setup/vars.yml
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Perhaps this file can be called vars.yml.template and an entry for
-vars.yml can be added to .gitignore. A file that needs local editing
-should not be commited to git in-place. Otherwise it's easy to
-accidentally commit the local changes to git (and expose the private
-GitLab token!).
+Best regards,
+	Maxim Levitsky
 
---wac7ysb48OaltWcw
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8hTH0ACgkQnKSrs4Gr
-c8ic/AgApLILZ0M94P3EEH5tnkRqwclTBBTO/a9UT1+5LUJrqUwqGHec4uyxctSH
-LXmhDuvktrDzft0/GXZuaMklCpFjPYanPOC9Ha6hygdBLiXfmR95qlN+ss5EFnfa
-tNg9q0ENXDSMWU6Kb11w4JoJO0Q4hBPRAFR0S9KZsHNwtZ78ml3fY4NG8c3Jgn7f
-V3G4oJDeQRDoYlyWP+IkNTZk7LNBCgNo0ZAylh/NREs1VWRnFf+KZAQ+se3rMcSE
-Uu58DixCIQi5Pk2LHBUZnJ5tHA6WcjIa2Mx6QhHT/4nL5fkGWyvMriVRZAsfD2mA
-kZSOKy9xw0qe5hvQ61e50hvuMgO0Yg==
-=MIGD
------END PGP SIGNATURE-----
-
---wac7ysb48OaltWcw--
 
