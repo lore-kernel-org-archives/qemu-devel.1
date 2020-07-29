@@ -2,76 +2,92 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_DIGITS,FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88764C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ADD8C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:31:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 544E5207E8
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:28:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33B24207E8
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:31:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="kkctkZMB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 544E5207E8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJDETA2L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B24207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0n4g-0004ZP-Ix
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:28:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58828)
+	id 1k0n7J-00065q-Ge
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:31:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59516)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <13824125580@163.com>)
- id 1k0n45-00046H-9s
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:28:17 -0400
-Received: from m13153.mail.163.com ([220.181.13.153]:5779)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <13824125580@163.com>)
- id 1k0n3y-0001i3-RU
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:28:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=Date:From:Subject:MIME-Version:Message-ID; bh=bqSax
- H6uUBBEmFTQCKVLX6KCpwrCs1CKfHR7/JJgWbA=; b=kkctkZMBZOJlLUvF5yU/e
- m5pCpYPRneYNZDxZlpNR3qsMft6H+qqJueVj10wToZ7hvN7qWsR58sdz+jIyjJds
- Aw8ZwxHm2HSwu85iBqD8XpXfwkUEs+fFCl+qr+iYgS7ykUBVf+tpbj5B/nnAbUCK
- zXNJdZ2AwpO1QC0D7R8AkM=
-Received: from 13824125580$163.com ( [113.74.44.15] ) by
- ajax-webmail-wmsvr153 (Coremail) ; Wed, 29 Jul 2020 22:27:55 +0800 (CST)
-X-Originating-IP: [113.74.44.15]
-Date: Wed, 29 Jul 2020 22:27:55 +0800 (CST)
-From: tugouxp <13824125580@163.com>
-To: qemu-devel@nongnu.org
-Subject: What this mean "dead: 1" and "dead: 0 1" on each tb block start?
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.10 build 20190724(ac680a23)
- Copyright (c) 2002-2020 www.mailtech.cn 163com
-X-CM-CTRLDATA: Do1L9mZvb3Rlcl9odG09Mjg4Njo2MQ==
-Content-Type: multipart/alternative; 
- boundary="----=_Part_114287_606518536.1596032875538"
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k0n61-0005X8-Ui
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:30:17 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38606
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k0n5y-0001zu-Dd
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:30:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596033013;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=mIDkxltvDEgv5aPG58kveP5LTo4gYeFZX+YY/uQFJnI=;
+ b=cJDETA2LUM28FWk1FSJ+uT3WU0oX6vvMBVh0KMd1rIDr7tQ9d79VsF+Mndnla9awCSk/hi
+ 8idBzffmgx8R04CgOTfVQ46GyIh8Z1ytNk8iPLYQlReLXD2DKTo3BQh9WZdzs7VPCcZseG
+ sfIFhRm8xQbBIXYzj4eNFbxdwGedGG0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-Z5C3pzp8MgyyUeZSBrMc-A-1; Wed, 29 Jul 2020 10:29:58 -0400
+X-MC-Unique: Z5C3pzp8MgyyUeZSBrMc-A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 974AF106B242;
+ Wed, 29 Jul 2020 14:29:57 +0000 (UTC)
+Received: from localhost (ovpn-112-185.ams2.redhat.com [10.36.112.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4E88D5DA73;
+ Wed, 29 Jul 2020 14:29:54 +0000 (UTC)
+Date: Wed, 29 Jul 2020 15:29:53 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Daniel Walsh <dwalsh@redhat.com>
+Subject: Re: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and print an
+ error
+Message-ID: <20200729142953.GE52286@stefanha-x1.localdomain>
+References: <20200727190223.422280-1-stefanha@redhat.com>
+ <20200727190223.422280-4-stefanha@redhat.com>
+ <OSBPR01MB45826073E5A54CF869E56721E5730@OSBPR01MB4582.jpnprd01.prod.outlook.com>
+ <CALDPj7syG0KPhtZEma5n403=YFZ2ptcD4MtP=GdrY9n1eUs5Eg@mail.gmail.com>
+ <20200728153219.GC21660@stefanha-x1.localdomain>
+ <c5b15243-200b-fa17-27b5-1b27dbddbe6d@redhat.com>
 MIME-Version: 1.0
-Message-ID: <6807386b.7ba3.1739af8fc12.Coremail.13824125580@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: mcGowADX5JlrhyFfYaNdAA--.22847W
-X-CM-SenderInfo: bprtmjyurskkiyq6il2tof0z/1tbiVh9wQlqzmHTMLwACsf
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
-Received-SPF: pass client-ip=220.181.13.153; envelope-from=13824125580@163.com;
- helo=m13153.mail.163.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 10:27:55
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, FROM_LOCAL_DIGITS=0.001,
- FROM_LOCAL_HEX=0.006, HTML_MESSAGE=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <c5b15243-200b-fa17-27b5-1b27dbddbe6d@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="FEz7ebHBGB6b2e8X"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:27:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,93 +100,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "vromanso@redhat.com" <vromanso@redhat.com>,
+ "mpatel@redhat.com" <mpatel@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "virtio-fs@redhat.com" <virtio-fs@redhat.com>,
+ "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>,
+ Roman Mohr <rmohr@redhat.com>, "vgoyal@redhat.com" <vgoyal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-------=_Part_114287_606518536.1596032875538
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
+--FEz7ebHBGB6b2e8X
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-SEkgZm9sa3M6CiAgb24gZWFjaCB0YiBibG9jayBzdGFydCwgdGhlcmUgYXJlIGZvbGxvd2luZyBp
-ciBjb2RlLCBhbmQgdGhlIG1vc3QgY29uZnVzaW5nIG1lIGlzIHRoYXQgIHRoZSBwb3N0Zml4IG9m
-IGVhY2ggbGluZSAiZGVhZDoiIGZsYWcsIHdoYXQgaXQgaXMgcmVwcmVzZW50IHByZWNpc2VseT8K
-aSBndWVzcyBpdCBtYXkgYmUgcmVsYXRlZCB0byB0aGUgcmVnaXN0ZXIgb3IgdmFyaWJsZSBsaXZl
-bmVzcyBmb3IgaGVscCBnZW5lcmF0aW5nIHRnaGUgdGFyZ2V0IG1hY2hpbmUgY29kZSwgYnV0IGkg
-Y2FudCBnZXQgdGhlIHByZWNpc2VseSBjb25uZWN0aW9uIG9mIHRoZSBkZWFkIGF0dHJyaWJ1dGUg
-d2l0aCBxZW11ICBpbnRlcm5hbCB2YXJpYmxlcy4KZm9yIGV4YW1wbGUsIHdoeSB0aGUgbGluZSA2
-MSB1c2UgImRlYWQ6MSIgYW5kIHRoZSBsaW5lIDYzIHVzZSAiZGVhZDogMCwgMSI/ICB3aGF0IGlz
-IHRoZSBwcmVjaXNlbHkgbWVhbmluZyBvZiB0aGUgbnVtYmVyIGFmdGVyIHRoZSAiZGVhZDoiIHdv
-cmQ/CgoKdGhhbmsgeW91ISAgICAgCgoKCgogICAgNjAgT1AgYWZ0ZXIgb3B0aW1pemF0aW9uIGFu
-ZCBsaXZlbmVzcyBhbmFseXNpczoKCiAgICAgNjEgIGxkX2kzMiB0bXA1LGVudiwkMHhmZmZmZmZm
-ZmZmZmZmZmVjICAgICAgICAgICAgICAgICBkZWFkOiAxCgogICAgIDYyICBtb3ZpX2kzMiB0bXA2
-LCQweDAKCiAgICAgNjMgIGJyY29uZF9pMzIgdG1wNSx0bXA2LGx0LCRMMCAgICAgICAgICAgICAg
-ICAgICAgICBkZWFkOiAwIDEKCiAgICAgNjQgIAoKICAgICA2NSAgLS0tLSA2MDAwMDAwNCAwMDAw
-MDAwMCAwMDAwMGUwNAoKICAgICA2NiAgbW92aV9pMzIgdG1wNSwkMHg2MDAwMDAxMAoKICAgICA2
-NyAgbW92X2kzMiB0bXA3LHRtcDUgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlYWQ6
-IDEKCiAgICAgNjggIHFlbXVfbGRfaTMyIHRtcDYsdG1wNyxsZXVsLDMgICAgICAgICAgICAgICAg
-ICAgICBkZWFkOiAxCgogICAgIDY5ICBtb3ZfaTMyIHIxLHRtcDYgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgc3luYzogMCAgZGVhZDogMCAxCgogICAgIDcwICBnb3RvX3RiICQweDEK
-CiAgICAgNzEgIG1vdmlfaTMyIHBjLCQweDYwMDAwMDA4ICAgICAgICAgICAgICAgICAgICAgICAg
-ICBzeW5jOiAwICBkZWFkOiAwCgogICAgIDcyICBleGl0X3RiICQweDdmOGU4ZWY1ODEwMQoKICAg
-ICA3MyAgc2V0X2xhYmVsICRMMAoKICAgICA3NCAgZXhpdF90YiAkMHg3ZjhlOGVmNTgxMDMKCiAg
-ICAgNzUgIAoKCg==
-------=_Part_114287_606518536.1596032875538
-Content-Type: text/html; charset=GBK
-Content-Transfer-Encoding: base64
+On Tue, Jul 28, 2020 at 03:15:25PM -0400, Daniel Walsh wrote:
+> On 7/28/20 11:32, Stefan Hajnoczi wrote:
+> > On Tue, Jul 28, 2020 at 12:00:20PM +0200, Roman Mohr wrote:
+> >> On Tue, Jul 28, 2020 at 3:07 AM misono.tomohiro@fujitsu.com <
+> >> misono.tomohiro@fujitsu.com> wrote:
+> >>
+> >>>> Subject: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and print=
+ an
+> >>> error
+> >> "Just" pointing docker to a different seccomp.json file is something w=
+hich
+> >> k8s users/admin in many cases can't do.
+> > There is a Moby PR to change the default seccomp.json file here but it'=
+s
+> > unclear if it will be merged:
+> > https://github.com/moby/moby/pull/41244
+> >
+> > Stefan
+>=20
+> Why not try Podman?
 
-PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
-Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXYgc3R5bGU9Im1hcmdpbjowOyI+SEkgZm9sa3M6PC9kaXY+
-PGRpdiBzdHlsZT0ibWFyZ2luOjA7Ij4mbmJzcDsgb24gZWFjaCB0YiBibG9jayBzdGFydCwgdGhl
-cmUgYXJlIGZvbGxvd2luZyBpciBjb2RlLCBhbmQgdGhlIG1vc3QgY29uZnVzaW5nIG1lIGlzIHRo
-YXQmbmJzcDsgdGhlIHBvc3RmaXggb2YgZWFjaCBsaW5lICJkZWFkOiIgZmxhZywgd2hhdCBpdCBp
-cyByZXByZXNlbnQgcHJlY2lzZWx5PzwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjowOyI+aSBndWVz
-cyBpdCBtYXkgYmUgcmVsYXRlZCB0byB0aGUgcmVnaXN0ZXIgb3IgdmFyaWJsZSBsaXZlbmVzcyBm
-b3IgaGVscCBnZW5lcmF0aW5nIHRnaGUgdGFyZ2V0IG1hY2hpbmUgY29kZSwgYnV0IGkgY2FudCBn
-ZXQgdGhlIHByZWNpc2VseSBjb25uZWN0aW9uIG9mIHRoZSBkZWFkIGF0dHJyaWJ1dGUgd2l0aCBx
-ZW11Jm5ic3A7IGludGVybmFsIHZhcmlibGVzLjwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjowOyI+
-Zm9yIGV4YW1wbGUsIHdoeSB0aGUgbGluZSA2MSB1c2UgImRlYWQ6MSIgYW5kIHRoZSBsaW5lIDYz
-IHVzZSAiZGVhZDogMCwgMSI/Jm5ic3A7IHdoYXQgaXMgdGhlIHByZWNpc2VseSBtZWFuaW5nIG9m
-IHRoZSBudW1iZXIgYWZ0ZXIgdGhlICJkZWFkOiIgd29yZD88L2Rpdj48ZGl2IHN0eWxlPSJtYXJn
-aW46MDsiPjxicj48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46MDsiPnRoYW5rIHlvdSEmbmJzcDsg
-Jm5ic3A7ICZuYnNwOzwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjowOyI+PGJyPjwvZGl2PjxkaXYg
-c3R5bGU9Im1hcmdpbjowOyI+PGJyPjwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjowOyI+Jm5ic3A7
-ICZuYnNwOyA2MCBPUCBhZnRlciBvcHRpbWl6YXRpb24gYW5kIGxpdmVuZXNzIGFuYWx5c2lzOjwv
-ZGl2PjxwIHN0eWxlPSJtYXJnaW46MDsiPjxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiBy
-Z2IoMjIxLCA2NCwgNTApOyI+Jm5ic3A7ICZuYnNwOyAmbmJzcDs2MSZuYnNwOyBsZF9pMzIgdG1w
-NSxlbnYsJDB4ZmZmZmZmZmZmZmZmZmZlYyZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ZGVhZDogMTwvc3Bhbj48L3A+PHAgc3R5bGU9
-Im1hcmdpbjowOyI+PHNwYW4gc3R5bGU9ImJhY2tncm91bmQtY29sb3I6IHJnYigyMjEsIDY0LCA1
-MCk7Ij4mbmJzcDsgJm5ic3A7ICZuYnNwOzYyJm5ic3A7IG1vdmlfaTMyIHRtcDYsJDB4MDwvc3Bh
-bj48L3A+PHAgc3R5bGU9Im1hcmdpbjowOyI+PHNwYW4gc3R5bGU9ImJhY2tncm91bmQtY29sb3I6
-IHJnYigyMjEsIDY0LCA1MCk7Ij4mbmJzcDsgJm5ic3A7ICZuYnNwOzYzJm5ic3A7IGJyY29uZF9p
-MzIgdG1wNSx0bXA2LGx0LCRMMCZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5i
-c3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgZGVhZDogMCAxPC9zcGFuPjwv
-cD48cCBzdHlsZT0ibWFyZ2luOjA7Ij4mbmJzcDsgJm5ic3A7ICZuYnNwOzY0Jm5ic3A7Jm5ic3A7
-PC9wPjxwIHN0eWxlPSJtYXJnaW46MDsiPiZuYnNwOyAmbmJzcDsgJm5ic3A7NjUmbmJzcDsgLS0t
-LSA2MDAwMDAwNCAwMDAwMDAwMCAwMDAwMGUwNDwvcD48cCBzdHlsZT0ibWFyZ2luOjA7Ij4mbmJz
-cDsgJm5ic3A7ICZuYnNwOzY2Jm5ic3A7IG1vdmlfaTMyIHRtcDUsJDB4NjAwMDAwMTA8L3A+PHAg
-c3R5bGU9Im1hcmdpbjowOyI+Jm5ic3A7ICZuYnNwOyAmbmJzcDs2NyZuYnNwOyBtb3ZfaTMyIHRt
-cDcsdG1wNSZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAm
-bmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZu
-YnNwOyBkZWFkOiAxPC9wPjxwIHN0eWxlPSJtYXJnaW46MDsiPiZuYnNwOyAmbmJzcDsgJm5ic3A7
-NjgmbmJzcDsgcWVtdV9sZF9pMzIgdG1wNix0bXA3LGxldWwsMyZuYnNwOyAmbmJzcDsgJm5ic3A7
-ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDtk
-ZWFkOiAxPC9wPjxwIHN0eWxlPSJtYXJnaW46MDsiPiZuYnNwOyAmbmJzcDsgJm5ic3A7NjkmbmJz
-cDsgbW92X2kzMiByMSx0bXA2Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
-OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyBzeW5jOiAwJm5ic3A7IGRlYWQ6IDAgMTwvcD48cCBzdHls
-ZT0ibWFyZ2luOjA7Ij4mbmJzcDsgJm5ic3A7ICZuYnNwOzcwJm5ic3A7IGdvdG9fdGIgJDB4MTwv
-cD48cCBzdHlsZT0ibWFyZ2luOjA7Ij4mbmJzcDsgJm5ic3A7ICZuYnNwOzcxJm5ic3A7IG1vdmlf
-aTMyIHBjLCQweDYwMDAwMDA4Jm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7IHN5bmM6
-IDAmbmJzcDsgZGVhZDogMDwvcD48cCBzdHlsZT0ibWFyZ2luOjA7Ij4mbmJzcDsgJm5ic3A7ICZu
-YnNwOzcyJm5ic3A7IGV4aXRfdGIgJDB4N2Y4ZThlZjU4MTAxPC9wPjxwIHN0eWxlPSJtYXJnaW46
-MDsiPiZuYnNwOyAmbmJzcDsgJm5ic3A7NzMmbmJzcDsgc2V0X2xhYmVsICRMMDwvcD48cCBzdHls
-ZT0ibWFyZ2luOjA7Ij4mbmJzcDsgJm5ic3A7ICZuYnNwOzc0Jm5ic3A7IGV4aXRfdGIgJDB4N2Y4
-ZThlZjU4MTAzPC9wPjxwIHN0eWxlPSJtYXJnaW46MDsiPiZuYnNwOyAmbmJzcDsgJm5ic3A7NzUm
-bmJzcDsmbmJzcDs8L3A+PGRpdj48YnI+PC9kaXY+PC9kaXY+PGJyPjxicj48c3BhbiB0aXRsZT0i
-bmV0ZWFzZWZvb3RlciI+PHA+PGJyLz4mbmJzcDs8L3A+PC9zcGFuPg==
-------=_Part_114287_606518536.1596032875538--
+Absolutely, Podman allows unshare(2) in its default seccomp policy so it
+does not have this problem.
+
+I think Roman's point was mainly about the upstream user experience
+where Docker is common.
+
+Stefan
+
+--FEz7ebHBGB6b2e8X
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8hh+AACgkQnKSrs4Gr
+c8j8nQgAp70hD2BPLqDLm5JIwSXUuitCFEM/4u7WRCIu4k+IHcAdopIHEolwkQ3p
+p05v4mTk69BwTNbFfKwzX2o8yXu/sjT96BqZqDtcJIoGH4vZd5l1yiqefGD8VvQM
+qvTqOw8P3oXeY/H4WsluTbsQfL6aKuWjuBdSReOoTrUqfXnvH+Y2N3Y+yPIuFWeF
+7Fnak1afGTeShhTWyDCLgomu1fwgdVSLZUt56bJ7ARaBkgr0YRsykdXUP4c1KkUO
+93LoEW1Vwoxm/J+yziECd02oruuu9SM1M5CY/FOGxS7kBiebs683tI3Cq2zfBE4c
+a3Yff6jYM4fFFN62MpB95KJ2JFenmg==
+=eINk
+-----END PGP SIGNATURE-----
+
+--FEz7ebHBGB6b2e8X--
 
 
