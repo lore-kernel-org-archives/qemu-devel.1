@@ -2,95 +2,94 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D758C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:14:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B25BC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:17:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5756F2074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:14:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56A132074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 10:17:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Znm4w4Je"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5756F2074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBtQbyod"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A132074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0j61-0007MX-J5
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 06:14:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56022)
+	id 1k0j9G-00007u-HX
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 06:17:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0j5O-0006ug-Pg
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:13:22 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:52343)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k0j5N-0008Jp-9e
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:13:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596017600;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=odfJ3bBclk2MMjV8q2jEs3bZ/Ku4061gJdV8lqP3cJE=;
- b=Znm4w4Jetyc2xMVlmIM9nndqRM0/eoAlJ5/HJ4PZNOsSe//hFcIx5PYLJ8o5eU2QHgNyUl
- sOWPpxsUtKNlWvmPTh/RVrrMaLB0w1jIfkDtdCswIj1LFmNl6ryI+jjMupBFqzoWiUFR1S
- y7j3xFldmlvezaN/a9W/2FQT1fTOnfk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-363-CEp5ZunKPNC2hakoX1v1cQ-1; Wed, 29 Jul 2020 06:13:16 -0400
-X-MC-Unique: CEp5ZunKPNC2hakoX1v1cQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C4E658;
- Wed, 29 Jul 2020 10:13:15 +0000 (UTC)
-Received: from gondolin (ovpn-113-17.ams2.redhat.com [10.36.113.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7B9E610013D7;
- Wed, 29 Jul 2020 10:13:07 +0000 (UTC)
-Date: Wed, 29 Jul 2020 12:13:05 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH RFCv3 6/9] s390x/diag: subcode to query device memory
- region
-Message-ID: <20200729121305.19564c4f.cohuck@redhat.com>
-In-Reply-To: <ccf008cb-1812-6598-fc65-d7e3c0edce03@redhat.com>
-References: <20200724143750.59836-1-david@redhat.com>
- <20200724143750.59836-7-david@redhat.com>
- <20200727114819.3f816010.cohuck@redhat.com>
- <963e5931-117e-48cb-b829-d630abff9e42@redhat.com>
- <20200727120930.7b8803e4.cohuck@redhat.com>
- <520ac822-df67-b33a-378f-a8f91a3bed2f@redhat.com>
- <20200727111546.GA13770@osiris>
- <68205bc1-1ac4-a023-0531-aa1a0c91e17d@redhat.com>
- <20200728091014.173a7d18.cohuck@redhat.com>
- <3f337e2d-fc46-b842-cbca-cc4036bf8fe0@redhat.com>
- <20200729113737.39621d48.cohuck@redhat.com>
- <ccf008cb-1812-6598-fc65-d7e3c0edce03@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0j8W-00087o-Hq
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:16:36 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37938)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k0j8U-0000Ss-K9
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 06:16:36 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a14so21101539wra.5
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 03:16:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=8uWkdfkp4X5NJOBKPmtfC9riOfG48fZvrnOEFsfWFQo=;
+ b=eBtQbyodUlu7e5DvAGFDreK4RUZq1zF7JGb8Qy6306bOO+SQdZ1awzXpL38bIdHwXG
+ AhqoSdQdRTk0Xz40rs/tE8ITfNJsGjwmzqoREJf0ie91gEzcCYXkKaT5gwUjaKPDgLMn
+ XRAj261AoKyg1mV0bzyIBD9uipDIWR0keVFuAubPSkamiGfy3ygEJIUqOO22+Tf0BWJq
+ tPrHJF34vDsNjU6KscoGJWiRSQuG/hwGG1F2MRRgk161+wzQ2EVdyGPYmv0cZ+r1JuTq
+ BDKDIQR3aMq2jS1jToJxZHqA84SCQgenp+SUEv8TfFyn40KCfe0tZszF6eG2jwztVtbJ
+ biLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=8uWkdfkp4X5NJOBKPmtfC9riOfG48fZvrnOEFsfWFQo=;
+ b=MoUdt2NU6oKPHnCSquGIPCv0L+EKuJrt8dUJ22Z7QVJLGZyK++b9vazZ4ovpynRRpT
+ dPqhy+1FqBwH+KL3cPfgK/ljegdwwCOp1JyjPIR/apzua8IGHvbenYOHjuGHtqgyFmmG
+ KGzSzGfYLzvD9QXDt82vUzFDTctkIMmg8Qkd39tUYQWBXXQuGwNQIQnCkQIrHJt9DVc/
+ 6WjYNDZqtZFpywnUjCrmkvx643vO/PQWhQNWuvJawJGj280rt7fabMAsaRD5v9ujvwVr
+ +3swpVMWsqhHFucSnQD/Y2JeBDrDA/ef1Q4rWz8iJdsUdsJvTJsIC+25igyPp4jQQjP9
+ vz2A==
+X-Gm-Message-State: AOAM532MZpxS8mU69Zfr5ajmHq/TQlTTOahwGxfKtGkZ9gh/xiOG6xlk
+ fXHi2itdbuFlI3HsgvccfaU=
+X-Google-Smtp-Source: ABdhPJx60yUfZEawuNrdJkbyaI58DdJkIY1JW0UxdfFShWBQ3trpCsQ6bES1kdsHn4s0Dc36OtPZCw==
+X-Received: by 2002:adf:bbc1:: with SMTP id z1mr28539715wrg.173.1596017792491; 
+ Wed, 29 Jul 2020 03:16:32 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id v15sm4204275wrm.23.2020.07.29.03.16.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Jul 2020 03:16:31 -0700 (PDT)
+Date: Wed, 29 Jul 2020 11:16:29 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Cleber Rosa <crosa@redhat.com>
+Subject: Re: [PATCH v2 2/2] GitLab Gating CI: initial set of jobs,
+ documentation and scripts
+Message-ID: <20200729101629.GA37763@stefanha-x1.localdomain>
+References: <20200709024657.2500558-1-crosa@redhat.com>
+ <20200709024657.2500558-3-crosa@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.74; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-74.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 03:32:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
+Content-Disposition: inline
+In-Reply-To: <20200709024657.2500558-3-crosa@redhat.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=stefanha@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,46 +102,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 29 Jul 2020 11:57:04 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> On 29.07.20 11:37, Cornelia Huck wrote:
-> > On Wed, 29 Jul 2020 10:57:58 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 28.07.20 09:10, Cornelia Huck wrote:  
-> >   
-> >>> However, I think we really need a central place for definitions that
-> >>> are not just a Linux/QEMU interface, but can potentially also be used
-> >>> by other hypervisors/guests. Nothing as complicated as an OASIS spec,
-> >>> but maybe a git??b project?    
-> >>
-> >> Sounds good. Maintainers? I can volunteer (+setup/create initial
-> >> version), but would be good to have other QEMU/KVM maintainers there as
-> >> well.  
-> > 
-> > Count me in. Best as a collection of rst or markdown documents, I guess?
-> >   
-> 
-> Yes, alternatively, gitlab/github pages? (which essentially convert
-> markdown in the repository to html - both is accessible)
+--wac7ysb48OaltWcw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I guess anything that is (a) easily editable, (b) easily accessible on
-the web, and (c) easily downloadable is fine with me.
+On Wed, Jul 08, 2020 at 10:46:57PM -0400, Cleber Rosa wrote:
 
-> 
-> > gitlab or github? Either would be fine with me.  
-> 
-> Same on my side.
-> 
+Awesome, thanks for creating this stuff! Minor suggestions:
 
+> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> index c1ff24370b..f8dab788ea 100644
+> --- a/docs/devel/testing.rst
+> +++ b/docs/devel/testing.rst
+> @@ -1003,3 +1003,150 @@ exercise as many corner cases as possible. It is =
+a useful test suite
+>  to run to exercise QEMU's linux-user code::
+> =20
+>    https://linux-test-project.github.io/
+> +
+> +CI
+> +=3D=3D
+> +
+> +QEMU has configurations enabled for a number of different CI services.
+> +The most update information about them and their status can be found
+> +at::
+> +
+> +   https://wiki.qemu.org/Testing/CI
+> +
+> +Gating CI
+> +----------
+> +
+> +A Pull Requests will only to be merged if they successfully go through
+> +a different set of CI jobs.  GitLab's CI is the service/framework used
+
+s/A Pull Requests/Pull Requests/
+s/will only to be merged/will only be merged/
+
+I suggest simplifying the first sentence:
+
+  Code is only merged after passing the "gating" set of CI jobs.
+
+Whether they are called Pull Requests or Merge Requests shouldn't matter
+:).
+
+> +for executing the gating jobs.
+> +
+> +The architecture of GitLab's CI service allows different machines to be
+> +setup with GitLab's "agent", called gitlab-runner, which will take care
+
+s/setup/set up/ throughout this document
+https://grammarist.com/spelling/set-up-vs-setup/
+
+> +of running jobs created by events such as a push to a branch.
+> +
+> +Even though gitlab-runner can execute jobs on environments such as
+> +containers, this initial implementation assumes the shell executor is
+> +used, effectively running jobs on the same machine (be them physical
+
+s/them/they/
+
+> +or virtual) the gitlab-runner agent is running.  This means those
+
+s/the/where the/
+
+> +machines must be setup in advance, with the requirements matching the
+> +jobs expected to be executed there.
+> +
+> +Machine configuration for gating jobs
+> +-------------------------------------
+> +
+> +The GitLab's CI architecture allows different parties to provide
+> +different machines that will run different jobs.  At this point, QEMU
+> +will deploy a limited set of machines and jobs.  Documentation and/or
+> +scripts to setup those machines is located under::
+> +
+> +  scripts/ci/setup
+> +
+> +Ansible playbooks have been provided to perform two different tasks
+> +related to setting gitlab-runner and the build environment.
+
+s/setting/setting up/
+
+> +
+> +Other organizations involved in QEMU development may, in the near
+> +future, contribute their own setup documentation/scripts under
+
+Comments about relative time lack context in a long-lived document like
+this one:
+s/in the near future//
+
+> diff --git a/scripts/ci/setup/build-environment.yml b/scripts/ci/setup/bu=
+ild-environment.yml
+> new file mode 100644
+> index 0000000000..89b35386c7
+> --- /dev/null
+> +++ b/scripts/ci/setup/build-environment.yml
+> @@ -0,0 +1,217 @@
+> +---
+> +- name: Installation of basic packages to build QEMU
+> +  hosts: all
+> +  vars_files:
+> +    - vars.yml
+> +  tasks:
+> +    - name: Install basic packages to build QEMU on Ubuntu 18.04/20.04
+> +      apt:
+> +        update_cache: yes
+> +        # This matches the packages on tests/docker/Dockerfiles/ubuntu18=
+04.docker
+
+These comments will not age well :). If you really want to leave a note
+then I suggest "Originally from
+tests/docker/Dockerfiles/ubuntu1804.docker".
+
+> diff --git a/scripts/ci/setup/inventory b/scripts/ci/setup/inventory
+> new file mode 100644
+> index 0000000000..8bb7ba6b33
+> --- /dev/null
+> +++ b/scripts/ci/setup/inventory
+> @@ -0,0 +1,2 @@
+> +[local]
+> +localhost
+> diff --git a/scripts/ci/setup/vars.yml b/scripts/ci/setup/vars.yml
+
+Perhaps this file can be called vars.yml.template and an entry for
+vars.yml can be added to .gitignore. A file that needs local editing
+should not be commited to git in-place. Otherwise it's easy to
+accidentally commit the local changes to git (and expose the private
+GitLab token!).
+
+--wac7ysb48OaltWcw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8hTH0ACgkQnKSrs4Gr
+c8ic/AgApLILZ0M94P3EEH5tnkRqwclTBBTO/a9UT1+5LUJrqUwqGHec4uyxctSH
+LXmhDuvktrDzft0/GXZuaMklCpFjPYanPOC9Ha6hygdBLiXfmR95qlN+ss5EFnfa
+tNg9q0ENXDSMWU6Kb11w4JoJO0Q4hBPRAFR0S9KZsHNwtZ78ml3fY4NG8c3Jgn7f
+V3G4oJDeQRDoYlyWP+IkNTZk7LNBCgNo0ZAylh/NREs1VWRnFf+KZAQ+se3rMcSE
+Uu58DixCIQi5Pk2LHBUZnJ5tHA6WcjIa2Mx6QhHT/4nL5fkGWyvMriVRZAsfD2mA
+kZSOKy9xw0qe5hvQ61e50hvuMgO0Yg==
+=MIGD
+-----END PGP SIGNATURE-----
+
+--wac7ysb48OaltWcw--
 
