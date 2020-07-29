@@ -2,91 +2,107 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E89E6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B73C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:29:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEA8320663
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:23:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fCBWWPZA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA8320663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2927420663
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 09:29:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2927420663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0iIw-0002jg-V0
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 05:23:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41004)
+	id 1k0iP2-0004MX-BY
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 05:29:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kchamart@redhat.com>)
- id 1k0iIL-0002Ed-79
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:22:41 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:36263)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kchamart@redhat.com>)
- id 1k0iII-0000gf-T4
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 05:22:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596014556;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IOGNzWEGFDX7VQydGC6tQEanWMpctP51/yUF0SzWAVk=;
- b=fCBWWPZAMrzm+o5jKG3HKtmkvHLfs/H1wMLRToGDlKNBiXNvlAIjjByVvCdGeaMsnzsZ04
- Jw60g2JKH3EOnMv5mQihyV6nb1GXn1I+Yd6j5t53fDPluL6QYEkZHUsrW3heDkhxulrcHK
- IK63cOSP/+6OtqI+2AcX8eStKuC5jQo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-zd8VcadTPvySFzKbylORIg-1; Wed, 29 Jul 2020 05:22:33 -0400
-X-MC-Unique: zd8VcadTPvySFzKbylORIg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43AFCE91D
- for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 09:22:32 +0000 (UTC)
-Received: from paraplu.localdomain (ovpn-112-157.ams2.redhat.com
- [10.36.112.157])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 156D85D9E8;
- Wed, 29 Jul 2020 09:22:31 +0000 (UTC)
-Received: by paraplu.localdomain (Postfix, from userid 1001)
- id 7D4D93E047D; Wed, 29 Jul 2020 11:22:30 +0200 (CEST)
-Date: Wed, 29 Jul 2020 11:22:30 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH for-5.1?] qapi/block-core.json: Remove stale description
- of 'blockdev-add'
-Message-ID: <20200729092230.4strlnuas34o54vg@paraplu>
-References: <20200728143202.616687-1-kchamart@redhat.com>
- <f285cbb4-5b40-eb38-785c-0f6ff8631321@redhat.com>
+ (Exim 4.90_1) (envelope-from <imbrenda@linux.ibm.com>)
+ id 1k0iON-0003v6-32; Wed, 29 Jul 2020 05:28:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22622
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <imbrenda@linux.ibm.com>)
+ id 1k0iOL-00026r-BG; Wed, 29 Jul 2020 05:28:54 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06T92QAV018714; Wed, 29 Jul 2020 05:28:51 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32hrnnfusy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 29 Jul 2020 05:25:51 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06T9NxO8071541;
+ Wed, 29 Jul 2020 05:23:59 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.72])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32hrnnfspu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 29 Jul 2020 05:23:58 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+ by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06T9Blpi027096;
+ Wed, 29 Jul 2020 09:18:12 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by ppma06fra.de.ibm.com with ESMTP id 32jgvpryvf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 29 Jul 2020 09:18:12 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 06T9I9Ip65011760
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 29 Jul 2020 09:18:09 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4C278A4060;
+ Wed, 29 Jul 2020 09:18:09 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BD127A405C;
+ Wed, 29 Jul 2020 09:18:08 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.10.171])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 29 Jul 2020 09:18:08 +0000 (GMT)
+Date: Wed, 29 Jul 2020 10:01:33 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH for-5.2 2/6] pc-bios/s390-ccw: Move ipl-related code
+ from main() into a separate function
+Message-ID: <20200729100133.00b62e71@ibm-vm>
+In-Reply-To: <20200728183734.7838-3-thuth@redhat.com>
+References: <20200728183734.7838-1-thuth@redhat.com>
+ <20200728183734.7838-3-thuth@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <f285cbb4-5b40-eb38-785c-0f6ff8631321@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.74; envelope-from=kchamart@redhat.com;
- helo=us-smtp-delivery-74.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 03:32:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-29_03:2020-07-28,
+ 2020-07-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0
+ mlxlogscore=999 adultscore=0 clxscore=1015 impostorscore=0 phishscore=0
+ mlxscore=0 spamscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007290058
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=imbrenda@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 05:18:12
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,56 +115,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: "Jason J .
+ Herne" <jjherne@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 28, 2020 at 09:50:39AM -0500, Eric Blake wrote:
-> On 7/28/20 9:32 AM, Kashyap Chamarthy wrote:
+On Tue, 28 Jul 2020 20:37:30 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-[...]
-
-> > [1] https://lists.nongnu.org/archive/html/qemu-discuss/2020-07/msg00071.html
-> >      -- equivalent to "-drive if=ide,id=disk0....."
-> > 
-> > Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-> > Identified-by: Kevin Wolf <kwolf@redhat.com>
+> Let's move this part of the code into a separate function to be able
+> to use it from multiple spots later.
 > 
-> This would be our first use of this unusual tag name; more typical is
-> Suggested-by or Reported-by.
-
-Yes, I agree, using predictable tags is better; so 'Suggested-by' is
-good.
-
-(We perhaps don't have as many 'unusual tags' as the kernel does :-) —
-https://lwn.net/Articles/503829/)
-
-> Is it worth a 'Fixes: be4b67bc7d' line?
-
-Sure, including the provenance is always useful for later `git`
-sleuthing.
-
-[...]
-
-> > -# Creates a new block device. If the @id option is given at the top level, a
-> > -# BlockBackend will be created; otherwise, @node-name is mandatory at the top
-> > -# level and no BlockBackend will be created.
-> > +# Creates a new block device.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  pc-bios/s390-ccw/main.c | 20 ++++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
 > 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index 146a50760b..9b64eb0c24 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -223,14 +223,8 @@ static void virtio_setup(void)
+>      }
+>  }
+>  
+> -int main(void)
+> +static void ipl_boot_device(void)
+>  {
+> -    sclp_setup();
+> -    css_setup();
+> -    boot_setup();
+> -    find_boot_device();
+> -    enable_subchannel(blk_schid);
+> -
+>      switch (cutype) {
+>      case CU_TYPE_DASD_3990:
+>      case CU_TYPE_DASD_2107:
+> @@ -242,8 +236,18 @@ int main(void)
+>          break;
+>      default:
+>          print_int("Attempting to boot from unexpected device type",
+> cutype);
+> -        panic("");
+> +        panic("\nBoot failed.\n");
+>      }
+> +}
+> +
+> +int main(void)
+> +{
+> +    sclp_setup();
+> +    css_setup();
+> +    boot_setup();
+> +    find_boot_device();
+> +    enable_subchannel(blk_schid);
+> +    ipl_boot_device();
+>  
+>      panic("Failed to load OS from hard disk\n");
+>      return 0; /* make compiler happy */
 
-Thanks; shall I spin a v2?  (I agree with both your suggestions above.)
-
-> As a doc fix, it is safe for 5.1, but given the timing of -rc2 today, it's
-> also okay if it slips into 5.2.
-
-Yeah, 5.1 or 5.2, both are fine by me.
-
-[...]
-
--- 
-/kashyap
-
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
