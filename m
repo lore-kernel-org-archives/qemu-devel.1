@@ -2,79 +2,80 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F28C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C3EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:57:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EA7D207E8
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:41:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEBF5208A9
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 14:57:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DYaAIFw7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EA7D207E8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LTdHYoAH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEBF5208A9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0nHJ-0002Lx-OY
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:41:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34334)
+	id 1k0nVx-0007hc-0y
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 10:57:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k0nGQ-0001Oe-1s
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:41:02 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21422
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k0nVH-0006zw-41
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:56:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53145
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k0nGO-0003iO-AO
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:41:01 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k0nVE-000627-Ay
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 10:56:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596033659;
+ s=mimecast20190719; t=1596034578;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=dldRjVj3WzIQ43MNWIxVC2TaFtT1MfQvTXgUszV2Xto=;
- b=DYaAIFw7Hm724C/ntKMI/eOV5Vp+AakYtY8qFm3dGpkvruWFKFkKxQRFJtSNhfEnk92meR
- pEqWnKSLfCYWZRcxE3DNEHQBOc2b38aQI+T5IEO2GEqIsbZG0Fgfj3xn10HOqg2AsENqrU
- dZTQr4QH7JnFO0jBQ0B3CO2ZRsgbP04=
+ bh=kiXoj/CPJK2G/4VRLgNBz+AF/9chIgMHMotpmJmNCtw=;
+ b=LTdHYoAHtpFc/CnwbHl0z91jtMMCjs45b3doCxNlhDNNNAiDcbuKAmgI1+i35+8tXvVugx
+ vIqfzSOnZAzhhm2UCPzMsIUwWQQ04rCK0ocxQvY6ViPGI2vUIIa19ze6qB5Uba6atwGeqa
+ xfbZKYomjSTWNk3r5jwoqH4Z6R+mvJo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-r5NjES9UOICIwZqdHh-dYQ-1; Wed, 29 Jul 2020 10:40:55 -0400
-X-MC-Unique: r5NjES9UOICIwZqdHh-dYQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-292-pS1t0dpINHa6njfK02iE9Q-1; Wed, 29 Jul 2020 10:56:14 -0400
+X-MC-Unique: pS1t0dpINHa6njfK02iE9Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C41380183C;
- Wed, 29 Jul 2020 14:40:54 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 256895C1BD;
- Wed, 29 Jul 2020 14:40:52 +0000 (UTC)
-Date: Wed, 29 Jul 2020 16:40:50 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 3/3] hw/arm/virt: Implement kvm-steal-time
-Message-ID: <20200729144050.pzl4t3pnpt2zg36u@kamzik.brq.redhat.com>
-References: <20200711101033.47371-1-drjones@redhat.com>
- <20200711101033.47371-4-drjones@redhat.com>
- <CAFEAcA_GGVyjV_avxAfrRKnF72mxXEEf=J34aq-L8yMnLndigg@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E8CB8035B2;
+ Wed, 29 Jul 2020 14:55:36 +0000 (UTC)
+Received: from localhost (ovpn-112-185.ams2.redhat.com [10.36.112.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B12AB709F5;
+ Wed, 29 Jul 2020 14:55:35 +0000 (UTC)
+Date: Wed, 29 Jul 2020 15:55:34 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH for 5.1] docs: fix trace docs build with sphinx 3.1.1
+Message-ID: <20200729145534.GH52286@stefanha-x1.localdomain>
+References: <20200714162659.1017432-1-berrange@redhat.com>
+ <20200729103719.GD37763@stefanha-x1.localdomain>
+ <20200729113415.GB3451141@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_GGVyjV_avxAfrRKnF72mxXEEf=J34aq-L8yMnLndigg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200729113415.GB3451141@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="rCwQ2Y43eQY6RBgR"
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:18:45
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:17:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -82,7 +83,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,93 +96,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Beata Michalska <beata.michalska@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 21, 2020 at 11:46:12AM +0100, Peter Maydell wrote:
-> > +    if (!probed) {
-> > +        probed = true;
-> > +        if (kvm_check_extension(kvm_state, KVM_CAP_VCPU_ATTRIBUTES)) {
-> > +            if (!kvm_arm_create_scratch_host_vcpu(NULL, fdarray, NULL)) {
-> > +                error_report("Failed to create scratch VCPU");
-> > +                abort();
-> > +            }
-> > +
-> > +            has_steal_time = kvm_device_check_attr(fdarray[2],
-> > +                                                   KVM_ARM_VCPU_PVTIME_CTRL,
-> > +                                                   KVM_ARM_VCPU_PVTIME_IPA);
-> > +
-> > +            kvm_arm_destroy_scratch_host_vcpu(fdarray);
-> 
-> I was a bit surprised that we create a scratch VCPU here, but
-> it looks like we've opted for "create scratch VCPU, check specific
-> detail, destroy VCPU" as the usual coding pattern rather than trying
-> to coalesce into a single "create scratch VCPU once, cache all
-> the info we might need for later". I guess if somebody (a) cares
-> about startup performance and (b) finds through profiling that
-> creation-and-destruction of the scratch VMs/VCPUs is a significant
-> contributor they can write the refactoring themselves :-)
+--rCwQ2Y43eQY6RBgR
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-There's still a chance I'll be changing this to a KVM CAP if the KVM
-maintainers accept the patch I proposed to add one.
+On Wed, Jul 29, 2020 at 12:34:15PM +0100, Daniel P. Berrang=E9 wrote:
+> On Wed, Jul 29, 2020 at 11:37:19AM +0100, Stefan Hajnoczi wrote:
+> > On Tue, Jul 14, 2020 at 05:26:59PM +0100, Daniel P. Berrang=E9 wrote:
+> > > In Fedora 33 rawhide, we now have sphinx 3.1.1, as opposed
+> > > to previous 2.2.2. This new version generates a warning on
+> > > the source:
+> > >=20
+> > > docs/qemu-option-trace.rst.inc:4:Malformed option description
+> > >   '[enable=3D]PATTERN', should look like "opt", "-opt args",
+> > >   "--opt args", "/opt args" or "+opt args"
+> > >=20
+> > > This turns into an error when QEMU passes -W to sphinx-build
+> > >=20
+> > > Strangely the previous 2.2.2 code has the exact same logic
+> > > for checking the syntax, but it is not being triggered. While
+> > > it is only complaining about the first option, I changed all
+> > > the options to give consistency.
+> > >=20
+> > > Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+> > > ---
+> > >  docs/qemu-option-trace.rst.inc | 6 +++---
+> > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >=20
+> > Thanks, applied to my tracing tree:
+> > https://github.com/stefanha/qemu/commits/tracing
+>=20
+> I'm not sure this is a good idea to queue it, based on the other
+> part of this thread about incompatibilities with differnet sphinx
+> versions, and the patchew failures.
+>=20
+> I don't have a answer for how to fix this to make every versions happy.
 
-> 
-> > +        }
-> > +    }
-> > +
-> > +    if (cpu->kvm_steal_time == ON_OFF_AUTO_AUTO) {
-> > +        if (!has_steal_time || !arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-> > +            cpu->kvm_steal_time = ON_OFF_AUTO_OFF;
-> > +        } else {
-> > +            cpu->kvm_steal_time = ON_OFF_AUTO_ON;
-> > +        }
-> > +    } else if (cpu->kvm_steal_time == ON_OFF_AUTO_ON) {
-> > +        if (!has_steal_time) {
-> > +            error_setg(errp, "'kvm-steal-time' cannot be enabled "
-> > +                             "on this host");
-> > +            return;
-> > +        } else if (!arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-> > +            error_setg(errp, "'kvm-steal-time' cannot be enabled "
-> > +                             "for AArch32 guests");
-> 
-> Why not? Unlike aarch32-host KVM, aarch32-guest KVM is
-> still supported. What's the missing piece for kvm-steal-time
-> to work in that setup?
+Yes, thanks. I was playing around with it and considering Sphinx
+suppress_warnings.
 
-The specification. DEN0057A chapter 2 says "This specification only covers
-systems in which the Execution state of the hypervisor as well as EL1 of
-virtual machines is AArch64.". And, to ensure that the smc/hvc calls are
-only specified as smc64/hvc64. I find that a bit disappointing, since
-there's nothing about steal-time that should be 64-bit specific, but
-that's how this cookie is crumbling...
+Let's leave this patch for QEMU 5.1. Fedora rawhide is cutting-edge and
+has a smaller userbase than those using older Sphinx versions. At the
+moment we can keep the code as-is.
 
-I'll add a comment to explain this error for v2.
+Stefan
 
-> 
-> > +            return;
-> > +        }
-> > +    }
-> > +}
-> > +
-> >  bool kvm_arm_aarch32_supported(void)
-> >  {
-> >      return kvm_check_extension(kvm_state, KVM_CAP_ARM_EL1_32BIT);
-> 
-> >  static inline void kvm_arm_add_vcpu_properties(Object *obj) {}
-> > +static inline void kvm_arm_steal_time_finalize(ARMCPU *cpu, Error **errp) {}
-> 
-> Does this stub need to report an error to the caller via errp,
-> or is it a "never called but needs to exist to avoid linker errors" ?
+--rCwQ2Y43eQY6RBgR
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The second one, as we can't have kvm_enabled() and !defined(CONFIG_KVM).
-Hmm, these types of stubs would be more robust to refactoring if we put
-build bugs in them. I can try to analyze all the stubs in this #else to
-see which ones should be returning false/error/nothing vs. build bugging.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
-drew
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8hjeYACgkQnKSrs4Gr
+c8i6JQf9H0dj+QtU4QeZbMXbp9tPDAfPBJPOf1itw81TisytkLxdhW33jMDjwK72
+NQvxF4c9CNWIOvmBsBfamdDJa2ucCBoKojaOOQ/+q8MfWMC69jnlOws0iDGL8bMe
+pY/ovd064c9hZNuRycUAEltZllWuVAmlCwKRtoV+uV7XjEPZQu6CJyuAFC6k1CGt
+j7qVsnstt6FybZBVH17Hf6dEq+t+DnKPp9z8QaN+Lb0QW7reCqIEcXewuRhouO/2
+TgcQFOTwdDUEkyM2arRzaG/37sBbTsQhp0fRtM7FEvR2CRfzXOBuY+xH1LwbjW11
+o6haM0CRvjbOOqg50nOd7ykZA0Vziw==
+=3qGf
+-----END PGP SIGNATURE-----
+
+--rCwQ2Y43eQY6RBgR--
 
 
