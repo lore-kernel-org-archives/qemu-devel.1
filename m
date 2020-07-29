@@ -2,70 +2,86 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4E9C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98F16C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:17:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 379B120656
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:17:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60D1720656
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 22:17:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="TS9+H+kM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 379B120656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V7584BNV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60D1720656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0uNl-0007XJ-ET
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:17:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53916)
+	id 1k0uOJ-0000Ow-MF
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 18:17:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1k0uED-0007iU-Aw; Wed, 29 Jul 2020 18:07:13 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:34778)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1k0uEA-00005o-UU; Wed, 29 Jul 2020 18:07:12 -0400
-Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id C145DBFD63;
- Wed, 29 Jul 2020 22:06:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
- s=default; t=1596060408;
- bh=eNlataF+0J7DJqtc2N5ssxzGdukz9hyR6Q933SUCGV4=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=TS9+H+kMAUfTx7pBvfs8hiubYjAZaORVc8D+4yHjIXzd8e1Bm4sYe1WEsoe7jsB2G
- Os8HBlOT282lPZTSByhAXBsN/cvNC9ziayR3hAS7R5i8yW26FVW420oCSr1dLQtHpS
- 0OD1qkQQ+wqoCARQXZUKh+L5dxFTVDSTXEcbk48UvaHuRk6mwC5eVudR5v9Lgod1J2
- 6E2iSFaa/2SX9dAwNkoqnTiw4EyJ+A9YxcmNVo/cMmu2C7xn99T5MFrIxO2WsVZOqk
- VA66UAb4IOB2rSwR7nI7Hnfk18ZSy65rhB2staO0mn0Mxn3u1qfPjpXKVdBx0/vdWv
- DOc7yY2JHWeaw==
-From: Klaus Jensen <its@irrelevant.dk>
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k0uLV-0003eu-Ot
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 18:14:45 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34041
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k0uLS-0001B2-E3
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 18:14:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596060880;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cW1Fv6F+zfd8ts97DlbbgwPQ6AYGjGluPWGyzh4qrh8=;
+ b=V7584BNV5ZHaQErY4Pu0opiK/IVxiQCqnb4R6C7Fpz9izO4FeRhSVTnzMVMPWtzMee3r8d
+ LdH/4SOlUPnWCSQgZ59LpQ/E8hgI7x06G37KHbi4oKt6To4YzoH8xKxRmkXg2rFLK6kEis
+ oM4xZMeJx1a0PCS+GWR1P5GAblt2Bfo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-497-vlZ7nJAQMDaErwEzaI8RoQ-1; Wed, 29 Jul 2020 18:14:38 -0400
+X-MC-Unique: vlZ7nJAQMDaErwEzaI8RoQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7FF458
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 22:14:37 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-116-149.rdu2.redhat.com [10.10.116.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4631710013C4;
+ Wed, 29 Jul 2020 22:14:32 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id CCC32223D06; Wed, 29 Jul 2020 18:14:31 -0400 (EDT)
+From: Vivek Goyal <vgoyal@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/16] hw/block/nvme: be consistent about zeros vs zeroes
-Date: Thu, 30 Jul 2020 00:06:34 +0200
-Message-Id: <20200729220638.344477-13-its@irrelevant.dk>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200729220638.344477-1-its@irrelevant.dk>
-References: <20200729220638.344477-1-its@irrelevant.dk>
+Subject: [PATCH 3/5] virtiofsd: open /proc/self/fd/ in sandbox=NONE mode
+Date: Wed, 29 Jul 2020 18:14:08 -0400
+Message-Id: <20200729221410.147556-4-vgoyal@redhat.com>
+In-Reply-To: <20200729221410.147556-1-vgoyal@redhat.com>
+References: <20200729221410.147556-1-vgoyal@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 14:23:15
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 13:17:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,109 +94,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
- Andrzej Jakowski <andrzej.jakowski@linux.intel.com>,
- Minwoo Im <minwoo.im.dev@gmail.com>, Keith Busch <kbusch@kernel.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: berrange@redhat.com, vromanso@redhat.com, dgilbert@redhat.com,
+ virtio-fs@redhat.com, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Klaus Jensen <k.jensen@samsung.com>
+We need /proc/self/fd descriptor even in sandbox=NONE mode.
 
-The NVM Express specification generally uses 'zeroes' and not 'zeros',
-so let us align with it.
-
-Cc: Fam Zheng <fam@euphon.net>
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
 ---
- block/nvme.c         | 4 ++--
- hw/block/nvme.c      | 8 ++++----
- include/block/nvme.h | 4 ++--
- 3 files changed, 8 insertions(+), 8 deletions(-)
+ tools/virtiofsd/passthrough_ll.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index c1c4c07ac6cc..05485fdd1189 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -537,7 +537,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-                           s->page_size / sizeof(uint64_t) * s->page_size);
- 
-     oncs = le16_to_cpu(idctrl->oncs);
--    s->supports_write_zeroes = !!(oncs & NVME_ONCS_WRITE_ZEROS);
-+    s->supports_write_zeroes = !!(oncs & NVME_ONCS_WRITE_ZEROES);
-     s->supports_discard = !!(oncs & NVME_ONCS_DSM);
- 
-     memset(resp, 0, 4096);
-@@ -1201,7 +1201,7 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
-     }
- 
-     NvmeCmd cmd = {
--        .opcode = NVME_CMD_WRITE_ZEROS,
-+        .opcode = NVME_CMD_WRITE_ZEROES,
-         .nsid = cpu_to_le32(s->nsid),
-         .cdw10 = cpu_to_le32((offset >> s->blkshift) & 0xFFFFFFFF),
-         .cdw11 = cpu_to_le32(((offset >> s->blkshift) >> 32) & 0xFFFFFFFF),
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 60034ea62ca8..2acde838986c 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -616,7 +616,7 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     return NVME_NO_COMPLETE;
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index cd91c4a831..76ef891105 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -2969,6 +2969,15 @@ static void setup_capabilities(char *modcaps_in)
+     pthread_mutex_unlock(&cap.mutex);
  }
  
--static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-+static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-     NvmeRequest *req)
- {
-     NvmeRwCmd *rw = (NvmeRwCmd *)cmd;
-@@ -716,8 +716,8 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-     switch (cmd->opcode) {
-     case NVME_CMD_FLUSH:
-         return nvme_flush(n, ns, cmd, req);
--    case NVME_CMD_WRITE_ZEROS:
--        return nvme_write_zeros(n, ns, cmd, req);
-+    case NVME_CMD_WRITE_ZEROES:
-+        return nvme_write_zeroes(n, ns, cmd, req);
-     case NVME_CMD_WRITE:
-     case NVME_CMD_READ:
-         return nvme_rw(n, ns, cmd, req);
-@@ -2337,7 +2337,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     id->sqes = (0x6 << 4) | 0x6;
-     id->cqes = (0x4 << 4) | 0x4;
-     id->nn = cpu_to_le32(n->num_namespaces);
--    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP |
-+    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROES | NVME_ONCS_TIMESTAMP |
-                            NVME_ONCS_FEATURES);
++static void setup_none(struct lo_data *lo)
++{
++    lo->proc_self_fd = open("/proc/self/fd", O_PATH);
++    if (lo->proc_self_fd == -1) {
++        fuse_log(FUSE_LOG_ERR, "open(\"/proc/self/fd\", O_PATH): %m\n");
++        exit(1);
++    }
++}
++
+ /*
+  * Use chroot as a weaker sandbox for environments where the process is
+  * launched without CAP_SYS_ADMIN.
+@@ -3014,8 +3023,10 @@ static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
+     if (lo->sandbox == SANDBOX_NAMESPACE) {
+         setup_namespaces(lo, se);
+         setup_mounts(lo->source);
+-    } else {
++    } else if (lo->sandbox == SANDBOX_CHROOT) {
+         setup_chroot(lo);
++    } else {
++        setup_none(lo);
+     }
  
-     subnqn = g_strdup_printf("nqn.2019-08.org.qemu:%s", n->params.serial);
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 370df7fc0570..65e68a82c897 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -460,7 +460,7 @@ enum NvmeIoCommands {
-     NVME_CMD_READ               = 0x02,
-     NVME_CMD_WRITE_UNCOR        = 0x04,
-     NVME_CMD_COMPARE            = 0x05,
--    NVME_CMD_WRITE_ZEROS        = 0x08,
-+    NVME_CMD_WRITE_ZEROES       = 0x08,
-     NVME_CMD_DSM                = 0x09,
- };
- 
-@@ -838,7 +838,7 @@ enum NvmeIdCtrlOncs {
-     NVME_ONCS_COMPARE       = 1 << 0,
-     NVME_ONCS_WRITE_UNCORR  = 1 << 1,
-     NVME_ONCS_DSM           = 1 << 2,
--    NVME_ONCS_WRITE_ZEROS   = 1 << 3,
-+    NVME_ONCS_WRITE_ZEROES  = 1 << 3,
-     NVME_ONCS_FEATURES      = 1 << 4,
-     NVME_ONCS_RESRVATIONS   = 1 << 5,
-     NVME_ONCS_TIMESTAMP     = 1 << 6,
+     setup_seccomp(enable_syslog);
 -- 
-2.27.0
+2.25.4
 
 
