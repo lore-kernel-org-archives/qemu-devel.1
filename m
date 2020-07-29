@@ -2,95 +2,89 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D559C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C35C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:51:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57FD72076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8EB4C2075D
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 08:51:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GOx1VJS8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57FD72076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aGYBwONq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EB4C2075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0hmc-0007wW-MB
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 04:49:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59684)
+	id 1k0hnv-000114-Qs
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 04:51:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dmitry.fleytman@gmail.com>)
- id 1k0hl1-0006RC-LL
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:48:16 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:44525)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dmitry.fleytman@gmail.com>)
- id 1k0hky-0004Xj-Ny
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:48:14 -0400
-Received: by mail-ed1-x541.google.com with SMTP id l23so3120328edv.11
- for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 01:48:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=S0TE4Jdp2+O1lgoO241QABTtlDNWoL5nAwuUdzS2LB0=;
- b=GOx1VJS8SSifyo5uT9KEz1eRGCT3b651dpAKbhFvUzDYA8T4RS/NeFTMZjtzkp2KqR
- PuHsTAeqdFeN1w4fBHEdSHR+1j/9iIlZjyN1oXagRkUJHMO70InbhMZMTMuOj2vTEUAZ
- YT24jzgT3kwTS8C4yGM68qOpo5ek7kvJRoqzNzXxq3/4Mjujb1tQdmyPT4HySRti8N1I
- /J5ijsN+YataYLT01UKs5I7p0lJqCaz/ldFieHE2NIBPkooxIpSwTlANtVcZ3tUeIhW/
- memoCb1sQGPCiPFDCY2KOtdDkvuO9p5yPSDWz8Hm242ZVBcsa2VuavDEJhmZ5r32v2D1
- 3tMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=S0TE4Jdp2+O1lgoO241QABTtlDNWoL5nAwuUdzS2LB0=;
- b=gANrPULwwlas5c6tqpdsVWOrhGfOtflnzAsYwSD9yHkzB2Hx6hBa8XuexvpfWeoOB3
- 6I/klnET00RN2vjfR7cb3XYazggwd3qohGfRjrDbvufNqDw1zjUXOuDploY5R2gZ5IgR
- MKgnqXTj8cXyGfV0HiAVOhP+9lMaqDBueGhXuAzQJCpEP2FRj/jgdeHCwDeD+7Hp6dcN
- S/GuIFe6Wxvm9rzS16rbPVu/Vq+mhsOoM0M6P7CnsC87kTblKn+O/IVxtd5S8ACi4E+9
- /IFQoBMCNYfps3f+7q4DfUfA8tV4tDjd+OJgqiIKa9KmcWXwVVm2r+egqEmrWmr2o1uo
- g1LA==
-X-Gm-Message-State: AOAM533OGjurJOixTksYAbsSXReOYwtYpjBriAdx0fuVHS7P5Te2+cF3
- 8FAHmkHVuzeyQXW4yK/3sWM=
-X-Google-Smtp-Source: ABdhPJy9gInyQ+K7uZWngudVQqjoOJDGlCD+w7WDZPaIIEqb6GwbcFcjjcJV/1ILbyUcxLgPPVnLqw==
-X-Received: by 2002:aa7:d88e:: with SMTP id u14mr30431017edq.11.1596012490707; 
- Wed, 29 Jul 2020 01:48:10 -0700 (PDT)
-Received: from [10.0.1.16] ([141.226.29.227])
- by smtp.gmail.com with ESMTPSA id q21sm1010128ejr.75.2020.07.29.01.48.09
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 29 Jul 2020 01:48:10 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Re: [PATCH 0/2] assertion failure in net_tx_pkt_add_raw_fragment() in
- hw/net/net_tx_pkt.c
-From: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-In-Reply-To: <20200727172929.5nnasrbvp2gg3yyv@mozz.bu.edu>
-Date: Wed, 29 Jul 2020 11:48:08 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <AA604F63-C36B-471C-9E0C-F9A84C9595BA@gmail.com>
-References: <20200727170838.1101775-1-mcascell@redhat.com>
- <20200727172929.5nnasrbvp2gg3yyv@mozz.bu.edu>
-To: Alexander Bulekov <alxndr@bu.edu>
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=dmitry.fleytman@gmail.com; helo=mail-ed1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1k0hmp-0008Jb-2N
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:50:07 -0400
+Received: from us-smtp-delivery-74.mimecast.com ([63.128.21.74]:33649)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1k0hmQ-0004fc-IV
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 04:50:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596012581;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zG7ZYqYYb9OhHv2XutuH2lNCHj4hL+N8G0RxXiOb9so=;
+ b=aGYBwONqgNh4bnV/XflvxsOebL+yprK/dvHT1Hv30mLfhEN19hQLrIXiAw8ZXJTJLszVNe
+ 8x0ZNJk5X4Lz7y9E+AwJp2gJN59EaTzubKyF3sEYB2KTIHVryod/ufP4L30auA5Q0BXT8T
+ P6Uhu+OYU3CeZsljwCvgJZCrW8B98Ts=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-u1GUgba_PkycM5KOkIuxqQ-1; Wed, 29 Jul 2020 04:49:39 -0400
+X-MC-Unique: u1GUgba_PkycM5KOkIuxqQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64C1580046C;
+ Wed, 29 Jul 2020 08:49:38 +0000 (UTC)
+Received: from starship (unknown [10.35.206.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C790B10098AE;
+ Wed, 29 Jul 2020 08:49:35 +0000 (UTC)
+Message-ID: <48b2a22842b851f8052ee0e20f6bfbf02abf2a0e.camel@redhat.com>
+Subject: Re: [PATCH v3 02/18] hw/block/nvme: fix missing endian conversion
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Klaus Jensen <its@irrelevant.dk>, qemu-block@nongnu.org
+Date: Wed, 29 Jul 2020 11:49:34 +0300
+In-Reply-To: <20200706061303.246057-3-its@irrelevant.dk>
+References: <20200706061303.246057-1-its@irrelevant.dk>
+ <20200706061303.246057-3-its@irrelevant.dk>
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.74; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-74.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 01:09:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,82 +97,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>,
- Mauro Matteo Cascella <mcascell@redhat.com>, qemu-devel@nongnu.org,
- ezrakiez@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Dmitry Fomichev <Dmitry.Fomichev@wdc.com>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Javier Gonzalez <javier.gonz@samsung.com>,
+ Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+On Mon, 2020-07-06 at 08:12 +0200, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
+> 
+> Fix a missing cpu_to conversion by moving conversion to just before
+> returning instead.
+> 
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  hw/block/nvme.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 71b388aa0e20..766cd5b33bb1 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -815,8 +815,8 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          trace_pci_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
+>          break;
+>      case NVME_NUMBER_OF_QUEUES:
+> -        result = cpu_to_le32((n->params.max_ioqpairs - 1) |
+> -                             ((n->params.max_ioqpairs - 1) << 16));
+> +        result = (n->params.max_ioqpairs - 1) |
+> +            ((n->params.max_ioqpairs - 1) << 16);
+>          trace_pci_nvme_getfeat_numq(result);
+>          break;
+>      case NVME_TIMESTAMP:
+> @@ -826,7 +826,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+>          return NVME_INVALID_FIELD | NVME_DNR;
+>      }
+>  
+> -    req->cqe.result = result;
+> +    req->cqe.result = cpu_to_le32(result);
+>      return NVME_SUCCESS;
+>  }
+>  
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-The idea looks good to me. I believe it makes sense to do the check in =
-net_tx_pkt_add_raw_fragment() as suggested by Jason.
-
-> On 27 Jul 2020, at 20:29, Alexander Bulekov <alxndr@bu.edu> wrote:
->=20
-> I sent a reproducer for the to the list some time ago, but never =
-created
-> a Launchpad bug...
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg701930.html
->=20
-> Anyways.. I can confirm that I can't reproduce the issue with these
-> patches.
->=20
-> Minimized Reproducer:
-> cat << EOF | ./i386-softmmu/qemu-system-i386 -M pc-q35-5.0 -nographic =
-\
-> -display none -serial none -monitor none -qtest stdio
-> outl 0xcf8 0x80001010
-> outl 0xcfc 0xe1020000
-> outl 0xcf8 0x80001004
-> outw 0xcfc 0x7
-> write 0xe10207e8 0x4 0x25ff13ff
-> write 0xe10200b8 0x7 0xe3055e411b0202
-> write 0xe1020100 0x5 0x5e411b0202
-> write 0xe1020110 0x4 0x1b0202e1
-> write 0xe1020118 0x4 0x06fff105
-> write 0xe1020128 0x7 0xf3055e411b0202
-> write 0xe1020402 0x2 0x5e41
-> write 0xe1020420 0x4 0x1b0202e1
-> write 0xe1020428 0x4 0x06ff6105
-> write 0xe1020438 0x1 0x63
-> write 0xe1020439 0x1 0x05
-> EOF
->=20
-> -Alex
->=20
-> On 200727 1908, Mauro Matteo Cascella wrote:
->> An assertion failure issue was reported by Mr. Ziming Zhang (CC'd).
->> It occurs in the code that processes network packets while adding =
-data
->> fragments into packet context. This flaw could potentially be abused =
-by
->> a malicious guest to abort the QEMU process on the host. This two =
-patch
->> series does a couple of things:
->>=20
->> - introduces a new function in net_tx_pkt.{c,h} to check the maximum =
-number
->>  of data fragments
->> - adds a check in both e1000e and vmxnet3 devices to skip the packet =
-if the
->>  current data fragment exceeds max_raw_frags, preventing
->>  net_tx_pkt_add_raw_fragment() to be called with an invalid raw_frags
->>=20
->> Mauro Matteo Cascella (2):
->>  hw/net/net_tx_pkt: add function to check pkt->max_raw_frags
->>  hw/net: check max_raw_frags in e1000e and vmxnet3 devices
->>=20
->> hw/net/e1000e_core.c | 3 ++-
->> hw/net/net_tx_pkt.c  | 5 +++++
->> hw/net/net_tx_pkt.h  | 8 ++++++++
->> hw/net/vmxnet3.c     | 3 ++-
->> 4 files changed, 17 insertions(+), 2 deletions(-)
->>=20
->> --=20
->> 2.26.2
->>=20
->>=20
+Best regards,
+	Maxim Levitsky
 
 
