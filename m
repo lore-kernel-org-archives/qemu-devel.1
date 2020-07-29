@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B25C6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 15:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5757C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 15:57:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EFA6207E8
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 15:56:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 72BF0206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 15:57:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="siJDtlbl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EFA6207E8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FkllsY7a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72BF0206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0oRI-0003VJ-PD
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 11:56:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54104)
+	id 1k0oS5-0004Ti-Q8
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 11:57:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
- id 1k0oPf-0001O5-3d; Wed, 29 Jul 2020 11:54:39 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:40272)
+ id 1k0oRC-0003ZY-O2; Wed, 29 Jul 2020 11:56:14 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42262)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
- id 1k0oPd-00089d-49; Wed, 29 Jul 2020 11:54:38 -0400
-Received: by mail-pf1-x442.google.com with SMTP id k18so5909079pfp.7;
- Wed, 29 Jul 2020 08:54:36 -0700 (PDT)
+ id 1k0oRB-0000EW-8N; Wed, 29 Jul 2020 11:56:14 -0400
+Received: by mail-pf1-x444.google.com with SMTP id b186so2859418pfb.9;
+ Wed, 29 Jul 2020 08:56:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=DIIqYw1vKbqkfLYITP+1Dw+n1rUSkWxElKkba4zENuo=;
- b=siJDtlblDo1kderRSTKgM4dX1r4/uCZo8Up4KbIFA8WziLs2mpuMZ/qCwW+ruKEMsc
- dNRJkxaho4wWmKvEj5Dau9sG4xfCRa+gQYeFL9pRRdMOetdauhA0nkN4Ro5HvFaHGlpx
- riH6SGqhMFUFx5558BSlMBIbyDeraYUglBu3j81Q/WGQlvclNbkNAw1bxGrVylKt8VK/
- dmj2lhXBT+yOT8R7o4C0cXCbf+A6WvXnoG0uxZSZHxli9omxLXUiIWWzcUJnL2x9uULj
- CqaGVMBiOvtTk4j+03eywbiXKwRHbUQ+GWX58qX9Xw2ns9hB86XALigj1Vl7Hsc1D2af
- 2LQQ==
+ bh=3pY1fcqXml+zGmGu6FSlfZAfCy8bJNq/iyWk9Dm9U6c=;
+ b=FkllsY7aD5NCo4M4VY8yhu7lzBgpBcnRTM5HnamN3Si2qKmP3uUXwAGGlFhXGHRnGr
+ XcZkaygmb0DlBnvSSPa98GqP7Bd3JwyQwO4sPBg9V6E7navyLBKD1LhqD+bjMPD3SFbm
+ Xez4ln8EuKQFpRFDXk3+tZ4IUNQD1D+Hl3ANyBHorwtqlYmOf+Vp/UBjHBbzDf9jGlI/
+ fi4cNyIxOL/ZXlncKwzlobElbp5S2v39h10g3pWMWKcA02ayqxgHqi4C1d/er1X+oJpf
+ g0keCUoHJZvGsdIk+5buCca8qVKgA5KWUAqyemhUZkmJsNaGxxcCwrEGdh0zjsTe2PCE
+ Y9vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=DIIqYw1vKbqkfLYITP+1Dw+n1rUSkWxElKkba4zENuo=;
- b=Dbw9rQeKzlYxbNgOo8OQMkyEEsB/HUWBdiH1oApZnFojkiGNxCdTncFBAlm1wMHY/a
- eyG6vBHNe7ULOfpJG4je/wEIORuf+auNdVM7xIe4MmBNLZzf53ZAqcWmBoba6wQAbpt4
- BBum2HOLXEPDWbVeiDL6GtDQVrAD2eGQDNeVZjLf06ckQAMKTRY25+aY9Cz9X1bCux5M
- JQOuC4c11xdvdIs/qKRHthXJCLX9mcCsfqCg2TSrhMa+MjhHPeslDwG9Ss/7urCv5fyV
- lnqoFGm98Hw9OI77jiPDcCLJj6+JOfMQ8LWx9oWG8p6QymO+Aft82ghsbGNSIv8sRdT1
- IX8Q==
-X-Gm-Message-State: AOAM533oLXlt6YzNVtJSbkb7IpMzZpW8lhLWW5uPB1GwmNptNd52c4FY
- l0PO50VyuDtWmZGuaRNib8c=
-X-Google-Smtp-Source: ABdhPJyDi2LRIDzNKZQDMr108LiTV08HRAPv9QpK0sHHjjsjp3koOnZugSJzYr3GRdeZ1pCjohuJRg==
-X-Received: by 2002:a63:135b:: with SMTP id 27mr30814504pgt.37.1596038075124; 
- Wed, 29 Jul 2020 08:54:35 -0700 (PDT)
+ bh=3pY1fcqXml+zGmGu6FSlfZAfCy8bJNq/iyWk9Dm9U6c=;
+ b=SUxwECfew8CYQGcpPhSznzqbwZ99eYimc978FWRqiikszp7YGdyews/j6J4i3Lclj5
+ 4VLlviDFeJQi4UQSJZ7Tqh7LfXENnG61K8C53MTBta0/zhVgkuRBfSXPvm2ochzcvUE9
+ km/fICZvwnZU8BVIeTzt6xwC2XdIaj3+eFcCXCk5DZLZyCSl79s2zDKwuVw3PVJy67wa
+ yIE9Izadnk9p6MsKIKTYzxa05gaq4MwUS+3HY/ukrPmtJ7XoOwhY6borFxMY8wOSLn6n
+ 1NwWt7YyrNFSSSEc/M4U10LU3QE3DzOY9N007+afagKBVM1y/8EGb2g9R0cQlWvAOEjb
+ FQJQ==
+X-Gm-Message-State: AOAM530evScN0V0ZjTbxTZBVM0dRG5M/Xg/CIyLQdn/xT6HgiiDA5mH8
+ JWyLpDjACNzaH77dqo+ohss=
+X-Google-Smtp-Source: ABdhPJwZcjXI/67u4nOvDDL/azF3DcZQ+USARUiI9pQe2gDG94IR7loAIkbDdd+M8pGjsjwnKmd9dw==
+X-Received: by 2002:aa7:83c9:: with SMTP id j9mr18690220pfn.151.1596038171712; 
+ Wed, 29 Jul 2020 08:56:11 -0700 (PDT)
 Received: from localhost ([211.108.35.36])
- by smtp.gmail.com with ESMTPSA id n9sm2577877pjo.53.2020.07.29.08.54.34
+ by smtp.gmail.com with ESMTPSA id y8sm2740830pjj.17.2020.07.29.08.56.10
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 29 Jul 2020 08:54:34 -0700 (PDT)
-Date: Thu, 30 Jul 2020 00:54:32 +0900
+ Wed, 29 Jul 2020 08:56:11 -0700 (PDT)
+Date: Thu, 30 Jul 2020 00:56:09 +0900
 From: Minwoo Im <minwoo.im.dev@gmail.com>
 To: Klaus Jensen <its@irrelevant.dk>
-Subject: Re: [PATCH 08/16] hw/block/nvme: verify validity of prp lists in the
- cmb
-Message-ID: <20200729155432.GG14876@localhost.localdomain>
+Subject: Re: [PATCH 09/16] hw/block/nvme: refactor request bounds checking
+Message-ID: <20200729155609.GH14876@localhost.localdomain>
 References: <20200720113748.322965-1-its@irrelevant.dk>
- <20200720113748.322965-9-its@irrelevant.dk>
+ <20200720113748.322965-10-its@irrelevant.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200720113748.322965-9-its@irrelevant.dk>
+In-Reply-To: <20200720113748.322965-10-its@irrelevant.dk>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=minwoo.im.dev@gmail.com; helo=mail-pf1-x442.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=minwoo.im.dev@gmail.com; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,16 +107,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20-07-20 13:37:40, Klaus Jensen wrote:
+On 20-07-20 13:37:41, Klaus Jensen wrote:
 > From: Klaus Jensen <k.jensen@samsung.com>
 > 
-> Before this patch the device already supported PRP lists in the CMB, but
-> it did not check for the validity of it nor announced the support in the
-> Identify Controller data structure LISTS field.
-> 
-> If some of the PRPs in a PRP list are in the CMB, then ALL entries must
-> be there. This patch makes sure that requirement is verified as well as
-> properly announcing support for PRP lists in the CMB.
+> Hoist bounds checking into its own function and check for wrap-around.
 > 
 > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
