@@ -2,91 +2,115 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D9CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:03:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE826C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:04:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61894208A9
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:03:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A86E6206D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 16:04:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RAjlk1pL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61894208A9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LzY4RAVA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A86E6206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0oXn-00088s-HY
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:03:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55228)
+	id 1k0oZV-0002Rk-TX
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 12:04:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
- id 1k0oVL-0005Kj-ND; Wed, 29 Jul 2020 12:00:32 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33544)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
- id 1k0oVJ-0000Yx-9g; Wed, 29 Jul 2020 12:00:31 -0400
-Received: by mail-pg1-x544.google.com with SMTP id o13so14489581pgf.0;
- Wed, 29 Jul 2020 09:00:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=zm+QUKHk7VOjueDio0Cn0Fh1ie6WJIbJejq0zGGrBuE=;
- b=RAjlk1pLxWF6nwp8Fu1edcr5jBp3HJeXPKwJTfD0gchuAyIGtaJp3s0d83rZjsWOQH
- FvuxbQ6rO8NX6qvZXK89EY0WRge8UaIZhplJCMLsWhi8M9KorEQITJI9HUtm65kMYThm
- 07dEnHXWUaE/sZV5En7hC5I/IMayvzxTD0AJMIFUvMLB8AunJAdgOdobSm+6DFUbYfZm
- EbAZeRJlcSqnfbP/PGLpgnINvNaRawgYYFaJ2FTdDyKxLJ6eFGUBUmw0FHNGgBwilYp/
- /GbQN4qfPZTop7cEAiDt2Q9RNtLUsZGlunW8juYZE+mXcS53pWxgasy/TH2hEwhmtTHC
- UBMg==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k0oWT-0006NP-4O
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:01:41 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28923
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k0oWQ-0000qa-Md
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 12:01:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596038497;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=I8nUgHmZDHlcYcZgpKyAYpuwb4GCg6YuZRnvHKb6rPM=;
+ b=LzY4RAVAcseDFkD5U72UG+Un0W7f34I4V3wMja8o60CWkURV8AW+OLQgSxlYw+obofT9KL
+ w1xvPCAhmIU7MQG0LINQALUsOmnv5GYCTshEwFjVyRCjjw7UYw80bEHSbrq7JLQ5lBK7l2
+ 05fXrQ5gU4LPyJaWXt0KUCH00eqFReY=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-cjjoPsuMND6OUq7N9MQm2A-1; Wed, 29 Jul 2020 12:01:35 -0400
+X-MC-Unique: cjjoPsuMND6OUq7N9MQm2A-1
+Received: by mail-ej1-f70.google.com with SMTP id l18so8621912ejn.17
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 09:01:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=zm+QUKHk7VOjueDio0Cn0Fh1ie6WJIbJejq0zGGrBuE=;
- b=rZZs2rl8q756AhzVmc+aeTUSz4JO52ZK7eyMyWl6SG7ooaNmToM7/iGuLNwrPnXe8J
- DgVx5rcDnDYGtbkyMDgR5d13SX8FzuDmRpeCpsS3DUgz+rRi6wWi6b71wd5b1hlv79xD
- QwE39dtpnfU/wtz3d2TfiJ+1raKwE0C2MzqIEPv6rx8VhbnW/BYPOIcPNjTfK4I0upFf
- eDH2WOlnSG38cwRX/vuhbM9mLgW3WCHFfCzvsyzgsuPn/07tFh6mBpEK04w4OnQ+VEUQ
- qX/TE0jrL1VY5JKeRxCKCbkyM9L/6DdggV8kWyNOCbvDVdZUusgN9TWOtEn4RDAmIk82
- abag==
-X-Gm-Message-State: AOAM530PD190woqZhb4C2tW5ggWhN81ct4WpmcP1aOuaHQx7sOlYVetj
- 8MHd/wI2QbeEdSm4pDFqDZA=
-X-Google-Smtp-Source: ABdhPJzrYjBlARMrNDvHhyLrvKIq6ko4aBO90S4U9gRgidyp6uhbxtN0QGFHc3lzah/2wgEW31PzGg==
-X-Received: by 2002:a63:bf04:: with SMTP id v4mr30569225pgf.212.1596038427473; 
- Wed, 29 Jul 2020 09:00:27 -0700 (PDT)
-Received: from localhost ([211.108.35.36])
- by smtp.gmail.com with ESMTPSA id w18sm2830901pgj.31.2020.07.29.09.00.26
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 29 Jul 2020 09:00:27 -0700 (PDT)
-Date: Thu, 30 Jul 2020 01:00:24 +0900
-From: Minwoo Im <minwoo.im.dev@gmail.com>
-To: Klaus Jensen <its@irrelevant.dk>
-Subject: Re: [PATCH 10/16] hw/block/nvme: add check for mdts
-Message-ID: <20200729160024.GI14876@localhost.localdomain>
-References: <20200720113748.322965-1-its@irrelevant.dk>
- <20200720113748.322965-11-its@irrelevant.dk>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=I8nUgHmZDHlcYcZgpKyAYpuwb4GCg6YuZRnvHKb6rPM=;
+ b=oaRPMnWFwuFLnlluPwVX400rJPOT4YhYieXrU7RspPiwc5255vsoyCP51NcTtzEEZx
+ W+hBCX/MFDnKeeD8LDhAKT/Q6kpPphU0lDdEc/cnNv97noCAPcnVCFfi3R64a2chZzW5
+ r6rH4XMpFF6jR05YCc+cCyoSWvi0e6LMjAtXqTu1jYmzNfW/LsEvsECCWNx2ymOU2B4B
+ mrJjPhACo20PUyXN+IRYGa1VzZOmodym+3+Yb0Oz3O+8eDlh/EoaY83LIEiF3P1RyR0B
+ gpdQulm14Zu15e+9xO4+SOTy/aHgnUiBMu1J6GFVCk6VGnyx20NDlPnS5B9f1aoaWmfV
+ +BzA==
+X-Gm-Message-State: AOAM532nFP8ptR9Hi7De2VB4XdDUVbUydxmbVJdOznDzVnGw+5JehOg7
+ YbNmFNhfNNHkECDgjoGSKakc6kqIFUNWUNRZ86oXG0qIZOBGRRVkxne1VSTgZGwCPtUXi0RlVr7
+ czeH/unTNKnddI2Q=
+X-Received: by 2002:a17:906:b890:: with SMTP id
+ hb16mr21319837ejb.376.1596038493929; 
+ Wed, 29 Jul 2020 09:01:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyhlkmYIU4DDO03VWayNenOpUHWzy0IjLFMT/zgG0WRsEFx7sk1NfYJFoXYd1nv9pEZkeiVlw==
+X-Received: by 2002:a17:906:b890:: with SMTP id
+ hb16mr21319806ejb.376.1596038493654; 
+ Wed, 29 Jul 2020 09:01:33 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:101f:6e7:e073:454c?
+ ([2001:b07:6468:f312:101f:6e7:e073:454c])
+ by smtp.gmail.com with ESMTPSA id dc12sm1933349ejb.124.2020.07.29.09.01.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 29 Jul 2020 09:01:32 -0700 (PDT)
+Subject: Re: sysbus_create_simple Vs qdev_create
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <87tuy6k9pa.fsf@dusky.pond.sub.org>
+ <20200717162312.GR1274972@habkost.net> <87r1t6hc0f.fsf@dusky.pond.sub.org>
+ <20200720155955.GV1274972@habkost.net> <87v9ihbe6u.fsf@dusky.pond.sub.org>
+ <50e31ece-215c-a632-e5a2-86ae7ab3abab@redhat.com>
+ <87lfj4f6nz.fsf@dusky.pond.sub.org>
+ <759959d1-f320-734a-ac5e-a60db6b1bc23@redhat.com>
+ <20200728224733.GP225270@habkost.net>
+ <422d7879-3fdc-d38e-259f-2477b9d3c169@redhat.com>
+ <20200729143241.GS225270@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <78767e1f-4124-cb6e-ead6-25fd415027c7@redhat.com>
+Date: Wed, 29 Jul 2020 18:01:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
+In-Reply-To: <20200729143241.GS225270@habkost.net>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200720113748.322965-11-its@irrelevant.dk>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=minwoo.im.dev@gmail.com; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 09:18:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,147 +124,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Pratik Parvati <pratikp@vayavyalabs.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20-07-20 13:37:42, Klaus Jensen wrote:
-> From: Klaus Jensen <k.jensen@samsung.com>
+On 29/07/20 16:32, Eduardo Habkost wrote:
+> On Wed, Jul 29, 2020 at 11:54:35AM +0200, Paolo Bonzini wrote:
+>> On 29/07/20 00:47, Eduardo Habkost wrote:
+> [...]
+>>> Do we really need need QOM children to be accessible using the QOM
+>>> property API?
+>>>
+>>> Using the same code for both user-configurable properties and for
+>>> the list of children of a QOM object might have saved some time
+>>> years ago, but I'm not sure this is still a necessary or useful
+>>> abstraction.
+>>
+>> The main thing we get from it is that the QOM paths treat children and
+>> links the same, and links are properties.  To be honest it's not a
+>> feature that is very much developed, so perhaps we can remove it but we
+>> need to evaluate the impact of losing it.
 > 
-> Add 'mdts' device parameter to control the Maximum Data Transfer Size of
-> the controller and check that it is respected.
-> 
-> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  hw/block/nvme.c       | 32 ++++++++++++++++++++++++++++++--
->  hw/block/nvme.h       |  1 +
->  hw/block/trace-events |  1 +
->  3 files changed, 32 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 35bc1a7b7e21..10fe53873ae9 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -18,9 +18,10 @@
->   * Usage: add options:
->   *      -drive file=<file>,if=none,id=<drive_id>
->   *      -device nvme,drive=<drive_id>,serial=<serial>,id=<id[optional]>, \
-> - *              cmb_size_mb=<cmb_size_mb[optional]>, \
-> + *              [cmb_size_mb=<cmb_size_mb>,] \
->   *              [pmrdev=<mem_backend_file_id>,] \
-> - *              max_ioqpairs=<N[optional]>
-> + *              [max_ioqpairs=<N>,] \
-> + *              [mdts=<N>]
+> Are link properties usable by -device/device_add/-object/object-add?
 
-Nitpick:
-  cmb and ioqpairs-things could be in another thread. :)
+Not sure exactly what you mean, but there is DEFINE_PROP_LINK and it's
+used to link devices to objects.  Is it ever used with an actual path
+rather than just the id of something in /objects?  Probably not.
 
->   *
->   * Note cmb_size_mb denotes size of CMB in MB. CMB is assumed to be at
->   * offset 0 in BAR2 and supports only WDS, RDS and SQS for now.
-> @@ -553,6 +554,17 @@ static void nvme_clear_events(NvmeCtrl *n, uint8_t event_type)
->      }
->  }
->  
-> +static inline uint16_t nvme_check_mdts(NvmeCtrl *n, size_t len)
-> +{
-> +    uint8_t mdts = n->params.mdts;
-> +
-> +    if (mdts && len > n->page_size << mdts) {
-> +        return NVME_INVALID_FIELD | NVME_DNR;
-> +    }
-> +
-> +    return NVME_SUCCESS;
-> +}
-> +
->  static inline uint16_t nvme_check_bounds(NvmeCtrl *n, NvmeNamespace *ns,
->                                           uint64_t slba, uint32_t nlb)
->  {
-> @@ -646,6 +658,13 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
->  
->      trace_pci_nvme_rw(is_write ? "write" : "read", nlb, data_size, slba);
->  
-> +    status = nvme_check_mdts(n, data_size);
-> +    if (status) {
-> +        trace_pci_nvme_err_mdts(nvme_cid(req), data_size);
-> +        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
-> +        return status;
-> +    }
-> +
->      status = nvme_check_bounds(n, ns, slba, nlb);
->      if (status) {
->          trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
-> @@ -938,6 +957,7 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->      uint32_t numdl, numdu;
->      uint64_t off, lpol, lpou;
->      size_t   len;
-> +    uint16_t status;
->  
->      numdl = (dw10 >> 16);
->      numdu = (dw11 & 0xffff);
-> @@ -953,6 +973,12 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->  
->      trace_pci_nvme_get_log(nvme_cid(req), lid, lsp, rae, len, off);
->  
-> +    status = nvme_check_mdts(n, len);
-> +    if (status) {
-> +        trace_pci_nvme_err_mdts(nvme_cid(req), len);
-> +        return status;
-> +    }
-> +
->      switch (lid) {
->      case NVME_LOG_ERROR_INFO:
->          return nvme_error_info(n, cmd, rae, len, off, req);
-> @@ -2275,6 +2301,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
->      id->ieee[0] = 0x00;
->      id->ieee[1] = 0x02;
->      id->ieee[2] = 0xb3;
-> +    id->mdts = n->params.mdts;
->      id->ver = cpu_to_le32(NVME_SPEC_VER);
->      id->oacs = cpu_to_le16(0);
->  
-> @@ -2394,6 +2421,7 @@ static Property nvme_props[] = {
->      DEFINE_PROP_UINT16("msix_qsize", NvmeCtrl, params.msix_qsize, 65),
->      DEFINE_PROP_UINT8("aerl", NvmeCtrl, params.aerl, 3),
->      DEFINE_PROP_UINT32("aer_max_queued", NvmeCtrl, params.aer_max_queued, 64),
-> +    DEFINE_PROP_UINT8("mdts", NvmeCtrl, params.mdts, 7),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 5519b5cc7686..137cd8c2bf20 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -11,6 +11,7 @@ typedef struct NvmeParams {
->      uint32_t cmb_size_mb;
->      uint8_t  aerl;
->      uint32_t aer_max_queued;
-> +    uint8_t  mdts;
->  } NvmeParams;
->  
->  typedef struct NvmeAsyncEvent {
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index 6d0cd588c786..5d7d4679650b 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -85,6 +85,7 @@ pci_nvme_mmio_shutdown_set(void) "shutdown bit set"
->  pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
->  
->  # nvme traces for error conditions
-> +pci_nvme_err_mdts(uint16_t cid, size_t len) "cid %"PRIu16" len %"PRIu64""
->  pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
->  pci_nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null or not page aligned: 0x%"PRIx64""
->  pci_nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x%"PRIx64""
-> -- 
-> 2.27.0
-> 
-> 
+Paolo
 
-Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
-
-Thanks,
 
