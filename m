@@ -2,110 +2,146 @@ Return-Path: <SRS0=FCxk=BI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C951C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 11:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 901CAC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 11:31:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28FCB2074B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 11:31:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AFD62074B
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 Jul 2020 11:31:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KfRrFGGx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28FCB2074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="i8Ftcq+z";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="pHQ9wABU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AFD62074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0kJG-0008Oh-E8
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 07:31:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44090)
+	id 1k0kJK-0008T2-FS
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 07:31:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
- id 1k0kHg-0006sT-Oj
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 07:30:08 -0400
-Received: from us-smtp-delivery-74.mimecast.com ([216.205.24.74]:54626)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
- id 1k0kHc-0001xw-R3
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 07:30:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596022201;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bRCwriZuya4PIqyCKK+++y6J/9RTsVsLdq/Wykb7orU=;
- b=KfRrFGGxf1rDwp6ZsScrnOySqXUcMaYxLzwjpHUfUDtaP6Py4vGcCYtKZ8kS14MY9pxguG
- YPi1m6hbNt5LUFGFBHj5f6f3ASbHXBxsvCzJ0E/k3j0he1vHVzoZFSSuQLWAXHgn+xiAdC
- H28aTruXhWGy+ccELee6BzhvCHeecAg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-v-U9TruMNK-LboWQN5GdWQ-1; Wed, 29 Jul 2020 07:28:51 -0400
-X-MC-Unique: v-U9TruMNK-LboWQN5GdWQ-1
-Received: by mail-wr1-f69.google.com with SMTP id f7so6556373wrs.8
- for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 04:28:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=bRCwriZuya4PIqyCKK+++y6J/9RTsVsLdq/Wykb7orU=;
- b=i0aT2rzDwprxdiqXRaKeRZODLPaheAYUe3nQNbK707prKRXo+S5IMO+YsVWfCmzjXX
- gKFP1bc4zUPzTa0TDr97X22o6aQ9G1yOodcJrbDBs12mYMnr3TmYYoXdzNCmi7u2FG0F
- wknhu+YhotKneOQzt+QTaY1K5n7e60srTu1wxwzcTk9Szm9LKCbh6g6XtZIOduk453Gi
- 81fbsmCiQBNj8EV3Uc5Un3HwO8VX4iAlmV+L01w5lbBXVehZLpAuasT26CGtO0zt4uVT
- aoVw/0tiFoiYH8EjFtiReZhW8JZPy2IrczdMT85w3qa3lMHLstdcY3LJGE0Y8Uy3WPsz
- bWew==
-X-Gm-Message-State: AOAM530YJ+DHBftEZ2IIpa2/3EXCzMvy4l78a2wiql+OuthVEHF+nUt1
- Yl88YGAh91QXpPxx3vzHQyRc06jz0zEBK4O5dcNS+bNOidzcIbME2PW5+XFXT98NKNc6h15m/Si
- JJPu/7ODViCdHQ0Q=
-X-Received: by 2002:a7b:ce04:: with SMTP id m4mr8106787wmc.1.1596022129929;
- Wed, 29 Jul 2020 04:28:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwZvgnBRnonp6o9AsWUWxKGzzu2XlLjhGEgh0vj0YKqRBTQggJO98+P6VhHPzbp4gCHeHsQag==
-X-Received: by 2002:a7b:ce04:: with SMTP id m4mr8106739wmc.1.1596022129417;
- Wed, 29 Jul 2020 04:28:49 -0700 (PDT)
-Received: from pop-os ([2001:470:1f1d:1ea:4fde:6f63:1f5a:12b1])
- by smtp.gmail.com with ESMTPSA id c194sm4994688wme.8.2020.07.29.04.28.47
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 29 Jul 2020 04:28:48 -0700 (PDT)
-Message-ID: <e8a973ea0bb2bc3eb15649fb1c44599ae3509e84.camel@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-From: Sean Mooney <smooney@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>, Alex Williamson
- <alex.williamson@redhat.com>
-Date: Wed, 29 Jul 2020 12:28:46 +0100
-In-Reply-To: <20200729080503.GB28676@joy-OptiPlex-7040>
-References: <20200713232957.GD5955@joy-OptiPlex-7040>
- <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
- <20200716083230.GA25316@joy-OptiPlex-7040>
- <20200717101258.65555978@x1.home>
- <20200721005113.GA10502@joy-OptiPlex-7040>
- <20200727072440.GA28676@joy-OptiPlex-7040>
- <20200727162321.7097070e@x1.home>
- <20200729080503.GB28676@joy-OptiPlex-7040>
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2
-Mime-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.74; envelope-from=smooney@redhat.com;
- helo=us-smtp-delivery-74.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 03:32:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <prvs=47218c038=Anup.Patel@wdc.com>)
+ id 1k0kGK-0005D5-4V; Wed, 29 Jul 2020 07:28:44 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:14630)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <prvs=47218c038=Anup.Patel@wdc.com>)
+ id 1k0kGI-0001pz-0I; Wed, 29 Jul 2020 07:28:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1596022121; x=1627558121;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:content-transfer-encoding:mime-version;
+ bh=3ovgoh9RYf9x+TXZWqjXqhdhVCBZC5tQzm8JwHuvwZA=;
+ b=i8Ftcq+zMYmTeNerMgPmWakB/v4q6Y2QRoBeYs1zV1RCTwP+IbBR0MMf
+ zJMCFe61nONh3CQM91PX5jh5x0BWnTQMdus3LRazkSpgaoOVvL9TevSq9
+ FybXrEdBHOUZf3waTA3A1gf1ckaceAokZENaxtvj5wvtHDEyJTeLIdJo+
+ zacjJYS8WNoZsUBsh0LmNRWFabhi9/SuoC00EDv/BrxPOp+1QZQSR7FvL
+ eGK4NRqFL7dn9lKjCWzQZKozJSWuLqlnGsjdT+AXJksZONBJfdgvqkVxe
+ +lxgugAZt/9Y72yOJRjkN7l9X4ug9/H39AXVxXeCZanad2X+2ygLXJOqO A==;
+IronPort-SDR: Uu+pcmRyLy+qVlbzzGurXQRluKS5YCflVJaI6GVreGcHebP5lA2e6hscHefKrwLBPo0yQCLTW4
+ K/NrdAsWply+YKGBi0cQbDtBrVlolnXNTos9WDkWobhf5GOSjPfOB7T+m5i4dBXk+79cQE7DaQ
+ SPesg5nDinnDWtYh+OpdP99U6yZFll+9WW7jo81/WswXi5IJwKjvgmI0fe7rg0XTHKpEwQgvZ3
+ P4CWGH9Wl47d51lr7b0F2Uievw/DMTHL719zzIKv9YIEkmQZ2RLDEvvhW0WvM63uxpw4gX/NTH
+ lms=
+X-IronPort-AV: E=Sophos;i="5.75,410,1589212800"; d="scan'208";a="143644194"
+Received: from mail-dm6nam12lp2168.outbound.protection.outlook.com (HELO
+ NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.168])
+ by ob1.hgst.iphmx.com with ESMTP; 29 Jul 2020 19:28:39 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=I4uYmPxCEmbfJMaKz/iNVGx2ZO0oLdoz7vv3EGKEzpMqyX2y6VBTprslcLbUTLMqkIAb+6/zricPeF+8XKKk+En0nmpl3qSDVpE256Ux5S0Uhi2xeHS5D+H3fb21BmRtq7Sj9RPuum2htcl475a1iR3HNCBBTsiibcF2VyBmaQqcRLKs5Qdf3nGbWlmDr+SCA8AY2fHfg/zwRbO9porJovjVJFPr9CG6zoHnwaC5cVPsML+YM2i+jH80fdqJQaZCYyw2Ry8RCYThYyusGuR/8/52LGf5ua21V5nKdjXUPNBC+wI+Kc0e2vut75QXXmg6EvvABKBYVhuMVLSlkXnBBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2zucbBLuhA++Js13w8UpK5p5c03btMirgbnWzE/10yg=;
+ b=nI/EB0jFCfz4e7/En1KAdFQJfmbCcO1u2Ljc7x4aF8UL8LCCXQVip+TL66Jfs1CwqSfbwnvWMBLy/1eg6ZTDpTUj+OMlIiOfIU1ln/laXDAUtVfxNnnBEA0lOW25CH2zCAp9o8S7QfLYrb2i0YDm3ARzIBV62S9ZG0Oqy4bAtZ2XNcY56bqIK7hPT6o6b2nng/WnPZujZoXX9NUjdBhmXvhH4KJt9WzoUQDqfloZKpUfyrWV8M8SuN4lfEGCLg+7pg9mNRWCiqp9vPoicL3DKZGLXPOSgtuQ2H6NpX7SZguWXq+eomlz4+4VAnLczgNjJ71gCLmoXAFNilx9MPU1ew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2zucbBLuhA++Js13w8UpK5p5c03btMirgbnWzE/10yg=;
+ b=pHQ9wABUQpPdAAkSwBcudrurpjUE5XweB42QSXHg/truDBcQAPSjjQdIv6AATQyeGHKE2eWGcFWP+s0U225P5jGTGeIUSH3Xf4KOm2p8Ci78qcPXAHsslMBqSwdCtXiVxQ7OOOVmbLzjJD3ISKr213ugE5lm7ifeBlhnKX+/fwY=
+Authentication-Results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=wdc.com;
+Received: from DM6PR04MB6201.namprd04.prod.outlook.com (2603:10b6:5:127::32)
+ by DM6PR04MB5753.namprd04.prod.outlook.com (2603:10b6:5:167::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.23; Wed, 29 Jul
+ 2020 11:28:38 +0000
+Received: from DM6PR04MB6201.namprd04.prod.outlook.com
+ ([fe80::e0a4:aa82:1847:dea5]) by DM6PR04MB6201.namprd04.prod.outlook.com
+ ([fe80::e0a4:aa82:1847:dea5%7]) with mapi id 15.20.3239.017; Wed, 29 Jul 2020
+ 11:28:38 +0000
+From: Anup Patel <anup.patel@wdc.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>
+Subject: [PATCH 2/3] target/riscv: Fix write_htinst() implementation
+Date: Wed, 29 Jul 2020 16:58:00 +0530
+Message-Id: <20200729112801.108985-3-anup.patel@wdc.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200729112801.108985-1-anup.patel@wdc.com>
+References: <20200729112801.108985-1-anup.patel@wdc.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BM1PR01CA0166.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:68::36) To DM6PR04MB6201.namprd04.prod.outlook.com
+ (2603:10b6:5:127::32)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from wdc.com (103.56.183.175) by
+ BM1PR01CA0166.INDPRD01.PROD.OUTLOOK.COM (2603:1096:b00:68::36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3239.17 via Frontend Transport; Wed, 29 Jul 2020 11:28:34 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [103.56.183.175]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 564d6e7c-4e39-4a54-5cae-08d833b289dc
+X-MS-TrafficTypeDiagnostic: DM6PR04MB5753:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR04MB5753AE5EA4FC5A1485ADD8178D700@DM6PR04MB5753.namprd04.prod.outlook.com>
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Oob-TLC-OOBClassifiers: OLM:1388;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ImuYcHTkx6qGb7C/QNazCftt3b+P0718EpHRXf9Oto+qPCv2FLXpUybvwDo+hhishBL27B9OM4Zopy/RCsf6FwLG8OVzBN0gd7e5WtZBKQDFq1ahKd/axFTT2ySFEEl4/cZ02Lo340b+rlDIQJHlRLNYBkMENwu4yRdkowFOs546xVEhI6Y3tX6SWHtx9Hg4UQBU8rFLP/JsqQ4YWNlotaVy6AvB++MqRpl+5fS6J1aRG8Qra6qtsgPs6ahd0dT5ioSj1i9Of1A8RPApPBrNqmt2do2Ii8ys/+Cu/4uMaVD6zRObsabhSKRscRCNX6gc
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:DM6PR04MB6201.namprd04.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(39860400002)(396003)(136003)(376002)(366004)(346002)(4326008)(36756003)(956004)(2616005)(52116002)(8886007)(110136005)(2906002)(7696005)(55016002)(8676002)(44832011)(186003)(4744005)(66946007)(316002)(26005)(54906003)(16526019)(8936002)(86362001)(66556008)(5660300002)(6666004)(1076003)(478600001)(66476007);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: xf7vNfROaFLCi/6v1t2YG+Qgc6gwliR8ibRtNXFkXGbBk/59BOyTivvQUshfQOgCsJX8FU9J8LWxEeKqsDCIkWWrgGESclWIDm5WZhj65JNjGe7n2NOBuqsPGztBM7L8T46ILKIu6ATRm99gqbWyRoNSz0oskdjM+rMixqj96p+VxeK1+v707WE6oWfBjwk/hFUSARkzi63UkDq+G99kVidrzdCykK1Sn3momofneYa4p9oTuUy+dliy2R3tPA/aVIoNhK04LW8nhJ9FB2StLAWPa4v2Hdqg4pmMs+Pbx2R8op4+7r0GLyoow88A0z0Rp3xXfSdYTOaYcyzV6HHfIVe48UJtHK0FZ0eC52qYhf1N2mN6i6TFU+HKhapwlyEJQyOhps/2nrp1z++kCTPxXaqpC1fHhY62FRX7aqZA15eifCpevZkZwNAr/Mk4TvnUUjbX2PNrmWY0R6X1us90r1tJC7jc05Yql3eO9DsyThx4R9ni2Jz6O/NeRyAXII1Y
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 564d6e7c-4e39-4a54-5cae-08d833b289dc
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB6201.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2020 11:28:38.7907 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: q9q6tKpLvLn8rkf8oQu5is084v71hQR31YciJkAWJmcFN2HasvtEKeHWnhkCfUUFrGoBXKqJfOry4O/8itaO9Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB5753
+Received-SPF: pass client-ip=216.71.154.42;
+ envelope-from=prvs=47218c038=Anup.Patel@wdc.com; helo=esa4.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 07:28:35
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,249 +154,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net, devel@ovirt.org,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, eskultet@redhat.com, jian-feng.ding@intel.com,
- dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
- bao.yumeng@zte.com.cn, intel-gvt-dev@lists.freedesktop.org,
- berrange@redhat.com, cohuck@redhat.com, dinechin@redhat.com
+Cc: Atish Patra <atish.patra@wdc.com>, Anup Patel <anup.patel@wdc.com>,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Anup Patel <anup@brainfault.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2020-07-29 at 16:05 +0800, Yan Zhao wrote:
-> On Mon, Jul 27, 2020 at 04:23:21PM -0600, Alex Williamson wrote:
-> > On Mon, 27 Jul 2020 15:24:40 +0800
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > 
-> > > > > As you indicate, the vendor driver is responsible for checking version
-> > > > > information embedded within the migration stream.  Therefore a
-> > > > > migration should fail early if the devices are incompatible.  Is it  
-> > > > 
-> > > > but as I know, currently in VFIO migration protocol, we have no way to
-> > > > get vendor specific compatibility checking string in migration setup stage
-> > > > (i.e. .save_setup stage) before the device is set to _SAVING state.
-> > > > In this way, for devices who does not save device data in precopy stage,
-> > > > the migration compatibility checking is as late as in stop-and-copy
-> > > > stage, which is too late.
-> > > > do you think we need to add the getting/checking of vendor specific
-> > > > compatibility string early in save_setup stage?
-> > > >  
-> > > 
-> > > hi Alex,
-> > > after an offline discussion with Kevin, I realized that it may not be a
-> > > problem if migration compatibility check in vendor driver occurs late in
-> > > stop-and-copy phase for some devices, because if we report device
-> > > compatibility attributes clearly in an interface, the chances for
-> > > libvirt/openstack to make a wrong decision is little.
-> > 
-> > I think it would be wise for a vendor driver to implement a pre-copy
-> > phase, even if only to send version information and verify it at the
-> > target.  Deciding you have no device state to send during pre-copy does
-> > not mean your vendor driver needs to opt-out of the pre-copy phase
-> > entirely.  Please also note that pre-copy is at the user's discretion,
-> > we've defined that we can enter stop-and-copy at any point, including
-> > without a pre-copy phase, so I would recommend that vendor drivers
-> > validate compatibility at the start of both the pre-copy and the
-> > stop-and-copy phases.
-> > 
-> 
-> ok. got it!
-> 
-> > > so, do you think we are now arriving at an agreement that we'll give up
-> > > the read-and-test scheme and start to defining one interface (perhaps in
-> > > json format), from which libvirt/openstack is able to parse and find out
-> > > compatibility list of a source mdev/physical device?
-> > 
-> > Based on the feedback we've received, the previously proposed interface
-> > is not viable.  I think there's agreement that the user needs to be
-> > able to parse and interpret the version information.  Using json seems
-> > viable, but I don't know if it's the best option.  Is there any
-> > precedent of markup strings returned via sysfs we could follow?
-> 
-> I found some examples of using formatted string under /sys, mostly under
-> tracing. maybe we can do a similar implementation.
-> 
-> #cat /sys/kernel/debug/tracing/events/kvm/kvm_mmio/format
-> 
-> name: kvm_mmio
-> ID: 32
-> format:
->         field:unsigned short common_type;       offset:0;       size:2; signed:0;
->         field:unsigned char common_flags;       offset:2;       size:1; signed:0;
->         field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
->         field:int common_pid;   offset:4;       size:4; signed:1;
-> 
->         field:u32 type; offset:8;       size:4; signed:0;
->         field:u32 len;  offset:12;      size:4; signed:0;
->         field:u64 gpa;  offset:16;      size:8; signed:0;
->         field:u64 val;  offset:24;      size:8; signed:0;
-> 
-> print fmt: "mmio %s len %u gpa 0x%llx val 0x%llx", __print_symbolic(REC->type, { 0, "unsatisfied-read" }, { 1, "read"
-> }, { 2, "write" }), REC->len, REC->gpa, REC->val
-> 
-this is not json fromat and its not supper frendly to parse.
-> 
-> #cat /sys/devices/pci0000:00/0000:00:02.0/uevent
-> DRIVER=vfio-pci
-> PCI_CLASS=30000
-> PCI_ID=8086:591D
-> PCI_SUBSYS_ID=8086:2212
-> PCI_SLOT_NAME=0000:00:02.0
-> MODALIAS=pci:v00008086d0000591Dsv00008086sd00002212bc03sc00i00
-> 
-this is ini format or conf formant 
-this is pretty simple to parse whichi would be fine.
-that said you could also have a version or capablitiy directory with a file
-for each key and a singel value.
+The htinst CSR is writeable from M-mode and HS-mode so
+we should not ignore writes to htinst CSR.
 
-i would prefer to only have to do one read personally the list the files in
-directory and then read tehm all ot build the datastucture myself but that is
-doable though the simple ini format use d for uevent seams the best of 3 options
-provided above.
-> > 
-> > Your idea of having both a "self" object and an array of "compatible"
-> > objects is perhaps something we can build on, but we must not assume
-> > PCI devices at the root level of the object.  Providing both the
-> > mdev-type and the driver is a bit redundant, since the former includes
-> > the latter.  We can't have vendor specific versioning schemes though,
-> > ie. gvt-version. We need to agree on a common scheme and decide which
-> > fields the version is relative to, ex. just the mdev type?
-> 
-> what about making all comparing fields vendor specific?
-> userspace like openstack only needs to parse and compare if target
-> device is within source compatible list without understanding the meaning
-> of each field.
-that kind of defeats the reason for having them be be parsable.
-the reason openstack want to be able to understand the capablitys is so
-we can staticaly declare the capablit of devices ahead of time on so our schduler
-can select host based on that. is the keys and data are opaquce to userspace
-becaue they are just random vendor sepecific blobs we cant do that.
-> 
-> > I had also proposed fields that provide information to create a
-> > compatible type, for example to create a type_x2 device from a type_x1
-> > mdev type, they need to know to apply an aggregation attribute.  If we
-> > need to explicitly list every aggregation value and the resulting type,
-> > I think we run aground of what aggregation was trying to avoid anyway,
-> > so we might need to pick a language that defines variable substitution
-> > or some kind of tagging.  For example if we could define ${aggr} as an
-> > integer within a specified range, then we might be able to define a type
-> > relative to that value (type_x${aggr}) which requires an aggregation
-> > attribute using the same value.  I dunno, just spit balling.  Thanks,
-> 
-> what about a migration_compatible attribute under device node like
-> below?
-rather then listing comaptiable devices it would be better if you could declaritivly 
-list the feature supported and we could compare those along with a simple semver version string.
-> 
-> #cat /sys/bus/pci/devices/0000\:00\:02.0/UUID1/migration_compatible
-> SELF:
-> 	device_type=pci
-> 	device_id=8086591d
-> 	mdev_type=i915-GVTg_V5_2
-> 	aggregator=1
-> 	pv_mode="none+ppgtt+context"
-> 	interface_version=3
-> COMPATIBLE:
-> 	device_type=pci
-> 	device_id=8086591d
-> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-this mixed notation will be hard to parse so i would avoid that.
-> 	aggregator={val1}/2
-> 	pv_mode={val2:string:"none+ppgtt","none+context","none+ppgtt+context"}
->  
-> 	interface_version={val3:int:2,3}
-> COMPATIBLE:
-> 	device_type=pci
-> 	device_id=8086591d
-> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-> 	aggregator={val1}/2
-> 	pv_mode=""  #"" meaning empty, could be absent in a compatible device
-> 	interface_version=1
-if you presented this information the only way i could see to use it would be to
-extract the mdev_type name and interface_vertion  and build a database table as follows
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+---
+ target/riscv/csr.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-source_mdev_type | source_version | target_mdev_type | target_version
-i915-GVTg_V5_2 | 3 | 915-GVTg_V5_{val1:int:1,2,4,8} | {val3:int:2,3}
-i915-GVTg_V5_2 | 3 | 915-GVTg_V5_{val1:int:1,2,4,8} | 1
-
-this would either reuiqre use to use a post placment sechudler filter to itrospec this data base
-or thansform the target_mdev_type and target_version colum data into CUSTOM_* traits we apply to
-our placment resouce providers and we would have to prefrom multiple reuqest for each posible compatiable
-alternitive.  if the vm has muplite mdevs this is combinatorially problmenatic as it is 1 query for each
-device * the number of possible compatible devices for that device.
-
-in other word if this is just opaque data we cant ever represent it efficently in our placment service and
-have to fall back to an explisive post placment schdluer filter base on the db table approch.
-
-this also ignore the fact that at present the mdev_type cannot change druing a migration so the compatiable
-devicve with a different mdev type would not be considerd accpetable choice in openstack. they way you select a host
-with a specific vgpu mdev type today is to apply a custome trait which is CUSTOM_<medev_type_goes_here> to the vGPU
-resouce provider and then in the flavor you request 1 allcoaton of vGPU and require the CUSTOM_<medev_type_goes_here>
-trait. so going form i915-GVTg_V5_2 to i915-GVTg_V5_{val1:int:1,2,4,8} would not currently be compatiable with that
-workflow.
-
-
-> #cat /sys/bus/pci/dei915-GVTg_V5_{val1:int:1,2,4,8}vices/0000\:00\:i915-
-> GVTg_V5_{val1:int:1,2,4,8}2.0/UUID2/migration_compatible
-> SELF:
-> 	device_type=pci
-> 	device_id=8086591d
-> 	mdev_type=i915-GVTg_V5_4
-> 	aggregator=2
-> 	interface_version=1
-> COMPATIBLE: 
-> 	device_type=pci
-> 	device_id=8086591d
-> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-> 	aggregator={val1}/2
-> 	interface_version=1
-by the way this is closer to yaml format then it is to json but it does not align with any exsiting
-format i know of so that just make the representation needless hard to consume
-if we are going to use a markup lanag let use a standard one like yaml json or toml and not invent a new one.
-> 
-> Notes:
-> - A COMPATIBLE object is a line starting with COMPATIBLE.
->   It specifies a list of compatible devices that are allowed to migrate
->   in.
->   The reason to allow multiple COMPATIBLE objects is that when it
->   is hard to express a complex compatible logic in one COMPATIBLE
->   object, a simple enumeration is still a fallback.
->   in the above example, device UUID2 is in the compatible list of
->   device UUID1, but device UUID1 is not in the compatible list of device
->   UUID2, so device UUID2 is able to migrate to device UUID1, but device
->   UUID1 is not able to migrate to device UUID2.
-> 
-> - fields under each object are of "and" relationship to each other,  meaning
->   all fields of SELF object of a target device must be equal to corresponding
->   fields of a COMPATIBLE object of source device, otherwise it is regarded as not
->   compatible.
-> 
-> - each field, however, is able to specify multiple allowed values, using
->   variables as explained below.
-> 
-> - variables are represented with {}, the first appearance of one variable
->   specifies its type and allowed list. e.g.
->   {val1:int:1,2,4,8} represents var1 whose type is integer and allowed
->   values are 1, 2, 4, 8.
-> 
-> - vendors are able to specify which fields are within the comparing list
->   and which fields are not. e.g. for physical VF migration, it may not
->   choose mdev_type as a comparing field, and maybe use driver name instead.
-this format might be useful to vendors but from a orcestrator perspecive i dont think this has
-value to us likely we would not use this api if it was added as it does not help us with schduling.
-ideally instead fo declaring which other mdev types a device is compatiable with (which could presumably change over
-time as new device and firmwares are released) i would prefer to see a declaritive non vendor specific api that declares
-the feature set provided by each mdev_type from which we can infer comaptiablity similar to cpu feature flags.
-for devices fo the same mdev_type name addtionally a declaritive version sting could also be used if required for
-addtional compatiablity checks.
->  
-> 
-> Thanks
-> Yan
-> 
-> 
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index f985b85de4..99fcb7f67d 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -943,6 +943,7 @@ static int read_htinst(CPURISCVState *env, int csrno, target_ulong *val)
+ 
+ static int write_htinst(CPURISCVState *env, int csrno, target_ulong val)
+ {
++    env->htinst = val;
+     return 0;
+ }
+ 
+-- 
+2.25.1
 
 
