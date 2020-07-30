@@ -2,121 +2,106 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B6CDC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 13:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB5B4C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 13:25:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB5DB2074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 13:18:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9254E2067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 13:25:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OJTtgwZV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB5DB2074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LOVbLxPb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9254E2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k18Rm-0007EJ-6F
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 09:18:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38800)
+	id 1k18Yw-0002J6-TB
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 09:25:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40692)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k18Qp-00066T-7E
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 09:17:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30158
+ (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
+ id 1k18Y7-0001sD-Rn
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 09:24:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37055
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k18Qn-0004vn-8g
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 09:17:10 -0400
+ (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
+ id 1k18Y4-00063v-SO
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 09:24:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596115028;
+ s=mimecast20190719; t=1596115479;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=OpLzgsFkNX8PZg8qnS3MlSi1x1A+9qtPsiXmj3np3Zg=;
- b=OJTtgwZVnLDR5Omb+oCbfJdNPA9hasjgJMpb7IzDQi/ZaH7gjHi5hBdPBeCTelFm/v96H4
- 3GLkMr9YqxyzsWwtJ56Xd5VuH9N2jGSZTPpQbCpSvJe9qhwOw7js0BIJb76PqI8Aw8/LHS
- Og75kvw74EBcjaFyIhchNWxniIRHEY8=
+ in-reply-to:in-reply-to:references:references;
+ bh=trBMDum5jaV2PmP6FGjCemPgC956VMcTP3eowoAov1g=;
+ b=LOVbLxPb2UPcHVZgDLM7KuWagUXwfaAVvrN5XMhAQRsuBSRY+7yzPPJvFtZQ7RhVKXvb2S
+ SytRhs4flFhA5TnnJsyndvo7SiaxfGYnw5obFnlNghKQ5vezRjgAnG9xRzpw9T1QXwtvSF
+ 8Urs52f/BO1DgT1pTrd6EA5EXN5RXLo=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-HdOjaqxqN4C3G9tjpAyo9w-1; Thu, 30 Jul 2020 09:17:06 -0400
-X-MC-Unique: HdOjaqxqN4C3G9tjpAyo9w-1
-Received: by mail-wm1-f71.google.com with SMTP id f74so2236023wmf.1
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 06:17:06 -0700 (PDT)
+ us-mta-88-wUhUt8HkOZmWpPj-6-5AOw-1; Thu, 30 Jul 2020 09:24:35 -0400
+X-MC-Unique: wUhUt8HkOZmWpPj-6-5AOw-1
+Received: by mail-wm1-f71.google.com with SMTP id u14so1315299wml.0
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 06:24:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=OpLzgsFkNX8PZg8qnS3MlSi1x1A+9qtPsiXmj3np3Zg=;
- b=NQrF1saTQVQ1mLIhd62Z0WIeMUbY8fE4ENtI2mfze0nT53I+inVkruyVyCHOu7m4p7
- FgxmABMR8eDPgp/CJYwlpQMXpM797BM7N5tXMfYpC7JWQw+cqscWJBaOoXDvOVZ7QNlX
- yNpGMrQAQEg/ClLNj3FTm/CIGHzNUHfNvhyKA5adCzMvSkNoxCIOt5SvYIpVnSuSa8Fm
- lq01hFbxOCUJTE9UHDGo8ru7w1FWIVMohaggdI4F03HS1SMFVwfz0BJIHSDLXVHlJFAi
- DMnYnX5ppK8gdX55dlqTlI9wEoqTUQLlrami2qYvT/cRHvOpwYK842c0OK9lTY1cqu2d
- R7IA==
-X-Gm-Message-State: AOAM530kVLQDjEQheymNoMrCy4j6ltz5HJ8SYrVQtjKBUdX1TZhik/b6
- 79Xlnimazx3M929pxuXUwbvd9cRCft/D0Dd+8ZB8zI4zszf2UytnhCgtvUelH+4Tt66KDB/ODSs
- CB5GbJD/VFiBtgMM=
-X-Received: by 2002:a5d:4109:: with SMTP id l9mr2882454wrp.398.1596115025256; 
- Thu, 30 Jul 2020 06:17:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyWiSIJMpjeFdE4iiIp0tol8FhDu4ZB/MdzzZAAeys+9wYcPPUwxGFa8l0hcRJdJMKJftbpkg==
-X-Received: by 2002:a5d:4109:: with SMTP id l9mr2882432wrp.398.1596115025043; 
- Thu, 30 Jul 2020 06:17:05 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id h199sm9111133wme.42.2020.07.30.06.17.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jul 2020 06:17:04 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] target/arm: Fix compile error.
-To: Kaige Li <likaige@loongson.cn>, "Michael S. Tsirkin" <mst@redhat.com>,
- David Hildenbrand <david@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <1596110248-7366-1-git-send-email-likaige@loongson.cn>
- <1596110248-7366-2-git-send-email-likaige@loongson.cn>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <43e912f0-4383-93c0-ccd7-204c7eaf9850@redhat.com>
-Date: Thu, 30 Jul 2020 15:17:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <1596110248-7366-2-git-send-email-likaige@loongson.cn>
-Content-Language: en-US
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=trBMDum5jaV2PmP6FGjCemPgC956VMcTP3eowoAov1g=;
+ b=gHwOW2czoj0t+Aqi/SXPUVK6iSix2MpJUoHMCz2ft0aGtydAHKKEm2f0RRYta/o0HH
+ R+YOLHXDLR3ow7akUVS60oui1G/l2ex+2P1sFhlseKpyJy2wlRj8DdJMXeGtjkKjwuw+
+ WMAurRnvMQtNCMZxAs3pUlO8iWsoNoIomnmOO6ldJMQDjRmAFe3jnCCpP2uYIP5IrxmZ
+ Z3zYNG5rn6zCyT3q0CGsrkFC/ZBgLd43x70lWuG7qkSgXuh89v4xT2ABq+5u0S1JfSCT
+ KorKmzqSpu8xs2Dd29RYl6Wn8tUVEILx9PDU8hwkWfS9lzj6YZvjaiXJRc3BeorKUKHz
+ j8zw==
+X-Gm-Message-State: AOAM5303vwP7pxrOBPxRB4vyBZsQCBbQLy7oLWPZcgByJSCqIdego4qW
+ k5xljIjpE+/fBtVBneeRYmHkdh+M4RKOytmQbM3docc9n77WQGm4u7KiZC7yc5/rBoQa1YBV+eS
+ udB61T4m/QRODgc4=
+X-Received: by 2002:a1c:28c4:: with SMTP id o187mr12750871wmo.62.1596115474321; 
+ Thu, 30 Jul 2020 06:24:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwbK20wdWHvC4AuD4fC98U/RMEiNOX+IYs63dLbAh2/L5ig+EHrNSXl9Gtwq/lrg+jGKUC+8g==
+X-Received: by 2002:a1c:28c4:: with SMTP id o187mr12750834wmo.62.1596115474070; 
+ Thu, 30 Jul 2020 06:24:34 -0700 (PDT)
+Received: from pop-os ([2001:470:1f1d:1ea:4fde:6f63:1f5a:12b1])
+ by smtp.gmail.com with ESMTPSA id l11sm8654553wme.11.2020.07.30.06.24.32
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 30 Jul 2020 06:24:33 -0700 (PDT)
+Message-ID: <c56990fe775268793b06d94c679bec2c458b7ecf.camel@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+From: Sean Mooney <smooney@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>, Alex Williamson
+ <alex.williamson@redhat.com>
+Date: Thu, 30 Jul 2020 14:24:31 +0100
+In-Reply-To: <20200730034104.GB32327@joy-OptiPlex-7040>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
+ <20200716083230.GA25316@joy-OptiPlex-7040>
+ <20200717101258.65555978@x1.home>
+ <20200721005113.GA10502@joy-OptiPlex-7040>
+ <20200727072440.GA28676@joy-OptiPlex-7040>
+ <20200727162321.7097070e@x1.home>
+ <20200729080503.GB28676@joy-OptiPlex-7040>
+ <e8a973ea0bb2bc3eb15649fb1c44599ae3509e84.camel@redhat.com>
+ <20200729131255.68730f68@x1.home>
+ <20200730034104.GB32327@joy-OptiPlex-7040>
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2
+Mime-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=smooney@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=smooney@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 23:51:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -126,7 +111,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,59 +124,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net, devel@ovirt.org,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, eskultet@redhat.com, jian-feng.ding@intel.com,
+ dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+ bao.yumeng@zte.com.cn, intel-gvt-dev@lists.freedesktop.org,
+ berrange@redhat.com, cohuck@redhat.com, dinechin@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/30/20 1:57 PM, Kaige Li wrote:
-> When I compile qemu with such as:
+On Thu, 2020-07-30 at 11:41 +0800, Yan Zhao wrote:
+> > > >    interface_version=3
+> > 
+> > Not much granularity here, I prefer Sean's previous
+> > <major>.<minor>[.bugfix] scheme.
+> > 
 > 
-> git clone https://git.qemu.org/git/qemu.git
-> cd qemu
-> git submodule init
-> git submodule update --recursive
-> ./configure
-> make
+> yes, <major>.<minor>[.bugfix] scheme may be better, but I'm not sure if
+> it works for a complicated scenario.
+> e.g for pv_mode,
+> (1) initially,  pv_mode is not supported, so it's pv_mode=none, it's 0.0.0,
+> (2) then, pv_mode=ppgtt is supported, pv_mode="none+ppgtt", it's 0.1.0,
+> indicating pv_mode=none can migrate to pv_mode="none+ppgtt", but not vice versa.
+> (3) later, pv_mode=context is also supported,
+> pv_mode="none+ppgtt+context", so it's 0.2.0.
+> 
+> But if later, pv_mode=ppgtt is removed. pv_mode="none+context", how to
+> name its version?
+it would become 1.0.0
+addtion of a feature is a minor version bump as its backwards compatiable.
+if you dont request the new feature you dont need to use it and it can continue to behave like
+a 0.0.0 device evne if its capably of acting as a 0.1.0 device.
+when you remove a feature that is backward incompatable as any isnstance that was prevously not
+using it would nolonger work so you have to bump the major version.
+>  "none+ppgtt" (0.1.0) is not compatible to
+> "none+context", but "none+ppgtt+context" (0.2.0) is compatible to
+> "none+context".
+> 
+> Maintain such scheme is painful to vendor driver.
+not really its how most software libs are version today. some use other schemes
+but semantic versioning is don right is a concies and easy to consume set of rules
+https://semver.org/ however you are right that it forcnes vendor to think about backwards
+and forwards compatiablty with each change which for the most part is a good thing.
+it goes hand in hand with have stable abi and api definitons to ensuring firmware updates and driver chagnes
+dont break userspace that depend on the kernel interfaces they expose.
 
-Again, timeless information is not useful.
-
-> 
-> There is error log:
-> 
-> /home/LiKaige/qemu/target/arm/translate-a64.c: In function ‘disas_ldst’:
-> /home/LiKaige/qemu/target/arm/translate-a64.c:3392:5: error: ‘fn’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->      fn(cpu_reg(s, rt), clean_addr, tcg_rs, get_mem_index(s),
->      ^
-> /home/LiKaige/qemu/target/arm/translate-a64.c:3318:22: note: ‘fn’ was declared here
->      AtomicThreeOpFn *fn;
->                       ^
-> cc1: all warnings being treated as errors
-
-Again, what compiler / version are you using? My guess is you are
-using an old GCC, and I wonder if it is still supported.
-
-> 
-> So, add an initiallization value NULL for fn to fix this.
-> 
-> Signed-off-by: Kaige Li <likaige@loongson.cn>
-> ---
->  target/arm/translate-a64.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 8c07649..c98dfb1 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -3315,7 +3315,7 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
->      bool r = extract32(insn, 22, 1);
->      bool a = extract32(insn, 23, 1);
->      TCGv_i64 tcg_rs, clean_addr;
-> -    AtomicThreeOpFn *fn;
-> +    AtomicThreeOpFn *fn = NULL;
->  
->      if (is_vector || !dc_isar_feature(aa64_atomics, s)) {
->          unallocated_encoding(s);
-> 
 
 
