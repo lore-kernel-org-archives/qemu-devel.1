@@ -8,70 +8,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD059C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 10:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A289C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 10:20:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A26D20809
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 10:18:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66EDE2075F
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 10:20:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o1VrR5ZD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A26D20809
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JxFhHoTT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66EDE2075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k15e9-00026U-OW
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 06:18:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47358)
+	id 1k15fX-00039v-MQ
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 06:20:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
- id 1k15dL-0001f8-Fy; Thu, 30 Jul 2020 06:17:55 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36659)
+ id 1k15ek-0002er-ET; Thu, 30 Jul 2020 06:19:22 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46218)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <minwoo.im.dev@gmail.com>)
- id 1k15dJ-00045L-QJ; Thu, 30 Jul 2020 06:17:55 -0400
-Received: by mail-ot1-x344.google.com with SMTP id l27so12533174oti.3;
- Thu, 30 Jul 2020 03:17:53 -0700 (PDT)
+ id 1k15ei-0004Bz-NL; Thu, 30 Jul 2020 06:19:22 -0400
+Received: by mail-ot1-x342.google.com with SMTP id v6so8914981ota.13;
+ Thu, 30 Jul 2020 03:19:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8DA231LHPV2cyZhGDI+dMcu++nRZMljgdpqOCyU5Cvg=;
- b=o1VrR5ZDX7tuj8Q6VtZdm6hhIq9Q2KpuMGtrhKHKtiUePurT1m2VPngGR3TX34l3Kk
- lLwFvq6A3tC7SUoCXj04NwmACH1kP54+BD8PpnS10ljInozPNK/Vvpvt531nhiggO4EL
- 7ui0CtCBoCSjc2ejwWzZhwzqVjVQ/89UxpXqngL1ztlo9M2NHQij1LW1msA5UG9OC8FY
- uMqaqtq64GHN69aGUjaHq1g4yiBvFZ7oycuxjsCrB/bZ4Ec193hyM5v9fsgvnJm6LhqQ
- kVYn6twDjwcj8RnPAsVJTgekPcc2xC12+fo6aP8NH9h5z+t5kbNox+R/IUhCFATLD+Ja
- x9PA==
+ :cc; bh=VXl1xLlHugazKOiI+mlFXaRQAQifSHJowRp9v1FNkQg=;
+ b=JxFhHoTTgdr/tnqVazfTCRqJ4WxLfUOFRN5uNCoMdfMGIlY7cVtjpJ1W9BUnZFYiyZ
+ fCbWRAabX8Cn32cr2ogplPPGzshJYx5SZVRQyUJSMBH5jOalDqjI0/V1jT689YY7d+Un
+ gBDBcJcSUxeckovHXZKTGRF5B8biPtcRdKv7i+ZdniW5rNgogpTU+aeI34zx066zcrL4
+ M3jUDZexr3kyuhZTvr4h42eZYpQJBuvqTr8dBDM3lz4ZKotpzN1KVAZV0VcNwDjTo8iv
+ tKM0eww9BNSBpMP7damzLzCr5gjtA9R7ig442oekfiXuNOFapbbzIYAwIRbaGF0s4rRs
+ EJzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=8DA231LHPV2cyZhGDI+dMcu++nRZMljgdpqOCyU5Cvg=;
- b=D/3vtwhNHiXjzXLCePg7xCfxFe7zqmzU8sqNx0A5Nd6mxwNyoQVfHpta1ddnDkfOY5
- URh7w8wZYVcFnpe3YFlXn+r455AnUbQvtzmP6AsO0Trf34vaJDXaZzBkHdhSmFVBhpci
- 34ea4L1Y+3+qdJJAXceNE3ejCRInr8kXY7DG94n+kKZWZaPjeS8Rvp7vTPiH7gOJOwVe
- V/v0w0noNnDobS0QhNKgR3/jxYJsWHnyZuUKJfBxFsSD+KDuS9Hl/WCzHYVutLFu0xWp
- l0o21HdFz+AbukYxliEaQXPskehYwZy0h/OQi5a24rBd7B6rGKOzeYR6aamcyJf0rhna
- 6Nfg==
-X-Gm-Message-State: AOAM532WEQiAlMHziD+7d5I1QS2iov3KZoLBquzCffYxYPA4DC6hwVW/
- f4TVIXGpTkqu7dVMSvpwYK8rzyd5dLPhjcyLaSQ=
-X-Google-Smtp-Source: ABdhPJw+1RP/camM0PxGPpoXW/8EToR3xOJB1ef9uC1pFhZIjZ0nXTLgDCCL0iePhILQnUYPtXORySr1jnI8ayeiK/o=
-X-Received: by 2002:a9d:7d04:: with SMTP id v4mr1625228otn.319.1596104272335; 
- Thu, 30 Jul 2020 03:17:52 -0700 (PDT)
+ bh=VXl1xLlHugazKOiI+mlFXaRQAQifSHJowRp9v1FNkQg=;
+ b=EH+iFsN7eqb/kk86GBkLRV8n/6rZQqfwjF6WwUvmFZZPvfMNeTP5fuDtgra8eSvvMw
+ opz8J9WsW5fDXw+N6B5+ZmK9qpmUub75kvDu7E/dZIWPVwcmAmUyZIM0x39oYDaVEVCS
+ NPb6nyQqUo1olu3t+gIw3rIsl7dY6FuKMdY/zdb0tiW+nOgatd/1XNRZZu75thUOVADN
+ QQCOZVq1Y855xcbDmtqBOmZUbjs3WPSJj07i7oicgF0Iphhz6lDgSINxwIXFl5NHYH1M
+ sjGDdD7u0qqFmZ10XhQgcyee1V2iCmjQ0jSecySeVx1h726c+NtFE5Ush14T8esaaUZl
+ zKrQ==
+X-Gm-Message-State: AOAM533WVNHZUlZZ6G460ciIvQLTRROIxLkMuy4bHCP3wM3U2gB4eTtJ
+ /gzcdiiz+9rjyZNkLDmEiWNmqSN0TtgpPFIG434=
+X-Google-Smtp-Source: ABdhPJyHQZvxAPWscoJJdEw4v0JZEbzeJjneOPqd39VxABRReR9DDxhVw/tYnuk2zm8kp6DgpIxnEpedUfGaPvCcqTw=
+X-Received: by 2002:a9d:7d04:: with SMTP id v4mr1628746otn.319.1596104358351; 
+ Thu, 30 Jul 2020 03:19:18 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200729220638.344477-1-its@irrelevant.dk>
- <20200729220638.344477-8-its@irrelevant.dk>
-In-Reply-To: <20200729220638.344477-8-its@irrelevant.dk>
+ <20200729220638.344477-9-its@irrelevant.dk>
+In-Reply-To: <20200729220638.344477-9-its@irrelevant.dk>
 From: Minwoo Im <minwoo.im.dev@gmail.com>
-Date: Thu, 30 Jul 2020 19:17:41 +0900
-Message-ID: <CAA7jztdvr5=vUPioq_iPXoV_0Ch-kOFRC8OxvQDPe0qEQiNjxQ@mail.gmail.com>
-Subject: Re: [PATCH v2 07/16] hw/block/nvme: add tracing to nvme_map_prp
+Date: Thu, 30 Jul 2020 19:19:07 +0900
+Message-ID: <CAA7jztf4iYBhcwRJM7AEZ9L-dxL3GW9gc0T-7SerDDXQmpn2bA@mail.gmail.com>
+Subject: Re: [PATCH v2 08/16] hw/block/nvme: add request mapping helper
 To: Klaus Jensen <its@irrelevant.dk>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=minwoo.im.dev@gmail.com; helo=mail-ot1-x344.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=minwoo.im.dev@gmail.com; helo=mail-ot1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,49 +106,60 @@ On Thu, Jul 30, 2020 at 7:06 AM Klaus Jensen <its@irrelevant.dk> wrote:
 >
 > From: Klaus Jensen <k.jensen@samsung.com>
 >
-> Add tracing to nvme_map_prp.
+> Introduce the nvme_map helper to remove some noise in the main nvme_rw
+> function.
 >
 > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  hw/block/nvme.c       | 2 ++
->  hw/block/trace-events | 1 +
->  2 files changed, 3 insertions(+)
+>  hw/block/nvme.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
 >
 > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 571635ebe9f9..952afbb05175 100644
+> index 952afbb05175..198a26890e0c 100644
 > --- a/hw/block/nvme.c
 > +++ b/hw/block/nvme.c
-> @@ -274,6 +274,8 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->      int num_prps = (len >> n->page_bits) + 1;
->      uint16_t status;
+> @@ -415,6 +415,15 @@ static uint16_t nvme_dma_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+>      return status;
+>  }
 >
-> +    trace_pci_nvme_map_prp(trans_len, len, prp1, prp2, num_prps);
+> +static uint16_t nvme_map_dptr(NvmeCtrl *n, NvmeCmd *cmd, size_t len,
+> +                         NvmeRequest *req)
+> +{
+> +    uint64_t prp1 = le64_to_cpu(cmd->dptr.prp1);
+> +    uint64_t prp2 = le64_to_cpu(cmd->dptr.prp2);
+> +
+> +    return nvme_map_prp(&req->qsg, &req->iov, prp1, prp2, len, n);
+> +}
 
-Hmm.. Okay with this.  But once QEMUSGList and QEMUIOVector instances are coming
-into the NvmeRequest, we just can pass the NvmeRequest instance here
-and print the cid as well
-later :)
+Let's do something for MPTR laster also when we are right in front of that.
+
+Looks good to me.
 
 Reviewed-by: Minwoo Im <minwoo.im.dev@gmail.com>
 
-Thanks!
-
 > +
->      if (unlikely(!prp1)) {
->          trace_pci_nvme_err_invalid_prp();
+>  static void nvme_post_cqes(void *opaque)
+>  {
+>      NvmeCQueue *cq = opaque;
+> @@ -602,8 +611,6 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>      NvmeRwCmd *rw = (NvmeRwCmd *)cmd;
+>      uint32_t nlb  = le32_to_cpu(rw->nlb) + 1;
+>      uint64_t slba = le64_to_cpu(rw->slba);
+> -    uint64_t prp1 = le64_to_cpu(rw->dptr.prp1);
+> -    uint64_t prp2 = le64_to_cpu(rw->dptr.prp2);
+>
+>      uint8_t lba_index  = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
+>      uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
+> @@ -620,7 +627,7 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
+>          return NVME_LBA_RANGE | NVME_DNR;
+>      }
+>
+> -    if (nvme_map_prp(&req->qsg, &req->iov, prp1, prp2, data_size, n)) {
+> +    if (nvme_map_dptr(n, cmd, data_size, req)) {
+>          block_acct_invalid(blk_get_stats(n->conf.blk), acct);
 >          return NVME_INVALID_FIELD | NVME_DNR;
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index f3b2d004e078..f20c59a4b542 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -35,6 +35,7 @@ pci_nvme_irq_masked(void) "IRQ is masked"
->  pci_nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=0x%"PRIx64" prp2=0x%"PRIx64""
->  pci_nvme_map_addr(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
->  pci_nvme_map_addr_cmb(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
-> +pci_nvme_map_prp(uint64_t trans_len, uint32_t len, uint64_t prp1, uint64_t prp2, int num_prps) "trans_len %"PRIu64" len %"PRIu32" prp1 0x%"PRIx64" prp2 0x%"PRIx64" num_prps %d"
->  pci_nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8""
->  pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8""
->  pci_nvme_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
+>      }
 > --
 > 2.27.0
 >
