@@ -2,97 +2,107 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BBFCC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 21:33:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5358C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 21:39:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53C172083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 21:33:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 675B620809
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 21:39:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kOIVMBxW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53C172083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XEqVLOs8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 675B620809
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1GBJ-0007WC-MB
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 17:33:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58756)
+	id 1k1GHM-0000xK-OJ
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 17:39:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k1GAZ-00072c-CC
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 17:32:55 -0400
-Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:35369)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k1GAX-0004WS-HN
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 17:32:55 -0400
-Received: by mail-pj1-x102e.google.com with SMTP id t6so1940492pjr.0
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 14:32:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=rTEQ9qi39BiNJZVkVAHaaevAUcf8e6x1Fahkn45LvrM=;
- b=kOIVMBxWpgJkZ0vXLNsIvhHDOCyBnoucxOnocBKSpd6354+yTBUtzELm3IBo0FG27p
- QlE1iVUSzIZN+wVP9DTLjD3QmOL4Ss7pTn7vh+e9DRoGPnUPuEAE805BvEWuBq/kluhB
- yEWzbKZ081jZLWAqSjEt7jtL8LFPs9coZtEXdcAheyDNhfhkzp3t/P49ESjWeO/rZsn4
- fMMerArX+4dMd6DYekmMkXkPzPnb2VhQKCFWMz+pm6fPPF/ByCYx8EE/fsVrywcC+98O
- stLCsoW7ymURoJ0CEvJdHKBrWK3Hmdq03zSEz6TV5c3wImojG7rPXj63MP+3vpeLQKiX
- vD3g==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k1GGh-0000Wt-2j
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 17:39:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38301
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k1GGf-0005ON-0e
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 17:39:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596145151;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YaSShEw13jtXhBgkKPIXmE/6WfDaxlSJ8NYlk4+rphY=;
+ b=XEqVLOs8BiU7nZOUC6Z/pZ1SpWGFlCY+FeJouJALXT3ghGbdIUdMCYbcxUVbkVNubMHa3g
+ znBU7/wjuw9hPcfC8SVUo2SBhkB6so2KvoVMF+oBakTGesMhKoso/Y3V82MDKSKSB5kyyF
+ Opf0wfp5zfkQS1eU+5X8AGrQSV+eYxw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-QbDLe69JPdWQk907HWpXaw-1; Thu, 30 Jul 2020 17:39:09 -0400
+X-MC-Unique: QbDLe69JPdWQk907HWpXaw-1
+Received: by mail-wr1-f71.google.com with SMTP id f14so8322015wrm.22
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 14:39:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=rTEQ9qi39BiNJZVkVAHaaevAUcf8e6x1Fahkn45LvrM=;
- b=oPhfbr2v6uIqjjtAGH9o7WBPKjxLKsDTVM8P97CwgQu9x0XYiniOJoc9xPnlKzR6k8
- BouzjYvDLvmvpMIbolQSmJT14z8q2mQrUW4IpOoC/kVtdr1NIz5d64dt58d3Z0HwrJzh
- lMuF/po6XPe6QD36LVDm+NVowM1R5803XIXoRh1tWgCLA7jDvr/tFiYqMg4CI2iIOCC7
- /YVYQptFjC/SqjyMh+PUhNlgPvrthN738a86FhVwXCt74o9zqywIrIz7flf+sEk41NBE
- w4rbUsu71QAgmyg1zcI3ccuPwHsUQDs/xnSFffDSwEfSMAdefIoj7N/Af1xxC+fsn+n7
- aKIg==
-X-Gm-Message-State: AOAM530FAezXNRvOaCIFfbgMAf6R1xF4LcXdsGa9yEBHT3rjKiwqdY7g
- 3zz593w+vnD5Z7+KVp8l9JPxoA==
-X-Google-Smtp-Source: ABdhPJyFUD8J/JgIwGJ1OChvKv35vI0iZ8/x17I3rbrJaM1JknTxvXN1nP7eYanABGmCaEO2noGjww==
-X-Received: by 2002:a17:902:b20a:: with SMTP id
- t10mr978543plr.185.1596144772053; 
- Thu, 30 Jul 2020 14:32:52 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id x66sm7601370pgb.12.2020.07.30.14.32.50
+ bh=YaSShEw13jtXhBgkKPIXmE/6WfDaxlSJ8NYlk4+rphY=;
+ b=aq+aACOy33AgOz0UViOsWZ1hnhIQNtB8RkWXqModvOZgcKNP8yZL2DXHEcklzAIGYH
+ mkmFDu9jHyCSUFf5PlPJuXd25NZ+q7u20MZP/83GKhEyMhY3iI9aLAN8NzJVAvUeHabc
+ swXNtdvyoHDgODRaXry4jhNfvqAWtK57oyzDLEusj9Np6DcQ1q+DPbCC2g7F7WiUkJeS
+ qKUuO2/rLW6QIgcOJ7/ucP2le5GRTrWN4mMEe8gpSjg2PGH0XO3FvY+VNvD/fbo7N9H8
+ cpJYWYHPgoqY0A/LRFRcDbgCE1qRhsRWgSPktxunL75ztgQsObaLzA/epJmZbY/91cB7
+ itYQ==
+X-Gm-Message-State: AOAM531IxrmFR6WXo8WMSIh0fyCmLJkUPshB104iyVabU+lygs4igjEX
+ jgeFsNHniYOArLOD+ld+2KSeU/HBZMh19XgoWxU8RXQ4VCGlx2FkYM2/GXy+/eXNQAM3nbmCK4M
+ gf2lG0xVOz5EeCPI=
+X-Received: by 2002:a1c:e304:: with SMTP id a4mr980532wmh.11.1596145148320;
+ Thu, 30 Jul 2020 14:39:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzny5VRc06Zo8i0LfGZEls0DIzNfTN947zkrk/PKE1oehYco2WtSZ9Im71usPA3v1j0FzzUQQ==
+X-Received: by 2002:a1c:e304:: with SMTP id a4mr980512wmh.11.1596145148046;
+ Thu, 30 Jul 2020 14:39:08 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:310b:68e5:c01a:3778?
+ ([2001:b07:6468:f312:310b:68e5:c01a:3778])
+ by smtp.gmail.com with ESMTPSA id p14sm11251904wrg.96.2020.07.30.14.39.06
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jul 2020 14:32:51 -0700 (PDT)
-Subject: Re: [RFC v2 53/76] target/riscv: use softfloat lib float16 comparison
- functions
-To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-References: <20200722091641.8834-1-frank.chang@sifive.com>
- <20200722091641.8834-54-frank.chang@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6169b129-2868-3ee9-b70d-7a1725ef75ab@linaro.org>
-Date: Thu, 30 Jul 2020 14:32:49 -0700
+ Thu, 30 Jul 2020 14:39:07 -0700 (PDT)
+Subject: Re: [PATCH V1 00/32] Live Update
+To: Steven Sistare <steven.sistare@oracle.com>, qemu-devel@nongnu.org
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <37635d27-b63f-f200-fa89-ccb6f7eba7f6@redhat.com>
+ <c7fe0c2e-045c-f50c-6429-7ceaeee7bd66@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5fbcfbcc-0908-4957-d15b-4ba4494dde85@redhat.com>
+Date: Thu, 30 Jul 2020 23:39:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200722091641.8834-54-frank.chang@sifive.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <c7fe0c2e-045c-f50c-6429-7ceaeee7bd66@oracle.com>
 Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102e;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 23:51:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,24 +116,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/20 2:16 AM, frank.chang@sifive.com wrote:
-> From: Frank Chang <frank.chang@sifive.com>
-> 
-> Signed-off-by: Frank Chang <frank.chang@sifive.com>
-> ---
->  target/riscv/vector_helper.c | 19 -------------------
->  1 file changed, 19 deletions(-)
+On 30/07/20 21:09, Steven Sistare wrote:
+>> please spell it out.  Also, how does the functionality compare to
+>> xen-save-devices-state and xen-load-devices-state?
+>
+> qmp_xen_save_devices_state serializes device state to a file which is loaded 
+> on the target for a live migration.  It performs some of the same actions
+> as cprsave/cprload but does not support live update-in-place.
 
+So it is a subset, can code be reused across both?  Also, live migration
+across versions is supported, so can you describe the special
+update-in-place support more precisely?  I am confused about the use
+cases, which require (or try) to keep file descriptors across re-exec,
+which are for kexec, and so on.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>>> cprsave and cprload support guests with vfio devices if the caller first
+>>> suspends the guest by issuing guest-suspend-ram to the qemu guest agent.
+>>> The guest drivers suspend methods flush outstanding requests and re-
+>>> initialize the devices, and thus there is no device state to save and
+>>> restore.
+>> This probably should be allowed even for regular migration.  Can you
+>> generalize the code as a separate series?
+>
+> Maybe.  I think that would be a distinct patch that ignores the vfio migration blocker 
+> if the state is suspended.  Plus a qemu agent call to do the suspend.  Needs more
+> thought.
 
-r~
+The agent already supports suspend, so that should be relatively easy.
+Only the code to add/remove the VFIO migration blocker from a VM state
+change notifier, or something like that, would be needed.
+
+Paolo
+
 
