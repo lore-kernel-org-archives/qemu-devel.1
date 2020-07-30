@@ -2,126 +2,120 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF33FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 22:10:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D1FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 22:12:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 923D520829
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 22:10:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABEFC20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 22:12:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ahfkbHuC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 923D520829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="SzQNMmdO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABEFC20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Gku-0008VD-U3
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 18:10:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38506)
+	id 1k1GmY-0001Fe-15
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 18:12:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k1Gjg-0007Rb-94
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 18:09:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58140
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k1Gjc-0000lA-TT
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 18:09:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596146947;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PlezEbcGbemcrB5KKTPYUUKfJWK3NqsY9WL1vRFrtzQ=;
- b=ahfkbHuCTXewJ+4CsFCTVkyvqUdxloSJjtc/gPEQ4yD8OG7NU+M58Mk1JRXxXh19mfYsVF
- YT2HnSDIeyzKN55z+XruK2aZbErOZOKCetCwDw0IdFE7SMlZ/U6X8fkuU1mc2RxM3l6jNx
- S0BuAqMSnMTlQNjDoljX6Qa3px8cWWI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-3iqHlxd5PM6xHGEOlbfZsg-1; Thu, 30 Jul 2020 18:09:05 -0400
-X-MC-Unique: 3iqHlxd5PM6xHGEOlbfZsg-1
-Received: by mail-wm1-f69.google.com with SMTP id h6so1688579wml.8
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 15:09:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=PlezEbcGbemcrB5KKTPYUUKfJWK3NqsY9WL1vRFrtzQ=;
- b=oxvAqbs+OyIqS3PdOoOkyFYvkzm6tHT2XdQib6QmC5EDa3QOLU4wRqzgn3uBCrryjp
- wFVpA+qY2Hfa004HgIRMrEkpMJbGQ4c4mr4Gf+sed+4tBdrLD6+HLnQf/kS2zChfKSeU
- MgVapI9LfrRfEaBZYOdNJ/aQom+TEg0wyZcT9K7yG+SArBAPPJxxijD/lMCI8nxJ6VPM
- D3o9OOH5Yiqvk+lAdtXeSmeW6phetFBAqDrzDVvXF0u9ptxZoj3KlsZOOgyKlF9a0Q3b
- jGPEWNWnf7kCNpiGQosXJyLmMerACv817w60RiKPknG009yGCHNqf4usv51wye3gQrIi
- Hkjg==
-X-Gm-Message-State: AOAM532l1kHv3cTi8R1TQGIjZUGqTp4pWb28tsRG6sz1gPTmmVgKwLrx
- AQnGSKjcgGszg1fg8vdEKXaxld7yYjO7MPt/OViqqZrck5uwPq2rgoNfnHUjIkTUh4whx38xV4y
- vWiEtt00Ikkfjlik=
-X-Received: by 2002:a05:6000:12c5:: with SMTP id
- l5mr705334wrx.219.1596146944629; 
- Thu, 30 Jul 2020 15:09:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyNPFDfH17cIBG25poaOTwNdr5PQ6UgGTiJ5lbwejo+7XJao3qgOQMzDnv6nNu1WYbSQIs2dQ==
-X-Received: by 2002:a05:6000:12c5:: with SMTP id
- l5mr705301wrx.219.1596146944369; 
- Thu, 30 Jul 2020 15:09:04 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:310b:68e5:c01a:3778?
- ([2001:b07:6468:f312:310b:68e5:c01a:3778])
- by smtp.gmail.com with ESMTPSA id p6sm10627307wmg.0.2020.07.30.15.09.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jul 2020 15:09:03 -0700 (PDT)
-Subject: Re: [PATCH 3/3] cpu-timers, icount: new modules
-To: Claudio Fontana <cfontana@suse.de>, Thomas Huth <thuth@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200629093504.3228-1-cfontana@suse.de>
- <20200629093504.3228-4-cfontana@suse.de>
- <aa45a793-35b1-d3bd-18a8-4c52ad888029@redhat.com>
- <f89f249d-dbc4-779b-5b53-fc408461f072@suse.de>
- <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
- <e9dca3d1-f52d-13ce-2d7d-66958bc15765@suse.de>
- <996dc455-548e-5964-9c87-f4abe5b63907@redhat.com>
- <146b0cf2-509b-6a48-e82b-b93740e4c60d@redhat.com>
- <e3cc11a4-8ba7-917a-844b-4f6ec69d140a@suse.de>
- <76aac4ac-40f5-4870-ed2b-bab8b68b0a64@redhat.com>
- <9630c685-0a37-a1e7-4614-9d692988a799@suse.de>
- <22228280-f3b4-3f64-d2ba-30cfc47c8b0d@redhat.com>
- <994492fd-5ae2-52e2-0864-7216ec9dae34@suse.de>
- <b4de7352-87ba-df4c-fdcd-dab4028cef61@redhat.com>
- <5a41a63f-8397-64d3-0839-6990e2965339@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8aaa983a-c720-88f2-5ad4-b88078ef705e@redhat.com>
-Date: Fri, 31 Jul 2020 00:09:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <5a41a63f-8397-64d3-0839-6990e2965339@suse.de>
+ (Exim 4.90_1) (envelope-from <sunilmut@microsoft.com>)
+ id 1k1Glv-0000pV-H3
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 18:11:31 -0400
+Received: from mail-dm6nam11on2132.outbound.protection.outlook.com
+ ([40.107.223.132]:19160 helo=NAM11-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sunilmut@microsoft.com>)
+ id 1k1Glt-0001AG-Ij
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 18:11:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TBrmVBwkmwWt5ePcMZ4bBW7e+A7Ud+IqX3aY1slI3JoT7HJPxXh6gu4ohPfK7mEj7MUQP+SEJ/Fzfk82HTz0LLenZQ4LfohfGiCtXm3xp9srWzKzbAx6kKIUG1jKhXp/rcNQlwTQRQEHCpZyUYle7H/S2SUjyr2H2qV2IVFqYw4061yY7aSUbwJ7dtVoSVOHTFJUDIfb3UpNW3qkmJvo5ZvVRqGIKK/6ijWzjgvs1qV0YqRZChYLErVjyMB3t/SPxe5yPG2efjPcv93tyT9ZotmfJu6zi+b7gUQuhWZD1QHef8zQteFSvdm9Dm/UFu1Ndwp/ZYWl7vzXvZt59s6jNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6wsYCZ20nnPnoGpbpPWwggkwDhavPDQGWBA1ruojhco=;
+ b=LSbr8macfplaNOmGJmqtYcZmXcpQ4kPC/Sw4a6mvbh2CIAcvCl//w/9FNgwbp/JGlCn/TLCKyY5pfQNSgZTEq6c1Fkihz4oA9ZhMpDTBvR3Egoz0xCa/q6jdak+FWmYiJ6gCZya73/5gK5KnaAv9os63pX5z2vfGke6M0bqRH+QSojLHZnJrx71s1XSO0oVixjnaBg3XiQHBhcmgHo1fTAw99ia1RJXSksUtpXfXi9npsrr1AW2oddJmDWKppR5ryyGMyWoxarRwM0bZlpaAsYSg/AusbnEUqohFmb7UR6Ul6sBsiaE2q7F0iAjr71pt2Q8O3LO2eN5vsuqXQyjnow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6wsYCZ20nnPnoGpbpPWwggkwDhavPDQGWBA1ruojhco=;
+ b=SzQNMmdObO26i1SNKqWYsj3GHO19fVy8ynjOOdvZWn01fffPc96S61g5N0U1DlPKuJIAaJ6zhLJepLy5NSUsuUEA4UF6vPfep5r74LNyX62Jo4RAPRH0157Ya/i0T+ChxldJj6Th764FgBu4cSNZQaV4zq6EjzYlIz4IDtjOXYc=
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ (2603:10b6:803:51::33) by SN6PR2101MB0911.namprd21.prod.outlook.com
+ (2603:10b6:805:a::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.9; Thu, 30 Jul
+ 2020 22:11:26 +0000
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::99a:30fe:609e:be35]) by SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::99a:30fe:609e:be35%8]) with mapi id 15.20.3239.016; Thu, 30 Jul 2020
+ 22:11:26 +0000
+From: Sunil Muthuswamy <sunilmut@microsoft.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
+ Eduardo Habkost <ehabkost@redhat.com>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Weil
+ <sw@weilnetz.de>
+Subject: [PATCH] WHPX: vmware cpuid leaf for tsc and apic frequency
+Thread-Topic: [PATCH] WHPX: vmware cpuid leaf for tsc and apic frequency
+Thread-Index: AdZmvkwMdobd7GWITmu6pdxDKVKTrw==
+Date: Thu, 30 Jul 2020 22:11:26 +0000
+Message-ID: <SN4PR2101MB08808DFDDC3F442BBEAADFF4C0710@SN4PR2101MB0880.namprd21.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 23:51:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=microsoft.com;
+x-originating-ip: [2601:602:9400:570:c5c8:1863:df3a:3ff6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: bcc1222f-f17c-4f58-a14f-08d834d580d7
+x-ms-traffictypediagnostic: SN6PR2101MB0911:
+x-microsoft-antispam-prvs: <SN6PR2101MB0911B0E23A6E7F4EF3D51C17C0710@SN6PR2101MB0911.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4125;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: R7xkHctqGUi7yCXetWjq7WPw87mnQ9oWheTpkS/d5QNuU4KIqaYY5U4OmfeJ/LLOWdN8fXmqVYrCegGX0lThoTWvyFdlwwYYHHIobcQBPykGs8jKd7kluBzyqOvIp5eYBt1UvVQ/vhhpJ6itLkFFf79bXyBrlmznurZnOr6/6awW2PAvkvjBMOMx566/cikOC+bufpQZMwbi1ldTbwkqWgnYU72PhzRKSlGupY2vf/6gZcpaUtiexKwrbGvHJmnO0sBy8EIYANBWAe2TB9w3CUasVALfosNfXsJQqiWBVML8QScH+B5PvmiUrUCKwRLx113N9rX/6WqGs197v2yNHA==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN4PR2101MB0880.namprd21.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(376002)(136003)(366004)(396003)(39860400002)(71200400001)(54906003)(66556008)(8990500004)(66946007)(478600001)(66476007)(76116006)(10290500003)(110136005)(55016002)(64756008)(66446008)(316002)(9686003)(5660300002)(8936002)(6506007)(8676002)(86362001)(83380400001)(186003)(52536014)(2906002)(7696005)(33656002)(82950400001)(82960400001)(4326008);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: Nyd5/fZsrZcgXa3DgRoH9neZ5U6NZgHY1zCUmZMj6iUd6HdzwWAVhbqLe28lGL5X3GUWCwwtXiHiNYb4G7YQvuaVOJ69tHfWest1UCQrhmREqZmyp2UxwFQYlRyeH11LmXfBRaARnZiSglK68g+vUhzFNRqfQjIT8wu/nMCJT6a1XpMjb9q7z79nWf1gYREB5MwPvcqm27zoXmBZ8V1lqy+aL2u++jDC4KcCSS9cvqfTV8hB9OsQvXffIe3hVgVfX6hJTpwRWjsJD5NEX+McvLfA1PUZhjJyREXZWjDspbPB92/nyiZsKvC4iS+yAv1EatZ6ZrenFTj6oG33afdWaPmba8D0NgMB6KoFjNUlWaVkB8SJ1K0K+v/YeVtp2FvGDqBNtA2pZIRxqwSnC7ndo8iGf9LN9ZL3zsYqG7aYXQ13wtQ+uJVdU38Za1iY8PxrAWc5EWI+sXs5qmwziSdWOBZ95kB4oJpuyIr7IJt6be7tPyn0QUbg3a3C+SNTYAvR2LxWg0rVI3AGnf5VtwVNNeJf3IP3JweAP4zL1aanf/o0b0dMj0nonHYcDa7CdveEDP/lm0SI/kh6hZ2B4YhMfUVqFYiYlm7fuF2uh5bvy59Bg+gedujR9MQjARCrOu3eXfDw6mzuEij42BM0/pR0/pGL0Rc3cl1yMfasbe7YtzZCpzW1Uh7MPRPlirrH+XZN41HGmmdJbyd0IBZK9Awc0Q==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR2101MB0880.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bcc1222f-f17c-4f58-a14f-08d834d580d7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jul 2020 22:11:26.6519 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: d9DXCLPMExc5+3oG1IwXWnaVhiu+/LM13eHt3cJ6DonsYA4utJ5XcRrOtKlBuEPpH9EeZJbZyxLgW3PrIdXW2rm1bpTr/CiWaXXhH6iTSwA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR2101MB0911
+Received-SPF: pass client-ip=40.107.223.132;
+ envelope-from=sunilmut@microsoft.com;
+ helo=NAM11-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 18:11:28
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -135,42 +129,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/07/20 18:33, Claudio Fontana wrote:
-> One problem I noticed is that qemu_clock_get_ns is util/qemu-timer.c,
-> which is tools _and_ softmmu, while I tried to extract the
-> softmmu-only timer code in softmmu/cpu-timers.c,
+Newer versions of WHPX provide the capability to query the tsc
+and apic frequency. Expose these through the vmware cpuid leaf.
+This patch doesnt support setting the tsc frequency; that will
+come as a separate fix.
 
-Not all of it, only the VIRTUAL clock which is
+Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
+---
+ target/i386/whp-dispatch.h |  3 +-
+ target/i386/whpx-all.c     | 94 ++++++++++++++++++++++++++++++++++----
+ 2 files changed, 86 insertions(+), 11 deletions(-)
 
-        if (use_icount) {
-            return cpu_get_icount();
-        } else {
-            return cpu_get_clock();
-        }
-
-and would be changed to something like
-
-	return cpu_get_virtual_clock();
-
-In turn cpu_get_virtual_clock() is
-
-	return (accel_ops->cpu_get_virtual clock ?: cpu_get_clock)();
-
-in the emulators, plus a stub that replaces stubs/cpu-get-icount.c and
-is just
-
-	return get_clock_realtime();
-
-as in stubs/cpu-get-clock.c.
-
-Paolo
+diff --git a/target/i386/whp-dispatch.h b/target/i386/whp-dispatch.h
+index e4695c349f..b18aba20ed 100644
+--- a/target/i386/whp-dispatch.h
++++ b/target/i386/whp-dispatch.h
+@@ -2,10 +2,11 @@
+ #define WHP_DISPATCH_H
+=20
+ #include <windows.h>
+-
+ #include <WinHvPlatform.h>
+ #include <WinHvEmulation.h>
+=20
++#define WHV_E_UNKNOWN_CAPABILITY 0x80370300L
++
+ #define LIST_WINHVPLATFORM_FUNCTIONS(X) \
+   X(HRESULT, WHvGetCapability, (WHV_CAPABILITY_CODE CapabilityCode, VOID* =
+CapabilityBuffer, UINT32 CapabilityBufferSizeInBytes, UINT32* WrittenSizeIn=
+Bytes)) \
+   X(HRESULT, WHvCreatePartition, (WHV_PARTITION_HANDLE* Partition)) \
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index c78baac6df..da4c135925 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -27,6 +27,8 @@
+ #include <WinHvPlatform.h>
+ #include <WinHvEmulation.h>
+=20
++#define HYPERV_APIC_BUS_FREQUENCY      (200000000ULL)
++
+ struct whpx_state {
+     uint64_t mem_quota;
+     WHV_PARTITION_HANDLE partition;
+@@ -1061,6 +1063,18 @@ static int whpx_vcpu_run(CPUState *cpu)
+             cpu_x86_cpuid(env, cpuid_fn, 0, (UINT32 *)&rax, (UINT32 *)&rbx=
+,
+                 (UINT32 *)&rcx, (UINT32 *)&rdx);
+             switch (cpuid_fn) {
++            case 0x40000000:
++                /* Expose the vmware cpu frequency cpuid leaf */
++                rax =3D 0x40000010;
++                rbx =3D rcx =3D rdx =3D 0;
++                break;
++
++            case 0x40000010:
++                rax =3D env->tsc_khz;
++                rbx =3D env->apic_bus_freq / 1000; /* Hz to KHz */
++                rcx =3D rdx =3D 0;
++                break;
++
+             case 0x80000001:
+                 /* Remove any support of OSVW */
+                 rcx &=3D ~CPUID_EXT3_OSVW;
+@@ -1193,6 +1207,10 @@ int whpx_init_vcpu(CPUState *cpu)
+     struct whpx_state *whpx =3D &whpx_global;
+     struct whpx_vcpu *vcpu;
+     Error *local_error =3D NULL;
++    struct CPUX86State *env =3D (CPUArchState *)(cpu->env_ptr);
++    X86CPU *x86_cpu =3D X86_CPU(cpu);
++    UINT64 freq =3D 0;
++    int ret;
+=20
+     /* Add migration blockers for all unsupported features of the
+      * Windows Hypervisor Platform
+@@ -1207,7 +1225,8 @@ int whpx_init_vcpu(CPUState *cpu)
+             error_report_err(local_error);
+             migrate_del_blocker(whpx_migration_blocker);
+             error_free(whpx_migration_blocker);
+-            return -EINVAL;
++            ret =3D -EINVAL;
++            goto error;
+         }
+     }
+=20
+@@ -1215,7 +1234,8 @@ int whpx_init_vcpu(CPUState *cpu)
+=20
+     if (!vcpu) {
+         error_report("WHPX: Failed to allocte VCPU context.");
+-        return -ENOMEM;
++        ret =3D -ENOMEM;
++        goto error;
+     }
+=20
+     hr =3D whp_dispatch.WHvEmulatorCreateEmulator(
+@@ -1224,8 +1244,8 @@ int whpx_init_vcpu(CPUState *cpu)
+     if (FAILED(hr)) {
+         error_report("WHPX: Failed to setup instruction completion support=
+,"
+                      " hr=3D%08lx", hr);
+-        g_free(vcpu);
+-        return -EINVAL;
++        ret =3D -EINVAL;
++        goto error;
+     }
+=20
+     hr =3D whp_dispatch.WHvCreateVirtualProcessor(
+@@ -1234,17 +1254,72 @@ int whpx_init_vcpu(CPUState *cpu)
+         error_report("WHPX: Failed to create a virtual processor,"
+                      " hr=3D%08lx", hr);
+         whp_dispatch.WHvEmulatorDestroyEmulator(vcpu->emulator);
+-        g_free(vcpu);
+-        return -EINVAL;
++        ret =3D -EINVAL;
++        goto error;
+     }
+=20
+-    vcpu->interruptable =3D true;
++    /*
++     * vcpu's TSC frequency is either specified by user, or use the value
++     * provided by Hyper-V if the former is not present. In the latter cas=
+e, we
++     * query it from Hyper-V and record in env->tsc_khz, so that vcpu's TS=
+C
++     * frequency can be migrated later via this field.
++     */
++    if (!env->tsc_khz) {
++        hr =3D whp_dispatch.WHvGetCapability(
++            WHvCapabilityCodeProcessorClockFrequency, &freq, sizeof(freq),
++                NULL);
++        if (hr !=3D WHV_E_UNKNOWN_CAPABILITY) {
++            if (FAILED(hr)) {
++                printf("WHPX: Failed to query tsc frequency, hr=3D0x%08lx\=
+n", hr);
++            } else {
++                env->tsc_khz =3D freq / 1000; /* Hz to KHz */
++            }
++        }
++    }
+=20
++    env->apic_bus_freq =3D HYPERV_APIC_BUS_FREQUENCY;
++    hr =3D whp_dispatch.WHvGetCapability(
++        WHvCapabilityCodeInterruptClockFrequency, &freq, sizeof(freq), NUL=
+L);
++    if (hr !=3D WHV_E_UNKNOWN_CAPABILITY) {
++        if (FAILED(hr)) {
++            printf("WHPX: Failed to query apic bus frequency hr=3D0x%08lx\=
+n", hr);
++        } else {
++            env->apic_bus_freq =3D freq;
++        }
++    }
++
++    /*
++     * If the vmware cpuid frequency leaf option is set, and we have a val=
+id
++     * tsc value, trap the corresponding cpuid's.
++     */
++    if (x86_cpu->vmware_cpuid_freq && env->tsc_khz) {
++        UINT32 cpuidExitList[] =3D {1, 0x80000001, 0x40000000, 0x40000010}=
+;
++
++        hr =3D whp_dispatch.WHvSetPartitionProperty(
++                whpx->partition,
++                WHvPartitionPropertyCodeCpuidExitList,
++                cpuidExitList,
++                RTL_NUMBER_OF(cpuidExitList) * sizeof(UINT32));
++
++        if (FAILED(hr)) {
++            error_report("WHPX: Failed to set partition CpuidExitList hr=
+=3D%08lx",
++                        hr);
++            ret =3D -EINVAL;
++            goto error;
++        }
++    }
++
++    vcpu->interruptable =3D true;
+     cpu->vcpu_dirty =3D true;
+     cpu->hax_vcpu =3D (struct hax_vcpu_state *)vcpu;
+     qemu_add_vm_change_state_handler(whpx_cpu_update_state, cpu->env_ptr);
+=20
+     return 0;
++
++error:
++    g_free(vcpu);
++
++    return ret;
+ }
+=20
+ int whpx_vcpu_exec(CPUState *cpu)
+@@ -1493,6 +1568,7 @@ static int whpx_accel_init(MachineState *ms)
+     WHV_CAPABILITY whpx_cap;
+     UINT32 whpx_cap_size;
+     WHV_PARTITION_PROPERTY prop;
++    UINT32 cpuidExitList[] =3D {1, 0x80000001};
+=20
+     whpx =3D &whpx_global;
+=20
+@@ -1551,7 +1627,6 @@ static int whpx_accel_init(MachineState *ms)
+         goto error;
+     }
+=20
+-    UINT32 cpuidExitList[] =3D {1, 0x80000001};
+     hr =3D whp_dispatch.WHvSetPartitionProperty(
+         whpx->partition,
+         WHvPartitionPropertyCodeCpuidExitList,
+@@ -1579,14 +1654,13 @@ static int whpx_accel_init(MachineState *ms)
+     printf("Windows Hypervisor Platform accelerator is operational\n");
+     return 0;
+=20
+-  error:
++error:
+=20
+     if (NULL !=3D whpx->partition) {
+         whp_dispatch.WHvDeletePartition(whpx->partition);
+         whpx->partition =3D NULL;
+     }
+=20
+-
+     return ret;
+ }
+=20
+--=20
+2.25.1
 
 
