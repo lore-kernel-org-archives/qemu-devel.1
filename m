@@ -2,67 +2,71 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76806C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 01:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F04C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 01:13:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 412C72075D
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 01:01:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="BkgzC6JE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 412C72075D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 484262074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 01:13:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 484262074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0wwo-0002Qm-G2
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 21:01:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58694)
+	id 1k0x82-0005Eg-GW
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 21:13:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k0wvY-000197-3n; Wed, 29 Jul 2020 21:00:08 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:60431)
+ (Exim 4.90_1) (envelope-from <jingqi.liu@intel.com>)
+ id 1k0x7U-0004pB-Dk
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 21:12:28 -0400
+Received: from mga18.intel.com ([134.134.136.126]:15476)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k0wvW-0006Vh-6l; Wed, 29 Jul 2020 21:00:07 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BHBsC1RPyz9sRN; Thu, 30 Jul 2020 10:59:58 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1596070799;
- bh=N2A3QinCPcXfIXYlyWTtIuIP8c79od3Ol5bcww38GDM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=BkgzC6JEWlUYrzHr6/X5wgJd8DMKfkx6HjuEJnHl6uG5c5Z28+qYfosdxlAZLHpQL
- 2YPNGuGvUjyJ7cMNMO+V4PHpQb8sGdS/9kMIkKgYs1TW7+v9CaXMT05i3gMZw0hoWD
- IQAMzb9tKmq432y7bD5knKCdexuY84F9bCzd13HU=
-Date: Thu, 30 Jul 2020 10:59:47 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: Re: [PATCH v3 0/8] Generalize start-powered-off property from ARM
-Message-ID: <20200730005947.GO84173@umbus.fritz.box>
-References: <20200723025657.644724-1-bauerman@linux.ibm.com>
- <878sf3uojf.fsf@morokweng.localdomain>
+ (Exim 4.90_1) (envelope-from <jingqi.liu@intel.com>)
+ id 1k0x7R-0007vL-Lh
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 21:12:27 -0400
+IronPort-SDR: Xn41st3Lb3tBigGy5iv+cqK0yC16w6ycD8EU9Or5V0RhlYjNNZCABjLvM52UxPQG2TOachgdEV
+ R7b4uuR7ZuKw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9697"; a="139055715"
+X-IronPort-AV: E=Sophos;i="5.75,412,1589266800"; d="scan'208";a="139055715"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 29 Jul 2020 18:12:20 -0700
+IronPort-SDR: 51dGuBhdgg+xbxDmYkcmeWFTyEoO6TkqCGO2jXDPrTbnnq9wOovf9d4772n3GCKrH/tQZmRmro
+ 6u7pgaNEwegw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,412,1589266800"; d="scan'208";a="313233873"
+Received: from dazhang1-mobile.sh.intel.com ([10.239.48.70])
+ by fmsmga004.fm.intel.com with ESMTP; 29 Jul 2020 18:12:18 -0700
+From: Jingqi Liu <jingqi.liu@intel.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Dan Williams <dan.j.williams@intel.com>
+Subject: [PATCH] docs/nvdimm: add 'pmem=on' for the device dax backend file
+Date: Thu, 30 Jul 2020 09:02:06 +0800
+Message-Id: <20200730010206.47051-1-jingqi.liu@intel.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="vNrHrykRFvLVX6W3"
-Content-Disposition: inline
-In-Reply-To: <878sf3uojf.fsf@morokweng.localdomain>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=134.134.136.126;
+ envelope-from=jingqi.liu@intel.com; helo=mga18.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 21:12:20
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,72 +79,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
- qemu-s390x@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Jingqi Liu <jingqi.liu@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+At the end of live migration, QEMU uses msync() to flush the data to
+the backend storage. When the backend file is a character device dax,
+the pages explicitly avoid the page cache. It will return failure from msync().
+The following warning is output.
 
---vNrHrykRFvLVX6W3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+    "warning: qemu_ram_msync: failed to sync memory range“
 
-On Tue, Jul 28, 2020 at 09:56:36PM -0300, Thiago Jung Bauermann wrote:
->=20
-> Thiago Jung Bauermann <bauerman@linux.ibm.com> writes:
->=20
-> > The ARM code has a start-powered-off property in ARMCPU, which is a
-> > subclass of CPUState. This property causes arm_cpu_reset() to set
-> > CPUState::halted to 1, signalling that the CPU should start in a halted
-> > state. Other architectures also have code which aim to achieve the same
-> > effect, but without using a property.
-> >
-> > The ppc/spapr version has a bug where QEMU does a KVM_RUN on the vcpu
-> > before cs->halted is set to 1, causing the vcpu to run while it's still=
- in
-> > an unitialized state (more details in patch 3).
->=20
-> Since this series fixes a bug is it eligible for 5.1, at least the
-> patches that were already approved by the appropriate maintainers?
+So we add 'pmem=on' to avoid calling msync(), use the QEMU command line:
 
-Ok by me.
+    -object memory-backend-file,id=mem1,pmem=on,mem-path=/dev/dax0.0,size=4G
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+---
+ docs/nvdimm.txt | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
---vNrHrykRFvLVX6W3
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+index c2c6e441b3..31048aff5e 100644
+--- a/docs/nvdimm.txt
++++ b/docs/nvdimm.txt
+@@ -243,6 +243,13 @@ use the QEMU command line:
+ 
+     -object memory-backend-file,id=nv_mem,mem-path=/XXX/yyy,size=4G,pmem=on
+ 
++At the end of live migration, QEMU uses msync() to flush the data to the
++backend storage. When the backend file is a character device dax, the pages
++explicitly avoid the page cache. It will return failure from msync().
++So we add 'pmem=on' to avoid calling msync(), use the QEMU command line:
++
++    -object memory-backend-file,id=mem1,pmem=on,mem-path=/dev/dax0.0,size=4G
++
+ References
+ ----------
+ 
+-- 
+2.17.1
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8iG4MACgkQbDjKyiDZ
-s5Iveg//aisagDLxRmaDf7/etcVy4HN1kI/iGlxxbZLocT+xUb7bXLcYA/ZDUCJ0
-T1v+xN5a5e4c2S1JBOqrBnvqP8MKhFtV4p8ZtRCR8mGIKahMrDwJkKjeD6mexioc
-d+Lbe/lwilT8d0dmRHGt/W6u0UVocboMLoNfx567Rqd22EuUB8CsVjthZ6ZXvsr/
-QFNYHPqfnnzANLr62kvf+DHW8TppOEcbUPrG4pmOYaQCBy7Tj3NRsYnnikohTpY4
-4QpUoO02Lny1TapaGFYObTYP++65i/hbWjgS+qSwVZvsfF0nBjfvjUp5nt7tH9A6
-aV0o/4WlIY5FDpsnrqxj2TIBbbH0uFpg1/OAorrcNnwLArJylJ2/vqpUv81p/qlk
-LUL7ZVYAhEQkhmNh/cRWT9v71jcdx5RNwIpQusoXNbrurP8qGyeGh9NH3ZrPaLA0
-5hEyg2CMxCZ7xF5ZhLrLtTYL9rHgA5mDvw4FmKfpVHHymKa7u956xhP7YF9hJwrh
-Yr5uc9CsM24THQONchQuXfmTl55cbZFOocI30qSvYRy8f64tjfMcrRJyL/4hsXZR
-kwYBzeQUfwyzIlf4zhYhFQIA8+FBHqKs0/hyuNfZGEMZatzoSZNdjxLnWy0VTnkf
-ob+uofgZYTol74NZYvpYmV4PVEk0iKDr3bMgIsfDggv7yFkvKeI=
-=TTOn
------END PGP SIGNATURE-----
-
---vNrHrykRFvLVX6W3--
 
