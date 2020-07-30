@@ -2,78 +2,121 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A692C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 14:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D88C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 14:30:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3539A20578
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 14:28:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 202ED20578
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 14:30:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XtrwlQDF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3539A20578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G7s11llM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 202ED20578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k19Xn-0001dy-I7
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 10:28:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56278)
+	id 1k19ZL-0002zT-9n
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 10:30:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k19S5-0002QO-GU
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 10:22:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31368
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k19YX-0002DF-7W
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 10:29:13 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53791
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k19S4-000633-1W
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 10:22:33 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k19YU-00074g-8s
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 10:29:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596118950;
+ s=mimecast20190719; t=1596119349;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1g+nDRNzICULfjPK9VzqRZhJlna7oA9vv99CYPf3EUg=;
- b=XtrwlQDF9lytp608YOv2xVzyU9pHhmW2OA6C4ngREYspSkmL+F1glzWn0jwIV6snzu9/E4
- 5wnd39fg4u+05n09U1X2nC9OsGevZzWZ8mNv9oYbVKV13mynglk+CxqZEiKAKx+DaM9qHd
- 9z/Nh61gSfM6sJ3xIj6UNGDUAXbzKZQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-2Bh90G5aMwyAAl-9Y6F-XQ-1; Thu, 30 Jul 2020 10:22:29 -0400
-X-MC-Unique: 2Bh90G5aMwyAAl-9Y6F-XQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 337B81009440;
- Thu, 30 Jul 2020 14:22:27 +0000 (UTC)
-Received: from work-vm (ovpn-114-102.ams2.redhat.com [10.36.114.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0293F7AC94;
- Thu, 30 Jul 2020 14:22:22 +0000 (UTC)
-Date: Thu, 30 Jul 2020 15:22:20 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ON1OtNmWc+sWirLzhHcY0wMbAE33llek/hkyMukuUBI=;
+ b=G7s11llMYP63/BIQPCPzBb643P3M5x/dJW8gdnfEWYTQ1bGg70crpcGoZPBiMt3QgDWYHy
+ PUFa1Y2mhU+ZZP7GOsDpoVuo3kJ9DiUUA7ZQ8/YMb1X+UHmSbiRU92CPBsvJK1HZPQTRxM
+ 6/HiXWrQSXCN81zezdWN4mTUbMgP+ws=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-502-gnveiXTLNSatuJRskBmPCw-1; Thu, 30 Jul 2020 10:29:07 -0400
+X-MC-Unique: gnveiXTLNSatuJRskBmPCw-1
+Received: by mail-wr1-f72.google.com with SMTP id 89so7999250wrr.15
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 07:29:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=ON1OtNmWc+sWirLzhHcY0wMbAE33llek/hkyMukuUBI=;
+ b=Gcsatycx+rOU34ru98rALM2Zn9RHqn01n13R5G1R4qrlKAxBQL9rcPZHHdCPmxAFMo
+ ZZ5hVRDa0ilQHM6NFkIs5rja/L8AhJHcmhb60hs/MEZFGyH77Hah55puJth13fVocSPc
+ yf9bwmP35AgCkURwwluYTe6DOHFvm7Tj8+cLFfk4ZFoeU++Ep7DMplc58YmZ+OQg2wAB
+ HCPlzWs6IK08AVTkm67rXdjsXDHOYjyqy39J2WSfjbvWbNj4XaWuER71MV2mrF5zD3Mi
+ 0GSSRa8dmutw37XC2plBXfXsx2jB5hKop8Zhs9BP4CQrWAUjf2jmpD4FodX7q6KJlkxu
+ l6+w==
+X-Gm-Message-State: AOAM533BA1kJqdxLwmzMYNhsrbOZMnkeOcWnZ/OWolNKMtfw5bkPvULs
+ D+tzNa1EwkiZ5oWL3qJlet+5XJwfdLq9gQRSgbyqs7Gz+yK0exWhwc80/V5bcqi38EzpwpQRwrf
+ 2x7oNuah/E8Pv608=
+X-Received: by 2002:a1c:7c16:: with SMTP id x22mr12930110wmc.76.1596119346648; 
+ Thu, 30 Jul 2020 07:29:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxRk9Toidnn/8nNPJ92iTbSlGujn51nI+mWtmy4pxgPlXrvSf4iyFihMZ4GDNXrvGVTR5MsuQ==
+X-Received: by 2002:a1c:7c16:: with SMTP id x22mr12930082wmc.76.1596119346396; 
+ Thu, 30 Jul 2020 07:29:06 -0700 (PDT)
+Received: from [192.168.1.39] (214.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.214])
+ by smtp.gmail.com with ESMTPSA id h199sm9307047wme.42.2020.07.30.07.29.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Jul 2020 07:29:05 -0700 (PDT)
 Subject: Re: [PATCH-for-5.1? v2 0/2] util/pagesize: Make
  qemu_real_host_page_size of type size_t
-Message-ID: <20200730142220.GA7120@work-vm>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 References: <20200730141245.21739-1-philmd@redhat.com>
+ <20200730142220.GA7120@work-vm>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <1338b920-28a6-8f9f-693d-b3852b7e54de@redhat.com>
+Date: Thu, 30 Jul 2020 16:29:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20200730142220.GA7120@work-vm>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200730141245.21739-1-philmd@redhat.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:59:04
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -81,7 +124,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,36 +149,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daudé (philmd@redhat.com) wrote:
-> Since v1:
-> Make QEMU_VMALLOC_ALIGN unsigned in a previous patch
-
-Nah, not for 5.1 - it feels like the type of thing that might on a
-really bad day create a really subtle bug.
-
-Dave
-
-> Philippe Mathieu-Daudé (2):
->   qemu/osdep: Make QEMU_VMALLOC_ALIGN unsigned long
->   util/pagesize: Make qemu_real_host_page_size of type size_t
+On 7/30/20 4:22 PM, Dr. David Alan Gilbert wrote:
+> * Philippe Mathieu-DaudÃƒÂ© (philmd@redhat.com) wrote:
+>> Since v1:
+>> Make QEMU_VMALLOC_ALIGN unsigned in a previous patch
 > 
->  include/exec/ram_addr.h  | 4 ++--
->  include/qemu/osdep.h     | 6 +++---
->  accel/kvm/kvm-all.c      | 3 ++-
->  block/qcow2-cache.c      | 2 +-
->  exec.c                   | 8 ++++----
->  hw/ppc/spapr_pci.c       | 2 +-
->  hw/virtio/virtio-mem.c   | 2 +-
->  migration/migration.c    | 2 +-
->  migration/postcopy-ram.c | 2 +-
->  monitor/misc.c           | 2 +-
->  util/pagesize.c          | 2 +-
->  11 files changed, 18 insertions(+), 17 deletions(-)
-> 
-> -- 
-> 2.21.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Nah, not for 5.1 - it feels like the type of thing that might on a
+> really bad day create a really subtle bug.
+
+Ack :)
 
 
