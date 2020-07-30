@@ -2,79 +2,89 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D10A8C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A44C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:34:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 665BB2074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:32:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 665BB2074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+	by mail.kernel.org (Postfix) with ESMTPS id 176552074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:34:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GwdUmkF8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 176552074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k16nL-0003A8-B6
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:32:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34446)
+	id 1k16pH-0005Rf-Ei
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:34:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36766)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <likaige@loongson.cn>)
- id 1k16j5-0005jZ-7X; Thu, 30 Jul 2020 07:27:55 -0400
-Received: from mail.loongson.cn ([114.242.206.163]:39854 helo=loongson.cn)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <likaige@loongson.cn>)
- id 1k16iy-0005Gb-CC; Thu, 30 Jul 2020 07:27:54 -0400
-Received: from [10.130.0.69] (unknown [113.200.148.30])
- by mail.loongson.cn (Coremail) with SMTP id AQAAf9DxKMWrriJfc4MCAA--.476S3;
- Thu, 30 Jul 2020 19:27:39 +0800 (CST)
-Subject: Re: [PATCH 2/2] target/arm: Fix compile error.
-To: Peter Maydell <peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k16oh-0004yD-Ih
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:33:43 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45532)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k16of-0006Ar-Qo
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:33:43 -0400
+Received: by mail-oi1-x241.google.com with SMTP id o21so2730075oie.12
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 04:33:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=a/KbVx1s3ycJ66pUa39DQPUXRctiQhwXA1nHi7J6pvM=;
+ b=GwdUmkF8k3UVTryLn57Pqrk1LruMghh8A0C5boBOuSo5L1//iCm7UcWALltoY9Tuax
+ uLosOo+LZfiHGOzgEjfVc99fKEhlkVyF+reFvtDYzhnJMuXCQym4AbrVSN6KFUopxz7h
+ xGENKuIniDoGy1oVDGTBA6P7kMSt3KKFKWBBvFBlaEFE5L8Q5c+V0eDjVfs9T75di4Qk
+ 4B1VNSNOgzR/d79dLvS/MC3oqJcTbakOYZAAtDL4ho60ujpllxqmca5MOwhWA9WTQLjA
+ /KiHGjFxh3kX+Tb1VbYuFTpaO42GdmpvpusPtqpG3CZIq/JIq99PEiRZj7PfcorkU3/a
+ DZOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=a/KbVx1s3ycJ66pUa39DQPUXRctiQhwXA1nHi7J6pvM=;
+ b=Hzr6du406chxzVZ5zWHtzgJJOaJedNon+19tJPnQ4nHqdxFjhr196gbuIEzmk6Zt1z
+ bmT5CoHSEJqy2P94aXuyKqoKBB9zCza37EpO4INJQYTNMUL5kpNreJnKJrbMt1Q4S+58
+ ZcY+NgcNHBTT0JZ0BDHXA+cPA5o5Wo1f7wzSJl3RoIXrp9cO7QKct6h+vHIE2bgUwQl+
+ a84pBN3fYEnSVcPX3gtHV1pZGqv65CijZetDib9yVWP5ODmTHgPGET8GOBhX8QjUixxv
+ p38BSMalfoimxFjr4kJQ+PcdZyke2ThlFAaSDQ9ur24hTa2WOSUX28vnAb7hfKLiL9YK
+ NVSw==
+X-Gm-Message-State: AOAM531e/1cI+qTgXemhgfX15P+s5cw+WmKJGb9aWS5Lq9KdT1hfAbHG
+ k07vevz17orcCkBfWJT1Iy+oxW/4FrkkkcbXG5MYEQ==
+X-Google-Smtp-Source: ABdhPJzfXsrwqYDyVw92r1b++cah1Kipdre8OLLOdl7BCpr5/beKT/MUT+f9fbTWsLS8OdjpwwehOcULSMb4KKALEN4=
+X-Received: by 2002:aca:50c4:: with SMTP id
+ e187mr10721818oib.146.1596108820417; 
+ Thu, 30 Jul 2020 04:33:40 -0700 (PDT)
+MIME-Version: 1.0
 References: <1596074182-4920-1-git-send-email-likaige@loongson.cn>
  <1596074182-4920-2-git-send-email-likaige@loongson.cn>
  <CAFEAcA_ZgrkcpwYZD-stZGDDjhTgMOSLx--9KHPnxfbKz58s7g@mail.gmail.com>
  <25c0ba1a-088d-c932-1f17-030211af5d4f@loongson.cn>
  <CAFEAcA_uy0dpxQ07S=THCBaMx2R0-xaM_BUn8OxLkOwR9LJdWQ@mail.gmail.com>
-From: Kaige Li <likaige@loongson.cn>
-Message-ID: <b52213cb-1caf-75b9-7783-ca531af44e43@loongson.cn>
-Date: Thu, 30 Jul 2020 19:27:39 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_uy0dpxQ07S=THCBaMx2R0-xaM_BUn8OxLkOwR9LJdWQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAf9DxKMWrriJfc4MCAA--.476S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw1DCr1DAw17JF43WF4xtFb_yoW8Xr1xpF
- WxGa1DKF4UXryrGrs2y34rX3Wjy3y5Kr18Za1ktrnaqr4qyr1YqrZrGrWakFWqqF1UA3yj
- gay7Z3y3W395AaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
- 9KBjDU0xBIdaVrnRJUUUvSb7Iv0xC_KF4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
- 0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
- A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
- jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
- C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
- 0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr
- 1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l
- c2xSY4AK67AK6r4kMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I
- 0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWU
- AVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcV
- CY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280
- aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43
- ZEXa7IU0wL05UUUUU==
-X-CM-SenderInfo: 5olntxtjh6z05rqj20fqof0/
-Received-SPF: pass client-ip=114.242.206.163; envelope-from=likaige@loongson.cn;
- helo=loongson.cn
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:18:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_PASS=-0.001,
+ <b52213cb-1caf-75b9-7783-ca531af44e43@loongson.cn>
+In-Reply-To: <b52213cb-1caf-75b9-7783-ca531af44e43@loongson.cn>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 30 Jul 2020 12:33:29 +0100
+Message-ID: <CAFEAcA_6kfWz0KbPYOj4BwHJKDF=k3tvbSozs4_5wk=SVr+0cA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] target/arm: Fix compile error.
+To: Kaige Li <likaige@loongson.cn>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,41 +104,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/30/2020 07:21 PM, Peter Maydell wrote:
+On Thu, 30 Jul 2020 at 12:28, Kaige Li <likaige@loongson.cn> wrote:
+>
+> On 07/30/2020 07:21 PM, Peter Maydell wrote:
+> > Clang, gcc, OSX clang, something else, and which version number?
+> Sorry for that. Gcc version is 4.9.4.
 
-> On Thu, 30 Jul 2020 at 12:19, Kaige Li <likaige@loongson.cn> wrote:
->> On 07/30/2020 04:44 PM, Peter Maydell wrote:
->>
->>> On Thu, 30 Jul 2020 at 02:56, Kaige Li <likaige@loongson.cn> wrote:
->>>> When I compile qemu with such as:
->>>>
->>>> git clone https://git.qemu.org/git/qemu.git
->>>> cd qemu
->>>> git submodule init
->>>> git submodule update --recursive
->>>> ./configure
->>>> make
->>>>
->>>> There is error log:
->>>>
->>>> /home/LiKaige/qemu/target/arm/translate-a64.c: In function ‘disas_ldst’:
->>>> /home/LiKaige/qemu/target/arm/translate-a64.c:3392:5: error: ‘fn’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>>>        fn(cpu_reg(s, rt), clean_addr, tcg_rs, get_mem_index(s),
->>>>        ^
->>>> /home/LiKaige/qemu/target/arm/translate-a64.c:3318:22: note: ‘fn’ was declared here
->>>>        AtomicThreeOpFn *fn;
->>>>                         ^
->>>> cc1: all warnings being treated as errors
->>>>
->>>> So, add an initiallization value for fn to fix this.
->>>>
->>>> Signed-off-by: Kaige Li <likaige@loongson.cn>
->>> What compiler version is this ?
->> It's the latest version: v5.1.0-rc2, but VERSION shows that is 5.0.92.
->> Commit id is 5772f2b1fc5d00e7e04e01fa28e9081d6550440a
-> I asked for the compiler version, not the QEMU version :-)
-> Clang, gcc, OSX clang, something else, and which version number?
-Sorry for that. Gcc version is 4.9.4.
-> -- PMM
+Ah, that makes sense. That's a pretty old version of gcc (it's
+almost the oldest we still support), and it had more false-positives
+for maybe-used-uninitialized warnings than more recent gcc versions.
+Adding in the = NULL initializer should help it.
 
+thanks
+-- PMM
 
