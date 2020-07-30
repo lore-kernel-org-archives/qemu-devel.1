@@ -2,73 +2,72 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1338C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 456D8C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:10:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7568C2075F
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:06:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7568C2075F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 120CB206D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:10:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="LJU8ddBy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 120CB206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k16Oe-0004YP-KI
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:06:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57760)
+	id 1k16SC-0006Pq-EK
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:10:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k16No-0003zg-Bx; Thu, 30 Jul 2020 07:05:56 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:36240)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k16Nm-00027p-JU; Thu, 30 Jul 2020 07:05:56 -0400
-Received: by mail-ed1-f65.google.com with SMTP id c15so9971059edj.3;
- Thu, 30 Jul 2020 04:05:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vwqD+Czhv6mTzpo2HX6+cQ/cC7MrcIZyKswxU9LhogM=;
- b=k79NlUo6l7+HSEQD8OMcZ1oun0ADAxJ0XCj6/WexsfXtdOOZQc3HhVIw2+1hGwPvSM
- VEoX0U2tqBdBhR1yPgdl3oG5xGaKyui2znKsrmDcUA49scPeDNkXfZgEvRDux/zo+AVe
- lwYdKFa8G97btpit5XA8lamEiS/xh6SDbuvlI05c/+Fnkh8KgTHtdOlbd22BR+7ZRkC2
- klVoi6JftxWVE9SJb50sEWi68cZYz7IXW0KlTZzGrNWEy/VZ5vO4Qusn/L0E4YVU0q5l
- sFORkY7F3QuiIHe696ANOmBbsYP7dsfrvb/nkID0Pt/PaDYRCpjU29dwUyJcZ3WDfWrD
- Nq2Q==
-X-Gm-Message-State: AOAM533tTx5+baTL4AGurHr7NUTrYa+OAkP9efZkJbIN/ek+q81T/ZkK
- TBS31nmNL/fx97lUBD4/YoO7SBp7m7vXIBMPZls=
-X-Google-Smtp-Source: ABdhPJxD8zUPFMgIAkRDqpwM1aDuANw5ve6LlbysaNo9wauiSMNwqKPPiYyymScOHTL/As0ow6K81WmnbESTba/dZng=
-X-Received: by 2002:a50:d9cb:: with SMTP id x11mr1993173edj.93.1596107152259; 
- Thu, 30 Jul 2020 04:05:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1k16RT-0005nK-PJ; Thu, 30 Jul 2020 07:09:44 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:35786)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1k16RP-0002PB-QX; Thu, 30 Jul 2020 07:09:43 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 78A8ABF5AF;
+ Thu, 30 Jul 2020 11:09:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
+ s=default; t=1596107377;
+ bh=rbYGzWTjduOLsEG3zE8MOeIQeIAnlsdW0p4pBlX9e5I=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=LJU8ddBy/tSH0yY1U3xRoNEToyLtFH5SoSFzpBrH+3eco6sRCDzk0P2UU98Fi/9cM
+ M4h/SAK2llMSUoISAgpBpVm6hSXF5hfvGjenlhJlzIJ4M9v/RiVgy1BSKbfItrWw2F
+ 4yYaI/DCwnnpqC+0Z9SaGl+do7nXt0JZ5LGiQOYm1YL0ICY+Ubmg652P5So/okQayr
+ AYcpAVYZC9F7T/Eijnj+o7By4p39Vjt5dl42Ico5m/GxLxc1ovEoVVlZmZKWGxAyHg
+ rTQOXgv9SUzZRHg3fzz8AcCeVg/8HSTGmCOjb+rvF/SvJXL7j++7n8skRqBaKI7atR
+ NqGAFG1PWNyMw==
+Date: Thu, 30 Jul 2020 13:09:33 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: Re: [PATCH v2 14/16] hw/block/nvme: consolidate qsg/iov clearing
+Message-ID: <20200730110933.GA504315@apples.localdomain>
+References: <20200729220638.344477-1-its@irrelevant.dk>
+ <20200729220638.344477-15-its@irrelevant.dk>
+ <20200730103117.5f7pd6cv3vgqh2mx@localhost.localdomain>
 MIME-Version: 1.0
-References: <20200723025657.644724-1-bauerman@linux.ibm.com>
- <878sf3uojf.fsf@morokweng.localdomain>
- <20200730005947.GO84173@umbus.fritz.box>
-In-Reply-To: <20200730005947.GO84173@umbus.fritz.box>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 30 Jul 2020 13:05:39 +0200
-Message-ID: <CAAdtpL5Mtaf7Xwu74U33eGTCAiFZNNXeCST8COwQeW8S9j8ZVQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/8] Generalize start-powered-off property from ARM
-To: David Gibson <david@gibson.dropbear.id.au>
-Content-Type: multipart/alternative; boundary="000000000000d57f5505aba6a7ae"
-Received-SPF: pass client-ip=209.85.208.65;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-f65.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:05:52
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200730103117.5f7pd6cv3vgqh2mx@localhost.localdomain>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:09:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -8
-X-Spam_score: -0.9
-X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,114 +80,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Thiago Jung Bauermann <bauerman@linux.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Andrzej Jakowski <andrzej.jakowski@linux.intel.com>,
+ Keith Busch <kbusch@kernel.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d57f5505aba6a7ae
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Jul 30 19:31, Minwoo Im wrote:
+> On 20-07-30 00:06:36, Klaus Jensen wrote:
+> > From: Klaus Jensen <k.jensen@samsung.com>
+> > 
+> > Always destroy the request qsg/iov at the end of request use.
+> > 
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> > ---
+> >  hw/block/nvme.c | 52 ++++++++++++++++++++-----------------------------
+> >  1 file changed, 21 insertions(+), 31 deletions(-)
+> > 
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index 3d7275eae369..045dd55376a5 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -217,6 +217,17 @@ static void nvme_req_clear(NvmeRequest *req)
+> >      memset(&req->cqe, 0x0, sizeof(req->cqe));
+> >  }
+> >  
+> > +static void nvme_req_exit(NvmeRequest *req)
+> > +{
+> > +    if (req->qsg.sg) {
+> > +        qemu_sglist_destroy(&req->qsg);
+> > +    }
+> > +
+> > +    if (req->iov.iov) {
+> > +        qemu_iovec_destroy(&req->iov);
+> > +    }
+> > +}
+> > +
+> 
+> Klaus,
+> 
+> What is differences between 'clear' and 'exit' from the request
+> perspective?
+> 
 
-Le jeu. 30 juil. 2020 03:00, David Gibson <david@gibson.dropbear.id.au> a
-=C3=A9crit :
+Hi Minwoo,
 
-> On Tue, Jul 28, 2020 at 09:56:36PM -0300, Thiago Jung Bauermann wrote:
-> >
-> > Thiago Jung Bauermann <bauerman@linux.ibm.com> writes:
-> >
-> > > The ARM code has a start-powered-off property in ARMCPU, which is a
-> > > subclass of CPUState. This property causes arm_cpu_reset() to set
-> > > CPUState::halted to 1, signalling that the CPU should start in a halt=
-ed
-> > > state. Other architectures also have code which aim to achieve the sa=
-me
-> > > effect, but without using a property.
-> > >
-> > > The ppc/spapr version has a bug where QEMU does a KVM_RUN on the vcpu
-> > > before cs->halted is set to 1, causing the vcpu to run while it's
-> still in
-> > > an unitialized state (more details in patch 3).
-> >
-> > Since this series fixes a bug is it eligible for 5.1, at least the
-> > patches that were already approved by the appropriate maintainers?
->
-> Ok by me.
->
-
-Maybe just the arm generalization and ppc fix for 5.1, delaying all not
-bugfix to 5.2?
-
-
-> --
-> David Gibson                    | I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au  | minimalist, thank you.  NOT _the_
-> _other_
->                                 | _way_ _around_!
-> http://www.ozlabs.org/~dgibson
->
-
---000000000000d57f5505aba6a7ae
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
-"gmail_attr">Le jeu. 30 juil. 2020 03:00, David Gibson &lt;<a href=3D"mailt=
-o:david@gibson.dropbear.id.au">david@gibson.dropbear.id.au</a>&gt; a =C3=A9=
-crit=C2=A0:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 =
-0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On Tue, Jul 28, 2020 at=
- 09:56:36PM -0300, Thiago Jung Bauermann wrote:<br>
-&gt; <br>
-&gt; Thiago Jung Bauermann &lt;<a href=3D"mailto:bauerman@linux.ibm.com" ta=
-rget=3D"_blank" rel=3D"noreferrer">bauerman@linux.ibm.com</a>&gt; writes:<b=
-r>
-&gt; <br>
-&gt; &gt; The ARM code has a start-powered-off property in ARMCPU, which is=
- a<br>
-&gt; &gt; subclass of CPUState. This property causes arm_cpu_reset() to set=
-<br>
-&gt; &gt; CPUState::halted to 1, signalling that the CPU should start in a =
-halted<br>
-&gt; &gt; state. Other architectures also have code which aim to achieve th=
-e same<br>
-&gt; &gt; effect, but without using a property.<br>
-&gt; &gt;<br>
-&gt; &gt; The ppc/spapr version has a bug where QEMU does a KVM_RUN on the =
-vcpu<br>
-&gt; &gt; before cs-&gt;halted is set to 1, causing the vcpu to run while i=
-t&#39;s still in<br>
-&gt; &gt; an unitialized state (more details in patch 3).<br>
-&gt; <br>
-&gt; Since this series fixes a bug is it eligible for 5.1, at least the<br>
-&gt; patches that were already approved by the appropriate maintainers?<br>
-<br>
-Ok by me.<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=
-=3D"auto">Maybe just the arm generalization and ppc fix for 5.1, delaying a=
-ll not bugfix to 5.2?</div><div dir=3D"auto"><br></div><div dir=3D"auto"><d=
-iv class=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:=
-0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-<br>
--- <br>
-David Gibson=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 | I&#39;ll have my music baroque, and my code<br>
-david AT <a href=3D"http://gibson.dropbear.id.au" rel=3D"noreferrer norefer=
-rer" target=3D"_blank">gibson.dropbear.id.au</a>=C2=A0 | minimalist, thank =
-you.=C2=A0 NOT _the_ _other_<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | _way_ _around_!<br>
-<a href=3D"http://www.ozlabs.org/~dgibson" rel=3D"noreferrer noreferrer" ta=
-rget=3D"_blank">http://www.ozlabs.org/~dgibson</a><br>
-</blockquote></div></div></div>
-
---000000000000d57f5505aba6a7ae--
+The is that on 'exit' we release request resources (like the qsg and
+iov). On 'clear' we initialize the request by clearing the struct. I
+guess I could call it nvme_req_init instead maybe, but really - it is
+clearing it.
 
