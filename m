@@ -2,90 +2,106 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 283F5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3084FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:26:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7E9C2074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:22:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CCwqsUZh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7E9C2074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0AB8F2074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:26:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB8F2074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k16dv-00026K-83
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:22:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60896)
+	id 1k16hg-0003P4-DE
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:26:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k16dH-0001Yu-3P
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:21:55 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35017)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k16dE-0004Bt-4S
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:21:54 -0400
-Received: by mail-ot1-x344.google.com with SMTP id 93so9630260otx.2
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 04:21:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=nW7AKJ4vYC3+boL8MHhZC9J+wbz691Jws/nMErt9LVw=;
- b=CCwqsUZhS2+MYU5WawIvm1qLGO8ZqhQgsosgrb8cwE0xRLrueE8dBDjh92JXBlzyE6
- 7L/B9ABxNnAdnK2RvHZuUkAj3h+4QWqE3X4+P14/HOZfpVJ47HjEQDehZ7iTH6moDEzF
- UwDARA/ks2AvVqcXV7Z7F2pgvLjY1VRjpT+jAPNTh99MuT739QMW7x7tha6xU5ZSwrJR
- BmzvhadkfmFbnFt/53W/vidcQWnbl3+LPqeZ8z0ta1DmGP+9TckP2Q6mSPLsNcqyKKZL
- /k1aM1yRp37I3bUvyEC8BxkIFEzRoGnj7zQenuSrbJj7wgij8cbdBu8gsYo3kOrVXYrt
- N+hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=nW7AKJ4vYC3+boL8MHhZC9J+wbz691Jws/nMErt9LVw=;
- b=qIFlfv3S8ecBgwJ53vtPQphF89R9u3c7zKE9bY6hOvJmElleU6jeSmoeqodkwDWI5B
- Uly6ukRN6BL0jg+mdpC+Uasluh7kYn/7ZRz1VNBtgLpAPCoa5WzFIjWnc3gpni9FCc3i
- 4enk5vVTI/DB7eMiILUYf2wPFIODzI3a/Gvqf118QJowWpUDsf0NpGYqOh2G8ycB3mpz
- XVNLggLFOI9uj1zwF5zw0WGcLrvKskkVb++1+/YnG59MUH5VvcxrM4XgiimBRC7/YIIh
- rMYDcUsb97DfgXonxTQzazbFfCasp/Ur/bgHL9EZxQD5hwa8qybMHe0thg2vqi2nUgok
- Zg/w==
-X-Gm-Message-State: AOAM531wqOWepUEOvKL6AXZ5M4oQYYsv+NeTB48bIsvEHzVslGKVVSU5
- okXOU9fp7ktdI7JUWbRGdXc5glgsi6FVX7Ut296+oA==
-X-Google-Smtp-Source: ABdhPJzsdUQWBlFQLwsGBQYIje3wzOtXJqiGL6vVRJcbaH58pbE2LpQ+A1Jni6gOGPeWQ3BEJRW+0xMTaXHk41j6v/c=
-X-Received: by 2002:a9d:3b61:: with SMTP id z88mr1981398otb.135.1596108110740; 
- Thu, 30 Jul 2020 04:21:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1k16gr-0002xY-2z; Thu, 30 Jul 2020 07:25:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9100)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1k16gn-0004x7-Qe; Thu, 30 Jul 2020 07:25:36 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06UB4nxp071462; Thu, 30 Jul 2020 07:25:31 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32krge0fpg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 30 Jul 2020 07:25:30 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06UB51bY071925;
+ Thu, 30 Jul 2020 07:25:29 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.107])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32krge0fna-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 30 Jul 2020 07:25:29 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+ by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06UBKtiX008393;
+ Thu, 30 Jul 2020 11:25:26 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma03fra.de.ibm.com with ESMTP id 32gcr0kqvk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 30 Jul 2020 11:25:26 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+ [9.149.105.60])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 06UBNwHJ66453910
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 30 Jul 2020 11:23:58 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3C3E442041;
+ Thu, 30 Jul 2020 11:25:24 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A9A7342042;
+ Thu, 30 Jul 2020 11:25:23 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.26.108])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 30 Jul 2020 11:25:23 +0000 (GMT)
+Date: Thu, 30 Jul 2020 13:25:21 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH 1/1] s390x/s390-virtio-ccw: fix off-by-one in loadparm
+ getter
+Message-ID: <20200730132521.674ded34.pasic@linux.ibm.com>
+In-Reply-To: <20200730122656.4942edbb.cohuck@redhat.com>
+References: <20200729130222.29026-1-pasic@linux.ibm.com>
+ <20200730122656.4942edbb.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <1596074182-4920-1-git-send-email-likaige@loongson.cn>
- <1596074182-4920-2-git-send-email-likaige@loongson.cn>
- <CAFEAcA_ZgrkcpwYZD-stZGDDjhTgMOSLx--9KHPnxfbKz58s7g@mail.gmail.com>
- <25c0ba1a-088d-c932-1f17-030211af5d4f@loongson.cn>
-In-Reply-To: <25c0ba1a-088d-c932-1f17-030211af5d4f@loongson.cn>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Jul 2020 12:21:39 +0100
-Message-ID: <CAFEAcA_uy0dpxQ07S=THCBaMx2R0-xaM_BUn8OxLkOwR9LJdWQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] target/arm: Fix compile error.
-To: Kaige Li <likaige@loongson.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-30_09:2020-07-30,
+ 2020-07-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015
+ priorityscore=1501 mlxlogscore=999 mlxscore=0 adultscore=0 bulkscore=0
+ suspectscore=0 impostorscore=0 phishscore=0 malwarescore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007300082
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
+ helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:25:31
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,50 +114,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, David Hildenbrand <david@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 30 Jul 2020 at 12:19, Kaige Li <likaige@loongson.cn> wrote:
->
-> On 07/30/2020 04:44 PM, Peter Maydell wrote:
->
-> > On Thu, 30 Jul 2020 at 02:56, Kaige Li <likaige@loongson.cn> wrote:
-> >> When I compile qemu with such as:
-> >>
-> >> git clone https://git.qemu.org/git/qemu.git
-> >> cd qemu
-> >> git submodule init
-> >> git submodule update --recursive
-> >> ./configure
-> >> make
-> >>
-> >> There is error log:
-> >>
-> >> /home/LiKaige/qemu/target/arm/translate-a64.c: In function =E2=80=98di=
-sas_ldst=E2=80=99:
-> >> /home/LiKaige/qemu/target/arm/translate-a64.c:3392:5: error: =E2=80=98=
-fn=E2=80=99 may be used uninitialized in this function [-Werror=3Dmaybe-uni=
-nitialized]
-> >>       fn(cpu_reg(s, rt), clean_addr, tcg_rs, get_mem_index(s),
-> >>       ^
-> >> /home/LiKaige/qemu/target/arm/translate-a64.c:3318:22: note: =E2=80=98=
-fn=E2=80=99 was declared here
-> >>       AtomicThreeOpFn *fn;
-> >>                        ^
-> >> cc1: all warnings being treated as errors
-> >>
-> >> So, add an initiallization value for fn to fix this.
-> >>
-> >> Signed-off-by: Kaige Li <likaige@loongson.cn>
-> > What compiler version is this ?
-> It's the latest version: v5.1.0-rc2, but VERSION shows that is 5.0.92.
-> Commit id is 5772f2b1fc5d00e7e04e01fa28e9081d6550440a
+On Thu, 30 Jul 2020 12:26:56 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-I asked for the compiler version, not the QEMU version :-)
-Clang, gcc, OSX clang, something else, and which version number?
+> On Wed, 29 Jul 2020 15:02:22 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+> > As pointed out by Peter, g_memdup(ms->loadparm, sizeof(ms->loadparm) + 1)
+> > reads one past of the end of ms->loadparm, so g_memdup() can not be used
+> > here.
+> > 
+> > Let's use malloc and memcpy instead!
+> 
+> Hm, an alternative would be to use g_strndup(). What do you think?
 
--- PMM
+Sure. It is more concise and does exactly what we want. I'm not too
+familiar with the string utility funcitons of glib, so it didn't jup
+at me.
+
+Shall I spin a v2?
+
+Halil
+
+> 
+> > 
+> > Fixes: d664548328 ("s390x/s390-virtio-ccw: fix loadparm property getter")
+> > Fixes: Coverity CID 1431058
+> > Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > ---
+> >  hw/s390x/s390-virtio-ccw.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> > index 403d30e13b..8b7bac0392 100644
+> > --- a/hw/s390x/s390-virtio-ccw.c
+> > +++ b/hw/s390x/s390-virtio-ccw.c
+> > @@ -704,8 +704,8 @@ static char *machine_get_loadparm(Object *obj, Error **errp)
+> >      char *loadparm_str;
+> >  
+> >      /* make a NUL-terminated string */
+> > -    loadparm_str = g_memdup(ms->loadparm, sizeof(ms->loadparm) + 1);
+> > -    loadparm_str[sizeof(ms->loadparm)] = 0;
+> > +    loadparm_str = g_malloc0(sizeof(ms->loadparm) + 1);
+> > +    memcpy(loadparm_str, ms->loadparm, sizeof(ms->loadparm));
+> >      return loadparm_str;
+> >  }
+> >  
+> > 
+> > base-commit: 5772f2b1fc5d00e7e04e01fa28e9081d6550440a
+> 
+> 
+
 
