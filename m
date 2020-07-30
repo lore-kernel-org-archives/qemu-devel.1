@@ -2,88 +2,80 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 183B9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D10A8C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:32:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D98462074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:31:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MYwaSlv5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D98462074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 665BB2074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:32:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 665BB2074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k16mk-0002Tf-Vq
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:31:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35168)
+	id 1k16nL-0003A8-B6
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:32:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k16l3-0000qz-0I
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:29:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39553
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k16l1-0005Wv-BR
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:29:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596108593;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WZXuqWMMjM71taDLBLMznQua1y5/n6InfoamN+Iv7/Q=;
- b=MYwaSlv53pTMybak+Vir9+Luvib7VKzAAL591ij1Qq3OcXzWZCHjiuxhKkXqiCRIqwEhyD
- 7Fux4T1PM+JBC21Gql1vq9xYIKq0YWkHg+QLmfX7RGdJvBi6LxpK0T+SheY7SL5uA6oY9A
- OVgVTR1MClKg2jSIYmHlTLbJP6J5ymE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-g3Xy1SxEOwaam9tbAdRT2A-1; Thu, 30 Jul 2020 07:29:50 -0400
-X-MC-Unique: g3Xy1SxEOwaam9tbAdRT2A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 98AAC800FEA;
- Thu, 30 Jul 2020 11:29:48 +0000 (UTC)
-Received: from gondolin (ovpn-112-203.ams2.redhat.com [10.36.112.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 117E45FC31;
- Thu, 30 Jul 2020 11:29:43 +0000 (UTC)
-Date: Thu, 30 Jul 2020 13:29:42 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH 1/1] s390x/s390-virtio-ccw: fix off-by-one in loadparm
- getter
-Message-ID: <20200730132942.485b73c6.cohuck@redhat.com>
-In-Reply-To: <20200730132521.674ded34.pasic@linux.ibm.com>
-References: <20200729130222.29026-1-pasic@linux.ibm.com>
- <20200730122656.4942edbb.cohuck@redhat.com>
- <20200730132521.674ded34.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <likaige@loongson.cn>)
+ id 1k16j5-0005jZ-7X; Thu, 30 Jul 2020 07:27:55 -0400
+Received: from mail.loongson.cn ([114.242.206.163]:39854 helo=loongson.cn)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <likaige@loongson.cn>)
+ id 1k16iy-0005Gb-CC; Thu, 30 Jul 2020 07:27:54 -0400
+Received: from [10.130.0.69] (unknown [113.200.148.30])
+ by mail.loongson.cn (Coremail) with SMTP id AQAAf9DxKMWrriJfc4MCAA--.476S3;
+ Thu, 30 Jul 2020 19:27:39 +0800 (CST)
+Subject: Re: [PATCH 2/2] target/arm: Fix compile error.
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <1596074182-4920-1-git-send-email-likaige@loongson.cn>
+ <1596074182-4920-2-git-send-email-likaige@loongson.cn>
+ <CAFEAcA_ZgrkcpwYZD-stZGDDjhTgMOSLx--9KHPnxfbKz58s7g@mail.gmail.com>
+ <25c0ba1a-088d-c932-1f17-030211af5d4f@loongson.cn>
+ <CAFEAcA_uy0dpxQ07S=THCBaMx2R0-xaM_BUn8OxLkOwR9LJdWQ@mail.gmail.com>
+From: Kaige Li <likaige@loongson.cn>
+Message-ID: <b52213cb-1caf-75b9-7783-ca531af44e43@loongson.cn>
+Date: Thu, 30 Jul 2020 19:27:39 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:59:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA_uy0dpxQ07S=THCBaMx2R0-xaM_BUn8OxLkOwR9LJdWQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf9DxKMWrriJfc4MCAA--.476S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw1DCr1DAw17JF43WF4xtFb_yoW8Xr1xpF
+ WxGa1DKF4UXryrGrs2y34rX3Wjy3y5Kr18Za1ktrnaqr4qyr1YqrZrGrWakFWqqF1UA3yj
+ gay7Z3y3W395AaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDU0xBIdaVrnRJUUUvSb7Iv0xC_KF4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+ 0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+ A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+ jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
+ C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+ 0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr
+ 1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l
+ c2xSY4AK67AK6r4kMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I
+ 0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWU
+ AVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcV
+ CY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280
+ aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43
+ ZEXa7IU0wL05UUUUU==
+X-CM-SenderInfo: 5olntxtjh6z05rqj20fqof0/
+Received-SPF: pass client-ip=114.242.206.163; envelope-from=likaige@loongson.cn;
+ helo=loongson.cn
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:18:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,37 +88,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, David Hildenbrand <david@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 30 Jul 2020 13:25:21 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On 07/30/2020 07:21 PM, Peter Maydell wrote:
 
-> On Thu, 30 Jul 2020 12:26:56 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Wed, 29 Jul 2020 15:02:22 +0200
-> > Halil Pasic <pasic@linux.ibm.com> wrote:
-> >   
-> > > As pointed out by Peter, g_memdup(ms->loadparm, sizeof(ms->loadparm) + 1)
-> > > reads one past of the end of ms->loadparm, so g_memdup() can not be used
-> > > here.
-> > > 
-> > > Let's use malloc and memcpy instead!  
-> > 
-> > Hm, an alternative would be to use g_strndup(). What do you think?  
-> 
-> Sure. It is more concise and does exactly what we want. I'm not too
-> familiar with the string utility funcitons of glib, so it didn't jup
-> at me.
-> 
-> Shall I spin a v2?
-
-Sounds good.
+> On Thu, 30 Jul 2020 at 12:19, Kaige Li <likaige@loongson.cn> wrote:
+>> On 07/30/2020 04:44 PM, Peter Maydell wrote:
+>>
+>>> On Thu, 30 Jul 2020 at 02:56, Kaige Li <likaige@loongson.cn> wrote:
+>>>> When I compile qemu with such as:
+>>>>
+>>>> git clone https://git.qemu.org/git/qemu.git
+>>>> cd qemu
+>>>> git submodule init
+>>>> git submodule update --recursive
+>>>> ./configure
+>>>> make
+>>>>
+>>>> There is error log:
+>>>>
+>>>> /home/LiKaige/qemu/target/arm/translate-a64.c: In function ‘disas_ldst’:
+>>>> /home/LiKaige/qemu/target/arm/translate-a64.c:3392:5: error: ‘fn’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>>>>        fn(cpu_reg(s, rt), clean_addr, tcg_rs, get_mem_index(s),
+>>>>        ^
+>>>> /home/LiKaige/qemu/target/arm/translate-a64.c:3318:22: note: ‘fn’ was declared here
+>>>>        AtomicThreeOpFn *fn;
+>>>>                         ^
+>>>> cc1: all warnings being treated as errors
+>>>>
+>>>> So, add an initiallization value for fn to fix this.
+>>>>
+>>>> Signed-off-by: Kaige Li <likaige@loongson.cn>
+>>> What compiler version is this ?
+>> It's the latest version: v5.1.0-rc2, but VERSION shows that is 5.0.92.
+>> Commit id is 5772f2b1fc5d00e7e04e01fa28e9081d6550440a
+> I asked for the compiler version, not the QEMU version :-)
+> Clang, gcc, OSX clang, something else, and which version number?
+Sorry for that. Gcc version is 4.9.4.
+> -- PMM
 
 
