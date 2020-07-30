@@ -2,100 +2,86 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34050C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E322C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:48:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F078720663
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:46:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44CDD20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:48:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="otw7cZuS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F078720663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BAaX17ER"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44CDD20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1EVA-00019w-6b
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 15:46:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59320)
+	id 1k1EXq-0002xD-HM
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 15:48:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60070)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yuanzi@google.com>) id 1k1ETw-0000Ze-FA
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:44:48 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41051)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <yuanzi@google.com>) id 1k1ETt-00067r-RM
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:44:48 -0400
-Received: by mail-oi1-x241.google.com with SMTP id y22so24704820oie.8
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 12:44:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=cPDwwDoGxO5fx6tyt89T8KCrjbYtsjuYRSbUiUfExPE=;
- b=otw7cZuSpO4CJkd7SVyZUF5GiKCXpEmyTGBvaQ91M+0dPH9irtMY2KonwT9qD6dhOQ
- H3lct0IeTFFZBtKjeiyOrG3KBwklSCN972cMvqmlIpV1nhwg3igYOf9fowp5Wm8oZ4nH
- 6CRbUc1KZwtZblWYb8jCUqqz397RVolRzGT7sWNLJLuvt70C6dssTBk7hNgNRotxaqsY
- jlnKU9Lee/JzP9sfZr/B09WWb58jl+cpnDdLO9brluBQRciHD3u8fkpcvygypCxSSyUy
- Wpp4HCOuUFMA9Zgcu/vj+l0GWQw+sEweDZCmTJpuqEmK3s330LdPbuKOMQT3IP9DtHIn
- qpNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=cPDwwDoGxO5fx6tyt89T8KCrjbYtsjuYRSbUiUfExPE=;
- b=hzMQnZp/OpyYxdMbYBZzG8rSb4ZaG/cbr+dUczhmMFTKJQmNGX3rcCk9Ndx9+qV8O4
- 4rsh53LoL47f6BEQWFqyIJyvO22XgOkVKkq2N4yQgSAmuynzXcg21rZkiHoaRPrX2qZO
- S9NtNHypDSBR6oC1KbwGqace+fDWslSEbn8iPxSJXsZ48zembfry3U3E87CxX7wntnHC
- cUN80ZMqdIPUBkEYGXEgGLdcdB79wD1ZAWW7/Zq3PURfzQ2aa9PZwgSYvnklgnSdUDRY
- /q7We3BHb7m2FRVRNPrsYpY35ftQmtPs1n7qV4q9o/nlg9fNN9tPDJ3ni9DzHu6MzNm/
- sEAA==
-X-Gm-Message-State: AOAM533JrexokDA77CUti6ZHSFaaq2cNMa5snWepSMyo7Y1Eh86tc0Mh
- 8o4oJ+hi651zbIThU+y9nBhOhR3LtFQ2ss2YbOaFFw==
-X-Google-Smtp-Source: ABdhPJwpCy1QJwaJL1DQB6lSOvndbwjFxgs4Fq5jabE8ZCigw2JL/Y5enBlCF7pyUkp0QGceC37hdLrnx8kgn28S2M8=
-X-Received: by 2002:aca:eb88:: with SMTP id j130mr495420oih.38.1596138282840; 
- Thu, 30 Jul 2020 12:44:42 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX4-0001jr-7j
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49094
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX1-0006kd-I9
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596138478;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DGBjvtXB4L2SI6nM108SphLzu7g5pVlFobBDWdOoClA=;
+ b=BAaX17ER3gYrqDd6J+bEGugFPC53yS3fXOkajF8nzgMOYGXQuELxiu+9Uh0oXQvPwFoKf+
+ klQzucio3DomHCb4yzoXoyh/k11MZEPeX0MZH4XGepetYGB/D1jbGWcFkClJMBqEM1f26L
+ NEd5g+VlDbyCmUrT85WdPs/tnlaaCRU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-QIigYv4FNPejSJWl7Kk6MA-1; Thu, 30 Jul 2020 15:47:56 -0400
+X-MC-Unique: QIigYv4FNPejSJWl7Kk6MA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87445101C8A7
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 19:47:55 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-117-166.rdu2.redhat.com [10.10.117.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D56FD1C6;
+ Thu, 30 Jul 2020 19:47:49 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 5B80E223D04; Thu, 30 Jul 2020 15:47:48 -0400 (EDT)
+From: Vivek Goyal <vgoyal@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/5] virtiofsd: Add notion of unprivileged mode
+Date: Thu, 30 Jul 2020 15:47:32 -0400
+Message-Id: <20200730194736.173994-2-vgoyal@redhat.com>
+In-Reply-To: <20200730194736.173994-1-vgoyal@redhat.com>
+References: <20200730194736.173994-1-vgoyal@redhat.com>
 MIME-Version: 1.0
-References: <20200307010051.97022-1-yuanzi@google.com>
- <CADjx4CKDPY9J7Zr1YTLv78Ku6mQS6zrMu7oX7-ujU3PGxvHA4w@mail.gmail.com>
- <87imizidwc.fsf@linaro.org>
- <CADjx4CJJdQep+K3ibfhjin7Eo6uCEFGQ6R6yVC0OcNo8MsfvJw@mail.gmail.com>
- <87d095u804.fsf@linaro.org>
- <CADjx4CKhoikcZanqYCs11ubGY+6tOeNjToiCgjnp8V_rzZcDHw@mail.gmail.com>
- <87tv25fwvz.fsf@linaro.org>
- <CADjx4CK-NtPP9iRmao_J9A+25y-MUjco=sM+sKwHfpWXzSV_yA@mail.gmail.com>
- <87o8sdf0sl.fsf@linaro.org>
- <CADjx4CJNhZv2guePFckf-ijPz1OYfMofJFfeUvC+bHwjtF4JYg@mail.gmail.com>
- <878sfcve9l.fsf@linaro.org>
- <CADjx4C+EO7qEv7=8PSA+TG6-d9U9rGuREKpqfm_QrWrKtebR2w@mail.gmail.com>
-In-Reply-To: <CADjx4C+EO7qEv7=8PSA+TG6-d9U9rGuREKpqfm_QrWrKtebR2w@mail.gmail.com>
-From: Lirong Yuan <yuanzi@google.com>
-Date: Thu, 30 Jul 2020 12:44:31 -0700
-Message-ID: <CADjx4C+1pDP_Y3CbHXpgFumhxE=P4f+MV_YcxQ7cMUXmEyhBzA@mail.gmail.com>
-Subject: Re: [PATCH] gdbstub: add support to Xfer:auxv:read: packet
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, 
- Shu-Chun Weng <scw@google.com>, Josh Kunz <jkz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=yuanzi@google.com; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,255 +94,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: berrange@redhat.com, vromanso@redhat.com, dwalsh@redhat.com,
+ dgilbert@redhat.com, virtio-fs@redhat.com, stefanha@redhat.com,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 21, 2020 at 1:29 PM Lirong Yuan <yuanzi@google.com> wrote:
->
-> On Tue, Jul 21, 2020 at 12:50 PM Alex Benn=C3=A9e <alex.bennee@linaro.org=
-> wrote:
-> >
-> >
-> > Lirong Yuan <yuanzi@google.com> writes:
-> >
-> > > On Tue, Mar 31, 2020 at 12:20 AM Alex Benn=C3=A9e <alex.bennee@linaro=
-.org> wrote:
-> > >>
-> > >>
-> > >> Lirong Yuan <yuanzi@google.com> writes:
-> > >>
-> > >> > On Mon, Mar 30, 2020 at 12:47 PM Alex Benn=C3=A9e <alex.bennee@lin=
-aro.org> wrote:
-> > >> >
-> > >> >>
-> > >> >> Lirong Yuan <yuanzi@google.com> writes:
-> > >> >>
-> > >> >> > On Sat, Mar 21, 2020 at 6:56 AM Alex Benn=C3=A9e <alex.bennee@l=
-inaro.org>
-> > >> >> wrote:
-> > >> >> >
-> > >> >> >>
-> > >> >> >> Lirong Yuan <yuanzi@google.com> writes:
-> > >> >> >>
-> > >> >> >> > On Fri, Mar 20, 2020 at 2:17 AM Alex Benn=C3=A9e <alex.benne=
-e@linaro.org>
-> > >> >> >> wrote:
-> > >> >> >> <snip>
-> > >> >> >> >>
-> > >> >> >> >> Sorry I missed this on my radar. There was a minor re-facto=
-r of
-> > >> >> gdbstub
-> > >> >> >> >> that was just merged which will mean this patch needs a re-=
-base to
-> > >> >> use
-> > >> >> >> >> g_string_* functions to expand stings.
-> > >> >> >> >>
-> > >> >> >> >> Also we have some simple gdbstub tests now - could we come =
-up with a
-> > >> >> >> >> multiarch gdbstub test to verify this is working properly?
-> > >> >> >> >>
-> > >> >> >> <snip>
-> > >> >> >> > For sure, I will re-base this patch to use g_string_* functi=
-ons.
-> > >> >> >> >
-> > >> >> >> > Currently we are using qemu aarch64. I am not sure how to do=
- this yet,
-> > >> >> >> but
-> > >> >> >> > I could try to add something to
-> > >> >> >> > https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/g=
-dbstub
-> > >> >> >>
-> > >> >> >> If the auxv support is appropriate to all linux-user targets y=
-ou can
-> > >> >> >> plumb it into the multiarch tests - you can even use the exist=
-ing
-> > >> >> >> binaries.
-> > >> >> >>
-> > >> >> >> So you need:
-> > >> >> >>
-> > >> >> >>   - a stanza in the makefiles to launch the test (see
-> > >> >> >>     tests/tcg/aarch64/Makefile.target)
-> > >> >> >>
-> > >> >> >>   - a .py test script that manipulates gdbstub to check things=
- are
-> > >> >> working
-> > >> >> >>
-> > >> >> >> So something like:
-> > >> >> >>
-> > >> >> >> .PHONY: gdbstub-foo-binary
-> > >> >> >> run-gdbstub-foo-binary: foo-binary
-> > >> >> >>         $(call run-test, $@, $(GDB_SCRIPT) \
-> > >> >> >>                 --gdb $(HAVE_GDB_BIN) \
-> > >> >> >>                 --qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
-> > >> >> >>                 --bin $< --test $(MULTIARCH_SRC)/gdbstub/test-=
-foo.py, \
-> > >> >> >>         "basic gdbstub FOO support")
-> > >> >> >>
-> > >> >> >>
-> > >> >> >> >
-> > >> >> >> > Does this sound good?
-> > >> >> >>
-> > >> >> >> Hope that helps.
-> > >> >> >>
-> > >> >> >> >
-> > >> >> >> > Thanks!
-> > >> >> >> > Lirong
-> > >> >> >>
-> > >> >> >>
-> > >> >> >> --
-> > >> >> >> Alex Benn=C3=A9e
-> > >> >> >>
-> > >> >> >
-> > >> >> > Hi Alex,
-> > >> >> >
-> > >> >> > Thanks for the instructions, very helpful!
-> > >> >> >
-> > >> >> > I rebased this patch to use g_string_* functions, and the link =
-to
-> > >> >> patchwork
-> > >> >> > is:
-> > >> >> > http://patchwork.ozlabs.org/patch/1264125/
-> > >> >> > Could you help take another look?
-> > >> >> >
-> > >> >> > Regarding testing, I looked at some instructions for running te=
-sts, e.g.
-> > >> >> > https://github.com/qemu/qemu/blob/master/docs/devel/testing.rst
-> > >> >> > https://wiki.qemu.org/Testing
-> > >> >> > However I still could not get the tests for aarch64 to run. Do =
-you know
-> > >> >> how
-> > >> >> > to run the aarch64 or multi-arch tests?
-> > >> >>
-> > >> >> The aarch64 ones run with "make run-tcg-tests-aarch64-linux-user"=
- add
-> > >> >> V=3D1 to see the details.
-> > >> >>
-> > >> >> > Also there aren't any existing gdb stub tests that try to read
-> > >> >> > uninterpreted bytes from the target=E2=80=99s special data area=
- identified by a
-> > >> >> > keyword:
-> > >> >> >
-> > >> >> https://sourceware.org/gdb/current/onlinedocs/gdb/General-Query-P=
-ackets.html#qXfer-auxiliary-vector-read
-> > >> >> > I looked at some other gdb stub tests, but they did not seem to=
- send any
-> > >> >> > queries:
-> > >> >> > https://github.com/qemu/qemu/tree/master/tests/tcg/aarch64/gdbs=
-tub
-> > >> >> > So I am not sure how to set up one for "Xfer:auxv:read:" packet=
-s...
-> > >> >> > Are there plans to add more tests for other packets like
-> > >> >> > "Xfer:features:read:"?
-> > >> >> > I'd be happy to add a test if there is an example of how to do =
-it. :)
-> > >> >>
-> > >> >> What would you do from a normal gdb command line. At the very lea=
-st you
-> > >> >> run the same command with gdb.execute(), e.g.:
-> > >> >>
-> > >> >>   gdb.execute("set confirm off")
-> > >> >>
-> > >> >> is the same as typing
-> > >> >>
-> > >> >>   set confirm off
-> > >> >>
-> > >> >> at the gdb command prompt.
-> > >> >>
-> > >> >> >
-> > >> >> > Thanks,
-> > >> >> > Lirong
-> > >> >>
-> > >> >>
-> > >> >> --
-> > >> >> Alex Benn=C3=A9e
-> > >> >>
-> > >> >
-> > >> > Hey Alex,
-> > >> >
-> > >> > I tried to run the test but they were skipped. Do you know if ther=
-e's any
-> > >> > other flag that needs to be set?
-> > >> >
-> > >> > $ make run-tcg-tests-aarch64-linux-user
-> > >> > make[1]: Entering directory '/usr/local/google/home/yuanzi/qemu/sl=
-irp'
-> > >> > make[1]: Nothing to be done for 'all'.
-> > >> > make[1]: Leaving directory '/usr/local/google/home/yuanzi/qemu/sli=
-rp'
-> > >> >   BUILD   TCG tests for aarch64-linux-user
-> > >> >   BUILD   aarch64-linux-user guest-tests SKIPPED
-> > >> >   RUN     TCG tests for aarch64-linux-user
-> > >> >   RUN     tests for aarch64-linux-user SKIPPED
-> > >>
-> > >> Ahh you either need to have docker enabled or the aarch64 compilers =
-in
-> > >> your path when you run configure so the test programs can be built. =
-The
-> > >> details are in docs/devel/testing.rst
-> > >>
-> > >> > I don't think any command needs to be run. It should just send the=
- query
-> > >> > automatically.
-> > >> > Could we assume that it will work the same in the test?
-> > >>
-> > >> If that is enough to exercise the code. Can we not validate the data=
- somehow?
-> > >>
-> > >>
-> > >> --
-> > >> Alex Benn=C3=A9e
-> > >
-> > > Hi Alex,
-> > >
-> > > Thanks for the suggestions! I just installed docker and ran the tests=
-,
-> > > but got the following error messages for gdbstub tests:
-> > > $ make run-tcg-tests-aarch64-linux-user
-> > > ...
-> > > TEST    basic gdbstub support
-> > > warning: while parsing target description (at line 1): Target
-> > > description specified unknown architecture "aarch64"
-> > > warning: Could not load XML target description; ignoring
-> > > Truncated register 37 in remote 'g' packet
-> > > Traceback (most recent call last):
-> > >   File "/usr/local/google/home/yuanzi/Documents/gdbstub-patch/qemu/te=
-sts/tcg/multiarch/gdbstub/sha1.py",
-> > > line 68, in <module>
-> > >     if gdb.parse_and_eval('$pc') =3D=3D 0:
-> > > gdb.error: No registers.
-> > >   TEST    basic gdbstub SVE support
-> > > warning: while parsing target description (at line 1): Target
-> > > description specified unknown architecture "aarch64"
-> > > warning: Could not load XML target description; ignoring
-> > > Truncated register 37 in remote 'g' packet
-> > >
-> > > I'm not sure if there is any additional setup needed to make those
-> > > tests pass. Do you know how to fix those errors?
-> >
-> > The error is because the gdb you have installed doesn't understand
-> > foreign architectures. The test should have skipped in this case so I',
-> > not sure why it causes it to fail.
-> >
-> > You can either ensure you have multiarch capable gdb (this is
-> > binutils-multiarch on debian for example) or build your own gdb and
-> > point at it with --gdb in configure.
-> >
-> > >
-> > > Thanks,
-> > > Lirong
-> >
-> >
-> > --
-> > Alex Benn=C3=A9e
->
-> Hmm I installed binutils-multiarch but it still did not work. The
-> error messages are the same as the previous ones.
+At startup if we are running as non-root user, then internally set
+unpriviliged mode set. Also add a notion of sandbox NONE and set
+that internally in unprivileged mode. setting up namespaces and
+chroot() fails in unpriviliged mode.
 
-Turns out that it can be fixed by installing gdb-multiarch and
-rerunning configure.
+Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-I submitted a new patch, and here is the link to patchwork. :)
-http://patchwork.ozlabs.org/project/qemu-devel/patch/20200730193932.3654677=
--1-yuanzi@google.com/
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index e2fbc614fd..cd91c4a831 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -147,11 +147,13 @@ enum {
+ enum {
+     SANDBOX_NAMESPACE,
+     SANDBOX_CHROOT,
++    SANDBOX_NONE,
+ };
+ 
+ struct lo_data {
+     pthread_mutex_t mutex;
+     int sandbox;
++    bool unprivileged;
+     int debug;
+     int writeback;
+     int flock;
+@@ -3288,6 +3290,12 @@ int main(int argc, char *argv[])
+     lo_map_init(&lo.dirp_map);
+     lo_map_init(&lo.fd_map);
+ 
++    if (geteuid() != 0) {
++       lo.unprivileged = true;
++       lo.sandbox = SANDBOX_NONE;
++       fuse_log(FUSE_LOG_DEBUG, "Running in unprivileged passthrough mode.\n");
++    }
++
+     if (fuse_parse_cmdline(&args, &opts) != 0) {
+         goto err_out1;
+     }
+-- 
+2.25.4
+
 
