@@ -2,81 +2,105 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81010C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65FD3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:57:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52C87206F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:56:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52C87206F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1DDCD206F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:57:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="T/1swMwa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DDCD206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1AvR-0008Rv-JL
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:56:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55872)
+	id 1k1Avw-0000fJ-Ei
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:57:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k1Akh-0001O3-9t
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:45:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44216)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k1Ake-0003ZG-Ia
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:45:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k1Akc-000646-Es
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 15:45:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6F7DD2E80BA
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 15:45:46 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jul 2020 15:37:41 -0000
-From: TheCatFelix <1884684@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1Af4-00019k-Oh
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:40:02 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:51750)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1Af1-0002Tl-5w
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:40:02 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXUoj007564;
+ Thu, 30 Jul 2020 15:39:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
+ bh=9yU3uF0G2s5qWsK/B3S+9s+ZnpI5bYaEDMA1bh3ly1A=;
+ b=T/1swMwaDReppaREZ3DKXzoBsMTAo1crVZqkF5LvNqHCS3M/jzVpmronv4WUuwMZg16t
+ EdhcrK1PTjRQToUEYZGVuTz2qlS4ooCSdqPXHk2bZZigUnT81pyllFNSj6RqVJsvrTUa
+ hOkoCvn3Z6nprqMS06sq7Twvy10y8gG+/MXcD/kGVhHykr8klbjBsUx4/58pt5tzEeWx
+ FRe2aAmqOcIlby767KqTLDWpgKdsQVES0/BdumyV85WrqaVyEaiq1EAIxoxVhhr6VLBK
+ nrbIo0cfd6GZ3owxgow117wVItCvM2jeC7taVIswtN2CN3lHxY11k0xM2yJ2GBhBbiod 3Q== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 32hu1jmfsw-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Thu, 30 Jul 2020 15:39:56 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXSVk130767;
+ Thu, 30 Jul 2020 15:37:55 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 32hu5wwgjp-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 30 Jul 2020 15:37:55 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06UFbsQp001804;
+ Thu, 30 Jul 2020 15:37:54 GMT
+Received: from ca-dev63.us.oracle.com (/10.211.8.221)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 30 Jul 2020 08:37:54 -0700
+From: Steve Sistare <steven.sistare@oracle.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: thecatfelix
-X-Launchpad-Bug-Reporter: TheCatFelix (thecatfelix)
-X-Launchpad-Bug-Modifier: TheCatFelix (thecatfelix)
-References: <159287262873.13509.14889128175029136647.malonedeb@wampee.canonical.com>
-Message-Id: <159612346193.10348.2150148730413805044.malone@chaenomeles.canonical.com>
-Subject: [Bug 1884684] Re: QEMU 5.0: Guest VM hangs/freeze when unplugging USB
- device
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: cfb3d4b427667f9c39a8d915abce29914b5c786a
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 09:45:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH V1 02/32] savevm: VM handlers mode mask
+Date: Thu, 30 Jul 2020 08:14:06 -0700
+Message-Id: <1596122076-341293-3-git-send-email-steven.sistare@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ mlxlogscore=999 mlxscore=0
+ suspectscore=1 bulkscore=0 malwarescore=0 spamscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007300111
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ clxscore=1015
+ malwarescore=0 spamscore=0 suspectscore=1 bulkscore=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007300111
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=steven.sistare@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 11:37:58
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,163 +109,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1884684 <1884684@bugs.launchpad.net>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Steve Sistare <steven.sistare@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Following reports on Proxmox forums, this is still very much seen by
-multiple users with no known workaround.
+Add a new mode argument to qemu_savevm_state() and qemu_loadvm_state() that
+can customize the operation.  Define the VMS_MIGRATE and VMS_SNAPSHOT modes
+for the existing live migration and snapshot capabilities.
 
-I was able to run QEMU 5.0.13 (Debian) with all traces turned on and
-capture the following:
+Provide a mode mask for vmstate handlers.  A handler is only processed by
+SAVEVM_FOREACH if its mask includes the savevm_state.mode.  Unmodified
+handler declarations have a zero mask field, which implicitly enables the
+handler for all modes.
 
-- Behavior is reproducible by unbinding usb device on the host (ex. "echo '=
-1-8' > /sys/bus/usb/drivers/usb/unbind")
-- qemu trace logs stops at exactly the same time when VM freezes
-- Last few lines of the qemu trace:
+No functional change for the VMS_MIGRATE and VMS_SNAPSHOT modes.
 
-1592303@1596123157.254134:virtio_notify vdev 0x56193d04d820 vq 0x7fcd5c48a0=
-10
-1592320@1596123158.822309:usb_xhci_oper_read off 0x0004, ret 0x00000008
-1592320@1596123158.822397:usb_xhci_port_read port 1, off 0x0000, ret 0x0e00=
-02a0
-1592320@1596123158.822459:usb_xhci_port_read port 2, off 0x0000, ret 0x0e00=
-02a0
-1592320@1596123158.822513:usb_xhci_port_read port 3, off 0x0000, ret 0x0e00=
-02a0
-1592320@1596123158.822565:usb_xhci_port_read port 4, off 0x0000, ret 0x0e00=
-02a0
-1592303@1596123159.858372:virtqueue_alloc_element elem 0x56193c8c8990 size =
-56 in_num 2 out_num 0
-1592303@1596123159.858435:virtqueue_pop vq 0x7fcd5c48a010 elem 0x56193c8c89=
-90 in_num 2 out_num 0
-1592303@1596123159.858482:virtqueue_fill vq 0x7fcd5c48a010 elem 0x56193c8c8=
-990 len 72 idx 0
-1592303@1596123159.858533:virtqueue_flush vq 0x7fcd5c48a010 count 1
-1592303@1596123159.858565:virtio_notify vdev 0x56193d04d820 vq 0x7fcd5c48a0=
-10
-1592303@1596123160.272641:virtqueue_alloc_element elem 0x56193c8c8990 size =
-56 in_num 2 out_num 0
-1592303@1596123160.272702:virtqueue_pop vq 0x7fcd5c48a010 elem 0x56193c8c89=
-90 in_num 2 out_num 0
-1592303@1596123160.272751:virtqueue_fill vq 0x7fcd5c48a010 elem 0x56193c8c8=
-990 len 104 idx 0
-1592303@1596123160.272802:virtqueue_flush vq 0x7fcd5c48a010 count 1
-1592303@1596123160.272833:virtio_notify vdev 0x56193d04d820 vq 0x7fcd5c48a0=
-10
-1592303@1596123160.845694:lockcnt_unlock_attempt lockcnt 0x56193bea6514 unl=
-ock 5->4
-1592303@1596123160.846821:lockcnt_unlock_success lockcnt 0x56193bea6514 unl=
-ock 5->4 succeeded
-1592303@1596123160.847923:usb_host_req_complete dev 1:4, packet 0x7fcb84000=
-ea8, status 0, length 0
-1592303@1596123160.849369:usb_packet_state_change bus 0, port 1, ep 2, pack=
-et 0x7fcb84000ea8, state async -> complete
-1592303@1596123160.851157:usb_xhci_xfer_success 0x7fcb84000ea0: len 0
-1592303@1596123160.851214:usb_xhci_queue_event v 3, idx 5, ER_TRANSFER, CC_=
-SHORT_PACKET, p 0xffffac0c62444ae3, s 0x0d000000, c 0x02058005
-1592303@1596123160.851285:usb_xhci_irq_msix nr 3
-1592303@1596123160.851331:usb_xhci_ep_kick slotid 2, epid 5, streamid 0
-1592303@1596123160.851374:usb_host_req_data dev 1:4, packet 0x56193cce8da8,=
- in 1, ep 2, size 4
-1592303@1596123160.851434:usb_host_req_complete dev 1:4, packet 0x56193cce8=
-da8, status -1, length 0
-1592303@1596123160.851485:usb_packet_state_change bus 0, port 1, ep 2, pack=
-et 0x56193cce8da8, state queued -> complete
-1592303@1596123160.851541:usb_xhci_xfer_error 0x56193cce8da0: ret -1
-1592303@1596123160.851577:usb_xhci_queue_event v 3, idx 6, ER_TRANSFER, CC_=
-USB_TRANSACTION_ERROR, p 0x00000001c18a4e20, s 0x04000004, c 0x02058001
-1592303@1596123160.851647:usb_xhci_ep_state slotid 2, epid 5, running -> ha=
-lted
-1592303@1596123160.852700:usb_xhci_ep_kick slotid 2, epid 5, streamid 0
-1592303@1596123160.852744:usb_host_req_complete dev 1:4, packet 0x7fcb84000=
-b98, status 0, length 0
-1592303@1596123160.852788:usb_packet_state_change bus 0, port 1, ep 1, pack=
-et 0x7fcb84000b98, state async -> complete
-1592303@1596123160.852845:usb_xhci_xfer_success 0x7fcb84000b90: len 0
-1592303@1596123160.852879:usb_xhci_queue_event v 3, idx 7, ER_TRANSFER, CC_=
-SHORT_PACKET, p 0xffffac0c6229aae3, s 0x0d000000, c 0x02038005
-1592303@1596123160.852945:usb_xhci_ep_kick slotid 2, epid 3, streamid 0
-1592303@1596123160.852977:usb_host_req_data dev 1:4, packet 0x56193c9da348,=
- in 1, ep 1, size 8
-1592303@1596123160.853031:usb_host_req_complete dev 1:4, packet 0x56193c9da=
-348, status -1, length 0
-1592303@1596123160.853080:usb_packet_state_change bus 0, port 1, ep 1, pack=
-et 0x56193c9da348, state queued -> complete
-1592303@1596123160.853136:usb_xhci_xfer_error 0x56193c9da340: ret -1
-1592303@1596123160.853170:usb_xhci_queue_event v 3, idx 8, ER_TRANSFER, CC_=
-USB_TRANSACTION_ERROR, p 0x00000001c18a4c20, s 0x04000008, c 0x02038001
-1592303@1596123160.853240:usb_xhci_ep_state slotid 2, epid 3, running -> ha=
-lted
-1592303@1596123160.853280:usb_xhci_ep_kick slotid 2, epid 3, streamid 0
-1592303@1596123160.853316:lockcnt_unlock_attempt lockcnt 0x56193bea6514 unl=
-ock 1->4
-1592303@1596123160.853352:lockcnt_unlock_success lockcnt 0x56193bea6514 unl=
-ock 1->4 succeeded
-1592303@1596123160.853564:usb_host_close dev 1:4
-libusb: error [udev_hotplug_event] ignoring udev action unbind
+Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+---
+ include/migration/register.h |  3 +++
+ include/migration/vmstate.h  |  9 ++++++++
+ migration/migration.c        |  4 ++--
+ migration/savevm.c           | 51 +++++++++++++++++++++++++++++++++++---------
+ migration/savevm.h           |  4 +++-
+ 5 files changed, 58 insertions(+), 13 deletions(-)
 
--- =
+diff --git a/include/migration/register.h b/include/migration/register.h
+index c1dcff0..c030a10 100644
+--- a/include/migration/register.h
++++ b/include/migration/register.h
+@@ -17,6 +17,9 @@
+ #include "hw/vmstate-if.h"
+ 
+ typedef struct SaveVMHandlers {
++    /* Mask of VMStateMode's that should use this handler */
++    unsigned mode_mask;
++
+     /* This runs inside the iothread lock.  */
+     SaveStateHandler *save_state;
+ 
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f68ed7d..fa575f9 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -158,6 +158,12 @@ typedef enum {
+     MIG_PRI_MAX,
+ } MigrationPriority;
+ 
++typedef enum {
++    VMS_MIGRATE  = (1U << 1),
++    VMS_SNAPSHOT = (1U << 2),
++    VMS_MODE_ALL = ~0U
++} VMStateMode;
++
+ struct VMStateField {
+     const char *name;
+     const char *err_hint;
+@@ -182,6 +188,7 @@ struct VMStateDescription {
+     int minimum_version_id;
+     int minimum_version_id_old;
+     MigrationPriority priority;
++    unsigned mode_mask;
+     LoadStateHandler *load_state_old;
+     int (*pre_load)(void *opaque);
+     int (*post_load)(void *opaque, int version_id);
+@@ -1215,4 +1222,6 @@ void vmstate_register_ram_global(struct MemoryRegion *memory);
+ 
+ bool vmstate_check_only_migratable(const VMStateDescription *vmsd);
+ 
++void savevm_set_mode(VMStateMode mode);
++
+ #endif
+diff --git a/migration/migration.c b/migration/migration.c
+index 2ed9923..e3d0899 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -465,7 +465,7 @@ static void process_incoming_migration_co(void *opaque)
+     postcopy_state_set(POSTCOPY_INCOMING_NONE);
+     migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
+                       MIGRATION_STATUS_ACTIVE);
+-    ret = qemu_loadvm_state(mis->from_src_file);
++    ret = qemu_loadvm_state(mis->from_src_file, VMS_MIGRATE);
+ 
+     ps = postcopy_state_get();
+     trace_process_incoming_migration_co_end(ret, ps);
+@@ -3414,7 +3414,7 @@ static void *migration_thread(void *opaque)
+ 
+     object_ref(OBJECT(s));
+     update_iteration_initial_status(s);
+-
++    savevm_set_mode(VMS_MIGRATE);
+     qemu_savevm_state_header(s->to_dst_file);
+ 
+     /*
+diff --git a/migration/savevm.c b/migration/savevm.c
+index a07fcad..ce02b6b 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -256,6 +256,7 @@ typedef struct SaveState {
+     const char *name;
+     uint32_t target_page_bits;
+     uint32_t caps_count;
++    VMStateMode mode;
+     MigrationCapability *capabilities;
+     QemuUUID uuid;
+ } SaveState;
+@@ -266,16 +267,15 @@ static SaveState savevm_state = {
+     .global_section_id = 0,
+ };
+ 
+-/*
+- * The FOREACH macros will filter handlers based on the current operation when
+- * additional conditions are added in a subsequent patch.
+- */
++/* The FOREACH macros filter handlers based on the current operation. */
+ 
+ #define SAVEVM_FOREACH(se, entry)                                    \
+     QTAILQ_FOREACH(se, &savevm_state.handlers, entry)                \
++        if (savevm_state.mode & mode_mask(se))
+ 
+ #define SAVEVM_FOREACH_SAFE(se, entry, new_se)                       \
+     QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se)   \
++        if (savevm_state.mode & mode_mask(se))
+ 
+ /* The FORALL macros unconditionally loop over all handlers. */
+ 
+@@ -285,6 +285,33 @@ static SaveState savevm_state = {
+ #define SAVEVM_FORALL_SAFE(se, entry, new_se)                        \
+     QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se)
+ 
++/*
++ * Set the current mode to be used for filtering savevm handlers in
++ * SAVEVM_FOREACH.
++ */
++void savevm_set_mode(VMStateMode mode)
++{
++    savevm_state.mode = mode;
++}
++
++/*
++ * A savevm handler is selected in SAVEVM_FOREACH if its mask overlaps the
++ * current mode.  The mask is defined by either the new vmsd interface or the
++ * legacy ops interface.  If the mask is zero, it implicily includes all modes.
++ */
++static inline unsigned mode_mask(SaveStateEntry *se)
++{
++    const VMStateDescription *vmsd = se->vmsd;
++    unsigned mask = 0;
++
++    if (vmsd) {
++        mask = vmsd->mode_mask;
++    } else if (se->ops) {
++        mask = se->ops->mode_mask;
++    }
++    return mask ? mask : VMS_MODE_ALL;
++}
++
+ static bool should_validate_capability(int capability)
+ {
+     assert(capability >= 0 && capability < MIGRATION_CAPABILITY__MAX);
+@@ -1527,12 +1554,14 @@ void qemu_savevm_state_cleanup(void)
+     }
+ }
+ 
+-static int qemu_savevm_state(QEMUFile *f, Error **errp)
++static int qemu_savevm_state(QEMUFile *f, VMStateMode mode, Error **errp)
+ {
+     int ret;
+     MigrationState *ms = migrate_get_current();
+     MigrationStatus status;
+ 
++    savevm_set_mode(mode);
++
+     if (migration_is_running(ms->state)) {
+         error_setg(errp, QERR_MIGRATION_ACTIVE);
+         return -EINVAL;
+@@ -2557,13 +2586,14 @@ out:
+     return ret;
+ }
+ 
+-int qemu_loadvm_state(QEMUFile *f)
++int qemu_loadvm_state(QEMUFile *f, VMStateMode mode)
+ {
+     MigrationIncomingState *mis = migration_incoming_get_current();
+     Error *local_err = NULL;
+     int ret;
+ 
+-    if (qemu_savevm_state_blocked(&local_err)) {
++    if ((mode & (VMS_SNAPSHOT | VMS_MIGRATE)) &&
++        qemu_savevm_state_blocked(&local_err)) {
+         error_report_err(local_err);
+         return -EINVAL;
+     }
+@@ -2736,7 +2766,7 @@ int save_snapshot(const char *name, Error **errp)
+         error_setg(errp, "Could not open VM state file");
+         goto the_end;
+     }
+-    ret = qemu_savevm_state(f, errp);
++    ret = qemu_savevm_state(f, VMS_SNAPSHOT, errp);
+     vm_state_size = qemu_ftell(f);
+     ret2 = qemu_fclose(f);
+     if (ret < 0) {
+@@ -2785,6 +2815,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+     int saved_vm_running;
+     int ret;
+ 
++    savevm_set_mode(VMS_MIGRATE);
+     if (!has_live) {
+         /* live default to true so old version of Xen tool stack can have a
+          * successfull live migration */
+@@ -2850,7 +2881,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
+     f = qemu_fopen_channel_input(QIO_CHANNEL(ioc));
+     object_unref(OBJECT(ioc));
+ 
+-    ret = qemu_loadvm_state(f);
++    ret = qemu_loadvm_state(f, VMS_MIGRATE);
+     qemu_fclose(f);
+     if (ret < 0) {
+         error_setg(errp, QERR_IO_ERROR);
+@@ -2928,7 +2959,7 @@ int load_snapshot(const char *name, Error **errp)
+     mis->from_src_file = f;
+ 
+     aio_context_acquire(aio_context);
+-    ret = qemu_loadvm_state(f);
++    ret = qemu_loadvm_state(f, VMS_SNAPSHOT);
+     migration_incoming_state_destroy();
+     aio_context_release(aio_context);
+ 
+diff --git a/migration/savevm.h b/migration/savevm.h
+index ba64a7e..4b7ce91 100644
+--- a/migration/savevm.h
++++ b/migration/savevm.h
+@@ -14,6 +14,8 @@
+ #ifndef MIGRATION_SAVEVM_H
+ #define MIGRATION_SAVEVM_H
+ 
++#include "migration/vmstate.h"
++
+ #define QEMU_VM_FILE_MAGIC           0x5145564d
+ #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+ #define QEMU_VM_FILE_VERSION         0x00000003
+@@ -60,7 +62,7 @@ void qemu_savevm_send_colo_enable(QEMUFile *f);
+ void qemu_savevm_live_state(QEMUFile *f);
+ int qemu_save_device_state(QEMUFile *f);
+ 
+-int qemu_loadvm_state(QEMUFile *f);
++int qemu_loadvm_state(QEMUFile *f, VMStateMode mode);
+ void qemu_loadvm_state_cleanup(void);
+ int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+ int qemu_load_device_state(QEMUFile *f);
+-- 
+1.8.3.1
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1884684
-
-Title:
-  QEMU 5.0: Guest VM hangs/freeze when unplugging USB device
-
-Status in QEMU:
-  New
-
-Bug description:
-  Setup:
-
-  Host: Debian/SID, Kernel 5.6, QEMU 5.0
-  Guest: Windows 10 VM with PCI and USB device passthrough.
-
-  Problem: Guest VM suddenly hangs when pulling USB device out from the
-  Host.
-
-  Observations:
-   - Issue appears to be related to QEMU 5.0
-     - It started after an upgrade to QEMU 5.0.
-     - Downgrading only QEMU on multiple systems fixes the issue.
-
-   - Issue is very reproducible.
-     - Most of the time within a few attempts of pulling/reconnecting the d=
-evice.
-     - Issue happens with multiple devices (I did try standard HID devices,=
- a webcam and an x-ray sensor).
-
-   - Guest just hangs.
-     - Display output remains on last frame shown.
-     - Ping to Guest immediately stops working.
-     - Logs in the Guest stop logging immediately.
-
-   - Host is fine and thinks the Guest is fine. =
-
-     - Guest continues to show as running in "virsh list".
-     - No suspicious entries in the QEMU logs.
-     - No suspicious entries in Host syslogs/messages.
-     - Host can can kill guest "virsh destroy" and respawn fine.
-
-   - Issue seems widespread.
-     - Multiple similar reports from ProxMox users after upgrade to ProxMox=
- 6.2 for both Windows and Linux guests (First version that uses QEMU 5.0)
-
-  https://forum.proxmox.com/threads/vm-freezes-when-disconnecting-usb-keybo=
-ard-and-mouse.70287/
-  https://forum.proxmox.com/threads/usb-drive-crashes-vm.70214/
-  https://forum.proxmox.com/threads/latest-proxmox-usb-disconnects-freeze-k=
-vm.70398/
-  https://forum.proxmox.com/threads/vm-with-gpu-passthrough-freezes-when-tu=
-rning-off-monitor-after-proxmox-6-2-upgrade.69821/
-  https://forum.proxmox.com/threads/vm-with-gpu-passthrough-freezes-when-tu=
-rning-off-monitor-after-proxmox-6-2-upgrade.69824/
-
-  I'd be more than happy any debugs that might be helpful.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1884684/+subscriptions
 
