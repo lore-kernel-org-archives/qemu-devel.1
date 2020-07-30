@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8388C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 228EAC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:50:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A05442074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:50:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4C682074B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:50:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqfDbsHI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A05442074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NzpAVxxJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4C682074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1EZ8-0005Uk-SY
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 15:50:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60148)
+	id 1k1EZB-0005Wq-6d
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 15:50:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EXA-0001uV-4Q
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:08 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32056
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX7-0001no-3U
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50820
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX8-0006nQ-Gw
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:07 -0400
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX4-0006lL-RF
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596138485;
+ s=mimecast20190719; t=1596138482;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PaH6/prDe0zOnbw0p8530Sh7BSPAEfCKXw62zps8Fcw=;
- b=JqfDbsHI3gZp7mdod1aAZDep1y/AozSZJVND/aAlrYCqvzRj3UohxKGpcWF2PumhskuEhh
- ZgQTu7KuwKv5/fneq3/hJLFEsPjxDc6pbcfGdjCCEJ9xWChzZrEbC9y2Vqv8SvyRAVbdiV
- qCXNy0CiW66LYwggpCrC4wuGHQem5C0=
+ bh=jhjZBzKdUPWmQBoGYYNmaWrngqD0E272Oq6g881pzZA=;
+ b=NzpAVxxJ+CJJB8XrQ/3pi7I1O2Xe36HGJzYJa5J6eyLyBDMAptcqc8QxcR4RrkG9PlS3eg
+ LUeIe6rNt3SS9GmON7Wu+12FXZNMvHZbSoKsTulLtNrr4t0tp3yDaq+2rNcGVuEZkD6GqG
+ BVFUnpu0/AKO9K7pPygZHQF1jfkLH1k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-EYzzquMQPYmMbdvrSRlkPQ-1; Thu, 30 Jul 2020 15:48:03 -0400
-X-MC-Unique: EYzzquMQPYmMbdvrSRlkPQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-410-tsvrPN_aPUWBRm8FDFYhfA-1; Thu, 30 Jul 2020 15:48:00 -0400
+X-MC-Unique: tsvrPN_aPUWBRm8FDFYhfA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 851D4101C8A0
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 19:48:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C160F1932482
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 19:47:59 +0000 (UTC)
 Received: from horse.redhat.com (ovpn-117-166.rdu2.redhat.com [10.10.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 055E05BAC3;
- Thu, 30 Jul 2020 19:47:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA72F19D7B;
+ Thu, 30 Jul 2020 19:47:53 +0000 (UTC)
 Received: by horse.redhat.com (Postfix, from userid 10451)
- id 6F4FD223D09; Thu, 30 Jul 2020 15:47:48 -0400 (EDT)
+ id 6BA52223D08; Thu, 30 Jul 2020 15:47:48 -0400 (EDT)
 From: Vivek Goyal <vgoyal@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/5] virtiofsd: Skip setup_capabilities() in sandbox=NONE
- mode
-Date: Thu, 30 Jul 2020 15:47:36 -0400
-Message-Id: <20200730194736.173994-6-vgoyal@redhat.com>
+Subject: [PATCH v2 4/5] virtiofsd: Open lo->source while setting up root in
+ sandbox=NONE mode
+Date: Thu, 30 Jul 2020 15:47:35 -0400
+Message-Id: <20200730194736.173994-5-vgoyal@redhat.com>
 In-Reply-To: <20200730194736.173994-1-vgoyal@redhat.com>
 References: <20200730194736.173994-1-vgoyal@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -102,31 +102,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-setup_capabilites() tries to give some of the required capabilities
-to act as a full fledged file server in priviliged mode. In unpriviliged
-mode we can't get those capabilities and setup_capabilities() will fail.
-
-So don't setup capabilities when sandbox=NONE.
+In sandbox=NONE mode, lo->source points to the directory which is being
+exported. We have not done any chroot()/pivot_root(). So open lo->source.
 
 Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tools/virtiofsd/passthrough_ll.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index a6fa816b6c..1a0b24cbf2 100644
+index 76ef891105..a6fa816b6c 100644
 --- a/tools/virtiofsd/passthrough_ll.c
 +++ b/tools/virtiofsd/passthrough_ll.c
-@@ -3030,7 +3030,8 @@ static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
-     }
+@@ -3209,7 +3209,10 @@ static void setup_root(struct lo_data *lo, struct lo_inode *root)
+     int fd, res;
+     struct stat stat;
  
-     setup_seccomp(enable_syslog);
--    setup_capabilities(g_strdup(lo->modcaps));
-+    if (lo->sandbox != SANDBOX_NONE)
-+       setup_capabilities(g_strdup(lo->modcaps));
- }
- 
- /* Set the maximum number of open file descriptors */
+-    fd = open("/", O_PATH);
++    if (lo->sandbox == SANDBOX_NONE)
++        fd = open(lo->source, O_PATH);
++    else
++        fd = open("/", O_PATH);
+     if (fd == -1) {
+         fuse_log(FUSE_LOG_ERR, "open(%s, O_PATH): %m\n", lo->source);
+         exit(1);
 -- 
 2.25.4
 
