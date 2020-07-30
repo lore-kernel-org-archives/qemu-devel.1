@@ -2,80 +2,93 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B5D0C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 02:08:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891DDC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 02:56:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E69AF2075D
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 02:08:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E69AF2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 543C222B48
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 02:56:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A9k0t6eR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 543C222B48
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k0xzi-000709-98
-	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 22:08:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42216)
+	id 1k0ykR-0008Jq-Je
+	for qemu-devel@archiver.kernel.org; Wed, 29 Jul 2020 22:56:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50890)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k0xz7-0006Za-I4
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 22:07:53 -0400
-Received: from mga04.intel.com ([192.55.52.120]:21536)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k0xz4-0006td-04
- for qemu-devel@nongnu.org; Wed, 29 Jul 2020 22:07:53 -0400
-IronPort-SDR: cDSFirNs3b/tpFu0kx6vubt6l2OkLbLD+dhReWBWvVsyztNijnRAXyWwE9nlZul5VwzxiMQx7g
- DQCdc/8DAcyw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9697"; a="148990209"
-X-IronPort-AV: E=Sophos;i="5.75,412,1589266800"; d="scan'208";a="148990209"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Jul 2020 19:07:46 -0700
-IronPort-SDR: NWievWMlrY1IhP9aIEHtYXbpJeTQ8hhvNh7AGLehZFOVge18AO1MUwK7DQLNK+9jQa9Yp3/zdd
- e9/P+thGqH7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,412,1589266800"; d="scan'208";a="490961672"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by fmsmga005.fm.intel.com with ESMTP; 29 Jul 2020 19:07:39 -0700
-Date: Thu, 30 Jul 2020 09:56:39 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sean Mooney <smooney@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200730015639.GA32327@joy-OptiPlex-7040>
-References: <20200713232957.GD5955@joy-OptiPlex-7040>
- <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
- <20200716083230.GA25316@joy-OptiPlex-7040>
- <20200717101258.65555978@x1.home>
- <20200721005113.GA10502@joy-OptiPlex-7040>
- <20200727072440.GA28676@joy-OptiPlex-7040>
- <20200727162321.7097070e@x1.home>
- <20200729080503.GB28676@joy-OptiPlex-7040>
- <e8a973ea0bb2bc3eb15649fb1c44599ae3509e84.camel@redhat.com>
+ (Exim 4.90_1) (envelope-from <leif.n.huhn@gmail.com>)
+ id 1k0yji-0007Yk-Dp
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 22:56:02 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39633)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <leif.n.huhn@gmail.com>)
+ id 1k0yjg-00010p-Fc
+ for qemu-devel@nongnu.org; Wed, 29 Jul 2020 22:56:02 -0400
+Received: by mail-wm1-x341.google.com with SMTP id q76so3600676wme.4
+ for <qemu-devel@nongnu.org>; Wed, 29 Jul 2020 19:55:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=je+6b8E2cDEw2VievIHp/3ty1EbLbxkNjcOvLSlJz84=;
+ b=A9k0t6eRY7nZuKtA2NkPGxDlWFV8/pyvjBo+f+0i7MfmGiqj09bvN30djhsVGhE7ij
+ pPPwUqFUOkjCSYB9l+MeBde9SQUmgv3oQX4iyo/Ua7CHKhuNCM7HGVDB6Ii2/6qaIq+S
+ /mwpBYXkN4q+BICT0BcxkpNYr2FJ5s0HPv4bD4QKmvZp3un9MGE22OraLoo58i7iNeRm
+ j8H2T+F46LzlmiZsrFMF7wAEw/KRZTBRPR+BO5FJATRJGK5A11u88/OBOWrdeXklRaP+
+ b6/Lw0zNXr6lH0Q6owj7BpawGX7w02VmDSu15Mg9E9/sRkgNKhN/Ob5HFqvCnjUiXLqT
+ un8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=je+6b8E2cDEw2VievIHp/3ty1EbLbxkNjcOvLSlJz84=;
+ b=KzIax6K4VOqPg/Eh8qZRocUdubGSr3HNzNACGzX/rTwnWpAyANasnr7zNoT452YmTS
+ fT15UEOiXRPkCDp0ZQGAyj6K62zww0jMDCYnSATXh4Yg5nWsSozjGbqiiN12LoBmKCP0
+ BI6lTRcqO+SW8P3MKr+VhimGOJrxUfPnDoZGP52vjE/i+eDEb/vOSpu00mcxs7SFrraf
+ u8zUUuQhP91JCXTg5xFE+fwkhzZI+o1CLZUUEhTFInUwBUFKIKYrFevuh+dqzm6apPTg
+ 0uznaL7b80M0FZi+dqEaeGaVLqpKD6rMRsYE8wltazEP41RKpAk3ny90rDKudUht8VFZ
+ Za/g==
+X-Gm-Message-State: AOAM530JpDlAn6WKXCeH/Sy+fnZ/9EQPGyCG/gqR2D9Lk/EZ54WerE1d
+ zX3JUFD8bMX0b9Cgabw3NRZ2sTFb
+X-Google-Smtp-Source: ABdhPJxsdNwckfrc5I3LW+wOBdjgQhaaU5XgLoKYov6M72SCpGUPu1TMEBy8W/rJBf/mUE86z0KUdw==
+X-Received: by 2002:a7b:c8d3:: with SMTP id f19mr8947011wml.163.1596077757883; 
+ Wed, 29 Jul 2020 19:55:57 -0700 (PDT)
+Received: from lhuhn.localdomain
+ (24-148-42-188.s4794.c3-0.grn-cbr1.chi-grn.il.cable.rcncustomer.com.
+ [24.148.42.188])
+ by smtp.gmail.com with ESMTPSA id p25sm6958025wma.39.2020.07.29.19.55.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Jul 2020 19:55:57 -0700 (PDT)
+From: Leif N Huhn <leif.n.huhn@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/1] linux-user: Add support for SG_IO and SG_GET_VERSION_NUM
+ raw SCSI ioctls
+Date: Wed, 29 Jul 2020 21:55:47 -0500
+Message-Id: <20200730025548.237905-1-leif.n.huhn@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e8a973ea0bb2bc3eb15649fb1c44599ae3509e84.camel@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.120; envelope-from=yan.y.zhao@intel.com;
- helo=mga04.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 22:07:47
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=leif.n.huhn@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,308 +101,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, eskultet@redhat.com, jian-feng.ding@intel.com,
- dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
- bao.yumeng@zte.com.cn, Alex Williamson <alex.williamson@redhat.com>,
- intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com, cohuck@redhat.com,
- dinechin@redhat.com, devel@ovirt.org
+Cc: Leif N Huhn <leif.n.huhn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 29, 2020 at 12:28:46PM +0100, Sean Mooney wrote:
-> On Wed, 2020-07-29 at 16:05 +0800, Yan Zhao wrote:
-> > On Mon, Jul 27, 2020 at 04:23:21PM -0600, Alex Williamson wrote:
-> > > On Mon, 27 Jul 2020 15:24:40 +0800
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > 
-> > > > > > As you indicate, the vendor driver is responsible for checking version
-> > > > > > information embedded within the migration stream.  Therefore a
-> > > > > > migration should fail early if the devices are incompatible.  Is it  
-> > > > > 
-> > > > > but as I know, currently in VFIO migration protocol, we have no way to
-> > > > > get vendor specific compatibility checking string in migration setup stage
-> > > > > (i.e. .save_setup stage) before the device is set to _SAVING state.
-> > > > > In this way, for devices who does not save device data in precopy stage,
-> > > > > the migration compatibility checking is as late as in stop-and-copy
-> > > > > stage, which is too late.
-> > > > > do you think we need to add the getting/checking of vendor specific
-> > > > > compatibility string early in save_setup stage?
-> > > > >  
-> > > > 
-> > > > hi Alex,
-> > > > after an offline discussion with Kevin, I realized that it may not be a
-> > > > problem if migration compatibility check in vendor driver occurs late in
-> > > > stop-and-copy phase for some devices, because if we report device
-> > > > compatibility attributes clearly in an interface, the chances for
-> > > > libvirt/openstack to make a wrong decision is little.
-> > > 
-> > > I think it would be wise for a vendor driver to implement a pre-copy
-> > > phase, even if only to send version information and verify it at the
-> > > target.  Deciding you have no device state to send during pre-copy does
-> > > not mean your vendor driver needs to opt-out of the pre-copy phase
-> > > entirely.  Please also note that pre-copy is at the user's discretion,
-> > > we've defined that we can enter stop-and-copy at any point, including
-> > > without a pre-copy phase, so I would recommend that vendor drivers
-> > > validate compatibility at the start of both the pre-copy and the
-> > > stop-and-copy phases.
-> > > 
-> > 
-> > ok. got it!
-> > 
-> > > > so, do you think we are now arriving at an agreement that we'll give up
-> > > > the read-and-test scheme and start to defining one interface (perhaps in
-> > > > json format), from which libvirt/openstack is able to parse and find out
-> > > > compatibility list of a source mdev/physical device?
-> > > 
-> > > Based on the feedback we've received, the previously proposed interface
-> > > is not viable.  I think there's agreement that the user needs to be
-> > > able to parse and interpret the version information.  Using json seems
-> > > viable, but I don't know if it's the best option.  Is there any
-> > > precedent of markup strings returned via sysfs we could follow?
-> > 
-> > I found some examples of using formatted string under /sys, mostly under
-> > tracing. maybe we can do a similar implementation.
-> > 
-> > #cat /sys/kernel/debug/tracing/events/kvm/kvm_mmio/format
-> > 
-> > name: kvm_mmio
-> > ID: 32
-> > format:
-> >         field:unsigned short common_type;       offset:0;       size:2; signed:0;
-> >         field:unsigned char common_flags;       offset:2;       size:1; signed:0;
-> >         field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
-> >         field:int common_pid;   offset:4;       size:4; signed:1;
-> > 
-> >         field:u32 type; offset:8;       size:4; signed:0;
-> >         field:u32 len;  offset:12;      size:4; signed:0;
-> >         field:u64 gpa;  offset:16;      size:8; signed:0;
-> >         field:u64 val;  offset:24;      size:8; signed:0;
-> > 
-> > print fmt: "mmio %s len %u gpa 0x%llx val 0x%llx", __print_symbolic(REC->type, { 0, "unsatisfied-read" }, { 1, "read"
-> > }, { 2, "write" }), REC->len, REC->gpa, REC->val
-> > 
-> this is not json fromat and its not supper frendly to parse.
-yes, it's just an example. It's exported to be used by userspace perf &
-trace_cmd.
+Hi. This is my first time trying to contribute to qemu. This patch
+works correctly for architectures with the same bit-width, for example
+32bit arm host and i386 user binary. Here is an example with the sg_simple2
+executable from https://github.com/hreinecke/sg3_utils
 
-> > 
-> > #cat /sys/devices/pci0000:00/0000:00:02.0/uevent
-> > DRIVER=vfio-pci
-> > PCI_CLASS=30000
-> > PCI_ID=8086:591D
-> > PCI_SUBSYS_ID=8086:2212
-> > PCI_SLOT_NAME=0000:00:02.0
-> > MODALIAS=pci:v00008086d0000591Dsv00008086sd00002212bc03sc00i00
-> > 
-> this is ini format or conf formant 
-> this is pretty simple to parse whichi would be fine.
-> that said you could also have a version or capablitiy directory with a file
-> for each key and a singel value.
-> 
-if this is easy for openstack, maybe we can organize the data like below way?
- 
- |- [device]
-    |- migration
-        |-self
-	|-compatible1
-	|-compatible2
+32-bit ARM native:
 
-e.g. 
-#cat /sys/bus/pci/devices/0000:00:02.0/UUID1/migration/self
- 	filed1=xxx
- 	filed2=xxx
- 	filed3=xxx
- 	filed3=xxx
-#cat /sys/bus/pci/devices/0000:00:02.0/UUID1/migration/compatible
- 	filed1=xxx
- 	filed2=xxx
- 	filed3=xxx
- 	filed3=xxx
+  strace -e trace=ioctl ./sg_simple2 /dev/sg0
+  ioctl(3, SG_GET_VERSION_NUM, [30536])   = 0
+  ioctl(3, SG_IO, {interface_id='S', dxfer_direction=SG_DXFER_FROM_DEV, cmd_len=6, cmdp="\x12\x00\x00\x00\x60\x00", mx_sb_len=32, iovec_count=0, dxfer_len=96, timeout=20000, flags=0, dxferp="\x05\x80\x00\x32\x5b\x00\x00\x00\x48\x4c\x2d\x44\x54\x2d\x53\x54\x42\x44\x2d\x52\x45\x20\x20\x57\x48\x31\x36\x4e\x53\x34\x30\x20"..., status=0, masked_status=0, msg_status=0, sb_len_wr=0, sbp="", host_status=0, driver_status=0, resid=0, duration=3, info=0}) = 0
+  Some of the INQUIRY command's results:
+      HL-DT-ST  BD-RE  WH16NS40   1.05  [wide=0 sync=0 cmdque=0 sftre=0]
+  ioctl(3, SG_IO, {interface_id='S', dxfer_direction=SG_DXFER_NONE, cmd_len=6, cmdp="\x00\x00\x00\x00\x00\x00", mx_sb_len=32, iovec_count=0, dxfer_len=0, timeout=20000, flags=0, status=0, masked_status=0, msg_status=0, sb_len_wr=0, sbp="", host_status=0, driver_status=0, resid=0, duration=4, info=0}) = 0
+  Test Unit Ready successful so unit is ready!
+  +++ exited with 0 +++
 
-or in a flat layer
- |- [device]
-    |- migration-self-traits
-    |- migration-compatible-traits
+i386 binary on 32-bit arm host:
 
-I'm not sure whether json format in a single file is better, as I didn't
-find any precedent.
+  strace -f -e trace=ioctl qemu/build/i386-linux-user/qemu-i386 sg3_utils/examples/sg_simple2 /dev/sg0
+  strace: Process 690 attached
+  [pid   689] ioctl(3, SG_GET_VERSION_NUM, [30536]) = 0
+  [pid   689] ioctl(3, SG_IO, {interface_id='S', dxfer_direction=SG_DXFER_FROM_DEV, cmd_len=6, cmdp="\x12\x00\x00\x00\x60\x00", mx_sb_len=32, iovec_count=0, dxfer_len=96, timeout=20000, flags=0, dxferp="\x05\x80\x00\x32\x5b\x00\x00\x00\x48\x4c\x2d\x44\x54\x2d\x53\x54\x42\x44\x2d\x52\x45\x20\x20\x57\x48\x31\x36\x4e\x53\x34\x30\x20"..., status=0, masked_status=0, msg_status=0, sb_len_wr=0, sbp="", host_status=0, driver_status=0, resid=0, duration=3, info=0}) = 0
+  Some of the INQUIRY command's results:
+      HL-DT-ST  BD-RE  WH16NS40   1.05  [wide=0 sync=0 cmdque=0 sftre=0]
+  [pid   689] ioctl(3, SG_IO, {interface_id='S', dxfer_direction=SG_DXFER_NONE, cmd_len=6, cmdp="\x00\x00\x00\x00\x00\x00", mx_sb_len=32, iovec_count=0, dxfer_len=0, timeout=20000, flags=0, status=0, masked_status=0, msg_status=0, sb_len_wr=0, sbp="", host_status=0, driver_status=0, resid=0, duration=3, info=0}) = 0
+  Test Unit Ready successful so unit is ready!
+  [pid   690] +++ exited with 0 +++
+  +++ exited with 0 +++
 
-> i would prefer to only have to do one read personally the list the files in
-> directory and then read tehm all ot build the datastucture myself but that is
-> doable though the simple ini format use d for uevent seams the best of 3 options
-> provided above.
-> > > 
-> > > Your idea of having both a "self" object and an array of "compatible"
-> > > objects is perhaps something we can build on, but we must not assume
-> > > PCI devices at the root level of the object.  Providing both the
-> > > mdev-type and the driver is a bit redundant, since the former includes
-> > > the latter.  We can't have vendor specific versioning schemes though,
-> > > ie. gvt-version. We need to agree on a common scheme and decide which
-> > > fields the version is relative to, ex. just the mdev type?
-> > 
-> > what about making all comparing fields vendor specific?
-> > userspace like openstack only needs to parse and compare if target
-> > device is within source compatible list without understanding the meaning
-> > of each field.
-> that kind of defeats the reason for having them be be parsable.
-> the reason openstack want to be able to understand the capablitys is so
-> we can staticaly declare the capablit of devices ahead of time on so our schduler
-> can select host based on that. is the keys and data are opaquce to userspace
-> becaue they are just random vendor sepecific blobs we cant do that.
-I heard that cyborg can parse the kernel interface and generate several
-traits without understanding the meaning of each trait. Then it reports
-those traits to placement for scheduling.
+However when I try i386 guest on x86_64 host, the cmdp bytes in the
+first SG_IO call are zero, incorrectly. I assume that is because I need
+to write a special ioctl handler. Is that correct? Should I be calling
+lock_user(VERIFY_WRITE...) to copy the buffers over?
 
-but I agree if mdev creation is involved, those traits need to match
-to mdev attributes and mdev_type.
+Also, is the current patch acceptable as is, or does it need to be
+reworked until the ioctl works with different architecture bit-widths?
 
-could you explain a little how you plan to create a target mdev device?
-is it dynamically created during searching of compatible mdevs or just statically
-created before migration?
+Thanks!
 
-> > 
-> > > I had also proposed fields that provide information to create a
-> > > compatible type, for example to create a type_x2 device from a type_x1
-> > > mdev type, they need to know to apply an aggregation attribute.  If we
-> > > need to explicitly list every aggregation value and the resulting type,
-> > > I think we run aground of what aggregation was trying to avoid anyway,
-> > > so we might need to pick a language that defines variable substitution
-> > > or some kind of tagging.  For example if we could define ${aggr} as an
-> > > integer within a specified range, then we might be able to define a type
-> > > relative to that value (type_x${aggr}) which requires an aggregation
-> > > attribute using the same value.  I dunno, just spit balling.  Thanks,
-> > 
-> > what about a migration_compatible attribute under device node like
-> > below?
-> rather then listing comaptiable devices it would be better if you could declaritivly 
-> list the feature supported and we could compare those along with a simple semver version string.
-I think below is already in a way of listing feature supported.
-The reason I also want to declare compatible lists of features is that
-sometimes it's not a simple 1:1 matching of source list and target list.
-as I demonstrated below,
-source mdev of (mdev_type i915-GVTg_V5_2 + aggregator 1) is compatible to
-target mdev of (mdev_type i915-GVTg_V5_4 + aggregator 2),
-               (mdev_type i915-GVTg_V5_8 + aggregator 4)
+Leif N Huhn (1):
+  linux-user: Add support for SG_IO and SG_GET_VERSION_NUM raw SCSI
+    ioctls
 
-and aggragator may be just one of such examples that 1:1 matching is not
-fit.
-so I guess it's best not to leave the hard decision to openstack.
+ linux-user/ioctls.h        |  2 ++
+ linux-user/syscall.c       |  1 +
+ linux-user/syscall_defs.h  | 33 +++++++++++++++++++++++++++++++++
+ linux-user/syscall_types.h |  5 +++++
+ 4 files changed, 41 insertions(+)
 
-Thanks
-Yan
-> > 
-> > #cat /sys/bus/pci/devices/0000\:00\:02.0/UUID1/migration_compatible
-> > SELF:
-> > 	device_type=pci
-> > 	device_id=8086591d
-> > 	mdev_type=i915-GVTg_V5_2
-> > 	aggregator=1
-> > 	pv_mode="none+ppgtt+context"
-> > 	interface_version=3
-> > COMPATIBLE:
-> > 	device_type=pci
-> > 	device_id=8086591d
-> > 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-> this mixed notation will be hard to parse so i would avoid that.
-> > 	aggregator={val1}/2
-> > 	pv_mode={val2:string:"none+ppgtt","none+context","none+ppgtt+context"}
-> >  
-> > 	interface_version={val3:int:2,3}
-> > COMPATIBLE:
-> > 	device_type=pci
-> > 	device_id=8086591d
-> > 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-> > 	aggregator={val1}/2
-> > 	pv_mode=""  #"" meaning empty, could be absent in a compatible device
-> > 	interface_version=1
-> if you presented this information the only way i could see to use it would be to
-> extract the mdev_type name and interface_vertion  and build a database table as follows
-> 
-> source_mdev_type | source_version | target_mdev_type | target_version
-> i915-GVTg_V5_2 | 3 | 915-GVTg_V5_{val1:int:1,2,4,8} | {val3:int:2,3}
-> i915-GVTg_V5_2 | 3 | 915-GVTg_V5_{val1:int:1,2,4,8} | 1
-> 
-> this would either reuiqre use to use a post placment sechudler filter to itrospec this data base
-> or thansform the target_mdev_type and target_version colum data into CUSTOM_* traits we apply to
-> our placment resouce providers and we would have to prefrom multiple reuqest for each posible compatiable
-> alternitive.  if the vm has muplite mdevs this is combinatorially problmenatic as it is 1 query for each
-> device * the number of possible compatible devices for that device.
-> 
-> in other word if this is just opaque data we cant ever represent it efficently in our placment service and
-> have to fall back to an explisive post placment schdluer filter base on the db table approch.
-> 
-> this also ignore the fact that at present the mdev_type cannot change druing a migration so the compatiable
-> devicve with a different mdev type would not be considerd accpetable choice in openstack. they way you select a host
-> with a specific vgpu mdev type today is to apply a custome trait which is CUSTOM_<medev_type_goes_here> to the vGPU
-> resouce provider and then in the flavor you request 1 allcoaton of vGPU and require the CUSTOM_<medev_type_goes_here>
-> trait. so going form i915-GVTg_V5_2 to i915-GVTg_V5_{val1:int:1,2,4,8} would not currently be compatiable with that
-> workflow.
-> 
-> 
-> > #cat /sys/bus/pci/dei915-GVTg_V5_{val1:int:1,2,4,8}vices/0000\:00\:i915-
-> > GVTg_V5_{val1:int:1,2,4,8}2.0/UUID2/migration_compatible
-> > SELF:
-> > 	device_type=pci
-> > 	device_id=8086591d
-> > 	mdev_type=i915-GVTg_V5_4
-> > 	aggregator=2
-> > 	interface_version=1
-> > COMPATIBLE: 
-> > 	device_type=pci
-> > 	device_id=8086591d
-> > 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
-> > 	aggregator={val1}/2
-> > 	interface_version=1
-> by the way this is closer to yaml format then it is to json but it does not align with any exsiting
-> format i know of so that just make the representation needless hard to consume
-> if we are going to use a markup lanag let use a standard one like yaml json or toml and not invent a new one.
-> > 
-> > Notes:
-> > - A COMPATIBLE object is a line starting with COMPATIBLE.
-> >   It specifies a list of compatible devices that are allowed to migrate
-> >   in.
-> >   The reason to allow multiple COMPATIBLE objects is that when it
-> >   is hard to express a complex compatible logic in one COMPATIBLE
-> >   object, a simple enumeration is still a fallback.
-> >   in the above example, device UUID2 is in the compatible list of
-> >   device UUID1, but device UUID1 is not in the compatible list of device
-> >   UUID2, so device UUID2 is able to migrate to device UUID1, but device
-> >   UUID1 is not able to migrate to device UUID2.
-> > 
-> > - fields under each object are of "and" relationship to each other,  meaning
-> >   all fields of SELF object of a target device must be equal to corresponding
-> >   fields of a COMPATIBLE object of source device, otherwise it is regarded as not
-> >   compatible.
-> > 
-> > - each field, however, is able to specify multiple allowed values, using
-> >   variables as explained below.
-> > 
-> > - variables are represented with {}, the first appearance of one variable
-> >   specifies its type and allowed list. e.g.
-> >   {val1:int:1,2,4,8} represents var1 whose type is integer and allowed
-> >   values are 1, 2, 4, 8.
-> > 
-> > - vendors are able to specify which fields are within the comparing list
-> >   and which fields are not. e.g. for physical VF migration, it may not
-> >   choose mdev_type as a comparing field, and maybe use driver name instead.
-> this format might be useful to vendors but from a orcestrator perspecive i dont think this has
-> value to us likely we would not use this api if it was added as it does not help us with schduling.
-> ideally instead fo declaring which other mdev types a device is compatiable with (which could presumably change over
-> time as new device and firmwares are released) i would prefer to see a declaritive non vendor specific api that declares
-> the feature set provided by each mdev_type from which we can infer comaptiablity similar to cpu feature flags.
-> for devices fo the same mdev_type name addtionally a declaritive version sting could also be used if required for
-> addtional compatiablity checks.
-> >  
-> > 
-> > Thanks
-> > Yan
-> > 
-> > 
-> 
+-- 
+2.28.0
+
 
