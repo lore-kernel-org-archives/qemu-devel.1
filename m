@@ -2,87 +2,110 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 584E5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 18:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D36E0C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 18:19:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24ED520829
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 18:18:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5AB72083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 18:19:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aLfv7Fam"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24ED520829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ntHeFbb2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5AB72083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1D8L-000158-EO
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 14:18:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34662)
+	id 1k1D96-0002Cs-1B
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 14:19:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k1D4n-0006me-LY
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 14:14:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45578
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k1D4j-0001T8-9K
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 14:14:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596132879;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ISqQ5uIw5KF4G3fNDYh9e7g0ivRbimnlWj30R7n1OSQ=;
- b=aLfv7FamhXbzonEYYGTgn3AcX/1dvOW2Odf+0Dtg61nlr4YxbTvrFACZE20Ncn1x1YsAjC
- bLPNIOtYZ8k5WrUH6n/29Yzze/3mtowIBn00/6gQHAFu48SdFrCzUigyUMa+X62ig9e8+y
- a2un6rf6whTi07CfliVqC9i/v+UVGVs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-MxbGVOVQPCGPAgMfeoBSxw-1; Thu, 30 Jul 2020 14:14:34 -0400
-X-MC-Unique: MxbGVOVQPCGPAgMfeoBSxw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C548119200C2;
- Thu, 30 Jul 2020 18:14:33 +0000 (UTC)
-Received: from localhost (ovpn-114-112.ams2.redhat.com [10.36.114.112])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C13B6111F;
- Thu, 30 Jul 2020 18:14:33 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL for-5.1 2/2] tracetool: carefully define SDT_USE_VARIADIC
-Date: Thu, 30 Jul 2020 19:14:14 +0100
-Message-Id: <20200730181414.160066-3-stefanha@redhat.com>
-In-Reply-To: <20200730181414.160066-1-stefanha@redhat.com>
-References: <20200730181414.160066-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1D6z-00007Z-8L
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 14:17:01 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:44244)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1D6x-0001sa-1n
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 14:17:00 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UIBjfu031467;
+ Thu, 30 Jul 2020 18:16:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=dfvOnTnHyKT3y/Y9JsbnDs+Jc3jN7Cl+L8cmGoKmtB4=;
+ b=ntHeFbb2+Sii3LLIhg3PyBbPncNF4stgFpDvZdw5HtKdPcd2GSKkAINAwr76Xg4mYZbV
+ PzweGzLgCB+YIjZlPDREo9VSVXrIG3WgXQfOcEBY+YaLPtdaEv3AZNTr/0ibxTwsEvUp
+ K0ayRu5uSi5FSpDklod5byKCRZ+lZiu33wKivAww8E9dpmsYyxgAW7/kJ+ZpBZE1gCwd
+ 44tfuGD8jwFpdYbbworoG+LHXu1dPu7VbOjhgmr3tWoRQGaImBrFny9qTk0dOxdRipAG
+ hnrV4Dq06gtUC5eQ+90AK8exZZobDeWOq1FU/coeeusW+2FN8vSv+UrMHD9fbe6GJ/ua 5Q== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 32hu1jn7sf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Thu, 30 Jul 2020 18:16:57 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UI8p2U011242;
+ Thu, 30 Jul 2020 18:14:56 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 32hu5xrk1a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 30 Jul 2020 18:14:56 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06UIEsD6021313;
+ Thu, 30 Jul 2020 18:14:54 GMT
+Received: from [10.39.200.60] (/10.39.200.60)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 30 Jul 2020 11:14:54 -0700
+Subject: Re: [PATCH V1 14/32] savevm: VMS_RESTART and cprsave restart
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-15-git-send-email-steven.sistare@oracle.com>
+ <d1d3d800-4fea-767c-6836-3af926dda7ea@redhat.com>
+From: Steven Sistare <steven.sistare@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <c60cbf83-9a5e-fffe-9444-dd04cd93b471@oracle.com>
+Date: Thu, 30 Jul 2020 14:14:51 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:59:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
-X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+In-Reply-To: <d1d3d800-4fea-767c-6836-3af926dda7ea@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ mlxscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007300129
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ bulkscore=0 mlxlogscore=999
+ lowpriorityscore=0 malwarescore=0 clxscore=1015 mlxscore=0 impostorscore=0
+ phishscore=0 adultscore=0 suspectscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007300129
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=steven.sistare@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 14:11:27
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,43 +118,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGhlIGR0cmFjZSBiYWNrZW5kIGRlZmluZXMgU0RUX1VTRV9WQVJJQURJQyBhcyBhIHdvcmthcm91
-bmQgZm9yIGEKY29uZmxpY3Qgd2l0aCBhIExUVG5nIFVTVCBoZWFkZXIgZmlsZSwgd2hpY2ggcmVx
-dWlyZXMgU0RUX1VTRV9WQVJJQURJQwp0byBiZSBkZWZpbmVkLgoKTFRUbmcgVVNUIDxsdHRuZy90
-cmFjZXBvaW50Lmg+IGJyZWFrcyBpZiBpbmNsdWRlZCBhZnRlciBnZW5lcmF0ZWQgZHRyYWNlCmhl
-YWRlcnMgYmVjYXVzZSBTRFRfVVNFX1ZBUklBRElDIHdpbGwgYWxyZWFkeSBiZSBkZWZpbmVkOgoK
-ICAjaWZkZWYgTFRUTkdfVVNUX0hBVkVfU0RUX0lOVEVHUkFUSU9OCiAgI2RlZmluZSBTRFRfVVNF
-X1ZBUklBRElDIDwtLSBlcnJvciwgaXQncyBhbHJlYWR5IGRlZmluZWQKICAjaW5jbHVkZSA8c3lz
-L3NkdC5oPgoKQmUgbW9yZSBjYXJlZnVsIHdoZW4gZGVmaW5pbmcgU0RUX1VTRV9WQVJJQURJQy4g
-VGhpcyBmaXhlcyB0aGUgYnVpbGQKd2hlbiBib3RoIHRoZSBkdHJhY2UgYW5kIHVzdCB0cmFjZXJz
-IGFyZSBlbmFibGVkIGF0IHRoZSBzYW1lIHRpbWUuCgpGaXhlczogMjdlMDhiYWI5NGY3YzZlYmUw
-Yjc1OTM4Yzk4YzM5NGM5NjllM2ZkOCAoInRyYWNldG9vbDogd29yayBhcm91bmQgdXN0IDxzeXMv
-c2R0Lmg+IGluY2x1ZGUgY29uZmxpY3QiKQpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkg
-PHN0ZWZhbmhhQHJlZGhhdC5jb20+Ck1lc3NhZ2UtaWQ6IDIwMjAwNzI5MTUzOTI2LjEyNzA4My0x
-LXN0ZWZhbmhhQHJlZGhhdC5jb20KU2lnbmVkLW9mZi1ieTogU3RlZmFuIEhham5vY3ppIDxzdGVm
-YW5oYUByZWRoYXQuY29tPgotLS0KIHNjcmlwdHMvdHJhY2V0b29sL2JhY2tlbmQvZHRyYWNlLnB5
-IHwgNCArKysrCiAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEv
-c2NyaXB0cy90cmFjZXRvb2wvYmFja2VuZC9kdHJhY2UucHkgYi9zY3JpcHRzL3RyYWNldG9vbC9i
-YWNrZW5kL2R0cmFjZS5weQppbmRleCBiN2ZlNGMxYjUwLi5mYzBjOGZjNTJmIDEwMDY0NAotLS0g
-YS9zY3JpcHRzL3RyYWNldG9vbC9iYWNrZW5kL2R0cmFjZS5weQorKysgYi9zY3JpcHRzL3RyYWNl
-dG9vbC9iYWNrZW5kL2R0cmFjZS5weQpAQCAtNDQsMTEgKzQ0LDE1IEBAIGRlZiBnZW5lcmF0ZV9o
-X2JlZ2luKGV2ZW50cywgZ3JvdXApOgogICAgICMgcmVxdWlyZSBTRFRfVVNFX1ZBUklBRElDIHRv
-IGJlIGRlZmluZWQuIElmIGR0cmFjZSBpbmNsdWRlcyA8c3lzL3NkdC5oPgogICAgICMgZmlyc3Qg
-d2l0aG91dCBkZWZpbmluZyBTRFRfVVNFX1ZBUklBRElDIHRoZW4gdXN0IGJyZWFrcyBiZWNhdXNl
-IHRoZQogICAgICMgU1RBUF9QUk9CRVYoKSBtYWNybyBpcyBub3QgZGVmaW5lZC4KKyAgICBvdXQo
-JyNpZm5kZWYgU0RUX1VTRV9WQVJJQURJQycpCiAgICAgb3V0KCcjZGVmaW5lIFNEVF9VU0VfVkFS
-SUFESUMgMScpCisgICAgb3V0KCcjZW5kaWYnKQogCiAgICAgb3V0KCcjaW5jbHVkZSAiJXMiJyAl
-IGhlYWRlciwKICAgICAgICAgJycpCiAKKyAgICBvdXQoJyN1bmRlZiBTRFRfVVNFX1ZBUklBRElD
-JykKKwogICAgICMgU3lzdGVtVGFwIGRlZmluZXMgPHByb3ZpZGVyPl88bmFtZT5fRU5BQkxFRCgp
-IGJ1dCBvdGhlciBEVHJhY2UKICAgICAjIGltcGxlbWVudGF0aW9ucyBtaWdodCBub3QuCiAgICAg
-Zm9yIGUgaW4gZXZlbnRzOgotLSAKMi4yNi4yCgo=
+On 7/30/2020 12:22 PM, Eric Blake wrote:
+> On 7/30/20 10:14 AM, Steve Sistare wrote:
+>> Add the VMS_RESTART variant of vmstate, for use when upgrading qemu in place
+>> on the same host without a reboot.  Invoke it using:
+>>    cprsave <filename> restart
+>>
+>> VMS_RESTART supports guest ram mapped by private anonymous memory, versus
+>> VMS_REBOOT which requires that guest ram be mapped by persistent shared
+>> memory.  Subsequent patches complete its implementation.
+>>
+>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+>> ---
+> 
+>> +++ b/qapi/migration.json
+>> @@ -1639,6 +1639,7 @@
+>>   #
+>>   # @file: name of checkpoint file
+>>   # @mode: 'reboot' : checkpoint can be cprload'ed after a host kexec reboot.
+>> +#        'restart': checkpoint can be cprload'ed after restarting qemu.
+> 
+> This should be a modification to an enum type (the 'CprMode' type I suggested earlier in the series).
 
+Will do - steve
 
