@@ -2,93 +2,80 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_DIGITS,FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E7D9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 05:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D93D0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 06:12:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4494B20842
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 05:28:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4FE120656
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 06:12:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aS/7AFZ1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4494B20842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="U7EpCwMh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4FE120656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k117Y-0000N8-F6
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 01:28:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46524)
+	id 1k11ny-0004qr-VU
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 02:12:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k116q-0008OT-Er
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 01:28:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42886
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k116o-00086B-9g
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 01:28:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596086879;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HY6i5rtBtKqT1lfTlALq1/+bUURk82idIQv5QUIDAa8=;
- b=aS/7AFZ19P6vuv8mvdtCCM0H/NSvrKkZnmGJD6tjb1f7Q7Fk0xByDGgzU6L56BWdhG5wMW
- tDy7YE+AXbfh3WUacs0RNN1WVZpYpWwdrh1q9zlIRn09U/6dcuRExz9jypuzP52tlTr6lo
- SPJzl6nTuo4fsqbet6985RdmRN9ebT0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-8uUDW3_COq2emg6ACHPMMw-1; Thu, 30 Jul 2020 01:27:56 -0400
-X-MC-Unique: 8uUDW3_COq2emg6ACHPMMw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEF5B1005504;
- Thu, 30 Jul 2020 05:27:54 +0000 (UTC)
-Received: from [10.72.13.179] (ovpn-13-179.pek2.redhat.com [10.72.13.179])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2B1C019D9E;
- Thu, 30 Jul 2020 05:27:52 +0000 (UTC)
-Subject: Re: [PATCH 1/2] hw/net/net_tx_pkt: add function to check
- pkt->max_raw_frags
-To: Mauro Matteo Cascella <mcascell@redhat.com>
-References: <20200727170838.1101775-1-mcascell@redhat.com>
- <20200727170838.1101775-2-mcascell@redhat.com>
- <adb52967-d2b2-cb55-87a2-38fda18a2a0a@redhat.com>
- <CAA8xKjXagrLU+DVcO3uVw6D0sJHXQ_rOd0nqEHHNcaMwG6oXRA@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <3672bcc5-329f-0cc6-a505-e5b21a316a20@redhat.com>
-Date: Thu, 30 Jul 2020 13:27:51 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <13824125580@163.com>)
+ id 1k11n4-0004Oy-8W
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 02:11:42 -0400
+Received: from m138.mail.163.com ([220.181.13.8]:5042)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <13824125580@163.com>)
+ id 1k11my-0004td-48
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 02:11:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=Date:From:Subject:MIME-Version:Message-ID; bh=jB1HT
+ MZpVGAi57G0tzywiTo5bqELhnjA6QbkK2fltEA=; b=U7EpCwMh0cusk/1PB/xs9
+ axVeBIPk3wHX+00FVyq9WzeoFDaUYD4O2mDXX/aB1ydXtBCLBv1UBIwUpQWmVx85
+ LKqPkbcaHXdxjirKWUiWshPyc8UsUU6NLbeyxLxSa5M70XgsOFcgSEytKYOGYnV7
+ KmkNmSJ2XGQymH/pjsCtmE=
+Received: from 13824125580$163.com ( [221.4.213.95] ) by ajax-webmail-wmsvr8
+ (Coremail) ; Thu, 30 Jul 2020 13:54:46 +0800 (CST)
+X-Originating-IP: [221.4.213.95]
+Date: Thu, 30 Jul 2020 13:54:46 +0800 (CST)
+From: tugouxp  <13824125580@163.com>
+To: "Richard Henderson" <richard.henderson@linaro.org>
+Subject: Re:Re: What this mean "dead: 1" and "dead: 0 1" on each tb block
+ start?
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.10 build 20190724(ac680a23)
+ Copyright (c) 2002-2020 www.mailtech.cn 163com
+In-Reply-To: <a21310ca-b637-5d6e-bfe8-e7834b2498bc@linaro.org>
+References: <6807386b.7ba3.1739af8fc12.Coremail.13824125580@163.com>
+ <a21310ca-b637-5d6e-bfe8-e7834b2498bc@linaro.org>
+X-CM-CTRLDATA: tsAa+mZvb3Rlcl9odG09MTgyMDo2MQ==
+Content-Type: multipart/alternative; 
+ boundary="----=_Part_40470_601492635.1596088486119"
 MIME-Version: 1.0
-In-Reply-To: <CAA8xKjXagrLU+DVcO3uVw6D0sJHXQ_rOd0nqEHHNcaMwG6oXRA@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 23:51:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Message-ID: <58c617e6.2b3c.1739e4988e7.Coremail.13824125580@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: CMGowADXKkKmYCJf66VGAA--.28656W
+X-CM-SenderInfo: bprtmjyurskkiyq6il2tof0z/1tbiHhJxQlSIpnKaHAABsw
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Received-SPF: pass client-ip=220.181.13.8; envelope-from=13824125580@163.com;
+ helo=m138.mail.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 01:55:13
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: 1
+X-Spam_score: 0.1
+X-Spam_bar: /
+X-Spam_report: (0.1 / 5.0 requ) BAYES_40=-0.001, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, FROM_LOCAL_DIGITS=0.001,
+ FROM_LOCAL_HEX=0.006, HTML_MESSAGE=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,86 +88,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, ziming zhang <ezrakiez@gmail.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+------=_Part_40470_601492635.1596088486119
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
 
-On 2020/7/29 上午12:26, Mauro Matteo Cascella wrote:
-> On Tue, Jul 28, 2020 at 6:06 AM Jason Wang <jasowang@redhat.com> wrote:
->>
->> On 2020/7/28 上午1:08, Mauro Matteo Cascella wrote:
->>> This patch introduces a new function in hw/net/net_tx_pkt.{c,h} to check the
->>> current data fragment against the maximum number of data fragments.
->>
->> I wonder whether it's better to do the check in
->> net_tx_pkt_add_raw_fragment() and fail there.
-> Given the assertion, I assumed the caller is responsible for the
-> check, but moving the check in net_tx_pkt_add_raw_fragment() totally
-> makes sense to me.
+U28sIGZsYWcgaXMgYWxzbyB0aGUgcGFyYW10ZXIgaW5kZXggcmlnaHQ/ICx3aGF0IGFib3V0IHRo
+ZSBzeW5jID8gICAKCgoKCgoKCgoKCgoKCgoKCgpBdCAyMDIwLTA3LTMwIDAwOjE2OjI1LCAiUmlj
+aGFyZCBIZW5kZXJzb24iIDxyaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnPiB3cm90ZToKPk9u
+IDcvMjkvMjAgNzoyNyBBTSwgdHVnb3V4cCB3cm90ZToKPj4gSEkgZm9sa3M6Cj4+ICAgb24gZWFj
+aCB0YiBibG9jayBzdGFydCwgdGhlcmUgYXJlIGZvbGxvd2luZyBpciBjb2RlLCBhbmQgdGhlIG1v
+c3QgY29uZnVzaW5nCj4+IG1lIGlzIHRoYXQgIHRoZSBwb3N0Zml4IG9mIGVhY2ggbGluZSAiZGVh
+ZDoiIGZsYWcsIHdoYXQgaXQgaXMgcmVwcmVzZW50IHByZWNpc2VseT8KPj4gaSBndWVzcyBpdCBt
+YXkgYmUgcmVsYXRlZCB0byB0aGUgcmVnaXN0ZXIgb3IgdmFyaWJsZSBsaXZlbmVzcyBmb3IgaGVs
+cAo+PiBnZW5lcmF0aW5nIHRnaGUgdGFyZ2V0IG1hY2hpbmUgY29kZSwgYnV0IGkgY2FudCBnZXQg
+dGhlIHByZWNpc2VseSBjb25uZWN0aW9uIG9mCj4+IHRoZSBkZWFkIGF0dHJyaWJ1dGUgd2l0aCBx
+ZW11ICBpbnRlcm5hbCB2YXJpYmxlcy4KPj4gZm9yIGV4YW1wbGUsIHdoeSB0aGUgbGluZSA2MSB1
+c2UgImRlYWQ6MSIgYW5kIHRoZSBsaW5lIDYzIHVzZSAiZGVhZDogMCwgMSI/IAo+PiB3aGF0IGlz
+IHRoZSBwcmVjaXNlbHkgbWVhbmluZyBvZiB0aGUgbnVtYmVyIGFmdGVyIHRoZSAiZGVhZDoiIHdv
+cmQ/Cj4+IAo+PiB0aGFuayB5b3UhICAgICAKPj4gCj4+IAo+PiAgICAgNjAgT1AgYWZ0ZXIgb3B0
+aW1pemF0aW9uIGFuZCBsaXZlbmVzcyBhbmFseXNpczoKPj4gCj4+ICAgICAgNjEgIGxkX2kzMiB0
+bXA1LGVudiwkMHhmZmZmZmZmZmZmZmZmZmVjICAgICAgICAgICAgICAgICBkZWFkOiAxCj4+IAo+
+PiAgICAgIDYyICBtb3ZpX2kzMiB0bXA2LCQweDAKPj4gCj4+ICAgICAgNjMgIGJyY29uZF9pMzIg
+dG1wNSx0bXA2LGx0LCRMMCAgICAgICAgICAgICAgICAgICAgICBkZWFkOiAwIDEKPgo+VGhlIG51
+bWJlcnMgYXJlIHRoZSBpbmRleCBvZiB0aGUgYXJndW1lbnQgdGhhdCBpcyBkZWFkLgo+Cj5FLmcu
+IGhlcmUsIGJvdGggdG1wNSBhbmQgdG1wNiBhcmUgZGVhZC4KPgo+Cj5yfgo=
+------=_Part_40470_601492635.1596088486119
+Content-Type: text/html; charset=GBK
+Content-Transfer-Encoding: base64
 
+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
+Zm9udC1mYW1pbHk6QXJpYWwiPjxwIHN0eWxlPSJtYXJnaW46IDA7Ij5TbywgZmxhZyBpcyBhbHNv
+IHRoZSBwYXJhbXRlciBpbmRleCByaWdodD8gLHdoYXQgYWJvdXQgdGhlIHN5bmMgPyZuYnNwOyAm
+bmJzcDs8L3A+PHAgc3R5bGU9Im1hcmdpbjogMDsiPjxicj48L3A+PHAgc3R5bGU9Im1hcmdpbjog
+MDsiPjxicj48L3A+PHAgc3R5bGU9Im1hcmdpbjogMDsiPjxicj48L3A+PHAgc3R5bGU9Im1hcmdp
+bjogMDsiPjxicj48L3A+PGRpdiBzdHlsZT0icG9zaXRpb246cmVsYXRpdmU7em9vbToxIj48L2Rp
+dj48ZGl2IGlkPSJkaXZOZXRlYXNlTWFpbENhcmQiPjwvZGl2PjxwIHN0eWxlPSJtYXJnaW46IDA7
+Ij48YnI+PC9wPjxwcmU+PGJyPkF0IDIwMjAtMDctMzAgMDA6MTY6MjUsICJSaWNoYXJkIEhlbmRl
+cnNvbiIgJmx0O3JpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcmZ3Q7IHdyb3RlOgomZ3Q7T24g
+Ny8yOS8yMCA3OjI3IEFNLCB0dWdvdXhwIHdyb3RlOgomZ3Q7Jmd0OyBISSBmb2xrczoKJmd0OyZn
+dDsgJm5ic3A7IG9uIGVhY2ggdGIgYmxvY2sgc3RhcnQsIHRoZXJlIGFyZSBmb2xsb3dpbmcgaXIg
+Y29kZSwgYW5kIHRoZSBtb3N0IGNvbmZ1c2luZwomZ3Q7Jmd0OyBtZSBpcyB0aGF0Jm5ic3A7IHRo
+ZSBwb3N0Zml4IG9mIGVhY2ggbGluZSAiZGVhZDoiIGZsYWcsIHdoYXQgaXQgaXMgcmVwcmVzZW50
+IHByZWNpc2VseT8KJmd0OyZndDsgaSBndWVzcyBpdCBtYXkgYmUgcmVsYXRlZCB0byB0aGUgcmVn
+aXN0ZXIgb3IgdmFyaWJsZSBsaXZlbmVzcyBmb3IgaGVscAomZ3Q7Jmd0OyBnZW5lcmF0aW5nIHRn
+aGUgdGFyZ2V0IG1hY2hpbmUgY29kZSwgYnV0IGkgY2FudCBnZXQgdGhlIHByZWNpc2VseSBjb25u
+ZWN0aW9uIG9mCiZndDsmZ3Q7IHRoZSBkZWFkIGF0dHJyaWJ1dGUgd2l0aCBxZW11Jm5ic3A7IGlu
+dGVybmFsIHZhcmlibGVzLgomZ3Q7Jmd0OyBmb3IgZXhhbXBsZSwgd2h5IHRoZSBsaW5lIDYxIHVz
+ZSAiZGVhZDoxIiBhbmQgdGhlIGxpbmUgNjMgdXNlICJkZWFkOiAwLCAxIj8mbmJzcDsKJmd0OyZn
+dDsgd2hhdCBpcyB0aGUgcHJlY2lzZWx5IG1lYW5pbmcgb2YgdGhlIG51bWJlciBhZnRlciB0aGUg
+ImRlYWQ6IiB3b3JkPwomZ3Q7Jmd0OyAKJmd0OyZndDsgdGhhbmsgeW91ISZuYnNwOyAmbmJzcDsg
+Jm5ic3A7CiZndDsmZ3Q7IAomZ3Q7Jmd0OyAKJmd0OyZndDsgJm5ic3A7ICZuYnNwOyA2MCBPUCBh
+ZnRlciBvcHRpbWl6YXRpb24gYW5kIGxpdmVuZXNzIGFuYWx5c2lzOgomZ3Q7Jmd0OyAKJmd0OyZn
+dDsgJm5ic3A7ICZuYnNwOyAmbmJzcDs2MSZuYnNwOyBsZF9pMzIgdG1wNSxlbnYsJDB4ZmZmZmZm
+ZmZmZmZmZmZlYyZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNw
+OyAmbmJzcDsgJm5ic3A7ZGVhZDogMQomZ3Q7Jmd0OyAKJmd0OyZndDsgJm5ic3A7ICZuYnNwOyAm
+bmJzcDs2MiZuYnNwOyBtb3ZpX2kzMiB0bXA2LCQweDAKJmd0OyZndDsgCiZndDsmZ3Q7ICZuYnNw
+OyAmbmJzcDsgJm5ic3A7NjMmbmJzcDsgYnJjb25kX2kzMiB0bXA1LHRtcDYsbHQsJEwwJm5ic3A7
+ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsg
+Jm5ic3A7ICZuYnNwOyBkZWFkOiAwIDEKJmd0OwomZ3Q7VGhlIG51bWJlcnMgYXJlIHRoZSBpbmRl
+eCBvZiB0aGUgYXJndW1lbnQgdGhhdCBpcyBkZWFkLgomZ3Q7CiZndDtFLmcuIGhlcmUsIGJvdGgg
+dG1wNSBhbmQgdG1wNiBhcmUgZGVhZC4KJmd0OwomZ3Q7CiZndDtyfgo8L3ByZT48L2Rpdj48YnI+
+PGJyPjxzcGFuIHRpdGxlPSJuZXRlYXNlZm9vdGVyIj48cD48YnIvPiZuYnNwOzwvcD48L3NwYW4+
 
-Want to send a new version for this?
-
-
->
->> Btw, I find net_tx_pkt_add_raw_fragment() does not unmap dma when
->> returning to true, is this a bug?
-> Isn't it unmapped in net_tx_pkt_reset()?
-
-
-Probably but see how it was used in e1000e, the net_tx_pkt_reset() is 
-only called when eop is set. Is this a bug?
-
-Thanks
-
->
->> Thanks
->>
->>
->>> Reported-by: Ziming Zhang <ezrakiez@gmail.com>
->>> Signed-off-by: Mauro Matteo Cascella <mcascell@redhat.com>
->>> ---
->>>    hw/net/net_tx_pkt.c | 5 +++++
->>>    hw/net/net_tx_pkt.h | 8 ++++++++
->>>    2 files changed, 13 insertions(+)
->>>
->>> diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
->>> index 9560e4a49e..d035618f2c 100644
->>> --- a/hw/net/net_tx_pkt.c
->>> +++ b/hw/net/net_tx_pkt.c
->>> @@ -400,6 +400,11 @@ bool net_tx_pkt_add_raw_fragment(struct NetTxPkt *pkt, hwaddr pa,
->>>        }
->>>    }
->>>
->>> +bool net_tx_pkt_exceed_max_fragments(struct NetTxPkt *pkt)
->>> +{
->>> +    return pkt->raw_frags >= pkt->max_raw_frags;
->>> +}
->>> +
->>>    bool net_tx_pkt_has_fragments(struct NetTxPkt *pkt)
->>>    {
->>>        return pkt->raw_frags > 0;
->>> diff --git a/hw/net/net_tx_pkt.h b/hw/net/net_tx_pkt.h
->>> index 4ec8bbe9bd..e2ee46ae03 100644
->>> --- a/hw/net/net_tx_pkt.h
->>> +++ b/hw/net/net_tx_pkt.h
->>> @@ -179,6 +179,14 @@ bool net_tx_pkt_send_loopback(struct NetTxPkt *pkt, NetClientState *nc);
->>>     */
->>>    bool net_tx_pkt_parse(struct NetTxPkt *pkt);
->>>
->>> +/**
->>> +* indicates if the current data fragment exceeds max_raw_frags
->>> +*
->>> +* @pkt:            packet
->>> +*
->>> +*/
->>> +bool net_tx_pkt_exceed_max_fragments(struct NetTxPkt *pkt);
->>> +
->>>    /**
->>>    * indicates if there are data fragments held by this packet object.
->>>    *
+------=_Part_40470_601492635.1596088486119--
 
 
