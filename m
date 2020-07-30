@@ -2,77 +2,76 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73380C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 20:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5A4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 20:26:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33297207F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 20:24:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 842CC207F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 20:26:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ai19AHP1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33297207F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z6qRDFUQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 842CC207F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1F6O-0002sR-D9
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 16:24:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40768)
+	id 1k1F7w-0003yE-Q7
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 16:26:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k1F5R-0002JY-8P
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 16:23:33 -0400
-Received: from mail-oo1-xc2b.google.com ([2607:f8b0:4864:20::c2b]:35662)
+ id 1k1F7L-0003Q4-KM
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 16:25:31 -0400
+Received: from mail-oi1-x230.google.com ([2607:f8b0:4864:20::230]:42356)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k1F5P-00037g-Ia
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 16:23:32 -0400
-Received: by mail-oo1-xc2b.google.com with SMTP id w1so5486943ooj.2
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 13:23:30 -0700 (PDT)
+ id 1k1F7J-0003ZD-QE
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 16:25:31 -0400
+Received: by mail-oi1-x230.google.com with SMTP id j7so8459733oij.9
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 13:25:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jy+a6XT66sNCAQL1CqUdWC2u5DYxP/Gdw12l+L2mujY=;
- b=ai19AHP1BGRpGSxQmVVCi/tHCtQsosw92xJqXed0a7mqVTIVKYaHpgtKuSP+Tq7oQo
- rAF5IKZLG7A2BZYeVdcYU0hQExo8GIsZkws0WloxBjsrTOv6FalKW5rOwtzICHOYkwfM
- f15wdUAf+PBBGlUxSqLzMD2V/tTUMTiD3a3YB4E9mVzaZ49ln9u+NymCgukbH/E2Lfdc
- vxmiR6N8bN2Wdy18eXsZROy1tCLYARc9nySIRgA8/hKhHNckcc16F8ddXxmvDirQVQj2
- nMO91KCqv53wyCbb0zfVAjrzjNLpqbDEk4yXSh/e5xTUTgywcpeqePyGP1rFShaRqjMI
- u6Aw==
+ :cc; bh=YHlc384mFb3XF8dMrD2AfcjHoCI2l9HlgVEZF+ZxYWQ=;
+ b=Z6qRDFUQxgewW+RYxmMdMs28IKISq5uF7DcxADVmgykgSKYr5B5lfyqR9MizSVCnYD
+ UBB6yeT6TeHoTyOsKn7z16Upc5i6hGE5chdMU4GOQQUOZ8+ORtqVREOwgNF2yzX/NlhM
+ vgeEb5sacj7d071zA2he+7ZXkPZa3vlYOIguLFhLMvPGOmEcupDF52UWlld74SrKqrcE
+ jeJOo2jiUGlylNvyfEQB9EnGhYSgvUrYr6UM5oQ8gUKehCKrCNGDlKXGkNpPrdR32mo3
+ ro5JSxjOS/PXl5A/L6P85qgeevtfukhclTvnsCF0nSsScvCqEKb5wwjCmp5Kd1mLN1xd
+ Od9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=jy+a6XT66sNCAQL1CqUdWC2u5DYxP/Gdw12l+L2mujY=;
- b=AMjPwiraXcq0h5spHxO2cUK4pq0im5LVVgg+dJTPlu7NjhDRiK9iHGGXxGELcYBfKk
- GOQo6FGRli83QuoJfrTTaw5XxIrK1LL1YDV9GvRM/B9NvxYPznvc0RyhsGT68fzTdO7i
- MTG7UiJyhUghHJdZAV4E05NWOYkcftcrEhfLcaXw1K7ssgGCxELFffm8+lFM2VXG+qa+
- nnzAqg/j/us6Hh2lqk+0Zb5c/7or8rCCdHUXiQs3b6QxrJ1FV1+QaXebk1x/POBqHeBl
- sStRB47CNsxoPGtgPKXkVug3HCklAg0A2vg35RkP/xQcoK/GbvuGJ/jHx2g6O2OBHF6h
- dGlA==
-X-Gm-Message-State: AOAM532CLJisUROkLUCP/feKEzk3aT3Ko8k0vQibVG3GqOwRDmObEIUF
- ZFRU01Je+5VZQelPZV5IMuRU5O//6Rj0Y9hEZdYxpg==
-X-Google-Smtp-Source: ABdhPJxv+FXlYPW99AWOnw4HZzWC1ZnnwP2TTa7ofWdAeE0Jhb1wc+TTWzscuoOZxM0FlJABvzGZmEfI5ktzbmG7jXk=
-X-Received: by 2002:a4a:4949:: with SMTP id z70mr415472ooa.85.1596140609900;
- Thu, 30 Jul 2020 13:23:29 -0700 (PDT)
+ bh=YHlc384mFb3XF8dMrD2AfcjHoCI2l9HlgVEZF+ZxYWQ=;
+ b=JWJYrWlGBtPDCQCqUCzfMSEfx30AhVVtQf1p87LCzgkl3Kz+pTfr8ZuhY7y19R66wH
+ Ulq8PMQjCDJPLokhNCtSiOnQ5V8lg9Gjd1mHf1jUUfm+3OuEW7lUvyD3BtoVgfH+shBi
+ U4INi7ndE5K/Z4aujggq79lxn8ah4dLC8ecVZyaHezyXvjm6wa6+mZn/O0D5yY+8413w
+ g+B9IhS9nsmqHnTAYXq6WnRpIiOk65+M7BBoumxXJGN8oTcD2oJtsO1pilroGemzoqz5
+ fMu+BJZE7ulSrmIWpT9ui4eq19LyiIIn1sqGpvl18bB8PdR3KDRl9+YWe4Jyxrz2K9+w
+ fPMQ==
+X-Gm-Message-State: AOAM532rBb50Oa/FCsev9nEJoZ118H3cX8JsuI5uSxZ4/TyeTLlUiIVu
+ jIsVvw1Po17l3516aHA56twUxYdLdf/LPrnc2/7HwQ==
+X-Google-Smtp-Source: ABdhPJyyBoOViTrU3mI5RlA5d1NFl1m6UgAan73op13gd/mH+zcRo8JE1sDx99V4eusVuDIcvqwDeMABpA+Y+BXbshA=
+X-Received: by 2002:aca:4a96:: with SMTP id x144mr546547oia.163.1596140728742; 
+ Thu, 30 Jul 2020 13:25:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAJoBWHzJq-51dBxP8pniQPd7fy7J+jU2gHwZOkn-NRJzc5uNiQ@mail.gmail.com>
- <CAFEAcA9XmXhp+Crx09k++Ryd3jSL8U36FSMvw6X73sBFEmiofw@mail.gmail.com>
- <CAJoBWHypu+nJ4L3fE-tQzr_EWf294THGQkovTrn+j5iQ+b4MyA@mail.gmail.com>
-In-Reply-To: <CAJoBWHypu+nJ4L3fE-tQzr_EWf294THGQkovTrn+j5iQ+b4MyA@mail.gmail.com>
+References: <20200730181414.160066-1-stefanha@redhat.com>
+In-Reply-To: <20200730181414.160066-1-stefanha@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 30 Jul 2020 21:23:18 +0100
-Message-ID: <CAFEAcA_H5V4EzaDy0C2j8VBYHtPu25vNj0SXuYLbypj6-m9M-Q@mail.gmail.com>
-Subject: Re: Differing PAC behavior between Qemu and Arm FVP
-To: Derrick McKee <derrick.mckee@gmail.com>
+Date: Thu, 30 Jul 2020 21:25:17 +0100
+Message-ID: <CAFEAcA_GMRXdN-arOz_7zVc9WwPySvoUMDrcjaMsZmuqt3qfbQ@mail.gmail.com>
+Subject: Re: [PULL for-5.1 0/2] Tracing patches
+To: Stefan Hajnoczi <stefanha@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c2b;
- envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc2b.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::230;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x230.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -94,22 +93,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 30 Jul 2020 at 21:06, Derrick McKee <derrick.mckee@gmail.com> wrote:
+On Thu, 30 Jul 2020 at 19:14, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> Hi Peter,
+> The following changes since commit 5772f2b1fc5d00e7e04e01fa28e9081d6550440a:
 >
-> I just got a SIGILL trying to execute a stg instruction with the QEMU version later in this thread, but the same instruction works correctly on the FVP.  Are you sure that all the MTE functionality is present in the master head?
+>   Update version for v5.1.0-rc2 release (2020-07-28 21:51:03 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stefanha/qemu.git tags/tracing-pull-request
+>
+> for you to fetch changes up to 000822441e34916991f7c03217dc24f38be49e50:
+>
+>   tracetool: carefully define SDT_USE_VARIADIC (2020-07-30 16:02:38 +0100)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> A build fix and a 'simple' trace backend regression fix.
+>
+> ----------------------------------------------------------------
 
-I would recommend that you cc qemu-devel and Richard on
-these emails...
 
-thanks
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
+
 -- PMM
 
