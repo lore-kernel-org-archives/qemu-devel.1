@@ -2,67 +2,71 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3EC4C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:48:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BA7C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:48:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90F5320838
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:48:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 554AC20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:48:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HZWBl2Ut"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F5320838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cQyPH/2l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 554AC20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1EXq-0002x8-T0
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 15:48:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60068)
+	id 1k1EXs-00032F-Kj
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 15:48:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX4-0001jo-3A
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27997
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX6-0001mr-IZ
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33854
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX1-0006kg-Fe
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:01 -0400
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX4-0006lK-PS
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596138478;
+ s=mimecast20190719; t=1596138482;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=aFWJpzGhsDniDBHu+uzRvAR9IX+8RUIXlBDYugJOvvs=;
- b=HZWBl2UtAzFr1EZHmwzJZ2M/zURe6SwWakZkKhXaBhsYSAcZ/yIIeFW+52oY40Y6Cn35gF
- qANJCJUhBpkNb4sHHnPTepOwUl5+RbwttK3KLUgBqJiQrYe9c6s1YEw+u09q3PCsb2+bOl
- Bi/jESw+RpzNaJ7zgcjjMrD0GwSe8D8=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cW1Fv6F+zfd8ts97DlbbgwPQ6AYGjGluPWGyzh4qrh8=;
+ b=cQyPH/2ljyS4+dgFILlhBZZS/xFKWo6xzxjPL9iAICpK1Mxg0x8tOsmCi6nohW7OrCg4EI
+ bX6HigpTRHVlpAGauLnDUV0+JBVX9bRWhfYl+Y2dhySpOT49Bx/cYKk0doQffsBKPxCoSY
+ MyWWzJWj6p/v7GsO0R5807J7ofCmUOs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-voBe6tKWMH2n_yWASKRUdA-1; Thu, 30 Jul 2020 15:47:56 -0400
-X-MC-Unique: voBe6tKWMH2n_yWASKRUdA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-352-PAL2IvpsMVOyjob5ADIa4Q-1; Thu, 30 Jul 2020 15:48:00 -0400
+X-MC-Unique: PAL2IvpsMVOyjob5ADIa4Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84953801A03
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 19:47:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94561101C8A0
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 19:47:59 +0000 (UTC)
 Received: from horse.redhat.com (ovpn-117-166.rdu2.redhat.com [10.10.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E969287B03;
- Thu, 30 Jul 2020 19:47:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DF92061176;
+ Thu, 30 Jul 2020 19:47:53 +0000 (UTC)
 Received: by horse.redhat.com (Postfix, from userid 10451)
- id 515C32237A7; Thu, 30 Jul 2020 15:47:48 -0400 (EDT)
+ id 67470223D06; Thu, 30 Jul 2020 15:47:48 -0400 (EDT)
 From: Vivek Goyal <vgoyal@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/5] virtiofsd: Add a unprivileged passthrough mode
-Date: Thu, 30 Jul 2020 15:47:31 -0400
-Message-Id: <20200730194736.173994-1-vgoyal@redhat.com>
+Subject: [PATCH v2 3/5] virtiofsd: open /proc/self/fd/ in sandbox=NONE mode
+Date: Thu, 30 Jul 2020 15:47:34 -0400
+Message-Id: <20200730194736.173994-4-vgoyal@redhat.com>
+In-Reply-To: <20200730194736.173994-1-vgoyal@redhat.com>
+References: <20200730194736.173994-1-vgoyal@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -97,37 +101,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+We need /proc/self/fd descriptor even in sandbox=NONE mode.
 
-This is V2 of patches. Only change since last version is handling of
-lock/pid file creation as per the comments from Daniel Berrange.
+Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+---
+ tools/virtiofsd/passthrough_ll.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-I can't think of any more changes needed. As a unpriviliged user
-inside VM I can do simple operations like create/remove/read/write
-files.
-
-For more testing, I probably need a testsuite which runs as unpriviliged
-user. pjdfstests needs to run as root and this does not work in this
-setup as creation of files as root fails. (On host, daemon tries to
-switch to root uid and that fails).
-
-So as of now, I think these are the minimum changes needed to support
-unprivileged passthrough mode of virtiofsd.
-
-Thanks
-Vivek
-
-Vivek Goyal (5):
-  virtiofsd: Add notion of unprivileged mode
-  virtiofsd: create lock/pid file in per user cache dir
-  virtiofsd: open /proc/self/fd/ in sandbox=NONE mode
-  virtiofsd: Open lo->source while setting up root in sandbox=NONE mode
-  virtiofsd: Skip setup_capabilities() in sandbox=NONE mode
-
- tools/virtiofsd/fuse_virtio.c    | 15 ++++++++++++++-
- tools/virtiofsd/passthrough_ll.c | 29 ++++++++++++++++++++++++++---
- 2 files changed, 40 insertions(+), 4 deletions(-)
-
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index cd91c4a831..76ef891105 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -2969,6 +2969,15 @@ static void setup_capabilities(char *modcaps_in)
+     pthread_mutex_unlock(&cap.mutex);
+ }
+ 
++static void setup_none(struct lo_data *lo)
++{
++    lo->proc_self_fd = open("/proc/self/fd", O_PATH);
++    if (lo->proc_self_fd == -1) {
++        fuse_log(FUSE_LOG_ERR, "open(\"/proc/self/fd\", O_PATH): %m\n");
++        exit(1);
++    }
++}
++
+ /*
+  * Use chroot as a weaker sandbox for environments where the process is
+  * launched without CAP_SYS_ADMIN.
+@@ -3014,8 +3023,10 @@ static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
+     if (lo->sandbox == SANDBOX_NAMESPACE) {
+         setup_namespaces(lo, se);
+         setup_mounts(lo->source);
+-    } else {
++    } else if (lo->sandbox == SANDBOX_CHROOT) {
+         setup_chroot(lo);
++    } else {
++        setup_none(lo);
+     }
+ 
+     setup_seccomp(enable_syslog);
 -- 
 2.25.4
 
