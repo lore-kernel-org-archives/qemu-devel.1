@@ -2,110 +2,110 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 442B0C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 17:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09490C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 18:02:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 118CD20809
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 17:53:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB0AB20809
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 18:02:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nxX2fjLZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 118CD20809
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="N/uW8TCO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB0AB20809
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1CkZ-0003Un-A8
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 13:53:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57096)
+	id 1k1Csm-00062s-4d
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 14:02:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1Cjg-00031U-Ss
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 13:52:56 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:37344)
+ id 1k1CrV-0005SA-Mh
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 14:01:02 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:44056)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1Cje-0006qj-Rt
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 13:52:56 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UHlrp7195254;
- Thu, 30 Jul 2020 17:52:51 GMT
+ id 1k1CrT-0008AA-CZ
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 14:01:00 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UHv58i050239;
+ Thu, 30 Jul 2020 18:00:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=yEps1S+sqercb3u0e69yngOBcLozBuJOWIiW67otIM0=;
- b=nxX2fjLZqIjHGrJ6ksp67auJgqySmILJHpVevDTa+iTNUko9JkqP3olqVtZiCtknYoFO
- xDP8wC5J96aIcNNvgklVFfNs0xFkH1jAruUWHYKzBhpvnIjSi8XvYuk/yqdLDP3XqANy
- TxZJbB7FV5R6I4hObQ4ypTTYPvbTHHsSO6wTBjFT6WgPHWccYuhODfCqvPDtrXF8KnSu
- f2ENef41qEro98d5nq5xkqINVSxGC8vIcUxBXTBcJWk4JL0v6G3Nc+cZPbqm1LPc3xaR
- Eac1OXOufGMJbenPHeuVTt1NTj4zgHskV1D7iXUWcy9ZyTqeVmop2E3YVmZkJtNQcfTm Tw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 32hu1jw3cv-1
+ bh=ql1fGPUxfzV89DNrtUsQRWNlOxsrKr/hfRfaP6YAzl0=;
+ b=N/uW8TCOLA3v6rEZq4PkW8C0HH89vU8+HUvr+mDY8hT7wAp6ERx6AtyXdK0VRzatDoZM
+ LpkKvB1LJPgvXumvjaYWWxIX50hfN1XpRHD/HbMsuB3jVcb9NoO05zKvUQQ3Yqif6VRW
+ oCXezJQBaRVedw0ozQsKypqWJSvEamvGiSTCRGHUv7tMb3CIEXTmxO2dQ0aBHwULUw9z
+ tbEHRVQZeup7lKdxYMoqa3KrwnDezbknoQM6jHQcw43Uevf35G7Jb4L/08JijboyujJ/
+ 1EgLRZutmLVsI274AJlBnU1uHS1KTmvl8aoFrVpM1ZOiYrPMoXz+Z5QV1XxYB3YkMj1c kA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2130.oracle.com with ESMTP id 32hu1jn5w2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 30 Jul 2020 17:52:51 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UHlRGN080707;
- Thu, 30 Jul 2020 17:52:50 GMT
+ Thu, 30 Jul 2020 18:00:55 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UHqZvq136486;
+ Thu, 30 Jul 2020 18:00:54 GMT
 Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3030.oracle.com with ESMTP id 32hu5x4bu6-1
+ by aserp3020.oracle.com with ESMTP id 32hu61mt5b-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 30 Jul 2020 17:52:50 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06UHqngG021964;
- Thu, 30 Jul 2020 17:52:49 GMT
+ Thu, 30 Jul 2020 18:00:54 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06UI0reL025981;
+ Thu, 30 Jul 2020 18:00:53 GMT
 Received: from [10.39.200.60] (/10.39.200.60)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 30 Jul 2020 10:52:48 -0700
-Subject: Re: [PATCH V1 03/32] savevm: QMP command for cprsave
+ with ESMTP ; Thu, 30 Jul 2020 11:00:53 -0700
+Subject: Re: [PATCH V1 05/32] savevm: QMP command for cprload
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-4-git-send-email-steven.sistare@oracle.com>
- <6aefdd56-b8fe-358b-6699-3f82a7fa8b1a@redhat.com>
+ <1596122076-341293-6-git-send-email-steven.sistare@oracle.com>
+ <654553cb-e071-0498-fe66-78ddda3942e9@redhat.com>
 From: Steven Sistare <steven.sistare@oracle.com>
 Organization: Oracle Corporation
-Message-ID: <ec60b632-4441-146b-61f3-67a48ac42697@oracle.com>
-Date: Thu, 30 Jul 2020 13:52:44 -0400
+Message-ID: <c135f2e5-10d5-81f5-7251-cead777428aa@oracle.com>
+Date: Thu, 30 Jul 2020 14:00:48 -0400
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <6aefdd56-b8fe-358b-6699-3f82a7fa8b1a@redhat.com>
+In-Reply-To: <654553cb-e071-0498-fe66-78ddda3942e9@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- mlxlogscore=999 mlxscore=0
- suspectscore=0 bulkscore=0 malwarescore=0 spamscore=0 phishscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ adultscore=0 bulkscore=0
+ malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007300126
+ definitions=main-2007300127
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015
- mlxlogscore=999
- malwarescore=0 impostorscore=0 priorityscore=1501 spamscore=0 phishscore=0
- suspectscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ clxscore=1015
+ malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007300126
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=steven.sistare@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 13:52:52
+ definitions=main-2007300127
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=steven.sistare@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 14:00:56
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -53
-X-Spam_score: -5.4
-X-Spam_bar: -----
-X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,56 +132,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/30/2020 12:12 PM, Eric Blake wrote:
+On 7/30/2020 12:14 PM, Eric Blake wrote:
 > On 7/30/20 10:14 AM, Steve Sistare wrote:
->> To enable live reboot, provide the cprsave QMP command and the VMS_REBOOT
->> vmstate-saving operation, which saves the state of the virtual machine in a
->> simple file.
->>
->> Syntax:
->>    {'command':'cprsave', 'data':{'file':'str', 'mode':'str'}}
->>
->>    The mode argument must be 'reboot'.  Additional modes will be defined in
->>    the future.
->>
+>> Provide the cprload QMP command.  The VM is created from the file produced
+>> by the cprsave command.  Guest RAM is restored in-place from the shared
+>> memory backend file, and guest block devices are used as is.  The contents
+>> of such devices must not be modified between the cprsave and cprload
+>> operations.  If the VM was running at cprsave time, then VM execution
+>> resumes.
 > 
-> Focusing on just the UI:
+> Is it always wise to unconditionally resume, or might this command need an additional optional knob that says what state (paused or running) to move into?
+
+This can already be done.  Issue a stop command before cprsave, then cprload will finish in a
+paused state.
+
+Also, cprsave re-execs and leaves the guest in a paused state.  One can
+
+send device add commands, then send cprload which continues
+.
+
+>> Syntax:
+>>    {'command':'cprload', 'data':{'file':'str'}}
+>>
+>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+>> Signed-off-by: Maran Wilson <maran.wilson@oracle.com>
+>> ---
 > 
 >> +++ b/qapi/migration.json
->> @@ -1621,3 +1621,17 @@
+>> @@ -1635,3 +1635,14 @@
 >>   ##
->>   { 'event': 'UNPLUG_PRIMARY',
->>     'data': { 'device-id': 'str' } }
->> +
->> +##
->> +# @cprsave:
+>>   { 'command': 'cprsave', 'data': { 'file': 'str', 'mode': 'str' } }
+>>   +##
+>> +# @cprload:
 >> +#
->> +# Create a checkpoint of the virtual machine device state in @file.
->> +# Guest RAM and guest block device blocks are not saved.
+>> +# Start virtual machine from checkpoint file that was created earlier using
+>> +# the cprsave command.
 >> +#
 >> +# @file: name of checkpoint file
-> 
-> Since you used qemu_open() in the code, this can include a '/dev/fdset/NNN' magic name for saving into a previously-passed-in file descriptor instead of directly opening a local file name.  That's a good thing, but I don't know if it needs explicit mention in the docs.
-
-OK, I'll look for other uses of file and fdset in the docs and see if it fits naturally here.
-
->> +# @mode: 'reboot' : checkpoint can be cprload'ed after a host kexec reboot.
 >> +#
 >> +# Since 5.0
 > 
-> 5.2 (you've missed 5.0 by a long shot, and even 5.1 is too late now).
+> another 5.2 instance. I'll quit pointing it out for the rest of the series.
 
-Yup!  Will fix here and in the other patches, thanks.
-
->> +##
->> +{ 'command': 'cprsave', 'data': { 'file': 'str', 'mode': 'str' } }
-> 
-> 'mode' should be an enum type, rather than an open-coded string:
-> 
-> { 'enum': 'CprMode', 'data': ['reboot'] }
-> { 'command': 'cprsave', 'data': {'file': 'str', 'mode': 'CprMode' } }
-
-Will do, thanks for the syntax.
+Will find and fix all, thanks.
 
 - Steve
 
