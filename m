@@ -2,136 +2,120 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93EA9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 12:58:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D48C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 12:59:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F33620842
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 12:58:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DDA920842
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 12:59:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LbrqI5cn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F33620842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=Mellanox.com header.i=@Mellanox.com header.b="hr0ljGLz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DDA920842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mellanox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k188w-0006Rj-N6
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 08:58:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60898)
+	id 1k189D-0006rt-Tj
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 08:58:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1k1880-0005W8-NX
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 08:57:44 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43699
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1k187y-0001s9-Th
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 08:57:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596113861;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=C1G3i+wCf18TEQ2r1EemrQr6jL/9jBSb5FtBTuqzjS8=;
- b=LbrqI5cnyX82GIr/Ud64xy2yAkSGBkKKFO6CxQGh8jAFOfHNq5OzgbBMFlSgJagQl8NdUt
- hCwA18CEPEXrt0F0m9kD59P8nJ4EiEflDI3DNJriLPdJATer6gzR3UZ1hTPSbqQyJt5eBb
- evAIiePpEShbLYY7rBXx5sA9hZ6aM+Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-gcxHZU-BPEueIeCjXXsnGQ-1; Thu, 30 Jul 2020 08:57:35 -0400
-X-MC-Unique: gcxHZU-BPEueIeCjXXsnGQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B9261DE4;
- Thu, 30 Jul 2020 12:57:34 +0000 (UTC)
-Received: from [10.36.113.185] (ovpn-113-185.ams2.redhat.com [10.36.113.185])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DC2C719934;
- Thu, 30 Jul 2020 12:57:27 +0000 (UTC)
-Subject: Re: [PATCH v2 1/2] virtio-mem: Change PRIx32 to PRIXPTR to fix
- compile error.
-From: David Hildenbrand <david@redhat.com>
-To: Kaige Li <likaige@loongson.cn>, "Michael S. Tsirkin" <mst@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <1596110248-7366-1-git-send-email-likaige@loongson.cn>
- <9bafb053-a6cb-5738-700f-a71cba79ccc8@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <ca47a89b-15dd-655b-d524-0d39c36b00f5@redhat.com>
-Date: Thu, 30 Jul 2020 14:57:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
-MIME-Version: 1.0
-In-Reply-To: <9bafb053-a6cb-5738-700f-a71cba79ccc8@redhat.com>
+ (Exim 4.90_1) (envelope-from <yajunw@mellanox.com>)
+ id 1k13V9-0006Zf-Ue
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 04:01:20 -0400
+Received: from mail-eopbgr10068.outbound.protection.outlook.com
+ ([40.107.1.68]:29779 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yajunw@mellanox.com>)
+ id 1k13V7-0002hO-8y
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 04:01:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UT9jvf5TY2at2vWpwPPv/y0AXhMNOW9tAk3Qr3AtSVTX8A4vlAvCB+Aa7VZNc6sK0BK0wRccNjvIvExDCQD+WaIGi07TAWro0gOnrkE2HuQKgbZ36VKPfOh4Rs+JW3KkXAoz6KHOPOd5IWZ4/sBkcmfapzRScZLqPOjI+NTYnkIZpZVS5xMhYfODpXQT81zaU+ShCXRfaQZz4i0ZPCEC31lu+MwQ7DkqYxGaRqvayEd5LJ2BNzaKClFIySPy3cCb8T2IZSfzc6E8qkyXSm9LhbVON9lFlWmJtqBMHsUZfbUIYQ1FUBvpa0o/zcuY3X42nHB4EXABCbJMMJUzpktOfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RAGzxxNykyGSWuHRyG8fOWldTzxxgomTA7wl14DtZwI=;
+ b=P9hRkzRwj2KCCejxT46bGeyBGua/HgY1R7NprLgFByWPcCbyAGRzGCL0vYPmS1y25lMqb2OhgfpZ9KgvY06LNihaO9Bc2ctHoUWsCMUDTbDEMwNfqvLwvc+wakPu9byNWmfyEbuXue582VqDd9lN18jd061KR/aK602+63CtPn4FmcI5csJLren9XE6aTtBGstmEF5OPw7g9YZSfiMk34RsNt/1vQ0mjr26MeOFJ7Or8e4Qz3aHqBE2L+eWnZR6KLIi97twoPtRFw8IbEEMTuxTjzLt97cq7TsawbVkiuXRG+pDZe6VNT7OIuR9OilQmxn9LpH8cLFqXEfZCFL901w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mellanox.com; dmarc=pass action=none header.from=mellanox.com;
+ dkim=pass header.d=mellanox.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RAGzxxNykyGSWuHRyG8fOWldTzxxgomTA7wl14DtZwI=;
+ b=hr0ljGLzXDJI4fD0a5aWjdqe1igfjcyGpdc8OpzlV0JFEbIGuiPmd5QmJVH+ibb4LiWTZKU/wg3Wen09A+VhSl4wbnWm8S+A2OFQ9/pF6uBi5VnePbN1kLjHOkjX8G91qu9MtRSA//8qc4vbJS6v3fmWwaYuLgAEqDzMTyDHCL8=
+Received: from AM7PR05MB6695.eurprd05.prod.outlook.com (2603:10a6:20b:142::22)
+ by AM6PR05MB4968.eurprd05.prod.outlook.com (2603:10a6:20b:4::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.16; Thu, 30 Jul
+ 2020 07:46:10 +0000
+Received: from AM7PR05MB6695.eurprd05.prod.outlook.com
+ ([fe80::8574:63a5:ef7b:bd]) by AM7PR05MB6695.eurprd05.prod.outlook.com
+ ([fe80::8574:63a5:ef7b:bd%3]) with mapi id 15.20.3239.017; Thu, 30 Jul 2020
+ 07:46:09 +0000
+From: Yajun Wu <yajunw@mellanox.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Any reason VIRTQUEUE_MAX_SIZE is 1024? Can we increase this limit?
+Thread-Topic: Any reason VIRTQUEUE_MAX_SIZE is 1024? Can we increase this
+ limit?
+Thread-Index: AdZmRKXyRhpGB73vSMi6kUjXqcq6sw==
+Date: Thu, 30 Jul 2020 07:46:09 +0000
+Message-ID: <AM7PR05MB6695D4FF6766BF2942C345D6BB710@AM7PR05MB6695.eurprd05.prod.outlook.com>
+Accept-Language: zh-CN, en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=mellanox.com;
+x-originating-ip: [101.80.66.147]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: fa8b9c4c-a2bd-4164-f45e-08d8345ca000
+x-ms-traffictypediagnostic: AM6PR05MB4968:
+x-microsoft-antispam-prvs: <AM6PR05MB4968BDB6122BC6454049F85EBB710@AM6PR05MB4968.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: GSQ33o1PoF+FW8PIKG22MtP19r3IJ0CDgffIiUc/2/I4PVtIFWea9bIPpkz2j/0fQT78OiAzeobTEjruyGq4/GGhyuEY7hVnj+I8qHV8LDxt4D5p+sV4oeNPmLY8+oc1vEVTFGtX2InltwR/4UxfrST+G8+TU5uphuHO55BKz1jl/s0lH8dAOF3RTbn6kbTdFPgwY667B6fz++EZ/XO6p/E/SgIP0kvLEdgvTk6nmgL9OaJ3j9t4C40dTCWOwOXUcdOCIcEhTvmrZoWrMabEjFM/5B8lk7v3K+cbnRtR2UeEu7TXGyLvs069kPTD4snECcN739WyYVQqwQXQHnygEg==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR05MB6695.eurprd05.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(376002)(366004)(346002)(396003)(39860400002)(7696005)(52536014)(86362001)(6506007)(5660300002)(71200400001)(33656002)(478600001)(8676002)(66476007)(66946007)(6916009)(66556008)(64756008)(26005)(55016002)(83380400001)(9686003)(2906002)(186003)(8936002)(4744005)(316002)(76116006)(66446008);
+ DIR:OUT; SFP:1101; 
+x-ms-exchange-antispam-messagedata: ThBU01aDYCUXC/2ZGEhP0NiH+3ZMeFx5oNFrzVMyagpG7zewZnNyVdytg5rleWLF2V+gfQ8osq2bkp/LRrvutfrBRc2V3EoU5/DOzlGsbNOAki3I43UbMd+3ktoJHL4cKA+wNkHV/t8ggKjz13A7fjFHSBP+KauIUuIW8sX9KYGczztMk2m8fQsx1l0W1ttrJjF7EORAd9aVSRGTehUpRWyTrvFyZbKTNUOm24tYM9PdoxIzYgJnUp504A44KKkU/XnXBWZeg8icpdEBuMtSqKSxEczL4EQ29nnRcEkKJouE4dI6GP6kYNy3FSOnXZseW7b/LqHn6YHH1ch3CNPxD51Qv8yeVI6bSl/eJIUbMy/ENTGZFSoZQAd1RSOA8C775awuUJeGfiQ6KkiFey5HTpVnrD2XEJ2xcuDBOhQOnh5dCBXESFFl0/rei1BB+EV5R5KJOHgFgDZspMmh5yPXYemD+4RMbhznkLpyw8s2GBc7z+hNd82GTpxmyi4IWLW7/L+rrN9eGBN3TR1tukNamUsZUUUxnFbQ5blTZhWqg+N7UhnVCUC8+8YSBnEe8ywmKxHEiODvO0PzUwfEazG8L184PzWCWrNezLSMRvSYXNsltu8YGpHqBpc5J7oj1SkTEAyIi78LvxpSiR074iUp9w==
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+ boundary="_000_AM7PR05MB6695D4FF6766BF2942C345D6BB710AM7PR05MB6695eurp_"
+MIME-Version: 1.0
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR05MB6695.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa8b9c4c-a2bd-4164-f45e-08d8345ca000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jul 2020 07:46:09.7484 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pNZnqR3DFPVw4dLHW61+1zH3Wk4lIoywVTl9HacnwX3WqzZiUh5fXOq0VCDhuptBq6a2F1Pns6Jawq5AEYpVOQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR05MB4968
+Received-SPF: pass client-ip=40.107.1.68; envelope-from=yajunw@mellanox.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 04:01:14
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Thu, 30 Jul 2020 08:58:06 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -143,65 +127,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Bruce Rogers <brogers@suse.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30.07.20 14:03, David Hildenbrand wrote:
-> On 30.07.20 13:57, Kaige Li wrote:
->> When I compile qemu with such as:
->>
->> git clone https://git.qemu.org/git/qemu.git
->> cd qemu
->> git submodule init
->> git submodule update --recursive
->> ./configure
->> make
->>
->> There is error log:
->>
->> /home/LiKaige/qemu/hw/virtio/virtio-mem.c: In function ‘virtio_mem_set_block_size’:
->> /home/LiKaige/qemu/hw/virtio/virtio-mem.c:756:9: error: format ‘%x’ expects argument of type ‘unsigned int’, but argument 7 has type ‘uintptr_t’ [-Werror=format=]
->>          error_setg(errp, "'%s' property has to be at least 0x%" PRIx32, name,
->>          ^
->> cc1: all warnings being treated as errors
->> /home/LiKaige/qemu/rules.mak:69: recipe for target 'hw/virtio/virtio-mem.o' failed
->>
->> So, change PRIx32 to PRIXPTR to fix this.
->>
->> Signed-off-by: Kaige Li <likaige@loongson.cn>
->> ---
->>  hw/virtio/virtio-mem.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
->> index c12e9f7..3dcaf9a 100644
->> --- a/hw/virtio/virtio-mem.c
->> +++ b/hw/virtio/virtio-mem.c
->> @@ -753,7 +753,7 @@ static void virtio_mem_set_block_size(Object *obj, Visitor *v, const char *name,
->>      }
->>  
->>      if (value < VIRTIO_MEM_MIN_BLOCK_SIZE) {
->> -        error_setg(errp, "'%s' property has to be at least 0x%" PRIx32, name,
->> +        error_setg(errp, "'%s' property has to be at least 0x%" PRIXPTR "\n", name,
->>                     VIRTIO_MEM_MIN_BLOCK_SIZE);
->>          return;
->>      } else if (!is_power_of_2(value)) {
->>
-> 
-> That's not what I suggested ... and you should mention the compiler/host
-> architecture used.
-> 
+--_000_AM7PR05MB6695D4FF6766BF2942C345D6BB710AM7PR05MB6695eurp_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Sorry, I thought this was a resend from Bruce:
+Hi all,
 
-https://lkml.kernel.org/r/1b00c0e25ec65e113d4c7fa98b1466689f05a986.camel@suse.com
+I'm doing iperf test on VIRTIO net through vhost-user(HW VDPA).
+Find maximal acceptable tx_queue_size/rx_queue_size is 1024.
+Basically increase queue size can get better RX rate for my case.
 
--- 
+Can we increase the limit(VIRTQUEUE_MAX_SIZE) to 8192 to possibly gain bett=
+er performance?
+
 Thanks,
+Yajun
 
-David / dhildenb
 
+
+--_000_AM7PR05MB6695D4FF6766BF2942C345D6BB710AM7PR05MB6695eurp_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:DengXian;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:DengXian;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-family:"Calibri",sans-serif;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal">Hi all,<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I&#8217;m doing iperf test on VIRTIO net through vho=
+st-user(HW VDPA).<o:p></o:p></p>
+<p class=3D"MsoNormal">Find maximal acceptable tx_queue_size/rx_queue_size =
+is 1024.
+<o:p></o:p></p>
+<p class=3D"MsoNormal">Basically increase queue size can get better RX rate=
+ for my case.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Can we increase the limit(VIRTQUEUE_MAX_SIZE) to 819=
+2 to possibly gain better performance?<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Thanks,<o:p></o:p></p>
+<p class=3D"MsoNormal">Yajun<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+</div>
+</body>
+</html>
+
+--_000_AM7PR05MB6695D4FF6766BF2942C345D6BB710AM7PR05MB6695eurp_--
 
