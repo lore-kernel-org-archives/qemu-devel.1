@@ -2,77 +2,76 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A88C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 09:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EB1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 09:09:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4385C2072A
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 09:00:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D5E320809
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 09:09:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i/dDIGpq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4385C2072A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cI1Nz0LH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D5E320809
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k14Qn-0004uU-Ir
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 05:00:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59416)
+	id 1k14Yo-0006ug-OC
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 05:09:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k14Pt-0004PJ-N0
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 04:59:57 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56659
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k14XV-00067L-Uo
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 05:07:49 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43851
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k14Pr-0001u6-3S
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 04:59:57 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k14XU-00034g-Er
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 05:07:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596099593;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=oy4y1XX3qEC/F151hiPi3q9+0DIBRAFLl3WnzndQFF8=;
- b=i/dDIGpqkBMwJBKDBfvx3OVp/zeCpY7sa/Cg76CPpVB/9b/Kvp6ksNheWMiIP5iTGVu9z1
- YnxBqaZ7YMDPqricEYQLlMrGNVhm3t5wCUS/Q3NvOV36sIFo5x1sEwRMhtmSRfrTuSJQ0d
- Fa3ZLzPpf7kSHeJZY+xeuraZZVyH084=
+ s=mimecast20190719; t=1596100067;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=OMTuFgsY2OasRX+DUOMcWFsDbZdeMqNSMeezDupj+/k=;
+ b=cI1Nz0LHJre0+tP9GtxqGL3KRZ9ws3AQTNkLLDd2uOyc+gyveH9bejgbkz5EwfhRJ04V9s
+ yDgnGDdJ88Ieu07rIUB8m+mvnWlMWukU/skWxhKLh9koubxyPubjtZUTZjMbXrO2nKgA4F
+ qKOaETez1lNe4icrROLqoXiNL5UflPs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-d7qsv3vmMIeX92UPlj6O9A-1; Thu, 30 Jul 2020 04:59:48 -0400
-X-MC-Unique: d7qsv3vmMIeX92UPlj6O9A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-172-pk-bvGAON7CSdNS3yPy7xw-1; Thu, 30 Jul 2020 05:07:43 -0400
+X-MC-Unique: pk-bvGAON7CSdNS3yPy7xw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 485E8107ACCA
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 08:59:47 +0000 (UTC)
-Received: from redhat.com (ovpn-114-181.ams2.redhat.com [10.36.114.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 354305D9D3;
- Thu, 30 Jul 2020 08:59:39 +0000 (UTC)
-Date: Thu, 30 Jul 2020 09:59:37 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Vivek Goyal <vgoyal@redhat.com>
-Subject: Re: [PATCH 2/5] virtiofsd: create lock/pid file in per user cache dir
-Message-ID: <20200730085937.GA3477223@redhat.com>
-References: <20200729221410.147556-1-vgoyal@redhat.com>
- <20200729221410.147556-3-vgoyal@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09E2C101C8D5;
+ Thu, 30 Jul 2020 09:07:42 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1FFEA26553;
+ Thu, 30 Jul 2020 09:07:28 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id AE21C1132FD2; Thu, 30 Jul 2020 11:07:26 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Subject: Re: [PATCH] schemas: Add vim modeline
+References: <20200729185024.121766-1-abologna@redhat.com>
+Date: Thu, 30 Jul 2020 11:07:26 +0200
+In-Reply-To: <20200729185024.121766-1-abologna@redhat.com> (Andrea Bolognani's
+ message of "Wed, 29 Jul 2020 20:50:24 +0200")
+Message-ID: <87ime52wxd.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200729221410.147556-3-vgoyal@redhat.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -82,7 +81,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,86 +94,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: virtio-fs@redhat.com, vromanso@redhat.com, qemu-devel@nongnu.org,
- stefanha@redhat.com, dgilbert@redhat.com
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?utf-8?Q?Mar?= =?utf-8?Q?c-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 29, 2020 at 06:14:07PM -0400, Vivek Goyal wrote:
-> Right now we create lock/pid file in /usr/local/var/... and unprivliged
-> user does not have access to create files there.
-> 
-> So create this file in per user cache dir as queried as specified
-> by environment variable XDG_RUNTIME_DIR.
-> 
-> Note: "su $USER" does not update XDG_RUNTIME_DIR and it still points to
-> root user's director. So for now I create a directory /tmp/$UID to save
-> lock/pid file. Dan pointed out that it can be a problem if a malicious
-> app already has /tmp/$UID created. So we probably need to get rid of this.
+Andrea Bolognani <abologna@redhat.com> writes:
 
-IMHO use of "su $USER" is simply user error and we don't need to
-care about workarounds. They will see the startup fail due to
-EPERM on /run/user/0 directory, and then they'll have to fix
-their command to use "su - $USER" to setup a clean environment.
+> The various schemas included in QEMU use a JSON-based format which
+> is, however, strictly speaking not valid JSON.
+>
+> As a consequence, when vim tries to apply syntax highlight rules
+> for JSON (as guessed from the file name), the result is an unreadable
+> mess which mostly consist of red markers pointing out supposed errors
+> in, well, pretty much everything.
+>
+> Using Python syntax highlighting produces much better results, and
+> in fact these files already start with specially-formatted comments
+> that instruct Emacs to process them as if they were Python files.
+>
+> This commit adds the equivalent special comments for vim.
+>
+> Signed-off-by: Andrea Bolognani <abologna@redhat.com>
 
+Naming QAPI schema files .json even though their contents isn't was a
+mistake.  Correcting it would be a pain.  If we correct it, then the
+sooner the better.
 
-> +    /*
-> +     * Unpriviliged users don't have access to /usr/local/var. Hence
-> +     * store lock/pid file in per user directory. Use environment
-> +     * variable XDG_RUNTIME_DIR.
-> +     * If one logs into the system as root and then does "su" then
-> +     * XDG_RUNTIME_DIR still points to root user directory. In that
-> +     * case create a directory for user in /tmp/$UID
-> +     */
-> +    if (unprivileged) {
-> +        gchar *user_dir = NULL;
-> +        gboolean create_dir = false;
-> +        user_dir = g_strdup(g_get_user_runtime_dir());
-> +        if (!user_dir || g_str_has_suffix(user_dir, "/0")) {
-> +            user_dir = g_strdup_printf("/tmp/%d", geteuid());
-> +            create_dir = true;
-> +        }
+Renaming them to .py gives decent editor support out of the box.  Their
+contents isn't quite Python, though: true vs. True, false vs. False.  Do
+we care?  Only a few dozen occurences; they could be adjusted.
 
-As above, I don't think we need to have this fallback code to deal
-with something that is just user error.
+Renaming them to .qapi would perhaps be less confusing, for the price of
+"out of the box".
 
-Also, g_get_user_runtime_dir() is guaranteed to return non-NULL.
-
-> +
-> +        if (create_dir && g_mkdir_with_parents(user_dir, S_IRWXU) < 0) {
-> +            fuse_log(FUSE_LOG_ERR, "%s: Failed to create directory %s: %s",
-> +                     __func__, user_dir, strerror(errno));
-> +            g_free(user_dir);
-> +            return false;
-> +        }
-> +        dir = g_strdup(user_dir);
-
-Don't we also want to be appending "virtiofsd" to this directory path
-like we do in the privileged case ?
-
-
-> +        g_free(user_dir);
-> +    } else {
-> +        dir = qemu_get_local_state_pathname("run/virtiofsd");
-> +        if (g_mkdir_with_parents(dir, S_IRWXU) < 0) {
-> +            fuse_log(FUSE_LOG_ERR, "%s: Failed to create directory %s: %s",
-> +                     __func__, dir, strerror(errno));
-> +            return false;
-> +        }
->      }
->  
->      sk_name = g_strdup(se->vu_socket_path);
-> -- 
-> 2.25.4
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thoughts?
 
 
