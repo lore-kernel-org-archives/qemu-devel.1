@@ -2,81 +2,109 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A9CC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FC4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:29:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AC3E2074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:29:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AC3E2074B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 68D842082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:29:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68D842082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k16kc-0007ey-DU
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:29:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33812)
+	id 1k16kp-0008C7-L6
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:29:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k16hT-0003UF-Dp
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:26:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36540)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k16hR-00055t-KW
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:26:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k16hQ-00007T-Et
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 11:26:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6DC6B2E80EE
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 11:26:12 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1k16jZ-0006TO-UE; Thu, 30 Jul 2020 07:28:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18860)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1k16jY-0005Kc-3d; Thu, 30 Jul 2020 07:28:25 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 06UB44ri141786; Thu, 30 Jul 2020 07:28:21 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32krumg5vt-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 30 Jul 2020 07:28:20 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06UBKXuG045557;
+ Thu, 30 Jul 2020 07:28:20 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32krumg5up-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 30 Jul 2020 07:28:20 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06UBJIHw002627;
+ Thu, 30 Jul 2020 11:28:17 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma04ams.nl.ibm.com with ESMTP id 32gcy4p3s9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 30 Jul 2020 11:28:17 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 06UBQonY62849376
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 30 Jul 2020 11:26:50 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 99D894C04E;
+ Thu, 30 Jul 2020 11:28:15 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 134124C044;
+ Thu, 30 Jul 2020 11:28:15 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.26.108])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 30 Jul 2020 11:28:14 +0000 (GMT)
+Date: Thu, 30 Jul 2020 13:28:12 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Subject: Re: [PATCH 1/1] s390x/s390-virtio-ccw: fix off-by-one in loadparm
+ getter
+Message-ID: <20200730132812.0a4a4607.pasic@linux.ibm.com>
+In-Reply-To: <20200730102506.GD3477223@redhat.com>
+References: <20200729130222.29026-1-pasic@linux.ibm.com>
+ <20200730102506.GD3477223@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jul 2020 11:15:26 -0000
-From: Peter Maydell <1879587@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jfreche
-X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
-Message-Id: <159610772697.5578.18190236883836732294.launchpad@soybean.canonical.com>
-Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
- banked registers when switching from AA32 to AA64
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ef5ba2376c9e2c11fe12635f39bacad00ed4bd1d
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:16:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-07-30_06:2020-07-30,
+ 2020-07-30 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0
+ lowpriorityscore=0 mlxlogscore=979 impostorscore=0 malwarescore=0
+ mlxscore=0 suspectscore=0 adultscore=0 priorityscore=1501 bulkscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007300077
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:28:21
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,54 +113,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1879587 <1879587@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: arm
+On Thu, 30 Jul 2020 11:25:06 +0100
+Daniel P. Berrangé <berrange@redhat.com> wrote:
 
--- =
+> >      /* make a NUL-terminated string */
+> > -    loadparm_str = g_memdup(ms->loadparm, sizeof(ms->loadparm) + 1);
+> > -    loadparm_str[sizeof(ms->loadparm)] = 0;
+> > +    loadparm_str = g_malloc0(sizeof(ms->loadparm) + 1);
+> > +    memcpy(loadparm_str, ms->loadparm, sizeof(ms->loadparm));  
+> 
+> I feel like  g_strndup(ms->loadparm, sizeof(ms->loadparm))
+> is what should have been used here.
+> 
+> It copies N characters, but allocates N+1 adding a trailing NUL
+> which are the semantic we wanted here.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1879587
+I agree. Thanks for pointing this out. I'm not very familiar with the
+string utilities of glib.
 
-Title:
-  Register number in ESR is incorrect for certain banked registers when
-  switching from AA32 to AA64
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am running into a situation where I have:
-  - A hypervisor running in EL2, AA64
-  - A guest running in EL1, AA32
-
-  We trap certain accesses to special registers such as DACR (via
-  HCR.TVM). One instruction that is trapped is:
-
-  ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
-
-  The guest is running in SVC mode. So, LR should refer to LR_svc there.
-  LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
-  the actual ESR value is: 0xfe00dc0
-
-  If we decode the 'rt':
-  >>> (0xfe00dc0 >> 5) & 0x1f
-  14
-
-  My understanding is that 14 is incorrect in the context of AA64. rt
-  should be set to 18. The current mode being SVC, LR refers to LR_svc
-  not LR_usr. In other words, the mapping between registers in AA64 and
-  AA32 doesn't seem to be accounted for. I've tested this with Qemu
-  5.0.0
-
-  Let me know if that makes sense and if you would like more info. I am als=
-o happy to test patches.
-  Thanks for all the great work on Qemu!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1879587/+subscriptions
+Regards,
+Halil
 
