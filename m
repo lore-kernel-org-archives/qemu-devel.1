@@ -2,101 +2,97 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A8EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 13:03:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46248C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 13:03:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A39420842
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 13:03:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A39420842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1038E20842
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 13:03:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GJOliML5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1038E20842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k18D9-0000Qk-Fg
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 09:03:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33908)
+	id 1k18DL-0000kj-D5
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 09:03:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1k18CF-00085X-TO; Thu, 30 Jul 2020 09:02:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27816
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1k18CE-0002Xs-2k; Thu, 30 Jul 2020 09:02:07 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 06UCXkZl007084; Thu, 30 Jul 2020 09:02:04 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32k9q62q44-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 30 Jul 2020 09:02:04 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 06UCYjJS012695;
- Thu, 30 Jul 2020 09:02:03 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.72])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32k9q62q2h-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 30 Jul 2020 09:02:03 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
- by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 06UD21hq032397;
- Thu, 30 Jul 2020 13:02:01 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com
- (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
- by ppma06fra.de.ibm.com with ESMTP id 32jgvpstvf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 30 Jul 2020 13:02:01 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 06UD1wjk60031102
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 30 Jul 2020 13:01:58 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A5CBC11C054;
- Thu, 30 Jul 2020 13:01:58 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 49C7411C04C;
- Thu, 30 Jul 2020 13:01:58 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 30 Jul 2020 13:01:58 +0000 (GMT)
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org
-Subject: [PATCH v2 1/1] s390x/s390-virtio-ccw: fix off-by-one in loadparm
- getter
-Date: Thu, 30 Jul 2020 15:01:56 +0200
-Message-Id: <20200730130156.35063-1-pasic@linux.ibm.com>
-X-Mailer: git-send-email 2.17.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-07-30_10:2020-07-30,
- 2020-07-30 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 phishscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 lowpriorityscore=0
- bulkscore=0 spamscore=0 clxscore=1015 mlxlogscore=999 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007300093
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:25:31
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k18CS-0008En-9o
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 09:02:20 -0400
+Received: from mail-pl1-x632.google.com ([2607:f8b0:4864:20::632]:42942)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k18CP-0002Yv-Sj
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 09:02:19 -0400
+Received: by mail-pl1-x632.google.com with SMTP id q17so14030857pls.9
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 06:02:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=K4d2aOJKk6Ll04KZGZoQftP8vTqPy7vZDuRH8215P1w=;
+ b=GJOliML5Tv9eIfD7EYPXETQw2Pv5NOY7D8wrFOKXxGgQhOuGzwXqUGvcGSiS9LH/AS
+ RfSqDgipMAzeNT75qKMHKC2vDmWNOuuk8Kn8A7nYPyV06IA0JpQvCDLP7UEtejrghMCh
+ SaLm279QmBZjDRQjX43Fidowkto3qUz7SHwXFSP/pt4n7v1+6gxiGZ/4KFLEO4vokTxc
+ c1TW7aBxSzXTU8/V+vmjBcNuNbWAvyd1oux5O9Mh/p0C1yov+iBHqT9Hpxb+NZwjyR7I
+ +T8/o5lCjQ2elanbttjkVzKPiOP/gy2NJDIMh6Zy6vqCqI8iWsXYCA1UqbcmkREyfLfM
+ Yh4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=K4d2aOJKk6Ll04KZGZoQftP8vTqPy7vZDuRH8215P1w=;
+ b=Edd9vyDGhbgs/WxQWSkuwxcMPfhdemK6IvQtu2/+F9d3MoK7ASaNUY17PRABoo42jW
+ KIkl9JjmTOG9M9pSrueouYa2ApTCifmAKiOC0z8n1bPrDvTuQXs+O/Uu7zbDqaysql6J
+ UJcO/a8xzYGXdjpeOKLK5R/G9/n58SufIDHt/6rhwo2SnA27LqpeSyxUBG01itL1QMtu
+ EQuZjjIEHA141SLytxiQKrcIQUTlXUZ43+/VlXQhLwQVajlHyzwVJxkxXDtsNEnnwO0R
+ jJ76cew+q5jck6AjxV7C3ZbGvEF+UeyLwtA9hi+FjkYpDMJQ37crvmcKFl2AQd9E1PnE
+ m8Hg==
+X-Gm-Message-State: AOAM530/8ohe3gumXepQUU4vEtqOlRPuR4gdYwZaCwdL4efMa8LJ96Iz
+ 3MY1QSK3qAI+JV/spJ1XoqaMPA==
+X-Google-Smtp-Source: ABdhPJzJfJZUwOqxMDWwlZ4ojBT+L4Eeik5zv8M3nYXfF8T0HZz9KNG5TA80mqSdP0UPAnKfIrH5NQ==
+X-Received: by 2002:a17:90a:d56:: with SMTP id 22mr3190813pju.58.1596114136058; 
+ Thu, 30 Jul 2020 06:02:16 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id g10sm5908822pfr.164.2020.07.30.06.02.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Jul 2020 06:02:15 -0700 (PDT)
+Subject: Re: [RFC v2 30/76] target/riscv: rvv-0.9: floating-point square-root
+ instruction
+To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+References: <20200722091641.8834-1-frank.chang@sifive.com>
+ <20200722091641.8834-31-frank.chang@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <36462872-e635-91a3-9e13-cc82b36a2bf3@linaro.org>
+Date: Thu, 30 Jul 2020 06:02:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200722091641.8834-31-frank.chang@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::632;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x632.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,50 +105,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As pointed out by Peter, g_memdup(ms->loadparm, sizeof(ms->loadparm) + 1)
-reads one past of the end of ms->loadparm, so g_memdup() can not be used
-here.
+On 7/22/20 2:15 AM, frank.chang@sifive.com wrote:
+> From: Frank Chang <frank.chang@sifive.com>
+> 
+> Signed-off-by: Frank Chang <frank.chang@sifive.com>
+> ---
+>  target/riscv/insn32.decode | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Let's use g_strndup instead!
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Fixes: d664548328 ("s390x/s390-virtio-ccw: fix loadparm property getter")
-Fixes: Coverity CID 1431058
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
----
- hw/s390x/s390-virtio-ccw.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 403d30e13b..e72c61d2ea 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -701,12 +701,9 @@ bool hpage_1m_allowed(void)
- static char *machine_get_loadparm(Object *obj, Error **errp)
- {
-     S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
--    char *loadparm_str;
- 
-     /* make a NUL-terminated string */
--    loadparm_str = g_memdup(ms->loadparm, sizeof(ms->loadparm) + 1);
--    loadparm_str[sizeof(ms->loadparm)] = 0;
--    return loadparm_str;
-+    return g_strndup((char *) ms->loadparm, sizeof(ms->loadparm));
- }
- 
- static void machine_set_loadparm(Object *obj, const char *val, Error **errp)
-
-base-commit: 5772f2b1fc5d00e7e04e01fa28e9081d6550440a
--- 
-2.17.1
-
+r~
 
