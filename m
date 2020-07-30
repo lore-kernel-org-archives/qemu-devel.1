@@ -7,90 +7,98 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1262C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 17:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A797BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 17:06:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6DC12082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 17:05:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 729402082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 17:06:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lduqauny"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6DC12082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jRwhST5U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 729402082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1BzZ-0006MI-WB
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 13:05:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47212)
+	id 1k1C0i-0007Mj-QA
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 13:06:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k1ByN-0005T8-DS
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 13:04:03 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51578)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k1ByL-0008Rg-Jx
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 13:04:03 -0400
-Received: by mail-wm1-x343.google.com with SMTP id p14so6356052wmg.1
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 10:04:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=pchR31nrcO5b0nyQf52oinSOdgGHqZ6o3u5HgtyNLsk=;
- b=lduqaunyqZlfHe+m1f5mqwheeq4SgMH9gVZP+bXkOSIpYddNRSGeYeOhGQ3ezFJUwA
- nAwHpO4B5KNuEl85hqIpx6NzUdLgTAOqJaNY55U43ahJotZ2R1j0saP10CPlyqq0glKN
- L+jOXaXGcpak67hnbDN1wlDdwuuI8WVX8fV881XY0N5XmpzpvdWSva5/4sLXSAptfzCL
- AQFG9m7GO8Wc+EUKt9cUa3iONREhmFhEHBKIbc8MxoL3zFvVotV3u7n1pykDA+4dRm6G
- hM+RBMpPlY3RzwbEEHIuJHVSmwbd0+70H2F/r6Sr4PfEye48QiYhkW9Jej9twAoOoT/j
- pA8A==
+ (Exim 4.90_1) (envelope-from <mcascell@redhat.com>)
+ id 1k1Bzz-0006up-Lu
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 13:05:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26409
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mcascell@redhat.com>)
+ id 1k1Bzx-0000CJ-0t
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 13:05:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596128739;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dHhlU00ch/46XLnJVndF3PH4fX809S6xohN8VPGEK/o=;
+ b=jRwhST5UbMBVUFfpSDM0ylAvilHiF+blBhoGzeTrC9JymAqANB91hHYlixylfqMaTdOaID
+ xuA8QYkGJUx8RC6ZQWSplvvFbJzgz+2Ifi/M/n89PCNmaNZ3/CdnjrmCRP+JrZY5mvyftl
+ Vab1ZsEuJf7S6Y5yJCk9ZWKDVnys1ug=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-501-qG2EM-yWOLa124I2ALdrtA-1; Thu, 30 Jul 2020 13:05:37 -0400
+X-MC-Unique: qG2EM-yWOLa124I2ALdrtA-1
+Received: by mail-ej1-f72.google.com with SMTP id l7so4457543ejr.7
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 10:05:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=pchR31nrcO5b0nyQf52oinSOdgGHqZ6o3u5HgtyNLsk=;
- b=ABQ9wyeNge+uJ+CKq2Hk2SvIydzN4bJvxWAFiqVrKo526/r5/6r9COLDBX1f2TZp2Q
- KlZU/M6OT0C0OHr9Xl6IVAR0sDjbHAiSWwOhsnaHvgLARx0i56iL6cRUjPBJIhTelMYH
- gnj4D1AQ89xM4ULjwPfZ6Dcyt2pcrT/7tjsl7eLbmGZhvHJaCTScFEUkxqNmey0u6/3w
- AG4aTFnzlYI+uXw0G4yz78bkLADXrdwzVQoghg2GOCk97kwUulGdjF//9EcuvGjYMimD
- Z3GWig9KjWpcVihMoxgHcGO2vRwKUuzrIsJE11oqOCg9fgkGXzfkvlz2UK/2b1EmtSO/
- jckQ==
-X-Gm-Message-State: AOAM533vE142E1nhQzdunAj0r7hU1ppg2XMo5WPXVw/6Ucx/vDrvjSQB
- n5A4frNsycMo5UeszkItNw/w5w==
-X-Google-Smtp-Source: ABdhPJweSrbZ1gHDZRMQF0hXqVFdOY4If/Sjwnx4sei2hbKvQkd2aY+tz4FgtD5w6PEjXr8BP/g5EQ==
-X-Received: by 2002:a1c:9a02:: with SMTP id c2mr258522wme.16.1596128639053;
- Thu, 30 Jul 2020 10:03:59 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i14sm13610773wrc.19.2020.07.30.10.03.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jul 2020 10:03:57 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 40BC01FF7E;
- Thu, 30 Jul 2020 18:03:56 +0100 (BST)
-References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-13-git-send-email-steven.sistare@oracle.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Steve Sistare <steven.sistare@oracle.com>
-Subject: Re: [PATCH V1 12/32] vl: pause option
-In-reply-to: <1596122076-341293-13-git-send-email-steven.sistare@oracle.com>
-Date: Thu, 30 Jul 2020 18:03:55 +0100
-Message-ID: <87r1stdjes.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=dHhlU00ch/46XLnJVndF3PH4fX809S6xohN8VPGEK/o=;
+ b=VVYnAjNDFpej3w3uYyO+3S8BcbDk5FR7Q7oPLg3zqNCnmkwFJGhzrMFUivIS9hwl1w
+ WBhVS80Xkiulgcp6/anuNNH9f1k16gfkqrxxusw9p2rJ+o1Gn4f5VIvR27thw8XiCTB+
+ SubnO2pIiNemHQaa7U+iRL0OWYY5q/WsUjTjmIqiMnHcrGKDEwjoMDgvrPxHIpAe5crr
+ f0Iu5TWg2B+8jxIpG85IjwaLtnWxbRnERTfWukuXevLLB/VWb8sJzjys30RhsS8qMm9y
+ tNcdUgK2LQXTIq/xxr4s5Cix12fRw+UvASTIPIIOUu5w/YmUC0HGK1e1vtf7qM8CkZyz
+ glKQ==
+X-Gm-Message-State: AOAM5315HnysSwa6D/W+s5J8bOYHeJC3X6BSk3gMJG2WBnF9Shm0vriP
+ ICLEUIRZ1slzC0YPVrL94JcY0jCTYUq5IZKdQVxEaQ1EbyRUQOdjYbNADwpTDW5SScZ5TFPvnwL
+ WszScn4v08AVLVcpkEhtEyQ4XDPReLuE=
+X-Received: by 2002:a17:906:b6d0:: with SMTP id
+ ec16mr97227ejb.94.1596128734274; 
+ Thu, 30 Jul 2020 10:05:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzbbbIB3RoVRNqK+rkJww6CMG/+hh/2l4DRlzmEEbCwlQLbUfegN4Nd0DVHBJC5gjArEnpq2L7t9kDq2/Lta4g=
+X-Received: by 2002:a17:906:b6d0:: with SMTP id
+ ec16mr97200ejb.94.1596128734033; 
+ Thu, 30 Jul 2020 10:05:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20200727170838.1101775-1-mcascell@redhat.com>
+ <20200727170838.1101775-2-mcascell@redhat.com>
+ <adb52967-d2b2-cb55-87a2-38fda18a2a0a@redhat.com>
+ <CAA8xKjXagrLU+DVcO3uVw6D0sJHXQ_rOd0nqEHHNcaMwG6oXRA@mail.gmail.com>
+ <3672bcc5-329f-0cc6-a505-e5b21a316a20@redhat.com>
+In-Reply-To: <3672bcc5-329f-0cc6-a505-e5b21a316a20@redhat.com>
+From: Mauro Matteo Cascella <mcascell@redhat.com>
+Date: Thu, 30 Jul 2020 19:05:23 +0200
+Message-ID: <CAA8xKjWoyTPEbW=xdKqtTHHn2krKssif9t6nEeWGDQLt7KmCvg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] hw/net/net_tx_pkt: add function to check
+ pkt->max_raw_frags
+To: Jason Wang <jasowang@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mcascell@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:59:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,114 +112,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, ziming zhang <ezrakiez@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Jul 30, 2020 at 7:28 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2020/7/29 =E4=B8=8A=E5=8D=8812:26, Mauro Matteo Cascella wrote:
+> > On Tue, Jul 28, 2020 at 6:06 AM Jason Wang <jasowang@redhat.com> wrote:
+> >>
+> >> On 2020/7/28 =E4=B8=8A=E5=8D=881:08, Mauro Matteo Cascella wrote:
+> >>> This patch introduces a new function in hw/net/net_tx_pkt.{c,h} to ch=
+eck the
+> >>> current data fragment against the maximum number of data fragments.
+> >>
+> >> I wonder whether it's better to do the check in
+> >> net_tx_pkt_add_raw_fragment() and fail there.
+> > Given the assertion, I assumed the caller is responsible for the
+> > check, but moving the check in net_tx_pkt_add_raw_fragment() totally
+> > makes sense to me.
+>
+>
+> Want to send a new version for this?
 
-Steve Sistare <steven.sistare@oracle.com> writes:
-
-> Provide the -pause command-line parameter and the QEMU_PAUSE environment
-> variable to briefly pause QEMU in main and allow a developer to attach gd=
-b.
-> Useful when the developer does not invoke QEMU directly, such as when usi=
-ng
-> libvirt.
-
-How does this differ from -S?
+Sure, I'll send a new version. Thank you.
 
 >
-> Usage:
->   qemu -pause <seconds>
->   or
->   export QEMU_PAUSE=3D<seconds>
+> >
+> >> Btw, I find net_tx_pkt_add_raw_fragment() does not unmap dma when
+> >> returning to true, is this a bug?
+> > Isn't it unmapped in net_tx_pkt_reset()?
 >
-> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> ---
->  qemu-options.hx |  9 +++++++++
->  softmmu/vl.c    | 15 ++++++++++++++-
->  2 files changed, 23 insertions(+), 1 deletion(-)
 >
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 708583b..8505cf2 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3668,6 +3668,15 @@ SRST
->      option is experimental.
->  ERST
->=20=20
-> +DEF("pause", HAS_ARG, QEMU_OPTION_pause, \
-> +    "-pause secs    Pause for secs seconds on entry to main.\n", QEMU_AR=
-CH_ALL)
-> +
-> +SRST
-> +``--pause secs``
-> +    Pause for a number of seconds on entry to main.  Useful for attaching
-> +    a debugger after QEMU has been launched by some other entity.
-> +ERST
-> +
+> Probably but see how it was used in e1000e, the net_tx_pkt_reset() is
+> only called when eop is set. Is this a bug?
 
-It seems like having an option to race with the debugger is just asking
-for trouble.
+Yeah it all depends on E1000_TXD_CMD_EOP. Besides, if not set,
+e1000e_tx_pkt_send() would never be called. Honestly, I don't know if
+this is a reasonable scenario or not.
 
->  DEF("S", 0, QEMU_OPTION_S, \
->      "-S              freeze CPU at startup (use 'c' to start execution)\=
-n",
->      QEMU_ARCH_ALL)
-> diff --git a/softmmu/vl.c b/softmmu/vl.c
-> index 8478778..951994f 100644
-> --- a/softmmu/vl.c
-> +++ b/softmmu/vl.c
-> @@ -2844,7 +2844,7 @@ static void create_default_memdev(MachineState *ms,=
- const char *path)
->=20=20
->  void qemu_init(int argc, char **argv, char **envp)
->  {
-> -    int i;
-> +    int i, seconds;
->      int snapshot, linux_boot;
->      const char *initrd_filename;
->      const char *kernel_filename, *kernel_cmdline;
-> @@ -2882,6 +2882,13 @@ void qemu_init(int argc, char **argv, char **envp)
->      QemuPluginList plugin_list =3D QTAILQ_HEAD_INITIALIZER(plugin_list);
->      int mem_prealloc =3D 0; /* force preallocation of physical target me=
-mory */
->=20=20
-> +    if (getenv("QEMU_PAUSE")) {
-> +        seconds =3D atoi(getenv("QEMU_PAUSE"));
-> +        printf("Pausing %d seconds for debugger. QEMU PID is %d\n",
-> +               seconds, getpid());
-> +        sleep(seconds);
-> +    }
-> +
->      os_set_line_buffering();
->=20=20
->      error_init(argv[0]);
-> @@ -3204,6 +3211,12 @@ void qemu_init(int argc, char **argv, char **envp)
->              case QEMU_OPTION_gdb:
->                  add_device_config(DEV_GDB, optarg);
->                  break;
-> +            case QEMU_OPTION_pause:
-> +                seconds =3D atoi(optarg);
-> +                printf("Pausing %d seconds for debugger. QEMU PID is %d\=
-n",
-> +                            seconds, getpid());
-> +                sleep(seconds);
-> +                break;
->              case QEMU_OPTION_L:
->                  if (is_help_option(optarg)) {
->                      list_data_dirs =3D true;
+> Thanks
+>
+> >
+> >> Thanks
+> >>
+> >>
+> >>> Reported-by: Ziming Zhang <ezrakiez@gmail.com>
+> >>> Signed-off-by: Mauro Matteo Cascella <mcascell@redhat.com>
+> >>> ---
+> >>>    hw/net/net_tx_pkt.c | 5 +++++
+> >>>    hw/net/net_tx_pkt.h | 8 ++++++++
+> >>>    2 files changed, 13 insertions(+)
+> >>>
+> >>> diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+> >>> index 9560e4a49e..d035618f2c 100644
+> >>> --- a/hw/net/net_tx_pkt.c
+> >>> +++ b/hw/net/net_tx_pkt.c
+> >>> @@ -400,6 +400,11 @@ bool net_tx_pkt_add_raw_fragment(struct NetTxPkt=
+ *pkt, hwaddr pa,
+> >>>        }
+> >>>    }
+> >>>
+> >>> +bool net_tx_pkt_exceed_max_fragments(struct NetTxPkt *pkt)
+> >>> +{
+> >>> +    return pkt->raw_frags >=3D pkt->max_raw_frags;
+> >>> +}
+> >>> +
+> >>>    bool net_tx_pkt_has_fragments(struct NetTxPkt *pkt)
+> >>>    {
+> >>>        return pkt->raw_frags > 0;
+> >>> diff --git a/hw/net/net_tx_pkt.h b/hw/net/net_tx_pkt.h
+> >>> index 4ec8bbe9bd..e2ee46ae03 100644
+> >>> --- a/hw/net/net_tx_pkt.h
+> >>> +++ b/hw/net/net_tx_pkt.h
+> >>> @@ -179,6 +179,14 @@ bool net_tx_pkt_send_loopback(struct NetTxPkt *p=
+kt, NetClientState *nc);
+> >>>     */
+> >>>    bool net_tx_pkt_parse(struct NetTxPkt *pkt);
+> >>>
+> >>> +/**
+> >>> +* indicates if the current data fragment exceeds max_raw_frags
+> >>> +*
+> >>> +* @pkt:            packet
+> >>> +*
+> >>> +*/
+> >>> +bool net_tx_pkt_exceed_max_fragments(struct NetTxPkt *pkt);
+> >>> +
+> >>>    /**
+> >>>    * indicates if there are data fragments held by this packet object=
+.
+> >>>    *
+>
 
+--
+Mauro Matteo Cascella, Red Hat Product Security
+6F78 E20B 5935 928C F0A8  1A9D 4E55 23B8 BB34 10B0
 
---=20
-Alex Benn=C3=A9e
 
