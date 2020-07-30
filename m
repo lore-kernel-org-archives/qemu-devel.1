@@ -2,102 +2,85 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0922C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 10:49:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2934C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 10:57:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 663C12074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 10:49:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F45D207F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 10:57:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OHcipVi6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 663C12074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fHKPQiS8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F45D207F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k167e-0007K6-Mt
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 06:49:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53628)
+	id 1k16G1-0000d8-W0
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 06:57:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1k166l-0006s6-5q
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 06:48:19 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52481
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1k166j-00081r-HV
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 06:48:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596106096;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Jsk36ivxNx3QKwiETnhPq7voIDVHx7X8KyNXJOMbugQ=;
- b=OHcipVi6FtUzAVsZCbZdjCQvCf51GhA1DNfo5dn+qXA8qha5lf3ZI/MhNNXoSNeMnMEIK9
- OWZUSYDsOyZ4Zxlo4S/7e2wUg8HbWtd1jhWVrfoQgvUay7I8MS8un4BhfWF3d5L1vxuuFA
- 05w/R2sOpBb2v//68kG8NuGneyD2iZY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325--GkF3FZAPduQEryjtDL1Ag-1; Thu, 30 Jul 2020 06:48:15 -0400
-X-MC-Unique: -GkF3FZAPduQEryjtDL1Ag-1
-Received: by mail-wr1-f71.google.com with SMTP id k11so7275133wrv.1
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 03:48:15 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k16FQ-0000D9-RC
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 06:57:16 -0400
+Received: from mail-oo1-xc43.google.com ([2607:f8b0:4864:20::c43]:44276)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k16FP-00013U-7q
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 06:57:16 -0400
+Received: by mail-oo1-xc43.google.com with SMTP id o36so5129653ooi.11
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 03:57:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=XiW7Lo9DkCCefHgEFlgnoyq2Lzb1Rk5l4tqufRQYrns=;
+ b=fHKPQiS8nirGs8ZQtZt2iu0LDtJ2fyvn+8Sdl/ZMqVDCHCkEqsbzGzuhgUVEazNEJF
+ acTd43DamqJpj1OnurzlzkCqYRetYwmmgaYCRA5OJ6yPzZ0pffWFGhbUlb4yQW4qkJi/
+ sDTuwborCJKTmepNBe1VfdEAn6PuBeap2W742R/apb0PiCZUfFpgWHwdmRk4DobczTvd
+ dM/bz8nD3FelF4STvJBi/u/IZeDTwe+ueIk0vi/X7QfM89G6+6w2Pf3b8dcrHL8Bb/pc
+ JrgRCN7WrcukkwOY2kOrMHfuy39DLhQV1BCOSFNdBzNwhCJIk7W53xSfgRPGt4d0s9SZ
+ 11Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Jsk36ivxNx3QKwiETnhPq7voIDVHx7X8KyNXJOMbugQ=;
- b=kvJ4itNeO91d50zJg3T0WtmSxLPfg+HfyBi6Klg+T7pBxgSTaB+utnnYrP42H1PG/P
- jK8JQsEz1UROMcyM1NlSG/vlpS45KJR7twWmlrBJACmRm/CtaWndslSiUkvgRf5An6Jk
- wSoFi1khn9ZxIgfIhpwai6C6qItdIi2RaGJlcQD1ZmgGsPFXYaDv6RaLDEPvK0tgSC0r
- tiAyHTC4I+aF28eqL8tbFXggt+xQzuIxBstKBFZEgUJLssQWglmxVutEKL1ItXbKdMuE
- 9hzspinkA7KMUG1pw98EIgIkSW2mVcrn0o4sCI73RD9mz1vHASJnfZu6IDdm5d99Jftb
- 5rAg==
-X-Gm-Message-State: AOAM531TuyB5vZR8NlkvOXZ7LknxQNGNR9+xvDT20Ci2EPw6Ho6GzzE/
- DNkD9QaM0E9dueNfFlYIG1t3/EYng8YIo3TDHLmoWbL0L2d1csC7nlrt7R84Gr5IE52j48C6fqZ
- TvDw6jBDp/Mopt+s=
-X-Received: by 2002:a1c:7915:: with SMTP id l21mr13437006wme.50.1596106094114; 
- Thu, 30 Jul 2020 03:48:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy+QZRp5LeB1NgHCQpEHGDSjI8LwW0SDMfPb1YpmDeIpkDINjg2FpK7JxDl2rUh0Q0OZ79sVw==
-X-Received: by 2002:a1c:7915:: with SMTP id l21mr13436987wme.50.1596106093902; 
- Thu, 30 Jul 2020 03:48:13 -0700 (PDT)
-Received: from steredhat.lan ([5.180.207.22])
- by smtp.gmail.com with ESMTPSA id j5sm9023906wmb.15.2020.07.30.03.48.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jul 2020 03:48:13 -0700 (PDT)
-Date: Thu, 30 Jul 2020 12:48:04 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] pci_dma_rw: return correct value instead of 0
-Message-ID: <20200730104804.apxqhhaszjnef77d@steredhat.lan>
-References: <20200729221732.29041-1-e.emanuelegiuseppe@gmail.com>
- <20200730074146.b66tur2v7tx4uo3d@steredhat.lan>
- <CAFEAcA9A6_S0NEzjmjvxJofFQVKgZS2U_YjgW7jwEo--irNQyw@mail.gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=XiW7Lo9DkCCefHgEFlgnoyq2Lzb1Rk5l4tqufRQYrns=;
+ b=YdQAolN79xG+xV9sBaaS9t3S+dnlE0zdMgoqoy8BFE6NSIVH50edPH0JOepx5+oR2f
+ 8K3GRPbCr61Tx4yz/BevEsmkJMNk4m2qB3HzpMETtpfBExa6LK9kEZySSoa5IHjTwYu/
+ czToegaJxoMOwZ5EMlgls4gN1n7J1iOP4ADuqT8DVTkj9TMcWKWLlLwMGv5iOSBJOdD6
+ ikPtNL7PYLUORq6nYcUVIOtdYOlMhZtbZQptyVphneLdE7NkPKvvtywWezRIDK7DeACe
+ 5qKaswOItwes9CiZWs5fOK8fHNRfmVRW2oy2xb5m3hmTep8sSHviZ8v+bVzDszBlvvTb
+ 8v0w==
+X-Gm-Message-State: AOAM532AxX5g0V48w0lY/dosXKoJoN4bTBNZYPS5+L8+Cvy1NZTVxTgj
+ YPdUWX5pSXdo8G/xlPt5KAx9vlPrbufEMKjbFKur/Q==
+X-Google-Smtp-Source: ABdhPJze92xci3GAzYi871hgg4NEHu4Wj7Ueop6GrSZKjHL5gnNH38VmgFeGDHERXTXWjwN9HPXe+U3C5giqnKMlrTw=
+X-Received: by 2002:a4a:8dc1:: with SMTP id a1mr1909327ool.69.1596106633815;
+ Thu, 30 Jul 2020 03:57:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9A6_S0NEzjmjvxJofFQVKgZS2U_YjgW7jwEo--irNQyw@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:59:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200728195706.11087-1-richard.henderson@linaro.org>
+In-Reply-To: <20200728195706.11087-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 30 Jul 2020 11:57:02 +0100
+Message-ID: <CAFEAcA-XSjJxspYw9ESeh0CUW-OJvJnyMbo4m6LJQ9wuhoAhpQ@mail.gmail.com>
+Subject: Re: [PATCH] target/arm: Fix AddPAC error indication
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c43;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oo1-xc43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,45 +93,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Derrick McKee <derrick.mckee@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 30, 2020 at 09:58:21AM +0100, Peter Maydell wrote:
-> On Thu, 30 Jul 2020 at 08:42, Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > I agree that it is better to return the dma_memory_rw() return value, but
-> > at first look, no one seems to check the return value of pci_dma_rw(),
-> > pci_dma_read(), andpci_dma_write().
-> >
-> > Should we make them void?
-> 
-> In general code (eg device models) that issues memory transactions
-> need to have a mechanism for finding out whether the transaction
-> succeeds. Traditionally QEMU didn't have the concept of a
-> transaction failing, but we have added it, starting with the
-> APIs at the bottom level (the address_space_* ones). We haven't
-> always plumbed the error-handling (or the memory-transaction
-> input, for that matter) through to some of these other APIs.
-> I think for consistency we should do that, and ideally we
-> should make all these APIs look the same as the base-level
-> address_space* ones, which would mean returning a MemTxError
-> rather than a bool.
+On Tue, 28 Jul 2020 at 20:57, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The definition of top_bit used in this function is one higher
+> than that used in the Arm ARM psuedo-code, which put the error
+> indication at top_bit - 1 at the wrong place, which meant that
+> it wasn't visible to Auth.
+>
+> Fixing the definition of top_bit requires more changes, because
+> its most common use is for the count of bits in top_bit:bot_bit,
+> which would then need to be computed as top_bit - bot_bit + 1.
+>
+> For now, prefer the minimal fix to the error indication alone.
+>
+> Fixes: 63ff0ca94cb
+> Reported-by: Derrick McKee <derrick.mckee@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Yeah, that makes a lot of sense to me.
+This seems like it might confuse us in future so I've added
+a comment inside the if():
 
-> 
-> We should also figure out why the dma_* functions exist at all:
-> they include some calls to dma_barrier(), but not all devices
-> do DMA with the dma_* functions, so we have an inconsistency
-> that should be sorted out...
-> 
+        /*
+         * Note that our top_bit is one greater than the pseudocode's
+         * version, hence "- 2" here.
+         */
 
-I've never looked in detail, but I agree we should have more consistency.
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Thanks for the details!
-Stefano
+and added to target-arm.next.
 
+thanks
+-- PMM
 
