@@ -2,80 +2,82 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94165C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 170E1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:19:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 671622083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:16:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 671622083E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E02592083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:19:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E02592083E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k16YQ-0008MV-ND
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:16:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59556)
+	id 1k16b7-0000yH-8e
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:19:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k16Xg-0007we-0X
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:16:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34416)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k16Xd-0003OX-ML
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:16:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k16Xb-00079I-DU
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 11:16:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5BD952E80EF
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 11:16:03 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <likaige@loongson.cn>)
+ id 1k16aS-0000Sb-Mv; Thu, 30 Jul 2020 07:19:00 -0400
+Received: from mail.loongson.cn ([114.242.206.163]:38320 helo=loongson.cn)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <likaige@loongson.cn>)
+ id 1k16aP-0003ey-RX; Thu, 30 Jul 2020 07:19:00 -0400
+Received: from [10.130.0.69] (unknown [113.200.148.30])
+ by mail.loongson.cn (Coremail) with SMTP id AQAAf9DxmMWSrCJf1oICAA--.170S3;
+ Thu, 30 Jul 2020 19:18:44 +0800 (CST)
+Subject: Re: [PATCH 2/2] target/arm: Fix compile error.
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <1596074182-4920-1-git-send-email-likaige@loongson.cn>
+ <1596074182-4920-2-git-send-email-likaige@loongson.cn>
+ <CAFEAcA_ZgrkcpwYZD-stZGDDjhTgMOSLx--9KHPnxfbKz58s7g@mail.gmail.com>
+From: Kaige Li <likaige@loongson.cn>
+Message-ID: <25c0ba1a-088d-c932-1f17-030211af5d4f@loongson.cn>
+Date: Thu, 30 Jul 2020 19:18:42 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jul 2020 11:08:38 -0000
-From: Peter Maydell <1886343@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell th-huth wilson-q
-X-Launchpad-Bug-Reporter: Wilson-q (wilson-q)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <159397709821.1977.12730820791239292652.malonedeb@wampee.canonical.com>
-Message-Id: <159610731899.9962.5740887293337129850.malone@chaenomeles.canonical.com>
-Subject: [Bug 1886343] Re: configure has non-posix bash syntax
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 12c0a1c2c1d8aae7d95f09cbd6912231401997d3
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:16:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA_ZgrkcpwYZD-stZGDDjhTgMOSLx--9KHPnxfbKz58s7g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAf9DxmMWSrCJf1oICAA--.170S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tFy5tFyUXFWxtr1UAr4fXwb_yoW8Cr4xpF
+ 4xGa92kr4Yqr95C3s2ka1kXw1UWw42kry0ya97trs3XrsrKr1FgrnrKr9IkF4jqF48Cw45
+ WFyxZ345Wrs5ZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDU0xBIdaVrnRJUUUvab7Iv0xC_tr1lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+ 0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+ A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+ jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
+ C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+ 0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr
+ 1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l
+ c2xSY4AK67AK6r4kMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I
+ 0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWU
+ AVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcV
+ CY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv
+ 67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyT
+ uYvjxUI5l1DUUUU
+X-CM-SenderInfo: 5olntxtjh6z05rqj20fqof0/
+Received-SPF: pass client-ip=114.242.206.163; envelope-from=likaige@loongson.cn;
+ helo=loongson.cn
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 07:18:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,48 +86,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1886343 <1886343@bugs.launchpad.net>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fixed in commit b418d2656112174c; this will be in QEMU 5.1.
+On 07/30/2020 04:44 PM, Peter Maydell wrote:
 
+> On Thu, 30 Jul 2020 at 02:56, Kaige Li <likaige@loongson.cn> wrote:
+>> When I compile qemu with such as:
+>>
+>> git clone https://git.qemu.org/git/qemu.git
+>> cd qemu
+>> git submodule init
+>> git submodule update --recursive
+>> ./configure
+>> make
+>>
+>> There is error log:
+>>
+>> /home/LiKaige/qemu/target/arm/translate-a64.c: In function ‘disas_ldst’:
+>> /home/LiKaige/qemu/target/arm/translate-a64.c:3392:5: error: ‘fn’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>>       fn(cpu_reg(s, rt), clean_addr, tcg_rs, get_mem_index(s),
+>>       ^
+>> /home/LiKaige/qemu/target/arm/translate-a64.c:3318:22: note: ‘fn’ was declared here
+>>       AtomicThreeOpFn *fn;
+>>                        ^
+>> cc1: all warnings being treated as errors
+>>
+>> So, add an initiallization value for fn to fix this.
+>>
+>> Signed-off-by: Kaige Li <likaige@loongson.cn>
+> What compiler version is this ?
+It's the latest version: v5.1.0-rc2, but VERSION shows that is 5.0.92.
+Commit id is 5772f2b1fc5d00e7e04e01fa28e9081d6550440a
+>
+>> ---
+>>   target/arm/translate-a64.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+>> index 8c07649..910a91f 100644
+>> --- a/target/arm/translate-a64.c
+>> +++ b/target/arm/translate-a64.c
+>> @@ -3315,7 +3315,7 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
+>>       bool r = extract32(insn, 22, 1);
+>>       bool a = extract32(insn, 23, 1);
+>>       TCGv_i64 tcg_rs, clean_addr;
+>> -    AtomicThreeOpFn *fn;
+>> +    AtomicThreeOpFn *fn = tcg_gen_atomic_fetch_add_i64;
+> NULL would be a better choice for a "this is never actually used"
+> initialiser.
+Ok, I will have a try and submit it in v2.
 
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Committed
+Thank you.
+Kaige.
+>
+> thanks
+> -- PMM
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1886343
-
-Title:
-  configure has non-posix bash syntax
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  which gives an error when run on a system that uses dash for /bin/sh.
-
-  The problem is at line 6464 which has
-      if test "$have_keyring" =3D=3D "yes"
-  the double equal sign is non-posix bash syntax that isn't accepted by pos=
-ix shells like dash.  This was added 2020-05-25 according to git blame so l=
-ooks like a recent problem.
-
-  On an Ubuntu 20.04 system with top of tree sources I get
-  gondor:2027$ ../qemu/configure --prefix=3D/home/wilson/FOSS/qemu/install-=
-qemu-tmp --target-list=3Driscv64-linux-user,riscv64-softmmu,riscv32-linux-u=
-ser,riscv32-softmmu
-  ../qemu/configure: 6464: test: yes: unexpected operator
-  ...
-
-  configure completes OK, so this is a minor problem.  It is just one
-  configure test that is failing to work properly.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1886343/+subscriptions
 
