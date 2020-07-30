@@ -2,119 +2,79 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D88C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 14:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44060C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 14:39:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 202ED20578
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 14:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F21B20829
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 14:39:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G7s11llM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 202ED20578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FZvWEbqx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F21B20829
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k19ZL-0002zT-9n
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 10:30:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58418)
+	id 1k19iS-0004o2-AH
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 10:39:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k19YX-0002DF-7W
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 10:29:13 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53791
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k19ht-0004Ix-50
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 10:38:53 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25436
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k19YU-00074g-8s
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 10:29:12 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k19hr-00089N-EE
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 10:38:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596119349;
+ s=mimecast20190719; t=1596119930;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ON1OtNmWc+sWirLzhHcY0wMbAE33llek/hkyMukuUBI=;
- b=G7s11llMYP63/BIQPCPzBb643P3M5x/dJW8gdnfEWYTQ1bGg70crpcGoZPBiMt3QgDWYHy
- PUFa1Y2mhU+ZZP7GOsDpoVuo3kJ9DiUUA7ZQ8/YMb1X+UHmSbiRU92CPBsvJK1HZPQTRxM
- 6/HiXWrQSXCN81zezdWN4mTUbMgP+ws=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-gnveiXTLNSatuJRskBmPCw-1; Thu, 30 Jul 2020 10:29:07 -0400
-X-MC-Unique: gnveiXTLNSatuJRskBmPCw-1
-Received: by mail-wr1-f72.google.com with SMTP id 89so7999250wrr.15
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 07:29:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=ON1OtNmWc+sWirLzhHcY0wMbAE33llek/hkyMukuUBI=;
- b=Gcsatycx+rOU34ru98rALM2Zn9RHqn01n13R5G1R4qrlKAxBQL9rcPZHHdCPmxAFMo
- ZZ5hVRDa0ilQHM6NFkIs5rja/L8AhJHcmhb60hs/MEZFGyH77Hah55puJth13fVocSPc
- yf9bwmP35AgCkURwwluYTe6DOHFvm7Tj8+cLFfk4ZFoeU++Ep7DMplc58YmZ+OQg2wAB
- HCPlzWs6IK08AVTkm67rXdjsXDHOYjyqy39J2WSfjbvWbNj4XaWuER71MV2mrF5zD3Mi
- 0GSSRa8dmutw37XC2plBXfXsx2jB5hKop8Zhs9BP4CQrWAUjf2jmpD4FodX7q6KJlkxu
- l6+w==
-X-Gm-Message-State: AOAM533BA1kJqdxLwmzMYNhsrbOZMnkeOcWnZ/OWolNKMtfw5bkPvULs
- D+tzNa1EwkiZ5oWL3qJlet+5XJwfdLq9gQRSgbyqs7Gz+yK0exWhwc80/V5bcqi38EzpwpQRwrf
- 2x7oNuah/E8Pv608=
-X-Received: by 2002:a1c:7c16:: with SMTP id x22mr12930110wmc.76.1596119346648; 
- Thu, 30 Jul 2020 07:29:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxRk9Toidnn/8nNPJ92iTbSlGujn51nI+mWtmy4pxgPlXrvSf4iyFihMZ4GDNXrvGVTR5MsuQ==
-X-Received: by 2002:a1c:7c16:: with SMTP id x22mr12930082wmc.76.1596119346396; 
- Thu, 30 Jul 2020 07:29:06 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id h199sm9307047wme.42.2020.07.30.07.29.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jul 2020 07:29:05 -0700 (PDT)
-Subject: Re: [PATCH-for-5.1? v2 0/2] util/pagesize: Make
- qemu_real_host_page_size of type size_t
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20200730141245.21739-1-philmd@redhat.com>
- <20200730142220.GA7120@work-vm>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <1338b920-28a6-8f9f-693d-b3852b7e54de@redhat.com>
-Date: Thu, 30 Jul 2020 16:29:04 +0200
+ in-reply-to:in-reply-to:references:references;
+ bh=UBlHq20h2xXsrLyTWvnclaCPy3hBgDYHLZA3TR0/AD8=;
+ b=FZvWEbqx+EbF8R/E60cgzK+soKvzwDSQWwWmPl2AHeHNyiYW6gRd7fu7vAGPRY2tu8XVMB
+ Tp+v1UWSdmgSTRasKsAQBHxDhWTPdBtIg/l6I2jVJT1vc1ss1MHiDdQE6cfZCWX5y8eyRA
+ 9S5oAwUFcU04znFF9SRGi7qaW7O6bqo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-IAbrcFqBMvGzztVb9tlBOA-1; Thu, 30 Jul 2020 10:38:46 -0400
+X-MC-Unique: IAbrcFqBMvGzztVb9tlBOA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6693100A614;
+ Thu, 30 Jul 2020 14:38:44 +0000 (UTC)
+Received: from [10.3.114.255] (ovpn-114-255.phx2.redhat.com [10.3.114.255])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 396221C6;
+ Thu, 30 Jul 2020 14:38:44 +0000 (UTC)
+Subject: Re: [PATCH 2/2] iotests/169: Test source cont with backing bmap
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200730120234.49288-1-mreitz@redhat.com>
+ <20200730120234.49288-3-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <2d89e3e6-a535-8d0c-63e2-605f7233d1bf@redhat.com>
+Date: Thu, 30 Jul 2020 09:38:43 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200730142220.GA7120@work-vm>
+In-Reply-To: <20200730120234.49288-3-mreitz@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -137,26 +97,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Kaige Li <likaige@loongson.cn>,
- kvm@vger.kernel.org, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/30/20 4:22 PM, Dr. David Alan Gilbert wrote:
-> * Philippe Mathieu-DaudÃ© (philmd@redhat.com) wrote:
->> Since v1:
->> Make QEMU_VMALLOC_ALIGN unsigned in a previous patch
-> 
-> Nah, not for 5.1 - it feels like the type of thing that might on a
-> really bad day create a really subtle bug.
+On 7/30/20 7:02 AM, Max Reitz wrote:
+> Test migrating from a VM with a persistent bitmap in the backing chain,
+> and then continuing that VM after the migration
 
-Ack :)
+Indeed, the more our iotest is like what libvirt actually does, the 
+better we protect ourselves from future bugs in this area.
+
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   tests/qemu-iotests/169     | 64 +++++++++++++++++++++++++++++++++++++-
+>   tests/qemu-iotests/169.out |  4 +--
+>   2 files changed, 65 insertions(+), 3 deletions(-)
+> 
+
+> +class TestDirtyBitmapBackingMigration(iotests.QMPTestCase):
+> +    def setUp(self):
+> +        qemu_img_create('-f', iotests.imgfmt, base_a, size)
+> +        qemu_img_create('-f', iotests.imgfmt, '-F', iotests.imgfmt,
+> +                        '-b', base_a, disk_a, size)
+> +
+> +        for f in (disk_a, base_a):
+> +            qemu_img('bitmap', '--add', f, 'bmap0')
+
+I'm so glad to see 'qemu-img bitmap' getting some use :)
+
+> +
+> +        blockdev = {
+> +            'node-name': 'node0',
+> +            'driver': iotests.imgfmt,
+> +            'file': {
+> +                'driver': 'file',
+> +                'filename': disk_a
+> +            },
+> +            'backing': {
+> +                'node-name': 'node0-base',
+> +                'driver': iotests.imgfmt,
+> +                'file': {
+> +                    'driver': 'file',
+> +                    'filename': base_a
+> +                }
+> +            }
+> +        }
+> +
+> +        self.vm = iotests.VM()
+> +        self.vm.launch()
+> +
+> +        result = self.vm.qmp('blockdev-add', **blockdev)
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        # Check that the bitmaps are there
+> +        for node in self.vm.qmp('query-named-block-nodes', flat=True)['return']:
+> +            if 'node0' in node['node-name']:
+
+This caught me on the first read, before I realized it was a clever way 
+to test both 'node0' and 'node0-base'.
+
+> +                self.assert_qmp(node, 'dirty-bitmaps[0]/name', 'bmap0')
+> +
+> +        caps = [{'capability': 'events', 'state': True}]
+> +        result = self.vm.qmp('migrate-set-capabilities', capabilities=caps)
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +    def tearDown(self):
+> +        self.vm.shutdown()
+> +        for f in (disk_a, base_a):
+> +            os.remove(f)
+> +
+> +    def test_cont_on_source(self):
+> +        """
+> +        Continue the source after migration.
+> +        """
+> +        result = self.vm.qmp('migrate', uri=f'exec: cat > /dev/null')
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        with Timeout(10, 'Migration timeout'):
+> +            self.vm.wait_migration('postmigrate')
+> +
+> +        result = self.vm.qmp('cont')
+> +        self.assert_qmp(result, 'return', {})
+> +
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
