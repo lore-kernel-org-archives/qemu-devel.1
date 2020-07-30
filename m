@@ -2,82 +2,105 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49406C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5196C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:47:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 216B72082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:47:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 216B72082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id AF0712082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:47:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ecgJHuBN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0712082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Alx-0003Cz-AR
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:47:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54930)
+	id 1k1AmZ-0004LA-UD
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:47:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k1Ag0-00021D-FQ
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:41:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42750)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k1Aft-0002jf-H8
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:40:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k1Afp-0004W5-LH
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 15:40:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9D8FF2E80BA
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 15:40:49 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 30 Jul 2020 15:31:41 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1889621@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1AdZ-0007hN-Pt
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:30 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:50262)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1AdV-0002CX-Vt
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:29 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXSrl007533;
+ Thu, 30 Jul 2020 15:38:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
+ bh=UF79pvoFFJrsRYU2u2K28RtDkLoecSqXccCEeTdSY4A=;
+ b=ecgJHuBNf/qK2wMV3XHPCVD5ikOXxVnRjA0Z5VMPbqQe+7mrlCR3wv4k1GSC7+nV1sKe
+ jNznwLs0DIzWWfQ3fJM8sBsIwKgrSG6CRA33Bmkgkcc7lBpYygmnReQ65Lw4kdcDoEWZ
+ tP4ICI+QlVXDI/Mt6q4+lvVXRYzj0rqF3RYNGDV/CPVZNEB2n4iGzlfuAx3XLbVX1a0L
+ /vaxV2hx87nwKsAt6hjVJIOw5kO1aD7f9r8AGD0DGhRbJI8yuiNQmysppoGdZ5jjFi7M
+ LQhIF039F4DdroVKmP4PJpmvaK1giD1081PuHih3gcGD6L14DQ9MC2QVPLL6sgeJb2n1 SQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 32hu1jmfga-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Thu, 30 Jul 2020 15:38:19 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFWpjI188534;
+ Thu, 30 Jul 2020 15:38:18 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 32hu5xja81-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 30 Jul 2020 15:38:18 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06UFcIrw020542;
+ Thu, 30 Jul 2020 15:38:18 GMT
+Received: from ca-dev63.us.oracle.com (/10.211.8.221)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 30 Jul 2020 08:38:18 -0700
+From: Steve Sistare <steven.sistare@oracle.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr philmd
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <159611622900.2711.11274153830927420832.malonedeb@gac.canonical.com>
-Message-Id: <159612310142.16310.15462691731262899664.malone@wampee.canonical.com>
-Subject: [Bug 1889621] Re: ARM Highbank Crashes Realted to GIC
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ebbf87a224fa13528fe4ca51e05af81c375c4687
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 09:45:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH V1 31/32] vfio-pci: trace pci config
+Date: Thu, 30 Jul 2020 08:14:35 -0700
+Message-Id: <1596122076-341293-32-git-send-email-steven.sistare@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ mlxscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007300111
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ clxscore=1015
+ malwarescore=0 spamscore=0 suspectscore=1 bulkscore=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007300111
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=steven.sistare@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 11:37:58
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,211 +109,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1889621 <1889621@bugs.launchpad.net>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Steve Sistare <steven.sistare@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Why put all these bugs in the same ticket?
+Add new trace points trace_vfio_pci_config and trace_vfio_msix_table to dump
+PCI config space and MSI data.
 
-For reproducer #2:
+Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+---
+ hw/vfio/pci.c        | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/trace-events |  2 ++
+ 2 files changed, 101 insertions(+)
 
-writeq 0xfff11f00 0x613a650f0fda6555 does:
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 5743807..f72e277 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2715,6 +2715,90 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+     vdev->req_enabled = false;
+ }
+ 
++/* To limit output, trace only this many bytes of config. */
++#define CONFIG_LEN 512
++
++static void vfio_dump_config(const char *name, int fd, off_t offset)
++{
++    int i, j, n, config[CONFIG_LEN / 4];
++    char buf[128];
++    const char *fmt;
++    char *ptr = buf;
++    int *v = config;
++    int len = sizeof(buf) - 1;
++
++#ifdef CONFIG_TRACE_DTRACE
++    if (!QEMU_VFIO_PCI_CONFIG_ENABLED()) {
++        return;
++    }
++#endif
++
++    if (pread(fd, &config, sizeof(config), offset) < 0) {
++        perror("pread");
++        return;
++    }
++
++    trace_vfio_pci_config(name);
++
++    for (i = 0; i < CONFIG_LEN; i += 32, v += 8) {
++        n = snprintf(buf, len, "+%3d:", i);
++        ptr += n;
++        len -= n;
++        for (j = 0; j < 8; j++) {
++            fmt = v[j] ?  " %08x" : " %8x";
++            n = snprintf(ptr, len, fmt, v[j]);
++            ptr += n;
++            len -= n;
++        }
++        *ptr = 0;   /* terminate in case of truncation above */
++        trace_vfio_pci_config(buf);
++    }
++}
++
++static void vfio_dump_config_vdev(VFIOPCIDevice *vdev)
++{
++    vfio_dump_config(vdev->vbasedev.name, vdev->vbasedev.fd,
++                     vdev->config_offset);
++}
++
++static void vfio_dump_msix_vdev(VFIOPCIDevice *vdev)
++{
++    int i;
++    int *ptr = (int *) vdev->pdev.msix_table;
++
++    for (i = 0; i < vdev->pdev.msix_entries_nr; i++, ptr += 4) {
++        trace_vfio_msix_table(vdev->vbasedev.name, i,
++                              ptr[0], ptr[1], ptr[2], ptr[3]);
++    }
++}
++
++static void vfio_diff_config(VFIOPCIDevice *vdev)
++{
++    int i;
++    unsigned char config[CONFIG_LEN];
++    int n = sizeof(config);
++    unsigned char *c1 = (unsigned char *)config;
++    unsigned char *c2 = (unsigned char *)vdev->pdev.config;
++    char buf[128];
++
++#ifdef CONFIG_TRACE_DTRACE
++    if (!QEMU_VFIO_PCI_CONFIG_ENABLED()) {
++        return;
++    }
++#endif
++
++    if (pread(vdev->vbasedev.fd, &config, n, vdev->config_offset) != n) {
++        error_report("vfio_diff_config pread failed");
++    }
++    for (i = 0; i < CONFIG_LEN; i++) {
++        if (c1[i] != c2[i]) {
++            snprintf(buf, sizeof(buf),
++                     "config mismatch at %d: %x vs %x", i, c1[i], c2[i]);
++            trace_vfio_pci_config(buf);
++        }
++    }
++}
++
+ static void vfio_realize(PCIDevice *pdev, Error **errp)
+ {
+     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+@@ -3037,6 +3121,9 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     if (pdev->reused) {
+         pci_update_mappings(pdev);
+     }
++    vfio_diff_config(vdev);
++    vfio_dump_config_vdev(vdev);
++    vfio_dump_msix_vdev(vdev);
+ 
+     return;
+ 
+@@ -3207,6 +3294,15 @@ static Property vfio_pci_dev_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static int vfio_pci_pre_save(void *opaque)
++{
++    VFIOPCIDevice *vdev = opaque;
++
++    vfio_dump_config_vdev(vdev);
++    vfio_dump_msix_vdev(vdev);
++    return 0;
++}
++
+ static int vfio_pci_post_load(void *opaque, int version_id)
+ {
+     int vector;
+@@ -3226,6 +3322,8 @@ static int vfio_pci_post_load(void *opaque, int version_id)
+             }
+         }
+ 
++        vfio_dump_msix_vdev(vdev);
++
+     } else if (vfio_pci_read_config(pdev, PCI_INTERRUPT_PIN, 1)) {
+         vfio_intx_enable(vdev, &err);
+         if (err) {
+@@ -3246,6 +3344,7 @@ static const VMStateDescription vfio_pci_vmstate = {
+     .version_id = 0,
+     .minimum_version_id = 0,
+     .post_load = vfio_pci_post_load,
++    .pre_save = vfio_pci_pre_save,
+     .fields = (VMStateField[]) {
+         VMSTATE_MSIX(pdev, VFIOPCIDevice),
+         VMSTATE_END_OF_LIST()
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index b1ef55a..10d899c 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -47,6 +47,8 @@ vfio_pci_emulated_vendor_id(const char *name, uint16_t val) "%s 0x%04x"
+ vfio_pci_emulated_device_id(const char *name, uint16_t val) "%s 0x%04x"
+ vfio_pci_emulated_sub_vendor_id(const char *name, uint16_t val) "%s 0x%04x"
+ vfio_pci_emulated_sub_device_id(const char *name, uint16_t val) "%s 0x%04x"
++vfio_msix_table(const char *name, int index, int x0, int x1, int x2, int x3) "%s MSI-X[%d] = { %x %x %x %x }"
++vfio_pci_config(const char *buf) "%s"
+ 
+ # pci-quirks.c
+ vfio_quirk_rom_blacklisted(const char *name, uint16_t vid, uint16_t did) "%s %04x:%04x"
+-- 
+1.8.3.1
 
-gic_dist_write dist write at 0x00000f00 size 4: 0x0fda6555
-
-0x0fda6555 =3D> IRQ 341, mask type 3 illegal -> DPRINTF("Bad Soft Int
-target filter\n");
-
-mask =3D ALL_CPU_MASK =3D 0xff
-
-Having:
-
-#define GIC_NR_SGIS 16
-uint8_t sgi_pending[GIC_NR_SGIS][GIC_NCPU];
-
-s->sgi_pending[irq][target_cpu] |=3D (1 << cpu);
-               ^^^
-                  \ OOB access.
-
-** Changed in: qemu
-       Status: New =3D> Confirmed
-
-** Tags added: arm
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1889621
-
-Title:
-  ARM Highbank Crashes Realted to GIC
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Hello,
-  Here are some QTest reproducers for crashes on ARM Highbank that all seem=
- to be related to the gic device.
-
-  Reproducer 1:
-  cat << EOF | ./arm-softmmu/qemu-system-arm -machine highbank \
-  -nographic -monitor none -serial none -qtest stdio
-  writel 0xfff11f00 0x8405f559
-  writel 0xfff117fd 0x5c057bd8
-  EOF
-
-  =3D=3D10595=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x62b00=
-0013e01 (pc 0x55b6ab85cc91 bp 0x7fff60bd4d70 sp 0x7fff60bd4ce0 T0)
-  =3D=3D10595=3D=3DThe signal is caused by a READ memory access.
-      #0 0x55b6ab85cc91 in gic_get_current_cpu /home/alxndr/Development/qem=
-u/general-fuzz/hw/intc/arm_gic.c:60:12
-      #1 0x55b6ab85e1bd in gic_dist_writeb /home/alxndr/Development/qemu/ge=
-neral-fuzz/hw/intc/arm_gic.c:1182:11
-      #2 0x55b6ab855a97 in gic_dist_write /home/alxndr/Development/qemu/gen=
-eral-fuzz/hw/intc/arm_gic.c:1514:9
-      #3 0x55b6aa1650d4 in memory_region_write_with_attrs_accessor /home/al=
-xndr/Development/qemu/general-fuzz/softmmu/memory.c:503:12
-      #4 0x55b6aa163ac6 in access_with_adjusted_size /home/alxndr/Developme=
-nt/qemu/general-fuzz/softmmu/memory.c:544:18
-      #5 0x55b6aa161f35 in memory_region_dispatch_write /home/alxndr/Develo=
-pment/qemu/general-fuzz/softmmu/memory.c:1473:13
-      #6 0x55b6a9313949 in flatview_write_continue /home/alxndr/Development=
-/qemu/general-fuzz/exec.c:3176:23
-      #7 0x55b6a92fca11 in flatview_write /home/alxndr/Development/qemu/gen=
-eral-fuzz/exec.c:3216:14
-      #8 0x55b6a92fc54e in address_space_write /home/alxndr/Development/qem=
-u/general-fuzz/exec.c:3308:18
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  Reproducer 2:
-  cat << EOF | ./arm-softmmu/qemu-system-arm -machine highbank \
-  -nographic -monitor none -serial none -qtest stdio
-  writeq 0xfff11f00 0x613a650f0fda6555
-  EOF
-
-  =3D=3D1375=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on address =
-0x608000001c80 at pc 0x5618928c486e bp 0x7ffe22c4ee10 sp 0x7ffe22c4ee08
-  READ of size 8 at 0x608000001c80 thread T0
-      #0 0x5618928c486d in address_space_translate_iommu /home/alxndr/Devel=
-opment/qemu/general-fuzz/exec.c:451:23
-      #1 0x561892850acc in flatview_do_translate /home/alxndr/Development/q=
-emu/general-fuzz/exec.c:524:16
-      #2 0x5618928514ad in flatview_translate /home/alxndr/Development/qemu=
-/general-fuzz/exec.c:584:15
-      #3 0x5618928b1e14 in flatview_write_continue /home/alxndr/Development=
-/qemu/general-fuzz/exec.c:3199:14
-      #4 0x56189289aa11 in flatview_write /home/alxndr/Development/qemu/gen=
-eral-fuzz/exec.c:3216:14
-      #5 0x56189289a54e in address_space_write /home/alxndr/Development/qem=
-u/general-fuzz/exec.c:3308:18
-      #6 0x5618937a5e13 in qtest_process_command /home/alxndr/Development/q=
-emu/general-fuzz/softmmu/qtest.c:452:13
-      #7 0x56189379d89f in qtest_process_inbuf /home/alxndr/Development/qem=
-u/general-fuzz/softmmu/qtest.c:710:9
-      #8 0x56189379c680 in qtest_read /home/alxndr/Development/qemu/general=
--fuzz/softmmu/qtest.c:722:5
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  Reproducer 3:
-  cat << EOF | ./arm-softmmu/qemu-system-arm -machine highbank \
-  -nographic -monitor none -serial none -qtest stdio
-  writeq 0xfff11000 0x700000b
-  writeq 0xfff11f00 0x4f4f4fff54a7afaf
-  writel 0xfff10100 0x600001ff
-  EOF
-
-  =3D=3D23743=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on address=
- 0x62b000006a92 at pc 0x55d690d980e1 bp 0x7ffe606082d0 sp 0x7ffe606082c8
-  READ of size 1 at 0x62b000006a92 thread T0
-      #0 0x55d690d980e0 in gic_get_best_irq /home/alxndr/Development/qemu/g=
-eneral-fuzz/hw/intc/arm_gic.c:94:13
-      #1 0x55d690d9485b in gic_update_internal /home/alxndr/Development/qem=
-u/general-fuzz/hw/intc/arm_gic.c:185:13
-      #2 0x55d690d90376 in gic_update /home/alxndr/Development/qemu/general=
--fuzz/hw/intc/arm_gic.c:226:5
-      #3 0x55d690dc0879 in gic_cpu_write /home/alxndr/Development/qemu/gene=
-ral-fuzz/hw/intc/arm_gic.c:1758:9
-      #4 0x55d690da41c0 in gic_thiscpu_write /home/alxndr/Development/qemu/=
-general-fuzz/hw/intc/arm_gic.c:1777:12
-      #5 0x55d68f6b30d4 in memory_region_write_with_attrs_accessor /home/al=
-xndr/Development/qemu/general-fuzz/softmmu/memory.c:503:12
-      #6 0x55d68f6b1ac6 in access_with_adjusted_size /home/alxndr/Developme=
-nt/qemu/general-fuzz/softmmu/memory.c:544:18
-      #7 0x55d68f6aff35 in memory_region_dispatch_write /home/alxndr/Develo=
-pment/qemu/general-fuzz/softmmu/memory.c:1473:13
-      #8 0x55d68e861949 in flatview_write_continue /home/alxndr/Development=
-/qemu/general-fuzz/exec.c:3176:23
-      #9 0x55d68e84aa11 in flatview_write /home/alxndr/Development/qemu/gen=
-eral-fuzz/exec.c:3216:14
-      #10 0x55d68e84a54e in address_space_write /home/alxndr/Development/qe=
-mu/general-fuzz/exec.c:3308:18
-      #11 0x55d68f755537 in qtest_process_command /home/alxndr/Development/=
-qemu/general-fuzz/softmmu/qtest.c:447:13
-      #12 0x55d68f74d89f in qtest_process_inbuf /home/alxndr/Development/qe=
-mu/general-fuzz/softmmu/qtest.c:710:9
-      #13 0x55d68f74c680 in qtest_read /home/alxndr/Development/qemu/genera=
-l-fuzz/softmmu/qtest.c:722:5
-      #14 0x55d692dddc36 in qemu_chr_be_write_impl /home/alxndr/Development=
-/qemu/general-fuzz/chardev/char.c:188:9
-      #15 0x55d692dddd79 in qemu_chr_be_write /home/alxndr/Development/qemu=
-/general-fuzz/chardev/char.c:200:9
-      #16 0x55d692df105e in fd_chr_read /home/alxndr/Development/qemu/gener=
-al-fuzz/chardev/char-fd.c:68:9
-      #17 0x55d692f395df in qio_channel_fd_source_dispatch /home/alxndr/Dev=
-elopment/qemu/general-fuzz/io/channel-watch.c:84:12
-      #18 0x7f69a1b50897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e897)
-      #19 0x55d6932f5c83 in glib_pollfds_poll /home/alxndr/Development/qemu=
-/general-fuzz/util/main-loop.c:217:9
-      #20 0x55d6932f35b6 in os_host_main_loop_wait /home/alxndr/Development=
-/qemu/general-fuzz/util/main-loop.c:240:5
-      #21 0x55d6932f2f97 in main_loop_wait /home/alxndr/Development/qemu/ge=
-neral-fuzz/util/main-loop.c:516:11
-      #22 0x55d68f76c62d in qemu_main_loop /home/alxndr/Development/qemu/ge=
-neral-fuzz/softmmu/vl.c:1676:9
-      #23 0x55d692f6f20c in main /home/alxndr/Development/qemu/general-fuzz=
-/softmmu/main.c:49:5
-      #24 0x7f69a06d6e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #25 0x55d68e753459 in _start (/home/alxndr/Development/qemu/general-f=
-uzz/build/arm-softmmu/qemu-system-arm+0x3254459)
-
-  0x62b000006a92 is located 2 bytes to the right of 26768-byte region [0x62=
-b000000200,0x62b000006a90)
-  allocated by thread T0 here:
-      #0 0x55d68e7cbe4d in malloc (/home/alxndr/Development/qemu/general-fu=
-zz/build/arm-softmmu/qemu-system-arm+0x32cce4d)
-      #1 0x7f69a1b56500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.=
-so.0+0x54500)
-      #2 0x55d69254f231 in object_new /home/alxndr/Development/qemu/general=
--fuzz/qom/object.c:708:12
-      #3 0x55d69034bf01 in qdev_new /home/alxndr/Development/qemu/general-f=
-uzz/hw/core/qdev.c:136:12
-      #4 0x55d68f2b7aa4 in calxeda_init /home/alxndr/Development/qemu/gener=
-al-fuzz/hw/arm/highbank.c:319:15
-      #5 0x55d68f2b6466 in highbank_init /home/alxndr/Development/qemu/gene=
-ral-fuzz/hw/arm/highbank.c:411:5
-      #6 0x55d6903d43f1 in machine_run_board_init /home/alxndr/Development/=
-qemu/general-fuzz/hw/core/machine.c:1134:5
-      #7 0x55d68f77e0ee in qemu_init /home/alxndr/Development/qemu/general-=
-fuzz/softmmu/vl.c:4356:5
-      #8 0x55d692f6f207 in main /home/alxndr/Development/qemu/general-fuzz/=
-softmmu/main.c:48:5
-      #9 0x7f69a06d6e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.30=
-/csu/../csu/libc-start.c:308:16
-
-  =
-
-  Let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1889621/+subscriptions
 
