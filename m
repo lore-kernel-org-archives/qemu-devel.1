@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2157C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7412C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:23:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A23F520838
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:22:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 832812082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:23:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qamam3Hi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A23F520838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c6niimqc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832812082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1BKQ-0005pa-03
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 12:22:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36862)
+	id 1k1BLH-0006ld-T1
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 12:23:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k1BJ4-0004cK-Cn
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 12:21:22 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47459
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k1BKi-0006Il-Ms
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 12:23:04 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32258
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k1BJ2-0001rk-FC
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 12:21:22 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k1BKg-00023S-Sh
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 12:23:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596126079;
+ s=mimecast20190719; t=1596126182;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RpwrwfuyOv3rz+YG9e+XnjscTlzN4BdFoO3cxPxhNck=;
- b=Qamam3HiFMZlzbGZKRTTP30oEaORA0NF7AyRi3AIhD1rQTrUEXzy3eJ5RGwSq8XcCinw8u
- q+wrNXrFkRnY2UIIUqYZTIYd5hOiUnfbZRsFfTisq5h/bSM1AmiHy/ntzb9qDruhRHVOGF
- DedxlcBWMjQX3zvLxr6WdgI82j4fuqA=
+ bh=eL1r5d5Lru/ir4LgT5aN3BuJtxNAkEyqxioqtRxDqDw=;
+ b=c6niimqcEnDcy9ZXxo+gzYPiuAdFLRZAoe7wvvBUR4mkeKoENvL2Hm5w4ZGoKsoW7l2Ggc
+ KkH7EiIuCn3enbMjH9C73sy8jAYj9SXXZrcSYaeVKnFSQXBN5EjCJoKAMvm2M+dhoHMF/R
+ 5TSGFfThjw2ADYoLgkLJzaRGHqnnJL4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-RmrhKBkaP-y_UmhZKIMxtw-1; Thu, 30 Jul 2020 12:21:14 -0400
-X-MC-Unique: RmrhKBkaP-y_UmhZKIMxtw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-256-Ff0NgRsmO7iaLAV04TpDHg-1; Thu, 30 Jul 2020 12:23:00 -0400
+X-MC-Unique: Ff0NgRsmO7iaLAV04TpDHg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C81B5800465;
- Thu, 30 Jul 2020 16:21:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CD82800465;
+ Thu, 30 Jul 2020 16:22:59 +0000 (UTC)
 Received: from [10.3.114.255] (ovpn-114-255.phx2.redhat.com [10.3.114.255])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F40487B12;
- Thu, 30 Jul 2020 16:20:59 +0000 (UTC)
-Subject: Re: [PATCH V1 12/32] vl: pause option
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 286831002382;
+ Thu, 30 Jul 2020 16:22:47 +0000 (UTC)
+Subject: Re: [PATCH V1 14/32] savevm: VMS_RESTART and cprsave restart
 To: Steve Sistare <steven.sistare@oracle.com>, qemu-devel@nongnu.org
 References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-13-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-15-git-send-email-steven.sistare@oracle.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <1dea1698-f8be-519d-e00c-d163b08dca65@redhat.com>
-Date: Thu, 30 Jul 2020 11:20:58 -0500
+Message-ID: <d1d3d800-4fea-767c-6836-3af926dda7ea@redhat.com>
+Date: Thu, 30 Jul 2020 11:22:46 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1596122076-341293-13-git-send-email-steven.sistare@oracle.com>
+In-Reply-To: <1596122076-341293-15-git-send-email-steven.sistare@oracle.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:51:24
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -84,7 +84,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,39 +112,26 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 7/30/20 10:14 AM, Steve Sistare wrote:
-> Provide the -pause command-line parameter and the QEMU_PAUSE environment
-> variable to briefly pause QEMU in main and allow a developer to attach gdb.
-> Useful when the developer does not invoke QEMU directly, such as when using
-> libvirt.
-
-How would you set this option with libvirt?
-
-It feels like you are trying to reinvent something that is already 
-well-documented:
-
-https://www.berrange.com/posts/2011/10/12/debugging-early-startup-of-kvm-with-gdb-when-launched-by-libvirtd/
-
+> Add the VMS_RESTART variant of vmstate, for use when upgrading qemu in place
+> on the same host without a reboot.  Invoke it using:
+>    cprsave <filename> restart
 > 
-> Usage:
->    qemu -pause <seconds>
->    or
->    export QEMU_PAUSE=<seconds>
+> VMS_RESTART supports guest ram mapped by private anonymous memory, versus
+> VMS_REBOOT which requires that guest ram be mapped by persistent shared
+> memory.  Subsequent patches complete its implementation.
 > 
 > Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 > ---
->   qemu-options.hx |  9 +++++++++
->   softmmu/vl.c    | 15 ++++++++++++++-
->   2 files changed, 23 insertions(+), 1 deletion(-)
 
-> @@ -3204,6 +3211,12 @@ void qemu_init(int argc, char **argv, char **envp)
->               case QEMU_OPTION_gdb:
->                   add_device_config(DEV_GDB, optarg);
->                   break;
-> +            case QEMU_OPTION_pause:
-> +                seconds = atoi(optarg);
+> +++ b/qapi/migration.json
+> @@ -1639,6 +1639,7 @@
+>   #
+>   # @file: name of checkpoint file
+>   # @mode: 'reboot' : checkpoint can be cprload'ed after a host kexec reboot.
+> +#        'restart': checkpoint can be cprload'ed after restarting qemu.
 
-atoi() cannot detect overflow.  You should never use it in robust 
-parsing of untrusted input.
+This should be a modification to an enum type (the 'CprMode' type I 
+suggested earlier in the series).
 
 -- 
 Eric Blake, Principal Software Engineer
