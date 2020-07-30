@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 228EAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F84C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:51:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4C682074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:50:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FA9C2070B
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 19:51:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NzpAVxxJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4C682074B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fkpmqtkj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FA9C2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1EZB-0005Wq-6d
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 15:50:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60134)
+	id 1k1Eal-0007Sq-St
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 15:51:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX7-0001no-3U
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX7-0001o8-88
  for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:05 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50820
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32574
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX4-0006lL-RF
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k1EX5-0006lP-KC
  for qemu-devel@nongnu.org; Thu, 30 Jul 2020 15:48:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1596138482;
@@ -39,42 +39,41 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jhjZBzKdUPWmQBoGYYNmaWrngqD0E272Oq6g881pzZA=;
- b=NzpAVxxJ+CJJB8XrQ/3pi7I1O2Xe36HGJzYJa5J6eyLyBDMAptcqc8QxcR4RrkG9PlS3eg
- LUeIe6rNt3SS9GmON7Wu+12FXZNMvHZbSoKsTulLtNrr4t0tp3yDaq+2rNcGVuEZkD6GqG
- BVFUnpu0/AKO9K7pPygZHQF1jfkLH1k=
+ bh=ecYC0oDUN6iehE9QTW6j0vyXiAs7Yphtol1U5+V4Lj0=;
+ b=FkpmqtkjjnlyzxYaSC1o1rGa/Ma4e4KfyHTTPxtG4zHXpSYcYcWd9iyimSaIs8G802j2N3
+ 0HMpJG0OgMnQzvn+1sZPU+tao7WOia0gaKuPdZTodzp774jpTTRDLaWtkMztXJkG/az8fw
+ WTQ46iJSiD/C0k67Xs0MLKvxPLkIZ8g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-tsvrPN_aPUWBRm8FDFYhfA-1; Thu, 30 Jul 2020 15:48:00 -0400
-X-MC-Unique: tsvrPN_aPUWBRm8FDFYhfA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-352-Scy43mYcNpCTxZhhh9v_jA-1; Thu, 30 Jul 2020 15:48:00 -0400
+X-MC-Unique: Scy43mYcNpCTxZhhh9v_jA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C160F1932482
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 812CB1DE0
  for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 19:47:59 +0000 (UTC)
 Received: from horse.redhat.com (ovpn-117-166.rdu2.redhat.com [10.10.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EA72F19D7B;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D7E416111F;
  Thu, 30 Jul 2020 19:47:53 +0000 (UTC)
 Received: by horse.redhat.com (Postfix, from userid 10451)
- id 6BA52223D08; Thu, 30 Jul 2020 15:47:48 -0400 (EDT)
+ id 62C75223D05; Thu, 30 Jul 2020 15:47:48 -0400 (EDT)
 From: Vivek Goyal <vgoyal@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/5] virtiofsd: Open lo->source while setting up root in
- sandbox=NONE mode
-Date: Thu, 30 Jul 2020 15:47:35 -0400
-Message-Id: <20200730194736.173994-5-vgoyal@redhat.com>
+Subject: [PATCH v2 2/5] virtiofsd: create lock/pid file in per user cache dir
+Date: Thu, 30 Jul 2020 15:47:33 -0400
+Message-Id: <20200730194736.173994-3-vgoyal@redhat.com>
 In-Reply-To: <20200730194736.173994-1-vgoyal@redhat.com>
 References: <20200730194736.173994-1-vgoyal@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=vgoyal@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 23:51:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -102,30 +101,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In sandbox=NONE mode, lo->source points to the directory which is being
-exported. We have not done any chroot()/pivot_root(). So open lo->source.
+Right now we create lock/pid file in /usr/local/var/... and unprivliged
+user does not have access to create files there.
+
+Hence, in unprivileged mode, create this file in per user cache dir
+as specified by environment variable XDG_RUNTIME_DIR.
 
 Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ tools/virtiofsd/fuse_virtio.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 76ef891105..a6fa816b6c 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -3209,7 +3209,10 @@ static void setup_root(struct lo_data *lo, struct lo_inode *root)
-     int fd, res;
-     struct stat stat;
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 6b21a93841..1551a94757 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -972,8 +972,21 @@ static bool fv_socket_lock(struct fuse_session *se)
+     g_autofree gchar *pidfile = NULL;
+     g_autofree gchar *dir = NULL;
+     Error *local_err = NULL;
++    gboolean unprivileged = false;
  
--    fd = open("/", O_PATH);
-+    if (lo->sandbox == SANDBOX_NONE)
-+        fd = open(lo->source, O_PATH);
-+    else
-+        fd = open("/", O_PATH);
-     if (fd == -1) {
-         fuse_log(FUSE_LOG_ERR, "open(%s, O_PATH): %m\n", lo->source);
-         exit(1);
+-    dir = qemu_get_local_state_pathname("run/virtiofsd");
++    if (geteuid() != 0)
++        unprivileged = true;
++
++    /*
++     * Unpriviliged users don't have access to /usr/local/var. Hence
++     * store lock/pid file in per user cache directory. Use environment
++     * variable XDG_RUNTIME_DIR.
++     */
++    if (unprivileged) {
++        dir = g_strdup_printf("%s/virtiofsd", g_get_user_runtime_dir());
++    } else {
++        dir = qemu_get_local_state_pathname("run/virtiofsd");
++    }
+ 
+     if (g_mkdir_with_parents(dir, S_IRWXU) < 0) {
+         fuse_log(FUSE_LOG_ERR, "%s: Failed to create directory %s: %s",
 -- 
 2.25.4
 
