@@ -2,122 +2,127 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CD2C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 22:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF33FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 22:10:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E65520829
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 22:09:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 923D520829
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 22:10:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="jJVdrVBB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E65520829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ahfkbHuC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 923D520829
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Gjz-0007bf-CK
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 18:09:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38394)
+	id 1k1Gku-0008VD-U3
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 18:10:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sunilmut@microsoft.com>)
- id 1k1GjP-0007Ad-0b
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 18:08:55 -0400
-Received: from mail-eopbgr690120.outbound.protection.outlook.com
- ([40.107.69.120]:50658 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sunilmut@microsoft.com>)
- id 1k1GjM-0000iT-N4
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 18:08:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dV8u6x9morv0rpQwwL+1m74iC/6FZKV/Q8NOg1nUeJ2HRUc9vhR0mn7Ph+o8aBzJ/UunHvMQTYg10+lP+5KO3f13ces14rQ6azFl7OP38z1Rh5LowH1HKBs67PFPtdxXDoL4SWwjmsPe3vap7x1f3ixHgVSwo8NsWNc2vatK1dTqkx9nl3lmkQcvgpsNQFG6y78pN9o0ADo7YOxVVyoTEI5iScvT+TOLaI1S0WuEk8x9bLo+7a/6CWLPZRjYiRv3AP47c09FPe+hezD4AnCgZY4+ULADvh9l7i9zjHQCjTtF9LbR0T8DuL1bKgCL2aPZsSclXwk99zKEc7t9DyNffA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+/O7/6xeslJQEpWWWtqoLirWpiUJhWrUDk+iy7fr9eQ=;
- b=EWTNBGqr+AVdnJQIdJPdZLL6035WKxj8ocZku6hE3hnsvQG4Sw0ym0K07A+Ao94Rvc8jWKnzPzf3y7FJq+GHXpvpoaD5MuAWmsmo2q4U4UsZIpTXtMNm6iEOsLuPUOSpATNYqJ/m2NJGe2ygSiRULaMdUAWt5xbq7rUvHHWvf1WzAKa44KaqwZzPMWQpyrxfTQsDC9rmi2bJzO6R6Yelrhaoe6czBin/Slt+fWgV/bYUJw2EulhySSLfYCcJ0K3EacsShffgiXJd3WWsZzWhOAWBDDxv1z2eC4i+36kBqeXZOXjth5GIrmJcCb9JSwtNotWC7I2Zln8whI1LpuQ5Ow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+/O7/6xeslJQEpWWWtqoLirWpiUJhWrUDk+iy7fr9eQ=;
- b=jJVdrVBB3AKvu2/3tc0nnMPhk94nJX2FgmJMZ/EC5wMFfoKvpLegnI/LdveHwPJxFve5Qw3v46pNMnwKqacAttsR5Yc4kHN/MfYXB7lM+oCR/KwcqM3Qkrgk+yg613ya0QdmxNZTWDXRWcTAcdYh2JmcF3QJJliVV/lk3in0vkQ=
-Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
- (2603:10b6:803:51::33) by SN6PR2101MB1136.namprd21.prod.outlook.com
- (2603:10b6:805:4::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.1; Thu, 30 Jul
- 2020 21:53:47 +0000
-Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
- ([fe80::99a:30fe:609e:be35]) by SN4PR2101MB0880.namprd21.prod.outlook.com
- ([fe80::99a:30fe:609e:be35%8]) with mapi id 15.20.3239.016; Thu, 30 Jul 2020
- 21:53:47 +0000
-From: Sunil Muthuswamy <sunilmut@microsoft.com>
-To: Paolo Bonzini <bonzini@gnu.org>
-CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: RE: [EXTERNAL] Re: qemu repo lockdown message for a WHPX PR
-Thread-Topic: [EXTERNAL] Re: qemu repo lockdown message for a WHPX PR
-Thread-Index: AdZlFApWhEK0UloZS9GdU/X2cvsH+AA0sUKAADUxpNA=
-Date: Thu, 30 Jul 2020 21:53:47 +0000
-Message-ID: <SN4PR2101MB08802D6D26E0B811065DDF36C0710@SN4PR2101MB0880.namprd21.prod.outlook.com>
-References: <SN4PR2101MB08805B8E85196354ACA49B54C0730@SN4PR2101MB0880.namprd21.prod.outlook.com>
- <c0ff07b6-87bb-f0da-d345-71e62e6c8ef6@gnu.org>
-In-Reply-To: <c0ff07b6-87bb-f0da-d345-71e62e6c8ef6@gnu.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: gnu.org; dkim=none (message not signed)
- header.d=none;gnu.org; dmarc=none action=none header.from=microsoft.com;
-x-originating-ip: [2601:602:9400:570:c5c8:1863:df3a:3ff6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: edb750ee-e79a-46dc-273b-08d834d3097a
-x-ms-traffictypediagnostic: SN6PR2101MB1136:
-x-microsoft-antispam-prvs: <SN6PR2101MB1136463DD3F8E0E70ED06E9BC0710@SN6PR2101MB1136.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: da6NWGdP1wYn3QRN8WzN0GtYpWJ+PUxp7q+mBB/AVXUOp1/Xn95ENg9XO1SkBKgsMjpC/A8iZJ4CizIQUFYa44WMHSY/hN1NBDu9uAFxLilSeKdYS7fJgpXoUbtSDJuz2vMcSd4+Xc6MZmxRZS8Kdnb3xya0geK9AZfsleNYQq1aVcMN9/Ur+pkQEwl5FkZktPoKqPBbYdFWdlrbvZzWkW7t/4MOKdR4IGU8vcJJPVQXbeIy7UStufZxyA/zfOL5Vf+IYq6ehwdc6kPsOfD7A2V++nrVEyhlHWhOWYVGVf4WH35d3mBHVE2dDUrKK0IqpZIOOveo73OYmgR/m81P649Eyh+ZDcoBcyHFiSfYEA+/MP9qrf8nJO40MS1ARV4ZDzJWbJbQLkI7FYpm4NrrQQ==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN4PR2101MB0880.namprd21.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39860400002)(346002)(376002)(366004)(396003)(136003)(4326008)(6506007)(8676002)(6916009)(9686003)(82950400001)(478600001)(52536014)(8990500004)(82960400001)(86362001)(7696005)(316002)(186003)(2906002)(8936002)(71200400001)(83380400001)(55016002)(76116006)(66946007)(966005)(10290500003)(33656002)(5660300002)(66476007)(66556008)(64756008)(66446008);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: trEImWtrFIXGJv71i3+DkT16e9ymQElBA+239VPlpdBQY8UFVMJlvVfHcYzeYTujEWjVnf+PEM00hwJfsEpajTZjkMsomQ9And1y9FGNC3ubiInmyXfEdp9Ob9k7q13QZO/0y2VYD0gXaig6WDIDW3wBqbM4cXU38tSWNDmjoAh7Pq/OQTlEG7qAeGw+KG0p3ParCOeySP5q7NyverstY6rBC14va/JU6ORVNgsHC7qeo74/VrN1QnA3ATR7nlqkMw9UUvh/YsQR1X+DT7XC7fOC4hHDHAWyt2zikED2dOOtBrhwAwvda7tR24vHHxVjBqZYSd4HV2GTUyl6mz3oj3nZXz2TphHg4OVxJEwUJwqBp/o/kdhd5Q+8cYRiYT1XlcuNACOYh+Ej8e5+nUHu8CUaqqA0s9KzyCe6UJqzL6HDGRmzep+Mg6bnlrk3nOoOgjQ5RTpEF9SEjM57W9VVI6ovVM5eZujRCwS7KpFV62Ju4dIP95IFT3na7qCJQe6+ldrdm8z/+e1RK/Jj49E516Ahxv/1onp7YPSOBIwql1zV4WGfeuuVkgnc7loPlht9AdBd0RaOSD0ytBwVs9XXZ2IE406bGf5amkYvF8es5M4KqdzpmMtbFBaEp7A/D74PofAVHNrFPn6Q4xoF0JvwEgHOb3w2DrNUzLVT8korBtX2s3SdP4ITVNRfWw4kq4P7d9MnhNpDGhEDGWzf/laLQw==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k1Gjg-0007Rb-94
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 18:09:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58140
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k1Gjc-0000lA-TT
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 18:09:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596146947;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PlezEbcGbemcrB5KKTPYUUKfJWK3NqsY9WL1vRFrtzQ=;
+ b=ahfkbHuCTXewJ+4CsFCTVkyvqUdxloSJjtc/gPEQ4yD8OG7NU+M58Mk1JRXxXh19mfYsVF
+ YT2HnSDIeyzKN55z+XruK2aZbErOZOKCetCwDw0IdFE7SMlZ/U6X8fkuU1mc2RxM3l6jNx
+ S0BuAqMSnMTlQNjDoljX6Qa3px8cWWI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-508-3iqHlxd5PM6xHGEOlbfZsg-1; Thu, 30 Jul 2020 18:09:05 -0400
+X-MC-Unique: 3iqHlxd5PM6xHGEOlbfZsg-1
+Received: by mail-wm1-f69.google.com with SMTP id h6so1688579wml.8
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 15:09:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=PlezEbcGbemcrB5KKTPYUUKfJWK3NqsY9WL1vRFrtzQ=;
+ b=oxvAqbs+OyIqS3PdOoOkyFYvkzm6tHT2XdQib6QmC5EDa3QOLU4wRqzgn3uBCrryjp
+ wFVpA+qY2Hfa004HgIRMrEkpMJbGQ4c4mr4Gf+sed+4tBdrLD6+HLnQf/kS2zChfKSeU
+ MgVapI9LfrRfEaBZYOdNJ/aQom+TEg0wyZcT9K7yG+SArBAPPJxxijD/lMCI8nxJ6VPM
+ D3o9OOH5Yiqvk+lAdtXeSmeW6phetFBAqDrzDVvXF0u9ptxZoj3KlsZOOgyKlF9a0Q3b
+ jGPEWNWnf7kCNpiGQosXJyLmMerACv817w60RiKPknG009yGCHNqf4usv51wye3gQrIi
+ Hkjg==
+X-Gm-Message-State: AOAM532l1kHv3cTi8R1TQGIjZUGqTp4pWb28tsRG6sz1gPTmmVgKwLrx
+ AQnGSKjcgGszg1fg8vdEKXaxld7yYjO7MPt/OViqqZrck5uwPq2rgoNfnHUjIkTUh4whx38xV4y
+ vWiEtt00Ikkfjlik=
+X-Received: by 2002:a05:6000:12c5:: with SMTP id
+ l5mr705334wrx.219.1596146944629; 
+ Thu, 30 Jul 2020 15:09:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyNPFDfH17cIBG25poaOTwNdr5PQ6UgGTiJ5lbwejo+7XJao3qgOQMzDnv6nNu1WYbSQIs2dQ==
+X-Received: by 2002:a05:6000:12c5:: with SMTP id
+ l5mr705301wrx.219.1596146944369; 
+ Thu, 30 Jul 2020 15:09:04 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:310b:68e5:c01a:3778?
+ ([2001:b07:6468:f312:310b:68e5:c01a:3778])
+ by smtp.gmail.com with ESMTPSA id p6sm10627307wmg.0.2020.07.30.15.09.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 30 Jul 2020 15:09:03 -0700 (PDT)
+Subject: Re: [PATCH 3/3] cpu-timers, icount: new modules
+To: Claudio Fontana <cfontana@suse.de>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20200629093504.3228-1-cfontana@suse.de>
+ <20200629093504.3228-4-cfontana@suse.de>
+ <aa45a793-35b1-d3bd-18a8-4c52ad888029@redhat.com>
+ <f89f249d-dbc4-779b-5b53-fc408461f072@suse.de>
+ <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
+ <e9dca3d1-f52d-13ce-2d7d-66958bc15765@suse.de>
+ <996dc455-548e-5964-9c87-f4abe5b63907@redhat.com>
+ <146b0cf2-509b-6a48-e82b-b93740e4c60d@redhat.com>
+ <e3cc11a4-8ba7-917a-844b-4f6ec69d140a@suse.de>
+ <76aac4ac-40f5-4870-ed2b-bab8b68b0a64@redhat.com>
+ <9630c685-0a37-a1e7-4614-9d692988a799@suse.de>
+ <22228280-f3b4-3f64-d2ba-30cfc47c8b0d@redhat.com>
+ <994492fd-5ae2-52e2-0864-7216ec9dae34@suse.de>
+ <b4de7352-87ba-df4c-fdcd-dab4028cef61@redhat.com>
+ <5a41a63f-8397-64d3-0839-6990e2965339@suse.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8aaa983a-c720-88f2-5ad4-b88078ef705e@redhat.com>
+Date: Fri, 31 Jul 2020 00:09:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR2101MB0880.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: edb750ee-e79a-46dc-273b-08d834d3097a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jul 2020 21:53:47.3540 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2GyCfGdX3RTFah2l/+FKPl+I8zbYZe2BFr9btwMt/BQUFSoqvuc7deuwnRK/o/N/mjeWW0VLXpCEZSVkPi7lvgzUOi4bXnnSTyXtUgb+4zI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR2101MB1136
-Received-SPF: pass client-ip=40.107.69.120;
- envelope-from=sunilmut@microsoft.com;
- helo=NAM04-CO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 18:08:49
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+In-Reply-To: <5a41a63f-8397-64d3-0839-6990e2965339@suse.de>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/29 23:51:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,29 +135,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Colin Xu <colin.xu@intel.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiANCj4gSSB3YXMgbm90IHJlZmVycmluZyB0byBnaXRodWIgcHVsbCByZXF1ZXN0cywgYnV0IHJh
-dGhlciB0byBhIG1haW50YWluZXINCj4gcHVsbCByZXF1ZXN0LiAgVGhpcyBpcyBhbHNvIHNlbnQg
-dG8gdGhlIG1haWxpbmcgbGlzdC4gIFRoZXJlIGlzIG5vDQo+IFFFTVUtc3BlY2lmaWMgZG9jdW1l
-bnRhdGlvbiBzaW5jZSBtYWludGFpbmVycyBhcmUgZ2VuZXJhbGx5IGV4cGVyaWVuY2VkDQo+IGVu
-b3VnaCB0byBoYXZlIG9ic2VydmVkIGhvdyB0aGVzZSBhcmUgc2VudCwgYnV0IHRoZSBMaW51eCBk
-b2N1bWVudGF0aW9uDQo+IG1vcmUgb3IgbGVzcyBhcHBsaWVzOg0KPiBodHRwczovL25hbTA2LnNh
-ZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0cHMlM0ElMkYlMkZ3d3cua2Vy
-bmVsLm9yZyUyRmRvYyUyRmh0bWwlMkZsYXRlc3QlMkZtYWludGFpbmVyJQ0KPiAyRnB1bGwtDQo+
-IHJlcXVlc3RzLmh0bWwmYW1wO2RhdGE9MDIlN0MwMSU3Q3N1bmlsbXV0JTQwbWljcm9zb2Z0LmNv
-bSU3Q2Y2N2QyNjBiMjU1YTQ1NWNmYTFjMDhkODMzZmRmMzMzJTdDNzJmOTg4YmY4NmYxNDENCj4g
-YWY5MWFiMmQ3Y2QwMTFkYjQ3JTdDMSU3QzAlN0M2MzczMTY1MTMwODk3ODE0NDImYW1wO3NkYXRh
-PUtiNFpPTFV4ZnE3a3dyRUNHZHlxS3BlRlg5U25JSFNRY2FrNjRhVkFOWXMlMw0KPiBEJmFtcDty
-ZXNlcnZlZD0wDQo+IA0KPiBJbiBhbnkgY2FzZSwgSSBzdXNwZWN0IHRoaXMgbWlzdW5kZXJzdGFu
-ZGluZyBpcyBhIHNpZ24gdGhhdCBJIHNob3VsZCBiZQ0KPiBoYW5kbGluZyBXSFBYIHBhdGNoZXMg
-Zm9yIHNvbWUgbW9yZSB0aW1lLCB3aGljaCBJIHdpbGwgZ2xhZGx5IGRvLiA6KQ0KPiANCj4gVGhh
-bmtzIQ0KPiANCj4gUGFvbG8NClRoYW5rcyBmb3IgdGhlIGxpbmtzLiBJIHRoaW5rIEkgdW5kZXJz
-dGFuZCBpdC4gVGhlIGlkZWEgaXMgdG8gaG9zdCBhIHB1YmxpYyBXSFBYIHFlbXUgYnJhbmNoIGlu
-IG15IHFlbXUgZ2l0aHViIGZvcmssIGhvc3QNCmFsbCB0aGUgc2lnbmVkLW9mZiBXSFBYIHBhdGNo
-ZXMgdGhlcmUgYW5kIGV2ZXJ5IG5vdyBhbmQgdGhlbiwgZ2VuZXJhdGUgYSAncHVsbC1yZXF1ZXN0
-JyB0byBtZXJnZSB0aG9zZSBwYXRjaGVzIGJhY2sgdG8gdXBzdHJlYW0uDQpEb2VzIHRoYXQgYWxp
-Z24gd2l0aCB0aGUgZXhwZWN0YXRpb24gaGVyZT8NCg==
+On 30/07/20 18:33, Claudio Fontana wrote:
+> One problem I noticed is that qemu_clock_get_ns is util/qemu-timer.c,
+> which is tools _and_ softmmu, while I tried to extract the
+> softmmu-only timer code in softmmu/cpu-timers.c,
+
+Not all of it, only the VIRTUAL clock which is
+
+        if (use_icount) {
+            return cpu_get_icount();
+        } else {
+            return cpu_get_clock();
+        }
+
+and would be changed to something like
+
+	return cpu_get_virtual_clock();
+
+In turn cpu_get_virtual_clock() is
+
+	return (accel_ops->cpu_get_virtual clock ?: cpu_get_clock)();
+
+in the emulators, plus a stub that replaces stubs/cpu-get-icount.c and
+is just
+
+	return get_clock_realtime();
+
+as in stubs/cpu-get-clock.c.
+
+Paolo
+
 
