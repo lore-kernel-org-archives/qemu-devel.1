@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9201C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65163C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:51:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 731B8206F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:51:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33ACD206F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="T+hVvyLG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 731B8206F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jLeRnvBK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33ACD206F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1AqF-0000wj-KF
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:51:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53954)
+	id 1k1AqH-0000zY-H1
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:51:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1AdN-0007TZ-6M
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:17 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:50150)
+ id 1k1AdO-0007Wf-GE
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:18 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:50186)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1AdK-0002Ag-6O
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:16 -0400
+ id 1k1AdM-0002Au-8i
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:18 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXcGv007652;
- Thu, 30 Jul 2020 15:38:11 GMT
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXbZP007647;
+ Thu, 30 Jul 2020 15:38:13 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=T4ZfUEryyQOwpRw5tgVkPIpr18yCga2sggJCM6Ln6So=;
- b=T+hVvyLGa2mk7Ry+Z6hgrlGP4fkKb4v1ky0CzCa0BLJcFTRl+IxZWlX9Wf95p6xy5Pb2
- Y3kf6TTDIlfGjqQcjyoPxNkD/BS4aXJbdfoVir8qwdXwEhIWbA87KHOytlbDw1fTWANi
- IzHxhfwE1XjyzWmNAOmbGHaFoigaO51B34ylSJBKVEhz40YU5TAJFDAssp+ot6WysrL9
- PYYmRluXRt2GvXfY7ScHoqvYW0TPZVU44FJGm4KVoLZUA9fPUQzpC28HHlMgvUE2fIOH
- ew2NZheeyvuwn8gkd7FU82Ua1np3YA5xFaXunSEDDgAs91AHUDIm5Ouyxo7siMWTqmD3 Rg== 
+ bh=yiR9ky1zjTylsw8BvTXwpDDI6qX/bEvwcYOs2wTpK2g=;
+ b=jLeRnvBKmk3fqCsGN5XETuObcAsvUR0IfiKA5km8vUp+JKn0cppTODFVSB6dYeYthEdt
+ SCMz+3CUnzDWohYmt7wHJJarex5WvRYBqy/7A5M2jFN/86Lq87gG/Tp7T0K8bdb8AmtJ
+ VvcTchZ+6rLpqhY8svvt5b7/rLKiR43l6xPQfJFvH5vYm7t7WmgGNdtJffntuOO2uJuM
+ 1gtL3AZLjAnUXBhtJPN2uJtMCthTNIEbvrFCoL7iq/8mx0ShHUL3WqPc6tsP7O2nYbsL
+ UC0UCbKotxXIJQaQSFSHyfaRVwbecRUUo3xuFHyf12gHZbTjVYGBGiOqs+ytzIDadvER QA== 
 Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2130.oracle.com with ESMTP id 32hu1jmffa-1
+ by userp2130.oracle.com with ESMTP id 32hu1jmffm-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 30 Jul 2020 15:38:11 +0000
+ Thu, 30 Jul 2020 15:38:13 +0000
 Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFYjOR172108;
- Thu, 30 Jul 2020 15:38:11 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3020.oracle.com with ESMTP id 32hu5x0wkd-1
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFYkbK172237;
+ Thu, 30 Jul 2020 15:38:12 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 32hu5x0wnr-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 30 Jul 2020 15:38:10 +0000
+ Thu, 30 Jul 2020 15:38:12 +0000
 Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06UFc9lt001893;
- Thu, 30 Jul 2020 15:38:09 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06UFcBVv014547;
+ Thu, 30 Jul 2020 15:38:11 GMT
 Received: from ca-dev63.us.oracle.com (/10.211.8.221)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 30 Jul 2020 08:38:08 -0700
+ with ESMTP ; Thu, 30 Jul 2020 08:38:11 -0700
 From: Steve Sistare <steven.sistare@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH V1 20/32] vl: add helper to request re-exec
-Date: Thu, 30 Jul 2020 08:14:24 -0700
-Message-Id: <1596122076-341293-21-git-send-email-steven.sistare@oracle.com>
+Subject: [PATCH V1 22/32] char: qio_channel_socket_accept reuse fd
+Date: Thu, 30 Jul 2020 08:14:26 -0700
+Message-Id: <1596122076-341293-23-git-send-email-steven.sistare@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
 References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
@@ -125,112 +125,158 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a qemu_exec_requested() hook that causes the main loop to exit and
-re-exec qemu using the same initial arguments.  If /usr/bin/qemu-exec
-exists, exec that instead.  This is an optional site-specific trampoline
-that may alter the environment before exec'ing the qemu binary.
+From: Mark Kanda <mark.kanda@oracle.com>
 
+Add an fd argument to qio_channel_socket_accept.  If not -1, the channel
+uses that fd instead of accepting a new socket connection.  All callers
+pass -1 in this patch, so no functional change.
+
+Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
 Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 ---
- include/sysemu/sysemu.h |  1 +
- softmmu/vl.c            | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ include/io/channel-socket.h    |  3 ++-
+ io/channel-socket.c            | 12 +++++++++---
+ io/net-listener.c              |  4 ++--
+ scsi/qemu-pr-helper.c          |  2 +-
+ tests/qtest/tpm-emu.c          |  2 +-
+ tests/test-char.c              |  2 +-
+ tests/test-io-channel-socket.c |  4 ++--
+ 7 files changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 5360da5..4dfc4ca 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -15,6 +15,7 @@ extern QemuUUID qemu_uuid;
- extern bool qemu_uuid_set;
+diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
+index 777ff59..0ffc560 100644
+--- a/include/io/channel-socket.h
++++ b/include/io/channel-socket.h
+@@ -248,6 +248,7 @@ qio_channel_socket_get_remote_address(QIOChannelSocket *ioc,
+ /**
+  * qio_channel_socket_accept:
+  * @ioc: the socket channel object
++ * @reuse_fd: fd to reuse; -1 otherwise
+  * @errp: pointer to a NULL-initialized error object
+  *
+  * If the socket represents a server, then this accepts
+@@ -258,7 +259,7 @@ qio_channel_socket_get_remote_address(QIOChannelSocket *ioc,
+  */
+ QIOChannelSocket *
+ qio_channel_socket_accept(QIOChannelSocket *ioc,
+-                          Error **errp);
++                          int reuse_fd, Error **errp);
  
- void qemu_add_data_dir(const char *path);
-+void qemu_system_exec_request(void);
  
- void qemu_add_exit_notifier(Notifier *notify);
- void qemu_remove_exit_notifier(Notifier *notify);
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 7016e39..72f0e08 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -116,6 +116,7 @@
+ #endif /* QIO_CHANNEL_SOCKET_H */
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index e1b4667..dde12bf 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -352,7 +352,7 @@ void qio_channel_socket_dgram_async(QIOChannelSocket *ioc,
  
- #define MAX_VIRTIO_CONSOLES 1
- 
-+static char **argv_main;
- static const char *data_dir[16];
- static int data_dir_idx;
- const char *bios_name = NULL;
-@@ -1296,6 +1297,7 @@ static ShutdownCause reset_requested;
- static ShutdownCause shutdown_requested;
- static int shutdown_signal;
- static pid_t shutdown_pid;
-+static int exec_requested;
- static int powerdown_requested;
- static int debug_requested;
- static int suspend_requested;
-@@ -1326,6 +1328,11 @@ static int qemu_shutdown_requested(void)
-     return atomic_xchg(&shutdown_requested, SHUTDOWN_CAUSE_NONE);
- }
- 
-+static int qemu_exec_requested(void)
-+{
-+    return atomic_xchg(&exec_requested, 0);
-+}
-+
- static void qemu_kill_report(void)
+ QIOChannelSocket *
+ qio_channel_socket_accept(QIOChannelSocket *ioc,
+-                          Error **errp)
++                          int reuse_fd, Error **errp)
  {
-     if (!qtest_driver() && shutdown_signal) {
-@@ -1582,6 +1589,13 @@ void qemu_system_shutdown_request(ShutdownCause reason)
-     qemu_notify_event();
- }
+     QIOChannelSocket *cioc;
  
-+void qemu_system_exec_request(void)
-+{
-+    shutdown_requested = 1;
-+    exec_requested = 1;
-+    qemu_notify_event();
-+}
-+
- static void qemu_system_powerdown(void)
- {
-     qapi_event_send_powerdown();
-@@ -1617,6 +1631,16 @@ void qemu_system_debug_request(void)
-     qemu_notify_event();
- }
+@@ -362,8 +362,14 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
  
-+static void qemu_exec(void)
-+{
-+    const char *helper = "/usr/bin/qemu-exec";
-+    const char *bin = !access(helper, X_OK) ? helper : argv_main[0];
+  retry:
+     trace_qio_channel_socket_accept(ioc);
+-    cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
+-                           &cioc->remoteAddrLen);
 +
-+    execvp(bin, argv_main);
-+    error_report("execvp failed, errno %d.", errno);
-+    exit(1);
-+}
++    if (reuse_fd != -1) {
++        cioc->fd = reuse_fd;
++    } else {
++        cioc->fd = qemu_accept(ioc->fd, (struct sockaddr *)&cioc->remoteAddr,
++                               &cioc->remoteAddrLen);
++    }
 +
- static bool main_loop_should_exit(void)
- {
-     RunState r;
-@@ -1637,6 +1661,11 @@ static bool main_loop_should_exit(void)
+     if (cioc->fd < 0) {
+         if (errno == EINTR) {
+             goto retry;
+diff --git a/io/net-listener.c b/io/net-listener.c
+index 5d8a226..bbdea1e 100644
+--- a/io/net-listener.c
++++ b/io/net-listener.c
+@@ -45,7 +45,7 @@ static gboolean qio_net_listener_channel_func(QIOChannel *ioc,
+     QIOChannelSocket *sioc;
+ 
+     sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
+-                                     NULL);
++                                     -1, NULL);
+     if (!sioc) {
+         return TRUE;
      }
-     request = qemu_shutdown_requested();
-     if (request) {
-+
-+        if (qemu_exec_requested()) {
-+            qemu_exec();
-+            /* not reached */
-+        }
-         qemu_kill_report();
-         qemu_system_shutdown(request);
-         if (no_shutdown) {
-@@ -2891,6 +2920,7 @@ void qemu_init(int argc, char **argv, char **envp)
+@@ -194,7 +194,7 @@ static gboolean qio_net_listener_wait_client_func(QIOChannel *ioc,
+     QIOChannelSocket *sioc;
  
-     os_set_line_buffering();
+     sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
+-                                     NULL);
++                                     -1, NULL);
+     if (!sioc) {
+         return TRUE;
+     }
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index 57ad830..0e6d683 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -800,7 +800,7 @@ static gboolean accept_client(QIOChannel *ioc, GIOCondition cond, gpointer opaqu
+     PRHelperClient *prh;
  
-+    argv_main = argv;
-     error_init(argv[0]);
-     module_call_init(MODULE_INIT_TRACE);
+     cioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(ioc),
+-                                     NULL);
++                                     -1, NULL);
+     if (!cioc) {
+         return TRUE;
+     }
+diff --git a/tests/qtest/tpm-emu.c b/tests/qtest/tpm-emu.c
+index 2e8eb7b..19e5dab 100644
+--- a/tests/qtest/tpm-emu.c
++++ b/tests/qtest/tpm-emu.c
+@@ -83,7 +83,7 @@ void *tpm_emu_ctrl_thread(void *data)
+     g_cond_signal(&s->data_cond);
  
+     qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
+-    ioc = QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
++    ioc = QIO_CHANNEL(qio_channel_socket_accept(lioc, -1, &error_abort));
+     g_assert(ioc);
+ 
+     {
+diff --git a/tests/test-char.c b/tests/test-char.c
+index 614bdac..1bb6ae0 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -884,7 +884,7 @@ char_socket_client_server_thread(gpointer data)
+     QIOChannelSocket *cioc;
+ 
+ retry:
+-    cioc = qio_channel_socket_accept(ioc, &error_abort);
++    cioc = qio_channel_socket_accept(ioc, -1, &error_abort);
+     g_assert_nonnull(cioc);
+ 
+     if (char_socket_ping_pong(QIO_CHANNEL(cioc), NULL) != 0) {
+diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
+index d43083a..0d410cf 100644
+--- a/tests/test-io-channel-socket.c
++++ b/tests/test-io-channel-socket.c
+@@ -75,7 +75,7 @@ static void test_io_channel_setup_sync(SocketAddress *listen_addr,
+     qio_channel_set_delay(*src, false);
+ 
+     qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
+-    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
++    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, -1, &error_abort));
+     g_assert(*dst);
+ 
+     test_io_channel_set_socket_bufs(*src, *dst);
+@@ -143,7 +143,7 @@ static void test_io_channel_setup_async(SocketAddress *listen_addr,
+     g_assert(!data.err);
+ 
+     qio_channel_wait(QIO_CHANNEL(lioc), G_IO_IN);
+-    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, &error_abort));
++    *dst = QIO_CHANNEL(qio_channel_socket_accept(lioc, -1, &error_abort));
+     g_assert(*dst);
+ 
+     qio_channel_set_delay(*src, false);
 -- 
 1.8.3.1
 
