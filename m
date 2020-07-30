@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD9AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B03F0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:42:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DE562082E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:40:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76E662082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:42:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eMhrEBdm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DE562082E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QW1mNHZL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76E662082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Af3-0000UM-Bl
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:40:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53828)
+	id 1k1Ahg-0004IC-Nd
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:42:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1AdD-00077o-CB
+ id 1k1AdD-00077X-4t
  for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:07 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:46036)
+Received: from userp2120.oracle.com ([156.151.31.85]:46092)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1Ad9-00026H-N9
+ id 1k1AdB-00026T-9R
  for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:06 -0400
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXOTE152139;
- Thu, 30 Jul 2020 15:38:00 GMT
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXQQp152168;
+ Thu, 30 Jul 2020 15:38:02 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=aiKW6/1eRgMEg/BPEoaBrBmwEPrCXVYIEMzTQ/w6CR8=;
- b=eMhrEBdmo9++yKbghcpVHAB4AVHoF7lWu1/6UVIL2SSwk93Ppl/Ispg+LgTR8NIjRm3v
- hybT9EOQuf+oqI+mqvCrRYQfDZwUvnOdbLnqTdxa9VR7ZbxdMPMErCq8Et9Ue6c/Fmbq
- lLjFp3P8980gcqq1mG4xKZATstl68t8zL9B0/4G52YbbXs3kWJfGwjIPqyl9ZQAKLPXB
- F1h+pWuRiGuAHYcT5Q1kX1OTzWnyC5761rHm6sJ8AkUofUXx9YTvy7o+QJ0zE+oRqtEC
- cXHXo6Edw5ET4hqM6apaUujbfbPbwmxs6i8SWdxLjGPKye7I4bEIkJoJN9a5V3o8Gbas pA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 32hu1jvdxq-1
+ bh=b9FFmQWTlGqrcBgCjwNHHJqNdI4vPeyPId0JJEpNZUw=;
+ b=QW1mNHZLrKDI/TyJrxY+XfKmOOCm/o670xc2IK+Uk4v6pGxinNIgtDDfEUu5JbPsVewe
+ u5v1pkp1N5LmEQXSSaGRJKPa2SEoRkUDtMbISHOsufdivMrOZ79nGWzbPcF9DBw1moDO
+ e8589BC9YDDXt9AcsPJcDdhgPCOYcDT87IogVuLQKZts437c6sB2tWEsEclB8rtcxzj6
+ 5icyMQMR9dMGwO3WCSuHEOLd+sIlIBU1NQFQdvJDG65F/CL1KWwLOJS8v3U7+JamxpJQ
+ sZsGzZIPDUv3+ep1lJx78rrK7ivnOg+Uj/+FRfEESvNeOASDyJG6yf+VVfoNab/a6gb8 hg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 32hu1jvdy0-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 30 Jul 2020 15:38:00 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXSnY130844;
- Thu, 30 Jul 2020 15:38:00 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 32hu5wwgpn-1
+ Thu, 30 Jul 2020 15:38:02 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFYjGo172130;
+ Thu, 30 Jul 2020 15:38:02 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 32hu5x0w82-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 30 Jul 2020 15:38:00 +0000
+ Thu, 30 Jul 2020 15:38:02 +0000
 Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06UFbxD3001845;
- Thu, 30 Jul 2020 15:37:59 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06UFc04Q020369;
+ Thu, 30 Jul 2020 15:38:00 GMT
 Received: from ca-dev63.us.oracle.com (/10.211.8.221)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 30 Jul 2020 08:37:59 -0700
+ with ESMTP ; Thu, 30 Jul 2020 08:38:00 -0700
 From: Steve Sistare <steven.sistare@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH V1 08/32] savevm: HMP command for cprinfo
-Date: Thu, 30 Jul 2020 08:14:12 -0700
-Message-Id: <1596122076-341293-9-git-send-email-steven.sistare@oracle.com>
+Subject: [PATCH V1 10/32] kvmclock: restore paused KVM clock
+Date: Thu, 30 Jul 2020 08:14:14 -0700
+Message-Id: <1596122076-341293-11-git-send-email-steven.sistare@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
 References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
  signatures=668679
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- mlxlogscore=999 mlxscore=0
- suspectscore=3 bulkscore=0 malwarescore=0 spamscore=0 phishscore=0
+ phishscore=0 bulkscore=0
+ malwarescore=0 suspectscore=1 spamscore=0 mlxlogscore=999 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2007300111
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
@@ -83,7 +83,7 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015
  mlxlogscore=999
  malwarescore=0 impostorscore=0 priorityscore=1501 spamscore=0 phishscore=0
- suspectscore=3 bulkscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
+ suspectscore=1 bulkscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2007300111
 Received-SPF: pass client-ip=156.151.31.85;
@@ -126,74 +126,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enable HMP access to the cprinfo QMP command.
+If the VM is paused when the KVM clock is serialized to a file, record
+that the clock is valid, so the value will be reused rather than
+overwritten after cprload with a new call to KVM_GET_CLOCK here:
 
-Usage: cprinfo
+kvmclock_vm_state_change()
+    if (running)
+        ...
+    else
+        if (s->clock_valid)
+            return;         <-- instead, return here
+
+        kvm_update_clock()
+           kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data)  <-- overwritten
 
 Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 ---
- hmp-commands.hx       | 13 +++++++++++++
- include/monitor/hmp.h |  1 +
- monitor/hmp-cmds.c    | 10 ++++++++++
- 3 files changed, 24 insertions(+)
+ hw/i386/kvm/clock.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index cb67150..7517876 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -354,6 +354,19 @@ SRST
- ERST
+diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
+index 6428335..161991a 100644
+--- a/hw/i386/kvm/clock.c
++++ b/hw/i386/kvm/clock.c
+@@ -285,18 +285,22 @@ static int kvmclock_pre_save(void *opaque)
+     if (!s->runstate_paused) {
+         kvm_update_clock(s);
+     }
++    if (!runstate_is_running()) {
++        s->clock_valid = true;
++    }
  
-     {
-+        .name       = "cprinfo",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "return list of modes supported by cprsave",
-+        .cmd        = hmp_cprinfo,
-+    },
-+
-+SRST
-+``cprinfo`` *tag*
-+  Return a space-delimited list of modes supported by cprsave.
-+ERST
-+
-+    {
-         .name       = "cprsave",
-         .args_type  = "file:s,mode:s",
-         .params     = "file 'reboot'",
-diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-index 7b8cdfd..919b9a9 100644
---- a/include/monitor/hmp.h
-+++ b/include/monitor/hmp.h
-@@ -59,6 +59,7 @@ void hmp_balloon(Monitor *mon, const QDict *qdict);
- void hmp_loadvm(Monitor *mon, const QDict *qdict);
- void hmp_savevm(Monitor *mon, const QDict *qdict);
- void hmp_delvm(Monitor *mon, const QDict *qdict);
-+void hmp_cprinfo(Monitor *mon, const QDict *qdict);
- void hmp_cprsave(Monitor *mon, const QDict *qdict);
- void hmp_cprload(Monitor *mon, const QDict *qdict);
- void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index ba95737..2f6af07 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -1139,6 +1139,16 @@ void hmp_announce_self(Monitor *mon, const QDict *qdict)
-     qapi_free_AnnounceParameters(params);
+     return 0;
  }
  
-+void hmp_cprinfo(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+    char *res = qmp_cprinfo(&err);
-+
-+    monitor_printf(mon, "%s\n", res);
-+    g_free(res);
-+    hmp_handle_error(mon, err);
-+}
-+
- void hmp_cprsave(Monitor *mon, const QDict *qdict)
- {
-     Error *err = NULL;
+ static const VMStateDescription kvmclock_vmsd = {
+     .name = "kvmclock",
+-    .version_id = 1,
++    .version_id = 2,
+     .minimum_version_id = 1,
+     .pre_load = kvmclock_pre_load,
+     .pre_save = kvmclock_pre_save,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT64(clock, KVMClockState),
++        VMSTATE_BOOL_V(clock_valid, KVMClockState, 2),
+         VMSTATE_END_OF_LIST()
+     },
+     .subsections = (const VMStateDescription * []) {
 -- 
 1.8.3.1
 
