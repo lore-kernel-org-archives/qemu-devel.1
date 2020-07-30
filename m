@@ -2,88 +2,79 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49708C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 20:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6F8C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 20:46:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1193F2074B
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 20:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 632BE2083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 20:46:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UNz6MCvV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1193F2074B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YqeGcrUK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 632BE2083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1FI3-0007wW-Cv
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 16:36:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44134)
+	id 1k1FS0-0002Ub-Nn
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 16:46:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47238)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k1FHN-0007Ri-Ub
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 16:35:53 -0400
-Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:39515)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k1FQg-0001p1-Ma
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 16:45:30 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44138)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k1FHM-000555-BZ
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 16:35:53 -0400
-Received: by mail-pl1-x636.google.com with SMTP id b9so15237251plx.6
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 13:35:51 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k1FQe-0006lS-Q9
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 16:45:30 -0400
+Received: by mail-oi1-x241.google.com with SMTP id h3so1305300oie.11
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 13:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=tdOF5l/+w6DNYPdIVSkYM+XGiTaa2xz0Lf8idG7aUTU=;
- b=UNz6MCvV9clgBJeQ36/nFmDUp/2/6qLFWfde8iQ9xqOPifG9mPphoSFNH0mtIfFcU1
- gLUl6Q3YYxq0CIj3hp4IZ/eDpEp30KxFwGSXApPSrVSEqQeD/cL31kvLZtqXReH45Fg5
- 0IKqZ+Bm5NhBkOjFHVp119rG/dnwJtP39QzeLcfQx8UTcrbFd3ARnxELgASdQdmNCoV6
- hwkB6lKRD/qZ98PKdz4rw/cy4uwdBNFqOpSad3w8oUFsgSJDiibLekXKZjwMyz9iav+i
- Uq9cNofruQN7rwfxFZLg0RfadUG5dkowe0IiucknkuGbYMN2OvHiTdNS1xoaNqgfcLqV
- Ol8Q==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=aBkYvXkJmJRapHaYhhDaM6BjCIDlswdRCmfla7GwHYA=;
+ b=YqeGcrUKOCr8MEeMA+/b1iof0fzvvJJGI2h4iuCJiTOHJn6XbV7JzYWArye73dG9K4
+ YGpP9X1gbJ6at4WN48DMuH1g7/18XFb1V9zBFRgXYQsFWrOBQPvc8le7PUJxY/6kB7VF
+ xjFdCbUhJDCck3K7MEvnWmI+YU21v4Dxth+PSzZ/KlJKM6hvKzVip/xqMApoLtVqzxSw
+ uIO7LZpbzs4+c5yzobbT+pyagL58ot7yqABHPPgKEIYZJjgUHWYJVBmxLI65fDCLnFC8
+ WeafOo9qO93CSR5uNw/ItnLzlTn/STRI2Uvkxv6+1ICcG93mY9WbQwwFMSLqAg1XtoC7
+ RN0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tdOF5l/+w6DNYPdIVSkYM+XGiTaa2xz0Lf8idG7aUTU=;
- b=cfy72jqxI9QP/KQFgRKlrfcsXsBhxU63CcQgljcw6IfSF2fEU3Gv32H6EWW9PCxjTz
- Og8ioUag/UmTZRi950QlWcmzMh4PNzMOW7fo5j0qLtvp0bQbM0nHhsOtvxrSWrTU64vj
- 6ZfXekwc4n8vsa93vV1d11QYDdawn2qLnVgNO1Zm7ND5PeMR6M9pAx59nehbLJF+KZLJ
- Iqrf6oaBC+xh+PDqM2BeLykiUbVYVImVX0cDeHvD/et83GFZnUq70bYU6SH5SqbbDPzb
- 6XrcjgycD0Txfj+LWW5BEipcD1zU6+i9SwBfgfsUFiaq/kQuXHDheqjDMmhvEVziDPS6
- b2mA==
-X-Gm-Message-State: AOAM530SdpKnaLW44NPaNxmKt1X1v+9t0/Ha2acOdXK6B4NdIYVB6B4p
- 8ytyg5ajRFcVBHTOdVCHaRQ4Zw==
-X-Google-Smtp-Source: ABdhPJztLqmPkLVMk3OoBPnS832fYtpaPUIE2c4FSVod/n7HuiyWJ7XJedmQyU1nIAAlk6aLtphqQQ==
-X-Received: by 2002:a63:5a20:: with SMTP id o32mr635478pgb.15.1596141350461;
- Thu, 30 Jul 2020 13:35:50 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id f89sm6938173pjg.5.2020.07.30.13.35.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 30 Jul 2020 13:35:49 -0700 (PDT)
-Subject: Re: [RFC v2 43/76] target/riscv: rvv-0.9: integer extension
- instructions
-To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-References: <20200722091641.8834-1-frank.chang@sifive.com>
- <20200722091641.8834-44-frank.chang@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0b042afa-61e4-d6a4-7fbd-2c359026b8aa@linaro.org>
-Date: Thu, 30 Jul 2020 13:35:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=aBkYvXkJmJRapHaYhhDaM6BjCIDlswdRCmfla7GwHYA=;
+ b=s6Ye6dD4hZVGVx5UadJiTYs7LYFcTo40+kbhDpK8SD9Noj6/Hh3R/V8l2lB5ap0QSa
+ DdblSKqkP8Cx90hTnflgD34VddFMZ/1teo3ZZPJjL0YgAaTKUs6Abz0LV1UmqRtFc7gc
+ EaK2M16TmXbntxUl5qSZCBAiR2ueeV4HLEzYCdiE7mBuESjT+qDC4I08NJQUyZqx43so
+ OrVtbY/ptzoGHD3rKbK4YreHnhxsLdVk0Ezkb6UyVXwTxvW4GSwXlhSX7UnDILPob2z7
+ 2CZpPkxRS3Ypcec6bqRLaugoirB0HyMGrjeT3z6A9A/UjNj6ELoi2P8hYpnYnqrhPO9i
+ cYUw==
+X-Gm-Message-State: AOAM531G9v+oZC7ryxkSuO7i/8PktlhX2JaUbTLJ8RigoT911tezhnwG
+ GairIwEe1dI0+VPCsbGYE07eKGveVnqG7aYPLT05LA==
+X-Google-Smtp-Source: ABdhPJwUhyfzQ2Q+qGHF8H7sCi+YU4ppR1ULdfb5Rj60/qoNUof8kctfEKokWujmR9Uug92cMsv87J5gqD9hxObzD7U=
+X-Received: by 2002:aca:50c4:: with SMTP id e187mr601881oib.146.1596141927371; 
+ Thu, 30 Jul 2020 13:45:27 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200722091641.8834-44-frank.chang@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::636;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x636.google.com
+References: <1596110248-7366-1-git-send-email-likaige@loongson.cn>
+ <1596110248-7366-2-git-send-email-likaige@loongson.cn>
+In-Reply-To: <1596110248-7366-2-git-send-email-likaige@loongson.cn>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 30 Jul 2020 21:45:16 +0100
+Message-ID: <CAFEAcA85xA=T389_M5_vjvm=TPirMqxNDt0za65G2NOfaDHdWA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] target/arm: Fix compile error.
+To: Kaige Li <likaige@loongson.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,45 +96,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: David Hildenbrand <david@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/20 2:16 AM, frank.chang@sifive.com wrote:
-> +    static gen_helper_gvec_3_ptr * const fns[6][4] = {
-> +        {
-> +            NULL, gen_helper_vzext_vf2_h,
-> +            gen_helper_vzext_vf2_w, gen_helper_vzext_vf2_d
-> +        },
-> +        {
-> +            NULL, NULL,
-> +            gen_helper_vzext_vf4_w, gen_helper_vzext_vf4_d,
-> +        },
-> +        {
-> +            NULL, NULL,
-> +            NULL, gen_helper_vzext_vf8_d
-> +        },
-> +        {
-> +            NULL, gen_helper_vsext_vf2_h,
-> +            gen_helper_vsext_vf2_w, gen_helper_vsext_vf2_d
-> +        },
-> +        {
-> +            NULL, NULL,
-> +            gen_helper_vsext_vf4_w, gen_helper_vsext_vf4_d,
-> +        },
-> +        {
-> +            NULL, NULL,
-> +            NULL, gen_helper_vsext_vf8_d
-> +        }
-> +    };
+On Thu, 30 Jul 2020 at 12:58, Kaige Li <likaige@loongson.cn> wrote:
+>
+> When I compile qemu with such as:
+>
+> git clone https://git.qemu.org/git/qemu.git
+> cd qemu
+> git submodule init
+> git submodule update --recursive
+> ./configure
+> make
+>
+> There is error log:
+>
+> /home/LiKaige/qemu/target/arm/translate-a64.c: In function =E2=80=98disas=
+_ldst=E2=80=99:
+> /home/LiKaige/qemu/target/arm/translate-a64.c:3392:5: error: =E2=80=98fn=
+=E2=80=99 may be used uninitialized in this function [-Werror=3Dmaybe-unini=
+tialized]
+>      fn(cpu_reg(s, rt), clean_addr, tcg_rs, get_mem_index(s),
+>      ^
+> /home/LiKaige/qemu/target/arm/translate-a64.c:3318:22: note: =E2=80=98fn=
+=E2=80=99 was declared here
+>      AtomicThreeOpFn *fn;
+>                       ^
+> cc1: all warnings being treated as errors
+>
+> So, add an initiallization value NULL for fn to fix this.
+>
+> Signed-off-by: Kaige Li <likaige@loongson.cn>
 
-I don't understand why there aren't more functions in this table.  As far as I
-can see, the only NULLs should be at [*][0].
+Hi; I've taken this patch (but not patch 1 in the series)
+into target-arm.next, with the commit message cleaned up
+to quote the compiler version.
 
-
-r~
+thanks
+-- PMM
 
