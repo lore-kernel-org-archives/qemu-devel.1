@@ -2,101 +2,97 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0885AC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:00:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A83C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:01:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8ACFE206F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:00:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 927A1206F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:01:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="b6tbzol3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ACFE206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T4aiYUzO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 927A1206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1AzF-00043v-H4
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 12:00:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54780)
+	id 1k1AzP-0004I2-MO
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 12:01:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1AfR-0001X9-GG
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:40:25 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:52042)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1AfL-0002Vv-0G
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:40:25 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXQsV007512;
- Thu, 30 Jul 2020 15:40:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=nYgT/y57sVzpOSiaYIaK+jjHlfq5K79EuRuiPY25c60=;
- b=b6tbzol30La8tD87BoxgppdoxH3E7J9KREUqyPa9GXweWn2XnDsog4HYdYhoDY9EajxA
- kPZ7iFiIMWJFk5Jj+NlegHwygsFqDLZjOnXlw4AeD+ouujPslSDCIuhuQOjTMauAZEWy
- e+eo7uSuX5xceyEvixl4uCc+dc8Hy0Yq1K0nlmL1aQBiHTNEBgw12WyTMhCUcXSLoUeo
- k284HeikC17b7cnEviS5olItJgyNsZ5iI+14AWwYSAae+7zKaL38uk5Hjh1zDbc7zpnB
- HyCB/AEbL8rqOqI/gFOGcJTrHmtFgVYjARWFUD4ToBP22RDHf81tmgYgP/QkgMYdfTRW 8Q== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2130.oracle.com with ESMTP id 32hu1jmfv6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 30 Jul 2020 15:40:15 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFWpSk188385;
- Thu, 30 Jul 2020 15:38:15 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3030.oracle.com with ESMTP id 32hu5xja5v-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 30 Jul 2020 15:38:15 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06UFcEXp020515;
- Thu, 30 Jul 2020 15:38:14 GMT
-Received: from ca-dev63.us.oracle.com (/10.211.8.221)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 30 Jul 2020 08:38:14 -0700
-From: Steve Sistare <steven.sistare@oracle.com>
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k1AxJ-0002qO-R9
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:58:53 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57633
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k1AxE-0005QH-33
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:58:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596124726;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+ bh=iTAPlkbVeuwJ9KHxTaElUHdQWwmEPVXWYMHGCKNh/X4=;
+ b=T4aiYUzOeeNrlFwNQ/BVjIuXwnk9e2ysui7ziRseYYyB0ioGZWjAiPKhQXIG29BzF6e1rt
+ pCjHWkeQSHjpOyYLzxz2ftS62Ml5dip0a+UF9w7QLvViAAMWKwkieW7huOo79HSqiMy+do
+ /7UBTVM8fffGShouElfdXPxJLhw7+a4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-380-yFMyx7c_O7ORhX4ZV7F17A-1; Thu, 30 Jul 2020 11:58:43 -0400
+X-MC-Unique: yFMyx7c_O7ORhX4ZV7F17A-1
+Received: by mail-wm1-f71.google.com with SMTP id h6so1471720wml.8
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 08:58:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition;
+ bh=iTAPlkbVeuwJ9KHxTaElUHdQWwmEPVXWYMHGCKNh/X4=;
+ b=FIOGdP2dUVHeljskt693CxUqVvJMBMLSIQQvDHVqa3WLpZmWz6ulRQJZVgaWDeIA5/
+ dLNtSOXeTkb45LplvN+rEGM0QWlm/1od/tO9oGslxH/Kr3w9WfHcyO5J5S4r4pvXqIdR
+ K5cBcxb84uQawJZvetcbijj2F/CMzlTP76t8W7J2Ee4f3+U0VZhqe8tiRmjHvkaxFk9s
+ j1x8bmQBNMMIhxwgF5X8+ir1ez8Z5I89lfziyWfHgQonTKfi+oRkSNNjbJPxi3kYetQl
+ 7M/6LmDK3EifIXIWupSW8QxFz019qCbpBs12UIb1RcMN3wEMzN8+i9ZU6rWijHs9fsBh
+ JoIA==
+X-Gm-Message-State: AOAM531rQU1jA437L02p7ecP52fbCYTsdrohCosQEjQVb2rYO/wrsngI
+ BqpoBmfzJSndSLebHQRfX6px+/AC6b3470/48P0rIUNEE6EaIlE/7uTyYTmHMaT7P8lhTdpQsq1
+ XwqafWAgKMrLWygc=
+X-Received: by 2002:a1c:ab06:: with SMTP id u6mr14759787wme.55.1596124721769; 
+ Thu, 30 Jul 2020 08:58:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwyrB/QEd7eW0ctE75pwfS1RBHYHDBRh9wTlvqDoWiCUArzZJELd+DK69xyi6DItxDd94E6Iw==
+X-Received: by 2002:a1c:ab06:: with SMTP id u6mr14759759wme.55.1596124721470; 
+ Thu, 30 Jul 2020 08:58:41 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
+ by smtp.gmail.com with ESMTPSA id l18sm10266808wrm.52.2020.07.30.08.58.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Jul 2020 08:58:40 -0700 (PDT)
+Date: Thu, 30 Jul 2020 11:58:38 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH V1 26/32] monitor: save/restore QMP negotiation status
-Date: Thu, 30 Jul 2020 08:14:30 -0700
-Message-Id: <1596122076-341293-27-git-send-email-steven.sistare@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
-References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- malwarescore=0
- mlxscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007300111
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- clxscore=1015
- malwarescore=0 spamscore=0 suspectscore=1 bulkscore=0 priorityscore=1501
- phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007300111
-Received-SPF: pass client-ip=156.151.31.86;
- envelope-from=steven.sistare@oracle.com; helo=userp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 11:37:58
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+Subject: [PATCH 1/2] i386/acpi: fix inconsistent QEMU/OVMF device paths
+Message-ID: <20200730155755.188845-1-mst@redhat.com>
+MIME-Version: 1.0
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,125 +105,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Steve Sistare <steven.sistare@oracle.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: vit9696 <vit9696@protonmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mark Kanda <mark.kanda@oracle.com>
+macOS uses ACPI UIDs to build the DevicePath for NVRAM boot options,
+while OVMF firmware gets them via an internal channel through QEMU.
+Due to a bug in QEMU ACPI currently UEFI firmware and ACPI have
+different values, and this makes the underlying operating system
+unable to report its boot option.
 
-Save and restore QMP compatibility negotiation status across cprsave and
-cprload.
+The particular node in question is the primary PciRoot (PCI0 in ACPI),
+which for some reason gets assigned 1 in ACPI UID and 0 in the
+DevicePath. This is due to the _UID assigned to it by build_dsdt in
+hw/i386/acpi-build.c Which does not correspond to the primary PCI
+identifier given by pcibus_num in hw/pci/pci.c
 
-Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
-Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+Reference with the device paths, OVMF startup logs, and ACPI table
+dumps (SysReport):
+https://github.com/acidanthera/bugtracker/issues/1050
+
+In UEFI v2.8, section "10.4.2 Rules with ACPI _HID and _UID" ends with
+the paragraph,
+
+    Root PCI bridges will use the plug and play ID of PNP0A03, This will
+    be stored in the ACPI Device Path _HID field, or in the Expanded
+    ACPI Device Path _CID field to match the ACPI name space. The _UID
+    in the ACPI Device Path structure must match the _UID in the ACPI
+    name space.
+
+(See especially the last sentence.)
+
+Considering *extra* root bridges / root buses (with bus number > 0),
+QEMU's ACPI generator actually does the right thing; since QEMU commit
+c96d9286a6d7 ("i386/acpi-build: more traditional _UID and _HID for PXB
+root buses", 2015-06-11).
+
+However, the _UID values for root bridge zero (on both i440fx and q35)
+have always been "wrong" (from UEFI perspective), going back in QEMU to
+commit 74523b850189 ("i386: add ACPI table files from seabios",
+2013-10-14).
+
+Even in SeaBIOS, these _UID values have always been 1; see commit
+a4d357638c57 ("Port rombios32 code from bochs-bios.", 2008-03-08) for
+i440fx, and commit ecbe3fd61511 ("seabios: q35: add dsdt", 2012-12-01)
+for q35.
+
+Suggested-by: Laszlo Ersek <lersek@redhat.com>
+Tested-by: vit9696 <vit9696@protonmail.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/sysemu/sysemu.h |  1 +
- migration/savevm.c      |  1 +
- monitor/qmp.c           | 42 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 44 insertions(+)
+ hw/i386/acpi-build.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 3e7bfee..c5b2f24 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -30,6 +30,7 @@ void load_cpr_snapshot(const char *file, Error **errp);
- void save_chardev_fds(void);
- void save_vnc_fds(void);
- void load_vnc_fds(void);
-+void save_qmp_negotiation_status(void);
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index b7bcbbbb2a..7a5a8b3521 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1497,7 +1497,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         dev = aml_device("PCI0");
+         aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
+         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+-        aml_append(dev, aml_name_decl("_UID", aml_int(1)));
++        aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+         aml_append(sb_scope, dev);
+         aml_append(dsdt, sb_scope);
  
- extern int autostart;
- 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 35fafb7..225eaa6 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2770,6 +2770,7 @@ void save_cpr_snapshot(const char *file, const char *mode, Error **errp)
-         save_chardev_fds();
-         save_vnc_fds();
-         walkenv(FD_PREFIX, preserve_fd, 0);
-+        save_qmp_negotiation_status();
-         qemu_system_exec_request();
-         putenv((char *)"QEMU_START_FREEZE=");
-     }
-diff --git a/monitor/qmp.c b/monitor/qmp.c
-index d433cea..9944ce5 100644
---- a/monitor/qmp.c
-+++ b/monitor/qmp.c
-@@ -33,6 +33,8 @@
- #include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qstring.h"
- #include "trace.h"
-+#include "qemu/env.h"
-+#include "sysemu/sysemu.h"
- 
- struct QMPRequest {
-     /* Owner of the request */
-@@ -398,6 +400,21 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
-     monitor_list_append(&mon->common);
- }
- 
-+static void setenv_qmp(const char *name, bool val)
-+{
-+    setenv_bool(name, val);
-+}
-+
-+static bool getenv_qmp(const char *name)
-+{
-+    bool ret = getenv_bool(name);
-+    if (ret != -1) {
-+        unsetenv_bool(name);
-+        return ret;
-+    }
-+    return false;
-+}
-+
- void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp)
- {
-     MonitorQMP *mon = g_new0(MonitorQMP, 1);
-@@ -438,4 +455,29 @@ void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp)
-                                  NULL, &mon->common, NULL, true);
-         monitor_list_append(&mon->common);
-     }
-+
-+    /*
-+     * If a chr->label qmp env var is true, this is a restored qmp
-+     * connection with capabilities negotiated.
-+     */
-+    if (getenv_qmp(chr->label) == true) {
-+        mon->commands = &qmp_commands;
-+    }
-+}
-+
-+void save_qmp_negotiation_status(void)
-+{
-+    Monitor *mon;
-+    MonitorQMP *qmp_mon;
-+
-+    QTAILQ_FOREACH(mon, &mon_list, entry) {
-+        if (!monitor_is_qmp(mon)) {
-+            continue;
-+        }
-+
-+        qmp_mon = container_of(mon, MonitorQMP, common);
-+        if (qmp_mon->commands == &qmp_commands) {
-+            setenv_qmp(mon->chr.chr->label, true);
-+        }
-+    }
- }
+@@ -1512,7 +1512,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));
+         aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+-        aml_append(dev, aml_name_decl("_UID", aml_int(1)));
++        aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+         aml_append(dev, build_q35_osc_method());
+         aml_append(sb_scope, dev);
+         aml_append(dsdt, sb_scope);
 -- 
-1.8.3.1
+MST
 
 
