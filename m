@@ -4,77 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BE3C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1ADFC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:40:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D31E120656
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:35:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97DC12082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 11:40:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gXoJe9a2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D31E120656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OKDoixgy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97DC12082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k16qn-0006gY-4w
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:35:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37168)
+	id 1k16vf-0008I4-Uo
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 07:40:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k16pr-00061V-Ar
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:34:55 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44301
+ id 1k16uw-0007kg-H5
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:40:10 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26288
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k16po-0006Jj-L7
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:34:53 -0400
+ id 1k16uu-0007QU-VB
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 07:40:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596108891;
+ s=mimecast20190719; t=1596109207;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=C2iao+OtF2uyUjodfO1r2tJ0kY0g0jWcJHNcogVwvLk=;
- b=gXoJe9a2w+5HBbi1vWps/gnGcqqOngYD3vLg5Z7fkL1Sf+dZ/3pzJ8kzW5vFoLvkf2ON1Q
- n2SuyDfDthRw9c1mWUnGrTvGU8tOg2/b5OJ+Zxd23utWVs7wGy9KuquGR0ldcIwBQO9kUj
- MOFBZpGiCpBX4/VILM8Wym3JAGF+pV0=
+ bh=vDtNAgLyjAJLRoPja4vKdF3rEIrIS7+dZ+qtmwLgec0=;
+ b=OKDoixgy5jdM13ErvJIOnaN/eOxWLqCXlKbNCrjP2QRkQpqzmj4yiPbKSbVsqDwNYa8DI+
+ 88THLXLq2hmfrIcO2y5AD/SxTiMTjUylW6/IAf4SvTy1zEe+8dZ/MXUcO4nYf7cvTkvMdP
+ AFjRLYQDLWc0F9YmM1NibwxFNddDhIg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-9MvbS-ZeNNGDUaAMgKZ_6Q-1; Thu, 30 Jul 2020 07:34:47 -0400
-X-MC-Unique: 9MvbS-ZeNNGDUaAMgKZ_6Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-83-mfSwmAYEPNaVUZyv-L1bQw-1; Thu, 30 Jul 2020 07:39:01 -0400
+X-MC-Unique: mfSwmAYEPNaVUZyv-L1bQw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA3B718C63C1;
- Thu, 30 Jul 2020 11:34:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 918A2102C889
+ for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 11:38:56 +0000 (UTC)
 Received: from localhost (unknown [10.40.208.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B655A19D7B;
- Thu, 30 Jul 2020 11:34:43 +0000 (UTC)
-Date: Thu, 30 Jul 2020 13:34:41 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 538BA76628;
+ Thu, 30 Jul 2020 11:38:55 +0000 (UTC)
+Date: Thu, 30 Jul 2020 13:38:53 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Subject: Re: [PATCH-for-5.2] default-configs: Remove ACPI_CPU_HOTPLUG from
- MIPS machines
-Message-ID: <20200730133441.39257618@redhat.com>
-In-Reply-To: <20200724165259.19939-1-f4bug@amsat.org>
-References: <20200724165259.19939-1-f4bug@amsat.org>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH 1/1] pci/pcie: refuse another hotplug/unplug event if
+ attention button is pending
+Message-ID: <20200730133853.048b64ce@redhat.com>
+In-Reply-To: <1111d100381f431c1ffeabf1f2c7c74ba79a2af5.camel@redhat.com>
+References: <20200722161722.51416-1-mlevitsk@redhat.com>
+ <20200722161722.51416-2-mlevitsk@redhat.com>
+ <3c4a37263eaceffec01fb00bc9b3549a3c9df90e.camel@redhat.com>
+ <1111d100381f431c1ffeabf1f2c7c74ba79a2af5.camel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:51:24
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -82,7 +87,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,44 +100,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-trivial@nongnu.org,
- qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 24 Jul 2020 18:52:59 +0200
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+On Wed, 29 Jul 2020 08:09:37 +0300
+Maxim Levitsky <mlevitsk@redhat.com> wrote:
 
-> No MIPS machine uses the ACPI cpu-hotplug feature
-> (QEMU implementation is X86 specific).
+> On Wed, 2020-07-22 at 19:19 +0300, Maxim Levitsky wrote:
+> > On Wed, 2020-07-22 at 19:17 +0300, Maxim Levitsky wrote:  
+> > > Curently it is possible to hotplug a device and then immediatly
+> > > hotunplug it before the OS notices, and that will result
+> > > in missed unplug event since we can only send one attention button event.
+> > > 
+> > > Moreover the device will stuck in unplugging state forever.
+> > > 
+> > > Error out in such cases and rely on the caller (e.g libvirt) to retry
+> > > the unplug a bit later
+> > > 
+> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > ---
+> > >  hw/pci/pcie.c | 11 +++++++++++
+> > >  1 file changed, 11 insertions(+)
+> > > 
+> > > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> > > index 5b48bae0f6..9e836cf2f4 100644
+> > > --- a/hw/pci/pcie.c
+> > > +++ b/hw/pci/pcie.c
+> > > @@ -402,6 +402,17 @@ static void pcie_cap_slot_plug_common(PCIDevice *hotplug_dev, DeviceState *dev,
+> > >           */
+> > >          error_setg_errno(errp, EBUSY, "slot is electromechanically locked");
+> > >      }
+> > > +
+> > > +    if (sltsta & PCI_EXP_SLTSTA_ABP) {
+> > > +        /*
+> > > +         * Attention button is pressed, thus we can't send another
+> > > +         * hotpplug event  
+> > Typo here, forgot to refresh the commit.  
+> > > +         */
+> > > +        error_setg_errno(errp, EBUSY,
+> > > +                         "attention button is already pressed, can't "
+> > > +                         "send another hotplug event");
+> > > +    }
+> > > +
+> > >  }
+> > >  
+> > >  void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,  
+> ping.
 
-if I recall correctly we were building it to satisfy symbol dependencies
-due to hw/acpi/piix4.c being shared between x86 and mips.
+CCing Julia since she was looking into PCI hotplug/unplug code recently.
 
-It no longer the case?
-
-
-> Fixes: 135a67a692 ("ACPI: split CONFIG_ACPI into 4 pieces")
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  default-configs/mips-softmmu-common.mak | 1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mi=
-ps-softmmu-common.mak
-> index da29c6c0b2..e9c208da3d 100644
-> --- a/default-configs/mips-softmmu-common.mak
-> +++ b/default-configs/mips-softmmu-common.mak
-> @@ -21,7 +21,6 @@ CONFIG_ACPI=3Dy
->  CONFIG_ACPI_X86=3Dy
->  CONFIG_ACPI_MEMORY_HOTPLUG=3Dy
->  CONFIG_ACPI_NVDIMM=3Dy
-> -CONFIG_ACPI_CPU_HOTPLUG=3Dy
->  CONFIG_APM=3Dy
->  CONFIG_I8257=3Dy
->  CONFIG_PIIX4=3Dy
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> 
 
 
