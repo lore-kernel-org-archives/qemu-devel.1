@@ -2,107 +2,101 @@ Return-Path: <SRS0=WSdW=BJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D846C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F1C1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:02:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65B03206F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:02:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15FFD206F5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 16:02:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z/JSI/vs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65B03206F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lpsd5iZB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15FFD206F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1B0J-0005q7-FG
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 12:01:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58758)
+	id 1k1B0r-0006iN-4n
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 12:02:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k1Axv-0003lG-Kf
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:59:31 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50544
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k1Axt-0005Uj-Ax
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:59:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596124768;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EHy459NRfjsyOu8s435MZbetWGRYF2vqJ7PlxyraEmk=;
- b=Z/JSI/vsL39HtKGmEXJLNIPnz8HP9B/OxFcA/ty5fzRp2AHMY9zvIs2v+9+2zU2lyHuCmn
- g/myQqxJv4G3efoHLXWfPRRh4OVIpxo7gDF76eOt7rxUx/pZ7SBKkZIrp+aBSJ1ciyym4T
- zZM+xs/m/6ZNVYHqgYFSPhYK6wJNrH8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-FG5e6y16NY6S1HRHgqY4ZA-1; Thu, 30 Jul 2020 11:59:23 -0400
-X-MC-Unique: FG5e6y16NY6S1HRHgqY4ZA-1
-Received: by mail-wr1-f72.google.com with SMTP id t12so8163165wrp.0
- for <qemu-devel@nongnu.org>; Thu, 30 Jul 2020 08:59:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=bOrbd3fBpyjtD0O8aD2U6d3OHMfG1J5Sqp3kzMTCwbs=;
- b=bWM+cik5a1VnDoNSuyyplEMZqlxoOAvYa2BMnCp1yf7E5tMYXbU5PLFY+CIeVnP1na
- ItNJCGdXIXQFxa3H2GaEeXrZti8DHuSlajWFtnHkrn2H2deC5lPFONRjaRbwQows/mhn
- NbI9V9eTnI6NOdfOs+w24/Pg5YeHGQy0SSrMli/dkMIpKFP2/KhB+zHhPjuPHMzLMKhT
- uES/phtz8iqjYTd53IL0By0MHRAD8tabQ3DeXG4rBGSki31R4WvTJeBsTXasRnyt/FkO
- vtXBhZfYtkf4Af4WG6lr9LjKniuvVXVEgyao32PRnbZofw24A41b4aJUdlxrfcDFWovA
- gOYA==
-X-Gm-Message-State: AOAM532S/qAMzgDtOPjeZcObPPNsgLe3i/D1PjznEkI/tb/t4sxK6+Wh
- BBjaMMuTD1wKBh36zmRuNY7VVqK2IPXWeo/z6+5oghqQ43IOPtVIT+rIyhPjeOAqMSaf6YiFlJQ
- lT1+lFUw0S1tFuus=
-X-Received: by 2002:a05:6000:124c:: with SMTP id
- j12mr3497929wrx.83.1596124761936; 
- Thu, 30 Jul 2020 08:59:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxAr3sW9dUloN8vpHnYxk2brltdMRaudl/gNj3ZJIP/5j1wE5Y4zTt2eFbrMdq/rBwdSf54Qw==
-X-Received: by 2002:a05:6000:124c:: with SMTP id
- j12mr3497896wrx.83.1596124761563; 
- Thu, 30 Jul 2020 08:59:21 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
- by smtp.gmail.com with ESMTPSA id g188sm11180778wma.5.2020.07.30.08.59.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Jul 2020 08:59:20 -0700 (PDT)
-Date: Thu, 30 Jul 2020 11:59:18 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: vit9696 <vit9696@protonmail.com>
-Subject: Re: OVMF and PCI0 UID
-Message-ID: <20200730115902-mutt-send-email-mst@kernel.org>
-References: <56E4DCD4-DBA1-4A41-8568-1CBBB37ED320@protonmail.com>
- <829eba8a-d9a7-a335-6b85-91e64462e64b@redhat.com>
- <20200721025745-mutt-send-email-mst@kernel.org>
- <BF9EF866-55D1-47A4-85F5-3E654F825AEF@protonmail.com>
- <YOYfNLw-NvrJb0_cXoe66EsssRZYv1T099QNHtlpvktzBndo6yIfecUZ2XeybP7TBaibMAyDxa_jZV-2ZVytTDTTvE_dFjRkmolDYi_8Hjs=@protonmail.com>
-MIME-Version: 1.0
-In-Reply-To: <YOYfNLw-NvrJb0_cXoe66EsssRZYv1T099QNHtlpvktzBndo6yIfecUZ2XeybP7TBaibMAyDxa_jZV-2ZVytTDTTvE_dFjRkmolDYi_8Hjs=@protonmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 03:41:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1AfQ-0001Vv-Uk
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:40:24 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52020)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1AfJ-0002Va-NE
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:40:24 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXPL6007495;
+ Thu, 30 Jul 2020 15:40:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
+ bh=Nv/b2PUDoqsO8F4DqZ6z7ZSgREh1Dj6LffZizWf6DgQ=;
+ b=lpsd5iZB4zS7RfTSXqVLdGdu12hG/QHJ21uZjJif1qyYI7ULZ0ZRPwOmyB6no+Cp3XxQ
+ HM+58KDyZ310qMlS7xdz+r11iDR47qaMcGYqvX39GsIea/V7BfrImKqMGPG+3zdSdm71
+ TSJJFkM823g5vejzOEzMkrQIMUUWTgGzC758EvTicU/XT9l32yDWQ5Xaeag569S8Hg3v
+ JJRtmOsJ1ZDUzfCF2CPn2aZgbZl97NJSCl2LQtKlwAa/6UKKkysdt44xVDkDqSjpFbp/
+ FhLlkREJG+iOCocyyPrVetiAxt8tprwG9Y9DttZfxS7muDzDnf+k+NF7QxRFvfy4JNCc iw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 32hu1jmfv3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Thu, 30 Jul 2020 15:40:13 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXSM4130705;
+ Thu, 30 Jul 2020 15:38:13 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 32hu5wwh1a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 30 Jul 2020 15:38:13 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06UFcCfo001915;
+ Thu, 30 Jul 2020 15:38:12 GMT
+Received: from ca-dev63.us.oracle.com (/10.211.8.221)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 30 Jul 2020 08:38:12 -0700
+From: Steve Sistare <steven.sistare@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH V1 23/32] char: save/restore chardev socket fds
+Date: Thu, 30 Jul 2020 08:14:27 -0700
+Message-Id: <1596122076-341293-24-git-send-email-steven.sistare@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ mlxlogscore=999 mlxscore=0
+ suspectscore=3 bulkscore=0 malwarescore=0 spamscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007300111
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ clxscore=1015
+ malwarescore=0 spamscore=0 suspectscore=3 bulkscore=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007300111
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=steven.sistare@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 11:37:58
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,201 +109,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, mhaeuser@posteo.de,
- Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Steve Sistare <steven.sistare@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks, I sent the patches on the list now!
+From: Mark Kanda <mark.kanda@oracle.com>
 
-On Wed, Jul 22, 2020 at 01:53:23PM +0000, vit9696 via wrote:
-> Hello,
-> 
-> We can confirm that the suggested change to zero UIDs resolves the problem. It
-> will be great if you could handle the rest as you see fit. Thank you!
-> 
-> Best regards,
-> Vitaly
-> 
-> 
-> В вт, июля 21, 2020 в 12:24, vit9696 <vit9696@protonmail.com> пишет:
-> 
->     Thank you, we will provide an update whether this solves the problem.
-> 
->     Besides, this is not the only case where UIDs are wrong for the PCI bus.
->     In hw/arm/virt-acpi-build.c there is the following code:
-> 
->         Aml *dev = aml_device("%s", "PCI0");
->         aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
->         aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
->         aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
->         aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
->         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->         aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
->         aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")));
->         aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
-> 
->     https://github.com/qemu/qemu/blob/2c1fb4d/hw/arm/virt-acpi-build.c#
->     L168-L175
-> 
->     It makes UID on ARM builds a string, which is certainly not expected. We do
->     not have ARM test setups, but I hope this can be useful too.
-> 
->     Best wishes,
->     Vitaly
-> 
-> 
->         21 июля 2020 г., в 09:58, Michael S. Tsirkin <mst@redhat.com> написал
->         (а):
-> 
-> 
->         On Mon, Jul 20, 2020 at 11:25:58PM +0200, Laszlo Ersek wrote:
-> 
->             Hi Vitaly,
-> 
->             adding Igor, Michael, Marcel, and qemu-devel.
-> 
->             On 07/20/20 11:06, vit9696 wrote:
-> 
->                 Hello,
-> 
->                 I discovered an issue with inconsistent QEMU/OVMF device paths,
->                 and
->                 while I am unsure whether directing this e-mail is appropriate
->                 to you,
->                 I believe that you likely have the contacts you could forward
->                 this
->                 e-mail to.
-> 
->                 macOS uses ACPI UIDs to build the DevicePath for NVRAM boot
->                 options,
->                 while OVMF firmware gets them via an internal channel through
->                 QEMU.
->                 Due to a bug in QEMU (or OVMF) currently UEFI firmware and ACPI
->                 have
->                 different values, and this makes the underlying operating
->                 system
->                 unable to report its boot option.
-> 
->                 The particular node in question is the primary PciRoot (PCI0 in
->                 ACPI),
->                 which for some reason gets assigned 1 in ACPI UID and 0 in the
->                 DevicePath. To me this looks like a bug here:
->                 https://github.com/qemu/qemu/blob/8f06f22/hw/i386/acpi-build.c#
->                 L1511-L1515
->                 Which does not correspond to the primary PCI identifier here:
->                 https://github.com/qemu/qemu/blob/5a79d10/hw/pci/pci.c#
->                 L160-L162
-> 
->                 Reference with the device paths, OVMF startup logs, and ACPI
->                 table
->                 dumps (SysReport):
->                 https://github.com/acidanthera/bugtracker/issues/1050
-> 
->                 Would you be able to forward this to the right people or
->                 perhaps keep
->                 an eye on the issue itself?
-> 
-> 
->             I think you are right.
-> 
->             In UEFI v2.8, section "10.4.2 Rules with ACPI _HID and _UID" ends
->             with
->             the paragraph,
-> 
->                Root PCI bridges will use the plug and play ID of PNP0A03, This
->             will
->                be stored in the ACPI Device Path _HID field, or in the Expanded
->                ACPI Device Path _CID field to match the ACPI name space. The
->             _UID
->                in the ACPI Device Path structure must match the _UID in the
->             ACPI
->                name space.
-> 
->             (See especially the last sentence.)
-> 
->             Considering *extra* root bridges / root buses (with bus number >
->             0),
->             QEMU's ACPI generator actually does the right thing; since QEMU
->             commit
->             c96d9286a6d7 ("i386/acpi-build: more traditional _UID and _HID for
->             PXB
->             root buses", 2015-06-11).
-> 
->             However, the _UID values for root bridge zero (on both i440fx and
->             q35)
->             have always been "wrong" (from UEFI perspective), going back in
->             QEMU to
->             commit 74523b850189 ("i386: add ACPI table files from seabios",
->             2013-10-14).
-> 
->             Even in SeaBIOS, these _UID values have always been 1; see commit
->             a4d357638c57 ("Port rombios32 code from bochs-bios.", 2008-03-08)
->             for
->             i440fx, and commit ecbe3fd61511 ("seabios: q35: add dsdt",
->             2012-12-01)
->             for q35.
-> 
->             Does the following patch work for you? (I can see you proposed the
->             same
->             in
->             <https://github.com/acidanthera/bugtracker/issues/1050
->             issuecomment-660734139>)
-> 
-> 
->                 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->                 index b7bcbbbb2a35..7a5a8b3521b0 100644
->                 --- a/hw/i386/acpi-build.c
->                 +++ b/hw/i386/acpi-build.c
->                 @@ -1496,9 +1496,9 @@ build_dsdt(GArray *table_data, BIOSLinker
->                 *linker,
->                         sb_scope = aml_scope("_SB");
->                         dev = aml_device("PCI0");
->                         aml_append(dev, aml_name_decl("_HID", aml_eisaid
->                 ("PNP0A03")));
->                         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->                 -        aml_append(dev, aml_name_decl("_UID", aml_int(1)));
->                 +        aml_append(dev, aml_name_decl("_UID", aml_int(0)));
->                         aml_append(sb_scope, dev);
->                         aml_append(dsdt, sb_scope);
-> 
->                         build_hpet_aml(dsdt);
->                 @@ -1511,9 +1511,9 @@ build_dsdt(GArray *table_data, BIOSLinker
->                 *linker,
->                         dev = aml_device("PCI0");
->                         aml_append(dev, aml_name_decl("_HID", aml_eisaid
->                 ("PNP0A08")));
->                         aml_append(dev, aml_name_decl("_CID", aml_eisaid
->                 ("PNP0A03")));
->                         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->                 -        aml_append(dev, aml_name_decl("_UID", aml_int(1)));
->                 +        aml_append(dev, aml_name_decl("_UID", aml_int(0)));
->                         aml_append(dev, build_q35_osc_method());
->                         aml_append(sb_scope, dev);
->                         aml_append(dsdt, sb_scope);
-> 
-> 
->             If it does, I suggest submitting the above patch to qemu-devel, and
->             /or
->             filing a bug for upstream QEMU at <https://bugs.launchpad.net/qemu/
->             >.
-> 
-> 
->         Or even just reporting whether the above helps you, we can
->         take it from there.
-> 
-> 
->             (Note: I didn't even compile the above change.)
-> 
->             Thanks
->             Laszlo
-> 
-> 
-> 
-> 
-> 
+Iterate through the character devices and save/restore the socket fds.
 
+Signed-off-by: Mark Kanda <mark.kanda@oracle.com>
+Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+---
+ chardev/char-socket.c   | 35 +++++++++++++++++++++++++++++++++++
+ chardev/char.c          | 14 ++++++++++++++
+ include/chardev/char.h  |  5 +++++
+ include/sysemu/sysemu.h |  1 +
+ migration/savevm.c      |  8 ++++++++
+ 5 files changed, 63 insertions(+)
 
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index ef62dbf..e08e7e1 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -36,6 +36,8 @@
+ #include "qapi/qapi-visit-sockets.h"
+ 
+ #include "chardev/char-io.h"
++#include "sysemu/sysemu.h"
++#include "qemu/cutils.h"
+ 
+ /***********************************************************/
+ /* TCP Net console */
+@@ -400,6 +402,7 @@ static void tcp_chr_free_connection(Chardev *chr)
+     SocketChardev *s = SOCKET_CHARDEV(chr);
+     int i;
+ 
++    unsetenv_fd(chr->label);
+     if (s->read_msgfds_num) {
+         for (i = 0; i < s->read_msgfds_num; i++) {
+             close(s->read_msgfds[i]);
+@@ -1375,6 +1378,9 @@ static void qmp_chardev_open_socket(Chardev *chr,
+             return;
+         }
+     }
++
++    load_char_socket_fd(chr);
++
+ }
+ 
+ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
+@@ -1517,3 +1523,32 @@ static void register_types(void)
+ }
+ 
+ type_init(register_types);
++
++void save_char_socket_fd(Chardev *chr)
++{
++    SocketChardev *sockchar = SOCKET_CHARDEV(chr);
++
++    if (sockchar->sioc) {
++        setenv_fd(chr->label, sockchar->sioc->fd);
++    }
++}
++
++void load_char_socket_fd(Chardev *chr)
++{
++    SocketChardev *sockchar;
++    QIOChannelSocket *sioc;
++
++    int fd = getenv_fd(chr->label);
++
++    if (fd != -1) {
++        unsetenv_fd(chr->label);
++        sockchar = SOCKET_CHARDEV(chr);
++        sioc = qio_channel_socket_accept(*sockchar->listener->sioc, fd, NULL);
++        if (sioc) {
++            tcp_chr_accept(sockchar->listener, sioc, chr);
++        } else {
++            error_printf("error: could not restore socket for %s\n",
++                         chr->label);
++        }
++    }
++}
+diff --git a/chardev/char.c b/chardev/char.c
+index 77e7ec8..8fd54cc 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -34,6 +34,7 @@
+ #include "qapi/qapi-commands-char.h"
+ #include "qapi/qmp/qerror.h"
+ #include "sysemu/replay.h"
++#include "sysemu/sysemu.h"
+ #include "qemu/help_option.h"
+ #include "qemu/module.h"
+ #include "qemu/option.h"
+@@ -1174,3 +1175,16 @@ static void register_types(void)
+ }
+ 
+ type_init(register_types);
++
++static int chardev_is_socket(Object *child, void *opaque)
++{
++    if (CHARDEV_IS_SOCKET(child)) {
++        save_char_socket_fd((Chardev *) child);
++    }
++    return 0;
++}
++
++void save_chardev_fds(void)
++{
++    object_child_foreach(get_chardevs_root(), chardev_is_socket, NULL);
++}
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index 00589a6..80a9cf8 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -250,6 +250,8 @@ int qemu_chr_wait_connected(Chardev *chr, Error **errp);
+     object_dynamic_cast(OBJECT(chr), TYPE_CHARDEV_RINGBUF)
+ #define CHARDEV_IS_PTY(chr) \
+     object_dynamic_cast(OBJECT(chr), TYPE_CHARDEV_PTY)
++#define CHARDEV_IS_SOCKET(chr) \
++    object_dynamic_cast(OBJECT(chr), TYPE_CHARDEV_SOCKET)
+ 
+ typedef struct ChardevClass {
+     ObjectClass parent_class;
+@@ -290,4 +292,7 @@ GSource *qemu_chr_timeout_add_ms(Chardev *chr, guint ms,
+ /* console.c */
+ void qemu_chr_parse_vc(QemuOpts *opts, ChardevBackend *backend, Error **errp);
+ 
++void save_char_socket_fd(Chardev *);
++void load_char_socket_fd(Chardev *);
++
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 4dfc4ca..fa1a5c3 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -27,6 +27,7 @@ void qemu_remove_machine_init_done_notifier(Notifier *notify);
+ 
+ void save_cpr_snapshot(const char *file, const char *mode, Error **errp);
+ void load_cpr_snapshot(const char *file, Error **errp);
++void save_chardev_fds(void);
+ 
+ extern int autostart;
+ 
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 2902006..81f38c4 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2700,6 +2700,12 @@ static QEMUFile *qf_file_open(const char *filename, int flags, int mode,
+     return qemu_fopen_channel_input(ioc);
+ }
+ 
++static int preserve_fd(const char *name, const char *val, void *handle)
++{
++    qemu_clr_cloexec(atoi(val));
++    return 0;
++}
++
+ void save_cpr_snapshot(const char *file, const char *mode, Error **errp)
+ {
+     int ret = 0;
+@@ -2761,6 +2767,8 @@ void save_cpr_snapshot(const char *file, const char *mode, Error **errp)
+         if (qemu_preserve_ram(errp)) {
+             return;
+         }
++        save_chardev_fds();
++        walkenv(FD_PREFIX, preserve_fd, 0);
+         qemu_system_exec_request();
+         putenv((char *)"QEMU_START_FREEZE=");
+     }
+-- 
+1.8.3.1
 
 
