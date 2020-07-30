@@ -7,96 +7,97 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1593C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2252C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF6A0206F5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:53:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B18F20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 Jul 2020 15:54:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="F7bhjvHl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF6A0206F5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fVDW8D3N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B18F20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1AsN-0003fA-Ut
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:53:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54042)
+	id 1k1Asz-0004fV-Te
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 11:54:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1AdY-0007eL-Ig
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:28 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:50258)
+ id 1k1AfP-0001SK-D3
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:40:23 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:48040)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
- id 1k1AdV-0002CS-VP
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:38:27 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXP6S007487;
- Thu, 30 Jul 2020 15:38:19 GMT
+ id 1k1AfH-0002VO-Rj
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 11:40:23 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFXjA1152650;
+ Thu, 30 Jul 2020 15:40:12 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=YY5D39VKx7KmG8DuA4MVFb9AvBcnww2s9GY477Dv1AY=;
- b=F7bhjvHlazBQxGL8ecgUix4nSu7n3KX2vBNSjqrTaNCfBR3e1OkS+XYQK3UWFGe6odLA
- 9bVzh+9wd9EcRgiQjuHSijJFFYPriyV+HN/AiKi6muNl6v9cpTKGTNJl6NO0LqShbLn7
- 4owo3W8vaMqqnPBuBPTiKRd2tCbIzNvsYz+GdgFoxdHatGqS/+g0FnzztdN6QSr/6hua
- gPOrE5+v8YszM3CJnjMaHo41EG9FKZAdKX5PZhu+9AX1Uf45OvhrQv1qA1Mq0pRzaj6p
- 5lionbrrfOALx6xEpauTA34ORkGF3Wi0dWsug/2Jqrf9TmUPNkHZtn54U33K+Vvj1zl3 IA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 32hu1jmfg8-1
+ bh=micmSlORAvpi9yB3dc5wSQuxzyCBVgja6SS0xcqR81Y=;
+ b=fVDW8D3NpBMq4/wzeoNpQ+NCTkZMkzsIs3oZ4PdsOoqqZ4/NaHt09iGxxqf5eNCHiGgf
+ 4Acypv1qVUOEk1zWJeu46GgBHxMeWOD++EZz1IaedzaQhCDwhPfemElpRAzNzDoFS3zE
+ 4AwgWj+nZpwFoC/0NvhS5We9JuU+RrjTR3zDrhXpuPc6fOBBdSS6OCHl3egFzrs3ai6a
+ p4frav4DeCDKGmtHtyPxDrcy2U09ThmYnlwe+v8pFViKt3NK98pCplTArsvmOQffxKDQ
+ qzJGfcr1HpV4OuTN39/4JzLrA9YXz8dBYDexKcA7rZm4irJjzv5YmhmJMPMWrq+BAavP /A== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 32hu1jvecx-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 30 Jul 2020 15:38:19 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFWZkc176078;
- Thu, 30 Jul 2020 15:38:18 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 32hu61a21u-1
+ Thu, 30 Jul 2020 15:40:12 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06UFWp4K188370;
+ Thu, 30 Jul 2020 15:38:11 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 32hu5xja3d-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 30 Jul 2020 15:38:18 +0000
+ Thu, 30 Jul 2020 15:38:11 +0000
 Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06UFcGG1007551;
- Thu, 30 Jul 2020 15:38:16 GMT
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06UFcA0c001907;
+ Thu, 30 Jul 2020 15:38:10 GMT
 Received: from ca-dev63.us.oracle.com (/10.211.8.221)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 30 Jul 2020 08:38:16 -0700
+ with ESMTP ; Thu, 30 Jul 2020 08:38:10 -0700
 From: Steve Sistare <steven.sistare@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH V1 29/32] pci: export pci_update_mappings
-Date: Thu, 30 Jul 2020 08:14:33 -0700
-Message-Id: <1596122076-341293-30-git-send-email-steven.sistare@oracle.com>
+Subject: [PATCH V1 21/32] exec, memory: exec(3) to restart
+Date: Thu, 30 Jul 2020 08:14:25 -0700
+Message-Id: <1596122076-341293-22-git-send-email-steven.sistare@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
 References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- adultscore=0 bulkscore=0
- malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007300111
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
+ malwarescore=0
+ mlxscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007300111
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9698
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- clxscore=1015
- malwarescore=0 spamscore=0 suspectscore=1 bulkscore=0 priorityscore=1501
- phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015
+ mlxlogscore=999
+ malwarescore=0 impostorscore=0 priorityscore=1501 spamscore=0 phishscore=0
+ suspectscore=3 bulkscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2007300111
-Received-SPF: pass client-ip=156.151.31.86;
- envelope-from=steven.sistare@oracle.com; helo=userp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 11:37:58
+Received-SPF: pass client-ip=156.151.31.85;
+ envelope-from=steven.sistare@oracle.com; helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 11:38:02
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -53
+X-Spam_score: -5.4
+X-Spam_bar: -----
+X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,47 +126,139 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow pci_update_mappings to be called from other modules.
-No change in functionality.
+Use exec() to restart qemu to a potentially new version, while preserving
+guest RAM.  The guest pauses briefly.
+
+cprsave saves the address and length of RAM blocks to the environment via
+setenv, tags the RAM with the new madvise(MADV_DOEXEC) option to preserve
+it across exec, then exec()'s the (typically updated) qemu binary with the
+original argv.
+
+On qemu restart, ram_block_add() finds the env vars that describe preserved
+RAM segments and does not reallocate them.
 
 Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 ---
- hw/pci/pci.c         | 3 +--
- include/hw/pci/pci.h | 1 +
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ exec.c                | 36 ++++++++++++++++++++++++++++++++++--
+ include/exec/memory.h |  2 ++
+ migration/savevm.c    | 16 ++++++++++++++++
+ 3 files changed, 52 insertions(+), 2 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index de0fae1..7343e00 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -216,7 +216,6 @@ static const TypeInfo pcie_bus_info = {
- };
+diff --git a/exec.c b/exec.c
+index 359e437..5473c09 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2235,7 +2235,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
+     Error *err = NULL;
+     const char *name;
+     void *addr;
+-    size_t maxlen;
++    size_t len, maxlen;
  
- static PCIBus *pci_find_bus_nr(PCIBus *bus, int bus_num);
--static void pci_update_mappings(PCIDevice *d);
- static void pci_irq_handler(void *opaque, int irq_num, int level);
- static void pci_add_option_rom(PCIDevice *pdev, bool is_default_rom, Error **);
- static void pci_del_option_rom(PCIDevice *pdev);
-@@ -1316,7 +1315,7 @@ static pcibus_t pci_bar_address(PCIDevice *d,
-     return new_addr;
+     old_ram_size = last_ram_page();
+ 
+@@ -2253,7 +2253,12 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
+             }
+         } else {
+             name = memory_region_name(new_block->mr);
+-            addr = phys_mem_alloc(maxlen, &new_block->mr->align, shared);
++            if (getenv_ram(name, &addr, &len)) {
++                assert(len == maxlen);
++            } else {
++                addr = phys_mem_alloc(maxlen, &new_block->mr->align, shared);
++                setenv_ram(name, addr, maxlen);
++            }
+ 
+             if (!addr) {
+                 error_setg_errno(errp, errno,
+@@ -2499,6 +2504,8 @@ void qemu_ram_free(RAMBlock *block)
+         return;
+     }
+ 
++    unsetenv_ram(memory_region_name(block->mr));
++
+     if (block->host) {
+         ram_block_notify_remove(block->host, block->max_length);
+     }
+@@ -2763,6 +2770,31 @@ bool qemu_ram_volatile(Error **errp)
+     return ret;
  }
  
--static void pci_update_mappings(PCIDevice *d)
-+void pci_update_mappings(PCIDevice *d)
- {
-     PCIIORegion *r;
-     int i;
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index c1bf7d5..bd07c86 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -865,5 +865,6 @@ extern const VMStateDescription vmstate_pci_device;
- }
++static int preserve_ram(const char *name, const char *val, void *handle)
++{
++    void *addr;
++    size_t len;
++    Error **errp = handle;
++
++    getenv_ram(name, &addr, &len);
++    if (qemu_madvise(addr, len, QEMU_MADV_DOEXEC)) {
++        error_setg_errno(errp, errno,
++                         "MADV_DOEXEC failed on memory region %s", name);
++        return 1;
++    }
++    return 0;
++}
++
++
++int qemu_preserve_ram(Error **errp)
++{
++    int ret;
++    qemu_mutex_lock_ramlist();
++    ret = walkenv(ADDR_PREFIX, preserve_ram, errp);
++    qemu_mutex_unlock_ramlist();
++    return ret;
++}
++
+ /* Generate a debug exception if a watchpoint has been hit.  */
+ void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
+                           MemTxAttrs attrs, int flags, uintptr_t ra)
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 6aafbb0..e2d297d 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -2521,6 +2521,8 @@ bool ram_block_discard_is_required(void);
  
- MSIMessage pci_get_msi_message(PCIDevice *dev, int vector);
-+void pci_update_mappings(PCIDevice *d);
+ bool qemu_ram_volatile(Error **errp);
+ 
++int qemu_preserve_ram(Error **errp);
++
+ #endif
  
  #endif
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 38cc63a..2902006 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2719,6 +2719,16 @@ void save_cpr_snapshot(const char *file, const char *mode, Error **errp)
+         return;
+     }
+ 
++    if (op == VMS_RESTART && QEMU_MADV_DOEXEC == QEMU_MADV_INVALID) {
++        error_setg(errp, "kernel does not support MADV_DOEXEC.");
++        return;
++    }
++
++    if (op == VMS_RESTART && xen_enabled()) {
++        error_setg(errp, "xen does not support cprsave restart");
++        return;
++    }
++
+     f = qf_file_open(file, O_CREAT | O_WRONLY | O_TRUNC, 0600, errp);
+     if (!f) {
+         return;
+@@ -2747,6 +2757,12 @@ void save_cpr_snapshot(const char *file, const char *mode, Error **errp)
+     if (op == VMS_REBOOT) {
+         no_shutdown = 0;
+         qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++    } else if (op == VMS_RESTART) {
++        if (qemu_preserve_ram(errp)) {
++            return;
++        }
++        qemu_system_exec_request();
++        putenv((char *)"QEMU_START_FREEZE=");
+     }
+ }
+ 
 -- 
 1.8.3.1
 
