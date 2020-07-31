@@ -7,68 +7,69 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FFFC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2CEC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:26:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB19A22B42
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:25:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24CFE22B42
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:26:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Pvpjej4T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB19A22B42
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZkFAUcLd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CFE22B42
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1ZiL-00072X-U8
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:25:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58094)
+	id 1k1Zjr-0000vx-Ds
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:26:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1ZeR-0001tr-P1
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:03 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:54934)
+ id 1k1ZeQ-0001qv-L1
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:02 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:50686)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1ZeP-0005PJ-Nd
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:03 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIBmov069799;
- Fri, 31 Jul 2020 18:20:55 GMT
+ id 1k1ZeO-0005Ja-Gh
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:02 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIE25V111434;
+ Fri, 31 Jul 2020 18:20:44 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references : mime-version : content-type : content-transfer-encoding;
- s=corp-2020-01-29; bh=dxPLklm6WT/PsavEZFX/Da2B98UHd7xtUPB9I7sAaN8=;
- b=Pvpjej4TR1AxwKmj7NT7KeGJzqLJY9A3UCH5U/qbjor/mab/qQEwPDC7DBeRoAqmP5pI
- eVn4hz9Y76p4iqPE2YGM5eI0FMQ6wpDhEul7ncL/NDyGgAYJEjVgxwoEWoV3hpytkFsi
- XLM5aSO+KwBkibQEDEvjZ5xbjaKPeRVe0Q/eXpurKIZgS+0KJkqV+gAlh28QdjO4cCdV
- EKGwBTkvUipCCUKY8JIV47GnK4zXVSVgO3KBqHYTgFs/ZhhHpAAbcYGUkiXzWpW2biq+
- gaEmcbc/vBCMET1zmmVlc/X++3xj0a4Cx/YCF0G68C3ZQu2Ri6aFa0kaZBJntTyVrFb7 Yw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 32mf702u8a-1
+ s=corp-2020-01-29; bh=NH5HLQlQOPmoQl57ijRKRFjElbxIl8CJ0GOUVPCdBKQ=;
+ b=ZkFAUcLdzVTt+QmUAjw1DcffyJAIF9h7cCbghjMc244nVp2GAtygkWcqehdFM23mczjy
+ PpCUory6rY0CpM2w4hdhpVbAo+dG9so2K3ZfI4O3rYta283DPuOHJ2InQZJIHzYQuiEV
+ QukmTFR1YJ5FkxJDl3wlZlBrNTqAcfqhhhyAFO8yFXtLSF0KmhjGDUM4r3WBn457Ug04
+ akJMehXNODb1l5lqrxjSz3MpJdQEA72J6PinUDTTW+TVi5sU1+CXO2RPiTe5S4K4Vn6H
+ ruxYMxncofYMa+9fGEwrkaOV6gjJjuiYOrcJibDD04mTQg/lmvfQR7TC2zjM6hHl2+1A 7A== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2130.oracle.com with ESMTP id 32hu1jtfy2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Fri, 31 Jul 2020 18:20:55 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIIt5a086448;
- Fri, 31 Jul 2020 18:20:55 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3030.oracle.com with ESMTP id 32hu608m1x-1
+ Fri, 31 Jul 2020 18:20:44 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIIc2w137651;
+ Fri, 31 Jul 2020 18:20:43 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 32hu64r6xb-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 31 Jul 2020 18:20:54 +0000
+ Fri, 31 Jul 2020 18:20:43 +0000
 Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06VIKrlH013498;
- Fri, 31 Jul 2020 18:20:53 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06VIKgki013252;
+ Fri, 31 Jul 2020 18:20:42 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 31 Jul 2020 11:20:52 -0700
+ with ESMTP ; Fri, 31 Jul 2020 11:20:42 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 11/20] multi-process: introduce proxy object
-Date: Fri, 31 Jul 2020 14:20:18 -0400
-Message-Id: <735bfb2360481fcb576d7da1d00179b074edd3b6.1596217462.git.jag.raman@oracle.com>
+Subject: [PATCH v8 04/20] multi-process: setup a machine object for remote
+ device process
+Date: Fri, 31 Jul 2020 14:20:11 -0400
+Message-Id: <a379f9e0ea5c1635a3a9315be415d8afd4d94444.1596217462.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1596217462.git.jag.raman@oracle.com>
 References: <cover.1596217462.git.jag.raman@oracle.com>
@@ -80,30 +81,29 @@ Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
  signatures=668679
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- malwarescore=0
- mlxscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007310137
+ adultscore=0 bulkscore=0
+ malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007310137
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- bulkscore=0 suspectscore=1
- spamscore=0 impostorscore=0 clxscore=1015 phishscore=0 priorityscore=1501
- adultscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ clxscore=1015
+ malwarescore=0 spamscore=0 suspectscore=1 bulkscore=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2007310136
-Received-SPF: pass client-ip=156.151.31.85; envelope-from=jag.raman@oracle.com;
- helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 14:20:51
+Received-SPF: pass client-ip=156.151.31.86; envelope-from=jag.raman@oracle.com;
+ helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:51:59
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -53
-X-Spam_score: -5.4
-X-Spam_bar: -----
-X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,51 +128,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+remote-machine object sets up various subsystems of the remote
+device process. Instantiate PCI host bridge object and initialize RAM, IO &
+PCI memory regions.
 
-Defines a PCI Device proxy object as a child of TYPE_PCI_DEVICE.
-
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- MAINTAINERS            |  2 ++
- hw/pci/Makefile.objs   |  1 +
- hw/pci/proxy.c         | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/pci/proxy.h | 26 ++++++++++++++++
- 4 files changed, 109 insertions(+)
- create mode 100644 hw/pci/proxy.c
- create mode 100644 include/hw/pci/proxy.h
+ MAINTAINERS                  |  2 ++
+ hw/i386/Makefile.objs        |  1 +
+ hw/i386/remote.c             | 69 ++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/i386/remote.h     | 28 ++++++++++++++++++
+ include/hw/pci-host/remote.h |  1 +
+ 5 files changed, 101 insertions(+)
+ create mode 100644 hw/i386/remote.c
+ create mode 100644 include/hw/i386/remote.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 2da7680..a8f097a 100644
+index d781a28..32e264e 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -3051,6 +3051,8 @@ F: include/hw/i386/remote-obj.h
- F: hw/i386/remote-obj.c
- F: include/hw/i386/remote-memory.h
- F: hw/i386/remote-memory.c
-+F: hw/pci/proxy.c
-+F: include/hw/pci/proxy.h
+@@ -3042,6 +3042,8 @@ M: John G Johnson <john.g.johnson@oracle.com>
+ S: Maintained
+ F: hw/pci-host/remote.c
+ F: include/hw/pci-host/remote.h
++F: hw/i386/remote.c
++F: include/hw/i386/remote.h
  
  Build and test automation
  -------------------------
-diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
-index c78f2fb..515dda5 100644
---- a/hw/pci/Makefile.objs
-+++ b/hw/pci/Makefile.objs
-@@ -12,3 +12,4 @@ common-obj-$(CONFIG_PCI_EXPRESS) += pcie_port.o pcie_host.o
+diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+index 6abc745..5ead266 100644
+--- a/hw/i386/Makefile.objs
++++ b/hw/i386/Makefile.objs
+@@ -14,6 +14,7 @@ obj-$(CONFIG_XEN) += ../xenpv/ xen/
+ obj-$(CONFIG_VMPORT) += vmport.o
+ obj-$(CONFIG_VMMOUSE) += vmmouse.o
+ obj-$(CONFIG_PC) += port92.o
++obj-$(CONFIG_MPQEMU) += remote.o
  
- common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
- common-obj-$(CONFIG_ALL) += pci-stub.o
-+obj-$(CONFIG_MPQEMU) += proxy.o
-diff --git a/hw/pci/proxy.c b/hw/pci/proxy.c
+ obj-y += kvmvapic.o
+ obj-$(CONFIG_ACPI) += acpi-common.o
+diff --git a/hw/i386/remote.c b/hw/i386/remote.c
 new file mode 100644
-index 0000000..014c1cb
+index 0000000..a67be33
 --- /dev/null
-+++ b/hw/pci/proxy.c
-@@ -0,0 +1,80 @@
++++ b/hw/i386/remote.c
+@@ -0,0 +1,69 @@
 +/*
++ * Machine for remote device
++ *
++ *  This machine type is used by the remote device process in multi-process
++ *  QEMU. QEMU device models depend on parent busses, interrupt controllers,
++ *  memory regions, etc. The remote machine type offers this environment so
++ *  that QEMU device models can be used as remote devices.
++ *
 + * Copyright © 2018, 2020 Oracle and/or its affiliates.
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
@@ -183,82 +194,66 @@ index 0000000..014c1cb
 +#include "qemu/osdep.h"
 +#include "qemu-common.h"
 +
-+#include "hw/pci/proxy.h"
-+#include "hw/pci/pci.h"
++#include "hw/i386/remote.h"
++#include "exec/address-spaces.h"
++#include "exec/memory.h"
 +#include "qapi/error.h"
-+#include "io/channel-util.h"
-+#include "hw/qdev-properties.h"
-+#include "monitor/monitor.h"
 +
-+static void proxy_set_socket(PCIProxyDev *pdev, int fd, Error **errp)
++static void remote_machine_init(MachineState *machine)
 +{
-+    pdev->ioc = qio_channel_new_fd(fd, errp);
++    MemoryRegion *system_memory, *system_io, *pci_memory;
++    RemoteMachineState *s = REMOTE_MACHINE(machine);
++    RemotePCIHost *rem_host;
++
++    system_memory = get_system_memory();
++    system_io = get_system_io();
++
++    pci_memory = g_new(MemoryRegion, 1);
++    memory_region_init(pci_memory, NULL, "pci", UINT64_MAX);
++
++    rem_host = REMOTE_HOST_DEVICE(qdev_new(TYPE_REMOTE_HOST_DEVICE));
++
++    rem_host->mr_pci_mem = pci_memory;
++    rem_host->mr_sys_mem = system_memory;
++    rem_host->mr_sys_io = system_io;
++
++    s->host = rem_host;
++
++    object_property_add_child(OBJECT(s), "remote-device", OBJECT(rem_host));
++    memory_region_add_subregion_overlap(system_memory, 0x0, pci_memory, -1);
++
++    qdev_realize(DEVICE(rem_host), sysbus_get_default(), &error_fatal);
 +}
 +
-+static Property proxy_properties[] = {
-+    DEFINE_PROP_STRING("fd", PCIProxyDev, fd),
-+    DEFINE_PROP_END_OF_LIST(),
++static void remote_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++
++    mc->init = remote_machine_init;
++}
++
++static const TypeInfo remote_machine = {
++    .name = TYPE_REMOTE_MACHINE,
++    .parent = TYPE_MACHINE,
++    .instance_size = sizeof(RemoteMachineState),
++    .class_init = remote_machine_class_init,
 +};
 +
-+static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
++static void remote_machine_register_types(void)
 +{
-+    PCIProxyDev *dev = PCI_PROXY_DEV(device);
-+    int fd;
-+
-+    if (dev->fd) {
-+        fd = monitor_fd_param(cur_mon, dev->fd, errp);
-+        if (fd == -1) {
-+            error_prepend(errp, "proxy: unable to parse fd: ");
-+            return;
-+        }
-+        proxy_set_socket(dev, fd, errp);
-+    } else {
-+        error_setg(errp, "fd parameter not specified for %s",
-+                   DEVICE(device)->id);
-+    }
++    type_register_static(&remote_machine);
 +}
 +
-+static void pci_proxy_dev_exit(PCIDevice *pdev)
-+{
-+    PCIProxyDev *dev = PCI_PROXY_DEV(pdev);
-+
-+    qio_channel_close(dev->ioc, NULL);
-+}
-+
-+static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+
-+    k->realize = pci_proxy_dev_realize;
-+    k->exit = pci_proxy_dev_exit;
-+    device_class_set_props(dc, proxy_properties);
-+}
-+
-+static const TypeInfo pci_proxy_dev_type_info = {
-+    .name          = TYPE_PCI_PROXY_DEV,
-+    .parent        = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(PCIProxyDev),
-+    .class_init    = pci_proxy_dev_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { },
-+    },
-+};
-+
-+static void pci_proxy_dev_register_types(void)
-+{
-+    type_register_static(&pci_proxy_dev_type_info);
-+}
-+
-+type_init(pci_proxy_dev_register_types)
-diff --git a/include/hw/pci/proxy.h b/include/hw/pci/proxy.h
++type_init(remote_machine_register_types);
+diff --git a/include/hw/i386/remote.h b/include/hw/i386/remote.h
 new file mode 100644
-index 0000000..0a66ddc
+index 0000000..5b36b25
 --- /dev/null
-+++ b/include/hw/pci/proxy.h
-@@ -0,0 +1,26 @@
++++ b/include/hw/i386/remote.h
+@@ -0,0 +1,28 @@
 +/*
++ * Remote machine configuration
++ *
 + * Copyright © 2018, 2020 Oracle and/or its affiliates.
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
@@ -266,24 +261,36 @@ index 0000000..0a66ddc
 + *
 + */
 +
-+#ifndef PROXY_H
-+#define PROXY_H
++#ifndef REMOTE_MACHINE_H
++#define REMOTE_MACHINE_H
 +
-+#include "hw/pci/pci.h"
-+#include "io/channel.h"
++#include "qom/object.h"
++#include "hw/boards.h"
++#include "hw/pci-host/remote.h"
 +
-+#define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
++typedef struct RemoteMachineState {
++    MachineState parent_obj;
 +
-+#define PCI_PROXY_DEV(obj) \
-+            OBJECT_CHECK(PCIProxyDev, (obj), TYPE_PCI_PROXY_DEV)
++    RemotePCIHost *host;
++} RemoteMachineState;
 +
-+typedef struct PCIProxyDev {
-+    PCIDevice parent_dev;
-+    char *fd;
-+    QIOChannel *ioc;
-+} PCIProxyDev;
++#define TYPE_REMOTE_MACHINE "remote-machine"
++#define REMOTE_MACHINE(obj) \
++    OBJECT_CHECK(RemoteMachineState, (obj), TYPE_REMOTE_MACHINE)
 +
-+#endif /* PROXY_H */
++#endif
+diff --git a/include/hw/pci-host/remote.h b/include/hw/pci-host/remote.h
+index bab6d3c..cc0fff4 100644
+--- a/include/hw/pci-host/remote.h
++++ b/include/hw/pci-host/remote.h
+@@ -25,6 +25,7 @@ typedef struct RemotePCIHost {
+ 
+     MemoryRegion *mr_pci_mem;
+     MemoryRegion *mr_sys_io;
++    MemoryRegion *mr_sys_mem;
+ } RemotePCIHost;
+ 
+ #endif
 -- 
 1.8.3.1
 
