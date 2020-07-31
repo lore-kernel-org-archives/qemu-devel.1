@@ -2,91 +2,94 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5406EC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 07:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74783C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 07:55:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F54520829
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 07:52:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E091207F5
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 07:55:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aWz2ascC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F54520829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="dkBUZNkn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E091207F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1PqV-0003Cd-Er
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 03:52:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52074)
+	id 1k1PtK-0004C6-Am
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 03:55:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k1Ppo-0002lp-CI
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 03:52:08 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51075
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k1Ppm-0000pp-Fc
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 03:52:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596181925;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=s+QnI68YqBKqFylR7G/MFs8rxzhqAWK9M0SHd6+x0C0=;
- b=aWz2ascCtY3X2svMpHHx13uuLtXY2MnjiUsZor7nqtZcX6oNj19Kx7/ttDJrQQi+ZSaBnG
- s3qXOkJc4g3+EsIY98UQqQs887pUebbZ98Kpwq1aSvs9sATSJFtiFhoagRT+dJ5JPbjxkK
- /QPyfrPoeCPYSLeHEfnp+GN3buenBDY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-AQ8aS-grOOimahGbJaMm3A-1; Fri, 31 Jul 2020 03:52:02 -0400
-X-MC-Unique: AQ8aS-grOOimahGbJaMm3A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F23968017FB;
- Fri, 31 Jul 2020 07:52:00 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-153.ams2.redhat.com [10.36.112.153])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DF88A10013C4;
- Fri, 31 Jul 2020 07:51:58 +0000 (UTC)
-Subject: Re: [PATCH for-5.2 1/6] pc-bios/s390-ccw/Makefile: Compile with
- -std=gnu99, -fwrapv and -fno-common
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200728183734.7838-1-thuth@redhat.com>
- <20200728183734.7838-2-thuth@redhat.com>
- <cd6b0a45-deeb-bf36-1763-c79b1759e892@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <7a7e9ea0-1630-e24e-c6ae-3026c07ed9a9@redhat.com>
-Date: Fri, 31 Jul 2020 09:51:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1k1PqN-0003IS-2W
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 03:52:43 -0400
+Received: from mout.web.de ([217.72.192.78]:57157)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1k1PqJ-0000vt-Bv
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 03:52:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1596181947;
+ bh=3k8OaWwjiE/sMMkrIV3Wf++LcBggb3wqBedD/3L5oYQ=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=dkBUZNknJoaodqbygE+wDDgb+Fcazkw0c74vKOd8bDYqktR4j/Imib/aDRomKDYZi
+ +fNV7mgBoRHpdwFjQl2/J2ExV383W678NdHczJHGfwoTyncfRpUsvuF51BiKMN8u3V
+ 5inCcoRbgnZDzEkuf+geQDo6T9d6PEP6aj4FAlNo=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([88.130.61.42]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lrs70-1klyo03Kyk-013gSS; Fri, 31
+ Jul 2020 09:52:26 +0200
+Date: Fri, 31 Jul 2020 09:52:17 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: Derek Su <dereksu@qnap.com>
+Subject: Re: [PATCH v1 0/1] COLO: migrate dirty ram pages before colo
+ checkpoint
+Message-ID: <20200731094940.7a26e583@luklap>
+In-Reply-To: <20200621021004.5559-1-dereksu@qnap.com>
+References: <20200621021004.5559-1-dereksu@qnap.com>
 MIME-Version: 1.0
-In-Reply-To: <cd6b0a45-deeb-bf36-1763-c79b1759e892@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 02:46:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Type: multipart/signed; boundary="Sig_/J.VP9aqn2UTKOSVy+4jyF49";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:vqEl0azvZ94Vtj3JXkqoT/YSqoiirLLTapXvmNjEW4SFJP1kF6T
+ iMo8E4igeEBpJTPLSpzgfBycpuoT9CsvZWQa7N7v8FGewxTzj+MegDKZD+/gIfIRS7maH1B
+ CBPUlGs6PMM9lzPrDsIzWYwl3oaxYkEbtGoEK7VqVfh31hR6KrT/M/gnMrAES6h3Zi3AQbq
+ cKN6UG2JycAGMU+z4Vs5g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Oj56s0PUhM8=:AL9D597BdW/PPyXUv7jOfU
+ pBJhFPUTl6sNcWEz/eQQIqf4CjYU+ull2ij2SHxkW/HL+6QIzYpNf4oYrpHqcPpa5ZlEn+RLF
+ JH3i84oXIFJ0jv0ZsaE5/IPlfSVWu0aGBTdoiEHC/eiksebCmXADVkSHIPJupWNhMGCaSJQCJ
+ f+d1hdfLTR3wsMnxzg6wVrcqzWY7HUdgeqhuR7jpCh9VmUJ/+nZS3AC8eSfJE7onQjUnOKXPL
+ xRflHDg0rm8pv7BJN4wmX/Ofqv7dXWNzu7q5LlxdlTPeZLzutdfgejIEh33YmYzMa8HasSN7v
+ rnnr6TyMfKJTTBmb9siBQWPdP1J+ikF5exynyBmkrjRc0nffDjbQTlkaJs2cfUl+Lly38TGYM
+ k1FEYMONZSSrvDaVNGkl9CqVPDE9y5dMpUyYfHSAOduf0Z5sHF3pVrxqfIHPNBH3prkRPq0m4
+ xBv4ox/6fAaEK5YSNIOuC3MdvxLoPISYgItGenoO2Rww19HQQSgNNF7rwLUM+3r8cvaiVNfGT
+ czbZ9pupcLowIZAUE0y24Hr6rKqDumiJH4bBXRPLpcdN6cSsPNs1+wI614LA076VPZfIoMcM5
+ D0ziFMPsn/lUPPzw8Gsui3tbORBE0AfQI/MnQeSUR2g0ZzKBeDlvQWeiFOM+er0xMHO0u0KiI
+ CIJsPZtMZfC5pQfeW845fktBligzvTx4kB4lbSNE6pIAwPsrcJGOJG0nSq2PYWoNWoDHrQdMb
+ jg8rPIXTUKE0Ge2B6ViuI3ZXAaHlzGiHLKIt2JwqJJWb7q7bQ0VTicdGXeaW8z74eAmiT0Bnq
+ YDCS1uIAxnJO8XfWo3yv1Jss7RlL6ZxEnN+ymeiFu9ZsJ1nwA4MKj6Tyk2aHhUigcEZ0SbB2b
+ 86QM0bf0GYOQ9UImsswcHqC7diEOEtV3IOlyAas5azkwFPiaTZlcbyXJspC2CUVtxgcDtXI6h
+ keireGARMwa1/rMJbMJt7V2MmKxWGa62jVq4TA8e7nxnT/rzrjySzhgo2sRnIV+CW1FKC4D7U
+ IsSP7VkrJKcwxllaHwHJgPZNT79NDk0NN2fJbF+oHAhd6POvgwzKOrI2vodnzA6s/H/cSk32x
+ ktgIMCswVT1uDFvJq5HHRZKEF1tOI/hkym35tNmWu50SlD2HF3M/sN1/8aBzEuBHhFHL7pcWR
+ jSzv/woW4ujj0CKRl2cSyTDJnalsIMyAKG4lBzyMMgDmyWTN+h8YE248bkeiwGPWRzNBUuFQ5
+ iBUNWTWWR+9FOESEWdEUnuA+awSduEzV/q40ShQ==
+Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 03:52:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -34
+X-Spam_score: -3.5
+X-Spam_bar: ---
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,33 +103,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Collin Walling <walling@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: zhang.zhanghailiang@huawei.com, chyang@qnap.com, quintela@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, ctcheng@qnap.com,
+ jwsu1986@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/07/2020 09.46, Janosch Frank wrote:
-> On 7/28/20 8:37 PM, Thomas Huth wrote:
->> The main QEMU code is compiled with -std=gnu99, -fwrapv and -fno-common.
->> We should use the same flags for the s390-ccw bios, too, to avoid that
->> we get different behavior with different compiler versions that changed
->> their default settings in the course of time (it happened at least with
->> -std=... and -fno-common in the past already).
->>
->> While we're at it, also group the other flags here in a little bit nicer
->> fashion: Move the two "-m" flags out of the "-f" area and specify them on
->> a separate line.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> 
-> What was the argument for z900 again? TCG?
+--Sig_/J.VP9aqn2UTKOSVy+4jyF49
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Yes. As long as you can still select "-cpu z900" as parameter, the bios
-should of course support that CPU level, too.
+On Sun, 21 Jun 2020 10:10:03 +0800
+Derek Su <dereksu@qnap.com> wrote:
 
- Thomas
+> This series is to reduce the guest's downtime during colo checkpoint
+> by migrating dirty ram pages as many as possible before colo checkpoint.
+>=20
+> If the iteration count reaches COLO_RAM_MIGRATE_ITERATION_MAX or
+> ram pending size is lower than 'x-colo-migrate-ram-threshold',
+> stop the ram migration and do colo checkpoint.
+>=20
+> Test environment:
+> The both primary VM and secondary VM has 1GiB ram and 10GbE NIC
+> for FT traffic.
+> One fio buffer write job runs on the guest.                              =
+                                                                           =
+           =20
+> The result shows the total primary VM downtime is decreased by ~40%.
+>=20
+> Please help to review it and suggestions are welcomed.
+> Thanks.
 
+Hello Derek,
+Sorry for the late reply.
+I think this is not a good idea, because it unnecessarily introduces a dela=
+y between checkpoint request and the checkpoint itself and thus impairs net=
+work bound workloads due to increased network latency. Workloads that are i=
+ndependent from network don't cause many checkpoints anyway, so it doesn't =
+help there either.
+
+Hailang did have a patch to migrate ram between checkpoints, which should h=
+elp all workloads, but it wasn't merged back then. I think you can pick it =
+up again, rebase and address David's and Eric's comments:
+https://lore.kernel.org/qemu-devel/20200217012049.22988-3-zhang.zhanghailia=
+ng@huawei.com/T/#u
+
+Hailang, are you ok with that?
+
+Regards,
+Lukas Straub
+
+--Sig_/J.VP9aqn2UTKOSVy+4jyF49
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl8jzbEACgkQNasLKJxd
+slgOChAAg6/br8DiPI+PJEcn30E4DqPWxxNb6d0iZnov/Imdr/P5HmtLCmLvuYza
+B3fJ+fl01CbldIFL2Oo4G62Wwh1NyuOX8FEVAHFQOxIQ3KvbkoVHb5WKhy2QJz2C
+47VxTyxmm1Vk3fL9OF1LNNylrO4e5Aq6uz0vAYw2ZSFFE75tKhZK1botYyIZndtt
+X7ckufjobLP+JOuqCmBw6fWFtlphfdvlJ9ChN9crFQUCifRqCPnzs1kX90M47DPc
+Re2aQJB6nUZwh0CFAMIF46pPt91NXHYp23wV1L1WsIbsyEUYlY0m0y14UHzwu+b9
+UrJKOOzxhIUVIW//8wh+Xs023Gsl5Xw+dQTSfFbDPZzpa36XZpBff+hPbju3Uk47
+29eAt4yIpbHYLPbfOL6FfoMQlInzxUToIYvrAMo3YiOIQ6T5E7sXAawqYgKTV6x3
+1w1AVJgoJq/JoafO4FwYDgSEh48zDnmEcNoXTmv0wFJjX+1wMj8Gnlxmuk/h6ZSq
+AQ22LIt+L18qUyHNo3jS4hszMKuSdxdWtMvYq373WtydoWTdJoYoI6PfM7Et7pgL
+/qXDhSpMVbLbhISS3HAmDKDyZpOz/+VnXgIZrRbMiqAjyrOkHDVYPj9HhGfS1/Za
+vCVmw60fetJOe4eWftqI+jI3+q5vbsMjEcVzrkc0A5Y8ful6JW4=
+=edeJ
+-----END PGP SIGNATURE-----
+
+--Sig_/J.VP9aqn2UTKOSVy+4jyF49--
 
