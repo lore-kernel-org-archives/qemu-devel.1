@@ -3,92 +3,90 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0198C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB9CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:30:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC98422CF7
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:22:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16526208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:30:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kqx2dnQI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC98422CF7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="JEw/kOqr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16526208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1RFS-0006CP-Rm
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 05:22:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41024)
+	id 1k1RMe-00011D-3I
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 05:30:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k1REg-0005eB-Pw
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 05:21:54 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41378
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k1REd-0002Yf-Ld
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 05:21:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596187310;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4uvFTpdNk6J+HXQFnrrocG1d9Vy30mBovL6xJCMnAYo=;
- b=Kqx2dnQINiCfvUx5uPcDYR3xL0v+mp/HUlyvLjhDq9YiCIb3uyIdRtil4uW+issiBpDJum
- MqlBD4qf0JPu2V4jJ/qfhbHp0y+DgdBWIJ4Zvka1paCAit0Y0y7hFNrEAfRJHyWSH5lZeR
- AXecJFsN6DAczMGLNOC4/9J5sV/cQNA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-Duk6wM7OOJWhquowySOTMg-1; Fri, 31 Jul 2020 05:21:47 -0400
-X-MC-Unique: Duk6wM7OOJWhquowySOTMg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1AF818C63C0;
- Fri, 31 Jul 2020 09:21:45 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D617B60BF3;
- Fri, 31 Jul 2020 09:21:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 71B471132FD2; Fri, 31 Jul 2020 11:21:35 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH] schemas: Add vim modeline
-References: <20200729185024.121766-1-abologna@redhat.com>
- <87ime52wxd.fsf@dusky.pond.sub.org>
- <20200730093732.GB3477223@redhat.com>
- <87k0ylz0ep.fsf@dusky.pond.sub.org>
- <20200730132446.GL3477223@redhat.com>
- <ce88d35d-ff34-7e27-4518-c087ccd709cd@redhat.com>
-Date: Fri, 31 Jul 2020 11:21:35 +0200
-In-Reply-To: <ce88d35d-ff34-7e27-4518-c087ccd709cd@redhat.com> (John Snow's
- message of "Fri, 31 Jul 2020 02:45:54 -0400")
-Message-ID: <87zh7grqe8.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1k1RJI-0007aN-Ae; Fri, 31 Jul 2020 05:26:40 -0400
+Received: from mout.web.de ([212.227.17.12]:33799)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1k1RJG-0003FT-5p; Fri, 31 Jul 2020 05:26:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1596187591;
+ bh=6iMVISeNf/a8F1CLRILWmWekUb18QBn8w3n1uied6b4=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=JEw/kOqrJStkJn4qmJnj6NqZkuuoNkbSMXfJW/Wk43k14mVbCQFg+wxlHKqabjQcz
+ gZDadOyYKtSP3rDlrc0KqfWXYDqjd+ayZeIsB+Vxb/dsiKvSFjEa9XKvvlhnpik150
+ Aic9twv4yzYzeBP55r7jW24K78ZQj3RZbqPtrlwY=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([88.130.61.42]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MIL0Q-1jy7vu3TvA-00Enp8; Fri, 31
+ Jul 2020 11:26:30 +0200
+Date: Fri, 31 Jul 2020 11:26:21 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH v6 0/9] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <cover.1596184200.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 04:33:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+Content-Type: multipart/signed; boundary="Sig_/5Vu23TWvf86BJFdZE9wMLR/";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:aLzRWyVXOlBHhQF4VqSBe6oO5uGEQnDOpk0AdlM8zf90FK1v22b
+ HIMD56npIWnFVTPbZIys5tfgZXtNxFmiEIG5mEULKsdbTfy2AzY3oSnTRZs/721IAs08HQZ
+ HEpyH+hP/nRGgQP56eQ4kiXIpHDNkhz5cmd5+ZL/LOG3026pbRm2q0OIq3pLX/pmC4bWycd
+ i5OGnJzqkQ9q+YSzwGjzg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lXfGxIKOFu4=:3TjAN3kBV3obWS/WrjAkNg
+ 9Mq9khdi8RM4dk+Gth/OlL9e45STAy8s5d8l7twOK/Yt60J7qHUZZWZ0H2oxgOFaM+UyWogF3
+ YaYEPhDrHED9DPMMuMR5i1xOC39Bls+L+dbhNZhnV6weHaaWJxMMEYE63O2wLU7y3eYrstKOh
+ 5/Spp84UraqGgtF/GFmXly9B0MM1C4jh/kaVDVhpWA8PTdAcvKXkkORKRI0jBQdrSjQtMIL67
+ BYQErgOXYcTqlmSK9qNhdAwIMzr4p0oHdvRtn+esnm8MAt5XmMxHPOXNLyKDwhIkGaEekgksK
+ F9XqeFXV3J3qfy0QyP7FPIGRNUgGXHy27IUP6R3j98NMW7z3Kjx/iAh/dlNTkMPOKuwYQO+OU
+ W8X4+ZKmbyt76G+I7NEDnyNxGexCvlRWqUSe9npBAkoDdMgLrVo/sIPuX4x9No/4J1T7GeNxF
+ mSayLcYdUg1tPR4j70pnUYf6hOv4qWfP97aa7InNdwf2+BeyzPPIfCdGBsmPb8/As1JrqFoI+
+ Xk25/S+ki/eIFPnV6ElknMOd3hUdwNvxhL1OrVhMnZz2TPfErToHZGUR9X39i2hNmVehwOwus
+ yeiBliLLzC2HaC7j5Jcb0T8+k+N1hnQkjky7w0/PhG6/7qqz6Z+k+usg+a2h0d8gLsQ46o/ya
+ 0Paup3wLaqGX4BfZZsqrOYC7FUps5aWTSwlg9/XEGXGj7JxatYLIdAxC3y5jnxITjd7GelNyO
+ ZinF5dppNdX4EGtdexSogyQ9q34a1gh1l4o26hUIAuSXVkTx2ACSUbjCnh+YbU3LYTQ7C10bi
+ WlmFT4VW44uKm+uAGGIJ87nc9k6KMcRkrDhF+ghFV2TNw6Mg+BED0Css0SqEmZVTWb1GgyW0k
+ ywqTaLZ0Lb5PKOCmFsNaJsummq+rHTsX59jtTw4IBNOgdBNkiWauu80qb1JI9y7hWGXuB0Afc
+ 0RAt/x9wePsNrRLX0t3lUGvhULnPjKj0UAUzFWP1EEqmhx7TlKiaEekUCtV8v+8Ot2G0S0cnb
+ tAQ8h7zccoOygwN2yBNBWkmGf0jPSH/zRIMLLrsGiHODmtwurDEnVdxZIofJBBDsRyibSu2ZJ
+ A0RiRCdw+yb6mXISUaowa67eYr9VrAvgCJ2octHp/Hyige3rzl5EjjEPoB9qIblKENLIjLV9C
+ vvxJqtf/a9g+Jtxdtaeaoz4r2zHdJenvlM0fzjra9RAk/Y6BPnDUmW6CmVgycdKW6W3vpKq96
+ 9r4hRIhuCHIr0RSpJe5jPat/mHf2tEXOuz0U9Bw==
+Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 05:26:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,170 +99,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan
+ Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+--Sig_/5Vu23TWvf86BJFdZE9wMLR/
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 7/30/20 9:24 AM, Daniel P. Berrang=C3=A9 wrote:
->> On Thu, Jul 30, 2020 at 01:51:10PM +0200, Markus Armbruster wrote:
->>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->>>
->>>>                                modify them so that we can load the
->>>> files straight into the python intepretor as code, and not parse
->>>> them as data. I feel unhappy about treating data as code though.
->>>
->>> Stress on *can* load.  Doesn't mean we should.
->>>
->>> Ancient prior art: Lisp programs routinely use s-expressions as
->>> configuration file syntax.  They don't load them as code, they read the=
-m
->>> as data.
->>>
->>> With Python, it's ast.parse(), I think.
->>
->> Yes, that could work
->>
->
-> I use a similar trick for parsing "Fuzzy JSON" inside of qmp-shell.
->
-> It's cute, and I'm not really proud of it.
->
->>
->>>> struct: ImageInfoSpecificQCow2
->>>> data:
->>>>    compat: str
->>>>    "*data-file": str
->>>>    "*data-file-raw": bool
->>>>    "*lazy-refcounts": bool
->>>>    "*corrupt": bool
->>>>    refcount-bits: int
->>>>    "*encrypt": ImageInfoSpecificQCow2Encryption
->>>>    "*bitmaps":
->>>>      - Qcow2BitmapInfo
->>>>    compression-type: Qcow2CompressionType
->>>>
->>>>
->>>> Then we could use a regular off the shelf YAML parser in python.
->>>>
->
-> I have a prototype where I started this, but I use "---" as a document
-> separator to allow us multiple definitions per file so that the
-> nesting remains pleasant.
->
-> (YAML does not allow you to duplicate field names.)
->
->>>> The uglyiness with quotes is due to the use of "*". Slightly less ugly
->>>> if we simply declare that quotes are always used, even where they're
->>>> not strictly required.
->>>
->>> StrictYAML insists on quotes.
->>
->> I wouldn't suggest StrictYAML, just normal YAML is what pretty much
->> everyone uses.
->>  > If we came up with a different way to mark a field as optional
->> instead of using the magic "*" then we wouldn't need to quote
->> anything
->>
->
-> I have a YAML prototype branch where I use `?field` to indicate
-> optional syntax. It works just fine, at the expense of being slightly
-> new to people.
->
-> I tested with normal YAML, but I was thinking about adopting strict
-> YAML because Markus wanted some assurance we wouldn't get lost in the
-> weeds using complex feature of YAML.
->
-> (Or, shoot ourselves entirely by accident.)
->
-> My prototype doesn't use anything that Strict YAML prohibits, so I
-> thought it was a good idea.
->
-> IF -- IF IF IF IF IF we decide that actually we need the crazy
-> horsepower of standard YAML, or that strict YAML is too buggy -- we
-> could always just replace it. No real big deal.
->
->>> I hate having to quote identifiers.  There's a reason we don't write
->>>
->>>      'int'
->>>      'main'('int', 'argc', 'char' *'argv'[])
->>>      {
->>>          'printf'("hello world\n");
->>>          return 0;
->>>      }
->>>
->
-> Fair enough ... but there's no special meaning to quoting or not
-> quoting the RHS in YAML, so maybe it's best to avoid pretending like
-> there's a structural semantic between an identifier and a string
-> there.
->
-> (Since they're both just strings, and the semantic difference is
-> picked up inside the QAPI generator post-parse.)
+Hello Everyone,
+In many cases, if qemu has a network connection (qmp, migration, chardev, e=
+tc.)
+to some other server and that server dies or hangs, qemu hangs too.
+These patches introduce the new 'yank' out-of-band qmp command to recover f=
+rom
+these kinds of hangs. The different subsystems register callbacks which get
+executed with the yank command. For example the callback can shutdown() a
+socket. This is intended for the colo use-case, but it can be used for other
+things too of course.
 
-You wish...
+Regards,
+Lukas Straub
 
-An unquoted right hand side is a string, unless it can be interpreted as
-something else.  For instance, when something else is one of the
-eleven(?) ways to say false, you have a variation of YAML's Norway
-problem:
+v6:
+ -add Reviewed-by and Acked-by tags
+ -rebase on master
+ -lots of changes in nbd due to rebase
+ -only take maintainership of util/yank.c and include/qemu/yank.h (Daniel P=
+. Berrang=C3=A9)
+ -fix a crash discovered by the newly added chardev test
+ -fix the test itself
 
-https://hitchdev.com/strictyaml/why/implicit-typing-removed/
+v5:
+ -move yank.c to util/
+ -move yank.h to include/qemu/
+ -add license to yank.h
+ -use const char*
+ -nbd: use atomic_store_release and atomic_load_aqcuire
+ -io-channel: ensure thread-safety and document it
+ -add myself as maintainer for yank
 
->>>> struct: ImageInfoSpecificQCow2
->>>> data:
->>>>    "compat": "str"
->>>>    "*data-file": "str"
->>>>    "*data-file-raw": "bool"
->>>>    "*lazy-refcounts": "bool"
->>>>    "*corrupt": "bool"
->>>>    "refcount-bits": "int"
->>>>    "*encrypt": "ImageInfoSpecificQCow2Encryption"
->>>>    "*bitmaps":
->>>>      - "Qcow2BitmapInfo"
->>>>    "compression-type": "Qcow2CompressionType"
->>>>
->>>> With the use of "---" to denote the start of document, we have no trou=
-ble
->>>> parsing our files which would actually be a concatenation of multiple
->>>> documents. The python YAML library provides the easy yaml.load_all()
->>>> method.
->>>
->
-> Nevermind the earlier comment, then.
->
->>> Required reading on YAML:
->>> https://www.arp242.net/yaml-config.html
->>
->> I don't think this is especially helpful to our evaluation. You can writ=
-e
->> such blog posts about pretty much any thing if you want to pick holes in=
- a
->> proposal. Certainly there's plenty of awful stuff you can write about
->> JSON, and Python.
->>
->>> Some of the criticism there doesn't matter for our use case.
->>
->> Yeah, what matters is whether it can do the job we need in a way that is
->> better than what we have today, and whether there are any further option=
-s
->> to consider that might be viable alternatives.
+v4:
+ -fix build errors...
 
-The sheer complexity of YAML puts me off.  The spec exceeds 20k words.
+v3:
+ -don't touch softmmu/vl.c, use __contructor__ attribute instead (Paolo Bon=
+zini)
+ -fix build errors
+ -rewrite migration patch so it actually passes all tests
 
-> I guess I'll dust off the work I have already to show the class.
+v2:
+ -don't touch io/ code anymore
+ -always register yank functions
+ -'yank' now takes a list of instances to yank
+ -'query-yank' returns a list of yankable instances
 
-Prototype code should beat guesswork.
+Lukas Straub (9):
+  Introduce yank feature
+  block/nbd.c: Add yank feature
+  chardev/char-socket.c: Add yank feature
+  migration: Add yank feature
+  io/channel-tls.c: make qio_channel_tls_shutdown thread-safe
+  io: Document thread-safety of qio_channel_shutdown
+  MAINTAINERS: Add myself as maintainer for yank feature
+  chardev/char.c: Check for duplicate id before creating chardev
+  tests/test-char.c: Wait for the chardev to connect in
+    char_socket_client_dupid_test
 
+ MAINTAINERS                   |   6 ++
+ block/nbd.c                   | 123 +++++++++++++----------
+ chardev/char-socket.c         |  24 +++++
+ chardev/char.c                |  11 ++-
+ include/io/channel.h          |   2 +
+ include/qemu/yank.h           |  79 +++++++++++++++
+ io/channel-tls.c              |   6 +-
+ migration/channel.c           |  12 +++
+ migration/migration.c         |  18 +++-
+ migration/multifd.c           |  10 ++
+ migration/qemu-file-channel.c |   6 ++
+ migration/savevm.c            |   2 +
+ qapi/misc.json                |  45 +++++++++
+ tests/Makefile.include        |   2 +-
+ tests/test-char.c             |   1 +
+ util/Makefile.objs            |   1 +
+ util/yank.c                   | 179 ++++++++++++++++++++++++++++++++++
+ 17 files changed, 469 insertions(+), 58 deletions(-)
+ create mode 100644 include/qemu/yank.h
+ create mode 100644 util/yank.c
+
+--
+2.20.1
+
+--Sig_/5Vu23TWvf86BJFdZE9wMLR/
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl8j470ACgkQNasLKJxd
+slhT3BAAimstLOsl9weJ5kab03+8Q2bh5UTZiryXQxROXoHEn/3nACMn5hUs9Dp0
+sgSjcAU1wph5yWw7ut84hy0XcXBZKHK/L6coCL5epyEQvdD8VHDmijOHcgOZgdM3
+2dl+afpPfwe+PgzJCNOG3mRpmlwc1UVn9L8Q0Qc49wpg8QsuRKp1cz2X3neuFrNb
+r/85sTP98FQNO90AE7oWo9QDsSx+JCEQ8I4kt4R2UUDNf68VY6Jz05bpryi6IJcn
+JMTwNs0Q/1gnhvOyT7sAK2TaWuNfIO+XtkybUFbZu4qW8YaUsQjUJLx6TbRyC8nj
+P09Ex7A2KFCSjmiNx3hIvvN/zq+1lLjztajXnwGNbkYmtiCOt9FVmu+4yNan/TNV
+SVKtkqsgrrlS6jVgodwG6oRVftjdTof3UExuqPmu1HfHuAowfN5LVT0TtSVXVFhy
+7ni9JBjTNNYf/g8e6Kp0d66r+EYHo5NmGiAXwFKB4N1YuyWpwUN5P6XHYx+ZUvN5
+sEr0/F1cJzUD7GT0yLv2kX1Bq+VMPm7dCd0uMrgXSX9a93pRo94NKauX6LbLWeCs
+ozcPVGC24PRjfbpPAXnjK+I4QrFFx2QI/KG1gf9KSeIdgcRh8Rpl0iptf8ijep/E
+mVsghYEifPbzp4lC4AJ8h5vY+groqJR8Kqcuy6/0hs/VJNfWI/Q=
+=4wGH
+-----END PGP SIGNATURE-----
+
+--Sig_/5Vu23TWvf86BJFdZE9wMLR/--
 
