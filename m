@@ -2,94 +2,78 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A41AC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 03:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC3EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 03:53:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38F02206FA
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 03:34:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N521Xa8p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38F02206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 231F0207F5
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 03:53:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 231F0207F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1LoS-0002EN-Dx
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 23:34:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38868)
+	id 1k1M6U-0004HX-9u
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 23:53:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k1Lns-0001o2-Ki
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 23:33:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35360
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k1Lnq-0002zr-8A
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 23:33:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596166428;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/9ua6Rm2RK8h2W3ABTYLWZnU/mmGLn2TKWuvv9ktXzQ=;
- b=N521Xa8pwd7GrVe/LvHFKVRn7tGA6U5j2SbSuK+btR9XgDve+D9tbLqN5Uhr6ogvbwbHWN
- YKv8+4Yh1oOzFgFjy7im1sDl7jSqme+dbYVvFunq/OsSNCjn6o04fRDLJcP5qxRWPsXCHs
- 5mHmA5jem21lLE94joiCRoEJcplrKOc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-0qtElWasMxGXAbEHhALf4Q-1; Thu, 30 Jul 2020 23:33:47 -0400
-X-MC-Unique: 0qtElWasMxGXAbEHhALf4Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF33D19253C3;
- Fri, 31 Jul 2020 03:33:45 +0000 (UTC)
-Received: from [10.72.13.197] (ovpn-13-197.pek2.redhat.com [10.72.13.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2EC3260BE2;
- Fri, 31 Jul 2020 03:33:43 +0000 (UTC)
-Subject: Re: [PATCH 1/2] hw/net/net_tx_pkt: add function to check
- pkt->max_raw_frags
-To: Mauro Matteo Cascella <mcascell@redhat.com>
-References: <20200727170838.1101775-1-mcascell@redhat.com>
- <20200727170838.1101775-2-mcascell@redhat.com>
- <adb52967-d2b2-cb55-87a2-38fda18a2a0a@redhat.com>
- <CAA8xKjXagrLU+DVcO3uVw6D0sJHXQ_rOd0nqEHHNcaMwG6oXRA@mail.gmail.com>
- <3672bcc5-329f-0cc6-a505-e5b21a316a20@redhat.com>
- <CAA8xKjWoyTPEbW=xdKqtTHHn2krKssif9t6nEeWGDQLt7KmCvg@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <4f6c065e-de0c-4fe3-f4aa-8e98a48d2650@redhat.com>
-Date: Fri, 31 Jul 2020 11:33:42 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <likaige@loongson.cn>)
+ id 1k1M5l-0003m6-OF; Thu, 30 Jul 2020 23:52:21 -0400
+Received: from mail.loongson.cn ([114.242.206.163]:34858 helo=loongson.cn)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <likaige@loongson.cn>)
+ id 1k1M5i-0004vt-TA; Thu, 30 Jul 2020 23:52:21 -0400
+Received: from [10.130.0.69] (unknown [113.200.148.30])
+ by mail.loongson.cn (Coremail) with SMTP id AQAAf9DxX99ilSNf8dQCAA--.603S3;
+ Fri, 31 Jul 2020 11:52:03 +0800 (CST)
+Subject: Re: [PATCH v2 1/2] virtio-mem: Change PRIx32 to PRIXPTR to fix
+ compile error.
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <1596110248-7366-1-git-send-email-likaige@loongson.cn>
+ <601c098c-0f39-92be-8800-99f5fe99399f@redhat.com>
+From: Kaige Li <likaige@loongson.cn>
+Message-ID: <10b4681c-a129-3735-0395-7439b7d48742@loongson.cn>
+Date: Fri, 31 Jul 2020 11:52:02 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:45.0) Gecko/20100101
+ Thunderbird/45.4.0
 MIME-Version: 1.0
-In-Reply-To: <CAA8xKjWoyTPEbW=xdKqtTHHn2krKssif9t6nEeWGDQLt7KmCvg@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <601c098c-0f39-92be-8800-99f5fe99399f@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 23:33:48
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+X-CM-TRANSID: AQAAf9DxX99ilSNf8dQCAA--.603S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7urW8JrWxGw4rJFW8KF13XFb_yoW8CryDpw
+ 4xJ3ZYkw4UJr13Aan2q3WrWa4DCwn3GrnrtF4aqr15WFn8ur92gr4jkr4rWFW3Zr1DZw43
+ uryIgryYq3Z8ZaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDU0xBIdaVrnRJUUUkmb7Iv0xC_KF4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+ 0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+ A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+ jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
+ C2z280aVCY1x0267AKxVWxJr0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+ F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r4j6F
+ 4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vIY487
+ MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
+ 0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0E
+ wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJV
+ W8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+ 42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUcpVbUUUUU
+X-CM-SenderInfo: 5olntxtjh6z05rqj20fqof0/
+Received-SPF: pass client-ip=114.242.206.163; envelope-from=likaige@loongson.cn;
+ helo=loongson.cn
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 23:52:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,46 +87,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, ziming zhang <ezrakiez@gmail.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020/7/31 上午1:05, Mauro Matteo Cascella wrote:
-> On Thu, Jul 30, 2020 at 7:28 AM Jason Wang<jasowang@redhat.com>  wrote:
->> On 2020/7/29 上午12:26, Mauro Matteo Cascella wrote:
->>> On Tue, Jul 28, 2020 at 6:06 AM Jason Wang<jasowang@redhat.com>  wrote:
->>>> On 2020/7/28 上午1:08, Mauro Matteo Cascella wrote:
->>>>> This patch introduces a new function in hw/net/net_tx_pkt.{c,h} to check the
->>>>> current data fragment against the maximum number of data fragments.
->>>> I wonder whether it's better to do the check in
->>>> net_tx_pkt_add_raw_fragment() and fail there.
->>> Given the assertion, I assumed the caller is responsible for the
->>> check, but moving the check in net_tx_pkt_add_raw_fragment() totally
->>> makes sense to me.
->> Want to send a new version for this?
-> Sure, I'll send a new version. Thank you.
+
+On 07/30/2020 09:15 PM, Philippe Mathieu-Daudé wrote:
+> On 7/30/20 1:57 PM, Kaige Li wrote:
+>> When I compile qemu with such as:
+>>
+>> git clone https://git.qemu.org/git/qemu.git
+>> cd qemu
+>> git submodule init
+>> git submodule update --recursive
+>> ./configure
+>> make
+> ^ this timeless description is pointless (think at a developer
+> who read this in 2 weeks, 3 months, 1 year).
+Thanks for your suggestions, I will delete it.
 >
->>>> Btw, I find net_tx_pkt_add_raw_fragment() does not unmap dma when
->>>> returning to true, is this a bug?
->>> Isn't it unmapped in net_tx_pkt_reset()?
->> Probably but see how it was used in e1000e, the net_tx_pkt_reset() is
->> only called when eop is set. Is this a bug?
-> Yeah it all depends on E1000_TXD_CMD_EOP. Besides, if not set,
-> e1000e_tx_pkt_send() would never be called. Honestly, I don't know if
-> this is a reasonable scenario or not.
-
-
-It's probably fine since anyway e1000e_core_reset() will call 
-net_tx_pkt_reset().
-
-Thanks
-
-
+>> There is error log:
+>>
+>> /home/LiKaige/qemu/hw/virtio/virtio-mem.c: In function ‘virtio_mem_set_block_size’:
+>> /home/LiKaige/qemu/hw/virtio/virtio-mem.c:756:9: error: format ‘%x’ expects argument of type ‘unsigned int’, but argument 7 has type ‘uintptr_t’ [-Werror=format=]
+> What compiler are you using? That is the relevant information to
+> include.
+Gcc version is 4.9.4.
 >
->> Thanks
+>>           error_setg(errp, "'%s' property has to be at least 0x%" PRIx32, name,
+>>           ^
+>> cc1: all warnings being treated as errors
+>> /home/LiKaige/qemu/rules.mak:69: recipe for target 'hw/virtio/virtio-mem.o' failed
+>>
+>> So, change PRIx32 to PRIXPTR to fix this.
+>>
+>> Signed-off-by: Kaige Li <likaige@loongson.cn>
+>> ---
+>>   hw/virtio/virtio-mem.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
+>> index c12e9f7..3dcaf9a 100644
+>> --- a/hw/virtio/virtio-mem.c
+>> +++ b/hw/virtio/virtio-mem.c
+>> @@ -753,7 +753,7 @@ static void virtio_mem_set_block_size(Object *obj, Visitor *v, const char *name,
+>>       }
+>>   
+>>       if (value < VIRTIO_MEM_MIN_BLOCK_SIZE) {
+>> -        error_setg(errp, "'%s' property has to be at least 0x%" PRIx32, name,
+>> +        error_setg(errp, "'%s' property has to be at least 0x%" PRIXPTR "\n", name,
+>>                      VIRTIO_MEM_MIN_BLOCK_SIZE);
+>>           return;
+>>       } else if (!is_power_of_2(value)) {
 >>
 
 
