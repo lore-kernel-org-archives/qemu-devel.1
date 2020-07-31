@@ -2,86 +2,93 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08063C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 14:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D2BC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 15:09:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9C4B206E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 14:55:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4A8A21744
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 15:08:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LO2lyY5c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9C4B206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WNuLNR7J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4A8A21744
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1WRL-0007hI-11
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 10:55:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59256)
+	id 1k1WeZ-0005Ft-1O
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 11:08:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k1WQP-00077x-OX
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 10:54:21 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40985)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k1WQO-0001eH-2c
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 10:54:21 -0400
-Received: by mail-ot1-x341.google.com with SMTP id a65so13667434otc.8
- for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 07:54:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HL8rbpItYh57rQFmhUGenD+1qALQXnHJtL9E29zbp44=;
- b=LO2lyY5c5TytM2PBSAqntH4qzLGqBjLHvSomlgJF2xLaI9xKl37ZutbrHMFEdog9aH
- Jn2LWnqBS9EcNnm7ZdOLzaK1VUdY6cCWQ+Trcn3mNYRgwauMBZ+hV4kiMOFxOprFkqkb
- Pge6KlgupI+TtYxz0qj3DryaqhAJyBaG8jv1bGKQ8qN1LRv37n0qZgRHK+fVwmlVEEio
- yjPfe0cq4x+OeI5ScjTa/X4zI2yOY+nNGcuTdabKjKMjUvDl0S2KEBpOxUWQ1iAcSVi3
- N087xRg7yRoxTxhfCyfM2drlufjbGJIVFFkTe/AESVrlLnnyFI674jj+L0sKXstsGecx
- BFSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HL8rbpItYh57rQFmhUGenD+1qALQXnHJtL9E29zbp44=;
- b=EBZ2dGQ+C+ZTqVkmn8+MdYcmtloriTRVQfs2EMflkCkOvIRtKVTerZffzev6UGC+wy
- Uh1/vHoGY56awPNgRB0gctT1tGtQsafd2AmBePCOnJICWgkt8GOsMAVx02NAwIJKpsEM
- LkE/w3V6hd4/hgiV87lQo978ivs6tBYWg/Yt13/0WVZNJAB2QvkRqoVxMK4xsiqJvTj9
- gkyGLUuB0KLl1l5eJwGK9+ioRcIouP8/dnlcvt/fCFl57koFcM51r0bMGXt0f2IiB4UV
- TinPkrwBXLxnaq6CAi+66ZKq9BH6Z+DuUtYJrrerduZeORHiZVhLvaegp+yDyX0g6ilB
- owEQ==
-X-Gm-Message-State: AOAM533zsNIm+dxZ2OpHvZhxaWakOmNaVq6ZR21HkTc3/dPhnHKrIFs1
- /gqbOEZtsQHuSWKqE5igfH7t1MnckBczcQr1559k+w==
-X-Google-Smtp-Source: ABdhPJwXZME0dZWKkYUG7ipaFiTrmrWjPnb07tnRQcddU0bgaiwM+876WjGFKI0fuEz3nW8r5Iid4nt379gwLwSKrxc=
-X-Received: by 2002:a9d:5504:: with SMTP id l4mr3087480oth.221.1596207258592; 
- Fri, 31 Jul 2020 07:54:18 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k1Wds-0004l8-2a
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 11:08:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20380
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k1Wdp-0004KO-4U
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 11:08:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596208091;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=jY6lhzu26CxIzvdMyKvm0trMT4SNao1zKsW85j3G+WM=;
+ b=WNuLNR7J4xsiVAslwO2v3zLxZhXN30J1WBIgAglofNIxfwkycVispdxCXTq4YexYvHc5we
+ YLZ4bxHvdolb0QcKBpWF1VtWhTnW+BWIaimPk9aFjOShoOz4sX3ueamdbLQ0ZNQfExffpM
+ 2nqpF22Al3ci0DIqhihB6Exlv7jIKBU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-hQs0s23xOnixpSzT9nDkmQ-1; Fri, 31 Jul 2020 11:07:55 -0400
+X-MC-Unique: hQs0s23xOnixpSzT9nDkmQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE66B802B41;
+ Fri, 31 Jul 2020 15:07:53 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 41F4A7C0ED;
+ Fri, 31 Jul 2020 15:07:41 +0000 (UTC)
+Date: Fri, 31 Jul 2020 16:07:38 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] schemas: Add vim modeline
+Message-ID: <20200731150738.GB3660103@redhat.com>
+References: <20200729185024.121766-1-abologna@redhat.com>
+ <87ime52wxd.fsf@dusky.pond.sub.org>
+ <20200730093732.GB3477223@redhat.com>
+ <87k0ylz0ep.fsf@dusky.pond.sub.org>
+ <20200730132446.GL3477223@redhat.com>
+ <875za33ku1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20200711101033.47371-1-drjones@redhat.com>
- <20200711101033.47371-4-drjones@redhat.com>
-In-Reply-To: <20200711101033.47371-4-drjones@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 31 Jul 2020 15:54:07 +0100
-Message-ID: <CAFEAcA8h+6btvjvx=j5v7Gn12+bros_UgFScKHaWVxh0dmi-Qw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] hw/arm/virt: Implement kvm-steal-time
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <875za33ku1.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 04:39:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,126 +101,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 11 Jul 2020 at 11:10, Andrew Jones <drjones@redhat.com> wrote:
-> We add the kvm-steal-time CPU property and implement it for machvirt.
-> A tiny bit of refactoring was also done to allow pmu and pvtime to
-> use the same vcpu device helper functions.
->
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+On Fri, Jul 31, 2020 at 02:55:34PM +0200, Markus Armbruster wrote:
+> Daniel P. Berrangé <berrange@redhat.com> writes:
 
-Hi; I'm forwarding a couple of comments here from Beata,
-(whose secondment with Linaro is coming to an end so she won't
-have access to her Linaro email address to continue the conversation):
+> >> Some of the criticism there doesn't matter for our use case.
+> >
+> > Yeah, what matters is whether it can do the job we need in a way that is
+> > better than what we have today, and whether there are any further options
+> > to consider that might be viable alternatives.
+> 
+> Would it improve things enough to be worth the switching pain?
 
+The short answer is that I don't think that question matters. We should
+do the conversion regardless, as our JSON-but-not file format has no
+compelling reason to exist as a thing when there's a variety of standard
+file formats that could do the job. I'd explicitly ignore the sunk costs
+and minor amount of work to convert to a new format.
 
->  static void virt_cpu_post_init(VirtMachineState *vms)
->  {
-> -    bool aarch64, pmu;
-> +    bool aarch64, pmu, steal_time;
->      CPUState *cpu;
->
->      aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
->      pmu = object_property_get_bool(OBJECT(first_cpu), "pmu", NULL);
-> +    steal_time = object_property_get_bool(OBJECT(first_cpu),
-> +                                          "kvm-steal-time", NULL);
->
->      if (kvm_enabled()) {
-> +        hwaddr pvtime_base = vms->memmap[VIRT_PVTIME].base;
-> +        hwaddr pvtime_size = vms->memmap[VIRT_PVTIME].size;
-> +
-> +        if (steal_time) {
-> +            MemoryRegion *pvtime = g_new(MemoryRegion, 1);
-> +
-> +            memory_region_init_ram(pvtime, NULL, "pvtime", pvtime_size, NULL);
-> +            memory_region_add_subregion(get_system_memory(), pvtime_base,
-> +                                        pvtime);
-> +        }
+The long answer is that as a general philosophy I'm in favour of agressively
+eliminating anything that is custom to a project and isn't offering an
+compelling benefit over a functionally equivalent, commonly used / standard
+solution.
 
-B: I'm not sure whether it wouldn't be useful to have the area
-allocated with size determined by number of VCPUs instead of having
-pre-defined size.
+Any time a project re-invents the wheel, that is one more piece of custom
+knowledge a contributor has to learn. Each one may seem insignificant on
+its own, but cummulatively they result in death by a 1000 cuts. This makes
+a project increasingly less attractive to contribute to over the long term.
 
-> +        if (vmc->kvm_no_steal_time &&
-> +            object_property_find(cpuobj, "kvm-steal-time", NULL)) {
-> +            object_property_set_bool(cpuobj, false, "kvm-steal-time", NULL);
-> +        }
-> +
->          if (vmc->no_pmu && object_property_find(cpuobj, "pmu", NULL)) {
->              object_property_set_bool(cpuobj, "pmu", false, NULL);
->          }
-> @@ -2528,6 +2558,7 @@ static void virt_machine_5_0_options(MachineClass *mc)
->      mc->numa_mem_supported = true;
->      vmc->acpi_expose_flash = true;
->      mc->auto_enable_numa_with_memdev = false;
-> +    vmc->kvm_no_steal_time = true;
->  }
->  DEFINE_VIRT_MACHINE(5, 0)
->
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 54bcf17afd35..b5153afedcdf 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -80,6 +80,7 @@ enum {
->      VIRT_PCDIMM_ACPI,
->      VIRT_ACPI_GED,
->      VIRT_NVDIMM_ACPI,
-> +    VIRT_PVTIME,
->      VIRT_LOWMEMMAP_LAST,
->  };
->
-> @@ -126,6 +127,7 @@ typedef struct {
->      bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device */
->      bool kvm_no_adjvtime;
->      bool acpi_expose_flash;
-> +    bool kvm_no_steal_time;
+Measuring the long term benefit of the change is generally quite difficult,
+because while you can see what impact a change will have today on current
+code, it is hard to usefully evaluate future benefits as you're trying to
+imagine the impact on things that don't even exist.
 
-B: It is slightly confusing : using kvm_no_steal_time vs kvm_steal_time
+Overall my POV is not to think too hard about measuring improvements, and
+discard any concern about sunk costs. Instead have a general presumption
+in favour of eliminating any examples of wheel re-invention in a project.
+Even if regular contributors don't want to spend time on such work, this
+kind of thing is pretty amenable to new contributors looking for tasks to
+start their involvement.
 
-P: I have to admit I get confused about which sense this flag
-should have. I think the sense of the flags in this struct is
-"the false case is the one that the older virt boards had",
-so original virt didn't have an ITS or a PMU and so we have
-no_its and no_pmu. Similarly here old virt didn't have steal-time
-and so we want a no_ flag (ie the patch is correct). Why
-kvm_no_steal_time rather than no_kvm_steal_time, though ?
+The QAPI JSON-but-not file format is a case where I think we should just
+adopt a standard file format no matter what. A conversion will have some
+short term work, but this is really simple data to deal with and the code
+involved is nicely self contained. Again I'm not saying QAPI maintainers
+must do it, just put the idea out there as a piece of work that would
+be welcomed if someone is interested in working ont.
 
->  } VirtMachineClass;
+Another example would be elimination of anything in QEMU code that is
+duplicating functionality in GLib, even if there zero functional
+difference between the two impls.
 
-> +void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa)
-> +{
-> +    struct kvm_device_attr attr = {
-> +        .group = KVM_ARM_VCPU_PVTIME_CTRL,
-> +        .attr = KVM_ARM_VCPU_PVTIME_IPA,
-> +        .addr = (uint64_t)&ipa,
-> +    };
-> +
-> +    if (!ARM_CPU(cs)->kvm_steal_time) {
-> +        return;
-> +    }
-> +    if (!kvm_arm_set_device_attr(cs, &attr, "PVTIME IPA")) {
-> +        error_report("failed to init PVTIME IPA");
-> +        abort();
-> +    }
-> +}
+Another example would be adopting a standard code style and using a
+tool like clang-format to enforce this for entire of existing code
+base and future contributions and throwing away our checkpatch.pl
+which nearly everyone is scared of touching as it is Perl code.
 
-B: I am probably missing smth but .. there is a trigger missing to
-update the stats
-and write them back to pre-allocated guest memory.
-Looking at the kernel code the stats are updated upon pending
-VCPU request :
-in arch/arm64/kvm/arm.c:
-static void check_vcpu_requests(struct kvm_vcpu *vcpu) {
-        ...
-         if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
-                kvm_update_stolen_time(vcpu);
-}
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-
-thanks
--- PMM
 
