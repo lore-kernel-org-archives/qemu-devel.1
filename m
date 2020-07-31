@@ -2,105 +2,102 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E82DC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61215C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:03:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4415F2087C
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 330BF2087C
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:03:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MAAnrUzh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4415F2087C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+xf214n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 330BF2087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1ZM9-0006Na-E0
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:02:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54866)
+	id 1k1ZNs-0007Vv-HQ
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:03:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55114)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k1ZLJ-0005tN-Tg
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:01:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23759
- helo=us-smtp-1.mimecast.com)
+ id 1k1ZMv-0006sT-59
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:02:57 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31973
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k1ZLH-00038F-7E
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:01:17 -0400
+ id 1k1ZMq-0003JT-Jm
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:02:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596218474;
+ s=mimecast20190719; t=1596218571;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sn28enFnpLd3/JdhPHHStBRRimvlVA926SS7iVz1HnM=;
- b=MAAnrUzhEZo6vWDvEBrpzFPMSWiaPDpxzqgLUiLDWwV9U7i/RRRtROgVBDHHozzi1fFZtj
- RTVIAhHDlkpjxQeJkmBV5DfOVlP81Kp4T6A8ui0Kp5ccHM6AeUCiN7pDgZX+EdOBphUyKP
- bvELhrhFSfwGF5UGvBDJmRYSOMyj8Wo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-O9AiD3MaOcqBP9sg4Yz_gw-1; Fri, 31 Jul 2020 14:01:12 -0400
-X-MC-Unique: O9AiD3MaOcqBP9sg4Yz_gw-1
-Received: by mail-wr1-f69.google.com with SMTP id t12so9522130wrp.0
- for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 11:01:12 -0700 (PDT)
+ bh=BRN/3Wt3ViPal7QMstF/fwN3sKlIzUZO0/oIBlWXA7A=;
+ b=K+xf214nPdFoX5zMLHR38S7mjOVuoOFE8PV4BIafcgL/VUNm0CiVYKFDq6KRXs1adbPxey
+ 0dfj8+5KAlIkvMaXq8ANEAsrOb/yhOmKp5o3H2oNVVU7dNgeg+NOBy5VmBfJ3mUpWuVmpn
+ Z++T0rnZYNoorwY5yT8rWoss40PVssI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-j1fzBf4DPFeJP3zQlDgP3w-1; Fri, 31 Jul 2020 14:02:50 -0400
+X-MC-Unique: j1fzBf4DPFeJP3zQlDgP3w-1
+Received: by mail-wr1-f72.google.com with SMTP id f14so9400742wrm.22
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 11:02:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=sn28enFnpLd3/JdhPHHStBRRimvlVA926SS7iVz1HnM=;
- b=L4d0Ny5ZbEbqhba7vlh3OhCQQmlaubH56RMs5/PUQupr5fAouDJt8BWgsV5OKiE63v
- nugNZgxYF8XZqgofXzWu3vFav8VP7M3xUBTI6LGg2/snpPAsl+HOtVz8pp38Qf5cI1ZX
- A3wO88k1HOTzWsgpdtP1kOKYqaIFAhxVRVWe2kbGpE/YkfcjY62WPRJ+S5XjHrYLit+G
- eF4FTcobhCiUq6M2PUjCyeNobtbIrgVbImnLb44V3IH1i8Mj9xMkNXi445e+EMAT31FR
- tXG1KaqRLKUgV1+GKNm6kAM6xeWX2K+1CpeBJkdK1QuERqGO47qHd5JTR+Tt70wF3ohJ
- Thgw==
-X-Gm-Message-State: AOAM5307IAbCLd59S0jqcw0g5wOW2wt+4BfBJrUeAiBlM5SXTYYGmkji
- OFA4Is3GQuYRt0g5VqHFoRjMUDO70gMeJr33QRzE5e9AGGSikq+hOXJnsJHwhoYfTl8FCuJ0Qry
- kcm/dURIZalQIiew=
-X-Received: by 2002:adf:ed0c:: with SMTP id a12mr4411059wro.24.1596218471284; 
- Fri, 31 Jul 2020 11:01:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyJcsGjLe1KnHVbPfLEOzNRVu5X/wCY85mDS1udRC9viMZ4ZY/8pDT+RAqEiGmYwFyqVjdqmw==
-X-Received: by 2002:adf:ed0c:: with SMTP id a12mr4411018wro.24.1596218470914; 
- Fri, 31 Jul 2020 11:01:10 -0700 (PDT)
+ bh=BRN/3Wt3ViPal7QMstF/fwN3sKlIzUZO0/oIBlWXA7A=;
+ b=hGrvZgTMbiFC84/EkwpLrUW1/ddP7zegKlrntBsQGkzYP9HkgA+BK5hkVt8xie0oz/
+ fMsOTNVNT6P6nJ5YDKI9muvk9o/VlwEFsxjixHOb5dMsgGGXRwWYu7ObBaOgQc3w7QpT
+ 4FYwDv7fMlOQdFjM3ntBoFy31vO35RPVWileKKVNYTZEqIGlKB1RxZebSUQ8WPVNpTlA
+ hgr27NOK665aF9JWLgNQ7vo67SvqZj5qfulquyLfVioIdbGALddXnN3joJeW2RsPSu5S
+ 7QWmjO1mN4hH7seLZFqYffLqGVwfCOY37jCdUCrosxByWQ1pUKAMEQaMkG85Ll9lGZKn
+ AARQ==
+X-Gm-Message-State: AOAM532stitZNUJSQqnFtzN1+C59aaOm1PHKYvDLsW7e3Q9jVLWZwMmf
+ y2pONh8OMpRxV9b9mC9e7AQgfXbAGXYt4HNBeXP3yR65Y9LaVhqqycBK+Gt4oWWR4cDvSSPs5El
+ AmTmtn66/U6FOnrI=
+X-Received: by 2002:a1c:b188:: with SMTP id a130mr4567614wmf.125.1596218568845; 
+ Fri, 31 Jul 2020 11:02:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyxPjJ+Oyx3PbYhI97AXkkmbD5tZEr5U7l1nrUN68HYIGlsuoWoTNV1byXoWRuzvaoCCattVw==
+X-Received: by 2002:a1c:b188:: with SMTP id a130mr4567598wmf.125.1596218568560; 
+ Fri, 31 Jul 2020 11:02:48 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:90a5:f767:5f9f:3445?
  ([2001:b07:6468:f312:90a5:f767:5f9f:3445])
- by smtp.gmail.com with ESMTPSA id e5sm15422074wrc.37.2020.07.31.11.01.09
+ by smtp.gmail.com with ESMTPSA id f17sm15860029wme.14.2020.07.31.11.02.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 31 Jul 2020 11:01:10 -0700 (PDT)
-Subject: Re: [PATCH] schemas: Add vim modeline
-To: John Snow <jsnow@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <20200729185024.121766-1-abologna@redhat.com>
- <87ime52wxd.fsf@dusky.pond.sub.org> <20200730093732.GB3477223@redhat.com>
- <87k0ylz0ep.fsf@dusky.pond.sub.org> <20200730132446.GL3477223@redhat.com>
- <875za33ku1.fsf@dusky.pond.sub.org> <20200731150738.GB3660103@redhat.com>
- <03bb7822-20a0-2945-6c86-1d5f1b2a01d9@redhat.com>
- <6ceef1ab-5078-d77e-6e6c-4e1bfc01418a@redhat.com>
- <bb0f4298-414c-6b89-c9c2-7c9d86541daf@redhat.com>
+ Fri, 31 Jul 2020 11:02:48 -0700 (PDT)
+Subject: Re: [PATCH 2/2] accel/tcg: interrupt/exception handling uses
+ bql_interrupt flag
+To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
+References: <20200731125127.30866-1-robert.foley@linaro.org>
+ <20200731125127.30866-3-robert.foley@linaro.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a304b5ed-8dba-5ac0-a264-fa8ca1487cb5@redhat.com>
-Date: Fri, 31 Jul 2020 20:01:09 +0200
+Message-ID: <67497c73-d2b9-941e-471d-de0ccd61bb7f@redhat.com>
+Date: Fri, 31 Jul 2020 20:02:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <bb0f4298-414c-6b89-c9c2-7c9d86541daf@redhat.com>
+In-Reply-To: <20200731125127.30866-3-robert.foley@linaro.org>
 Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:39:31
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:28:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -121,43 +118,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: peter.puhov@linaro.org, cota@braap.org, alex.bennee@linaro.org,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/07/20 19:53, John Snow wrote:
-> You have misunderstood me.
+On 31/07/20 14:51, Robert Foley wrote:
+> This change removes the implied BQL from the cpu_handle_interrupt,
+> and cpu_handle_exception paths. We can now select per-arch if
+> the BQL is needed or not by using the bql_interrupt flag.
+> By default, the core code holds the BQL.
+> One benefit of this change is that it leaves it up to the arch
+> to make the change to remove BQL when it makes sense.
 > 
-> The critique I am relaying, but not raising, is that we already use a
-> custom JSON parser in two or more places, and so replacing one instance
-> of this with a new format actually complicates QEMU instead of
-> simplifies it.
-> 
-> I disagree with this concern on the premise that moving one non-standard
-> JSON usage to a standard usage is a win because it reduces the total
-> number of instances of proprietary formats.
-> 
-> Further, if we remove ALL instances of proprietary JSON, then we're back
-> to the same level of complexity internally, but with a reduced level of
-> complexity for outside observers.
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
 
-I think we should first build a consensus on using "real" JSON (plus
-Javascript comments) for the schema, which is easy, and then somebody
-can try his hands at removing the custom JSON parser.
-
-I wouldn't conflate the QMP and schema parsers.  For example, QMP does
-not need comments and schemas don't need either bigints or printf-style
-% interpolation.
+No, please just modify all implementation to do lock/unlock.  It's a
+simpler patch than this on.
 
 Paolo
+
+> ---
+>  accel/tcg/cpu-exec.c | 34 ++++++++++++++++++++++++++--------
+>  1 file changed, 26 insertions(+), 8 deletions(-)
+> 
+> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+> index 80d0e649b2..cde27ee0bf 100644
+> --- a/accel/tcg/cpu-exec.c
+> +++ b/accel/tcg/cpu-exec.c
+> @@ -517,9 +517,13 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
+>  #else
+>          if (replay_exception()) {
+>              CPUClass *cc = CPU_GET_CLASS(cpu);
+> -            qemu_mutex_lock_iothread();
+> +            if (cc->bql_interrupt) {
+> +                qemu_mutex_lock_iothread();
+> +            }
+>              cc->do_interrupt(cpu);
+> -            qemu_mutex_unlock_iothread();
+> +            if (cc->bql_interrupt) {
+> +                qemu_mutex_unlock_iothread();
+> +            }
+>              cpu->exception_index = -1;
+>  
+>              if (unlikely(cpu->singlestep_enabled)) {
+> @@ -558,7 +562,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>      if (unlikely(cpu_interrupt_request(cpu))) {
+>          int interrupt_request;
+>  
+> -        qemu_mutex_lock_iothread();
+> +        cpu_mutex_lock(cpu);
+>          interrupt_request = cpu_interrupt_request(cpu);
+>          if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
+>              /* Mask out external interrupts for this step. */
+> @@ -567,7 +571,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>          if (interrupt_request & CPU_INTERRUPT_DEBUG) {
+>              cpu_reset_interrupt(cpu, CPU_INTERRUPT_DEBUG);
+>              cpu->exception_index = EXCP_DEBUG;
+> -            qemu_mutex_unlock_iothread();
+> +            cpu_mutex_unlock(cpu);
+>              return true;
+>          }
+>          if (replay_mode == REPLAY_MODE_PLAY && !replay_has_interrupt()) {
+> @@ -577,13 +581,15 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>              cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
+>              cpu_halted_set(cpu, 1);
+>              cpu->exception_index = EXCP_HLT;
+> -            qemu_mutex_unlock_iothread();
+> +            cpu_mutex_unlock(cpu);
+>              return true;
+>          }
+>  #if defined(TARGET_I386)
+>          else if (interrupt_request & CPU_INTERRUPT_INIT) {
+>              X86CPU *x86_cpu = X86_CPU(cpu);
+>              CPUArchState *env = &x86_cpu->env;
+> +            cpu_mutex_unlock(cpu);
+> +            qemu_mutex_lock_iothread();
+>              replay_interrupt();
+>              cpu_svm_check_intercept_param(env, SVM_EXIT_INIT, 0, 0);
+>              do_cpu_init(x86_cpu);
+> @@ -595,7 +601,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>          else if (interrupt_request & CPU_INTERRUPT_RESET) {
+>              replay_interrupt();
+>              cpu_reset(cpu);
+> -            qemu_mutex_unlock_iothread();
+> +            cpu_mutex_unlock(cpu);
+>              return true;
+>          }
+>  #endif
+> @@ -604,7 +610,15 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>             True when it is, and we should restart on a new TB,
+>             and via longjmp via cpu_loop_exit.  */
+>          else {
+> +            cpu_mutex_unlock(cpu);
+> +            if (cc->bql_interrupt) {
+> +                qemu_mutex_lock_iothread();
+> +            }
+>              if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
+> +                if (cc->bql_interrupt) {
+> +                    qemu_mutex_unlock_iothread();
+> +                }
+> +                cpu_mutex_lock(cpu);
+>                  replay_interrupt();
+>                  /*
+>                   * After processing the interrupt, ensure an EXCP_DEBUG is
+> @@ -614,6 +628,11 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>                  cpu->exception_index =
+>                      (cpu->singlestep_enabled ? EXCP_DEBUG : -1);
+>                  *last_tb = NULL;
+> +            } else {
+> +                if (cc->bql_interrupt) {
+> +                    qemu_mutex_unlock_iothread();
+> +                }
+> +                cpu_mutex_lock(cpu);
+>              }
+>              /* The target hook may have updated the 'cpu->interrupt_request';
+>               * reload the 'interrupt_request' value */
+> @@ -627,7 +646,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+>          }
+>  
+>          /* If we exit via cpu_loop_exit/longjmp it is reset in cpu_exec */
+> -        qemu_mutex_unlock_iothread();
+> +        cpu_mutex_unlock(cpu);
+>      }
+>  
+>      /* Finally, check if we need to exit to the main loop.  */
+> @@ -691,7 +710,6 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
+>      }
+>  #endif
+>  }
+> -
+>  /* main execution loop */
+>  
+>  int cpu_exec(CPUState *cpu)
+> 
 
 
