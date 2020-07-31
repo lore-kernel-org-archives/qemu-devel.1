@@ -2,79 +2,78 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC04C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 19:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E031C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 19:49:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E459208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 19:24:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3C372087C
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 19:49:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FF6z8nS6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E459208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h3LWkr3f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3C372087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1ae8-0005YL-QO
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 15:24:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41038)
+	id 1k1b2G-0001gi-5m
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 15:49:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k1ada-000595-IA
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 15:24:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45099
+ id 1k1b1V-0001DJ-Oc
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 15:48:59 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34882
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k1adX-0004Hc-MM
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 15:24:13 -0400
+ id 1k1b1S-00070q-R6
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 15:48:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596223449;
+ s=mimecast20190719; t=1596224932;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=AVU3Kvxs6OfJnaGw8nBtAKme6z+7m8gcNGI6IG/zWjI=;
- b=FF6z8nS6V7yk4KSE82OOQTBqnSNaQjzVhVZhvlN+scBRCjAbxyzCYQGuc9rkofYIfHByM8
- 78c9dL9bsyqo+AHNnw2cIoq4B4KeKAs93DD0GPdLJB3z0nCTRKoKo5Wk0p2xhMike4SBH4
- yBJujdKlVewg+bvMwhmeac4UVLA1Y68=
+ bh=0KmuHGeTPKwkDX4esuxCZ0HvUlHxCfBe+nLh2txgkkA=;
+ b=h3LWkr3fIzPdOWI+Djlu4LIgTz0rSAuA+8B4Vr6iHs+nBQl8qIFxlk8thHUrVVU7TTy/x0
+ tVh8ACRTaToKUirw6R5Twres45B6tHWbot2N2R+GQYBsWzcp/piaosXqhX7jDZnfh7SoFB
+ HyH3m4qiUa1ktI0LzSY8wWo8f09GIMs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259--9VZ1GSSPGmr8OnU3jjZZQ-1; Fri, 31 Jul 2020 15:24:08 -0400
-X-MC-Unique: -9VZ1GSSPGmr8OnU3jjZZQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-270-CtiW05VkPbmf6P3XC_T9hg-1; Fri, 31 Jul 2020 15:48:48 -0400
+X-MC-Unique: CtiW05VkPbmf6P3XC_T9hg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6FE0E91A;
- Fri, 31 Jul 2020 19:24:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C76771083E84;
+ Fri, 31 Jul 2020 19:48:47 +0000 (UTC)
 Received: from localhost (ovpn-120-33.rdu2.redhat.com [10.10.120.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5668E73039;
- Fri, 31 Jul 2020 19:24:05 +0000 (UTC)
-Date: Fri, 31 Jul 2020 15:24:04 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0292310013D9;
+ Fri, 31 Jul 2020 19:48:41 +0000 (UTC)
+Date: Fri, 31 Jul 2020 15:48:40 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH 1/2] hw/core: Add bql_interrupt flag to CPUClass
-Message-ID: <20200731192404.GH225270@habkost.net>
-References: <20200731125127.30866-1-robert.foley@linaro.org>
- <20200731125127.30866-2-robert.foley@linaro.org>
- <20200731174353.GF225270@habkost.net>
- <CAEyhzFuBiqpAijLMw-SZmiDyGQnc2c6yk6g+E0HN9eSYRVaWMA@mail.gmail.com>
+To: Julia Suvorova <jusual@redhat.com>
+Subject: Re: [RFC PATCH] target/i386: kvm: Enable KVM_FEATURE_PCI_GO_MMCONFIG
+ CPUID bit
+Message-ID: <20200731194840.GI225270@habkost.net>
+References: <20200731184938.606754-1-jusual@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEyhzFuBiqpAijLMw-SZmiDyGQnc2c6yk6g+E0HN9eSYRVaWMA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200731184938.606754-1-jusual@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 08:55:49
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:28:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -95,46 +94,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Peter Puhov <peter.puhov@linaro.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 31, 2020 at 03:14:02PM -0400, Robert Foley wrote:
-> On Fri, 31 Jul 2020 at 13:44, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > >
-> > > +static inline void cpu_class_disable_bql_interrupt(CPUClass *cc)
-> > > +{
-> > > +    cc->bql_interrupt = false;
-> > > +}
-> >
-> > Class data is not supposed to change outside class_init.  Why do
-> > you need this function?  I don't see it being used anywhere in
-> > this series.
+On Fri, Jul 31, 2020 at 08:49:38PM +0200, Julia Suvorova wrote:
+> This feature allows MMCONFIG to be used even to access the base PCI
+> config space [1]. This means increased performance: one access to
+> MMCONFIG instead of two conventional accesses to I/O ports.
 > 
-> This function was to be called from changes in a later patch series
-> that depend on these changes.  BTW,  I added a correction above,
-> it should be disable, not enable.  The idea is that it is initialized to true,
-> but then the per arch changes would use this call at init time to set
-> it to false
-> as needed.
-
-If you plan to call it from class_init, I don't think you need a
-wrapper.  You can simply set cc->bql_interrupt=false directly
-inside arch-specific class_init functions.
-
-If you plan to call it from somewhere else, then maybe the field
-doesn't belong to CPUClass.
-
+> Q35 makes no distinction in base or extended PCI config access to
+> MMCONFIG, MMCONFIG is always on, and in case it is is not initialized,
+> probing of PCI devices will fall back to normal process and use type1
+> access.
 > 
-> We can remove this function from this series and add it in later when
-> it gets used,
-> it might make things more clear.
+> Enable the feature unconditionally.
+> 
+> [1]: https://lore.kernel.org/kvm/20200730193510.578309-1-jusual@redhat.com/
+> 
+> Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> ---
+> The feature is in the review phase.
+> 
+>  include/standard-headers/asm-x86/kvm_para.h | 1 +
+>  target/i386/cpu.c                           | 3 ++-
+>  target/i386/kvm.c                           | 1 +
+>  3 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/standard-headers/asm-x86/kvm_para.h b/include/standard-headers/asm-x86/kvm_para.h
+> index 07877d3295..52eeba9067 100644
+> --- a/include/standard-headers/asm-x86/kvm_para.h
+> +++ b/include/standard-headers/asm-x86/kvm_para.h
+> @@ -32,6 +32,7 @@
+>  #define KVM_FEATURE_POLL_CONTROL	12
+>  #define KVM_FEATURE_PV_SCHED_YIELD	13
+>  #define KVM_FEATURE_ASYNC_PF_INT	14
+> +#define KVM_FEATURE_PCI_GO_MMCONFIG	15
+>  
+>  #define KVM_HINTS_REALTIME      0
+>  
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 588f32e136..5509523bb3 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -810,7 +810,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
+>              "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
+>              NULL, "kvm-pv-tlb-flush", NULL, "kvm-pv-ipi",
+> -            "kvm-poll-control", "kvm-pv-sched-yield", NULL, NULL,
+> +            "kvm-poll-control", "kvm-pv-sched-yield", NULL, "kvm-pci-go-mmconfig",
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+>              "kvmclock-stable-bit", NULL, NULL, NULL,
+> @@ -4141,6 +4141,7 @@ static PropValue kvm_default_props[] = {
+>      { "acpi", "off" },
+>      { "monitor", "off" },
+>      { "svm", "off" },
+> +    { "kvm-pci-go-mmconfig", "on" },
 
-Makes sense to me.
+You'll need a TYPE_X86_CPU.kvm-pci-go-mmconfig=off entry in
+pc_compat_5_1 to keep guest ABI compatibility on older machine
+types.
+
+pc_compat_5_1 is introduced by
+https://lore.kernel.org/qemu-devel/20200728094645.272149-1-cohuck@redhat.com/
+("hw: add compat machines for 5.2").
+
+>      { NULL, NULL },
+>  };
+>  
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 6f18d940a5..0069e945e6 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -440,6 +440,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+>          if (!kvm_irqchip_in_kernel()) {
+>              ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
+>          }
+> +        ret |= 1U << KVM_FEATURE_PCI_GO_MMCONFIG;
+
+On most cases, enabling a feature unconditionally on
+kvm_arch_get_supported_cpuid() would be a mistake, but this flag
+seems to be an exception to the rule.
+
+A comment here explaining why it is really safe to enable it
+unconditionally would be welcome.
+
+>      } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
+>          ret |= 1U << KVM_HINTS_REALTIME;
+>          found = 1;
+> -- 
+> 2.25.4
+> 
 
 -- 
 Eduardo
