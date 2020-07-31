@@ -4,71 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73318C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA74C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:29:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 447D822B42
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:29:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9448122B42
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:29:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="niq9l6xU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 447D822B42
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="un13eUar"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9448122B42
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Zmw-0005Gp-Hu
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:29:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58240)
+	id 1k1Zn2-0005Sj-SL
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:29:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1Zef-0002S2-61
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:17 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:55140)
+ id 1k1ZeY-0002AT-92
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:10 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:55042)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1Zec-0005Rq-PA
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:16 -0400
+ id 1k1ZeW-0005Q5-1m
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:09 -0400
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIBwu3069937;
- Fri, 31 Jul 2020 18:21:07 GMT
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIBndt069847;
+ Fri, 31 Jul 2020 18:21:02 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2020-01-29;
- bh=z+B+7nLzsZ06MKfna63YXrq7L1SIE6BY4AOI+9Toi4I=;
- b=niq9l6xUi5/EEfdXzssoZ4DeT/ZVFtwnDxBnHXIUzY9qQPwYvrjINAHsGv3OY1wZVoaS
- tUjipY68xqOuWZOoJJCOsrrDwepV4Fss0BfPqgXdCO+bkBwDgW06OEcYR6+nEI+vxayJ
- UVqospUO7YtJ9oxs5CtX6ADqrhXXKgrQ9Ot5ts8YBvml8ojnJB5LlyFxaW4DQb4iHTu9
- ZzyfnRS4yYg/xFfPKR34gmzA7kLNMyZLx0l/+jJPqN41zWTbxpNKvVzjlE4l1NYu6wTT
- 0Ot7usznukllUPckgsYsBF7qg6o9a7I5cg+H69C9ewZnKor4BgUvzSa+s7PMmhcmVFwk qQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 32mf702u9c-1
+ bh=MXX6shJu8yoatq85fqYCTgw69wfywhSpu1dkwd0cANc=;
+ b=un13eUarKlPf1CkAuwAwjZa8IXZg981Ft2CjuPMhly2oPWcNtxTqqcaBieXgMWI3ecaG
+ 9DfWLZX/txAsOWf/JR1Losvs/b/u4hoTu8MEs3GykY83jp3Ju5aj4ivHZhg5XiqCiELm
+ pNQfKk3pBWlIJuE2A8f5lkKjzJb/c4yV8h23jWyMe8Se1CQqWY3WuDdr5IaP/NVxOX01
+ aXaQctd3F6njwvZmi2tGaN1mjYEewDYOwh3HM0ci6rOgTy/LKcQLj8646OEBgRudt6A0
+ pM1s730oOqt8LV9FkIBujIN3HYhZdfWOzh1OLsAjXXKDhmogiWrbhHtceiJFetDFA3tW +g== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 32mf702u91-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Fri, 31 Jul 2020 18:21:07 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIIccS137659;
- Fri, 31 Jul 2020 18:21:07 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3020.oracle.com with ESMTP id 32hu64r7rm-1
+ Fri, 31 Jul 2020 18:21:02 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIHV2I073969;
+ Fri, 31 Jul 2020 18:21:01 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3030.oracle.com with ESMTP id 32hu606skx-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 31 Jul 2020 18:21:06 +0000
+ Fri, 31 Jul 2020 18:21:01 +0000
 Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06VIL67Y013536;
- Fri, 31 Jul 2020 18:21:06 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06VIL0IX013621;
+ Fri, 31 Jul 2020 18:21:00 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 31 Jul 2020 11:21:05 -0700
+ with ESMTP ; Fri, 31 Jul 2020 11:21:00 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 20/20] multi-process: add configure and usage information
-Date: Fri, 31 Jul 2020 14:20:27 -0400
-Message-Id: <4d3d55b69bfb5a7a10c9b4bc5b1b2dcbf160084b.1596217462.git.jag.raman@oracle.com>
+Subject: [PATCH v8 16/20] multi-process: Retrieve PCI info from remote process
+Date: Fri, 31 Jul 2020 14:20:23 -0400
+Message-Id: <bf71ee5f81b49cd9c083109bdb04eb4c492da231.1596217462.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1596217462.git.jag.raman@oracle.com>
 References: <cover.1596217462.git.jag.raman@oracle.com>
@@ -76,15 +76,15 @@ In-Reply-To: <cover.1596217462.git.jag.raman@oracle.com>
 References: <cover.1596217462.git.jag.raman@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- adultscore=0 bulkscore=0
- malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ mlxlogscore=999 mlxscore=0
+ suspectscore=3 bulkscore=0 malwarescore=0 spamscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2007310137
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
  signatures=668679
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- bulkscore=0 suspectscore=1
+ bulkscore=0 suspectscore=3
  spamscore=0 impostorscore=0 clxscore=1015 phishscore=0 priorityscore=1501
  adultscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
@@ -99,8 +99,8 @@ X-Spam_bar: -----
 X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,160 +125,146 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Retrieve PCI configuration info about the remote device and
+configure the Proxy PCI object based on the returned information
 
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- MAINTAINERS                |  2 ++
- docs/multi-process.rst     | 67 ++++++++++++++++++++++++++++++++++++++++++++++
- scripts/mpqemu-launcher.py | 49 +++++++++++++++++++++++++++++++++
- 3 files changed, 118 insertions(+)
- create mode 100644 docs/multi-process.rst
- create mode 100755 scripts/mpqemu-launcher.py
+ hw/pci/proxy.c           | 85 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/io/mpqemu-link.h |  1 +
+ 2 files changed, 86 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f41b54c..3df9441 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3058,6 +3058,8 @@ F: include/hw/pci/memory-sync.h
- F: hw/remote/iohub.c
- F: include/hw/remote/iohub.h
- F: docs/devel/multi-process.rst
-+F: scripts/mpqemu-launcher.py
-+F: scripts/mpqemu-launcher-perf-mode.py
+diff --git a/hw/pci/proxy.c b/hw/pci/proxy.c
+index 1c1b682..50a806c 100644
+--- a/hw/pci/proxy.c
++++ b/hw/pci/proxy.c
+@@ -23,6 +23,8 @@
+ #include "sysemu/kvm.h"
+ #include "util/event_notifier-posix.c"
  
- Build and test automation
- -------------------------
-diff --git a/docs/multi-process.rst b/docs/multi-process.rst
-new file mode 100644
-index 0000000..9dc55e3
---- /dev/null
-+++ b/docs/multi-process.rst
-@@ -0,0 +1,67 @@
-+Multi-process QEMU
-+==================
++static void probe_pci_info(PCIDevice *dev, Error **errp);
 +
-+This document describes how to configure and use multi-process qemu.
-+For the design document refer to docs/devel/qemu-multiprocess.
+ static void proxy_set_socket(PCIProxyDev *pdev, int fd, Error **errp)
+ {
+     pdev->ioc = qio_channel_new_fd(fd, errp);
+@@ -86,6 +88,7 @@ static void setup_irqfd(PCIProxyDev *dev)
+ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
+ {
+     PCIProxyDev *dev = PCI_PROXY_DEV(device);
++    uint8_t *pci_conf = device->config;
+     int fd;
+ 
+     if (dev->fd) {
+@@ -100,9 +103,14 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
+                    DEVICE(device)->id);
+     }
+ 
++    pci_conf[PCI_LATENCY_TIMER] = 0xff;
++    pci_conf[PCI_INTERRUPT_PIN] = 0x01;
 +
-+1) Configuration
-+----------------
+     configure_memory_sync(&dev->sync, dev->ioc);
+ 
+     setup_irqfd(dev);
 +
-+To enable support for multi-process add --enable-mpqemu
-+to the list of options for the "configure" script.
++    probe_pci_info(PCI_DEVICE(dev), errp);
+ }
+ 
+ static void pci_proxy_dev_exit(PCIDevice *pdev)
+@@ -258,3 +266,80 @@ const MemoryRegionOps proxy_mr_ops = {
+         .max_access_size = 1,
+     },
+ };
 +
++static void probe_pci_info(PCIDevice *dev, Error **errp)
++{
++    PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(dev);
++    uint32_t orig_val, new_val, base_class, val;
++    PCIProxyDev *pdev = PCI_PROXY_DEV(dev);
++    DeviceClass *dc = DEVICE_CLASS(pc);
++    uint8_t type;
++    int i, size;
++    char *name;
 +
-+2) Usage
-+--------
++    config_op_send(pdev, PCI_VENDOR_ID, &val, 2, PCI_CONFIG_READ);
++    pc->vendor_id = (uint16_t)val;
 +
-+Multi-process QEMU requires an orchestrator to launch. Please refer to a
-+light-weight python based orchestrator for mpqemu in
-+scripts/mpqemu-launcher.py to lauch QEMU in multi-process mode.
++    config_op_send(pdev, PCI_DEVICE_ID, &val, 2, PCI_CONFIG_READ);
++    pc->device_id = (uint16_t)val;
 +
-+Following is a description of command-line used to launch mpqemu.
++    config_op_send(pdev, PCI_CLASS_DEVICE, &val, 2, PCI_CONFIG_READ);
++    pc->class_id = (uint16_t)val;
 +
-+* Orchestrator:
++    config_op_send(pdev, PCI_SUBSYSTEM_ID, &val, 2, PCI_CONFIG_READ);
++    pc->subsystem_id = (uint16_t)val;
 +
-+  - The Orchestrator creates a unix socketpair
++    base_class = pc->class_id >> 4;
++    switch (base_class) {
++    case PCI_BASE_CLASS_BRIDGE:
++        set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++        break;
++    case PCI_BASE_CLASS_STORAGE:
++        set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++        break;
++    case PCI_BASE_CLASS_NETWORK:
++        set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
++        break;
++    case PCI_BASE_CLASS_INPUT:
++        set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
++        break;
++    case PCI_BASE_CLASS_DISPLAY:
++        set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
++        break;
++    case PCI_BASE_CLASS_PROCESSOR:
++        set_bit(DEVICE_CATEGORY_CPU, dc->categories);
++        break;
++    default:
++        set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++        break;
++    }
 +
-+  - It launches the remote process and passes one of the
-+    sockets to it via command-line.
++    for (i = 0; i < PCI_NUM_REGIONS; i++) {
++        config_op_send(pdev, PCI_BASE_ADDRESS_0 + (4 * i), &orig_val, 4,
++                       PCI_CONFIG_READ);
++        new_val = 0xffffffff;
++        config_op_send(pdev, PCI_BASE_ADDRESS_0 + (4 * i), &new_val, 4,
++                       PCI_CONFIG_WRITE);
++        config_op_send(pdev, PCI_BASE_ADDRESS_0 + (4 * i), &new_val, 4,
++                       PCI_CONFIG_READ);
++        size = (~(new_val & 0xFFFFFFF0)) + 1;
++        config_op_send(pdev, PCI_BASE_ADDRESS_0 + (4 * i), &orig_val, 4,
++                       PCI_CONFIG_WRITE);
++        type = (new_val & 0x1) ?
++                   PCI_BASE_ADDRESS_SPACE_IO : PCI_BASE_ADDRESS_SPACE_MEMORY;
 +
-+  - It then launches QEMU and specifies the other socket as an option
-+    to the Proxy device object
-+
-+* Remote Process:
-+
-+  - QEMU can enter remote process mode by using the "remote" machine
-+    option.
-+
-+  - The orchestrator creates a "remote-object" with details about
-+    the device and the file descriptor for the device
-+
-+  - The remaining options are no different from how one launches QEMU with
-+    devices.
-+
-+  - Example command-line for the remote process is as follows:
-+
-+      /usr/bin/qemu-system-x86_64                                        \
-+      -machine remote                                                    \
-+      -device lsi53c895a,id=lsi0                                         \
-+      -drive id=drive_image2,file=/build/ol7-nvme-test-1.qcow2           \
-+      -device scsi-hd,id=drive2,drive=drive_image2,bus=lsi0.0,scsi-id=0  \
-+      -object remote-object,id=robj1,devid=lsi1,fd=4,
-+
-+* QEMU:
-+
-+  - Since parts of the RAM are shared between QEMU & remote process, a
-+    memory-backend-memfd is required to facilitate this, as follows:
-+
-+    -object memory-backend-memfd,id=mem,size=2G
-+
-+  - A "pci-proxy-dev" device is created for each of the PCI devices emulated
-+    in the remote process. A "socket" sub-option specifies the other end of
-+    unix channel created by orchestrator. The "id" sub-option must be specified
-+    and should be the same as the "id" specified for the remote PCI device
-+
-+  - Example commandline for QEMU is as follows:
-+
-+      -device pci-proxy-dev,id=lsi0,socket=3
-diff --git a/scripts/mpqemu-launcher.py b/scripts/mpqemu-launcher.py
-new file mode 100755
-index 0000000..07b11c6
---- /dev/null
-+++ b/scripts/mpqemu-launcher.py
-@@ -0,0 +1,49 @@
-+#!/usr/bin/env python3
-+import socket
-+import os
-+import subprocess
-+import time
-+
-+PROC_QEMU='/usr/bin/qemu-system-x86_64'
-+
-+proxy, remote = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM)
-+
-+remote_cmd = [ PROC_QEMU,                                                     \
-+               '-machine', 'remote',                                          \
-+               '-device', 'lsi53c895a,id=lsi1',                               \
-+               '-drive', 'id=drive_image1,file=/build/ol7-nvme-test-1.qcow2', \
-+               '-device', 'scsi-hd,id=drive1,drive=drive_image1,bus=lsi1.0,'  \
-+                              'scsi-id=0',                                    \
-+               '-object',                                                     \
-+               'remote-object,id=robj1,devid=lsi1,fd='+str(remote.fileno()),  \
-+               '-nographic',                                                  \
-+             ]
-+
-+proxy_cmd = [ PROC_QEMU,                                                      \
-+              '-name', 'OL7.4',                                               \
-+              '-machine', 'q35,accel=kvm',                                    \
-+              '-smp', 'sockets=1,cores=1,threads=1',                          \
-+              '-m', '2048',                                                   \
-+              '-object', 'memory-backend-memfd,id=sysmem-file,size=2G',       \
-+              '-numa', 'node,memdev=sysmem-file',                             \
-+              '-device', 'virtio-scsi-pci,id=virtio_scsi_pci0',               \
-+              '-drive', 'id=drive_image1,if=none,format=qcow2,'               \
-+                            'file=/home/ol7-hdd-1.qcow2',                     \
-+              '-device', 'scsi-hd,id=image1,drive=drive_image1,'              \
-+                             'bus=virtio_scsi_pci0.0',                        \
-+              '-boot', 'd',                                                   \
-+              '-vnc', ':0',                                                   \
-+              '-device', 'pci-proxy-dev,id=lsi1,fd='+str(proxy.fileno()),     \
-+            ]
-+
-+
-+pid = os.fork();
-+
-+if pid:
-+    # In Proxy
-+    print('Launching QEMU with Proxy object');
-+    process = subprocess.Popen(proxy_cmd, pass_fds=[proxy.fileno()])
-+else:
-+    # In remote
-+    print('Launching Remote process');
-+    process = subprocess.Popen(remote_cmd, pass_fds=[remote.fileno()])
++        if (size) {
++            pdev->region[i].dev = pdev;
++            pdev->region[i].present = true;
++            if (type == PCI_BASE_ADDRESS_SPACE_MEMORY) {
++                pdev->region[i].memory = true;
++            }
++            name = g_strdup_printf("bar-region-%d", i);
++            memory_region_init_io(&pdev->region[i].mr, OBJECT(pdev),
++                                  &proxy_mr_ops, &pdev->region[i],
++                                  name, size);
++            pci_register_bar(dev, i, type, &pdev->region[i].mr);
++            g_free(name);
++        }
++    }
++}
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+index 6625de6..a3844e1 100644
+--- a/include/io/mpqemu-link.h
++++ b/include/io/mpqemu-link.h
+@@ -39,6 +39,7 @@ typedef enum {
+     BAR_WRITE,
+     BAR_READ,
+     SET_IRQFD,
++    GET_PCI_INFO,
+     MAX = INT_MAX,
+ } MPQemuCmd;
+ 
 -- 
 1.8.3.1
 
