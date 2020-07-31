@@ -2,94 +2,96 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36EEAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 16:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12883C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 16:46:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F41BB21744
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 16:42:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D112F20663
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 16:46:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d0M8GB7W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F41BB21744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DmkeI+um"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D112F20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Y6u-0008QM-AY
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 12:42:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38864)
+	id 1k1YB1-0001ll-3K
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 12:46:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k1Y6F-0007w4-BZ
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 12:41:39 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36433
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k1Y6C-0001xV-Cd
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 12:41:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596213694;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=VmlME45EkEZinVqDFcBrYGGqS1oqTiEBi7ABQ+yt2cU=;
- b=d0M8GB7Wktc8Hb/sjehqGvYLamn0pNRv1AuDvjBKOzhaHpPK4JROk5xG/kSmWUfnGJAliJ
- I/zfpttWwBxnrydP4kTRzhl8X2CU++DnVgiVACpytcsVJxgReAvI7ErX0Cgxm+SRghr56k
- Yv4KXaGucgtDl05LcFTmbx8qau3Om+U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-CPG1BXceMwCtc2KNzkxLHw-1; Fri, 31 Jul 2020 12:41:31 -0400
-X-MC-Unique: CPG1BXceMwCtc2KNzkxLHw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A35A7107ACCA;
- Fri, 31 Jul 2020 16:41:30 +0000 (UTC)
-Received: from work-vm (ovpn-114-48.ams2.redhat.com [10.36.114.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4218573039;
- Fri, 31 Jul 2020 16:41:15 +0000 (UTC)
-Date: Fri, 31 Jul 2020 17:41:13 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] schemas: Add vim modeline
-Message-ID: <20200731164113.GG2624@work-vm>
-References: <20200729185024.121766-1-abologna@redhat.com>
- <87ime52wxd.fsf@dusky.pond.sub.org>
- <20200730093732.GB3477223@redhat.com>
- <87k0ylz0ep.fsf@dusky.pond.sub.org>
- <20200730132446.GL3477223@redhat.com>
- <875za33ku1.fsf@dusky.pond.sub.org>
- <20200731150738.GB3660103@redhat.com>
- <03bb7822-20a0-2945-6c86-1d5f1b2a01d9@redhat.com>
- <6ceef1ab-5078-d77e-6e6c-4e1bfc01418a@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k1YAK-0001IC-4K
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 12:45:52 -0400
+Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:34909)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k1YAH-0002P6-NX
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 12:45:51 -0400
+Received: by mail-pf1-x434.google.com with SMTP id d188so8705051pfd.2
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 09:45:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=2SpEe3BEg5fTQoDgclaogKKe40Hl6yJfr0ts2CcQfNo=;
+ b=DmkeI+umx0CKCLDbNM+SZdG0LqPpqg8w115jcEsmYHyhzgikXNG72z/PLJ+9hqeM2e
+ HtiRpu70LucpHbwc9nCCWf+sPx4aarCuTWhDZCgznfr35K+BhGpXO4zIZEuSnXmyq+9x
+ 69jn/qpGTtyR42Jf0cQVCt8cBXkdObTLsGw/L9MEe9mrOPzYGpgNr+fPXgXSD8JPkVxY
+ kWA6qood0XGLGPvjHGOvekZz7rvccmMgin707s5rpzfIpHi0nqXYSt1ZfbYYX4L/EXD5
+ 4+jw5vZYuxqaUyJ3cn9fdl7W2ZJZkMIegWeL4ejy120nL8Uu4HSMcKZgwW6WTBMpq/tt
+ yCYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2SpEe3BEg5fTQoDgclaogKKe40Hl6yJfr0ts2CcQfNo=;
+ b=eI35DsU3ADng3nKauoqUvxzkDdxy36z7WW1RZCWjOf+cBTPMhkJcsb6mTzmBSAQKhb
+ 1ERzupf/je8zw62f/zAWVxYWgayRZKfaQrYwyPMIrt16O/OvstSWlc/0u5npyuH21HVx
+ F3aCE/7AMn9rUJTLj2V7LiIe8jw0qpgkAAhqCkvvPO/AuUPtMNy3mi+qh3ItULcnzIok
+ hQVZhrj7wPIoXkGMdLbSE8aB28uaAz86gb75o9qWeAXlrKIus+XRVypRottFEgrr8CsC
+ NwbOZQOcgTE4V2b9w4URaAzA/raLHMMMxiunLNz0sMI1wuFU9r8w6xpZjPkpYQJcieGu
+ vGOA==
+X-Gm-Message-State: AOAM530/u4VWmvuu7LrzOgGMRY7ehEG2fcQTgi453RCnwP7LaB0C636V
+ c/GkemkwN7LqHwcyi3p5aCCfqg==
+X-Google-Smtp-Source: ABdhPJxf2ffi1ToTSpKOaF8ZknqLU3ywtGDen05n3K7frjjB0VV9Z352edlbbHFqhyC0+dyXja+GZA==
+X-Received: by 2002:aa7:9d04:: with SMTP id k4mr4452882pfp.256.1596213947968; 
+ Fri, 31 Jul 2020 09:45:47 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id a24sm10354385pfg.113.2020.07.31.09.45.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 31 Jul 2020 09:45:47 -0700 (PDT)
+Subject: Re: [RFC v2 62/76] target/riscv: rvv-0.9: single-width floating-point
+ reduction
+To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+References: <20200722091641.8834-1-frank.chang@sifive.com>
+ <20200722091641.8834-63-frank.chang@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fbb66f8c-62af-97aa-48bb-1a26d5baeb29@linaro.org>
+Date: Fri, 31 Jul 2020 09:45:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <6ceef1ab-5078-d77e-6e6c-4e1bfc01418a@redhat.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:28:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200722091641.8834-63-frank.chang@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::434;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x434.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,56 +105,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Andrea Bolognani <abologna@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 31/07/20 17:26, John Snow wrote:
-> > I saw the critique that we still use JSON-ish for the runtime QMP
-> > protocol, and moving the QAPI IDL to a standard wouldn't remove all
-> > instances of a custom format from our tree.
-> 
-> Sorry, but "still using JSON" is not a critique that makes any sense.
-> 
-> 99% of the websites you use daily use JSON as their RPC
-> frontend-to-backend language; OpenAPI is essentially JSON over HTTP.
-> There must be something good in JSON.
+On 7/22/20 2:16 AM, frank.chang@sifive.com wrote:
+>  # Vector ordered and unordered reduction sum
+> -vfredsum_vs     0000-1 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfredsum_vs     000001 . ..... ..... 001 ..... 1010111 @r_vm
+> +vfredosum_vs    000011 . ..... ..... 001 ..... 1010111 @r_vm
 
-If there is, I've not found it:
-    a) It's integer definitions are a mess
-    b) You can't require ordering
-    c) No two parsers agree with each other
+"The vfredosum instruction is a valid implementation of the vfredsum instruction."
 
-and those are the only ones I've hit in my very limited JSON wrangling.
+Which is exactly what we're doing here.
 
-It's possible attractions are that no one has anything widely used
-that's better, and it's easy to use from JS.
+Why should we treat them differently?  There is no parallelism that we can
+exploit in tcg, unlike in hardware.
 
-But it seems popular to try and find replacements; e.g. Amazon Ion that
-landed a few weeks ago (like JSON but...not quite and with a binary
-format optionally).
 
-Dave
-
-> Whenever you hear a complaint about "using JSON", it's actually a
-> complaint about bindings for your language, which can be a sensible
-> critique: gRPC is essentially {protobuf,FlatBuffers} over HTTP/2 plus a
-> boatload of language mappings.  Unfortunately C is not one of those
-> mappings.
-> 
-> Paolo
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+r~
 
