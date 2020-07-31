@@ -2,74 +2,79 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A753C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 05:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A39C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 06:42:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24535208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 05:23:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oogN39Pq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24535208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 197CA207F5
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 06:42:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 197CA207F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1NW9-00058x-AI
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 01:23:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52438)
+	id 1k1Ojw-00076K-76
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 02:42:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k1NVR-0004bS-Gg; Fri, 31 Jul 2020 01:22:58 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:36387)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k1NVO-0007uN-KW; Fri, 31 Jul 2020 01:22:57 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BHwdz1pX7z9sT6; Fri, 31 Jul 2020 15:22:47 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1596172967;
- bh=M4gcUv3vDrXwSxP+7v6sh5RHzwlkiiBvOK9SktiDxsU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=oogN39PqbDsyfyki4KeEk0k2S7yJ7u52gH5oSbq43cZif5DbENvmexZFbGeK37FCT
- mTUD2MznPZvMxOMlwtuTTQEKWlOOGJGlmNv/I7Qhvz2tHtSDLDThgwJinxKdyqs/i5
- Vg+K9R1pbQr0n/KLP22/qU6RF6n/kwUjduDGKFpI=
-Date: Fri, 31 Jul 2020 13:22:14 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH for-5.2] spapr: Avoid some integer conversions in
- spapr_phb_realize()
-Message-ID: <20200731032214.GC12398@yekko.fritz.box>
-References: <159592765385.99837.12059368746532345109.stgit@bahia.lan>
- <20200729025441.GJ84173@umbus.fritz.box>
- <20200730185518.774172c9@bahia.lan>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1OjO-0006gu-D8
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 02:41:26 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40724)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1OjM-0000Iw-BC
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 02:41:26 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k1OjI-0002dd-K1
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 06:41:20 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 960DB2E8105
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 06:41:20 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="4jXrM3lyYWu4nBt5"
-Content-Disposition: inline
-In-Reply-To: <20200730185518.774172c9@bahia.lan>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 Jul 2020 06:32:31 -0000
+From: Naresh GS <1888971@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: lersek nareshgs
+X-Launchpad-Bug-Reporter: Naresh GS (nareshgs)
+X-Launchpad-Bug-Modifier: Naresh GS (nareshgs)
+References: <159573587135.29737.8295812528041177661.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159617715143.10566.7234051309804107579.malone@chaenomeles.canonical.com>
+Subject: [Bug 1888971] Re: SMI trigger causes hang with multiple cores
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 6cd33afe1bcbc8e64eb107877a711f4b49b78e53
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 02:41:21
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,81 +83,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1888971 <1888971@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I tried without specifying -bios parameter still hang is seen. But this
+time it had low memory corruption.
 
---4jXrM3lyYWu4nBt5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+And built seabios with more debug logs but seabios doesn't does SMM init
+even when its selected in make menuconfig.
 
-On Thu, Jul 30, 2020 at 06:55:18PM +0200, Greg Kurz wrote:
-> On Wed, 29 Jul 2020 12:54:41 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Tue, Jul 28, 2020 at 11:14:13AM +0200, Greg Kurz wrote:
-> > > Without this patch, the irq number gets converted uselessly from int
-> > > to int32_t, back and forth.
-> > >=20
-> > > This doesn't fix an actual issue, it's just to make the code neater.
-> > >=20
-> > > Suggested-by: Markus Armbruster <armbru@redhat.com>
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> >=20
-> > Applied to ppc-for-5.2, thanks.
-> >=20
->=20
-> Daniel reported a crash that happens systematically on some systems that
-> don't support KVM XIVE (aka. bostons) since the patch "spapr: Simplify
-> error handling in spapr_phb_realize()" landed in the ppc-for-5.2 tree.
->=20
-> The patch is good but it uncovered an issue we have in the KVM XIVE code
-> in QEMU (basically we should ignore the absence of KVM XIVE device when
-> claiming IRQ numbers).
->=20
-> The fix is trivial but to avoid breaking bisect, it should rather go
-> before the patch mentioned above. Also I want to consolidate the error
-> handling a bit more so, in the meantime, for others to be able to use
-> the ppc-for-5.2 branch, I suggest you simply drop:
->=20
-> spapr: Simplify error handling in spapr_phb_realize()
->=20
-> and the current patch as well since it's a follow-up.
->=20
-> I'll send a new patchset later.
+I guess fundamentally th issue is writing 0xXX in IO port 0xB2 should
+trigger SMI handler in all possible core but instead it triggers SMI
+only in Core#0.
 
-Ok, done, I've removed both those patches from ppc-for-5.2, resend the
-new version whenever you're ready.
+-- =
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888971
 
---4jXrM3lyYWu4nBt5
-Content-Type: application/pgp-signature; name="signature.asc"
+Title:
+  SMI trigger causes hang with multiple cores
 
------BEGIN PGP SIGNATURE-----
+Status in QEMU:
+  New
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8jjmUACgkQbDjKyiDZ
-s5IJig//YK3cS7kPF/RcQFZ0YOqsiXg1Z6qKvArcv0n7wjVqO6O5W7RQgNrpk/42
-U7PSPsBWMswXtYCySRwsZ+L2a6LdD8onjcqSlj0YCSTfp2E8xyK8osVE99neFaGq
-Qj3QYSxDgFmQYBOWozQ2FI+tZoMCpADFp74Vag0UKo1WithnkNw4PZKx/JafsMIC
-Lgs/gz2Ex9JpFMaBlRbUvvR2A+jqFq4Bguce/bWJAntiH6r5nPITsZji7f66AxXD
-V8LeHlAYPli1q2O3Xdl1XPZTd0ZCW9nXzwrmLdvBxu6J8EOEifi3tN5Ygp2H6Vw9
-Qb1WwPMWazYom8CeEJ2yxtyzIkqtfVVPvIiaqR2Y2U/PGjmbcXX5fBjb5AKvkKot
-k1tXeh6Ham6nUliJ5lY8eKp5YcoXihTp0KHyf2F9QUv0L5IqVe8vRN5ds7YX6bzd
-BwFAkEw6igoKUyelPSW+SQED5KzXG5x/ZjKEB0nZDW1QQoegHFCguBxyNqu1p9j/
-V3yZAOQC2+iLNNYt+Kvg/S11MWIxjnLWIDnI+v7fTru9H2I/ARizxPNF4hMFwoSk
-QiP7xwUTKUiztJ8URCyY5Nq+jTqJsUqrUyeKNz3Gr9/RlwbVCGFbTbeJheoHDc7P
-CHr4xcq9ypCEV4qg+ZDN5ncByMIH9MaG2REGf9SCcvAnw2KgPJA=
-=Xnbl
------END PGP SIGNATURE-----
+Bug description:
+  When using qemu , SMI trigger causes hang/reboot under following
+  conditions:
 
---4jXrM3lyYWu4nBt5--
+  1. No KVM but there are more than 1 threads (-smp > 1)
+  2. When using KVM.
+
+  Info:
+  qemu-system-x86_64 --version
+  QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.29)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  SMI trigger was done by writing 0x00 in IO port 0xB2.
+
+  Command:
+  No failure in SMI trigger when using the below command:
+  qemu-system-x86_64 -M pc-q35-bionic -smp 1 -bios build/coreboot.rom  -ser=
+ial stdio -hda ../linux.img  -m 2048 | tee 1.txt
+
+  Hang/resets with below commands:
+  qemu-system-x86_64 -M pc-q35-bionic -smp 2 -bios build/coreboot.rom  -ser=
+ial stdio -hda ../linux.img  -m 2048 | tee 1.txt
+
+  sudo qemu-system-x86_64 -M pc-q35-bionic,accel=3Dkvm -smp 1 -bios
+  build/coreboot.rom  -serial stdio -hda ../linux.img  -m 2048 | tee
+  1.txt
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888971/+subscriptions
 
