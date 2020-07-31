@@ -4,95 +4,108 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12883C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 16:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3F1C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 16:54:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D112F20663
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 16:46:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71FE3206D8
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 16:54:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DmkeI+um"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D112F20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="U0Oa4HE3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71FE3206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1YB1-0001ll-3K
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 12:46:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40124)
+	id 1k1YIx-00041l-M9
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 12:54:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k1YAK-0001IC-4K
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 12:45:52 -0400
-Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:34909)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k1YAH-0002P6-NX
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 12:45:51 -0400
-Received: by mail-pf1-x434.google.com with SMTP id d188so8705051pfd.2
- for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 09:45:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=2SpEe3BEg5fTQoDgclaogKKe40Hl6yJfr0ts2CcQfNo=;
- b=DmkeI+umx0CKCLDbNM+SZdG0LqPpqg8w115jcEsmYHyhzgikXNG72z/PLJ+9hqeM2e
- HtiRpu70LucpHbwc9nCCWf+sPx4aarCuTWhDZCgznfr35K+BhGpXO4zIZEuSnXmyq+9x
- 69jn/qpGTtyR42Jf0cQVCt8cBXkdObTLsGw/L9MEe9mrOPzYGpgNr+fPXgXSD8JPkVxY
- kWA6qood0XGLGPvjHGOvekZz7rvccmMgin707s5rpzfIpHi0nqXYSt1ZfbYYX4L/EXD5
- 4+jw5vZYuxqaUyJ3cn9fdl7W2ZJZkMIegWeL4ejy120nL8Uu4HSMcKZgwW6WTBMpq/tt
- yCYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=2SpEe3BEg5fTQoDgclaogKKe40Hl6yJfr0ts2CcQfNo=;
- b=eI35DsU3ADng3nKauoqUvxzkDdxy36z7WW1RZCWjOf+cBTPMhkJcsb6mTzmBSAQKhb
- 1ERzupf/je8zw62f/zAWVxYWgayRZKfaQrYwyPMIrt16O/OvstSWlc/0u5npyuH21HVx
- F3aCE/7AMn9rUJTLj2V7LiIe8jw0qpgkAAhqCkvvPO/AuUPtMNy3mi+qh3ItULcnzIok
- hQVZhrj7wPIoXkGMdLbSE8aB28uaAz86gb75o9qWeAXlrKIus+XRVypRottFEgrr8CsC
- NwbOZQOcgTE4V2b9w4URaAzA/raLHMMMxiunLNz0sMI1wuFU9r8w6xpZjPkpYQJcieGu
- vGOA==
-X-Gm-Message-State: AOAM530/u4VWmvuu7LrzOgGMRY7ehEG2fcQTgi453RCnwP7LaB0C636V
- c/GkemkwN7LqHwcyi3p5aCCfqg==
-X-Google-Smtp-Source: ABdhPJxf2ffi1ToTSpKOaF8ZknqLU3ywtGDen05n3K7frjjB0VV9Z352edlbbHFqhyC0+dyXja+GZA==
-X-Received: by 2002:aa7:9d04:: with SMTP id k4mr4452882pfp.256.1596213947968; 
- Fri, 31 Jul 2020 09:45:47 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id a24sm10354385pfg.113.2020.07.31.09.45.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 31 Jul 2020 09:45:47 -0700 (PDT)
-Subject: Re: [RFC v2 62/76] target/riscv: rvv-0.9: single-width floating-point
- reduction
-To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-References: <20200722091641.8834-1-frank.chang@sifive.com>
- <20200722091641.8834-63-frank.chang@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <fbb66f8c-62af-97aa-48bb-1a26d5baeb29@linaro.org>
-Date: Fri, 31 Jul 2020 09:45:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1YGO-0003CN-Ri
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 12:52:09 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:39068)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k1YGK-0003A7-Gy
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 12:52:08 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VGkxRl147622;
+ Fri, 31 Jul 2020 16:51:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=OwcAf4Z9O4jDlMvRbQKo+1Da4xiK8CCQUDi4UUnUxNA=;
+ b=U0Oa4HE37PHdpRr6kg80FZyQxB1bcXqUl1wc17b9aiT5UpE84q5AAuC6J9wG7pULS6Er
+ vpodZVrpafPrXC+0MxKTMeKVpwJKjAav9CyobOOcrdVmiG0A7eaBqz33eBsft2G2boJd
+ hhZkS4ZpWBjhv3eyDADsgPYZlREnodqdg6XnOYqpngMEkOIdTkJSiU+M/vt8LGyqSPPF
+ RajONUSU3edBGgl50E20SEb18FfRiKWtj5vqwYinrQZMStg4HuTvXH4Zj6qQZxa++7tV
+ /NhtGKziQ6i+H+dZ05OkfxyWUJoyFfxnoPqI9Kn6/Q97hpNWLUaxTNXUVLjxK0zlkb3w 3A== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 32hu1jt2m5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Fri, 31 Jul 2020 16:51:56 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VGgsbS127069;
+ Fri, 31 Jul 2020 16:51:56 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 32hu605a1c-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 31 Jul 2020 16:51:56 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06VGpsYe003684;
+ Fri, 31 Jul 2020 16:51:54 GMT
+Received: from [10.39.235.87] (/10.39.235.87)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 31 Jul 2020 09:51:54 -0700
+Subject: Re: [PATCH V1 24/32] ui: save/restore vnc socket fds
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-25-git-send-email-steven.sistare@oracle.com>
+ <20200731090633.GC3518939@redhat.com>
+From: Steven Sistare <steven.sistare@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <ad9f9ccf-729f-63e9-f074-ce7288de651a@oracle.com>
+Date: Fri, 31 Jul 2020 12:51:51 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200722091641.8834-63-frank.chang@sifive.com>
+In-Reply-To: <20200731090633.GC3518939@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::434;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x434.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ mlxscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2007310125
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ clxscore=1015
+ malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0 priorityscore=1501
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2007310125
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=steven.sistare@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:51:59
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,27 +118,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Juan Quintela <quintela@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/22/20 2:16 AM, frank.chang@sifive.com wrote:
->  # Vector ordered and unordered reduction sum
-> -vfredsum_vs     0000-1 . ..... ..... 001 ..... 1010111 @r_vm
-> +vfredsum_vs     000001 . ..... ..... 001 ..... 1010111 @r_vm
-> +vfredosum_vs    000011 . ..... ..... 001 ..... 1010111 @r_vm
+On 7/31/2020 5:06 AM, Daniel P. Berrangé wrote:
+> On Thu, Jul 30, 2020 at 08:14:28AM -0700, Steve Sistare wrote:
+>> From: Mark Kanda <mark.kanda@oracle.com>
+>>
+>> Iterate through the VNC displays and save/restore the socket fds.
+> 
+> This patch doesn't appear to do anything around the client state, so I
+> can't see how this will work in general.  eg QEMU is 1/2 way through
+> receiving a message from the client, and we trigger re-exec.
+> 
+> The new QEMU is going to startup considering the VNC client is in an
+> idle state, and will then read the 2nd 1/2 of the message off the
+> client socket. Everything will go rapidly downhill from there.
+> Or the reverse, the server has sent a message, but this outbound
+> message is still in the buffer and only been partially sent on the
+> wire. We re'exec and now we've lost the unsent part of the buffer.
 
-"The vfredosum instruction is a valid implementation of the vfredsum instruction."
+Yes.  For partial messages in qemu object buffers, we need to add a draining phase
+between exec-requested and exec, and complete all partial messages.
 
-Which is exactly what we're doing here.
+For kernel socket buffers, we should be OK.  If we are accurately preserving vnc
+server state (which is the intent), then we can correctly respond to any client
+reqwuests that were sent to us pre-exec but read into qemu post-exec.
 
-Why should we treat them differently?  There is no parallelism that we can
-exploit in tcg, unlike in hardware.
+However, there is another icky issue with vnc.  It only works reliably with raw 
+encoding.  Compressed streams accumulate state on the client side which ww cannot
+match on the server when we create a new zlib stream after exec.  The vnc protocol
+defines a per-stream reset flag in the compression control word, which sounds like it
+should reset zlib state, but it does not for tigervnc.  I have not tried other clients.
 
+vnc is one of the tricker patches in this series.  It may be wisest to close the connection 
+and require the client to reconnect.  The virtual framebuffer is preserved, so the same content 
+will be shown after reconnect.
 
-r~
+- Steve
+
 
