@@ -2,93 +2,95 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA4CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:45:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A35B9C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:45:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79EE220829
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:45:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EA122076B
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:45:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="c7Oezxlb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79EE220829
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K7xxsq5S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EA122076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1RbE-0003iI-9c
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 05:45:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42052)
+	id 1k1Rbl-0004eY-NV
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 05:45:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1k1RJk-0007oJ-Jd; Fri, 31 Jul 2020 05:27:08 -0400
-Received: from mout.web.de ([212.227.15.3]:36171)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1k1RJi-0003Iv-Um; Fri, 31 Jul 2020 05:27:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1596187622;
- bh=EuJZnhDdT/XNOaCKZvdlajlxeYo8brk4aoRtdHhMqZw=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=c7Oezxlb0shLuK2NvAs1GhGQPamxnyINjMtGmy9O5I8U+z8IdIue9OA2XdoTa03DO
- TDtsaFXcuq3iq5ruB/jXk7PUFFayjwnaw/TnIyQAU/AYMzmT5IaCw0jzbQ7FPnsNSA
- 5zdfUmWnmyYMFfMrbnYlW/669UZfKY8Kc/YMUb+o=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.42]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MVaYi-1kBEvK0QjM-00RWVu; Fri, 31
- Jul 2020 11:27:02 +0200
-Date: Fri, 31 Jul 2020 11:27:00 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v6 7/9] MAINTAINERS: Add myself as maintainer for yank feature
-Message-ID: <14a7a25d32cb021d9b4f03318dd7ef9bb47133f3.1596184200.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1596184200.git.lukasstraub2@web.de>
-References: <cover.1596184200.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k1RPi-0003wT-A7
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 05:33:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23444
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k1RPg-0003vr-Hp
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 05:33:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596187995;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=k8ImAMaWBFB1wB0wesl5Yv7XoLmeNSqOuCCtNgY+AyY=;
+ b=K7xxsq5S3bSrPi/JmVfsZQQ0+QyTwQCqh3h1wJCDCJvrMEJjDpNcjrATekHNxCZISC2ilH
+ xk2tjG4nSjn5H6p6vQt24Aq409unad+jrWazRF0G3rQEgVq/bMgoc9HO3CxFdrHVz8SOpr
+ ug9OAvrDylNvSdeN5XcCG/s5FYiW+lA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-368-G_j0Jli-NCC5IVS_BKm0dw-1; Fri, 31 Jul 2020 05:33:13 -0400
+X-MC-Unique: G_j0Jli-NCC5IVS_BKm0dw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1926E57;
+ Fri, 31 Jul 2020 09:33:12 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E42E7C106;
+ Fri, 31 Jul 2020 09:32:54 +0000 (UTC)
+Date: Fri, 31 Jul 2020 10:32:51 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] schemas: Add vim modeline
+Message-ID: <20200731093251.GD3518939@redhat.com>
+References: <20200729185024.121766-1-abologna@redhat.com>
+ <87ime52wxd.fsf@dusky.pond.sub.org>
+ <20200730093732.GB3477223@redhat.com>
+ <87k0ylz0ep.fsf@dusky.pond.sub.org>
+ <20200730132446.GL3477223@redhat.com>
+ <ce88d35d-ff34-7e27-4518-c087ccd709cd@redhat.com>
+ <87zh7grqe8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/xN8STn.HjHO7F6UZmoX9Ii+";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:psJT6U/QISliVQvFy7CpWW6m4Rr19kTOMdoNMIYEexy3xvELOYS
- +O/FHqzaiFgvHKx+w5IbTAP3EHN9cxOlGuWQtPbUhft/cEbXCXNPEYHDW0fX2/aBCmKsJVm
- D01SMRfV3ZWtPDG30bPug1asUa10kzYmMOkIID0XcbuOl8nV6znzSYxUGrEMyZ6YWQIEaId
- jyi8P31Qe4nOwJZAENfCA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:RU5pCBk1Sow=:OaAO1nLHWxnFEXnSuuSSbn
- v/0qNAIpAyhIg+VzS8QK/Ho40IPpg/rRej8MHSUzR6x6S/+v9URMnKBqAGULYaGdNtun9sR15
- 9L/Nj32wnxzrlkKx0JJOjfHXit64NZinBbnk+hmGbm/cxEhga5NkYLfD3rhwIwMjVpIIkJl8+
- I3r0v8ka5znqQKeeGxXhXVBhzeg7rMYbc0jqRuydfYgLKzH/3skgkkF1IHDzLL+Y/bg1AR1SN
- wfrto5SfrJYkha4q/9F1d+i/gouLmoS5eWoc2UALZeShzbo6rsqymDlcboToHZQ9iH3k7q1ua
- 4RLWxjWORlb3pgC0abdY0ADFN+objj2ld/F28r0e3maLTTkULs4BNsfAtx/HRRneC4Ix9ZMuB
- Xaohm7q7MAvH2+NRco+gpaIrj5nnSkbHsv8pw5pqGnUJkziR/YsszWfG1/WIv+7bw6z7pRjJo
- aklsC24OLthXPsSYZrmpRmYv5ECabkyGLKwlWMGenI4DhI7q2X+TaiY3uj6EvxG8MZdrx8DYw
- U495zjYcOXqv/RQHY6HPrCeUzUnWZgYhHJ28W+X/GNktMEzcUdNds2NGfqXMCeknruJ31NyXU
- 0d6yTZIsz2BXVnqcCS7ZJ5yjNA9eGWjbN18vetNp/oNpKhK+J8xqECydDfajhoWpHRETI0yxK
- tflUj9SL00QCr+deF5dyCO7/K66FEs0NuHqCam8bZ4a0OXGP2t0XhaeyWEevcNLmdBv30/+bw
- rHlLbm9p4wvSfjOJmL36Bnqj5kbkwfLH9eLi6YPq6mfUhrWUlgQnsZw/u1qdX3ay2Y2kEF7R+
- gfBA8nZ6k78WLDJJYHS0dHuc7sBsgu97cUYLkPo+a94g93mVKvamTlPfQlxNgKoZwruGKhUVx
- fktaqVXtsc0SzFg2WnUDETApzhu2I5GlOpwC5SyPLPl/PJGZXtpwOjZR4JPM6NVNikl+C+AP4
- 7LEgjqGuRTsXTZytzeXfZcZvunCro+q2fGiHJHGlM2bwuNfWdK1We09MMl26F7YkXE1kQiFoM
- TFbOFGzROQt1cVksKIio/yQHMbhvzmbor+zPLqOTVo72tLlcjZQOjv2eFCluCfpYcbPUUrimT
- vNNscuRcX+FvawObtF7FQ1Vrx6MGZO/EQ6gWo8pcpl29JRwcc/PibsWbQdbk16Bdo7YtT6wT4
- sFZZtAw3JTrKM80IYuGS55xDnUnBDW54zQKAhLfXImNqoUPHtn6hb8jjIDV9NOcpBsVFL6lYy
- 3myGjY7J+DNiE/UAZaCwganD7YGi+JvgD03MpWw==
-Received-SPF: pass client-ip=212.227.15.3; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 05:10:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <87zh7grqe8.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 03:06:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,72 +103,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/xN8STn.HjHO7F6UZmoX9Ii+
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Jul 31, 2020 at 11:21:35AM +0200, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+> > On 7/30/20 9:24 AM, Daniel P. Berrangé wrote:
+> >>> Some of the criticism there doesn't matter for our use case.
+> >>
+> >> Yeah, what matters is whether it can do the job we need in a way that is
+> >> better than what we have today, and whether there are any further options
+> >> to consider that might be viable alternatives.
+> 
+> The sheer complexity of YAML puts me off.  The spec exceeds 20k words.
 
-I'll maintain this for now as the colo usecase is the first user
-of this functionality.
-
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0886eb3d2b..bf5075a637 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2614,6 +2614,12 @@ F: util/uuid.c
- F: include/qemu/uuid.h
- F: tests/test-uuid.c
-
-+Yank feature
-+M: Lukas Straub <lukasstraub2@web.de>
-+S: Odd fixes
-+F: util/yank.c
-+F: include/qemu/yank.h
-+
- COLO Framework
- M: zhanghailiang <zhang.zhanghailiang@huawei.com>
- S: Maintained
---
-2.20.1
+Just because complexity exists doesn't mean it has any negative impact
+on us as users. A large spec is a concern if writing a parser, but we'd
+be using an off the shelf parser so not a concern. Or if you're trying
+to do obscure stuff that pushes the boundaries of what YAML can do in
+terms of data representation, but QAPI schema needs are really trivial
+so won't ever hit anything complex unless we actively went looking for
+it. In all the times I've used YAML I can't say "complexity" has been
+a word that ever came to mind, quite the opposite, it felt simple.
 
 
---Sig_/xN8STn.HjHO7F6UZmoX9Ii+
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl8j4+QACgkQNasLKJxd
-sljG+xAAhAPOcf3+wf04M1DWIMsmL5BIJD13x3fuRbvM9axS91ZSgs13LgtU9NWR
-KJlUrRTUZzs1iDi62r4TlFV7PPssFTaf2X2B8NiK0V7rin3jZJ15wW33tX+VWrIh
-BowjN/J7KeN4eNHAaM5cy0xCbMq7d7AcP49nB05K7b4P16uDZULC6X9w4X1z7Rk/
-6GSblFVe8vBaYZj0eyMqB9LFVJTBWxtfq1XosLeYAvosruuTtT9ihjdo/k/Hb03c
-SuQBGaWttIng7fee4/N+ez7SHLPAfZXCsYDfsoKfRJuAId/IuAsHK0rfm9NzjusL
-vvT2xcXTlfaYIz9kC6scLn1k6lcnHb0F4td1WD9z/6hPwA4zD3TXrqxfC+RnjlNj
-3eJ+SYnbngWtMhDoH+l0B/dyC8nEVvouSj1v3wCq4sb4o/4x6TMOzHQN832jlE2s
-6XMrQZ5QOI/1lgWVB3DJ8GQQyM7WEMwuD7anEMvKTMy2CILO/kFp9IEFONZOpDyh
-ekQZ5eXX9XeYcUN2lSEWtWQZFBWlJtxNg+gTRsBSN3BMBjBYYubePOjJiv5fgQJ2
-uUtlu3gIkOPA+XRl5MkmX1tiwkPu6D6Hq6D9/1NhAELcHIDdjRilX0o23h94nm3z
-NfmtPK52PSZZs/8+5hDiv8xcy/MGSY6XPG9Kd6sVj/E/S3vwywg=
-=w1DH
------END PGP SIGNATURE-----
-
---Sig_/xN8STn.HjHO7F6UZmoX9Ii+--
 
