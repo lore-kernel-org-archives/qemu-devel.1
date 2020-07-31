@@ -4,106 +4,104 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2CEC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 132E2C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:27:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24CFE22B42
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:26:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFA1922B42
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:27:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZkFAUcLd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CFE22B42
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ijBD3K1j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFA1922B42
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Zjr-0000vx-Ds
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:26:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58088)
+	id 1k1Zkh-0002BG-3R
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:27:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1ZeQ-0001qv-L1
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:02 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:50686)
+ id 1k1ZeL-0001hY-OA
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:20:57 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:54838)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1ZeO-0005Ja-Gh
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:21:02 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIE25V111434;
- Fri, 31 Jul 2020 18:20:44 GMT
+ id 1k1ZeJ-0005LZ-Hz
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:20:57 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIBmft069809;
+ Fri, 31 Jul 2020 18:20:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
- references : mime-version : content-type : content-transfer-encoding;
- s=corp-2020-01-29; bh=NH5HLQlQOPmoQl57ijRKRFjElbxIl8CJ0GOUVPCdBKQ=;
- b=ZkFAUcLdzVTt+QmUAjw1DcffyJAIF9h7cCbghjMc244nVp2GAtygkWcqehdFM23mczjy
- PpCUory6rY0CpM2w4hdhpVbAo+dG9so2K3ZfI4O3rYta283DPuOHJ2InQZJIHzYQuiEV
- QukmTFR1YJ5FkxJDl3wlZlBrNTqAcfqhhhyAFO8yFXtLSF0KmhjGDUM4r3WBn457Ug04
- akJMehXNODb1l5lqrxjSz3MpJdQEA72J6PinUDTTW+TVi5sU1+CXO2RPiTe5S4K4Vn6H
- ruxYMxncofYMa+9fGEwrkaOV6gjJjuiYOrcJibDD04mTQg/lmvfQR7TC2zjM6hHl2+1A 7A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 32hu1jtfy2-1
+ references; s=corp-2020-01-29;
+ bh=1l67bn+gCumzFGqkgymzvlntK4IEFqBqvaSg3HO6MtE=;
+ b=ijBD3K1jNpms2CG0XjRlzRrdvgu8I9A4mDzpDQRNwkDrLQerCR+EM1pR0VU8U/zySSUi
+ Vb7tZbkLP6ZeoW5LsJJLfiELJbnK6hbLkRH1bA1qGBeIruwzrBltuByJfqGuJWypE5Wu
+ rzmc8XgwiAu5w10CAytqwP4iZiU+RFDHPaDdnR06PikJhmVzOhObjFEuWoIJoXEmyCaE
+ Q0vOrsW0zsgAFWZt/gjRFddGSIawtsITITYMMkbV5zlxz4RZ3cwlGOkefs1je0s4Oesp
+ YelPIgVJx/z16YzyD4CVo21BCsnWHgFkiphpQrqvtRXvm668BuczXqlw6re6mxGR3cKz jA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 32mf702u7x-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Fri, 31 Jul 2020 18:20:44 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIIc2w137651;
- Fri, 31 Jul 2020 18:20:43 GMT
+ Fri, 31 Jul 2020 18:20:48 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIIi8c080286;
+ Fri, 31 Jul 2020 18:20:48 GMT
 Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3020.oracle.com with ESMTP id 32hu64r6xb-1
+ by userp3020.oracle.com with ESMTP id 32mf70vdwy-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 31 Jul 2020 18:20:43 +0000
+ Fri, 31 Jul 2020 18:20:48 +0000
 Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06VIKgki013252;
- Fri, 31 Jul 2020 18:20:42 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06VIKldb013260;
+ Fri, 31 Jul 2020 18:20:47 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 31 Jul 2020 11:20:42 -0700
+ with ESMTP ; Fri, 31 Jul 2020 11:20:46 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 04/20] multi-process: setup a machine object for remote
- device process
-Date: Fri, 31 Jul 2020 14:20:11 -0400
-Message-Id: <a379f9e0ea5c1635a3a9315be415d8afd4d94444.1596217462.git.jag.raman@oracle.com>
+Subject: [PATCH v8 07/20] multi-process: add co-routines to communicate with
+ remote
+Date: Fri, 31 Jul 2020 14:20:14 -0400
+Message-Id: <b57493752ed0ec04f44df915413e325acf641882.1596217462.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1596217462.git.jag.raman@oracle.com>
 References: <cover.1596217462.git.jag.raman@oracle.com>
 In-Reply-To: <cover.1596217462.git.jag.raman@oracle.com>
 References: <cover.1596217462.git.jag.raman@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- adultscore=0 bulkscore=0
- malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ suspectscore=0 spamscore=0
+ mlxlogscore=999 adultscore=0 malwarescore=0 mlxscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2007310137
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- clxscore=1015
- malwarescore=0 spamscore=0 suspectscore=1 bulkscore=0 priorityscore=1501
- phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ bulkscore=0 suspectscore=0
+ spamscore=0 impostorscore=0 clxscore=1015 phishscore=0 priorityscore=1501
+ adultscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2007310136
-Received-SPF: pass client-ip=156.151.31.86; envelope-from=jag.raman@oracle.com;
- helo=userp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:51:59
+Received-SPF: pass client-ip=156.151.31.85; envelope-from=jag.raman@oracle.com;
+ helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 14:20:51
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -53
+X-Spam_score: -5.4
+X-Spam_bar: -----
+X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,169 +126,159 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-remote-machine object sets up various subsystems of the remote
-device process. Instantiate PCI host bridge object and initialize RAM, IO &
-PCI memory regions.
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+process to avoid blocking the main loop during the message exchanges.
+To be used by proxy device.
+
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 ---
- MAINTAINERS                  |  2 ++
- hw/i386/Makefile.objs        |  1 +
- hw/i386/remote.c             | 69 ++++++++++++++++++++++++++++++++++++++++++++
- include/hw/i386/remote.h     | 28 ++++++++++++++++++
- include/hw/pci-host/remote.h |  1 +
- 5 files changed, 101 insertions(+)
- create mode 100644 hw/i386/remote.c
- create mode 100644 include/hw/i386/remote.h
+ include/io/mpqemu-link.h | 15 +++++++++
+ io/mpqemu-link.c         | 82 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d781a28..32e264e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3042,6 +3042,8 @@ M: John G Johnson <john.g.johnson@oracle.com>
- S: Maintained
- F: hw/pci-host/remote.c
- F: include/hw/pci-host/remote.h
-+F: hw/i386/remote.c
-+F: include/hw/i386/remote.h
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+index ae7008e..8591ad2 100644
+--- a/include/io/mpqemu-link.h
++++ b/include/io/mpqemu-link.h
+@@ -14,6 +14,7 @@
+ #include "qom/object.h"
+ #include "qemu/thread.h"
+ #include "io/channel.h"
++#include "io/channel-socket.h"
  
- Build and test automation
- -------------------------
-diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-index 6abc745..5ead266 100644
---- a/hw/i386/Makefile.objs
-+++ b/hw/i386/Makefile.objs
-@@ -14,6 +14,7 @@ obj-$(CONFIG_XEN) += ../xenpv/ xen/
- obj-$(CONFIG_VMPORT) += vmport.o
- obj-$(CONFIG_VMMOUSE) += vmmouse.o
- obj-$(CONFIG_PC) += port92.o
-+obj-$(CONFIG_MPQEMU) += remote.o
+ #define REMOTE_MAX_FDS 8
  
- obj-y += kvmvapic.o
- obj-$(CONFIG_ACPI) += acpi-common.o
-diff --git a/hw/i386/remote.c b/hw/i386/remote.c
-new file mode 100644
-index 0000000..a67be33
---- /dev/null
-+++ b/hw/i386/remote.c
-@@ -0,0 +1,69 @@
-+/*
-+ * Machine for remote device
-+ *
-+ *  This machine type is used by the remote device process in multi-process
-+ *  QEMU. QEMU device models depend on parent busses, interrupt controllers,
-+ *  memory regions, etc. The remote machine type offers this environment so
-+ *  that QEMU device models can be used as remote devices.
-+ *
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+
-+#include "hw/i386/remote.h"
-+#include "exec/address-spaces.h"
-+#include "exec/memory.h"
-+#include "qapi/error.h"
-+
-+static void remote_machine_init(MachineState *machine)
-+{
-+    MemoryRegion *system_memory, *system_io, *pci_memory;
-+    RemoteMachineState *s = REMOTE_MACHINE(machine);
-+    RemotePCIHost *rem_host;
-+
-+    system_memory = get_system_memory();
-+    system_io = get_system_io();
-+
-+    pci_memory = g_new(MemoryRegion, 1);
-+    memory_region_init(pci_memory, NULL, "pci", UINT64_MAX);
-+
-+    rem_host = REMOTE_HOST_DEVICE(qdev_new(TYPE_REMOTE_HOST_DEVICE));
-+
-+    rem_host->mr_pci_mem = pci_memory;
-+    rem_host->mr_sys_mem = system_memory;
-+    rem_host->mr_sys_io = system_io;
-+
-+    s->host = rem_host;
-+
-+    object_property_add_child(OBJECT(s), "remote-device", OBJECT(rem_host));
-+    memory_region_add_subregion_overlap(system_memory, 0x0, pci_memory, -1);
-+
-+    qdev_realize(DEVICE(rem_host), sysbus_get_default(), &error_fatal);
-+}
-+
-+static void remote_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    mc->init = remote_machine_init;
-+}
-+
-+static const TypeInfo remote_machine = {
-+    .name = TYPE_REMOTE_MACHINE,
-+    .parent = TYPE_MACHINE,
-+    .instance_size = sizeof(RemoteMachineState),
-+    .class_init = remote_machine_class_init,
+@@ -27,6 +28,7 @@
+  */
+ typedef enum {
+     INIT = 0,
++    RET_MSG,
+     MAX = INT_MAX,
+ } MPQemuCmd;
+ 
+@@ -64,6 +66,19 @@ typedef struct {
+     uint8_t *data2;
+ } MPQemuMsg;
+ 
++struct MPQemuRequest {
++    MPQemuMsg *msg;
++    QIOChannel *ioc;
++    Coroutine *co;
++    bool finished;
++    int error;
++    long ret;
 +};
 +
-+static void remote_machine_register_types(void)
++typedef struct MPQemuRequest MPQemuRequest;
++
++uint64_t mpqemu_msg_send_and_await_reply(MPQemuMsg *msg, QIOChannel *ioc,
++                                  Error **errp);
+ void mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc, Error **errp);
+ void mpqemu_msg_recv(MPQemuMsg *msg, QIOChannel *ioc, Error **errp);
+ 
+diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
+index dcefa42..d4dd0fe 100644
+--- a/io/mpqemu-link.c
++++ b/io/mpqemu-link.c
+@@ -16,6 +16,8 @@
+ #include "qapi/error.h"
+ #include "qemu/iov.h"
+ #include "qemu/error-report.h"
++#include "qemu/main-loop.h"
++#include "io/channel-socket.h"
+ 
+ void mpqemu_msg_send(MPQemuMsg *msg, QIOChannel *ioc, Error **errp)
+ {
+@@ -132,6 +134,86 @@ void mpqemu_msg_recv(MPQemuMsg *msg, QIOChannel *ioc, Error **errp)
+     }
+ }
+ 
++/* Use in proxy only as it clobbers fd handlers. */
++static void coroutine_fn mpqemu_msg_send_co(void *data)
 +{
-+    type_register_static(&remote_machine);
++    MPQemuRequest *req = (MPQemuRequest *)data;
++    MPQemuMsg msg_reply = {0};
++    Error *local_err = NULL;
++
++    if (!req->ioc) {
++        error_report("No channel available to send command %d",
++                     req->msg->cmd);
++        req->finished = true;
++        req->error = -EINVAL;
++        return;
++    }
++
++    req->co = qemu_coroutine_self();
++    mpqemu_msg_send(req->msg, req->ioc, &local_err);
++    if (local_err) {
++        error_report("ERROR: failed to send command to remote %d, ",
++                     req->msg->cmd);
++        req->finished = true;
++        req->error = -EINVAL;
++        return;
++    }
++
++    mpqemu_msg_recv(&msg_reply, req->ioc, &local_err);
++    if (local_err) {
++        error_report("ERROR: failed to get a reply for command %d, "
++                     "errno %s",
++                     req->msg->cmd, strerror(errno));
++        req->error = -EIO;
++    } else {
++        if (!mpqemu_msg_valid(&msg_reply) || msg_reply.cmd != RET_MSG) {
++            error_report("ERROR: Invalid reply received for command %d",
++                         req->msg->cmd);
++            req->error = -EINVAL;
++        } else {
++            req->ret = msg_reply.data1.u64;
++        }
++    }
++    req->finished = true;
 +}
 +
-+type_init(remote_machine_register_types);
-diff --git a/include/hw/i386/remote.h b/include/hw/i386/remote.h
-new file mode 100644
-index 0000000..5b36b25
---- /dev/null
-+++ b/include/hw/i386/remote.h
-@@ -0,0 +1,28 @@
 +/*
-+ * Remote machine configuration
-+ *
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
++ * Create if needed and enter co-routine to send the message to the
++ * remote channel ioc and wait for the reply.
++ * Returns the value from the reply message, sets the error on failure.
 + */
 +
-+#ifndef REMOTE_MACHINE_H
-+#define REMOTE_MACHINE_H
++uint64_t mpqemu_msg_send_and_await_reply(MPQemuMsg *msg, QIOChannel *ioc,
++                                  Error **errp)
++{
++    MPQemuRequest req = {0};
++    uint64_t ret = UINT64_MAX;
 +
-+#include "qom/object.h"
-+#include "hw/boards.h"
-+#include "hw/pci-host/remote.h"
++    req.ioc = ioc;
++    if (!req.ioc) {
++        error_setg(errp, "Channel is set to NULL");
++        return ret;
++    }
 +
-+typedef struct RemoteMachineState {
-+    MachineState parent_obj;
++    req.msg = msg;
++    req.ret = 0;
++    req.finished = false;
 +
-+    RemotePCIHost *host;
-+} RemoteMachineState;
++    req.co = qemu_coroutine_create(mpqemu_msg_send_co, &req);
++    qemu_coroutine_enter(req.co);
 +
-+#define TYPE_REMOTE_MACHINE "remote-machine"
-+#define REMOTE_MACHINE(obj) \
-+    OBJECT_CHECK(RemoteMachineState, (obj), TYPE_REMOTE_MACHINE)
++    while (!req.finished) {
++        aio_poll(qemu_get_aio_context(), true);
++    }
++    if (req.error) {
++        error_setg(errp, "Error exchanging message with remote process, "
++                        "error %d", req.error);
++    }
++    ret = req.ret;
 +
-+#endif
-diff --git a/include/hw/pci-host/remote.h b/include/hw/pci-host/remote.h
-index bab6d3c..cc0fff4 100644
---- a/include/hw/pci-host/remote.h
-+++ b/include/hw/pci-host/remote.h
-@@ -25,6 +25,7 @@ typedef struct RemotePCIHost {
- 
-     MemoryRegion *mr_pci_mem;
-     MemoryRegion *mr_sys_io;
-+    MemoryRegion *mr_sys_mem;
- } RemotePCIHost;
- 
- #endif
++    return ret;
++}
++
+ bool mpqemu_msg_valid(MPQemuMsg *msg)
+ {
+     if (msg->cmd >= MAX && msg->cmd < 0) {
 -- 
 1.8.3.1
 
