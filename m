@@ -2,99 +2,87 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B767BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 14:12:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EAAC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 14:31:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 813C8206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 14:12:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aX6dPv67"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 813C8206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB7EA206FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 14:31:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB7EA206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Vm3-0002Wl-Ol
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 10:12:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50592)
+	id 1k1W4V-0006lR-5n
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 10:31:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k1VlQ-00025n-RL
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 10:12:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25996
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k1VlO-0005Kw-4n
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 10:12:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596204716;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=l5BMN84/nFjfKuGCtoKsxuaws9MCl5OPEbl10yee1Oc=;
- b=aX6dPv67JE1JM0KKhZIuODOhu0vTjt6zWWuEtI5yZO3rO7RFhd56LbSkSyZbfI8b1tl+lP
- rts5Eoq3GL6/wJTKZbUiCOTG5r6bF0dB7Bdns86BIIIHUbN2D9vYmAPGm+JFH6mjrbWSSm
- sEkLcxiU6Us2uY28FLAMVDsrvHAKb7M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-fCkvy1-qMaevmnK0Qq1Jgg-1; Fri, 31 Jul 2020 10:11:54 -0400
-X-MC-Unique: fCkvy1-qMaevmnK0Qq1Jgg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E9CF59;
- Fri, 31 Jul 2020 14:11:53 +0000 (UTC)
-Received: from localhost (ovpn-114-6.ams2.redhat.com [10.36.114.6])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 50D77797FC;
- Fri, 31 Jul 2020 14:11:48 +0000 (UTC)
-Date: Fri, 31 Jul 2020 15:11:47 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Roman Mohr <rmohr@redhat.com>
-Subject: Re: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and print an
- error
-Message-ID: <20200731141147.GA199536@stefanha-x1.localdomain>
-References: <20200727190223.422280-1-stefanha@redhat.com>
- <20200727190223.422280-4-stefanha@redhat.com>
- <OSBPR01MB45826073E5A54CF869E56721E5730@OSBPR01MB4582.jpnprd01.prod.outlook.com>
- <CALDPj7syG0KPhtZEma5n403=YFZ2ptcD4MtP=GdrY9n1eUs5Eg@mail.gmail.com>
- <20200728131250.GB78409@redhat.com>
- <CALDPj7uvquu=YWX_Ve7ROdj=LZWjkgPOm+wvEAynGvjeF4Xivg@mail.gmail.com>
- <20200729144027.GF52286@stefanha-x1.localdomain>
- <ad75a25c-0343-5c57-1933-e3c88f76df1c@redhat.com>
- <20200731082638.GA173083@stefanha-x1.localdomain>
- <CALDPj7s-UjrvgD4-mhEwisetz7PtAO-RCmKvH+=1UTM8K8oLPw@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1W3f-0006Ka-L0
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 10:30:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35966)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1W3d-0007Hj-JG
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 10:30:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k1W3b-0006jX-62
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 14:30:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 2CD032E80DB
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 14:30:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CALDPj7s-UjrvgD4-mhEwisetz7PtAO-RCmKvH+=1UTM8K8oLPw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="2fHTh5uZTiUOsy+g"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 10:11:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 Jul 2020 14:19:33 -0000
+From: Rafael David Tinoco <1886811@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=Laurent@vivier.eu; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Fix Released; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=debian; sourcepackage=qemu; component=main;
+ status=Fix Released; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: emojifreak laurent-vivier rafaeldtinoco
+X-Launchpad-Bug-Reporter: Ryutaroh Matsumoto (emojifreak)
+X-Launchpad-Bug-Modifier: Rafael David Tinoco (rafaeldtinoco)
+References: <159420830935.32230.13858618076699173558.malonedeb@gac.canonical.com>
+Message-Id: <159620517328.10452.7080291190055276315.malone@chaenomeles.canonical.com>
+Subject: [Bug 1886811] Re: systemd complains Failed to enqueue loopback
+ interface start request: Operation not supported
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: fc1d21dd0097d739a2a5447b28a88bb0fe67cffd
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 10:30:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -103,153 +91,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "vromanso@redhat.com" <vromanso@redhat.com>,
- Daniel Walsh <dwalsh@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "virtio-fs@redhat.com" <virtio-fs@redhat.com>,
- "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>,
- "mpatel@redhat.com" <mpatel@redhat.com>, Vivek Goyal <vgoyal@redhat.com>
+Reply-To: Bug 1886811 <1886811@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---2fHTh5uZTiUOsy+g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+qemu (1:5.0-5ubuntu3) groovy; urgency=3Dmedium
 
-On Fri, Jul 31, 2020 at 10:39:37AM +0200, Roman Mohr wrote:
-> On Fri, Jul 31, 2020 at 10:26 AM Stefan Hajnoczi <stefanha@redhat.com>
-> wrote:
->=20
-> > On Thu, Jul 30, 2020 at 06:21:34PM -0400, Daniel Walsh wrote:
-> > > On 7/29/20 10:40, Stefan Hajnoczi wrote:
-> > > > On Wed, Jul 29, 2020 at 09:59:01AM +0200, Roman Mohr wrote:
-> > > >> On Tue, Jul 28, 2020 at 3:13 PM Vivek Goyal <vgoyal@redhat.com>
-> > wrote:
-> > > >>
-> > > >>> On Tue, Jul 28, 2020 at 12:00:20PM +0200, Roman Mohr wrote:
-> > > >>>> On Tue, Jul 28, 2020 at 3:07 AM misono.tomohiro@fujitsu.com <
-> > > >>>> misono.tomohiro@fujitsu.com> wrote:
-> > > >>>>
-> > > >>>>>> Subject: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and
-> > print
-> > > >>> an
-> > > >>>>> error
-> > > >> Yes they can run as root. I can tell you what we plan to do with t=
-he
-> > > >> containerized virtiofsd: We run it as part of the user-owned pod (=
-a
-> > set of
-> > > >> containers).
-> > > >> One of our main goals at the moment is to run VMs in a user-owned =
-pod
-> > > >> without additional privileges.
-> > > >> So that in case the user (VM-creator/owner) enters the pod or
-> > something
-> > > >> breaks out of the VM they are just in the unprivileged container
-> > sandbox.
-> > > >> As part of that we try to get also rid of running containers in th=
-e
-> > > >> user-context with the root user.
-> > > >>
-> > > >> One possible scenario which I could think of as being desirable fr=
-om a
-> > > >> kubevirt perspective:
-> > > >> We would run the VM in one container and have an unprivileged
-> > > >> virtiofsd container in parallel.
-> > > >> This container already has its own mount namespace and it is not t=
-hat
-> > > >> critical if something manages to enter this sandbox.
-> > > >>
-> > > >> But we are not as far yet as getting completely rid of root right =
-now
-> > in
-> > > >> kubevirt, so if as a temporary step it needs root, the current
-> > proposed
-> > > >> changes would still be very useful for us.
-> > > > What is the issue with root in user namespaces?
-> > > >
-> > > > I remember a few years ago it was seen as a major security issue bu=
-t
-> > > > don't remember if container runtimes were already using user namesp=
-aces
-> > > > back then.
-> > > >
-> > > > I guess the goal might be simply to minimize Linux capabilities as =
-much
-> > > > as possible?
-> > > >
-> > > > virtiofsd could nominally run with an arbitrary uid/gid but it stil=
-l
-> > > > needs the Linux capabilities that allow it to change uid/gid and
-> > > > override file system permission checks just like the root user. Not
-> > sure
-> > > > if there is any advantage to running with uid 1000 when you still h=
-ave
-> > > > these Linux capabilities.
-> > > >
-> > > > Stefan
-> > >
-> > > When you run in a user namespace, virtiofsd would only have
-> > > setuid/setgid over the range of UIDs mapped into the user namespace. =
- So
-> > > if UID=3D0 on the host is not mapped, then the container can not crea=
-te
-> > > real UID=3D0 files on disk.
-> > >
-> > > Similarly you can protect the user directories and any content by
-> > > running the containers in a really high UID Mapping.
-> >
-> > Roman, do user namespaces address your concerns about uid 0 in
-> > containers?
-> >
->=20
-> They may eventually solve it. I would not let us hang up on this right no=
-w,
-> since as said at least in kubevirt we can't get rid right now of root
-> anyway.
-> Even if it is at some point in the future save and supported on
-> bleeding-edge managed k8s clusters to allow ordinary users to run with ui=
-d
-> 0, from my perspective it is right now common to restrict namespaces with
-> PodSecurityPolicies or SecurityContexts to not allow running pods as root
-> for normal users.
-> It is also common that a significant part of the community users run dock=
-er
-> and/or run on managed k8s clusters where they can not influence if
-> user-namespaces are enabled, if they can run pods as root, if the runtime
-> points to a seccomp file they like or if the runtime they prefer is used.
->=20
-> But let me repeat again that we require root right now anyway and that we
-> don't run the pods right now with the user privileges (but we should and =
-we
-> aim for that). Right now PSPs and SCCs restrict access to these pods by t=
-he
-> users.
-> So for our use case, at this exact moment root is acceptable, the unshare
-> call is a little bit more problematic.
+has the merge with this fix:
 
-Okay, thanks for explaining.
+    - linux-user-add-netlink-RTM_SETLINK-command.patch (Closes: #964289)
 
-Stefan
 
---2fHTh5uZTiUOsy+g
-Content-Type: application/pgp-signature; name="signature.asc"
+** Changed in: qemu (Ubuntu)
+       Status: New =3D> Fix Released
 
------BEGIN PGP SIGNATURE-----
+-- =
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8kJqMACgkQnKSrs4Gr
-c8jVbQgAyYO9cKSUW7EGV6IZ7kVySXKKq/gwb3J4AckA4/xQ8knhf6J8zm1zgsvE
-jv3cEucwvyueZ5glj9NnZNQsnjT+SwduGbAhWYnR7ULbvV9k/3XqKUX545KcMK2F
-FH8YtunI943cjlMnoHJvOOyCwUy/YUCspkTZU5kPhtcVx6121GvdYZs3pfoCR6cM
-8woIQbaA6dwAh+zxtAHfUygMfXBWMutJ5eL38d/K2kp22pU7UyYIQhQV7Nh0zENe
-KV4iWcdYZ8ca9F6end2ef+lN3GltrKgAZg2l952r6AKF9FcKCu3yp4xTR/fZGiq7
-PLrJDYh/UN8BGWuXmwXbsHfwyuJrdw==
-=uvXF
------END PGP SIGNATURE-----
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1886811
 
---2fHTh5uZTiUOsy+g--
+Title:
+  systemd complains Failed to enqueue loopback interface start request:
+  Operation not supported
 
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu package in Debian:
+  Fix Released
+
+Bug description:
+  This symptom seems similar to
+  https://bugs.launchpad.net/qemu/+bug/1823790
+
+  Host Linux: Debian 11 Bullseye (testing) on x84-64 architecture
+  qemu version: latest git of git commit hash eb2c66b10efd2b914b56b20ae9065=
+5914310c925
+  compiled with "./configure --static --disable-system" =
+
+
+  Down stream bug report at https://bugs.debian.org/cgi-bin/bugreport.cgi?b=
+ug=3D964289
+  Bug report (closed) to systemd: https://github.com/systemd/systemd/issues=
+/16359
+
+  systemd in armhf and armel (both little endian 32-bit) containers fail to=
+ start with
+  Failed to enqueue loopback interface start request: Operation not support=
+ed
+
+  How to reproduce on Debian (and probably Ubuntu):
+  mmdebstrap --components=3D"main contrib non-free" --architectures=3Darmhf=
+ --variant=3Dimportant bullseye /var/lib/machines/armhf-bullseye
+  systemd-nspawn -D /var/lib/machines/armhf-bullseye -b
+
+  When "armhf" architecture is replaced with "mips" (32-bit big endian) or =
+"ppc64"
+  (64-bit big endian), the container starts up fine.
+
+  The same symptom is also observed with "powerpc" (32-bit big endian)
+  architecture.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1886811/+subscriptions
 
