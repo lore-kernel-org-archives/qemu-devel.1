@@ -2,97 +2,83 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 783B3C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 08:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1545C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 08:31:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 462AA2072A
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 08:27:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KKSr4VY4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 462AA2072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C2C3D2072A
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 08:31:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C3D2072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1QO6-00020S-Gu
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 04:27:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58890)
+	id 1k1QSK-0003Tz-Mm
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 04:31:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k1QNS-0001L1-RX
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 04:26:54 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60203
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k1QNP-0004w4-1N
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 04:26:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596184009;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=gz6V5/Q+OfMA/BJSQDXGukdbueurXqLwt6KM0qV2uuc=;
- b=KKSr4VY4p32BUcLCqrNGTrJDveUH3mVwFfj3slV2hZ+dwBPRwomEwksnw7eZD2RbGcACo0
- yuG7AZdaMvdIDer3SdlSV0h9YDHhMljE9LVxHdmksHIU6u/yGuOKX39EiZ+WxFNE3y1EIT
- o6W9TY6OU6cfoUc4hh1j9iWsKNUeQic=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-rmKb4L5nOl6zwSB6aO8whw-1; Fri, 31 Jul 2020 04:26:44 -0400
-X-MC-Unique: rmKb4L5nOl6zwSB6aO8whw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C1E1800597;
- Fri, 31 Jul 2020 08:26:43 +0000 (UTC)
-Received: from localhost (ovpn-114-6.ams2.redhat.com [10.36.114.6])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 792135DAA9;
- Fri, 31 Jul 2020 08:26:39 +0000 (UTC)
-Date: Fri, 31 Jul 2020 09:26:38 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Roman Mohr <rmohr@redhat.com>
-Subject: Re: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and print an
- error
-Message-ID: <20200731082638.GA173083@stefanha-x1.localdomain>
-References: <20200727190223.422280-1-stefanha@redhat.com>
- <20200727190223.422280-4-stefanha@redhat.com>
- <OSBPR01MB45826073E5A54CF869E56721E5730@OSBPR01MB4582.jpnprd01.prod.outlook.com>
- <CALDPj7syG0KPhtZEma5n403=YFZ2ptcD4MtP=GdrY9n1eUs5Eg@mail.gmail.com>
- <20200728131250.GB78409@redhat.com>
- <CALDPj7uvquu=YWX_Ve7ROdj=LZWjkgPOm+wvEAynGvjeF4Xivg@mail.gmail.com>
- <20200729144027.GF52286@stefanha-x1.localdomain>
- <ad75a25c-0343-5c57-1933-e3c88f76df1c@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1QRQ-00031p-5U
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 04:31:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58128)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1QRN-0005VK-W8
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 04:30:59 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k1QRL-0001nS-J5
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 08:30:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8EDE12E80F0
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 08:30:55 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <ad75a25c-0343-5c57-1933-e3c88f76df1c@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="T4sUOijqQbZv57TR"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 02:46:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 Jul 2020 08:23:33 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1845185@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: mingw32 msys windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: avladu chewi philmd pmaydell
+X-Launchpad-Bug-Reporter: Adrian Vladu (avladu)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <156932212305.13447.6077258015607645915.malonedeb@gac.canonical.com>
+Message-Id: <159618381345.2438.12482137855242220925.malone@gac.canonical.com>
+Subject: [Bug 1845185] Re: Cannot build qemu utils (qemu-img.exe, qemu-edid.exe,
+ qemu-io.exe) statically with MSYS64 on Windows because intl and iconv
+ libs are not loaded
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 870783f60e543286a46c0ab1f66b87d0686ab031
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 02:41:21
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -101,107 +87,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "vromanso@redhat.com" <vromanso@redhat.com>,
- Daniel Walsh <dwalsh@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "virtio-fs@redhat.com" <virtio-fs@redhat.com>,
- "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>,
- "mpatel@redhat.com" <mpatel@redhat.com>, Vivek Goyal <vgoyal@redhat.com>
+Reply-To: Bug 1845185 <1845185@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---T4sUOijqQbZv57TR
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+James, do you know if this has been fixed in GLib 2.65.0?
 
-On Thu, Jul 30, 2020 at 06:21:34PM -0400, Daniel Walsh wrote:
-> On 7/29/20 10:40, Stefan Hajnoczi wrote:
-> > On Wed, Jul 29, 2020 at 09:59:01AM +0200, Roman Mohr wrote:
-> >> On Tue, Jul 28, 2020 at 3:13 PM Vivek Goyal <vgoyal@redhat.com> wrote:
-> >>
-> >>> On Tue, Jul 28, 2020 at 12:00:20PM +0200, Roman Mohr wrote:
-> >>>> On Tue, Jul 28, 2020 at 3:07 AM misono.tomohiro@fujitsu.com <
-> >>>> misono.tomohiro@fujitsu.com> wrote:
-> >>>>
-> >>>>>> Subject: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and pri=
-nt
-> >>> an
-> >>>>> error
-> >> Yes they can run as root. I can tell you what we plan to do with the
-> >> containerized virtiofsd: We run it as part of the user-owned pod (a se=
-t of
-> >> containers).
-> >> One of our main goals at the moment is to run VMs in a user-owned pod
-> >> without additional privileges.
-> >> So that in case the user (VM-creator/owner) enters the pod or somethin=
-g
-> >> breaks out of the VM they are just in the unprivileged container sandb=
-ox.
-> >> As part of that we try to get also rid of running containers in the
-> >> user-context with the root user.
-> >>
-> >> One possible scenario which I could think of as being desirable from a
-> >> kubevirt perspective:
-> >> We would run the VM in one container and have an unprivileged
-> >> virtiofsd container in parallel.
-> >> This container already has its own mount namespace and it is not that
-> >> critical if something manages to enter this sandbox.
-> >>
-> >> But we are not as far yet as getting completely rid of root right now =
-in
-> >> kubevirt, so if as a temporary step it needs root, the current propose=
-d
-> >> changes would still be very useful for us.
-> > What is the issue with root in user namespaces?
-> >
-> > I remember a few years ago it was seen as a major security issue but
-> > don't remember if container runtimes were already using user namespaces
-> > back then.
-> >
-> > I guess the goal might be simply to minimize Linux capabilities as much
-> > as possible?
-> >
-> > virtiofsd could nominally run with an arbitrary uid/gid but it still
-> > needs the Linux capabilities that allow it to change uid/gid and
-> > override file system permission checks just like the root user. Not sur=
-e
-> > if there is any advantage to running with uid 1000 when you still have
-> > these Linux capabilities.
-> >
-> > Stefan
->=20
-> When you run in a user namespace, virtiofsd would only have
-> setuid/setgid over the range of UIDs mapped into the user namespace.=A0 S=
-o
-> if UID=3D0 on the host is not mapped, then the container can not create
-> real UID=3D0 files on disk.
->=20
-> Similarly you can protect the user directories and any content by
-> running the containers in a really high UID Mapping.
+-- =
 
-Roman, do user namespaces address your concerns about uid 0 in
-containers?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1845185
 
-Stefan
+Title:
+  Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe)
+  statically with MSYS64 on Windows because intl and iconv libs are not
+  loaded
 
---T4sUOijqQbZv57TR
-Content-Type: application/pgp-signature; name="signature.asc"
+Status in QEMU:
+  New
 
------BEGIN PGP SIGNATURE-----
+Bug description:
+  Using MSYS2 and mingw32 instructions from
+  https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
+  statically build the qemu-utils using the latest qemu master branch.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8j1b4ACgkQnKSrs4Gr
-c8j0gQf/XOWE89ORV2Kmnot5KdoBuTN+VNcLxQllhA0bwIJbCrX7wXJhfpVkgzvU
-Lsg+tp8lRMjE0EWSAelF7UbNqEF97JXQgSA1BT3Aqf0w+FR9he09sjL6m3VMc6xt
-OgFc0yx3UxAbuQpryCXBYI7gMmliO/eRmiOCx69CPnaWsbjhbldHpwSg2oyWne3k
-uJ3biwV73x0ig66XkBWHQ9qwR9iYTZAvx/OK+DBFvtaQXUpZjfyjqbInKi3yTF0Z
-Arg+nJ25yHctaPMjjXYoR19AiUeZREKIODuw9agM8qCJgfnkBln9XmYUgDupTVV7
-vPXTOYF3kwmz5aPfc+2O1f0el/VRTw==
-=0WtM
------END PGP SIGNATURE-----
+  Steps to reproduce the issue:
+  1. Install MSYS2 on a Windows 10 x64 box
+  2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86=
+_64-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gt=
+k3 mingw64/mingw-w64-x86_64-SDL2
+  3. clone qemu
+  4. Run configure for static build for the tools only
+  =C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --=
+enable-tools  --disable-guest-agent --disable-capstone --disable-sheepdog -=
+-enable-debug --static
+  =C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because =
+other errors popped out, but let's not go in the rabbit hole.
+  5. Run 'make -j'. the following errors appeared, signaling that intl lib =
+is not loaded. If I add intl lib, iconv lib needs to be loaded too.
 
---T4sUOijqQbZv57TR--
+  make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
+  make: *** Waiting for unfinished jobs....
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more=
+ undefined references to `libintl_sprintf' follow
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefi=
+ned reference to `libintl_textdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefi=
+ned reference to `libintl_gettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undef=
+ined reference to `libintl_bindtextdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undef=
+ined reference to `libintl_bind_textdomain_codeset'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undef=
+ined reference to `libintl_dgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undef=
+ined reference to `libintl_dcgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undef=
+ined reference to `libintl_dngettext'
 
+  Patch to fix the issue (added intl and iconv to the libs):
+
+  diff --git a/configure b/configure
+  index 30aad233d1..e2ab8ef026 100755
+  --- a/configure
+  +++ b/configure
+  @@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
+  =C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
+  =C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
+  =C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
+  -  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
+  +  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
+  =C2=A0=C2=A0=C2=A0write_c_skeleton;
+  =C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1845185/+subscriptions
 
