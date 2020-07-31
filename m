@@ -2,92 +2,80 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E570C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 10:33:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDA3C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 11:00:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 320182245C
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 10:33:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 320182245C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 04D2C20838
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 11:00:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04D2C20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1SMP-00006y-GD
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 06:33:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55086)
+	id 1k1Slt-0003e1-2h
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 07:00:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1k1SL4-0007jS-Ag
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 06:32:34 -0400
-Received: from mga14.intel.com ([192.55.52.115]:49108)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k1SlH-0003AJ-7u
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 06:59:39 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49910)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1k1SL1-0002zo-4a
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 06:32:33 -0400
-IronPort-SDR: CeDaG02qD+b4u/J+1a/1MXhkL5b4yDEmS0oZbKvRUC+/HQI/YHa+MjD4BP90J+Gf+d6VsfImEq
- r5Z9ymHgA+3Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9698"; a="150954729"
-X-IronPort-AV: E=Sophos;i="5.75,418,1589266800"; d="scan'208";a="150954729"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
- by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 31 Jul 2020 03:32:27 -0700
-IronPort-SDR: GgXPiKl498NCKXq/aVUxHdDCJzMn/p40HuF89Wv+NoVrwGsZvXv+cV/qHiAEijrM9ZlqYx+7ob
- 0H0w7Xbx4Gmw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,418,1589266800"; d="scan'208";a="274477961"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
- by fmsmga008.fm.intel.com with ESMTP; 31 Jul 2020 03:32:27 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 31 Jul 2020 03:32:27 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX605.ccr.corp.intel.com (10.109.6.215) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 31 Jul 2020 18:32:24 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Fri, 31 Jul 2020 18:32:24 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
-Subject: RE: [PATCH] colo-compare: Remove superfluous NULL-pointer checks for
- s->iothread
-Thread-Topic: [PATCH] colo-compare: Remove superfluous NULL-pointer checks for
- s->iothread
-Thread-Index: AQHWZvhcyNtoE14Q+k2AsNDcZxskCakhfatw
-Date: Fri, 31 Jul 2020 10:32:24 +0000
-Message-ID: <75db1541718344588f08647465e02067@intel.com>
-References: <20200731070604.0c981f41@luklap>
-In-Reply-To: <20200731070604.0c981f41@luklap>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.5.1.3
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k1SlF-0005wD-DJ
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 06:59:38 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 13059AD0B;
+ Fri, 31 Jul 2020 10:59:49 +0000 (UTC)
+Subject: Re: [PATCH 3/3] cpu-timers, icount: new modules
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20200629093504.3228-1-cfontana@suse.de>
+ <20200629093504.3228-4-cfontana@suse.de>
+ <aa45a793-35b1-d3bd-18a8-4c52ad888029@redhat.com>
+ <f89f249d-dbc4-779b-5b53-fc408461f072@suse.de>
+ <ecf5f26b-ce86-3e13-5c5c-567919433acb@redhat.com>
+ <e9dca3d1-f52d-13ce-2d7d-66958bc15765@suse.de>
+ <996dc455-548e-5964-9c87-f4abe5b63907@redhat.com>
+ <146b0cf2-509b-6a48-e82b-b93740e4c60d@redhat.com>
+ <e3cc11a4-8ba7-917a-844b-4f6ec69d140a@suse.de>
+ <76aac4ac-40f5-4870-ed2b-bab8b68b0a64@redhat.com>
+ <9630c685-0a37-a1e7-4614-9d692988a799@suse.de>
+ <22228280-f3b4-3f64-d2ba-30cfc47c8b0d@redhat.com>
+ <994492fd-5ae2-52e2-0864-7216ec9dae34@suse.de>
+ <b4de7352-87ba-df4c-fdcd-dab4028cef61@redhat.com>
+ <5a41a63f-8397-64d3-0839-6990e2965339@suse.de>
+ <8aaa983a-c720-88f2-5ad4-b88078ef705e@redhat.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <8ea42cd4-02ef-8c5b-7286-bc9db37deba9@suse.de>
+Date: Fri, 31 Jul 2020 12:59:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.115; envelope-from=chen.zhang@intel.com;
- helo=mga14.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 06:32:27
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <8aaa983a-c720-88f2-5ad4-b88078ef705e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 02:10:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,61 +88,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ haxm-team@intel.com, Wenchao Wang <wenchao.wang@intel.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
+ Colin Xu <colin.xu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 7/31/20 12:09 AM, Paolo Bonzini wrote:
+> On 30/07/20 18:33, Claudio Fontana wrote:
+>> One problem I noticed is that qemu_clock_get_ns is util/qemu-timer.c,
+>> which is tools _and_ softmmu, while I tried to extract the
+>> softmmu-only timer code in softmmu/cpu-timers.c,
+> 
+> Not all of it, only the VIRTUAL clock which is
+> 
+>         if (use_icount) {
+>             return cpu_get_icount();
+>         } else {
+>             return cpu_get_clock();
+>         }
+> 
+> and would be changed to something like
+> 
+> 	return cpu_get_virtual_clock();
+> 
+> In turn cpu_get_virtual_clock() is
+> 
+> 	return (accel_ops->cpu_get_virtual clock ?: cpu_get_clock)();
+> 
+> in the emulators, plus a stub that replaces stubs/cpu-get-icount.c and
+> is just
+> 
+> 	return get_clock_realtime();
+> 
+> as in stubs/cpu-get-clock.c.
+> 
+> Paolo
+> 
+> 
 
+works, hooking up cpu_get_ticks() also works.
 
-> -----Original Message-----
-> From: Lukas Straub <lukasstraub2@web.de>
-> Sent: Friday, July 31, 2020 1:06 PM
-> To: qemu-devel <qemu-devel@nongnu.org>
-> Cc: Peter Maydell <peter.maydell@linaro.org>; Jason Wang
-> <jasowang@redhat.com>; Zhang, Chen <chen.zhang@intel.com>
-> Subject: [PATCH] colo-compare: Remove superfluous NULL-pointer checks
-> for s->iothread
->=20
-> s->iothread is checked for NULL on object creation in
-> s->colo_compare_complete,
-> so it's guaranteed not to be NULL.
-> This resolves a false alert from Coverity (CID 1429969).
->=20
+qemu_start_warp_timer seems to make sense only for tcg/icount and not for qtest, which directly sets and warps the clock, is that right?
 
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+Would you want a start_warp_timer cpu accel interface that is actually useful only for tcg, to avoid if (icount_enabled()) { qemu_start_warp_timer()? }
 
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> ---
->  net/colo-compare.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
->=20
-> diff --git a/net/colo-compare.c b/net/colo-compare.c index
-> cc15f23dea..2c20de1537 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -1442,9 +1442,7 @@ static void colo_compare_finalize(Object *obj)
->          qemu_chr_fe_deinit(&s->chr_notify_dev, false);
->      }
->=20
-> -    if (s->iothread) {
-> -        colo_compare_timer_del(s);
-> -    }
-> +    colo_compare_timer_del(s);
->=20
->      qemu_bh_delete(s->event_bh);
->=20
-> @@ -1470,9 +1468,7 @@ static void colo_compare_finalize(Object *obj)
->          g_hash_table_destroy(s->connection_track_table);
->      }
->=20
-> -    if (s->iothread) {
-> -        object_unref(OBJECT(s->iothread));
-> -    }
-> +    object_unref(OBJECT(s->iothread));
->=20
->      g_free(s->pri_indev);
->      g_free(s->sec_indev);
-> --
-> 2.20.1
+Thanks,
+
+Claudio
 
