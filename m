@@ -2,91 +2,92 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5AE1C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 10:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8310C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 10:14:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CE0B208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 10:11:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83169208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 10:14:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X5ItxMH2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE0B208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkYKcrsB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83169208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1S0B-0006Ok-Ma
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 06:10:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50722)
+	id 1k1S3u-0007Yr-QT
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 06:14:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51350)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k1RzM-0005sZ-I3
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 06:10:08 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29530
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k1RzH-00006e-TQ
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 06:10:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596190202;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=ro4IwO/g8bn78eeqddRCmquPoiWABhXPheM2a+LeRB8=;
- b=X5ItxMH2lc2ofW3TFVN+ADb+fhfmVtIuh7Sk+SrzgHIX5OZMO6ZscaAzJa28/jkXVOHwpa
- 7mJdUqNvkweuPCKkPk/NFtceo7Rt66fxXEVIDEQnaUQDGumSgkVA5SRL/YnQaBxalDkc1E
- qyH0lsZl20sd3IobVZQaXnweO/+U+no=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-117-woxtIGFJPJKbpa1hsl2ZJg-1; Fri, 31 Jul 2020 06:08:36 -0400
-X-MC-Unique: woxtIGFJPJKbpa1hsl2ZJg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB6A9100CC88;
- Fri, 31 Jul 2020 10:08:34 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 77D4B277C1;
- Fri, 31 Jul 2020 10:07:45 +0000 (UTC)
-Date: Fri, 31 Jul 2020 11:07:42 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Steven Sistare <steven.sistare@oracle.com>
-Subject: Re: [PATCH V1 12/32] vl: pause option
-Message-ID: <20200731100742.GA3641941@redhat.com>
-References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-13-git-send-email-steven.sistare@oracle.com>
- <1dea1698-f8be-519d-e00c-d163b08dca65@redhat.com>
- <36036b5f-4e63-4287-a8e6-499732f54689@oracle.com>
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k1S2r-00074v-RD
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 06:13:45 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51895)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k1S2q-0000ZO-1R
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 06:13:45 -0400
+Received: by mail-wm1-x343.google.com with SMTP id p14so8117047wmg.1
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 03:13:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=1gkrmFg0o+12Y03vP1FnEKruTlzpJFIVm0HRG9MN2V8=;
+ b=YkYKcrsBgLHYHGVJ43tmH16sSa2eAcMwTqPvmgVUKZzZB5dhDmTk83CkjSRyQnQvcx
+ Al2f0EH+vIgUebabdG+VWknE8juifG3ejKDWR4Epk6WCdOrC/0Zo9+s81GSoqWZEI5tp
+ oX13iLnAVzlipY1QnjYaYN9CVv+nthWS4NGyePT3/VAQT+oc3ZZSMee5+UggjjSo+RYr
+ Azr1FqAYGMmAXP4pG9Su7zlrIFywofbnEti+m/SUdDoe88yr4rIOAWmikPAUYJvEoY5m
+ 0Ac+izV0ZYJGccBUIwTMewf6ocpj+VRdEtIl70kNNwhdpZ0qENIEAOGXb+lsgiYGtwAP
+ kDRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=1gkrmFg0o+12Y03vP1FnEKruTlzpJFIVm0HRG9MN2V8=;
+ b=PqH5sRRFOfJD2DvEMc9XzY7Wg/L7aMh7QHIULnvg0w8ZUoI0XqxxibUjvzkbuSTNVm
+ 4JKQENG7IiVTHo/1T3T4mzflxvUbspJQ9ukov+X360XYjEBNMQxR9Yv6izVLxRmGgo1Q
+ juFEgwef+EW4U/z8i/cKW+l2vSVxEo1IZOYf5LmrdNPpxHFZw12ojOjJr90k1Ns0zfZF
+ 4lt+H+p3ZF3TBDknnhvkH77WO3IKHjxpfUaePbsJ/xzoJXyiI5P6o/YZXn2ZOTPgU7cP
+ D6i85p9lvjHTk+jQFnEQIWD1ayOqb6cLzSgGAEF5S6q/bAyC3ZqXNQSg5uI4gUW8L9/N
+ elgQ==
+X-Gm-Message-State: AOAM531swUQpQsKXy7VE0q9R6w24mjLbW8b7lP2Tm1s/JGmRjzJIpLAP
+ Lcb0GyZdiQ/4kS+H8RRGSHA=
+X-Google-Smtp-Source: ABdhPJzZQKhZcWRLSBVwjBQI1G/y9nmNWX7hTZyyq6+hn+3T4WwMdqQtnsQpU0bSz6ga+mjkhHbswA==
+X-Received: by 2002:a7b:c008:: with SMTP id c8mr1518117wmb.59.1596190421325;
+ Fri, 31 Jul 2020 03:13:41 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id p15sm12632865wrj.61.2020.07.31.03.13.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 31 Jul 2020 03:13:40 -0700 (PDT)
+Date: Fri, 31 Jul 2020 11:13:38 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: "Pincus, Josh" <Josh.Pincus@windriver.com>
+Subject: Re: [PATCH v2 0/5] virtio mmio specification enhancement
+Message-ID: <20200731101338.GA177875@stefanha-x1.localdomain>
+References: <DM6PR11MB4331B490586462DE7353E0B8F9710@DM6PR11MB4331.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <36036b5f-4e63-4287-a8e6-499732f54689@oracle.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="mP3DRpeJDSE+ciuQ"
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 02:46:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <DM6PR11MB4331B490586462DE7353E0B8F9710@DM6PR11MB4331.namprd11.prod.outlook.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=stefanha@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,59 +100,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>,
+ "zhabin@linux.alibaba.com" <zhabin@linux.alibaba.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 30, 2020 at 02:11:19PM -0400, Steven Sistare wrote:
-> On 7/30/2020 12:20 PM, Eric Blake wrote:
-> > On 7/30/20 10:14 AM, Steve Sistare wrote:
-> >> Provide the -pause command-line parameter and the QEMU_PAUSE environment
-> >> variable to briefly pause QEMU in main and allow a developer to attach gdb.
-> >> Useful when the developer does not invoke QEMU directly, such as when using
-> >> libvirt.
-> > 
-> > How would you set this option with libvirt?
-> 
-> Add -pause in the qemu args in the xml.
->  
-> > It feels like you are trying to reinvent something that is already well-documented:
-> > 
-> > https://www.berrange.com/posts/2011/10/12/debugging-early-startup-of-kvm-with-gdb-when-launched-by-libvirtd/
-> 
-> Too many steps to reach BINGO for my taste.  Easier is better.  Also, in our shop we start qemu 
-> in other ways, such as via services.
 
+--mP3DRpeJDSE+ciuQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-A "sleep" is a pretty crude & unreliable way to get into debugging
-though. It is racy for a start, but also QEMU has a bunch of stuff
-that runs via ELF constructors before main() even starts.
+On Thu, Jul 30, 2020 at 08:15:12PM +0000, Pincus, Josh wrote:
+> We were looking into a similar enhancement for the Virt I/O MMIO transpor=
+t and came across this project.
+> This enhancement would be perfect for us.
+>=20
+> Has there been any progress since Feb, 2020?  It looks like the effort mi=
+ght have stalled?
 
-So I feel like the thing that starts QEMU is better placed to provide
-a way in for debugging.
+CCing Alex Bennee. I think he recently asked the same question.
 
-eg the service launcher can send SIGSTOP to the child process immediately
-before the execve(qemu) call.
+Stefan
 
-Now user can attach with the debugger, allow execution to continue,
-and has ability to debug *everything* right from the ELF constructors
-onwards into main() and all that follows.
+--mP3DRpeJDSE+ciuQ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8j7tIACgkQnKSrs4Gr
+c8hBuAf+OmPRYxvZokWgMkN08xj8gRvvsYKyjcYDdgX/rT2XKHyUAwL1nadrkyW+
+OEx3K+jwC9f6Z2ICwRg08ccNCKct3Si4abzvk8Ky3HMFFh5k0Bt2RnUdTeJ3dws0
+X1Vkd+RMaLdGv8Jdm4KoGDpCx1lXtjY+cVtzMt3bC2g0QUwXrs91wMTbS3RSbP1A
+lBfgkUwrr3p4ZoDQooCINljLPfAGFmgQLuWOQHopMss4e+IKKkC5otjNPVgZanUs
+Fvu/P+6lt3nSpsKNqCJBqsBNEqo7JbvwsMUd8dDrn47Xrwyjl6kDMITpRgr5gQAw
+xJTdNfpW9eouJ0XSbZNU1nZZQu0XMw==
+=KbmI
+-----END PGP SIGNATURE-----
+
+--mP3DRpeJDSE+ciuQ--
 
