@@ -2,99 +2,129 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2445AC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 23:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 101CFC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 23:47:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF49F205CB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 23:13:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA1CA206D4
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 23:46:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QVo+97gZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF49F205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="U7dsbw4E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA1CA206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1eDs-0003jF-3S
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 19:13:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34336)
+	id 1k1ejr-0001Zw-3H
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 19:46:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1k1eDG-0003Ej-4q
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 19:13:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41691
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
- id 1k1eDC-000843-JZ
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 19:13:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596237192;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QIeVg7hV8/YXtrLLsERRgL4hSqd76ck4OF6tNpA3w5o=;
- b=QVo+97gZ+GkKQGT8kIT70E2pTeSUnWxzhjP2eBa/otvaKfN9k1ta6FeDnUxcLFSqSFXIBJ
- LYuu4Xr+FmLf1YjG9oG21m0HLLDNvB02xPQawxuaxrM84AIYmuTb5tSVF+E8Z/AgKKXSaD
- YAy26JEdJpDwluMDmDQG+xsGAd9bEoA=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-WMIi6JWHMHG3m3MxvanUSw-1; Fri, 31 Jul 2020 19:13:07 -0400
-X-MC-Unique: WMIi6JWHMHG3m3MxvanUSw-1
-Received: by mail-oi1-f200.google.com with SMTP id q28so5034583oij.16
- for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 16:13:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=QIeVg7hV8/YXtrLLsERRgL4hSqd76ck4OF6tNpA3w5o=;
- b=EQ+c29w6BNjY0yczRdYdlcShNXTo9TJ852OZnDIofhP98cCfiDOly86bNLcqGtB6yC
- +AjsbdKiEBxyumCh1Pz7Q4YD3dvWgVptZXNwlwUkmuD6WidL63tA7Nrt4w+r5CsokkEY
- ybL4N5+mZVQK0EiPFetTDD3mYpMtoHSAfEEZRitLCp+o4hJYTAeCGEiorbdJLFTV0eQF
- 3aAwBhpzllSbNL73ByU/nYPPg2LXtI5SnIalnyNj+6XiCvJq1iegSbuf/yCJ8GSYW66v
- oDSKZImQH0A9kdMQRc9TuKYcXODWdT689a/lP2rHUAmdkxoUu1606se3AgH8SRbey97y
- SADA==
-X-Gm-Message-State: AOAM530rdVZQbaN0bPXly4hAMraEGXsAnYcoto6wHt+JgBF14o160rxZ
- gh/0rPIC8e/BSbfHHYk9NRXa2gU3rhTH/TTM7HF6bzlmB8Q0mXnXYpk/cmhoZ7CCV0rGz80bvYU
- gYmeImRo6Ffby89QdcDpWri7b73IEKzw=
-X-Received: by 2002:a9d:148:: with SMTP id 66mr4809630otu.132.1596237186571;
- Fri, 31 Jul 2020 16:13:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxPDLYlUgU8KtA4KzIx9TCQ6WsiDDB5e5sK6SRvoJjP1ju8Sc5DTdkXlxolvEe90TB5XsUz6fjdRmXWQELUyn0=
-X-Received: by 2002:a9d:148:: with SMTP id 66mr4809605otu.132.1596237186193;
- Fri, 31 Jul 2020 16:13:06 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <sunilmut@microsoft.com>)
+ id 1k1ejE-0001Ap-2s
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 19:46:20 -0400
+Received: from mail-bn8nam12on2118.outbound.protection.outlook.com
+ ([40.107.237.118]:1633 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sunilmut@microsoft.com>)
+ id 1k1ejB-0003Na-F6
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 19:46:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QQ2bRnG3AamMgPEA7w+Tozig/9dTvQJmxDGOhFlx26GunR6/+Sz0413NzBiZkOKiJOQMSRWpSFqtZIFAbDnfRW8VEznb1O+9ce9PH0XKqvLFC5llLUmFfojf0Ry0fBAa7Q8asYTLf8HgfKqAQi9pxqQqnwsAp06LknZK21HS6LmeNk/GbDR+dCFfsCdQNEkwHwD61OXsTKUBTzHfIBClwVbTPZKcoHh4wANvd7y16kx3uucV4C960e6k0jWud2SC9GK9Xq/cZc6SY7FFW8lfymYFMLGEnA2hoeyUptGHO/MQFJnuS/q2gRU1+WcV3fHjdZjLEeznqurLKLjgbfJBuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Pzdf1AfaT8FcMs4bG4Avg0fY5VZB2Zrb1oHuxQ7D9P4=;
+ b=LT6PQr9BjzV7V2u5qQ1/L6S21Ff98ZvP0BvD8O0FOXzEsdTUfxW+udN9dB1psL4CPBlwuqcuGm5qdyuDOkkE3K6N5nRu3sSZB5CdzFojeBc7ybPH5YqJSUYCe2Rl4+1hjf0edHdzxyIUdEr1V8NLn07njQNRGdISdF5e2SbzoqqTkC84cZ4luoD7lpJ+Tw6ElY5aJ1XPSWDllsjkatGmN5CrINSj61+5BeDphJtX68GMFcOssOkj63mWinEUFdOA2Jlc1ggvbN3o4TQTJdDxd2ho7Ivs/hQz/38eHOWytL3BHGDs87ONYN4a4k7zcrbhdAtO0F0MTPBQMMs4wKqCdw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Pzdf1AfaT8FcMs4bG4Avg0fY5VZB2Zrb1oHuxQ7D9P4=;
+ b=U7dsbw4EIegcHNRFyau9NwpbrT9PR6FgMdjojBpUGQZ9irzoygishpfcL5wx1zPAk77JqPCbtaPJuqToS40B+2pJtqpv3r+SZzQCIvJoFV+umwuXCMaGc3griAK+PW+ZjZKFbKWffJtNRnSg1BSUq4J8Cg51xXgRwIIY/HOO0gw=
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ (2603:10b6:803:51::33) by SN6PR2101MB0894.namprd21.prod.outlook.com
+ (2603:10b6:805:9::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.0; Fri, 31 Jul
+ 2020 23:31:11 +0000
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::99a:30fe:609e:be35]) by SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::99a:30fe:609e:be35%8]) with mapi id 15.20.3239.020; Fri, 31 Jul 2020
+ 23:31:10 +0000
+From: Sunil Muthuswamy <sunilmut@microsoft.com>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+CC: =?utf-8?B?RGFuaWVsIFAgLiBCZXJyYW5nw6k=?= <berrange@redhat.com>, Fam Zheng
+ <fam@euphon.net>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, "1879672@bugs.launchpad.net"
+ <1879672@bugs.launchpad.net>
+Subject: RE: [EXTERNAL] Re: [PATCH v2 0/3] testing: Build WHPX enabled binaries
+Thread-Topic: [EXTERNAL] Re: [PATCH v2 0/3] testing: Build WHPX enabled
+ binaries
+Thread-Index: AQHWZxVKeot30QB7QUymyE/5azx7WKkiVYjw
+Date: Fri, 31 Jul 2020 23:31:10 +0000
+Message-ID: <SN4PR2101MB0880AF5A5D752F06DB94A15FC04E0@SN4PR2101MB0880.namprd21.prod.outlook.com>
+References: <20190920113329.16787-1-philmd@redhat.com>
+ <01f2f0ee-a288-921a-58f4-78aeb4d457e1@redhat.com>
+ <BYAPR21MB1208F0D09B3E5CA80F1B7C3BB6880@BYAPR21MB1208.namprd21.prod.outlook.com>
+ <2acf854f-c49a-0811-31af-80e1e958f058@redhat.com>
+ <324f5002-be0a-563e-b5a6-e08ee5e1ddad@redhat.com>
+In-Reply-To: <324f5002-be0a-563e-b5a6-e08ee5e1ddad@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=microsoft.com;
+x-originating-ip: [2601:602:9400:570:948b:471c:3b83:44f3]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: edadf8cc-e390-4bbd-b755-08d835a9cee4
+x-ms-traffictypediagnostic: SN6PR2101MB0894:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN6PR2101MB0894D16B055FAC15A4D8B9D5C04E0@SN6PR2101MB0894.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN4PR2101MB0880.namprd21.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(376002)(39860400002)(346002)(136003)(396003)(6506007)(5660300002)(8936002)(53546011)(55016002)(4326008)(86362001)(8676002)(7416002)(33656002)(52536014)(66446008)(76116006)(478600001)(71200400001)(2906002)(186003)(8990500004)(10290500003)(9686003)(82950400001)(316002)(83380400001)(54906003)(66946007)(110136005)(64756008)(66556008)(66476007)(7696005)(82960400001);
+ DIR:OUT; SFP:1102; 
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20200729185024.121766-1-abologna@redhat.com>
- <87ime52wxd.fsf@dusky.pond.sub.org>
- <20200730093732.GB3477223@redhat.com>
-In-Reply-To: <20200730093732.GB3477223@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Sat, 1 Aug 2020 02:12:49 +0300
-Message-ID: <CAMRbyysFSFKSOXvYbxAvyf_pqzAxA0KpEgcoJ+5bwa3DbA3x6g@mail.gmail.com>
-Subject: Re: [PATCH] schemas: Add vim modeline
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=nsoffer@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 19:13:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR2101MB0880.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: edadf8cc-e390-4bbd-b755-08d835a9cee4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2020 23:31:10.8286 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AxZnOSGLILGUhLtVXNDWzYlBixfMtiQMiPLMGhQPbipMHLO/24EYH8h7iDwX7xKhW/IgArQc2k6X0VGNsAqxTRAkcbwhK9v5hegJg47neCU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR2101MB0894
+Received-SPF: pass client-ip=40.107.237.118;
+ envelope-from=sunilmut@microsoft.com;
+ helo=NAM12-BN8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 19:46:15
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,224 +137,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Andrea Bolognani <abologna@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 30, 2020 at 12:38 PM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
->
-> On Thu, Jul 30, 2020 at 11:07:26AM +0200, Markus Armbruster wrote:
-> > Andrea Bolognani <abologna@redhat.com> writes:
-> >
-> > > The various schemas included in QEMU use a JSON-based format which
-> > > is, however, strictly speaking not valid JSON.
-> > >
-> > > As a consequence, when vim tries to apply syntax highlight rules
-> > > for JSON (as guessed from the file name), the result is an unreadable
-> > > mess which mostly consist of red markers pointing out supposed errors
-> > > in, well, pretty much everything.
-> > >
-> > > Using Python syntax highlighting produces much better results, and
-> > > in fact these files already start with specially-formatted comments
-> > > that instruct Emacs to process them as if they were Python files.
-> > >
-> > > This commit adds the equivalent special comments for vim.
-> > >
-> > > Signed-off-by: Andrea Bolognani <abologna@redhat.com>
->
-> Given that we already have emacs mode-lines, I see no reason to
-> not also have vim mode-lines, so regardless of the deeper discussion
-> I think this is patch is fine to merge in the short term
->
->   Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->
->
-> > Naming QAPI schema files .json even though their contents isn't was a
-> > mistake.  Correcting it would be a pain.  If we correct it, then the
-> > sooner the better.
-> >
-> > Renaming them to .py gives decent editor support out of the box.  Their
-> > contents isn't quite Python, though: true vs. True, false vs. False.  D=
-o
-> > we care?  Only a few dozen occurences; they could be adjusted.
-> >
-> > Renaming them to .qapi would perhaps be less confusing, for the price o=
-f
-> > "out of the box".
->
-> IMHO, the critical rule is that if you a pick a particular file extension
-> associated with an existing language, you absolutely MUST BE compliant
-> with that language.
->
-> We fail at compliance with both JSON and Python because we're actually
-> using our own DSL (domain specific language).
->
-> IOW if we're going to stick with our current file format, then we should
-> be naming them .qapi. We can still use an editor mode line if we want to
-> claim we're approximately equiv to another language, but we can't be
-> surprised if editors get upset.
->
->
-> The bigger question is whether having our own DSL is justified ?
->
-> I'm *really* sceptical that it is.
->
->
-> We can't use JSON because it lacks comments. So we invented our own
-> psuedo-JSON parser that supported comments, and used ' instead of "
-> for some reason. We also needed to be able to parse a sequence of
-> multiple JSON documents in one file. We should have just picked a
-> different language because JSON clearly didn't do what we eneeded.
->
-> You suggest naming them .py. If we do that, we must declare that they
-> are literally Python code and modify them so that we can load the
-> files straight into the python intepretor as code, and not parse
-> them as data. I feel unhappy about treating data as code though.
->
->
-> While JSON doesn't do what we need, its second-cousin YAML is a more
-> flexible format. Taking one example
->
-> ---
-> ##
-> # @ImageInfoSpecificQCow2:
-> #
-> # @compat: compatibility level
-> #
-> # ...snip...
-> #
-> # Since: 1.7
-> ##
-> struct: ImageInfoSpecificQCow2
-> data:
->   compat: str
->   "*data-file": str
->   "*data-file-raw": bool
->   "*lazy-refcounts": bool
->   "*corrupt": bool
->   refcount-bits: int
->   "*encrypt": ImageInfoSpecificQCow2Encryption
->   "*bitmaps":
->     - Qcow2BitmapInfo
->   compression-type: Qcow2CompressionType
->
->
-> Then we could use a regular off the shelf YAML parser in python.
->
-> The uglyiness with quotes is due to the use of "*". Slightly less ugly
-> if we simply declare that quotes are always used, even where they're
-> not strictly required.
->
-> struct: ImageInfoSpecificQCow2
-> data:
->   "compat": "str"
->   "*data-file": "str"
->   "*data-file-raw": "bool"
->   "*lazy-refcounts": "bool"
->   "*corrupt": "bool"
->   "refcount-bits": "int"
->   "*encrypt": "ImageInfoSpecificQCow2Encryption"
->   "*bitmaps":
->     - "Qcow2BitmapInfo"
->   "compression-type": "Qcow2CompressionType"
->
-> With the use of "---" to denote the start of document, we have no trouble
-> parsing our files which would actually be a concatenation of multiple
-> documents. The python YAML library provides the easy yaml.load_all()
-> method.
-
-We had the same issue in vdsm. Someone ported qemu "json" schema to vdsm,
-probbay when the plan was to add C API to vdsm, which never happened.
-
-My first patch to vdsm was fixing the parser for this "json" format,
-because it used to
-get in an endless loop if an unknown token was found. We hated this
-format, and finally
-replaced it with yaml. But we did not keep the comments since they
-duplicate data
-which is already in the json part, and not portable to other formats.
-
-Here is the patch adding schema convertor from qemu "json" format to
-standard yaml:
-https://github.com/oVirt/vdsm/commit/e57b69e72987c0929b20306c454835b52b5eb7=
-ee
-
-The current version of the new yaml based schema:
-https://github.com/oVirt/vdsm/blob/master/lib/vdsm/api/vdsm-api.yml
-
-We don't use comments, so the yaml is portable to json or regular
-python dict. In fact,
-we use the schama in as a pickle of the parsed schema for 5 times
-faster loading, which
-is important since we use the schema in the command line client.
-
-Having the comments part of the schema allows nice things like
-verifying requests and
-generating help messages directly from the schema. This is not a good
-example before
-our implementation is poor, but:
-
-$ vdsm-client Host getDeviceList -h
-usage: vdsm-client Host getDeviceList [-h] [arg=3Dvalue [arg=3Dvalue ...]]
-
-positional arguments:
-  arg=3Dvalue   storageType: Only return devices of this type
-              guids: Only return info on specific list of block device GUID=
-s
-              checkStatus: Indicates if device status should be checked
-
-
-              JSON representation:
-              {
-                  "storageType": {
-                      "BlockDeviceType": "enum ['FCP', 'MIXED', 'iSCSI']"
-                  },
-                  "guids": [
-                      "string",
-                      {}
-                  ],
-                  "checkStatus": "boolean"
-              }
-
-optional arguments:
-  -h, --help  show this help message and exit
-
-vdsm-client knows nothing about vdsm API and we never have to change
-it, because it generates
-the command line interface and the help messages from the schema on
-the fly, and its input and
-output is json.
-
-vdsm/client.py is similar, providing vdsm API without knowing anything
-about the API, or requiring
-changes when APIs are added or modified, because everything is done by
-inspecting the schema:
-
->>> from vdsm import client
->>> c =3D client.connect("localhost")
->>> c.Host.getDeviceList(storageType=3D"FCP", checkStatus=3DFalse)
-[]
->>> print(c.Host)
-<vdsm.client.Namespace object at 0x7fcda017fa58>
->>> print(c.Host.getDeviceList)
-functools.partial(<bound method _Client._call of <vdsm.client._Client
-object at 0x7fcda757e0f0>>, 'Host', 'getDeviceList')
-
-I think inventing DSLs and developing tools is wrong. Use standard
-format and tools and spend
-time on the core of the project.
-
-Nir
-
+PiBIaSBKdXN0aW4sIFN1bmlsLA0KDQpKdXN0aW4gaGFzIG1vdmVkIHRvIGEgZGlmZmVyZW50IHRl
+YW0gaXMgbm8gbG9uZ2VyIHdvcmtpbmcgd2l0aCBXSFBYLiBNb3ZpbmcgaGltDQp0byBiY2MuDQoN
+Cj4gDQo+IE9uIDUvMjAvMjAgMTI6MjYgUE0sIFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIHdyb3Rl
+Og0KPiA+ICtsYXVuY2hwYWQgdGlja2V0DQo+ID4NCj4gPiBPbiA5LzIwLzE5IDY6NTMgUE0sIEp1
+c3RpbiBUZXJyeSAoVk0pIHdyb3RlOg0KPiA+PiBIZXkgUGhpbCwNCj4gPj4NCj4gPj4gSSBoYXZl
+IGNvbnRhY3RlZCBvdXIgbGVnYWwgZGVwYXJ0bWVudCBmb3IgZ3VpZGFuY2Ugb24gdGhpcyBzcGVj
+aWZpYw0KPiA+PiB1c2UgY2FzZSBhbmQgd2lsbCB1cGRhdGUgeW91IHdoZW4gSSBoZWFyIGJhY2su
+IFRoYW5rIHlvdSBmb3IgeW91cg0KPiA+PiBwYXRpZW5jZS4NCj4gDQo+IEkgcmVjZW50bHkgdW5k
+ZXJzdG9vZCBsZWdhbCBjaGFuZ2VzIGNhbiBiZSB2ZXJ5IGNvbXBsZXgsIHRodXMgaXQgaXMNCj4g
+aW1wbGljaXQgaXQgY2FuIHRha2UgeWVhcnMgYmVmb3JlIGdldHRpbmcgdXBkYXRlcy4NCj4gDQo+
+IFNpbmNlIHRoZSBwcm9qZWN0IGlzIHN0aWxsIGFjdGl2ZWx5IGRldmVsb3BlZCwgbWF5YmUgeW91
+IGNvdWxkIHByb3ZpZGUNCj4gYSBBenVyZSBDSSBqb2IgdG8gYnVpbGQgYSBXSFBYIGJpbmFyeS4g
+V2UgZG9uJ3QgbmVlZCB0byBoYXZlIGFjY2VzcyB0bw0KPiB0aGUgYmluYXJ5LCBqdXN0IHRvIHRo
+ZSBleGl0IHN0YXR1cyAoc3VjY2Vzcy9mYWlsKSBhbmQgYnVpbGQgbG9ncy4NCj4gDQo+IERvIHlv
+dSB0aGluayBpdCBpcyBkb2FibGU/DQo+IA0KPiBUaGFua3MsDQo+IA0KPiBQaGlsLg0KPiANClRo
+ZSBhc2sgZ2VuZXJhbGx5IHNvdW5kcyByZWFzb25hYmxlLiBCdXQsIGNhbiB5b3UgaGVscCBtZSB1
+bmRlcnN0YW5kIHRoZSBmdWxsDQpzY29wZSBvZiB0aGUgYXNrLiBGZXcgcXVlc3Rpb25zOg0KMS4g
+U3RlZmFuIGhhcyBhIENJIHBpcGVsaW5lIHRvIGJ1aWxkIFdIUFguIFdoYXQncyB0aGUgYmVuZWZp
+dCBvZiBoYXZpbmcgYW5vdGhlciBDSQ0Kam9iLCB0aGF0IGRvZXNuJ3QgZXhwb3J0IHRoZSBiaW5h
+cnksIGJ1dCwganVzdCB0aGUgc3RhdHVzPw0KMi4gV2hpY2ggYnJhbmNoIGlzIHRoZSBDSSBwaXBl
+bGluZSBleHBlY3RlZCB0byBidWlsZD8NCjMuIElzIHRoZSBleHBlY3RhdGlvbiBhbHNvIHRoYXQg
+aXQgd2lsbCBidWlsZCBXSFBYIHBhdGNoZXMgdGhhdCBhcmUgc3VibWl0dGVkIHRvIHRoZQ0KV0hQ
+WCBicmFuY2g/DQo=
 
