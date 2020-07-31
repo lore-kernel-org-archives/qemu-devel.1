@@ -2,107 +2,84 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A450DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 332FDC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7902A208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:37:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 080382076B
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:51:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XJmTS+S/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7902A208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KzYLlkWk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 080382076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1ZuY-0006jS-R8
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:37:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58612)
+	id 1k1a8G-0002Qq-8F
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:51:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1ZgY-0004dL-De
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:23:14 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:52798)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1ZgV-0005cg-J8
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:23:14 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIN20f119493;
- Fri, 31 Jul 2020 18:23:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : in-reply-to :
- references : mime-version : content-type : content-transfer-encoding;
- s=corp-2020-01-29; bh=iTrAPmYTdGk8QMAOQLSemHOl6ugjtva2hUJyXQQ6dJI=;
- b=XJmTS+S/nfPP+EmdXoJGAwB8ApTiNNHuZqBs+dn9SIz+k9zjnRdV75AnJU7+97Y6NcXX
- HokSBiYyiM7HsYTiHXXG3jKcFPrN9ZArbJW36ZWNUNiQoVPG7r8K3ZME8bdzfaBlJub+
- fIBU2ucPwYjZY7mi2cyqEVAGg6wTEoB1Pj70Jk5cJSaO9bViFHN7a5u6O/wQQ3ia8U5A
- tb2ZBwr5BjOoe99k7TD6Xry/Lg0Qldnam/jdLlBFnxlDEAMx/Oh6+XlD5fwnC12Y+ddJ
- s2UqNvyFeYJ3Vx1R4sGLtJlupPiKVnUU3ede1bjcyPOJeoxMAJYn2jZB+8QUGyyb8wxX BA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2130.oracle.com with ESMTP id 32hu1jtgau-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Fri, 31 Jul 2020 18:23:02 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIItib086263;
- Fri, 31 Jul 2020 18:20:53 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 32hu608m17-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 31 Jul 2020 18:20:53 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 06VIKpNd020186;
- Fri, 31 Jul 2020 18:20:51 GMT
-Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 31 Jul 2020 11:20:51 -0700
-From: Jagannathan Raman <jag.raman@oracle.com>
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1k1a7h-00020m-Bs
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:51:17 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21800
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1k1a7e-0000UJ-Cu
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:51:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596221473;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=imsvRW5yWZy6AQyive/oOZhhd9Y0331pS9i0+Do6C1M=;
+ b=KzYLlkWkYeeZ7dvONS8nTD/jSlV/AlCQ1Rh8NGIgb7orSh878gnLFMFwiQETS6OJ9ilnkb
+ YuSVlAecjag+5uEnwzptfg/8E2FbRUEiGt0ZUlCkNMbYwOi+0ZDRTJ6qsb2KYCiN9BffFX
+ WXsxnUuRX4p7B3ez1jxpGt66koWoDJI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-1bxy9DAGNVaLJ5R7yVBZEQ-1; Fri, 31 Jul 2020 14:50:02 -0400
+X-MC-Unique: 1bxy9DAGNVaLJ5R7yVBZEQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82922100CCC0;
+ Fri, 31 Jul 2020 18:50:01 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.40.192.3])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 501811001B0B;
+ Fri, 31 Jul 2020 18:49:44 +0000 (UTC)
+From: Julia Suvorova <jusual@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 10/20] multi-process: setup memory manager for remote device
-Date: Fri, 31 Jul 2020 14:20:17 -0400
-Message-Id: <2bebe51b049f2f6583c5227fc12a60c63229a2f6.1596217462.git.jag.raman@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1596217462.git.jag.raman@oracle.com>
-References: <cover.1596217462.git.jag.raman@oracle.com>
-In-Reply-To: <cover.1596217462.git.jag.raman@oracle.com>
-References: <cover.1596217462.git.jag.raman@oracle.com>
+Subject: [RFC PATCH] target/i386: kvm: Enable KVM_FEATURE_PCI_GO_MMCONFIG
+ CPUID bit
+Date: Fri, 31 Jul 2020 20:49:38 +0200
+Message-Id: <20200731184938.606754-1-jusual@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jusual@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
- malwarescore=0
- mlxscore=0 adultscore=0 spamscore=0 phishscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2007310137
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- clxscore=1015
- malwarescore=0 spamscore=0 suspectscore=3 bulkscore=0 priorityscore=1501
- phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2007310137
-Received-SPF: pass client-ip=156.151.31.86; envelope-from=jag.raman@oracle.com;
- helo=userp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:51:59
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=jusual@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:28:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,229 +92,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Julia Suvorova <jusual@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SyncSysMemMsg message format is defined. It is used to send
-file descriptors of the RAM regions to remote device.
-RAM on the remote device is configured with a set of file descriptors.
-Old RAM regions are deleted and new regions, each with an fd, is
-added to the RAM.
+This feature allows MMCONFIG to be used even to access the base PCI
+config space [1]. This means increased performance: one access to
+MMCONFIG instead of two conventional accesses to I/O ports.
 
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Q35 makes no distinction in base or extended PCI config access to
+MMCONFIG, MMCONFIG is always on, and in case it is is not initialized,
+probing of PCI devices will fall back to normal process and use type1
+access.
+
+Enable the feature unconditionally.
+
+[1]: https://lore.kernel.org/kvm/20200730193510.578309-1-jusual@redhat.com/
+
+Signed-off-by: Julia Suvorova <jusual@redhat.com>
 ---
- MAINTAINERS                     |  2 ++
- hw/i386/Makefile.objs           |  1 +
- hw/i386/remote-memory.c         | 58 +++++++++++++++++++++++++++++++++++++++++
- include/hw/i386/remote-memory.h | 19 ++++++++++++++
- include/io/mpqemu-link.h        | 13 +++++++++
- io/mpqemu-link.c                | 13 +++++++++
- 6 files changed, 106 insertions(+)
- create mode 100644 hw/i386/remote-memory.c
- create mode 100644 include/hw/i386/remote-memory.h
+The feature is in the review phase.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9fd278f..2da7680 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3049,6 +3049,8 @@ F: include/io/mpqemu-link.h
- F: hw/i386/remote-msg.c
- F: include/hw/i386/remote-obj.h
- F: hw/i386/remote-obj.c
-+F: include/hw/i386/remote-memory.h
-+F: hw/i386/remote-memory.c
+ include/standard-headers/asm-x86/kvm_para.h | 1 +
+ target/i386/cpu.c                           | 3 ++-
+ target/i386/kvm.c                           | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/standard-headers/asm-x86/kvm_para.h b/include/standard-headers/asm-x86/kvm_para.h
+index 07877d3295..52eeba9067 100644
+--- a/include/standard-headers/asm-x86/kvm_para.h
++++ b/include/standard-headers/asm-x86/kvm_para.h
+@@ -32,6 +32,7 @@
+ #define KVM_FEATURE_POLL_CONTROL	12
+ #define KVM_FEATURE_PV_SCHED_YIELD	13
+ #define KVM_FEATURE_ASYNC_PF_INT	14
++#define KVM_FEATURE_PCI_GO_MMCONFIG	15
  
- Build and test automation
- -------------------------
-diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-index 30d7102..4ba47e0 100644
---- a/hw/i386/Makefile.objs
-+++ b/hw/i386/Makefile.objs
-@@ -17,6 +17,7 @@ obj-$(CONFIG_PC) += port92.o
- obj-$(CONFIG_MPQEMU) += remote.o
- obj-$(CONFIG_MPQEMU) += remote-msg.o
- obj-$(CONFIG_MPQEMU) += remote-obj.o
-+obj-$(CONFIG_MPQEMU) += remote-memory.o
+ #define KVM_HINTS_REALTIME      0
  
- obj-y += kvmvapic.o
- obj-$(CONFIG_ACPI) += acpi-common.o
-diff --git a/hw/i386/remote-memory.c b/hw/i386/remote-memory.c
-new file mode 100644
-index 0000000..759b8e9
---- /dev/null
-+++ b/hw/i386/remote-memory.c
-@@ -0,0 +1,58 @@
-+/*
-+ * Memory manager for remote device
-+ *
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+
-+#include "hw/i386/remote-memory.h"
-+#include "exec/address-spaces.h"
-+#include "exec/ram_addr.h"
-+#include "qapi/error.h"
-+
-+void remote_sysmem_reconfig(MPQemuMsg *msg, Error **errp)
-+{
-+    SyncSysmemMsg *sysmem_info = &msg->data1.sync_sysmem;
-+    MemoryRegion *sysmem, *subregion, *next;
-+    static unsigned int suffix;
-+    Error *local_err = NULL;
-+    char *name;
-+    int region;
-+
-+    sysmem = get_system_memory();
-+
-+    memory_region_transaction_begin();
-+
-+    QTAILQ_FOREACH_SAFE(subregion, &sysmem->subregions, subregions_link, next) {
-+        if (subregion->ram) {
-+            memory_region_del_subregion(sysmem, subregion);
-+            object_unparent(OBJECT(subregion));
-+        }
-+    }
-+
-+    for (region = 0; region < msg->num_fds; region++) {
-+        subregion = g_new(MemoryRegion, 1);
-+        name = g_strdup_printf("remote-mem-%u", suffix++);
-+        memory_region_init_ram_from_fd(subregion, NULL,
-+                                       name, sysmem_info->sizes[region],
-+                                       RAM_SHARED, msg->fds[region],
-+                                       sysmem_info->offsets[region],
-+                                       &local_err);
-+        g_free(name);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            break;
-+        }
-+
-+        memory_region_add_subregion(sysmem, sysmem_info->gpas[region],
-+                                    subregion);
-+    }
-+
-+    memory_region_transaction_commit();
-+}
-diff --git a/include/hw/i386/remote-memory.h b/include/hw/i386/remote-memory.h
-new file mode 100644
-index 0000000..aab3e4d
---- /dev/null
-+++ b/include/hw/i386/remote-memory.h
-@@ -0,0 +1,19 @@
-+/*
-+ * Memory manager for remote device
-+ *
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef REMOTE_MEMORY_H
-+#define REMOTE_MEMORY_H
-+
-+#include "exec/hwaddr.h"
-+#include "io/mpqemu-link.h"
-+
-+void remote_sysmem_reconfig(MPQemuMsg *msg, Error **errp);
-+
-+#endif
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index 8591ad2..98383f9 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -15,6 +15,8 @@
- #include "qemu/thread.h"
- #include "io/channel.h"
- #include "io/channel-socket.h"
-+#include "exec/cpu-common.h"
-+#include "exec/hwaddr.h"
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 588f32e136..5509523bb3 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -810,7 +810,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
+             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
+             NULL, "kvm-pv-tlb-flush", NULL, "kvm-pv-ipi",
+-            "kvm-poll-control", "kvm-pv-sched-yield", NULL, NULL,
++            "kvm-poll-control", "kvm-pv-sched-yield", NULL, "kvm-pci-go-mmconfig",
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             "kvmclock-stable-bit", NULL, NULL, NULL,
+@@ -4141,6 +4141,7 @@ static PropValue kvm_default_props[] = {
+     { "acpi", "off" },
+     { "monitor", "off" },
+     { "svm", "off" },
++    { "kvm-pci-go-mmconfig", "on" },
+     { NULL, NULL },
+ };
  
- #define REMOTE_MAX_FDS 8
- 
-@@ -25,13 +27,22 @@
-  *
-  * MPQemuCmd enum type to specify the command to be executed on the remote
-  * device.
-+ *
-+ * SYNC_SYSMEM      Shares QEMU's RAM with remote device's RAM
-  */
- typedef enum {
-     INIT = 0,
-+    SYNC_SYSMEM,
-     RET_MSG,
-     MAX = INT_MAX,
- } MPQemuCmd;
- 
-+typedef struct {
-+    hwaddr gpas[REMOTE_MAX_FDS];
-+    uint64_t sizes[REMOTE_MAX_FDS];
-+    off_t offsets[REMOTE_MAX_FDS];
-+} SyncSysmemMsg;
-+
- /**
-  * Maximum size of data2 field in the message to be transmitted.
-  */
-@@ -50,6 +61,7 @@ typedef enum {
-  * MPQemuMsg Format of the message sent to the remote device from QEMU.
-  *
-  */
-+
- typedef struct {
-     int cmd;
-     int bytestream;
-@@ -57,6 +69,7 @@ typedef struct {
- 
-     union {
-         uint64_t u64;
-+        SyncSysmemMsg sync_sysmem;
-     } data1;
- 
-     int fds[REMOTE_MAX_FDS];
-diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-index d4dd0fe..aad1d77 100644
---- a/io/mpqemu-link.c
-+++ b/io/mpqemu-link.c
-@@ -245,6 +245,19 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
-             }
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6f18d940a5..0069e945e6 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -440,6 +440,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+         if (!kvm_irqchip_in_kernel()) {
+             ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
          }
-     }
-+     /* Verify message specific fields. */
-+    switch (msg->cmd) {
-+    case SYNC_SYSMEM:
-+        if (msg->num_fds == 0 || msg->bytestream) {
-+            return false;
-+        }
-+        if (msg->size != sizeof(msg->data1)) {
-+            return false;
-+        }
-+        break;
-+    default:
-+        break;
-+    }
- 
-     return true;
- }
++        ret |= 1U << KVM_FEATURE_PCI_GO_MMCONFIG;
+     } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
+         ret |= 1U << KVM_HINTS_REALTIME;
+         found = 1;
 -- 
-1.8.3.1
+2.25.4
 
 
