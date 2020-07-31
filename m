@@ -2,101 +2,79 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D0F1C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E809C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:51:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE771208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:50:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uuDHPJj8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE771208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 342802074B
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 09:51:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 342802074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Rft-0000we-82
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 05:50:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45424)
+	id 1k1RhY-0002JP-Gt
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 05:51:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k1RaW-0003lB-TU
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 05:44:28 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36635)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1Rgh-0001pw-8g
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 05:50:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40772)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k1RaU-0005Ib-SL
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 05:44:28 -0400
-Received: by mail-wr1-x441.google.com with SMTP id 88so27373365wrh.3
- for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 02:44:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=qeGSqd0GTYjIeTcFeJsppsJXVYqxgxNSujPajAXMAZQ=;
- b=uuDHPJj8K/EdZfvTBT9GDRAwoHKD0JGaGVYOuONLJEUNuILuWhidQ72nVlZIoKTpgS
- zw8EyQNC8iRSE0WkjqhkLYpOzhPbqxFXRhMkYfchxi6JsdsAeWQqUZG99p0Ycv0O6wM0
- h3AhdTQwBHkyYu/XH5avtDr1RhrG3WZvUbc8yao7cbPkWsXKK0styimeGmIwNJRss9iw
- APRqc0vbG4naw+Qyb1zBIX03ysoJAj8R3HI8JD8tAKl9inmwnRhY7F2G8bcFah3A+9Fq
- AEQBma1lF8TxFaQW/DCGEE+MjbC19lUCr9solTKMKMFAY9lJCGHsdjUR+JIstY5elG5a
- s5xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=qeGSqd0GTYjIeTcFeJsppsJXVYqxgxNSujPajAXMAZQ=;
- b=fUaQk5J/gvxH0T+Y862Y9JxXIC18XEyfuoKU0Xhm5pZ35fU32H77wepm9PGBLiL2sy
- UME3k9Y4UTIpbcyOBXngUeAVzDSiCv/k8ggwbXl+8ph6V3AOPSJCPltdZVHACUSWpjLA
- 44EmaAXjktnvzh1fCjI+IgCXWd47Be3oO7KleNg1fr4zHW0RKgmWk+7WiclA1wVK+27E
- MGyKfOmh5XGUp+FTw5F5BVrrRLPuKwP2f+23jrYt02DiHprfII3b+tjpavL4guZu1oJG
- OOD7mbvK5Jko8bmE6yA5EF+zoWaZFrWjlShuBJpnM+IlqGeHNBrNtsWvRt26+AkMx1Iq
- AXvw==
-X-Gm-Message-State: AOAM533JfzVJuo3PuusxM6URgiOmrCLHmrhUVbF8y/c6VuqGyfpIId8r
- 2tVhGQaOySOJndvxirrT5Udz4Q==
-X-Google-Smtp-Source: ABdhPJwRzYf3LOotOv5byeanboWaa/RoBi2VSBgsebRrKHhJq/lH69uKLseMutQIAdhdAzWJn0mXKw==
-X-Received: by 2002:adf:f007:: with SMTP id j7mr2557483wro.195.1596188664554; 
- Fri, 31 Jul 2020 02:44:24 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z127sm12738114wme.44.2020.07.31.02.44.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 31 Jul 2020 02:44:23 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 90DCB1FF7E;
- Fri, 31 Jul 2020 10:44:22 +0100 (BST)
-References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-13-git-send-email-steven.sistare@oracle.com>
- <87r1stdjes.fsf@linaro.org>
- <b18f2181-902b-a091-9711-93d49ab8aec8@oracle.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Steven Sistare <steven.sistare@oracle.com>
-Subject: Re: [PATCH V1 12/32] vl: pause option
-In-reply-to: <b18f2181-902b-a091-9711-93d49ab8aec8@oracle.com>
-Date: Fri, 31 Jul 2020 10:44:22 +0100
-Message-ID: <87tuxo2f49.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1Rge-0006AR-07
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 05:50:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k1Rgb-0004XT-Eo
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 09:50:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4D0072E80EE
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 09:50:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Date: Fri, 31 Jul 2020 09:44:41 -0000
+From: "Laszlo Ersek \(Red Hat\)" <1888971@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: lersek nareshgs
+X-Launchpad-Bug-Reporter: Naresh GS (nareshgs)
+X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
+References: <159573587135.29737.8295812528041177661.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159618868108.4471.3506773723212076959.malone@soybean.canonical.com>
+Subject: [Bug 1888971] Re: SMI trigger causes hang with multiple cores
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4c68b39968661edec649a0358e98d38c18148070
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 02:41:21
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -105,67 +83,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: Bug 1888971 <1888971@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+> I guess fundamentally th issue is writing 0xXX in IO port 0xB2 should
+> trigger SMI handler in all possible core but instead it triggers SMI
+> only in Core#0.
 
-Steven Sistare <steven.sistare@oracle.com> writes:
+For that, the guest needs to negotiate the "broadcast SMI" feature with
+QEMU. See commit range 57bb40c9db40..b8bab8eb6934.
 
-> On 7/30/2020 1:03 PM, Alex Benn=C3=A9e wrote:
->>=20
->> Steve Sistare <steven.sistare@oracle.com> writes:
->>=20
->>> Provide the -pause command-line parameter and the QEMU_PAUSE environment
->>> variable to briefly pause QEMU in main and allow a developer to attach =
-gdb.
->>> Useful when the developer does not invoke QEMU directly, such as when u=
-sing
->>> libvirt.
->>=20
->> How does this differ from -S?
->
-> The -S flag runs qemu to the main loop but does not start the guest.  Lot=
-s of code
-> that you may need to debug runs before you get there.
+-- =
 
-Right - so this is for attaching a debugger to QEMU itself, not using
-the gdbstub? Why isn't this a problem the calling entity can solve by
-the way it invoked QEMU?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888971
 
-We have similar sort of solutions for debugging our testcases:
+Title:
+  SMI trigger causes hang with multiple cores
 
-  https://wiki.qemu.org/Features/QTest#Using_debugging_tools_under_the_test=
-_harness
+Status in QEMU:
+  New
 
-I still think:
+Bug description:
+  When using qemu , SMI trigger causes hang/reboot under following
+  conditions:
 
->>> +DEF("pause", HAS_ARG, QEMU_OPTION_pause, \
->>> +    "-pause secs    Pause for secs seconds on entry to main.\n", QEMU_=
-ARCH_ALL)
->>> +
->>> +SRST
->>> +``--pause secs``
->>> +    Pause for a number of seconds on entry to main.  Useful for attach=
-ing
->>> +    a debugger after QEMU has been launched by some other entity.
->>> +ERST
->>> +
->>=20
->> It seems like having an option to race with the debugger is just asking
->> for trouble.
+  1. No KVM but there are more than 1 threads (-smp > 1)
+  2. When using KVM.
 
-this make the option problematic.
+  Info:
+  qemu-system-x86_64 --version
+  QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.29)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
---=20
-Alex Benn=C3=A9e
+  SMI trigger was done by writing 0x00 in IO port 0xB2.
+
+  Command:
+  No failure in SMI trigger when using the below command:
+  qemu-system-x86_64 -M pc-q35-bionic -smp 1 -bios build/coreboot.rom  -ser=
+ial stdio -hda ../linux.img  -m 2048 | tee 1.txt
+
+  Hang/resets with below commands:
+  qemu-system-x86_64 -M pc-q35-bionic -smp 2 -bios build/coreboot.rom  -ser=
+ial stdio -hda ../linux.img  -m 2048 | tee 1.txt
+
+  sudo qemu-system-x86_64 -M pc-q35-bionic,accel=3Dkvm -smp 1 -bios
+  build/coreboot.rom  -serial stdio -hda ../linux.img  -m 2048 | tee
+  1.txt
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888971/+subscriptions
 
