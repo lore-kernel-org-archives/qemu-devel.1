@@ -2,127 +2,94 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 115F9C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 07:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91AE8C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 07:45:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D03D3207F5
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 07:29:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A2782067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 07:45:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="t4BK4qyz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D03D3207F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IH/XTwIf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A2782067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1PUB-0006XF-2v
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 03:29:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48112)
+	id 1k1PjT-0000Yt-Hm
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 03:45:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k1PTa-00062s-JQ; Fri, 31 Jul 2020 03:29:10 -0400
-Received: from mail-eopbgr00129.outbound.protection.outlook.com
- ([40.107.0.129]:6460 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k1PTX-0006i7-S6; Fri, 31 Jul 2020 03:29:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hu306IDHDFS95OQjJoXrKUR1W3l2FRjb+lL9RmjoqYT/vpwS+EE85vZ5YqorqusdiaD5WFa4Fm92j5mPch5Em9SzrTAOKHx17xzngVwCNeISiYNMOiDAsOYCwj5o1AVDgm2yCqLojKB+GCPg4xrnZ4Ir/a8A1/e1+JuU/ueNQI25uSA2TWZMSbXNHvLc68SgpHHTkdEcJZRmIjAoBBg88ryNv042o+GMXgU6eGjEBCthIhY1ebgjsAsSCPUES1lqxDT6B8GhX4W9oTnTwsRu5TM9EkVN9MGkAkA5UhhoqGNF0IzkZxNjz1Jeh9QoHtZ3fVFLfmNCUiC7Cq5nWWRtAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gcfYXOGnBTrWICaA9V6eHgczOu3KpnQd47uxSHTYk28=;
- b=Mw7SuItAjlOzx0wFNc87/bdP2LbmGW/FUtZRV6g1W8+cCqoqZbOZuyusWPaahCSjB20h2v6o5V7CYJsrAuReIblesfHtYhNBN1BXfK2ObAVudGs5Mdj+rW4Y42WFjd82PGzjB1iP04Ots6nthG08uOmpRmMUNqLFitlBzVmoJfTx+ZoowU6VsMHdnlTuuLkpa2YiExfIIOEChxdeEs9poLQ9/ElxlJzSKjye/dWhLxuWHcmMcSywS/eqjZcXelr+vE2NarFdY6+aGhFJy0Oj5LTU9xtqgnRL4drq8Ymtmphf1Eh7mAWcoa+fZ/U0S2tO9FscS2nF/S4wFzLo2RQO/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gcfYXOGnBTrWICaA9V6eHgczOu3KpnQd47uxSHTYk28=;
- b=t4BK4qyzIung432NxzFAuEVm/UoVFjszkUcX2r5Ug43YJcM5DJ3UdczcjfDjkqkBFdfS/gkhzq64Sk93O4sEHOgu21w/o/GAZa7YSZG5n38TpcEEihuE6IHepfUAe6TE3ntRJaDfMzyug+6VhCmis8kx3C5ehyV3OYzyOrSOxL0=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
- by AM7PR08MB5493.eurprd08.prod.outlook.com (2603:10a6:20b:102::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3216.24; Fri, 31 Jul
- 2020 07:29:04 +0000
-Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
- ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3239.020; Fri, 31 Jul 2020
- 07:29:03 +0000
-Subject: Re: [PATCH v12 01/11] iotests: add test for QCOW2 header dump
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <1596118512-424960-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1596118512-424960-2-git-send-email-andrey.shinkevich@virtuozzo.com>
- <644c25e0-2d5b-1eee-68aa-245026b9c94e@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <a0405d81-a42e-5638-9290-58b211d5e874@virtuozzo.com>
-Date: Fri, 31 Jul 2020 10:28:57 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <644c25e0-2d5b-1eee-68aa-245026b9c94e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM0PR01CA0142.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::47) To AM6PR08MB4070.eurprd08.prod.outlook.com
- (2603:10a6:20b:a3::25)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k1Pih-0008Lj-27
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 03:44:47 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45175
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k1Pie-0008IO-7E
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 03:44:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596181482;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1UdoygK3os5o72+8NFLQ+SCSJV9B0RM5JrZKIjlH2/c=;
+ b=IH/XTwIfuENgtdXpFdRFDVwA3+nNy7Yjb7+5mkoWRY4ruR88sjC3fIGU7x4lYreMU48zI4
+ g8D+wjJI6lAtcoSXIko6ACk6SHZV4Uv/HDV5ao67RFQLlgrRgc9nx/zkuoHXFcrHO6hROZ
+ hxTHOTxddQ1oQkwj+zoK2u0NfiO+xJE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-i5U6w9nNMwagjtd9X6eCfw-1; Fri, 31 Jul 2020 03:44:40 -0400
+X-MC-Unique: i5U6w9nNMwagjtd9X6eCfw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54F30100CCC5;
+ Fri, 31 Jul 2020 07:44:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E85D35DA75;
+ Fri, 31 Jul 2020 07:44:38 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 678151132FD2; Fri, 31 Jul 2020 09:44:37 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH] osdep.h: Add doc comment for qemu_get_thread_id()
+References: <20200716154114.10838-1-peter.maydell@linaro.org>
+ <0f8b8fea-2bd0-7616-292b-8fb0f87cec75@redhat.com>
+ <CAFEAcA9ukzKGiaV6Tazu8Aezn39v81DKQik1b=jEy=NLnau05w@mail.gmail.com>
+ <87k0ylvy0t.fsf@dusky.pond.sub.org>
+ <CAFEAcA-AYJ64HE698TMRS6cV=u4ig6S6TU2xufns7fCVbcQXrg@mail.gmail.com>
+ <20200730155939.GP3477223@redhat.com>
+ <4d2cba04-04d8-9b82-562f-acb84b6010d2@redhat.com>
+Date: Fri, 31 Jul 2020 09:44:37 +0200
+In-Reply-To: <4d2cba04-04d8-9b82-562f-acb84b6010d2@redhat.com> (Eric Blake's
+ message of "Thu, 30 Jul 2020 11:24:51 -0500")
+Message-ID: <87pn8ct9ga.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.82) by
- AM0PR01CA0142.eurprd01.prod.exchangelabs.com (2603:10a6:208:168::47) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.17 via Frontend
- Transport; Fri, 31 Jul 2020 07:29:02 +0000
-X-Originating-IP: [109.252.114.82]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2b020c8f-8896-44fa-736c-08d8352366b1
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5493:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54930807DF21C2299D8E2DE3F44E0@AM7PR08MB5493.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2449;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GEW+X/MBKZXszc9k6rVydkhc0JijONip4+QgXYCLZ9KaqL9TOTQorO78TWu4uuNVMIHlYF7qFyAvzQvbVzgHIl9FHoSmj5xsi9IJlhjuwxvOPrVs6kogpYN5FAZGdiavgXKU6w6Ihhqryr98cWcHPkB7IJT8BXJLVyYyRDoLhqtelB1wP1dUMfl8Yp/wa6u1RSQGfyqLKlhM2+iniKvyLEGzstR7lQhnHZdDPyb6oiXOtIgVqHEol/mk/R8v2kQ5KuOosODBo91aNnpMEaUyRF305yCMgjbXpl24T9KeuDO7d/ftWeAMCe1mo2WUwyXfz9219MB3RKvsPGMFmmRxM8tju10H2s+e5e29FDYvDyWoMFSBmySQAIYiOUYAI7eH
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(4636009)(39840400004)(136003)(376002)(396003)(346002)(366004)(6506007)(8676002)(53546011)(5660300002)(66946007)(66476007)(8936002)(86362001)(36756003)(316002)(83380400001)(66556008)(44832011)(52116002)(956004)(2616005)(107886003)(31686004)(478600001)(6512007)(6666004)(26005)(186003)(2906002)(16526019)(6486002)(31696002)(4326008)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: n5pMOReHEdRBj1LNexXnyciydXvPs85FotS1TaSZBJ9yiEF+34oIgONFl53svmC68wiYfUvKkXyqTkFTKieOr+W2xY3fPiGHaMRlVI9tAetM+oOxGEbma1WFGdja+DAol5VMEawLY/ndEr6JnOHBimP3z53mKkejjD0W91BMd31l4Osb9a7M3qvN7O2Gdqedhz594p3TjyEFnnQVzEiuUNwBOAOAnbAL5Dtg0U+G5cEVJqipQweeUQM7YAkU+mbAcM9AQkvJTy/NyIs7vb5ZRnP0fAAwbOJnLxxaOhldwRk/hPoZzPjP0A14ButRz4LPZyuiI7GPjr/0tyA4CpjJneBbz8g+YQwCKclcZ4s6ekUTpTkUXae2hjcgdMfNzjOETKBhaL0BgMNE2lhJuw46ElmxIxEKTGjE+sa6M/ysS+PEglv2fty29WwXRwMJuV8JfwUsjmxgXJx0TV0TgLOs1HDuAEGzw3Xwn4SGA53ReHN/NxuW6PTOEP54sOnZZ/Yh
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b020c8f-8896-44fa-736c-08d8352366b1
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2020 07:29:03.8216 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QB6dwyr2E9L6rIMfgvwEB3cjSuQgFigAVmtpsVP6QlmIBRvUvGYR2fi6O1nHi9FVsPohtCULVVEaIXHStiK5PX0XpGsHvSEv2GIe7Wv3Y3I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5493
-Received-SPF: pass client-ip=40.107.0.129;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR02-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 03:29:05
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 02:46:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,70 +102,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30.07.2020 22:05, Eric Blake wrote:
-> On 7/30/20 9:15 AM, Andrey Shinkevich wrote:
->> The simple script creates a QCOW2 image and fills it with some data.
->> Two bitmaps are created as well. Then the script reads the image header
->> with extensions from the disk by running the script qcow2.py and dumps
->> the information to the output. Other entities, such as snapshots, may
->> be added to the test later.
+Eric Blake <eblake@redhat.com> writes:
+
+> On 7/30/20 10:59 AM, Daniel P. Berrang=C3=A9 wrote:
+>
+>>> Well, I suspect that management-layer code currently has
+>>> gone for "assume we're always running on Linux" and was
+>>> written by people who knew they were getting a Linux tid...
 >>
->> Suggested-by: Eric Blake <eblake@redhat.com>
->> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
->>   tests/qemu-iotests/303     | 59 
->> ++++++++++++++++++++++++++++++++++++++++++
->>   tests/qemu-iotests/303.out | 64 
->> ++++++++++++++++++++++++++++++++++++++++++++++
->>   tests/qemu-iotests/group   |  1 +
->>   3 files changed, 124 insertions(+)
->>   create mode 100755 tests/qemu-iotests/303
->>   create mode 100644 tests/qemu-iotests/303.out
+>> Yes, on the libvirt side, the functionality that relies on thread_is is
+>> only compiled on Linux. If someone wants to use it on other OS, they'll
+>> have to provide an impl using their platforms equivalent of
+>> sched_setaffinity and friends since none of this stuff is standardized
+>> across OS.
+>>
+>>
+>>>> The PID is quite unlikely to be "an OS-specific identifier of the
+>>>> current thread".  Shouldn't we fail instead of lie when we don't know
+>>>> how to compute the truth?
+>>>
+>>> Yeah, I think the default codepath is pretty bogus too. Should
+>>> the QMP functions have a mechanism for saying "we don't know
+>>> a thread-id on this platform" ?
+>>
+>> Thread_id should be optional and thus not filled in if we
+>> can't provide a sensible value. Unfortunately we made it
+>> mandatory in QMP.
 >
->> +import iotests
->> +import subprocess
->> +from iotests import qemu_img_create, qemu_io, file_path, log, 
->> filter_qemu_io
->> +
->> +iotests.script_initialize(supported_fmts=['qcow2'])
->> +
->> +disk = file_path('disk')
->> +chunk = 1024 * 1024
->> +
->> +
->> +def create_bitmap(bitmap_number, disabled):
->> +    granularity = 1 << (14 + bitmap_number)
->> +    bitmap_name = 'bitmap-' + str(bitmap_number)
->> +    vm = iotests.VM().add_drive(disk)
->> +    vm.launch()
->> +    vm.qmp_log('block-dirty-bitmap-add', node='drive0', 
->> name=bitmap_name,
->> +               granularity=granularity, persistent=True, 
->> disabled=disabled)
->> +    vm.shutdown()
->
-> Would it be any easier to use qemu-img bitmap here instead of firing 
-> up a full VM?
+> Normally, converting a mandatory output value to optional is a
+> back-compatibility risk (we could break apps that depended on it being
+> present).  But if the only apps that depended on it being present are
+> compiled on Linux, where the member will actually be present, I think
+> that changing the schema to make it optional for non-Linux platforms
+> won't be a back-compatibility nightmare (but we will have to be
+> careful in our documentation).
 
+Options for systems where don't know how to compute a system-wide thread
+ID:
 
-I agree, you are right. I'll take it into account for the next version, 
-if any.
+0. Return a bogus value: the PID.  This is the status quo.
 
-Thank you for your R-b.
+1. Return a more obviously bogus value: -1.  Semantic compatibility
+   break.  Should be harmless, because a QMP client relying on the
+   thread-id being the PID would be insane.
 
-Andrey
+2. Make thread-id optional, present iff we can compute a value.
 
+   This is what we should have done, but we didn't, and now it's a
+   syntactic compatibility break.  Matters only if it actually breaks
+   QMP clients.  We believe the one we know shouldn't break.
 
->
-> At any rate, this is a nice starting point for tracking what the rest 
-> of your series improves.
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
+Preferences?
+
 
