@@ -2,77 +2,95 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_REPLYTO_END_DIGIT,HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,HTML_MIME_NO_HTML_TAG,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MIME_HTML_ONLY,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F058DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 03:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A41AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 03:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2008207F5
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 03:06:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38F02206FA
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 03:34:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="ZBHmquxR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2008207F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N521Xa8p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38F02206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1LN9-0006nP-1L
-	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 23:06:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34426)
+	id 1k1LoS-0002EN-Dx
+	for qemu-devel@archiver.kernel.org; Thu, 30 Jul 2020 23:34:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vit9696@protonmail.com>)
- id 1k1LMM-0006Hg-ME
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 23:05:26 -0400
-Received: from mail-40136.protonmail.ch ([185.70.40.136]:61021)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vit9696@protonmail.com>)
- id 1k1LMJ-0007j6-Ep
- for qemu-devel@nongnu.org; Thu, 30 Jul 2020 23:05:26 -0400
-Date: Fri, 31 Jul 2020 02:55:46 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
- s=protonmail; t=1596164151;
- bh=M7CgakWJICw+vYXIedT4t384GXVz0amURND25oq04Rg=;
- h=Date:To:From:Cc:Reply-To:Subject:In-Reply-To:References:From;
- b=ZBHmquxRQEJUitRVsX9ZgoyOxB4cvTrg+s4Xrz9atdzF9K3hwKGMMKsV9bF93ZQW6
- /AJUHOizo1ECHVkct1aNB89CIT2cuuMc0AjESOpbuTTHEnrFeLEEVv3Oya95ct5l7U
- uUmxHlIw6doKvJbNSSvh5WdJsb8TsAWNbE3Vj7/Y=
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH 1/2] i386/acpi: fix inconsistent QEMU/OVMF device paths
-Message-ID: <lE_xyk_1uYzbQKr5tPEMurU_jWzMJ74ZDmC6QZHQx2XTNK1AnZSqw-25RsyO8LMtQRiw_vyFvmjGI7y5SBuJS86yu6ynvDqg8GliBayGYaw=@protonmail.com>
-In-Reply-To: <20200730153447-mutt-send-email-mst@kernel.org>
-References: <20200730155755.188845-1-mst@redhat.com>
- <e1759ee7-b167-d69e-99f9-e824e9e3e0b8@redhat.com>
- <20200730153447-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k1Lns-0001o2-Ki
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 23:33:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35360
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k1Lnq-0002zr-8A
+ for qemu-devel@nongnu.org; Thu, 30 Jul 2020 23:33:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596166428;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/9ua6Rm2RK8h2W3ABTYLWZnU/mmGLn2TKWuvv9ktXzQ=;
+ b=N521Xa8pwd7GrVe/LvHFKVRn7tGA6U5j2SbSuK+btR9XgDve+D9tbLqN5Uhr6ogvbwbHWN
+ YKv8+4Yh1oOzFgFjy7im1sDl7jSqme+dbYVvFunq/OsSNCjn6o04fRDLJcP5qxRWPsXCHs
+ 5mHmA5jem21lLE94joiCRoEJcplrKOc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-0qtElWasMxGXAbEHhALf4Q-1; Thu, 30 Jul 2020 23:33:47 -0400
+X-MC-Unique: 0qtElWasMxGXAbEHhALf4Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF33D19253C3;
+ Fri, 31 Jul 2020 03:33:45 +0000 (UTC)
+Received: from [10.72.13.197] (ovpn-13-197.pek2.redhat.com [10.72.13.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2EC3260BE2;
+ Fri, 31 Jul 2020 03:33:43 +0000 (UTC)
+Subject: Re: [PATCH 1/2] hw/net/net_tx_pkt: add function to check
+ pkt->max_raw_frags
+To: Mauro Matteo Cascella <mcascell@redhat.com>
+References: <20200727170838.1101775-1-mcascell@redhat.com>
+ <20200727170838.1101775-2-mcascell@redhat.com>
+ <adb52967-d2b2-cb55-87a2-38fda18a2a0a@redhat.com>
+ <CAA8xKjXagrLU+DVcO3uVw6D0sJHXQ_rOd0nqEHHNcaMwG6oXRA@mail.gmail.com>
+ <3672bcc5-329f-0cc6-a505-e5b21a316a20@redhat.com>
+ <CAA8xKjWoyTPEbW=xdKqtTHHn2krKssif9t6nEeWGDQLt7KmCvg@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <4f6c065e-de0c-4fe3-f4aa-8e98a48d2650@redhat.com>
+Date: Fri, 31 Jul 2020 11:33:42 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg=pgp-sha256;
- boundary="---------------------9256accdabb51ebf06706bfefff4fa69";
- charset=utf-8
-Received-SPF: pass client-ip=185.70.40.136;
- envelope-from=vit9696@protonmail.com; helo=mail-40136.protonmail.ch
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 22:55:52
+In-Reply-To: <CAA8xKjWoyTPEbW=xdKqtTHHn2krKssif9t6nEeWGDQLt7KmCvg@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/30 23:33:48
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- FREEMAIL_REPLYTO_END_DIGIT=0.25, HTML_MESSAGE=0.001,
- HTML_MIME_NO_HTML_TAG=0.377, MIME_HTML_ONLY=0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,117 +103,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, ziming zhang <ezrakiez@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: vit9696 <vit9696@protonmail.com>, vit9696 <vit9696@protonmail.com>
-From: vit9696 via <qemu-devel@nongnu.org>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
------------------------9256accdabb51ebf06706bfefff4fa69
-Content-Type: multipart/mixed; boundary="0723013a1a8e2a0676ecfd524f4ae4fabcfcab0d"
-
---0723013a1a8e2a0676ecfd524f4ae4fabcfcab0d
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-
-  Hi,<div><br></div><div>Thanks a lot! Can confirm the authenticity of both=
- patches. I also do not mind whether my full name or nickname is used, what=
-ever is easier.</div><div><br></div>Best regards,<div>Vitaly<caret></caret>=
-<br><div><div> <div><br></div><div><br></div>On Thu, Jul 30, 2020 at 22:35,=
- Michael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com" class=3D"">mst@re=
-dhat.com</a>&gt; wrote:<blockquote class=3D"protonmail_quote" type=3D"cite"=
->  On Thu, Jul 30, 2020 at 06:11:17PM +0200, Philippe Mathieu-Daud=C3=83=C2=
-=A9 wrote:<br>&gt; On 7/30/20 5:58 PM, Michael S. Tsirkin wrote:<br>&gt; &g=
-t; macOS uses ACPI UIDs to build the DevicePath for NVRAM boot options,<br>=
-&gt; &gt; while OVMF firmware gets them via an internal channel through QEM=
-U.<br>&gt; &gt; Due to a bug in QEMU ACPI currently UEFI firmware and ACPI =
-have<br>&gt; &gt; different values, and this makes the underlying operating=
- system<br>&gt; &gt; unable to report its boot option.<br>&gt; &gt;<br>&gt;=
- &gt; The particular node in question is the primary PciRoot (PCI0 in ACPI)=
-,<br>&gt; &gt; which for some reason gets assigned 1 in ACPI UID and 0 in t=
-he<br>&gt; &gt; DevicePath. This is due to the _UID assigned to it by build=
-_dsdt in<br>&gt; &gt; hw/i386/acpi-build.c Which does not correspond to the=
- primary PCI<br>&gt; &gt; identifier given by pcibus_num in hw/pci/pci.c<br=
->&gt; &gt;<br>&gt; &gt; Reference with the device paths, OVMF startup logs,=
- and ACPI table<br>&gt; &gt; dumps (SysReport):<br>&gt; &gt; https://github=
-.com/acidanthera/bugtracker/issues/1050<br>&gt; &gt;<br>&gt; &gt; In UEFI v=
-2.8, section "10.4.2 Rules with ACPI _HID and _UID" ends with<br>&gt; &gt; =
-the paragraph,<br>&gt; &gt;<br>&gt; &gt;     Root PCI bridges will use the =
-plug and play ID of PNP0A03, This will<br>&gt; &gt;     be stored in the AC=
-PI Device Path _HID field, or in the Expanded<br>&gt; &gt;     ACPI Device =
-Path _CID field to match the ACPI name space. The _UID<br>&gt; &gt;     in =
-the ACPI Device Path structure must match the _UID in the ACPI<br>&gt; &gt;=
-     name space.<br>&gt; &gt;<br>&gt; &gt; (See especially the last sentenc=
-e.)<br>&gt; &gt;<br>&gt; &gt; Considering *extra* root bridges / root buses=
- (with bus number &gt; 0),<br>&gt; &gt; QEMU's ACPI generator actually does=
- the right thing; since QEMU commit<br>&gt; &gt; c96d9286a6d7 ("i386/acpi-b=
-uild: more traditional _UID and _HID for PXB<br>&gt; &gt; root buses", 2015=
--06-11).<br>&gt; &gt;<br>&gt; &gt; However, the _UID values for root bridge=
- zero (on both i440fx and q35)<br>&gt; &gt; have always been "wrong" (from =
-UEFI perspective), going back in QEMU to<br>&gt; &gt; commit 74523b850189 (=
-"i386: add ACPI table files from seabios",<br>&gt; &gt; 2013-10-14).<br>&gt=
-; &gt;<br>&gt; &gt; Even in SeaBIOS, these _UID values have always been 1; =
-see commit<br>&gt; &gt; a4d357638c57 ("Port rombios32 code from bochs-bios.=
-", 2008-03-08) for<br>&gt; &gt; i440fx, and commit ecbe3fd61511 ("seabios: =
-q35: add dsdt", 2012-12-01)<br>&gt; &gt; for q35.<br>&gt; &gt;<br>&gt; &gt;=
- Suggested-by: Laszlo Ersek &lt;lersek@redhat.com&gt;<br>&gt; &gt; Tested-b=
-y: vit9696 &lt;vit9696@protonmail.com&gt;<br>&gt;<br>&gt; Vitaly uses his f=
-ull name on EDK2 mailing list, so I don't think he'll<br>&gt; have a proble=
-m to use it in QEMU too:<br>&gt; Tested-by: Vitaly Cheptsov &lt;vit9696@pro=
-tonmail.com&gt;<br>&gt;<br>&gt; From:<br>&gt; https://wiki.qemu.org/Contrib=
-ute/SubmitAPatch#Patch_emails_must_include_a_Signed-off-by:_line<br>&gt; "P=
-lease use your real name to sign a patch (not an alias or acronym)."<br><br=
->Right. Tested-by is different though, I don't think we have<br>a problem w=
-ith anonymous testing.<br><br>Anyway, updated.<br><br>&gt; &gt; Signed-off-=
-by: Michael S. Tsirkin &lt;mst@redhat.com&gt;<br>&gt; &gt; ---<br>&gt; &gt;=
-  hw/i386/acpi-build.c | 4 ++--<br>&gt; &gt;  1 file changed, 2 insertions(=
-+), 2 deletions(-)<br>&gt; &gt;<br>&gt; &gt; diff --git a/hw/i386/acpi-buil=
-d.c b/hw/i386/acpi-build.c<br>&gt; &gt; index b7bcbbbb2a..7a5a8b3521 100644=
-<br>&gt; &gt; --- a/hw/i386/acpi-build.c<br>&gt; &gt; +++ b/hw/i386/acpi-bu=
-ild.c<br>&gt; &gt; @@ -1497,7 +1497,7 @@ build_dsdt(GArray *table_data, BIO=
-SLinker *linker,<br>&gt; &gt;          dev =3D aml_device("PCI0");<br>&gt; =
-&gt;          aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")))=
-;<br>&gt; &gt;          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));=
-<br>&gt; &gt; -        aml_append(dev, aml_name_decl("_UID", aml_int(1)));<=
-br>&gt; &gt; +        aml_append(dev, aml_name_decl("_UID", aml_int(0)));<b=
-r>&gt; &gt;          aml_append(sb_scope, dev);<br>&gt; &gt;          aml_a=
-ppend(dsdt, sb_scope);<br>&gt; &gt;<br>&gt; &gt; @@ -1512,7 +1512,7 @@ buil=
-d_dsdt(GArray *table_data, BIOSLinker *linker,<br>&gt; &gt;          aml_ap=
-pend(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));<br>&gt; &gt;      =
-    aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));<br>&gt; =
-&gt;          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));<br>&gt; &=
-gt; -        aml_append(dev, aml_name_decl("_UID", aml_int(1)));<br>&gt; &g=
-t; +        aml_append(dev, aml_name_decl("_UID", aml_int(0)));<br>&gt; &gt=
-;          aml_append(dev, build_q35_osc_method());<br>&gt; &gt;          a=
-ml_append(sb_scope, dev);<br>&gt; &gt;          aml_append(dsdt, sb_scope);=
-<br>&gt; &gt;<br><br></blockquote><div><br></div><div><br></div></div></div=
-></div>
 
 
+On 2020/7/31 上午1:05, Mauro Matteo Cascella wrote:
+> On Thu, Jul 30, 2020 at 7:28 AM Jason Wang<jasowang@redhat.com>  wrote:
+>> On 2020/7/29 上午12:26, Mauro Matteo Cascella wrote:
+>>> On Tue, Jul 28, 2020 at 6:06 AM Jason Wang<jasowang@redhat.com>  wrote:
+>>>> On 2020/7/28 上午1:08, Mauro Matteo Cascella wrote:
+>>>>> This patch introduces a new function in hw/net/net_tx_pkt.{c,h} to check the
+>>>>> current data fragment against the maximum number of data fragments.
+>>>> I wonder whether it's better to do the check in
+>>>> net_tx_pkt_add_raw_fragment() and fail there.
+>>> Given the assertion, I assumed the caller is responsible for the
+>>> check, but moving the check in net_tx_pkt_add_raw_fragment() totally
+>>> makes sense to me.
+>> Want to send a new version for this?
+> Sure, I'll send a new version. Thank you.
+>
+>>>> Btw, I find net_tx_pkt_add_raw_fragment() does not unmap dma when
+>>>> returning to true, is this a bug?
+>>> Isn't it unmapped in net_tx_pkt_reset()?
+>> Probably but see how it was used in e1000e, the net_tx_pkt_reset() is
+>> only called when eop is set. Is this a bug?
+> Yeah it all depends on E1000_TXD_CMD_EOP. Besides, if not set,
+> e1000e_tx_pkt_send() would never be called. Honestly, I don't know if
+> this is a reasonable scenario or not.
 
---0723013a1a8e2a0676ecfd524f4ae4fabcfcab0d--
 
------------------------9256accdabb51ebf06706bfefff4fa69
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+It's probably fine since anyway e1000e_core_reset() will call 
+net_tx_pkt_reset().
 
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
-
-wsBmBAEBCAAQBQJfI4gwCRBPsoxt7Hy0xQAKCRBPsoxt7Hy0xa7PB/wPzXH2
-BjzY4gszbZxLdvRVCl2ouUZfw719ZDdC+fWCBnGNJ5ee20vE2OEc//i/lAJH
-J8ZWxmApO1X+QttR9ia8Wy3+f3vA3rbKi7kJVWN0dslSxOSsB7MplIA8vAM5
-0vVhv+C39GcU3to5W/WZl1Xrsx7jUBukdaSqg5v2irsq470Qnbdkq63D9Yk0
-b5hJZ6d1Ty1HR3m3bDlsUMykASm4bQS7DX0qqfuzPVvZ3OX/OYm3wtCMTp6R
-z1yOX1IGVUnE9kpRPFPPTOmuNeCG+k6d9VphPr+EcvpYhR69Cz+H0q5iY49L
-q8uFuZowC81qKcumEDqgElz8phVxUU655omy
-=sM6X
------END PGP SIGNATURE-----
+Thanks
 
 
------------------------9256accdabb51ebf06706bfefff4fa69--
+>
+>> Thanks
+>>
 
 
