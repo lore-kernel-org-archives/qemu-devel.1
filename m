@@ -2,108 +2,104 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88751C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A79AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:22:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61FC222B3F
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:22:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 036F922B3F
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 18:22:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Hxd85FVU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61FC222B3F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dok2bif7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 036F922B3F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Zg5-0003Sx-L5
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:22:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58052)
+	id 1k1Zg6-0003UV-8F
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 14:22:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1ZeN-0001k8-9b
+ id 1k1ZeN-0001kz-S9
  for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:20:59 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:50684)
+Received: from userp2120.oracle.com ([156.151.31.85]:54784)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1k1ZeI-0005JX-9E
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:20:58 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VID2kN110735;
+ id 1k1ZeL-0005JY-1v
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 14:20:59 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIBpw6069896;
  Fri, 31 Jul 2020 18:20:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
- subject : date : message-id : in-reply-to : references : in-reply-to :
- references : mime-version : content-type : content-transfer-encoding;
- s=corp-2020-01-29; bh=esnuSUsw+zutTCesko7PBcHnqXd9qZSK/UE6b2zHDZA=;
- b=Hxd85FVUOy5pQ9zjstVOVcMYmhTbwB9hKb/742BenP+sjJ1gmFtcbsZKZ+4wwEEmRgYC
- pSCTACb1lXN/IP78ZyUEDWYJdaLwrM/sXQZ6lDi1jjDPmNgbbX1guE9R2wBqoO7GJdpg
- EG1csCWptAKJCzxtQgOzikSogV9HYH0m7jeNspp6DOruj93FWyuGc4431Aq1OqwZoKKp
- WA27NZ0berMU105sj60jJX5WiK5m+Xyc1EGss2KEA2A4wzLwTUBFrL6kvoShePaUyQFc
- oMRP9hjDpaAkcjMeZF/RKkJHb4hk/4dW3TBBo+vWeZVxYLqcdTm7fa1GFQxgd1zK5biW Rw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2130.oracle.com with ESMTP id 32hu1jtfy0-1
+ subject : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=/HdUmbh/uFpS2vqfh+Za/6q69dGZN5wcnvZ4PjpM6v8=;
+ b=dok2bif7EXPtqqrOvHWrjk2EvPcXvhUmaCN1IL6hS3AARNcwm5GTGjs/HhukKTE4wtc3
+ jJ24h6JII5zvxD7h2J81zVSvDjiIu3kFdACgzPPWAILmSxyw5R2vLDog8fgd+cFvVfQf
+ y3kVjKKgkwb0WRz7V/7bda5zA4PncgARmV9aN5oDDea06mzVsjuPKFF/V45EbuuHOQVn
+ 1YbEs9ZUvO7Q9KDasWlCBXlvlERZ0HlJjqN7Y53ava4U4A4xIS1NbkYF+Gwa5+tLGt62
+ 1QO2FSsiEo2jg4+tr8nmbhuBomRX7PJwnM2EF3LmYztkqyEJfJzS5J2j+uPk1bdRweJH Eg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 32mf702u7q-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
  Fri, 31 Jul 2020 18:20:42 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIIjVe080443;
- Fri, 31 Jul 2020 18:20:42 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3020.oracle.com with ESMTP id 32mf70vdug-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 31 Jul 2020 18:20:42 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06VIKfj7013242;
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 06VIHVCT073987;
  Fri, 31 Jul 2020 18:20:41 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3030.oracle.com with ESMTP id 32hu606s53-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 31 Jul 2020 18:20:41 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 06VIKaoL013127;
+ Fri, 31 Jul 2020 18:20:36 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 31 Jul 2020 11:20:40 -0700
+ with ESMTP ; Fri, 31 Jul 2020 11:20:36 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 03/20] multi-process: setup PCI host bridge for remote
- device
-Date: Fri, 31 Jul 2020 14:20:10 -0400
-Message-Id: <cd3a20960062081d7c911879f509c26aedee89b4.1596217462.git.jag.raman@oracle.com>
+Subject: [PATCH v8 00/20] Initial support for multi-process qemu
+Date: Fri, 31 Jul 2020 14:20:07 -0400
+Message-Id: <cover.1596217462.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1596217462.git.jag.raman@oracle.com>
-References: <cover.1596217462.git.jag.raman@oracle.com>
-In-Reply-To: <cover.1596217462.git.jag.raman@oracle.com>
-References: <cover.1596217462.git.jag.raman@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- suspectscore=1 spamscore=0
- mlxlogscore=999 adultscore=0 malwarescore=0 mlxscore=0 phishscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ mlxlogscore=999 mlxscore=0
+ suspectscore=0 bulkscore=0 malwarescore=0 spamscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2007310137
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9699
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- clxscore=1015
- malwarescore=0 spamscore=0 suspectscore=1 bulkscore=0 priorityscore=1501
- phishscore=0 mlxlogscore=999 lowpriorityscore=0 impostorscore=0 mlxscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ bulkscore=0 suspectscore=0
+ spamscore=0 impostorscore=0 clxscore=1011 phishscore=0 priorityscore=1501
+ adultscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
  definitions=main-2007310136
-Received-SPF: pass client-ip=156.151.31.86; envelope-from=jag.raman@oracle.com;
- helo=userp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 12:51:59
+Received-SPF: pass client-ip=156.151.31.85; envelope-from=jag.raman@oracle.com;
+ helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 14:20:51
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -53
+X-Spam_score: -5.4
+X-Spam_bar: -----
+X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,173 +124,149 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PCI host bridge is setup for the remote device process. It is
-implemented using remote-pcihost object. It is an extension of the PCI
-host bridge setup by QEMU.
-Remote-pcihost configures a PCI bus which could be used by the remote
-PCI device to latch on to.
+Hello
 
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
----
- MAINTAINERS                  |  8 +++++
- hw/pci-host/Makefile.objs    |  1 +
- hw/pci-host/remote.c         | 76 ++++++++++++++++++++++++++++++++++++++++++++
- include/hw/pci-host/remote.h | 30 +++++++++++++++++
- 4 files changed, 115 insertions(+)
+This is the v8 of the patchset. Thank you very much for the
+detailed feedback for v7. We appreciate your time. We believe
+we have address all the comments for v7 in the current series.
+
+The broader items we have addressed in this series are as follows:
+- Removed the main channel / control channel.
+- Enabled 1:1 mapping between irqfd:PCIDevice, moving away from
+  shared interrupt lines to avoid collision between irqfds
+- Defined an object type named “remote-object” that connects the
+  device with its fd in the remote process. This object limits the
+  number of remote devices to 1 per process to alleviate security
+  concerns with multiple devices per process. We are addressing the
+  authentication mechanism for multiple devices in the
+  VFIO-over-socket proposal.
+
+To touch upon the brief history of this project, we posted the
+Proof Of Concept patches before the BoF session in 2018.
+Subsequently, we posted RFC v1 [1], RFC v2 [2], RFC v3 [3],
+RFC v4 [4], v5 [5], v6 [6] and v7 [7] of the patch series.
+Following people contributed to the design and
+implementation of this project:
+
+Stefan Hajnoczi <stefanha@redhat.com>
+Konrad Wilk <konrad.wilk@oracle.com>
+Kanth Ghatraju <kanth.ghatraju@oracle.com>
+John G Johnson <john.g.johnson@oracle.com>
+Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Jagannathan Raman <jag.raman@oracle.com>
+
+
+We would like to thank QEMU community for your feedback in the
+design and implementation of this project.
+
+For the full concept writeup about QEMU multi-process, please refer to
+docs/devel/qemu-multiprocess.rst. Also see docs/qemu-multiprocess.txt for
+usage information.
+
+
+We welcome all your ideas, concerns, and questions for this patchset.
+
+[POC]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg566538.html
+[1]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg602285.html
+[2]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg624877.html
+[3]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg642000.html
+[4]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg655118.html
+[5]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg682429.html
+[6]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg697484.html
+[7]: https://patchew.org/QEMU/cover.1593273671.git.elena.ufimtseva@oracle.com/
+
+Elena Ufimtseva (8):
+  multi-process: add qio channel function to transmit
+  multi-process: define MPQemuMsg format and transmission functions
+  multi-process: add co-routines to communicate with remote
+  multi-process: introduce proxy object
+  multi-process: Forward PCI config space acceses to the remote process
+  multi-process: heartbeat messages to remote
+  multi-process: perform device reset in the remote process
+  multi-process: add configure and usage information
+
+Jagannathan Raman (11):
+  memory: alloc RAM from file at offset
+  multi-process: Add config option for multi-process QEMU
+  multi-process: setup PCI host bridge for remote device
+  multi-process: setup a machine object for remote device process
+  multi-process: Initialize message handler in remote device
+  multi-process: Associate fd of a PCIDevice with its object
+  multi-process: setup memory manager for remote device
+  multi-process: PCI BAR read/write handling for proxy & remote
+    endpoints
+  multi-process: Synchronize remote memory
+  multi-process: create IOHUB object to handle irq
+  multi-process: Retrieve PCI info from remote process
+
+John G Johnson (1):
+  multi-process: add the concept description to
+    docs/devel/qemu-multiprocess
+
+ MAINTAINERS                     |  26 ++
+ backends/hostmem-memfd.c        |   2 +-
+ configure                       |  11 +
+ docs/devel/index.rst            |   1 +
+ docs/devel/multi-process.rst    | 966 ++++++++++++++++++++++++++++++++++++++++
+ docs/multi-process.rst          |  67 +++
+ exec.c                          |  11 +-
+ hw/Makefile.objs                |   1 +
+ hw/i386/Makefile.objs           |   4 +
+ hw/i386/remote-memory.c         |  58 +++
+ hw/i386/remote-msg.c            | 266 +++++++++++
+ hw/i386/remote-obj.c            | 127 ++++++
+ hw/i386/remote.c                |  79 ++++
+ hw/misc/ivshmem.c               |   3 +-
+ hw/pci-host/Makefile.objs       |   1 +
+ hw/pci-host/remote.c            |  76 ++++
+ hw/pci/Makefile.objs            |   2 +
+ hw/pci/memory-sync.c            | 211 +++++++++
+ hw/pci/proxy.c                  | 417 +++++++++++++++++
+ hw/remote/Makefile.objs         |   1 +
+ hw/remote/iohub.c               | 123 +++++
+ include/exec/memory.h           |   2 +
+ include/exec/ram_addr.h         |   2 +-
+ include/hw/i386/remote-memory.h |  19 +
+ include/hw/i386/remote-obj.h    |  42 ++
+ include/hw/i386/remote.h        |  35 ++
+ include/hw/pci-host/remote.h    |  31 ++
+ include/hw/pci/memory-sync.h    |  27 ++
+ include/hw/pci/pci_ids.h        |   3 +
+ include/hw/pci/proxy.h          |  48 ++
+ include/hw/remote/iohub.h       |  42 ++
+ include/io/channel.h            |  24 +
+ include/io/mpqemu-link.h        | 123 +++++
+ include/qemu/mmap-alloc.h       |   3 +-
+ io/Makefile.objs                |   2 +
+ io/channel.c                    |  45 ++
+ io/mpqemu-link.c                | 303 +++++++++++++
+ scripts/mpqemu-launcher.py      |  49 ++
+ softmmu/memory.c                |   3 +-
+ util/mmap-alloc.c               |   7 +-
+ util/oslib-posix.c              |   2 +-
+ 41 files changed, 3252 insertions(+), 13 deletions(-)
+ create mode 100644 docs/devel/multi-process.rst
+ create mode 100644 docs/multi-process.rst
+ create mode 100644 hw/i386/remote-memory.c
+ create mode 100644 hw/i386/remote-msg.c
+ create mode 100644 hw/i386/remote-obj.c
+ create mode 100644 hw/i386/remote.c
  create mode 100644 hw/pci-host/remote.c
+ create mode 100644 hw/pci/memory-sync.c
+ create mode 100644 hw/pci/proxy.c
+ create mode 100644 hw/remote/Makefile.objs
+ create mode 100644 hw/remote/iohub.c
+ create mode 100644 include/hw/i386/remote-memory.h
+ create mode 100644 include/hw/i386/remote-obj.h
+ create mode 100644 include/hw/i386/remote.h
  create mode 100644 include/hw/pci-host/remote.h
+ create mode 100644 include/hw/pci/memory-sync.h
+ create mode 100644 include/hw/pci/proxy.h
+ create mode 100644 include/hw/remote/iohub.h
+ create mode 100644 include/io/mpqemu-link.h
+ create mode 100644 io/mpqemu-link.c
+ create mode 100755 scripts/mpqemu-launcher.py
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0886eb3..d781a28 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3035,6 +3035,14 @@ S: Maintained
- F: hw/semihosting/
- F: include/hw/semihosting/
- 
-+Multi-process QEMU
-+M: Jagannathan Raman <jag.raman@oracle.com>
-+M: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-+M: John G Johnson <john.g.johnson@oracle.com>
-+S: Maintained
-+F: hw/pci-host/remote.c
-+F: include/hw/pci-host/remote.h
-+
- Build and test automation
- -------------------------
- Build and test automation
-diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-index e422e0a..daf9007 100644
---- a/hw/pci-host/Makefile.objs
-+++ b/hw/pci-host/Makefile.objs
-@@ -18,6 +18,7 @@ common-obj-$(CONFIG_XEN_IGD_PASSTHROUGH) += xen_igd_pt.o
- common-obj-$(CONFIG_PCI_EXPRESS_Q35) += q35.o
- common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) += gpex.o
- common-obj-$(CONFIG_PCI_EXPRESS_XILINX) += xilinx-pcie.o
-+common-obj-$(CONFIG_MPQEMU) += remote.o
- 
- common-obj-$(CONFIG_PCI_EXPRESS_DESIGNWARE) += designware.o
- obj-$(CONFIG_POWERNV) += pnv_phb4.o pnv_phb4_pec.o
-diff --git a/hw/pci-host/remote.c b/hw/pci-host/remote.c
-new file mode 100644
-index 0000000..03c8e99
---- /dev/null
-+++ b/hw/pci-host/remote.c
-@@ -0,0 +1,76 @@
-+/*
-+ * Remote PCI host device
-+ *
-+ * Unlike PCI host devices that model physical hardware, the purpose
-+ * of this PCI host is to host multi-process QEMU devices.
-+ *
-+ * Multi-process QEMU extends the PCI host of a QEMU machine into a
-+ * remote process. Any PCI device attached to the remote process is
-+ * visible in the QEMU guest. This allows existing QEMU device models
-+ * to be reused in the remote process.
-+ *
-+ * This PCI host is purely a container for PCI devices. It's fake in the
-+ * sense that the guest never sees this PCI host and has no way of
-+ * accessing it. It's job is just to provide the environment that QEMU
-+ * PCI device models need when running in a remote process.
-+ *
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+
-+#include "hw/pci/pci.h"
-+#include "hw/pci/pci_host.h"
-+#include "hw/pci/pcie_host.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/pci-host/remote.h"
-+#include "exec/memory.h"
-+
-+static const char *remote_pcihost_root_bus_path(PCIHostState *host_bridge,
-+                                                PCIBus *rootbus)
-+{
-+    return "0000:00";
-+}
-+
-+static void remote_pcihost_realize(DeviceState *dev, Error **errp)
-+{
-+    char *busname = g_strdup_printf("remote-pci-%ld", (unsigned long)getpid());
-+    PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-+    RemotePCIHost *s = REMOTE_HOST_DEVICE(dev);
-+
-+    pci->bus = pci_root_bus_new(DEVICE(s), busname,
-+                                s->mr_pci_mem, s->mr_sys_io,
-+                                0, TYPE_PCIE_BUS);
-+}
-+
-+static void remote_pcihost_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_CLASS(klass);
-+
-+    hc->root_bus_path = remote_pcihost_root_bus_path;
-+    dc->realize = remote_pcihost_realize;
-+
-+    dc->user_creatable = false;
-+    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-+    dc->fw_name = "pci";
-+}
-+
-+static const TypeInfo remote_pcihost_info = {
-+    .name = TYPE_REMOTE_HOST_DEVICE,
-+    .parent = TYPE_PCIE_HOST_BRIDGE,
-+    .instance_size = sizeof(RemotePCIHost),
-+    .class_init = remote_pcihost_class_init,
-+};
-+
-+static void remote_pcihost_register(void)
-+{
-+    type_register_static(&remote_pcihost_info);
-+}
-+
-+type_init(remote_pcihost_register)
-diff --git a/include/hw/pci-host/remote.h b/include/hw/pci-host/remote.h
-new file mode 100644
-index 0000000..bab6d3c
---- /dev/null
-+++ b/include/hw/pci-host/remote.h
-@@ -0,0 +1,30 @@
-+/*
-+ * PCI Host for remote device
-+ *
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef REMOTE_PCIHOST_H
-+#define REMOTE_PCIHOST_H
-+
-+#include "exec/memory.h"
-+#include "hw/pci/pcie_host.h"
-+
-+#define TYPE_REMOTE_HOST_DEVICE "remote-pcihost"
-+#define REMOTE_HOST_DEVICE(obj) \
-+    OBJECT_CHECK(RemotePCIHost, (obj), TYPE_REMOTE_HOST_DEVICE)
-+
-+typedef struct RemotePCIHost {
-+    /*< private >*/
-+    PCIExpressHost parent_obj;
-+    /*< public >*/
-+
-+    MemoryRegion *mr_pci_mem;
-+    MemoryRegion *mr_sys_io;
-+} RemotePCIHost;
-+
-+#endif
 -- 
 1.8.3.1
 
