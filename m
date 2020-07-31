@@ -2,107 +2,85 @@ Return-Path: <SRS0=FShu=BK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3E6C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 08:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C95C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 08:41:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8CF120838
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 08:40:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FrRAg+xt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8CF120838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC3CF20838
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 Jul 2020 08:41:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC3CF20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1Qaf-0006c7-4T
-	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 04:40:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32838)
+	id 1k1Qbu-0007bI-Ox
+	for qemu-devel@archiver.kernel.org; Fri, 31 Jul 2020 04:41:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rmohr@redhat.com>) id 1k1Qa4-0006BF-CV
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 04:39:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47609
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <rmohr@redhat.com>) id 1k1Qa2-0006EN-Dx
- for qemu-devel@nongnu.org; Fri, 31 Jul 2020 04:39:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596184793;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=vLCcjsDe5WPrIchAiT+XruRPH9aIJZKT06MxjWX9+RE=;
- b=FrRAg+xtOpDyWqW3WRIcH+EgTfIRiwBlA18YDsznrQfuljsHlHRY1Mt+KrKs+YqJXlhYYd
- H+/ws/sC9PzcR05inU3AiD+DpXccoYz4o9z3kcvcC14Yo23ouO3eD5ZMMMTwfg8Umx2ypM
- xC42RFwcIvkSZqumQ2z8vJiZndzhPwY=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-i1v_zjkEMJWRmTLBgs1vDA-1; Fri, 31 Jul 2020 04:39:50 -0400
-X-MC-Unique: i1v_zjkEMJWRmTLBgs1vDA-1
-Received: by mail-oo1-f69.google.com with SMTP id t20so5735000oot.7
- for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 01:39:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vLCcjsDe5WPrIchAiT+XruRPH9aIJZKT06MxjWX9+RE=;
- b=A44gwDQN7prZNftU4508Sr1wbRNgPHif5JDY+SO/RyQtdzFeUx7qo61k6z2reZSISa
- E3uLNN6a/TlR6xu0Bo01S0gSTlTc1qXg+6xrP2wriPD5Ml45Kq9ogBUkEnuXoa+Eu0ut
- c6eybAUmI+j2dAJKe9FevKzCC/gzhXk1czknEMQOki7Tw6hqwOG3fgnS3Ie3pTwV9bjC
- 2mnY5pYFLwRtJxi5S5ocP/Wt5ku3XvLm4dZGa7pc3uT1GNJi/d+tS1t96DZTTXk+2TYX
- 73UpE0Z9kEQSmeBVmeDXJU/2RD1DBMlq1i4v9hCxFe0G6l2qZ4a9jGVlsWBWHtrO/eoR
- t0Ag==
-X-Gm-Message-State: AOAM532Pm//FHmPW6KPBlzCaUaiawsPFyU+GuU5rZXIHwURwZmAw5bop
- yVVo+0mdkbSNMD+ti5HtVTSSmtujOlG9XmIJjpqv4MamlZdLu8FomvkdeEcHWdfqNBOxXtrGWGH
- YXM3lutq80c4IZ3FmfBZgIPFKAxU/QNU=
-X-Received: by 2002:aca:1209:: with SMTP id 9mr2211091ois.136.1596184789256;
- Fri, 31 Jul 2020 01:39:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxX4fn3Alg8lc8GYtq9YBSgkyz8ejVQmYt4FW0/Yen3Zu+dgMWULJoZW2XoW8F7LUrgWduA86ex7VEjzRahk1Y=
-X-Received: by 2002:aca:1209:: with SMTP id 9mr2211081ois.136.1596184789018;
- Fri, 31 Jul 2020 01:39:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1Qb9-0007AD-Ki
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 04:41:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60296)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k1Qb7-0006Tj-Je
+ for qemu-devel@nongnu.org; Fri, 31 Jul 2020 04:41:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k1Qb5-0003bX-HC
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 08:40:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 33C252E80EE
+ for <qemu-devel@nongnu.org>; Fri, 31 Jul 2020 08:40:59 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200727190223.422280-1-stefanha@redhat.com>
- <20200727190223.422280-4-stefanha@redhat.com>
- <OSBPR01MB45826073E5A54CF869E56721E5730@OSBPR01MB4582.jpnprd01.prod.outlook.com>
- <CALDPj7syG0KPhtZEma5n403=YFZ2ptcD4MtP=GdrY9n1eUs5Eg@mail.gmail.com>
- <20200728131250.GB78409@redhat.com>
- <CALDPj7uvquu=YWX_Ve7ROdj=LZWjkgPOm+wvEAynGvjeF4Xivg@mail.gmail.com>
- <20200729144027.GF52286@stefanha-x1.localdomain>
- <ad75a25c-0343-5c57-1933-e3c88f76df1c@redhat.com>
- <20200731082638.GA173083@stefanha-x1.localdomain>
-In-Reply-To: <20200731082638.GA173083@stefanha-x1.localdomain>
-From: Roman Mohr <rmohr@redhat.com>
-Date: Fri, 31 Jul 2020 10:39:37 +0200
-Message-ID: <CALDPj7s-UjrvgD4-mhEwisetz7PtAO-RCmKvH+=1UTM8K8oLPw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and print an
- error
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=rmohr@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="0000000000005880c605abb8bb38"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=rmohr@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 04:39:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 Jul 2020 08:33:22 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1879672@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Opinion; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange philmd ubuntu-weilnetz
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <158996968484.21371.12685815665992748631.malonedeb@wampee.canonical.com>
+ <2acf854f-c49a-0811-31af-80e1e958f058@redhat.com>
+Message-ID: <324f5002-be0a-563e-b5a6-e08ee5e1ddad@redhat.com>
+Subject: [Bug 1879672] Re: [PATCH v2 0/3] testing: Build WHPX enabled binaries
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a7617c13ad4a6e2a4944317eb2c6c046c463d513
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/31 02:41:21
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -111,238 +89,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "vromanso@redhat.com" <vromanso@redhat.com>,
- Daniel Walsh <dwalsh@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "virtio-fs@redhat.com" <virtio-fs@redhat.com>,
- "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>,
- "mpatel@redhat.com" <mpatel@redhat.com>, Vivek Goyal <vgoyal@redhat.com>
+Reply-To: Bug 1879672 <1879672@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200731083322.ENhRhT75ndr6ZlmpCzUolBeHSkZ1fi7_HbqaUewWaO8@z>
 
---0000000000005880c605abb8bb38
-Content-Type: text/plain; charset="UTF-8"
+Hi Justin, Sunil,
 
-On Fri, Jul 31, 2020 at 10:26 AM Stefan Hajnoczi <stefanha@redhat.com>
-wrote:
+On 5/20/20 12:26 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> +launchpad ticket
+> =
 
-> On Thu, Jul 30, 2020 at 06:21:34PM -0400, Daniel Walsh wrote:
-> > On 7/29/20 10:40, Stefan Hajnoczi wrote:
-> > > On Wed, Jul 29, 2020 at 09:59:01AM +0200, Roman Mohr wrote:
-> > >> On Tue, Jul 28, 2020 at 3:13 PM Vivek Goyal <vgoyal@redhat.com>
-> wrote:
-> > >>
-> > >>> On Tue, Jul 28, 2020 at 12:00:20PM +0200, Roman Mohr wrote:
-> > >>>> On Tue, Jul 28, 2020 at 3:07 AM misono.tomohiro@fujitsu.com <
-> > >>>> misono.tomohiro@fujitsu.com> wrote:
-> > >>>>
-> > >>>>>> Subject: [PATCH v2 3/3] virtiofsd: probe unshare(CLONE_FS) and
-> print
-> > >>> an
-> > >>>>> error
-> > >> Yes they can run as root. I can tell you what we plan to do with the
-> > >> containerized virtiofsd: We run it as part of the user-owned pod (a
-> set of
-> > >> containers).
-> > >> One of our main goals at the moment is to run VMs in a user-owned pod
-> > >> without additional privileges.
-> > >> So that in case the user (VM-creator/owner) enters the pod or
-> something
-> > >> breaks out of the VM they are just in the unprivileged container
-> sandbox.
-> > >> As part of that we try to get also rid of running containers in the
-> > >> user-context with the root user.
-> > >>
-> > >> One possible scenario which I could think of as being desirable from a
-> > >> kubevirt perspective:
-> > >> We would run the VM in one container and have an unprivileged
-> > >> virtiofsd container in parallel.
-> > >> This container already has its own mount namespace and it is not that
-> > >> critical if something manages to enter this sandbox.
-> > >>
-> > >> But we are not as far yet as getting completely rid of root right now
-> in
-> > >> kubevirt, so if as a temporary step it needs root, the current
-> proposed
-> > >> changes would still be very useful for us.
-> > > What is the issue with root in user namespaces?
-> > >
-> > > I remember a few years ago it was seen as a major security issue but
-> > > don't remember if container runtimes were already using user namespaces
-> > > back then.
-> > >
-> > > I guess the goal might be simply to minimize Linux capabilities as much
-> > > as possible?
-> > >
-> > > virtiofsd could nominally run with an arbitrary uid/gid but it still
-> > > needs the Linux capabilities that allow it to change uid/gid and
-> > > override file system permission checks just like the root user. Not
-> sure
-> > > if there is any advantage to running with uid 1000 when you still have
-> > > these Linux capabilities.
-> > >
-> > > Stefan
-> >
-> > When you run in a user namespace, virtiofsd would only have
-> > setuid/setgid over the range of UIDs mapped into the user namespace.  So
-> > if UID=0 on the host is not mapped, then the container can not create
-> > real UID=0 files on disk.
-> >
-> > Similarly you can protect the user directories and any content by
-> > running the containers in a really high UID Mapping.
->
-> Roman, do user namespaces address your concerns about uid 0 in
-> containers?
->
+> On 9/20/19 6:53 PM, Justin Terry (VM) wrote:
+>> Hey Phil,
+>>
+>> I have contacted our legal department for guidance on this specific
+>> use case and will update you when I hear back. Thank you for your
+>> patience.
 
-They may eventually solve it. I would not let us hang up on this right now,
-since as said at least in kubevirt we can't get rid right now of root
-anyway.
-Even if it is at some point in the future save and supported on
-bleeding-edge managed k8s clusters to allow ordinary users to run with uid
-0, from my perspective it is right now common to restrict namespaces with
-PodSecurityPolicies or SecurityContexts to not allow running pods as root
-for normal users.
-It is also common that a significant part of the community users run docker
-and/or run on managed k8s clusters where they can not influence if
-user-namespaces are enabled, if they can run pods as root, if the runtime
-points to a seccomp file they like or if the runtime they prefer is used.
+I recently understood legal changes can be very complex, thus it is
+implicit it can take years before getting updates.
 
-But let me repeat again that we require root right now anyway and that we
-don't run the pods right now with the user privileges (but we should and we
-aim for that). Right now PSPs and SCCs restrict access to these pods by the
-users.
-So for our use case, at this exact moment root is acceptable, the unshare
-call is a little bit more problematic.
+Since the project is still actively developed, maybe you could provide
+a Azure CI job to build a WHPX binary. We don't need to have access to
+the binary, just to the exit status (success/fail) and build logs.
 
-Best Regards,
-Roman
+Do you think it is doable?
 
+Thanks,
 
+Phil.
 
->
-> Stefan
+>>
+>> Justin Terry
+>>
+>>> -----Original Message-----
+>>> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> Sent: Friday, September 20, 2019 8:18 AM
+>>> To: qemu-devel@nongnu.org; Justin Terry (VM) <juterry@microsoft.com>
+>>> Cc: Daniel P . Berrang=C3=A9 <berrange@redhat.com>; Fam Zheng
+>>> <fam@euphon.net>; Thomas Huth <thuth@redhat.com>; Paolo Bonzini
+>>> <pbonzini@redhat.com>; Alex Benn=C3=A9e <alex.bennee@linaro.org>; Richa=
+rd
+>>> Henderson <rth@twiddle.net>; Eduardo Habkost <ehabkost@redhat.com>;
+>>> Stefan Weil <sw@weilnetz.de>
+>>> Subject: Re: [PATCH v2 0/3] testing: Build WHPX enabled binaries
+>>>
+>>> On 9/20/19 1:33 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> Add a job to cross-build QEMU with WHPX enabled.
+>>>>
+>>>> Since the WHPX is currently broken, include the patch required to have
+>>>> successful Shippable build.
+>>>>
+>>>> I previously included the WHPX headers shared by the Android project,
+>>>> and Daniel asked me to check the EULA. While trying to manually
+>>>> install the Windows SDK, I noticed the installer fetches archives
+>>>> directly, kindly asking where they are stored via the /fwlink API.
+>>>> Do the same, fetch the required archives and extract them. No need to
+>>>> accept EULA...
+>>>>
+>>>> Docker build the image first, then build QEMU in a instance of this
+>>>> image. The image is internal to Shippable, the instances are not
+>>>> reachable and are thrown once the build is finished. What we collect
+>>>> from Shippable is the console output of QEMU build process, and if the
+>>>> build process succeed or failed. So far we do not redistribute the
+>>>> image or built binaries.
+>>>>
+>>>> Philippe Mathieu-Daud=C3=A9 (3):
+>>>> =C2=A0=C2=A0 target/i386: Fix broken build with WHPX enabled
+>>>> =C2=A0=C2=A0 tests/docker: Add fedora-win10sdk-cross image
+>>>> =C2=A0=C2=A0 .shippable.yml: Build WHPX enabled binaries
+>>>
+>>> FWIW here is the result of this series:
+>>> https://nam06.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fapp.
+>>> shippable.com%2Fgithub%2Fphilmd%2Fqemu%2Fruns%2F516%2F11%2Fcon
+>>> sole&amp;data=3D02%7C01%7Cjuterry%40microsoft.com%7C733a566f3233427
+>>> 8ae6f08d73dddb39f%7C72f988bf86f141af91ab2d7cd011db47%7C1%7C0%7C6
+>>> 37045894733463150&amp;sdata=3D55URgDII5r74QMUpLOD%2FWT5%2B5jbzyv
+>>> nfCSdv%2FNaWDAw%3D&amp;reserved=3D0
+>>> Duration 17 minutes (1076 seconds)
+>>>
+>>> 4m49s building the qemu:fedora-win10sdk-cross docker image, 11m10s
+>>> building WHPX QEMU.
 >
 
---0000000000005880c605abb8bb38
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Jul 31, 2020 at 10:26 AM Stef=
-an Hajnoczi &lt;<a href=3D"mailto:stefanha@redhat.com">stefanha@redhat.com<=
-/a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0=
-px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">O=
-n Thu, Jul 30, 2020 at 06:21:34PM -0400, Daniel Walsh wrote:<br>
-&gt; On 7/29/20 10:40, Stefan Hajnoczi wrote:<br>
-&gt; &gt; On Wed, Jul 29, 2020 at 09:59:01AM +0200, Roman Mohr wrote:<br>
-&gt; &gt;&gt; On Tue, Jul 28, 2020 at 3:13 PM Vivek Goyal &lt;<a href=3D"ma=
-ilto:vgoyal@redhat.com" target=3D"_blank">vgoyal@redhat.com</a>&gt; wrote:<=
-br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt;&gt; On Tue, Jul 28, 2020 at 12:00:20PM +0200, Roman Mohr wrot=
-e:<br>
-&gt; &gt;&gt;&gt;&gt; On Tue, Jul 28, 2020 at 3:07 AM <a href=3D"mailto:mis=
-ono.tomohiro@fujitsu.com" target=3D"_blank">misono.tomohiro@fujitsu.com</a>=
- &lt;<br>
-&gt; &gt;&gt;&gt;&gt; <a href=3D"mailto:misono.tomohiro@fujitsu.com" target=
-=3D"_blank">misono.tomohiro@fujitsu.com</a>&gt; wrote:<br>
-&gt; &gt;&gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt;&gt;&gt; Subject: [PATCH v2 3/3] virtiofsd: probe unsh=
-are(CLONE_FS) and print<br>
-&gt; &gt;&gt;&gt; an<br>
-&gt; &gt;&gt;&gt;&gt;&gt; error<br>
-&gt; &gt;&gt; Yes they can run as root. I can tell you what we plan to do w=
-ith the<br>
-&gt; &gt;&gt; containerized virtiofsd: We run it as part of the user-owned =
-pod (a set of<br>
-&gt; &gt;&gt; containers).<br>
-&gt; &gt;&gt; One of our main goals at the moment is to run VMs in a user-o=
-wned pod<br>
-&gt; &gt;&gt; without additional privileges.<br>
-&gt; &gt;&gt; So that in case the user (VM-creator/owner) enters the pod or=
- something<br>
-&gt; &gt;&gt; breaks out of the VM they are just in the unprivileged contai=
-ner sandbox.<br>
-&gt; &gt;&gt; As part of that we try to get also rid of running containers =
-in the<br>
-&gt; &gt;&gt; user-context with the root user.<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; One possible scenario which I could think of as being desirab=
-le from a<br>
-&gt; &gt;&gt; kubevirt perspective:<br>
-&gt; &gt;&gt; We would run the VM in one container and have an unprivileged=
-<br>
-&gt; &gt;&gt; virtiofsd container in parallel.<br>
-&gt; &gt;&gt; This container already has its own mount namespace and it is =
-not that<br>
-&gt; &gt;&gt; critical if something manages to enter this sandbox.<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; But we are not as far yet as getting completely rid of root r=
-ight now in<br>
-&gt; &gt;&gt; kubevirt, so if as a temporary step it needs root, the curren=
-t proposed<br>
-&gt; &gt;&gt; changes would still be very useful for us.<br>
-&gt; &gt; What is the issue with root in user namespaces?<br>
-&gt; &gt;<br>
-&gt; &gt; I remember a few years ago it was seen as a major security issue =
-but<br>
-&gt; &gt; don&#39;t remember if container runtimes were already using user =
-namespaces<br>
-&gt; &gt; back then.<br>
-&gt; &gt;<br>
-&gt; &gt; I guess the goal might be simply to minimize Linux capabilities a=
-s much<br>
-&gt; &gt; as possible?<br>
-&gt; &gt;<br>
-&gt; &gt; virtiofsd could nominally run with an arbitrary uid/gid but it st=
-ill<br>
-&gt; &gt; needs the Linux capabilities that allow it to change uid/gid and<=
-br>
-&gt; &gt; override file system permission checks just like the root user. N=
-ot sure<br>
-&gt; &gt; if there is any advantage to running with uid 1000 when you still=
- have<br>
-&gt; &gt; these Linux capabilities.<br>
-&gt; &gt;<br>
-&gt; &gt; Stefan<br>
-&gt; <br>
-&gt; When you run in a user namespace, virtiofsd would only have<br>
-&gt; setuid/setgid over the range of UIDs mapped into the user namespace.=
-=C2=A0 So<br>
-&gt; if UID=3D0 on the host is not mapped, then the container can not creat=
-e<br>
-&gt; real UID=3D0 files on disk.<br>
-&gt; <br>
-&gt; Similarly you can protect the user directories and any content by<br>
-&gt; running the containers in a really high UID Mapping.<br>
-<br>
-Roman, do user namespaces address your concerns about uid 0 in<br>
-containers?<br></blockquote><div><br>They may eventually solve it. I would =
-not let us hang up on this right now, since as said at least in kubevirt we=
- can&#39;t get rid right now of root anyway.<br>Even if it is at some point=
- in the future save and supported on bleeding-edge managed k8s clusters to =
-allow ordinary users to run with uid 0, from my perspective it is right now=
- common to restrict namespaces with PodSecurityPolicies or SecurityContexts=
- to not allow running pods as root for normal users.</div><div>It is also c=
-ommon that a significant part of the community users run docker and/or run =
-on managed k8s clusters where they can not influence if user-namespaces are=
- enabled, if they can run pods as root, if the runtime points to a seccomp =
-file they like or if the runtime they prefer is used.<br><br>But let me rep=
-eat again that we require root right now anyway and that we don&#39;t run t=
-he pods right now with the user privileges (but we should and we aim for th=
-at). Right now PSPs and SCCs restrict access to these pods by the users.</d=
-iv><div>So for our use case, at this exact moment root is acceptable, the u=
-nshare call is a little bit more problematic.<br></div><div><br>Best Regard=
-s,</div><div>Roman</div><div><br>=C2=A0</div><blockquote class=3D"gmail_quo=
-te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
-);padding-left:1ex">
-<br>
-Stefan<br>
-</blockquote></div></div>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1879672
 
---0000000000005880c605abb8bb38--
+Title:
+  QEMU installer with WHPX support
 
+Status in QEMU:
+  Opinion
+
+Bug description:
+  People often ask the community to add WHPX support to the QEMU installer =
+for Windows,
+  but it is impossible due to the license limitations of the WHPX SDK.
+
+  The WinHvEmulation.h and WinHvPlatform.h header files needed are "All
+  rights reserved".
+
+  However these headers only contain struct definitions and integer constan=
+ts,
+  no functional code in macros or inline functions. See:
+  https://www.mail-archive.com/qemu-devel@nongnu.org/msg645815.html
+  It is questionable whether the headers alone can be considered copyrighta=
+ble material.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1879672/+subscriptions
 
