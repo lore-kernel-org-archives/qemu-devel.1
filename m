@@ -2,52 +2,55 @@ Return-Path: <SRS0=xT3E=BL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C054C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Aug 2020 13:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6BFC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Aug 2020 13:15:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3612E2087C
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Aug 2020 13:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08FB0208A9
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Aug 2020 13:15:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="iYa8oLXq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3612E2087C
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Yz4q8YsF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08FB0208A9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k1rKw-0005p2-42
-	for qemu-devel@archiver.kernel.org; Sat, 01 Aug 2020 09:14:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37912)
+	id 1k1rM9-0006Wl-3c
+	for qemu-devel@archiver.kernel.org; Sat, 01 Aug 2020 09:15:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38238)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k1rHQ-0004wf-MQ
- for qemu-devel@nongnu.org; Sat, 01 Aug 2020 09:10:28 -0400
-Received: from mout.gmx.net ([212.227.15.18]:35029)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k1rJ4-0005N3-F1
+ for qemu-devel@nongnu.org; Sat, 01 Aug 2020 09:12:10 -0400
+Received: from mout.gmx.net ([212.227.15.18]:37241)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k1rHO-0003ee-O8
- for qemu-devel@nongnu.org; Sat, 01 Aug 2020 09:10:28 -0400
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k1rJ2-0003pF-Cq
+ for qemu-devel@nongnu.org; Sat, 01 Aug 2020 09:12:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1596287417;
- bh=yYSun86lxZi55MSReU2BnCVtqQNPdiECl2IkqQ3tM64=;
+ s=badeba3b8450; t=1596287510;
+ bh=mgJrx+RfUTfEX6RxCK8PTkbM4tIg6daq9WGPksyeePo=;
  h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=iYa8oLXqEY59K7GL47t7pJMMhguw58rttI2cjH36/X0E5rfWAP/wFePGyRNQrAI+Z
- DT0tNRMUp00Flxw3429nBY2VnumCXDJCeao5Siz+sBq6yykyqXNASDO5S/p90Z7Lfx
- to2Tqd1JalShf7ogi5Xvv+rzTfpW59fJeeoUjg9I=
+ b=Yz4q8YsFdQpG9YX448kPtFgrVHOYctPbCORylXett/uRjHKbYfADT17E+r6HcIOky
+ 1vdFyWVQdgQmizSr1eENdzeucmAMuCC3ua2H9YQpzRE+Gr3FdBGYoePK72GTdwpy3H
+ v7vnJTdoIuuxTOI5/aNoTQODDyvqGUYixA0scxE0=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from [192.168.20.60] ([92.116.162.176]) by mail.gmx.com (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MTRMs-1kBeNx1rZc-00TnlS; Sat, 01
- Aug 2020 15:10:17 +0200
-Subject: Re: [PATCH 4/4] hw/display/artist.c: fix out of bounds check
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1M5fIW-1k90yC0HzG-007AQ5; Sat, 01
+ Aug 2020 15:11:50 +0200
+Subject: Re: [PATCH 1/4] hw/hppa: Sync hppa_hardware.h file with SeaBIOS
+ sources
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
 References: <20200727214608.32710-1-deller@gmx.de>
- <20200727214608.32710-5-deller@gmx.de>
- <767c4e05-6018-7f99-4401-cbc1480c3d28@linaro.org>
+ <20200727214608.32710-2-deller@gmx.de>
+ <7a559501-3a8a-f778-6058-5407043bd1f7@amsat.org>
 From: Helge Deller <deller@gmx.de>
 Autocrypt: addr=deller@gmx.de; keydata=
  mQINBF3Ia3MBEAD3nmWzMgQByYAWnb9cNqspnkb2GLVKzhoH2QD4eRpyDLA/3smlClbeKkWT
@@ -106,38 +109,38 @@ Autocrypt: addr=deller@gmx.de; keydata=
  XzCscCr+pggvqX7kI33AQsxo1DT19sNYLU5dJ5Qxz1+zdNkB9kK9CcTVFXMYehKueBkk5MaU
  ou0ZH9LCDjtnOKxPuUWstxTXWzsinSpLDIpkP//4fN6asmPo2cSXMXE0iA5WsWAXcK8uZ4jD
  c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
-Message-ID: <a767a5b3-c10e-9ea3-ad6f-d342ca9d5c41@gmx.de>
-Date: Sat, 1 Aug 2020 15:10:14 +0200
+Message-ID: <ef18d47f-f37c-b93a-6921-c77d191ed7fc@gmx.de>
+Date: Sat, 1 Aug 2020 15:11:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <767c4e05-6018-7f99-4401-cbc1480c3d28@linaro.org>
+In-Reply-To: <7a559501-3a8a-f778-6058-5407043bd1f7@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:C8F/UArEEw5yb5LmQvM3l/oKiG1vmZl6c5mgJELE8m9Lk3TVyQI
- 3NI7ncR0/IAbuFKF/omIIm4VVrD7Qz7c8MJyYWr4szfUyVr4+Xqu9zJ6sbKI850TOKtLqyj
- /2AB8BQ3nb+TjTwn0HxcXZ3CvLuB+6H0xZRDdxPJW6ytDTxflvG6AEU54jxVI4d3dsXs0jx
- 2lH5miW6d3qsiOBbjpvEA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ZBnMs2COTD8=:SLrRcLtaOLIwyT0AFReMDL
- zdbv4cLqVNm+p/vjESoXCI7MpOrJ2O2P2WtxeZaVTi+oxyr1p1xnfQ11YnuTi6LYFwxTlUZBm
- CQXUQRJ7vvx8cjbpiWQGvAekBzF/YhNSmJgTi8ZcHH/T+xd2W64yd/FSUHOB6i5F+lzTuIS6H
- MpmW7xlMQPvaQ2CZxmHVbZasxfhouHVW2ini0cXQaRwWlYbDCVZrCxIwXy0bH3W9ra7QclBAb
- +b6Wg1ayw5r4+f1q+yOOJNVjzuAnT6GQIFrb2eDOCBrJW/DY6lHMG9jncps8yFuYdBkcBAAQ3
- UXsVF7n5XdULebWiOrETT8sIuswSkEZJo9bAeORpWdIeaAcGqZKKgzGmCJP0SLNxNjFJOlS7U
- SefGtCNojmipEf0fW9VFZ5jNO3/55U8SgJzeGx/h4Xz34rhEn9b1dHgV5S7L8PVpM+TtPDBPO
- X3NH5oAC2x4tOhOUnpEirXiorN9cMaD9VwXZpOicc69NQHdLdLlbKYvvxRBhzLnen02oxNx6k
- FliWo1GuvrL7uSvCzFPu/ShXvIlonKSpDyRTBb3S+3Xl+HO1yN2XstAA1b8OmJubyf2CwUQ+r
- bZ14FPiCVp4v1d7pbEiLxa0sACFNUHmMMdKTQarIPWXTO8BRd/XRbBdZcbYx1CR/kN54OjiA8
- 182LJcxP7KNdZ7rHnxvkChAqoGW34cELWT1HZTXsWKabsvQot7kcsaXGII2M5g5+kqE4dGrDO
- aypJFU8XxVcWGblvgpBlm9LHF0PuTg5JWfBn2o493L8pxPHyu5HMb5V7mHEKHfsuNnA2pVJg/
- Qebkbw5oVCOeO1QytN2FYp+23wbiSYJs4TQd3otKC/lfD1zn1yF/Zt/R13Xm49HCbHv/4DYgZ
- KNze+yhv5l4FmaS+lmdFtUkISNSUOASaNKu1B4kBdOBukhWLcvRh1AUf1ShT4fwBnOEbOD8jV
- sU4ADE71946tM+U9FIELTTWLnq7WYuZ7P2a7iV7g1KhTI+32HXBAltetdyjTg4sM1ovMEmOvb
- ETDtiXLXH2CYZzk1eWPvQ9AK7/Fg+pdQ5VrtLPZBNPxDEctZaRaPm0D5Ys75iObINTAUUxl2d
- zbqwkVqOGTCQA12YIsACowMAsz/o9fUP7ISiYQuGOFTHty4/hpVGHa7MwkxyZgPzRkUqm5FPi
- +XfQtewvnAOQpCjkG6AV9qTl6keCgzF4gvA3aBHDfsB1XT0n78m4ZA2/j/CKDf8kvT7bjH9hO
- 1pbuhgU82Tv5vBlk+
+X-Provags-ID: V03:K1:GSWDLjK6vAgQTbeGkT6X89wZHlAgEuh8UQAjhsizKdM1SGrkjgj
+ pS24mN3gEC5CDZvCYbb+07e/pRAVJIdCxtb3o2AEHHF7m9tRBIU2+SDAGtH1RfeTgpXudMK
+ IrA1g/WiWwXYlZ3FMKo3QhZN5uegAZBKVr1JugkO3kvw9UOW3i7e7a4BdU8ymv3Cc/s+d+J
+ fEcnTngSQUTzQTWfsoWgQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7da54BY1onk=:c3Cq5XLd4mE9jqTFvdQ3q3
+ k0+7yTTTZBMKQfpfrCjJvexhpCr6eVWKoc05G40mexal7gjQjJWSmVKjZvnnZt7yhJtTr44+G
+ qvTaP3sN12AkMbMKrpxdaX7xzJX375FVTXupQp8qH91q8mg7PC/Rw4ErBYQImMC120o9nevSr
+ EVzZEBmG8Z6kMw1ARx6pbvBbNt7uubHjcOeO/0O8AYvCIQTH7RcmFIhTmGyPHu1J6Y/91vUWE
+ j6zL7XZa8SaPVmLnwQ3nTorwV9qTXoK/xU1ewSCgHjCBz1yk67ObI/iwvW7O01bWs8Oj9yfDl
+ 7vLeeJMqhEy/I2PK8Z6vnGgryfvdxIEd/AYMUI7mETfi8ckfUZWMBMJmlKZ6nigKHSkKEIeOd
+ rva/ZmeSdnCt6lQZ6A3yrnjBk7GOhlkCMl3aMEo4WOdoifhm3isuWglsnu2M5nAJ5zKPYpAQ4
+ NlW9YQEW+vJFdM6ee3/rvEPm7rkUl88SMC4cefl7nlyo0bdrznzUPz34ia+0zu37cUrMdQIt8
+ Wuj6jf9GSN/MSlouvgnOfGAhIaRv1ZHFnb5RfBJZsnZG3/BKhNBHeo+jTqbOQvsElcGp3uycV
+ sTOdNfjpL6/NCgKGdtN5kJd/XaPdq0af2SwxWyKRr7QNzJy1VGfEvJSISud1BXbJl6qW23ozv
+ RFg0LPWftW0MXlbKl3SVtzuaDhwi9Uh3d0htqNwCrnhTK/F/fqb87qaLa2eeoci7ssoSn0HVL
+ uvPn80jTJKYmufRreCfzGYixJxYgerCqn5aL4LlAk0+C4eOOYrHlnsvAN2sRksKGIQThxmYHp
+ eeCz7bCw4lY/nWo8+g+fX6TB2UorlZVi75NZ0Nt58de0Q59tIaaTlkbPvSg3kfizj5JjIEbwX
+ OfrUcHyKzhnIhN29QnrckAqq8v8eanIPoq0zcrMiT+SU/kJUn941PodjigMhj9qQWIDzEBc3s
+ hwhpfJeaax5+08u0rh/fpzm/atz5XBTk8rjv6xyHfsipIInaZP3IRHlMDFdutKx16mwIfWZGj
+ Q3PC+q/MQY3iZrx2rEfMEqjUUqYXvTmOUh/FezBPJo+xgLdByIkL79zmuLBTVZVlrc2tGeiJg
+ YWrf/d8l0tB/vu4tZPaCPVqf+exeeJYUzTNC+3FFKTQjnyucm/Zty/s/qjWsvYrZo/DnET2ZP
+ 8O5pi25Nxw3vj8PR/pydZ0q1sVEabOE2Z6hdxuFdZDpPcf1ZpLGYFUMN19G6wHKAjitFsWsL3
+ uzbbeVHie7j5i3Svz
 Received-SPF: pass client-ip=212.227.15.18; envelope-from=deller@gmx.de;
  helo=mout.gmx.net
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/01 09:10:23
@@ -161,62 +164,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
+Cc: Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29.07.20 19:26, Richard Henderson wrote:
-> On 7/27/20 2:46 PM, Helge Deller wrote:
->> -        for (i =3D 0; i < pix_count; i++) {
->> +        for (i =3D 0; i < pix_count && offset + i < buf->size; i++) {
->>              artist_rop8(s, p + offset + pix_count - 1 - i,
->>                          (data & 1) ? (s->plane_mask >> 24) : 0);
->>              data >>=3D 1;
+On 29.07.20 20:21, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 7/27/20 11:46 PM, Helge Deller wrote:
+>> The hppa_hardware.h file is shared with SeaBIOS. Sync it.
+>>
+>> Signed-off-by: Helge Deller <deller@gmx.de>
+>> ---
+>>  hw/hppa/hppa_hardware.h | 6 ++++++
+>>  hw/hppa/lasi.c          | 2 --
+>>  2 files changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/hppa/hppa_hardware.h b/hw/hppa/hppa_hardware.h
+>> index 4a2fe2df60..cdb7fa6240 100644
+>> --- a/hw/hppa/hppa_hardware.h
+>> +++ b/hw/hppa/hppa_hardware.h
+>> @@ -17,6 +17,7 @@
+>>  #define LASI_UART_HPA   0xffd05000
+>>  #define LASI_SCSI_HPA   0xffd06000
+>>  #define LASI_LAN_HPA    0xffd07000
+>> +#define LASI_RTC_HPA    0xffd09000
 >
-> This doesn't look right.
->
-> You're writing to "offset + pix_count - 1 - i" and yet you're checking b=
-ounds
-> vs "offset + i".
->
-> This could be fixed by computing the complete offset into a local variab=
-le and
-> then have an inner if to avoid the write, as you do for the second loop.
->
-> But it would be better to precompute the correct loop bounds.
+> I find the line you are removing cleaner:
+> -#define LASI_RTC_HPA    (LASI_HPA + 0x9000)
 
-Thanks for the feedback.
-Will send out a revised version soon.
+Yes, but at least temporarily it should be consistent inside
+the header file.
+
+> "Offset in the LASI memory region".
+>
+> Anyway not a blocker.
+
+Ok, thanks!
 
 Helge
 
+
+> Having these values sorted would help.
 >
-> r~
->
->
->> @@ -398,7 +390,9 @@ static void vram_bit_write(ARTISTState *s, int posx=
-, int posy, bool incr_x,
->>          for (i =3D 3; i >=3D 0; i--) {
->>              if (!(s->image_bitmap_op & 0x20000000) ||
->>                  s->vram_bitmask & (1 << (28 + i))) {
->> -                artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i)]);
->> +                if (offset + 3 - i < buf->size) {
->> +                    artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i=
-)]);
->> +                }
->>              }
->>          }
->>          memory_region_set_dirty(&buf->mr, offset, 3);
->> @@ -420,7 +414,7 @@ static void vram_bit_write(ARTISTState *s, int posx=
-, int posy, bool incr_x,
->>              break;
->>          }
+>>  #define LASI_LPT_HPA    0xffd02000
+>>  #define LASI_AUDIO_HPA  0xffd04000
+>>  #define LASI_PS2KBD_HPA 0xffd08000
+>> @@ -37,10 +38,15 @@
+>>  #define PORT_PCI_CMD    (PCI_HPA + DINO_PCI_ADDR)
+>>  #define PORT_PCI_DATA   (PCI_HPA + DINO_CONFIG_DATA)
 >>
->> -        for (i =3D 0; i < pix_count; i++) {
->> +        for (i =3D 0; i < pix_count && offset + i < buf->size; i++) {
->>              mask =3D 1 << (pix_count - 1 - i);
+>> +/* QEMU fw_cfg interface port */
+>> +#define QEMU_FW_CFG_IO_BASE     (MEMORY_HPA + 0x80)
+>> +
+>>  #define PORT_SERIAL1    (DINO_UART_HPA + 0x800)
+>>  #define PORT_SERIAL2    (LASI_UART_HPA + 0x800)
 >>
->>              if (!(s->image_bitmap_op & 0x20000000) ||
+>>  #define HPPA_MAX_CPUS   8       /* max. number of SMP CPUs */
+>>  #define CPU_CLOCK_MHZ   250     /* emulate a 250 MHz CPU */
+>>
+>> +#define CPU_HPA_CR_REG  7       /* store CPU HPA in cr7 (SeaBIOS inter=
+nal) */
+>> +
+>>  #endif
+>> diff --git a/hw/hppa/lasi.c b/hw/hppa/lasi.c
+>> index 19974034f3..ffcbb988b8 100644
+>> --- a/hw/hppa/lasi.c
+>> +++ b/hw/hppa/lasi.c
+>> @@ -54,8 +54,6 @@
+>>  #define LASI_CHIP(obj) \
+>>      OBJECT_CHECK(LasiState, (obj), TYPE_LASI_CHIP)
+>>
+>> -#define LASI_RTC_HPA    (LASI_HPA + 0x9000)
+>> -
+>>  typedef struct LasiState {
+>>      PCIHostState parent_obj;
+>>
+>> --
+>> 2.21.3
+>>
+>>
+>
 
 
