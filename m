@@ -2,80 +2,101 @@ Return-Path: <SRS0=xk1j=BM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57528C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 04:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC26C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 05:14:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2272B2072A
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 04:36:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2272B2072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E514D2075A
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 05:14:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XjbTw9/R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E514D2075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k25jO-0006eZ-BG
-	for qemu-devel@archiver.kernel.org; Sun, 02 Aug 2020 00:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51930)
+	id 1k26KW-000671-4f
+	for qemu-devel@archiver.kernel.org; Sun, 02 Aug 2020 01:14:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k25ig-0006Es-T6
- for qemu-devel@nongnu.org; Sun, 02 Aug 2020 00:35:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42082)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k25ie-0008R8-E3
- for qemu-devel@nongnu.org; Sun, 02 Aug 2020 00:35:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k25ib-00061z-Ed
- for <qemu-devel@nongnu.org>; Sun, 02 Aug 2020 04:35:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5DF482E80E7
- for <qemu-devel@nongnu.org>; Sun,  2 Aug 2020 04:35:29 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k26Jx-0005gi-N0
+ for qemu-devel@nongnu.org; Sun, 02 Aug 2020 01:14:05 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44216
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k26Jv-0004kj-B4
+ for qemu-devel@nongnu.org; Sun, 02 Aug 2020 01:14:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596345241;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=VTnxfCts2RzMRFnCi4ffrOF3VbZeyt+xTn4uuuB9KuM=;
+ b=XjbTw9/RaNAmG96v1itl42WT6NcPDRuJIpdu6z/A63FtcuBTWaSp6KGui1b5LWH5ZiUvOI
+ jQrJeGGEzK2ZxX577YqigatxbJ7YGv9AfounroaLCi25aqfrngZDT74Wbo9isTezHs8I4s
+ cmyc98Nfh3B6vH/URV7ceeyfiN4ObqM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-9D2r9xDHOKeGU0nTmG8hcQ-1; Sun, 02 Aug 2020 01:13:58 -0400
+X-MC-Unique: 9D2r9xDHOKeGU0nTmG8hcQ-1
+Received: by mail-wr1-f69.google.com with SMTP id b8so635823wrr.2
+ for <qemu-devel@nongnu.org>; Sat, 01 Aug 2020 22:13:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=VTnxfCts2RzMRFnCi4ffrOF3VbZeyt+xTn4uuuB9KuM=;
+ b=mTNapk1d/g486B1JBIxY11DjgMr8PdgbasnCxlTcBEKpxIlDGXRXEBUbeJ6awTzpZc
+ vYGDAh4gKFlpmvpFP/uTPXIpU0anjKbczrGZjW+1lX8uuEgIBFxLbPV+FGU7lGJbf6pN
+ eDP1ydv2hU7kjPKD09X0fp117OYAsNgb+PFfmIonxgJdNcW28mAPQGDeaMYsZ5CRwm90
+ CZZjnaFoGODuBF+VhMabK61e+7VqpwEB+v3T/GDqU47xiuMPmHw++IvPZh8QN5RD0dnE
+ qwtwLO9qtDtmvzHAIzIIhOvcIfcEwFs85pGe7DvF3wh+xIo36Z8t/yQkypdkKIXmmzNe
+ VQfw==
+X-Gm-Message-State: AOAM533LcL3Qh0Kox8UC/O30uuFiJsp00lHSmQm36JvoBWuzusDAKZd2
+ JxxxXP4zhsXzQ/OjqZ3AMZ5fyC0AeB+covnYhPopBwTinmmwoWhD28/Pfmw1PHAOqOe1RDrtRkC
+ hzF+rFhwVThmFvyI=
+X-Received: by 2002:a1c:6446:: with SMTP id y67mr10443478wmb.49.1596345237406; 
+ Sat, 01 Aug 2020 22:13:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxbqrRrpjzcbZiN70pmuewDCHBr5bMQ9tlZ7hVrrTqNfNrG20SkfUrNzaUYchA3vUHc8m7BIg==
+X-Received: by 2002:a1c:6446:: with SMTP id y67mr10443464wmb.49.1596345237225; 
+ Sat, 01 Aug 2020 22:13:57 -0700 (PDT)
+Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
+ by smtp.gmail.com with ESMTPSA id g188sm20416034wma.5.2020.08.01.22.13.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 01 Aug 2020 22:13:56 -0700 (PDT)
+Date: Sun, 2 Aug 2020 01:13:53 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Marc Hartmayer <mhartmay@linux.ibm.com>
+Subject: Re: [PATCH 0/2] Enable virtio-fs on s390x
+Message-ID: <20200802011337-mutt-send-email-mst@kernel.org>
+References: <20200730140731.32912-1-mhartmay@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 02 Aug 2020 04:29:37 -0000
-From: Patrick Magauran <1889943@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: patmagauran
-X-Launchpad-Bug-Reporter: Patrick Magauran (patmagauran)
-X-Launchpad-Bug-Modifier: Patrick Magauran (patmagauran)
-References: <159622949743.5060.8912306868276612545.malonedeb@soybean.canonical.com>
-Message-Id: <159634257744.3361.8442021489420408279.malone@gac.canonical.com>
-Subject: [Bug 1889943] Re: Improper TCP/IP packet splitting on e1000e/vmxnet3
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2ba648486f158aa1183f0e00eb3d05ad123d1852
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/02 00:35:29
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200730140731.32912-1-mhartmay@linux.ibm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/02 01:03:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,129 +105,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1889943 <1889943@bugs.launchpad.net>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After stepping through the code, it has become clear that the
-e1000e/vmxnet3 emulated models do not implement TCP segmentation,
-however they still "advertise" it as a feature to the guest OS.
+On Thu, Jul 30, 2020 at 04:07:29PM +0200, Marc Hartmayer wrote:
+> This patch series is about enabling virtio-fs on s390x. For that we need
+>  + some shim code (first patch), and we need
+>  + libvhost-user to deal with virtio endiannes for non-legacy virtio
+>    devices as mandated by the spec.
+> 
+> How to use?
+> 
+> For general instructions how to use virtio-fs (on x86) please have a
+> look at https://virtio-fs.gitlab.io/howto-qemu.html. Most of the
+> instructions can also be applied on s390x.
+> 
+> In short:
+> 
+> 1. Install self-compiled QEMU with this patch series applied
+> 2. Prepare host and guest kernel so they support virtio-fs
+> 
+> Start virtiofsd on the host
+> 
+>  $ virtiofsd -f --socket-path=/tmp/vhostqemu -o source=/tmp/shared
+> 
+> Now you can start QEMU in a separate shell on the host:
+> 
+>  $ qemu-system-s390x -machine type=s390-ccw-virtio,accel=kvm,memory-backend=mem \
+>    -object memory-backend-file,id=mem,size=2G,mem-path=/dev/shm/virtiofs,share=on,prealloc=on,prealloc-threads=1 \
+>    -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-ccw,queue-size=1024,chardev=char0,tag=myfs \
+>    -drive if=virtio,file=disk.qcow2 \
+>    -m 2G -smp 2 -nographic
+> 
+> Log into the guest and mount it
+> 
+>  $ mount -t virtiofs myfs /mnt
 
-Regarding my prior interpretation, the implementation is written to
-forward the entire packet to the host OS if the has_vnet_hdr variable is
-set, which is passed all the way up from the IFF_VNET_HDR on the tap/tun
-interface. I am not sure what the kernel considers when setting that
-flag, but it appears that it is true when in a host-only configuration,
-and false otherwise. I may look into the virtio implementation to see
-how it affects that because they are linked.
+Who's merging this? My tree?
 
-In order to fix this, it would likely be possible to modify the
-net_tx_pkt_do_sw_fragmentation function in net_tx_pkt.c to incorporate
-the full set of offloads, not just ipv4.
+> Changelog:
+>  RFC v2 -> v1:
+>  - patch 1:
+>   + Added `force_revision_1 = true` (Conny)
+>   + I didn't add the r-b from Stefan Hajnoczi as I've added the
+>     changes suggested by Conny
+>  - squashed patches 2 and 3:
+>   + removed assertion in performance critical code path (Stefan)
+>   + dropped all dead code (Stefan)
+>   + removed libvhost-access.h
+>   
+>  RFC v1 -> RFC v2:
+>   + rebased
+>   + drop patch "libvhost-user: print invalid address on vu_panic" as it's not related to this series
+>   + drop patch "[RFC 4/4] HACK: Hard-code the libvhost-user.o-cflags for s390x"
+>   + patch "virtio: add vhost-user-fs-ccw device": replace qdev_set_parent_bus and object_property_set_bool by qdev_realize
+>   + patch "libvhost-user: handle endianness as mandated by the spec":
+>     Drop support for legacy virtio devices
+>   + add patch to fence legacy virtio devices
+> *** BLURB HERE ***
+> 
+> Halil Pasic (1):
+>   virtio: add vhost-user-fs-ccw device
+> 
+> Marc Hartmayer (1):
+>   libvhost-user: handle endianness as mandated by the spec
+> 
+>  contrib/libvhost-user/libvhost-user.c | 77 +++++++++++++++------------
+>  hw/s390x/Makefile.objs                |  1 +
+>  hw/s390x/vhost-user-fs-ccw.c          | 75 ++++++++++++++++++++++++++
+>  3 files changed, 119 insertions(+), 34 deletions(-)
+>  create mode 100644 hw/s390x/vhost-user-fs-ccw.c
+> 
+> -- 
+> 2.25.4
 
-Because both the e1000e and the vmxnet3 implmentations share net_tx_pkt
-functions, this could fix both.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1889943
-
-Title:
-  Improper TCP/IP packet splitting on e1000e/vmxnet3
-
-Status in QEMU:
-  New
-
-Bug description:
-  Problem Description:
-  When using a tap interface and the guest sends a TCP packet that would ne=
-ed to be segmented, it is fragmented using IP fragmentation. The host does =
-not reassemble the IP fragments and forwards them to the next hop. This cau=
-ses issues on certain ISPs, which seemingly reject IP fragments(Verizon Fio=
-s). =
-
-  This issue occurs on the e1000e and vmxnet3 NIC models, and possibly othe=
-rs. It does not occur on the virtio(which passes the entire packet through =
-to the host w/o fragmentation or segmentation) or the e1000 model(). =
-
-
-  Test scenario:
-  Setup a tap and network bridge using the directions here: https://gist.gi=
-thub.com/extremecoders-re/e8fd8a67a515fee0c873dcafc81d811c
-  Boot the machine into any modern guest(a Fedora 31 live iso was used for =
-testing)
-  Begin a wireshark capture on the host machine
-  On the host(or another machine on the network) run: npx http-echo-server(=
-See https://github.com/watson/http-echo-server)
-  On the guest run
-  Curl -d =E2=80=9CLorem ipsum dolor sit amet, consectetur adipiscing elit.=
- Maecenas venenatis viverra ipsum, ac tincidunt est rhoncus eu. Suspendisse=
- vehicula congue ante, non rhoncus elit tempus vitae. Duis ac leo massa. Do=
-nec rutrum condimentum turpis nec ultricies. Duis laoreet elit eu arcu pulv=
-inar, vitae congue neque mattis. Mauris sed ante nunc. Vestibulum vitae urn=
-a a tellus maximus sagittis. Vivamus luctus pellentesque neque, vel tempor =
-purus porta ut. Phasellus at quam bibendum, fermentum libero sit amet, ulla=
-mcorper mauris. In rutrum sit amet dui id maximus. Ut lectus ligula, hendre=
-rit nec aliquam non, finibus a turpis. Proin scelerisque convallis ante, et=
- pharetra elit. Donec nunc nisl, viverra vitae dui at, posuere rhoncus nibh=
-. Mauris in massa quis neque posuere placerat quis quis massa. Donec quis l=
-acus ligula. Donec mollis vel nisi eget elementum. Nam id magna porta nunc =
-consectetur efficitur ac quis lorem. Cras faucibus vel ex porttitor mattis.=
- Praesent in mattis tortor. In venenatis convallis quam, in posuere nibh. P=
-roin non dignissim massa. Cras at mi ut lorem tristique fringilla. Nulla ac=
- quam condimentum metus tincidunt vulputate ut at leo. Nunc pellentesque, n=
-unc vel rhoncus condimentum, arcu sem molestie augue, in suscipit mauris od=
-io mollis odio. Integer hendrerit lectus a leo facilisis, in accumsan urna =
-maximus. Nam nec odio volutpat, varius est id, tempus libero. Vestibulum lo=
-bortis tortor quam, ac scelerisque urna rhoncus in. Etiam tempor, est sit a=
-met vulputate molestie, urna neque sodales leo, sit amet blandit risus feli=
-s sed est. Nulla eu eros nec tortor dapibus maximus faucibus ut erat. Ut ph=
-aretra tempor massa in bibendum. Interdum et malesuada fames ac ante ipsum =
-primis in faucibus. Etiam mattis molestie felis eu efficitur. Morbi tincidu=
-nt consectetur diam tincidunt feugiat. Morbi euismod ut lorem finibus pelle=
-ntesque. Aliquam eu porta ex. Aliquam cursus, orci sit amet volutpat egesta=
-s, est est pulvinar erat, sed luctus nisl ligula eget justo vestibulum.=E2=
-=80=9D <ECHOSERVERIP:PORT>
-
-  2000 bytes of Lorem Ipsum taken from https://www.lipsum.com/
-
-  Compare results from an e1000, a virtio, and a e1000e card:
-  +--------+-----------+---------+------------+
-  | Model  | Fragment  | Segment | Wire Size  |
-  +--------+-----------+---------+------------+
-  | e1000e | Yes       | NO      | 1484 + 621 |
-  +--------+-----------+---------+------------+
-  | e1000  | No        | Yes     | 1516 + 620 |
-  +--------+-----------+---------+------------+
-  | Virtio | NO        | NO      | 2068       |
-  +--------+-----------+---------+------------+
-
-  Expected Results:
-  TCP Segment to proper size OR pass full size to host and let the host spl=
-it if necessary.
-
-  Configuration changes that did not work:
-  Disable host, guest, router firewalls
-  Different Hosts
-  Different Physical NICs
-  Libvirt based NAT/Routed modes
-  Fedora 32 vs 31
-  Qemu 4.2.0 vs github commit d74824cf7c8b352f9045e949dc636c7207a41eee
-
-  System Information:
-  lsb_release -rd
-  Description:	Fedora release 32 (Thirty Two)
-  Release:	32
-
-  uname -a
-  Linux pats-laptop-linux 5.7.10-201.fc32.x86_64 #1 SMP Thu Jul 23 00:58:39=
- UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
-
-  I can provide additional logs, debug info, etc. if needed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1889943/+subscriptions
 
