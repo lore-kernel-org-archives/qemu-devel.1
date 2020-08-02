@@ -2,76 +2,94 @@ Return-Path: <SRS0=xk1j=BM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF7CC433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 13:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA244C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 14:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F26B2065C
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 13:40:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F26B2065C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emindsoft.com.cn
+	by mail.kernel.org (Postfix) with ESMTPS id 7C7E320738
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 14:44:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKAE88fx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C7E320738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2EED-0000R8-Jn
-	for qemu-devel@archiver.kernel.org; Sun, 02 Aug 2020 09:40:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46730)
+	id 1k2FDV-0003vL-Lk
+	for qemu-devel@archiver.kernel.org; Sun, 02 Aug 2020 10:44:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
- id 1k2EDe-0008RX-9E
- for qemu-devel@nongnu.org; Sun, 02 Aug 2020 09:40:06 -0400
-Received: from lucky1.263xmail.com ([211.157.147.130]:44286)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chengang@emindsoft.com.cn>)
- id 1k2EDb-0007kU-5a
- for qemu-devel@nongnu.org; Sun, 02 Aug 2020 09:40:06 -0400
-Received: from localhost (unknown [192.168.167.32])
- by lucky1.263xmail.com (Postfix) with ESMTP id 995BBCAC46
- for <qemu-devel@nongnu.org>; Sun,  2 Aug 2020 21:39:45 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ADDR-CHECKED4: 1
-X-ANTISPAM-LEVEL: 2
-X-ABS-CHECKED: 0
-Received: from localhost.localdomain (unknown [120.244.108.108])
- by smtp.263.net (postfix) whith ESMTP id
- P31037T140065908971264S1596375579754136_; 
- Sun, 02 Aug 2020 21:39:45 +0800 (CST)
-X-UNIQUE-TAG: <5e4d2f1d095839f4fa60745582fb3ea1>
-X-RL-SENDER: chengang@emindsoft.com.cn
-X-SENDER: chengang@emindsoft.com.cn
-X-LOGIN-NAME: chengang@emindsoft.com.cn
-X-FST-TO: laurent@vivier.eu
-X-SENDER-IP: 120.244.108.108
-X-ATTACHMENT-NUM: 0
-X-DNS-TYPE: 0
-X-System-Flag: 0
-From: chengang@emindsoft.com.cn
-To: laurent@vivier.eu
-Subject: [PATCH v2] linux-user: syscall: ioctls: support
- DRM_IOCTL_I915_GETPARAM
-Date: Sun,  2 Aug 2020 21:39:38 +0800
-Message-Id: <20200802133938.12055-1-chengang@emindsoft.com.cn>
-X-Mailer: git-send-email 2.24.0.308.g228f53135a
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=211.157.147.130;
- envelope-from=chengang@emindsoft.com.cn; helo=lucky1.263xmail.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/02 09:39:50
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -28
-X-Spam_score: -2.9
+ (Exim 4.90_1) (envelope-from <dmitry.fleytman@gmail.com>)
+ id 1k2FCy-0003WG-MU
+ for qemu-devel@nongnu.org; Sun, 02 Aug 2020 10:43:28 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53807)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <dmitry.fleytman@gmail.com>)
+ id 1k2FCx-0006nW-77
+ for qemu-devel@nongnu.org; Sun, 02 Aug 2020 10:43:28 -0400
+Received: by mail-wm1-x343.google.com with SMTP id g8so12191467wmk.3
+ for <qemu-devel@nongnu.org>; Sun, 02 Aug 2020 07:43:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=lYQL71sX6J6/Y/YbJMdaGZ52xMj2hAhnKLXedjS6zus=;
+ b=PKAE88fx2u1JFwMrbfnlkzFgU6/EQTBqM0LFXsuSexedQ1uNmmzX6ojceTE3bFaCpL
+ B2SUQ1DXlGz49px3EkcnHO7lMthWIH7DagrnXpib/BBjGXsrV8K0Nkq1nI0ZqFFhkiK2
+ wJ9ZuaMBD4+Z4dS4084lmxh4qOChm4uULbeSXViCXOVXOh3bUOIdVqXdpx7m+plQQ5Mq
+ 4pmuHEMd7i3JyC/Jw7zlau6x/wSecvYrzrSy4RfrjaOptZrc/13CcN9GOu9QY3cSaHlQ
+ +bO5+ktlUmfQ+oTxbimLdR3Lov5fQZrYXnpDHqoUqy49q3N/OXOiATcH/mPeKxGAq/pZ
+ 56ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=lYQL71sX6J6/Y/YbJMdaGZ52xMj2hAhnKLXedjS6zus=;
+ b=LyuCOadefFb7j+nH4lCKO5K2RSLPZGDMSIIyftomvmLjFNRynpz2C5r4q2nhHOF2Z0
+ C7TBVxsnMr8Tq01Kx1I0KSOiZlJZDgryiQo0rqMRtm6T/8lD+Vn3n0ooeXC+sP5gaOOz
+ FfyVmvKXBfventoe3o9u8zMw6SP6h7Fdh5xvneiqJLgeyKJQOBx1affwQYoatSFCgTB6
+ u8Tv8U4oK7SQTuDI2JT2L9N9wj6/SDqlZvdI/gqapCMHCGq5dRv0mXheQvTV/uAMvfnN
+ bQJop9LRqdDzweb9UahrscmMLXAb/zuoE1SATYIKHqGOHhOKVzajaggcYo/ifwV6hNZy
+ iRAA==
+X-Gm-Message-State: AOAM533yu8xpDqnzWFhyfWqhjGPSFCNGf74bY99v/dyVXDncSXLI915l
+ 5yFdf+4euNjAPoi7aYKcOHo=
+X-Google-Smtp-Source: ABdhPJzLu8Ry3bQ1k3mLa10mUT5wJSp7wVIWMS1ospO+O/hX0xz528DaHlf7Boz3OFf81kEK9N0UoQ==
+X-Received: by 2002:a1c:26c4:: with SMTP id m187mr11779148wmm.90.1596379404929; 
+ Sun, 02 Aug 2020 07:43:24 -0700 (PDT)
+Received: from [192.168.1.90] ([5.102.195.137])
+ by smtp.gmail.com with ESMTPSA id f15sm18240825wmj.39.2020.08.02.07.43.23
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 02 Aug 2020 07:43:24 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
+Subject: Re: [PATCH v2] hw/net/net_tx_pkt: fix assertion failure in
+ net_tx_pkt_add_raw_fragment()
+From: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+In-Reply-To: <20200801164238.1610609-1-mcascell@redhat.com>
+Date: Sun, 2 Aug 2020 17:43:22 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <E55CC0D0-FD86-472E-8A7F-F05F39855D7A@gmail.com>
+References: <20200801164238.1610609-1-mcascell@redhat.com>
+To: Mauro Matteo Cascella <mcascell@redhat.com>
+X-Mailer: Apple Mail (2.3608.80.23.2.2)
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=dmitry.fleytman@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,134 +102,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: chengang@emindsoft.com.cn, qemu-devel@nongnu.org
+Cc: Alexander Bulekov <alxndr@bu.edu>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, ezrakiez@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Gang <chengang@emindsoft.com.cn>
 
-Another DRM_IOCTL_I915 patches will be sent next.
-
-Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
----
- linux-user/ioctls.h        |  3 +++
- linux-user/syscall.c       | 35 +++++++++++++++++++++++++++++++++++
- linux-user/syscall_defs.h  |  8 ++++++++
- linux-user/syscall_types.h |  4 ++++
- 4 files changed, 50 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 0713ae1311..e2fc09b5a5 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -581,6 +581,9 @@
- #ifdef HAVE_DRM_H
-   IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
-                 MK_PTR(MK_STRUCT(STRUCT_drm_version)))
-+
-+  IOCTL_SPECIAL(DRM_IOCTL_I915_GETPARAM, IOC_RW, do_ioctl_drm_i915,
-+                MK_PTR(MK_STRUCT(STRUCT_drm_i915_getparam)))
- #endif
- 
- #ifdef TARGET_TIOCSTART
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 945fc25279..b0e15f373c 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -114,6 +114,7 @@
- #include <sound/asound.h>
- #ifdef HAVE_DRM_H
- #include <libdrm/drm.h>
-+#include <libdrm/i915_drm.h>
- #endif
- #include "linux_loop.h"
- #include "uname.h"
-@@ -5413,6 +5414,40 @@ static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
-     return -TARGET_ENOSYS;
- }
- 
-+static abi_long do_ioctl_drm_i915_getparam(const IOCTLEntry *ie,
-+                                           struct drm_i915_getparam *gparam,
-+                                           int fd, abi_long arg)
-+{
-+    abi_long ret;
-+    int value;
-+    struct target_drm_i915_getparam *target_gparam;
-+
-+    if (!lock_user_struct(VERIFY_READ, target_gparam, arg, 0)) {
-+        return -TARGET_EFAULT;
-+    }
-+
-+    __get_user(gparam->param, &target_gparam->param);
-+    gparam->value = &value;
-+    ret = get_errno(safe_ioctl(fd, ie->host_cmd, gparam));
-+    put_user_s32(value, target_gparam->value);
-+
-+    unlock_user_struct(target_gparam, arg, 0);
-+    return ret;
-+}
-+
-+static abi_long do_ioctl_drm_i915(const IOCTLEntry *ie, uint8_t *buf_temp,
-+                                  int fd, int cmd, abi_long arg)
-+{
-+    switch (ie->host_cmd) {
-+    case DRM_IOCTL_I915_GETPARAM:
-+        return do_ioctl_drm_i915_getparam(ie,
-+                                          (struct drm_i915_getparam *)buf_temp,
-+                                          fd, arg);
-+    default:
-+        return -TARGET_ENOSYS;
-+    }
-+}
-+
- #endif
- 
- IOCTLEntry ioctl_entries[] = {
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 3c261cff0e..5a1692aa26 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1170,6 +1170,9 @@ struct target_rtc_pll_info {
- /* drm ioctls */
- #define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
- 
-+/* drm i915 ioctls */
-+#define TARGET_DRM_IOCTL_I915_GETPARAM              TARGET_IOWRU('d', 0x46)
-+
- /* from asm/termbits.h */
- 
- #define TARGET_NCC 8
-@@ -2613,6 +2616,11 @@ struct target_drm_version {
-     abi_ulong desc;
- };
- 
-+struct target_drm_i915_getparam {
-+    int param;
-+    abi_ulong value;
-+};
-+
- #include "socket.h"
- 
- #include "errno_defs.h"
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 3f1f033464..12bf3484e2 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -325,6 +325,10 @@ STRUCT(drm_version,
-        TYPE_ULONG, /* desc_len */
-        TYPE_PTRVOID) /* desc */
- 
-+STRUCT(drm_i915_getparam,
-+       TYPE_INT, /* param */
-+       TYPE_PTRVOID) /* value */
-+
- STRUCT(file_clone_range,
-        TYPE_LONGLONG, /* src_fd */
-        TYPE_ULONGLONG, /* src_offset */
--- 
-2.24.0.308.g228f53135a
+> On 1 Aug 2020, at 19:42, Mauro Matteo Cascella <mcascell@redhat.com> =
+wrote:
+>=20
+> An assertion failure issue was found in the code that processes =
+network packets
+> while adding data fragments into the packet context. It could be =
+abused by a
+> malicious guest to abort the QEMU process on the host. This patch =
+replaces the
+> affected assert() with a conditional statement, returning false if the =
+current
+> data fragment exceeds max_raw_frags.
+>=20
 
 
+Reviewed-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+
+
+> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+> Reported-by: Ziming Zhang <ezrakiez@gmail.com>
+> Signed-off-by: Mauro Matteo Cascella <mcascell@redhat.com>
+> ---
+> hw/net/net_tx_pkt.c | 5 ++++-
+> 1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+> index 9560e4a49e..da262edc3e 100644
+> --- a/hw/net/net_tx_pkt.c
+> +++ b/hw/net/net_tx_pkt.c
+> @@ -379,7 +379,10 @@ bool net_tx_pkt_add_raw_fragment(struct NetTxPkt =
+*pkt, hwaddr pa,
+>     hwaddr mapped_len =3D 0;
+>     struct iovec *ventry;
+>     assert(pkt);
+> -    assert(pkt->max_raw_frags > pkt->raw_frags);
+> +
+> +    if (pkt->raw_frags >=3D pkt->max_raw_frags) {
+> +        return false;
+> +    }
+>=20
+>     if (!len) {
+>         return true;
+> --=20
+> 2.26.2
+>=20
 
 
