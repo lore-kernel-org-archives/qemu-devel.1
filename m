@@ -2,99 +2,124 @@ Return-Path: <SRS0=xk1j=BM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755F3C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 05:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD0BC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 11:21:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F3772075A
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 05:15:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B07222075A
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Aug 2020 11:21:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PmABQoZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F3772075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="iSctxikU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B07222075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k26Ll-00076O-GY
-	for qemu-devel@archiver.kernel.org; Sun, 02 Aug 2020 01:15:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58836)
+	id 1k2C3l-0000L4-U6
+	for qemu-devel@archiver.kernel.org; Sun, 02 Aug 2020 07:21:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k26Kw-0006aU-Bx
- for qemu-devel@nongnu.org; Sun, 02 Aug 2020 01:15:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60517
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k26Kt-0004q1-Jr
- for qemu-devel@nongnu.org; Sun, 02 Aug 2020 01:15:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596345302;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=t940nU9dWew1+U6Rir6rGT42NaRg3ivb+22ham5KRS8=;
- b=PmABQoZ68l11MPLgL8QnuDpai9Ul0Kmxfk2+oHScqTyMgfFl+6HoPLSjKVRrQ+VTnCZ/cQ
- nIMlsInhYGdNfGhlMOtx9OoyPu0l1J8BPqhvNN91xlGm6PMls0wgutfc9f6TcYPBZH+eLn
- WroZId115cGF+WQam5226hPWhigs0GE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-iE5cLXnYNOK_WeNSxgdYBQ-1; Sun, 02 Aug 2020 01:13:33 -0400
-X-MC-Unique: iE5cLXnYNOK_WeNSxgdYBQ-1
-Received: by mail-wr1-f72.google.com with SMTP id e12so10307486wra.13
- for <qemu-devel@nongnu.org>; Sat, 01 Aug 2020 22:13:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=t940nU9dWew1+U6Rir6rGT42NaRg3ivb+22ham5KRS8=;
- b=EWFOmKyaT02duM617izP8BSKcr1GzyfMHmSVl6EVRxBPP5a3pva4Rkmx7S+kSrzB+D
- gmyV9PJe52zaypTXZThTuQEATh4fEefq+LYXipkaBbyH96PLtLi52B82G0ZmpRZRAuFi
- X6xo6StcaTZ95rCdrhC7zAQi4ZJr5YTuLqwC8eUHg3x2Loq92wFYfDnrwBaIGoyBZTYT
- KWWpeJ46a5m22YvPRNTJyl7RP/FgqAkIOv0kSsD+ioUxJ8shsqFkbrQdT2/YhpzFY6sr
- k+1HkqOyh+nnif6izqrOi4KsI3p9ZclPWTE59MFudiT/EPtRJbs2kxc4LfPKKfFMFEnR
- NiIg==
-X-Gm-Message-State: AOAM531hulVt5j8gCCuw5rImaVnAxl6J85eF7bnchB1LH25GYpObkY9U
- xVmJV9bCJiyvlv29Ul3Eo8LIoaLi+ih7dm523slffhSgq2DE2X0OBr+jEYYGH8o+i7f99XBe99O
- LqvQBcYiIIV1bLRI=
-X-Received: by 2002:a1c:68c2:: with SMTP id d185mr10047439wmc.24.1596345212417; 
- Sat, 01 Aug 2020 22:13:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz8iBWtD3/QVTR8Zr6z5TLLO1rmX5vXKgDH9pQfJU1yK4WmB+/jR9+fIS5FC2p1A71R0ni3Jw==
-X-Received: by 2002:a1c:68c2:: with SMTP id d185mr10047421wmc.24.1596345212112; 
- Sat, 01 Aug 2020 22:13:32 -0700 (PDT)
-Received: from redhat.com (bzq-79-179-105-63.red.bezeqint.net. [79.179.105.63])
- by smtp.gmail.com with ESMTPSA id 62sm19033040wrq.31.2020.08.01.22.13.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 01 Aug 2020 22:13:31 -0700 (PDT)
-Date: Sun, 2 Aug 2020 01:13:28 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: Re: [PATCH 2/2] libvhost-user: handle endianness as mandated by the
- spec
-Message-ID: <20200802011240-mutt-send-email-mst@kernel.org>
-References: <20200730140731.32912-1-mhartmay@linux.ibm.com>
- <20200730140731.32912-3-mhartmay@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k2C2y-0008Gy-Aj; Sun, 02 Aug 2020 07:20:56 -0400
+Received: from mail-eopbgr10112.outbound.protection.outlook.com
+ ([40.107.1.112]:1662 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k2C2v-0001my-A0; Sun, 02 Aug 2020 07:20:55 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Enb/rWwRk8tG6PUgq4waKZ3HSPPDOUBCdg7qbWt4DFNOSvJ78AVovINMKaly2i2BwUTDUYjiEnTD1B3Ui40MfNblbeIujzL/+solHEeTJvgukc7PqyGpAD1FLhUDskMuZeXfmKAxwjJEv3wO/2PXGAxw0jkc3Eh4uM1GcF72RxG6pF7ne8dOSwpYfo48f0gJUjH1IkThPzYsJiGTnf+nP7aPXjcYdfw15hWEX8gqgQCwM5ASpsxxThCWPQMUUwe6wvFnHMs/A/9juhqloCB7xdQfUlSsv8M1ikKM8zTxF5+JQZx6MH/ZlBhhGKEBJVRn+rf9Lfxe1cS6jfA6VGWabg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dMh6c2I0pE5mVg2fkzy1YjSYwIRa97f/zAGMDthJ0gI=;
+ b=G+TQEOFcG3t6qXL7100+EtmLMzGmpkR9YsfcpurEJBvLCpvb3YerFAUy5kGUTN5T9ZlcFIcDpDOTxp2G69jW54xE9bG2hku+Gf/zEorvTZYDhgDkx4EU7Iyz/kcnEocQR7rpPWFU/FLAKBZ/LXduZkA++HLXiAnK1Y/uVJ3w9dAPFzZR1DiquYEbVrq7u5YCqclxmedTUDsrZ7tMg33BRABALyAw4z76K8MaVJUPqlmp9SvqN2NtPUTO/CSr4icrrUJu+RphBcCD4gZQlbaZCSq9fyB+ERKkp2Wc2W+NZwkKWXXiiqbWrqAuckYTUTtZvfoHrScZ2UUgi7cF62nxMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dMh6c2I0pE5mVg2fkzy1YjSYwIRa97f/zAGMDthJ0gI=;
+ b=iSctxikUuerNaeTtDVXqLSCKcdA9xBsVHDLcnn4WcMWjkfi3RGk1iQj7zRaNtvtS86/wAIC9Tt++bY4Efy3TwxVWtev3XuNKFDDANShAiNy96LtYghci03yVUqUl/gGV3+WR3cTadvL9YCNAiKOXDVwfk4NgjkaZbKuX9zszdp8=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com (2603:10a6:20b:a3::25)
+ by AM5PR0801MB1652.eurprd08.prod.outlook.com (2603:10a6:203:3c::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.16; Sun, 2 Aug
+ 2020 11:05:47 +0000
+Received: from AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0]) by AM6PR08MB4070.eurprd08.prod.outlook.com
+ ([fe80::78ec:8cb6:41f7:b2a0%5]) with mapi id 15.20.3239.021; Sun, 2 Aug 2020
+ 11:05:46 +0000
+Subject: Re: [PATCH v7 45/47] iotests: Add filter mirror test cases
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200625152215.941773-1-mreitz@redhat.com>
+ <20200625152215.941773-46-mreitz@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <f2d492a1-61de-90d7-3bea-a3244c2da3d5@virtuozzo.com>
+Date: Sun, 2 Aug 2020 14:05:42 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <20200625152215.941773-46-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-GB
+X-ClientProxiedBy: AM3PR07CA0092.eurprd07.prod.outlook.com
+ (2603:10a6:207:6::26) To AM6PR08MB4070.eurprd08.prod.outlook.com
+ (2603:10a6:20b:a3::25)
 MIME-Version: 1.0
-In-Reply-To: <20200730140731.32912-3-mhartmay@linux.ibm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/02 01:15:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.82) by
+ AM3PR07CA0092.eurprd07.prod.outlook.com (2603:10a6:207:6::26) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3261.13 via Frontend Transport; Sun, 2 Aug 2020 11:05:43 +0000
+X-Originating-IP: [109.252.114.82]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 762f2558-2b0b-46b7-2f37-08d836d40166
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB1652:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB1652C9E282082421C504725FF44C0@AM5PR0801MB1652.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:129;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WMPzYrQPt+w5FeTtqTeYtRyi+mXCP+fETyjenAG3nmlgXfNQCwRe5uObhs+lwvIdU22jo8KFEQNgc8W/dBmDeUcVEeeX2RkOE6qC45gh/s+2Uh8oxM9ZTZJn/ILXg/NLjvOoKzU6j92hvp2634b31C6oxA5tq6iSyN7MWZzUkxPLiIHWGQ5d77GuAwOE6oizZOu+S/VtWRmXibxLDVRKrycZjjgw/7sfhv6eIzLaw+OrV1n+Sv+Mx0mC6q8vEtkuV9J4ihASThl3eJnqkL4VkfmmvE4hVFIz9G6dOHdpmXhoRdk1AsSAoSEPIuunvLfdIYmW2OI4NIYbWU/OqQkIO+NkwwV2BMKE1JF2j9yWTTACdQdbrCD6L/FiILeYKfbU
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4070.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(366004)(39830400003)(346002)(376002)(396003)(8676002)(316002)(16526019)(186003)(53546011)(6506007)(2906002)(478600001)(956004)(2616005)(44832011)(54906003)(66946007)(31696002)(52116002)(66556008)(36756003)(66476007)(86362001)(5660300002)(6512007)(31686004)(83380400001)(8936002)(4326008)(6486002)(26005)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: UlW8D2O6qZa3qJB2ZPkL7Mx2SUfnms86+LRiNY7nzZ5rMWrJfnxkPPBhEK28xDPgkiOxX2sdKqv1EGtrdWTkLYHwwvY65IQODPFTm4O5Cxj4lAyU7GbjQAFWS+r71nIFgm/+JU3NlTUowlvD2UGzZQbDUe5LcAZZByD253I6+u4V0mpodyc65+EnvZxXtwHkjx8on0iAsOAZY4sA60Usa0kCanCQTsXWnSK/xAw4SOi8T1kSeSR7mEfhOtUKEClCILVoCRzCEyBmr1hW1TAuhVINBJUCWDcFD9dX7EBIl0RAXOm+8t80bUvkJDFmAQJ4j+Wt3jSbfO3uuMwQnd7KRUxcsg5zZbQs5phvsQa35mBG96934/MjqGAZPogDdRZlmfHlwf07W34sxxbdqwEsRP88bYWJBQiemDgaY7MpJUw3f5maG+bLSanUXPXYU5f+EFRVrgm6/fo5RIQ3Qyskx1Kc11Ce6+IjSa8iBesZ1k9ITk7K2ZhJ6IYHbMhIpnro0dekwRCWsKpnlvbmbbmJXMgreDjj0qz+NQJ1p3jEsu3pMf8IACYeAeE0YtyWQtPPZlLGWQmxB41ZWAt4rnIYWdDUz8HUh4Czq248siL6lnkfcRc/nvRZcxG6vDR3noFBdPzRHvWrqfR7sc/QAqrXOQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 762f2558-2b0b-46b7-2f37-08d836d40166
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4070.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2020 11:05:46.9478 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qg9JnUpE+NDwxt/NpPknAMG1qB5EJE/sTIGVKpV+9zvmOPP3+9QSr8wPl9mKdvnX5x4dDNqVszan5bGLLas93/P7M5g74WyyNpkZUxWlb60=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1652
+Received-SPF: pass client-ip=40.107.1.112;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/02 07:20:50
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,284 +133,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 30, 2020 at 04:07:31PM +0200, Marc Hartmayer wrote:
-> Since virtio existed even before it got standardized, the virtio
-> standard defines the following types of virtio devices:
-> 
->  + legacy device (pre-virtio 1.0)
->  + non-legacy or VIRTIO 1.0 device
->  + transitional device (which can act both as legacy and non-legacy)
-> 
-> Virtio 1.0 defines the fields of the virtqueues as little endian,
-> while legacy uses guest's native endian [1]. Currently libvhost-user
-> does not handle virtio endianness at all, i.e. it works only if the
-> native endianness matches with whatever is actually needed. That means
-> things break spectacularly on big-endian targets. Let us handle virtio
-> endianness for non-legacy as required by the virtio specification
-> [1]. The fencing of legacy virtio devices is done in
-> `vu_set_features_exec`.
-> 
-> [1] https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-210003
-> 
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
+On 25.06.2020 18:22, Max Reitz wrote:
+> This patch adds some test cases how mirroring relates to filters.  One
+> of them tests what happens when you mirror off a filtered COW node, two
+> others use the mirror filter node as basically our only example of an
+> implicitly created filter node so far (besides the commit filter).
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  contrib/libvhost-user/libvhost-user.c | 77 +++++++++++++++------------
->  1 file changed, 43 insertions(+), 34 deletions(-)
-> 
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-> index 53f16bdf082c..e2238a0400c9 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -42,6 +42,7 @@
->  
->  #include "qemu/atomic.h"
->  #include "qemu/osdep.h"
-> +#include "qemu/bswap.h"
->  #include "qemu/memfd.h"
->  
->  #include "libvhost-user.h"
-> @@ -539,6 +540,14 @@ vu_set_features_exec(VuDev *dev, VhostUserMsg *vmsg)
->      DPRINT("u64: 0x%016"PRIx64"\n", vmsg->payload.u64);
->  
->      dev->features = vmsg->payload.u64;
-> +    if (!vu_has_feature(dev, VIRTIO_F_VERSION_1)) {
-> +        /*
-> +         * We only support devices conforming to VIRTIO 1.0 or
-> +         * later
-> +         */
-> +        vu_panic(dev, "virtio legacy devices aren't supported by libvhost-user");
-> +        return false;
-> +    }
->  
->      if (!(dev->features & VHOST_USER_F_PROTOCOL_FEATURES)) {
->          vu_set_enable_all_rings(dev, true);
-> @@ -1074,7 +1083,7 @@ vu_set_vring_addr_exec(VuDev *dev, VhostUserMsg *vmsg)
->          return false;
->      }
->  
-> -    vq->used_idx = vq->vring.used->idx;
-> +    vq->used_idx = lduw_le_p(&vq->vring.used->idx);
->  
->      if (vq->last_avail_idx != vq->used_idx) {
->          bool resume = dev->iface->queue_is_processed_in_order &&
-> @@ -1191,7 +1200,7 @@ vu_check_queue_inflights(VuDev *dev, VuVirtq *vq)
->          return 0;
->      }
->  
-> -    vq->used_idx = vq->vring.used->idx;
-> +    vq->used_idx = lduw_le_p(&vq->vring.used->idx);
->      vq->resubmit_num = 0;
->      vq->resubmit_list = NULL;
->      vq->counter = 0;
-> @@ -2021,13 +2030,13 @@ vu_queue_started(const VuDev *dev, const VuVirtq *vq)
->  static inline uint16_t
->  vring_avail_flags(VuVirtq *vq)
->  {
-> -    return vq->vring.avail->flags;
-> +    return lduw_le_p(&vq->vring.avail->flags);
->  }
->  
->  static inline uint16_t
->  vring_avail_idx(VuVirtq *vq)
->  {
-> -    vq->shadow_avail_idx = vq->vring.avail->idx;
-> +    vq->shadow_avail_idx = lduw_le_p(&vq->vring.avail->idx);
->  
->      return vq->shadow_avail_idx;
->  }
-> @@ -2035,7 +2044,7 @@ vring_avail_idx(VuVirtq *vq)
->  static inline uint16_t
->  vring_avail_ring(VuVirtq *vq, int i)
->  {
-> -    return vq->vring.avail->ring[i];
-> +    return lduw_le_p(&vq->vring.avail->ring[i]);
->  }
->  
->  static inline uint16_t
-> @@ -2123,12 +2132,12 @@ virtqueue_read_next_desc(VuDev *dev, struct vring_desc *desc,
->                           int i, unsigned int max, unsigned int *next)
->  {
->      /* If this descriptor says it doesn't chain, we're done. */
-> -    if (!(desc[i].flags & VRING_DESC_F_NEXT)) {
-> +    if (!(lduw_le_p(&desc[i].flags) & VRING_DESC_F_NEXT)) {
->          return VIRTQUEUE_READ_DESC_DONE;
->      }
->  
->      /* Check they're not leading us off end of descriptors. */
-> -    *next = desc[i].next;
-> +    *next = lduw_le_p(&desc[i].next);
->      /* Make sure compiler knows to grab that: we don't want it changing! */
->      smp_wmb();
->  
-> @@ -2171,8 +2180,8 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq, unsigned int *in_bytes,
->          }
->          desc = vq->vring.desc;
->  
-> -        if (desc[i].flags & VRING_DESC_F_INDIRECT) {
-> -            if (desc[i].len % sizeof(struct vring_desc)) {
-> +        if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_INDIRECT) {
-> +            if (ldl_le_p(&desc[i].len) % sizeof(struct vring_desc)) {
->                  vu_panic(dev, "Invalid size for indirect buffer table");
->                  goto err;
->              }
-> @@ -2185,8 +2194,8 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq, unsigned int *in_bytes,
->  
->              /* loop over the indirect descriptor table */
->              indirect = 1;
-> -            desc_addr = desc[i].addr;
-> -            desc_len = desc[i].len;
-> +            desc_addr = ldq_le_p(&desc[i].addr);
-> +            desc_len = ldl_le_p(&desc[i].len);
->              max = desc_len / sizeof(struct vring_desc);
->              read_len = desc_len;
->              desc = vu_gpa_to_va(dev, &read_len, desc_addr);
-> @@ -2213,10 +2222,10 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq, unsigned int *in_bytes,
->                  goto err;
->              }
->  
-> -            if (desc[i].flags & VRING_DESC_F_WRITE) {
-> -                in_total += desc[i].len;
-> +            if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_WRITE) {
-> +                in_total += ldl_le_p(&desc[i].len);
->              } else {
-> -                out_total += desc[i].len;
-> +                out_total += ldl_le_p(&desc[i].len);
->              }
->              if (in_total >= max_in_bytes && out_total >= max_out_bytes) {
->                  goto done;
-> @@ -2367,7 +2376,7 @@ vring_used_flags_set_bit(VuVirtq *vq, int mask)
->  
->      flags = (uint16_t *)((char*)vq->vring.used +
->                           offsetof(struct vring_used, flags));
-> -    *flags |= mask;
-> +    stw_le_p(flags, lduw_le_p(flags) | mask);
->  }
->  
->  static inline void
-> @@ -2377,7 +2386,7 @@ vring_used_flags_unset_bit(VuVirtq *vq, int mask)
->  
->      flags = (uint16_t *)((char*)vq->vring.used +
->                           offsetof(struct vring_used, flags));
-> -    *flags &= ~mask;
-> +    stw_le_p(flags, lduw_le_p(flags) & ~mask);
->  }
->  
->  static inline void
-> @@ -2387,7 +2396,7 @@ vring_set_avail_event(VuVirtq *vq, uint16_t val)
->          return;
->      }
->  
-> -    *((uint16_t *) &vq->vring.used->ring[vq->vring.num]) = val;
-> +    stw_le_p(&vq->vring.used->ring[vq->vring.num], val);
->  }
->  
->  void
-> @@ -2476,14 +2485,14 @@ vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
->      struct vring_desc desc_buf[VIRTQUEUE_MAX_SIZE];
->      int rc;
->  
-> -    if (desc[i].flags & VRING_DESC_F_INDIRECT) {
-> -        if (desc[i].len % sizeof(struct vring_desc)) {
-> +    if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_INDIRECT) {
-> +        if (ldl_le_p(&desc[i].len) % sizeof(struct vring_desc)) {
->              vu_panic(dev, "Invalid size for indirect buffer table");
->          }
->  
->          /* loop over the indirect descriptor table */
-> -        desc_addr = desc[i].addr;
-> -        desc_len = desc[i].len;
-> +        desc_addr = ldq_le_p(&desc[i].addr);
-> +        desc_len = ldl_le_p(&desc[i].len);
->          max = desc_len / sizeof(struct vring_desc);
->          read_len = desc_len;
->          desc = vu_gpa_to_va(dev, &read_len, desc_addr);
-> @@ -2505,10 +2514,10 @@ vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
->  
->      /* Collect all the descriptors */
->      do {
-> -        if (desc[i].flags & VRING_DESC_F_WRITE) {
-> +        if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_WRITE) {
->              virtqueue_map_desc(dev, &in_num, iov + out_num,
->                                 VIRTQUEUE_MAX_SIZE - out_num, true,
-> -                               desc[i].addr, desc[i].len);
-> +                               ldq_le_p(&desc[i].addr), ldl_le_p(&desc[i].len));
->          } else {
->              if (in_num) {
->                  vu_panic(dev, "Incorrect order for descriptors");
-> @@ -2516,7 +2525,7 @@ vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
->              }
->              virtqueue_map_desc(dev, &out_num, iov,
->                                 VIRTQUEUE_MAX_SIZE, false,
-> -                               desc[i].addr, desc[i].len);
-> +                               ldq_le_p(&desc[i].addr), ldl_le_p(&desc[i].len));
->          }
->  
->          /* If we've got too many, that implies a descriptor loop. */
-> @@ -2712,14 +2721,14 @@ vu_log_queue_fill(VuDev *dev, VuVirtq *vq,
->      max = vq->vring.num;
->      i = elem->index;
->  
-> -    if (desc[i].flags & VRING_DESC_F_INDIRECT) {
-> -        if (desc[i].len % sizeof(struct vring_desc)) {
-> +    if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_INDIRECT) {
-> +        if (ldl_le_p(&desc[i].len) % sizeof(struct vring_desc)) {
->              vu_panic(dev, "Invalid size for indirect buffer table");
->          }
->  
->          /* loop over the indirect descriptor table */
-> -        desc_addr = desc[i].addr;
-> -        desc_len = desc[i].len;
-> +        desc_addr = ldq_le_p(&desc[i].addr);
-> +        desc_len = ldl_le_p(&desc[i].len);
->          max = desc_len / sizeof(struct vring_desc);
->          read_len = desc_len;
->          desc = vu_gpa_to_va(dev, &read_len, desc_addr);
-> @@ -2745,9 +2754,9 @@ vu_log_queue_fill(VuDev *dev, VuVirtq *vq,
->              return;
->          }
->  
-> -        if (desc[i].flags & VRING_DESC_F_WRITE) {
-> -            min = MIN(desc[i].len, len);
-> -            vu_log_write(dev, desc[i].addr, min);
-> +        if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_WRITE) {
-> +            min = MIN(ldl_le_p(&desc[i].len), len);
-> +            vu_log_write(dev, ldq_le_p(&desc[i].addr), min);
->              len -= min;
->          }
->  
-> @@ -2772,15 +2781,15 @@ vu_queue_fill(VuDev *dev, VuVirtq *vq,
->  
->      idx = (idx + vq->used_idx) % vq->vring.num;
->  
-> -    uelem.id = elem->index;
-> -    uelem.len = len;
-> +    stl_le_p(&uelem.id, elem->index);
-> +    stl_le_p(&uelem.len, len);
->      vring_used_write(dev, vq, &uelem, idx);
->  }
->  
->  static inline
->  void vring_used_idx_set(VuDev *dev, VuVirtq *vq, uint16_t val)
->  {
-> -    vq->vring.used->idx = val;
-> +    stw_le_p(&vq->vring.used->idx, val);
->      vu_log_write(dev,
->                   vq->vring.log_guest_addr + offsetof(struct vring_used, idx),
->                   sizeof(vq->vring.used->idx));
-> -- 
-> 2.25.4
+>   tests/qemu-iotests/041     | 146 ++++++++++++++++++++++++++++++++++++-
+>   tests/qemu-iotests/041.out |   4 +-
+>   2 files changed, 147 insertions(+), 3 deletions(-)
+>
+> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+> index b843f88a66..588bb76626 100755
+> --- a/tests/qemu-iotests/041
+> +++ b/tests/qemu-iotests/041
+...
+> diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
+> index 53abe11d73..46651953e8 100644
+> --- a/tests/qemu-iotests/041.out
+> +++ b/tests/qemu-iotests/041.out
+> @@ -1,5 +1,5 @@
+> -........................................................................................................
+> +...........................................................................................................
+>   ----------------------------------------------------------------------
+> -Ran 104 tests
+> +Ran 107 tests
+>   
+>   OK
+
+
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+
 
 
