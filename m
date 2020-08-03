@@ -2,96 +2,88 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99199C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C99C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:16:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EBB620775
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:13:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 710E52054F
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:16:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i7Zk8rBx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EBB620775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Li/KAqSB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 710E52054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2c9b-0001Ed-Jy
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 11:13:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50570)
+	id 1k2cCu-000440-Jq
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 11:16:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k2c8x-0000UF-K4; Mon, 03 Aug 2020 11:12:51 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55511)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k2c8v-0002pr-RH; Mon, 03 Aug 2020 11:12:51 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 9so14619092wmj.5;
- Mon, 03 Aug 2020 08:12:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=1e3lSfJs56vgQa17PMAI9CB1G1Wmu+nSqZ4gwDK4N6E=;
- b=i7Zk8rBxrmIqw1zybp2tpTqaqnu/nlI6Rq+pVnJ5IEj8fvPPTYTeMfuwnWHeea+4Sg
- crF3S1+qv8oTqnV2WfTTUSqnO1HgZUcsWJkPBitPvHRw6YOBkOAYAjYMR3eQCze+VZSD
- 30z9517WxsZCgG6XBxuGArjs7kB48BL10o4soRbM2FweoOn6KZpgl1l99fEGHTL+u8Gr
- G2jkO9jJf4wOWwKW4l3sU7gCqMeoQFMFQwFcTeSZdH2PqcNxjRK0qKsE6T+YZLkhwiNi
- s5BhdIPABPFkycfn2myLye49nL+3osenLc/3qWKv/uhzagylF2vYFkC141aVIrUlEggK
- VWOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1e3lSfJs56vgQa17PMAI9CB1G1Wmu+nSqZ4gwDK4N6E=;
- b=r9D7EXQN5Tm35clociTUq8EMrsV58mXzMf7bciymIfAmk1nobUMPOcERkUS1FxBEbQ
- izP8Ds5w1hHXgwlPR4p87UpJA5hkB29AubVzs1hqShtE9QW7xmpRCVwTbhJ5iNcOlYQ8
- jiWmyjxnBVceEBgw9tzW3cFK/jxpdZhVwg5UXuTmKxF33Y0qro59sk6+kWeg5cgz2L/9
- GqiasHBGwNdTlh0LwzG9UmU5EnqE+KBTL1qurbsR+QFe7ePjigP0ArGqZjW9Z067Yp76
- f3VXF8Ey0RbDkCyD0yF1zi6dfs6LnhsptN15K+7cc42a3Yjcyb9n0THP1z/uDYr9LXA4
- jZhA==
-X-Gm-Message-State: AOAM5331g2FNeiKY3rrkILd4dfbRnbgtmb6oJNqzhj8rcEzACl/kO1MA
- Wm5mR0HutmIiWqKXFygMEDo=
-X-Google-Smtp-Source: ABdhPJxJ7vj19JHs7/3Zi9AaatfZUyVXpLJAT1/46hqAjBJF/+mEfcsgGoOSPbSrIQoJrl3cZNiFMg==
-X-Received: by 2002:a1c:6a18:: with SMTP id f24mr428227wmc.94.1596467567921;
- Mon, 03 Aug 2020 08:12:47 -0700 (PDT)
-Received: from [192.168.1.43] (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id t14sm28498625wrg.38.2020.08.03.08.12.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Aug 2020 08:12:47 -0700 (PDT)
-Subject: Re: [PATCH for-5.1] hw/timer/imx_epit: Avoid assertion when CR.SWR is
- written
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200727154550.3409-1-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <16de518e-d36f-2b8d-8598-985275524897@amsat.org>
-Date: Mon, 3 Aug 2020 17:12:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1k2cCG-0003ah-HE
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 11:16:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25360
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1k2cCD-0003PX-4t
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 11:16:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596467771;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=oWkqQO8NteYQ4DBZsaBy/o6tzsxxwI8DuxsbTGUnyb8=;
+ b=Li/KAqSBT3vw4NfBNoBo0eT+diG6RhOQZfGYhpZ6zyZYAGj6gzvWLGDaWpuSK9Y3IUoGUN
+ P7lIDdnDBpTEG5+TFDgztlwGD1iPZdLfR5gH3MOWxp2a/u71RA/sSL57n/rhMxVBvJnD6g
+ Fnqia8IYyg0r4CuaG/JFfRKbDyWQymg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-CCbqfj5VP9izZ2nk6Yh0EA-1; Mon, 03 Aug 2020 11:16:07 -0400
+X-MC-Unique: CCbqfj5VP9izZ2nk6Yh0EA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FFFF1923761;
+ Mon,  3 Aug 2020 15:16:06 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 14CFE1001B0B;
+ Mon,  3 Aug 2020 15:16:04 +0000 (UTC)
+Date: Mon, 3 Aug 2020 17:16:02 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 3/3] hw/arm/virt: Implement kvm-steal-time
+Message-ID: <20200803151602.bervmyxsqg2v5ird@kamzik.brq.redhat.com>
+References: <20200711101033.47371-1-drjones@redhat.com>
+ <20200711101033.47371-4-drjones@redhat.com>
+ <CAFEAcA8h+6btvjvx=j5v7Gn12+bros_UgFScKHaWVxh0dmi-Qw@mail.gmail.com>
+ <20200801120030.puzdwi4deczjm6gh@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200727154550.3409-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200801120030.puzdwi4deczjm6gh@kamzik.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=drjones@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:09:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,76 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Chubb <peter.chubb@nicta.com.au>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/27/20 5:45 PM, Peter Maydell wrote:
-> The imx_epit device has a software-controllable reset triggered by
-> setting the SWR bit in the CR register. An error in commit cc2722ec83ad9
-> means that we will end up assert()ing if the guest does this, because
-> the code in imx_epit_write() starts ptimer transactions, and then
-> imx_epit_reset() also starts ptimre transactions, triggering
-> "ptimer_transaction_begin: Assertion `!s->in_transaction' failed".
+On Sat, Aug 01, 2020 at 02:00:34PM +0200, Andrew Jones wrote:
+> > >      if (kvm_enabled()) {
+> > > +        hwaddr pvtime_base = vms->memmap[VIRT_PVTIME].base;
+> > > +        hwaddr pvtime_size = vms->memmap[VIRT_PVTIME].size;
+> > > +
+> > > +        if (steal_time) {
+> > > +            MemoryRegion *pvtime = g_new(MemoryRegion, 1);
+> > > +
+> > > +            memory_region_init_ram(pvtime, NULL, "pvtime", pvtime_size, NULL);
+> > > +            memory_region_add_subregion(get_system_memory(), pvtime_base,
+> > > +                                        pvtime);
+> > > +        }
+> > 
+> > B: I'm not sure whether it wouldn't be useful to have the area
+> > allocated with size determined by number of VCPUs instead of having
+> > pre-defined size.
 > 
-> The cleanest way to avoid this double-transaction is to move the
-> start-transaction for the CR write handling down below the check of
-> the SWR bit.
+> We can't go smaller than one host-sized page, so this 64k region is the
+> smallest we can go. The assert in the next hunk, which was snipped
+> out of the reply, ensures that 64k is large enough to cover the maximum
+> number of VCPUs that could ever be configured. I don't think there's
+> anything else we should do at this time. If the pvtime structure grows,
+> or if we increase the maximum number of VCPUs to be larger than 1024,
+> then we can revisit this in order to determine when additional 64k pages
+> should be allocated.
 > 
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1880424
+> For now, if it would help, I could extend the comment (which was also
+> snipped) to mention that 64k was chosen because it's the maximum host
+> page size, and that at least one host-sized page must be allocated for
+> this region.
+>
 
-Thanks for looking at this.
+In the end, I think I will calculate the size based on host-page-size
+and the number of possible guest cpus. The main reason is that it's
+actually more awkward to properly document it in a comment than to just
+code it. And, we'll also reduce the number of pages that would need to
+be migrated when the host is using 4k pages.
 
-> Fixes: cc2722ec83ad944505fe
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> I don't have a test image for KZM so this is the minimal
-> obviously-safe change. I'm pretty sure that actually we could
-> add a "break" after the imx_epit_reset() call because all of
-> the work done by the following code is duplicating the ptimer
-> setup done by the reset function. But I'm not really happy making
-> that change without a test image...
-
-Agreed. I'd add a comment in the code to not forget about this...
-
-> ---
->  hw/timer/imx_epit.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/timer/imx_epit.c b/hw/timer/imx_epit.c
-> index baf6338e1a6..4f51e6e12da 100644
-> --- a/hw/timer/imx_epit.c
-> +++ b/hw/timer/imx_epit.c
-> @@ -199,15 +199,18 @@ static void imx_epit_write(void *opaque, hwaddr offset, uint64_t value,
->  
->      switch (offset >> 2) {
->      case 0: /* CR */
-> -        ptimer_transaction_begin(s->timer_cmp);
-> -        ptimer_transaction_begin(s->timer_reload);
->  
->          oldcr = s->cr;
->          s->cr = value & 0x03ffffff;
->          if (s->cr & CR_SWR) {
->              /* handle the reset */
->              imx_epit_reset(DEVICE(s));
-
-... such:
-               /* break; ??? */
-
-Anyway:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> -        } else {
-> +        }
-> +
-> +        ptimer_transaction_begin(s->timer_cmp);
-> +        ptimer_transaction_begin(s->timer_reload);
-> +
-> +        if (!(s->cr & CR_SWR)) {
->              imx_epit_set_freq(s);
->          }
->  
-> 
+Thanks,
+drew
 
 
