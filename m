@@ -2,96 +2,81 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB27C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE25C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:37:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6755520656
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:35:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QuQN4YZ5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6755520656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C9C81207DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:37:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9C81207DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2gEu-0002HT-HE
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 15:35:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39522)
+	id 1k2gGd-0004OB-Uq
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 15:37:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k2gDq-0001Oe-PX
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:10 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:55871)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2gFD-00035h-Vj
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:35:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35404)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k2gDm-0003Z8-JE
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:10 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id 9so594600wmj.5
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 12:34:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=u2p6IyQ9jI8fq1z/3i+bly/o4Cwa7bYMinoZHh/imvg=;
- b=QuQN4YZ5aI45iJpZLOpXQRYzBsZbInYXUWnprGAR5T+WX4t3xfc+92QD9b87EGy7vD
- P1eZwCfZu8UH4DZmcH+r0OE2grJ7DdkvL9eLjdjllb0LOLry3ezpBM04wwN1nERSwL7E
- ILJuV+Balnji9JWjLFOwcKooGyFR/MbkqqUtc6Eluk79EH9IDk0oH6mj91Ko+tRHCRIn
- BPbxEOvmjwW3CuQiqWONsz6pzd+N2n/qFFo0Kw5hZSI8d99WuEgEpLZf5wEZTX/ZD9KT
- AbJL4hJYyyI65KNOC4Ri4aIEoCsV59WRTWhm3kMbQE5DiurUu+3QHzrpIsJI2ljf7v7M
- 8O5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=u2p6IyQ9jI8fq1z/3i+bly/o4Cwa7bYMinoZHh/imvg=;
- b=XrNQbXhn6rEADMTZuaXRNbub+a1rzjxunqG1QN5Mmos5W5APmv3D13rKKtklJOnbG5
- kV3SZAjlU7lh1gPRArFY+TCijVMRA9mOXlQDJ6i9QhHa659K7eb7d96SRcdWZJgVL5Xn
- WBFZRTKvd64aGxw9q33H/xH8NIgk0Gn4TosgnGGo1wCryAdrOxEMYMcrcz0AhMs+eXa8
- OVNxp6d4wxgqH4InkwCe+wwPk6wwoeUeqcCm0dpgh82mchECX1Jcv8V82hUAbY37vs/b
- VTTYKuhYQ1+mqd3QNbl68Fc4gM8QAyQtAaV4N9JWCgUEn/YKrN/mVwcXTK1yJHwnZxna
- CUdA==
-X-Gm-Message-State: AOAM531ge+0PZ4EocoGNn1GEuDNBabcBO1FcqXpahP1u+CtstS7Z9Kdd
- ec0da7f5X7DEQC332KdkgpBA5S/7XmqsNw==
-X-Google-Smtp-Source: ABdhPJzqjNxjLcBY4qTkrR5ZiEEMhuB23EaX6PdOyiFSYLDF/7xnUmFTXiZadlCMo6irUeHUxZX3Wg==
-X-Received: by 2002:a7b:c3d2:: with SMTP id t18mr660693wmj.92.1596483244402;
- Mon, 03 Aug 2020 12:34:04 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r206sm985565wma.6.2020.08.03.12.34.03
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Aug 2020 12:34:03 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/8] hw/arm/netduino2, netduinoplus2: Set system_clock_scale
-Date: Mon,  3 Aug 2020 20:33:52 +0100
-Message-Id: <20200803193359.12936-2-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200803193359.12936-1-peter.maydell@linaro.org>
-References: <20200803193359.12936-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2gFA-0003ou-KD
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:35:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k2gF8-0006rg-DY
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 19:35:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 618462E802E
+ for <qemu-devel@nongnu.org>; Mon,  3 Aug 2020 19:35:30 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32d;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 03 Aug 2020 19:28:28 -0000
+From: Patrick Magauran <1889943@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: patmagauran
+X-Launchpad-Bug-Reporter: Patrick Magauran (patmagauran)
+X-Launchpad-Bug-Modifier: Patrick Magauran (patmagauran)
+References: <159622949743.5060.8912306868276612545.malonedeb@soybean.canonical.com>
+Message-ID: <07a76c44306d4bbc699019b2f3fea4ac67c8a1d9.camel@gmail.com>
+Subject: Re: [Bug 1889943] Improper TCP/IP packet splitting on e1000e/vmxnet3
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 5cb6ab3782d0b2250965f7c1544bc3b30bb14313
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 07:00:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,79 +85,420 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1889943 <1889943@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200803192828.jhpxAafun0pk4aReBQs4o_gnu_0lnNmNu5v-B7cmNY0@z>
 
-The netduino2 and netduinoplus2 boards forgot to set the system_clock_scale
-global, which meant that if guest code used the systick timer in "use
-the processor clock" mode it would hang because time never advances.
+Hello Yan,
 
-Set the global to match the documented CPU clock speed of these boards.
-Judging by the data sheet this is slightly simplistic because the
-SoC allows configuration of the SYSCLK source and frequency via the
-RCC (reset and clock control) module, but we don't model that.
+I tryed the patches mentioned(the first one was already implemented in
+the git master, the second wasn't). It did fix the IPv6 fragmentation
+issue. So therefore, the focus needs to be on implementing proper layer
+4 segmentation. =
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1876187
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200727162617.26227-1-peter.maydell@linaro.org
----
- hw/arm/netduino2.c     | 10 ++++++++++
- hw/arm/netduinoplus2.c | 10 ++++++++++
- 2 files changed, 20 insertions(+)
 
-diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
-index 79e19392b56..8f103341443 100644
---- a/hw/arm/netduino2.c
-+++ b/hw/arm/netduino2.c
-@@ -30,10 +30,20 @@
- #include "hw/arm/stm32f205_soc.h"
- #include "hw/arm/boot.h"
- 
-+/* Main SYSCLK frequency in Hz (120MHz) */
-+#define SYSCLK_FRQ 120000000ULL
-+
- static void netduino2_init(MachineState *machine)
- {
-     DeviceState *dev;
- 
-+    /*
-+     * TODO: ideally we would model the SoC RCC and let it handle
-+     * system_clock_scale, including its ability to define different
-+     * possible SYSCLK sources.
-+     */
-+    system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
-+
-     dev = qdev_new(TYPE_STM32F205_SOC);
-     qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m3"));
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-diff --git a/hw/arm/netduinoplus2.c b/hw/arm/netduinoplus2.c
-index 958d21dd9f9..68abd3ec69d 100644
---- a/hw/arm/netduinoplus2.c
-+++ b/hw/arm/netduinoplus2.c
-@@ -30,10 +30,20 @@
- #include "hw/arm/stm32f405_soc.h"
- #include "hw/arm/boot.h"
- 
-+/* Main SYSCLK frequency in Hz (168MHz) */
-+#define SYSCLK_FRQ 168000000ULL
-+
- static void netduinoplus2_init(MachineState *machine)
- {
-     DeviceState *dev;
- 
-+    /*
-+     * TODO: ideally we would model the SoC RCC and let it handle
-+     * system_clock_scale, including its ability to define different
-+     * possible SYSCLK sources.
-+     */
-+    system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
-+
-     dev = qdev_new(TYPE_STM32F405_SOC);
-     qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m4"));
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
--- 
-2.20.1
+--Patrick
+On Mon, 2020-08-03 at 09:37 +0300, Yan Vugenfirer wrote:
+> Hello Patrick,
+> =
 
+> If you are using  QEMU version 4.2, then it is missing recent patches
+> fixing IPv6 and TSO behaviour:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg723411.html
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg723412.html
+> =
+
+> Can you check that the above patches solve your issues?
+> =
+
+> =
+
+> Best regards,
+> Yan.
+> =
+
+> > On 2 Aug 2020, at 6:59 PM, Patrick Magauran <
+> > 1889943@bugs.launchpad.net> wrote:
+> > =
+
+> > Some more clarifications:
+> > It appears the QEMU does turn on the vnet_hdr flag of the tap
+> > interface in most cases, not just host-only networks. My previous
+> > assumption was due to the way the libvirt manages it, only setting
+> > it if the virtio interface is used.
+> > =
+
+> > Still, for software fragmentation implementations, ip fragmentation
+> > should be a last resort.
+> > =
+
+> > I have also confirmed a suspicion that the current implementation
+> > of sw
+> > fragmentation will not work with IPV6. It creates malformed packets
+> > as
+> > ipv6 requires a different setup of headers to fragment. Thanks to
+> > the
+> > many redundancies in the network stack, the packets eventually
+> > arrive at
+> > the host server correctly formed, but we should not rely on this
+> > fact.
+> > =
+
+> > ** Description changed:
+> > =
+
+> > + Update: The sw implementation of fragmentation also creates
+> > malformed
+> > + IPv6 packets when their size is above the MTU. See comment #3
+> > + =
+
+> >  Problem Description:
+> > - When using a tap interface and the guest sends a TCP packet that
+> > would need to be segmented, it is fragmented using IP
+> > fragmentation. The host does not reassemble the IP fragments and
+> > forwards them to the next hop. This causes issues on certain ISPs,
+> > which seemingly reject IP fragments(Verizon Fios). =
+
+> > - This issue occurs on the e1000e and vmxnet3 NIC models, and
+> > possibly others. It does not occur on the virtio(which passes the
+> > entire packet through to the host w/o fragmentation or
+> > segmentation) or the e1000 model(). =
+
+> > + When using a tap interface and the guest sends a TCP packet that
+> > would need to be segmented, it is fragmented using IP
+> > fragmentation. The host does not reassemble the IP fragments and
+> > forwards them to the next hop. This causes issues on certain ISPs,
+> > which seemingly reject IP fragments(Verizon Fios).
+> > + This issue occurs on the e1000e and vmxnet3 NIC models, and
+> > possibly others. It does not occur on the virtio(which passes the
+> > entire packet through to the host w/o fragmentation or
+> > segmentation) or the e1000 model().
+> > =
+
+> >  Test scenario:
+> >  Setup a tap and network bridge using the directions here: =
+
+> > https://gist.github.com/extremecoders-re/e8fd8a67a515fee0c873dcafc81d81=
+1c
+> >  Boot the machine into any modern guest(a Fedora 31 live iso was
+> > used for testing)
+> >  Begin a wireshark capture on the host machine
+> >  On the host(or another machine on the network) run: npx http-echo-
+> > server(See https://github.com/watson/http-echo-server)
+> >  On the guest run
+> >  Curl -d =E2=80=9CLorem ipsum dolor sit amet, consectetur adipiscing el=
+it.
+> > Maecenas venenatis viverra ipsum, ac tincidunt est rhoncus eu.
+> > Suspendisse vehicula congue ante, non rhoncus elit tempus vitae.
+> > Duis ac leo massa. Donec rutrum condimentum turpis nec ultricies.
+> > Duis laoreet elit eu arcu pulvinar, vitae congue neque mattis.
+> > Mauris sed ante nunc. Vestibulum vitae urna a tellus maximus
+> > sagittis. Vivamus luctus pellentesque neque, vel tempor purus porta
+> > ut. Phasellus at quam bibendum, fermentum libero sit amet,
+> > ullamcorper mauris. In rutrum sit amet dui id maximus. Ut lectus
+> > ligula, hendrerit nec aliquam non, finibus a turpis. Proin
+> > scelerisque convallis ante, et pharetra elit. Donec nunc nisl,
+> > viverra vitae dui at, posuere rhoncus nibh. Mauris in massa quis
+> > neque posuere placerat quis quis massa. Donec quis lacus ligula.
+> > Donec mollis vel nisi eget elementum. Nam id magna porta nunc
+> > consectetur efficitur ac quis lorem. Cras faucibus vel ex porttitor
+> > mattis. Praesent in mattis tortor. In venenatis convallis quam, in
+> > posuere nibh. Proin non dignissim massa. Cras at mi ut lorem
+> > tristique fringilla. Nulla ac quam condimentum metus tincidunt
+> > vulputate ut at leo. Nunc pellentesque, nunc vel rhoncus
+> > condimentum, arcu sem molestie augue, in suscipit mauris odio
+> > mollis odio. Integer hendrerit lectus a leo facilisis, in accumsan
+> > urna maximus. Nam nec odio volutpat, varius est id, tempus libero.
+> > Vestibulum lobortis tortor quam, ac scelerisque urna rhoncus in.
+> > Etiam tempor, est sit amet vulputate molestie, urna neque sodales
+> > leo, sit amet blandit risus felis sed est. Nulla eu eros nec tortor
+> > dapibus maximus faucibus ut erat. Ut pharetra tempor massa in
+> > bibendum. Interdum et malesuada fames ac ante ipsum primis in
+> > faucibus. Etiam mattis molestie felis eu efficitur. Morbi tincidunt
+> > consectetur diam tincidunt feugiat. Morbi euismod ut lorem finibus
+> > pellentesque. Aliquam eu porta ex. Aliquam cursus, orci sit amet
+> > volutpat egestas, est est pulvinar erat, sed luctus nisl ligula
+> > eget justo vestibulum.=E2=80=9D <ECHOSERVERIP:PORT>
+> > =
+
+> >  2000 bytes of Lorem Ipsum taken from https://www.lipsum.com/
+> > =
+
+> >  Compare results from an e1000, a virtio, and a e1000e card:
+> >  +--------+-----------+---------+------------+
+> >  | Model  | Fragment  | Segment | Wire Size  |
+> >  +--------+-----------+---------+------------+
+> >  | e1000e | Yes       | NO      | 1484 + 621 |
+> >  +--------+-----------+---------+------------+
+> >  | e1000  | No        | Yes     | 1516 + 620 |
+> >  +--------+-----------+---------+------------+
+> >  | Virtio | NO        | NO      | 2068       |
+> >  +--------+-----------+---------+------------+
+> > =
+
+> >  Expected Results:
+> >  TCP Segment to proper size OR pass full size to host and let the
+> > host split if necessary.
+> > =
+
+> >  Configuration changes that did not work:
+> >  Disable host, guest, router firewalls
+> >  Different Hosts
+> >  Different Physical NICs
+> >  Libvirt based NAT/Routed modes
+> >  Fedora 32 vs 31
+> >  Qemu 4.2.0 vs github commit
+> > d74824cf7c8b352f9045e949dc636c7207a41eee
+> > =
+
+> >  System Information:
+> >  lsb_release -rd
+> >  Description:	Fedora release 32 (Thirty Two)
+> >  Release:	32
+> > =
+
+> >  uname -a
+> >  Linux pats-laptop-linux 5.7.10-201.fc32.x86_64 #1 SMP Thu Jul 23
+> > 00:58:39 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+> > =
+
+> >  I can provide additional logs, debug info, etc. if needed.
+> > =
+
+> > -- =
+
+> > You received this bug notification because you are a member of
+> > qemu-
+> > devel-ml, which is subscribed to QEMU.
+> > https://bugs.launchpad.net/bugs/1889943
+> > =
+
+> > Title:
+> >  Improper TCP/IP packet splitting on e1000e/vmxnet3
+> > =
+
+> > Status in QEMU:
+> >  New
+> > =
+
+> > Bug description:
+> >  Update: The sw implementation of fragmentation also creates
+> > malformed
+> >  IPv6 packets when their size is above the MTU. See comment #3
+> > =
+
+> >  Problem Description:
+> >  When using a tap interface and the guest sends a TCP packet that
+> > would need to be segmented, it is fragmented using IP
+> > fragmentation. The host does not reassemble the IP fragments and
+> > forwards them to the next hop. This causes issues on certain ISPs,
+> > which seemingly reject IP fragments(Verizon Fios).
+> >  This issue occurs on the e1000e and vmxnet3 NIC models, and
+> > possibly others. It does not occur on the virtio(which passes the
+> > entire packet through to the host w/o fragmentation or
+> > segmentation) or the e1000 model().
+> > =
+
+> >  Test scenario:
+> >  Setup a tap and network bridge using the directions here: =
+
+> > https://gist.github.com/extremecoders-re/e8fd8a67a515fee0c873dcafc81d81=
+1c
+> >  Boot the machine into any modern guest(a Fedora 31 live iso was
+> > used for testing)
+> >  Begin a wireshark capture on the host machine
+> >  On the host(or another machine on the network) run: npx http-echo-
+> > server(See https://github.com/watson/http-echo-server)
+> >  On the guest run
+> >  Curl -d =E2=80=9CLorem ipsum dolor sit amet, consectetur adipiscing el=
+it.
+> > Maecenas venenatis viverra ipsum, ac tincidunt est rhoncus eu.
+> > Suspendisse vehicula congue ante, non rhoncus elit tempus vitae.
+> > Duis ac leo massa. Donec rutrum condimentum turpis nec ultricies.
+> > Duis laoreet elit eu arcu pulvinar, vitae congue neque mattis.
+> > Mauris sed ante nunc. Vestibulum vitae urna a tellus maximus
+> > sagittis. Vivamus luctus pellentesque neque, vel tempor purus porta
+> > ut. Phasellus at quam bibendum, fermentum libero sit amet,
+> > ullamcorper mauris. In rutrum sit amet dui id maximus. Ut lectus
+> > ligula, hendrerit nec aliquam non, finibus a turpis. Proin
+> > scelerisque convallis ante, et pharetra elit. Donec nunc nisl,
+> > viverra vitae dui at, posuere rhoncus nibh. Mauris in massa quis
+> > neque posuere placerat quis quis massa. Donec quis lacus ligula.
+> > Donec mollis vel nisi eget elementum. Nam id magna porta nunc
+> > consectetur efficitur ac quis lorem. Cras faucibus vel ex porttitor
+> > mattis. Praesent in mattis tortor. In venenatis convallis quam, in
+> > posuere nibh. Proin non dignissim massa. Cras at mi ut lorem
+> > tristique fringilla. Nulla ac quam condimentum metus tincidunt
+> > vulputate ut at leo. Nunc pellentesque, nunc vel rhoncus
+> > condimentum, arcu sem molestie augue, in suscipit mauris odio
+> > mollis odio. Integer hendrerit lectus a leo facilisis, in accumsan
+> > urna maximus. Nam nec odio volutpat, varius est id, tempus libero.
+> > Vestibulum lobortis tortor quam, ac scelerisque urna rhoncus in.
+> > Etiam tempor, est sit amet vulputate molestie, urna neque sodales
+> > leo, sit amet blandit risus felis sed est. Nulla eu eros nec tortor
+> > dapibus maximus faucibus ut erat. Ut pharetra tempor massa in
+> > bibendum. Interdum et malesuada fames ac ante ipsum primis in
+> > faucibus. Etiam mattis molestie felis eu efficitur. Morbi tincidunt
+> > consectetur diam tincidunt feugiat. Morbi euismod ut lorem finibus
+> > pellentesque. Aliquam eu porta ex. Aliquam cursus, orci sit amet
+> > volutpat egestas, est est pulvinar erat, sed luctus nisl ligula
+> > eget justo vestibulum.=E2=80=9D <ECHOSERVERIP:PORT>
+> > =
+
+> >  2000 bytes of Lorem Ipsum taken from https://www.lipsum.com/
+> > =
+
+> >  Compare results from an e1000, a virtio, and a e1000e card:
+> >  +--------+-----------+---------+------------+
+> >  | Model  | Fragment  | Segment | Wire Size  |
+> >  +--------+-----------+---------+------------+
+> >  | e1000e | Yes       | NO      | 1484 + 621 |
+> >  +--------+-----------+---------+------------+
+> >  | e1000  | No        | Yes     | 1516 + 620 |
+> >  +--------+-----------+---------+------------+
+> >  | Virtio | NO        | NO      | 2068       |
+> >  +--------+-----------+---------+------------+
+> > =
+
+> >  Expected Results:
+> >  TCP Segment to proper size OR pass full size to host and let the
+> > host split if necessary.
+> > =
+
+> >  Configuration changes that did not work:
+> >  Disable host, guest, router firewalls
+> >  Different Hosts
+> >  Different Physical NICs
+> >  Libvirt based NAT/Routed modes
+> >  Fedora 32 vs 31
+> >  Qemu 4.2.0 vs github commit
+> > d74824cf7c8b352f9045e949dc636c7207a41eee
+> > =
+
+> >  System Information:
+> >  lsb_release -rd
+> >  Description:	Fedora release 32 (Thirty Two)
+> >  Release:	32
+> > =
+
+> >  uname -a
+> >  Linux pats-laptop-linux 5.7.10-201.fc32.x86_64 #1 SMP Thu Jul 23
+> > 00:58:39 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+> > =
+
+> >  I can provide additional logs, debug info, etc. if needed.
+> > =
+
+> > To manage notifications about this bug go to:
+> > https://bugs.launchpad.net/qemu/+bug/1889943/+subscriptions
+> > =
+
+> =
+
+>
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1889943
+
+Title:
+  Improper TCP/IP packet splitting on e1000e/vmxnet3
+
+Status in QEMU:
+  New
+
+Bug description:
+  Update: The sw implementation of fragmentation also creates malformed
+  IPv6 packets when their size is above the MTU. See comment #3
+
+  Problem Description:
+  When using a tap interface and the guest sends a TCP packet that would ne=
+ed to be segmented, it is fragmented using IP fragmentation. The host does =
+not reassemble the IP fragments and forwards them to the next hop. This cau=
+ses issues on certain ISPs, which seemingly reject IP fragments(Verizon Fio=
+s).
+  This issue occurs on the e1000e and vmxnet3 NIC models, and possibly othe=
+rs. It does not occur on the virtio(which passes the entire packet through =
+to the host w/o fragmentation or segmentation) or the e1000 model().
+
+  Test scenario:
+  Setup a tap and network bridge using the directions here: https://gist.gi=
+thub.com/extremecoders-re/e8fd8a67a515fee0c873dcafc81d811c
+  Boot the machine into any modern guest(a Fedora 31 live iso was used for =
+testing)
+  Begin a wireshark capture on the host machine
+  On the host(or another machine on the network) run: npx http-echo-server(=
+See https://github.com/watson/http-echo-server)
+  On the guest run
+  Curl -d =E2=80=9CLorem ipsum dolor sit amet, consectetur adipiscing elit.=
+ Maecenas venenatis viverra ipsum, ac tincidunt est rhoncus eu. Suspendisse=
+ vehicula congue ante, non rhoncus elit tempus vitae. Duis ac leo massa. Do=
+nec rutrum condimentum turpis nec ultricies. Duis laoreet elit eu arcu pulv=
+inar, vitae congue neque mattis. Mauris sed ante nunc. Vestibulum vitae urn=
+a a tellus maximus sagittis. Vivamus luctus pellentesque neque, vel tempor =
+purus porta ut. Phasellus at quam bibendum, fermentum libero sit amet, ulla=
+mcorper mauris. In rutrum sit amet dui id maximus. Ut lectus ligula, hendre=
+rit nec aliquam non, finibus a turpis. Proin scelerisque convallis ante, et=
+ pharetra elit. Donec nunc nisl, viverra vitae dui at, posuere rhoncus nibh=
+. Mauris in massa quis neque posuere placerat quis quis massa. Donec quis l=
+acus ligula. Donec mollis vel nisi eget elementum. Nam id magna porta nunc =
+consectetur efficitur ac quis lorem. Cras faucibus vel ex porttitor mattis.=
+ Praesent in mattis tortor. In venenatis convallis quam, in posuere nibh. P=
+roin non dignissim massa. Cras at mi ut lorem tristique fringilla. Nulla ac=
+ quam condimentum metus tincidunt vulputate ut at leo. Nunc pellentesque, n=
+unc vel rhoncus condimentum, arcu sem molestie augue, in suscipit mauris od=
+io mollis odio. Integer hendrerit lectus a leo facilisis, in accumsan urna =
+maximus. Nam nec odio volutpat, varius est id, tempus libero. Vestibulum lo=
+bortis tortor quam, ac scelerisque urna rhoncus in. Etiam tempor, est sit a=
+met vulputate molestie, urna neque sodales leo, sit amet blandit risus feli=
+s sed est. Nulla eu eros nec tortor dapibus maximus faucibus ut erat. Ut ph=
+aretra tempor massa in bibendum. Interdum et malesuada fames ac ante ipsum =
+primis in faucibus. Etiam mattis molestie felis eu efficitur. Morbi tincidu=
+nt consectetur diam tincidunt feugiat. Morbi euismod ut lorem finibus pelle=
+ntesque. Aliquam eu porta ex. Aliquam cursus, orci sit amet volutpat egesta=
+s, est est pulvinar erat, sed luctus nisl ligula eget justo vestibulum.=E2=
+=80=9D <ECHOSERVERIP:PORT>
+
+  2000 bytes of Lorem Ipsum taken from https://www.lipsum.com/
+
+  Compare results from an e1000, a virtio, and a e1000e card:
+  +--------+-----------+---------+------------+
+  | Model  | Fragment  | Segment | Wire Size  |
+  +--------+-----------+---------+------------+
+  | e1000e | Yes       | NO      | 1484 + 621 |
+  +--------+-----------+---------+------------+
+  | e1000  | No        | Yes     | 1516 + 620 |
+  +--------+-----------+---------+------------+
+  | Virtio | NO        | NO      | 2068       |
+  +--------+-----------+---------+------------+
+
+  Expected Results:
+  TCP Segment to proper size OR pass full size to host and let the host spl=
+it if necessary.
+
+  Configuration changes that did not work:
+  Disable host, guest, router firewalls
+  Different Hosts
+  Different Physical NICs
+  Libvirt based NAT/Routed modes
+  Fedora 32 vs 31
+  Qemu 4.2.0 vs github commit d74824cf7c8b352f9045e949dc636c7207a41eee
+
+  System Information:
+  lsb_release -rd
+  Description:	Fedora release 32 (Thirty Two)
+  Release:	32
+
+  uname -a
+  Linux pats-laptop-linux 5.7.10-201.fc32.x86_64 #1 SMP Thu Jul 23 00:58:39=
+ UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+
+  I can provide additional logs, debug info, etc. if needed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1889943/+subscriptions
 
