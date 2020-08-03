@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6C4C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 14:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA207C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 22:41:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A484B206D4
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 14:28:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D98BF2076C
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 22:41:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="lFInRY4X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A484B206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="KjEFRhj7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D98BF2076C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2bRp-0004lp-Qb
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 10:28:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37746)
+	id 1k2j99-0001le-S3
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 18:41:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1k2bRC-0004Md-2p
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 10:27:38 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:25400)
+ id 1k2j7r-0001Eg-0G
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 18:40:11 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:52709)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1k2bR3-0004IR-Gl
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 10:27:37 -0400
+ id 1k2j7n-0002V2-RO
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 18:40:10 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1596464855; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1596494408; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=AlSyKTngFKN2XARMOWVSZgeoGFnt3Q3UVLjga6n33n8=;
- b=lFInRY4XcU49Q5VFbWqKg6QZg1XD3fV7vK4D99NFnM5vD3aqtShWDjKGIFnxK/bc/HrKie9J
- bwbDIVKLO6xZ8hwRbxgc5tijZIN327VBatfL2SHzAGKnIcZ/8ehzleP6K7aX5b75YBKZi68y
- /6MYB/xwKJ0VAvJOJKwwWKdxBM8=
+ Sender; bh=XJ6dc6V7KpzYzMb6QmwEbsp4sgwvcPlevasLv2URTcs=;
+ b=KjEFRhj7Uep53cZIDt6WjZDzmK9EYkZExxc+HRo9hArh9po2pib5WtEQsr8JM2BbVgcPs05D
+ uZv/Y7n5Ci6TLYJ57zmV8KWeWyevsgF3e9Qi2qnFtQ57u5JShsWbUi5hRthGRbZqfllDBa9B
+ gqrwmduB+0DU38f8CD6YMjaCMvA=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (66.90.74.34.bc.googleusercontent.com
- [34.74.90.66]) by smtp-out-n12.prod.us-west-2.postgun.com with SMTP id
- 5f281eb8eb556d49a6e7dae6 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Mon, 03 Aug 2020 14:27:04 GMT
-Date: Mon, 03 Aug 2020 14:27:02 +0000
-Message-ID: <5f281eb6542ca_5b633fa0f0fb0fec133446@sidekiq-catchall-02-sv-gprd.mail>
-Subject: QEMU | Pipeline #173720789 has failed for master | 6c5dfc9c
+Received: from mg.gitlab.com (68.90.74.34.bc.googleusercontent.com
+ [34.74.90.68]) by smtp-out-n19.prod.us-west-2.postgun.com with SMTP id
+ 5f289241498d6102394eb924 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Mon, 03 Aug 2020 22:40:01 GMT
+Date: Mon, 03 Aug 2020 22:40:00 +0000
+Message-ID: <5f289240cdd46_746f3facdb1df08410965a@sidekiq-catchall-06-sv-gprd.mail>
+Subject: QEMU | Pipeline #173898302 has failed for master | 5c1c3e4f
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5f281eb61e691_5b633fa0f0fb0fec1333ca";
+ boundary="--==_mimepart_5f289240c69cc_746f3facdb1df08410955";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 173720789
+X-GitLab-Pipeline-Id: 173898302
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -78,8 +78,8 @@ X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
  HTML_FONT_LOW_CONTRAST=0.001, HTML_MESSAGE=0.001, MISSING_HEADERS=1.021,
  RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, REPLYTO_WITHOUT_TO_CC=1.552,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001, URIBL_BLOCKED=0.001,
+ WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,7 +99,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5f281eb61e691_5b633fa0f0fb0fec1333ca
+----==_mimepart_5f289240c69cc_746f3facdb1df08410955
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -111,94 +111,70 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: 6c5dfc9c ( https://gitlab.com/qemu-project/qemu/-/commit/6c5dfc9c=
-cb643a0d50fdec9f10806b14960571d1 )
-Commit Message: Merge remote-tracking branch 'remotes/armbru/ta...
+Commit: 5c1c3e4f ( https://gitlab.com/qemu-project/qemu/-/commit/5c1c3e4f=
+02e458cf280c677c817ae4fd1ed9bf10 )
+Commit Message: Merge remote-tracking branch 'remotes/pmaydell/...
 Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-Pipeline #173720789 ( https://gitlab.com/qemu-project/qemu/-/pipelines/17=
-3720789 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+Pipeline #173898302 ( https://gitlab.com/qemu-project/qemu/-/pipelines/17=
+3898302 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 1 failed build.
 
-Job #668409119 ( https://gitlab.com/qemu-project/qemu/-/jobs/668409119/ra=
+Job #669208742 ( https://gitlab.com/qemu-project/qemu/-/jobs/669208742/ra=
 w )
 
 Stage: test
-Name: acceptance-system-fedora-alt
-Trace:     self.wait_for_console_pattern('QEMU advent calendar')
+Name: acceptance-system-ubuntu-main
+Trace: 22:30:59 ERROR| =
 
-14:11:51 ERROR|   File "/builds/qemu-project/qemu/build/tests/acceptance/=
-boot_linux_console.py", line 51, in wait_for_console_pattern
-    wait_for_console_pattern(self, success_message,
+22:30:59 ERROR| Reproduced traceback from: /builds/qemu-project/qemu/buil=
+d/tests/venv/lib/python3.8/site-packages/avocado/core/test.py:846
+22:30:59 ERROR| Traceback (most recent call last):
+22:30:59 ERROR|   File "/builds/qemu-project/qemu/build/tests/acceptance/=
+avocado_qemu/__init__.py", line 172, in setUp
+22:30:59 ERROR|     self.cancel("No QEMU binary defined or found in the b=
+uild tree")
+22:30:59 ERROR|   File "/builds/qemu-project/qemu/build/tests/venv/lib/py=
+thon3.8/site-packages/avocado/core/test.py", line 1081, in cancel
+22:30:59 ERROR|     raise exceptions.TestCancel(message)
+22:30:59 ERROR| avocado.core.exceptions.TestCancel: No QEMU binary define=
+d or found in the build tree
+22:30:59 ERROR| =
 
-14:11:51 ERROR|   File "/builds/qemu-project/qemu/build/tests/acceptance/=
-avocado_qemu/__init__.py", line 131, in wait_for_console_pattern
-    _console_interaction(test, success_message, failure_message, None, vm=
-=3Dvm)
+22:30:59 ERROR| CANCEL 38-tests/acceptance/vnc.py:Vnc.test_change_passwor=
+d_requires_a_password -> TestCancel: No QEMU binary defined or found in t=
+he build tree
+22:30:59 INFO | =
 
-14:11:51 ERROR|   File "/builds/qemu-project/qemu/build/tests/acceptance/=
-avocado_qemu/__init__.py", line 83, in _console_interaction
-    msg =3D console.readline().strip()
+22:30:59 DEBUG| PARAMS (key=3Darch, path=3D*, default=3DNone) =3D> None
+22:30:59 DEBUG| PARAMS (key=3Dmachine, path=3D*, default=3DNone) =3D> Non=
+e
+22:30:59 DEBUG| PARAMS (key=3Dqemu_bin, path=3D*, default=3DNone) =3D> No=
+ne
+22:30:59 ERROR| =
 
-14:11:51 ERROR|   File "/usr/lib64/python3.8/socket.py", line 669, in rea=
-dinto
-    return self._sock.recv_into(b)
+22:30:59 ERROR| Reproduced traceback from: /builds/qemu-project/qemu/buil=
+d/tests/venv/lib/python3.8/site-packages/avocado/core/test.py:846
+22:30:59 ERROR| Traceback (most recent call last):
+22:30:59 ERROR|   File "/builds/qemu-project/qemu/build/tests/acceptance/=
+avocado_qemu/__init__.py", line 172, in setUp
+22:30:59 ERROR|     self.cancel("No QEMU binary defined or found in the b=
+uild tree")
+22:30:59 ERROR|   File "/builds/qemu-project/qemu/build/tests/venv/lib/py=
+thon3.8/site-packages/avocado/core/test.py", line 1081, in cancel
+22:30:59 ERROR|     raise exceptions.TestCancel(message)
+22:30:59 ERROR| avocado.core.exceptions.TestCancel: No QEMU binary define=
+d or found in the build tree
+22:30:59 ERROR| =
 
-14:11:51 ERROR|   File "/builds/qemu-project/qemu/build/tests/venv/lib64/=
-python3.8/site-packages/avocado/plugins/runner.py", line 89, in sigterm_h=
-andler
-    raise RuntimeError("Test interrupted by SIGTERM")
+22:30:59 ERROR| CANCEL 39-tests/acceptance/vnc.py:Vnc.test_change_passwor=
+d -> TestCancel: No QEMU binary defined or found in the build tree
+22:30:59 INFO | =
 
-14:11:51 ERROR| RuntimeError: Test interrupted by SIGTERM
-
-14:11:51 ERROR| ERROR 10-tests/acceptance/boot_linux_console.py:BootLinux=
-Console.test_microblaze_s3adsp1800 -> RuntimeError: Test interrupted by S=
-IGTERM
-14:11:51 INFO | =
-
-
-Runner error occurred: Timeout reached
-Original status: ERROR
-{'name': '10-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test=
-_microblaze_s3adsp1800', 'logdir': '/builds/qemu-project/qemu/build/tests=
-/results/job-2020-08-03T14.01-f7bf296/test-results/10-tests_acceptance_bo=
-ot_linux_console.py_BootLinuxConsole.test_microblaze_s3adsp1800', 'logfil=
-e': '/builds/qemu-project/qemu/build/tests/results/job-2020-08-03T14.01-f=
-7bf296/test-results/10-tests_acceptance_boot_linux_console.py_BootLinuxCo=
-nsole.test_microblaze_s3adsp1800/debug.log', 'status': 'ERROR', 'running'=
-: False, 'paused': False, 'time_start': 1596463820.738055, 'time_elapsed'=
-: 90.76783561706543, 'time_end': 1596463911.5058906, 'fail_reason': 'Test=
- interrupted by SIGTERM', 'fail_class': 'RuntimeError', 'traceback': 'Tra=
-ceback (most recent call last):\n  File "/builds/qemu-project/qemu/build/=
-tests/venv/lib64/python3.8/site-packages/avocado/core/test.py", line 955,=
- in _run_avocado\n    raise test_exception\n  File "/builds/qemu-project/=
-qemu/build/tests/venv/lib64/python3.8/site-packages/avocado/core/test.py"=
-, line 855, in _run_avocado\n    testMethod()\n  File "/builds/qemu-proje=
-ct/qemu/build/tests/acceptance/boot_linux_console.py", line 917, in test_=
-microblaze_s3adsp1800\n    self.do_test_advcal_2018(\'17\', tar_hash, \'b=
-allerina.bin\')\n  File "/builds/qemu-project/qemu/build/tests/acceptance=
-/boot_linux_console.py", line 892, in do_test_advcal_2018\n    self.wait_=
-for_console_pattern(\'QEMU advent calendar\')\n  File "/builds/qemu-proje=
-ct/qemu/build/tests/acceptance/boot_linux_console.py", line 51, in wait_f=
-or_console_pattern\n    wait_for_console_pattern(self, success_message,\n=
-  File "/builds/qemu-project/qemu/build/tests/acceptance/avocado_qemu/__i=
-nit__.py", line 131, in wait_for_console_pattern\n    _console_interactio=
-n(test, success_message, failure_message, None, vm=3Dvm)\n  File "/builds=
-/qemu-project/qemu/build/tests/acceptance/avocado_qemu/__init__.py", line=
- 83, in _console_interaction\n    msg =3D console.readline().strip()\n  F=
-ile "/usr/lib64/python3.8/socket.py", line 669, in readinto\n    return s=
-elf._sock.recv_into(b)\n  File "/builds/qemu-project/qemu/build/tests/ven=
-v/lib64/python3.8/site-packages/avocado/plugins/runner.py", line 89, in s=
-igterm_handler\n    raise RuntimeError("Test interrupted by SIGTERM")\nRu=
-ntimeError: Test interrupted by SIGTERM\n', 'timeout': 90, 'whiteboard': =
-'', 'phase': 'FINISHED', 'class_name': 'BootLinuxConsole', 'job_logdir': =
-'/builds/qemu-project/qemu/build/tests/results/job-2020-08-03T14.01-f7bf2=
-96', 'job_unique_id': 'f7bf296a6d0d420ed8329016b4dfcb63dba009ff', 'params=
-': []}
 =1B[32;1m$ du -chs $HOME/avocado/data/cache=1B[0;m
 du: cannot access '/root/avocado/data/cache': No such file or directory
 0	total
-section_end:1596463981:after_script
+section_end:1596493861:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
@@ -210,7 +186,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5f281eb61e691_5b633fa0f0fb0fec1333ca
+----==_mimepart_5f289240c69cc_746f3facdb1df08410955
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -225,7 +201,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #173720789 has failed for master | 6c5dfc9c</title=
+<title>QEMU | Pipeline #173898302 has failed for master | 5c1c3e4f</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -393,17 +369,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/6c5dfc9ccb643a0d=
-50fdec9f10806b14960571d1" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/5c1c3e4f02e458cf=
+280c677c817ae4fd1ed9bf10" style=3D"color: #3777b0; text-decoration: none;=
 ">
-6c5dfc9c
+5c1c3e4f
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-Merge remote-tracking branch 'remotes/armbru/ta...
+Merge remote-tracking branch 'remotes/pmaydell/...
 </div>
 </td>
 </tr>
@@ -460,9 +436,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/173720789" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/173898302" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#173720789
+#173898302
 </a>
 triggered by
 </td>
@@ -539,9 +515,9 @@ test
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/668409119" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/669208742" style=3D=
 "color: #3777b0; text-decoration: none;">
-acceptance-system-fedora-alt
+acceptance-system-ubuntu-main
 </a>
 
 </td>
@@ -552,65 +528,41 @@ sans-serif; padding: 0 0 16px;">
 <pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>    self.=
-wait_for_console_pattern('QEMU advent calendar')<br /><br />14:11:51 ERRO=
-R|   File "/builds/qemu-project/qemu/build/tests/acceptance/boot_linux_co=
-nsole.py", line 51, in wait_for_console_pattern<br />    wait_for_console=
-_pattern(self, success_message,<br /><br />14:11:51 ERROR|   File "/build=
-s/qemu-project/qemu/build/tests/acceptance/avocado_qemu/__init__.py", lin=
-e 131, in wait_for_console_pattern<br />    _console_interaction(test, su=
-ccess_message, failure_message, None, vm=3Dvm)<br /><br />14:11:51 ERROR|=
-   File "/builds/qemu-project/qemu/build/tests/acceptance/avocado_qemu/__=
-init__.py", line 83, in _console_interaction<br />    msg =3D console.rea=
-dline().strip()<br /><br />14:11:51 ERROR|   File "/usr/lib64/python3.8/s=
-ocket.py", line 669, in readinto<br />    return self._sock.recv_into(b)<=
-br /><br />14:11:51 ERROR|   File "/builds/qemu-project/qemu/build/tests/=
-venv/lib64/python3.8/site-packages/avocado/plugins/runner.py", line 89, i=
-n sigterm_handler<br />    raise RuntimeError("Test interrupted by SIGTER=
-M")<br /><br />14:11:51 ERROR| RuntimeError: Test interrupted by SIGTERM<=
-br /><br />14:11:51 ERROR| ERROR 10-tests/acceptance/boot_linux_console.p=
-y:BootLinuxConsole.test_microblaze_s3adsp1800 -&gt; RuntimeError: Test in=
-terrupted by SIGTERM<br />14:11:51 INFO | <br /><br />Runner error occurr=
-ed: Timeout reached<br />Original status: ERROR<br />{'name': '10-tests/a=
-cceptance/boot_linux_console.py:BootLinuxConsole.test_microblaze_s3adsp18=
-00', 'logdir': '/builds/qemu-project/qemu/build/tests/results/job-2020-08=
--03T14.01-f7bf296/test-results/10-tests_acceptance_boot_linux_console.py_=
-BootLinuxConsole.test_microblaze_s3adsp1800', 'logfile': '/builds/qemu-pr=
-oject/qemu/build/tests/results/job-2020-08-03T14.01-f7bf296/test-results/=
-10-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_microblaz=
-e_s3adsp1800/debug.log', 'status': 'ERROR', 'running': False, 'paused': F=
-alse, 'time_start': 1596463820.738055, 'time_elapsed': 90.76783561706543,=
- 'time_end': 1596463911.5058906, 'fail_reason': 'Test interrupted by SIGT=
-ERM', 'fail_class': 'RuntimeError', 'traceback': 'Traceback (most recent =
-call last):\n  File "/builds/qemu-project/qemu/build/tests/venv/lib64/pyt=
-hon3.8/site-packages/avocado/core/test.py", line 955, in _run_avocado\n  =
-  raise test_exception\n  File "/builds/qemu-project/qemu/build/tests/ven=
-v/lib64/python3.8/site-packages/avocado/core/test.py", line 855, in _run_=
-avocado\n    testMethod()\n  File "/builds/qemu-project/qemu/build/tests/=
-acceptance/boot_linux_console.py", line 917, in test_microblaze_s3adsp180=
-0\n    self.do_test_advcal_2018(\'17\', tar_hash, \'ballerina.bin\')\n  F=
-ile "/builds/qemu-project/qemu/build/tests/acceptance/boot_linux_console.=
-py", line 892, in do_test_advcal_2018\n    self.wait_for_console_pattern(=
-\'QEMU advent calendar\')\n  File "/builds/qemu-project/qemu/build/tests/=
-acceptance/boot_linux_console.py", line 51, in wait_for_console_pattern\n=
-    wait_for_console_pattern(self, success_message,\n  File "/builds/qemu=
--project/qemu/build/tests/acceptance/avocado_qemu/__init__.py", line 131,=
- in wait_for_console_pattern\n    _console_interaction(test, success_mess=
-age, failure_message, None, vm=3Dvm)\n  File "/builds/qemu-project/qemu/b=
-uild/tests/acceptance/avocado_qemu/__init__.py", line 83, in _console_int=
-eraction\n    msg =3D console.readline().strip()\n  File "/usr/lib64/pyth=
-on3.8/socket.py", line 669, in readinto\n    return self._sock.recv_into(=
-b)\n  File "/builds/qemu-project/qemu/build/tests/venv/lib64/python3.8/si=
-te-packages/avocado/plugins/runner.py", line 89, in sigterm_handler\n    =
-raise RuntimeError("Test interrupted by SIGTERM")\nRuntimeError: Test int=
-errupted by SIGTERM\n', 'timeout': 90, 'whiteboard': '', 'phase': 'FINISH=
-ED', 'class_name': 'BootLinuxConsole', 'job_logdir': '/builds/qemu-projec=
-t/qemu/build/tests/results/job-2020-08-03T14.01-f7bf296', 'job_unique_id'=
-: 'f7bf296a6d0d420ed8329016b4dfcb63dba009ff', 'params': []}<br /></span><=
-span class=3D"term-fg-l-green term-bold">$ du -chs $HOME/avocado/data/cac=
-he</span><span><br />du: cannot access '/root/avocado/data/cache': No suc=
-h file or directory<br />0	total<br /></span><span class=3D"term-fg-l-red=
- term-bold">ERROR: Job failed: exit code 1<br /></span></pre>
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>22:30:59 =
+ERROR| <br />22:30:59 ERROR| Reproduced traceback from: /builds/qemu-proj=
+ect/qemu/build/tests/venv/lib/python3.8/site-packages/avocado/core/test.p=
+y:846<br />22:30:59 ERROR| Traceback (most recent call last):<br />22:30:=
+59 ERROR|   File "/builds/qemu-project/qemu/build/tests/acceptance/avocad=
+o_qemu/__init__.py", line 172, in setUp<br />22:30:59 ERROR|     self.can=
+cel("No QEMU binary defined or found in the build tree")<br />22:30:59 ER=
+ROR|   File "/builds/qemu-project/qemu/build/tests/venv/lib/python3.8/sit=
+e-packages/avocado/core/test.py", line 1081, in cancel<br />22:30:59 ERRO=
+R|     raise exceptions.TestCancel(message)<br />22:30:59 ERROR| avocado.=
+core.exceptions.TestCancel: No QEMU binary defined or found in the build =
+tree<br />22:30:59 ERROR| <br />22:30:59 ERROR| CANCEL 38-tests/acceptanc=
+e/vnc.py:Vnc.test_change_password_requires_a_password -&gt; TestCancel: N=
+o QEMU binary defined or found in the build tree<br />22:30:59 INFO | <br=
+ />22:30:59 DEBUG| PARAMS (key=3Darch, path=3D*, default=3DNone) =3D&gt; =
+None<br />22:30:59 DEBUG| PARAMS (key=3Dmachine, path=3D*, default=3DNone=
+) =3D&gt; None<br />22:30:59 DEBUG| PARAMS (key=3Dqemu_bin, path=3D*, def=
+ault=3DNone) =3D&gt; None<br />22:30:59 ERROR| <br />22:30:59 ERROR| Repr=
+oduced traceback from: /builds/qemu-project/qemu/build/tests/venv/lib/pyt=
+hon3.8/site-packages/avocado/core/test.py:846<br />22:30:59 ERROR| Traceb=
+ack (most recent call last):<br />22:30:59 ERROR|   File "/builds/qemu-pr=
+oject/qemu/build/tests/acceptance/avocado_qemu/__init__.py", line 172, in=
+ setUp<br />22:30:59 ERROR|     self.cancel("No QEMU binary defined or fo=
+und in the build tree")<br />22:30:59 ERROR|   File "/builds/qemu-project=
+/qemu/build/tests/venv/lib/python3.8/site-packages/avocado/core/test.py",=
+ line 1081, in cancel<br />22:30:59 ERROR|     raise exceptions.TestCance=
+l(message)<br />22:30:59 ERROR| avocado.core.exceptions.TestCancel: No QE=
+MU binary defined or found in the build tree<br />22:30:59 ERROR| <br />2=
+2:30:59 ERROR| CANCEL 39-tests/acceptance/vnc.py:Vnc.test_change_password=
+ -&gt; TestCancel: No QEMU binary defined or found in the build tree<br /=
+>22:30:59 INFO | <br /></span><span class=3D"term-fg-l-green term-bold">$=
+ du -chs $HOME/avocado/data/cache</span><span><br />du: cannot access '/r=
+oot/avocado/data/cache': No such file or directory<br />0	total<br /></sp=
+an><span class=3D"term-fg-l-red term-bold">ERROR: Job failed: exit code 1=
+<br /></span></pre>
 </td>
 </tr>
 </tbody>
@@ -658,5 +610,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5f281eb61e691_5b633fa0f0fb0fec1333ca--
+----==_mimepart_5f289240c69cc_746f3facdb1df08410955--
 
