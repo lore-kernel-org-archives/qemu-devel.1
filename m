@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B37C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:39:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55DE6C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:39:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5946207DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:39:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6268207DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:39:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MjqwgFh1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5946207DF
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EBHkjwcZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6268207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2gIb-0006kC-35
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 15:39:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39540)
+	id 1k2gJ1-0007Tu-VN
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 15:39:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k2gDs-0001Pc-7x
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:12 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35478)
+ id 1k2gE1-0001fg-36
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:21 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:35803)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k2gDq-0003Zb-Fw
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:11 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 184so696656wmb.0
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 12:34:09 -0700 (PDT)
+ id 1k2gDz-0003au-8i
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:20 -0400
+Received: by mail-wr1-x430.google.com with SMTP id f1so34716375wro.2
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 12:34:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=3dVcMoMLCTb5XdSyz5C0L7sWyDj1NgAifJ97Hu5p/DY=;
- b=MjqwgFh1A97KaIwja73fCeOs6g21gNpsa25tCy5HsvIriATT6tl5M+WtZEwg3bHOBt
- zb6JlD3FdxvbzT9vrCO8s6MDfbhlYuFmIRDf/Xx/To6Vd6RPgB4DwbcQPJ2mnyLhkFH8
- AEniiuBQK6bMOWYZCCFGCrtMb83FKOFMWW1edUlLMc0EVWzI/f6EdhPmGgp2ta0BpwRG
- 1RSpVYBj+Zcg05s48ZUv1f4Ud+7Ws8pnztQeL/Bf/VlBm2eo2yuO22TUsLaBkADRwlzF
- VjikOrPz0OzxodD8Jh6yOkkz+UhVxMwvgfN1YAq48vPgOweyXz5na9zEdb64OISn/dlR
- iJnw==
+ bh=p3Oj1hHYVSfEnmzR1MqlL9GNka397sl/NrXlR449zEg=;
+ b=EBHkjwcZniqt2OC4srTa97XVJ1EeN8RbgN4nAsqUrRhiMaOQM0HEtqDwNsXsg+gyjj
+ hUBCWBygTQJP1JVVawlECAzFpluBf4aW3Zx3uztRxvS5fLSv2RcTWrjEnD3UFCsCttJy
+ AZRTJa4pTy6EbyYJrs4BhuWq+LoQgAzjR6IU4tUhDZIzKQG3b/nNP1bfystH1Sv0loGw
+ 3NSVdowVAFKvVDwRqBDHjMduUvtPwe7+2SV9Ehexvtt+YfRp/BngIobfl6bEaNvDYiWW
+ VHFO4vYgDt7niaVunzjYOGSC9sIKO/yPXt9u+u8xJfvzK2MoOT+Mp7CBElh0sHQfOhBJ
+ AjRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=3dVcMoMLCTb5XdSyz5C0L7sWyDj1NgAifJ97Hu5p/DY=;
- b=JHru02RTX+A5sVZQjpQRDhMNPx8SxL0RETi5LJBWc9uOzCVsG40erR7DQ0yuLmhsBE
- v4th5zVDLFBl6T/1jtQO60LKozA6Z5mElgp1dBTXQDCcngIbgdOqk7i4QsJJR27uAu5J
- eVu/JJRUqIJ8reSrfzLUYE+yq59ZVvou/PjlwrwTOdMIJ9DJiI9Xddm+IwCCGAr6qhWE
- N5KtplhHjYsReR7iG82PVmNHjO8b/wM2wlDB4rE5OMNZ3yHqT+DV7VW+Unan4jclisdW
- 0CXxQqTcUr7i9oVQLjbG5z83Tx5FFwTiTE2mMgoE3ErVYY23kSmIqQUiOVMXclhhbvQz
- 33nw==
-X-Gm-Message-State: AOAM530Z1JRDO/hm0m7WdNuSL4V84Q3DFIFTNJX/jJ9tasAuV5QtlZ0p
- x77xgP3Qr8dF/nhlpRAJE1vgs34pxskTKg==
-X-Google-Smtp-Source: ABdhPJyxFo5yaoU0JY9MGZfhVvC1/6ltiVum6h0k9O88gDsBph39dVs2WWJIMpPJBoMOpXc0HLqCIg==
-X-Received: by 2002:a1c:ba83:: with SMTP id k125mr655825wmf.160.1596483247770; 
- Mon, 03 Aug 2020 12:34:07 -0700 (PDT)
+ bh=p3Oj1hHYVSfEnmzR1MqlL9GNka397sl/NrXlR449zEg=;
+ b=fD55cCKuvr2OxcmxGHheLcZhYqm3RBNt0oBzVQlwmXXMeWDIJ3+Xtzhe7wTy63lVGx
+ EWGWqcZe0hPm/VkUktVeawMF5wt7SgNWKI9N3aADzGJ56yN+IUUnjyJFkt8b/t1dtOeg
+ dcwqRhK9fuJQuF6+i96FhFi4I/gh3+pOnmMyoKSzKKzARL9lWBCsZYkj3fd0D93IxUgx
+ 17XQBHfFtylVLckkHxeEfr00n9PmCGYys4qWqcsXpHpRskVENQAl1TSjHYEi3i6GIGxm
+ Li30OqLWOORRUzGQ9TEKBAPBoIe6vWq56iigSHRCGkc7ahbZTrK/6/jdnUMsQOIz70HS
+ hYjA==
+X-Gm-Message-State: AOAM532S1WCvQao+NzmibkU+sp58qigg2D0RYuKTXKhtB13K6uu3eI1w
+ wzi0BZCP1kweL92kto8APw53rb2AJQFvBQ==
+X-Google-Smtp-Source: ABdhPJy4iJeumKA6Hoe3tZrF2vYF/WxXZNJSHg99q0V3BIPEr8FboBhm9Yoyx0noRqtoOirbjHSBWg==
+X-Received: by 2002:a5d:544f:: with SMTP id w15mr16428537wrv.208.1596483257125; 
+ Mon, 03 Aug 2020 12:34:17 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r206sm985565wma.6.2020.08.03.12.34.06
+ by smtp.gmail.com with ESMTPSA id r206sm985565wma.6.2020.08.03.12.34.15
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Aug 2020 12:34:06 -0700 (PDT)
+ Mon, 03 Aug 2020 12:34:16 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/8] hw/intc/armv7m_nvic: Provide default "reset the system"
- behaviour for SYSRESETREQ
-Date: Mon,  3 Aug 2020 20:33:54 +0100
-Message-Id: <20200803193359.12936-4-peter.maydell@linaro.org>
+Subject: [PULL 8/8] hw/timer/imx_epit: Avoid assertion when CR.SWR is written
+Date: Mon,  3 Aug 2020 20:33:59 +0100
+Message-Id: <20200803193359.12936-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200803193359.12936-1-peter.maydell@linaro.org>
 References: <20200803193359.12936-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x430.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -88,8 +87,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,103 +105,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The NVIC provides an outbound qemu_irq "SYSRESETREQ" which it signals
-when the guest sets the SYSRESETREQ bit in the AIRCR register.  This
-matches the hardware design (where the CPU has a signal of this name
-and it is up to the SoC to connect that up to an actual reset
-mechanism), but in QEMU it mostly results in duplicated code in SoC
-objects and bugs where SoC model implementors forget to wire up the
-SYSRESETREQ line.
+The imx_epit device has a software-controllable reset triggered by
+setting the SWR bit in the CR register. An error in commit cc2722ec83ad9
+means that we will end up assert()ing if the guest does this, because
+the code in imx_epit_write() starts ptimer transactions, and then
+imx_epit_reset() also starts ptimer transactions, triggering
+"ptimer_transaction_begin: Assertion `!s->in_transaction' failed".
 
-Provide a default behaviour for the case where SYSRESETREQ is not
-actually connected to anything: use qemu_system_reset_request() to
-perform a system reset.  This will allow us to remove the
-implementations of SYSRESETREQ handling from the boards where that's
-exactly what it does, and also fixes the bugs in the board models
-which forgot to wire up the signal:
+The cleanest way to avoid this double-transaction is to move the
+start-transaction for the CR write handling down below the check of
+the SWR bit.
 
- * microbit
- * mps2-an385
- * mps2-an505
- * mps2-an511
- * mps2-an521
- * musca-a
- * musca-b1
- * netduino
- * netduinoplus2
-
-We still allow the board to wire up the signal if it needs to, in case
-we need to model more complicated reset controller logic or to model
-buggy SoC hardware which forgot to wire up the line itself. But
-defaulting to "reset the system" is more often going to be correct
-than defaulting to "do nothing".
-
+Fixes: https://bugs.launchpad.net/qemu/+bug/1880424
+Fixes: cc2722ec83ad944505fe
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200728103744.6909-3-peter.maydell@linaro.org
+Message-id: 20200727154550.3409-1-peter.maydell@linaro.org
 ---
- include/hw/arm/armv7m.h |  4 +++-
- hw/intc/armv7m_nvic.c   | 17 ++++++++++++++++-
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ hw/timer/imx_epit.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
-index d2c74d3872a..a30e3c64715 100644
---- a/include/hw/arm/armv7m.h
-+++ b/include/hw/arm/armv7m.h
-@@ -35,7 +35,9 @@ typedef struct {
+diff --git a/hw/timer/imx_epit.c b/hw/timer/imx_epit.c
+index baf6338e1a6..ebd58254d15 100644
+--- a/hw/timer/imx_epit.c
++++ b/hw/timer/imx_epit.c
+@@ -199,15 +199,22 @@ static void imx_epit_write(void *opaque, hwaddr offset, uint64_t value,
  
- /* ARMv7M container object.
-  * + Unnamed GPIO input lines: external IRQ lines for the NVIC
-- * + Named GPIO output SYSRESETREQ: signalled for guest AIRCR.SYSRESETREQ
-+ * + Named GPIO output SYSRESETREQ: signalled for guest AIRCR.SYSRESETREQ.
-+ *   If this GPIO is not wired up then the NVIC will default to performing
-+ *   a qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET).
-  * + Property "cpu-type": CPU type to instantiate
-  * + Property "num-irq": number of external IRQ lines
-  * + Property "memory": MemoryRegion defining the physical address space
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 3c4b6e6d701..277a98b87b9 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -19,6 +19,7 @@
- #include "hw/intc/armv7m_nvic.h"
- #include "hw/irq.h"
- #include "hw/qdev-properties.h"
-+#include "sysemu/runstate.h"
- #include "target/arm/cpu.h"
- #include "exec/exec-all.h"
- #include "exec/memop.h"
-@@ -64,6 +65,20 @@ static const uint8_t nvic_id[] = {
-     0x00, 0xb0, 0x1b, 0x00, 0x0d, 0xe0, 0x05, 0xb1
- };
+     switch (offset >> 2) {
+     case 0: /* CR */
+-        ptimer_transaction_begin(s->timer_cmp);
+-        ptimer_transaction_begin(s->timer_reload);
  
-+static void signal_sysresetreq(NVICState *s)
-+{
-+    if (qemu_irq_is_connected(s->sysresetreq)) {
-+        qemu_irq_pulse(s->sysresetreq);
-+    } else {
-+        /*
-+         * Default behaviour if the SoC doesn't need to wire up
-+         * SYSRESETREQ (eg to a system reset controller of some kind):
-+         * perform a system reset via the usual QEMU API.
-+         */
-+        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+    }
-+}
+         oldcr = s->cr;
+         s->cr = value & 0x03ffffff;
+         if (s->cr & CR_SWR) {
+             /* handle the reset */
+             imx_epit_reset(DEVICE(s));
+-        } else {
++            /*
++             * TODO: could we 'break' here? following operations appear
++             * to duplicate the work imx_epit_reset() already did.
++             */
++        }
 +
- static int nvic_pending_prio(NVICState *s)
- {
-     /* return the group priority of the current pending interrupt,
-@@ -1524,7 +1539,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-             if (value & R_V7M_AIRCR_SYSRESETREQ_MASK) {
-                 if (attrs.secure ||
-                     !(cpu->env.v7m.aircr & R_V7M_AIRCR_SYSRESETREQS_MASK)) {
--                    qemu_irq_pulse(s->sysresetreq);
-+                    signal_sysresetreq(s);
-                 }
-             }
-             if (value & R_V7M_AIRCR_VECTCLRACTIVE_MASK) {
++        ptimer_transaction_begin(s->timer_cmp);
++        ptimer_transaction_begin(s->timer_reload);
++
++        if (!(s->cr & CR_SWR)) {
+             imx_epit_set_freq(s);
+         }
+ 
 -- 
 2.20.1
 
