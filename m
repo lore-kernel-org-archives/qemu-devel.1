@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 064F2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B37C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:39:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74D4622BF3
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:37:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5946207DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:39:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XJXsfYgJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74D4622BF3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MjqwgFh1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5946207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2gH1-0004dL-Lu
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 15:37:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39548)
+	id 1k2gIb-0006kC-35
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 15:39:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k2gDt-0001S8-HE
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:13 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54921)
+ id 1k2gDs-0001Pc-7x
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:12 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35478)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k2gDr-0003Zq-Ka
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:13 -0400
-Received: by mail-wm1-x344.google.com with SMTP id d190so600737wmd.4
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 12:34:11 -0700 (PDT)
+ id 1k2gDq-0003Zb-Fw
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:34:11 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 184so696656wmb.0
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 12:34:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=40piShayyQWcskVekKLi2etxoD3Oho/QcZJcKds9zsk=;
- b=XJXsfYgJS/ElZbXx4mdZM1ymgEQ1107Y2Vb7TTETqIJE2fyx5IFGOkrPEMB3BJtRMX
- Qj8OIfOk/afLBBzkdg3Zd/bunc8nTejEkVLyKC8SK3snAZXRLiC3BtRm7DP8KebvaJC1
- uHnFjrmNpi0Ack6dTrCillZYl1luWCp1ppNS7+zGPM+UMA1pIkxbpOhVCx3mvtdU3/Hi
- emKo6/9Ozq95Uf1v1v3OGX0KMlijCWzRw4RzsQoeFCk3XsHohPSmMqaqzPj9Jv7DitTx
- 1jK9A704ygVJQ6rA8tX5caST+8HrWqObudjoQxK6BI78KV5GYE1EflOzI8oiAn1DQW2+
- Kpxg==
+ bh=3dVcMoMLCTb5XdSyz5C0L7sWyDj1NgAifJ97Hu5p/DY=;
+ b=MjqwgFh1A97KaIwja73fCeOs6g21gNpsa25tCy5HsvIriATT6tl5M+WtZEwg3bHOBt
+ zb6JlD3FdxvbzT9vrCO8s6MDfbhlYuFmIRDf/Xx/To6Vd6RPgB4DwbcQPJ2mnyLhkFH8
+ AEniiuBQK6bMOWYZCCFGCrtMb83FKOFMWW1edUlLMc0EVWzI/f6EdhPmGgp2ta0BpwRG
+ 1RSpVYBj+Zcg05s48ZUv1f4Ud+7Ws8pnztQeL/Bf/VlBm2eo2yuO22TUsLaBkADRwlzF
+ VjikOrPz0OzxodD8Jh6yOkkz+UhVxMwvgfN1YAq48vPgOweyXz5na9zEdb64OISn/dlR
+ iJnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=40piShayyQWcskVekKLi2etxoD3Oho/QcZJcKds9zsk=;
- b=X+mU1CiB5zO8z/ydpaTggImx/GqNO2bnfF459Dvr5x/lIQ6z8AJKRf/WiM4a5Y/ymK
- iyi2hUnxzH8kIJVD/oKRV1qdPCBnmrx+wT1UWkUb5yQ5HNdhMJ7vi23t+Dd2l0eBfwH3
- joC6o+DODkY9ca7jhecoY+SzgrR1/boIJB0+edRunrsj6lbtPNi/nz8mDAVqo53Azh+c
- dE4VUKB+IDKvRsPvekjW5SkPOtr4wM4oS2YqKEmBbj7uNrIwqZ+I19i74z/gDoDqxrD3
- 2ZjkrcqJhN/HRJ2OXd5NUpjzvf9hl9Oj99UG8EsZDo4vqjv/l1+I+9yM2fk1sylmLSCj
- Qufw==
-X-Gm-Message-State: AOAM531pBc8N4qFyD5hkdyXh1ALKnxk6m1BPZQwELXae8W4i4UVm0zDu
- V3peEY3U9bjVaTj7trGaXch7grsYpty6/Q==
-X-Google-Smtp-Source: ABdhPJwERxrkhg/LHEBTsidoRmqEHmqkFy9hJBvHB2R5rRdUJIx5CVm2oh4XoOHAFyxwaZZtklCzfQ==
-X-Received: by 2002:a1c:7204:: with SMTP id n4mr610126wmc.161.1596483249471;
- Mon, 03 Aug 2020 12:34:09 -0700 (PDT)
+ bh=3dVcMoMLCTb5XdSyz5C0L7sWyDj1NgAifJ97Hu5p/DY=;
+ b=JHru02RTX+A5sVZQjpQRDhMNPx8SxL0RETi5LJBWc9uOzCVsG40erR7DQ0yuLmhsBE
+ v4th5zVDLFBl6T/1jtQO60LKozA6Z5mElgp1dBTXQDCcngIbgdOqk7i4QsJJR27uAu5J
+ eVu/JJRUqIJ8reSrfzLUYE+yq59ZVvou/PjlwrwTOdMIJ9DJiI9Xddm+IwCCGAr6qhWE
+ N5KtplhHjYsReR7iG82PVmNHjO8b/wM2wlDB4rE5OMNZ3yHqT+DV7VW+Unan4jclisdW
+ 0CXxQqTcUr7i9oVQLjbG5z83Tx5FFwTiTE2mMgoE3ErVYY23kSmIqQUiOVMXclhhbvQz
+ 33nw==
+X-Gm-Message-State: AOAM530Z1JRDO/hm0m7WdNuSL4V84Q3DFIFTNJX/jJ9tasAuV5QtlZ0p
+ x77xgP3Qr8dF/nhlpRAJE1vgs34pxskTKg==
+X-Google-Smtp-Source: ABdhPJyxFo5yaoU0JY9MGZfhVvC1/6ltiVum6h0k9O88gDsBph39dVs2WWJIMpPJBoMOpXc0HLqCIg==
+X-Received: by 2002:a1c:ba83:: with SMTP id k125mr655825wmf.160.1596483247770; 
+ Mon, 03 Aug 2020 12:34:07 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id r206sm985565wma.6.2020.08.03.12.34.07
+ by smtp.gmail.com with ESMTPSA id r206sm985565wma.6.2020.08.03.12.34.06
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Aug 2020 12:34:08 -0700 (PDT)
+ Mon, 03 Aug 2020 12:34:06 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 4/8] msf2-soc, stellaris: Don't wire up SYSRESETREQ
-Date: Mon,  3 Aug 2020 20:33:55 +0100
-Message-Id: <20200803193359.12936-5-peter.maydell@linaro.org>
+Subject: [PULL 3/8] hw/intc/armv7m_nvic: Provide default "reset the system"
+ behaviour for SYSRESETREQ
+Date: Mon,  3 Aug 2020 20:33:54 +0100
+Message-Id: <20200803193359.12936-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200803193359.12936-1-peter.maydell@linaro.org>
 References: <20200803193359.12936-1-peter.maydell@linaro.org>
@@ -87,8 +88,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,94 +106,103 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The MSF2 SoC model and the Stellaris board code both wire
-SYSRESETREQ up to a function that just invokes
-    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-This is now the default action that the NVIC does if the line is
-not connected, so we can delete the handling code.
+The NVIC provides an outbound qemu_irq "SYSRESETREQ" which it signals
+when the guest sets the SYSRESETREQ bit in the AIRCR register.  This
+matches the hardware design (where the CPU has a signal of this name
+and it is up to the SoC to connect that up to an actual reset
+mechanism), but in QEMU it mostly results in duplicated code in SoC
+objects and bugs where SoC model implementors forget to wire up the
+SYSRESETREQ line.
+
+Provide a default behaviour for the case where SYSRESETREQ is not
+actually connected to anything: use qemu_system_reset_request() to
+perform a system reset.  This will allow us to remove the
+implementations of SYSRESETREQ handling from the boards where that's
+exactly what it does, and also fixes the bugs in the board models
+which forgot to wire up the signal:
+
+ * microbit
+ * mps2-an385
+ * mps2-an505
+ * mps2-an511
+ * mps2-an521
+ * musca-a
+ * musca-b1
+ * netduino
+ * netduinoplus2
+
+We still allow the board to wire up the signal if it needs to, in case
+we need to model more complicated reset controller logic or to model
+buggy SoC hardware which forgot to wire up the line itself. But
+defaulting to "reset the system" is more often going to be correct
+than defaulting to "do nothing".
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200728103744.6909-4-peter.maydell@linaro.org
+Message-id: 20200728103744.6909-3-peter.maydell@linaro.org
 ---
- hw/arm/msf2-soc.c  | 11 -----------
- hw/arm/stellaris.c | 12 ------------
- 2 files changed, 23 deletions(-)
+ include/hw/arm/armv7m.h |  4 +++-
+ hw/intc/armv7m_nvic.c   | 17 ++++++++++++++++-
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
-index 33ea7df342c..d2c29e82d13 100644
---- a/hw/arm/msf2-soc.c
-+++ b/hw/arm/msf2-soc.c
-@@ -30,7 +30,6 @@
+diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
+index d2c74d3872a..a30e3c64715 100644
+--- a/include/hw/arm/armv7m.h
++++ b/include/hw/arm/armv7m.h
+@@ -35,7 +35,9 @@ typedef struct {
+ 
+ /* ARMv7M container object.
+  * + Unnamed GPIO input lines: external IRQ lines for the NVIC
+- * + Named GPIO output SYSRESETREQ: signalled for guest AIRCR.SYSRESETREQ
++ * + Named GPIO output SYSRESETREQ: signalled for guest AIRCR.SYSRESETREQ.
++ *   If this GPIO is not wired up then the NVIC will default to performing
++ *   a qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET).
+  * + Property "cpu-type": CPU type to instantiate
+  * + Property "num-irq": number of external IRQ lines
+  * + Property "memory": MemoryRegion defining the physical address space
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 3c4b6e6d701..277a98b87b9 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -19,6 +19,7 @@
+ #include "hw/intc/armv7m_nvic.h"
  #include "hw/irq.h"
- #include "hw/arm/msf2-soc.h"
- #include "hw/misc/unimp.h"
--#include "sysemu/runstate.h"
- #include "sysemu/sysemu.h"
+ #include "hw/qdev-properties.h"
++#include "sysemu/runstate.h"
+ #include "target/arm/cpu.h"
+ #include "exec/exec-all.h"
+ #include "exec/memop.h"
+@@ -64,6 +65,20 @@ static const uint8_t nvic_id[] = {
+     0x00, 0xb0, 0x1b, 0x00, 0x0d, 0xe0, 0x05, 0xb1
+ };
  
- #define MSF2_TIMER_BASE       0x40004000
-@@ -59,13 +58,6 @@ static const int spi_irq[MSF2_NUM_SPIS] = { 2, 3 };
- static const int uart_irq[MSF2_NUM_UARTS] = { 10, 11 };
- static const int timer_irq[MSF2_NUM_TIMERS] = { 14, 15 };
- 
--static void do_sys_reset(void *opaque, int n, int level)
--{
--    if (level) {
--        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
--    }
--}
--
- static void m2sxxx_soc_initfn(Object *obj)
++static void signal_sysresetreq(NVICState *s)
++{
++    if (qemu_irq_is_connected(s->sysresetreq)) {
++        qemu_irq_pulse(s->sysresetreq);
++    } else {
++        /*
++         * Default behaviour if the SoC doesn't need to wire up
++         * SYSRESETREQ (eg to a system reset controller of some kind):
++         * perform a system reset via the usual QEMU API.
++         */
++        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++    }
++}
++
+ static int nvic_pending_prio(NVICState *s)
  {
-     MSF2State *s = MSF2_SOC(obj);
-@@ -130,9 +122,6 @@ static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
-         return;
-     }
- 
--    qdev_connect_gpio_out_named(DEVICE(&s->armv7m.nvic), "SYSRESETREQ", 0,
--                                qemu_allocate_irq(&do_sys_reset, NULL, 0));
--
-     system_clock_scale = NANOSECONDS_PER_SECOND / s->m3clk;
- 
-     for (i = 0; i < MSF2_NUM_UARTS; i++) {
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index 28eb15c76ca..5f9d0801807 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -18,7 +18,6 @@
- #include "hw/boards.h"
- #include "qemu/log.h"
- #include "exec/address-spaces.h"
--#include "sysemu/runstate.h"
- #include "sysemu/sysemu.h"
- #include "hw/arm/armv7m.h"
- #include "hw/char/pl011.h"
-@@ -1206,14 +1205,6 @@ static void stellaris_adc_init(Object *obj)
-     qdev_init_gpio_in(dev, stellaris_adc_trigger, 1);
- }
- 
--static
--void do_sys_reset(void *opaque, int n, int level)
--{
--    if (level) {
--        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
--    }
--}
--
- /* Board init.  */
- static stellaris_board_info stellaris_boards[] = {
-   { "LM3S811EVB",
-@@ -1317,9 +1308,6 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
-     /* This will exit with an error if the user passed us a bad cpu_type */
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(nvic), &error_fatal);
- 
--    qdev_connect_gpio_out_named(nvic, "SYSRESETREQ", 0,
--                                qemu_allocate_irq(&do_sys_reset, NULL, 0));
--
-     if (board->dc1 & (1 << 16)) {
-         dev = sysbus_create_varargs(TYPE_STELLARIS_ADC, 0x40038000,
-                                     qdev_get_gpio_in(nvic, 14),
+     /* return the group priority of the current pending interrupt,
+@@ -1524,7 +1539,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+             if (value & R_V7M_AIRCR_SYSRESETREQ_MASK) {
+                 if (attrs.secure ||
+                     !(cpu->env.v7m.aircr & R_V7M_AIRCR_SYSRESETREQS_MASK)) {
+-                    qemu_irq_pulse(s->sysresetreq);
++                    signal_sysresetreq(s);
+                 }
+             }
+             if (value & R_V7M_AIRCR_VECTCLRACTIVE_MASK) {
 -- 
 2.20.1
 
