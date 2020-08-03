@@ -2,99 +2,100 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5464C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 14:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C2FC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 15:04:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA40A21744
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 14:54:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C48D207FC
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 15:04:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L6YgYEP8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA40A21744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HmK2QlJc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C48D207FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2yKS-0002KZ-UT
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 10:54:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54372)
+	id 1k2yUr-0007Bi-KN
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 11:04:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57250)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k2yJk-0001m5-1f
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 10:53:28 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40543)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k2yJg-0001PU-I0
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 10:53:26 -0400
-Received: by mail-pl1-x641.google.com with SMTP id u10so13541275plr.7
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 07:53:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=G8iK6Ss606ZM/B4U+kopOI9YHb2G6ZZxhPAcDenrYw0=;
- b=L6YgYEP8rBrg5lgOmnUQEU4E8dT8N3UFG6D0w3S2dG+E+qg6Q3+SZd9I27MCZfBp8O
- zGxaN2WHE6ZXI6zn84Yu/3UyfhG9fh9P32fUJ1nivXaLaSUl92m5VaXDseuWzvD700Ih
- 0f081TUZTa/zrNsPa6J+uOCHorhICBJ1Px3UlKhm2GzmWYQ1uUCEaZMjCW3gVWaqOKvJ
- s4imOtaiCuswq/cl2UF96EYppDf3m9QkppR6lK1pZf1dTkWXeJbK/aaaTnVIP1HwIu/R
- KkhyECx1MZ6Js49HXRhogbPVNje9MQYz01AdPHGDIMXSQ/C3gySNshmY9fiHda7ULNoq
- kOtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=G8iK6Ss606ZM/B4U+kopOI9YHb2G6ZZxhPAcDenrYw0=;
- b=g95EVtPOnISmH45vrXN9YtoYaMo9jPCVCJexq8AkJ1gfLZ/25OoGhOCSwWRAufEtux
- m2KjT8f04JBRmYkUo4PArh7Sg1S5ILWQ5Ma7Hts00OuJs6YnK6WTsbh/2XwBZtm2GNnn
- gJQ4Zeo6RPBKKPipUvGeHs+Tp6qpE+jXIV67YrNIARrAuDXsAcYc+SKNTUz8hYveeXAN
- yk/2R71CviokUSlcuVw9HZsPhxQTX21bEHOuH5dFm+8lsDz+kQi48LMRlDIm2SMKBYH5
- G5Qbd0uh20LzkfRWryL/WA2RgX+bHTwMOZ+fu0YrHVnbrq5wJ3bemVTlcTk+KcUWmLoJ
- Yl3Q==
-X-Gm-Message-State: AOAM532A3HiAoaXOfGByJRwWUktXEP/q2KPRUyV9kov2aSfVK2o9XRy7
- ZCzde8/NhNi2KcfccyV6rEQpJStLIIw=
-X-Google-Smtp-Source: ABdhPJygGaQS5mCh2JdMgQfk0/i/BKnIduGJ9hItKSETb30GkhwyfQWTWDTt8zdbv2y7SR4vID+W5Q==
-X-Received: by 2002:a17:90b:1287:: with SMTP id
- fw7mr4662828pjb.218.1596552802173; 
- Tue, 04 Aug 2020 07:53:22 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v128sm22279409pfc.14.2020.08.04.07.53.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 04 Aug 2020 07:53:21 -0700 (PDT)
-Subject: Re: [PATCH 2/7] target/arm: Separate decode from handling of coproc
- insns
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200803111849.13368-1-peter.maydell@linaro.org>
- <20200803111849.13368-3-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <96aa534f-4892-1084-7899-de9c76f5b8a8@linaro.org>
-Date: Tue, 4 Aug 2020 07:53:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <mtosatti@redhat.com>)
+ id 1k2yU5-0006kk-Sm
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 11:04:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53630
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mtosatti@redhat.com>)
+ id 1k2yU2-0003Sy-TN
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 11:04:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596553444;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JA17bUD499vwkBRhHz59CMc99eUCk2vZ1hUj0Eaz3io=;
+ b=HmK2QlJctveiwpR4KLsQJkfqhlRs5oKhTcZiIvgZiXcXGGc0cduzmW2cgQxyDqN8VWtiHg
+ YSuBK2gch79VRdAZ9X9L68dbq28RCEuChdTW/kQ++mjWcUyW13O84WyWgQ1BTVNvgH0aYX
+ H33XQNXvPIyDmDI3tK5Mv1+DBhdVp10=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-HgxQffhPPK-s2pxHRBcqYA-1; Tue, 04 Aug 2020 11:02:29 -0400
+X-MC-Unique: HgxQffhPPK-s2pxHRBcqYA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36087800685;
+ Tue,  4 Aug 2020 15:02:28 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-9.gru2.redhat.com [10.97.112.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 23D15100EBA4;
+ Tue,  4 Aug 2020 15:02:24 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+ id 140FB4168BAA; Mon,  3 Aug 2020 14:33:38 -0300 (-03)
+Date: Mon, 3 Aug 2020 14:33:38 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.0 1/2] hw/acpi/piix4: Add 'system-hotplug-support'
+ property
+Message-ID: <20200803173338.GA83945@fuller.cnet>
+References: <20200318221531.22910-1-philmd@redhat.com>
+ <20200318221531.22910-2-philmd@redhat.com>
+ <20200319114424.5723e777@office.mammed.net>
+ <4d42697e-ba84-e5af-3a17-a2cc52cf0dbc@redhat.com>
+ <20200319160800.614de5fb@redhat.com>
+ <d6c0dc2f-5b0f-2e34-6c12-e9d9cd7402c6@redhat.com>
+ <3f70d63d-e9ae-6676-edd5-20613b4b8856@redhat.com>
+ <20200323110452.GA14031@fuller.cnet>
+ <f8a17eb5-7c70-4deb-82b3-54bc097dcfd6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200803111849.13368-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <f8a17eb5-7c70-4deb-82b3-54bc097dcfd6@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mtosatti@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_12_24=1.049,
+ DKIMWL_WL_HIGH=-1, DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
+ DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,25 +108,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/3/20 4:18 AM, Peter Maydell wrote:
-> As a prelude to making coproc insns use decodetree, split out the
-> part of disas_coproc_insn() which does instruction decoding from the
-> part which does the actual work, and make do_coproc_insn() handle the
-> UNDEF-on-bad-permissions and similar cases itself rather than
-> returning 1 to eventually percolate up to a callsite that calls
-> unallocated_encoding() for it.
+On Mon, Aug 03, 2020 at 07:10:11PM +0200, Philippe Mathieu-Daudé wrote:
+> Hi Igor, Paolo.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/translate.c | 76 ++++++++++++++++++++++++------------------
->  1 file changed, 44 insertions(+), 32 deletions(-)
+> On 3/23/20 12:04 PM, Marcelo Tosatti wrote:
+> > On Mon, Mar 23, 2020 at 09:05:06AM +0100, Paolo Bonzini wrote:
+> >> On 22/03/20 17:27, Philippe Mathieu-Daudé wrote:
+> >>>>>
+> >>>> That 'ugly' is typically used within QEMU to deal with such things
+> >>>> probably due to its low complexity.
+> >>>
+> >>> OK. Can you point me to the documentation for this feature? I can find
+> >>> reference of GPE in the ICH9, but I can't find where this IO address on
+> >>> the PIIX4 comes from:
+> >>>
+> >>> #define GPE_BASE 0xafe0
+> >>
+> >> It's made up.  The implementation is placed in PIIX4_PM because it is
+> >> referenced by the ACPI tables.  Real hardware would probably place this
+> >> in the ACPI embedded controller or in the BMC.
+> >>
+> >> Paolo
+> > 
+> > Yes, there was nothing at 0xafe0 at the time ACPI support was written.
+> > 
+> 
+> Igor earlier said:
+> "it's already pretty twisted code and adding one more knob
+> to workaround other compat knobs makes it worse."
+> 
+> Is that OK to rename this file "hw/acpi/piix4_twisted.c" and
+> copy/paste the same content to "hw/acpi/piix4.c" but remove the
+> non-PIIX4 code (GPE from ICH9)?
+> 
+> This seems counterproductive from a maintenance PoV, but the PIIX4 bug
+> (https://bugs.launchpad.net/qemu/+bug/1835865) is more than 1 year old
+> now...
+> 
+> If someone has a clever idea, I'm open to listen and implement it, but
+> keeping ignoring this issue is not good.
+> 
+> Note there is a similar issue with the LPC bus not existing on the
+> PIIX, so maybe renaming this to something like "piix_virt.c" and having
+> someone writing the specs (or differences with the physical datasheet)
+> is not a such bad idea.
+> 
+> Thanks,
+> 
+> Phil.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
+Make the port address architecture specific ? 
 
 
