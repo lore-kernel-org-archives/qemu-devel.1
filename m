@@ -2,104 +2,89 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C301DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 07:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D1C6C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 07:29:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8999C206D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 07:12:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27CC8206E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 07:29:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HnFiAXOf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8999C206D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gW0fqZba"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27CC8206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2Ue8-000681-Ey
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 03:12:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55292)
+	id 1k2UuO-0000pD-UJ
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 03:29:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k2UdM-0005SQ-5x
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 03:11:44 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50182
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2UtX-0000Ky-MA
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 03:28:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54116
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k2UdK-0003tv-Mt
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 03:11:43 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2UtV-0005ko-2S
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 03:28:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596438701;
+ s=mimecast20190719; t=1596439704;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8ZGWNvQoyphBRtgfVpcmeCuGB8r273RcUlzahaXuspg=;
- b=HnFiAXOf2E+fZBHjf22ba8F1iDjpgAsYZiByqwiLlHN6ZIxeEBqj6FmsDkgAz/A2c9D5V4
- oumU/sf41AOq3FlopqZHoY+7tq2VOuknYObpvDnQpPEB+Ww/mR9y/a+gDdZzo86uicRAn0
- wgxg8mPxIcCv3+cI1dX+JWYmigp/Nts=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-2gHbwLGQPOyIcFmv_MREmw-1; Mon, 03 Aug 2020 03:11:39 -0400
-X-MC-Unique: 2gHbwLGQPOyIcFmv_MREmw-1
-Received: by mail-wm1-f71.google.com with SMTP id q15so5171922wmj.6
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 00:11:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8ZGWNvQoyphBRtgfVpcmeCuGB8r273RcUlzahaXuspg=;
- b=IFuBOwtpjO2GnsPRvhFS7v54JBnM4TlYGFZJpgtwlMYDvNgxoWuj40zyW/fralelMn
- XhG8ingrdu7ndHUvlJZJYudw/krynYtxV3iu47rUmv2Qg8ljBZN8IPOc62aoq3+L8/+F
- ofQZ3PqCXy8zCZMdibaE82aVr8ActrcMPv6JNJbX92qCgNO9tDoE30WwNI6y7/Q6yx/1
- fftFJjKXsECFZUe0YEMRrbHjObl4F48GIawauutsEimLCuVZWkfVP9QsWb8DWxhR8ulj
- hdIOFdJDJgSJOPTEqrRXm8cmVZ93HE/RdpU1+JVkC21plal0jieedrEIdKsUONimgKNu
- FybQ==
-X-Gm-Message-State: AOAM533kvTscYjjbihrxTZBx7SKzauPoZKCCzXxsi6YDMENK6ss4v/UH
- S/otkJ+cdnQfZeeZ77DXiDTWXDNEdDtMQuNhPhvMFwkLGVQSSakyiyXYXtr6Hzz15tJqIqb3uwz
- qcJt461YQkf36h0Y=
-X-Received: by 2002:a7b:cf0b:: with SMTP id l11mr14303108wmg.128.1596438698479; 
- Mon, 03 Aug 2020 00:11:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw7UTbFhiLzvKExqQSbdqJpaUaBYVq4oO5Ia6vl0XS8Z34ys23gZ+uiPSakKxV468TfCLab9Q==
-X-Received: by 2002:a7b:cf0b:: with SMTP id l11mr14303087wmg.128.1596438698216; 
- Mon, 03 Aug 2020 00:11:38 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:310b:68e5:c01a:3778?
- ([2001:b07:6468:f312:310b:68e5:c01a:3778])
- by smtp.gmail.com with ESMTPSA id l81sm22081463wmf.4.2020.08.03.00.11.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Aug 2020 00:11:37 -0700 (PDT)
-Subject: Re: [PATCH 2/2] accel/tcg: interrupt/exception handling uses
- bql_interrupt flag
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200731125127.30866-1-robert.foley@linaro.org>
- <20200731125127.30866-3-robert.foley@linaro.org>
- <67497c73-d2b9-941e-471d-de0ccd61bb7f@redhat.com>
- <CAEyhzFuPNsC3xVPG9bFEbfUPq6MW26STdr-OtKzGsfKykK2FuA@mail.gmail.com>
- <CABgObfbHMsn7yR9GiYGUmrHr6o2LZT+xdw+915R6zNi29reRzQ@mail.gmail.com>
- <87ft95yqq1.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <86d2f7e4-dd44-75c9-817a-b7afa90b4f38@redhat.com>
-Date: Mon, 3 Aug 2020 09:11:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ bh=4X4Bd22jjViqVhM3Nz9wLcuFN7+oimeGR03nrXxz5kE=;
+ b=gW0fqZbanwiBoLjlii+t5B+ScBwTnAC5BSqsd2juNX9xjCkyIvjsiuh2rdxkVvD7cznwEC
+ SasCAU6rBwbGE9l6kceHFr0PtK8bsIWZf+YZQLkFvRjthtsQant1MjlfYZo8RBkMS/otrE
+ 5dnFePfP+VNbgrOIH978x/UAqlnJK0A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-475-EwnmU30UMkqt7XmoE1dwvw-1; Mon, 03 Aug 2020 03:28:22 -0400
+X-MC-Unique: EwnmU30UMkqt7XmoE1dwvw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AB871800D42;
+ Mon,  3 Aug 2020 07:28:21 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1324087E26;
+ Mon,  3 Aug 2020 07:28:11 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9324F1132FD2; Mon,  3 Aug 2020 09:28:09 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH] schemas: Add vim modeline
+References: <20200729185024.121766-1-abologna@redhat.com>
+ <87ime52wxd.fsf@dusky.pond.sub.org>
+ <20200730093732.GB3477223@redhat.com>
+ <87k0ylz0ep.fsf@dusky.pond.sub.org>
+ <20200730132446.GL3477223@redhat.com>
+ <875za33ku1.fsf@dusky.pond.sub.org>
+ <20200731150738.GB3660103@redhat.com>
+ <03bb7822-20a0-2945-6c86-1d5f1b2a01d9@redhat.com>
+ <20200731154429.GD3660103@redhat.com>
+Date: Mon, 03 Aug 2020 09:28:09 +0200
+In-Reply-To: <20200731154429.GD3660103@redhat.com> ("Daniel P. =?utf-8?Q?B?=
+ =?utf-8?Q?errang=C3=A9=22's?=
+ message of "Fri, 31 Jul 2020 16:44:29 +0100")
+Message-ID: <87r1soi3xy.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <87ft95yqq1.fsf@linaro.org>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:09:19
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:37:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,7 +92,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,22 +105,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Puhov <peter.puhov@linaro.org>, Richard Henderson <rth@twiddle.net>,
- "Emilio G. Cota" <cota@braap.org>, Robert Foley <robert.foley@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/08/20 18:09, Alex Bennée wrote:
-> I originally suggested keeping the locking choice up in the main loop
-> because I suspect most guests will stick to BQL IRQs until they find it
-> is a bottle neck.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-True, but the main loop is already complicated and conditional locking
-is pretty much impossible to reason on and (in the future) do static
-analysis on.
+> On Fri, Jul 31, 2020 at 11:26:28AM -0400, John Snow wrote:
+>> > The long answer is that as a general philosophy I'm in favour of agres=
+sively
+>> > eliminating anything that is custom to a project and isn't offering an
+>> > compelling benefit over a functionally equivalent, commonly used / sta=
+ndard
+>> > solution.
+>> >=20
+>>=20
+>> I agree as violently as I know how. The purpose of this is not for us, i=
+t's
+>> for the ecosystem.
+>>=20
+>> I saw the critique that we still use JSON-ish for the runtime QMP protoc=
+ol,
+>> and moving the QAPI IDL to a standard wouldn't remove all instances of a
+>> custom format from our tree.
+>
+> I'd consider the runtime protocol separately. In terms of what's on the
+> wire, we use genuine JSON format.
 
-Paolo
+Yes.
+
+Fine print: QMP accepts (but does not emit) minor extensions[*].  RFC
+8592 actually permits this: "A JSON parser MAY accept non-JSON forms or
+extensions."  This is due to lazy implementation, not due to an actual
+need.  We could deprecate and remove.
+
+>                                   The Runtime problem is simply that JSON
+> standard is useless when it comes to integers, leaving behaviour undefine=
+d
+> in the standard if you exceed 53 bits of precision. So there's no way to
+> reliably parse unsigned 64-bit integers. Given that QEMU needs to pass
+> uint64 values, JSON was simply the wrong choice of format for QMP.
+
+To be precise: "An implementation may set limits on the range and
+precision of numbers."  Not quite undefined behavior.  Useless all the
+same.  There are more interoperability pitfalls due to JSON's
+notoriously useless minimal requirements.  Range of numbers is the most
+relevant one, because so many implementations set useless numeric
+limits, and there is no good way to work around the issue.
+
+> There's a 3rd aspect which is our source code that deals with JSON, where
+> we defined some JSON extensions to make it easier for C code to construct
+> JSON documents for sending over the wire.
+
+Example: qmp_error_response() uses the interpolation extension to safely
+insert values into a JSON syntax tree.
+
+    rsp =3D qdict_from_jsonf_nofail("{ 'error': { 'class': %s, 'desc': %s }=
+ }",
+                                  QapiErrorClass_str(error_get_class(err)),
+                                  error_get_pretty(err));
+
+Two extensions, actually:
+
+1. Interpolation: tokens starting with % get replaced by the
+   corresponding variable argument converted to a QObject.
+
+2. Single-quoted strings to avoid leaning toothpick syndrome.
+
+Without interpolation, we'd have to construct the tree by hand, like
+this:
+
+    error =3D qdict_new();
+    qdict_put_str(error, "class", QapiErrorClass_str(error_get_class(err)),
+    qdict_put_str(error, "desc", error_get_pretty(err));
+    rsp =3D qdict_new();
+    qdict_put(rsp, error);
+
+Much harder to read even for such a simple example.
+
+>                                           Back when we did this, it was a
+> reasonably good idea as no obvious alternative existed for this problem.
+> Today, I would just suggest using GLib's  GVariant feature, which solves
+> the same problem for GLib's DBus APIs.
+>
+> It is a shame we didn't just use DBus back in the day as that's a well
+> specified, simple protocol that would have done everything we needed,
+> including the ability to actually represent integers reliably. We
+> would be able to trivially talk to QEMU from any programming language,
+> and use common DBus code-generator tools instead of writing code
+> generators ourselves.
+
+Water under the bridge.
+
+[...]
+
+[*] Single-quoted strings and \' in strings.
 
 
