@@ -2,70 +2,99 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2198EC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 08:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 337E3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 08:19:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFA602065E
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 08:15:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F27BB2065E
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 08:19:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="njK4XxE9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFA602065E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gWipvlBC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F27BB2065E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2VdX-0007lG-PL
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 04:15:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41282)
+	id 1k2Vgv-0000pp-P7
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 04:19:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k2Vcp-00076a-Av; Mon, 03 Aug 2020 04:15:15 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:56647)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k2Vcl-00033r-Bb; Mon, 03 Aug 2020 04:15:15 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BKrKP23qKz9sTY; Mon,  3 Aug 2020 18:15:05 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1596442505;
- bh=fnfi8ddiHUnN4M8bcu+YiZECf3oSERrbt8OzoBipdTA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=njK4XxE90+mqXqr67odz8kv/vPaZ2ogH/lCKsMpbNAGp0mIUp9ykvOCEhU3/9a5jl
- c8lwc0ju0hGh7nN38TwhHpYobnbUhXuWYtfgpOF6tDaKvF1TGWBRW1SJTSEAkCavRK
- XeZxJ1PUaklNMawJSh42y7eQO6rhGGr5uOpeENU0=
-Date: Mon, 3 Aug 2020 18:14:57 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [for-5.2 v4 10/10] s390: Recognize host-trust-limitation option
-Message-ID: <20200803081457.GE7553@yekko.fritz.box>
-References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
- <20200724025744.69644-11-david@gibson.dropbear.id.au>
- <8be75973-65bc-6d15-99b0-fbea9fe61c80@linux.ibm.com>
- <20200803075459.GC7553@yekko.fritz.box>
- <d8168c58-7935-99e7-dfe5-d97f22766bf7@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2VgE-0000Io-M5
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 04:18:46 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45022
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2VgC-0003g8-4j
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 04:18:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596442722;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=THXAl9yyzu2vwelnP2abs4RSXjAGnp+e17tfpdjZvD0=;
+ b=gWipvlBCEMhB/Tiw+LYy9QAVe56OYyhIg0d0xjPW3ZI7G48J6PEs/fjwyu91hdn8zXhE0S
+ L+WqxnvbijZ1UCzY2TQzy52iNc4VuV01oOGsPddQFHCPDIRmNEJ07sQHuwlX00Ja6faDRU
+ jOZ/tcKdlWHnVor8aH2gL/t2V4T4ERE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-70-X8U-_icrPAuaiOrOEN4NPw-1; Mon, 03 Aug 2020 04:18:40 -0400
+X-MC-Unique: X8U-_icrPAuaiOrOEN4NPw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24DE8800138;
+ Mon,  3 Aug 2020 08:18:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D128B272A3;
+ Mon,  3 Aug 2020 08:18:30 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 67FC41132FD2; Mon,  3 Aug 2020 10:18:29 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: cleanups with long-term benefits (was Re: [PATCH] schemas: Add
+ vim modeline)
+References: <20200729185024.121766-1-abologna@redhat.com>
+ <87ime52wxd.fsf@dusky.pond.sub.org>
+ <20200730093732.GB3477223@redhat.com>
+ <87k0ylz0ep.fsf@dusky.pond.sub.org>
+ <20200730132446.GL3477223@redhat.com>
+ <875za33ku1.fsf@dusky.pond.sub.org>
+ <20200731150738.GB3660103@redhat.com>
+ <2cf1a431-9d2c-8ad6-446e-f10b36219764@redhat.com>
+Date: Mon, 03 Aug 2020 10:18:29 +0200
+In-Reply-To: <2cf1a431-9d2c-8ad6-446e-f10b36219764@redhat.com> (Paolo
+ Bonzini's message of "Fri, 31 Jul 2020 18:28:06 +0200")
+Message-ID: <87d048i1m2.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Dzs2zDY0zgkG72+7"
-Content-Disposition: inline
-In-Reply-To: <d8168c58-7935-99e7-dfe5-d97f22766bf7@linux.ibm.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:56:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,118 +107,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, brijesh.singh@amd.com, ehabkost@redhat.com,
- kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- David Hildenbrand <david@redhat.com>, pair@us.ibm.com, dgilbert@redhat.com,
- pasic@linux.ibm.com, Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- pbonzini@redhat.com, mdroth@linux.vnet.ibm.com,
- Richard Henderson <rth@twiddle.net>
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
---Dzs2zDY0zgkG72+7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 31/07/20 17:07, Daniel P. Berrang=C3=A9 wrote:
+>> The QAPI JSON-but-not file format is a case where I think we should just
+>> adopt a standard file format no matter what. A conversion will have some
+>> short term work, but this is really simple data to deal with and the cod=
+e
+>> involved is nicely self contained. Again I'm not saying QAPI maintainers
+>> must do it, just put the idea out there as a piece of work that would
+>> be welcomed if someone is interested in working ont.
+>
+> The main issues with JSON-but-not in QEMU are:
+>
+> - the 64-bit integers, which does not apply to the QAPI schema though
 
-On Mon, Aug 03, 2020 at 10:07:42AM +0200, Janosch Frank wrote:
-> On 8/3/20 9:54 AM, David Gibson wrote:
-> > On Mon, Aug 03, 2020 at 09:49:42AM +0200, Janosch Frank wrote:
-> >> On 7/24/20 4:57 AM, David Gibson wrote:
-> >>> At least some s390 cpu models support "Protected Virtualization" (PV),
-> >>> a mechanism to protect guests from eavesdropping by a compromised
-> >>> hypervisor.
-> >>>
-> >>> This is similar in function to other mechanisms like AMD's SEV and
-> >>> POWER's PEF, which are controlled bythe "host-trust-limitation"
-> >>> machine option.  s390 is a slightly special case, because we already
-> >>> supported PV, simply by using a CPU model with the required feature
-> >>> (S390_FEAT_UNPACK).
-> >>>
-> >>> To integrate this with the option used by other platforms, we
-> >>> implement the following compromise:
-> >>>
-> >>>  - When the host-trust-limitation option is set, s390 will recognize
-> >>>    it, verify that the CPU can support PV (failing if not) and set
-> >>>    virtio default options necessary for encrypted or protected guests,
-> >>>    as on other platforms.  i.e. if host-trust-limitation is set, we
-> >>>    will either create a guest capable of entering PV mode, or fail
-> >>>    outright
-> >>>
-> >>>  - If host-trust-limitation is not set, guest's might still be able to
-> >>>    enter PV mode, if the CPU has the right model.  This may be a
-> >>>    little surprising, but shouldn't actually be harmful.
-> >>
-> >> As I already explained, they have to continue to work without any chan=
-ge
-> >> to the VM's configuration.
-> >=20
-> > Yes.. that's what I'm saying will happen.
-> >=20
-> >> Our users already expect PV to work without HTL. This feature is alrea=
-dy
-> >> being used and the documentation has been online for a few months. I've
-> >> already heard enough complains because users found small errors in our
-> >> documentation. I'm not looking forward to complains because suddenly we
-> >> need to specify new command line arguments depending on the QEMU versi=
-on.
-> >>
-> >> @Cornelia: QEMU is not my expertise, am I missing something here?
-> >=20
-> > What I'm saying here is that you don't need a new option.  I'm only
-> > suggesting we make the new option the preferred way for future
-> > upstream releases.  (the new option has the advantage that you *just*
-> > need to specify it, and any necessary virtio or other options to be
-> > compatible should be handled for you).
-> >=20
-> > But existing configurations should work as is (I'm not sure they do
-> > with the current patch, because I'm not familiar with the s390 code
-> > and have no means to test PV, but that can be sorted out before
-> > merge).
-> >=20
-> OK, should and might are two different things so I was a bit concerned.
-> That's fine then, thanks for the answer.
+QMP only.  The QAPI schema does not use JSON numbers at all so far.
 
-Well, the "should" and "might" are covering different things.
-Existing working command lines should continue to work.  But those
-command lines must already have the necessary tweaks to make virtio
-work properly.  If you try to make a new command line for a PV guest
-with a virtio device - or anything else that introduces extra PV
-complications - then just chosing a CPU model with UNPACK might not be
-enough.  By contrast, if you set host-trust-limitation, then it should
-work and be PV capable with an arbitrary set of devices, or else fail
-immediately with a meaningful error.
+> - the comments, which are a common extension to JSON (see JSON5, NodeJS
+> config files, json_verify's -c option, etc.) so I find it quite surprisin=
+g
+> that no off-the-shelf Python component can parse JSON + comments
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+QAPI schema only.  QMP does not support comments.
 
---Dzs2zDY0zgkG72+7
-Content-Type: application/pgp-signature; name="signature.asc"
+> - the single-quote strings, which are not particularly useful in QAPI sch=
+ema
 
------BEGIN PGP SIGNATURE-----
+Every single string in the QAPI schema uses them, though.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8nx4EACgkQbDjKyiDZ
-s5IFHw/+Mlo1GETZ4M0/8tRfMOQ1ICrq1FoOEO9EYWxfzl/KMFmTcPuCNOyDF4Up
-XD/I2Kv6iL/VYzgXuxIR6e2s2zJfcUWDSeQA5Sg4p4EARFs1HlWhuC6ojhiy8ubL
-w4+mG27ewtYHxWFH6N8LmlZkUN/HmfwpbPXZzkgs8Dr8ZDI6uFfpvOJ1JceZWM8F
-xy9INXKy9YEHMF7wcESXZTuCIdA17IxI2W9j4p02DWSntTpnWj0xL8V3eZyIougb
-9FoTLRoWA+VVdzSUQoFlIL+QIVrKLM3cwTKzwnBVdHBriPWVULxeh3a88V0Qt20c
-bTWowPbqmxKe29jR94XA9dyXuGNdAall7GaUWlcaYtKvXXcTnMoJct5p/1PAnIwQ
-cj1MeyZn83DZwU1dKhr5jl1KxwcqMg+Zec2gfxx3PmD3A19VrqyF4oP5jpyEyuEe
-+7qByz+f3hCbgHsdo3cySNN4CKQFxTDBIpJGrBhqfX3SCIo3wXSqZK2w3+oDkdvP
-YhkXHa6RGxhtf9wAxo8td0Vc+6a4eEAYmNOUkZKLfEbZxxf+SxHOHQ/Jpb42W90F
-nXjdoTWTKQ11QjNEjNFGPq+MaUGXFLWQ8WEjttcZk2HxOc0drmSlDojPS4NiHSV1
-0IqcncQ/DH4cy8IRSpvXLuhgX4WSQbxKfySW4VUG6fAJd2nkf4o=
-=WkqB
------END PGP SIGNATURE-----
+I have no idea why Anthony put them in the QAPI schema language.
 
---Dzs2zDY0zgkG72+7--
+We could remove them from the QAPI schema language.  Flag day, and
+git-blame becomes pretty much useless for a couple of years.
+
+Removing them from QMP would be painless for QEMU itself, but could
+upset QMP clients that (unwisely) use them.
+
+> If we changed the single-quote strings to double-quote, jsonc.vim
+> (https://github.com/neoclide/jsonc.vim) seems to support JSON + comments.
+> In Emacs you'd probably add an epilogue like
+>
+> (defconst json-mode-comments-re (rx (group "#" (zero-or-more nonl) line-e=
+nd)))
+> (push (list json-mode-comments-re 1 font-lock-comment-face) json-font-loc=
+k-keywords-1)
+>
+> Did I miss anything?
+
+Let me reiterate that parsing the lower layer of the QAPI schema
+language is the trivial part (because we made it trivial, accepting a
+considerable hit to ergonomics).  For basic editor support, parsing the
+lower layer is all you need.  But to truly work with the schema, you
+need to grok the (less than trivial!) upper layer.  Making the lower
+layer slightly more trivial is not going to help with that.
+
+We can of course indulge in buyer's remorse on our choice to develop our
+own schema language for QAPI.  But that's separate discussion.
+
+As long as we have our own QAPI schema language, we should use a single
+frontend for working with it.
+
+> Besides that, why are we using Python and not JavaScript in the mode line=
+?
+
+Falls apart for # comments.  JavaScript uses // and /* */.
+
+[...]
+
 
