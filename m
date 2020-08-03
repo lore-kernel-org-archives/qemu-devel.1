@@ -2,125 +2,95 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B821C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 09:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F105BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 09:51:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAD8D20672
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 09:50:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCF6120678
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 09:51:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="VWM+WPSo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAD8D20672
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OFtbhIg7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCF6120678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2X74-0002Sq-QB
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 05:50:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43890)
+	id 1k2X8P-0003yi-Ph
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 05:51:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1k2X3j-0004A5-8z
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 05:47:07 -0400
-Received: from mail-eopbgr10121.outbound.protection.outlook.com
- ([40.107.1.121]:11844 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1k2X3h-0008SR-74
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 05:47:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F99uyOTnYs/LIFJFoENXza6Ir4wgxtkFjSlqKfQaUzPIBGft0FeQYVOMJjEBsx6UFIi5kbe65jouiQS5c7yVg01iPBaIKaVIdSoA6EPdmjh+UW3DvnWja6RZZalLLj5PQ28TlZMfZVw7a6IU2k2kt7uhwnLG9bK9N8sTI99Ex0NTOoDhs6TH4a2gw8OttfWT8Jcr+OHm0aYPhxZTO/XogtQknUNv8Z+fE4IzJjhd35Kr91lxN2hGBJXP0KwVWLBDtyry3kBvrz5OQmQozMI0bB5zhatlUXUVP9ky1CBTsG1H7ERg9vVxyQYTUDgTjfgSKoDPAeLwKO8jetoyn+sl3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lhS1NpwTJxUYP9y/CkbfwRbqip7kOfnpZQJI9dp1vrg=;
- b=WhUIATZlE+suxN3ZV5UN/k+LEHoSdnk6WGrXvsDqhij8g0uQZO5reO1L430paKJyaqzk9pxVM9Friaf6I/48WjVPvhM9oymnMNXrNaxGe6/6TCDtlJeWZmEacxybOmQ0lUCnv3Zo4ruYllqmrA0AjZ8W9v8POxdNtOokOMbqNLgxtMvELMGUCYrM8FGgWDsR110aEQ+IitNkFho4HtyKna64ejqUqWQV7yH48UqFitRpSpGSpVoMhb2Ph6M47rf2mlZqy1oBl41nZRNYpV13RDvb6G0eTV7eNbeMFCWGqPQlRiv3GAIz+pW3Ae/uOukMqj69JMsn9Ttji/oeTSdzuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
- dkim=pass header.d=syrmia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lhS1NpwTJxUYP9y/CkbfwRbqip7kOfnpZQJI9dp1vrg=;
- b=VWM+WPSosrS8OctS2LqtfVnDf2wOKcXIQcNJ53gvF5PM1zqEpzvbuhQBEVVv4mTrUJkr6nWUCz3f6n5Em1uZQIjt+xmGzCYCg1Mln95Sl6TRc6PGa7lxHtKMykywUUMVZXVPr/UUR1r8xL0Fgh0y/cUd6hOkdq7XsrLNL8PsVg8=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com (2603:10a6:20b:d1::19)
- by AM6PR03MB5457.eurprd03.prod.outlook.com (2603:10a6:20b:cb::22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.20; Mon, 3 Aug
- 2020 09:46:50 +0000
-Received: from AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618]) by AM6PR03MB5233.eurprd03.prod.outlook.com
- ([fe80::98f0:b948:78a8:f618%7]) with mapi id 15.20.3239.021; Mon, 3 Aug 2020
- 09:46:50 +0000
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 7/8] linux-user: Add support for btrfs ioctls used to
- manage quota
-Date: Mon,  3 Aug 2020 11:46:28 +0200
-Message-Id: <20200803094629.21898-8-Filip.Bozuta@syrmia.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200803094629.21898-1-Filip.Bozuta@syrmia.com>
-References: <20200803094629.21898-1-Filip.Bozuta@syrmia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: GV0P278CA0051.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:710:29::20) To AM6PR03MB5233.eurprd03.prod.outlook.com
- (2603:10a6:20b:d1::19)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k2X7o-0003Hh-8H
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 05:51:20 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46572
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k2X7l-0000Ub-7m
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 05:51:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596448276;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=G2CXHAebrLfDydjfx6Y+8Cpu7wyvWHpETrra4RjEUiQ=;
+ b=OFtbhIg7IlaMdl1OS2ORj2cMpNMxwWq8vZNA9XJTFfh0bvIQaefsq0i3HMfVOOVB5M9rNE
+ zgaZ0hylCAnwJN8zuAsZ8RrueasHvUtHjxGuhDXWNFSiIhODBO+5sxLZSyP2liA1Jm5al7
+ mONWbVbYwU+KI6RTGU0tB1IZu0kOcAM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-nWTHKp2tPHuI39KcZBW_Fg-1; Mon, 03 Aug 2020 05:51:14 -0400
+X-MC-Unique: nWTHKp2tPHuI39KcZBW_Fg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77C8C1800D42;
+ Mon,  3 Aug 2020 09:51:13 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9491C60CD1;
+ Mon,  3 Aug 2020 09:51:00 +0000 (UTC)
+Date: Mon, 3 Aug 2020 10:50:57 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: cleanups with long-term benefits (was Re: [PATCH] schemas: Add
+ vim modeline)
+Message-ID: <20200803095057.GE3670709@redhat.com>
+References: <20200729185024.121766-1-abologna@redhat.com>
+ <87ime52wxd.fsf@dusky.pond.sub.org>
+ <20200730093732.GB3477223@redhat.com>
+ <87k0ylz0ep.fsf@dusky.pond.sub.org>
+ <20200730132446.GL3477223@redhat.com>
+ <875za33ku1.fsf@dusky.pond.sub.org>
+ <20200731150738.GB3660103@redhat.com>
+ <2cf1a431-9d2c-8ad6-446e-f10b36219764@redhat.com>
+ <87d048i1m2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (147.91.217.238) by
- GV0P278CA0051.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:29::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3239.19 via Frontend Transport; Mon, 3 Aug 2020 09:46:49 +0000
-X-Mailer: git-send-email 2.25.1
-X-Originating-IP: [147.91.217.238]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 44e1ef88-e9c6-4560-5b2b-08d8379224f2
-X-MS-TrafficTypeDiagnostic: AM6PR03MB5457:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR03MB5457256398832E3430B4D0D6EB4D0@AM6PR03MB5457.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wcT1GxrivVBHbGWCLQe8XNTSQ2bRIL6Cs+bC47vpsqjCvf1OuPV1HiwH2wmy+iyy32oqcOLtolhsHdjAM1Pc/CdD/NSvbSRkenwD+B/GjbSCi7DkPzjVEUKXjZpV1ufHDDD/Zq8hp0bY1kbXo2X/aujZe97FBSIWTIqNhCvVpFKofuRfMmYIPQOBm8nV2cKosWNFOHtTWce9kPbWDIpuE7Ahezw9WO/rm5SwRBCGMOYyIZmoLfQQ7EIUnDT5CQXjRm6kr1HqJxz9/LjsXfbQ+6tZfImvtzav9DlWUEPOsbJ/Fuo6xgX8W6q4oojrWHptF8hWLNbmSRvMjIGYjDma3Y2XWSlvcZkUx3RKUnIY9rmMDLmcBsGtSGH7SC+ax4+cgO1tLNyL0J3gRLBTTiBp6uSG975H1YYbP41lFukK08hNrPLg/BVl+f/6cIPl1sN2WxTPJBJRhWX6xnNjwBiomg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR03MB5233.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFTY:;
- SFS:(396003)(376002)(39830400003)(346002)(136003)(366004)(66946007)(6486002)(6512007)(6506007)(66556008)(66476007)(1076003)(6916009)(86362001)(186003)(8676002)(2906002)(316002)(26005)(15650500001)(69590400007)(8936002)(16526019)(36756003)(107886003)(956004)(2616005)(52116002)(83380400001)(54906003)(966005)(6666004)(4326008)(5660300002)(508600001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: dlXAw9RoGnMeOAlL+pPmclPvpavSU4onWCIr7CepZGe9mUzC0o2hoCSSqdNzSn3QMnvm6KU+d/R4fKjCUHg4XllDsFX1Zf5OpOBlvF18zepPq/O5f4QbnxyIFbiLxUNqNkJ8VHo/euv33EpKnFcEdVMAtEEjyn/DM2w4pNspQ5jg5l6swO4AECDKyT99pAJFuH5576OiOV6Da87JofZQ1mxHti6e7Rb+FPl0/CiIhSGyt/+NDrMiX4bOSdO5Aw4/X5F3tOXloI/YZpUN7faOaQaZiyOp3gL4a+j4xMRvMajoUvL0JiIeJ/fElx0r7G3pCYp4xhQhuDigHj7Szo6yyizeVY95/CPt99brY5rrnEevJ1fepklOPV68w+C1xx1aqMXHPt085EKtBcMT7LhDyY3jgzzn7cJb79DVqhd260r5yEqHGP/OVCDhtyFfmG4RJsp9DS0eM6dCN+KkyyNyJ6cQ1AbuECmoJT32s3Y8OHuTvHlWyXwgCW8bvWJRrpQVEo/c17I92tpFOdWRkbgv9c/F5sx9K21qiYKa9Sm3Z4bx38VbHQwnWX9x/pDD/NsQtS7ENyxDsv4MrAhNaNKks0M21N1g7GfaE3Hiqh3au/Paw8okgPkY+aHM/T89Ifq0KbjrXGvbrlgp7vzj+zirCA==
-X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 44e1ef88-e9c6-4560-5b2b-08d8379224f2
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5233.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2020 09:46:49.9180 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h9YWidtC1XIwdEnar4XkirQaMz0HxLGXTlFIQZxrE59S2Sg7dp5JQetPUhxtJY3HzxAxOZQSmQqb2a5Ad8spCg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR03MB5457
-Received-SPF: pass client-ip=40.107.1.121;
- envelope-from=Filip.Bozuta@syrmia.com;
- helo=EUR02-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 05:46:49
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: 10
-X-Spam_score: 1.0
-X-Spam_bar: +
-X-Spam_report: (1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1, RCVD_IN_SBL_CSS=3.335,
- RCVD_IN_SORBS_WEB=1.5, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <87d048i1m2.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:56:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,234 +103,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Filip Bozuta <Filip.Bozuta@syrmia.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements functionality for following ioctls:
+On Mon, Aug 03, 2020 at 10:18:29AM +0200, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+> > - the single-quote strings, which are not particularly useful in QAPI schema
+> 
+> Every single string in the QAPI schema uses them, though.
+> 
+> I have no idea why Anthony put them in the QAPI schema language.
+> 
+> We could remove them from the QAPI schema language.  Flag day, and
+> git-blame becomes pretty much useless for a couple of years.
 
-BTRFS_IOC_QUOTA_CTL - Enabling/Disabling quota support
+I don't think the git-blame issue is a big deal, just a minor inconvenience.
+Say you find the line of code you are examining hits the commit which did
+the refactoring. You merely have to run git blame a second time passing
+SHA-OF-REFACTOR^1 as an arg. 
 
-    Enable or disable quota support for a btrfs filesystem. Quota
-    support is enabled or disabled using the ioctls third argument
-    which represents a pointer to a following type:
 
-    struct btrfs_ioctl_quota_ctl_args {
-	__u64 cmd;
-	__u64 status;
-    };
-
-    Before calling this ioctl, the 'cmd' field should be filled
-    with one of the values 'BTRFS_QUOTA_CTL_ENABLE' (enabling quota)
-    'BTRFS_QUOTA_CTL_DISABLE' (disabling quota).
-
-BTRFS_IOC_QGROUP_CREATE - Creating/Removing a subvolume quota group
-
-    Create or remove a subvolume quota group. The subvolume quota
-    group is created or removed using the ioctl's third argument which
-    represents a pointer to a following type:
-
-    struct btrfs_ioctl_qgroup_create_args {
-	__u64 create;
-	__u64 qgroupid;
-    };
-
-    Before calling this ioctl, the 'create' field should be filled
-    with the aproppriate value depending on if the user wants to
-    create or remove a quota group (0 for removing, everything else
-    for creating). Also, the 'qgroupid' field should be filled with
-    the value for the quota group id that is to be created.
-
-BTRFS_IOC_QGROUP_ASSIGN - Asigning or removing a quota group as child group
-
-    Asign or remove a quota group as child quota group of another
-    group in the btrfs filesystem. The asignment is done using the
-    ioctl's third argument which represents a pointert to a following type:
-
-    struct btrfs_ioctl_qgroup_assign_args {
-	__u64 assign;
-	__u64 src;
-	__u64 dst;
-    };
-
-    Before calling this ioctl, the 'assign' field should be filled with
-    the aproppriate value depending on if the user wants to asign or remove
-    a quota group as a child quota group of another group (0 for removing,
-    everythin else for asigning). Also, the 'src' and 'dst' fields should
-    be filled with the aproppriate quota group id values depending on which
-    quota group needs to asigned or removed as child quota group of another
-    group ('src' gets asigned or removed as child group of 'dst').
-
-BTRFS_IOC_QGROUP_LIMIT - Limiting the size of a quota group
-
-    Limit the size of a quota group. The size of the quota group is limited
-    with the ioctls third argument which represents a pointer to a following
-    type:
-
-    struct btrfs_ioctl_qgroup_limit_args {
-	__u64	qgroupid;
-	struct btrfs_qgroup_limit lim;
-    };
-
-    Before calling this ioctl, the 'qgroup' id field should be filled with
-    aproppriate value of the quota group id for which the size is to be
-    limited. The second field is of following type:
-
-    struct btrfs_qgroup_limit {
-	__u64	flags;
-	__u64	max_rfer;
-	__u64	max_excl;
-	__u64	rsv_rfer;
-	__u64	rsv_excl;
-    };
-
-    The 'max_rfer' field should be filled with the size to which the quota
-    group should be limited. The 'flags' field can be used for passing
-    additional options and can have values which can be found on:
-    https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/btrfs.h#L67
-
-BTRFS_IOC_QUOTA_RESCAN_STATUS - Checking status of running rescan operation
-
-    Check status of a running rescan operation. The status is checked using
-    the ioctl's third argument which represents a pointer to a following type:
-
-    struct btrfs_ioctl_quota_rescan_args {
-        __u64   flags;
-        __u64   progress;
-        __u64   reserved[6];
-    };
-
-    If there is a rescan operation running, 'flags' field is set to 1, and
-    'progress' field is set to aproppriate value which represents the progress
-    of the operation.
-
-BTRFS_IOC_QUOTA_RESCAN - Starting a rescan operation
-
-    Start ar rescan operation to Trash all quota groups and scan the metadata
-    again with the current config. Before calling this ioctl,
-    BTRFS_IOC_QUOTA_RESCAN_STATUS sould be run to check if there is already a
-    rescan operation runing. After that ioctl call, the received
-    'struct btrfs_ioctl_quota_rescan_args' should be than passed as this ioctls
-    third argument.
-
-BTRFS_IOC_QUOTA_RESCAN_WAIT - Waiting for a rescan operation to finish
-
-    Wait until a rescan operation is finished (if there is a rescan operation
-    running). The third ioctls argument is ignored.
-
-Implementation notes:
-
-    Almost all of the ioctls in this patch use structure types as third arguments.
-    That is the reason why aproppriate thunk definitions were added in file
-    'syscall_types.h'.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/ioctls.h        | 27 +++++++++++++++++++++++++++
- linux-user/syscall_defs.h  |  7 +++++++
- linux-user/syscall_types.h | 29 +++++++++++++++++++++++++++++
- 3 files changed, 63 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 2c553103e6..8665f504bf 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -227,6 +227,33 @@
-      IOCTL(BTRFS_IOC_LOGICAL_INO, IOC_RW,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_logical_ino_args)))
- #endif
-+#ifdef BTRFS_IOC_QUOTA_CTL
-+     IOCTL(BTRFS_IOC_QUOTA_CTL, IOC_RW,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_quota_ctl_args)))
-+#endif
-+#ifdef BTRFS_IOC_QGROUP_ASSIGN
-+     IOCTL(BTRFS_IOC_QGROUP_ASSIGN, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_qgroup_assign_args)))
-+#endif
-+#ifdef BTRFS_IOC_QGROUP_CREATE
-+     IOCTL(BTRFS_IOC_QGROUP_CREATE, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_qgroup_create_args)))
-+#endif
-+#ifdef BTRFS_IOC_QGROUP_LIMIT
-+     IOCTL(BTRFS_IOC_QGROUP_LIMIT, IOC_R,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_qgroup_limit_args)))
-+#endif
-+#ifdef BTRFS_IOC_QUOTA_RESCAN
-+     IOCTL(BTRFS_IOC_QUOTA_RESCAN, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_quota_rescan_args)))
-+#endif
-+#ifdef BTRFS_IOC_QUOTA_RESCAN_STATUS
-+     IOCTL(BTRFS_IOC_QUOTA_RESCAN_STATUS, IOC_R,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_quota_rescan_args)))
-+#endif
-+#ifdef BTRFS_IOC_QUOTA_RESCAN_WAIT
-+     IOCTL(BTRFS_IOC_QUOTA_RESCAN_WAIT, 0, TYPE_NULL)
-+#endif
- #ifdef BTRFS_IOC_GET_DEV_STATS
-      IOCTL(BTRFS_IOC_GET_DEV_STATS, IOC_RW,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_dev_stats)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index f1718ac521..1b1b2c2d96 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -985,6 +985,13 @@ struct target_rtc_pll_info {
- #define TARGET_BTRFS_IOC_DEV_INFO               TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 30)
- #define TARGET_BTRFS_IOC_INO_PATHS              TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 35)
- #define TARGET_BTRFS_IOC_LOGICAL_INO            TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 36)
-+#define TARGET_BTRFS_IOC_QUOTA_CTL              TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 40)
-+#define TARGET_BTRFS_IOC_QGROUP_ASSIGN          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 41)
-+#define TARGET_BTRFS_IOC_QGROUP_CREATE          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 42)
-+#define TARGET_BTRFS_IOC_QGROUP_LIMIT           TARGET_IORU(BTRFS_IOCTL_MAGIC, 43)
-+#define TARGET_BTRFS_IOC_QUOTA_RESCAN           TARGET_IOWU(BTRFS_IOCTL_MAGIC, 44)
-+#define TARGET_BTRFS_IOC_QUOTA_RESCAN_STATUS    TARGET_IORU(BTRFS_IOCTL_MAGIC, 45)
-+#define TARGET_BTRFS_IOC_QUOTA_RESCAN_WAIT      TARGET_IO(BTRFS_IOCTL_MAGIC, 46)
- #define TARGET_BTRFS_IOC_GET_DEV_STATS          TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 52)
- #define TARGET_BTRFS_IOC_GET_FEATURES           TARGET_IORU(BTRFS_IOCTL_MAGIC, 57)
- #define TARGET_BTRFS_IOC_SET_FEATURES           TARGET_IOWU(BTRFS_IOCTL_MAGIC, 57)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 6bac8f46bb..2f5bad808e 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -400,6 +400,35 @@ STRUCT(btrfs_ioctl_get_dev_stats,
-        MK_ARRAY(TYPE_ULONGLONG,
-                 128 - 2 - BTRFS_DEV_STAT_VALUES_MAX)) /* unused */
- 
-+STRUCT(btrfs_ioctl_quota_ctl_args,
-+       TYPE_ULONGLONG, /* cmd */
-+       TYPE_ULONGLONG) /* status */
-+
-+STRUCT(btrfs_ioctl_quota_rescan_args,
-+       TYPE_ULONGLONG, /* flags */
-+       TYPE_ULONGLONG, /* progress */
-+       MK_ARRAY(TYPE_ULONGLONG, 6)) /* reserved */
-+
-+STRUCT(btrfs_ioctl_qgroup_assign_args,
-+       TYPE_ULONGLONG, /* assign */
-+       TYPE_ULONGLONG, /* src */
-+       TYPE_ULONGLONG) /* dst */
-+
-+STRUCT(btrfs_ioctl_qgroup_create_args,
-+       TYPE_ULONGLONG, /* create */
-+       TYPE_ULONGLONG) /* qgroupid */
-+
-+STRUCT(btrfs_qgroup_limit,
-+       TYPE_ULONGLONG, /* flags */
-+       TYPE_ULONGLONG, /* max_rfer */
-+       TYPE_ULONGLONG, /* max_excl */
-+       TYPE_ULONGLONG, /* rsv_rfer */
-+       TYPE_ULONGLONG) /* rsv_excl */
-+
-+STRUCT(btrfs_ioctl_qgroup_limit_args,
-+       TYPE_ULONGLONG, /* qgroupid */
-+       MK_STRUCT(STRUCT_btrfs_qgroup_limit)) /* lim */
-+
- STRUCT(btrfs_ioctl_feature_flags,
-        TYPE_ULONGLONG, /* compat_flags */
-        TYPE_ULONGLONG, /* compat_ro_flags */
+Regards,
+Daniel
 -- 
-2.25.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
