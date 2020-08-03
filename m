@@ -2,83 +2,85 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D536C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AEADC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:27:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CC5A20738
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:26:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EABF820738
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:27:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yHOeXGR2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CC5A20738
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M5DCWZ3a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EABF820738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2Yc6-00059y-5S
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 07:26:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46032)
+	id 1k2Yd4-0006Bp-1D
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 07:27:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k2YUi-0003vd-LN
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:19:04 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51453)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k2YcS-0005fg-Mq
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:27:04 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33839)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k2YUg-0004tZ-QE
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:19:04 -0400
-Received: by mail-wm1-x343.google.com with SMTP id p14so14003709wmg.1
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 04:19:02 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k2YcQ-00065M-Up
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:27:04 -0400
+Received: by mail-wr1-x443.google.com with SMTP id f7so33886189wrw.1
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 04:27:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=uE/zSzU3YCUj+8keAlvLyFX2oijQycTIyZcK1gVRSqY=;
- b=yHOeXGR2+tLrevmmLAQBc1pTlblM93sXH20O1UjYNdxnWNyqGEP01d+ghis5QepkBJ
- nnsaAljk5M7pebS127QbwK0ye2ORk6Y0D5JwiRaf4IZ6KdaA6gAU2+Qm3E9HKh9nlw/i
- wuetfjcJzJhZlo2DDK0RixvsaxMayGV6+1uemSdZOE08frskmF73uIjGzBttcmtHSQDw
- t67uCqqtvWejovQsEEgxLeASwbPCIPJIOnQ7/7CsaS/PAdlx3Ih3Uz+HOmnDgkBrDn5K
- Okv9Ttn7R+eWS2tttQhAYUIezFzJ8Yv6wWT40sldWq13FRzu5zHPbZkVygAoz5VtUyFt
- FIVQ==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=bIca3G4w02Pb4vz1h9G48iMfKF6O/OhMhUC0oktLOgY=;
+ b=M5DCWZ3a7Q7tmuNNG2Gc376blLVvuTLCXVzpTZzuhxZVWwBf7BFLqZEs4gLKSP7Evy
+ g2iMsKqRw46a/denypxwsK+n1vepmN+mODxEBXZv3o3DMwfBSLQpV5rayG8b6jwA8csA
+ YwulaOY9icT4OuWNSFjjxMvlslaLQRqcYjn4PDkGqVcrDexTOWCTiJLCQExdEWVTVfEH
+ Qiuu7Rzk7b0MJR6y1eu6OdlJQdxExsBRGZTmjrwHHHjhbsn1qOByEGOxwvbAu3cRAkzy
+ vKptjj3pYvdYAAf8WxHO5w7HJCrOscLUCHbr6bpXyYRDaJcdIuOJIpET4bdNTQ7Yfxdg
+ LtbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=uE/zSzU3YCUj+8keAlvLyFX2oijQycTIyZcK1gVRSqY=;
- b=V5Vqs5WAsSrJ9eYMpRQUplPCy0bwE8WczPHGf50V9EYZPH+Awe3pLBOMJo3XF+LqE/
- 8CndRZOAX1evBY1VkNaqcWqGsPJViuGy43Gr4oVeEVjQe/WHHTgmQUR3tt5yFIo7AHNd
- CtBva+w766F2dlh/g/RpCUtEG1pJbRqYfcJSKz3g1vf3lKURIqTWYxaPtReULjnok1l+
- QruVsROU5rqt0iWGVVwPwjIHvteBXA5z0uiAduKmr/EMSoqIX485DSmYM6Qkp1bP/tko
- 0Q2fRNrRYe7NdPCxZjh4UZtcO0xo6D55d/s/tF7ng6X6pkdlcVRE5WkGr/ucURi6Rzqj
- kEQQ==
-X-Gm-Message-State: AOAM530pZrrtbbrqMydtuDUs0qYMse/eAsbnG8rDOabKCav++b6db2im
- VLvVIWa+w26rtgND0huPjqyFSD3MbeMeMA==
-X-Google-Smtp-Source: ABdhPJwawNq9iOhdFOEY/zisDxsCZTbjPQ7zJOIeG8TGavX85l8wh0rGA3wcvo6NMUpskNGGIxexGg==
-X-Received: by 2002:a7b:c765:: with SMTP id x5mr14994384wmk.14.1596453541230; 
- Mon, 03 Aug 2020 04:19:01 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id g3sm28013170wrb.59.2020.08.03.04.19.00
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=bIca3G4w02Pb4vz1h9G48iMfKF6O/OhMhUC0oktLOgY=;
+ b=kRYSE+g09Y3AIBL4i7is5O7hSDh0YFhMnVWnMFWXN0JlTAjd9glmuANunxBHr/fVvH
+ cHGmayoG2S78bOq7tkbuI7jLqSQkKs+2aEQGUOxlJYm0rD8ED/t/RWwNmJkRxf7HKTBU
+ swz5Z3kSI/DtbPr+asw5PkUeuuw5NcmFO7JRALfWSRQlEceR/f+GWGpxIyeiPrdC1wvN
+ b2i2VOo8YYU7XOFtSftDzUHBMyqOxE8mx4zT2L9fErb+kLMM8IaogbD5ubDrOJ/OA+41
+ mJtBN0KzSNiBV+vcNzbNR7+Fm4tLSRyZ0FS2zTJp1KGlKRalxZuy7OeO82bMM7iUUx07
+ zupw==
+X-Gm-Message-State: AOAM530EQIE8GZUJz0SiEfcVQvh+5BAmGCUTV2l3NPp4uobQaIA2Rr64
+ mhf+yLwdrDetPNYEa6WKr54ERQ==
+X-Google-Smtp-Source: ABdhPJw7nkRLvdjaY2gE5zT35ialNJHIbTBDOnYOr49EKsqrbbXIQi/9Gq7AOwjWlxIw8BCivLALGg==
+X-Received: by 2002:adf:e704:: with SMTP id c4mr16078042wrm.81.1596454020548; 
+ Mon, 03 Aug 2020 04:27:00 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p6sm24252083wmg.0.2020.08.03.04.26.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Aug 2020 04:19:00 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH 6/7] target/arm: Convert T32 coprocessor insns to decodetree
-Date: Mon,  3 Aug 2020 12:18:48 +0100
-Message-Id: <20200803111849.13368-7-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200803111849.13368-1-peter.maydell@linaro.org>
-References: <20200803111849.13368-1-peter.maydell@linaro.org>
+ Mon, 03 Aug 2020 04:26:59 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A7B061FF7E;
+ Mon,  3 Aug 2020 12:26:58 +0100 (BST)
+References: <20200730193932.3654677-1-yuanzi@google.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Lirong Yuan <yuanzi@google.com>
+Subject: Re: [PATCH] [PATCH v2] gdbstub: add support to Xfer:auxv:read: packet
+In-reply-to: <20200730193932.3654677-1-yuanzi@google.com>
+Date: Mon, 03 Aug 2020 12:26:58 +0100
+Message-ID: <87bljsnf5p.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -86,8 +88,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,143 +102,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the T32 coprocessor instructions to decodetree.
-As with the A32 conversion, this corrects an underdecoding
-where we did not check that MRRC/MCRR [24:21] were 0b0010
-and so treated some kinds of LDC/STC and MRRC/MCRR rather
-than UNDEFing them.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/t32.decode  | 19 +++++++++++++
- target/arm/translate.c | 64 ++----------------------------------------
- 2 files changed, 21 insertions(+), 62 deletions(-)
+Lirong Yuan <yuanzi@google.com> writes:
 
-diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index c21a988f971..7069d821fde 100644
---- a/target/arm/t32.decode
-+++ b/target/arm/t32.decode
-@@ -45,6 +45,8 @@
- &sat             !extern rd rn satimm imm sh
- &pkh             !extern rd rn rm imm tb
- &cps             !extern mode imod M A I F
-+&mcr             !extern cp opc1 crn crm opc2 rt
-+&mcrr            !extern cp opc1 crm rt rt2
- 
- # Data-processing (register)
- 
-@@ -621,6 +623,23 @@ RFE              1110 1001 10.1 .... 1100000000000000         @rfe pu=1
- SRS              1110 1000 00.0 1101 1100 0000 000. ....      @srs pu=2
- SRS              1110 1001 10.0 1101 1100 0000 000. ....      @srs pu=1
- 
-+# Coprocessor instructions
-+
-+# We decode MCR, MCR, MRRC and MCRR only, because for QEMU the
-+# other coprocessor instructions always UNDEF.
-+# The trans_ functions for these will ignore cp values 8..13 for v7 or
-+# earlier, and 0..13 for v8 and later, because those areas of the
-+# encoding space may be used for other things, such as VFP or Neon.
-+
-+@mcr             .... .... opc1:3 . crn:4 rt:4 cp:4 opc2:3 . crm:4
-+@mcrr            .... .... .... rt2:4 rt:4 cp:4 opc1:4 crm:4
-+
-+MCRR             1110 1100 0100 .... .... .... .... .... @mcrr
-+MRRC             1110 1100 0101 .... .... .... .... .... @mcrr
-+
-+MCR              1110 1110 ... 0 .... .... .... ... 1 .... @mcr
-+MRC              1110 1110 ... 1 .... .... .... ... 1 .... @mcr
-+
- # Branches
- 
- %imm24           26:s1 13:1 11:1 16:10 0:11 !function=t32_branch24
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index adcd2127290..59d6e43611a 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -4791,37 +4791,6 @@ static void do_coproc_insn(DisasContext *s, int cpnum, int is64,
-     return;
- }
- 
--static int disas_coproc_insn(DisasContext *s, uint32_t insn)
--{
--    int cpnum, is64, crn, crm, opc1, opc2, isread, rt, rt2;
--
--    cpnum = (insn >> 8) & 0xf;
--
--    is64 = (insn & (1 << 25)) == 0;
--    if (!is64 && ((insn & (1 << 4)) == 0)) {
--        /* cdp */
--        return 1;
--    }
--
--    crm = insn & 0xf;
--    if (is64) {
--        crn = 0;
--        opc1 = (insn >> 4) & 0xf;
--        opc2 = 0;
--        rt2 = (insn >> 16) & 0xf;
--    } else {
--        crn = (insn >> 16) & 0xf;
--        opc1 = (insn >> 21) & 7;
--        opc2 = (insn >> 5) & 7;
--        rt2 = 0;
--    }
--    isread = (insn >> 20) & 1;
--    rt = (insn >> 12) & 0xf;
--
--    do_coproc_insn(s, cpnum, is64, opc1, crn, crm, opc2, isread, rt, rt2);
--    return 0;
--}
--
- /* Decode XScale DSP or iWMMXt insn (in the copro space, cp=0 or 1) */
- static void disas_xscale_insn(DisasContext *s, uint32_t insn)
- {
-@@ -8485,38 +8454,9 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-         ((insn >> 28) == 0xe && disas_vfp(s, insn))) {
-         return;
-     }
--    /* fall back to legacy decoder */
- 
--    switch ((insn >> 25) & 0xf) {
--    case 0: case 1: case 2: case 3:
--        /* 16-bit instructions.  Should never happen.  */
--        abort();
--    case 6: case 7: case 14: case 15:
--        /* Coprocessor.  */
--        if (arm_dc_feature(s, ARM_FEATURE_M)) {
--            /* 0b111x_11xx_xxxx_xxxx_xxxx_xxxx_xxxx_xxxx */
--            goto illegal_op;
--        }
--        if (((insn >> 24) & 3) == 3) {
--            /* Neon DP, but failed disas_neon_dp() */
--            goto illegal_op;
--        } else if (((insn >> 8) & 0xe) == 10) {
--            /* VFP, but failed disas_vfp.  */
--            goto illegal_op;
--        } else {
--            if (insn & (1 << 28))
--                goto illegal_op;
--            if (disas_coproc_insn(s, insn)) {
--                goto illegal_op;
--            }
--        }
--        break;
--    case 12:
--        goto illegal_op;
--    default:
--    illegal_op:
--        unallocated_encoding(s);
--    }
-+illegal_op:
-+    unallocated_encoding(s);
- }
- 
- static void disas_thumb_insn(DisasContext *s, uint32_t insn)
--- 
-2.20.1
+> This allows gdb to access the target=E2=80=99s auxiliary vector,
+> which can be helpful for telling system libraries important details
+> about the hardware, operating system, and process.
+>
+> Signed-off-by: Lirong Yuan <yuanzi@google.com>
 
+I cleaned up the test a little:
+
+modified   tests/tcg/multiarch/gdbstub/test-qxfer-auxv-read.py
+@@ -22,13 +22,9 @@ def report(cond, msg):
+ def run_test():
+     "Run through the tests one by one"
+=20
+-    cond =3D True
+-    try:
+-      gdb.execute("info auxv")
+-    except (gdb.error, AttributeError):
+-      cond =3D False
+-
+-    report(cond, "Display the auxiliary vector of the inferior.")
++    auxv =3D gdb.execute("info auxv", False, True)
++    report(isinstance(auxv, str), "Fetched auxv from inferior")
++    report(auxv.find("sha1"), "Found test binary name in auxv")
+=20
+ #
+ # This runs as the script it sourced (via -x, via run-test.py)
+
+
+Queued to gdbstub/next, thanks.
+
+--=20
+Alex Benn=C3=A9e
 
