@@ -2,79 +2,94 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F00F2C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 22:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D903C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 22:44:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0833A2076C
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 22:42:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0833A2076C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1AD3E2076C
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 22:44:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fPxfARKZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AD3E2076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2jA2-0002e9-2U
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 18:42:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37436)
+	id 1k2jCS-0003ki-8d
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 18:44:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k2j8a-0001cR-EN
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 18:40:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38356)
+ (Exim 4.90_1) (envelope-from
+ <3PI8oXwMKCvssffjrrjoh.frpthpx-ghyhoqrqjqx.ruj@flex--pcc.bounces.google.com>)
+ id 1k2ivQ-0007ou-4E
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 18:27:20 -0400
+Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:46843)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k2j8V-0002dn-S8
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 18:40:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k2j8S-0000ND-TW
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 22:40:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DD55A2E806D
- for <qemu-devel@nongnu.org>; Mon,  3 Aug 2020 22:40:48 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Aug 2020 22:30:53 -0000
-From: Adriano Marto Reis <1890208@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: adrianomarto
-X-Launchpad-Bug-Reporter: Adriano Marto Reis (adrianomarto)
-X-Launchpad-Bug-Modifier: Adriano Marto Reis (adrianomarto)
-Message-Id: <159649385359.2765.12928081922733657659.malonedeb@gac.canonical.com>
-Subject: [Bug 1890208] [NEW] Mouse pointer disappears when it is over console
- window
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 92ecb7b0784311fb298164bbac8431862e0d3998
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 18:40:49
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from
+ <3PI8oXwMKCvssffjrrjoh.frpthpx-ghyhoqrqjqx.ruj@flex--pcc.bounces.google.com>)
+ id 1k2ivG-0000v5-G2
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 18:27:19 -0400
+Received: by mail-yb1-xb4a.google.com with SMTP id a14so40764530ybm.13
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 15:27:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=B4m3PxqDTvPw7tm6WU6OvMjg7gp8LiTODdOlcgxss48=;
+ b=fPxfARKZV++9IqcKNXysaShvxSS1YSg6hH+9Nkfj5sFkvVJy+YAMMQQEO7SmaDpJrB
+ arcF/nrHiRaXugSz2v9e4gMr7lwiEI8LTLmJviUpNyffE+xbgVyCuAuXw7uFvmZlhkP5
+ OtlwjXvTjZ0Ejt1n4F5IN8NwzEK/D+4gCobmnzyr6ay9QxBDJ1eLqIQYMpWfnlZNTWvM
+ 8+A2WBgCp5AVDEdebSzwQfevN8BLwvLHw3PYTFR0lzS6TFDaxT5JO4X06YXOjmXPprV1
+ isO2tbCA04ajWvKOgZi9jTy9e6Dvegxd8gxk/Y2nWP3M5uS8RItwCP5uhZimOYKD2DN1
+ e2CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=B4m3PxqDTvPw7tm6WU6OvMjg7gp8LiTODdOlcgxss48=;
+ b=A6lYcGBw+d62+Mq8nU74/nuXw75ym1wgcXswKncXQQcvERMUl+wRMoUhJs1lQZkpNS
+ Dr7c8wdikWwNQL14nj6AuVSQhWy9aE/Jy0d9p49PTg2CfU2MAO7mIPSm5nj+Ko1VUBey
+ y5FtyrjXLtplKkAT5Ii9kGLN19ekuGFreSdMzMvIC213sEqsX+8LdoZudecfgGYu1tyQ
+ exE1vnLDqAzn9FYpNul56Fj9Hc9pXPedpx+CERS1sbYMCB4HhZiv5a4PVaONusYf+xwN
+ qOaBP4Txmwlryxcg/2nduuJdeK9FGFleJgy49HQ8Hvfhe97CWd6Ut6LpIrxEbsfmgWdM
+ T/MQ==
+X-Gm-Message-State: AOAM5311GV0SlcfolFxI3UafbM9YcALfILSYJKZiEi2kYLvnfhf5C/pf
+ UwdUkxqsMXkE2epLiMsqv7noyHo=
+X-Google-Smtp-Source: ABdhPJx7F6dx0AtGh6DpKMlliUMgwH4DAJJVRfhxHxbrP+t/aKPnf6qK01Hm+hQf+0e//nyfhpXtM/U=
+X-Received: by 2002:a25:bfcc:: with SMTP id q12mr26869346ybm.166.1596493628017; 
+ Mon, 03 Aug 2020 15:27:08 -0700 (PDT)
+Date: Mon,  3 Aug 2020 15:26:56 -0700
+Message-Id: <20200803222656.63936-1-pcc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.28.0.163.g6104cc2f0b6-goog
+Subject: [PATCH] target/arm: Fix decode of {LD,ST}RA[AB] instructions
+From: Peter Collingbourne <pcc@google.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, 
+ qemu-arm@nongnu.org
+Cc: Peter Collingbourne <pcc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
+ envelope-from=3PI8oXwMKCvssffjrrjoh.frpthpx-ghyhoqrqjqx.ruj@flex--pcc.bounces.google.com;
+ helo=mail-yb1-xb4a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -105
+X-Spam_score: -10.6
+X-Spam_bar: ----------
+X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Mon, 03 Aug 2020 18:44:06 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,62 +98,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890208 <1890208@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+These instructions use zero as the discriminator, not SP.
 
-The host mouse pointer disappears when it is over a console window.
+Signed-off-by: Peter Collingbourne <pcc@google.com>
+---
+ target/arm/translate-a64.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-I am emulating quite simple hardware: just text console and no mouse. I
-don't expect the mouse to have any effect on the emulated computers, but
-I need to know where the mouse pointer is. That is  important because I
-need to use the mouse to switch between applications and to switch
-between virtual machines (QEMU grabs Alt+Tab events). Also, it is quite
-tricky to work with multiple screens when we don't know where the mouse
-pointer is.
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 8c0764957c..c996ca1393 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -3429,9 +3429,11 @@ static void disas_ldst_pac(DisasContext *s, uint32_t insn,
+ 
+     if (s->pauth_active) {
+         if (use_key_a) {
+-            gen_helper_autda(dirty_addr, cpu_env, dirty_addr, cpu_X[31]);
++            gen_helper_autda(dirty_addr, cpu_env, dirty_addr,
++                             new_tmp_a64_zero(s));
+         } else {
+-            gen_helper_autdb(dirty_addr, cpu_env, dirty_addr, cpu_X[31]);
++            gen_helper_autdb(dirty_addr, cpu_env, dirty_addr,
++                             new_tmp_a64_zero(s));
+         }
+     }
+ 
+-- 
+2.28.0.163.g6104cc2f0b6-goog
 
-I am using:
-* Virtual Machine Manager 2.2.1
-* QEMU 4.2.0
-* Fedora 32
-* KDE Plasma 5.18.5
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890208
-
-Title:
-  Mouse pointer disappears when it is over console window
-
-Status in QEMU:
-  New
-
-Bug description:
-  The host mouse pointer disappears when it is over a console window.
-
-  I am emulating quite simple hardware: just text console and no mouse.
-  I don't expect the mouse to have any effect on the emulated computers,
-  but I need to know where the mouse pointer is. That is  important
-  because I need to use the mouse to switch between applications and to
-  switch between virtual machines (QEMU grabs Alt+Tab events). Also, it
-  is quite tricky to work with multiple screens when we don't know where
-  the mouse pointer is.
-
-  I am using:
-  * Virtual Machine Manager 2.2.1
-  * QEMU 4.2.0
-  * Fedora 32
-  * KDE Plasma 5.18.5
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890208/+subscriptions
 
