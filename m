@@ -2,97 +2,100 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 636B1C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:56:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0B8C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 16:04:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EF9220825
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:56:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBBD62068F
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 16:04:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kd9Mxdwx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EF9220825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XiaoTe8G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBBD62068F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2cp6-0007Fa-9k
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 11:56:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38082)
+	id 1k2cwv-0007iS-5h
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 12:04:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k2coP-0006Xv-DI
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 11:55:41 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36546)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k2coN-0001Pp-JV
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 11:55:41 -0400
-Received: by mail-pg1-x544.google.com with SMTP id p3so20071464pgh.3
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 08:55:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=0qqpqD915onaFoCxpKXH4xqDUdvvjVy0l6KgzS3CiVc=;
- b=Kd9MxdwxdcTixVbfvVQfT9sF6CszWBoLuTbIO9i55J7JrIweY7RJLjkbw7tiY7T9LU
- N47ROMMUJw/ZV6ZWaHo3/hJ3JrhHMqfPKeMa6/C2Xu1pJ+GuGqU2JnP8ICGqlDd9b0Ck
- 3VHxzKacmKafANrJL3CPCXVEbgxwjJPDeJ4NO1g+udY+KGX9WylEIZubeF2+axIRXCO7
- lOGBo0apeHLLLYgT/X1gzylsum1RodEOEFReibabS4jP1BT7hP/iR/o7B4infWubOaBr
- hCpscxAcWCoP/+2Pw4eGMGTLrbPxS/lKdEFvE02I47tAp1ToTjZK32Iv5t/4xrz3s2uo
- 4VBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0qqpqD915onaFoCxpKXH4xqDUdvvjVy0l6KgzS3CiVc=;
- b=UHJK9DKe7h9drmRUW1VCxM+NQlaff1JRSXtgJu2IJBDTc2eIGgEB7Klw3Z37BhxiPG
- SeVxHELHBf59gB48L/kGaQ9Ip4AHn5G3h4hrexLhDrkgEabh/IpRMTJ3+r9kVVx5EXnI
- 41+IQmVocXMOwH1OFiYRWwlBexo+DQ1PoNgbb4746TbgON9LcaqcC4yC6jnbaC7HVJ7g
- Wu5QqTNNlABdVHj223V6P7G+45rhFMkA2t2isnGspHv+wbMciUZdi2SRptB5BPyB1C3U
- zmXSmipbHQKnnN3/z7PEqhDi9z0v+CCw7QIInDZgffHlzIOaNGE1zEasS2lxFeN3Y9hV
- UCsA==
-X-Gm-Message-State: AOAM532OzkW1awaYtPz+1ZXeTtAbImRWtBvJmnxknpoJidpICDAr5da3
- EdFmEyntXHclrvFR/bFGpa7nag==
-X-Google-Smtp-Source: ABdhPJx9wYQ4/rsHXU92+zy4dHlKlNn8kUeXUhLU7rmcAanf6V7b6KgjpymooiF47bBliDo+i59lgQ==
-X-Received: by 2002:a62:7958:: with SMTP id u85mr16477877pfc.248.1596470137195; 
- Mon, 03 Aug 2020 08:55:37 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id t19sm18581683pgg.19.2020.08.03.08.55.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Aug 2020 08:55:36 -0700 (PDT)
-Subject: Re: [PATCH v2 4/4] hw/display/artist.c: fix out of bounds check
-To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
- peter.maydell@linaro.org
-References: <20200801131357.17379-1-deller@gmx.de>
- <20200801131357.17379-5-deller@gmx.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1acaa4f9-917b-47f0-6c48-36d033d0a294@linaro.org>
-Date: Mon, 3 Aug 2020 08:55:34 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2cvz-0006I7-Gu
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 12:03:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58918
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2cvx-0002Rr-52
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 12:03:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596470607;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=MrWj/vtfsnftHu+s+Pcc6mZfxGL2LqGC3Wod97zh/vI=;
+ b=XiaoTe8GCA2PXguPDJ0aUntEgUaDKObN7D6q8dVGeU7B7uSf2tzr4/fo0+cxZxzPI3tjUJ
+ UZMwsXsFji9mLbbYe4a1pSIkIwc5oUWmhGkCCeRyOXBs0RPxnKP9P0XuSI/I8ebXIFglxT
+ ouLrEwcTg++NdST4FeFm7XkrMGoT0bM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-DRJzL5M8MlOBPmrQfkiINw-1; Mon, 03 Aug 2020 12:03:24 -0400
+X-MC-Unique: DRJzL5M8MlOBPmrQfkiINw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C90918C63C7;
+ Mon,  3 Aug 2020 16:03:23 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 495156115F;
+ Mon,  3 Aug 2020 16:03:13 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D2A581132FD2; Mon,  3 Aug 2020 18:03:11 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: cleanups with long-term benefits (was Re: [PATCH] schemas: Add
+ vim modeline)
+References: <20200729185024.121766-1-abologna@redhat.com>
+ <87ime52wxd.fsf@dusky.pond.sub.org>
+ <20200730093732.GB3477223@redhat.com>
+ <87k0ylz0ep.fsf@dusky.pond.sub.org>
+ <20200730132446.GL3477223@redhat.com>
+ <875za33ku1.fsf@dusky.pond.sub.org>
+ <20200731150738.GB3660103@redhat.com>
+ <2cf1a431-9d2c-8ad6-446e-f10b36219764@redhat.com>
+ <87d048i1m2.fsf@dusky.pond.sub.org>
+ <83bbe0b0-c5e0-e3b7-5ba1-5946098370d5@redhat.com>
+ <87ft94klyl.fsf@dusky.pond.sub.org>
+ <490a0786-73f3-411e-4dfe-8c2ae90de251@redhat.com>
+Date: Mon, 03 Aug 2020 18:03:11 +0200
+In-Reply-To: <490a0786-73f3-411e-4dfe-8c2ae90de251@redhat.com> (Paolo
+ Bonzini's message of "Mon, 3 Aug 2020 14:01:57 +0200")
+Message-ID: <87y2mvhg3k.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200801131357.17379-5-deller@gmx.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:09:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,23 +108,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/1/20 6:13 AM, Helge Deller wrote:
-> From: Sven Schnelle <svens@stackframe.org>
-> 
-> Signed-off-by: Sven Schnelle <svens@stackframe.org>
-> Signed-off-by: Helge Deller <deller@gmx.de>
-> ---
->  hw/display/artist.c | 24 +++++++++++-------------
->  1 file changed, 11 insertions(+), 13 deletions(-)
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Looks ok, if not ideal.
+> On 03/08/20 13:28, Markus Armbruster wrote:
+>>>> We could remove them from the QAPI schema language.  Flag day, and
+>>>> git-blame becomes pretty much useless for a couple of years.
+>>> Is that a nack or a "whatever"?
+>> It's "is this really worth the trouble?"  I guess that's halfway between
+>> NAK and whatever, ready to be moved in either direction by arguments :)
+>
+> In general it seems like a good idea to use a standard file format and
+> not "a standard file format except for two characters". :)  We also
+> wouldn't be having discussions on editors.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+No argument.  But towards which standard file format should the schema
+evolve?
 
-r~
+* Standard JSON: no comments, no go
+
+* JSON with # comments: need to change strings from ' to "
+
+* JavaScript: need to change comments from # to //
+
+* Python: may want to switch bool literals from true, false to True,
+  False
+
+> That said, after a bit more research I'm skeptical about the possibility
+> of using an off-the-shelf parser because most of them either don't
+> support comments, or are based on YAJL which simply discards comments.
+>
+> Since '//' comments are harder to parse than "#" comments, this would
+> actually _add_ code instead of removing it.  Also since our doc comment
+> syntax uses "##" as a delimiter, we'd have to bikeshed what the doc
+> comments would look like ("//!", "///", etc.).
+
+Doc comments don't have to be comments in the schema language.  They
+could be doc strings.  Requires decent support for long strings, which
+JSON does not provide.
+
+> This means the two parts might be considered separately:
+>
+> - replacing single-quote with double-quote strings
+>
+> - replacing # comments with //
+
+If all we want is decent editor support out of the box, then rename to
+.py, and drop the modelines.  No merge conflicts, no git-blame
+pollution.
+
+To make the .py files actual Python, additionally rename the bool
+literals.  Much, much less churn than massaging all strings or all
+comments.
+
 
