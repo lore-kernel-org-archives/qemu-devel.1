@@ -2,91 +2,151 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE1DC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 07:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 858F4C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 07:41:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74A062068F
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 07:38:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c1oPwvyc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74A062068F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C43A206E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 07:41:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C43A206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2V2m-0000zx-EE
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 03:38:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60470)
+	id 1k2V6K-0002Y6-1d
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 03:41:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k2V2D-0000ZF-8b
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 03:37:25 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53959
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k2V2A-0006s9-51
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 03:37:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596440241;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ro11TNE79MJIGWTNAhNLYSSZEM+K7TBk79v4qcez4P4=;
- b=c1oPwvycJV5tMC3YDPoxnGhTFEk2oPnKXW3/2WnRfzIrZpG6FK5dHGAgsy7QVbE/N/CTRP
- 3Yn/otHvrhhnZtuPxMls3kacre12O90sqGD2VvDpF3CPJqqxZHL/BIlndaWPIu2o3FkXVr
- yF56FfjOHsT5iU0cEtZ6/gaZLldymr4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-O1JgFjy9NYuguWI0Yo_8Hg-1; Mon, 03 Aug 2020 03:37:17 -0400
-X-MC-Unique: O1JgFjy9NYuguWI0Yo_8Hg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57594101C8A5;
- Mon,  3 Aug 2020 07:37:16 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
- [10.36.115.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 357587852C;
- Mon,  3 Aug 2020 07:37:14 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 1308211AB5; Mon,  3 Aug 2020 09:37:14 +0200 (CEST)
-Date: Mon, 3 Aug 2020 09:37:14 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Michael Brown <mcb30@ipxe.org>
-Subject: Re: [ipxe-devel] https booting
-Message-ID: <20200803073714.aeqffoct2l66ahrz@sirius.home.kraxel.org>
-References: <20200722120827.dq72uabrk26nllra@sirius.home.kraxel.org>
- <20200722122347.GF2324845@redhat.com>
- <20200722135538.wvblddvskp5j4wik@sirius.home.kraxel.org>
- <20200722141318.GJ2324845@redhat.com>
- <411ac2fb-1f3e-28f0-5c9a-6ff0806cfbf7@ipxe.org>
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1k2V5V-0001jh-JZ; Mon, 03 Aug 2020 03:40:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1354
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1k2V5T-0007B3-De; Mon, 03 Aug 2020 03:40:49 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0737YUbl064886; Mon, 3 Aug 2020 03:40:37 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32pdqv94tt-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 03 Aug 2020 03:40:37 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0737Z2Zw066956;
+ Mon, 3 Aug 2020 03:40:36 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32pdqv94sx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 03 Aug 2020 03:40:36 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0737ZhZv024982;
+ Mon, 3 Aug 2020 07:40:34 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com
+ (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+ by ppma04ams.nl.ibm.com with ESMTP id 32n0181wve-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 03 Aug 2020 07:40:34 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0737eVNw57802894
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 3 Aug 2020 07:40:31 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 684C811C050;
+ Mon,  3 Aug 2020 07:40:31 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5874811C05B;
+ Mon,  3 Aug 2020 07:40:30 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.10.116])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  3 Aug 2020 07:40:30 +0000 (GMT)
+Subject: Re: [for-5.2 v4 10/10] s390: Recognize host-trust-limitation option
+To: Cornelia Huck <cohuck@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
+ <20200724025744.69644-11-david@gibson.dropbear.id.au>
+ <20200727175040.7beca3dd.cohuck@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <2967ea9e-9d6d-51bd-bf0e-4aae15c63fbb@linux.ibm.com>
+Date: Mon, 3 Aug 2020 09:40:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <411ac2fb-1f3e-28f0-5c9a-6ff0806cfbf7@ipxe.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:56:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+In-Reply-To: <20200727175040.7beca3dd.cohuck@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Ag1RgI6hSAz88L8GD7V7rABgWS6V6sov3"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-03_07:2020-07-31,
+ 2020-08-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 bulkscore=0
+ mlxlogscore=999 clxscore=1011 priorityscore=1501 adultscore=0 mlxscore=0
+ phishscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008030053
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 03:40:43
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,50 +159,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ipxe-devel@lists.ipxe.org,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>
+Cc: pair@us.ibm.com, brijesh.singh@amd.com, ehabkost@redhat.com,
+ kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ David Hildenbrand <david@redhat.com>, dgilbert@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ qemu-ppc@nongnu.org,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, pbonzini@redhat.com, mdroth@linux.vnet.ibm.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 24, 2020 at 05:19:38PM +0100, Michael Brown wrote:
-> On 22/07/2020 15:13, Daniel P. Berrangé wrote:
-> > We could easily define etc/ipxe/https/{ciphers,cacerts} paths in a
-> > different format if better suited for iPXE. Libvirt can set the right
-> > path depending on whether its booting a VM with EDK2 vs legacy BIOS
-> 
-> The most useful for iPXE would probably be to expose the fw_cfg mechanism as
-> a URI scheme.  This would give a general mechanism allowing for use cases
-> such as running a script provided by the host via e.g.
-> 
->   chain fw_cfg:///opt/org.example/script.ipxe
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ag1RgI6hSAz88L8GD7V7rABgWS6V6sov3
+Content-Type: multipart/mixed; boundary="OdzRqdVvtbWlykFm3IivWSMZPlcFmhBc3"
 
-Looks useful.
-(coreboot folks might want add cbfs: support).
+--OdzRqdVvtbWlykFm3IivWSMZPlcFmhBc3
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> The ${crosscert} setting could then be pointed at a base URL within the
-> fw_cfg space, e.g.
-> 
->   #define CROSSCERT "fw_cfg:///etc/ipxe/crosscert/auto"
-> 
-> This would then work in the same way under either BIOS or UEFI (or other
-> custom firmware), would provide a feature with applicability broader than
-> just obtaining certificates, and would avoid any potential problems from
-> allocating enough RAM to parse every root certificate from iPXE's fixed
-> 512kB internal heap.
+On 7/27/20 5:50 PM, Cornelia Huck wrote:
+> On Fri, 24 Jul 2020 12:57:44 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+>> At least some s390 cpu models support "Protected Virtualization" (PV),=
 
-Well, it isn't that easy.
+>> a mechanism to protect guests from eavesdropping by a compromised
+>> hypervisor.
+>>
+>> This is similar in function to other mechanisms like AMD's SEV and
+>> POWER's PEF, which are controlled bythe "host-trust-limitation"
+>> machine option.  s390 is a slightly special case, because we already
+>> supported PV, simply by using a CPU model with the required feature
+>> (S390_FEAT_UNPACK).
+>>
+>> To integrate this with the option used by other platforms, we
+>> implement the following compromise:
+>>
+>>  - When the host-trust-limitation option is set, s390 will recognize
+>>    it, verify that the CPU can support PV (failing if not) and set
+>>    virtio default options necessary for encrypted or protected guests,=
 
-fw_cfg isn't designed for a large number of files, and right now there
-is a hard limit of (IIRC) 32 entries.  While adding an entry or two
-isn't that much of a problem, adding all *.der files (228 right now)
-hosted @ http://ca.ipxe.org/auto/ individually certainly is.
+>>    as on other platforms.  i.e. if host-trust-limitation is set, we
+>>    will either create a guest capable of entering PV mode, or fail
+>>    outright
+>>
+>>  - If host-trust-limitation is not set, guest's might still be able to=
 
-So, we'll have to pass a certificate bundle as single file and have ipxe
-pick the certificate it needs from it.
+>>    enter PV mode, if the CPU has the right model.  This may be a
+>>    little surprising, but shouldn't actually be harmful.
+>=20
+> This could be workable, I guess. Would like a second opinion, though.
+>=20
+>>
+>> To start a guest supporting Protected Virtualization using the new
+>> option use the command line arguments:
+>>     -object s390-pv-guest,id=3Dpv0 -machine host-trust-limitation=3Dpv=
+0
+>>
+>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>> ---
+>>  hw/s390x/pv.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++=
++
+>>  1 file changed, 61 insertions(+)
+>>
+>> diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
+>> index ab3a2482aa..4bf3b345b6 100644
+>> --- a/hw/s390x/pv.c
+>> +++ b/hw/s390x/pv.c
+>> @@ -14,8 +14,11 @@
+>>  #include <linux/kvm.h>
+>> =20
+>>  #include "cpu.h"
+>> +#include "qapi/error.h"
+>>  #include "qemu/error-report.h"
+>>  #include "sysemu/kvm.h"
+>> +#include "qom/object_interfaces.h"
+>> +#include "exec/host-trust-limitation.h"
+>>  #include "hw/s390x/ipl.h"
+>>  #include "hw/s390x/pv.h"
+>> =20
+>> @@ -111,3 +114,61 @@ void s390_pv_inject_reset_error(CPUState *cs)
+>>      /* Report that we are unable to enter protected mode */
+>>      env->regs[r1 + 1] =3D DIAG_308_RC_INVAL_FOR_PV;
+>>  }
+>> +
+>> +#define TYPE_S390_PV_GUEST "s390-pv-guest"
+>> +#define S390_PV_GUEST(obj)                              \
+>> +    OBJECT_CHECK(S390PVGuestState, (obj), TYPE_S390_PV_GUEST)
+>> +
+>> +typedef struct S390PVGuestState S390PVGuestState;
+>> +
+>> +/**
+>> + * S390PVGuestState:
+>> + *
+>> + * The S390PVGuestState object is basically a dummy used to tell the
+>> + * host trust limitation system to use s390's PV mechanism.  guest.
+>> + *
+>> + * # $QEMU \
+>> + *         -object s390-pv-guest,id=3Dpv0 \
+>> + *         -machine ...,host-trust-limitation=3Dpv0
+>> + */
+>> +struct S390PVGuestState {
+>> +    Object parent_obj;
+>> +};
+>> +
+>> +static int s390_pv_kvm_init(HostTrustLimitation *gmpo, Error **errp)
+>> +{
+>> +    if (!s390_has_feat(S390_FEAT_UNPACK)) {
+>> +        error_setg(errp,
+>> +                   "CPU model does not support Protected Virtualizati=
+on");
+>> +        return -1;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>=20
+> So here's where I'm confused: If I follow the code correctly, the
+> ->kvm_init callback is invoked before kvm_arch_init() is called. The
+> kvm_arch_init() implementation for s390x checks whether
+> KVM_CAP_S390_PROTECTED is available, which is a pre-req for
+> S390_FEAT_UNPACK. Am I missing something? Can someone with access to PV=
 
-take care,
-  Gerd
+> hardware check whether this works as intended?
+
+Doesn't look good:
+
+=2E/s390x-run s390x/stsi.img -object s390-pv-guest,id=3Dpv0 -machine
+host-trust-limitation=3Dpv0
+/usr/local/bin/qemu-system-s390x -nodefaults -nographic -machine
+s390-ccw-virtio,accel=3Dkvm -chardev stdio,id=3Dcon0 -device
+sclpconsole,chardev=3Dcon0 -kernel s390x/stsi.img -object
+s390-pv-guest,id=3Dpv0 -machine host-trust-limitation=3Dpv0 # -initrd
+/tmp/tmp.uacr85fJnw
+qemu-system-s390x: CPU model does not support Protected Virtualization
+qemu-system-s390x: failed to initialize kvm: Operation not permitted
+
+
+Without the htl it's happy.
+
+>=20
+>> +
+>> +static void s390_pv_guest_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    HostTrustLimitationClass *gmpc =3D HOST_TRUST_LIMITATION_CLASS(oc=
+);
+>> +
+>> +    gmpc->kvm_init =3D s390_pv_kvm_init;
+>> +}
+>> +
+>> +static const TypeInfo s390_pv_guest_info =3D {
+>> +    .parent =3D TYPE_OBJECT,
+>> +    .name =3D TYPE_S390_PV_GUEST,
+>> +    .instance_size =3D sizeof(S390PVGuestState),
+>> +    .class_init =3D s390_pv_guest_class_init,
+>> +    .interfaces =3D (InterfaceInfo[]) {
+>> +        { TYPE_HOST_TRUST_LIMITATION },
+>> +        { TYPE_USER_CREATABLE },
+>> +        { }
+>> +    }
+>> +};
+>> +
+>> +static void
+>> +s390_pv_register_types(void)
+>> +{
+>> +    type_register_static(&s390_pv_guest_info);
+>> +}
+>> +
+>> +type_init(s390_pv_register_types);
+>=20
+
+
+
+--OdzRqdVvtbWlykFm3IivWSMZPlcFmhBc3--
+
+--Ag1RgI6hSAz88L8GD7V7rABgWS6V6sov3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl8nv20ACgkQ41TmuOI4
+ufhC/xAAhkewbX0tfuW2wFvChG/kdDuVj9H8ULqfvq5p5V3hwGaOxv9GOdhoUt7A
+k+DSIcHQeZuplKP2KwdxLM2TCWhQZoP1odgdZAu2DDOidQKrSvyE8H4iICKBk3co
+FlrYurKdlC653rO9mX7fm0qGHPLcSFFVojIL0a1L9wmATywrYuZmmDkQNVAkbRv2
+zlzm9Y+8F95b8DO6SNRcNQuYnOhzskK4jgZagwMIMq5/OjeaIRwxRoFAzhVpN11e
+uYTHO+PuROWUNsbQqAxu8Pc1jLxzbMjuVvYfhrf9iVzg1DN93QjpWzmLTPftyblN
+oKKyi2xquog0yqagKOFzXTm4DlbYYshRwkpE5nUdymxtnTrFjVtKqgTiFynSxrYl
+cly34CDIvo0sNwzaWsfrLUG7LpeO26mYaCdfSyFubNkoeiO7SCErzisk08ufcOeO
+hsbA+PeDZOVeoMg5b1dSk3WFM+nsg9tJz8fTAWy4DqG08dPMzxhKJ50rQjG2261m
+H4YXNGE/yD6CzKJsdNaGhWZ8UUa1zgPNyRDd2txMEAIdQPBYAEscHgbJoeH2yUUj
++X9i/Lk14Fg2RvXAlyn09fcuRFvPzkpodeoMrhiulSVDhYbacRXVePIWXeUM3JD0
+PUI9s2SgDPD3+adE4ydUs8NH71vHTBJbpBp8R5eL+umehvC4JYQ=
+=tpFi
+-----END PGP SIGNATURE-----
+
+--Ag1RgI6hSAz88L8GD7V7rABgWS6V6sov3--
 
 
