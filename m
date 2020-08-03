@@ -2,81 +2,90 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC91C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD87C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 178E422B45
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:19:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A58F22B45
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 19:27:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XfoROXJ8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 178E422B45
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vLX3LtFx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A58F22B45
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2fzf-00062p-62
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 15:19:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35868)
+	id 1k2g7V-0007r0-Ml
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 15:27:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37730)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k2fz0-0005bE-Fi
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:18:50 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50313
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k2fyy-0001dM-4t
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:18:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596482324;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=+yt9QATeEJ5XHntrTPRR+DuhRTJE/vmVnKFUZskr0l8=;
- b=XfoROXJ860uwmqjvaZzNEAvKK2MyyzWjq1aZcsZVfjkj56qkSFFYrzkYYWZG5qEM2ASvAp
- 65IOq6ljK+XHzcP0vMpZNWlBYBmS5eyqU7sx3UCAU5L2tlJq+4Q56ewPpKW6uyejTcdlvj
- btKxRXGMTj0HrDltemIFMh/Aml7XnyM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-69-laGjP1v_MgWW-xNvXJ2W3g-1; Mon, 03 Aug 2020 15:18:42 -0400
-X-MC-Unique: laGjP1v_MgWW-xNvXJ2W3g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5A171902EA0;
- Mon,  3 Aug 2020 19:18:41 +0000 (UTC)
-Received: from thuth.com (ovpn-112-54.ams2.redhat.com [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AF6068A19B;
- Mon,  3 Aug 2020 19:18:40 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH] Get rid of the libqemustub.a remainders
-Date: Mon,  3 Aug 2020 21:18:38 +0200
-Message-Id: <20200803191838.14016-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:37:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
+ id 1k2g6f-0007Rf-42
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:26:45 -0400
+Received: from mail-il1-x132.google.com ([2607:f8b0:4864:20::132]:39776)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <atar4qemu@gmail.com>)
+ id 1k2g6c-0002kv-5s
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 15:26:44 -0400
+Received: by mail-il1-x132.google.com with SMTP id z17so17010709ill.6
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 12:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yHVKzHFXa9jrRnMz2PvpKXx9/pDJ3BHkuUd4w/M2sIg=;
+ b=vLX3LtFxFWdkbrM6FVpQdWhZ7JLEtGPow6FRt0cPZRoDuqNOol5ub91jKsjahjyvLZ
+ 9gakKAVOKCrNuXLcAz+3ngb2CY5KiYjPXLrm9lmjo85DXp3mOOWvgRCOPUtkdDJnc0Xi
+ FaEn3Ji1QidV4m6qK8xav7Ak2aWwR7Erb8jqF3wAmYkj89ESLadNbQOeca0a63G/oBnw
+ 4LBEWpFkzKb8v6Ls6IByW4j2P0KH745aR2uqKCvRUWpaj0S19c7rgVdxhfmvlWCsdPTy
+ oQuKFCXECnio9eDsPmp9f91I0dsPN2hdG3LLssTp6wX+xtnL7SGPvDr/ByNyJxoD0b1z
+ bcLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yHVKzHFXa9jrRnMz2PvpKXx9/pDJ3BHkuUd4w/M2sIg=;
+ b=QVytAUF9V19Tym5GyvaUqMXPLqh2UfQu/TNoyWnRhHRcdOwz7NCo2O9+k8RkZYvdns
+ AYUMPsI55T9+df+Ij3AGy5i0LyPRNXdxIls3+FqyvCBNjin0qGRn0K6USKZGBaJA0iTG
+ Sea7npJQKNOgIbfURQX2TkSdL7QWqaYcbl/D6kVk/sglLd0LbdGGYbCSEUz0Rjlmm1Np
+ EwQ4b/mIA4mkt5bxG0dbLwL41GzPpJoNjTny3Ym9uocOvaI6jjU08XMEm2J3OrOn9GV/
+ JFR1CYt5VRY99K7BhnrJigo1Y3YKD9iss+OmM3+f3PHD4AUCL4OZ20IfW/I6rxGZXERX
+ D2dg==
+X-Gm-Message-State: AOAM5320KDvqp6Z5TjtyGYoVEwblpGnbg2IBgqHv6UdEy1yCW6DTO5Dh
+ zJz4eiyoDwkAIJ2fp0w0dXYCOuEjiZcRP5iIQn0=
+X-Google-Smtp-Source: ABdhPJz7H77rjP+9ntWVv8pKROdkcyzZj4PXgFW+wrp8M+/vNi2qEc8q1tG9vob29WxuhPS6eX2nlF283EgGBS64ekw=
+X-Received: by 2002:a92:bac5:: with SMTP id t66mr933259ill.125.1596482801220; 
+ Mon, 03 Aug 2020 12:26:41 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200710201911.3a3e336c.hc981@poolhem.se>
+ <20200803192645.48513f57.hc981@poolhem.se>
+ <43e05cbb-14aa-80ed-d39a-1456f2a0e480@redhat.com>
+ <CACXAS8CkSX1knsStsL1azYQQFrbYV5ZXXOWm9bp_F-CU7ph=7w@mail.gmail.com>
+ <20200803203632.76222bb1.hc981@poolhem.se>
+In-Reply-To: <20200803203632.76222bb1.hc981@poolhem.se>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Mon, 3 Aug 2020 21:26:29 +0200
+Message-ID: <CACXAS8CyRSTuerymwNdc0Y=N1dWcKWGXGCzkAGqyLO_tJa-jvw@mail.gmail.com>
+Subject: Re: Ping: [PATCH] Emulate dip switch language layout settings on SUN
+ keyboard
+To: Henrik Carlqvist <hc981@poolhem.se>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::132;
+ envelope-from=atar4qemu@gmail.com; helo=mail-il1-x132.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,63 +98,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-libqemustub.a has been removed in commit ebedb37c8d ("Makefile: Remove
-libqemustub.a"). Some remainders have been missed. Remove them now.
+On Mon, Aug 3, 2020 at 8:36 PM Henrik Carlqvist <hc981@poolhem.se> wrote:
+>
+> Thanks for finding my typos!
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- Makefile                                | 2 +-
- scripts/coverity-scan/run-coverity-scan | 3 ---
- tests/test-util-sockets.c               | 3 ++-
- 3 files changed, 3 insertions(+), 5 deletions(-)
+:-)
 
-diff --git a/Makefile b/Makefile
-index c2120d8d48..13dd708c4a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -726,7 +726,7 @@ virtiofsd$(EXESUF): $(virtiofsd-obj-y) libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
- endif
- 
--vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) libqemuutil.a libqemustub.a
-+vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) libqemuutil.a
- 	$(call LINK, $^)
- 
- ifdef CONFIG_VHOST_USER_INPUT
-diff --git a/scripts/coverity-scan/run-coverity-scan b/scripts/coverity-scan/run-coverity-scan
-index 03a791dec9..6eefb4b558 100755
---- a/scripts/coverity-scan/run-coverity-scan
-+++ b/scripts/coverity-scan/run-coverity-scan
-@@ -403,9 +403,6 @@ echo "Configuring..."
-     --enable-mpath --enable-libxml2 --enable-glusterfs \
-     --enable-virtfs --enable-zstd
- 
--echo "Making libqemustub.a..."
--make libqemustub.a
--
- echo "Running cov-build..."
- rm -rf cov-int
- mkdir cov-int
-diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
-index 2ca1e99f17..261dc48c03 100644
---- a/tests/test-util-sockets.c
-+++ b/tests/test-util-sockets.c
-@@ -64,7 +64,8 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
-     return dup(mon_fd);
- }
- 
--/* Syms in libqemustub.a are discarded at .o file granularity.
-+/*
-+ * Syms of stubs in libqemuutil.a are discarded at .o file granularity.
-  * To replace monitor_get_fd() we must ensure everything in
-  * stubs/monitor.c is defined, to make sure monitor.o is discarded
-  * otherwise we get duplicate syms at link time.
+> On Mon, 3 Aug 2020 20:16:43 +0200
+> Artyom Tarasenko <atar4qemu@gmail.com> wrote:
+>
+> > > > On Fri, 10 Jul 2020 20:19:11 +0200
+> > > > Henrik Carlqvist <hc981@poolhem.se> wrote:
+> > > >> hardcoded to allways use an US keyboard layout.
+>
+> > Can you please move this description to the commit message? (Fixing
+> > typo in "always" ;-) )
+>
+> I don't think I have access to push commits to the git repo, or did you mean
+> that Paolo should make the commit?
+
+I mean the part of the commit message before "From 2f86bd..." will be
+lost after committing, and I would like to preserve the link to the
+documentation and the invocation command.
+
+>
+> > >> Subject: [PATCH] Emulating sun keyboard languate layout dip switches,
+>
+> > typo: language
+>
+> > Looks good otherwise. For the v2:
+> > Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
+>
+> Do you want me to post the same patch again to the mailing list with corrected
+> typos in subject and description?
+>
+
+Yes, please.
+
+
+
 -- 
-2.18.1
+Regards,
+Artyom Tarasenko
 
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
 
