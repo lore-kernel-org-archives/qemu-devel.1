@@ -2,122 +2,94 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A50C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 20:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B88C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 20:38:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D8B22086A
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 20:26:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D8B22086A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 0E94920678
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 20:38:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tTvW6tD+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E94920678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2h2L-0005Vu-CN
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 16:26:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54700)
+	id 1k2hDr-0007rs-4f
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 16:38:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1k2h1l-00054z-PE
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 16:25:45 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:53942
- helo=v2201612906741603.powersrv.de)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1k2h1j-0002Al-9y
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 16:25:45 -0400
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 97678DB3C52;
- Mon,  3 Aug 2020 22:25:40 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id cXWpHIe7Fqhv; Mon,  3 Aug 2020 22:25:39 +0200 (CEST)
-Received: from macbook02.fritz.box (p57b429dc.dip0.t-ipconnect.de
- [87.180.41.220])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 284EFDB3C51;
- Mon,  3 Aug 2020 22:25:39 +0200 (CEST)
-Subject: Re: [PATCH v2 0/3] testing: Build WHPX enabled binaries
-From: Stefan Weil <sw@weilnetz.de>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190920113329.16787-1-philmd@redhat.com>
- <01f2f0ee-a288-921a-58f4-78aeb4d457e1@redhat.com>
- <BYAPR21MB1208F0D09B3E5CA80F1B7C3BB6880@BYAPR21MB1208.namprd21.prod.outlook.com>
- <2acf854f-c49a-0811-31af-80e1e958f058@redhat.com>
- <324f5002-be0a-563e-b5a6-e08ee5e1ddad@redhat.com>
- <SN4PR2101MB0880AF5A5D752F06DB94A15FC04E0@SN4PR2101MB0880.namprd21.prod.outlook.com>
- <b8afd626-b6ae-d6fa-c8b7-5e5778574c07@redhat.com>
- <82fa39b2-676c-e8c5-72c6-53123983dcda@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <55002560-9741-1e71-85f9-e75d9f0f3bfc@weilnetz.de>
-Date: Mon, 3 Aug 2020 22:25:38 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1k2hD9-0007Bz-Ml
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 16:37:31 -0400
+Received: from mail-vk1-xa43.google.com ([2607:f8b0:4864:20::a43]:41614)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1k2hD7-0003hR-9I
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 16:37:31 -0400
+Received: by mail-vk1-xa43.google.com with SMTP id x2so684881vkd.8
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 13:37:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fk/G1fUE6L6Lp8ha6IxwNOEg++c/xykfvt89kiRx73E=;
+ b=tTvW6tD+A2hLWGhgB9vDS5JNYJTn8ehFsy7/BXYEKBWxw/PjAfYBvbvI/Idk49B0xl
+ iUyEQI8HA5Y4cRKsBxhqgeyGv1x0hATvJ+MrUak4D/MSajw+uoYPK2Q+1cT4i414TwzL
+ tc4Jn9QZyX9hdxdxAIBCd4sbqnF3kc0w5Z0Id4Px9t5bYXM9w+r9dzqLdfzCK9ejdXYM
+ qkdIzHY9yxLKgWUDAv9a1vyLsTz/ABYXlq4i6LaaTpsQZv4tIhAUDddjFjajufljVeeG
+ f5uk+uVAH6TqJTAXsPdRZr6FwIIJQPbIWYitx9yon4TlJjSEcxeSEVewLvMZWBzMOklf
+ pNYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fk/G1fUE6L6Lp8ha6IxwNOEg++c/xykfvt89kiRx73E=;
+ b=Rq8pIavw6VYoDAykUvdc6qlTESHCOIkAfQQzakKLun/YO+GpYfTmtNjNX3vvEWcAhn
+ fJhRT9XxCJiSaEjuC0ki8X4trSSFOKJA6Br+Rq0exb1Fk2UK96qFAVCxvz5bzW3OsCVo
+ 15Vit07cTrFILRqTOJww0JZjUWIW8tUN9jmu9/+0YwF5riQLouZEcYTSVaqow16WGaY1
+ /uIIf/g5lfkW1gCvMwxr89AMwkVaIPzuJ6a1ZiB40TNUcCzxKtfsErdhH27d7Ow+JUD9
+ fP3gf9/uPA1OPIZMEEKTdylgA7gYiTN/9oHht332kpp0LBNc//CPwOtWO87TtOMj2NIe
+ 2c4A==
+X-Gm-Message-State: AOAM532pZYbxIibcZhrxN7XhJWnlHU7yDXDkISvaSLPXOIHCNCBIJMZj
+ IXk8Vnrtj/dVXiN+eTxNYADgyURwIOCSS6EAWNmYxA==
+X-Google-Smtp-Source: ABdhPJy9HIWDa1MCByANKKJcQF7WvKQSnOXFb7AcOqM5dtW15ymxDKojP51F8UYJJUgBM++RUNo7C85X6MZwMiBB4ek=
+X-Received: by 2002:a05:6122:2c:: with SMTP id
+ q12mr13051161vkd.39.1596487046413; 
+ Mon, 03 Aug 2020 13:37:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <82fa39b2-676c-e8c5-72c6-53123983dcda@weilnetz.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
- helo=v2201612906741603.powersrv.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 16:21:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200717060258.1602319-1-hskinnemoen@google.com>
+ <61366428-ca35-e0b5-cfce-99624747631b@amsat.org>
+In-Reply-To: <61366428-ca35-e0b5-cfce-99624747631b@amsat.org>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Mon, 3 Aug 2020 13:37:15 -0700
+Message-ID: <CAFQmdRZMGbJSaULO9QSVyN914MpD8r4gELzeCw3GWswzGOyM8Q@mail.gmail.com>
+Subject: Re: [PATCH v6 00/13] Add Nuvoton NPCM730/NPCM750 SoCs and two BMC
+ machines
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, 
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>,
+ CS20 KFTing <kfting@nuvoton.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::a43;
+ envelope-from=hskinnemoen@google.com; helo=mail-vk1-xa43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,48 +102,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "1879672@bugs.launchpad.net" <1879672@bugs.launchpad.net>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 03.08.20 um 13:28 schrieb Stefan Weil:
+Hi Philippe,
 
-> Am 03.08.20 um 12:51 schrieb Philippe Mathieu-Daudé:
+On Mon, Aug 3, 2020 at 12:08 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
 >
->> Hi Sunil,
->>
->> On 8/1/20 1:31 AM, Sunil Muthuswamy wrote:
->>> The ask generally sounds reasonable. But, can you help me understand the full
->>> scope of the ask. Few questions:
->>> 1. Stefan has a CI pipeline to build WHPX.
->> Great! I didn't know Stefan already did it :)
->> Can you share the URL please, so we can integrate it with mainstream CI?
+> Hi Havard,
 >
-> I am sorry, but I don't have such a CI pipeline.
+> On 7/17/20 8:02 AM, Havard Skinnemoen wrote:
+> > I also pushed this and the previous two patchsets to my qemu fork on gi=
+thub.
+> > The branches are named npcm7xx-v[1-6].
+> >
+> >   https://github.com/hskinnemoen/qemu
+> >
+> > This patch series models enough of the Nuvoton NPCM730 and NPCM750 SoCs=
+ to boot
+> > an OpenBMC image built for quanta-gsj. This includes device models for:
+> >
+> >   - Global Configuration Registers
+> >   - Clock Control
+> >   - Timers
+> >   - Fuses
+> >   - Memory Controller
+> >   - Flash Controller
+> >
+> > These modules, along with the existing Cortex A9 CPU cores and built-in
+> > peripherals, are integrated into a NPCM730 or NPCM750 SoC, which in tur=
+n form
+> > the foundation for the quanta-gsj and npcm750-evb machines, respectivel=
+y. The
+> > two SoCs are very similar; the only difference is that NPCM730 is missi=
+ng some
+> > peripherals that NPCM750 has, and which are not considered essential fo=
+r
+> > datacenter use (e.g. graphics controllers). For more information, see
+> >
+> > https://www.nuvoton.com/products/cloud-computing/ibmc/
+> >
+> > Both quanta-gsj and npcm750-evb correspond to real boards supported by =
+OpenBMC.
+> > At the end of the series, qemu can boot an OpenBMC image built for one =
+of these
+> > boards with some minor modifications.
+> >
+> > The patches in this series were developed by Google and reviewed by Nuv=
+oton. We
+> > will be maintaining the machine and peripheral support together.
+> >
+> > The data sheet for these SoCs is not generally available. Please let me=
+ know if
+> > more comments are needed to understand the device behavior.
+> >
+> > Changes since v5:
+> >
+> >   - Boot ROM included, as a git submodule and a binary blob, and loaded=
+ by
+> >     default, so the -bios option is usually not necessary anymore.
+> >   - Two acceptance tests added (openbmc image boot, and direct kernel b=
+oot).
+> >   - npcm7xx_load_kernel() moved to SoC code.
+> >   - NPCM7XX_TIMER_REF_HZ definition moved to CLK header.
+> >   - Comments added clarifying available SPI flash chip selects.
+> >   - Error handling adjustments:
+> >       - Errors from CPU and GCR realization are propagated through the =
+SoC
+> >         since they may be triggered by user-configurable parameters.
+> >       - Machine init uses error_fatal instead of error_abort for SoC
+> >         realization flash init. This makes error messages more helpful.
+> >       - Comments added to indicate whether peripherals may fail to real=
+ize.
+> >       - Use ERRP_GUARD() instead of Error *err when possible.
+> >   - Default CPU type is now set, and attempting to set it to anything e=
+lse
+> >     will fail.
+> >   - Format string fixes (use HWADDR_PRIx, etc.)
+> >   - Simplified memory size encoding and error checking in npcm7xx_gcr.
+> >   - Encapsulate non-obvious pointer subtraction into helper functions i=
+n the
+> >     FIU and TIMER modules.
+> >   - Incorporate review feedback into the FIU module:
+> >       - Add select/deselect trace events.
+> >       - Use npcm7xx_fiu_{de,}select() consistently.
+> >       - Use extract/deposit in more places for consistency.
+> >       - Use -Wimplicit-fallthrough compatible fallthrough comments.
+> >       - Use qdev_init_gpio_out_named instead of sysbus_init_irq for chi=
+p
+> >         selects.
+> >   - Incorporate review feedback into the TIMER module:
+> >       - Assert that we never pause a timer that has already expired, in=
+stead of
+> >         trying to handle it. This should be safe since QEMU_CLOCK_VIRTU=
+AL is
+> >         stopped while this code is running.
+> >       - Simplify the switch blocks in the read and write handlers.
+> >
+> > I made a change to error out if a flash drive was not specified, but re=
+verted
+> > it because it caused make check to fail (qom-test). When specifying a N=
+ULL
+> > block device, the m25p flash device initializes its in-memory storage w=
+ith 0xff
+> > and doesn't attempt to write anything back. This seems correct to me.
 >
-> Stefan
+> I've been quite busy, now looking back a this series. Do you have a v7
+> in preparation or should I keep reviewing it?
 
+I have a few fixes queued up, but I didn't turn it into a v7 series
+yet. I can probably have that ready by tomorrow if you prefer.
 
-We can add a CI pipeline on Microsoft infrastructure by using a GitHub
-action.
+Or I can wait a bit longer and queue up more fixes. The merge window
+is expected to open next week at the earliest right?
 
-Here is an example: https://github.com/stweil/qemu/actions.
+> Hopefully v7 would be the one Peter queue for merging once 5.2 window
+> opens :)
 
-I just sent a patch which adds the GitHub action for
-https://github.com/qemu/qemu.
+I hope so too :)
 
-Peter, maybe you can add that patch even for 5.1.
-
-Kind regards,
-
-Stefan
-
-
+Havard
 
