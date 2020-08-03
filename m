@@ -2,64 +2,90 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E70C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 12:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D51A4C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 12:49:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AADA20678
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 12:46:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AADA20678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 9DCB320678
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 12:49:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hR+x5ZYp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DCB320678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2Zr4-0007g1-7D
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 08:46:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38072)
+	id 1k2ZuQ-0000RT-NW
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 08:49:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k2ZqL-0007AZ-9Y
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 08:45:29 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:43579)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k2ZqJ-0007Hk-Hw
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 08:45:28 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 073CikhD010794
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Mon, 3 Aug 2020 08:44:54 -0400
-Date: Mon, 3 Aug 2020 08:44:46 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [Bug 1888606] [NEW] Heap-use-after-free in
- virtio_gpu_ctrl_response
-Message-ID: <20200803124445.me2rmqytukjev22r@mozz.bu.edu>
-References: <159548011952.31456.8249433335836304327.malonedeb@chaenomeles.canonical.com>
- <20200723153726.m6eckrxwkoooreh3@mozz.bu.edu>
- <20200803065604.lvvplrxwc5yomwl7@sirius.home.kraxel.org>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k2Ztf-0008Jz-To
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 08:48:55 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36782)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k2Ztd-0007Zi-8D
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 08:48:55 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 3so15314609wmi.1
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 05:48:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Y1ekWK8CJLvHrVxfCc2kYGCDX3fGw6jKhM4D+UOMVQU=;
+ b=hR+x5ZYpgOfTj9hImkFq4ttlq2WAV+xBJSbajC/E7sa+oROv4i3j5JhVPv38hKOZrW
+ 0HLp58Lx13AEu2x3JFGiBAfWmcbaRU5S3kqb2vadt7hTBjujS/ZiTOqMXSIhYnkrjS0a
+ eud0W/iHqZ3vsYnvY7/Et3EJmkk7bnDu2ZyS/4Bt85qBf8iqKWLw9H3ujZxf8wgHKGwU
+ dOUP/tFfikSm7eRHTy2Igve3WqMcRsE3z9MbT9hpRgEXy3IQjw4GUVhdMQfkn0KR7fAI
+ 4slzuGHlc4TZAiM/GgBDGJ6uyuJbDVZ2ES3MuYcBK+JUS4nhr10z3bk+51ERIj+j7JpU
+ Kgtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Y1ekWK8CJLvHrVxfCc2kYGCDX3fGw6jKhM4D+UOMVQU=;
+ b=QBK05Zu+hklgDD7ssOJl1RdtMDlqLrLDv4pdPiCSyWmVkjJeQJbtsdAhmTB1KsnBA2
+ nT46jC7SQbkiV3YrkCafxBqkBbIHA6Eawlq/X0fTOPUdU5dOqIQoerkdg9l9EPCzZnJy
+ yZUlQ/T1Dg7fSpmpDlKeVfp2YAZnbF/vl8+MePcTBfBaIeNXAWlI9+Gv9+VFHMPem8T1
+ Ff3o4L2ifmRBFVLiFSh8c6b+wYnBNs6tjE7T6rYBiNXVt411XKpFafoszexnwF5s+g+q
+ 18cc+pSBv6CfxUPbCvmzP1lL+BrjkJjheJthhwBo/y5L/ZIKcc/dLKV5Lkr3C/TyxhQQ
+ NYQw==
+X-Gm-Message-State: AOAM533EOoYYsZ2FnVR1cgj0RT7sZjecEtZ5Tn296Thm2I8R1ghPEYBY
+ N4/Idk2MbHlruWu+4++5dpA/GCpha2QXMg==
+X-Google-Smtp-Source: ABdhPJzE1z34Bxuf3hSO7vcf19ZRKdzwMDDTIi7X9o6mMipYo/II9z6mJ+MVdMMfu1Oe5eTsMOeEIw==
+X-Received: by 2002:a7b:c054:: with SMTP id u20mr22517wmc.2.1596458930936;
+ Mon, 03 Aug 2020 05:48:50 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id d7sm19153174wra.29.2020.08.03.05.48.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 03 Aug 2020 05:48:49 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] target/arm: Delete unused VFP_DREG macros
+Date: Mon,  3 Aug 2020 13:48:48 +0100
+Message-Id: <20200803124848.18295-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200803065604.lvvplrxwc5yomwl7@sirius.home.kraxel.org>
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 08:45:25
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,50 +98,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bug 1888606 <1888606@bugs.launchpad.net>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gerd,
-Strange... After applying your patch, I re-ran the reproducer, but
-I still see the same crash.
--Alex
+As part of the Neon decodetree conversion we removed all
+the uses of the VFP_DREG macros, but forgot to remove the
+macro definitions. Do so now.
 
-On 200803 0856, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > > The ASAN trace:
-> > > ==29798==ERROR: AddressSanitizer: heap-use-after-free on address 0x60d0000050e8 at pc 0x560629814761 bp 0x7ffe916eb1e0 sp 0x7ffe916eb1d8
-> > > READ of size 8 at 0x60d0000050e8 thread T0
-> > >     #0 0x560629814760 in virtio_gpu_ctrl_response /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:181:42
-> > >     #4 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/util/async.c:164:13
-> 
-> > >     #1 0x560629827730 in virtio_gpu_reset /home/alxndr/Development/qemu/hw/display/virtio-gpu.c:1160:9
-> 
-> So it looks like the bottom half accesses stuff released by reset.
-> 
-> Guess the reset should cancel any scheduled bh calls to avoid that ...
-> 
-> Does the patch below help?
-> 
-> thanks,
->   Gerd
-> 
-> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> index 5f0dd7c15002..18f0011b5a0a 100644
-> --- a/hw/display/virtio-gpu.c
-> +++ b/hw/display/virtio-gpu.c
-> @@ -1144,6 +1144,9 @@ static void virtio_gpu_reset(VirtIODevice *vdev)
->      struct virtio_gpu_simple_resource *res, *tmp;
->      struct virtio_gpu_ctrl_command *cmd;
->  
-> +    qemu_bh_cancel(g->ctrl_bh);
-> +    qemu_bh_cancel(g->cursor_bh);
-> +
->  #ifdef CONFIG_VIRGL
->      if (g->parent_obj.use_virgl_renderer) {
->          virtio_gpu_virgl_reset(g);
-> 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/translate.c | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index c39a929b938..27bf6cd8b51 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -2471,21 +2471,6 @@ static int disas_dsp_insn(DisasContext *s, uint32_t insn)
+     return 1;
+ }
+ 
+-#define VFP_REG_SHR(x, n) (((n) > 0) ? (x) >> (n) : (x) << -(n))
+-#define VFP_DREG(reg, insn, bigbit, smallbit) do { \
+-    if (dc_isar_feature(aa32_simd_r32, s)) { \
+-        reg = (((insn) >> (bigbit)) & 0x0f) \
+-              | (((insn) >> ((smallbit) - 4)) & 0x10); \
+-    } else { \
+-        if (insn & (1 << (smallbit))) \
+-            return 1; \
+-        reg = ((insn) >> (bigbit)) & 0x0f; \
+-    }} while (0)
+-
+-#define VFP_DREG_D(reg, insn) VFP_DREG(reg, insn, 12, 22)
+-#define VFP_DREG_N(reg, insn) VFP_DREG(reg, insn, 16,  7)
+-#define VFP_DREG_M(reg, insn) VFP_DREG(reg, insn,  0,  5)
+-
+ static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
+ {
+ #ifndef CONFIG_USER_ONLY
+-- 
+2.20.1
+
 
