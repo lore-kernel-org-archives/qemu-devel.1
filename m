@@ -2,156 +2,101 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E978C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 20:47:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94457C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 20:49:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 779E1207DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 20:47:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8ECB6208C7
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 20:49:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="OpyuHvsv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779E1207DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SoIZaFyb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ECB6208C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2hMn-0001ML-6s
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 16:47:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59220)
+	id 1k2hOf-0002Fe-Ld
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 16:49:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60456)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k2hJ1-0000kv-LC
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 16:43:35 -0400
-Received: from mout.gmx.net ([212.227.15.18]:47077)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k2hIz-0004UJ-1H
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 16:43:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1596487400;
- bh=xf0m145lJ+YIMGuIoVJYUn5XjpjrGTBWDFrWe9Du6vU=;
- h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=OpyuHvsvYG+TkflM4eg0bGUO7E1+tsMmwXwh2069c1WCaghjI4Xk5D1y9spN7bnsR
- nnQwT1oIbPZcWNpFSvwMe7YT8INGQXvemKT26OwpfPgCFQOuPl13474Vf1xftAPtpL
- zO4YUHond4Lrv2mLnT+ONzv/PPiCkkv8uKBjPI5A=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.20.60] ([92.116.134.145]) by mail.gmx.com (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mulm5-1kuNz92bkR-00rqBK; Mon, 03
- Aug 2020 22:43:20 +0200
-Subject: Re: [PATCH v2 4/4] hw/display/artist.c: fix out of bounds check
-To: Alexander Bulekov <alxndr@bu.edu>
-References: <20200801131357.17379-1-deller@gmx.de>
- <20200801131357.17379-5-deller@gmx.de>
- <20200803173604.qtryrjnnubcpgoxq@mozz.bu.edu>
- <20200803183252.74z3czd2o5t2twjp@mozz.bu.edu>
- <20200803191021.dgqkmqajjutt4wei@mozz.bu.edu>
-From: Helge Deller <deller@gmx.de>
-Autocrypt: addr=deller@gmx.de; keydata=
- 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
- c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
-Message-ID: <6aa44e95-9db9-cbb5-2562-ddf18fea8341@gmx.de>
-Date: Mon, 3 Aug 2020 22:43:19 +0200
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1k2hO3-0001lL-4h
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 16:48:47 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56641
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1k2hO0-00054Q-0m
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 16:48:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596487722;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MmQMIxZKdH37ZFuyf+nlG4xRP67+oPnvyInJI2eDLAY=;
+ b=SoIZaFybP/w5QZUTnVBtI+90pwkGbWgUY6FiHnki/cZMn75K1C8i/Zp5ae6I+sXcRcfrPN
+ NjnAPkgct0C174WGpGp3ckBpIbqz6DAMTkBDL0hq+m7X4YhTRFnMfSLrkwLouG6X65I3WZ
+ b2SRE1gfaSL0pBHpGH9qexCvqFmsvbI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-313-T6HliqpKPxqq0CSpSjxgTw-1; Mon, 03 Aug 2020 16:48:39 -0400
+X-MC-Unique: T6HliqpKPxqq0CSpSjxgTw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32BA88064AB;
+ Mon,  3 Aug 2020 20:48:38 +0000 (UTC)
+Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com (unknown
+ [10.10.115.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 54B838AD1C;
+ Mon,  3 Aug 2020 20:48:27 +0000 (UTC)
+Subject: Re: cleanups with long-term benefits (was Re: [PATCH] schemas: Add
+ vim modeline)
+To: Nir Soffer <nsoffer@redhat.com>
+References: <20200729185024.121766-1-abologna@redhat.com>
+ <87ime52wxd.fsf@dusky.pond.sub.org> <20200730093732.GB3477223@redhat.com>
+ <87k0ylz0ep.fsf@dusky.pond.sub.org> <20200730132446.GL3477223@redhat.com>
+ <875za33ku1.fsf@dusky.pond.sub.org> <20200731150738.GB3660103@redhat.com>
+ <2cf1a431-9d2c-8ad6-446e-f10b36219764@redhat.com>
+ <87d048i1m2.fsf@dusky.pond.sub.org>
+ <83bbe0b0-c5e0-e3b7-5ba1-5946098370d5@redhat.com>
+ <87ft94klyl.fsf@dusky.pond.sub.org>
+ <490a0786-73f3-411e-4dfe-8c2ae90de251@redhat.com>
+ <17a92222-2627-4961-b57e-1f1f5c86e14a@redhat.com>
+ <e186e3b5-4aef-42c0-6957-2e5ae430686c@redhat.com>
+ <6514f2e2-4694-6790-7663-f8a8f6a91e5a@redhat.com>
+ <CAMRbyytzHwfEV2=bxhn3zVR3rUKK9DB0V1CCGgub=CfN0pH7jw@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <b5969c66-26d3-f9fd-a5f0-67ca21f59f93@redhat.com>
+Date: Mon, 3 Aug 2020 16:48:26 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200803191021.dgqkmqajjutt4wei@mozz.bu.edu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAMRbyytzHwfEV2=bxhn3zVR3rUKK9DB0V1CCGgub=CfN0pH7jw@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:6UyF/bMArUzQnlZ0FEWcTU8fT4/VR1c4oAV5XUXLh8wc9QUtyKg
- +N15ZOzjGVWlpseAf5fO7xSHcarIq2MTH5UZHkmIkye7mqxX20gyYWTAM3VoYGKQ15O9Y2D
- ftRqesl/365QQYPuRbG0oLtdqOqY4lBM9gMxs7YJ7wKxJ26XSllakHyCbOAy1l1XUnkdZTz
- p167iqmBg/ET9ChG0yO8g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:jMz9YEuxMGQ=:vBRhYnVAgYapJgzVsusyLX
- bySXifU2kHY5ctbeePTuKwQxLwf+LTeiM4BGR4FLEIXohqVY9oOVoEC1RHkriOq4mggWq0kWu
- e8hFTpOesLEV51j8cDkZzq4DjXVYcXwBRNYRAI7YwO0kroAginTsGnWmWARM+5Sfut4tXdFWS
- PzdY10h0lmrqX2oqdGnINxlIS7h64n6gMyYRpyaJsWb5EOLJVwu11yVwA8/dnsOd6vOBqE7qS
- XN6wW2c7wmARSdwkxeTY128YY8IVbplN6lLKQdsjpbx4TD7wKxkuz3wNoB7iVIR/gW02Sr9uY
- ESbxgFfCHUtRNdA2UiN4Sfy/ThHek7uRnf4OftlJyP0i3swVTq9s+diuqEorzAd9lCzXjL17u
- m3CDSZtBCGgIH3eBAWMvdLl4M3twVP3XKP2J99GWUlsfZaekIFi1ghb4lt3SxSwrVTY+3pTjO
- zCt9wDRDuMkG163J5PqJMzdHL2TJOxkpVXKuESO6d4v0C5UfLnAdI7f2pxkq/BHTzR8hqbAOG
- pUjplToJhTFIsSvhcbNoYh0/UTL2hyo2sbUtI8Ojdo+eA7Sx9pZy4bBqeKI93NWpeV7hPtlTm
- 9znFvYCR9ubyklyEPRopk25VLZ689SjiQm2YKZDkJNE6bWzjh9AFZaRyFyMuJhDTMazr4ZKeE
- 2mcvbd0MRDvyc52mweiIOjbhMD/07S9jCKJwaKstKetGj/xji+DkzHAgEHWrYsKJuAebAa3N9
- 2UUOCIf2+Si6FOEwgAigdWjZWNx5q1sqe1j3lcU6nXv9lU22ZTs1WtOX37DGiIKQWmxUxTMgM
- bOSzBqHTTypAHZHhGWFaBqeoGWqtI5M80WaROVTf9ldWSWayS0rPpmI6XZydTqmWGLrGfMWrE
- NqJyHPo3vX9exT5F69z8kxQbbktTYHVQ5MHgYnoKvkFcgdM7dxg/fiKSVQp6YWfkY4l9RuAbk
- mE0HBQ+zEVqp63liNqhnMKyAEapiylusILqXtMWBnBwMsikjsUUXAUNUf+lPUsX2ppBIWxUAp
- MJ/8clB85pz/3ntiVmxf7ovX1jEZz1GNdFV11qb/7MJmRtTzq1lqGWMZfxyZZ/WjLC/WhFIAp
- EBOkWVwsw+focpx8qmc3s5D2s0qZfDPu1sDtr21FUFakUd5TTZkEjUHGUTGQYcCktQ358Ds+O
- ka8QaNIkW+i9r83XnLCi4TcNT/vkE/ybGtjzidLCrDLXZXSAhKR/rhVpbr0sC2y3K2bguheV9
- 20nikTrj0mYbqvgI5
-Received-SPF: pass client-ip=212.227.15.18; envelope-from=deller@gmx.de;
- helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 16:43:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:37:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -164,45 +109,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Sven Schnelle <svens@stackframe.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Andrea Bolognani <abologna@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03.08.20 21:10, Alexander Bulekov wrote:
-> On 200803 1432, Alexander Bulekov wrote:
->> On 200803 1336, Alexander Bulekov wrote:
->>> Hi,
->>> I applied this patch, but I can still trigger a segfault and heap
->>> overread through artist_reg_write -> fill_window. I dont know if these
->>> problems are related to what this patch fixes. If not, let me know and
->>> I can create a separate launchpad report for these.
+On 8/3/20 3:54 PM, Nir Soffer wrote:
+> On Mon, Aug 3, 2020 at 9:19 PM John Snow <jsnow@redhat.com> wrote:
 >>
->> And another one through draw_line...
->> cat << EOF | ./hppa-softmmu/qemu-system-hppa -display none \
->> -qtest stdio -accel qtest
->> writeq 0xf8100e02 0x4f4f4f4f4f939600
->> EOF
->
-> I missed that Phil already submitted a report here:
-> https://bugs.launchpad.net/qemu/+bug/1880326
->
-> and sent a patchset
-> https://patchwork.ozlabs.org/project/qemu-devel/list/?series=3D178879
+>> On 8/3/20 2:16 PM, Paolo Bonzini wrote:
+>>> On 03/08/20 20:10, John Snow wrote:
+>>>> Heresy:
+>>>>
+>>>> Docstrings could become part of the data format so they can be parsed,
+>>>> analyzed and validated. Parsers largely treat comments like non-semantic
+>>>> information and discard it. Round-trip parsers that preserve comments in
+>>>> any language are extremely rare.
+>>>>
+>>>> If the docstrings are relevant to the generator and aren't discardable,
+>>>> they should be fully-fledged data members.
+>>>>
+>>>> In a prototype I had for a YAML format, I just promoted docstrings
+>>>> directly to fields, so I could allow clients to query help text for
+>>>> individual commands.
+>>>
+>>> This would be actually a good idea, but somebody has to write the code.
+>>>    Each field's docstring should be attached to the field, however---no
+>>> parsing needed only looking at the tree.  Take a look at what Nir posted:
+>>>
+>>>> Here is the patch adding schema convertor from qemu "json" format to
+>>>> standard yaml:
+>>>> https://github.com/oVirt/vdsm/commit/e57b69e72987c0929b20306c454835b52b5eb7ee
+>>>>
+>>>> The current version of the new yaml based schema:
+>>>> https://github.com/oVirt/vdsm/blob/master/lib/vdsm/api/vdsm-api.yml
+>>>
+>>>
+>>>       VmDiskDevice: &VmDiskDevice
+>>>           added: '3.1'
+>>>           description: Properties of a VM disk device.
+>>>           name: VmDiskDevice
+>>>           properties:
+>>>           -   description: Indicates if writes are prohibited for the
+>>>                   device
+>>>               name: readonly
+>>>               type: boolean
+>>>
+>>>           -   description: The size of the disk (in bytes)
+>>>               name: apparentsize
+>>>               type: uint
+>>>
+>>> etc.
+>>>
+>>> Paolo
+>>>
+>>
+>> I was working on a small prototype that used something that looked like
+>> this; the "*opt" format was traded for "?opt", but otherwise:
+>>
+>>
+>> struct:
+>>     name: AudiodevPerDirectionOptions
+>>     doc: >
+>>       General audio backend options that are used for both
+>>       playback and recording.
+>>     since: '4.0'
+>>     members:
+>>
+>>       ?mixing-engine:
+> 
+> This optimizes for writing instead of reading.
+> 
 
-Alexander, thanks for finding the bugs, and, Phil, thanks for the patches!
+Following a "path of least resistance" from the existing QAPI language, 
+clearly carrying over the '*optional' syntax.
 
-I'll test & review it tomorrow and add into the pull request if Ok.
+>      optional: true
+> 
+> Would be nicer to read, but more important is all the tools parsing
+> this schema in multiple languages that will have code like:
+> 
+>      def is_optional(node):
+>          return node.name.startswith("?")
+> 
+> Instead of :
+> 
+>     if node.optional:
+>         ...
+> 
+> Or maybe better:
+> 
+>      if node.required:
+> 
+> Because it seems that more nodes are optional, so focusing on the required
+> items will make the schema shorter and more clear.
+> 
+>>         type: bool
+>>         default: 'true'
+>>         since: '4.2'
+>>         doc: |
+>>           Use QEMU's mixing engine to mix all streams inside QEMU and
+>>           convert audio formats when not supported by the backend.
+> 
+> Using | is nicer than >-. Not sure what is the difference. In vdsm we don't use
+> anything and I think it causes trouble when indenting text.
+> 
 
-Helge
+I believe when I wrote this example I was trying to highlight the 
+different space consumption styles for the purposes of demonstrating 
+what it would do to Sphinx document generation support.
 
+ultimately, there's not really a way to enforce one or the other style 
+post-parse.
 
->
->> =3D=3D13563=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7f3=
-fe4d403fd (pc 0x55ae401eb392 bp 0x7ffea90ca2d0 sp 0x7ffea90ca1e0 T0)
->> =3D=3D13563=3D=3DThe signal is caused by a READ memory access.
->>     #0 0x55ae401eb392 in artist_rop8 /hw/display/artist.c:284:14
-...
+>>           When set to off, fixed-settings must be also off.
+>>
+>>       ?fixed-settings:
+>>         type: bool
+>>         default: 'true'
+> 
+> Why is the default a string and not the actual type?
+> 
+
+I'm going to be honest: I forget. I was playing around with the idea of 
+documenting defaults for the purposes of documentation, but not 
+necessarily for performing the actual code generation of those defaults.
+
+I believe I specified this field as a string in my grammar and `5` would 
+get promoted to "5", but `true` caused a type error.
+
+Doing something in a type-safe way seemed ... harder. So I didn't.
+
+>>         doc: >-
+>>           Use fixed settings for host input/output.
+>>           When off, frequency, channels and format must not be specified.
+>>
+>>       ?frequency:
+>>         type: bool
+>>         default: '44100'
+>>         doc: >-
+>>           frequency to use when using fixed settings.
+>>
+>>       ?channels:
+>>         type: 'uint32'
+>>         default: 2
+> 
+> Here you use the real type, and this is nicer.
+> 
+>>         doc: >-
+>>           Number of channels when using fixed settings.
+>>
+>>       ?voices:
+>>         type: 'uint32'
+>>         default: 1
+>>         doc: "Number of voices to use."
+>>
+>>       ?format:
+>>         type: 'AudioFormat'
+>>         default: 's16'
+>>         doc: "Sample format to use when using fixed settings."
+>>
+>>       ?buffer-length:
+>>         type: 'uint32'
+>>         doc: 'The buffer length, in microseconds.'
+>>
+>>     features:
+>>       my-cool-feature:
+>>         since: '6.0'
+>>         doc: 'This is, no doubt, an extremely cool feature.'
+>>
+>>       my-bad-feature:
+>>         doc: 'This is a very bad feature. I am sorry for making it.'
+>>         since: '1.0'
+>>         deprecated: '5.9'
+> 
+> Good example :-)
+> 
+>>
+>>
+> 
+
 
