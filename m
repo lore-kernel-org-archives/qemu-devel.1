@@ -2,97 +2,85 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C09CC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 10:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F6A7C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:02:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEC602064B
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 10:59:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkFjxpKU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEC602064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id E2DA220672
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:02:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2DA220672
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2YBx-00076f-T2
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 06:59:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39654)
+	id 1k2YEL-0008ST-U5
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 07:02:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k2Y9K-0002Wk-SP; Mon, 03 Aug 2020 06:56:59 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:50652)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2YDI-00081e-5w
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:01:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33388)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k2Y9J-00027R-ES; Mon, 03 Aug 2020 06:56:58 -0400
-Received: by mail-wm1-x335.google.com with SMTP id c80so13926411wme.0;
- Mon, 03 Aug 2020 03:56:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=XHiU5GmBcdXr23pohS4D4pPIDt+/4V6rIKN0OFbqJDw=;
- b=KkFjxpKUK0u3KIKvxKYk6uVXB55kQ0Q5bBCKz25HyoB/Wzw/Lv23RsHRiFe/pbVgDT
- zDNfHU1sCeMKtKmSwixabV4h2vdHRUTW7CbS7THkVN2UI5sJp/r2POpLhwH14K2JDHNC
- Hpzfc0AMJHjuNvWH2UiX+CjcExK0fSbpKmxRb2rudsM2oAe2i0W8WayXtg4Ik0+EDycf
- X3uSSMqtzSPtQzoVDT1PrMezuYmSLW7VM/BKnWGCoiBx+wZvxSm1f3UYv9PYRO06Vzgv
- hgYgijh0Ki/wbopCdwLwAUNuersh5bfoGMnksROGSd9pQ5YtAbqYcCbqaDwD6xAJqoQ8
- MAXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=XHiU5GmBcdXr23pohS4D4pPIDt+/4V6rIKN0OFbqJDw=;
- b=evk1VG7ghFbmVB6gRZr9VhQgqpkIYJnb0BuMiWmAxK78hcWW7U75MaIM2fjof197kf
- dCxm88YlsX/mNhmObQGTlnK5gffjYGRb1P6ZtJRsrgXKHGhI+VKKhsbHgg8HL9xMg/HM
- yS7Rb5NknlsC3XNVSnMSYj16Kmk7cV6iyrkb5KeOhbPY8SsIpX8JhRDXsI0/WUTidgh8
- EUKd9ZaFtpgg1OgMQFGaAInhbk8tjj8ModWDRXMrAQQalyEm1TsMlDM2JH2oMiQdFUuE
- /ou8fkxcS52vg3/nXlhYXHqmUUKA3DzI6w/FW2PJI6gYViuATbokuFjcBW1uoRZ264VI
- S6Jw==
-X-Gm-Message-State: AOAM530j5wV+tMuMpwcy/82iJ/MQyQezWrgbpir+KKGbbX9DUUV2xrF3
- FJ9Xe95Fue9gimn41ui7JHDgfeNw
-X-Google-Smtp-Source: ABdhPJz8WY0kh6Ov2rDiyPr3pBQwj0/g2n8VvoQGND9N0Hu5mkNvHU2wB+LV8/74aTxNwiVj/nIbMQ==
-X-Received: by 2002:a1c:770c:: with SMTP id t12mr16440255wmi.65.1596452215388; 
- Mon, 03 Aug 2020 03:56:55 -0700 (PDT)
-Received: from localhost.localdomain (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id z11sm23103477wrw.93.2020.08.03.03.56.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Aug 2020 03:56:54 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1? 4/4] hw/qdev-clock: Avoid calling
- qdev_connect_clock_in after DeviceRealize
-Date: Mon,  3 Aug 2020 12:56:47 +0200
-Message-Id: <20200803105647.22223-5-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200803105647.22223-1-f4bug@amsat.org>
-References: <20200803105647.22223-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2YDF-0002fu-0V
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:01:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k2YDC-00066Z-E0
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 11:00:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6190B2E80D2
+ for <qemu-devel@nongnu.org>; Mon,  3 Aug 2020 11:00:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x335.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 03 Aug 2020 10:51:35 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1879672@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Opinion; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange philmd ubuntu-weilnetz
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <158996968484.21371.12685815665992748631.malonedeb@wampee.canonical.com>
+Message-ID: <b8afd626-b6ae-d6fa-c8b7-5e5778574c07@redhat.com>
+Subject: [Bug 1879672] Re: [EXTERNAL] Re: [PATCH v2 0/3] testing: Build WHPX
+ enabled binaries
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 38cef08c27491d80b05f23b00c94cf74a81c0337
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 07:00:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -101,58 +89,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Bug 1879672 <1879672@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200803105135.Fg4kStcm-ppSGt5KWd2ELJiXIiZNqRrN3smuDC9Y4WI@z>
 
-Clock canonical name is set in device_set_realized (see the block
-added to hw/core/qdev.c in commit 0e6934f264).
-If we connect a clock after the device is realized, this code is
-not executed. This is currently not a problem as this name is only
-used for trace events, however this disrupt tracing.
+Hi Sunil,
 
-Add a comment to document qdev_connect_clock_in() must be called
-before the device is realized, and assert this condition.
+On 8/1/20 1:31 AM, Sunil Muthuswamy wrote:
+>> Hi Justin, Sunil,
+> =
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/qdev-clock.h | 2 ++
- hw/core/qdev-clock.c    | 1 +
- 2 files changed, 3 insertions(+)
+> Justin has moved to a different team is no longer working with WHPX. Movi=
+ng him
+> to bcc.
 
-diff --git a/include/hw/qdev-clock.h b/include/hw/qdev-clock.h
-index a897f7c9d0..64ca4d266f 100644
---- a/include/hw/qdev-clock.h
-+++ b/include/hw/qdev-clock.h
-@@ -70,6 +70,8 @@ Clock *qdev_get_clock_out(DeviceState *dev, const char *name);
-  *
-  * Set the source clock of input clock @name of device @dev to @source.
-  * @source period update will be propagated to @name clock.
-+ *
-+ * Must be called before @dev is realized.
-  */
- void qdev_connect_clock_in(DeviceState *dev, const char *name, Clock *source);
- 
-diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
-index f139b68b88..47ecb5b4fa 100644
---- a/hw/core/qdev-clock.c
-+++ b/hw/core/qdev-clock.c
-@@ -186,5 +186,6 @@ Clock *qdev_alias_clock(DeviceState *dev, const char *name,
- 
- void qdev_connect_clock_in(DeviceState *dev, const char *name, Clock *source)
- {
-+    assert(!dev->realized);
-     clock_set_source(qdev_get_clock_in(dev, name), source);
- }
--- 
-2.21.3
+OK. Does that mean you are the new responsible of updating the ticket
+regarding the WHPX headers and their license?
 
+> =
+
+>>
+>> On 5/20/20 12:26 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> +launchpad ticket
+>>>
+>>> On 9/20/19 6:53 PM, Justin Terry (VM) wrote:
+>>>> Hey Phil,
+>>>>
+>>>> I have contacted our legal department for guidance on this specific
+>>>> use case and will update you when I hear back. Thank you for your
+>>>> patience.
+>>
+>> I recently understood legal changes can be very complex, thus it is
+>> implicit it can take years before getting updates.
+>>
+>> Since the project is still actively developed, maybe you could provide
+>> a Azure CI job to build a WHPX binary. We don't need to have access to
+>> the binary, just to the exit status (success/fail) and build logs.
+>>
+>> Do you think it is doable?
+>>
+>> Thanks,
+>>
+>> Phil.
+>>
+> The ask generally sounds reasonable. But, can you help me understand the =
+full
+> scope of the ask. Few questions:
+> 1. Stefan has a CI pipeline to build WHPX.
+
+Great! I didn't know Stefan already did it :)
+Can you share the URL please, so we can integrate it with mainstream CI?
+
+> What's the benefit of having another CI
+> job, that doesn't export the binary, but, just the status?
+
+As usual, we do not want to circumvent the license. IANAL but IIUC we
+can not force a CI job to accept the EULA when installing it, even to
+test it. So the best we can do is check if the build succeeded (exit
+status).
+
+> 2. Which branch is the CI pipeline expected to build?
+
+'master', to be sure no regressions are introduced.
+
+> 3. Is the expectation also that it will build WHPX patches that are submi=
+tted to the
+> WHPX branch?
+
+You describe a "downstream CI" testing, which is out of scope of the
+community public CI.
+
+Regards,
+
+Phil.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1879672
+
+Title:
+  QEMU installer with WHPX support
+
+Status in QEMU:
+  Opinion
+
+Bug description:
+  People often ask the community to add WHPX support to the QEMU installer =
+for Windows,
+  but it is impossible due to the license limitations of the WHPX SDK.
+
+  The WinHvEmulation.h and WinHvPlatform.h header files needed are "All
+  rights reserved".
+
+  However these headers only contain struct definitions and integer constan=
+ts,
+  no functional code in macros or inline functions. See:
+  https://www.mail-archive.com/qemu-devel@nongnu.org/msg645815.html
+  It is questionable whether the headers alone can be considered copyrighta=
+ble material.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1879672/+subscriptions
 
