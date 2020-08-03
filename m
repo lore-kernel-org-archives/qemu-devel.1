@@ -2,99 +2,63 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59296C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 18:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C98C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 18:34:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA27722B4E
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 18:20:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h7gESGSL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA27722B4E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE94022B40
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 18:34:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE94022B40
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2f4c-000327-Jc
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 14:20:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49062)
+	id 1k2fI9-0005lo-5y
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 14:34:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1k2f3s-0002PX-LK
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 14:19:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31498
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1k2f3q-0002gC-Qh
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 14:19:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596478785;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2LF45nFMM8mwO6cXTItc3rG6vPFXyx7GbP9SN+qDZXk=;
- b=h7gESGSLuciU/2Mhu7lob1mLjAN6q+j5sIra0tN188c004jPMz4HAKoYt9XXYi5YuSxrGk
- i96ZCuqsZQJEdMpBITqt8qOpB+ytyodwV3y79h6Q0LLp+MdJf2PLg5llJa6hL5/iy7WajZ
- PAwNc68vTH5u0dr2h5dws0QDpp4kxrQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-X2GLuTMHOky5Yb8q7IV1Yw-1; Mon, 03 Aug 2020 14:19:44 -0400
-X-MC-Unique: X2GLuTMHOky5Yb8q7IV1Yw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20A0F8005B0;
- Mon,  3 Aug 2020 18:19:43 +0000 (UTC)
-Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com (unknown
- [10.10.115.249])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 55BE75C6D9;
- Mon,  3 Aug 2020 18:19:31 +0000 (UTC)
-Subject: Re: cleanups with long-term benefits (was Re: [PATCH] schemas: Add
- vim modeline)
-To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <20200729185024.121766-1-abologna@redhat.com>
- <87ime52wxd.fsf@dusky.pond.sub.org> <20200730093732.GB3477223@redhat.com>
- <87k0ylz0ep.fsf@dusky.pond.sub.org> <20200730132446.GL3477223@redhat.com>
- <875za33ku1.fsf@dusky.pond.sub.org> <20200731150738.GB3660103@redhat.com>
- <2cf1a431-9d2c-8ad6-446e-f10b36219764@redhat.com>
- <87d048i1m2.fsf@dusky.pond.sub.org>
- <83bbe0b0-c5e0-e3b7-5ba1-5946098370d5@redhat.com>
- <87ft94klyl.fsf@dusky.pond.sub.org>
- <490a0786-73f3-411e-4dfe-8c2ae90de251@redhat.com>
- <17a92222-2627-4961-b57e-1f1f5c86e14a@redhat.com>
- <e186e3b5-4aef-42c0-6957-2e5ae430686c@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <6514f2e2-4694-6790-7663-f8a8f6a91e5a@redhat.com>
-Date: Mon, 3 Aug 2020 14:19:30 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k2fH4-0004tA-4T
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 14:33:26 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:38466)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k2fH0-0004WF-CW
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 14:33:25 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 073IWquK014449
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Mon, 3 Aug 2020 14:32:56 -0400
+Date: Mon, 3 Aug 2020 14:32:52 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Helge Deller <deller@gmx.de>
+Subject: Re: [PATCH v2 4/4] hw/display/artist.c: fix out of bounds check
+Message-ID: <20200803183252.74z3czd2o5t2twjp@mozz.bu.edu>
+References: <20200801131357.17379-1-deller@gmx.de>
+ <20200801131357.17379-5-deller@gmx.de>
+ <20200803173604.qtryrjnnubcpgoxq@mozz.bu.edu>
 MIME-Version: 1.0
-In-Reply-To: <e186e3b5-4aef-42c0-6957-2e5ae430686c@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=jsnow@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 13:51:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200803173604.qtryrjnnubcpgoxq@mozz.bu.edu>
+User-Agent: NeoMutt/20180716
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 14:33:21
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,130 +71,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: peter.maydell@linaro.org, Sven Schnelle <svens@stackframe.org>,
+ qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/3/20 2:16 PM, Paolo Bonzini wrote:
-> On 03/08/20 20:10, John Snow wrote:
->> Heresy:
->>
->> Docstrings could become part of the data format so they can be parsed,
->> analyzed and validated. Parsers largely treat comments like non-semantic
->> information and discard it. Round-trip parsers that preserve comments in
->> any language are extremely rare.
->>
->> If the docstrings are relevant to the generator and aren't discardable,
->> they should be fully-fledged data members.
->>
->> In a prototype I had for a YAML format, I just promoted docstrings
->> directly to fields, so I could allow clients to query help text for
->> individual commands.
+On 200803 1336, Alexander Bulekov wrote:
+> Hi,
+> I applied this patch, but I can still trigger a segfault and heap
+> overread through artist_reg_write -> fill_window. I dont know if these
+> problems are related to what this patch fixes. If not, let me know and
+> I can create a separate launchpad report for these.
+
+And another one through draw_line...
+cat << EOF | ./hppa-softmmu/qemu-system-hppa -display none \
+-qtest stdio -accel qtest
+writeq 0xf8100e02 0x4f4f4f4f4f939600
+EOF
+
+==13563==ERROR: AddressSanitizer: SEGV on unknown address 0x7f3fe4d403fd (pc 0x55ae401eb392 bp 0x7ffea90ca2d0 sp 0x7ffea90ca1e0 T0)
+==13563==The signal is caused by a READ memory access.
+    #0 0x55ae401eb392 in artist_rop8 /hw/display/artist.c:284:14
+    #1 0x55ae401ee163 in draw_line /hw/display/artist.c:635:13
+    #2 0x55ae401e730a in draw_line_size /hw/display/artist.c:685:5
+    #3 0x55ae401db25d in artist_reg_write /hw/display/artist.c:917:9
+    #4 0x55ae3f8cd7a3 in memory_region_write_accessor /softmmu/memory.c:483:5
+    #5 0x55ae3f8ccadc in access_with_adjusted_size /softmmu/memory.c:539:18
+    #6 0x55ae3f8ca873 in memory_region_dispatch_write /softmmu/memory.c:1466:16
+    #7 0x55ae3ef78056 in flatview_write_continue /exec.c:3176:23
+    #8 0x55ae3ef60866 in flatview_write /exec.c:3216:14
+    #9 0x55ae3ef60387 in address_space_write /exec.c:3308:18
+    #10 0x55ae3f974604 in qtest_process_command /softmmu/qtest.c:452:13
+    #11 0x55ae3f96bc08 in qtest_process_inbuf /softmmu/qtest.c:710:9
+    #12 0x55ae3f96a895 in qtest_read /softmmu/qtest.c:722:5
+    #13 0x55ae41e262f3 in qemu_chr_be_write_impl /chardev/char.c:188:9
+    #14 0x55ae41e26477 in qemu_chr_be_write /chardev/char.c:200:9
+    #15 0x55ae41e3a763 in fd_chr_read /chardev/char-fd.c:68:9
+    #16 0x55ae41f8eb24 in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
+    #17 0x7f400f6cc897 in g_main_context_dispatch ()
+    #18 0x55ae42386a2b in glib_pollfds_poll /util/main-loop.c:217:9
+    #19 0x55ae4238415b in os_host_main_loop_wait /util/main-loop.c:240:5
+    #20 0x55ae42383af4 in main_loop_wait /util/main-loop.c:516:11
+    #21 0x55ae3f98cd00 in qemu_main_loop /softmmu/vl.c:1676:9
+    #22 0x55ae41fc6911 in main /softmmu/main.c:49:5
+
+
+> -Alex
 > 
-> This would be actually a good idea, but somebody has to write the code.
->   Each field's docstring should be attached to the field, however---no
-> parsing needed only looking at the tree.  Take a look at what Nir posted:
+> (1) Segfault:
+> cat << EOF | ./hppa-softmmu/qemu-system-hppa -display none \
+> -qtest stdio -accel qtest
+> writeq 0xf8100a02 0x845c235c223f0584
+> EOF
 > 
->> Here is the patch adding schema convertor from qemu "json" format to
->> standard yaml:
->> https://github.com/oVirt/vdsm/commit/e57b69e72987c0929b20306c454835b52b5eb7ee
->>
->> The current version of the new yaml based schema:
->> https://github.com/oVirt/vdsm/blob/master/lib/vdsm/api/vdsm-api.yml
+> AddressSanitizer: SEGV on unknown address 0x7fa50235cc00
+> #0 0x555577f8b392 in artist_rop8/hw/display/artist.c:284:14
+> #1 0x555577f84603 in fill_window/hw/display/artist.c:549:13
+> #2 0x555577f7abfc in artist_reg_write/hw/display/artist.c:895:9
+> #3 0x55557766d7a3 in memory_region_write_accessor/softmmu/memory.c:483:5
+> #4 0x55557766cadc in access_with_adjusted_size/softmmu/memory.c:539:18
+> #5 0x55557766a873 in memory_region_dispatch_write/softmmu/memory.c:1466:16
+> #6 0x555576d18056 in flatview_write_continue/exec.c:3176:23
+> #7 0x555576d00866 in flatview_write/exec.c:3216:14
+> #8 0x555576d00387 in address_space_write/exec.c:3308:18
+> #9 0x555577714604 in qtest_process_command/softmmu/qtest.c:452:13
+> 
+> ===========================================================
+> 
+> (2) Heap Overflow:
+> cat << EOF | ./hppa-softmmu/qemu-system-hppa -display none -m 64 \
+> -qtest stdio -accel qtest
+> writeq 0xf8100a02 0x8cd00011900a0203
+> EOF
+> 
+> AddressSanitizer: heap-buffer-overflow on address 0x603000045bc8 at pc 0x55bb3196f704 bp 0x7fff1c701d70 sp 0x7fff1c701d68
+> READ of size 8 at 0x603000045bc8 thread T0
+> 
+> #0 0x55bb3196f703 in cpu_physical_memory_set_dirty_range/include/exec/ram_addr.h:318:35
+> #1 0x55bb3196e6f2 in memory_region_set_dirty/softmmu/memory.c:1994:5
+> #2 0x55bb32279bb6 in artist_invalidate_lines/hw/display/artist.c:212:9
+> #3 0x55bb3227165d in fill_window/hw/display/artist.c:552:5
+> #4 0x55bb32267bfc in artist_reg_write/hw/display/artist.c:895:9
+> #5 0x55bb3195a7a3 in memory_region_write_accessor/softmmu/memory.c:483:5
+> #6 0x55bb31959adc in access_with_adjusted_size/softmmu/memory.c:539:18
+> #7 0x55bb31957873 in memory_region_dispatch_write/softmmu/memory.c:1466:16
+> #8 0x55bb31005056 in flatview_write_continue/exec.c:3176:23
+> #9 0x55bb30fed866 in flatview_write/exec.c:3216:14
+> #10 0x55bb30fed387 in address_space_write/exec.c:3308:18
+> 
+> 0x603000045bc8 is located 0 bytes to the right of 24-byte region [0x603000045bb0,0x603000045bc8)
+> allocated by thread T0 here:
+> #0 0x55bb30f7111d in malloc ()
+> #1 0x7fdae3d35500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x54500)
+> #2 0x55bb30fd84d4 in ram_block_add/exec.c:2268:9
+> #3 0x55bb30fded16 in qemu_ram_alloc_internal/exec.c:2441:5
+> #4 0x55bb30fdefed in qemu_ram_alloc/exec.c:2460:12
+> #5 0x55bb3195c0be in memory_region_init_ram_shared_nomigrate/softmmu/memory.c:1515:21
+> #6 0x55bb31cd6544 in ram_backend_memory_alloc/backends/hostmem-ram.c:30:5
+> #7 0x55bb31ccf875 in host_memory_backend_memory_complete/backends/hostmem.c:333:9
+> #8 0x55bb3360737e in user_creatable_complete/qom/object_interfaces.c:23:9
+> #9 0x55bb31a44e59 in create_default_memdev/softmmu/vl.c:2830:5
+> #10 0x55bb31a2d528 in qemu_init/softmmu/vl.c:4352:9
+> #11 0x55bb3405390c in main/softmmu/main.c:48:5
 > 
 > 
->      VmDiskDevice: &VmDiskDevice
->          added: '3.1'
->          description: Properties of a VM disk device.
->          name: VmDiskDevice
->          properties:
->          -   description: Indicates if writes are prohibited for the
->                  device
->              name: readonly
->              type: boolean
-> 
->          -   description: The size of the disk (in bytes)
->              name: apparentsize
->              type: uint
-> 
-> etc.
-> 
-> Paolo
-> 
-
-I was working on a small prototype that used something that looked like 
-this; the "*opt" format was traded for "?opt", but otherwise:
-
-
-struct:
-   name: AudiodevPerDirectionOptions
-   doc: >
-     General audio backend options that are used for both
-     playback and recording.
-   since: '4.0'
-   members:
-
-     ?mixing-engine:
-       type: bool
-       default: 'true'
-       since: '4.2'
-       doc: |
-         Use QEMU's mixing engine to mix all streams inside QEMU and
-         convert audio formats when not supported by the backend.
-
-         When set to off, fixed-settings must be also off.
-
-     ?fixed-settings:
-       type: bool
-       default: 'true'
-       doc: >-
-         Use fixed settings for host input/output.
-         When off, frequency, channels and format must not be specified.
-
-     ?frequency:
-       type: bool
-       default: '44100'
-       doc: >-
-         frequency to use when using fixed settings.
-
-     ?channels:
-       type: 'uint32'
-       default: 2
-       doc: >-
-         Number of channels when using fixed settings.
-
-     ?voices:
-       type: 'uint32'
-       default: 1
-       doc: "Number of voices to use."
-
-     ?format:
-       type: 'AudioFormat'
-       default: 's16'
-       doc: "Sample format to use when using fixed settings."
-
-     ?buffer-length:
-       type: 'uint32'
-       doc: 'The buffer length, in microseconds.'
-
-   features:
-     my-cool-feature:
-       since: '6.0'
-       doc: 'This is, no doubt, an extremely cool feature.'
-
-     my-bad-feature:
-       doc: 'This is a very bad feature. I am sorry for making it.'
-       since: '1.0'
-       deprecated: '5.9'
-
+> On 200801 1513, Helge Deller wrote:
+> > From: Sven Schnelle <svens@stackframe.org>
+> > 
+> > Signed-off-by: Sven Schnelle <svens@stackframe.org>
+> > Signed-off-by: Helge Deller <deller@gmx.de>
+> > ---
+> >  hw/display/artist.c | 24 +++++++++++-------------
+> >  1 file changed, 11 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/hw/display/artist.c b/hw/display/artist.c
+> > index 6261bfe65b..de56200dbf 100644
+> > --- a/hw/display/artist.c
+> > +++ b/hw/display/artist.c
+> > @@ -340,14 +340,13 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+> >  {
+> >      struct vram_buffer *buf;
+> >      uint32_t vram_bitmask = s->vram_bitmask;
+> > -    int mask, i, pix_count, pix_length, offset, height, width;
+> > +    int mask, i, pix_count, pix_length, offset, width;
+> >      uint8_t *data8, *p;
+> > 
+> >      pix_count = vram_write_pix_per_transfer(s);
+> >      pix_length = vram_pixel_length(s);
+> > 
+> >      buf = vram_write_buffer(s);
+> > -    height = buf->height;
+> >      width = buf->width;
+> > 
+> >      if (s->cmap_bm_access) {
+> > @@ -367,13 +366,6 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+> >          pix_count = size * 8;
+> >      }
+> > 
+> > -    if (posy * width + posx + pix_count > buf->size) {
+> > -        qemu_log("write outside bounds: wants %dx%d, max size %dx%d\n",
+> > -                 posx, posy, width, height);
+> > -        return;
+> > -    }
+> > -
+> > -
+> >      switch (pix_length) {
+> >      case 0:
+> >          if (s->image_bitmap_op & 0x20000000) {
+> > @@ -381,8 +373,11 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+> >          }
+> > 
+> >          for (i = 0; i < pix_count; i++) {
+> > -            artist_rop8(s, p + offset + pix_count - 1 - i,
+> > -                        (data & 1) ? (s->plane_mask >> 24) : 0);
+> > +            uint32_t off = offset + pix_count - 1 - i;
+> > +            if (off < buf->size) {
+> > +                artist_rop8(s, p + off,
+> > +                            (data & 1) ? (s->plane_mask >> 24) : 0);
+> > +            }
+> >              data >>= 1;
+> >          }
+> >          memory_region_set_dirty(&buf->mr, offset, pix_count);
+> > @@ -398,7 +393,10 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+> >          for (i = 3; i >= 0; i--) {
+> >              if (!(s->image_bitmap_op & 0x20000000) ||
+> >                  s->vram_bitmask & (1 << (28 + i))) {
+> > -                artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i)]);
+> > +                uint32_t off = offset + 3 - i;
+> > +                if (off < buf->size) {
+> > +                    artist_rop8(s, p + off, data8[ROP8OFF(i)]);
+> > +                }
+> >              }
+> >          }
+> >          memory_region_set_dirty(&buf->mr, offset, 3);
+> > @@ -420,7 +418,7 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+> >              break;
+> >          }
+> > 
+> > -        for (i = 0; i < pix_count; i++) {
+> > +        for (i = 0; i < pix_count && offset + i < buf->size; i++) {
+> >              mask = 1 << (pix_count - 1 - i);
+> > 
+> >              if (!(s->image_bitmap_op & 0x20000000) ||
+> > --
+> > 2.21.3
+> > 
+> > 
 
