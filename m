@@ -2,89 +2,85 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF4AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 13:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 020ABC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 13:20:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99EC2206D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 13:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BFEA8206DA
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 13:20:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pQy4EnOb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99EC2206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zK5yRIX0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFEA8206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2aG3-00005u-NU
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 09:12:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45500)
+	id 1k2aOX-000285-Rq
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 09:20:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k2aFS-0007n1-Q6
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 09:11:26 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41499)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k2aNt-0001fj-VK
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 09:20:09 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:36648)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k2aFR-0002Op-4W
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 09:11:26 -0400
-Received: by mail-oi1-x244.google.com with SMTP id b22so7231194oic.8
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 06:11:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k2aNq-0003CQ-4W
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 09:20:09 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id x24so3739267otp.3
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 06:20:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=xMGwUCBLAzCk8gnEvQK7mFHvwtkksyn++Rzj8tcAbSw=;
- b=pQy4EnObiWveBKJFM+QNlCImDBozQPzfEHifgyb3y0LVPMRHXyFwwN+E49ynGl5uB/
- JfjPVBb9uq9JPhk4L8gqcHtoTJE1QVTL7EvtzLKhdy4IzgHhvNrFgAGTY5uAC9OurSAK
- DtXG6IHr1LcIV3xgEPUDnMQ+baPP0BVQCU6l2u5T+EyuhT3MXKJAyYD8hoONAjSK4T5a
- 3aCaakAj86ICO5/oAnAh1ywQZp5h9mKrwRJB/zJcYQNHrFhEBMAXFkHj6KD/zFkUOq3W
- 3gICB4iGPZdiMOD6cVT2T4c2X05iF9GzUuHEqalgbqaHePMLQ5wivQjgFrsMdOpF5lGP
- Ccww==
+ :cc; bh=NJJXAqX3bHwhqwhRGQ74eSY9vcW2UJrHtd3NvbJSr3o=;
+ b=zK5yRIX0xyYGPMYRVx2KX6Bsvi8DgINNIFVdG118wlm0AFDSTsPB6rbGs7jpvVVtDK
+ CUf5omu+/WMgtXlL5IiFGOSTwh3eAjorvzjRIRDPfl3xfWJntGDi/jt2CcCtvjLIne+q
+ s5V2Ge3OwMNeVTCCaQu9tTAD/W2QLhoSc2IIn0EYgenoInbzUqg1Zl7FFvgr6/Q9uXiA
+ q8GnIEvoLaOr0xZItjgnV4WG7ngB213x48LuWIiw/dgWDVyicPQvBU9OC43FYp8C4Zom
+ EgL9S58heFWK8cyBza0UtZdDTWuPsFNAryBB7uzYikwh6VQiDowEnphxA57/zEcDry7t
+ nQiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=xMGwUCBLAzCk8gnEvQK7mFHvwtkksyn++Rzj8tcAbSw=;
- b=g8yeU1pbmjJq/oxjjPjtEggtVgIktI3iuXuA1bBqZe2q/jSiDk5WbDJDgbpIkbDVFq
- je3v135PxQgBsiXUOas7HU1IOIfen5GwiNU0lo0AzCRC9Xbs7cbHxN+Tjbr1ESiOMOiA
- SM9sJfXqm+M4KzVgYqFIKA8F/T++QHqS6AcjD324ORwB0PzpvHU3kEaGXjyMPtF6E2RT
- RmOpLxQSG8Z9Jo8xFgNGEoudtaj5uzz9mp/YZAUe1I90r3WPsx5Ll2kchSDaSpEtI4px
- KbqkEbZqjg4LDGKLE+BwL4fwlwSswcEEqSfzu/GMpF4uNdROz60rBtvxOBwC3o18or1p
- WgyQ==
-X-Gm-Message-State: AOAM531FEvtr4nTnJrOXkSJy32tBW9OKza8vJ4xeKL0R7GkTXM7/rCdX
- 0TjBxPCeZAyabCnF4tQ2hzUH+7C5KKMljNnlRN4=
-X-Google-Smtp-Source: ABdhPJzeQyFB1XyUaBSgeqF1gRA/caZ7UZMXpgUcODChSe9PDnmMW3ZZOOdAluM86bWN5bSazPWyLeyH+CtHDPcmuTo=
-X-Received: by 2002:aca:fd46:: with SMTP id b67mr12228775oii.150.1596460281769; 
- Mon, 03 Aug 2020 06:11:21 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=NJJXAqX3bHwhqwhRGQ74eSY9vcW2UJrHtd3NvbJSr3o=;
+ b=gjmEIX2bGyATjtOZq6Ons23lcI6zsj86/ZDXotnWtBu1/UBZX45YsKq/AgMsTzYSOi
+ rrd0OnZMCHvVW+TTm4IdyVwpVJVDlC8H9jk+UYTSefxRXORI9bYiy7yXWlCs9/B022hQ
+ KJPj77z/GA3/nUfOX/MQvjYWjz/HXgSs7VeBCm2W2irsYNtaYe7+2lOLTmJPOQJdCWzF
+ 60mq8CxQyQaomAdkQVK7efS05g/EbVzq+iuOhfaNWAbfyGg4rzYyy4+STEMe6bE9G5qN
+ oDKR959l6TB/PiZ6dToJtlmfhEhUEdYUG2JbQf5OJwjjnr7qgiyyd86ACR4Vhuqdtfxc
+ Fx+A==
+X-Gm-Message-State: AOAM533WOEbbvY3p6exCklWbc/sSwAHRmMyhmrq06ESqTJJH66t7HSiK
+ qEDXBBwMAmbcb3zI5EjRI53cnGpJt12I5AgfRqOwgw==
+X-Google-Smtp-Source: ABdhPJzjitH1/Q9/jI4CamEJ/GDWKTXLwcmzz6e8YzPRgolsEjrigEjdQN1mpmOIDaMotTCQ3byLaW2CEl4ZT7gCncQ=
+X-Received: by 2002:a9d:39c2:: with SMTP id y60mr13499973otb.91.1596460804632; 
+ Mon, 03 Aug 2020 06:20:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <159548011952.31456.8249433335836304327.malonedeb@chaenomeles.canonical.com>
- <20200723153726.m6eckrxwkoooreh3@mozz.bu.edu>
- <20200803065604.lvvplrxwc5yomwl7@sirius.home.kraxel.org>
-In-Reply-To: <20200803065604.lvvplrxwc5yomwl7@sirius.home.kraxel.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 3 Aug 2020 21:10:45 +0800
-Message-ID: <CAKXe6SLj1hkUUOOjCMinjbS27dJd9Ogzv=ON7LPmhd6S+qHBFQ@mail.gmail.com>
-Subject: Re: [Bug 1888606] [NEW] Heap-use-after-free in
- virtio_gpu_ctrl_response
-To: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
- Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>
+References: <20200803091042.2920218-1-armbru@redhat.com>
+In-Reply-To: <20200803091042.2920218-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 3 Aug 2020 14:19:53 +0100
+Message-ID: <CAFEAcA_HrUzPJ3ip+=-2GECU257TffWGLM-tguYzGoLg8YMyow@mail.gmail.com>
+Subject: Re: [PULL 0/3] QAPI patches patches for 2020-08-03
+To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x244.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::32b;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x32b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,76 +93,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, "Michael S. Tsirkin" <mst@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>,
- Bug 1888606 <1888606@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Gerd Hoffmann <kraxel@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=883=E6=97=
-=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=882:57=E5=86=99=E9=81=93=EF=BC=9A
+On Mon, 3 Aug 2020 at 10:10, Markus Armbruster <armbru@redhat.com> wrote:
 >
->   Hi,
+> The following changes since commit d74824cf7c8b352f9045e949dc636c7207a41eee:
 >
-> > > The ASAN trace:
-> > > =3D=3D29798=3D=3DERROR: AddressSanitizer: heap-use-after-free on addr=
-ess 0x60d0000050e8 at pc 0x560629814761 bp 0x7ffe916eb1e0 sp 0x7ffe916eb1d8
-> > > READ of size 8 at 0x60d0000050e8 thread T0
-> > >     #0 0x560629814760 in virtio_gpu_ctrl_response /home/alxndr/Develo=
-pment/qemu/hw/display/virtio-gpu.c:181:42
-> > >     #4 0x56062a8f1c96 in aio_bh_poll /home/alxndr/Development/qemu/ut=
-il/async.c:164:13
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200731' into staging (2020-07-31 10:28:13 +0100)
 >
-> > >     #1 0x560629827730 in virtio_gpu_reset /home/alxndr/Development/qe=
-mu/hw/display/virtio-gpu.c:1160:9
+> are available in the Git repository at:
 >
-> So it looks like the bottom half accesses stuff released by reset.
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2020-08-03
 >
-> Guess the reset should cancel any scheduled bh calls to avoid that ...
+> for you to fetch changes up to f7160f32186b4ae1e1327e3bd05060fffec8f9ae:
 >
+>   schemas: Add vim modeline (2020-08-03 08:28:08 +0200)
+>
+> ----------------------------------------------------------------
+> QAPI patches patches for 2020-08-03
 
-Gerd, the root case is we do DMA to MMIO. Following happens
 
-1. bh -> virtio_gpu_handle_ctrl
-here we alloc 'cmd'
+Applied, thanks.
 
-2. Next, virtio_gpu_handle_ctrl...->virtqueue_push->...write virtio
-used ring(but here we write to the virtio-gpu's MMIO
-and then we go virtio_gpu_reset).
-In the virtio_gpu_reset, we free the 'cmd'
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.1
+for any user-visible changes.
 
-3. In the 'virtio_gpu_ctrl_response', we use the 'cmd' again after
-'virtqueue_push'
-But the 'cmd' has been freed in step two.
-
-So the root cause is the DMA do write to MMIO.
-This is a general issue we have discussed in the e1000e case.
-
-We still don't think out a solution for this.
-
-Thanks,
-Li Qiang
-
-> Does the patch below help?
->
-> thanks,
->   Gerd
->
-> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> index 5f0dd7c15002..18f0011b5a0a 100644
-> --- a/hw/display/virtio-gpu.c
-> +++ b/hw/display/virtio-gpu.c
-> @@ -1144,6 +1144,9 @@ static void virtio_gpu_reset(VirtIODevice *vdev)
->      struct virtio_gpu_simple_resource *res, *tmp;
->      struct virtio_gpu_ctrl_command *cmd;
->
-> +    qemu_bh_cancel(g->ctrl_bh);
-> +    qemu_bh_cancel(g->cursor_bh);
-> +
->  #ifdef CONFIG_VIRGL
->      if (g->parent_obj.use_virgl_renderer) {
->          virtio_gpu_virgl_reset(g);
->
->
+-- PMM
 
