@@ -6,75 +6,78 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66825C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3AEC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:55:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CCB72076C
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 031E720775
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:55:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+I8oPAF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CCB72076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjwfKrMu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 031E720775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2Yzp-00071J-A8
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 07:51:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53124)
+	id 1k2Z3y-0008FY-2R
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 07:55:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2Yyh-00063n-Pn
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:50:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47586
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2Z3N-0007op-61
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:54:53 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52955
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2Yyf-00009k-Ao
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:50:03 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2Z3L-0000fk-EM
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:54:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596455399;
+ s=mimecast20190719; t=1596455690;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=q9fSbs/9gkw6OE0IAhUhkxwHsAXWYuqQ9twQ0Vpo98Y=;
- b=E+I8oPAFrLfaHm+6qNqkQ2D9b7JCs0J3pIMEXIyLUIxuJDPYoPyfGpEO53wPkzQlCAREEe
- XHWaihiqZNueN3KBeHMzFh1i54AKaQnGsZBE4rt11b80z7bSTN+rBPoGY/+qRhfhwI7h0P
- IX/g0zCxdMNHYiLzsm9VTvqp9XkXwTQ=
+ bh=ahWxR/GnuMvQ9gDhvj2rTV+LBgp97PJ89il2AsYmdMQ=;
+ b=WjwfKrMunuQOTYpPQ8fCiv54u47I5++kVnxDy7ZghYcYieTofXGqEIcblBv4jTdqAyNPQx
+ K9r6JJfNtyWaFnVh0q2sDfSxpgYtKAIQCcN1iM0ahhPKSBtKgurLtqdAp3CVKU2xYAU2+8
+ UfK53WEiEdP8c1JujWzFULfZh9OP7Jk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-ixaiPtsbMQec-cFiPhQfFA-1; Mon, 03 Aug 2020 07:49:58 -0400
-X-MC-Unique: ixaiPtsbMQec-cFiPhQfFA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-45-l629-B9oOSCHFRj2mKOdRw-1; Mon, 03 Aug 2020 07:54:47 -0400
+X-MC-Unique: l629-B9oOSCHFRj2mKOdRw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6317A101C8A0;
- Mon,  3 Aug 2020 11:49:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3ACA18C63C5;
+ Mon,  3 Aug 2020 11:54:46 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
  [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F26410013C1;
- Mon,  3 Aug 2020 11:49:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 445E98FA5E;
+ Mon,  3 Aug 2020 11:54:39 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 21E1B1132FD2; Mon,  3 Aug 2020 13:49:50 +0200 (CEST)
+ id 8E9711132FD2; Mon,  3 Aug 2020 13:54:37 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: [PATCH v4 1/2] trace: Add support for recorder back-end
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v4 2/2] trace: Example of non-tracing recorder use
 References: <20200723132903.1980743-1-dinechin@redhat.com>
- <20200723132903.1980743-2-dinechin@redhat.com>
-Date: Mon, 03 Aug 2020 13:49:50 +0200
-In-Reply-To: <20200723132903.1980743-2-dinechin@redhat.com> (Christophe de
- Dinechin's message of "Thu, 23 Jul 2020 15:29:02 +0200")
-Message-ID: <87eeooj6e9.fsf@dusky.pond.sub.org>
+ <20200723132903.1980743-3-dinechin@redhat.com>
+ <20200803104432.GG244853@stefanha-x1.localdomain>
+Date: Mon, 03 Aug 2020 13:54:37 +0200
+In-Reply-To: <20200803104432.GG244853@stefanha-x1.localdomain> (Stefan
+ Hajnoczi's message of "Mon, 3 Aug 2020 11:44:32 +0100")
+Message-ID: <87d048j66a.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 01:24:44
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:37:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,59 +98,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Michael Tokarev <mjt@tls.msk.ru>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Christophe de Dinechin <dinechin@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Christophe de Dinechin <dinechin@redhat.com> writes:
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-> The recorder library provides support for low-cost continuous
-> recording of events, which can then be replayed. This makes it
-> possible to collect data after the fact, for example to show the
-> events that led to a crash or unexpected condition.
+> On Thu, Jul 23, 2020 at 03:29:03PM +0200, Christophe de Dinechin wrote:
+>> This patch is a simple example showing how the recorder can be used to
+>> have one "topic" covering multiple entries. Here, the topic is "lock",
+>> the idea being to have the latest lock changes for instance in case of
+>> a crash or hang.
+>> 
+>> Here are a few use cases:
+>> 
+>> * Tracing  lock updates:
+>>     RECORDER_TRACES=lock qemu
+>> * Showing lock changes prior to a hang
+>>     RECORDER_TRACES=lock qemu &
+>>     # Wait until hang
+>>     killall -USR2 qemu  # This will trigger a dump
+>> * Graphic visualization of lock states:
+>>     RECORDER_TRACES="lock=state,id" qemu &
+>>     recorder_scope state
+>>     # Hit the 't' key to toggle timing display
+>>     # Hit the 'c' key to dump the screen data as CSV
+>>     cat recorder_scope_data-1.csv
 >
-> In this series, minimal recorder support in qemu is implemented using
-> the existing tracing interface. For each trace, a corresponding
-> recorder is created with a generic name and a default size of 8 entries.
+> Dan raised a good point regarding integrating recorder functionality
+> behind the tracetool interface.
 >
-> In addition, it is possible to explicitly enable recorders that are
-> not qemu traces, for example in order to use actually record events
-> rather than trace them, or to use the real-time graphing capabilities.
-> For that reason, a limited set of recorder-related macros are defined
-> as no-ops even if the recorder trace backend is not configured.
+> On the other hand, I would like to see where this goes so that we have
+> enough experience to design the tracetool interface, if necessary.
 >
-> Recorder-specific features, notably the ability to perform a
-> post-mortem dump and to group traces by topic, are not integrated in
-> this series, as doing so would require modifying the trace
-> infrastructure, which is a non-objective here. This may be the topic
-> of later series if there is any interest for it.
->
-> HMP COMMAND:
-> The 'recorder' hmp command has been added, which supports two
-> sub-commands:
-> * recorder dump: Dump the current state of the recorder. You can
->   give that command a recorder name, to only dump that recorder.
-> * recorder trace: Set traces using the recorder_trace_set() syntax.
->   You can use "recorder trace help" to list all available recorders.
+> Therefore I am for merging this as-is and taking action when it's clear
+> that duplication is taking place.
 
-Standard comment for patches adding HMP-only monitor commands:
+Sounds like we should not yet commit to a stable external interface.
 
-In general, functionality available in HMP should also available in QMP.
-Exceptions include functionality that makes no sense in QMP, or is of
-use only for human users.  If you think your command is an exception,
-please explain why in the commit message.
+The monitor command is HMP only.  Not a stable interface.  A QMP command
+would have to be marked experimental with the customary x- prefix.
 
-If it isn't, you need to implement it for QMP (including suitable test
-cases), then rewrite the HMP version to reuse either the QMP command or
-a common core.
-
-Example for "makes no sense in QMP": setting the current CPU, because a
-QMP monitor doesn't have a current CPU.
-
-Examples for "is of use only for human users": HMP command "help", the
-integrated pocket calculator.
+The environment variable is an external interface of the recorder
+library.  Attempting to police such interfaces of libraries we use seems
+futile.
 
 
