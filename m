@@ -2,99 +2,88 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5737C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 13:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D59D7C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 13:58:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FC0C2076E
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 13:44:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A072E206D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 13:58:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jd6EJYjd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC0C2076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KyPVQ115"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A072E206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2al8-0003wV-Ma
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 09:44:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53698)
+	id 1k2ayc-0007AG-M6
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 09:58:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1k2akX-0003Qp-V0; Mon, 03 Aug 2020 09:43:33 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:37893)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1k2akV-0006VD-1O; Mon, 03 Aug 2020 09:43:33 -0400
-Received: by mail-qt1-x842.google.com with SMTP id e5so14150502qth.5;
- Mon, 03 Aug 2020 06:43:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=NqoK83PRdIJnHEw6P7ZICbek9SFhfz4mflYaEb3PdiU=;
- b=Jd6EJYjdlWgWcaOKJGO/heo3T6FbqLMWjwxzSjDvh9sc83izyeXkNoTWBOAkeZDNE+
- kWis7sOM7Mviwu7U1Tdk0pyAgq+JLB/VuSbLACn40JMtfP/+PPQ8idv3bmyPftboHOYW
- t+2lwZAR3HN8JyiK5vXqxXZLTPQ+x7hYN5vvDYAupjLoDwyDOcq8hl6liEiuNJOB+aRM
- zbyS6tD/Z32EGjRJTpZedJD1LmP9bjz07LBCopyimL3HSkF2hC0qHcsvtj5MmP1cjJO9
- yQzmDIMPUDIGtUMG88wiGb6QERxA736dzS61sToaW0GuJzeSoKiyp5QAOiq+ViWbOxMP
- NJXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NqoK83PRdIJnHEw6P7ZICbek9SFhfz4mflYaEb3PdiU=;
- b=idWkDkCvSPcNiQhq2v34QDIMK79cmuVawwkLDDROKByH/xsexK22fF/paxBpbScJdx
- T5Jon3C/lFR9btQxf2LyPQHp0q1YxCr3ioLQJwUXZ1Dk41hlJOgaoIh4ELxt38rae0YI
- YGSShF/kkKgVLNUBRBTyX2hxHOBgvCnuFwkpg2WQTVizAFg49gAC4o2v7lCA5q8UCdJn
- gatdHKoCTcKrnHDWsUCNcW4yPaRrLVIegDd9T1icGDQRQ5KAz8l20ok5i7oJCUmC7SQR
- nHglyW0BCneyJnyKMCNewfy7n8wqtfzT2ZgeJ8/M3nah+43yolbCGNsrWsWYL7BbGAVM
- s9LA==
-X-Gm-Message-State: AOAM5325qB0PI25e7BJB3gmfR451X/vivcgx3pqfz+7PAQW38OtHIdE2
- rUnR1VA+q2xqjJ6ek4X+jCXMW2gA
-X-Google-Smtp-Source: ABdhPJyyy+wU8bWgg+jUYBrtXKzrJhvCkKtyF3o8XUfq+x+GyEjzyWUn5ayaGpO4MlTKFYNRx63IpA==
-X-Received: by 2002:aed:3461:: with SMTP id w88mr16479427qtd.180.1596462208623; 
- Mon, 03 Aug 2020 06:43:28 -0700 (PDT)
-Received: from ?IPv6:2804:431:c7c7:fea0:f34f:387b:ebfa:f155?
- ([2804:431:c7c7:fea0:f34f:387b:ebfa:f155])
- by smtp.gmail.com with ESMTPSA id z14sm20342572qtn.92.2020.08.03.06.43.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Aug 2020 06:43:27 -0700 (PDT)
-Subject: Re: [PATCH 1/1] docs: adding NUMA documentation for pseries
-To: Greg Kurz <groug@kaod.org>
-References: <20200729125756.224846-1-danielhb413@gmail.com>
- <20200730005852.GN84173@umbus.fritz.box> <20200803134917.48c5e7a5@bahia.lan>
- <8985209a-427b-1ec5-7d90-6a760e58f1cd@gmail.com>
- <20200803145311.55864d02@bahia.lan>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <2e83b3fe-100e-c75a-4a77-c6c3758d681d@gmail.com>
-Date: Mon, 3 Aug 2020 10:43:24 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k2ay4-0006l4-UU
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 09:57:32 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51368
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1k2ay1-0008Q5-Bw
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 09:57:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596463047;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ERcYbJma07PP5JwVltItx54C93hyi5SMrlrkCUM1PRA=;
+ b=KyPVQ115C5MacyJC3CiM44U5eMOIzTnOop/h9C0PDAmV8+xW1lQRCK/B8Lc9JZMTmBbadC
+ vD513yPblso8qfObKq1pbxT+Lv/JgO4m87NcIvFt3nZzynsiic9bZ+s0dio8mgaKSgBm93
+ iEdiBna30/9Fce4SHD529tgnR+/ZSqQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-eaDJsORVPFeaUSGbD1yTtg-1; Mon, 03 Aug 2020 09:57:26 -0400
+X-MC-Unique: eaDJsORVPFeaUSGbD1yTtg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECAC91030C53
+ for <qemu-devel@nongnu.org>; Mon,  3 Aug 2020 13:57:21 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-116-80.rdu2.redhat.com [10.10.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2BEEF8FA30;
+ Mon,  3 Aug 2020 13:57:16 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 94504220406; Mon,  3 Aug 2020 09:57:15 -0400 (EDT)
+Date: Mon, 3 Aug 2020 09:57:15 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v2 4/5] virtiofsd: Open lo->source while setting up root
+ in sandbox=NONE mode
+Message-ID: <20200803135715.GA233053@redhat.com>
+References: <20200730194736.173994-1-vgoyal@redhat.com>
+ <20200730194736.173994-5-vgoyal@redhat.com>
+ <20200803095459.GD244853@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20200803145311.55864d02@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
- envelope-from=danielhb413@gmail.com; helo=mail-qt1-x842.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200803095459.GD244853@stefanha-x1.localdomain>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:56:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,324 +96,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: berrange@redhat.com, vromanso@redhat.com, dwalsh@redhat.com,
+ qemu-devel@nongnu.org, dgilbert@redhat.com, virtio-fs@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David,
-
-This patch is breaking the build, as Greg mentioned below. Just sent
-a v2 that works properly.
-
-If you prefer you can squash this to the existing patch to fix it:
-
-
-$ git diff HEAD^ docs/specs/index.rst
-diff --git a/docs/specs/index.rst b/docs/specs/index.rst
-index 426632a475..1b0eb979d5 100644
---- a/docs/specs/index.rst
-+++ b/docs/specs/index.rst
-@@ -12,6 +12,7 @@ Contents:
-  
-     ppc-xive
-     ppc-spapr-xive
-+   ppc-spapr-numa
-     acpi_hw_reduced_hotplug
-     tpm
-     acpi_hest_ghes
-
-
-
-Thank you Greg  for reporting it. This went under my radar completely.
-
-
-Daniel
-
-
-On 8/3/20 9:53 AM, Greg Kurz wrote:
-> On Mon, 3 Aug 2020 09:14:22 -0300
-> Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
+On Mon, Aug 03, 2020 at 10:54:59AM +0100, Stefan Hajnoczi wrote:
+> On Thu, Jul 30, 2020 at 03:47:35PM -0400, Vivek Goyal wrote:
+> > In sandbox=NONE mode, lo->source points to the directory which is being
+> > exported. We have not done any chroot()/pivot_root(). So open lo->source.
+> > 
+> > Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+> > ---
+> >  tools/virtiofsd/passthrough_ll.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> > index 76ef891105..a6fa816b6c 100644
+> > --- a/tools/virtiofsd/passthrough_ll.c
+> > +++ b/tools/virtiofsd/passthrough_ll.c
+> > @@ -3209,7 +3209,10 @@ static void setup_root(struct lo_data *lo, struct lo_inode *root)
+> >      int fd, res;
+> >      struct stat stat;
+> >  
+> > -    fd = open("/", O_PATH);
+> > +    if (lo->sandbox == SANDBOX_NONE)
+> > +        fd = open(lo->source, O_PATH);
+> > +    else
+> > +        fd = open("/", O_PATH);
 > 
->>
->>
->> On 8/3/20 8:49 AM, Greg Kurz wrote:
->>> On Thu, 30 Jul 2020 10:58:52 +1000
->>> David Gibson <david@gibson.dropbear.id.au> wrote:
->>>
->>>> On Wed, Jul 29, 2020 at 09:57:56AM -0300, Daniel Henrique Barboza wrote:
->>>>> This patch adds a new documentation file, ppc-spapr-numa.rst,
->>>>> informing what developers and user can expect of the NUMA distance
->>>>> support for the pseries machine, up to QEMU 5.1.
->>>>>
->>>>> In the (hopefully soon) future, when we rework the NUMA mechanics
->>>>> of the pseries machine to at least attempt to contemplate user
->>>>> choice, this doc will be extended to inform about the new
->>>>> support.
->>>>>
->>>>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
->>>>
->>>> Applied to ppc-for-5.2, thanks.
->>>>
->>>
->>> I'm now hitting this:
->>>
->>> Warning, treated as error:
->>> docs/specs/ppc-spapr-numa.rst:document isn't included in any toctree
->>
->> How are you hitting this? I can't reproduce this error. Tried running
->> ./autogen.sh and 'make' and didn't see it.
->>
+> Up until now virtiofsd has been able to assume that path traversal has
+> the shared directory as "/".
 > 
-> I do out-of-tree builds and my configure line is:
+> Now this is no longer true and it is necessary to audit all syscalls
+> that take path arguments. They must ensure that:
+> 1. Path components are safe (no ".." or "/" allowed)
+> 2. Symlinks are not followed.
+
+This code does not change the path client is passing in and we are
+already doing the checks on passed in paths/names. So existing checks
+should work even for this case, isn't it?
+
+lo_lookup() {
+    if (strchr(name, '/')) {
+        fuse_reply_err(req, EINVAL);
+        return;
+    }
+}
+
+lo_do_lookup() {
+    /* Do not allow escaping root directory */
+    if (dir == &lo->root && strcmp(name, "..") == 0) {
+        name = ".";
+    }
+}
+
 > 
-> configure \
-> 	--enable-docs \
-> 	--disable-strip \
-> 	--disable-xen \
-> 	--enable-trace-backend=log \
-> 	--enable-kvm \
-> 	--enable-linux-aio \
-> 	--enable-vhost-net \
-> 	--enable-virtfs \
-> 	--enable-seccomp \
-> 	--target-list='ppc64-softmmu'
+> Did you audit all syscalls made by passthrough_ll.c?
 > 
->> Checking what other docs are doing I figure that this might be missing:
->>
->> $ git diff
->> diff --git a/docs/specs/index.rst b/docs/specs/index.rst
->> index 426632a475..1b0eb979d5 100644
->> --- a/docs/specs/index.rst
->> +++ b/docs/specs/index.rst
->> @@ -12,6 +12,7 @@ Contents:
->>    
->>       ppc-xive
->>       ppc-spapr-xive
->> +   ppc-spapr-numa
->>       acpi_hw_reduced_hotplug
->>       tpm
->>       acpi_hest_ghes
->>
->>
->>
->> Can you please check if this solves the error?
->>
-> 
-> Yes it does ! Thanks !
-> 
->>
->>
->> Thanks,
->>
->>
->> Daniel
->>
->>>
->>>>> ---
->>>>>    docs/specs/ppc-spapr-numa.rst | 191 ++++++++++++++++++++++++++++++++++
->>>>>    1 file changed, 191 insertions(+)
->>>>>    create mode 100644 docs/specs/ppc-spapr-numa.rst
->>>>>
->>>>> diff --git a/docs/specs/ppc-spapr-numa.rst b/docs/specs/ppc-spapr-numa.rst
->>>>> new file mode 100644
->>>>> index 0000000000..e762038022
->>>>> --- /dev/null
->>>>> +++ b/docs/specs/ppc-spapr-numa.rst
->>>>> @@ -0,0 +1,191 @@
->>>>> +
->>>>> +NUMA mechanics for sPAPR (pseries machines)
->>>>> +============================================
->>>>> +
->>>>> +NUMA in sPAPR works different than the System Locality Distance
->>>>> +Information Table (SLIT) in ACPI. The logic is explained in the LOPAPR
->>>>> +1.1 chapter 15, "Non Uniform Memory Access (NUMA) Option". This
->>>>> +document aims to complement this specification, providing details
->>>>> +of the elements that impacts how QEMU views NUMA in pseries.
->>>>> +
->>>>> +Associativity and ibm,associativity property
->>>>> +--------------------------------------------
->>>>> +
->>>>> +Associativity is defined as a group of platform resources that has
->>>>> +similar mean performance (or in our context here, distance) relative to
->>>>> +everyone else outside of the group.
->>>>> +
->>>>> +The format of the ibm,associativity property varies with the value of
->>>>> +bit 0 of byte 5 of the ibm,architecture-vec-5 property. The format with
->>>>> +bit 0 equal to zero is deprecated. The current format, with the bit 0
->>>>> +with the value of one, makes ibm,associativity property represent the
->>>>> +physical hierarchy of the platform, as one or more lists that starts
->>>>> +with the highest level grouping up to the smallest. Considering the
->>>>> +following topology:
->>>>> +
->>>>> +::
->>>>> +
->>>>> +    Mem M1 ---- Proc P1    |
->>>>> +    -----------------      | Socket S1  ---|
->>>>> +          chip C1          |               |
->>>>> +                                           | HW module 1 (MOD1)
->>>>> +    Mem M2 ---- Proc P2    |               |
->>>>> +    -----------------      | Socket S2  ---|
->>>>> +          chip C2          |
->>>>> +
->>>>> +The ibm,associativity property for the processors would be:
->>>>> +
->>>>> +* P1: {MOD1, S1, C1, P1}
->>>>> +* P2: {MOD1, S2, C2, P2}
->>>>> +
->>>>> +Each allocable resource has an ibm,associativity property. The LOPAPR
->>>>> +specification allows multiple lists to be present in this property,
->>>>> +considering that the same resource can have multiple connections to the
->>>>> +platform.
->>>>> +
->>>>> +Relative Performance Distance and ibm,associativity-reference-points
->>>>> +--------------------------------------------------------------------
->>>>> +
->>>>> +The ibm,associativity-reference-points property is an array that is used
->>>>> +to define the relevant performance/distance  related boundaries, defining
->>>>> +the NUMA levels for the platform.
->>>>> +
->>>>> +The definition of its elements also varies with the value of bit 0 of byte 5
->>>>> +of the ibm,architecture-vec-5 property. The format with bit 0 equal to zero
->>>>> +is also deprecated. With the current format, each integer of the
->>>>> +ibm,associativity-reference-points represents an 1 based ordinal index (i.e.
->>>>> +the first element is 1) of the ibm,associativity array. The first
->>>>> +boundary is the most significant to application performance, followed by
->>>>> +less significant boundaries. Allocated resources that belongs to the
->>>>> +same performance boundaries are expected to have relative NUMA distance
->>>>> +that matches the relevancy of the boundary itself. Resources that belongs
->>>>> +to the same first boundary will have the shortest distance from each
->>>>> +other. Subsequent boundaries represents greater distances and degraded
->>>>> +performance.
->>>>> +
->>>>> +Using the previous example, the following setting reference points defines
->>>>> +three NUMA levels:
->>>>> +
->>>>> +* ibm,associativity-reference-points = {0x3, 0x2, 0x1}
->>>>> +
->>>>> +The first NUMA level (0x3) is interpreted as the third element of each
->>>>> +ibm,associativity array, the second level is the second element and
->>>>> +the third level is the first element. Let's also consider that elements
->>>>> +belonging to the first NUMA level have distance equal to 10 from each
->>>>> +other, and each NUMA level doubles the distance from the previous. This
->>>>> +means that the second would be 20 and the third level 40. For the P1 and
->>>>> +P2 processors, we would have the following NUMA levels:
->>>>> +
->>>>> +::
->>>>> +
->>>>> +  * ibm,associativity-reference-points = {0x3, 0x2, 0x1}
->>>>> +
->>>>> +  * P1: associativity{MOD1, S1, C1, P1}
->>>>> +
->>>>> +  First NUMA level (0x3) => associativity[2] = C1
->>>>> +  Second NUMA level (0x2) => associativity[1] = S1
->>>>> +  Third NUMA level (0x1) => associativity[0] = MOD1
->>>>> +
->>>>> +  * P2: associativity{MOD1, S2, C2, P2}
->>>>> +
->>>>> +  First NUMA level (0x3) => associativity[2] = C2
->>>>> +  Second NUMA level (0x2) => associativity[1] = S2
->>>>> +  Third NUMA level (0x1) => associativity[0] = MOD1
->>>>> +
->>>>> +  P1 and P2 have the same third NUMA level, MOD1: Distance between them = 40
->>>>> +
->>>>> +Changing the ibm,associativity-reference-points array changes the performance
->>>>> +distance attributes for the same associativity arrays, as the following
->>>>> +example illustrates:
->>>>> +
->>>>> +::
->>>>> +
->>>>> +  * ibm,associativity-reference-points = {0x2}
->>>>> +
->>>>> +  * P1: associativity{MOD1, S1, C1, P1}
->>>>> +
->>>>> +  First NUMA level (0x2) => associativity[1] = S1
->>>>> +
->>>>> +  * P2: associativity{MOD1, S2, C2, P2}
->>>>> +
->>>>> +  First NUMA level (0x2) => associativity[1] = S2
->>>>> +
->>>>> +  P1 and P2 does not have a common performance boundary. Since this is a one level
->>>>> +  NUMA configuration, distance between them is one boundary above the first
->>>>> +  level, 20.
->>>>> +
->>>>> +
->>>>> +In a hypothetical platform where all resources inside the same hardware module
->>>>> +is considered to be on the same performance boundary:
->>>>> +
->>>>> +::
->>>>> +
->>>>> +  * ibm,associativity-reference-points = {0x1}
->>>>> +
->>>>> +  * P1: associativity{MOD1, S1, C1, P1}
->>>>> +
->>>>> +  First NUMA level (0x1) => associativity[0] = MOD0
->>>>> +
->>>>> +  * P2: associativity{MOD1, S2, C2, P2}
->>>>> +
->>>>> +  First NUMA level (0x1) => associativity[0] = MOD0
->>>>> +
->>>>> +  P1 and P2 belongs to the same first order boundary. The distance between then
->>>>> +  is 10.
->>>>> +
->>>>> +
->>>>> +How the pseries Linux guest calculates NUMA distances
->>>>> +=====================================================
->>>>> +
->>>>> +Another key difference between ACPI SLIT and the LOPAPR regarding NUMA is
->>>>> +how the distances are expressed. The SLIT table provides the NUMA distance
->>>>> +value between the relevant resources. LOPAPR does not provide a standard
->>>>> +way to calculate it. We have the ibm,associativity for each resource, which
->>>>> +provides a common-performance hierarchy,  and the ibm,associativity-reference-points
->>>>> +array that tells which level of associativity is considered to be relevant
->>>>> +or not.
->>>>> +
->>>>> +The result is that each OS is free to implement and to interpret the distance
->>>>> +as it sees fit. For the pseries Linux guest, each level of NUMA duplicates
->>>>> +the distance of the previous level, and the maximum amount of levels is
->>>>> +limited to MAX_DISTANCE_REF_POINTS = 4 (from arch/powerpc/mm/numa.c in the
->>>>> +kernel tree). This results in the following distances:
->>>>> +
->>>>> +* both resources in the first NUMA level: 10
->>>>> +* resources one NUMA level apart: 20
->>>>> +* resources two NUMA levels apart: 40
->>>>> +* resources three NUMA levels apart: 80
->>>>> +* resources four NUMA levels apart: 160
->>>>> +
->>>>> +
->>>>> +Consequences for QEMU NUMA tuning
->>>>> +---------------------------------
->>>>> +
->>>>> +The way the pseries Linux guest calculates NUMA distances has a direct effect
->>>>> +on what QEMU users can expect when doing NUMA tuning. As of QEMU 5.1, this is
->>>>> +the default ibm,associativity-reference-points being used in the pseries
->>>>> +machine:
->>>>> +
->>>>> +ibm,associativity-reference-points = {0x4, 0x4, 0x2}
->>>>> +
->>>>> +The first and second level are equal, 0x4, and a third one was added in
->>>>> +commit a6030d7e0b35 exclusively for NVLink GPUs support. This means that
->>>>> +regardless of how the ibm,associativity properties are being created in
->>>>> +the device tree, the pseries Linux guest will only recognize three scenarios
->>>>> +as far as NUMA distance goes:
->>>>> +
->>>>> +* if the resources belongs to the same first NUMA level = 10
->>>>> +* second level is skipped since it's equal to the first
->>>>> +* all resources that aren't a NVLink GPU, it is guaranteed that they will belong
->>>>> +  to the same third NUMA level, having distance = 40
->>>>> +* for NVLink GPUs, distance = 80 from everything else
->>>>> +
->>>>> +In short, we can summarize the NUMA distances seem in pseries Linux guests, using
->>>>> +QEMU up to 5.1, as follows:
->>>>> +
->>>>> +* local distance, i.e. the distance of the resource to its own NUMA node: 10
->>>>> +* if it's a NVLink GPU device, distance: 80
->>>>> +* every other resource, distance: 40
->>>>> +
->>>>> +This also means that user input in QEMU command line does not change the
->>>>> +NUMA distancing inside the guest for the pseries machine.
->>>>
->>>
-> 
+> virtiofsd still needs to restrict the client to the shared directory for
+> two reasons:
+> 1. The guest may not be trusted. An unprivileged sandbox=none mount can
+>    be used with a malicious guest.
+> 2. If accidental escapes are possible then the guest could accidentally
+>    corrupt or delete files outside the shared directory.
+
+Even if escape is possible, its no different than a malicious user
+application running. Given sandbox=none can be used in case of
+unpriviliged mode, that means user app can only affect files owned by
+that user.
+
+Given we are not doing chroot()/pivot_root(), key question will be
+what additional path we are enabling using which one can escape
+out of this shared directory.
+
+Having said that, In case of unpriviliged mode, it feels that chroot()
+is more of a nice to have kind of functionality. Even if guest manages
+to break out of shared directory, impact is equivalent to user running a
+malicious app directly. 
+
+If doing chroot/pivot_root is must, then we need additional capabilities.
+And that probably means we need to launch virtiofsd in a user namespace
+with required caps. And that will fall back into the territory of
+running virtiofsd in a user namespace. That indeed is an important
+use case which needs to be solved.
+
+Thanks
+Vivek
+
 
