@@ -2,94 +2,120 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AEADC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BECF0C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:29:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EABF820738
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:27:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M5DCWZ3a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EABF820738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 504292076B
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:29:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504292076B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2Yd4-0006Bp-1D
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 07:27:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48106)
+	id 1k2YeV-0007Gd-2Q
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 07:29:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k2YcS-0005fg-Mq
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:27:04 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33839)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k2YcQ-00065M-Up
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:27:04 -0400
-Received: by mail-wr1-x443.google.com with SMTP id f7so33886189wrw.1
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 04:27:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=bIca3G4w02Pb4vz1h9G48iMfKF6O/OhMhUC0oktLOgY=;
- b=M5DCWZ3a7Q7tmuNNG2Gc376blLVvuTLCXVzpTZzuhxZVWwBf7BFLqZEs4gLKSP7Evy
- g2iMsKqRw46a/denypxwsK+n1vepmN+mODxEBXZv3o3DMwfBSLQpV5rayG8b6jwA8csA
- YwulaOY9icT4OuWNSFjjxMvlslaLQRqcYjn4PDkGqVcrDexTOWCTiJLCQExdEWVTVfEH
- Qiuu7Rzk7b0MJR6y1eu6OdlJQdxExsBRGZTmjrwHHHjhbsn1qOByEGOxwvbAu3cRAkzy
- vKptjj3pYvdYAAf8WxHO5w7HJCrOscLUCHbr6bpXyYRDaJcdIuOJIpET4bdNTQ7Yfxdg
- LtbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=bIca3G4w02Pb4vz1h9G48iMfKF6O/OhMhUC0oktLOgY=;
- b=kRYSE+g09Y3AIBL4i7is5O7hSDh0YFhMnVWnMFWXN0JlTAjd9glmuANunxBHr/fVvH
- cHGmayoG2S78bOq7tkbuI7jLqSQkKs+2aEQGUOxlJYm0rD8ED/t/RWwNmJkRxf7HKTBU
- swz5Z3kSI/DtbPr+asw5PkUeuuw5NcmFO7JRALfWSRQlEceR/f+GWGpxIyeiPrdC1wvN
- b2i2VOo8YYU7XOFtSftDzUHBMyqOxE8mx4zT2L9fErb+kLMM8IaogbD5ubDrOJ/OA+41
- mJtBN0KzSNiBV+vcNzbNR7+Fm4tLSRyZ0FS2zTJp1KGlKRalxZuy7OeO82bMM7iUUx07
- zupw==
-X-Gm-Message-State: AOAM530EQIE8GZUJz0SiEfcVQvh+5BAmGCUTV2l3NPp4uobQaIA2Rr64
- mhf+yLwdrDetPNYEa6WKr54ERQ==
-X-Google-Smtp-Source: ABdhPJw7nkRLvdjaY2gE5zT35ialNJHIbTBDOnYOr49EKsqrbbXIQi/9Gq7AOwjWlxIw8BCivLALGg==
-X-Received: by 2002:adf:e704:: with SMTP id c4mr16078042wrm.81.1596454020548; 
- Mon, 03 Aug 2020 04:27:00 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p6sm24252083wmg.0.2020.08.03.04.26.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 03 Aug 2020 04:26:59 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A7B061FF7E;
- Mon,  3 Aug 2020 12:26:58 +0100 (BST)
-References: <20200730193932.3654677-1-yuanzi@google.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Lirong Yuan <yuanzi@google.com>
-Subject: Re: [PATCH] [PATCH v2] gdbstub: add support to Xfer:auxv:read: packet
-In-reply-to: <20200730193932.3654677-1-yuanzi@google.com>
-Date: Mon, 03 Aug 2020 12:26:58 +0100
-Message-ID: <87bljsnf5p.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1k2Ydh-0006gP-Nl
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:28:21 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:36724
+ helo=v2201612906741603.powersrv.de)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1k2Ydf-0006CV-Dy
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:28:21 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id BD3D8DB3C29;
+ Mon,  3 Aug 2020 13:28:15 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id VmuXPYll4YtT; Mon,  3 Aug 2020 13:28:14 +0200 (CEST)
+Received: from macbook02.fritz.box (p57b429dc.dip0.t-ipconnect.de
+ [87.180.41.220])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+ (No client certificate requested)
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 9D308DB3C1D;
+ Mon,  3 Aug 2020 13:28:14 +0200 (CEST)
+Subject: Re: [PATCH v2 0/3] testing: Build WHPX enabled binaries
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190920113329.16787-1-philmd@redhat.com>
+ <01f2f0ee-a288-921a-58f4-78aeb4d457e1@redhat.com>
+ <BYAPR21MB1208F0D09B3E5CA80F1B7C3BB6880@BYAPR21MB1208.namprd21.prod.outlook.com>
+ <2acf854f-c49a-0811-31af-80e1e958f058@redhat.com>
+ <324f5002-be0a-563e-b5a6-e08ee5e1ddad@redhat.com>
+ <SN4PR2101MB0880AF5A5D752F06DB94A15FC04E0@SN4PR2101MB0880.namprd21.prod.outlook.com>
+ <b8afd626-b6ae-d6fa-c8b7-5e5778574c07@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
+Autocrypt: addr=sw@weilnetz.de; keydata=
+ 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
+Message-ID: <82fa39b2-676c-e8c5-72c6-53123983dcda@weilnetz.de>
+Date: Mon, 3 Aug 2020 13:28:13 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <b8afd626-b6ae-d6fa-c8b7-5e5778574c07@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
+ helo=v2201612906741603.powersrv.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 07:28:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,44 +128,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "1879672@bugs.launchpad.net" <1879672@bugs.launchpad.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 03.08.20 um 12:51 schrieb Philippe Mathieu-Daud=C3=A9:
 
-Lirong Yuan <yuanzi@google.com> writes:
-
-> This allows gdb to access the target=E2=80=99s auxiliary vector,
-> which can be helpful for telling system libraries important details
-> about the hardware, operating system, and process.
+> Hi Sunil,
 >
-> Signed-off-by: Lirong Yuan <yuanzi@google.com>
-
-I cleaned up the test a little:
-
-modified   tests/tcg/multiarch/gdbstub/test-qxfer-auxv-read.py
-@@ -22,13 +22,9 @@ def report(cond, msg):
- def run_test():
-     "Run through the tests one by one"
-=20
--    cond =3D True
--    try:
--      gdb.execute("info auxv")
--    except (gdb.error, AttributeError):
--      cond =3D False
--
--    report(cond, "Display the auxiliary vector of the inferior.")
-+    auxv =3D gdb.execute("info auxv", False, True)
-+    report(isinstance(auxv, str), "Fetched auxv from inferior")
-+    report(auxv.find("sha1"), "Found test binary name in auxv")
-=20
- #
- # This runs as the script it sourced (via -x, via run-test.py)
+> On 8/1/20 1:31 AM, Sunil Muthuswamy wrote:
+>> The ask generally sounds reasonable. But, can you help me understand t=
+he full
+>> scope of the ask. Few questions:
+>> 1. Stefan has a CI pipeline to build WHPX.
+> Great! I didn't know Stefan already did it :)
+> Can you share the URL please, so we can integrate it with mainstream CI=
+?
 
 
-Queued to gdbstub/next, thanks.
+I am sorry, but I don't have such a CI pipeline.
 
---=20
-Alex Benn=C3=A9e
+Stefan
+
+
+
 
