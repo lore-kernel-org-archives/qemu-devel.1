@@ -2,78 +2,62 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D901C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 17:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C15C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 17:37:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F01372086A
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 17:28:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=poolhem.se header.i=@poolhem.se header.b="tZNA851V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F01372086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=poolhem.se
+	by mail.kernel.org (Postfix) with ESMTPS id ECEE322B45
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 17:37:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECEE322B45
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2eG2-00035t-9r
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 13:28:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60878)
+	id 1k2eOe-0005DR-5L
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 13:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hc981@poolhem.se>) id 1k2eFK-0002OG-4X
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 13:27:34 -0400
-Received: from mailout12.inleed.net ([2a0b:dc80:cafe:112::1]:34939
- helo=ns12.inleed.net)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k2eO3-0004jA-Ff
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 13:36:35 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:35055)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hc981@poolhem.se>) id 1k2eFH-0004Pn-4u
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 13:27:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=poolhem.se; 
- s=x;
- h=Content-Transfer-Encoding:Content-Type:Mime-Version:References:
- In-Reply-To:Message-Id:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
- Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
- :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
- List-Post:List-Owner:List-Archive;
- bh=8gYBF7g+pBziopdfexPU7M2ffepSmgDlD+5rCMgTJio=; b=tZNA851VlVlrZYVK/3hpvJUQK9
- kvZNXshCnno0pxVQRpa61s9z32kvFXiGPMBMKobfzJf8afS7wfu154gew1W05L/K+oB9H8Chg1Cv+
- s37zzRA7T1Bct69cs9a7+JhkVh4ZMlhCZ2KAi8GGEiUjbL/G3tH0mzEr2SpPZ9hipe7nJ6Re34paq
- Jf/fYLv4e1tHwYPi53bvglYxfUQrc3td7QAU77/n6x4NYtu/X+xtOEfApg4tBNUv6B+xWjbsWqMAA
- WR6GMypPgccbyOFZe8j+e7i1G7RX6q5QhAnwk17cBTEo4NuAN7oMuVY9ib8sEIRedOCVwhWm1YY8P
- 1ZoNt8Aw==;
-Received: from [213.115.245.47] (helo=balrog.lkp.se)
- by ns12.inleed.net with esmtpa (Exim 4.93.0.4)
- (envelope-from <hc981@poolhem.se>)
- id 1k2eFD-003x0s-SO; Mon, 03 Aug 2020 19:27:27 +0200
-Date: Mon, 3 Aug 2020 19:26:45 +0200
-From: Henrik Carlqvist <hc981@poolhem.se>
-To: Henrik Carlqvist <hc981@poolhem.se>
-Subject: Ping: [PATCH] Emulate dip switch language layout settings on SUN
- keyboard
-Message-Id: <20200803192645.48513f57.hc981@poolhem.se>
-In-Reply-To: <20200710201911.3a3e336c.hc981@poolhem.se>
-References: <20200710201911.3a3e336c.hc981@poolhem.se>
-X-Mailer: Sylpheed version 0.9.7 (GTK+ 1.2.10; i686-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Id: henrik@poolhem.se
-Received-SPF: none client-ip=2a0b:dc80:cafe:112::1;
- envelope-from=hc981@poolhem.se; helo=ns12.inleed.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -13
-X-Spam_score: -1.4
-X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_HELO_SOFTFAIL=0.732, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k2eO1-0005Qx-7f
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 13:36:34 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 073Ha4va009266
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Mon, 3 Aug 2020 13:36:07 -0400
+Date: Mon, 3 Aug 2020 13:36:04 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Helge Deller <deller@gmx.de>
+Subject: Re: [PATCH v2 4/4] hw/display/artist.c: fix out of bounds check
+Message-ID: <20200803173604.qtryrjnnubcpgoxq@mozz.bu.edu>
+References: <20200801131357.17379-1-deller@gmx.de>
+ <20200801131357.17379-5-deller@gmx.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200801131357.17379-5-deller@gmx.de>
+User-Agent: NeoMutt/20180716
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 13:36:32
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -86,189 +70,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, kraxel@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, Sven Schnelle <svens@stackframe.org>,
+ qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Would you please consider my patch which implements the honor of the -k switch
-for sparc as a sun keyboard language dip switch setting instead of a hard
-coded en-us keyboard layout?
+Hi,
+I applied this patch, but I can still trigger a segfault and heap
+overread through artist_reg_write -> fill_window. I dont know if these
+problems are related to what this patch fixes. If not, let me know and
+I can create a separate launchpad report for these.
 
-The initial patch mail was sent to the mailing list and the listed maintainers
-of escc.c and is also available at
-http://patchwork.ozlabs.org/project/qemu-devel/patch/20200710201911.3a3e336c.hc981@poolhem.se/
+-Alex
 
-This ping email is also sent to Gerd Hoffmann who many years ago
-(2014) selected the en-us keyboard layout as a hardcoded value in escc.c with
-commit 59e7a130054b55fe15cdfdebf284332b04d990ef.
+(1) Segfault:
+cat << EOF | ./hppa-softmmu/qemu-system-hppa -display none \
+-qtest stdio -accel qtest
+writeq 0xf8100a02 0x845c235c223f0584
+EOF
 
-Best regards Henrik
+AddressSanitizer: SEGV on unknown address 0x7fa50235cc00
+#0 0x555577f8b392 in artist_rop8/hw/display/artist.c:284:14
+#1 0x555577f84603 in fill_window/hw/display/artist.c:549:13
+#2 0x555577f7abfc in artist_reg_write/hw/display/artist.c:895:9
+#3 0x55557766d7a3 in memory_region_write_accessor/softmmu/memory.c:483:5
+#4 0x55557766cadc in access_with_adjusted_size/softmmu/memory.c:539:18
+#5 0x55557766a873 in memory_region_dispatch_write/softmmu/memory.c:1466:16
+#6 0x555576d18056 in flatview_write_continue/exec.c:3176:23
+#7 0x555576d00866 in flatview_write/exec.c:3216:14
+#8 0x555576d00387 in address_space_write/exec.c:3308:18
+#9 0x555577714604 in qtest_process_command/softmmu/qtest.c:452:13
 
-On Fri, 10 Jul 2020 20:19:11 +0200
-Henrik Carlqvist <hc981@poolhem.se> wrote:
+===========================================================
 
-> SUN Type 4, 5 and 5c keyboards have dip switches to choose the language
-> layout of the keyboard. Solaris makes an ioctl to query the value of the
-> dipswitches and uses that value to select keyboard layout. Also the SUN
-> bios like the one in the file ss5.bin uses this value to support at least
-> some keyboard layouts. However, the OpenBIOS provided with qemu is
-> hardcoded to allways use an US keyboard layout.
+(2) Heap Overflow:
+cat << EOF | ./hppa-softmmu/qemu-system-hppa -display none -m 64 \
+-qtest stdio -accel qtest
+writeq 0xf8100a02 0x8cd00011900a0203
+EOF
+
+AddressSanitizer: heap-buffer-overflow on address 0x603000045bc8 at pc 0x55bb3196f704 bp 0x7fff1c701d70 sp 0x7fff1c701d68
+READ of size 8 at 0x603000045bc8 thread T0
+
+#0 0x55bb3196f703 in cpu_physical_memory_set_dirty_range/include/exec/ram_addr.h:318:35
+#1 0x55bb3196e6f2 in memory_region_set_dirty/softmmu/memory.c:1994:5
+#2 0x55bb32279bb6 in artist_invalidate_lines/hw/display/artist.c:212:9
+#3 0x55bb3227165d in fill_window/hw/display/artist.c:552:5
+#4 0x55bb32267bfc in artist_reg_write/hw/display/artist.c:895:9
+#5 0x55bb3195a7a3 in memory_region_write_accessor/softmmu/memory.c:483:5
+#6 0x55bb31959adc in access_with_adjusted_size/softmmu/memory.c:539:18
+#7 0x55bb31957873 in memory_region_dispatch_write/softmmu/memory.c:1466:16
+#8 0x55bb31005056 in flatview_write_continue/exec.c:3176:23
+#9 0x55bb30fed866 in flatview_write/exec.c:3216:14
+#10 0x55bb30fed387 in address_space_write/exec.c:3308:18
+
+0x603000045bc8 is located 0 bytes to the right of 24-byte region [0x603000045bb0,0x603000045bc8)
+allocated by thread T0 here:
+#0 0x55bb30f7111d in malloc ()
+#1 0x7fdae3d35500 in g_malloc (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x54500)
+#2 0x55bb30fd84d4 in ram_block_add/exec.c:2268:9
+#3 0x55bb30fded16 in qemu_ram_alloc_internal/exec.c:2441:5
+#4 0x55bb30fdefed in qemu_ram_alloc/exec.c:2460:12
+#5 0x55bb3195c0be in memory_region_init_ram_shared_nomigrate/softmmu/memory.c:1515:21
+#6 0x55bb31cd6544 in ram_backend_memory_alloc/backends/hostmem-ram.c:30:5
+#7 0x55bb31ccf875 in host_memory_backend_memory_complete/backends/hostmem.c:333:9
+#8 0x55bb3360737e in user_creatable_complete/qom/object_interfaces.c:23:9
+#9 0x55bb31a44e59 in create_default_memdev/softmmu/vl.c:2830:5
+#10 0x55bb31a2d528 in qemu_init/softmmu/vl.c:4352:9
+#11 0x55bb3405390c in main/softmmu/main.c:48:5
+
+
+On 200801 1513, Helge Deller wrote:
+> From: Sven Schnelle <svens@stackframe.org>
 > 
-> Before this patch, qemu allways gave dip switch value 0x21 (US keyboard),
-> this patch uses the command line switch "-k" (keyboard layout) to select
-> dip switch value. A table is used to lookup values from arguments like:
-> 
-> -k fr
-> -k es
-> 
-> But the patch also accepts numeric dip switch values directly to the -k
-> switch:
-> 
-> -k 0x2b
-> -k 43
-> 
-> Both values above are the same and select swedish keyboard as explained in
-> table 3-15 at
-> https://docs.oracle.com/cd/E19683-01/806-6642/new-43/index.html
-> 
-> Unless you want to do a full Solaris installation but happen to have
-> access to a bios file, the easiest way to test that the patch works is to:
-> 
-> qemu-system-sparc -k sv -bios /path/to/ss5.bin
-> 
-> If you already happen to have a Solaris installation in a qemu disk image
-> file you can easily try different keyboard layouts after this patch is
-> applied.
-> 
-> Unfortunately my glib version is too old to compile later versions of qemu
-> so even though this patch is made from latest git I have only been able to
-> test it myself with qemu version 4.1.1. I think and hope that this patch
-> will compile and work also with the latest version of git as it only affects
-> one file and there hasn't been much changes to that file since tested
-> version 4.1.1.
-> 
-> Best regards Henrik
-> 
-> From 2f86bd60750d44206b9181f76115e77b58dff544 Mon Sep 17 00:00:00 2001
-> From: Henrik Carlqvist <hc1245@poolhem.se>
-> Date: Fri, 10 Jul 2020 19:21:08 +0200
-> Subject: [PATCH] Emulating sun keyboard languate layout dip switches, taking
->  the value for the dip switches from the "-k" option to qemu.
-> 
-> Signed-off-by: Henrik Carlqvist <hc1245@poolhem.se>
+> Signed-off-by: Sven Schnelle <svens@stackframe.org>
+> Signed-off-by: Helge Deller <deller@gmx.de>
 > ---
->  hw/char/escc.c | 74
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed,
-> 73 insertions(+), 1 deletion(-)
+>  hw/display/artist.c | 24 +++++++++++-------------
+>  1 file changed, 11 insertions(+), 13 deletions(-)
 > 
-> diff --git a/hw/char/escc.c b/hw/char/escc.c
-> index 7d16ee8688..7287056b5f 100644
-> --- a/hw/char/escc.c
-> +++ b/hw/char/escc.c
-> @@ -30,6 +30,8 @@
->  #include "qemu/module.h"
->  #include "hw/char/escc.h"
->  #include "ui/console.h"
-> +#include "sysemu/sysemu.h"
-> +#include "qemu/cutils.h"
->  #include "trace.h"
->  
->  /*
-> @@ -175,6 +177,7 @@
->  #define R_MISC1I 14
->  #define R_EXTINT 15
->  
-> +static unsigned char sun_keyboard_layout_dip_switch(void);
->  static void handle_kbd_command(ESCCChannelState *s, int val);
->  static int serial_can_receive(void *opaque);
->  static void serial_receive_byte(ESCCChannelState *s, int ch);
-> @@ -730,6 +733,75 @@ static QemuInputHandler sunkbd_handler = {
->      .event = sunkbd_handle_event,
->  };
->  
-> +static unsigned char sun_keyboard_layout_dip_switch(void)
-> +{
-> +    /* Return the value of the dip-switches in a SUN Type 5 keyboard */
-> +    static unsigned char ret = 0xff;
-> +
-> +    if ((ret == 0xff) && keyboard_layout) {
-> +        int i;
-> +        struct layout_values {
-> +            const char *lang;
-> +            unsigned char dip;
-> +        } languages[] =
-> +    /* Dip values from table 3-16 Layouts for Type 4, 5, and 5c Keyboards
-> */+            {
-> +                {"en-us", 0x21}, /* U.S.A. (US5.kt) */
-> +                                 /* 0x22 is some other US (US_UNIX5.kt)*/
-> +                {"fr",    0x23}, /* France (France5.kt) */
-> +                {"da",    0x24}, /* Denmark (Denmark5.kt) */
-> +                {"de",    0x25}, /* Germany (Germany5.kt) */
-> +                {"it",    0x26}, /* Italy (Italy5.kt) */
-> +                {"nl",    0x27}, /* The Netherlands (Netherland5.kt) */
-> +                {"no",    0x28}, /* Norway (Norway.kt) */
-> +                {"pt",    0x29}, /* Portugal (Portugal5.kt) */
-> +                {"es",    0x2a}, /* Spain (Spain5.kt) */
-> +                {"sv",    0x2b}, /* Sweden (Sweden5.kt) */
-> +                {"fr-ch", 0x2c}, /* Switzerland/French (Switzer_Fr5.kt) */
-> +                {"de-ch", 0x2d}, /* Switzerland/German (Switzer_Ge5.kt) */
-> +                {"en-gb", 0x2e}, /* Great Britain (UK5.kt) */
-> +                {"ko",    0x2f}, /* Korea (Korea5.kt) */
-> +                {"tw",    0x30}, /* Taiwan (Taiwan5.kt) */
-> +                {"ja",    0x31}, /* Japan (Japan5.kt) */
-> +                {"fr-ca", 0x32}, /* Canada/French (Canada_Fr5.kt) */
-> +                {"hu",    0x33}, /* Hungary (Hungary5.kt) */
-> +                {"pl",    0x34}, /* Poland (Poland5.kt) */
-> +                {"cz",    0x35}, /* Czech (Czech5.kt) */
-> +                {"ru",    0x36}, /* Russia (Russia5.kt) */
-> +                {"lv",    0x37}, /* Latvia (Latvia5.kt) */
-> +                {"tr",    0x38}, /* Turkey-Q5 (TurkeyQ5.kt) */
-> +                {"gr",    0x39}, /* Greece (Greece5.kt) */
-> +                {"ar",    0x3a}, /* Arabic (Arabic5.kt) */
-> +                {"lt",    0x3b}, /* Lithuania (Lithuania5.kt) */
-> +                {"nl-be", 0x3c}, /* Belgium (Belgian5.kt) */
-> +                {"be",    0x3c}, /* Belgium (Belgian5.kt) */
-> +            };
-> +
-> +        for (i = 0;
-> +             i < sizeof(languages) / sizeof(struct layout_values);
-> +             i++) {
-> +            if (!strcmp(keyboard_layout, languages[i].lang)) {
-> +                ret = languages[i].dip;
-> +                return ret;
-> +            }
-> +        }
-> +        /* Found no known language code */
-> +
-> +        if ((keyboard_layout[0] >= '0') && (keyboard_layout[0] <= '9')) {
-> +            unsigned int tmp;
-> +            /* As a fallback we also accept numeric dip switch value */
-> +            if (!qemu_strtoui(keyboard_layout, NULL, 0, &tmp)) {
-> +                ret = (unsigned char)tmp;
-> +            }
-> +        }
-> +    }
-> +    if (ret == 0xff) {
-> +        /* Final fallback if keyboard_layout was not set or recognized */
-> +        ret = 0x21; /* en-us layout */
-> +    }
-> +    return ret;
-> +}
-> +
->  static void handle_kbd_command(ESCCChannelState *s, int val)
+> diff --git a/hw/display/artist.c b/hw/display/artist.c
+> index 6261bfe65b..de56200dbf 100644
+> --- a/hw/display/artist.c
+> +++ b/hw/display/artist.c
+> @@ -340,14 +340,13 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
 >  {
->      trace_escc_kbd_command(val);
-> @@ -751,7 +823,7 @@ static void handle_kbd_command(ESCCChannelState *s, int
-> val)     case 0xf:
->          clear_queue(s);
->          put_queue(s, 0xfe);
-> -        put_queue(s, 0x21); /*  en-us layout */
-> +        put_queue(s, sun_keyboard_layout_dip_switch());
->          break;
->      default:
->          break;
-> -- 
-> 2.14.5
+>      struct vram_buffer *buf;
+>      uint32_t vram_bitmask = s->vram_bitmask;
+> -    int mask, i, pix_count, pix_length, offset, height, width;
+> +    int mask, i, pix_count, pix_length, offset, width;
+>      uint8_t *data8, *p;
+> 
+>      pix_count = vram_write_pix_per_transfer(s);
+>      pix_length = vram_pixel_length(s);
+> 
+>      buf = vram_write_buffer(s);
+> -    height = buf->height;
+>      width = buf->width;
+> 
+>      if (s->cmap_bm_access) {
+> @@ -367,13 +366,6 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+>          pix_count = size * 8;
+>      }
+> 
+> -    if (posy * width + posx + pix_count > buf->size) {
+> -        qemu_log("write outside bounds: wants %dx%d, max size %dx%d\n",
+> -                 posx, posy, width, height);
+> -        return;
+> -    }
+> -
+> -
+>      switch (pix_length) {
+>      case 0:
+>          if (s->image_bitmap_op & 0x20000000) {
+> @@ -381,8 +373,11 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+>          }
+> 
+>          for (i = 0; i < pix_count; i++) {
+> -            artist_rop8(s, p + offset + pix_count - 1 - i,
+> -                        (data & 1) ? (s->plane_mask >> 24) : 0);
+> +            uint32_t off = offset + pix_count - 1 - i;
+> +            if (off < buf->size) {
+> +                artist_rop8(s, p + off,
+> +                            (data & 1) ? (s->plane_mask >> 24) : 0);
+> +            }
+>              data >>= 1;
+>          }
+>          memory_region_set_dirty(&buf->mr, offset, pix_count);
+> @@ -398,7 +393,10 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+>          for (i = 3; i >= 0; i--) {
+>              if (!(s->image_bitmap_op & 0x20000000) ||
+>                  s->vram_bitmask & (1 << (28 + i))) {
+> -                artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i)]);
+> +                uint32_t off = offset + 3 - i;
+> +                if (off < buf->size) {
+> +                    artist_rop8(s, p + off, data8[ROP8OFF(i)]);
+> +                }
+>              }
+>          }
+>          memory_region_set_dirty(&buf->mr, offset, 3);
+> @@ -420,7 +418,7 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+>              break;
+>          }
+> 
+> -        for (i = 0; i < pix_count; i++) {
+> +        for (i = 0; i < pix_count && offset + i < buf->size; i++) {
+>              mask = 1 << (pix_count - 1 - i);
+> 
+>              if (!(s->image_bitmap_op & 0x20000000) ||
+> --
+> 2.21.3
+> 
+> 
 
