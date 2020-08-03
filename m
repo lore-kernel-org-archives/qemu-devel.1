@@ -2,95 +2,90 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B949DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D536C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:26:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8172020738
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:25:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CC5A20738
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 11:26:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="THF+ShGt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8172020738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yHOeXGR2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CC5A20738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2YbN-0004Cq-JQ
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 07:25:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47490)
+	id 1k2Yc6-00059y-5S
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 07:26:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2YaV-0003CC-NO
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:25:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21125
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2YaS-0005jE-TQ
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:25:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596453899;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=eCndamxCg5Er1Eqf1yYE2PkaSpc9LohO2q6jxr6CIh4=;
- b=THF+ShGtlimU9s+HgoPTfl3SPx7nwM4rgprhO2vMd647mq+dVi0ueGBHxZpCDyOu+Kap2b
- 7bz+ypVzePLNm/+NvwGk01epJw6pa8JuWDZG4dIDJT2xMcG1bT8eUrzq0T6W8xgAvwyJlV
- KvN4+DcYmPYpzwQvYezVeDC58knk8TE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-1NKJt8_nNlGwkwP7tKpmag-1; Mon, 03 Aug 2020 07:24:56 -0400
-X-MC-Unique: 1NKJt8_nNlGwkwP7tKpmag-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA836106B242;
- Mon,  3 Aug 2020 11:24:54 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C8DB217150;
- Mon,  3 Aug 2020 11:24:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5DA0A1132FD2; Mon,  3 Aug 2020 13:24:44 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] schemas: Add vim modeline
-References: <20200729185024.121766-1-abologna@redhat.com>
- <87ime52wxd.fsf@dusky.pond.sub.org>
- <20200730093732.GB3477223@redhat.com>
- <87k0ylz0ep.fsf@dusky.pond.sub.org>
- <20200730132446.GL3477223@redhat.com>
- <875za33ku1.fsf@dusky.pond.sub.org>
- <20200731150738.GB3660103@redhat.com>
- <03bb7822-20a0-2945-6c86-1d5f1b2a01d9@redhat.com>
- <20200731154429.GD3660103@redhat.com>
- <21cda868-85d3-77db-31d8-0248a5029318@redhat.com>
-Date: Mon, 03 Aug 2020 13:24:44 +0200
-In-Reply-To: <21cda868-85d3-77db-31d8-0248a5029318@redhat.com> (Paolo
- Bonzini's message of "Mon, 3 Aug 2020 10:41:22 +0200")
-Message-ID: <87k0ygkm4j.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k2YUi-0003vd-LN
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:19:04 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51453)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k2YUg-0004tZ-QE
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 07:19:04 -0400
+Received: by mail-wm1-x343.google.com with SMTP id p14so14003709wmg.1
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 04:19:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=uE/zSzU3YCUj+8keAlvLyFX2oijQycTIyZcK1gVRSqY=;
+ b=yHOeXGR2+tLrevmmLAQBc1pTlblM93sXH20O1UjYNdxnWNyqGEP01d+ghis5QepkBJ
+ nnsaAljk5M7pebS127QbwK0ye2ORk6Y0D5JwiRaf4IZ6KdaA6gAU2+Qm3E9HKh9nlw/i
+ wuetfjcJzJhZlo2DDK0RixvsaxMayGV6+1uemSdZOE08frskmF73uIjGzBttcmtHSQDw
+ t67uCqqtvWejovQsEEgxLeASwbPCIPJIOnQ7/7CsaS/PAdlx3Ih3Uz+HOmnDgkBrDn5K
+ Okv9Ttn7R+eWS2tttQhAYUIezFzJ8Yv6wWT40sldWq13FRzu5zHPbZkVygAoz5VtUyFt
+ FIVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=uE/zSzU3YCUj+8keAlvLyFX2oijQycTIyZcK1gVRSqY=;
+ b=V5Vqs5WAsSrJ9eYMpRQUplPCy0bwE8WczPHGf50V9EYZPH+Awe3pLBOMJo3XF+LqE/
+ 8CndRZOAX1evBY1VkNaqcWqGsPJViuGy43Gr4oVeEVjQe/WHHTgmQUR3tt5yFIo7AHNd
+ CtBva+w766F2dlh/g/RpCUtEG1pJbRqYfcJSKz3g1vf3lKURIqTWYxaPtReULjnok1l+
+ QruVsROU5rqt0iWGVVwPwjIHvteBXA5z0uiAduKmr/EMSoqIX485DSmYM6Qkp1bP/tko
+ 0Q2fRNrRYe7NdPCxZjh4UZtcO0xo6D55d/s/tF7ng6X6pkdlcVRE5WkGr/ucURi6Rzqj
+ kEQQ==
+X-Gm-Message-State: AOAM530pZrrtbbrqMydtuDUs0qYMse/eAsbnG8rDOabKCav++b6db2im
+ VLvVIWa+w26rtgND0huPjqyFSD3MbeMeMA==
+X-Google-Smtp-Source: ABdhPJwawNq9iOhdFOEY/zisDxsCZTbjPQ7zJOIeG8TGavX85l8wh0rGA3wcvo6NMUpskNGGIxexGg==
+X-Received: by 2002:a7b:c765:: with SMTP id x5mr14994384wmk.14.1596453541230; 
+ Mon, 03 Aug 2020 04:19:01 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id g3sm28013170wrb.59.2020.08.03.04.19.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 03 Aug 2020 04:19:00 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 6/7] target/arm: Convert T32 coprocessor insns to decodetree
+Date: Mon,  3 Aug 2020 12:18:48 +0100
+Message-Id: <20200803111849.13368-7-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200803111849.13368-1-peter.maydell@linaro.org>
+References: <20200803111849.13368-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:56:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -105,95 +100,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Convert the T32 coprocessor instructions to decodetree.
+As with the A32 conversion, this corrects an underdecoding
+where we did not check that MRRC/MCRR [24:21] were 0b0010
+and so treated some kinds of LDC/STC and MRRC/MCRR rather
+than UNDEFing them.
 
-> On 31/07/20 17:44, Daniel P. Berrang=C3=A9 wrote:
->> I'd consider the runtime protocol separately. In terms of what's on the
->> wire, we use genuine JSON format. The runtime problem is simply that JSO=
-N
->> standard is useless when it comes to integers, leaving behaviour undefin=
-ed
->> in the standard if you exceed 53 bits of precision. So there's no way to
->> reliably parse unsigned 64-bit integers. Given that QEMU needs to pass
->> uint64 values, JSON was simply the wrong choice of format for QMP.
->
-> JSON's 53-bit precision was not part of RFC4627, which was the JSON
-> specification in 2010.  They say hindsight is 20/20, but referring to
-> RFC7159 which would come 4 years later is rewriting history, not hindsigh=
-t.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/t32.decode  | 19 +++++++++++++
+ target/arm/translate.c | 64 ++----------------------------------------
+ 2 files changed, 21 insertions(+), 62 deletions(-)
 
-RFC 4627's original sin:
-
-    4.  Parsers
-    [...]
-    An implementation may set limits on the size of texts that it
-    accepts.  An implementation may set limits on the maximum depth of
-    nesting.  An implementation may set limits on the range of numbers.
-    An implementation may set limits on the length and character contents
-    of strings.
-
-Giving license to set limits is not a sin, absence of minimal limits is.
-
-Became an actual problem only when many implementations followed the
-early JavaScript implementation(s), which had inherited JavaScript's
-quick-and-dirty approach to numerical towers: double should be enough
-for anybody.
-
->> There's a 3rd aspect which is our source code that deals with JSON, wher=
-e
->> we defined some JSON extensions to make it easier for C code to construc=
-t
->> JSON documents for sending over the wire. Back when we did this, it was =
-a
->> reasonably good idea as no obvious alternative existed for this problem.
->> Today, I would just suggest using GLib's  GVariant feature, which solves
->> the same problem for GLib's DBus APIs.
->
-> Many years ago actually I tried replacing QObject with GVariant.  I'm
-> pretty sure the code for that experiment is lost but it took me just a
-> couple days so it could be redone.  The only issue was that QObjects are
-> mutable so some instances of QString had to be replaced with GString.
->
-> (A small part of it was merged as commit
-> 9bada8971173345ceb37ed1a47b00a01a4dd48cf for unrelated reasons).
->
->> It is a shame we didn't just use DBus back in the day as that's a well
->> specified, simple protocol that would have done everything we needed,
->> including the ability to actually represent integers reliably. We
->> would be able to trivially talk to QEMU from any programming language,
->> and use common DBus code-generator tools instead of writing code
->> generators ourselves.
->
-> Not really, DBus doesn't provide the extensibility that we get from
-> optional arguments in commands and optional fields in structs.
-
-Enables compatible evolution of interfaces, which has been a massive win
-for us.
-
->                                                                 Again,
-> we may discuss the QMP protocol itself,
-
-We can discuss everything, but please not everything in the same thread.
-This one is / tries to be about the QAPI schema language.
-
->                                         but JSON *was chosen for a reason=
-*.
-
-In our field, dissing prior technical choices without making an effort
-to understand the tradeoffs that led to them is an ancient tradition :)
+diff --git a/target/arm/t32.decode b/target/arm/t32.decode
+index c21a988f971..7069d821fde 100644
+--- a/target/arm/t32.decode
++++ b/target/arm/t32.decode
+@@ -45,6 +45,8 @@
+ &sat             !extern rd rn satimm imm sh
+ &pkh             !extern rd rn rm imm tb
+ &cps             !extern mode imod M A I F
++&mcr             !extern cp opc1 crn crm opc2 rt
++&mcrr            !extern cp opc1 crm rt rt2
+ 
+ # Data-processing (register)
+ 
+@@ -621,6 +623,23 @@ RFE              1110 1001 10.1 .... 1100000000000000         @rfe pu=1
+ SRS              1110 1000 00.0 1101 1100 0000 000. ....      @srs pu=2
+ SRS              1110 1001 10.0 1101 1100 0000 000. ....      @srs pu=1
+ 
++# Coprocessor instructions
++
++# We decode MCR, MCR, MRRC and MCRR only, because for QEMU the
++# other coprocessor instructions always UNDEF.
++# The trans_ functions for these will ignore cp values 8..13 for v7 or
++# earlier, and 0..13 for v8 and later, because those areas of the
++# encoding space may be used for other things, such as VFP or Neon.
++
++@mcr             .... .... opc1:3 . crn:4 rt:4 cp:4 opc2:3 . crm:4
++@mcrr            .... .... .... rt2:4 rt:4 cp:4 opc1:4 crm:4
++
++MCRR             1110 1100 0100 .... .... .... .... .... @mcrr
++MRRC             1110 1100 0101 .... .... .... .... .... @mcrr
++
++MCR              1110 1110 ... 0 .... .... .... ... 1 .... @mcr
++MRC              1110 1110 ... 1 .... .... .... ... 1 .... @mcr
++
+ # Branches
+ 
+ %imm24           26:s1 13:1 11:1 16:10 0:11 !function=t32_branch24
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index adcd2127290..59d6e43611a 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -4791,37 +4791,6 @@ static void do_coproc_insn(DisasContext *s, int cpnum, int is64,
+     return;
+ }
+ 
+-static int disas_coproc_insn(DisasContext *s, uint32_t insn)
+-{
+-    int cpnum, is64, crn, crm, opc1, opc2, isread, rt, rt2;
+-
+-    cpnum = (insn >> 8) & 0xf;
+-
+-    is64 = (insn & (1 << 25)) == 0;
+-    if (!is64 && ((insn & (1 << 4)) == 0)) {
+-        /* cdp */
+-        return 1;
+-    }
+-
+-    crm = insn & 0xf;
+-    if (is64) {
+-        crn = 0;
+-        opc1 = (insn >> 4) & 0xf;
+-        opc2 = 0;
+-        rt2 = (insn >> 16) & 0xf;
+-    } else {
+-        crn = (insn >> 16) & 0xf;
+-        opc1 = (insn >> 21) & 7;
+-        opc2 = (insn >> 5) & 7;
+-        rt2 = 0;
+-    }
+-    isread = (insn >> 20) & 1;
+-    rt = (insn >> 12) & 0xf;
+-
+-    do_coproc_insn(s, cpnum, is64, opc1, crn, crm, opc2, isread, rt, rt2);
+-    return 0;
+-}
+-
+ /* Decode XScale DSP or iWMMXt insn (in the copro space, cp=0 or 1) */
+ static void disas_xscale_insn(DisasContext *s, uint32_t insn)
+ {
+@@ -8485,38 +8454,9 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+         ((insn >> 28) == 0xe && disas_vfp(s, insn))) {
+         return;
+     }
+-    /* fall back to legacy decoder */
+ 
+-    switch ((insn >> 25) & 0xf) {
+-    case 0: case 1: case 2: case 3:
+-        /* 16-bit instructions.  Should never happen.  */
+-        abort();
+-    case 6: case 7: case 14: case 15:
+-        /* Coprocessor.  */
+-        if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-            /* 0b111x_11xx_xxxx_xxxx_xxxx_xxxx_xxxx_xxxx */
+-            goto illegal_op;
+-        }
+-        if (((insn >> 24) & 3) == 3) {
+-            /* Neon DP, but failed disas_neon_dp() */
+-            goto illegal_op;
+-        } else if (((insn >> 8) & 0xe) == 10) {
+-            /* VFP, but failed disas_vfp.  */
+-            goto illegal_op;
+-        } else {
+-            if (insn & (1 << 28))
+-                goto illegal_op;
+-            if (disas_coproc_insn(s, insn)) {
+-                goto illegal_op;
+-            }
+-        }
+-        break;
+-    case 12:
+-        goto illegal_op;
+-    default:
+-    illegal_op:
+-        unallocated_encoding(s);
+-    }
++illegal_op:
++    unallocated_encoding(s);
+ }
+ 
+ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+-- 
+2.20.1
 
 
