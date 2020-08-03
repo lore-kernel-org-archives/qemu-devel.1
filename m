@@ -2,83 +2,93 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B60A3C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 17:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3BA6C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 17:07:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C2CA207DF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 17:06:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C2CA207DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 7CB1B207DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 17:07:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ueHj6qBj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CB1B207DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2duk-0002wd-Pp
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 13:06:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56254)
+	id 1k2dvb-0003qN-Rm
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 13:07:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k2duA-0002Wl-Rw
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 13:05:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48964)
+ (Exim 4.90_1) (envelope-from <yuanzi@google.com>) id 1k2dug-00031J-Mo
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 13:06:14 -0400
+Received: from mail-oo1-xc44.google.com ([2607:f8b0:4864:20::c44]:39162)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k2du8-0001so-Ma
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 13:05:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k2du6-0003VY-Vl
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 17:05:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EED0E2E802E
- for <qemu-devel@nongnu.org>; Mon,  3 Aug 2020 17:05:38 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <yuanzi@google.com>) id 1k2duf-0001zZ-0i
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 13:06:14 -0400
+Received: by mail-oo1-xc44.google.com with SMTP id x1so5238189oox.6
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 10:06:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=+a5PKmeTNCX3hGWsbOAVGY6wwBmQT5kjuEC8Dl41+a4=;
+ b=ueHj6qBj/Wfzn6M7EYxmZlF13+VVKTnep/MN0yCfkmbg4flsgJKdVVpRahzREHmoLr
+ VvV9ahSoHeiFNs+r8FLPeYIwTjHU8guSLreFBIxZr5N5bs6uL36ODhf8wkiwYyesytVd
+ h5smgZJWt3beK1ezMod0a+iTaa8rE3TEF3Xf+46WhB1LM2+IbLZUDCjGfDChu7B2OM1f
+ VNitqBekPzBawCzoot5QaGJx1haakpQeiTrzKDe79QrIiNEFtAKDAwpPgxxGJ4TB9cXf
+ T7VlVtkVYfWcsX3syxugq+DVJ8dgPhVO07qaSkNPa8i+faLfypY3jgpQPRH8bHiXcDdm
+ TuGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=+a5PKmeTNCX3hGWsbOAVGY6wwBmQT5kjuEC8Dl41+a4=;
+ b=j3YQUCnErkCO0wEQyEpGIYK9dpIoACzr2Y40FqpXEu8zGj18MuyvpMQXzcPoe95VuS
+ Q20bePT96i9ExMrfKSo82y5RzdlSUNEgEaJ61W3KFzbIXPE9sD19FDNceWlchU3MUdE0
+ /LW8OvBMABjf+Scmr16bWrpo3nd9Ch4MKCLOEJvXrsvCFqi3ItftLLm/so/Jt9Qnagf2
+ dnbsQEB3+nmGDIU4/pLdbpxf37eCi/Y1oIfLRKg65RiljMjXTudBG6SyG032a+1HSWxE
+ X+BFpFmgHHHqu4YH7d3gY9GRzkRt8IkHl1wbJjKkif+RVyNMRTIYSheqHz7W7O6Dbmrp
+ XlSQ==
+X-Gm-Message-State: AOAM532iAT+bu9W89HUAfOR8vOsv0InTwJB6QU/CJ8xTdnWpunJ25kFF
+ Fn2WZDnzA7rOkYevw+k7GBYrgSh1VCmfqR5aaby+Gw==
+X-Google-Smtp-Source: ABdhPJytO3lkjHL/7LmFg8UYGppPd/PHpzI8qw9cTCj9oQFCjuaF6fokGaioiHCCyOXx5EpUV4xJ/EZZiFMM6tktcro=
+X-Received: by 2002:a4a:d62c:: with SMTP id n12mr15060622oon.38.1596474369896; 
+ Mon, 03 Aug 2020 10:06:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20200730193932.3654677-1-yuanzi@google.com>
+ <87bljsnf5p.fsf@linaro.org>
+In-Reply-To: <87bljsnf5p.fsf@linaro.org>
+From: Lirong Yuan <yuanzi@google.com>
+Date: Mon, 3 Aug 2020 10:05:58 -0700
+Message-ID: <CADjx4CJOGbYa_8W7f1KDF8qwTJhVwV75SA1G3TGHv+Mz3cXvFg@mail.gmail.com>
+Subject: Re: [PATCH] [PATCH v2] gdbstub: add support to Xfer:auxv:read: packet
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Aug 2020 16:59:21 -0000
-From: Peter Maydell <1879587@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jfreche pmaydell
-X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
-Message-Id: <159647396150.11064.8393831236412518140.malone@chaenomeles.canonical.com>
-Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
- banked registers when switching from AA32 to AA64
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: fb212fda48e0a4c073de8f0845041de082d57ed8
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 07:00:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c44;
+ envelope-from=yuanzi@google.com; helo=mail-oo1-xc44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,62 +97,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1879587 <1879587@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks for the bug report; I think this patch should fix it:
+On Mon, Aug 3, 2020 at 4:27 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+>
+>
+> Lirong Yuan <yuanzi@google.com> writes:
+>
+> > This allows gdb to access the target=E2=80=99s auxiliary vector,
+> > which can be helpful for telling system libraries important details
+> > about the hardware, operating system, and process.
+> >
+> > Signed-off-by: Lirong Yuan <yuanzi@google.com>
+>
+> I cleaned up the test a little:
+>
+> modified   tests/tcg/multiarch/gdbstub/test-qxfer-auxv-read.py
+> @@ -22,13 +22,9 @@ def report(cond, msg):
+>  def run_test():
+>      "Run through the tests one by one"
+>
+> -    cond =3D True
+> -    try:
+> -      gdb.execute("info auxv")
+> -    except (gdb.error, AttributeError):
+> -      cond =3D False
+> -
+> -    report(cond, "Display the auxiliary vector of the inferior.")
+> +    auxv =3D gdb.execute("info auxv", False, True)
+> +    report(isinstance(auxv, str), "Fetched auxv from inferior")
+> +    report(auxv.find("sha1"), "Found test binary name in auxv")
+>
+>  #
+>  # This runs as the script it sourced (via -x, via run-test.py)
+>
+>
+> Queued to gdbstub/next, thanks.
+>
+> --
+> Alex Benn=C3=A9e
 
-https://patchew.org/QEMU/20200803165409.15099-1-peter.maydell@linaro.org/
+Awesome, thank you Alex for the review and cleanup!
 
-Any chance you could test it?
-
-
-** Changed in: qemu
-       Status: New =3D> In Progress
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1879587
-
-Title:
-  Register number in ESR is incorrect for certain banked registers when
-  switching from AA32 to AA64
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  I am running into a situation where I have:
-  - A hypervisor running in EL2, AA64
-  - A guest running in EL1, AA32
-
-  We trap certain accesses to special registers such as DACR (via
-  HCR.TVM). One instruction that is trapped is:
-
-  ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
-
-  The guest is running in SVC mode. So, LR should refer to LR_svc there.
-  LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
-  the actual ESR value is: 0xfe00dc0
-
-  If we decode the 'rt':
-  >>> (0xfe00dc0 >> 5) & 0x1f
-  14
-
-  My understanding is that 14 is incorrect in the context of AA64. rt
-  should be set to 18. The current mode being SVC, LR refers to LR_svc
-  not LR_usr. In other words, the mapping between registers in AA64 and
-  AA32 doesn't seem to be accounted for. I've tested this with Qemu
-  5.0.0
-
-  Let me know if that makes sense and if you would like more info. I am als=
-o happy to test patches.
-  Thanks for all the great work on Qemu!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1879587/+subscriptions
+Regards,
+Lirong
 
