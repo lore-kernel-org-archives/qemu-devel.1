@@ -2,99 +2,97 @@ Return-Path: <SRS0=TdIk=BN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7009C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 636B1C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2BE320781
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:49:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EF9220825
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Aug 2020 15:56:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iPb5pwdr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2BE320781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kd9Mxdwx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EF9220825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2ciQ-0004MQ-Ou
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 11:49:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34876)
+	id 1k2cp6-0007Fa-9k
+	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 11:56:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2chr-0003ot-MR
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 11:48:55 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34032
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2chp-0008Tu-BZ
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 11:48:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596469731;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bpu7VVRy6Yht5APBWZdJUTgcWt01v1YLw8FSA7hu/pk=;
- b=iPb5pwdrtNRUgUombKMyigJA/5kQO8S7fF/iadZatL3fLb4uHsIzXRG+OqqrdqLTzJCKdj
- miee18Hoi238TnF0RFdAgKWYTNkdBs+FFHNLJDO2WNUdTzYKTHwG6XXdzlKKVglYVCwGp6
- KAurfMqgz+cXECTfHD6cyRVWl2Tw9qw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-EstMKDWnOmCk9u8bzBjOOg-1; Mon, 03 Aug 2020 11:48:49 -0400
-X-MC-Unique: EstMKDWnOmCk9u8bzBjOOg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D911C79ECD;
- Mon,  3 Aug 2020 15:48:45 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADB8110027A6;
- Mon,  3 Aug 2020 15:48:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 3D4641132FD2; Mon,  3 Aug 2020 17:48:35 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH] schemas: Add vim modeline
-References: <20200730093732.GB3477223@redhat.com>
- <87k0ylz0ep.fsf@dusky.pond.sub.org>
- <20200730132446.GL3477223@redhat.com>
- <875za33ku1.fsf@dusky.pond.sub.org>
- <20200731150738.GB3660103@redhat.com>
- <03bb7822-20a0-2945-6c86-1d5f1b2a01d9@redhat.com>
- <20200731154429.GD3660103@redhat.com>
- <21cda868-85d3-77db-31d8-0248a5029318@redhat.com>
- <20200803113655.GI3670709@redhat.com>
- <fcc9056d-4d72-5bdb-bd21-2bf6213f5a55@redhat.com>
- <20200803122304.GJ3670709@redhat.com>
-Date: Mon, 03 Aug 2020 17:48:35 +0200
-In-Reply-To: <20200803122304.GJ3670709@redhat.com> ("Daniel P. =?utf-8?Q?B?=
- =?utf-8?Q?errang=C3=A9=22's?=
- message of "Mon, 3 Aug 2020 13:23:04 +0100")
-Message-ID: <875z9zivcc.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k2coP-0006Xv-DI
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 11:55:41 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36546)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k2coN-0001Pp-JV
+ for qemu-devel@nongnu.org; Mon, 03 Aug 2020 11:55:41 -0400
+Received: by mail-pg1-x544.google.com with SMTP id p3so20071464pgh.3
+ for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 08:55:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=0qqpqD915onaFoCxpKXH4xqDUdvvjVy0l6KgzS3CiVc=;
+ b=Kd9MxdwxdcTixVbfvVQfT9sF6CszWBoLuTbIO9i55J7JrIweY7RJLjkbw7tiY7T9LU
+ N47ROMMUJw/ZV6ZWaHo3/hJ3JrhHMqfPKeMa6/C2Xu1pJ+GuGqU2JnP8ICGqlDd9b0Ck
+ 3VHxzKacmKafANrJL3CPCXVEbgxwjJPDeJ4NO1g+udY+KGX9WylEIZubeF2+axIRXCO7
+ lOGBo0apeHLLLYgT/X1gzylsum1RodEOEFReibabS4jP1BT7hP/iR/o7B4infWubOaBr
+ hCpscxAcWCoP/+2Pw4eGMGTLrbPxS/lKdEFvE02I47tAp1ToTjZK32Iv5t/4xrz3s2uo
+ 4VBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=0qqpqD915onaFoCxpKXH4xqDUdvvjVy0l6KgzS3CiVc=;
+ b=UHJK9DKe7h9drmRUW1VCxM+NQlaff1JRSXtgJu2IJBDTc2eIGgEB7Klw3Z37BhxiPG
+ SeVxHELHBf59gB48L/kGaQ9Ip4AHn5G3h4hrexLhDrkgEabh/IpRMTJ3+r9kVVx5EXnI
+ 41+IQmVocXMOwH1OFiYRWwlBexo+DQ1PoNgbb4746TbgON9LcaqcC4yC6jnbaC7HVJ7g
+ Wu5QqTNNlABdVHj223V6P7G+45rhFMkA2t2isnGspHv+wbMciUZdi2SRptB5BPyB1C3U
+ zmXSmipbHQKnnN3/z7PEqhDi9z0v+CCw7QIInDZgffHlzIOaNGE1zEasS2lxFeN3Y9hV
+ UCsA==
+X-Gm-Message-State: AOAM532OzkW1awaYtPz+1ZXeTtAbImRWtBvJmnxknpoJidpICDAr5da3
+ EdFmEyntXHclrvFR/bFGpa7nag==
+X-Google-Smtp-Source: ABdhPJx9wYQ4/rsHXU92+zy4dHlKlNn8kUeXUhLU7rmcAanf6V7b6KgjpymooiF47bBliDo+i59lgQ==
+X-Received: by 2002:a62:7958:: with SMTP id u85mr16477877pfc.248.1596470137195; 
+ Mon, 03 Aug 2020 08:55:37 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id t19sm18581683pgg.19.2020.08.03.08.55.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 03 Aug 2020 08:55:36 -0700 (PDT)
+Subject: Re: [PATCH v2 4/4] hw/display/artist.c: fix out of bounds check
+To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
+ peter.maydell@linaro.org
+References: <20200801131357.17379-1-deller@gmx.de>
+ <20200801131357.17379-5-deller@gmx.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1acaa4f9-917b-47f0-6c48-36d033d0a294@linaro.org>
+Date: Mon, 3 Aug 2020 08:55:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200801131357.17379-5-deller@gmx.de>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/03 02:37:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,63 +105,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On 8/1/20 6:13 AM, Helge Deller wrote:
+> From: Sven Schnelle <svens@stackframe.org>
+> 
+> Signed-off-by: Sven Schnelle <svens@stackframe.org>
+> Signed-off-by: Helge Deller <deller@gmx.de>
+> ---
+>  hw/display/artist.c | 24 +++++++++++-------------
+>  1 file changed, 11 insertions(+), 13 deletions(-)
 
-> On Mon, Aug 03, 2020 at 02:16:19PM +0200, Paolo Bonzini wrote:
->> On 03/08/20 13:36, Daniel P. Berrang=C3=A9 wrote:
->> >>> Given that QEMU needs to pass
->> >>> uint64 values, JSON was simply the wrong choice of format for QMP.
->> >
->> > I wasn't refering to RFC7159. The problem of undefined integer precisi=
-on
->> > with JSON came up right at the very start when QMP was first designed =
-and
->> > implemented, and has come up again periodically ever since then. libvi=
-rt
->> > needed to do workarounds right at the start in 2009, in order to fully
->> > handle signed/unsigned 64-bit integers with QMP.
->>=20
->> I assume the workaround you refer to is to store the number as a string
->> and converting it lazily to either an integer or a floating-point type
->> in whoever uses the JSON API.  It may not be pretty but probably it
->> would have been the same for any text-based, schema-less protocol.  For
->> example, it didn't require writing your own parser.
->
-> Yes, we get the raw values as a string, but not all parsers for C
-> allow you to do this.  We'd really love to move off YAJL for JSON
-> parsing, but the most viable alternatives don't have a way to let
-> you get the string before they parse it as an integer and report
-> errors.
+Looks ok, if not ideal.
 
-You know, if I had to write a *general purpose* parser for a language
-that obviously supports numbers of arbitrary precision (but permits
-implementations to support less), then I'd try *hard* to stay as general
-as practical.  At the very least, provide a way to retrieve number
-tokens as strings, so the decision to limit precision devolves to the
-client.  Also, GMP exists.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-The fact that "most viable alternatives" to YAJL are unable to support
-uint64_t tempts me to condemn the whole lot as toys :)
-
-I suspect the simplicity of JSON not only lowers the barrier for toys,
-but also dampens the demand for general purpose non-toys.  Writing and
-maintaining yet another JSON parser is quite possibly easier than
-getting one of the toys fixed up properly.
-
-[...]
-
+r~
 
