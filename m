@@ -2,103 +2,89 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 947FCC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 07:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D86F0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 07:52:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8ACCA2064B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 07:50:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDE052076E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 07:52:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZdjL/bf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ACCA2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p7jGcET4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE052076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2riW-0001mP-N4
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 03:50:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44564)
+	id 1k2rkk-0003zV-VI
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 03:52:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k2rhh-0000qq-Lz
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 03:49:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48043
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k2rhg-0003XL-2G
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 03:49:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596527382;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DubP2PHuYgedFkG9BnFDW3kZHoveZWoPNSRntSxbcE8=;
- b=IZdjL/bfSbMpdPokTYdRnI73fWJ2nF6dFOdvf7aDMzI1fqJxOp8Y6i66VCuLssNg2HnCiO
- 359UJHpZsIg3tGYHuk8Z9v07rvHFfS78XPG2MAf9NCzBCYE1SxvKzQP1he+DVaB4/gduZV
- l1I3XhO7CyMbCcSv9T7jevwP77ImW4M=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-BJxV1MUKMkGgO5GGexx0nw-1; Tue, 04 Aug 2020 03:49:39 -0400
-X-MC-Unique: BJxV1MUKMkGgO5GGexx0nw-1
-Received: by mail-wr1-f70.google.com with SMTP id t3so11300608wrr.5
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 00:49:38 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jwsu1986@gmail.com>)
+ id 1k2rjw-0002rW-K7; Tue, 04 Aug 2020 03:52:04 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:42341)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jwsu1986@gmail.com>)
+ id 1k2rju-0003sj-Ms; Tue, 04 Aug 2020 03:52:04 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id a34so16450824ybj.9;
+ Tue, 04 Aug 2020 00:52:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=DusenhJf7zgZTt8h/CNi5vfStyUG9q2o6UYyIZzlp3Q=;
+ b=p7jGcET4azWy7py48LAb2/IpE9DhEm3L+2u3S7QTXM/yKpZdFhWUSznKR1OHBIYHSE
+ vkFfleTITLYkmu1odQSir93qM1a2iMQLURx76b0aAD8nnVeyOBrCq39H2vgIo/Ik75bU
+ CuNRj6eUt4QeGURv+aCYPHur4aAF5iL0In9EM3WZQ694cmRk1hlaLxzmZNDiV9VNMRBs
+ CTkeYUA/DPwSFLGlmfgBeOnrhDtlGSn3j6zMAl15wWZx6U0GB7deO/JrchdvBOgyO2Bd
+ uXejoQyvWvHw8FI6zE7xFHWG02rokoSj4tXLtfoffAAwvYaqukNxckOI8KC0XYY+fLKs
+ iVrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=DubP2PHuYgedFkG9BnFDW3kZHoveZWoPNSRntSxbcE8=;
- b=rgJrf+wVEEBYSwrp471QFUx4WiQZp8d986UmCOMAc5GBD3d/Qayxa1ooGSWsPWY8Hw
- pnQV+BWGKUF0JAU4cQi4Hw1Gy3veF9sJEHlVAWtQ7ig0ZtOfMUn/U1RUi4/vaSBMFlmi
- zlUAlRLOYKoh6nxVem/alIOdECJUknVM1Iom8Hc9it538b7oCdNF43AV3uyhF8YtLvrK
- T1T8b7MufgCtU/zQK6C1Xa5Jr/+3MDRBaLsk1pJrkmOrXNcOAclgxYJ1Pto7bVg8sktm
- YUUw2AkULudcAYuh752FnxPrtgInWMCeZVQg4DbWNUG33yi27jaemL2a6IZvRpw9Wpdc
- /tPA==
-X-Gm-Message-State: AOAM532UnHCaqsGVW9RoLtpvlBbbanAzOgs6V59JwR/BdWBHTQQVFPwH
- bm1uMNOKVeb0vmxrujFyeDgVTmEu2PGyf9jRCkgDARZcjd6MHk+zTedLZGSrxjfjZtFpi53/LB9
- gvROndCmntTVGqcs=
-X-Received: by 2002:a1c:7e02:: with SMTP id z2mr2831212wmc.138.1596527377724; 
- Tue, 04 Aug 2020 00:49:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxNZ4uQ4vB8a5aJh7I4ZPsgC9K6vuCsuWWzRpjP2pDwPhZtBykcSfO33F9dwpNAm2EMiOXt+A==
-X-Received: by 2002:a1c:7e02:: with SMTP id z2mr2831191wmc.138.1596527377467; 
- Tue, 04 Aug 2020 00:49:37 -0700 (PDT)
-Received: from localhost.localdomain (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id 8sm30384185wrl.7.2020.08.04.00.49.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 04 Aug 2020 00:49:36 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.1 v2 1/1] accel/xen: Fix xen_enabled() behavior on
- target-agnostic objects
-Date: Tue,  4 Aug 2020 09:49:30 +0200
-Message-Id: <20200804074930.13104-2-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200804074930.13104-1-philmd@redhat.com>
-References: <20200804074930.13104-1-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=DusenhJf7zgZTt8h/CNi5vfStyUG9q2o6UYyIZzlp3Q=;
+ b=j7FqqXftqJoB+yuIJeFC7nmHEzlhu5cLNVPHNuNNxjWu4BBBJDS7ULnJdZxDRK1+Sv
+ Y0hXystr/50ssyK9vo89iySi2xNdd78FNJXIGREG6ul1yGX6zwsF1wi4ARDEbnnJugho
+ pcfG+h131UPkUv3L8GnjjKADlCGApSnESsld9HGvoD4MU8vc8MDX7sqvwjxxllIXMqBq
+ RjXS7o72glMy+fsrl8ovxqjTPU6ZXHQ84ClxEAR2m2Xrvqm4xI6CzX1bJB8zfMSAbrTW
+ TxZUC7EZZjPjghc89ComaIlZNeQaZcHBrRU9zmlne852CNTZ19oZknRTEles23WBDwcM
+ /HrA==
+X-Gm-Message-State: AOAM532TAMCJ+4S2iMqnWtT8Fd6K8YtTlRzQCkAEy9eh0T7M2xpgXbHk
+ xsJ4aSDHgD0MER5jpbokWlTrgTcRKwS83njsLMg=
+X-Google-Smtp-Source: ABdhPJxjOx5CtPbdnIgwcVNm75+GxCFhvsURhua/qCJ0U/U7rIo7y+VF/jlJkWGyWk6CalDi0N2y/actzFP6UjyuMvs=
+X-Received: by 2002:a25:d387:: with SMTP id
+ e129mr33327906ybf.370.1596527521041; 
+ Tue, 04 Aug 2020 00:52:01 -0700 (PDT)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <CAFKS8hWbckrE_cyJCf0pgFresD-JQk66wo-6uJA=Gu2MhReHVw@mail.gmail.com>
+ <20200728134936.GA21660@stefanha-x1.localdomain>
+ <20200728152719.GD78409@redhat.com>
+In-Reply-To: <20200728152719.GD78409@redhat.com>
+From: Derek Su <jwsu1986@gmail.com>
+Date: Tue, 4 Aug 2020 15:51:50 +0800
+Message-ID: <CAFKS8hUPdx=eHpvYqB3T__ZBWyztfNPGSBtiBDiqMotA8Cca9Q@mail.gmail.com>
+Subject: Re: [Virtio-fs] virtio-fs performance
+To: Vivek Goyal <vgoyal@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b44;
+ envelope-from=jwsu1986@gmail.com; helo=mail-yb1-xb44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,109 +97,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
- Paul Durrant <pdurrant@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-discuss@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CONFIG_XEN is generated by configure and stored in "config-target.h",
-which is (obviously) only include for target-specific objects.
-This is a problem for target-agnostic objects as CONFIG_XEN is never
-defined and xen_enabled() is always inlined as 'false'.
+Vivek Goyal <vgoyal@redhat.com> =E6=96=BC 2020=E5=B9=B47=E6=9C=8828=E6=97=
+=A5 =E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=8811:27=E5=AF=AB=E9=81=93=EF=BC=9A
+>
+> On Tue, Jul 28, 2020 at 02:49:36PM +0100, Stefan Hajnoczi wrote:
+> > > I'm trying and testing the virtio-fs feature in QEMU v5.0.0.
+> > > My host and guest OS are both ubuntu 18.04 with kernel 5.4, and the
+> > > underlying storage is one single SSD.
+> > >
+> > > The configuations are:
+> > > (1) virtiofsd
+> > > ./virtiofsd -o
+> > > source=3D/mnt/ssd/virtiofs,cache=3Dauto,flock,posix_lock,writeback,xa=
+ttr
+> > > --thread-pool-size=3D1 --socket-path=3D/tmp/vhostqemu
+> > >
+> > > (2) qemu
+> > > qemu-system-x86_64 \
+> > > -enable-kvm \
+> > > -name ubuntu \
+> > > -cpu Westmere \
+> > > -m 4096 \
+> > > -global kvm-apic.vapic=3Dfalse \
+> > > -netdev tap,id=3Dhn0,vhost=3Doff,br=3Dbr0,helper=3D/usr/local/libexec=
+/qemu-bridge-helper
+> > > \
+> > > -device e1000,id=3De0,netdev=3Dhn0 \
+> > > -blockdev '{"node-name": "disk0", "driver": "qcow2",
+> > > "refcount-cache-size": 1638400, "l2-cache-size": 6553600, "file": {
+> > > "driver": "file", "filename": "'${imagefolder}\/ubuntu.qcow2'"}}' \
+> > > -device virtio-blk,drive=3Ddisk0,id=3Ddisk0 \
+> > > -chardev socket,id=3Dch0,path=3D/tmp/vhostqemu \
+> > > -device vhost-user-fs-pci,chardev=3Dch0,tag=3Dmyfs \
+> > > -object memory-backend-memfd,id=3Dmem,size=3D4G,share=3Don \
+> > > -numa node,memdev=3Dmem \
+> > > -qmp stdio \
+> > > -vnc :0
+> > >
+> > > (3) guest
+> > > mount -t virtiofs myfs /mnt/virtiofs
+> > >
+> > > I tried to change virtiofsd's --thread-pool-size value and test the
+> > > storage performance by fio.
+> > > Before each read/write/randread/randwrite test, the pagecaches of
+> > > guest and host are dropped.
+> > >
+> > > ```
+> > > RW=3D"read" # or write/randread/randwrite
+> > > fio --name=3Dtest --rw=3D$RW --bs=3D4k --numjobs=3D1 --ioengine=3Dlib=
+aio
+> > > --runtime=3D60 --direct=3D0 --iodepth=3D64 --size=3D10g
+> > > --filename=3D/mnt/virtiofs/testfile
+> > > done
+>
+> Couple of things.
+>
+> - Can you try cache=3Dnone option in virtiofsd. That will bypass page
+>   cache in guest. It also gets rid of latencies related to
+>   file_remove_privs() as of now.
+>
+> - Also with direct=3D0, are we really driving iodepth of 64? With direct=
+=3D0
+>   it is cached I/O. Is it still asynchronous at this point of time of
+>   we have fallen back to synchronous I/O and driving queue depth of
+>   1.
 
-Fix by following the KVM schema, defining CONFIG_XEN_IS_POSSIBLE
-when we don't know to force the call of the non-inlined function,
-returning the xen_allowed boolean.
+Hi, Vivek
 
-Fixes: da278d58a092 ("accel: Move Xen accelerator code under accel/xen/")
-Reported-by: Paul Durrant <pdurrant@amazon.com>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- include/sysemu/xen.h   | 18 ++++++++++++++----
- accel/stubs/xen-stub.c |  2 ++
- accel/xen/xen-all.c    |  7 +------
- 3 files changed, 17 insertions(+), 10 deletions(-)
+I did not see any difference in queue depth with direct=3D{0|1} in my fio t=
+est.
+Are there more clues to dig into this issue?
 
-diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
-index 1ca292715e..2c2c429ea8 100644
---- a/include/sysemu/xen.h
-+++ b/include/sysemu/xen.h
-@@ -8,9 +8,19 @@
- #ifndef SYSEMU_XEN_H
- #define SYSEMU_XEN_H
- 
--#ifdef CONFIG_XEN
-+#ifdef NEED_CPU_H
-+# ifdef CONFIG_XEN
-+#  define CONFIG_XEN_IS_POSSIBLE
-+# endif
-+#else
-+# define CONFIG_XEN_IS_POSSIBLE
-+#endif
- 
--bool xen_enabled(void);
-+#ifdef CONFIG_XEN_IS_POSSIBLE
-+
-+extern bool xen_allowed;
-+
-+#define xen_enabled()           (xen_allowed)
- 
- #ifndef CONFIG_USER_ONLY
- void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
-@@ -18,7 +28,7 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-                    struct MemoryRegion *mr, Error **errp);
- #endif
- 
--#else /* !CONFIG_XEN */
-+#else /* !CONFIG_XEN_IS_POSSIBLE */
- 
- #define xen_enabled() 0
- #ifndef CONFIG_USER_ONLY
-@@ -33,6 +43,6 @@ static inline void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
- }
- #endif
- 
--#endif /* CONFIG_XEN */
-+#endif /* CONFIG_XEN_IS_POSSIBLE */
- 
- #endif
-diff --git a/accel/stubs/xen-stub.c b/accel/stubs/xen-stub.c
-index dcca4e678a..8ae658acff 100644
---- a/accel/stubs/xen-stub.c
-+++ b/accel/stubs/xen-stub.c
-@@ -9,6 +9,8 @@
- #include "hw/xen/xen.h"
- #include "qapi/qapi-commands-misc.h"
- 
-+bool xen_allowed;
-+
- void xenstore_store_pv_console_info(int i, Chardev *chr)
- {
- }
-diff --git a/accel/xen/xen-all.c b/accel/xen/xen-all.c
-index 0c24d4b191..60b971d0a8 100644
---- a/accel/xen/xen-all.c
-+++ b/accel/xen/xen-all.c
-@@ -32,12 +32,7 @@
-     do { } while (0)
- #endif
- 
--static bool xen_allowed;
--
--bool xen_enabled(void)
--{
--    return xen_allowed;
--}
-+bool xen_allowed;
- 
- xc_interface *xen_xc;
- xenforeignmemory_handle *xen_fmem;
--- 
-2.21.3
+>
+> - With cache=3Dauto/always, I am seeing performance issues with small wri=
+tes
+>   and trying to address it.
+>
+> https://lore.kernel.org/linux-fsdevel/20200716144032.GC422759@redhat.com/
+> https://lore.kernel.org/linux-fsdevel/20200724183812.19573-1-vgoyal@redha=
+t.com/
 
+No problem, I'll try it, thanks.
+
+Regards,
+Derek
+
+>
+> Thanks
+> Vivek
+>
+> > > ```
+> > >
+> > > --thread-pool-size=3D64 (default)
+> > >     seq read: 305 MB/s
+> > >     seq write: 118 MB/s
+> > >     rand 4KB read: 2222 IOPS
+> > >     rand 4KB write: 21100 IOPS
+> > >
+> > > --thread-pool-size=3D1
+> > >     seq read: 387 MB/s
+> > >     seq write: 160 MB/s
+> > >     rand 4KB read: 2622 IOPS
+> > >     rand 4KB write: 30400 IOPS
+> > >
+> > > The results show the performance using default-pool-size (64) is
+> > > poorer than using single thread.
+> > > Is it due to the lock contention of the multiple threads?
+> > > When can virtio-fs get better performance using multiple threads?
+> > >
+> > >
+> > > I also tested the performance that guest accesses host's files via
+> > > NFSv4/CIFS network filesystem.
+> > > The "seq read" and "randread" performance of virtio-fs are also worse
+> > > than the NFSv4 and CIFS.
+> > >
+> > > NFSv4:
+> > >   seq write: 244 MB/s
+> > >   rand 4K read: 4086 IOPS
+> > >
+> > > I cannot figure out why the perf of NFSv4/CIFS with the network stack
+> > > is better than virtio-fs.
+> > > Is it expected? Or, do I have an incorrect configuration?
+> >
+> > No, I remember benchmarking the thread pool and did not see such a big
+> > difference.
+> >
+> > Please use direct=3D1 so that each I/O results in a virtio-fs request.
+> > Otherwise the I/O pattern is not directly controlled by the benchmark
+> > but by the page cache (readahead, etc).
+> >
+> > Using numactl(8) or taskset(1) to launch virtiofsd allows you to contro=
+l
+> > NUMA and CPU scheduling properties. For example, you could force all 64
+> > threads to run on the same host CPU using taskset to see if that helps
+> > this I/O bound workload.
+> >
+> > fio can collect detailed statistics on queue depths and a latency
+> > histogram. It would be interesting to compare the --thread-pool-size=3D=
+64
+> > and --thread-pool-size=3D1 numbers.
+> >
+> > Comparing the "perf record -e kvm:kvm_exit" counts between the two migh=
+t
+> > also be interesting.
+> >
+> > Stefan
+>
+>
+>
+> > _______________________________________________
+> > Virtio-fs mailing list
+> > Virtio-fs@redhat.com
+> > https://www.redhat.com/mailman/listinfo/virtio-fs
+>
 
