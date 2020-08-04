@@ -2,78 +2,94 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AEB4C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55154C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:43:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 002FC2064B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:41:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 002FC2064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2BE962064B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:43:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bmEki7eP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BE962064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k300c-0003ui-6h
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:41:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53472)
+	id 1k301q-0006Bx-8V
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:43:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k2zzr-0002g0-JL
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:41:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45516)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k2zzo-0002Uw-CG
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:41:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k2zzn-0001mo-4n
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 16:40:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 226C12E80F1
- for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 16:40:59 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k300m-0004gE-Ly
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:42:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45111
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k300k-0002aE-0d
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:41:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596559316;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CVKPZjD+nqawWUht3msA2tjd8QOSfxMbQgsYbiHL9vc=;
+ b=bmEki7ePIEzBhOPtalq5wmQ9DZD5OJvqDwMI6gmwjZnbXMzqXhoHCC6CvWu+Bkk5FhMvbf
+ F9QHIr+E1iaMt2WLBe6kFQu8m03N71QLK+t/On4l8d3iXa33+2SVLJGjaG7H9i3Aw6qnqp
+ faS6HxqyWqIUFBnSumEhxU4bk2Nghb0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-443-ylVZJniGNg6PzblW4k6ERA-1; Tue, 04 Aug 2020 12:41:54 -0400
+X-MC-Unique: ylVZJniGNg6PzblW4k6ERA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F1D61DE0;
+ Tue,  4 Aug 2020 16:41:52 +0000 (UTC)
+Received: from gondolin (ovpn-112-169.ams2.redhat.com [10.36.112.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7EB445FC36;
+ Tue,  4 Aug 2020 16:41:38 +0000 (UTC)
+Date: Tue, 4 Aug 2020 18:35:03 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200804183503.39f56516.cohuck@redhat.com>
+In-Reply-To: <20200729080503.GB28676@joy-OptiPlex-7040>
+References: <20200713232957.GD5955@joy-OptiPlex-7040>
+ <9bfa8700-91f5-ebb4-3977-6321f0487a63@redhat.com>
+ <20200716083230.GA25316@joy-OptiPlex-7040>
+ <20200717101258.65555978@x1.home>
+ <20200721005113.GA10502@joy-OptiPlex-7040>
+ <20200727072440.GA28676@joy-OptiPlex-7040>
+ <20200727162321.7097070e@x1.home>
+ <20200729080503.GB28676@joy-OptiPlex-7040>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 04 Aug 2020 16:26:07 -0000
-From: Alexander Bulekov <1890310@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-Message-Id: <159655836781.5403.11127209005915887374.malonedeb@soybean.canonical.com>
-Subject: [Bug 1890310] [NEW] Segfault in artist.c:block_move
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 55c431651536a42e2d3e7987d995cf62feb8c15d
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 08:50:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,145 +98,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890310 <1890310@bugs.launchpad.net>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, jian-feng.ding@intel.com, dgilbert@redhat.com,
+ zhenyuw@linux.intel.com, hejie.xu@intel.com, bao.yumeng@zte.com.cn,
+ Alex Williamson <alex.williamson@redhat.com>, smooney@redhat.com,
+ intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com, eskultet@redhat.com,
+ dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+[sorry about not chiming in earlier]
 
-Hello,
-Reproducer:
+On Wed, 29 Jul 2020 16:05:03 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
--qtest stdio -accel qtest
-writeq 0xf8100802 0xff5c651ffffb7c5c
-writeq 0xf8100afb 0x25e000000000000
-EOF
+> On Mon, Jul 27, 2020 at 04:23:21PM -0600, Alex Williamson wrote:
 
-AddressSanitizer:DEADLYSIGNAL
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=3D=3D12686=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7f001a5=
-40000 (pc 0x55af3a373078 bp 0x7ffc23001a00 sp 0x7ffc23001670 T0)
-=3D=3D12686=3D=3DThe signal is caused by a READ memory access.
-    #0 0x55af3a373078 in block_move /hw/display/artist.c:525:13
-    #1 0x55af3a365fbc in artist_reg_write /hw/display/artist.c:964:9
-    #2 0x55af39a577a3 in memory_region_write_accessor /softmmu/memory.c:483=
-:5
-    #3 0x55af39a56adc in access_with_adjusted_size /softmmu/memory.c:539:18
-    #4 0x55af39a54873 in memory_region_dispatch_write /softmmu/memory.c:146=
-6:16
-    #5 0x55af39102056 in flatview_write_continue /exec.c:3176:23
-    #6 0x55af390ea866 in flatview_write /exec.c:3216:14
-    #7 0x55af390ea387 in address_space_write /exec.c:3308:18
-    #8 0x55af39afe604 in qtest_process_command /softmmu/qtest.c:452:13
-    #9 0x55af39af5c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
-    #10 0x55af39af4895 in qtest_read /softmmu/qtest.c:722:5
-    #11 0x55af3bfb0c43 in qemu_chr_be_write_impl /chardev/char.c:188:9
-    #12 0x55af3bfb0dc7 in qemu_chr_be_write /chardev/char.c:200:9
-    #13 0x55af3bfc50b3 in fd_chr_read /chardev/char-fd.c:68:9
-    #14 0x55af3c119474 in qio_channel_fd_source_dispatch /io/channel-watch.=
-c:84:12
-    #15 0x7f0028f60897 in g_main_context_dispatch (/usr/lib/x86_64-linux-gn=
-u/libglib-2.0.so.0+0x4e897)
-    #16 0x55af3c51137b in glib_pollfds_poll /util/main-loop.c:217:9
-    #17 0x55af3c50eaab in os_host_main_loop_wait /util/main-loop.c:240:5
-    #18 0x55af3c50e444 in main_loop_wait /util/main-loop.c:516:11
-    #19 0x55af39b16d00 in qemu_main_loop /softmmu/vl.c:1676:9
-    #20 0x55af3c151261 in main /softmmu/main.c:49:5
-    #21 0x7f0027ae6e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.30/=
-csu/../csu/libc-start.c:308:16
-    #22 0x55af38ff5729 in _start (/home/alxndr/Development/qemu/general-fuz=
-z/build/hppa-softmmu/qemu-system-hppa+0x22d4729)
+(...)
 
-AddressSanitizer can not provide additional info.
-SUMMARY: AddressSanitizer: SEGV /hw/display/artist.c:525:13 in block_move
-=3D=3D12686=3D=3DABORTING
+> > Based on the feedback we've received, the previously proposed interface
+> > is not viable.  I think there's agreement that the user needs to be
+> > able to parse and interpret the version information.  Using json seems
+> > viable, but I don't know if it's the best option.  Is there any
+> > precedent of markup strings returned via sysfs we could follow?  
 
-The error occurs even with Message-Id:
-<20200804140056.7690-1-deller@gmx.de> applied (I collected the above
-trace with the patch-set applied)
+I don't think encoding complex information in a sysfs file is a viable
+approach. Quoting Documentation/filesystems/sysfs.rst:
 
-Thanks
--Alex
+"Attributes should be ASCII text files, preferably with only one value            
+per file. It is noted that it may not be efficient to contain only one           
+value per file, so it is socially acceptable to express an array of              
+values of the same type.                                                         
+                                                                                 
+Mixing types, expressing multiple lines of data, and doing fancy                 
+formatting of data is heavily frowned upon."
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Even though this is an older file, I think these restrictions still
+apply.
 
--- =
+> I found some examples of using formatted string under /sys, mostly under
+> tracing. maybe we can do a similar implementation.
+> 
+> #cat /sys/kernel/debug/tracing/events/kvm/kvm_mmio/format
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890310
+Note that this is *not* sysfs (anything under debug/ follows different
+rules anyway!)
 
-Title:
-  Segfault in artist.c:block_move
+> 
+> name: kvm_mmio
+> ID: 32
+> format:
+>         field:unsigned short common_type;       offset:0;       size:2; signed:0;
+>         field:unsigned char common_flags;       offset:2;       size:1; signed:0;
+>         field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
+>         field:int common_pid;   offset:4;       size:4; signed:1;
+> 
+>         field:u32 type; offset:8;       size:4; signed:0;
+>         field:u32 len;  offset:12;      size:4; signed:0;
+>         field:u64 gpa;  offset:16;      size:8; signed:0;
+>         field:u64 val;  offset:24;      size:8; signed:0;
+> 
+> print fmt: "mmio %s len %u gpa 0x%llx val 0x%llx", __print_symbolic(REC->type, { 0, "unsatisfied-read" }, { 1, "read" }, { 2, "write" }), REC->len, REC->gpa, REC->val
+> 
+> 
+> #cat /sys/devices/pci0000:00/0000:00:02.0/uevent
 
-Status in QEMU:
-  New
+'uevent' can probably be considered a special case, I would not really
+want to copy it.
 
-Bug description:
-  Hello,
-  Reproducer:
+> DRIVER=vfio-pci
+> PCI_CLASS=30000
+> PCI_ID=8086:591D
+> PCI_SUBSYS_ID=8086:2212
+> PCI_SLOT_NAME=0000:00:02.0
+> MODALIAS=pci:v00008086d0000591Dsv00008086sd00002212bc03sc00i00
+> 
 
-  cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
-  -qtest stdio -accel qtest
-  writeq 0xf8100802 0xff5c651ffffb7c5c
-  writeq 0xf8100afb 0x25e000000000000
-  EOF
+(...)
 
-  AddressSanitizer:DEADLYSIGNAL
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =3D=3D12686=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7f001=
-a540000 (pc 0x55af3a373078 bp 0x7ffc23001a00 sp 0x7ffc23001670 T0)
-  =3D=3D12686=3D=3DThe signal is caused by a READ memory access.
-      #0 0x55af3a373078 in block_move /hw/display/artist.c:525:13
-      #1 0x55af3a365fbc in artist_reg_write /hw/display/artist.c:964:9
-      #2 0x55af39a577a3 in memory_region_write_accessor /softmmu/memory.c:4=
-83:5
-      #3 0x55af39a56adc in access_with_adjusted_size /softmmu/memory.c:539:=
-18
-      #4 0x55af39a54873 in memory_region_dispatch_write /softmmu/memory.c:1=
-466:16
-      #5 0x55af39102056 in flatview_write_continue /exec.c:3176:23
-      #6 0x55af390ea866 in flatview_write /exec.c:3216:14
-      #7 0x55af390ea387 in address_space_write /exec.c:3308:18
-      #8 0x55af39afe604 in qtest_process_command /softmmu/qtest.c:452:13
-      #9 0x55af39af5c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
-      #10 0x55af39af4895 in qtest_read /softmmu/qtest.c:722:5
-      #11 0x55af3bfb0c43 in qemu_chr_be_write_impl /chardev/char.c:188:9
-      #12 0x55af3bfb0dc7 in qemu_chr_be_write /chardev/char.c:200:9
-      #13 0x55af3bfc50b3 in fd_chr_read /chardev/char-fd.c:68:9
-      #14 0x55af3c119474 in qio_channel_fd_source_dispatch /io/channel-watc=
-h.c:84:12
-      #15 0x7f0028f60897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e897)
-      #16 0x55af3c51137b in glib_pollfds_poll /util/main-loop.c:217:9
-      #17 0x55af3c50eaab in os_host_main_loop_wait /util/main-loop.c:240:5
-      #18 0x55af3c50e444 in main_loop_wait /util/main-loop.c:516:11
-      #19 0x55af39b16d00 in qemu_main_loop /softmmu/vl.c:1676:9
-      #20 0x55af3c151261 in main /softmmu/main.c:49:5
-      #21 0x7f0027ae6e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #22 0x55af38ff5729 in _start (/home/alxndr/Development/qemu/general-f=
-uzz/build/hppa-softmmu/qemu-system-hppa+0x22d4729)
+> what about a migration_compatible attribute under device node like
+> below?
+> 
+> #cat /sys/bus/pci/devices/0000\:00\:02.0/UUID1/migration_compatible
+> SELF:
+> 	device_type=pci
+> 	device_id=8086591d
+> 	mdev_type=i915-GVTg_V5_2
+> 	aggregator=1
+> 	pv_mode="none+ppgtt+context"
+> 	interface_version=3
+> COMPATIBLE:
+> 	device_type=pci
+> 	device_id=8086591d
+> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
+> 	aggregator={val1}/2
+> 	pv_mode={val2:string:"none+ppgtt","none+context","none+ppgtt+context"} 
+> 	interface_version={val3:int:2,3}
+> COMPATIBLE:
+> 	device_type=pci
+> 	device_id=8086591d
+> 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}
+> 	aggregator={val1}/2
+> 	pv_mode=""  #"" meaning empty, could be absent in a compatible device
+> 	interface_version=1
 
-  AddressSanitizer can not provide additional info.
-  SUMMARY: AddressSanitizer: SEGV /hw/display/artist.c:525:13 in block_move
-  =3D=3D12686=3D=3DABORTING
+I'd consider anything of a comparable complexity to be a big no-no. If
+anything, this needs to be split into individual files (with many of
+them being vendor driver specific anyway.)
 
-  The error occurs even with Message-Id:
-  <20200804140056.7690-1-deller@gmx.de> applied (I collected the above
-  trace with the patch-set applied)
+I think we can list compatible versions in a range/list format, though.
+Something like
 
-  Thanks
-  -Alex
+cat interface_version 
+2.1.3
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890310/+subscriptions
+cat interface_version_compatible
+2.0.2-2.0.4,2.1.0-
+
+(indicating that versions 2.0.{2,3,4} and all versions after 2.1.0 are
+compatible, considering versions <2 and >2 incompatible by default)
+
+Possible compatibility between different mdev types feels a bit odd to
+me, and should not be included by default (only if it makes sense for a
+particular vendor driver.)
+
 
