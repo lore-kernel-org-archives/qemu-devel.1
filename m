@@ -2,122 +2,81 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D8FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 18:08:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A787C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 18:17:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1B5920792
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 18:08:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 563D220792
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 18:17:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C74+WwTV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1B5920792
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U90zG9R+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 563D220792
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k31Mb-0003qf-Vf
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 14:08:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51532)
+	id 1k31V3-0005e5-HX
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 14:17:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k31Ll-0003RG-Tn
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 14:07:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52248
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1k31Th-0005Bh-HR
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 14:15:57 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60435
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k31Lj-00064n-GC
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 14:07:45 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1k31Te-00073w-3P
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 14:15:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596564462;
+ s=mimecast20190719; t=1596564952;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=B/KhQzYtH7bBpJzGVvlj8M63UWBr1I1zjLx9dDFWLf8=;
- b=C74+WwTV/tW2z+QlXxNaTqWebAcSDnSnlvYhMTFS0VjSADz7DxCTIr2MzJ3M3EqZlMd7/K
- r1ewqG/x9gZ2h9reBP+tTqZggnnyj107fLHrkmaB/bs9iu3jtAG5E500Wu9ni6JjuW8bmB
- RR2MSrmBE8Gz7g9cAvpSZNcp/lgdwZg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-0i75EHfgM9m2HVWdUXI8GA-1; Tue, 04 Aug 2020 14:07:38 -0400
-X-MC-Unique: 0i75EHfgM9m2HVWdUXI8GA-1
-Received: by mail-ed1-f69.google.com with SMTP id l24so1017865edv.8
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 11:07:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=B/KhQzYtH7bBpJzGVvlj8M63UWBr1I1zjLx9dDFWLf8=;
- b=Y/t7lSlRVWiQ/nKD8Mp7mZKljaEktYAg1KgkO3k6qpUX6VkIcMExTsEUIM8OUGwhA+
- a3wgpXDH2JMbq8bXLZcrSMCHB6ib2QwdbFfGSEeP1tztB1g4q/EE6gFe5rzEg5Mr9Rn7
- 4stUlr6QqVqtS9J3veaGBpvH80P5h6edmWuRN2QxS3tQc14908P3NuvLM3gXa34kVljc
- wO4BrQ5FLBVBH4EaJh0RLZiSwqay+4bLFLyTZQN0ZZTH0s55qhBinEVt6OF+IK2WxGD2
- VxSOOHz7vT5/XEU2TcLPNv4zQWZluROQKmpFcg+FrMt4mIlXxLAJaV4wJKr/NMPMLaqy
- 1sCA==
-X-Gm-Message-State: AOAM533DseG47b612UXMnrefjbPcB33LY1rh5Vjcx/wTnV2OPzQJjFXn
- hmg3N2N9GgEjkHd6SCrUwIbZxA/RuAx51MwD8cTuNlxoifY296rjQOLSHk6QV3AQOp9UL5VwzdY
- VJQnqz7WzGgdS23o=
-X-Received: by 2002:a17:906:6a5b:: with SMTP id
- n27mr21815183ejs.221.1596564457760; 
- Tue, 04 Aug 2020 11:07:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwSFydkeOgPW8CtxqGkKdqG4+rnydGW8owEVoiXQjyn04U/9q4bqjtCBcVas+gXKLpYj5Udaw==
-X-Received: by 2002:a17:906:6a5b:: with SMTP id
- n27mr21815161ejs.221.1596564457532; 
- Tue, 04 Aug 2020 11:07:37 -0700 (PDT)
-Received: from [192.168.1.43] (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id u18sm18660340edt.31.2020.08.04.11.07.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 04 Aug 2020 11:07:37 -0700 (PDT)
-Subject: Re: [PATCH 11/11] dockerfiles/debian-win64-cross: Download WHPX MinGW
- headers
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200804170055.2851-1-thuth@redhat.com>
- <20200804170055.2851-12-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <476ca681-f35f-c8ce-60dd-1cf7c3ce8e5f@redhat.com>
-Date: Tue, 4 Aug 2020 20:07:35 +0200
+ in-reply-to:in-reply-to:references:references;
+ bh=AjLZoWomH/q0XQPfbNFBybTqJHIaWi3feJ7Tgy+cG1U=;
+ b=U90zG9R+bjkEkvtptnxjNMNbvbtZaBJExPieK9vyK3QX2HGvb7n+i9cvdhvUBaDpRHtD8a
+ 8Xuo90jl4ycpw6RCLkr/wRkpu8YxDBEjwDfXQzLgsRyyWRTXFeTBRq2Bg2EKv2TYJr7Uot
+ PlbWwcNbgYRxcB759gqjzdK4oRZom+I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-499-mJN4uZOMMI2vVyk0cjAH1A-1; Tue, 04 Aug 2020 14:15:46 -0400
+X-MC-Unique: mJN4uZOMMI2vVyk0cjAH1A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E9031DE0
+ for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 18:15:45 +0000 (UTC)
+Received: from ibm-p8-OVS-01-fsp.mgmt.pnr.lab.eng.rdu2.redhat.com
+ (ovpn-117-179.rdu2.redhat.com [10.10.117.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5F2C17B900;
+ Tue,  4 Aug 2020 18:15:44 +0000 (UTC)
+Subject: Re: qapi-schema esotera
+To: Markus Armbruster <armbru@redhat.com>
+References: <5bfa3895-304d-8372-c0db-fda4c1a1ba59@redhat.com>
+ <dc0a16e2-365f-a9e6-03df-b70f97dd7407@redhat.com>
+ <64792de9-6719-3987-a66b-aed8cca61572@redhat.com>
+ <875z9zgel3.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d3c59a98-b29f-1d80-e726-c656cd54bcd2@redhat.com>
+Date: Tue, 4 Aug 2020 14:15:43 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200804170055.2851-12-thuth@redhat.com>
+In-Reply-To: <875z9zgel3.fsf@dusky.pond.sub.org>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jsnow@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -141,49 +100,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/4/20 7:00 PM, Thomas Huth wrote:
-> To compile-test the WHPX accelerator, we need to download these system
-> headers first (they are unfortunately not part of any released and
-> packaged MinGW toolchain yet).
-> 
-> Idea taken from another patch by Stefan Weil.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/docker/dockerfiles/debian-win64-cross.docker | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/docker/dockerfiles/debian-win64-cross.docker b/tests/docker/dockerfiles/debian-win64-cross.docker
-> index 2fc9cfcbc6..4cc4a3f365 100644
-> --- a/tests/docker/dockerfiles/debian-win64-cross.docker
-> +++ b/tests/docker/dockerfiles/debian-win64-cross.docker
-> @@ -32,7 +32,14 @@ RUN apt-get update && \
->          mxe-$TARGET-w64-mingw32.shared-sdl2 \
->          mxe-$TARGET-w64-mingw32.shared-sdl2-mixer \
->          mxe-$TARGET-w64-mingw32.shared-sdl2-gfx \
-> -        mxe-$TARGET-w64-mingw32.shared-zlib
-> +        mxe-$TARGET-w64-mingw32.shared-zlib \
-> +        curl && \
-> +    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/WinHvEmulation.h \
-> +        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvemulation.h?format=raw" && \
-> +    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/WinHvPlatform.h \
-> +        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvplatform.h?format=raw" && \
-> +    curl -s -S -o /usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/winhvplatformdefs.h \
-> +        "https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-headers/include/winhvplatformdefs.h?format=raw"
+On 8/4/20 1:33 AM, Markus Armbruster wrote:
+ > John Snow <jsnow@redhat.com> writes:
+ >
+ >> On 8/3/20 1:25 PM, Eric Blake wrote:
+ >>> On 8/3/20 11:49 AM, John Snow wrote:
+ >>>> UNION is split into two primary forms:
+ >>>>
+ >>>> 1. Simple (No discriminator nor base)
+ >>>> 2. Flat (Discriminator and base)
+ >>>>
+ >>>> In expr.py, I notice that we modify the perceived type of the
+ >>>> 'type' expression based on the two union forms.
+ >>>>
+ >>>> 1a. Simple unions allow Array[T]
+ >>>> 1b. Flat unions disallow Array[T]
+ >>>
+ >>> Rather, branches in a simple unions are syntactic sugar for a
+ >>> wrapper struct that contains a single member 'data'; because of that
+ >>> extra nesting, the type of that single member is unconstrained.  In
+ >>> flat unionw, the type MUST be a QAPI struct, because its members
+ >>> will be used inline; as currently coded, this prevents the use of an
+ >>> intrinsic type ('int', 'str') or an array type.
+ >>>
+ >>
+ >> I meant syntactically here, to be clear. I'm looking at expr.py -- if
+ >> there are deeper constraints on the semantics of the information
+ >> provided, that happens later.
+ >>
+ >> Specifically, check_union's use of check_type() changes depending on
+ >> the form of the union. One allows a string, the other allows a List of
+ >> strings, provided the list is precisely one element long.
+ >>
+ >>> If you need to use an array type in a flat union, you can't do:
+ >>>
+ >>> { 'union' ...
+ >>>     'data': { 'foo': [ 'MyBranch' ] } }
+ >>>
+ >>> but you can provide a wrapper type yourself:
+ >>>
+ >>> { 'struct': 'MyBranch', 'data': { 'array': [ 'MyType' ] } }
+ >>> { 'union' ...
+ >>>     'data': { 'foo': 'MyBranch' } }
+ >>>
+ >>>>
+ >>>>   From the docs:
+ >>>>
+ >>>> Syntax:
+ >>>>       UNION = { 'union': STRING,
+ >>>>                 'data': BRANCHES,
+ >>>>                 '*if': COND,
+ >>>>                 '*features': FEATURES }
+ >>>>             | { 'union': STRING,
+ >>>>                 'data': BRANCHES,
+ >>>>                 'base': ( MEMBERS | STRING ),
+ >>>>                 'discriminator': STRING,
+ >>>>                 '*if': COND,
+ >>>>                 '*features': FEATURES }
+ >>>>       BRANCHES = { BRANCH, ... }
+ >>>>       BRANCH = STRING : TYPE-REF
+ >>>>              | STRING : { 'type': TYPE-REF, '*if': COND }
+ >>>>
+ >>>> Both arms use the same "BRANCHES" grammar production, which both
+ >>>> use TYPE-REF.
+ >>>>
+ >>>>       TYPE-REF = STRING | ARRAY-TYPE
+ >>>>       ARRAY-TYPE = [ STRING ]
+ >>>>
+ >>>> Implying that List[T] should be allowed for both productions.
+ >>>> Can I ask for a ruling from the judges?
+ >>>
+ >>> As you found, the docs are a bit misleading; the semantic constraint
+ >>> on flat union branches being a struct (because they will be inlined)
+ >>> prevents the use of type-refs that are valid in simple unions (where
+ >>> those simple types will be wrapped in an implicit struct).  A patch
+ >>> to improve the docs would be a reasonable idea.
+ >>>
+ >>
+ >> Yes. I was working on a YAML prototype and I am trying to follow the
+ >> existing parser as closely as possible. In some cases, this highlights
+ >> differences between the grammar as advertised and what the parser
+ >> actually does.
+ >
+ > Please report all such differences, so we can fix them.
+ >
+You have been the delightful beneficiary of all doubts thus far, I 
+promise. I am not aware of more discrepancies at the moment, but I 
+didn't finish my prototype, either.
 
-Seems legally safer than my older approach =)
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg645794.html
+ >> If we are to keep the current state of things, splitting UNION into
+ >> two separate productions might be nice.
+ >
+ > It *is* two productions, joined with |.
+ >
+I ... yes. Technically correct. I had meant separating them out even 
+further in the docs, which I suppose implies two top-level construct 
+names with how you have the grammar laid out.
 
->  
->  # Specify the cross prefix for this image (see tests/docker/common.rc)
->  ENV QEMU_CONFIGURE_OPTS --cross-prefix=x86_64-w64-mingw32.shared-
-> 
+I see you want to get rid of one of these productions, though, so don't 
+worry about this thought of mine. We can simplify in the other direction.
+
+ > The work unions really, really need is:
+ >
+ > * Eliminate the simple union sugar.
+ >
+What do you mean by "simple union sugar"? Wait, before you answer, let 
+me make sure I have the nuances of the forms straight in my head.
+
+The following is my attempt to summarize what I know about these forms.
+(Please correct me where I am mistaken.)
+
+ALTERNATE is like an untagged union with no discriminator/tag on the 
+wire. I think of a pure C union when I think of this form. The forms you 
+can use are limited, based on our ability to differentiate them upon 
+parsing.
+
+SIMPLE UNION takes no `discriminator` or `base` parameter in the QAPI 
+specification. However, the wire format is not an undifferentiated union.
+
+{ 'union': 'foobar',
+   'data': { 'a': 'TypeA',
+             'b': 'TypeB' } }
+
+Enjoys life at runtime as:
+
+{ "type": ['a' | 'b'],
+   "data": ... }
+
+(with TypeA or TypeB's definition filling in for the ellipsis as denoted 
+by the type field.)
+
+
+FLAT UNION has a more complex definitional form. It specifies a base 
+type reference by name *or* defined in-line. It also specifies a 
+discriminator, which must be an enumerated type in the base.
+
+For data, it no longer allows you to specify List[T] as a member type.
+
+For inline definitions of base, it uses a version of type info that also 
+allows the FEATURES field.
+
+(Deep breath).
+
+So, when you say remove "simple union sugar", do you mean the entirety 
+of the tagged union form? What do we replace it by?
+
+(Hardcoded, but compatible flat unions that use "type" field as 
+discriminator to ensure backwards compatibility?)
+
+ > * Make flat unions less cumbersome to write.  I'd like to fuse struct
+ >    and union into a single object type, like introspect.json already
+ >    does.
+ >
+Can you share what you have in mind for how to fuse 'struct' and 
+discriminated unions? At the high QAPI grammatical level; no need to 
+delve into code generator details.
+
+(Unless you want to, and then I'll read them.)
+
+ > The former is a matter of massaging the schema and simplifying code.
+ > The latter requires actual thought.  No big deal, just takes time, and
+ > time is always in short supply.
+ >
+
+
+--js
 
 
