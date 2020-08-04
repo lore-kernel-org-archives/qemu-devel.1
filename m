@@ -2,93 +2,86 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50AA9C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:39:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE27C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:39:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 426DF2076C
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:39:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ViKN70xf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 426DF2076C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 36B402076C
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:39:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36B402076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2sTX-0003nT-Dy
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:39:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59422)
+	id 1k2sTv-0004Qa-A0
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:39:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k2sSc-0002cL-7S
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:38:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43672
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k2sSa-0002Di-HM
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:38:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596530289;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=mj8Nx2QkFKKhnLdRk0a1cbxp2WcmoypSpHPyihRqr3M=;
- b=ViKN70xfFIATUUUgGf+wyyOU2FIC7bOSjDqPhY7faYSmj+w6mTyCfjoVJFMNKJc9L4yrqN
- MsooA7onT8+klINovfS3Pmg3vSyOkeQUVNvjnjvmrioBiRHtcgy2nsAbUPyhsD2QBle7uE
- kcflPUlS7bU6fxfH+ERWTPy/195muS4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-DJTRikVAN8y20VmaS_jT6w-1; Tue, 04 Aug 2020 04:38:06 -0400
-X-MC-Unique: DJTRikVAN8y20VmaS_jT6w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A6301923766;
- Tue,  4 Aug 2020 08:38:05 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-162.ams2.redhat.com [10.36.112.162])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44E5D5D9F7;
- Tue,  4 Aug 2020 08:37:58 +0000 (UTC)
-Subject: Re: [PATCH-for-5.1] .travis.yml: Deprecate it in favor of GitLab CI
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200804083040.24659-1-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <830481ff-d4c0-ff34-854a-c5d5f17bfdc9@redhat.com>
-Date: Tue, 4 Aug 2020 10:37:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2sM4-0005A1-91
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:31:28 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52854)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2sM0-00012q-KE
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:31:27 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k2sLx-0005za-Qf
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 08:31:21 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A23AE2E8119
+ for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 08:31:21 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200804083040.24659-1-philmd@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 04 Aug 2020 08:18:22 -0000
+From: Timo Aaltonen <1718719@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=xserver; status=Unknown; importance=Unknown;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Confirmed; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=xorg-server; component=main;
+ status=Incomplete; importance=Undecided; assignee=tjaalton@ubuntu.com; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: cyphermox fourdan gitlab-migration jadahl janitor
+ paelzer powersj seb128 tjaalton
+X-Launchpad-Bug-Reporter: Mathieu Trudel-Lapierre (cyphermox)
+X-Launchpad-Bug-Modifier: Timo Aaltonen (tjaalton)
+References: <150601012428.28823.10384460665730601462.malonedeb@gac.canonical.com>
+Message-Id: <159652910245.3153.16812625437053389475.malone@gac.canonical.com>
+Subject: [Bug 1718719] Re: qemu can't capture keys properly under wayland
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a62b97575d5182688300b06f617dafb771575b91
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 03:31:00
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,63 +90,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1718719 <1718719@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/08/2020 10.30, Philippe Mathieu-Daudé wrote:
-> As of QEMU 5.2 we prefer to focus our CI development on GitLab.
-> Mark Travis-CI as deprecated (adding a big warning).
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  docs/system/deprecated.rst | 11 +++++++++++
->  .travis.yml                |  7 +++++++
->  2 files changed, 18 insertions(+)
-> 
-> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-> index 851dbdeb8a..c17a5b0896 100644
-> --- a/docs/system/deprecated.rst
-> +++ b/docs/system/deprecated.rst
-> @@ -17,6 +17,17 @@ they were first deprecated in the 2.10.0 release.
->  What follows is a list of all features currently marked as
->  deprecated.
->  
-> +Build and test automation
-> +-------------------------
-> +
-> +``Travis-CI`` (Since 5.2)
-> +'''''''''''''''''''''''''
-> +
-> +``Travis-CI`` is deprecated in favor of GitLab-CI.
-> +
-> +The '.travis.yml' configuration should only be modified to remove jobs
-> +when equivalent exist on GitLab-CI. Adding new jobs is not allowed.
+upstream can't reproduce this bug, so I wonder if the backport was
+incomplete and it's fixed in the current release (1.20.8), could you
+test again?
 
-I don't think that we need to document this for the normal users.
+** Changed in: xserver
+   Importance: Medium =3D> Unknown
 
->  System emulator command line arguments
->  --------------------------------------
->  
-> diff --git a/.travis.yml b/.travis.yml
-> index 6695c0620f..4ad243f511 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -1,3 +1,10 @@
-> +#  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING
-> +#
-> +#  As of QEMU 5.2, this file is now deprecated in favor of GitLab CI.
-> +#  Do not modify, except to remove jobs ported to GitLab CI.
-> +#
-> +#  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING  WARNING
+** Changed in: xserver
+ Remote watch: freedesktop.org Bugzilla #102475 =3D> gitlab.freedesktop.org=
+/xorg/xserver/issues #706
 
-Fine for me to add this warning here (but maybe without saying 16 x
-WARNING) - but I guess we'd like to keep the non-x86 build jobs here for
-people who do not have access to aarch64, ppc64le and s390x runners
-otherwise?
+** Changed in: xorg-server (Ubuntu)
+       Status: Triaged =3D> Incomplete
 
- Thomas
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1718719
+
+Title:
+  qemu can't capture keys properly under wayland
+
+Status in QEMU:
+  New
+Status in XServer:
+  Unknown
+Status in qemu package in Ubuntu:
+  Confirmed
+Status in xorg-server package in Ubuntu:
+  Incomplete
+
+Bug description:
+  This appears to be different than the previous similar bugs; patches
+  do look to be applied to use libinput in the wayland case. Still:
+
+  unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
+
+  I am using qemu-system-x86                       1:2.10+dfsg-0ubuntu1
+  on artful.
+
+  Many key inputs work correctly, but at boot the system will not
+  properly catch the arrow keys, the above error shows up immediately
+  after hitting Esc (for instance) to get to the boot menu. Booting from
+  CD onto a daily Ubuntu desktop image, I can't navigate the splash
+  menu.
+
+  The same works correctly through virt-manager (which uses spice
+  AFAICT, but wayland tends to crash when running virt-manager), and
+  things work if I switch my session to Xorg rather than wayland.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1718719/+subscriptions
 
