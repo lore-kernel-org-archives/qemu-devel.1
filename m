@@ -7,86 +7,87 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E821C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8B4C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:15:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 515A82076C
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:14:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E4BA2076E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:15:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="aPdMGOJj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 515A82076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="lMnaxeRt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E4BA2076E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2s5t-0005Hz-9o
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:14:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51154)
+	id 1k2s6y-000615-5e
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:15:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1k2s34-0003YW-BO; Tue, 04 Aug 2020 04:11:50 -0400
-Received: from mout.web.de ([212.227.15.3]:35801)
+ id 1k2s3C-0003ff-7k; Tue, 04 Aug 2020 04:11:58 -0400
+Received: from mout.web.de ([212.227.15.14]:57289)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1k2s32-0006aK-Em; Tue, 04 Aug 2020 04:11:50 -0400
+ id 1k2s3A-0006bY-CT; Tue, 04 Aug 2020 04:11:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1596528703;
- bh=xEDe+zbBuVAXvPtAdZvI/hRMlZMB5Q4vXtnHyT3/2s0=;
+ s=dbaedf251592; t=1596528711;
+ bh=bSWjpbZspePlZ8BZSSi8m7220at3pdOLN8eqbLiQZjc=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=aPdMGOJjV2YRFitkCwx+7ezT2NuDWgWLi81v8tb2gAbARBOecdrmtHGK/fmyNdMSs
- MNz/joZXnob5jSduaI5P1L8J0DA+6hgis/k0Wx3uafgYFsN3WmUJxsK7oRaCuCog2c
- lTHLafgwLJzpIqeIxRkL0c83EjaXRNf9vCKwkPi0=
+ b=lMnaxeRtZMcN4k+f97ZauF6e5EK97IzOck4+TEHjwSKNV1Wdy+JEaTNni51vzT7Bb
+ 6UyomwDzfBMzBqcFMUdtw9SO6t+63NoDR3LGXdrRVF4/ZZ0io5gUFaVa4n46dJJGUf
+ Nm7uf1bQGZRPZujIjQ8jSv4Sjb763U7gw37Btgj0=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.220]) by smtp.web.de (mrweb004
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0M8c2V-1kyXEa1oP5-00wFv9; Tue, 04
- Aug 2020 10:11:43 +0200
-Date: Tue, 4 Aug 2020 10:11:41 +0200
+Received: from luklap ([89.247.255.220]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MeBVG-1kOMum2zMc-00Ptq5; Tue, 04
+ Aug 2020 10:11:50 +0200
+Date: Tue, 4 Aug 2020 10:11:49 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v7 3/8] chardev/char-socket.c: Add yank feature
-Message-ID: <de56059cb421282f60ec6e9e5a9ab823745e97c1.1596528468.git.lukasstraub2@web.de>
+Subject: [PATCH v7 5/8] io/channel-tls.c: make qio_channel_tls_shutdown
+ thread-safe
+Message-ID: <dad1ee8d9e87c34c71788eecc71c7743c9e11e20.1596528468.git.lukasstraub2@web.de>
 In-Reply-To: <cover.1596528468.git.lukasstraub2@web.de>
 References: <cover.1596528468.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/xnp2/WaHU++tiHJ9fKN=75S";
+Content-Type: multipart/signed; boundary="Sig_/6L8wL6ee/s.fuFafRuvIaIp";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:dG4H8LrPxo9gvV0K3JWJERG1ay+jx4IKXQ5xJcPwD4lnE+fEnkX
- OmnkNoFSsd2pkrSw3xp9tPzISSW/oUAkshI1Akx5CojK+HW9FEFqrVS8unYB+p7OQIDU0Fm
- Kibf9Kc2CJ8bpBhqFZZDHC95mvhPR4OvMByQWcvjV6MQApTN3ChNuiBPC+ERrnsdBVP3R+4
- ya2HssTgZ4OvD422lPlIQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:507kZDaXBb4=:lFH1F9/xToxkJzTRAPiZ67
- rIYS0qRhIzgPcwU6Q35EXNZ6zqdV8fL11X0qV1Jl6JBqaaHxQM07Z6rfYK5nqKxciXd+r1OEz
- pL3I+VFoeSsivQvDLODEMPd2rGqVb2kAoE6tzAUqG5hzNA8xive5uPiylSRRiY69H6rqkepWP
- nd/7T+2JFRbIIy8PLuXfHpCKqBj0mRPC6VcHuVTTCchgjAZDgioKB7OJL9rDz5nhwB65uHkI0
- iR8M950v2VWbGXwpcIsk9jSHleMQkCyX52+G4CoPWKthqBY2wdpIGp5X+1A6hWQVbWH8aFKEF
- dtqszk+y7BClCAwiZTe5zE2ZvCnH/Tqu80syrf8lkm7hcmt7++VrpLsuSO2boq+bbZz+vEqO0
- Jde1m50hTZ1/qvyKnBf5aC1BxNd1ZeaZELSbGQ0o6czcE1MpkUKVlCKuNY6AcnYALWDhsN4Ec
- KLmGBLfEj0pNdDTnKcGnJGE/AvIO2sN9bigOnJl94qydtG2xp3YrJJbtZgaqlMFudHg6ILuzz
- M591oAHhn4oPvhkopCe8qgtgPbZbf4OWRwtNP8l/bmX/svXvITMTIZTRaoQAJa7Zb4+TF1ise
- SRXu4WkUVHS6/Ha3lHAFH/LSc92DlB/N/iut6BmCkre2lRftU3/ANX5YCogE8VXup8TazBlOB
- LsaXiemJ8Pri/j3GSEO0uP1WsBiJdZgIqvLkcdhlYrrKkTbsSTGDj9/lDssDXcfwD1mN8gxHR
- MNzeV6hW/mDhzchO7yN2wBqw0Gv1GCVdwEoGzdT5IBE1tsKhYSG/2ZGS88FmdJRbSrF0cFbBt
- hwID9Nft054XSWv6yRyBrg3MDKsVlEx6E7ekKGhncWHccIE41i+v93kff6HaCngGYChBKl+vC
- B6DYuMEOJIfMK208wuym4LZ+hsw6xYfJWRI+0JWkt9c+/1CKgvM26wBKSXGDRjv3j8wbjMtaK
- ycbjrIAOjTkQA1P0MT0oFl5q50ttY/RBxsv9vkcyO/hm0zybMXFrEfzcOKWB78vU8je7p6xlE
- b82N+h1pPovhqubxTWRkF1ESlyBaDF+j1MbJAvTbdczbtE+j7DMqncCgvCJCt8eYb1mtCTpIF
- 7EV5OjvPSIZQYUifQQj1ERbiaI+fWFGVAEg456m3ADXuqQvwJSBxFiuLA7WlgGquFpluctevv
- nZHasVNetuxM1Octtzg6fg5uwrbG8edKO0hAeEeotlbmycyJ0VgI5fvFXnPgs3ll4+DMPSVk1
- to64bErWS1bKAz7dheOmkP3ezPCbjTw2OIsT0Zg==
-Received-SPF: pass client-ip=212.227.15.3; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:pJpYlpelk/Vm8ALqpszS5baQJuC3IPf6uDNhx3t3cZ9u+2r7NFx
+ zMEffUQjWoiSlCq4qzRt9KVvJaq4CMiVZCM86/oaoEDtksK7kH2k74cAU29+CCEfkjEIV0H
+ 6DC/Bp+CfyXL9LIj/pHwgB5epRAlBmkalRqFWxYXixIGBmiL4AS+PCX3MhHiHnS7pC/1Mr6
+ KwzgCGQXFxjyENOPnQtig==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:sEma/SQcmFQ=:wo767FoEFaCsXz+hfsESw0
+ qWUrRSk5cYm6l+6NNV+9tLiiFcGR/P7V554MvyD+C9GAVcFIvcYIDPzRlyGF3i+qxI24MBQRD
+ yfVL1Yj5yfVLZW+hM7KBTNjq2fGtb/q7wjWHbhH/DOKDjiBIvHNL8VPQFBdNPm5lTlIGFZwZI
+ tNVhhRUYl1qU2sNCpUTCno0rzB1mdiAdaz2+NYGpfh+phY8SzD5V9VSkwO2J/xhhG6XbliEp9
+ CLh4PjoHo+EXvxTpn4Wimjky9AS3eePIwgN+v4lcDd0gu3MqTRJMAfAFmLpT2ksKSRwa/whrn
+ TbJkCXCNO0WSHRXA/CCqhgiqFtdUPdUyCWGLJgMzUWMlvvcmd2cx1htY4PIsfDRg6QIWrFsCH
+ +fUJg0uqViOM+mXBhXE5mwWosMMlPSfRQ3SlE5DnxBR/TkVviGTM81VKZWu3Ac0h+4IFMNZUS
+ WczB7jCbOmyGDrLtVOdIkdtmKDBHCJpQ3It7DbnBr6YkgB5RV/SlV3eEdYO1CdfCHQ48o8iSB
+ xMg6PlmXCKfZI+8DdXaR8VYSYmdkLIf6/YOYlTXwfj9jQPs7ExVdsRvaYPTxlQKQ6rlz6FKCf
+ lFVvIu2cQmwmJ0lKYEMu+ctb2O0HEOKqgXQm8/J0eJm2cRE0pgG4v9CREyGx5pmzLH9EDyXEa
+ LEavFB3t9HAU4o5nz6L/KcNE4rzV1bpkKvgxf6zHepL+/ofBRwttNg+Pzk9kvhvd/lj5vfSyG
+ I91TWv4vhpYPRege+sLfGWi5wW2oPnXx0FLeHr9g5EzFM4veoGZnNkNRt8J8b8nTqujg+TZRR
+ WmDqG8/XXJ8HHDJj8c1v0eDC5QPqp+MORnk4K+6tv9NaejD0fmg7WIvHtHedD0/FU5WeSY10D
+ +eQaiyzrnc52O5CMIsl8WFZeMVn0asOTG/G1UZvu83FJaUMeu7yZpLE+G80K17AlmAEMtpbib
+ mtQMGVl9h8lJlQKU5vGLXlRAFPI2cyzhGekmZJ1Lb5Y5jTGegHX8QcVOqjWCXOLyOeo19eeJi
+ kiMGBX/Wj7snSqdaqrBKPKxiu7jujxdA6y6JXt+FVjSwGcN1QBNNZGNpQnTSqo07Cjqd6CsLp
+ vdFEzM5XA2xgaFwhUzEhNg3wRVjkkXwHfulWwAqtmYJ+n1YG1hM8rlRN/lWnr4p9nxn94V0yY
+ Yf4ixrcXdXsksqMBzDsGF50D6Rw48Rmxm4ChQ3jlhpl7PaJpWw2e9bQPasvf1Py/omjvaw2Mn
+ LlvllSf6ObJd4WRcYUHMHcvAeRRPeMRWCoWoifw==
+Received-SPF: pass client-ip=212.227.15.14; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 04:11:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 04:11:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -34
+X-Spam_score: -3.5
+X-Spam_bar: ---
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,156 +112,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/xnp2/WaHU++tiHJ9fKN=75S
-Content-Type: text/plain; charset=US-ASCII
+--Sig_/6L8wL6ee/s.fuFafRuvIaIp
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Register a yank function to shutdown the socket on yank.
+Make qio_channel_tls_shutdown thread-safe by using atomics when
+accessing tioc->shutdown.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- chardev/char-socket.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ io/channel-tls.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index ef62dbf3d7..8e2865ca83 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -34,6 +34,7 @@
- #include "qapi/error.h"
- #include "qapi/clone-visitor.h"
- #include "qapi/qapi-visit-sockets.h"
-+#include "qemu/yank.h"
+diff --git a/io/channel-tls.c b/io/channel-tls.c
+index 7ec8ceff2f..b350c84640 100644
+--- a/io/channel-tls.c
++++ b/io/channel-tls.c
+@@ -23,6 +23,7 @@
+ #include "qemu/module.h"
+ #include "io/channel-tls.h"
+ #include "trace.h"
++#include "qemu/atomic.h"
 
- #include "chardev/char-io.h"
 
-@@ -69,6 +70,7 @@ typedef struct {
-     size_t read_msgfds_num;
-     int *write_msgfds;
-     size_t write_msgfds_num;
-+    char *yank_name;
+ static ssize_t qio_channel_tls_write_handler(const char *buf,
+@@ -277,7 +278,8 @@ static ssize_t qio_channel_tls_readv(QIOChannel *ioc,
+                     return QIO_CHANNEL_ERR_BLOCK;
+                 }
+             } else if (errno =3D=3D ECONNABORTED &&
+-                       (tioc->shutdown & QIO_CHANNEL_SHUTDOWN_READ)) {
++                       (atomic_load_acquire(&tioc->shutdown) &
++                        QIO_CHANNEL_SHUTDOWN_READ)) {
+                 return 0;
+             }
 
-     SocketAddress *addr;
-     bool is_listen;
-@@ -413,6 +415,11 @@ static void tcp_chr_free_connection(Chardev *chr)
+@@ -361,7 +363,7 @@ static int qio_channel_tls_shutdown(QIOChannel *ioc,
+ {
+     QIOChannelTLS *tioc =3D QIO_CHANNEL_TLS(ioc);
 
-     tcp_set_msgfds(chr, NULL, 0);
-     remove_fd_in_watch(chr);
-+    if (s->state =3D=3D TCP_CHARDEV_STATE_CONNECTING
-+        || s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED) {
-+        yank_unregister_function(s->yank_name, yank_generic_iochannel,
-+                                 QIO_CHANNEL(s->sioc));
-+    }
-     object_unref(OBJECT(s->sioc));
-     s->sioc =3D NULL;
-     object_unref(OBJECT(s->ioc));
-@@ -916,6 +923,8 @@ static int tcp_chr_add_client(Chardev *chr, int fd)
-     }
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     tcp_chr_set_client_ioc_name(chr, sioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     ret =3D tcp_chr_new_client(chr, sioc);
-     object_unref(OBJECT(sioc));
-     return ret;
-@@ -930,6 +939,8 @@ static void tcp_chr_accept(QIONetListener *listener,
+-    tioc->shutdown |=3D how;
++    atomic_or(&tioc->shutdown, how);
 
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     tcp_chr_set_client_ioc_name(chr, cioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(cioc));
-     tcp_chr_new_client(chr, cioc);
+     return qio_channel_shutdown(tioc->master, how, errp);
  }
-
-@@ -945,6 +956,8 @@ static int tcp_chr_connect_client_sync(Chardev *chr, Er=
-ror **errp)
-         object_unref(OBJECT(sioc));
-         return -1;
-     }
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     tcp_chr_new_client(chr, sioc);
-     object_unref(OBJECT(sioc));
-     return 0;
-@@ -960,6 +973,8 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     sioc =3D qio_net_listener_wait_client(s->listener);
-     tcp_chr_set_client_ioc_name(chr, sioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     tcp_chr_new_client(chr, sioc);
-     object_unref(OBJECT(sioc));
- }
-@@ -1070,6 +1085,10 @@ static void char_socket_finalize(Object *obj)
-         object_unref(OBJECT(s->tls_creds));
-     }
-     g_free(s->tls_authz);
-+    if (s->yank_name) {
-+        yank_unregister_instance(s->yank_name);
-+        g_free(s->yank_name);
-+    }
-
-     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
- }
-@@ -1085,6 +1104,8 @@ static void qemu_chr_socket_connected(QIOTask *task, =
-void *opaque)
-
-     if (qio_task_propagate_error(task, &err)) {
-         tcp_chr_change_state(s, TCP_CHARDEV_STATE_DISCONNECTED);
-+        yank_unregister_function(s->yank_name, yank_generic_iochannel,
-+                                 QIO_CHANNEL(sioc));
-         check_report_connect_error(chr, err);
-         goto cleanup;
-     }
-@@ -1118,6 +1139,8 @@ static void tcp_chr_connect_client_async(Chardev *chr)
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     sioc =3D qio_channel_socket_new();
-     tcp_chr_set_client_ioc_name(chr, sioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     /*
-      * Normally code would use the qio_channel_socket_connect_async
-      * method which uses a QIOTask + qio_task_set_error internally
-@@ -1360,6 +1383,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
-         qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_FD_PASS);
-     }
-
-+    s->yank_name =3D g_strconcat("chardev:", chr->label, NULL);
-+    yank_register_instance(s->yank_name, errp);
-+    if (*errp) {
-+        g_free(s->yank_name);
-+        s->yank_name =3D NULL;
-+        return;
-+    }
-+
-     /* be isn't opened until we get a connection */
-     *be_opened =3D false;
-
 --
 2.20.1
 
 
---Sig_/xnp2/WaHU++tiHJ9fKN=75S
+--Sig_/6L8wL6ee/s.fuFafRuvIaIp
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl8pGD0ACgkQNasLKJxd
-slgUtw/+NAYhDxh+VC2yclYFd2xPyH6AyjWjtq7ijG3mABZjBWh6yGC1IrhIZRYj
-Z+G4HTAZimlTC/bJiso5oC6e8pMNELJPQ1RIhQU6wQsgtzNi4m93TVC/+xPKyaaS
-3kG6wCjfPlDvyipn4/DNq294/dEFnKqb52+tWsysESCRk+OyvXShUN3Xho2PX8ad
-9olVxL8oyDoqHxiWOAAWlmGZ2v3tuQGfOTHWViE99I7CgOwoBVJes0thNJVALd/T
-9ejtqSlHfJwX3nlCxG88gNGGal3gZh3xtUTxhV1AgPvzYwiQu98kkjOoG/61x56q
-4YUxJQGk5vBVvR+VX+Q3Mxjh5jGvykpxCCYPjznZN1iit4GLjF25EyNEk9VbU6yR
-7FB1rQiQf4s13EyfxvBMncyyYb+muvjKgYNWCUGR7gNeJA5u9c3RgcSfAoKi6wJX
-bqoOWoGOAd8hEZpukEb/Czl9C+CsU/Vj2WaBRXOwqwTimsT1Jfj9gf1fHQ3y/pwU
-DomKSoopNKOgdeKB/CQ7KkGt/w2HW6f8aDm+ne0XJBdBKPctM12DAxzo8KYXgxW8
-j6o+BJW6YsHHB5B3yNYOP4bCuMmcwStXW/V+4tBzW3/lKmSlFEiL+Sqc5fqKVQSN
-zTQEZPLn7N2obWXHpW8b6lIcL5Es3/gl98bH97X1gI5j70hWIXQ=
-=+Myq
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl8pGEUACgkQNasLKJxd
+sliwTQ/8CK125KBG2JH4fy/YQ7of0HzCzB8C1r+CUBtCfXBqGYmehqpV8g9yWXYo
+uAEwtvp46gLjAeYxU2WM46UF5I7PrZZ4Ttbh+y31+Z33GeOENUEO1Au+ZXQXMC6i
+Qya4aD/8xnK68P7mkymen+IutWPUUZZzKoOzz4/fDBKw9Ee2gdNImd5e4q0ac25A
+JOqyacnE1tzpJlH/5ZOxV6SUu/rcmhuocYeFQAtVHUQwvhQ2GYz6AqG4R4z2Wg2D
+/dT1bt/YuQkEWUtsFHNeD4p3SBB+OhpCNb2Z/4SDY50Fssfo7jJxeGUdlrYYtZ8Z
+h/Rt84maTeZA6UV2OhuuQW5tzITrUF1LLmOH12za83suw46aSLDEsjHcn8tSV0rz
+w40dcwFtyB1k6pahirNQkFMZC/R3adWxATRcn/IMMZIk0hncuuXvzUugAm2cAhQo
++siGzGZj/umdvXllNRbncIu17yPZlcBYSIndHSGS820zgOv2iIISp4oW1ZhZOw+L
+xX2ClPfOo0XA3vaGW35GP3LmuhDkAkPrTKwE6vQ2ln2ClYaxjgdZpyoXlx2aBQoJ
+OVby4vwMxOFaMwvc/URs5Bm1CvLnVHgt3b7eitb8vfRQO2bKi6kg9FAxxWm6mIu/
+H3AW2GDnOAyPgAd/OFEV9ymEzTmyRrwlyp8xEiU2vcec8aj/kMI=
+=Fzsv
 -----END PGP SIGNATURE-----
 
---Sig_/xnp2/WaHU++tiHJ9fKN=75S--
+--Sig_/6L8wL6ee/s.fuFafRuvIaIp--
 
