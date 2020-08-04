@@ -2,62 +2,90 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C6EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2EF7C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:45:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A40CA2064B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:43:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A40CA2064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 73A5220722
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:45:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LC0pRF/6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73A5220722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3027-0006gj-RU
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:43:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53514)
+	id 1k304M-0000z8-OU
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:45:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k2zzy-0002te-1L
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:41:10 -0400
-Received: from relay64.bu.edu ([128.197.228.104]:45919)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k2zzw-0002X0-7Y
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:41:09 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 074GeVsQ027477
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Tue, 4 Aug 2020 12:40:35 -0400
-Date: Tue, 4 Aug 2020 12:40:31 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Helge Deller <deller@gmx.de>
-Subject: Re: [PATCH v3 4/8] hw/display/artist.c: fix out of bounds check
-Message-ID: <20200804164015.sgkv64dnj6pmifo6@mozz.bu.edu>
-References: <20200804140056.7690-1-deller@gmx.de>
- <20200804140056.7690-5-deller@gmx.de>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k303V-0000SD-Vi
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:44:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54368
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k303U-0002wF-9a
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:44:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596559487;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TfMpbsk+znj1BpL+fmmDMViOhRt2auiNxNLDKB75Emo=;
+ b=LC0pRF/6b7amwFhFvoKnrgNC4Ce41HqvBEOBfhmeyw9P3NGzGqUT2fu3TfUq3q0sBRkRW7
+ x0rEqbX7yqNuhzdgh9rZyfoZRiSOuTFg23ikGRBKfWhxIWrTEEXtcRdYQ7DdpNnX+jnQPM
+ Cpla8vCxlvpThCyd1vT6bY8ENRpNC9k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-H5ozace3PFelE2JUCqh5sw-1; Tue, 04 Aug 2020 12:44:45 -0400
+X-MC-Unique: H5ozace3PFelE2JUCqh5sw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B21B18A1DFE;
+ Tue,  4 Aug 2020 16:44:44 +0000 (UTC)
+Received: from work-vm (ovpn-114-108.ams2.redhat.com [10.36.114.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 81EC95DA73;
+ Tue,  4 Aug 2020 16:44:42 +0000 (UTC)
+Date: Tue, 4 Aug 2020 17:44:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Chuan Zheng <zhengchuan@huawei.com>
+Subject: Re: [RFC PATCH 3/8] migration/dirtyrate: Add dirtyrate statistics
+ series functions
+Message-ID: <20200804164439.GF2659@work-vm>
+References: <1595646669-109310-1-git-send-email-zhengchuan@huawei.com>
+ <1595646669-109310-4-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
+In-Reply-To: <1595646669-109310-4-git-send-email-zhengchuan@huawei.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20200804140056.7690-5-deller@gmx.de>
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
- helo=relay64.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 12:40:58
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,144 +98,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Sven Schnelle <svens@stackframe.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, linyilu@huawei.com,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Helge, Sven,
-I think this patch introduces an issue:
-
-cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
--qtest stdio -accel qtest
-writeq 0xf810049f 0x7ed7087fffffff0d
-writew 0xf8118001 0x30fb
-writew 0xf8118000 0x5bfb
-writeq 0xf81005fb 0xd8d8d8d83d83d6
-EOF
-
-AddressSanitizer:DEADLYSIGNAL
-=================================================================
-==440==ERROR: AddressSanitizer: SEGV on unknown address 0x7fc4f3c87fff (pc 0x55a0e0ef024f bp 0x7ffcf40a8740 sp 0x7ffcf40a7f00 T0)
-==440==The signal is caused by a WRITE memory access.
-    #0 0x55a0e0ef024f in vram_bit_write /hw/display/artist.c:397:39
-    #1 0x55a0e0ee82ab in artist_reg_write /hw/display/artist.c:886:9
-    #2 0x55a0e05dc7a3 in memory_region_write_accessor /softmmu/memory.c:483:5
-    #3 0x55a0e05dbadc in access_with_adjusted_size /softmmu/memory.c:539:18
-    #4 0x55a0e05d9873 in memory_region_dispatch_write /softmmu/memory.c:1466:16
-    #5 0x55a0dfc87056 in flatview_write_continue /exec.c:3176:23
-    #6 0x55a0dfc6f866 in flatview_write /exec.c:3216:14
-    #7 0x55a0dfc6f387 in address_space_write /exec.c:3308:18
-    #8 0x55a0e0683604 in qtest_process_command /softmmu/qtest.c:452:13
-    #9 0x55a0e067ac08 in qtest_process_inbuf /softmmu/qtest.c:710:9
-    #10 0x55a0e0679895 in qtest_read /softmmu/qtest.c:722:5
-    #11 0x55a0e2b35c43 in qemu_chr_be_write_impl /chardev/char.c:188:9
-    #12 0x55a0e2b35dc7 in qemu_chr_be_write /chardev/char.c:200:9
-    #13 0x55a0e2b4a0b3 in fd_chr_read /chardev/char-fd.c:68:9
-    #14 0x55a0e2c9e474 in qio_channel_fd_source_dispatch /io/channel-watch.c:84:12
-    #15 0x7fc52b5d3897 in g_main_context_dispatch (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x4e897)
-    #16 0x55a0e309637b in glib_pollfds_poll /util/main-loop.c:217:9
-    #17 0x55a0e3093aab in os_host_main_loop_wait /util/main-loop.c:240:5
-    #18 0x55a0e3093444 in main_loop_wait /util/main-loop.c:516:11
-    #19 0x55a0e069bd00 in qemu_main_loop /softmmu/vl.c:1676:9
-    #20 0x55a0e2cd6261 in main /softmmu/main.c:49:5
-    #21 0x7fc52a159e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.30/csu/../csu/libc-start.c:308:16
-    #22 0x55a0dfb7a729 in _start (/home/alxndr/Development/qemu/general-fuzz/build/hppa-softmmu/qemu-system-hppa+0x22d4729)
-
-AddressSanitizer can not provide additional info.
-SUMMARY: AddressSanitizer: SEGV /hw/display/artist.c:397:39 in vram_bit_write
-==440==ABORTING
-
-I bisected it to this patch.
-Thanks
--Alex
-
-On 200804 1600, Helge Deller wrote:
-> From: Sven Schnelle <svens@stackframe.org>
-> 
-> Fix the following runtime warning with artist framebuffer:
-> "write outside bounds: wants 1256x1023, max size 1280x1024"
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Sven Schnelle <svens@stackframe.org>
-> Signed-off-by: Helge Deller <deller@gmx.de>
+* Chuan Zheng (zhengchuan@huawei.com) wrote:
+> From: Zheng Chuan <zhengchuan@huawei.com>
+>=20
+> Add dirtyrate statistics to record/update dirtyrate info.
+>=20
+> Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
+> Signed-off-by: YanYing Zhang <ann.zhuangyanying@huawei.com>
 > ---
->  hw/display/artist.c | 24 +++++++++++-------------
->  1 file changed, 11 insertions(+), 13 deletions(-)
-> 
-> diff --git a/hw/display/artist.c b/hw/display/artist.c
-> index 6261bfe65b..de56200dbf 100644
-> --- a/hw/display/artist.c
-> +++ b/hw/display/artist.c
-> @@ -340,14 +340,13 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+>  migration/dirtyrate.c | 47 ++++++++++++++++++++++++++++++---------------=
+--
+>  migration/dirtyrate.h | 11 +++++++++++
+>  2 files changed, 41 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index fc652fb..6baf674 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -13,19 +13,41 @@
+>  #include "dirtyrate.h"
+> =20
+>  static uint64_t sample_pages_per_gigabytes =3D DIRTYRATE_DEFAULT_SAMPLE_=
+PAGES;
+> -static uint64_t dirty_rate; /* MB/s */
+> +static struct dirtyrate_statistics dirty_stat;
+>  CalculatingDirtyRateStage calculating_dirty_rate_stage =3D CAL_DIRTY_RAT=
+E_INIT;
+> =20
+> -static bool calculate_dirtyrate(struct dirtyrate_config config,
+> -                        uint64_t *dirty_rate, int64_t time)
+> +static void reset_dirtyrate_stat(void)
 >  {
->      struct vram_buffer *buf;
->      uint32_t vram_bitmask = s->vram_bitmask;
-> -    int mask, i, pix_count, pix_length, offset, height, width;
-> +    int mask, i, pix_count, pix_length, offset, width;
->      uint8_t *data8, *p;
-> 
->      pix_count = vram_write_pix_per_transfer(s);
->      pix_length = vram_pixel_length(s);
-> 
->      buf = vram_write_buffer(s);
-> -    height = buf->height;
->      width = buf->width;
-> 
->      if (s->cmap_bm_access) {
-> @@ -367,13 +366,6 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
->          pix_count = size * 8;
->      }
-> 
-> -    if (posy * width + posx + pix_count > buf->size) {
-> -        qemu_log("write outside bounds: wants %dx%d, max size %dx%d\n",
-> -                 posx, posy, width, height);
-> -        return;
+> -    /* todo */
+> -    return true;
+> +    dirty_stat.total_dirty_samples =3D 0;
+> +    dirty_stat.total_sample_count =3D 0;
+> +    dirty_stat.total_block_mem_MB =3D 0;
+> +    dirty_stat.dirty_rate =3D 0;
+> +}
+> +
+> +static void update_dirtyrate_stat(struct block_dirty_info *info)
+> +{
+> +    dirty_stat.total_dirty_samples +=3D info->sample_dirty_count;
+> +    dirty_stat.total_sample_count +=3D info->sample_pages_count;
+> +    dirty_stat.total_block_mem_MB +=3D (info->block_pages << DIRTYRATE_P=
+AGE_SIZE_SHIFT) >> PAGE_SIZE_SHIFT;
+>  }
+> =20
+> -static void set_dirty_rate(uint64_t drate)
+> +static void update_dirtyrate(int64_t msec)
+>  {
+> -    dirty_rate =3D drate;
+> +    uint64_t dirty_rate;
+> +    unsigned int total_dirty_samples =3D dirty_stat.total_dirty_samples;
+> +    unsigned int total_sample_count =3D dirty_stat.total_sample_count;
+> +    unsigned long total_block_mem_MB =3D dirty_stat.total_block_mem_MB;
+> +
+> +    dirty_rate =3D total_dirty_samples * total_block_mem_MB *
+> +                 1000 / (total_sample_count * msec);
+> +
+> +    dirty_stat.dirty_rate =3D dirty_rate;
+> +}
+> +
+> +
+> +static void calculate_dirtyrate(struct dirtyrate_config config, int64_t =
+time)
+> +{
+> +    /* todo */
+>  }
+> =20
+>  /*
+> @@ -42,21 +64,12 @@ static void set_dirty_rate_stage(CalculatingDirtyRate=
+Stage ratestage)
+>  void *get_dirtyrate_thread(void *arg)
+>  {
+>      struct dirtyrate_config config =3D *(struct dirtyrate_config *)arg;
+> -    uint64_t dirty_rate;
+> -    uint64_t hash_dirty_rate;
+> -    bool query_succ;
+>      int64_t msec =3D 0;
+>  =20
+>      set_dirty_rate_stage(CAL_DIRTY_RATE_ING);
+> =20
+> -    query_succ =3D calculate_dirtyrate(config, &hash_dirty_rate, msec);
+> -    if (!query_succ) {
+> -        dirty_rate =3D 0;
+> -    } else {
+> -        dirty_rate =3D hash_dirty_rate;
 > -    }
-> -
-> -
->      switch (pix_length) {
->      case 0:
->          if (s->image_bitmap_op & 0x20000000) {
-> @@ -381,8 +373,11 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
->          }
-> 
->          for (i = 0; i < pix_count; i++) {
-> -            artist_rop8(s, p + offset + pix_count - 1 - i,
-> -                        (data & 1) ? (s->plane_mask >> 24) : 0);
-> +            uint32_t off = offset + pix_count - 1 - i;
-> +            if (off < buf->size) {
-> +                artist_rop8(s, p + off,
-> +                            (data & 1) ? (s->plane_mask >> 24) : 0);
-> +            }
->              data >>= 1;
->          }
->          memory_region_set_dirty(&buf->mr, offset, pix_count);
-> @@ -398,7 +393,10 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
->          for (i = 3; i >= 0; i--) {
->              if (!(s->image_bitmap_op & 0x20000000) ||
->                  s->vram_bitmask & (1 << (28 + i))) {
-> -                artist_rop8(s, p + offset + 3 - i, data8[ROP8OFF(i)]);
-> +                uint32_t off = offset + 3 - i;
-> +                if (off < buf->size) {
-> +                    artist_rop8(s, p + off, data8[ROP8OFF(i)]);
-> +                }
->              }
->          }
->          memory_region_set_dirty(&buf->mr, offset, 3);
-> @@ -420,7 +418,7 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
->              break;
->          }
-> 
-> -        for (i = 0; i < pix_count; i++) {
-> +        for (i = 0; i < pix_count && offset + i < buf->size; i++) {
->              mask = 1 << (pix_count - 1 - i);
-> 
->              if (!(s->image_bitmap_op & 0x20000000) ||
-> --
-> 2.21.3
-> 
-> 
+
+All this was only just added; it might be easier to create the
+update_dirtyrate function first.
+
+> +    calculate_dirtyrate(config, msec);
+> =20
+> -    set_dirty_rate(dirty_rate);
+>      set_dirty_rate_stage(CAL_DIRTY_RATE_END);
+> =20
+>      return NULL;
+> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+> index 342b89f..2994535 100644
+> --- a/migration/dirtyrate.h
+> +++ b/migration/dirtyrate.h
+> @@ -15,6 +15,9 @@
+> =20
+>  /* take 256 pages per GB for cal dirty rate */
+>  #define DIRTYRATE_DEFAULT_SAMPLE_PAGES    256
+> +#define DIRTYRATE_PAGE_SIZE_SHIFT       12
+> +#define BLOCK_INFO_MAX_LEN              256
+> +#define PAGE_SIZE_SHIFT                 20
+
+I think you might also have used one of these #define's in a previous
+patch; so make sure the patches each compile in order.
+Also, can you please comment each one of these - I was confused by a lot
+of the calculations above because I don't quite understand what each of
+these is.
+I don't thinl 'BLOCK_INFO_MAX_LEN' is needed - becuase it's just a
+RAMBlock ID, and you can link to the RAMBlock.
+I'm not sure what DIRTYRATE_PAGE_SIZE_SHIFT is, or why it's different
+from TARGET_PAGE_BITS.
+
+> =20
+>  struct dirtyrate_config {
+>      uint64_t sample_pages_per_gigabytes;
+> @@ -33,6 +36,14 @@ typedef enum {
+>      CAL_DIRTY_RATE_END   =3D 2,
+>  } CalculatingDirtyRateStage;
+> =20
+> +struct dirtyrate_statistics {
+> +    unsigned int total_dirty_samples;
+> +    unsigned int total_sample_count;
+> +    unsigned long total_block_mem_MB;
+
+'long' is normally a bad idea - we use it in a few places and it
+was generally a bad idea; size_t for a size is much better.
+
+> +    int64_t dirty_rate;
+
+Is this blocks/sec, MB/s what - please comment it.
+
+Dave
+
+> +};
+> +
+> +
+>  /*=20
+>   * Store dirtypage info for each block.
+>   */
+> --=20
+> 1.8.3.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
