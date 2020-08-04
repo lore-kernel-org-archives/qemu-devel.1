@@ -2,85 +2,87 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86F82C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3BC6C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:29:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CF9E206C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:21:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A434206C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:29:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x3emrL1G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CF9E206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UIuApx8B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A434206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k30dK-0008Fr-KO
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 13:21:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38656)
+	id 1k30kc-0004CY-HO
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 13:29:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k30ce-0007XT-Cn
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:21:08 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37170)
+ (Exim 4.90_1) (envelope-from <pcc@google.com>) id 1k30jg-0003ZL-FK
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:28:24 -0400
+Received: from mail-vk1-xa43.google.com ([2607:f8b0:4864:20::a43]:35103)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k30cc-0008JC-O0
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:21:08 -0400
-Received: by mail-oi1-x241.google.com with SMTP id e6so16800433oii.4
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 10:21:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <pcc@google.com>) id 1k30ja-0000j6-55
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:28:24 -0400
+Received: by mail-vk1-xa43.google.com with SMTP id i20so821392vkk.2
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 10:28:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=t7VmFSxjy/ThZ0efOei4Vu5UYq36uY2GFltfBnNnmsQ=;
- b=x3emrL1G7gPlr+qXIRNhbsPuduHOCCajwVHViK2c5q9Uy/gRDZVYFcUbsbEj9r/vwX
- Q7tJvXUtposWn2jm1n2oatwefmt/X1K7NXpGFLbB549zW/MOAbs77idFPbv81+MuqlKF
- fd4STih02qGPVGXFzWTf/u30XytdkfGFAcjJlITna4kzCjsec+UlGh1u+oum+vLPaE59
- l1/o68qAwHo0+7fL951JkqUP/qSxkCrdCPtuHGWB7EYumFGDbsBsKf2fCutmJxMI8YVL
- D1fmMZIAf35T35uCdqskZadpkKP2LR6OtOQL1lGc4C5agOIiVf1VVMzTbkjOYcMOO+kr
- EeQA==
+ :cc; bh=Tj9S+jt13dZL2uqzI9eNoiWm4249m0G177wh4qUTsLY=;
+ b=UIuApx8BVdeKf+fvNvxSiPK2Unzk7r/kZkxr+dBK1A7cWybGTTG2a3Gs5uvOA8mfVE
+ vMoEmpHKRF/H1DQYpxMcWbMK8+O1GU7UXL50EvUpmsLmUf15Xw7sRaEH7ptxqGNOxDKJ
+ is/VvklXKEQymkUlMeq79ZPFLKrq2gWSfMYX3Nn7hI1/SGwgH3l6KXgpTet7FzkwjCJA
+ /aVLt68xKIJQJAWeDbhl6VASmThHqjjUisOZ+xcu/bxNq0070MtNoeMQYeHJO49rVrzh
+ TKFRR2FWCZrZ3kcV9jBHZ00PBZaPhyunBFxd3kHsH0/x/aW24OvmvJI7mws2O4XSh5J/
+ ZaQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=t7VmFSxjy/ThZ0efOei4Vu5UYq36uY2GFltfBnNnmsQ=;
- b=qVV/eCT0JKWxXG+GH9yWfpZgeXPb36TwfuC7sZ6kFIGKLdLAL2OTpxgWVNzAtcHG3y
- 0siFSbepa/lGPToONRjMnhsQvQRLf+0QMxJ0VpyJY9b35BFpUvK1USrykGe2YUTfBe6J
- Gi9oZKXDlgQOprmNYCK/s6pRF2EqAYzOY3lTx27ZUM00tU/kwvecoC+QSiVMl0WdHicU
- A59fOWqVYz2hcYh1S9go5HiYunRR/92a4MQrUCmZWexdHueG2sjc3fb77gQQaRZ0+lXz
- oEGnheJ/ZHg1LmmrB+dYZSxZnFZFwFsCF63pO64vvne1gsnNRZqWKH8lunUBypvx+37V
- 8Ecw==
-X-Gm-Message-State: AOAM532F5O7CtPsFL5bQSRC8O3IAxe/X/riNvW5IjQFurlCSkfJChR4z
- wlDEfBpgpWpoHe9n3Tua1x0S6iT4T6OIyrPtyDlOnQ==
-X-Google-Smtp-Source: ABdhPJzTxYp6QkFxhUGaNKeIJ5MghdSnrEyAKeOip6ni8byE9XJqoA0sHaBtiEG/CVU0jy4tlWa/nP3xigwi/ef4xrw=
-X-Received: by 2002:aca:50c4:: with SMTP id e187mr4098517oib.146.1596561665163; 
- Tue, 04 Aug 2020 10:21:05 -0700 (PDT)
+ bh=Tj9S+jt13dZL2uqzI9eNoiWm4249m0G177wh4qUTsLY=;
+ b=HEl8rNaSgu/8pArNksrVzdglfeVZghKPxpFu3EvovY3niWXYy9xq/wtfJKp8emsMep
+ N0drsAZyCfuq1ojPAg26zuq76EjNM3A7ax5XNKQwai3zTKe03R7Lcz9xU4gzbISk6QZU
+ Iw/QZZciNved2tyz/S5Is1oENZ1r39/dJKy7Y6pbIQtFQdrEWLeRUnAjS/+9MeCgnc7M
+ OZHiSYDhRvcey3Ek3KURnbyYUeVYtnaoOhK9yDaBujPftsIj291cC/YnXazPbIteHWRB
+ M3wlLtLRzZuXQTh7OFStJhpz1ZtBPa0cW/WfALbRordFTRDF8hgqotbj0XWzlOA9Sg0Q
+ wqgQ==
+X-Gm-Message-State: AOAM5325UWNBsaouSr7qMUKr9DCuFikxOP/1AI0FJ/rxZd8Rx4nk8Tgk
+ 7cHVcQzQrbPQr6RDw5QJmrQerNoOdCkb2bxNYV+2Hg==
+X-Google-Smtp-Source: ABdhPJx+RL1YoBfzE4Wxp1/cvJjvt7lxiYokud+o5vcK/nXJOJHUzs+mANSRxPIFo5fywFA+4cKxDJmAJLYiZNxYV5I=
+X-Received: by 2002:a1f:f8c5:: with SMTP id w188mr8354044vkh.15.1596562096216; 
+ Tue, 04 Aug 2020 10:28:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200804141640.591031-1-mst@redhat.com>
-In-Reply-To: <20200804141640.591031-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Aug 2020 18:20:53 +0100
-Message-ID: <CAFEAcA_38GRFmdOyxtN+KbO=PtuvRmsgJ2QN0zcpwm4a5Hypmg@mail.gmail.com>
-Subject: Re: [PULL 0/3] virtio,acpi: bugfixes
-To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200803222656.63936-1-pcc@google.com>
+ <CAMn1gO75w=oaCp2TjhFzr2nrbKhHOP6Q20bnvuuAzgSVe+thMg@mail.gmail.com>
+ <1c14ed0a-da1b-a265-d5bd-2dea42764032@linaro.org>
+In-Reply-To: <1c14ed0a-da1b-a265-d5bd-2dea42764032@linaro.org>
+From: Peter Collingbourne <pcc@google.com>
+Date: Tue, 4 Aug 2020 10:28:05 -0700
+Message-ID: <CAMn1gO5nBvra0saJ53zY5fWYo_Jm0LReHmOSyYwsCGXES66fAA@mail.gmail.com>
+Subject: Re: [PATCH] target/arm: Fix decode of {LD,ST}RA[AB] instructions
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::a43;
+ envelope-from=pcc@google.com; helo=mail-vk1-xa43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,43 +95,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 4 Aug 2020 at 15:17, Michael S. Tsirkin <mst@redhat.com> wrote:
+On Tue, Aug 4, 2020 at 8:41 AM Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> The following changes since commit 5c1c3e4f02e458cf280c677c817ae4fd1ed9bf10:
+> On 8/3/20 5:21 PM, Peter Collingbourne wrote:
+> > On Mon, Aug 3, 2020 at 3:27 PM Peter Collingbourne <pcc@google.com> wrote:
+> >>
+> >> These instructions use zero as the discriminator, not SP.
+> >
+> > Oh, there is no such thing as STRAA/STRAB. I must have been confused
+> > by the name of the function, disas_ldst_pac. I will send a v2 with a
+> > fixed commit message, and another patch to rename the function to
+> > disas_ld_pac.
 >
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200803' into staging (2020-08-03 20:34:26 +0100)
+> It's called decode_ldst_pac because the Arm ARM section is called "Load/store
+> register (pac)".  Page C4-311 in the F.a revision.
 >
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 5957b49b423fe456896e10f7e4a6c69be07f9407:
->
->   virtio-mem: Correct format specifier mismatch for RISC-V (2020-08-04 09:13:34 -0400)
->
-> ----------------------------------------------------------------
-> virtio,acpi: bugfixes
->
-> A couple of last minute bugfixes.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ----------------------------------------------------------------
-> Bruce Rogers (1):
->       virtio-mem: Correct format specifier mismatch for RISC-V
->
-> Michael S. Tsirkin (2):
->       i386/acpi: fix inconsistent QEMU/OVMF device paths
->       arm/acpi: fix an out of spec _UID for PCI root
+> But yes, there are only loads defined in the section.
 
+I see. Arguably the ARM ARM section is misnamed then. There is a
+sibling section named "Load register (literal)", so there is precedent
+for naming a section after the types of instructions that are actually
+supported. I will send mail to errata@arm.com to see if the section
+can be renamed.
 
-I applied your updated pull with just the virtio-mem fix.
-
-thanks
--- PMM
+Peter
 
