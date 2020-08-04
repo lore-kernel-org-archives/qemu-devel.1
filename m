@@ -2,97 +2,82 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81078C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 03:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC518C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 05:29:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73724206F6
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 03:55:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFFC32064B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 05:29:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OJjgSR+K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73724206F6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CtkoZkXZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFFC32064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2o32-0003b3-Es
-	for qemu-devel@archiver.kernel.org; Mon, 03 Aug 2020 23:55:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51144)
+	id 1k2pVV-00068T-SY
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 01:29:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k2o2M-00030o-PS
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 23:54:50 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43946)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k2o2K-0000bH-VB
- for qemu-devel@nongnu.org; Mon, 03 Aug 2020 23:54:50 -0400
-Received: by mail-pg1-x542.google.com with SMTP id f5so4100258pgg.10
- for <qemu-devel@nongnu.org>; Mon, 03 Aug 2020 20:54:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=vmxj6nfyrQeB5YefZuszP+wIAmf9uqmW5iDuhIZ2zPA=;
- b=OJjgSR+KovaAf0IK0tD+v4Fh7kqWQ+5TyJQJj2ZTGU9rWIs9pQ6Jj/+yosl8CMGT0+
- 8jf94F5qMqpF1utLgV5Sau7WjXsi3Hc0oUIzGxEDzupwuohWnic+8dKMZk2P6TRD7qR7
- tCiST5m7CUd8v/qvaxCNTG5Urjqn9iwIz9bd+lZc+vGLuDs5ntK5ynkG7jP3vWYuFaQx
- TUKRemqYunxDWnkT2NbCULuwEZ1TQpW4J0nwg4WWDJzuNEJn/N/Rx+tX/0FF9PmJ/G8T
- gwUeC2edhbFI1gz9JQR/NYyzObse2sVAJ9GDEWbabFT2aeQ+IPKQJmBmNIkkJVy+qPqs
- OX6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=vmxj6nfyrQeB5YefZuszP+wIAmf9uqmW5iDuhIZ2zPA=;
- b=WIAiJrpn1+0z61rmqYCJarIzUgCr0DmUjtsubYHGXpySvrkDuz4NvHFH3JspQqqnbR
- a+IeuLYceIehML2ZgKYTnofCoH3GWK/wcM87utyl3IoWmQuzS6rvZDBsD3tBPdGcAP8F
- ok46TXUp36Pdljxn62sxKCXHBFiekle0N77EIjhIaZsKjradGG9Is+3u+dzoCF/DoNNT
- vts3sOE4uqnZsYTUMS4N3ecOjrOHULFbhDqYe5J06lRlySN0Cwc4aI9z9r8xaB3pn5LI
- j1ZReFwULtI833YCCT/TjHiinRs2WpbCLLAdnGeFbZoqpZstZbN3vMNgH7WBh6CZlnU9
- DrCA==
-X-Gm-Message-State: AOAM533h9ZazRNOipCKkT0fQLfB3vXG/bZ4P27TI7B7GCx1GKUOAX91E
- GrsYC4tQccgTXfXTfB1KAvIRQjCe+YQ=
-X-Google-Smtp-Source: ABdhPJzEUztVQYiy77vTwu04s4BgVs+6S8ZVtmU5U7Peis6m5XkZOCwp1O4Wy9bs/wcoId8vptC4aQ==
-X-Received: by 2002:a05:6a00:44:: with SMTP id
- i4mr9880839pfk.276.1596513286569; 
- Mon, 03 Aug 2020 20:54:46 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id m26sm21158962pff.84.2020.08.03.20.54.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 03 Aug 2020 20:54:45 -0700 (PDT)
-Subject: Re: [PATCH] target/arm/translate.c: Delete/amend incorrect comments
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200803132815.3861-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8b6b5af5-1e95-c4c5-ec28-027335ef359f@linaro.org>
-Date: Mon, 3 Aug 2020 20:54:43 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k2pUl-0005NZ-Da
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 01:28:15 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43147
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k2pUi-0004fa-E8
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 01:28:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596518891;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=FYbdF9A59yOuFAqIJal7DuJ8EsPliIp4vtn9QbCP0Yk=;
+ b=CtkoZkXZ0UdrTjf+N+B2vdze10c1Xph15dM+oqYYJZfM38OD/GfbOgZEIzOY1bqoKLK7VR
+ 6KqT+xSbU1z2VjElraZO63ExBrfGIOOMmRBFrqgLiGQYO8ZizwzmxE1mqqs/smfRMZAJ3U
+ DO5StBKJNQylDsyCV/uhH/d7Gt9fpgg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-oI8sd39iM7yo7NhTWWIPZA-1; Tue, 04 Aug 2020 01:28:09 -0400
+X-MC-Unique: oI8sd39iM7yo7NhTWWIPZA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CD39108088A;
+ Tue,  4 Aug 2020 05:28:08 +0000 (UTC)
+Received: from localhost (ovpn-112-116.ams2.redhat.com [10.36.112.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 516505D9F7;
+ Tue,  4 Aug 2020 05:28:05 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/3] aio-posix: keep aio_notify_me disabled during polling
+Date: Tue,  4 Aug 2020 06:28:01 +0100
+Message-Id: <20200804052804.1165291-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200803132815.3861-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:01:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,27 +90,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/3/20 6:28 AM, Peter Maydell wrote:
-> In arm_tr_init_disas_context() we have a FIXME comment that suggests
-> "cpu_M0 can probably be the same as cpu_V0".  This isn't in fact
-> possible: cpu_V0 is used as a temporary inside gen_iwmmxt_shift(),
-> and that function is called in various places where cpu_M0 contains a
-> live value (i.e.  between gen_op_iwmmxt_movq_M0_wRn() and
-> gen_op_iwmmxt_movq_wRn_M0() calls).  Remove the comment.
-> 
-> We also have a comment on the declarations of cpu_V0/V1/M0 which
-> claims they're "for efficiency".  This isn't true with modern TCG, so
-> replace this comment with one which notes that they're only used with
-> the iwmmxt decode.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
+VGhpcyBwYXRjaCBzZXJpZXMgZWxpbWluYXRlcyBjdHgtPm5vdGlmaWVyIEV2ZW50Tm90aWZpZXIg
+YWN0aXZpdHkgd2hlbg0KYWlvX3BvbGwoKSBpcyBpbiBwb2xsaW5nIG1vZGUuIFRoZXJlIGlzIG5v
+IG5lZWQgdG8gdXNlIHRoZSBFdmVudE5vdGlmaWVyIHNpbmNlDQphIHBvbGxpbmcgaGFuZGxlciBj
+YW4gZGV0ZWN0IHRoYXQgYWlvX25vdGlmeSgpIGhhcyBiZWVuIGNhbGxlZCBieSBtb25pdG9yaW5n
+IGENCmZpZWxkIGluIG1lbW9yeSBpbnN0ZWFkLg0KDQpPcHRpbWl6aW5nIG91dCB0aGUgRXZlbnRO
+b3RpZmllciBjYWxscyBpbXByb3ZlcyBudWxsLWNvIHJhbmRvbSByZWFkIDRLQg0KaW9kZXB0aD0x
+IElPUFMgYnkgMTglLg0KDQphaW9fY29tcHV0ZV90aW1lb3V0KCkgaXMgbm93IGNhbGxlZCB0d2lj
+ZSBpZiBhaW9fcG9sbCgpIG5lZWRzIHRvIGJsb2NrLCB3aGljaA0KbWVhbnMgYW4gZXh0cmEgcWVt
+dV9jbG9ja19nZXRfbnMoKSBjYWxsIGlzIG1hZGUgd2hlbiB0aGVyZSBpcyBhbiBhY3RpdmUgdGlt
+ZXIuDQpBbiBhbHRlcm5hdGl2ZSB3b3VsZCBiZSB0byBzZXQgdGltZW91dCA9IDAgaWYgY3R4LT5u
+b3RpZmllZCBpcyB0cnVlIGJlZm9yZQ0KYmxvY2tpbmcsIGJ1dCBnb2luZyBhcm91bmQgdGhlIGV2
+ZW50IGxvb3AgYWdhaW4gY291bGQgc2xvdyB0aGluZ3MgZG93biBtb3JlLg0KDQpJIGhhdmUgbm90
+IG1vZGlmaWVkIGRvY3Mvc3Bpbi9haW9fbm90aWZ5Ki5wcm9tZWxhIGJlY2F1c2UgSSdtIG5vdCBm
+YW1pbGlhciB3aXRoDQp0aGUgU1BJTiBtb2RlbCBjaGVja2VyLg0KDQpTdGVmYW4gSGFqbm9jemkg
+KDMpOg0KICBhc3luYzogcmVuYW1lIGV2ZW50X25vdGlmaWVyX2R1bW15X2NiL3BvbGwoKQ0KICBh
+c3luYzogYWx3YXlzIHNldCBjdHgtPm5vdGlmaWVkIGluIGFpb19ub3RpZnkoKQ0KICBhaW8tcG9z
+aXg6IGtlZXAgYWlvX25vdGlmeV9tZSBkaXNhYmxlZCBkdXJpbmcgcG9sbGluZw0KDQogdXRpbC9h
+aW8tcG9zaXguYyB8IDU2ICsrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLQ0KIHV0aWwvYXN5bmMuYyAgICAgfCAyMiArKysrKysrKystLS0tLS0tLS0tDQogMiBm
+aWxlcyBjaGFuZ2VkLCAzOCBpbnNlcnRpb25zKCspLCA0MCBkZWxldGlvbnMoLSkNCg0KLS0gDQoy
+LjI2LjINCg0K
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
 
