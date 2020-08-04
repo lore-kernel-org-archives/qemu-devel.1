@@ -2,103 +2,86 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_24_48,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B4BEC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 11:15:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C831EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 11:17:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C8612075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 11:15:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C8612075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 982F22075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 11:17:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UqcX0Xm2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 982F22075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2uup-0005nJ-E0
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 07:15:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49438)
+	id 1k2uxA-0006wt-Rr
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 07:17:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50730)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imbrenda@linux.ibm.com>)
- id 1k2uqB-0002hD-68; Tue, 04 Aug 2020 07:10:43 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36236)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imbrenda@linux.ibm.com>)
- id 1k2uq9-0006Ke-80; Tue, 04 Aug 2020 07:10:42 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 074B2tJo122348; Tue, 4 Aug 2020 07:10:39 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32q4hfbmau-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 04 Aug 2020 07:10:39 -0400
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 074B3dNH124842;
- Tue, 4 Aug 2020 07:10:38 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.102])
- by mx0a-001b2d01.pphosted.com with ESMTP id 32q4hfbma5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 04 Aug 2020 07:10:38 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
- by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 074B6sB4031408;
- Tue, 4 Aug 2020 11:10:36 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com
- (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
- by ppma06ams.nl.ibm.com with ESMTP id 32mynh38b8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 04 Aug 2020 11:10:36 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 074BAXN125493954
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 4 Aug 2020 11:10:33 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 49A4552050;
- Tue,  4 Aug 2020 11:10:33 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.12.119])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C009B52051;
- Tue,  4 Aug 2020 11:10:32 +0000 (GMT)
-Date: Mon, 3 Aug 2020 10:46:39 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH for-5.2 3/6] pc-bios/s390-ccw: Move the inner logic of
- find_subch() to a separate function
-Message-ID: <20200803104639.5946bdd2@ibm-vm>
-In-Reply-To: <20200728183734.7838-4-thuth@redhat.com>
-References: <20200728183734.7838-1-thuth@redhat.com>
- <20200728183734.7838-4-thuth@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2uwB-0006RN-3c
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 07:16:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57142
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2uw9-00070b-Jy
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 07:16:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596539813;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=zP42MCcdIcaSE/v5Og5eYa3JbzdNvJSDwnDBo5s7abU=;
+ b=UqcX0Xm2EGpDD5UTsB6v13JTJ2/r9flc6nx63LEybl/JMtLNwouWZQIQq3dbUAENt+OgcH
+ ocRLDNCogtL1gmoyjBY3aAZkgIp+5QdGr4RkaD1iuu5oakC+hRSn8H3SuivG0ALePuiMHE
+ eObqCtk+LG6lEbWeCzQtHbU0hUJIIRw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-JGDjk3jjMxSOpnZcRCepRA-1; Tue, 04 Aug 2020 07:16:49 -0400
+X-MC-Unique: JGDjk3jjMxSOpnZcRCepRA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06C648017FB;
+ Tue,  4 Aug 2020 11:16:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC7BA61983;
+ Tue,  4 Aug 2020 11:16:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 600DA1141D60; Tue,  4 Aug 2020 13:16:46 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v6 00/12] monitor: Optionally run handlers in coroutines
+References: <20200528153742.274164-1-kwolf@redhat.com>
+Date: Tue, 04 Aug 2020 13:16:46 +0200
+In-Reply-To: <20200528153742.274164-1-kwolf@redhat.com> (Kevin Wolf's message
+ of "Thu, 28 May 2020 17:37:30 +0200")
+Message-ID: <87d046d5k1.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-08-04_03:2020-08-03,
- 2020-08-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- lowpriorityscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 spamscore=0
- suspectscore=0 bulkscore=0 clxscore=1015 mlxscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008040083
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=imbrenda@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 07:10:39
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_24_48=1.34,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,162 +94,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J .
- Herne" <jjherne@linux.ibm.com>, Collin Walling <walling@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x@nongnu.org
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 Jul 2020 20:37:31 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+I let this series slide to get my Error API rework done, along with much
+else.  My sincere apologies!
 
-> Move the code to a separate function to be able to re-use it from a
-> different spot later.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  pc-bios/s390-ccw/main.c | 99
-> ++++++++++++++++++++++++----------------- 1 file changed, 57
-> insertions(+), 42 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-> index 9b64eb0c24..9477313188 100644
-> --- a/pc-bios/s390-ccw/main.c
-> +++ b/pc-bios/s390-ccw/main.c
-> @@ -51,6 +51,60 @@ unsigned int get_loadparm_index(void)
->      return atoui(loadparm_str);
->  }
->  
-> +static int check_sch_no(int dev_no, int sch_no)
-> +{
-> +    bool is_virtio;
-> +    Schib schib;
-> +    int r;
-> +
-> +    blk_schid.sch_no = sch_no;
-> +    r = stsch_err(blk_schid, &schib);
-> +    if (r == 3 || r == -EIO) {
-> +        return -EIO;
-> +    }
-> +    if (!schib.pmcw.dnv) {
-> +        return false;
-> +    }
-> +
-> +    enable_subchannel(blk_schid);
-> +    cutype = cu_type(blk_schid);
-> +
-> +    /*
-> +     * Note: we always have to run virtio_is_supported() here to make
-> +     * sure that the vdev.senseid data gets pre-initialized correctly
-> +     */
-> +    is_virtio = virtio_is_supported(blk_schid);
-> +
-> +    /* No specific devno given, just return 1st possibly bootable
-> device */
-> +    if (dev_no < 0) {
-> +        switch (cutype) {
-> +        case CU_TYPE_VIRTIO:
-> +            if (is_virtio) {
-> +                /*
-> +                 * Skip net devices since no IPLB is created and
-> therefore
-> +                 * no network bootloader has been loaded
-> +                 */
-> +                if (virtio_get_device_type() != VIRTIO_ID_NET) {
-> +                    return true;
-> +                }
-
-here it seems you are returning true for any non-network virtio device,
-is this the intended behaviour? (I know it was like this in the old
-code)
-
-like, non-block devices?
-
-> +            }
-> +            return false;
-> +        case CU_TYPE_DASD_3990:
-> +        case CU_TYPE_DASD_2107:
-> +            return true;
-> +        default:
-> +            return false;
-> +        }
-> +    }
-> +
-> +    /* Caller asked for a specific devno */
-> +    if (schib.pmcw.dev == dev_no) {
-> +        return true;
-> +    }
-> +
-> +    return false;
-> +}
-> +
->  /*
->   * Find the subchannel connected to the given device (dev_no) and
-> fill in the
->   * subchannel information block (schib) with the connected
-> subchannel's info. @@ -62,53 +116,14 @@ unsigned int
-> get_loadparm_index(void) */
->  static bool find_subch(int dev_no)
->  {
-> -    Schib schib;
->      int i, r;
-> -    bool is_virtio;
->  
->      for (i = 0; i < 0x10000; i++) {
-> -        blk_schid.sch_no = i;
-> -        r = stsch_err(blk_schid, &schib);
-> -        if ((r == 3) || (r == -EIO)) {
-> +        r = check_sch_no(dev_no, i);
-> +        if (r < 0) {
->              break;
->          }
-> -        if (!schib.pmcw.dnv) {
-> -            continue;
-> -        }
-> -
-> -        enable_subchannel(blk_schid);
-> -        cutype = cu_type(blk_schid);
-> -
-> -        /*
-> -         * Note: we always have to run virtio_is_supported() here to
-> make
-> -         * sure that the vdev.senseid data gets pre-initialized
-> correctly
-> -         */
-> -        is_virtio = virtio_is_supported(blk_schid);
-> -
-> -        /* No specific devno given, just return 1st possibly
-> bootable device */
-> -        if (dev_no < 0) {
-> -            switch (cutype) {
-> -            case CU_TYPE_VIRTIO:
-> -                if (is_virtio) {
-> -                    /*
-> -                     * Skip net devices since no IPLB is created and
-> therefore
-> -                     * no network bootloader has been loaded
-> -                     */
-> -                    if (virtio_get_device_type() != VIRTIO_ID_NET) {
-> -                        return true;
-> -                    }
-> -                }
-> -                continue;
-> -            case CU_TYPE_DASD_3990:
-> -            case CU_TYPE_DASD_2107:
-> -                return true;
-> -            default:
-> -                continue;
-> -            }
-> -        }
-> -
-> -        /* Caller asked for a specific devno */
-> -        if (schib.pmcw.dev == dev_no) {
-> +        if (r == true) {
->              return true;
->          }
->      }
+Unsurprisingly, it needs a rebase now.  I suggest to let me review it as
+is first.
 
 
