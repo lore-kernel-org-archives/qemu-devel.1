@@ -2,69 +2,66 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC18C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 883A4C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:11:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D95AD2086A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:06:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D95AD2086A
+	by mail.kernel.org (Postfix) with ESMTPS id 26BD22086A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:11:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26BD22086A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k32Gj-0006Yj-1x
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 15:06:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36242)
+	id 1k32LT-0008E7-36
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 15:11:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k32GA-00068W-So
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:06:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41496)
+ id 1k32Km-0007n7-PD
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:10:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41644)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k32G8-0004Jg-P1
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:06:02 -0400
+ id 1k32Kk-0004rg-Gj
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:10:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k32G5-0001Uq-MN
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 19:05:57 +0000
+ id 1k32Ki-0002F3-Oh
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 19:10:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9E0622E8109
- for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 19:05:57 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B0B3B2E80DC
+ for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 19:10:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 04 Aug 2020 19:00:27 -0000
-From: Julien Freche <1879587@bugs.launchpad.net>
+Date: Tue, 04 Aug 2020 19:03:44 -0000
+From: Alexander Bulekov <1890333@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jfreche pmaydell
-X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
-X-Launchpad-Bug-Modifier: Julien Freche (jfreche)
-References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
-Message-Id: <159656762727.3307.10681427266283405211.malone@gac.canonical.com>
-Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
- banked registers when switching from AA32 to AA64
+X-Launchpad-Bug-Commenters: a1xndr
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+Message-Id: <159656782458.2385.15174533675764579105.malonedeb@gac.canonical.com>
+Subject: [Bug 1890333] [NEW] Assertion failure in address_space_stw_le_cached
+ through virtio-* devices
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 479a02cd1917b8bfa5d7efe15e5c68ab8c19aef8
+X-Launchpad-Hash: 5101f36395f79baa9fed85288c5a63f6db8dcfc0
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 15:05:58
@@ -86,107 +83,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1879587 <1879587@bugs.launchpad.net>
+Reply-To: Bug 1890333 <1890333@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Unfortunately, I won't be able to send the code or binary for the
-hypervisor as of now (it will become available at some point in the
-future though). I've done a bit of debugging on the QEMU code and it
-seems like the approach you are taking works fine in general but the
-register mapping code doesn't seem quite right. Applying this patch (on
-top of yours):
+Public bug reported:
 
->From e2182581dcdeedc2cb88cd21b88b4db744677737 Mon Sep 17 00:00:00 2001
-From: Julien Freche <julien@bedrocksystems.com>
-Date: Tue, 4 Aug 2020 11:54:49 -0700
-Subject: [PATCH] Possible fix
+Hello,
+Reproducer:
+cat << EOF | ./i386-softmmu/qemu-system-i386 \
+-drive id=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone \
+-device virtio-blk,drive=3Dmydrive \
+-nodefaults -qtest stdio -nographic
+outl 0xcf8 0x80001001
+outl 0xcfc 0x6574c1ff
+outl 0xcf8 0x8000100e
+outl 0xcfc 0xefe5e1e
+outl 0xe86 0x3aff9090
+outl 0xe84 0x3aff9090
+outl 0xe8e 0xe
+EOF
 
----
- target/arm/helper.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+qemu-system-i386: /home/alxndr/Development/qemu/general-fuzz/include/exec/m=
+emory_ldst_cached.inc.h:88: void address_space_stw_le_cached(MemoryRegionCa=
+che *, hwaddr, uint32_t, MemTxAttrs, MemTxResult *): Assertion `addr < cach=
+e->len && 2 <=3D cache->len - addr' failed.
+Aborted
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 60b80228fd..455c92b891 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -9619,17 +9619,16 @@ static int aarch64_regnum(CPUARMState *env, int aar=
-ch32_reg)
-         switch (mode) {
-         case ARM_CPU_MODE_USR:
-         case ARM_CPU_MODE_SYS:
--            return 14;
-         case ARM_CPU_MODE_HYP:
--            return 16;
-+            return 14;
-         case ARM_CPU_MODE_IRQ:
--            return 18;
-+            return 16;
-         case ARM_CPU_MODE_SVC:
--            return 20;
-+            return 18;
-         case ARM_CPU_MODE_ABT:
--            return 22;
-+            return 20;
-         case ARM_CPU_MODE_UND:
--            return 24;
-+            return 22;
-         case ARM_CPU_MODE_FIQ:
-             return 30;
-         default:
--- =
+I can trigger similar assertions with other VIRTIO devices, as-well.
+I reported this at some point in Message-ID: <20200511033001.dzvtbdhl3oz5pg=
+iy@mozz.bu.edu> but never created a Launchpad issue...
+-Alex
 
-2.28.0
-
-Based on the ARM documentation, I would think that LR_svc maps to X18,
-not X20. I fixed the ones that seemed wrong but I haven't check every
-possible case so you may want to double check this. With the patch I was
-able to boot Linux correctly.
-
-Let me know if that makes sense
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1879587
+https://bugs.launchpad.net/bugs/1890333
 
 Title:
-  Register number in ESR is incorrect for certain banked registers when
-  switching from AA32 to AA64
+  Assertion failure in address_space_stw_le_cached through virtio-*
+  devices
 
 Status in QEMU:
-  In Progress
+  New
 
 Bug description:
-  I am running into a situation where I have:
-  - A hypervisor running in EL2, AA64
-  - A guest running in EL1, AA32
+  Hello,
+  Reproducer:
+  cat << EOF | ./i386-softmmu/qemu-system-i386 \
+  -drive id=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone \
+  -device virtio-blk,drive=3Dmydrive \
+  -nodefaults -qtest stdio -nographic
+  outl 0xcf8 0x80001001
+  outl 0xcfc 0x6574c1ff
+  outl 0xcf8 0x8000100e
+  outl 0xcfc 0xefe5e1e
+  outl 0xe86 0x3aff9090
+  outl 0xe84 0x3aff9090
+  outl 0xe8e 0xe
+  EOF
 
-  We trap certain accesses to special registers such as DACR (via
-  HCR.TVM). One instruction that is trapped is:
+  qemu-system-i386: /home/alxndr/Development/qemu/general-fuzz/include/exec=
+/memory_ldst_cached.inc.h:88: void address_space_stw_le_cached(MemoryRegion=
+Cache *, hwaddr, uint32_t, MemTxAttrs, MemTxResult *): Assertion `addr < ca=
+che->len && 2 <=3D cache->len - addr' failed.
+  Aborted
 
-  ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
-
-  The guest is running in SVC mode. So, LR should refer to LR_svc there.
-  LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
-  the actual ESR value is: 0xfe00dc0
-
-  If we decode the 'rt':
-  >>> (0xfe00dc0 >> 5) & 0x1f
-  14
-
-  My understanding is that 14 is incorrect in the context of AA64. rt
-  should be set to 18. The current mode being SVC, LR refers to LR_svc
-  not LR_usr. In other words, the mapping between registers in AA64 and
-  AA32 doesn't seem to be accounted for. I've tested this with Qemu
-  5.0.0
-
-  Let me know if that makes sense and if you would like more info. I am als=
-o happy to test patches.
-  Thanks for all the great work on Qemu!
+  I can trigger similar assertions with other VIRTIO devices, as-well.
+  I reported this at some point in Message-ID: <20200511033001.dzvtbdhl3oz5=
+pgiy@mozz.bu.edu> but never created a Launchpad issue...
+  -Alex
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1879587/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1890333/+subscriptions
 
