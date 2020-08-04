@@ -2,88 +2,86 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C9BC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 06:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 849C2C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 06:43:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38C9320722
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 06:29:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 783A820781
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 06:43:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FUJ4b8V1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C9320722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZIg16IIW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 783A820781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2qRh-0003oG-By
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 02:29:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55596)
+	id 1k2qf7-0006PY-FZ
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 02:43:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k2qQz-0003PD-D0
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 02:28:25 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23716
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k2qdX-0005BH-4h
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 02:41:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49841
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k2qQu-0002Yr-S3
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 02:28:24 -0400
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k2qdV-0004Fh-05
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 02:41:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596522498;
+ s=mimecast20190719; t=1596523278;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=/s8PyCi+K1tGx3LOai37LsR9gIsBU+W+n8na/acBVs0=;
- b=FUJ4b8V1/omxmJ6cR7zfr53dcKNXJLmfNjzc9vEoVkZ6OyWQ663Cl2xHbKjE1i3rl870E0
- 6UtPmhMkZdpMRWYoecvQlhKpoONh1sxMAPOM2DE5fuyBPj91yaP/cGEVT2jHpCGJgj/x9d
- 5Etes5dHZfl/JyjTfURv7MvptvGoyrE=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=6I2cVDZBdUEMRxKWTxLd/WV/UDtYOb9i5EsSiSXkkjU=;
+ b=ZIg16IIW1Fu4cf/Bn1q393uLyisqsfxp6JbwOolmBucNdQsFApXpIsTTm9dkotvXfjrVWu
+ uOr5HgD2slxHU5TFhPJRcwkjzlLccSmJbTGiXIlefGaUQclNiLHRnlknoE1Mc05lgotG8H
+ C87s43t+q0RCIo6ohmbN0UHtwOZJyIQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-eMWkvfdWMs2h9XycbXzT0w-1; Tue, 04 Aug 2020 02:26:58 -0400
-X-MC-Unique: eMWkvfdWMs2h9XycbXzT0w-1
+ us-mta-102-EfDCMU85OeqWketQ8rHYeQ-1; Tue, 04 Aug 2020 02:41:15 -0400
+X-MC-Unique: EfDCMU85OeqWketQ8rHYeQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06937100AA21;
- Tue,  4 Aug 2020 06:26:57 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-115-89.ams2.redhat.com
- [10.36.115.89])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 708AA60BF3;
- Tue,  4 Aug 2020 06:26:48 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 8AFB01750A; Tue,  4 Aug 2020 08:26:47 +0200 (CEST)
-Date: Tue, 4 Aug 2020 08:26:47 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: [PATCH 4/7] spice: Make spice a module configuration
-Message-ID: <20200804062647.qhhuuv7ffhbzkbng@sirius.home.kraxel.org>
-References: <20200723174615.2370096-1-dinechin@redhat.com>
- <20200723174615.2370096-5-dinechin@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E20C31005510;
+ Tue,  4 Aug 2020 06:41:14 +0000 (UTC)
+Received: from jason-ThinkPad-T430s.redhat.com (ovpn-13-166.pek2.redhat.com
+ [10.72.13.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 636E360BF4;
+ Tue,  4 Aug 2020 06:41:13 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: peter.maydell@linaro.org
+Subject: [PULL 0/2] Net patches
+Date: Tue,  4 Aug 2020 14:41:08 +0800
+Message-Id: <1596523270-5492-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200723174615.2370096-5-dinechin@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:16
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:23
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,30 +94,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 23, 2020 at 07:46:12PM +0200, Christophe de Dinechin wrote:
-> This commit changes the spice configuration 'm' by default, and moves
-> the spice components to obj-m variables. It is sufficient to build
-> without modules enable, but does not link correctly yet, since no
-> shims have been created for the missing functions yet.
+The following changes since commit 5c1c3e4f02e458cf280c677c817ae4fd1ed9bf10:
 
-So it breaks the modular build?  Don't do that, it is bad for bisecting.
-I guess this patch should simply come later in the patch series.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200803' into staging (2020-08-03 20:34:26 +0100)
 
-I can see that it is useful to have it here for development, so you
-easily find all the places which need a fixup, but for merging the
-patches should be reordered.
+are available in the git repository at:
 
-take care,
-  Gerd
+  https://github.com/jasowang/qemu.git tags/net-pull-request
+
+for you to fetch changes up to 035e69b063835a5fd23cacabd63690a3d84532a8:
+
+  hw/net/net_tx_pkt: fix assertion failure in net_tx_pkt_add_raw_fragment() (2020-08-04 14:14:48 +0800)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+Lukas Straub (1):
+      colo-compare: Remove superfluous NULL-pointer checks for s->iothread
+
+Mauro Matteo Cascella (1):
+      hw/net/net_tx_pkt: fix assertion failure in net_tx_pkt_add_raw_fragment()
+
+ hw/net/net_tx_pkt.c | 5 ++++-
+ net/colo-compare.c  | 8 ++------
+ 2 files changed, 6 insertions(+), 7 deletions(-)
 
 
