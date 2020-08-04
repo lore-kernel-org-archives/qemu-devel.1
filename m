@@ -2,94 +2,94 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D7FC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D606C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:11:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91B352076C
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:06:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F1522076C
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:11:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T2VY2H4Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91B352076C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gBYNCJ8T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F1522076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2rxR-0001Jh-Mg
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:06:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48430)
+	id 1k2s2Z-0002zj-93
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:11:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2rwh-0000n5-M6
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:05:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40310
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k2s22-0002Ze-1N
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:10:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37066
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2rwf-0005Ta-Up
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:05:15 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k2s20-0006So-7p
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:10:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596528313;
+ s=mimecast20190719; t=1596528642;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=GCDPa9M0bHNz1496Ad/ZUL2B4XlLEWxa4zwU0BFN03A=;
- b=T2VY2H4Qb8OF/Isrpd7ZHchDMNnDFxrtqHAlBPqYgboKpnSDmZJ1NQBuKec7x6wp5aD4sP
- PmpfWTITYo0FGod/yKJCSuU1NhFZXS8Zw+IRE54SdMKn5XjTTmuncWmMILJbnU1z24acas
- x6RMfJsMOlGUsj2NJsApWBRp8MMembc=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=dZjcRrlxjk/pqOxTXP6hI8EPt8L2x4b4CywjYkj9U5s=;
+ b=gBYNCJ8Tl50fhY4D48OSdD1mxm8P+bEYYZiQs5HRfgSoOZHXtkHdB7ORHpT/nYA/2kel5P
+ UQWsxxEtPLVlIVogoXbqbBrwuZRONaVz8Lk2CbYyFF5+H2PIH04vHgrIvjJsckPPiF50+q
+ 6ar1Pe70hILWE8ngFtFFKWk484B5AAk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-G8oyVfUKNZG9wgN2uEK51A-1; Tue, 04 Aug 2020 04:04:07 -0400
-X-MC-Unique: G8oyVfUKNZG9wgN2uEK51A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-203-D8F5Dw_POfecqQ8Hg1WmBQ-1; Tue, 04 Aug 2020 04:10:39 -0400
+X-MC-Unique: D8F5Dw_POfecqQ8Hg1WmBQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9636679EC0;
- Tue,  4 Aug 2020 08:04:06 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BD78288F3F;
- Tue,  4 Aug 2020 08:03:56 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 19B041132FD2; Tue,  4 Aug 2020 10:03:55 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: cleanups with long-term benefits (was Re: [PATCH] schemas: Add
- vim modeline)
-References: <20200729185024.121766-1-abologna@redhat.com>
- <87ime52wxd.fsf@dusky.pond.sub.org>
- <20200730093732.GB3477223@redhat.com>
- <87k0ylz0ep.fsf@dusky.pond.sub.org>
- <20200730132446.GL3477223@redhat.com>
- <875za33ku1.fsf@dusky.pond.sub.org>
- <20200731150738.GB3660103@redhat.com>
- <2cf1a431-9d2c-8ad6-446e-f10b36219764@redhat.com>
- <87d048i1m2.fsf@dusky.pond.sub.org>
- <83bbe0b0-c5e0-e3b7-5ba1-5946098370d5@redhat.com>
- <87ft94klyl.fsf@dusky.pond.sub.org>
- <490a0786-73f3-411e-4dfe-8c2ae90de251@redhat.com>
- <87y2mvhg3k.fsf@dusky.pond.sub.org>
- <facfef76-d880-82dd-f862-a64f8f487ba2@redhat.com>
-Date: Tue, 04 Aug 2020 10:03:55 +0200
-In-Reply-To: <facfef76-d880-82dd-f862-a64f8f487ba2@redhat.com> (Paolo
- Bonzini's message of "Mon, 3 Aug 2020 19:19:37 +0200")
-Message-ID: <87k0yeg7mc.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9141F8015F3;
+ Tue,  4 Aug 2020 08:10:37 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-162.ams2.redhat.com [10.36.112.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7117F10013C4;
+ Tue,  4 Aug 2020 08:10:33 +0000 (UTC)
+Subject: Re: [PATCH v2 0/3] testing: Build WHPX enabled binaries
+To: Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190920113329.16787-1-philmd@redhat.com>
+ <01f2f0ee-a288-921a-58f4-78aeb4d457e1@redhat.com>
+ <BYAPR21MB1208F0D09B3E5CA80F1B7C3BB6880@BYAPR21MB1208.namprd21.prod.outlook.com>
+ <2acf854f-c49a-0811-31af-80e1e958f058@redhat.com>
+ <324f5002-be0a-563e-b5a6-e08ee5e1ddad@redhat.com>
+ <SN4PR2101MB0880AF5A5D752F06DB94A15FC04E0@SN4PR2101MB0880.namprd21.prod.outlook.com>
+ <b8afd626-b6ae-d6fa-c8b7-5e5778574c07@redhat.com>
+ <82fa39b2-676c-e8c5-72c6-53123983dcda@weilnetz.de>
+ <55002560-9741-1e71-85f9-e75d9f0f3bfc@weilnetz.de>
+ <fde8dd22-679a-be5e-b36e-d8aeb7e955cc@redhat.com>
+ <58f5c48c-cf85-ae2a-ce28-510520c2ae75@weilnetz.de>
+ <1eae7ba1-47a2-29f3-9425-aa9d8f617106@redhat.com>
+ <7cdc7066-0477-5f8b-9d22-12de97098cfc@weilnetz.de>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5261de23-cbf9-fa90-bcd3-ad8fe213297d@redhat.com>
+Date: Tue, 4 Aug 2020 10:10:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+In-Reply-To: <7cdc7066-0477-5f8b-9d22-12de97098cfc@weilnetz.de>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:23
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:01:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,7 +97,8 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,96 +111,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org, "Michael S.
- Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "1879672@bugs.launchpad.net" <1879672@bugs.launchpad.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 03/08/20 18:03, Markus Armbruster wrote:
->>> In general it seems like a good idea to use a standard file format and
->>> not "a standard file format except for two characters". :)  We also
->>> wouldn't be having discussions on editors.
->> 
->> No argument.  But towards which standard file format should the schema
->> evolve?
->> 
->> * Standard JSON: no comments, no go
->> 
->> * JSON with # comments: need to change strings from ' to "
->> 
->> * JavaScript: need to change comments from # to //
->> 
->> * Python: may want to switch bool literals from true, false to True,
->>   False
->
-> Second or third, I'd say.  I dislike using .py because a stream of
-> Python objects doesn't really have a meaning in Python:
-
-It does have a meaning: compute a bunch of dictionaries and throw them
-away.  Its useless as a program, but it's not meaningless.
-
->                                                         that's the
-> difference between .js and .json.
-
-True.  RFC 4626: "JSON is a subset of JavaScript, but it is a safe
-subset that excludes assignment and invocation."[*]
-
-An analogous subset of Python is possible, but has not been formally
-defined as far as I know.
-
-> Third requires someone to do the work in the parser.  Unlikely.
-
-The pain of tweaking the parser is likely dwarved several times over by
-the pain of the flag day.
-
->>> That said, after a bit more research I'm skeptical about the possibility
->>> of using an off-the-shelf parser because most of them either don't
->>> support comments, or are based on YAJL which simply discards comments.
+On 04/08/2020 09.42, Stefan Weil wrote:
+> Am 04.08.20 um 09:23 schrieb Philippe Mathieu-Daudé:
+> 
+>> On 8/4/20 8:55 AM, Stefan Weil wrote:
+>>> Am 04.08.20 um 08:43 schrieb Thomas Huth:
 >>>
->>> Since '//' comments are harder to parse than "#" comments, this would
->>> actually _add_ code instead of removing it.  Also since our doc comment
->>> syntax uses "##" as a delimiter, we'd have to bikeshed what the doc
->>> comments would look like ("//!", "///", etc.).
->> 
->> Doc comments don't have to be comments in the schema language.  They
->> could be doc strings.  Requires decent support for long strings, which
->> JSON does not provide.
->
-> Exactly.  This was the appeal of YAML (or StrictYAML so that Norwegians
-> don't turn into Falsians) as far as I understood.  But if we were to go
-> YAML, I'd rather have make doc strings part of the YAML document too.
-> That is what Nir suggested, it makes sense but someone has to write the
-> conversion code.
+>>>> On 03/08/2020 22.25, Stefan Weil wrote:
+>>>>> We can add a CI pipeline on Microsoft infrastructure by using a GitHub
+>>>>> action.
+>>>> Sorry for being ignorant, but how does that solve the legal questions
+>>>> just because it is running on GitHub instead of a different CI?
+>>>>
+>>>>  Thomas
+>>>>
+>>> Sorry, I though that would be clear by looking at the included shell script.
+>>>
+>>> The build does not use the Microsoft SDK. It gets the required header
+>>> files from Mingw-w64. They added them in git master.
 
-To write a converter, you first have to understand the doc comment
-language.  It's a bit of a mess, because it was fitted to existing
-conventions to reduce churn.
+Great, thanks for the clarification!
 
-Peter Maydell has patches to generate rST instead of Texinfo.  They
-affect the doc comment language.  I expect to merge them for 5.2.
+>> Oh, so we can do that with GitLab too now, we don't need to rely on the
+>> GitHub 'Actions' CI in particular, right?
+> 
+> That's right. The build script was written for Ubuntu, so depending on
+> the distribution used for GitLab CI it will need some modifications. If
+> GitLab already has a recent Mingw-w64, it might be sufficient to fix the
+> case of the header file names. Mingw-w64 uses winhvplatform.h while QEMU
+> expects WinHvPlatform.h and so on. I used symbolic links to add the
+> camel case filenames.
 
->> If all we want is decent editor support out of the box, then rename to
->> .py, and drop the modelines.  No merge conflicts, no git-blame
->> pollution.
->
-> Another possibility is to rename to .qapi and keep Python modelines as a
-> hack that does work.
+I'm currently working on a patch series for our gitlab-CI that uses our
+containers to all possible kinds of cross-compiler builds (basically the
+ones that we are doing on shippable.com so far), including the 32-bit
+and 64-bit MinGW cross-compilation jobs. I can have a look whether I can
+integrate these headers there!
 
-Yes.
-
-
-[*] Unfortunately, this has become a statement of intent, not a
-description of reality, due to JSON design accidents.
+ Thanks,
+  Thomas
 
 
