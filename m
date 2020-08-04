@@ -2,134 +2,82 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1873C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 18:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC18C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:06:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A0D020792
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 18:52:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpNolkJP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A0D020792
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D95AD2086A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:06:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D95AD2086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3239-000406-PQ
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 14:52:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60840)
+	id 1k32Gj-0006Yj-1x
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 15:06:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k322W-0003YQ-V3
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 14:51:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54550
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k322U-0002bk-24
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 14:51:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596567112;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=5UbbOUUjnkovL7OIIJ/4cZcOxiv8PE+rgVuS+M8UUSs=;
- b=hpNolkJPR/SzcHS9Y0gtEWgt3ODhfk9Y+BfsuWeQ6My1ZxhpmUSgnqyMHLtEGqdV1dFcb3
- mFM+pUlTWfyraUF6sAl3yUUhCQbQK/lkIXsiQ8ygSakFEoSIqRm0KVOyhGPAi7zqlrHSOu
- +wUEkng34gDhIMyK50pivzdipq4N4oo=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-fdTHfVWxOVWfHu20JWUNsg-1; Tue, 04 Aug 2020 14:51:50 -0400
-X-MC-Unique: fdTHfVWxOVWfHu20JWUNsg-1
-Received: by mail-ed1-f70.google.com with SMTP id cz26so2250751edb.7
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 11:51:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=5UbbOUUjnkovL7OIIJ/4cZcOxiv8PE+rgVuS+M8UUSs=;
- b=Lkxx4sVZYTp1MX8o0CXOoXgjoUVhyhf4XrqoGH6iHrB4aHHpCaF5lpXRpPIw5aUXAY
- Da9LEz31EU6y+pefuHLFzbtIxemzd0mSQYETNGONxI/bcJuP5DPMbLAOue2je6r9XRge
- AOcF5QCJ4Wkrxa9DZrIA1H1CTdN7k1jR3Rlu5PzELQK+JD3Z7B7cYBYKL0HW0t7hll27
- iSplf+9YCGlMrtf7elRj0ASjObma9zelZAvTv2zlxqh3t0UaayhiOVgbOzNetkCdnco5
- GXlhgUW8caD1bwwyHYri2r3EZKX1uNvR1tGaGm45P9EGDHYlgAVNPRBb4fd8qxAjwQVC
- mTJw==
-X-Gm-Message-State: AOAM531lbQZWy7OYqdzwNm2qeCZxtRlYWSfCMDS1umfR50LZ+akbBSGp
- P112RVQ9rrMlVELJGCQnGqF/YyXwhmOAMJ4/IMKgmyvwJMM/Ro7+hPsXAdDnTbSTTN+Y9MUqARt
- 0caD9nye+K8WNoeM=
-X-Received: by 2002:a17:906:7f0b:: with SMTP id
- d11mr24207326ejr.116.1596567109401; 
- Tue, 04 Aug 2020 11:51:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxd6aVjKq0vFurdTtBchZ7q4PzS3+Iit09f+5twQgSRX7qxF88VKh7Cn5fhASp9o+klGZuZ5g==
-X-Received: by 2002:a17:906:7f0b:: with SMTP id
- d11mr24207313ejr.116.1596567109193; 
- Tue, 04 Aug 2020 11:51:49 -0700 (PDT)
-Received: from [192.168.1.43] (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id js19sm19956227ejb.76.2020.08.04.11.51.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 04 Aug 2020 11:51:48 -0700 (PDT)
-Subject: Re: [PATCH-for-5.1] stubs: Fix notify-event stub linkage error on
- MinGW
-To: qemu-devel@nongnu.org
-References: <20200804182241.31805-1-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <18d16d36-87a1-2d1a-6caa-6b62911a8f46@redhat.com>
-Date: Tue, 4 Aug 2020 20:51:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k32GA-00068W-So
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:06:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41496)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k32G8-0004Jg-P1
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:06:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k32G5-0001Uq-MN
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 19:05:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 9E0622E8109
+ for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 19:05:57 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200804182241.31805-1-philmd@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 04 Aug 2020 19:00:27 -0000
+From: Julien Freche <1879587@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jfreche pmaydell
+X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
+X-Launchpad-Bug-Modifier: Julien Freche (jfreche)
+References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
+Message-Id: <159656762727.3307.10681427266283405211.malone@gac.canonical.com>
+Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
+ banked registers when switching from AA32 to AA64
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 479a02cd1917b8bfa5d7efe15e5c68ab8c19aef8
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 15:05:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -138,57 +86,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>
+Reply-To: Bug 1879587 <1879587@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/4/20 8:22 PM, Philippe Mathieu-Daudé wrote:
-> In commit e4d6d41ce2 we reduced the user-mode object list,
-> but forgot to also change the notify.o stub in the next commit
-> dc70f80fb2. This triggers a linker error while compiling the
-> tests under MinGW:
-> 
->   LINK    tests/test-timed-average.exe
->  libqemuutil.a(main-loop.o): In function `qemu_notify_event':
->  util/main-loop.c:139: multiple definition of `qemu_notify_event'
->  tests/test-timed-average.o:/builds/huth/qemu/tests/../stubs/notify-event.c:5: first defined here
->  collect2: error: ld returned 1 exit status
->  rules.mak:124: recipe for target 'tests/test-timed-average.exe' failed
-> 
-> Correct by placing the stub object between the system emulation /
-> tools guards.
-> 
-> Fixes: dc70f80fb2 ("stubs/Makefile: Reduce the user-mode object list")
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  stubs/Makefile.objs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index d42046afe4..4e8605a609 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -12,7 +12,6 @@ stub-obj-y += isa-bus.o
->  stub-obj-$(CONFIG_LINUX_AIO) += linux-aio.o
->  stub-obj-$(CONFIG_LINUX_IO_URING) += io_uring.o
->  stub-obj-y += monitor-core.o
-> -stub-obj-y += notify-event.o
->  stub-obj-y += pci-bus.o
->  stub-obj-y += qmp_memory_device.o
->  stub-obj-y += qtest.o
-> @@ -45,6 +44,7 @@ stub-obj-y += iothread.o
->  stub-obj-y += machine-init-done.o
->  stub-obj-y += migr-blocker.o
->  stub-obj-y += monitor.o
-> +stub-obj-y += notify-event.o
->  stub-obj-y += pci-host-piix.o
->  stub-obj-y += ram-block.o
->  stub-obj-y += replay-user.o
-> 
+Unfortunately, I won't be able to send the code or binary for the
+hypervisor as of now (it will become available at some point in the
+future though). I've done a bit of debugging on the QEMU code and it
+seems like the approach you are taking works fine in general but the
+register mapping code doesn't seem quite right. Applying this patch (on
+top of yours):
 
-self-NACK, this doesn't work as expected =)
+>From e2182581dcdeedc2cb88cd21b88b4db744677737 Mon Sep 17 00:00:00 2001
+From: Julien Freche <julien@bedrocksystems.com>
+Date: Tue, 4 Aug 2020 11:54:49 -0700
+Subject: [PATCH] Possible fix
 
+---
+ target/arm/helper.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 60b80228fd..455c92b891 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -9619,17 +9619,16 @@ static int aarch64_regnum(CPUARMState *env, int aar=
+ch32_reg)
+         switch (mode) {
+         case ARM_CPU_MODE_USR:
+         case ARM_CPU_MODE_SYS:
+-            return 14;
+         case ARM_CPU_MODE_HYP:
+-            return 16;
++            return 14;
+         case ARM_CPU_MODE_IRQ:
+-            return 18;
++            return 16;
+         case ARM_CPU_MODE_SVC:
+-            return 20;
++            return 18;
+         case ARM_CPU_MODE_ABT:
+-            return 22;
++            return 20;
+         case ARM_CPU_MODE_UND:
+-            return 24;
++            return 22;
+         case ARM_CPU_MODE_FIQ:
+             return 30;
+         default:
+-- =
+
+2.28.0
+
+Based on the ARM documentation, I would think that LR_svc maps to X18,
+not X20. I fixed the ones that seemed wrong but I haven't check every
+possible case so you may want to double check this. With the patch I was
+able to boot Linux correctly.
+
+Let me know if that makes sense
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1879587
+
+Title:
+  Register number in ESR is incorrect for certain banked registers when
+  switching from AA32 to AA64
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  I am running into a situation where I have:
+  - A hypervisor running in EL2, AA64
+  - A guest running in EL1, AA32
+
+  We trap certain accesses to special registers such as DACR (via
+  HCR.TVM). One instruction that is trapped is:
+
+  ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
+
+  The guest is running in SVC mode. So, LR should refer to LR_svc there.
+  LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
+  the actual ESR value is: 0xfe00dc0
+
+  If we decode the 'rt':
+  >>> (0xfe00dc0 >> 5) & 0x1f
+  14
+
+  My understanding is that 14 is incorrect in the context of AA64. rt
+  should be set to 18. The current mode being SVC, LR refers to LR_svc
+  not LR_usr. In other words, the mapping between registers in AA64 and
+  AA32 doesn't seem to be accounted for. I've tested this with Qemu
+  5.0.0
+
+  Let me know if that makes sense and if you would like more info. I am als=
+o happy to test patches.
+  Thanks for all the great work on Qemu!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1879587/+subscriptions
 
