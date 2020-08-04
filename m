@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5026C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 20:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3FE6C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 20:03:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B58AF20842
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 20:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B58AF20842
+	by mail.kernel.org (Postfix) with ESMTPS id D49CC20842
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 20:03:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D49CC20842
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k338X-0005rD-NV
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 16:02:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48764)
+	id 1k339s-0007IE-3t
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 16:03:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k337H-0004ye-5g
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 16:00:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52242)
+ id 1k337I-0004z7-Fq
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 16:00:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52280)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k337E-0002h5-Rf
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 16:00:54 -0400
+ id 1k337G-0002hB-0o
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 16:00:56 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k337D-0000Ix-OG
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 20:00:51 +0000
+ id 1k337E-0000K0-Je
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 20:00:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B243B2E80DC
- for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 20:00:51 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 90B032E80D2
+ for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 20:00:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 04 Aug 2020 19:54:38 -0000
-From: Helge Deller <1890311@bugs.launchpad.net>
+Date: Tue, 04 Aug 2020 19:54:42 -0000
+From: Helge Deller <1890310@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
@@ -53,17 +53,16 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: a1xndr
 X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
 X-Launchpad-Bug-Modifier: Helge Deller (hdeller)
-References: <159655836950.10566.1129235625267302731.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159657087977.16561.15710633680972571356.launchpad@wampee.canonical.com>
-Subject: [Bug 1890311] Re: Segfault in cpu_physical_memory_set_dirty_range on
- hppa + artist
+References: <159655836781.5403.11127209005915887374.malonedeb@soybean.canonical.com>
+Message-Id: <159657088339.10724.2358190836502121792.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1890310] Re: Segfault in artist.c:block_move
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f740956860da01dffa64487a2350f30ef51f8f42
+X-Launchpad-Hash: 1f6973527766bbe8d8219079d7f5ee50e7840bf3
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 15:05:58
@@ -85,7 +84,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890311 <1890311@bugs.launchpad.net>
+Reply-To: Bug 1890310 <1890310@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -97,10 +96,10 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890311
+https://bugs.launchpad.net/bugs/1890310
 
 Title:
-  Segfault in cpu_physical_memory_set_dirty_range on hppa + artist
+  Segfault in artist.c:block_move
 
 Status in QEMU:
   New
@@ -111,62 +110,59 @@ Bug description:
 
   cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
   -qtest stdio -accel qtest
-  writeq 0xf810049f 0x85000000000000
-  writew 0xf8118001 0x14
-  writeq 0xf81005fb 0x5c00006418001832
+  writeq 0xf8100802 0xff5c651ffffb7c5c
+  writeq 0xf8100afb 0x25e000000000000
   EOF
 
   AddressSanitizer:DEADLYSIGNAL
   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =3D=3D10793=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7f93d=
-bb40000 (pc 0x5577f5523078 bp 0x7ffd41ad6360 sp 0x7ffd41ad5fd0 T0)
-  =3D=3D10793=3D=3DThe signal is caused by a READ memory access.
-
-      #0 0x5577f5523078 in block_move /hw/display/artist.c:525:13
-      #1 0x5577f5515fbc in artist_reg_write /hw/display/artist.c:964:9
-      #2 0x5577f4c077a3 in memory_region_write_accessor /softmmu/memory.c:4=
+  =3D=3D12686=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7f001=
+a540000 (pc 0x55af3a373078 bp 0x7ffc23001a00 sp 0x7ffc23001670 T0)
+  =3D=3D12686=3D=3DThe signal is caused by a READ memory access.
+      #0 0x55af3a373078 in block_move /hw/display/artist.c:525:13
+      #1 0x55af3a365fbc in artist_reg_write /hw/display/artist.c:964:9
+      #2 0x55af39a577a3 in memory_region_write_accessor /softmmu/memory.c:4=
 83:5
-      #3 0x5577f4c06adc in access_with_adjusted_size /softmmu/memory.c:539:=
+      #3 0x55af39a56adc in access_with_adjusted_size /softmmu/memory.c:539:=
 18
-      #4 0x5577f4c04873 in memory_region_dispatch_write /softmmu/memory.c:1=
+      #4 0x55af39a54873 in memory_region_dispatch_write /softmmu/memory.c:1=
 466:16
-      #5 0x5577f42b2056 in flatview_write_continue /exec.c:3176:23
-      #6 0x5577f429a866 in flatview_write /exec.c:3216:14
-      #7 0x5577f429a387 in address_space_write /exec.c:3308:18
-      #8 0x5577f4cae604 in qtest_process_command /softmmu/qtest.c:452:13
-      #9 0x5577f4ca5c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
-      #10 0x5577f4ca4895 in qtest_read /softmmu/qtest.c:722:5
-      #11 0x5577f7160c43 in qemu_chr_be_write_impl /chardev/char.c:188:9
-      #12 0x5577f7160dc7 in qemu_chr_be_write /chardev/char.c:200:9
-      #13 0x5577f71750b3 in fd_chr_read /chardev/char-fd.c:68:9
-      #14 0x5577f72c9474 in qio_channel_fd_source_dispatch /io/channel-watc=
+      #5 0x55af39102056 in flatview_write_continue /exec.c:3176:23
+      #6 0x55af390ea866 in flatview_write /exec.c:3216:14
+      #7 0x55af390ea387 in address_space_write /exec.c:3308:18
+      #8 0x55af39afe604 in qtest_process_command /softmmu/qtest.c:452:13
+      #9 0x55af39af5c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
+      #10 0x55af39af4895 in qtest_read /softmmu/qtest.c:722:5
+      #11 0x55af3bfb0c43 in qemu_chr_be_write_impl /chardev/char.c:188:9
+      #12 0x55af3bfb0dc7 in qemu_chr_be_write /chardev/char.c:200:9
+      #13 0x55af3bfc50b3 in fd_chr_read /chardev/char-fd.c:68:9
+      #14 0x55af3c119474 in qio_channel_fd_source_dispatch /io/channel-watc=
 h.c:84:12
-      #15 0x7f93ea531897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+      #15 0x7f0028f60897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
 gnu/libglib-2.0.so.0+0x4e897)
-      #16 0x5577f76c137b in glib_pollfds_poll /util/main-loop.c:217:9
-      #17 0x5577f76beaab in os_host_main_loop_wait /util/main-loop.c:240:5
-      #18 0x5577f76be444 in main_loop_wait /util/main-loop.c:516:11
-      #19 0x5577f4cc6d00 in qemu_main_loop /softmmu/vl.c:1676:9
-      #20 0x5577f7301261 in main /softmmu/main.c:49:5
-      #21 0x7f93e90b7e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
+      #16 0x55af3c51137b in glib_pollfds_poll /util/main-loop.c:217:9
+      #17 0x55af3c50eaab in os_host_main_loop_wait /util/main-loop.c:240:5
+      #18 0x55af3c50e444 in main_loop_wait /util/main-loop.c:516:11
+      #19 0x55af39b16d00 in qemu_main_loop /softmmu/vl.c:1676:9
+      #20 0x55af3c151261 in main /softmmu/main.c:49:5
+      #21 0x7f0027ae6e0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
 0/csu/../csu/libc-start.c:308:16
-      #22 0x5577f41a5729 in _start (/home/alxndr/Development/qemu/general-f=
+      #22 0x55af38ff5729 in _start (/home/alxndr/Development/qemu/general-f=
 uzz/build/hppa-softmmu/qemu-system-hppa+0x22d4729)
 
   AddressSanitizer can not provide additional info.
   SUMMARY: AddressSanitizer: SEGV /hw/display/artist.c:525:13 in block_move
-  =3D=3D10793=3D=3DABORTING
+  =3D=3D12686=3D=3DABORTING
 
-  =
-
-  The error occurs even with Message-Id: <20200804140056.7690-1-deller@gmx.=
-de> applied (I collected the above trace with the patch-set applied)
+  The error occurs even with Message-Id:
+  <20200804140056.7690-1-deller@gmx.de> applied (I collected the above
+  trace with the patch-set applied)
 
   Thanks
   -Alex
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890311/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1890310/+subscriptions
 
