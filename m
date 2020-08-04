@@ -2,81 +2,94 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1CDFC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE93FC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:49:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECB422075D
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:49:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECB422075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id B27262075D
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:49:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rkYUO/0a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B27262075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2sdC-000758-1f
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:49:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33196)
+	id 1k2sdl-0008Qk-RB
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:49:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k2scS-0006Ap-BC
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:48:24 -0400
-Received: from mga17.intel.com ([192.55.52.151]:6113)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k2scM-0003Ps-Ok
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:48:23 -0400
-IronPort-SDR: Qk64R7wKVCBGScT0MyHS2wGEBr9db/HcrOAwqKfLiSNKzXSPYrtozQyj6TR7lmvmjMqaCdjRSe
- rsdTohxUu+iQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9702"; a="132334457"
-X-IronPort-AV: E=Sophos;i="5.75,433,1589266800"; d="scan'208";a="132334457"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
- by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Aug 2020 01:48:14 -0700
-IronPort-SDR: irc5RID6ULqLZNetmbd2upm83OlouI5asaiOG3qd3M8sRHo28+PjSLXy2Sis8HfsZ5nGDWBkND
- 2wytEYurr0ZA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.75,433,1589266800"; d="scan'208";a="330538296"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by FMSMGA003.fm.intel.com with ESMTP; 04 Aug 2020 01:48:09 -0700
-Date: Tue, 4 Aug 2020 16:37:08 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200804083708.GA30485@joy-OptiPlex-7040>
-References: <20200716083230.GA25316@joy-OptiPlex-7040>
- <20200717101258.65555978@x1.home>
- <20200721005113.GA10502@joy-OptiPlex-7040>
- <20200727072440.GA28676@joy-OptiPlex-7040>
- <20200727162321.7097070e@x1.home>
- <20200729080503.GB28676@joy-OptiPlex-7040>
- <e8a973ea0bb2bc3eb15649fb1c44599ae3509e84.camel@redhat.com>
- <20200729131255.68730f68@x1.home>
- <20200730034104.GB32327@joy-OptiPlex-7040>
- <20200730112930.6f4c5762@x1.home>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k2scq-0006kt-Ua
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:48:48 -0400
+Received: from mail-ej1-x630.google.com ([2a00:1450:4864:20::630]:36094)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k2scp-0003Sz-DB
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:48:48 -0400
+Received: by mail-ej1-x630.google.com with SMTP id kq25so28580249ejb.3
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 01:48:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=0PARhiXdVodHPM5A1bHNqTp2LZsrKFa7JpVk6IXSowc=;
+ b=rkYUO/0aYMVnIiVeT1MKxlCRB1VZKqtwhy94kxl+zQlf1JZ2pD9Py02Pwa/x2Y73l1
+ 6JlZ5Onm27haH1HQv6PkIbQj3rNaPbEgRA0GSUw46l+0CIJ+cdxABAmk+b5Kosb7Bxup
+ eqMQr8RmCgJTJsXLrmsEjx1cNLqd8V4lxslnoovMeHRlmNniRjd9nHTIMnC8FxsQGe6X
+ S6K8CNN0kefE5Y/USpB7TZInpU7NR4YuyZE/ChnNIp3zqmB4SVbIU8Rsx2BNCxmiGzCG
+ 7R4+2kVBhvtTOb5ATPtMqXnxA5oS5Ez/N1GFRJaj1TLxDBaXyRvUO/T9dYm3lnbRc5w3
+ fc+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=0PARhiXdVodHPM5A1bHNqTp2LZsrKFa7JpVk6IXSowc=;
+ b=iRORgOEIDhUrcar3gzufDkORoP7Hs4GpXWyrP1BmJWTykE8hqwJCbfEC7FI0Q1gZjq
+ sXlCiZ7Y6RnoCxiH9SMlDSo7NHv/seKuQpyO051OeUjmwKaTiK5NJBq/Vdue9jg0eluI
+ DSCQYK0g/4Hoom/TzZ9xuGPb+pqjFXho4Np/bos5KnDVEMxIXD2XSFrlfVww3XIn7DtI
+ xnIj7jeSiUTjiaaQlyDFFXFUF5qqK4kqvR/6iM742GLm/LJJdQ85SeY8nypJ0n8HqoWB
+ sN2iH/66MoaO2Y0NYETERJTje/Gingovwc1fBe3MOzSFLtYXdVE7y3SOSyQrvkytCiUC
+ 7Myg==
+X-Gm-Message-State: AOAM532tjkcW8bT1IFcMHUesWmLE3I0Co8rn0Zm0csb15K4s3Rn9ZRaC
+ gYx5s67AXkIug7+QSviUSOX1Rlk7
+X-Google-Smtp-Source: ABdhPJxUQP8OQo+yTfHKiSpVFzDcTThmzfdEUd+DX8FVX8B+xgsoAg+MUAcxERuZBXc3aqwQUy4fZw==
+X-Received: by 2002:a17:906:401b:: with SMTP id
+ v27mr10015465ejj.300.1596530925387; 
+ Tue, 04 Aug 2020 01:48:45 -0700 (PDT)
+Received: from x1w.redhat.com (214.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.214])
+ by smtp.gmail.com with ESMTPSA id q11sm1299641edn.12.2020.08.04.01.48.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 04 Aug 2020 01:48:44 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 0/3] .github/workflows: Add GitHub action for Windows WHPX
+ build
+Date: Tue,  4 Aug 2020 10:48:40 +0200
+Message-Id: <20200804084843.31075-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200730112930.6f4c5762@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.151; envelope-from=yan.y.zhao@intel.com;
- helo=mga17.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 04:48:14
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::630;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x630.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,164 +102,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, eskultet@redhat.com, jian-feng.ding@intel.com,
- dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
- bao.yumeng@zte.com.cn, Sean Mooney <smooney@redhat.com>,
- intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com, cohuck@redhat.com,
- dinechin@redhat.com, devel@ovirt.org
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > yes, include a device_api field is better.
-> > for mdev, "device_type=vfio-mdev", is it right?
-> 
-> No, vfio-mdev is not a device API, it's the driver that attaches to the
-> mdev bus device to expose it through vfio.  The device_api exposes the
-> actual interface of the vfio device, it's also vfio-pci for typical
-> mdev devices found on x86, but may be vfio-ccw, vfio-ap, etc...  See
-> VFIO_DEVICE_API_PCI_STRING and friends.
-> 
-ok. got it.
+Reposting Stefan's patch in case we want to merge it in
+(I 'd rather not, adding them as GitLab jobs instead):
+- add MAINTAINERS entry
+- improve speed by parallelizing jobs
 
-> > > > > 	device_id=8086591d  
-> > > 
-> > > Is device_id interpreted relative to device_type?  How does this
-> > > relate to mdev_type?  If we have an mdev_type, doesn't that fully
-> > > defined the software API?
-> > >   
-> > it's parent pci id for mdev actually.
->
-> If we need to specify the parent PCI ID then something is fundamentally
-> wrong with the mdev_type.  The mdev_type should define a unique,
-> software compatible interface, regardless of the parent device IDs.  If
-> a i915-GVTg_V5_2 means different things based on the parent device IDs,
-> then then different mdev_types should be reported for those parent
-> devices.
->
-hmm, then do we allow vendor specific fields?
-or is it a must that a vendor specific field should have corresponding
-vendor attribute?
+Philippe Mathieu-Daudé (2):
+  MAINTAINERS: Add entry for GitHub 'Actions' config files
+  .github/workflows: Use matrix strategy to parallelize builds
 
-another thing is that the definition of mdev_type in GVT only corresponds
-to vGPU computing ability currently,
-e.g. i915-GVTg_V5_2, is 1/2 of a gen9 IGD, i915-GVTg_V4_2 is 1/2 of a
-gen8 IGD.
-It is too coarse-grained to live migration compatibility.
+Stefan Weil (1):
+  .github/workflows: Add GitHub action for Windows build
 
-Do you think we need to update GVT's definition of mdev_type?
-And is there any guide in mdev_type definition?
+ .github/workflows/build.sh                | 112 ++++++++++++++++++++++
+ .github/workflows/pkg-config-crosswrapper |  37 +++++++
+ .github/workflows/win.yml                 |  25 +++++
+ MAINTAINERS                               |   6 ++
+ 4 files changed, 180 insertions(+)
+ create mode 100755 .github/workflows/build.sh
+ create mode 100755 .github/workflows/pkg-config-crosswrapper
+ create mode 100644 .github/workflows/win.yml
 
-> > > > > 	mdev_type=i915-GVTg_V5_2  
-> > > 
-> > > And how are non-mdev devices represented?
-> > >   
-> > non-mdev can opt to not include this field, or as you said below, a
-> > vendor signature. 
-> > 
-> > > > > 	aggregator=1
-> > > > > 	pv_mode="none+ppgtt+context"  
-> > > 
-> > > These are meaningless vendor specific matches afaict.
-> > >   
-> > yes, pv_mode and aggregator are vendor specific fields.
-> > but they are important to decide whether two devices are compatible.
-> > pv_mode means whether a vGPU supports guest paravirtualized api.
-> > "none+ppgtt+context" means guest can not use pv, or use ppgtt mode pv or
-> > use context mode pv.
-> > 
-> > > > > 	interface_version=3  
-> > > 
-> > > Not much granularity here, I prefer Sean's previous
-> > > <major>.<minor>[.bugfix] scheme.
-> > >   
-> > yes, <major>.<minor>[.bugfix] scheme may be better, but I'm not sure if
-> > it works for a complicated scenario.
-> > e.g for pv_mode,
-> > (1) initially,  pv_mode is not supported, so it's pv_mode=none, it's 0.0.0,
-> > (2) then, pv_mode=ppgtt is supported, pv_mode="none+ppgtt", it's 0.1.0,
-> > indicating pv_mode=none can migrate to pv_mode="none+ppgtt", but not vice versa.
-> > (3) later, pv_mode=context is also supported,
-> > pv_mode="none+ppgtt+context", so it's 0.2.0.
-> > 
-> > But if later, pv_mode=ppgtt is removed. pv_mode="none+context", how to
-> > name its version? "none+ppgtt" (0.1.0) is not compatible to
-> > "none+context", but "none+ppgtt+context" (0.2.0) is compatible to
-> > "none+context".
-> 
-> If pv_mode=ppgtt is removed, then the compatible versions would be
-> 0.0.0 or 1.0.0, ie. the major version would be incremented due to
-> feature removal.
->  
-> > Maintain such scheme is painful to vendor driver.
-> 
-> Migration compatibility is painful, there's no way around that.  I
-> think the version scheme is an attempt to push some of that low level
-> burden on the vendor driver, otherwise the management tools need to
-> work on an ever growing matrix of vendor specific features which is
-> going to become unwieldy and is largely meaningless outside of the
-> vendor driver.  Instead, the vendor driver can make strategic decisions
-> about where to continue to maintain a support burden and make explicit
-> decisions to maintain or break compatibility.  The version scheme is a
-> simplification and abstraction of vendor driver features in order to
-> create a small, logical compatibility matrix.  Compromises necessarily
-> need to be made for that to occur.
->
-ok. got it.
+-- 
+2.21.3
 
-> > > > > COMPATIBLE:
-> > > > > 	device_type=pci
-> > > > > 	device_id=8086591d
-> > > > > 	mdev_type=i915-GVTg_V5_{val1:int:1,2,4,8}    
-> > > > this mixed notation will be hard to parse so i would avoid that.  
-> > > 
-> > > Some background, Intel has been proposing aggregation as a solution to
-> > > how we scale mdev devices when hardware exposes large numbers of
-> > > assignable objects that can be composed in essentially arbitrary ways.
-> > > So for instance, if we have a workqueue (wq), we might have an mdev
-> > > type for 1wq, 2wq, 3wq,... Nwq.  It's not really practical to expose a
-> > > discrete mdev type for each of those, so they want to define a base
-> > > type which is composable to other types via this aggregation.  This is
-> > > what this substitution and tagging is attempting to accomplish.  So
-> > > imagine this set of values for cases where it's not practical to unroll
-> > > the values for N discrete types.
-> > >   
-> > > > > 	aggregator={val1}/2  
-> > > 
-> > > So the {val1} above would be substituted here, though an aggregation
-> > > factor of 1/2 is a head scratcher...
-> > >   
-> > > > > 	pv_mode={val2:string:"none+ppgtt","none+context","none+ppgtt+context"}  
-> > > 
-> > > I'm lost on this one though.  I think maybe it's indicating that it's
-> > > compatible with any of these, so do we need to list it?  Couldn't this
-> > > be handled by Sean's version proposal where the minor version
-> > > represents feature compatibility?  
-> > yes, it's indicating that it's compatible with any of these.
-> > Sean's version proposal may also work, but it would be painful for
-> > vendor driver to maintain the versions when multiple similar features
-> > are involved.
-> 
-> This is something vendor drivers need to consider when adding and
-> removing features.
-> 
-> > > > > 	interface_version={val3:int:2,3}  
-> > > 
-> > > What does this turn into in a few years, 2,7,12,23,75,96,...
-> > >   
-> > is a range better?
-> 
-> I was really trying to point out that sparseness becomes an issue if
-> the vendor driver is largely disconnected from how their feature
-> addition and deprecation affects migration support.  Thanks,
->
-ok. we'll use the x.y.z scheme then.
-
-Thanks
-Yan
 
