@@ -2,105 +2,81 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E62C2C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 14:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C4CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 14:26:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B94B6208A9
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 14:24:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CfA7KUqU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B94B6208A9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B165F208A9
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 14:26:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B165F208A9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2xrv-0008C0-1I
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 10:24:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45050)
+	id 1k2xtY-0001Aa-W4
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 10:26:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46558)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k2xms-0003v9-L4
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 10:19:30 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26710
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k2xmq-0005Ka-P5
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 10:19:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596550768;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=a9SbY9auShf4q9Q15pGhvpVRHE1I1RNPvox++Y+hYFk=;
- b=CfA7KUqUOMgyPZQJdWhcXxc+hFtOQld9c5Yp3M2zJ53aRqOsTyUwZpgk2toAdbVSk547Bf
- P2bZxL1wxxva+PFpg2+tadUHRb3iOKQ6jJhb4Pt/qPVPwMAvoTFmRkOSzL6Fca5W0AZ+Ns
- OH/7pcexx/nvgJHuH5l6xJcK2kv/t84=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-6Tii61BFMaaO_7Fzbgf6WQ-1; Tue, 04 Aug 2020 10:19:24 -0400
-X-MC-Unique: 6Tii61BFMaaO_7Fzbgf6WQ-1
-Received: by mail-qv1-f69.google.com with SMTP id j8so26082821qvu.3
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 07:19:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=a9SbY9auShf4q9Q15pGhvpVRHE1I1RNPvox++Y+hYFk=;
- b=uEMHLNHIJERt4bfGFbes/6T/3rgW+4XmfTf7kiCE3br8SbBynziw98+OfWKC4v4+qk
- 59w9aautHtJUxPPd+TF5Kw5LjQeM7na8iaAilc7wvk96q852p8KZSCshoBAaPSAgczjD
- pzhWlYlf222Ig3HT67e38MHrN+LO0DpP4sbs9jZVxVE7qEO2YBRgokLR01pQnk3Jo1tJ
- /ZVf8I8MwtZ5ob78JTJ9IIP0CPhUkssYiE+7XNBa4UMdxXVNjAxDL5kNCrjgq7IZQHbS
- 2FXryQRti2fB3E63WaonJ67rccnpQiZ0CUzNFmIBt/dq4ELDotiAgprIgnt8CiQUwApy
- vbHA==
-X-Gm-Message-State: AOAM533oDn5QG7xYbTemySZnuR+eIf3fAIjvimjrkjQ9u/Cv8WGOKNg3
- FH+I4Z4NTLmqjLBk9lgOUnacFp9PAwtD0scCOz390QjjQ6cxwpUkN6d5KHXkSqKWC+CnEtLgG3u
- ZAahgdUC9YfsNOM8=
-X-Received: by 2002:aed:2a82:: with SMTP id t2mr21857060qtd.280.1596550763902; 
- Tue, 04 Aug 2020 07:19:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyzfs2ZCLc1G5Of9Qe9WkPrzjDFBgibDKyI9NAc/CqSC6o+JZLVRZRtGchagSauDwNmHeQ/7Q==
-X-Received: by 2002:aed:2a82:: with SMTP id t2mr21857026qtd.280.1596550763611; 
- Tue, 04 Aug 2020 07:19:23 -0700 (PDT)
-Received: from redhat.com (bzq-79-177-102-128.red.bezeqint.net.
- [79.177.102.128])
- by smtp.gmail.com with ESMTPSA id g4sm21567898qka.25.2020.08.04.07.19.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 04 Aug 2020 07:19:23 -0700 (PDT)
-Date: Tue, 4 Aug 2020 10:19:17 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dima Stepanov <dimastep@yandex-team.ru>
-Subject: Re: [PATCH v1 0/7] vhost-user-blk: fix the migration issue and
- enhance qtests
-Message-ID: <20200804101820-mutt-send-email-mst@kernel.org>
-References: <cover.1596536559.git.dimastep@yandex-team.ru>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2xsr-0000a8-J9
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 10:25:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39636)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2xso-00067R-Ps
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 10:25:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k2xsm-0006Y0-0g
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 14:25:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EC0172E802A
+ for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 14:25:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <cover.1596536559.git.dimastep@yandex-team.ru>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 04 Aug 2020 14:16:33 -0000
+From: Satheesh Rajendran <1890290@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: nested powerpc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: sathnaga
+X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
+X-Launchpad-Bug-Modifier: Satheesh Rajendran (sathnaga)
+Message-Id: <159655059319.10948.7356744312155765003.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1890290] [NEW] PowerPC L2(nested virt) kvm guest fails to boot
+ with ic-mode=dual, kernel-irqchip=on - `KVM is too old to support ic-mode=dual,
+ kernel-irqchip=on`
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9dfba4e537984d2ee3ba54c0c15c98a189ff3e8d
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 08:50:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -109,77 +85,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com,
- qemu-block@nongnu.org, jasowang@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, fengli@smartx.com, yc-core@yandex-team.ru,
- pbonzini@redhat.com, raphael.norwitz@nutanix.com, dgilbert@redhat.com
+Reply-To: Bug 1890290 <1890290@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 04, 2020 at 01:36:45PM +0300, Dima Stepanov wrote:
-> Reference e-mail threads:
->   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg01509.html
->   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05241.html
-> 
-> If vhost-user daemon is used as a backend for the vhost device, then we
-> should consider a possibility of disconnect at any moment. There was a general
-> question here: should we consider it as an error or okay state for the vhost-user
-> devices during migration process?
-> I think the disconnect event for the vhost-user devices should not break the
-> migration process, because:
->   - the device will be in the stopped state, so it will not be changed
->     during migration
->   - if reconnect will be made the migration log will be reinitialized as
->     part of reconnect/init process:
->     #0  vhost_log_global_start (listener=0x563989cf7be0)
->     at hw/virtio/vhost.c:920
->     #1  0x000056398603d8bc in listener_add_address_space (listener=0x563989cf7be0,
->         as=0x563986ea4340 <address_space_memory>)
->     at softmmu/memory.c:2664
->     #2  0x000056398603dd30 in memory_listener_register (listener=0x563989cf7be0,
->         as=0x563986ea4340 <address_space_memory>)
->     at softmmu/memory.c:2740
->     #3  0x0000563985fd6956 in vhost_dev_init (hdev=0x563989cf7bd8,
->         opaque=0x563989cf7e30, backend_type=VHOST_BACKEND_TYPE_USER,
->         busyloop_timeout=0)
->     at hw/virtio/vhost.c:1385
->     #4  0x0000563985f7d0b8 in vhost_user_blk_connect (dev=0x563989cf7990)
->     at hw/block/vhost-user-blk.c:315
->     #5  0x0000563985f7d3f6 in vhost_user_blk_event (opaque=0x563989cf7990,
->         event=CHR_EVENT_OPENED)
->     at hw/block/vhost-user-blk.c:379
-> The first patch in the patchset fixes this issue by setting vhost device to the
-> stopped state in the disconnect handler and check it the vhost_migration_log()
-> routine before returning from the function.
+Public bug reported:
 
-So I'm a bit confused. Isn't the connected state sufficient for this?
-If not, adding some code comments explaining when is each flag
-set would be helpful.
-Thanks!
+Env:
+HW: Power 9 DD2.3
+Host L0: 5.8.0-rc5-g8ba4ffcd8
+Qemu: 5.0.50 (v5.0.0-533-gdebe78ce14)
+Libvirt: 6.4.0
+L1: 5.8.0-rc5-ge9919e11e
+qemu_version': '5.0.50 (v5.1.0-rc2-dirty)
+libvirt_version': '6.4.0'
+L2: 5.8.0-rc7-g6ba1b005f
 
-> qtest framework was updated to test vhost-user-blk functionality. The
-> vhost-user-blk/vhost-user-blk-tests/migrate_reconnect test was added to reproduce
-> the original issue found.
-> 
-> Dima Stepanov (7):
->   vhost: recheck dev state in the vhost_migration_log routine
->   vhost: check queue state in the vhost_dev_set_log routine
->   tests/qtest/vhost-user-test: prepare the tests for adding new dev
->     class
->   tests/qtest/libqos/virtio-blk: add support for vhost-user-blk
->   tests/qtest/vhost-user-test: add support for the vhost-user-blk device
->   tests/qtest/vhost-user-test: add migrate_reconnect test
->   tests/qtest/vhost-user-test: enable the reconnect tests
-> 
->  hw/block/vhost-user-blk.c          |  13 +-
->  hw/virtio/vhost.c                  |  39 ++++-
->  include/hw/virtio/vhost-user-blk.h |   1 +
->  tests/qtest/libqos/virtio-blk.c    |  14 ++
->  tests/qtest/vhost-user-test.c      | 291 +++++++++++++++++++++++++++++++------
->  5 files changed, 311 insertions(+), 47 deletions(-)
-> 
-> -- 
-> 2.7.4
 
+1. boot a L2 KVM guest with `ic-mode=3Ddual,kernel-irqchip=3Don`
+
+/usr/bin/virt-install --connect=3Dqemu:///system --hvm --accelerate --name =
+'vm1' --machine pseries --memory=3D8192 --vcpu=3D8,maxvcpus=3D8,sockets=3D1=
+,cores=3D2,t
+hreads=3D4 --import --nographics --serial pty --memballoon model=3Dvirtio -=
+-disk path=3D/home/tests/data/avocado-vt/images/f31-ppc64le.qcow2,bus=3Dvir=
+tio,size=3D10,format=3Dqcow2 --network
+=3Dbridge=3Dvirbr0,model=3Dvirtio,mac=3D52:54:00:e6:fe:f6 --mac=3D52:54:00:=
+e6:fe:f6 --boot emulator=3D/usr/share/avocado-plugins-vt/bin/qemu,kernel=3D=
+/tmp/linux/vmlinux,kernel_args=3D"root=3D/de
+v/vda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcall_=
+debug selinux=3D0" --noautoconsole --qemu-commandline=3D" -M pseries,ic-mod=
+e=3Ddual,kernel-irqchip=3Don"
+
+
+ERROR    internal error: process exited while connecting to monitor: 2020-0=
+8-04T11:12:53.304482Z qemu: KVM is too old to support ic-mode=3Ddual,kernel=
+-irqchip=3Don
+
+
+Qemu Log:
+```
+/usr/share/avocado-plugins-vt/bin/qemu \
+-name guest=3Dvm1,debug-threads=3Don \
+-S \
+-object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/do=
+main-5-vm1/master-key.aes \
+-machine pseries-5.1,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff \
+-cpu POWER9 \
+-m 8192 \
+-overcommit mem-lock=3Doff \
+-smp 8,sockets=3D1,dies=3D1,cores=3D2,threads=3D4 \
+-uuid 20a3351b-2776-4e75-9059-c070fe3dd44b \
+-display none \
+-no-user-config \
+-nodefaults \
+-chardev socket,id=3Dcharmonitor,fd=3D34,server,nowait \
+-mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+-rtc base=3Dutc \
+-no-shutdown \
+-boot strict=3Don \
+-kernel /tmp/linux/vmlinux \
+-append 'root=3D/dev/vda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/=
+sbin/init initcall_debug selinux=3D0' \
+-device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.0,addr=3D0x2 \
+-device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 \
+-blockdev '{"driver":"file","filename":"/home/tests/data/avocado-vt/images/=
+f31-ppc64le.qcow2","node-name":"libvirt-1-storage","auto-read-only":true,"d=
+iscard":"unmap"}' \
+-blockdev '{"node-name":"libvirt-1-format","read-only":false,"driver":"qcow=
+2","file":"libvirt-1-storage","backing":null}' \
+-device virtio-blk-pci,bus=3Dpci.0,addr=3D0x4,drive=3Dlibvirt-1-format,id=
+=3Dvirtio-disk0,bootindex=3D1 \
+-netdev tap,fd=3D37,id=3Dhostnet0,vhost=3Don,vhostfd=3D38 \
+-device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:fe:f6,=
+bus=3Dpci.0,addr=3D0x1 \
+-chardev pty,id=3Dcharserial0 \
+-device spapr-vty,chardev=3Dcharserial0,id=3Dserial0,reg=3D0x30000000 \
+-chardev socket,id=3Dcharchannel0,fd=3D39,server,nowait \
+-device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchannel0=
+,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
+-device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 \
+-M pseries,ic-mode=3Ddual,kernel-irqchip=3Don \
+-msg timestamp=3Don
+2020-08-04 11:12:53.169+0000: Domain id=3D5 is tainted: custom-argv
+2020-08-04 11:12:53.179+0000: 11120: info : libvirt version: 6.4.0, package=
+: 1.fc31 (Unknown, 2020-06-02-05:09:40, ltc-wspoon4.aus.stglabs.ibm.com)
+2020-08-04 11:12:53.179+0000: 11120: info : hostname: atest-guest
+2020-08-04 11:12:53.179+0000: 11120: info : virObjectUnref:347 : OBJECT_UNR=
+EF: obj=3D0x7fff0c117c40
+char device redirected to /dev/pts/0 (label charserial0)
+2020-08-04T11:12:53.304482Z qemu: KVM is too old to support ic-mode=3Ddual,=
+kernel-irqchip=3Don
+2020-08-04 11:12:53.694+0000: shutting down, reason=3Dfailed
+```
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: nested powerpc
+
+** Summary changed:
+
+- PowerPC L2(nested virt) kvm guest fails to boot with ic-mode=3Ddual,kerne=
+l-irqchip=3Don
++ PowerPC L2(nested virt) kvm guest fails to boot with ic-mode=3Ddual,kerne=
+l-irqchip=3Don - `KVM is too old to support ic-mode=3Ddual,kernel-irqchip=
+=3Don`
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890290
+
+Title:
+  PowerPC L2(nested virt) kvm guest fails to boot with ic-mode=3Ddual
+  ,kernel-irqchip=3Don - `KVM is too old to support ic-mode=3Ddual,kernel-
+  irqchip=3Don`
+
+Status in QEMU:
+  New
+
+Bug description:
+  Env:
+  HW: Power 9 DD2.3
+  Host L0: 5.8.0-rc5-g8ba4ffcd8
+  Qemu: 5.0.50 (v5.0.0-533-gdebe78ce14)
+  Libvirt: 6.4.0
+  L1: 5.8.0-rc5-ge9919e11e
+  qemu_version': '5.0.50 (v5.1.0-rc2-dirty)
+  libvirt_version': '6.4.0'
+  L2: 5.8.0-rc7-g6ba1b005f
+
+  =
+
+  1. boot a L2 KVM guest with `ic-mode=3Ddual,kernel-irqchip=3Don`
+
+  /usr/bin/virt-install --connect=3Dqemu:///system --hvm --accelerate --nam=
+e 'vm1' --machine pseries --memory=3D8192 --vcpu=3D8,maxvcpus=3D8,sockets=
+=3D1,cores=3D2,t
+  hreads=3D4 --import --nographics --serial pty --memballoon model=3Dvirtio=
+ --disk path=3D/home/tests/data/avocado-vt/images/f31-ppc64le.qcow2,bus=3Dv=
+irtio,size=3D10,format=3Dqcow2 --network
+  =3Dbridge=3Dvirbr0,model=3Dvirtio,mac=3D52:54:00:e6:fe:f6 --mac=3D52:54:0=
+0:e6:fe:f6 --boot emulator=3D/usr/share/avocado-plugins-vt/bin/qemu,kernel=
+=3D/tmp/linux/vmlinux,kernel_args=3D"root=3D/de
+  v/vda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcal=
+l_debug selinux=3D0" --noautoconsole --qemu-commandline=3D" -M pseries,ic-m=
+ode=3Ddual,kernel-irqchip=3Don"
+
+  =
+
+  ERROR    internal error: process exited while connecting to monitor: 2020=
+-08-04T11:12:53.304482Z qemu: KVM is too old to support ic-mode=3Ddual,kern=
+el-irqchip=3Don
+
+
+  =
+
+  Qemu Log:
+  ```
+  /usr/share/avocado-plugins-vt/bin/qemu \
+  -name guest=3Dvm1,debug-threads=3Don \
+  -S \
+  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
+domain-5-vm1/master-key.aes \
+  -machine pseries-5.1,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff \
+  -cpu POWER9 \
+  -m 8192 \
+  -overcommit mem-lock=3Doff \
+  -smp 8,sockets=3D1,dies=3D1,cores=3D2,threads=3D4 \
+  -uuid 20a3351b-2776-4e75-9059-c070fe3dd44b \
+  -display none \
+  -no-user-config \
+  -nodefaults \
+  -chardev socket,id=3Dcharmonitor,fd=3D34,server,nowait \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dutc \
+  -no-shutdown \
+  -boot strict=3Don \
+  -kernel /tmp/linux/vmlinux \
+  -append 'root=3D/dev/vda2 rw console=3Dtty0 console=3DttyS0,115200 init=
+=3D/sbin/init initcall_debug selinux=3D0' \
+  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.0,addr=3D0x2 \
+  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 \
+  -blockdev '{"driver":"file","filename":"/home/tests/data/avocado-vt/image=
+s/f31-ppc64le.qcow2","node-name":"libvirt-1-storage","auto-read-only":true,=
+"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":false,"driver":"qc=
+ow2","file":"libvirt-1-storage","backing":null}' \
+  -device virtio-blk-pci,bus=3Dpci.0,addr=3D0x4,drive=3Dlibvirt-1-format,id=
+=3Dvirtio-disk0,bootindex=3D1 \
+  -netdev tap,fd=3D37,id=3Dhostnet0,vhost=3Don,vhostfd=3D38 \
+  -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:fe:f=
+6,bus=3Dpci.0,addr=3D0x1 \
+  -chardev pty,id=3Dcharserial0 \
+  -device spapr-vty,chardev=3Dcharserial0,id=3Dserial0,reg=3D0x30000000 \
+  -chardev socket,id=3Dcharchannel0,fd=3D39,server,nowait \
+  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
+l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 \
+  -M pseries,ic-mode=3Ddual,kernel-irqchip=3Don \
+  -msg timestamp=3Don
+  2020-08-04 11:12:53.169+0000: Domain id=3D5 is tainted: custom-argv
+  2020-08-04 11:12:53.179+0000: 11120: info : libvirt version: 6.4.0, packa=
+ge: 1.fc31 (Unknown, 2020-06-02-05:09:40, ltc-wspoon4.aus.stglabs.ibm.com)
+  2020-08-04 11:12:53.179+0000: 11120: info : hostname: atest-guest
+  2020-08-04 11:12:53.179+0000: 11120: info : virObjectUnref:347 : OBJECT_U=
+NREF: obj=3D0x7fff0c117c40
+  char device redirected to /dev/pts/0 (label charserial0)
+  2020-08-04T11:12:53.304482Z qemu: KVM is too old to support ic-mode=3Ddua=
+l,kernel-irqchip=3Don
+  2020-08-04 11:12:53.694+0000: shutting down, reason=3Dfailed
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890290/+subscriptions
 
