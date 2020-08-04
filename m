@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D23ECC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:05:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87204C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6B6F2086A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:05:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E7F4207FC
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUduSGYD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6B6F2086A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CHls41Dz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E7F4207FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k30NY-0003gW-Qd
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 13:05:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60882)
+	id 1k30OE-0004v9-Do
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 13:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k30Jz-0007JM-3f
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:01:51 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55263
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k30Jk-00070o-4S
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:01:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20621
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k30Jx-0005Uc-86
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:01:50 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k30JY-0005S6-C8
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:01:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596560508;
+ s=mimecast20190719; t=1596560483;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=c3ezaShaxxZkE+7RjTgmNbZcq3vheU1/lTb21lxDjE4=;
- b=jUduSGYDYxzazXRcJAotmW3hQGYj+g9k4N/9eBBdR2lcl6BuEanm9Zosvk5YIMratkvWx8
- 8k6E+w00Aa9VEOfjP0Lx6UiPmcZMyQpV/6MOjJ/0scmmmeHoClRlIkaQ7p53gYg+qzyh2e
- 45ST45xOrt1cREJSkwkMVsdTuBMGuV4=
+ references:references; bh=lYXuxcpUGvBzCNXaXLs4Q4NI+vITEib0V44KH+fziNg=;
+ b=CHls41Dzw01bfh3kPClPVrYq7JBACdYgdYhOAmSmXckMyP5aTy/WASxb+QpW9LJ+5krkfn
+ Q7Vh7D4Dks134DjG6Uwgyw1MOI1IZZEY9VFn/se4SvvjcXSgnUCz/Ebr9avCnt4uepfiHt
+ Opqgz08xquqOekcctnvW0T27j3F0xO8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-lxK0fOj0PTeKGNQLPmZNcg-1; Tue, 04 Aug 2020 13:01:44 -0400
-X-MC-Unique: lxK0fOj0PTeKGNQLPmZNcg-1
+ us-mta-27-d8rNA4RtM5a8-s6YUqP5UQ-1; Tue, 04 Aug 2020 13:01:22 -0400
+X-MC-Unique: d8rNA4RtM5a8-s6YUqP5UQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F7BB800469;
- Tue,  4 Aug 2020 17:01:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 026AB8064DD;
+ Tue,  4 Aug 2020 17:01:21 +0000 (UTC)
 Received: from thuth.com (ovpn-112-162.ams2.redhat.com [10.36.112.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D0BBC10013D0;
- Tue,  4 Aug 2020 17:01:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A16FA101042E;
+ Tue,  4 Aug 2020 17:01:18 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH 08/11] stubs/notify-event: Mark qemu_notify_event() stub as
- "weak"
-Date: Tue,  4 Aug 2020 19:00:52 +0200
-Message-Id: <20200804170055.2851-9-thuth@redhat.com>
+Subject: [PATCH 03/11] tests/Makefile: test-image-locking needs CONFIG_POSIX
+Date: Tue,  4 Aug 2020 19:00:47 +0200
+Message-Id: <20200804170055.2851-4-thuth@redhat.com>
 In-Reply-To: <20200804170055.2851-1-thuth@redhat.com>
 References: <20200804170055.2851-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:16
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,35 +99,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Otherwise there is a linker error with MinGW while compiling the tests:
+test-image-locking.c uses the qemu_lock_fd_test() function which is
+only available on POSIX-like systems.
 
-  LINK    tests/test-timed-average.exe
- libqemuutil.a(main-loop.o): In function `qemu_notify_event':
- /builds/huth/qemu/util/main-loop.c:139: multiple definition of
-  `qemu_notify_event'
- tests/test-timed-average.o:/builds/huth/qemu/tests/../stubs/notify-event.c:5:
-  first defined here
- collect2: error: ld returned 1 exit status
- /builds/huth/qemu/rules.mak:124: recipe for target
-  'tests/test-timed-average.exe' failed
-
+Reviewed-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- stubs/notify-event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/Makefile.include | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/stubs/notify-event.c b/stubs/notify-event.c
-index 827bb52d1a..75d98f4a79 100644
---- a/stubs/notify-event.c
-+++ b/stubs/notify-event.c
-@@ -1,6 +1,6 @@
- #include "qemu/osdep.h"
- #include "qemu/main-loop.h"
- 
--void qemu_notify_event(void)
-+void __attribute__((weak)) qemu_notify_event(void)
- {
- }
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index c7e4646ded..1e5ca3b585 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -87,7 +87,9 @@ check-unit-$(CONFIG_BLOCK) += tests/test-blockjob$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-blockjob-txn$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-block-backend$(EXESUF)
+ check-unit-$(CONFIG_BLOCK) += tests/test-block-iothread$(EXESUF)
++ifeq ($(CONFIG_POSIX),y)
+ check-unit-$(CONFIG_BLOCK) += tests/test-image-locking$(EXESUF)
++endif
+ check-unit-y += tests/test-x86-cpuid$(EXESUF)
+ # all code tested by test-x86-cpuid is inside topology.h
+ ifeq ($(CONFIG_SOFTMMU),y)
 -- 
 2.18.1
 
