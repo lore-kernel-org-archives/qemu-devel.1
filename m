@@ -6,62 +6,68 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 883A4C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:11:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D00DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:27:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26BD22086A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:11:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26BD22086A
+	by mail.kernel.org (Postfix) with ESMTPS id 233BC22B42
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:27:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 233BC22B42
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k32LT-0008E7-36
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 15:11:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37232)
+	id 1k32ad-0004NY-Bh
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 15:27:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k32Km-0007n7-PD
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:10:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41644)
+ id 1k32Zf-0003XQ-6q
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:26:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45770)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k32Kk-0004rg-Gj
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:10:48 -0400
+ id 1k32Zd-0006oT-E0
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:26:10 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k32Ki-0002F3-Oh
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 19:10:44 +0000
+ id 1k32Zb-0004Va-7Q
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 19:26:07 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B0B3B2E80DC
- for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 19:10:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 36F852E80E7
+ for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 19:26:07 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 04 Aug 2020 19:03:44 -0000
-From: Alexander Bulekov <1890333@bugs.launchpad.net>
+Date: Tue, 04 Aug 2020 19:15:45 -0000
+From: Bug Watch Updater <1718719@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=xserver; status=New; importance=Unknown; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Confirmed; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=xorg-server; component=main;
+ status=Incomplete; importance=Undecided; assignee=tjaalton@ubuntu.com; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-Message-Id: <159656782458.2385.15174533675764579105.malonedeb@gac.canonical.com>
-Subject: [Bug 1890333] [NEW] Assertion failure in address_space_stw_le_cached
- through virtio-* devices
+X-Launchpad-Bug-Commenters: cyphermox fourdan gitlab-migration jadahl janitor
+ paelzer powersj seb128 tjaalton
+X-Launchpad-Bug-Reporter: Mathieu Trudel-Lapierre (cyphermox)
+X-Launchpad-Bug-Modifier: Bug Watch Updater (bug-watch-updater)
+References: <150601012428.28823.10384460665730601462.malonedeb@gac.canonical.com>
+Message-Id: <159656854667.5120.2145755323108996942.launchpad@loganberry.canonical.com>
+Subject: [Bug 1718719] Re: qemu can't capture keys properly under wayland
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5101f36395f79baa9fed85288c5a63f6db8dcfc0
+X-Launchpad-Hash: 87ad6fb41db818c270d6632e738c4e6f916c3ad8
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 15:05:58
@@ -83,83 +89,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890333 <1890333@bugs.launchpad.net>
+Reply-To: Bug 1718719 <1718719@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-Hello,
-Reproducer:
-cat << EOF | ./i386-softmmu/qemu-system-i386 \
--drive id=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone \
--device virtio-blk,drive=3Dmydrive \
--nodefaults -qtest stdio -nographic
-outl 0xcf8 0x80001001
-outl 0xcfc 0x6574c1ff
-outl 0xcf8 0x8000100e
-outl 0xcfc 0xefe5e1e
-outl 0xe86 0x3aff9090
-outl 0xe84 0x3aff9090
-outl 0xe8e 0xe
-EOF
-
-qemu-system-i386: /home/alxndr/Development/qemu/general-fuzz/include/exec/m=
-emory_ldst_cached.inc.h:88: void address_space_stw_le_cached(MemoryRegionCa=
-che *, hwaddr, uint32_t, MemTxAttrs, MemTxResult *): Assertion `addr < cach=
-e->len && 2 <=3D cache->len - addr' failed.
-Aborted
-
-I can trigger similar assertions with other VIRTIO devices, as-well.
-I reported this at some point in Message-ID: <20200511033001.dzvtbdhl3oz5pg=
-iy@mozz.bu.edu> but never created a Launchpad issue...
--Alex
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+** Changed in: xserver
+       Status: Unknown =3D> New
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890333
+https://bugs.launchpad.net/bugs/1718719
 
 Title:
-  Assertion failure in address_space_stw_le_cached through virtio-*
-  devices
+  qemu can't capture keys properly under wayland
 
 Status in QEMU:
   New
+Status in XServer:
+  New
+Status in qemu package in Ubuntu:
+  Confirmed
+Status in xorg-server package in Ubuntu:
+  Incomplete
 
 Bug description:
-  Hello,
-  Reproducer:
-  cat << EOF | ./i386-softmmu/qemu-system-i386 \
-  -drive id=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone \
-  -device virtio-blk,drive=3Dmydrive \
-  -nodefaults -qtest stdio -nographic
-  outl 0xcf8 0x80001001
-  outl 0xcfc 0x6574c1ff
-  outl 0xcf8 0x8000100e
-  outl 0xcfc 0xefe5e1e
-  outl 0xe86 0x3aff9090
-  outl 0xe84 0x3aff9090
-  outl 0xe8e 0xe
-  EOF
+  This appears to be different than the previous similar bugs; patches
+  do look to be applied to use libinput in the wayland case. Still:
 
-  qemu-system-i386: /home/alxndr/Development/qemu/general-fuzz/include/exec=
-/memory_ldst_cached.inc.h:88: void address_space_stw_le_cached(MemoryRegion=
-Cache *, hwaddr, uint32_t, MemTxAttrs, MemTxResult *): Assertion `addr < ca=
-che->len && 2 <=3D cache->len - addr' failed.
-  Aborted
+  unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
 
-  I can trigger similar assertions with other VIRTIO devices, as-well.
-  I reported this at some point in Message-ID: <20200511033001.dzvtbdhl3oz5=
-pgiy@mozz.bu.edu> but never created a Launchpad issue...
-  -Alex
+  I am using qemu-system-x86                       1:2.10+dfsg-0ubuntu1
+  on artful.
+
+  Many key inputs work correctly, but at boot the system will not
+  properly catch the arrow keys, the above error shows up immediately
+  after hitting Esc (for instance) to get to the boot menu. Booting from
+  CD onto a daily Ubuntu desktop image, I can't navigate the splash
+  menu.
+
+  The same works correctly through virt-manager (which uses spice
+  AFAICT, but wayland tends to crash when running virt-manager), and
+  things work if I switch my session to Xorg rather than wayland.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890333/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1718719/+subscriptions
 
