@@ -2,89 +2,105 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2EF7C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:45:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7C39C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:54:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73A5220722
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:45:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 782C520792
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:54:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LC0pRF/6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73A5220722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUPUN4gb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 782C520792
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k304M-0000z8-OU
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:45:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54734)
+	id 1k30CN-0003iS-Ld
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:53:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k303V-0000SD-Vi
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:44:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54368
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k30Bk-0003F5-H0
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:53:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36619
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k303U-0002wF-9a
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:44:49 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k30Bi-00041D-9F
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:53:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596559487;
+ s=mimecast20190719; t=1596559996;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TfMpbsk+znj1BpL+fmmDMViOhRt2auiNxNLDKB75Emo=;
- b=LC0pRF/6b7amwFhFvoKnrgNC4Ce41HqvBEOBfhmeyw9P3NGzGqUT2fu3TfUq3q0sBRkRW7
- x0rEqbX7yqNuhzdgh9rZyfoZRiSOuTFg23ikGRBKfWhxIWrTEEXtcRdYQ7DdpNnX+jnQPM
- Cpla8vCxlvpThCyd1vT6bY8ENRpNC9k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-H5ozace3PFelE2JUCqh5sw-1; Tue, 04 Aug 2020 12:44:45 -0400
-X-MC-Unique: H5ozace3PFelE2JUCqh5sw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B21B18A1DFE;
- Tue,  4 Aug 2020 16:44:44 +0000 (UTC)
-Received: from work-vm (ovpn-114-108.ams2.redhat.com [10.36.114.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 81EC95DA73;
- Tue,  4 Aug 2020 16:44:42 +0000 (UTC)
-Date: Tue, 4 Aug 2020 17:44:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Chuan Zheng <zhengchuan@huawei.com>
-Subject: Re: [RFC PATCH 3/8] migration/dirtyrate: Add dirtyrate statistics
- series functions
-Message-ID: <20200804164439.GF2659@work-vm>
-References: <1595646669-109310-1-git-send-email-zhengchuan@huawei.com>
- <1595646669-109310-4-git-send-email-zhengchuan@huawei.com>
+ bh=WBCwfirkDEK9xUGhmuwryrwJ/b4wh7bAFmyI5FxB/d0=;
+ b=ZUPUN4gb5uzBIAletW0XgnyjvYAcVNH9ymtX12i2EYOP41qibT8cieFnoSznmH/0DEcIeW
+ WXOCCNv/dB6prDBhE+XabcJF7oUaz0ymJoCyKurj+YLeIUz6D00MJWmUPa5K0kI7Ieh0Xe
+ 0VOkLtEUjuaPAtbswhmq3lEo3PZBeis=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-88hu6lIxOl2jYOB7UjBY_g-1; Tue, 04 Aug 2020 12:53:14 -0400
+X-MC-Unique: 88hu6lIxOl2jYOB7UjBY_g-1
+Received: by mail-wm1-f72.google.com with SMTP id a207so1257370wme.9
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 09:53:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to;
+ bh=bAuktCWuFL3bNvr8NfNIWEedH+D6ag8iLJcy2k00/2Q=;
+ b=fzIAaRM3Vy+HQn94DUPSGOpwte76tRFg/WfZIYXWHJybUuLsfl6NJhpbB1AkcbaW+N
+ H01/b2dHy2Bx/FCazWHkjyJ4+DwFZQ8r2lhRw9ewlA1SXqan0SpZDNwDgyxDCeOsTcup
+ w2DuRYFCtp1bbUPVTeKkHc5WkKKwfaJXs3K2/ijmceazuq/mZjEN3LnNBAYHZAYcLBeu
+ duaF/Pdv2tylppew6OEnNrEhXBOH/NW7+S06YJL6Vw4f1MWFtJOAse90Gi83r4fo44Zg
+ aHL1zFlraASB8hfQTcCeAW49xnu/OGRa80xf2B5hWFDYKeT3Zf+AtUC6uXR/VV/1zBPD
+ WNMQ==
+X-Gm-Message-State: AOAM531wCEl1/erW52jRbz67/dtNjb1fs12BUXqymb1qH6DXYdsOwjM3
+ 2Zq16Uh7zANNC3ej5LHZRpTfZj6mzINyb6hWG1mar+2dKw+Cvb4W2XgyG8OW6m2r3BcszSQsBzr
+ WrFVzbx/9J6iZtso=
+X-Received: by 2002:adf:ba52:: with SMTP id t18mr2331249wrg.26.1596559992985; 
+ Tue, 04 Aug 2020 09:53:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/4yk7Z3YQncmGLJnrjU/b/8eW1Y7XCzFXz43Q455QEvM2Xf+R0CerkjbTfnXcDDt2lMYuog==
+X-Received: by 2002:adf:ba52:: with SMTP id t18mr2331232wrg.26.1596559992697; 
+ Tue, 04 Aug 2020 09:53:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7841:78cc:18c6:1e20?
+ ([2001:b07:6468:f312:7841:78cc:18c6:1e20])
+ by smtp.gmail.com with ESMTPSA id 130sm5335972wme.26.2020.08.04.09.53.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Aug 2020 09:53:11 -0700 (PDT)
+Subject: Re: [PATCH 3/3] aio-posix: keep aio_notify_me disabled during polling
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200804052804.1165291-1-stefanha@redhat.com>
+ <20200804052804.1165291-4-stefanha@redhat.com>
+ <20200804102941.GB1284284@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <92e8cc23-a361-f1d4-a2a6-160268cd8b3a@redhat.com>
+Date: Tue, 4 Aug 2020 18:53:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <1595646669-109310-4-git-send-email-zhengchuan@huawei.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200804102941.GB1284284@stefanha-x1.localdomain>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ocuxdfT34gUyH9uKyewxnYZ4WS3GKsBkI"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:23
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,164 +114,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, linyilu@huawei.com,
- qemu-devel@nongnu.org, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
+Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Chuan Zheng (zhengchuan@huawei.com) wrote:
-> From: Zheng Chuan <zhengchuan@huawei.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ocuxdfT34gUyH9uKyewxnYZ4WS3GKsBkI
+Content-Type: multipart/mixed; boundary="AltOV7tBOxbimPkG7ZZUiat7ucm3YcgLP"
+
+--AltOV7tBOxbimPkG7ZZUiat7ucm3YcgLP
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 04/08/20 12:29, Stefan Hajnoczi wrote:
+> On Tue, Aug 04, 2020 at 06:28:04AM +0100, Stefan Hajnoczi wrote:
+>> @@ -597,15 +574,38 @@ bool aio_poll(AioContext *ctx, bool blocking)
+>>       * system call---a single round of run_poll_handlers_once suffices.
+>>       */
+>>      if (timeout || ctx->fdmon_ops->need_wait(ctx)) {
+>> +        /*
+>> +         * aio_notify can avoid the expensive event_notifier_set if
+>> +         * everything (file descriptors, bottom halves, timers) will
+>> +         * be re-evaluated before the next blocking poll().  This is
+>> +         * already true when aio_poll is called with blocking =3D=3D fa=
+lse;
+>> +         * if blocking =3D=3D true, it is only true after poll() return=
+s,
+>> +         * so disable the optimization now.
+>> +         */
+>> +        if (timeout) {
+>> +            atomic_set(&ctx->notify_me, atomic_read(&ctx->notify_me) + =
+2);
+>> +            /*
+>> +             * Write ctx->notify_me before computing the timeout
+>> +             * (reading bottom half flags, etc.).  Pairs with
+>> +             * smp_mb in aio_notify().
+>> +             */
+>> +            smp_mb();
+>> +
+>> +            /* Check again in case a shorter timer was added */
+>> +            timeout =3D qemu_soonest_timeout(timeout, aio_compute_timeo=
+ut(ctx));
+>> +        }
+>> +
+>>          ret =3D ctx->fdmon_ops->wait(ctx, &ready_list, timeout);
+>> -    }
+>> =20
+>> -    if (blocking) {
+>> -        /* Finish the poll before clearing the flag.  */
+>> -        atomic_store_release(&ctx->notify_me, atomic_read(&ctx->notify_=
+me) - 2);
+>> -        aio_notify_accept(ctx);
+>> +        if (timeout) {
+>> +            /* Finish the poll before clearing the flag.  */
+>> +            atomic_store_release(&ctx->notify_me,
+>> +                                 atomic_read(&ctx->notify_me) - 2);
+>> +        }
+>>      }
 >=20
-> Add dirtyrate statistics to record/update dirtyrate info.
+> Hi Paolo,
+> We can avoid calling aio_compute_timeout() like this, what do you think?
+
+I don't understand :) except I guess you mean we can avoid the second
+call.  Can you post either a complete patch with this squashed, or a 4th
+patch (whatever you think is best)?
+
+Paolo
+
+>   bool use_notify_me =3D timeout !=3D 0;
 >=20
-> Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
-> Signed-off-by: YanYing Zhang <ann.zhuangyanying@huawei.com>
-> ---
->  migration/dirtyrate.c | 47 ++++++++++++++++++++++++++++++---------------=
---
->  migration/dirtyrate.h | 11 +++++++++++
->  2 files changed, 41 insertions(+), 17 deletions(-)
+>   if (use_notify_me) {
+>       atomic_set(&ctx->notify_me, atomic_read(&ctx->notify_me) + 2);
+>       /*
+>        * Write ctx->notify_me before computing the timeout
+>        * (reading bottom half flags, etc.).  Pairs with
+>        * smp_mb in aio_notify().
+>        */
+>       smp_mb();
 >=20
-> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-> index fc652fb..6baf674 100644
-> --- a/migration/dirtyrate.c
-> +++ b/migration/dirtyrate.c
-> @@ -13,19 +13,41 @@
->  #include "dirtyrate.h"
-> =20
->  static uint64_t sample_pages_per_gigabytes =3D DIRTYRATE_DEFAULT_SAMPLE_=
-PAGES;
-> -static uint64_t dirty_rate; /* MB/s */
-> +static struct dirtyrate_statistics dirty_stat;
->  CalculatingDirtyRateStage calculating_dirty_rate_stage =3D CAL_DIRTY_RAT=
-E_INIT;
-> =20
-> -static bool calculate_dirtyrate(struct dirtyrate_config config,
-> -                        uint64_t *dirty_rate, int64_t time)
-> +static void reset_dirtyrate_stat(void)
->  {
-> -    /* todo */
-> -    return true;
-> +    dirty_stat.total_dirty_samples =3D 0;
-> +    dirty_stat.total_sample_count =3D 0;
-> +    dirty_stat.total_block_mem_MB =3D 0;
-> +    dirty_stat.dirty_rate =3D 0;
-> +}
-> +
-> +static void update_dirtyrate_stat(struct block_dirty_info *info)
-> +{
-> +    dirty_stat.total_dirty_samples +=3D info->sample_dirty_count;
-> +    dirty_stat.total_sample_count +=3D info->sample_pages_count;
-> +    dirty_stat.total_block_mem_MB +=3D (info->block_pages << DIRTYRATE_P=
-AGE_SIZE_SHIFT) >> PAGE_SIZE_SHIFT;
->  }
-> =20
-> -static void set_dirty_rate(uint64_t drate)
-> +static void update_dirtyrate(int64_t msec)
->  {
-> -    dirty_rate =3D drate;
-> +    uint64_t dirty_rate;
-> +    unsigned int total_dirty_samples =3D dirty_stat.total_dirty_samples;
-> +    unsigned int total_sample_count =3D dirty_stat.total_sample_count;
-> +    unsigned long total_block_mem_MB =3D dirty_stat.total_block_mem_MB;
-> +
-> +    dirty_rate =3D total_dirty_samples * total_block_mem_MB *
-> +                 1000 / (total_sample_count * msec);
-> +
-> +    dirty_stat.dirty_rate =3D dirty_rate;
-> +}
-> +
-> +
-> +static void calculate_dirtyrate(struct dirtyrate_config config, int64_t =
-time)
-> +{
-> +    /* todo */
->  }
-> =20
->  /*
-> @@ -42,21 +64,12 @@ static void set_dirty_rate_stage(CalculatingDirtyRate=
-Stage ratestage)
->  void *get_dirtyrate_thread(void *arg)
->  {
->      struct dirtyrate_config config =3D *(struct dirtyrate_config *)arg;
-> -    uint64_t dirty_rate;
-> -    uint64_t hash_dirty_rate;
-> -    bool query_succ;
->      int64_t msec =3D 0;
->  =20
->      set_dirty_rate_stage(CAL_DIRTY_RATE_ING);
-> =20
-> -    query_succ =3D calculate_dirtyrate(config, &hash_dirty_rate, msec);
-> -    if (!query_succ) {
-> -        dirty_rate =3D 0;
-> -    } else {
-> -        dirty_rate =3D hash_dirty_rate;
-> -    }
-
-All this was only just added; it might be easier to create the
-update_dirtyrate function first.
-
-> +    calculate_dirtyrate(config, msec);
-> =20
-> -    set_dirty_rate(dirty_rate);
->      set_dirty_rate_stage(CAL_DIRTY_RATE_END);
-> =20
->      return NULL;
-> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-> index 342b89f..2994535 100644
-> --- a/migration/dirtyrate.h
-> +++ b/migration/dirtyrate.h
-> @@ -15,6 +15,9 @@
-> =20
->  /* take 256 pages per GB for cal dirty rate */
->  #define DIRTYRATE_DEFAULT_SAMPLE_PAGES    256
-> +#define DIRTYRATE_PAGE_SIZE_SHIFT       12
-> +#define BLOCK_INFO_MAX_LEN              256
-> +#define PAGE_SIZE_SHIFT                 20
-
-I think you might also have used one of these #define's in a previous
-patch; so make sure the patches each compile in order.
-Also, can you please comment each one of these - I was confused by a lot
-of the calculations above because I don't quite understand what each of
-these is.
-I don't thinl 'BLOCK_INFO_MAX_LEN' is needed - becuase it's just a
-RAMBlock ID, and you can link to the RAMBlock.
-I'm not sure what DIRTYRATE_PAGE_SIZE_SHIFT is, or why it's different
-from TARGET_PAGE_BITS.
-
-> =20
->  struct dirtyrate_config {
->      uint64_t sample_pages_per_gigabytes;
-> @@ -33,6 +36,14 @@ typedef enum {
->      CAL_DIRTY_RATE_END   =3D 2,
->  } CalculatingDirtyRateStage;
-> =20
-> +struct dirtyrate_statistics {
-> +    unsigned int total_dirty_samples;
-> +    unsigned int total_sample_count;
-> +    unsigned long total_block_mem_MB;
-
-'long' is normally a bad idea - we use it in a few places and it
-was generally a bad idea; size_t for a size is much better.
-
-> +    int64_t dirty_rate;
-
-Is this blocks/sec, MB/s what - please comment it.
-
-Dave
-
-> +};
-> +
-> +
->  /*=20
->   * Store dirtypage info for each block.
->   */
-> --=20
-> 1.8.3.1
+>       /* Don't block if aio_notify() was called */
+>       if (atomic_read(ctx->notified)) {
+>           timeout =3D 0;
+>       }
+>   }
 >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>   ret =3D ctx->fdmon_ops->wait(ctx, &ready_list, timeout);
+>=20
+>   if (use_notify_me) {
+>       /* Finish the poll before clearing the flag.  */
+>       atomic_store_release(&ctx->notify_me,
+>                            atomic_read(&ctx->notify_me) - 2);
+>   }
+>=20
+
+
+
+--AltOV7tBOxbimPkG7ZZUiat7ucm3YcgLP--
+
+--ocuxdfT34gUyH9uKyewxnYZ4WS3GKsBkI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl8pknYACgkQv/vSX3jH
+roN7kQf/TzoX2cxuzaoveVFRgbO7l5/0v0BJqkoh8EMPIHiFfhpSN/vEtjDMVU9H
+ggNfa+YCPyV5y0xkgWcVLhLOl3Z+m5S+4yB79+lgQ5NkwvvVeGtKTSXI6kCQ4k8t
+H+0dPV2K/R5XSIL8e4HrviPwwG/CDNDb6rtGXV4eE9JgtREmeOTVJUCMi70OMvti
+GI9g9zuUtK7G1e2RZFnRad7W2h3u1jDdscE+gXtIrPq9IpW3CfcO2J/vMmtM2nnH
+xluCg4kPwqjk377W1UU0P1sEogunz97LnXgNPFaLmUlerDYTEPwnYJ9EbiFXvOzs
+j65QV7Au7933dW+7s3sqVVkjmXCf4A==
+=+IoE
+-----END PGP SIGNATURE-----
+
+--ocuxdfT34gUyH9uKyewxnYZ4WS3GKsBkI--
 
 
