@@ -2,100 +2,116 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 008DCC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 07:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D47C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 07:59:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E84B32076E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 07:58:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dRYw/T0y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E84B32076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3F5302076E
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 07:59:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F5302076E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2rq3-00069s-3D
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 03:58:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46252)
+	id 1k2rr1-00074W-AC
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 03:59:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1k2rpK-0005j0-4c
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 03:57:38 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41234)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1k2rpG-0004dz-Rm
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 03:57:37 -0400
-Received: by mail-wr1-x442.google.com with SMTP id r2so31378554wrs.8
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 00:57:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
- :mime-version:content-transfer-encoding:content-language
- :thread-index; bh=vvQsoFHR2+DeaNoRp6DMvUWjuYGvhITErRMiUFGaDog=;
- b=dRYw/T0yqo5tl0bDOFShRYSS6Qf3gjZEgMUmriHTzgnKjgLlSGhSdbJ5egLrYzbEpW
- kyJfO+uq4G3gnyQ0qxGkaHHZD0BfRoVzpJ7EamxfRuroAnSCec7bGONhnWOzQ0xGxrtG
- KFt4qpRaYMjrGRLyY+mNMBaD6JZjHiAcpOeCZ3HbBPrnaEfz+lKfxI/bxdJirJW2Mzs2
- NFsKPMrLeT1vF5+ocVSwE2mCzRbLmZSK3iJboY+lEDqGYM/jFVi6CKGTDs0vUxnkWaHT
- pPtVo7tkVeJxSSFk9mTnY5wDIgIkouKaTx/GM7CMggRADoOZ7inEVmtPXlii3Hmplx16
- Vm8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
- :subject:date:message-id:mime-version:content-transfer-encoding
- :content-language:thread-index;
- bh=vvQsoFHR2+DeaNoRp6DMvUWjuYGvhITErRMiUFGaDog=;
- b=AtDdsOknu1TSJSKFcP8kJPXWz3NhNmmnxMRzYbbFx8Kz+JpkBsFHA24FzUTEGGR4fl
- mVZTQeOFTwLFELsuehgIf+t1cZy0ncd7DXQEc5SPJQ4d1fp+dzLtqdCmWIwVwg6AE30w
- V8w+JqWzCtwTux/Ucoa3lRo/9bfkeZt5rDUiwtyewjlp4SblMNLPVM0c+NvfcUWn298A
- cJ9mT7c8Dq+HsBeYJdLOtvxwPbuH//quTbktP71ZKhYUlJqhIDohoEBdArqqH2L5E58G
- Znaado9xmMGwzmrEjGwl+/DkiRljE/65cW0D3TGSHSfAnMiJ0pR0n4fd86rrtYeebKbU
- Z/6Q==
-X-Gm-Message-State: AOAM530VxR7DxZwLP8w6lWgz8OfYTQ7fiDl+eqxXPe67uD+ng42vMgYW
- DuxN9fL34OWFil0pE8bWbRE=
-X-Google-Smtp-Source: ABdhPJz5q55RXy9x8zNWsppP9ibasWEC4DANgO7R8btCtThODKtR27kGUGJdBZeIVcEjiBsemuaUpw==
-X-Received: by 2002:adf:ef92:: with SMTP id d18mr19684984wro.71.1596527852677; 
- Tue, 04 Aug 2020 00:57:32 -0700 (PDT)
-Received: from CBGR90WXYV0 ([2a00:23c5:5785:9a01:9005:cf07:3ece:ca77])
- by smtp.gmail.com with ESMTPSA id r3sm2114782wro.1.2020.08.04.00.57.31
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 04 Aug 2020 00:57:32 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: "Paul Durrant" <paul@xen.org>
-To: =?utf-8?Q?'Philippe_Mathieu-Daud=C3=A9'?= <philmd@redhat.com>,
- <qemu-devel@nongnu.org>
-References: <20200804074930.13104-1-philmd@redhat.com>
- <20200804074930.13104-2-philmd@redhat.com>
-In-Reply-To: <20200804074930.13104-2-philmd@redhat.com>
-Subject: RE: [PATCH-for-5.1 v2 1/1] accel/xen: Fix xen_enabled() behavior on
- target-agnostic objects
-Date: Tue, 4 Aug 2020 08:57:31 +0100
-Message-ID: <001201d66a34$e82ec070$b88c4150$@xen.org>
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1k2rq7-0006Ob-Ty
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 03:58:27 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:51792
+ helo=v2201612906741603.powersrv.de)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1k2rq5-0004hQ-Ex
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 03:58:27 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id F384BDB3C6F;
+ Tue,  4 Aug 2020 09:58:22 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id 2I5K00eSAeRm; Tue,  4 Aug 2020 09:58:21 +0200 (CEST)
+Received: from macbook02.fritz.box (p57b429dc.dip0.t-ipconnect.de
+ [87.180.41.220])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits))
+ (No client certificate requested)
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id BC505DB3C77;
+ Tue,  4 Aug 2020 09:54:09 +0200 (CEST)
+Subject: Re: [PATCH for-5.1] Add GitHub action for Windows build
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+References: <20200803202042.1869013-1-sw@weilnetz.de>
+ <5373338e-0be6-83f4-e370-d693a06ce26b@amsat.org>
+From: Stefan Weil <sw@weilnetz.de>
+Autocrypt: addr=sw@weilnetz.de; keydata=
+ mQINBFXCNBcBEACUbHx9FWsS1ATrhLGAS+Nc6bFQHPR3CpUQ4v++RiMg25bF6Ov1RsYEcovI
+ 0DXGh6Ma+l6dRlvUXV8tMvNwqghDUr5KY7LN6tgcFKjBbXdv9VlKiWiMLKBrARcFKxx1sfLp
+ 1P8RiaUdKsgy2Hq4T1PPy9ENTL1/FBG6P/Rw0rO9zOB+yNHcRJ5diDnERbi3x7qoaPUra2Ig
+ lmQk/uxXKC0aNIhpNLNiQ+YpwTUN9q3eG6B9/3CG8RGtFzH9vDPlLvtUX+01a2gCifTi3iH3
+ 8EEK8ACXIRs2dszlxMneKTvflXfvyCM1O+59wGcICQxltxLLhHSCJjOQyWdR2JUtn//XjVWM
+ mf6bBT7Imx3DhhfFRlA+/Lw9Zah66DJrZgiV0LqoN/2f031TzD3FCBiGQEMC072MvSQ1DdJN
+ OiRE1iWO0teLOxaFSbvJS9ij8CFSQQTnSVZs0YXGBal+1kMeaKo9sO4tkaAR2190IlMNanig
+ CTJfeFqxzZkoki378grSHdGUTGKfwNPflTOA6Pw6xuUcxW55LB3lBsPqb0289P8o9dTR7582
+ e6XTkpzqe/z/fYmfI9YXIjGY8WBMRbsuQA30JLq1/n/zwxAOr2P9y4nqTMMgFOtQS8w4G46K
+ UMY/5IspZp2VnPwvazUo2zpYiUSLo1hFHx2jrePYNu2KLROXpwARAQABtBxTdGVmYW4gV2Vp
+ bCA8c3dAd2VpbG5ldHouZGU+iQI6BBMBCAAkAhsDBQsJCAcDBRUKCQgLBRYCAwEAAh4BAheA
+ BQJV04LlAhkBAAoJEOCMIdVndFCtP5QP/1U8yWZzHeHufRFxtMsK1PERiLuKyGRH2oE5NWVc
+ 5QQHZZ2ypXu53o2ZbZxmdy8+4lXiPWWwYVqto3V7bPaMTvQhIT0I3c3ZEZsvwyEEE6QdRs52
+ haZwX+TzNMQ5mOePdM2m4WqO0oU7YHU2WFf54MBmAGtj3FAQEAlZAaMiJs2aApw/4t35ICL1
+ Sb0FY8d8lKBbIFOAaFfrlQTC3y8eMTk1QxOVtdXpRrOl6OE0alWn97NRqeZlBm0P+BEvdgTP
+ Qt+9rxbe4ulgKME2LkbDhLqf0m2+xMXb7T4LiHbQYnnWKGZyogpFaw3PuRVd9m8uxx1F8b4U
+ jNzI9x2Ez5LDv8NHpSY0LGwvVmkgELYbcbyiftbuw81gJuM7k4IW5GR85kTH6y/Sq6JNaI4p
+ 909IK8X4eeoCkAqEVmDOo1D5DytgxIV/PErrin82OIDXLENzOWfPPtUTO+H7qUe80NS2HLPG
+ IveYSjuYKBB6n2JhPkUD7xxMEdh5Ukqi1WIBSV4Tuk3/ubHajP5bqg4QP3Wo1AyICX09A1QQ
+ DajtMkyxXhYxr826EGcRD2WUUprGNYwaks4YiPuvOAJxSYprKWT6UDHzE3S8u4uZZm9H8cyg
+ Fa3pysJwTmbmrBAP1lMolwXHky60dPnKPmFyArGC0utAH7QELXzBybnE/vSNttNT1D+HuQIN
+ BFXcnj0BEAC32cCu2MWeqZEcvShjkoKsXk42mHrGbeuh/viVn8JOQbTO706GZtazoww2weAz
+ uVEYhwqi7u9RATz9MReHf7R5F0KIRhc/2NhNNeixT/7L+E5jffH1LD+0IQdeLPoz6unvg7U/
+ 7OpdKWbHzPM3Lfd0N1dRP5sXULpjtYQKEgiOU58sc4F5rM10KoPFEMz8Ip4j9RbH/CbTPUM0
+ S4PxytRciB3Fjd0ECbVsErTjX7cZc/yBgs3ip7BPVWgbflhrc+utML/MwC6ZqCOIXf/U0ICY
+ fp5I7PDbUSWgMFHvorWegMYJ9EzZ2nTvytL8E75C2U3j5RZAuQH5ysfGpdaTS76CRrYDtkEc
+ ViTL+hRUgrX9qvqzCdNEePbQZr6u6TNx3FBEnaTAZ5GuosfUk7ynvam2+zAzLNU+GTywTZL2
+ WU+tvOePp9z1/mbLnH2LkWHgy3bPu77AFJ1yTbBXl5OEQ/PtTOJeC1urvgeNru26hDFSFyk4
+ gFcqXxswu2PGU7tWYffXZXN+IFipCS718eDcT8eL66ifZ8lqJ8Vu5WJmp9mr1spP9RYbT7Rw
+ pzZ3iiz7e7AZyOtpSMIVJeYZTbtiqJbyN4zukhrTdCgCFYgf0CkA5UGpYXp2sXPr+gVxKX2p
+ tj/gid4n95vR7KMeWV6DJ0YS4hKGtdhkuJCpJfjKP/e8TwARAQABiQIfBBgBCAAJBQJV3J49
+ AhsMAAoJEOCMIdVndFCtYRoQAJOu3RZTEvUBPoFqsnd849VmOKKg77cs+HD3xyLtp95JwQrz
+ hwa/4ouDFrC86jt1vARfpVx5C8nQtNnWhg+5h5kyOIbtB1/27CCTdXAd/hL2k3GyrJXEc+i0
+ 31E9bCqgf2KGY7+aXu4LeAfRIWJT9FGVzdz1f+77pJuRIRRmtSs8VAond2l+OcDdEI9Mjd9M
+ qvyPJwDkDkDvsNptrcv4xeNzvX+2foxkJmYru6dJ+leritsasiAxacUowGB5E41RZEUg6bmV
+ F4SMseIAEKWLy3hPGvYBOzADhq2YLgnM/wn9Y9Z7bEMy+w5e75saBbkFI7TncxDPUnIl/UTE
+ KU1ORi5WWbvXYkUTtfNzZyD0/v3oojcIoZvK1OlpOtXHdlqOodjXF9nLe8eiVHyl8ZnzFxhe
+ EW2QPvX8FLKqmSs9W9saQtk6bhv9LNYIYINjH3EEH/+bbmV+ln4O7a73Wm8L3tnpC3LmdGn2
+ Rm8B6J2ZK6ci1TRDiMpCUWefpnIuE+TibC5VJR5zx0Yh11rxxBFob8mWktRmLZyeEoCcZoBo
+ sbJxD80QxWO03zPpkcJ7d4BrVsQ/BJkBtEe4Jn4iqHqA/OcrzwuEZSv+/MdgoqfblBZhDusm
+ LYfVy7wFDeVClG6eQIiK2EnmDChLRkVIQzbkV0iG+NJVVJHLGK7/OsO47+zq
+Message-ID: <98cf7953-05c1-2ff9-d44a-abef4063ac4c@weilnetz.de>
+Date: Tue, 4 Aug 2020 09:54:08 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+In-Reply-To: <5373338e-0be6-83f4-e370-d693a06ce26b@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: en-gb
-Thread-Index: AQM/xXTZtf+c9Zv1otz4aIX099Jj8gDx5jXApk1PJBA=
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=xadimgnik@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
+ helo=v2201612906741603.powersrv.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 02:55:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,134 +125,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: paul@xen.org
-Cc: 'Peter Maydell' <peter.maydell@linaro.org>,
- 'Stefano Stabellini' <sstabellini@kernel.org>,
- 'Paul Durrant' <pdurrant@amazon.com>, 'Paolo Bonzini' <pbonzini@redhat.com>,
- 'Anthony Perard' <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Sent: 04 August 2020 08:50
-> To: qemu-devel@nongnu.org
-> Cc: Peter Maydell <peter.maydell@linaro.org>; Anthony Perard =
-<anthony.perard@citrix.com>; Paolo
-> Bonzini <pbonzini@redhat.com>; Stefano Stabellini =
-<sstabellini@kernel.org>; xen-
-> devel@lists.xenproject.org; Paul Durrant <paul@xen.org>; Philippe =
-Mathieu-Daud=C3=A9 <philmd@redhat.com>;
-> Paul Durrant <pdurrant@amazon.com>
-> Subject: [PATCH-for-5.1 v2 1/1] accel/xen: Fix xen_enabled() behavior =
-on target-agnostic objects
->=20
-> CONFIG_XEN is generated by configure and stored in "config-target.h",
-> which is (obviously) only include for target-specific objects.
-> This is a problem for target-agnostic objects as CONFIG_XEN is never
-> defined and xen_enabled() is always inlined as 'false'.
->=20
-> Fix by following the KVM schema, defining CONFIG_XEN_IS_POSSIBLE
-> when we don't know to force the call of the non-inlined function,
-> returning the xen_allowed boolean.
->=20
-> Fixes: da278d58a092 ("accel: Move Xen accelerator code under =
-accel/xen/")
-> Reported-by: Paul Durrant <pdurrant@amazon.com>
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  include/sysemu/xen.h   | 18 ++++++++++++++----
->  accel/stubs/xen-stub.c |  2 ++
->  accel/xen/xen-all.c    |  7 +------
->  3 files changed, 17 insertions(+), 10 deletions(-)
->=20
-> diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
-> index 1ca292715e..2c2c429ea8 100644
-> --- a/include/sysemu/xen.h
-> +++ b/include/sysemu/xen.h
-> @@ -8,9 +8,19 @@
->  #ifndef SYSEMU_XEN_H
->  #define SYSEMU_XEN_H
->=20
-> -#ifdef CONFIG_XEN
-> +#ifdef NEED_CPU_H
-> +# ifdef CONFIG_XEN
-> +#  define CONFIG_XEN_IS_POSSIBLE
-> +# endif
-> +#else
-> +# define CONFIG_XEN_IS_POSSIBLE
-> +#endif
->=20
-> -bool xen_enabled(void);
-> +#ifdef CONFIG_XEN_IS_POSSIBLE
-> +
-> +extern bool xen_allowed;
-> +
-> +#define xen_enabled()           (xen_allowed)
+Am 04.08.20 um 09:29 schrieb Philippe Mathieu-Daud=C3=A9:
 
-Can this not move ahead of the #ifdef now (since xen_allowed is present =
-in both xen-stub and xen-all)? I think this is what Peter was saying in =
-his option '(2)'.
+> But I'm not keen on not using GitLab instead.
+>
+> The only point I see of using GitHub/Azureus is if we then install
+> and run testing in the Windows Server 2019 environment:
+>
+> https://docs.github.com/en/actions/reference/workflow-syntax-for-github=
+-actions#jobsjob_idruns-on
 
-  Paul
 
->=20
->  #ifndef CONFIG_USER_ONLY
->  void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
-> @@ -18,7 +28,7 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t =
-size,
->                     struct MemoryRegion *mr, Error **errp);
->  #endif
->=20
-> -#else /* !CONFIG_XEN */
-> +#else /* !CONFIG_XEN_IS_POSSIBLE */
->=20
->  #define xen_enabled() 0
->  #ifndef CONFIG_USER_ONLY
-> @@ -33,6 +43,6 @@ static inline void xen_ram_alloc(ram_addr_t =
-ram_addr, ram_addr_t size,
->  }
->  #endif
->=20
-> -#endif /* CONFIG_XEN */
-> +#endif /* CONFIG_XEN_IS_POSSIBLE */
->=20
->  #endif
-> diff --git a/accel/stubs/xen-stub.c b/accel/stubs/xen-stub.c
-> index dcca4e678a..8ae658acff 100644
-> --- a/accel/stubs/xen-stub.c
-> +++ b/accel/stubs/xen-stub.c
-> @@ -9,6 +9,8 @@
->  #include "hw/xen/xen.h"
->  #include "qapi/qapi-commands-misc.h"
->=20
-> +bool xen_allowed;
-> +
->  void xenstore_store_pv_console_info(int i, Chardev *chr)
->  {
->  }
-> diff --git a/accel/xen/xen-all.c b/accel/xen/xen-all.c
-> index 0c24d4b191..60b971d0a8 100644
-> --- a/accel/xen/xen-all.c
-> +++ b/accel/xen/xen-all.c
-> @@ -32,12 +32,7 @@
->      do { } while (0)
->  #endif
->=20
-> -static bool xen_allowed;
-> -
-> -bool xen_enabled(void)
-> -{
-> -    return xen_allowed;
-> -}
-> +bool xen_allowed;
->=20
->  xc_interface *xen_xc;
->  xenforeignmemory_handle *xen_fmem;
-> --
-> 2.21.3
+That should be possible. The required packages are available from
+Cygwin, and Cygwin also provides the same Mingw-w64 compilers as the
+typical Linux distributions. QEMU builds take much longer on Windows, so
+implementing and testing this will need much patience. Maybe it is also
+possible to combine a cross build on Ubuntu with a test part on Windows
+Server.
+
+Stefan
+
 
 
 
