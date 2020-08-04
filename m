@@ -2,79 +2,124 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41902C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 13:51:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C1EC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 13:58:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 140FA2086A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 13:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D3082086A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 13:58:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ANP1DlqT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 140FA2086A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BB9AqoIk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D3082086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2xLx-0004Y8-1R
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 09:51:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37906)
+	id 1k2xSN-0008JH-Iv
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 09:58:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2xLL-00043u-Bg
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 09:51:03 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28251
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k2xRl-0007n6-4z
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 09:57:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48750
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k2xLJ-0001mo-LE
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 09:51:03 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k2xRj-0002fo-9V
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 09:57:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596549060;
+ s=mimecast20190719; t=1596549458;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=PDlU1SWZIaXmKWWWUODjo+jN4UKP3f7x2IFWewAQi0Q=;
- b=ANP1DlqTN4OyOtvUgvngVdZuyTtHsztT/CMVV6EjfniuPFRbrQyhBJO+YffAqpLWiJfppg
- FkeQUgtMLbd552tKDnPi50nsYdGce3W0SpBUDbhx+tc7wObz98fj+QYS5vTS8GDU5n6frV
- m6OTa8yG7uya51CoNZFaWBrroN5A5Es=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-XBH2rDg9Ns-Xz-K5F-SsQg-1; Tue, 04 Aug 2020 09:50:56 -0400
-X-MC-Unique: XBH2rDg9Ns-Xz-K5F-SsQg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4DDB1009616;
- Tue,  4 Aug 2020 13:50:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 806DB2855E;
- Tue,  4 Aug 2020 13:50:55 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 16AA31141D60; Tue,  4 Aug 2020 15:50:54 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v6 06/12] monitor: Make current monitor a per-coroutine
- property
-References: <20200528153742.274164-1-kwolf@redhat.com>
- <20200528153742.274164-7-kwolf@redhat.com>
-Date: Tue, 04 Aug 2020 15:50:54 +0200
-In-Reply-To: <20200528153742.274164-7-kwolf@redhat.com> (Kevin Wolf's message
- of "Thu, 28 May 2020 17:37:36 +0200")
-Message-ID: <87tuxia5a9.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=KYu8ioF9yN3hlqFs3COjWWW7WoManQ74r0DViFTHPT0=;
+ b=BB9AqoIkPLrsmUBPHbbZpgyPD4OkafdgYKMuBDaVENz/huEVlIdSFR/M/Vx6huIqhKZ4YT
+ r+w4lBf9qxGEDEJCnYEOuRWDJF/Fy5oqrXsX6ZhRKNg8iKC5VVnWBeOG7+dGU804PiAAfG
+ jJ/goe17qmr0n0bjZsTgeL4AECViKys=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-2m76T6rUMaGtBkk_ri-K4g-1; Tue, 04 Aug 2020 09:57:36 -0400
+X-MC-Unique: 2m76T6rUMaGtBkk_ri-K4g-1
+Received: by mail-ej1-f69.google.com with SMTP id gg11so4768418ejb.6
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 06:57:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=oKn9gKuW+rDBMRy9SYoT4QEJRsmFV5qCsZWp/OvUhrI=;
+ b=J8nztUYvSLD/JbQ4i8pP6CWCsCrNd7ZYi9Ky/jluNtFFy+3pPhtnBz2NtljYfv6nqL
+ m/gGfhCkm10gtGEdagZhQGVznuEk5ogboq9gZN2t7YJBCW1c/cGzAFpRjnNSnSSl7GCg
+ OJDXNASvjR+BLeNoJo0o8hLfqf3EJJaB+5hcldt+VJqxAO22o0NmgjAuRppfZyqzbfIs
+ iscLduRL/uT434Wllpx4QoTTLR5HJ9YvyzIrb3lt+TbEpvcLnQjNsedH3vrFFuKevaM6
+ wSEazbnSJw81GGNRadWrTBk+SlcVqdC85jdoTD3aBsDcTe21RNkUsSFv2J1cqxrcOl4D
+ 7/1w==
+X-Gm-Message-State: AOAM533sN0LCxPAgLNJbjAgfErYG3/fhjq5PI2Rf3L242lR2rkyLxxn/
+ wiMzY9zfYCyTgYdxVQc2wWUHlwv+XGS+vmPrnaZ55jzyTfyXHAKw526MYnMA81uGcMp9RaX9GAc
+ rpxYLCwxXCgNRrsI=
+X-Received: by 2002:a17:906:3a4c:: with SMTP id
+ a12mr21196831ejf.306.1596549455510; 
+ Tue, 04 Aug 2020 06:57:35 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwuDHnTew2E+8+7pcgAxJ6PxGInWbgKDT2IbcpfVBpxpGOhnkx7xqLb60EIoYJY0ugqIxo7FQ==
+X-Received: by 2002:a17:906:3a4c:: with SMTP id
+ a12mr21196807ejf.306.1596549455233; 
+ Tue, 04 Aug 2020 06:57:35 -0700 (PDT)
+Received: from [192.168.1.43] (214.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.214])
+ by smtp.gmail.com with ESMTPSA id v14sm18819955ejb.63.2020.08.04.06.57.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Aug 2020 06:57:34 -0700 (PDT)
+Subject: Re: [PATCH 1/3] memory: add readonly support to
+ memory_region_init_ram_from_file()
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200804101244.1283503-1-stefanha@redhat.com>
+ <20200804101244.1283503-2-stefanha@redhat.com>
+ <febc6361-1c62-bc3e-7924-bbd19711b5df@redhat.com>
+ <1240d81b-7ac5-d06d-671a-70614004a721@redhat.com>
+ <20200804134756.GA1287869@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <ac5b358e-ac12-1979-f254-323e6fa2de99@redhat.com>
+Date: Tue, 4 Aug 2020 15:57:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200804134756.GA1287869@stefanha-x1.localdomain>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:01:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -84,7 +129,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,170 +142,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
+ qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On 8/4/20 3:47 PM, Stefan Hajnoczi wrote:
+> On Tue, Aug 04, 2020 at 02:26:22PM +0200, Philippe Mathieu-Daudé wrote:
+>> On 8/4/20 2:25 PM, Philippe Mathieu-Daudé wrote:
+>>> Hi Stefan,
+>>>
+>>> On 8/4/20 12:12 PM, Stefan Hajnoczi wrote:
+>>>> There is currently no way to open(O_RDONLY) and mmap(PROT_READ) when
+>>>> creating a memory region from a file. This functionality is needed since
+>>>> the underlying host file may not allow writing.
+>>>>
+>>>> Add a bool readonly argument to memory_region_init_ram_from_file() and
+>>>> the APIs it calls.
+>>>>
+>>>> Extend memory_region_init_ram_from_file() rather than introducing a
+>>>> memory_region_init_rom_from_file() API so that callers can easily make a
+>>>> choice between read/write and read-only at runtime without calling
+>>>> different APIs.
+>>>
+>>> What happens if we call:
+>>>
+>>>  memory_region_init_ram_from_file(mr, ..., readonly=false, ...);
+>>>  memory_region_set_readonly(mr, false);
+>>
+>> In case my error is not obvious, I meant:
+>>
+>>    memory_region_init_ram_from_file(mr, ..., readonly=true, ...);
+>>    memory_region_set_readonly(mr, false);
+> 
+> Since the mmap was made using PROT_READ any store instructions to the
+> memory will fault.
+> 
+> Is there some scenario where memory_region_set_readonly() is called? I
+> can't find one.
 
-> This way, a monitor command handler will still be able to access the
-> current monitor, but when it yields, all other code code will correctly
-> get NULL from monitor_cur().
->
-> Outside of coroutine context, qemu_coroutine_self() returns the leader
-> coroutine of the current thread.
+Not in the current code base, but I was wondering about the API abuses.
 
-Unsaid: you use it as a hash table key to map from coroutine to monitor,
-and for that you need it to return a value unique to the coroutine in
-coroutine context, and a value unique to the thread outside coroutine
-context.  Which qemu_coroutine_self() does.  Correct?
+I see in the next patch the property is protected:
 
-The hash table works, but I hate it just as much as I hate
-pthread_getspecific() / pthread_setspecific().
+    if (host_memory_backend_mr_inited(backend)) {
+        error_setg(errp, "cannot change property 'readonly' of %s.",
+                   object_get_typename(o));
+        return;
+    }
 
-What we have here is a need for coroutine-local data.  Feels like a
-perfectly natural concept to me.
+By using memory_region_set_readonly() you bypass this protection.
 
-Are we going to create another hash table whenever we need another piece
-of coroutine-local data?  Or shall we reuse the hash table, suitably
-renamed and moved to another file?
+Maybe not something to worry.
 
-Why not simply associate an opaque pointer with each coroutine?  All it
-takes is one more member of struct Coroutine.  Whatever creates the
-coroutine decides what to use it for.  The monitor coroutine would use
-it to point to the monitor.
+Anyway for the patch:
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-At least, discuss the design alternatives in the commit message.
-
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/monitor/monitor.h |  2 +-
->  monitor/hmp.c             |  4 ++--
->  monitor/monitor.c         | 27 +++++++++++++++++++++------
->  qapi/qmp-dispatch.c       |  4 ++--
->  stubs/monitor-core.c      |  2 +-
->  5 files changed, 27 insertions(+), 12 deletions(-)
->
-> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-> index 43cc746078..16072e325c 100644
-> --- a/include/monitor/monitor.h
-> +++ b/include/monitor/monitor.h
-> @@ -13,7 +13,7 @@ typedef struct MonitorOptions MonitorOptions;
->  extern QemuOptsList qemu_mon_opts;
->  
->  Monitor *monitor_cur(void);
-> -void monitor_set_cur(Monitor *mon);
-> +void monitor_set_cur(Coroutine *co, Monitor *mon);
->  bool monitor_cur_is_qmp(void);
->  
->  void monitor_init_globals(void);
-> diff --git a/monitor/hmp.c b/monitor/hmp.c
-> index 79be6f26de..3e73a4c3ce 100644
-> --- a/monitor/hmp.c
-> +++ b/monitor/hmp.c
-> @@ -1082,9 +1082,9 @@ void handle_hmp_command(MonitorHMP *mon, const char *cmdline)
->  
->      /* old_mon is non-NULL when called from qmp_human_monitor_command() */
->      old_mon = monitor_cur();
-> -    monitor_set_cur(&mon->common);
-> +    monitor_set_cur(qemu_coroutine_self(), &mon->common);
->      cmd->cmd(&mon->common, qdict);
-> -    monitor_set_cur(old_mon);
-> +    monitor_set_cur(qemu_coroutine_self(), old_mon);
->  
->      qobject_unref(qdict);
->  }
-> diff --git a/monitor/monitor.c b/monitor/monitor.c
-> index 182ba136b4..35003bb486 100644
-> --- a/monitor/monitor.c
-> +++ b/monitor/monitor.c
-> @@ -58,24 +58,38 @@ IOThread *mon_iothread;
->  /* Bottom half to dispatch the requests received from I/O thread */
->  QEMUBH *qmp_dispatcher_bh;
->  
-> -/* Protects mon_list, monitor_qapi_event_state, monitor_destroyed.  */
-> +/*
-> + * Protects mon_list, monitor_qapi_event_state, coroutine_mon,
-> + * monitor_destroyed.
-> + */
->  QemuMutex monitor_lock;
->  static GHashTable *monitor_qapi_event_state;
-> +static GHashTable *coroutine_mon; /* Maps Coroutine* to Monitor* */
->  
->  MonitorList mon_list;
->  int mon_refcount;
->  static bool monitor_destroyed;
->  
-> -static __thread Monitor *cur_monitor;
-> -
->  Monitor *monitor_cur(void)
->  {
-> -    return cur_monitor;
-> +    Monitor *mon;
-> +
-> +    qemu_mutex_lock(&monitor_lock);
-> +    mon = g_hash_table_lookup(coroutine_mon, qemu_coroutine_self());
-> +    qemu_mutex_unlock(&monitor_lock);
-> +
-> +    return mon;
->  }
->  
-> -void monitor_set_cur(Monitor *mon)
-> +void monitor_set_cur(Coroutine *co, Monitor *mon)
->  {
-> -    cur_monitor = mon;
-> +    qemu_mutex_lock(&monitor_lock);
-> +    if (mon) {
-> +        g_hash_table_replace(coroutine_mon, co, mon);
-> +    } else {
-> +        g_hash_table_remove(coroutine_mon, co);
-> +    }
-> +    qemu_mutex_unlock(&monitor_lock);
->  }
-
-You really need a contract now: any call to monitor_set_cur() with a
-non-null @mon must be followed by a call with a null @mon.
-
->  
->  /**
-> @@ -613,6 +627,7 @@ void monitor_init_globals_core(void)
->  {
->      monitor_qapi_event_init();
->      qemu_mutex_init(&monitor_lock);
-> +    coroutine_mon = g_hash_table_new(NULL, NULL);
->  
->      /*
->       * The dispatcher BH must run in the main loop thread, since we
-> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-> index 2fdbc0fba4..5677ba92ca 100644
-> --- a/qapi/qmp-dispatch.c
-> +++ b/qapi/qmp-dispatch.c
-> @@ -154,11 +154,11 @@ QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
->      }
->  
->      assert(monitor_cur() == NULL);
-> -    monitor_set_cur(cur_mon);
-> +    monitor_set_cur(qemu_coroutine_self(), cur_mon);
->  
->      cmd->fn(args, &ret, &err);
->  
-> -    monitor_set_cur(NULL);
-> +    monitor_set_cur(qemu_coroutine_self(), NULL);
->      qobject_unref(args);
->      if (err) {
->          /* or assert(!ret) after reviewing all handlers: */
-> diff --git a/stubs/monitor-core.c b/stubs/monitor-core.c
-> index e493df1027..635e37a6ba 100644
-> --- a/stubs/monitor-core.c
-> +++ b/stubs/monitor-core.c
-> @@ -8,7 +8,7 @@ Monitor *monitor_cur(void)
->      return NULL;
->  }
->  
-> -void monitor_set_cur(Monitor *mon)
-> +void monitor_set_cur(Coroutine *co, Monitor *mon)
->  {
->  }
+> 
+> Stefan
+> 
 
 
