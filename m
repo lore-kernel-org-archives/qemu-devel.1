@@ -2,91 +2,82 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF807C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 12:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA82C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 12:52:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 950982075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 12:50:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LwddJSJ3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 950982075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B85782075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 12:52:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B85782075A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2wP3-00032Z-Qw
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 08:50:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41554)
+	id 1k2wQb-0004PM-Fb
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 08:52:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k2wOQ-0002Ss-PT
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 08:50:10 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23669
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k2wOO-0000cF-GT
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 08:50:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596545407;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=RE1Vx0m7B9gews2LJrlNt0Qxlu7aJ7TNn1gz806bm9U=;
- b=LwddJSJ3CgqExCNuIu/yyv1NGcmRQ4Ujr1jRR5g7i/n4LDgX0FEQbmlw52hXKBxKGZYBys
- zXgD4/LVDrupNtU7xEoQu618Mn0J5wme5ctP5TKQOufOANEiVJ07P88Q4ZcODJtzgdpq56
- YDpE6ZBfU6g4BRUnQHlXeU5Tx8sUFRs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-6ncL7L-0PgOYW-gScmhUCg-1; Tue, 04 Aug 2020 08:50:03 -0400
-X-MC-Unique: 6ncL7L-0PgOYW-gScmhUCg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEDB6107BEF7;
- Tue,  4 Aug 2020 12:50:01 +0000 (UTC)
-Received: from localhost (ovpn-112-116.ams2.redhat.com [10.36.112.116])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5FE857B904;
- Tue,  4 Aug 2020 12:49:50 +0000 (UTC)
-Date: Tue, 4 Aug 2020 13:49:49 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jagannathan Raman <jag.raman@oracle.com>
-Subject: Re: [PATCH v8 06/20] multi-process: define MPQemuMsg format and
- transmission functions
-Message-ID: <20200804124949.GB1284674@stefanha-x1.localdomain>
-References: <cover.1596217462.git.jag.raman@oracle.com>
- <50f84ecac23889920aeed397adb9317b8ea5a54b.1596217462.git.jag.raman@oracle.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2wPB-0003LH-Ni
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 08:50:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40746)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2wP8-0000r9-GU
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 08:50:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k2wP6-0001S1-NA
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 12:50:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A7F3F2E80EE
+ for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 12:50:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <50f84ecac23889920aeed397adb9317b8ea5a54b.1596217462.git.jag.raman@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="rJwd6BRFiFCcLxzm"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:01:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 04 Aug 2020 12:44:46 -0000
+From: Peter Maydell <1879587@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jfreche pmaydell
+X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
+Message-Id: <159654508702.10292.8574813227211576329.malone@chaenomeles.canonical.com>
+Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
+ banked registers when switching from AA32 to AA64
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1134462886baf0fc6425a9ed16e606c2623e698b
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 08:50:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,122 +86,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
- kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Reply-To: Bug 1879587 <1879587@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---rJwd6BRFiFCcLxzm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Hmm, that's odd. The switch statement fall-throughs and case labels mean
+that that code should be executed for all exceptions taken to AArch64
+except for IRQ/FIQ/VIRQ/VFIQ. (You could probably confirm that by
+running QEMU under a debugger and putting in suitable breakpoints.)
 
-On Fri, Jul 31, 2020 at 02:20:13PM -0400, Jagannathan Raman wrote:
-> +static int mpqemu_readv(QIOChannel *ioc, struct iovec *iov, int **fds,
-> +                        size_t *nfds, Error **errp)
+Do you have a test case image/command line I could use to reproduce the
+issue ?
 
-readv(2) and similar functions take an int iovcnt argument while
-mpqemu_readv() takes just a single struct iovec. The name mpqemu_read()
-seems more appopriate and iov argument could be replaced by void *buf,
-size_t len. That is cleaner because this function modifies the iov
-argument (callers need to be be careful!).
+-- =
 
-> +{
-> +    struct iovec *l_iov = iov;
-> +    size_t *l_nfds = nfds;
-> +    unsigned int niov = 1;
-> +    int **l_fds = fds;
-> +    size_t size, len;
-> +    Error *local_err = NULL;
-> +
-> +    size = iov->iov_len;
-> +
-> +    while (size > 0) {
-> +        len = qio_channel_readv_full(ioc, l_iov, niov, l_fds, l_nfds,
-> +                                     &local_err);
-> +
-> +        if (len == QIO_CHANNEL_ERR_BLOCK) {
-> +            if (qemu_in_coroutine()) {
-> +                qio_channel_yield(ioc, G_IO_IN);
-> +            } else {
-> +                qio_channel_wait(ioc, G_IO_IN);
-> +            }
-> +            continue;
-> +        }
-> +
-> +        if (len <= 0) {
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1879587
 
-size_t is unsigned so this does not detect negative values. Please use
-qio_channel_readv_full()'s return type (ssize_t) instead.
+Title:
+  Register number in ESR is incorrect for certain banked registers when
+  switching from AA32 to AA64
 
-> +            error_propagate(errp, local_err);
-> +            return -EIO;
-> +        }
-> +
-> +        l_fds = NULL;
-> +        l_nfds = NULL;
-> +
-> +        size -= len;
-> +
-> +        (void)iov_discard_front(&l_iov, &niov, len);
-> +    }
-> +
-> +    return iov->iov_len;
+Status in QEMU:
+  In Progress
 
-read()-style functions return the number of bytes read. mpqemu_readv()
-returns the number of unread bytes remaining. Maintaining consistency
-with read() function conventions will reduce the chance of bugs, so I
-suggest returning the number of bytes read instead.
+Bug description:
+  I am running into a situation where I have:
+  - A hypervisor running in EL2, AA64
+  - A guest running in EL1, AA32
 
-> +}
-> +
-> +void mpqemu_msg_recv(MPQemuMsg *msg, QIOChannel *ioc, Error **errp)
-> +{
-> +    Error *local_err = NULL;
-> +    int *fds = NULL;
-> +    struct iovec hdr, data;
-> +    size_t nfds = 0;
-> +
-> +    hdr.iov_base = msg;
-> +    hdr.iov_len = MPQEMU_MSG_HDR_SIZE;
-> +
-> +    if (mpqemu_readv(ioc, &hdr, &fds, &nfds, &local_err) < 0) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
+  We trap certain accesses to special registers such as DACR (via
+  HCR.TVM). One instruction that is trapped is:
 
-Can we read less than MPQEMU_MSG_HDR_SIZE if the peer closes the socket?
-That case probably needs to be handled.
+  ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
 
-> +void mpqemu_msg_cleanup(MPQemuMsg *msg)
-> +{
-> +    if (msg->data2) {
-> +        free(msg->data2);
+  The guest is running in SVC mode. So, LR should refer to LR_svc there.
+  LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
+  the actual ESR value is: 0xfe00dc0
 
-The buffer was allocated with g_malloc0() so g_free() should be used to
-free it.
+  If we decode the 'rt':
+  >>> (0xfe00dc0 >> 5) & 0x1f
+  14
 
---rJwd6BRFiFCcLxzm
-Content-Type: application/pgp-signature; name="signature.asc"
+  My understanding is that 14 is incorrect in the context of AA64. rt
+  should be set to 18. The current mode being SVC, LR refers to LR_svc
+  not LR_usr. In other words, the mapping between registers in AA64 and
+  AA32 doesn't seem to be accounted for. I've tested this with Qemu
+  5.0.0
 
------BEGIN PGP SIGNATURE-----
+  Let me know if that makes sense and if you would like more info. I am als=
+o happy to test patches.
+  Thanks for all the great work on Qemu!
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8pWW0ACgkQnKSrs4Gr
-c8jxYQf/ZcOxxZC9olljiHU+zLeRrF5KS5Ntn5e4JxJzFMcBXzgVpvWZVEIWleW9
-24s9KaiGv3m4Ge28AKzQh4YadIT++uwfEFeI2kvvn95As2KGimzCb5rLM6B7KwRJ
-0emMaS0ivmQnbHpmIKlpckg9x7Kle2ti+p10kVkg/SkrayNfs/T0vK9ylQDZ9cwC
-8gMCcu2aJZp6tT2ydphRRlyoGNEnbaQel2B9MGVV/8TpclAmFNCjuVMJhzP2VOfN
-L5ckbsCzIwgxQY13R8WEHU1jgc3GXvqsM4DGBKqP5KRRKiuhDodG/rlsVQSSbQsZ
-3/3G5qxG7iYnMvfPZS7B1D48gme4Jg==
-=x3oI
------END PGP SIGNATURE-----
-
---rJwd6BRFiFCcLxzm--
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1879587/+subscriptions
 
