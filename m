@@ -2,99 +2,88 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC441C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C51CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:53:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 823F7206DA
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:52:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEB5D206DA
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 17:53:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f+gYqWYv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 823F7206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DIFvZO77"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEB5D206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k317J-0005oT-OJ
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 13:52:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47230)
+	id 1k318Q-0006zj-0z
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 13:53:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k316W-0004zf-3Y
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:52:00 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:44661)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k316U-00043h-I4
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:51:59 -0400
-Received: by mail-ej1-x644.google.com with SMTP id bo3so20786737ejb.11
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 10:51:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=bnJgQ96N4hK57RARO+UZKRQXB9rQDCBQzloXPRIZ9Yw=;
- b=f+gYqWYvoYeh1Yz3ujXiSQIo3pb08GMe5FEH+DmCDCHMhd1c23VTFvjsk5jktHoWZh
- s+k4lWbdG/7k8U7iqCGYfThBDHQWAuNa2dMI6nDAWS01DvDfbQKTXngY3DA9fP4/ysKg
- O+sRLxqeOMHpSQ0aAzSpZGnDON+1xTT00mNoeJojllIhppv/IcydD15JjOkFmA5+kRBw
- O9YEqCEcXFhQ05v6c2oOn9NdOZHNlND4aMbA4Rl/w10/WsGJGBni8UOfOjBtT8UR18aV
- qoB6KPUZqJYGlY+0JhesQE/mUx+srTut3yWzXT1lohQ4OZoeBWJJ9UgegU07K3ffhTdH
- /HPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bnJgQ96N4hK57RARO+UZKRQXB9rQDCBQzloXPRIZ9Yw=;
- b=hasYoemHf3dhzGPP0kTcaIjLADKkn2mj4kRPSTq/WZzDJLQ3EQ1n6rA05h7o3UxmDW
- nrgLpRz3LXiUfTtuJBiZl2fvwFhXmINcF6+H9F45MaLXgQGXyvCX8xASUrtAjS/3V/VL
- hpP/e8OSHpCZm6dJMRvDRrDMnGLI1CCctp2ADM1K6IECPfZ8QGFYuT0OYe5hKwAANdGn
- zihNRUCRsLshUVjvo7GbQortHZEjDQs4+8wq8KqMsiSABxmFylrakxYc+0x9HfOJrYgH
- Zo4iQv5BoUrejvj80XVSEFuRNilnjt+Ol8yDNQelnSS7lc6Zp9+msarF3B9eVrLLTrGm
- 04WA==
-X-Gm-Message-State: AOAM532F0dYU7Ho6c0WH4z11h11SFzZhgGJd8zGEPzTQhTl5g2mN8yXi
- 39BQhDdrohIl+V0n2WDtUso=
-X-Google-Smtp-Source: ABdhPJxo7Gge+I35j1XN6TU9km8xhqEI5WrrW9N7Th353WD6O90wJqkYBN4dR9AIFlEroZhqPxiKCQ==
-X-Received: by 2002:a17:906:a153:: with SMTP id
- bu19mr5925894ejb.142.1596563516775; 
- Tue, 04 Aug 2020 10:51:56 -0700 (PDT)
-Received: from [192.168.1.43] (214.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.214])
- by smtp.gmail.com with ESMTPSA id h8sm19024955ejj.104.2020.08.04.10.51.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 04 Aug 2020 10:51:56 -0700 (PDT)
-Subject: Re: [PATCH 06/11] tests/Makefile: Add $(EXESUF) to fp-test target
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200804170055.2851-1-thuth@redhat.com>
- <20200804170055.2851-7-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <34a90ec1-610d-556a-f411-8f85bbdb0a9e@amsat.org>
-Date: Tue, 4 Aug 2020 19:51:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k317M-000635-Is
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:52:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35572
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k317J-0004Fm-K9
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 13:52:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596563568;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=qgLp9d1Pw62/3CGIeyC8KJC+ubkZ9pj0aU69kdBj1S8=;
+ b=DIFvZO77pXSwlpu0Vj+kZuespXzn4yc7ukOInoFTJ0uaksJzy4klns1VU4IZbUvyWQflTj
+ B1wVFhkpMKgBDZqcR9MM+aEJw3yvtYaBGTmCxvAfFyLzMC9cfCWFMkQMgLo3ifqJngLJrw
+ Fs8LP9YZvVsN7GLfRvdys8Y+6M4kL/Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-JIbaqD6qNOmRDc6_8xlwkQ-1; Tue, 04 Aug 2020 13:52:46 -0400
+X-MC-Unique: JIbaqD6qNOmRDc6_8xlwkQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 435601005510;
+ Tue,  4 Aug 2020 17:52:45 +0000 (UTC)
+Received: from work-vm (ovpn-114-108.ams2.redhat.com [10.36.114.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DBD65D9F7;
+ Tue,  4 Aug 2020 17:52:43 +0000 (UTC)
+Date: Tue, 4 Aug 2020 18:52:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Chuan Zheng <zhengchuan@huawei.com>
+Subject: Re: [RFC PATCH 6/8] migration/dirtyrate: Implement
+ get_sample_gap_period() and block_sample_gap_period()
+Message-ID: <20200804175240.GI2659@work-vm>
+References: <1595646669-109310-1-git-send-email-zhengchuan@huawei.com>
+ <1595646669-109310-7-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200804170055.2851-7-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <1595646669-109310-7-git-send-email-zhengchuan@huawei.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:23
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,36 +96,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, linyilu@huawei.com,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/4/20 7:00 PM, Thomas Huth wrote:
-> In case we ever want to compile this for Windows, we need the $(EXESUF)
-> here.
+* Chuan Zheng (zhengchuan@huawei.com) wrote:
+> From: Zheng Chuan <zhengchuan@huawei.com>
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Implement get_sample_gap_period() and block_sample_gap_period() to
+> sleep specific time between sample actions.
+> 
+> Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
+> Signed-off-by: YanYing Zhang <ann.zhuangyanying@huawei.com>
 > ---
->  tests/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  migration/dirtyrate.c | 28 ++++++++++++++++++++++++++++
+>  migration/dirtyrate.h |  6 +++++-
+>  2 files changed, 33 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 2806e062d0..e2532e12e2 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -687,7 +687,7 @@ check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check
->  # generic Makefile expansions. Once we are cleanly passing all
->  # the tests we can simplify the make syntax.
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 7badc53..00abfa7 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -295,10 +295,38 @@ static void set_dirty_rate_stage(CalculatingDirtyRateStage ratestage)
+>      calculating_dirty_rate_stage = ratestage;
+>  }
 >  
-> -FP_TEST_BIN=$(BUILD_DIR)/tests/fp/fp-test
-> +FP_TEST_BIN=$(BUILD_DIR)/tests/fp/fp-test$(EXESUF)
->  
->  # the build dir is created by configure
->  $(FP_TEST_BIN): config-host.h $(test-util-obj-y)
-> 
+> +static int64_t block_sample_gap_period(int64_t msec, int64_t initial_time)
+> +{
+> +    int64_t current_time;
+> +
+> +    current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    if ((current_time - initial_time) >= msec) {
+> +        msec = current_time - initial_time;
+> +    } else {
+> +        g_usleep((msec + initial_time - current_time) * 1000);
+> +    }
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+OK, so I think this is for sleeping in your own thread?
+Since it's bounded at about 60s that's not too bad
+
+> +    return msec;
+> +}
+> +
+> +static int64_t get_sample_gap_period(struct dirtyrate_config config)
+> +{
+> +    int64_t msec;
+> +
+> +    msec = config.sample_period_seconds * 1000;
+> +    if (msec <= MIN_FETCH_DIRTYRATE_TIME_MSEC || msec > MAX_FETCH_DIRTYRATE_TIME_MSEC) {
+> +        msec = DEFAULT_FETCH_DIRTYRATE_TIME_MSEC;
+> +    }
+> +    return msec;
+> +}
+> +
+>  void *get_dirtyrate_thread(void *arg)
+>  {
+>      struct dirtyrate_config config = *(struct dirtyrate_config *)arg;
+>      int64_t msec = 0;
+> +
+> +    /* max period is 60 seconds */
+> +    msec = get_sample_gap_period(config);
+
+(I'm not sure I understood where the config was set?)
+
+>      set_dirty_rate_stage(CAL_DIRTY_RATE_ING);
+>  
+> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+> index 4d9b3b8..5aef2d7 100644
+> --- a/migration/dirtyrate.h
+> +++ b/migration/dirtyrate.h
+> @@ -14,12 +14,16 @@
+>  #define QEMU_MIGRATION_DIRTYRATE_H
+>  
+>  /* take 256 pages per GB for cal dirty rate */
+> -#define DIRTYRATE_DEFAULT_SAMPLE_PAGES    256
+> +#define DIRTYRATE_DEFAULT_SAMPLE_PAGES  256
+
+Not for this patch.
+
+>  #define DIRTYRATE_SAMPLE_PAGE_SIZE      4096
+>  #define DIRTYRATE_PAGE_SIZE_SHIFT       12
+>  #define BLOCK_INFO_MAX_LEN              256
+>  #define PAGE_SIZE_SHIFT                 20
+>  
+> +#define MIN_FETCH_DIRTYRATE_TIME_MSEC        0
+> +#define MAX_FETCH_DIRTYRATE_TIME_MSEC        60000
+> +#define DEFAULT_FETCH_DIRTYRATE_TIME_MSEC    1000
+> +
+>  struct dirtyrate_config {
+>      uint64_t sample_pages_per_gigabytes;
+>      int64_t sample_period_seconds;
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
