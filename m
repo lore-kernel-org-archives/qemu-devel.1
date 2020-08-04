@@ -3,96 +3,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41305C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A74DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:18:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C29B2086A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:16:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5A512086A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:18:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IoY20AyP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C29B2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HUgAJ9lA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A512086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2zcI-0003Qa-Ai
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:16:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46948)
+	id 1k2ze9-0005WL-3H
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:18:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47316)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k2zam-0001rQ-M0
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:15:08 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40597)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k2zak-0006pK-Dq
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:15:08 -0400
-Received: by mail-wm1-x342.google.com with SMTP id k20so3480876wmi.5
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 09:15:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=367oMtrM0LWp250z5gAKy1NqmlciNQn2qzt3sI9J+Hw=;
- b=IoY20AyPcIucOGRoQfTPSiThLqzyzrD+UXPmMJ3nf9rb6KBtTpfYxdaMaiCJ161ouF
- WrmOokwNSRaTTgAlbPvTNgsVGy1kbJG6sJPtnrSliQKXKOxodFd0zu3m/DO0A3bVSgoC
- 7eIOFtI7EXCZbtbFWRMxH7hO66f+l+2ok0ILtAEGu89RRDbOvOKHnCkO+fPD7KHrMZ2q
- A3oxfbIGy0/C3lYziA6FrT+scic0hrNz/1EwrDaiF58P5cnHqDiw3yGNOJUQpYbCUCKv
- 6uXM6nwN4JlwqScjsahnZiUSvMBZ3l1Xip6m7ykKZaEBS1ID+3E01bac1Fx1ve0EvKj0
- YORQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=367oMtrM0LWp250z5gAKy1NqmlciNQn2qzt3sI9J+Hw=;
- b=QnDLJB+IfiuL8SRexv5Aj4hx69I4Zl/4KaajkTkg4OJUXmjjSxRsbOvlDomTvW2cJ0
- TYpmisJ8FCh4x+c8AVBh3DLt0z7JhGAMdCv90UIy6wtuVesAhtuq+dynimEWGm5fCgXM
- SfoZMAV/7+qWsY4CLxesBmOTUXRnHEcZJJECTXwFKP/CTwllLPLROY77mwJzn7SVRJBo
- fb4hv7MdOL4DCkP3G8cqDfNi/p2a3/Dc9+gVM51e790V76YS6EXphRjIw3nlcoccc4pG
- tu5AzS4NL85Ol4rDtIF55difpj87SFIvBuvyTwvZnmE5Jv4n1C5bSi68jzct06QOhyYG
- rKmA==
-X-Gm-Message-State: AOAM530yGdSILA+4qCmcrT7WdxpSVkyIKqJ8ugiqYtrPkc7In9GylrAv
- Ieowky9RumNWg8sL3LzPyh0Q9w==
-X-Google-Smtp-Source: ABdhPJxolubboifvZRASzi6sQKNg3l9sXb8pCJaB/yE9S1kBhXYBsF58Td6cjzabbwhUOEfEL+zPlg==
-X-Received: by 2002:a05:600c:2246:: with SMTP id
- a6mr4870524wmm.71.1596557704254; 
- Tue, 04 Aug 2020 09:15:04 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q4sm5077473wme.31.2020.08.04.09.15.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 04 Aug 2020 09:15:02 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3837D1FF7E;
- Tue,  4 Aug 2020 17:15:02 +0100 (BST)
-References: <20200730141326.8260-1-thuth@redhat.com>
- <20200730141326.8260-4-thuth@redhat.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2 3/4] gitlab-ci.yml: Add build-system-debian and
- build-system-centos jobs
-In-reply-to: <20200730141326.8260-4-thuth@redhat.com>
-Date: Tue, 04 Aug 2020 17:15:02 +0100
-Message-ID: <87a6zamlq1.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k2zcK-0003t8-Eh
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:16:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37980
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k2zcI-0007C3-Oz
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:16:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596557802;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=HtTsTBrmbkA5+awXwb04H1HVgFKNkM/ZIQZzvJHZ7YE=;
+ b=HUgAJ9lAuWOsLFEDV/oAfEYFA2T/0ej8ithKFA5sHr546O26IZ3AUb7VgrlUYLPGn8K/r0
+ IYMODyoUwioF0nXld7vpa5Zb0IqyeQttd9K3NPkrvN3dRT24N758DRf+eP0Pif0DjH/nuM
+ kkAE6Q42PSPlqaaBaoIqZYz9D6TTdk8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281-2EuLAOPwMI-mn61R-RPe7w-1; Tue, 04 Aug 2020 12:16:38 -0400
+X-MC-Unique: 2EuLAOPwMI-mn61R-RPe7w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A90779EC6;
+ Tue,  4 Aug 2020 16:16:37 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-165.ams2.redhat.com [10.36.113.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5076C7B901;
+ Tue,  4 Aug 2020 16:16:36 +0000 (UTC)
+Date: Tue, 4 Aug 2020 18:16:34 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v6 02/12] monitor: Use getter/setter functions for cur_mon
+Message-ID: <20200804161634.GC4860@linux.fritz.box>
+References: <20200528153742.274164-1-kwolf@redhat.com>
+ <20200528153742.274164-3-kwolf@redhat.com>
+ <87lfiubmu3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <87lfiubmu3.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,32 +92,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 04.08.2020 um 14:46 hat Markus Armbruster geschrieben:
+> > diff --git a/monitor/hmp.c b/monitor/hmp.c
+> > index d598dd02bb..f609fcf75b 100644
+> > --- a/monitor/hmp.c
+> > +++ b/monitor/hmp.c
+> > @@ -1301,11 +1301,11 @@ cleanup:
+> >  static void monitor_read(void *opaque, const uint8_t *buf, int size)
+> >  {
+> >      MonitorHMP *mon;
+> > -    Monitor *old_mon = cur_mon;
+> > +    Monitor *old_mon = monitor_cur();
+> >      int i;
+> >  
+> > -    cur_mon = opaque;
+> > -    mon = container_of(cur_mon, MonitorHMP, common);
+> > +    monitor_set_cur(opaque);
+> > +    mon = container_of(monitor_cur(), MonitorHMP, common);
+> 
+> Simpler:
+> 
+>        MonitorHMP *mon = container_of(opaque, MonitorHMP, common);
 
-Thomas Huth <thuth@redhat.com> writes:
+opaque is void*, so it doesn't have a field 'common'.
 
-> We were missing the two new targets avr-softmmu and rx-softmmu in the
-> gitlab-CI so far, and did not add some of the "other endianess" targets
-> like sh4eb-softmmu yet.
-> Since the current build-system-* jobs run already for a very long time,
-> let's do not add these missing targets there, but introduce two new
-> additional build jobs, one running with Debian and one running with
-> CentOS, and add the new targets there. Also move some targets from
-> the old build-system-* jobs to these new targets, to distribute the
-> load and reduce the runtime of the CI.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > diff --git a/monitor/monitor.c b/monitor/monitor.c
+> > index 125494410a..182ba136b4 100644
+> > --- a/monitor/monitor.c
+> > +++ b/monitor/monitor.c
+> > @@ -66,13 +66,24 @@ MonitorList mon_list;
+> >  int mon_refcount;
+> >  static bool monitor_destroyed;
+> >  
+> > -__thread Monitor *cur_mon;
+> > +static __thread Monitor *cur_monitor;
+> > +
+> > +Monitor *monitor_cur(void)
+> > +{
+> > +    return cur_monitor;
+> > +}
+> > +
+> > +void monitor_set_cur(Monitor *mon)
+> > +{
+> > +    cur_monitor = mon;
+> > +}
+> 
+> All uses of monitor_set_cur() look like this:
+> 
+>     old_mon = monitor_cur();
+>     monitor_set_cur(new_mon);
+>     ...
+>     monitor_set_cur(old_mon);
+> 
+> If we let monitor_set_cur() return the old value, this becomes
+> 
+>     old_mon = monitor_set_cur(new_mon);
+>     ...
+>     monitor_set_cur(old_mon);
+> 
+> I like this better.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Fine with me.
 
---=20
-Alex Benn=C3=A9e
+> > diff --git a/stubs/monitor-core.c b/stubs/monitor-core.c
+> > index 6cff1c4e1d..0cd2d864b2 100644
+> > --- a/stubs/monitor-core.c
+> > +++ b/stubs/monitor-core.c
+> > @@ -3,7 +3,10 @@
+> >  #include "qemu-common.h"
+> >  #include "qapi/qapi-emit-events.h"
+> >  
+> > -__thread Monitor *cur_mon;
+> > +Monitor *monitor_cur(void)
+> > +{
+> > +    return NULL;
+> > +}
+> 
+> Is this meant to be called?  If not, abort().
+
+error_report() and friends are supposed to be called pretty much
+everywhere, so I'd say yes.
+
+Kevin
+
 
