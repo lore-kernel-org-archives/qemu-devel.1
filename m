@@ -2,82 +2,95 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F7C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94727C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:39:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D0D122BED
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:27:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D0D122BED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5F63722B45
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 19:39:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T7OmZzjs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F63722B45
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k32ai-0004Uo-7l
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 15:27:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40700)
+	id 1k32ms-0008Qf-9O
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 15:39:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k32ZT-0003I2-RY
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:25:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45008)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k32mG-0007ss-0O
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:39:12 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34473)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k32ZR-0006mw-La
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:25:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k32ZP-0004D8-NC
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 19:25:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7A30A2E80EE
- for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 19:25:55 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k32mC-0008RM-7f
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 15:39:11 -0400
+Received: by mail-wm1-x341.google.com with SMTP id c19so2850797wmd.1
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 12:39:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=HqGbC8FUGCeQi5R5J6OQwzhAXNsqzsV2csRohNKrHYc=;
+ b=T7OmZzjsZOt2UJirFFWl2tuE85uH9Z1J5MLHCIpJYroWA1nXXFm4zS4iNudk7+dL5W
+ uXpuFbe1zm8RF9FHAYBsgeHOSvrPv8AJ7mFqzyZYp9vKjex/3zvONSle9h+oBg5RJLom
+ XZ9b8co57pSnQ2CVt7yFbTCBvV3c/2Q3KxTjXYLWMD69STwiqOZQ/vgHr/IAre2Af/4Z
+ 7IGK3rGf2RJYk7FbxdKavZ02ab4HDlHlSD1f6kDPNM3TYFVymR9Dn1QmdE0GchNHNQ88
+ +D3VbGpUQYfN3QUN4IWSqDNmXiJ017EKfDUh6C+Kd9PLP8QT2u3ija0XXhppKa3la54Q
+ DUeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=HqGbC8FUGCeQi5R5J6OQwzhAXNsqzsV2csRohNKrHYc=;
+ b=XmeMzDe4VCRGJdQYVBz7NEXhGOPgNPVLuKpJgzvzVU/XZrTXUYheg6fGdOuurYEABE
+ rhlNMfiqFHAosjEAXe0BxvPP9Bi7xdKJoh6hlmvJkLBtWHA/mDU4/H9u0jaP8rHo5yNt
+ /tQNqYsPEkjKXufkvUGs16+hMe8M9USTfx80czrm5M/vxYzivSyvUOKd0EYNq5/1sWcd
+ L1ZambMhnkEjGQoef6R3dUtMzsEhzjLkCApibsZjisk3A6VKRpOeA/NU0EtFG6UXOOKD
+ J2jJk4frlTTxTnbyrH0Bc7pzq1ezyz35Oz/Q9BU+/lzZ36POShpSXQRIOwFA62itv6mo
+ udig==
+X-Gm-Message-State: AOAM530kGIKrMkHjKGJohVS5MJ7sA/FRl+tJdrWpJhfF6t768rCoDvf3
+ OJ9o+Y53U6Ci0NHezUySjvzS1g==
+X-Google-Smtp-Source: ABdhPJy0nJVyZ9FAOmcFWXxG8qQu7dodNKu3HEh3mNnmnrf7c6tZbTNzPqir9pyHk+I8OjJA3mzSiA==
+X-Received: by 2002:a1c:27c1:: with SMTP id n184mr52220wmn.6.1596569945632;
+ Tue, 04 Aug 2020 12:39:05 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id b203sm6023388wmc.22.2020.08.04.12.39.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 04 Aug 2020 12:39:04 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 for-5.1?] target/arm: Fix Rt/Rt2 in ESR_ELx for copro traps
+ from AArch32 to 64
+Date: Tue,  4 Aug 2020 20:39:03 +0100
+Message-Id: <20200804193903.31240-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 04 Aug 2020 19:17:37 -0000
-From: Peter Maydell <1879587@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jfreche pmaydell
-X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
-Message-Id: <159656865758.2711.5389558013038903410.malone@gac.canonical.com>
-Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
- banked registers when switching from AA32 to AA64
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a800f07e792c7315236943c47c9ab1ea12964ada
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 15:05:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,58 +99,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1879587 <1879587@bugs.launchpad.net>
+Cc: Marc Zyngier <maz@kernel.org>, Julien Freche <julien@bedrocksystems.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Whoops, yes. I somehow misread that table (I think I failed to spot that
-there is no LR_hyp and it just shares r14 with usr/sys, so I did a
-cut-n-paste of the SP cases to LR, which isn't right). I think your
-adjustment to the patch is correct. I'll do a v2 patch for you to test,
-but it will just be those fixes applied to v1.
+When a coprocessor instruction in an  AArch32 guest traps to AArch32
+Hyp mode, the syndrome register (HSR) includes Rt and Rt2 fields
+which are simply copies of the Rt and Rt2 fields from the trapped
+instruction.  However, if the instruction is trapped from AArch32 to
+an AArch64 higher exception level, the Rt and Rt2 fields in the
+syndrome register (ESR_ELx) must be the AArch64 view of the register.
+This makes a difference if the AArch32 guest was in a mode other than
+User or System and it was using r13 or r14, or if it was in FIQ mode
+and using r8-r14.
 
--- =
+We don't know at translate time which AArch32 CPU mode we are in, so
+we leave the values we generate in our prototype syndrome register
+value at translate time as the raw Rt/Rt2 from the instruction, and
+instead correct them to the AArch64 view when we find we need to take
+an exception from AArch32 to AArch64 with one of these syndrome
+values.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1879587
+Fixes: https://bugs.launchpad.net/qemu/+bug/1879587
+Reported-by: Julien Freche <julien@bedrocksystems.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Changes v1->v2: fixed the register mapping for LR (thanks to
+Julien for testing v1, diagnosing the bug in it, and suggesting
+the fix to LR handling)
 
-Title:
-  Register number in ESR is incorrect for certain banked registers when
-  switching from AA32 to AA64
+Marc: Cc'd you just in case you're interested, given that I'd
+expect running Linux aarch64 KVM in QEMU emulation with a 32-bit
+guest to hit this bug...
+---
+ target/arm/helper.c | 92 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 91 insertions(+), 1 deletion(-)
 
-Status in QEMU:
-  In Progress
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 8ef0fb478f4..455c92b8915 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -9581,6 +9581,66 @@ static void arm_cpu_do_interrupt_aarch32(CPUState *cs)
+     take_aarch32_exception(env, new_mode, mask, offset, addr);
+ }
+ 
++static int aarch64_regnum(CPUARMState *env, int aarch32_reg)
++{
++    /*
++     * Return the register number of the AArch64 view of the AArch32
++     * register @aarch32_reg. The CPUARMState CPSR is assumed to still
++     * be that of the AArch32 mode the exception came from.
++     */
++    int mode = env->uncached_cpsr & CPSR_M;
++
++    switch (aarch32_reg) {
++    case 0 ... 7:
++        return aarch32_reg;
++    case 8 ... 12:
++        return mode == ARM_CPU_MODE_FIQ ? aarch32_reg + 16 : aarch32_reg;
++    case 13:
++        switch (mode) {
++        case ARM_CPU_MODE_USR:
++        case ARM_CPU_MODE_SYS:
++            return 13;
++        case ARM_CPU_MODE_HYP:
++            return 15;
++        case ARM_CPU_MODE_IRQ:
++            return 17;
++        case ARM_CPU_MODE_SVC:
++            return 19;
++        case ARM_CPU_MODE_ABT:
++            return 21;
++        case ARM_CPU_MODE_UND:
++            return 23;
++        case ARM_CPU_MODE_FIQ:
++            return 29;
++        default:
++            g_assert_not_reached();
++        }
++    case 14:
++        switch (mode) {
++        case ARM_CPU_MODE_USR:
++        case ARM_CPU_MODE_SYS:
++        case ARM_CPU_MODE_HYP:
++            return 14;
++        case ARM_CPU_MODE_IRQ:
++            return 16;
++        case ARM_CPU_MODE_SVC:
++            return 18;
++        case ARM_CPU_MODE_ABT:
++            return 20;
++        case ARM_CPU_MODE_UND:
++            return 22;
++        case ARM_CPU_MODE_FIQ:
++            return 30;
++        default:
++            g_assert_not_reached();
++        }
++    case 15:
++        return 31;
++    default:
++        g_assert_not_reached();
++    }
++}
++
+ /* Handle exception entry to a target EL which is using AArch64 */
+ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+ {
+@@ -9591,6 +9651,7 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+     unsigned int new_mode = aarch64_pstate_mode(new_el, true);
+     unsigned int old_mode;
+     unsigned int cur_el = arm_current_el(env);
++    int rt;
+ 
+     /*
+      * Note that new_el can never be 0.  If cur_el is 0, then
+@@ -9645,7 +9706,8 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+     case EXCP_HVC:
+     case EXCP_HYP_TRAP:
+     case EXCP_SMC:
+-        if (syn_get_ec(env->exception.syndrome) == EC_ADVSIMDFPACCESSTRAP) {
++        switch (syn_get_ec(env->exception.syndrome)) {
++        case EC_ADVSIMDFPACCESSTRAP:
+             /*
+              * QEMU internal FP/SIMD syndromes from AArch32 include the
+              * TA and coproc fields which are only exposed if the exception
+@@ -9653,6 +9715,34 @@ static void arm_cpu_do_interrupt_aarch64(CPUState *cs)
+              * AArch64 format syndrome.
+              */
+             env->exception.syndrome &= ~MAKE_64BIT_MASK(0, 20);
++            break;
++        case EC_CP14RTTRAP:
++        case EC_CP15RTTRAP:
++        case EC_CP14DTTRAP:
++            /*
++             * For a trap on AArch32 MRC/MCR/LDC/STC the Rt field is currently
++             * the raw register field from the insn; when taking this to
++             * AArch64 we must convert it to the AArch64 view of the register
++             * number. Notice that we read a 4-bit AArch32 register number and
++             * write back a 5-bit AArch64 one.
++             */
++            rt = extract32(env->exception.syndrome, 5, 4);
++            rt = aarch64_regnum(env, rt);
++            env->exception.syndrome = deposit32(env->exception.syndrome,
++                                                5, 5, rt);
++            break;
++        case EC_CP15RRTTRAP:
++        case EC_CP14RRTTRAP:
++            /* Similarly for MRRC/MCRR traps for Rt and Rt2 fields */
++            rt = extract32(env->exception.syndrome, 5, 4);
++            rt = aarch64_regnum(env, rt);
++            env->exception.syndrome = deposit32(env->exception.syndrome,
++                                                5, 5, rt);
++            rt = extract32(env->exception.syndrome, 10, 4);
++            rt = aarch64_regnum(env, rt);
++            env->exception.syndrome = deposit32(env->exception.syndrome,
++                                                10, 5, rt);
++            break;
+         }
+         env->cp15.esr_el[new_el] = env->exception.syndrome;
+         break;
+-- 
+2.20.1
 
-Bug description:
-  I am running into a situation where I have:
-  - A hypervisor running in EL2, AA64
-  - A guest running in EL1, AA32
-
-  We trap certain accesses to special registers such as DACR (via
-  HCR.TVM). One instruction that is trapped is:
-
-  ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
-
-  The guest is running in SVC mode. So, LR should refer to LR_svc there.
-  LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
-  the actual ESR value is: 0xfe00dc0
-
-  If we decode the 'rt':
-  >>> (0xfe00dc0 >> 5) & 0x1f
-  14
-
-  My understanding is that 14 is incorrect in the context of AA64. rt
-  should be set to 18. The current mode being SVC, LR refers to LR_svc
-  not LR_usr. In other words, the mapping between registers in AA64 and
-  AA32 doesn't seem to be accounted for. I've tested this with Qemu
-  5.0.0
-
-  Let me know if that makes sense and if you would like more info. I am als=
-o happy to test patches.
-  Thanks for all the great work on Qemu!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1879587/+subscriptions
 
