@@ -2,96 +2,88 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A51C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B42C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:29:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00E542070A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:25:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6F842070A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:29:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I047+7DP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E542070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J4IzHcXl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6F842070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2zkt-0002hS-9I
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:25:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49368)
+	id 1k2zoX-00051E-Pb
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:29:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50468)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k2zk9-0001oG-SW
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:24:49 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51954)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k2zk8-0008Tk-4M
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:24:49 -0400
-Received: by mail-wm1-x343.google.com with SMTP id p14so3240679wmg.1
- for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 09:24:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=/6IVhOzHRf2lPByqwM3rJ8Ofvrl4uVAq5QraRE0p+ok=;
- b=I047+7DPhzJtBnVC9lHcc60e685cncUTTXhsQIVcAdKPQiVjHad+El/bKiYdpk99q8
- X2D5psJB4kXKNd/Ec5ITLGlrI+1XOmjJkXym0ClY7MPp+FYSB9FFBLDuPk74vC+8lTPc
- rOJgYW5xMlTw5Rqo+FIuV6PDu3Kykw+tWZftUPbAI9WXfzHlOuvRGDhzrcfGHpfRzXPe
- YHO+rO81Y2EWMzWDljIrTvf7Ix/MhphcumYmPgP4+vY5yvUN6Hrbhw3Z+xnkfI6KnGDa
- Cu/Gv4mv0d2UGo3raMUezGAoUXM0H2hfuZ4RxVcSPGrhuIiEKT4LCBLF51mszSF8Rs6y
- +npA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=/6IVhOzHRf2lPByqwM3rJ8Ofvrl4uVAq5QraRE0p+ok=;
- b=Kkps9JFoR1/qBN2y+jEs7k4LRWwIqXG5Qp9kG+p+Oib5hGWj+x46jOwsp1k80TBXs8
- VXSviSLqIUF87ZjsUud0cSr6fGkEBIatx0BLW2SD40kUDSOhzjpoaZHprc5xP9EU8Y6x
- zA23YhyKRAwkaX+EEhH8XD86EIyLxTMc+/dY0w4nFd8pOrxjwYR5fWbKjynMnPPYVqAh
- 8tJQdz1zMC5DJvWHl1d4+wGZAzEaLQ2cbaSDI8rtq5lmVSuleABGFeR7oy6LS+tsGE2l
- 9tpi37/HulSwJmwrosFaSr6dRC3hDZtBlLHGG2Pqeym3RbMyvuwMDq16gufuN5Wyp9v0
- m/Hw==
-X-Gm-Message-State: AOAM532C/m8seVG83bzdqfcnwWq4hP0HFDpvFxPWH+EcLqklz/ubbIlw
- f+JMq6cCx2Mi7mRCCE5eE9W3ig==
-X-Google-Smtp-Source: ABdhPJyj2bs+HCr2x1LekGOaJ6e9wQb2UvN4K7N3h7C+OXHM+/EHlS7vRPh7W8mqQ5TNbdsD+bD2Ng==
-X-Received: by 2002:a7b:c76e:: with SMTP id x14mr4696905wmk.176.1596558285395; 
- Tue, 04 Aug 2020 09:24:45 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id j5sm5134153wmb.12.2020.08.04.09.24.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 04 Aug 2020 09:24:44 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6B3281FF7E;
- Tue,  4 Aug 2020 17:24:43 +0100 (BST)
-References: <20200730141326.8260-1-thuth@redhat.com>
- <20200730141326.8260-5-thuth@redhat.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2 4/4] gitlab-ci: Fix Avocado cache usage
-In-reply-to: <20200730141326.8260-5-thuth@redhat.com>
-Date: Tue, 04 Aug 2020 17:24:43 +0100
-Message-ID: <877dueml9w.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k2znr-0004L8-FF
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:28:39 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25377
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k2znp-0000r7-GX
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:28:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596558516;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=EnH3iKHWvN1sRNcI6eWUsjQK/S7wesDrTm+WkeKOK9I=;
+ b=J4IzHcXlWIWSKyKk9bq/yMwzG+lbF8MLfNYAc62VH34R+DB7hVYIfDFxVdOYcc/Z0En/gn
+ 85RVYru//hIdclBqAMvZKrbbGzWAEQqjKlq+/aBYe7zXihUYR5DxLsHnQYMrFHBEfjL9PU
+ Ts5MceJ0p6aHHQuZZ2QwNdibIgvpJPk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-VRO3V13tMvKK6nlDvjEcAA-1; Tue, 04 Aug 2020 12:28:34 -0400
+X-MC-Unique: VRO3V13tMvKK6nlDvjEcAA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A17680183C;
+ Tue,  4 Aug 2020 16:28:33 +0000 (UTC)
+Received: from work-vm (ovpn-114-108.ams2.redhat.com [10.36.114.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 921A97B91A;
+ Tue,  4 Aug 2020 16:28:31 +0000 (UTC)
+Date: Tue, 4 Aug 2020 17:28:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Chuan Zheng <zhengchuan@huawei.com>
+Subject: Re: [RFC PATCH 2/8] migration/dirtyrate: Add block_dirty_info to
+ store dirtypage info
+Message-ID: <20200804162829.GE2659@work-vm>
+References: <1595646669-109310-1-git-send-email-zhengchuan@huawei.com>
+ <1595646669-109310-3-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1595646669-109310-3-git-send-email-zhengchuan@huawei.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:01:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,63 +96,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, linyilu@huawei.com,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Thomas Huth <thuth@redhat.com> writes:
-
-> In commit 6957fd98dc ("gitlab: add avocado asset caching") we
-> tried to save the Avocado cache (as in commit c1073e44b4 with
-> Travis-CI) however it doesn't work as expected. For some reason
-> Avocado uses /root/avocado_cache/ which we can not select later.
->
-> Manually generate a Avocado config to force the use of the
-> current job's directory.
->
-> This patch is based on an earlier version from Philippe Mathieu-Daud=C3=
-=A9.
-
-Maybe add a Based-on: <msgid>?
-
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+* Chuan Zheng (zhengchuan@huawei.com) wrote:
+> From: Zheng Chuan <zhengchuan@huawei.com>
+> 
+> Add block_dirty_info to store dirtypage info for each ramblock
+> 
+> Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
+> Signed-off-by: YanYing Zhang <ann.zhuangyanying@huawei.com>
 > ---
->  .gitlab-ci.yml | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
->
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index e96bcd50f8..9820066379 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -47,11 +47,24 @@ include:
->      - find . -type f -exec touch {} +
->      - make $MAKE_CHECK_ARGS
->=20=20
-> -.post_acceptance_template: &post_acceptance
-> +.acceptance_template: &acceptance_definition
-> +  cache:
-> +    key: "${CI_JOB_NAME}-cache"
-> +    paths:
-> +      - ${CI_PROJECT_DIR}/avocado-cache
-> +    policy: pull-push
-> +  before_script:
-> +    - mkdir -p ~/.config/avocado
-> +    - echo "[datadir.paths]" > ~/.config/avocado/avocado.conf
-> +    - echo "cache_dirs =3D ['${CI_PROJECT_DIR}/avocado-cache']"
-> +           >> ~/.config/avocado/avocado.conf
+>  migration/dirtyrate.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+> index 9a5c228..342b89f 100644
+> --- a/migration/dirtyrate.h
+> +++ b/migration/dirtyrate.h
+> @@ -33,6 +33,19 @@ typedef enum {
+>      CAL_DIRTY_RATE_END   = 2,
+>  } CalculatingDirtyRateStage;
+>  
+> +/* 
+> + * Store dirtypage info for each block.
+> + */
+> +struct block_dirty_info {
 
-I was hoping there was a neater way to do this with the multiline
-commands but whatever:
+Please call this ramblock_dirty_info; we use 'block' a lot to mean
+disk block and it gets confusing.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> +    char idstr[BLOCK_INFO_MAX_LEN];
 
---=20
-Alex Benn=C3=A9e
+Is there a reason you don't just use a RAMBlock *  here?
+
+> +    uint8_t *block_addr;
+> +    unsigned long block_pages;
+> +    unsigned long *sample_page_vfn;
+
+Please comment these; if I understand correctly, that's an array
+of page indexes into the block generated from the random numbers
+
+> +    unsigned int sample_pages_count;
+> +    unsigned int sample_dirty_count;
+> +    uint8_t *hash_result;
+
+If I understand, this is an array of hashes end-to-end for
+all the pages in this RAMBlock?
+
+Dave
+
+> +};
+> +
+>  void *get_dirtyrate_thread(void *arg);
+>  #endif
+>  
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
