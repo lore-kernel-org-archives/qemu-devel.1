@@ -2,96 +2,78 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B767EC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3334DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:41:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CFC322B40
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:35:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hg6D0O6H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CFC322B40
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0AAB32064B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 16:41:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AAB32064B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2zuD-0001VN-8H
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:35:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51974)
+	id 1k300Y-0003nz-7b
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 12:41:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k2ztS-00014G-RR
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:34:26 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59101
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k2ztR-0001du-7E
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:34:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596558864;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9BCTpmiIz4/MpMMiQjmm8+jD9roxn3YXfPCWsE9HPYo=;
- b=Hg6D0O6HgpmKbcsdzYgbTC8TGEusL+4jD8NYyHycPi1S1o1PA5UYL73iImxXFy5/yHdb7D
- MKUgP+0An0//V0TyyplJ/riJkRz6iscUcD9lpyWmE6F5A1u/+3fDwnph0dW96nt660wRi2
- k4XytNgwg+Twfhyh9SYcIoRQoK8qE3o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-zCNogHjYPaqhGRTc2tOdgw-1; Tue, 04 Aug 2020 12:34:14 -0400
-X-MC-Unique: zCNogHjYPaqhGRTc2tOdgw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A7E71902EA1;
- Tue,  4 Aug 2020 16:34:12 +0000 (UTC)
-Received: from [10.3.113.202] (ovpn-113-202.phx2.redhat.com [10.3.113.202])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F165619C71;
- Tue,  4 Aug 2020 16:34:11 +0000 (UTC)
-Subject: Re: [RFC PATCH 8/8] migration/dirtyrate: Implement
- qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
-To: Chuan Zheng <zhengchuan@huawei.com>, quintela@redhat.com,
- dgilbert@redhat.com
-References: <1595646669-109310-1-git-send-email-zhengchuan@huawei.com>
- <1595646669-109310-9-git-send-email-zhengchuan@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <49c8243d-3f9d-9420-c921-590cd80e8888@redhat.com>
-Date: Tue, 4 Aug 2020 11:34:11 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2zzo-0002dr-Bo
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:41:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45434)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k2zzm-0002Ui-El
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 12:41:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k2zzk-0001e7-MB
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 16:40:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A6A2C2E80E7
+ for <qemu-devel@nongnu.org>; Tue,  4 Aug 2020 16:40:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1595646669-109310-9-git-send-email-zhengchuan@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 04 Aug 2020 16:26:11 -0000
+From: Alexander Bulekov <1890312@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+Message-Id: <159655837180.16425.4114028291831523850.malonedeb@wampee.canonical.com>
+Subject: [Bug 1890312] [NEW] Segfault in artist_vram_read
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 89b0995cb1cab779ae1b047de6b96509c06edc55
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 08:50:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,48 +82,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, linyilu@huawei.com, qemu-devel@nongnu.org,
- alex.chen@huawei.com, ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Reply-To: Bug 1890312 <1890312@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/24/20 10:11 PM, Chuan Zheng wrote:
-> From: Zheng Chuan <zhengchuan@huawei.com>
-> 
-> Implement qmp_cal_dirty_rate()/qmp_get_dirty_rate() function which could be called
-> by libvirt api.
-> 
-> Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
-> Signed-off-by: YanYing Zhang <ann.zhuangyanying@huawei.com>
+Public bug reported:
 
-> +##
-> +{ 'command': 'get_dirty_rate', 'returns': 'int64' }
-> diff --git a/qapi/pragma.json b/qapi/pragma.json
-> index cffae27..ecd294b 100644
-> --- a/qapi/pragma.json
-> +++ b/qapi/pragma.json
-> @@ -10,7 +10,8 @@
->           'query-migrate-cache-size',
->           'query-tpm-models',
->           'query-tpm-types',
-> -        'ringbuf-read' ],
-> +        'ringbuf-read',
-> +        'get_dirty_rate' ],
+Hello,
+Reproducer:
 
-Nack.  You should not have to change the whitelist; this is evidence 
-that your command is returning the wrong type.  Instead, you should be 
-using:
+cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
+-qtest stdio -accel qtest
+writew 0xf8118001 0x105a
+readq 0xf900f8ff
+EOF
 
-{ 'command': 'get-dirty-rate', 'returns': { 'rate': 'int64' } }
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=3D=3D20118=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7fc6fb8=
+47672 (pc 0x55ec9c0f6828 bp 0x7ffd91000230 sp 0x7ffd90ffffd0 T0)
+=3D=3D20118=3D=3DThe signal is caused by a READ memory access.
+    #0 0x55ec9c0f6828 in artist_vram_read /hw/display/artist.c:1174:15
+    #1 0x55ec9b84a582 in memory_region_read_accessor /softmmu/memory.c:434:=
+11
+    #2 0x55ec9b7d1adc in access_with_adjusted_size /softmmu/memory.c:539:18
+    #3 0x55ec9b7cd769 in memory_region_dispatch_read1 /softmmu/memory.c:138=
+5:16
+    #4 0x55ec9b7cc855 in memory_region_dispatch_read /softmmu/memory.c:1414=
+:9
+    #5 0x55ec9ae621de in flatview_read_continue /exec.c:3239:23
+    #6 0x55ec9ae64fb1 in flatview_read /exec.c:3279:12
+    #7 0x55ec9ae64af7 in address_space_read_full /exec.c:3292:18
+    #8 0x55ec9b87c990 in address_space_read /include/exec/memory.h:2429:18
+    #9 0x55ec9b87c990 in qtest_process_command /softmmu/qtest.c:485:13
+    #10 0x55ec9b870c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
+    #11 0x55ec9b86f895 in qtest_read /softmmu/qtest.c:722:5
+    #12 0x55ec9dd2b2f3 in qemu_chr_be_write_impl /chardev/char.c:188:9
+    #13 0x55ec9dd2b477 in qemu_chr_be_write /chardev/char.c:200:9
+    #14 0x55ec9dd3f763 in fd_chr_read /chardev/char-fd.c:68:9
+    #15 0x55ec9de93b24 in qio_channel_fd_source_dispatch /io/channel-watch.=
+c:84:12
+    #16 0x7fc7261ad897 in g_main_context_dispatch ()
+    #17 0x55ec9e28ba2b in glib_pollfds_poll /util/main-loop.c:217:9
+    #18 0x55ec9e28915b in os_host_main_loop_wait /util/main-loop.c:240:5
+    #19 0x55ec9e288af4 in main_loop_wait /util/main-loop.c:516:11
+    #20 0x55ec9b891d00 in qemu_main_loop /softmmu/vl.c:1676:9
+    #21 0x55ec9decb911 in main /softmmu/main.c:49:5
 
-and populating a struct, so that if we ever want to return more than 
-just a single rate, we can extend the command in-place by adding to the 
-struct.
+The error occurs even with Message-Id:
+<20200804140056.7690-1-deller@gmx.de> applied (I collected the above
+trace with the patch-set applied)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Thanks
+-Alex
 
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890312
+
+Title:
+  Segfault in artist_vram_read
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+  Reproducer:
+
+  cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
+  -qtest stdio -accel qtest
+  writew 0xf8118001 0x105a
+  readq 0xf900f8ff
+  EOF
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  =3D=3D20118=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7fc6f=
+b847672 (pc 0x55ec9c0f6828 bp 0x7ffd91000230 sp 0x7ffd90ffffd0 T0)
+  =3D=3D20118=3D=3DThe signal is caused by a READ memory access.
+      #0 0x55ec9c0f6828 in artist_vram_read /hw/display/artist.c:1174:15
+      #1 0x55ec9b84a582 in memory_region_read_accessor /softmmu/memory.c:43=
+4:11
+      #2 0x55ec9b7d1adc in access_with_adjusted_size /softmmu/memory.c:539:=
+18
+      #3 0x55ec9b7cd769 in memory_region_dispatch_read1 /softmmu/memory.c:1=
+385:16
+      #4 0x55ec9b7cc855 in memory_region_dispatch_read /softmmu/memory.c:14=
+14:9
+      #5 0x55ec9ae621de in flatview_read_continue /exec.c:3239:23
+      #6 0x55ec9ae64fb1 in flatview_read /exec.c:3279:12
+      #7 0x55ec9ae64af7 in address_space_read_full /exec.c:3292:18
+      #8 0x55ec9b87c990 in address_space_read /include/exec/memory.h:2429:18
+      #9 0x55ec9b87c990 in qtest_process_command /softmmu/qtest.c:485:13
+      #10 0x55ec9b870c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
+      #11 0x55ec9b86f895 in qtest_read /softmmu/qtest.c:722:5
+      #12 0x55ec9dd2b2f3 in qemu_chr_be_write_impl /chardev/char.c:188:9
+      #13 0x55ec9dd2b477 in qemu_chr_be_write /chardev/char.c:200:9
+      #14 0x55ec9dd3f763 in fd_chr_read /chardev/char-fd.c:68:9
+      #15 0x55ec9de93b24 in qio_channel_fd_source_dispatch /io/channel-watc=
+h.c:84:12
+      #16 0x7fc7261ad897 in g_main_context_dispatch ()
+      #17 0x55ec9e28ba2b in glib_pollfds_poll /util/main-loop.c:217:9
+      #18 0x55ec9e28915b in os_host_main_loop_wait /util/main-loop.c:240:5
+      #19 0x55ec9e288af4 in main_loop_wait /util/main-loop.c:516:11
+      #20 0x55ec9b891d00 in qemu_main_loop /softmmu/vl.c:1676:9
+      #21 0x55ec9decb911 in main /softmmu/main.c:49:5
+
+  The error occurs even with Message-Id:
+  <20200804140056.7690-1-deller@gmx.de> applied (I collected the above
+  trace with the patch-set applied)
+
+  Thanks
+  -Alex
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890312/+subscriptions
 
