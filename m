@@ -2,64 +2,132 @@ Return-Path: <SRS0=UEgn=BO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AF0C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51BA0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:35:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37165206DA
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:34:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37165206DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 470252075D
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Aug 2020 08:35:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZkzyaBd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 470252075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k2sP4-0006ZX-BH
-	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:34:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51570)
+	id 1k2sQI-0007s1-Cz
+	for qemu-devel@archiver.kernel.org; Tue, 04 Aug 2020 04:35:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k2s4v-000561-JJ
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:13:45 -0400
-Received: from mx2.suse.de ([195.135.220.15]:40990)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k2s4t-0006kb-NX
- for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:13:45 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 45308AC85;
- Tue,  4 Aug 2020 08:13:58 +0000 (UTC)
-Subject: Re: [RFC v3 1/8] cpu-timers, icount: new modules
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>
-References: <20200803090533.7410-1-cfontana@suse.de>
- <20200803090533.7410-2-cfontana@suse.de>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <910286a7-805d-3b62-a3b0-aeb5d0a9606e@suse.de>
-Date: Tue, 4 Aug 2020 10:13:41 +0200
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k2sPK-0006yh-RE
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:34:50 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51025)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k2sPI-0001Ph-TL
+ for qemu-devel@nongnu.org; Tue, 04 Aug 2020 04:34:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596530087;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=qD/CeeZrbqIkgE83qE1EJDNBaCSUEFE64uJULaVnxnU=;
+ b=RZkzyaBdijr00rxtgew8M5LaYVAkcSlxXWxdQPUxnNFsA6wmKuK+yEImkfXzmprmbMC2Iz
+ 4yz1IoVbetErX1kgJ6pb0ucNdH9xLaG8Wf3Z9cYCWrMd9YTRHrQx4iMmv1CKm/Lz5o3HEk
+ c111twLwRMgfLsPIZoCkwL1URe8aBWA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-3CZHUtljNvyOFI2bX3zaLQ-1; Tue, 04 Aug 2020 04:34:46 -0400
+X-MC-Unique: 3CZHUtljNvyOFI2bX3zaLQ-1
+Received: by mail-ej1-f71.google.com with SMTP id d24so8662647ejb.3
+ for <qemu-devel@nongnu.org>; Tue, 04 Aug 2020 01:34:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=qD/CeeZrbqIkgE83qE1EJDNBaCSUEFE64uJULaVnxnU=;
+ b=hU2coZTm8RUc5Ssbb6RvdO2LleEzVmVsPRc5GTIlPEBH0tKX2eeBTmTu+3ReabWOwJ
+ w6oTKJD46iIRzghXWjrbSuZb7SPIdpF9fYgxTBvK/idlwas3yj1GtEorpnhcaZnk6gHq
+ NFo9VTVZ9KY64NnM05DfAzRHDpdmH0AIHpZPgDcdzVm6yPGwrJODv/aBPe1pLoFTDZk1
+ 3wIkFRUR6mFEsMXONZiThUg0wkYrAzG0SRAnuQLQnvpk3X3281lMQbK1y0EhDP9uftdG
+ zvuQnfANDnXL0v6TSNGoFMf4nMuk5L0Un2Tf0sAn3SIqKnhOcRntkoc3OAqjy5OX/HXs
+ 4AZg==
+X-Gm-Message-State: AOAM530zBQ100FdxsUqk0nolfVDsZVeVtosBYFvI4HRDu7RSsFLZ3TQd
+ VvWWBOeVPUEV36bE8THGyOxTe4OSDq2bI0YutH9fcp2ia5eMqwbDYIicoYGMIhO0owV1TPqN0xx
+ vWMSvXcZTaIoZ0E0=
+X-Received: by 2002:a05:6402:1a54:: with SMTP id
+ bf20mr19573312edb.217.1596530085185; 
+ Tue, 04 Aug 2020 01:34:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxcPFG6nWYYGYKd1IYh4XRaBTvM1zmuSGq2bzNjsP1QuA5gXXRyHlNYGm5sTx/gM2BJ1aCXoA==
+X-Received: by 2002:a05:6402:1a54:: with SMTP id
+ bf20mr19573296edb.217.1596530084967; 
+ Tue, 04 Aug 2020 01:34:44 -0700 (PDT)
+Received: from [192.168.1.43] (214.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.214])
+ by smtp.gmail.com with ESMTPSA id dk28sm18329770edb.90.2020.08.04.01.34.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 04 Aug 2020 01:34:44 -0700 (PDT)
+Subject: Re: [PATCH-for-5.1 v2 1/1] accel/xen: Fix xen_enabled() behavior on
+ target-agnostic objects
+To: paul@xen.org, qemu-devel@nongnu.org
+References: <20200804074930.13104-1-philmd@redhat.com>
+ <20200804074930.13104-2-philmd@redhat.com>
+ <001201d66a34$e82ec070$b88c4150$@xen.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <56c70b44-2d5f-44fc-5d9a-535c3c5fca71@redhat.com>
+Date: Tue, 4 Aug 2020 10:34:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200803090533.7410-2-cfontana@suse.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <001201d66a34$e82ec070$b88c4150$@xen.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 02:44:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/04 01:28:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -73,144 +141,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Roman Bolshakov <r.bolshakov@yadro.com>, haxm-team@intel.com,
- Wenchao Wang <wenchao.wang@intel.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
- Colin Xu <colin.xu@intel.com>
+Cc: 'Peter Maydell' <peter.maydell@linaro.org>,
+ 'Stefano Stabellini' <sstabellini@kernel.org>,
+ 'Paul Durrant' <pdurrant@amazon.com>, 'Paolo Bonzini' <pbonzini@redhat.com>,
+ 'Anthony Perard' <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex, Paolo and all,
+Hi Paul,
 
-thank you for your feedback, could you help me answer the question below?
+On 8/4/20 9:57 AM, Paul Durrant wrote:
+>> -----Original Message-----
+>> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> Sent: 04 August 2020 08:50
+>> To: qemu-devel@nongnu.org
+>> Cc: Peter Maydell <peter.maydell@linaro.org>; Anthony Perard <anthony.perard@citrix.com>; Paolo
+>> Bonzini <pbonzini@redhat.com>; Stefano Stabellini <sstabellini@kernel.org>; xen-
+>> devel@lists.xenproject.org; Paul Durrant <paul@xen.org>; Philippe Mathieu-Daudé <philmd@redhat.com>;
+>> Paul Durrant <pdurrant@amazon.com>
+>> Subject: [PATCH-for-5.1 v2 1/1] accel/xen: Fix xen_enabled() behavior on target-agnostic objects
+>>
+>> CONFIG_XEN is generated by configure and stored in "config-target.h",
+>> which is (obviously) only include for target-specific objects.
+>> This is a problem for target-agnostic objects as CONFIG_XEN is never
+>> defined and xen_enabled() is always inlined as 'false'.
+>>
+>> Fix by following the KVM schema, defining CONFIG_XEN_IS_POSSIBLE
+>> when we don't know to force the call of the non-inlined function,
+>> returning the xen_allowed boolean.
+>>
+>> Fixes: da278d58a092 ("accel: Move Xen accelerator code under accel/xen/")
+>> Reported-by: Paul Durrant <pdurrant@amazon.com>
+>> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  include/sysemu/xen.h   | 18 ++++++++++++++----
+>>  accel/stubs/xen-stub.c |  2 ++
+>>  accel/xen/xen-all.c    |  7 +------
+>>  3 files changed, 17 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
+>> index 1ca292715e..2c2c429ea8 100644
+>> --- a/include/sysemu/xen.h
+>> +++ b/include/sysemu/xen.h
+>> @@ -8,9 +8,19 @@
+>>  #ifndef SYSEMU_XEN_H
+>>  #define SYSEMU_XEN_H
+>>
+>> -#ifdef CONFIG_XEN
+>> +#ifdef NEED_CPU_H
+>> +# ifdef CONFIG_XEN
+>> +#  define CONFIG_XEN_IS_POSSIBLE
+>> +# endif
+>> +#else
+>> +# define CONFIG_XEN_IS_POSSIBLE
+>> +#endif
+>>
+>> -bool xen_enabled(void);
+>> +#ifdef CONFIG_XEN_IS_POSSIBLE
+>> +
+>> +extern bool xen_allowed;
+>> +
+>> +#define xen_enabled()           (xen_allowed)
+> 
+> Can this not move ahead of the #ifdef now (since xen_allowed is present in both xen-stub and xen-all)? I think this is what Peter was saying in his option '(2)'.
 
-On 8/3/20 11:05 AM, Claudio Fontana wrote:
-> ...
+I think I respected Peter's option '(2)', following how KVM does, this
+is the case with stub,
 
-> diff --git a/dma-helpers.c b/dma-helpers.c
-> index 2a77b5a9cb..240ef4d5b8 100644
-> --- a/dma-helpers.c
-> +++ b/dma-helpers.c
-> @@ -13,7 +13,7 @@
->  #include "trace-root.h"
->  #include "qemu/thread.h"
->  #include "qemu/main-loop.h"
-> -#include "sysemu/cpus.h"
-> +#include "sysemu/cpu-timers.h"
->  #include "qemu/range.h"
->  
->  /* #define DEBUG_IOMMU */
-> @@ -151,7 +151,7 @@ static void dma_blk_cb(void *opaque, int ret)
->           * from several sectors. This code splits all SGs into several
->           * groups. SGs in every group do not overlap.
->           */
-> -        if (mem && use_icount && dbs->dir == DMA_DIRECTION_FROM_DEVICE) {
-> +        if (mem && icount_enabled() && dbs->dir == DMA_DIRECTION_FROM_DEVICE) {
+> 
+>   Paul
+> 
+>>
+>>  #ifndef CONFIG_USER_ONLY
+>>  void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
+>> @@ -18,7 +28,7 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+>>                     struct MemoryRegion *mr, Error **errp);
+>>  #endif
+>>
+>> -#else /* !CONFIG_XEN */
+>> +#else /* !CONFIG_XEN_IS_POSSIBLE */
+>>
+>>  #define xen_enabled() 0
 
+    ^^^ here is the other case,
 
+>>  #ifndef CONFIG_USER_ONLY
+>> @@ -33,6 +43,6 @@ static inline void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+>>  }
+>>  #endif
+>>
+>> -#endif /* CONFIG_XEN */
+>> +#endif /* CONFIG_XEN_IS_POSSIBLE */
+>>
+>>  #endif
+>> diff --git a/accel/stubs/xen-stub.c b/accel/stubs/xen-stub.c
+>> index dcca4e678a..8ae658acff 100644
+>> --- a/accel/stubs/xen-stub.c
+>> +++ b/accel/stubs/xen-stub.c
+>> @@ -9,6 +9,8 @@
+>>  #include "hw/xen/xen.h"
+>>  #include "qapi/qapi-commands-misc.h"
+>>
+>> +bool xen_allowed;
 
+here is the stub,
 
-In this specific case, where dma_blk_cb() changes its behaviour to be more deterministic
-if icount_enabled(),
+>> +
+>>  void xenstore_store_pv_console_info(int i, Chardev *chr)
+>>  {
+>>  }
+>> diff --git a/accel/xen/xen-all.c b/accel/xen/xen-all.c
+>> index 0c24d4b191..60b971d0a8 100644
+>> --- a/accel/xen/xen-all.c
+>> +++ b/accel/xen/xen-all.c
+>> @@ -32,12 +32,7 @@
+>>      do { } while (0)
+>>  #endif
+>>
+>> -static bool xen_allowed;
+>> -
+>> -bool xen_enabled(void)
+>> -{
+>> -    return xen_allowed;
+>> -}
+>> +bool xen_allowed;
 
-do you think that if qtest_enabled() we should also follow the more deterministic path,
-or should we go through the "normal" path instead, as this patch does?
+here is the real variable.
 
-Tests pass in any case, but I wonder what would be the best behavior for qtest accel in this case.
-(Maybe Pavel?)
+>>
+>>  xc_interface *xen_xc;
+>>  xenforeignmemory_handle *xen_fmem;
+>> --
+>> 2.21.3
+> 
+> 
 
-
-
->              int i;
->              for (i = 0 ; i < dbs->iov.niov ; ++i) {
->                  if (ranges_overlap((intptr_t)dbs->iov.iov[i].iov_base,
-> diff --git a/docs/replay.txt b/docs/replay.txt
-> index 70c27edb36..8952e6d852 100644
-> --- a/docs/replay.txt
-> +++ b/docs/replay.txt
-> @@ -184,11 +184,11 @@ is then incremented (which is called "warping" the virtual clock) as
->  soon as the timer fires or the CPUs need to go out of the idle state.
->  Two functions are used for this purpose; because these actions change
->  virtual machine state and must be deterministic, each of them creates a
-> -checkpoint.  qemu_start_warp_timer checks if the CPUs are idle and if so
-> -starts accounting real time to virtual clock.  qemu_account_warp_timer
-> +checkpoint.  icount_start_warp_timer checks if the CPUs are idle and if so
-> +starts accounting real time to virtual clock.  icount_account_warp_timer
->  is called when the CPUs get an interrupt or when the warp timer fires,
->  and it warps the virtual clock by the amount of real time that has passed
-> -since qemu_start_warp_timer.
-> +since icount_start_warp_timer.
->  
->  Bottom halves
->  -------------
-> diff --git a/exec.c b/exec.c
-> index 6f381f98e2..a89ffa93c1 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -102,10 +102,6 @@ uintptr_t qemu_host_page_size;
->  intptr_t qemu_host_page_mask;
->  
->  #if !defined(CONFIG_USER_ONLY)
-> -/* 0 = Do not count executed instructions.
-> -   1 = Precise instruction counting.
-> -   2 = Adaptive rate instruction counting.  */
-> -int use_icount;
->  
->  typedef struct PhysPageEntry PhysPageEntry;
->  
-> diff --git a/hw/core/ptimer.c b/hw/core/ptimer.c
-> index b5a54e2536..c6d2beb1da 100644
-> --- a/hw/core/ptimer.c
-> +++ b/hw/core/ptimer.c
-> @@ -7,11 +7,11 @@
->   */
->  
->  #include "qemu/osdep.h"
-> -#include "qemu/timer.h"
->  #include "hw/ptimer.h"
->  #include "migration/vmstate.h"
->  #include "qemu/host-utils.h"
->  #include "sysemu/replay.h"
-> +#include "sysemu/cpu-timers.h"
->  #include "sysemu/qtest.h"
->  #include "block/aio.h"
->  #include "sysemu/cpus.h"
-> @@ -134,7 +134,8 @@ static void ptimer_reload(ptimer_state *s, int delta_adjust)
->       * on the current generation of host machines.
->       */
->  
-> -    if (s->enabled == 1 && (delta * period < 10000) && !use_icount) {
-> +    if (s->enabled == 1 && (delta * period < 10000) &&
-> +        !icount_enabled() && !qtest_enabled()) {
-
-
-In this case, it is necessary to also make qtest more deterministic in order to make existing tests pass,
-as the results of the timer are affecting the ptimer test results (IIRC tests/ptimer-test.c)
-
-
->          period = 10000 / delta;
->          period_frac = 0;
->      }
-> @@ -217,7 +218,8 @@ uint64_t ptimer_get_count(ptimer_state *s)
->              uint32_t period_frac = s->period_frac;
->              uint64_t period = s->period;
->  
-> -            if (!oneshot && (s->delta * period < 10000) && !use_icount) {
-> +            if (!oneshot && (s->delta * period < 10000) &&
-> +                !icount_enabled() && !qtest_enabled()) {
-
-...same here.
-
->                  period = 10000 / s->delta;
->                  period_frac = 0;
->              }
-
-
-Thanks for your feedback,
-
-Claudio
 
