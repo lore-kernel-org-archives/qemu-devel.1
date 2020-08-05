@@ -2,88 +2,75 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7FC1C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:21:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED1C1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:24:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 832C120792
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:21:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QlD3L0cF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832C120792
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4A3B22B40
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:24:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4A3B22B40
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=h3c.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3Fbs-0004u8-Q2
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 05:21:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57630)
+	id 1k3Fem-0007BI-3D
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 05:24:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k3FYi-0000Rs-EW
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:18:04 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47872
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k3FYg-0003pE-QT
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:18:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596619081;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RaBgmbtPTVZPc9Dfy2dHqvHe+ifm4ZctTlglyls1p9k=;
- b=QlD3L0cFtWKYYobgeIWh+fANQb0ool5LVO8XeZ3tdyy5u4VGTLWjKz0E4p9M5a6Phay30c
- DYXkEtscCoHwi7CFo22Fx6tIH7rgjD/pCnzOCw+WDoxtkYdrPwyLWiGtopsD1ngZKl+w6S
- mQb9aB1wuDrMRyPRw/GzENqW3QfoZdI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-HPfPi3m4OBK3opOw05WMGg-1; Wed, 05 Aug 2020 05:16:47 -0400
-X-MC-Unique: HPfPi3m4OBK3opOw05WMGg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33258E918;
- Wed,  5 Aug 2020 09:16:46 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.31])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E935E2DE66;
- Wed,  5 Aug 2020 09:16:44 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Subject: [PATCH v2 2/5] target/arm/kvm: Make uncalled stubs explicitly
- unreachable
-Date: Wed,  5 Aug 2020 11:16:37 +0200
-Message-Id: <20200805091640.11134-3-drjones@redhat.com>
-In-Reply-To: <20200805091640.11134-1-drjones@redhat.com>
-References: <20200805091640.11134-1-drjones@redhat.com>
+ (Exim 4.90_1) (envelope-from <tu.guoyi@h3c.com>)
+ id 1k3Fe5-0006gj-7n; Wed, 05 Aug 2020 05:23:37 -0400
+Received: from smtp.h3c.com ([60.191.123.50]:43822 helo=h3cspam02-ex.h3c.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <tu.guoyi@h3c.com>)
+ id 1k3Fe1-0004Y9-JK; Wed, 05 Aug 2020 05:23:36 -0400
+Received: from DAG2EX09-IDC.srv.huawei-3com.com ([10.8.0.72])
+ by h3cspam02-ex.h3c.com with ESMTPS id 0759Mt4a003231
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Wed, 5 Aug 2020 17:22:55 +0800 (GMT-8)
+ (envelope-from tu.guoyi@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
+ DAG2EX09-IDC.srv.huawei-3com.com (10.8.0.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 5 Aug 2020 17:22:58 +0800
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
+ by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%7])
+ with mapi id 15.01.1713.004; Wed, 5 Aug 2020 17:22:58 +0800
+From: Tuguoyi <tu.guoyi@h3c.com>
+To: "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com"
+ <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: [PATCH] qcow2-cluster: Fix integer left shift error in
+ qcow2_alloc_cluster_link_l2()
+Thread-Topic: [PATCH] qcow2-cluster: Fix integer left shift error in
+ qcow2_alloc_cluster_link_l2()
+Thread-Index: AdZrCV/0aSDyco1VQNa8/fefsiaORg==
+Date: Wed, 5 Aug 2020 09:22:58 +0000
+Message-ID: <81ba90fe0c014f269621c283269b42ad@h3c.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.125.108.131]
+x-sender-location: DAG2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 04:10:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-DNSRBL: 
+X-MAIL: h3cspam02-ex.h3c.com 0759Mt4a003231
+Received-SPF: pass client-ip=60.191.123.50; envelope-from=tu.guoyi@h3c.com;
+ helo=h3cspam02-ex.h3c.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 05:23:21
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,102 +83,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Gaoliang <liang_gao@h3c.com>, Chengchiwen <chengchiwen@h3c.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Wangyong <wang.yongD@h3c.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When we compile without KVM support !defined(CONFIG_KVM) we generate
-stubs for functions that the linker will still encounter. Sometimes
-these stubs can be executed safely and are placed in paths where they
-get executed with or without KVM. Other functions should never be
-called without KVM. Those functions should be guarded by kvm_enabled(),
-but should also be robust to refactoring mistakes. Putting a
-g_assert_not_reached() in the function should help. Additionally,
-the g_assert_not_reached() calls may actually help the linker remove
-some code.
-
-We remove the stubs for kvm_arm_get/put_virtual_time(), as they aren't
-necessary at all - the only caller is in kvm.c
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- target/arm/kvm_arm.h | 44 +++++++++++++++++++++++++++-----------------
- 1 file changed, 27 insertions(+), 17 deletions(-)
-
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index adb38514bf20..0da00eb6b20c 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -344,16 +344,10 @@ int kvm_arm_set_irq(int cpu, int irqtype, int irq, int level);
- 
- #else
- 
--static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
--{
--    /*
--     * This should never actually be called in the "not KVM" case,
--     * but set up the fields to indicate an error anyway.
--     */
--    cpu->kvm_target = QEMU_KVM_ARM_TARGET_NONE;
--    cpu->host_cpu_probe_failed = true;
--}
--
-+/*
-+ * It's safe to call these functions without KVM support.
-+ * They should either do nothing or return "not supported".
-+ */
- static inline void kvm_arm_add_vcpu_properties(Object *obj) {}
- 
- static inline bool kvm_arm_aarch32_supported(void)
-@@ -371,23 +365,39 @@ static inline bool kvm_arm_sve_supported(void)
-     return false;
- }
- 
-+/*
-+ * These functions should never actually be called without KVM support.
-+ */
-+static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
-+{
-+    g_assert_not_reached();
-+}
-+
- static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
- {
--    return -ENOENT;
-+    g_assert_not_reached();
- }
- 
- static inline int kvm_arm_vgic_probe(void)
- {
--    return 0;
-+    g_assert_not_reached();
- }
- 
--static inline void kvm_arm_pmu_set_irq(CPUState *cs, int irq) {}
--static inline void kvm_arm_pmu_init(CPUState *cs) {}
-+static inline void kvm_arm_pmu_set_irq(CPUState *cs, int irq)
-+{
-+    g_assert_not_reached();
-+}
- 
--static inline void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map) {}
-+static inline void kvm_arm_pmu_init(CPUState *cs)
-+{
-+    g_assert_not_reached();
-+}
-+
-+static inline void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map)
-+{
-+    g_assert_not_reached();
-+}
- 
--static inline void kvm_arm_get_virtual_time(CPUState *cs) {}
--static inline void kvm_arm_put_virtual_time(CPUState *cs) {}
- #endif
- 
- static inline const char *gic_class_name(void)
--- 
-2.25.4
-
+V2hlbiBjYWxjdWxhdGluZyB0aGUgb2Zmc2V0LCB0aGUgcmVzdWx0IG9mIGxlZnQgc2hpZnQgb3Bl
+cmF0aW9uIHdpbGwgYmUgcHJvbW90ZWQNCnRvIHR5cGUgaW50NjQgYXV0b21hdGljYWxseSBiZWNh
+dXNlIHRoZSBsZWZ0IG9wZXJhbmQgb2YgKyBvcGVyYXRvciBpcyB1aW50NjRfdC4NCmJ1dCB0aGUg
+cmVzdWx0IGFmdGVyIGludGVnZXIgcHJvbW90aW9uIG1heSBiZSBwcm9kdWNlIGFuIGVycm9yIHZh
+bHVlIGZvciB1cyBhbmQNCnRyaWdnZXIgdGhlIGZvbGxvd2luZyBhc3NlcnRpbmcgZXJyb3IuDQoN
+CkZvciBleGFtcGxlLCBjb25zaWRlciBpPTB4MjAwMCwgY2x1c3Rlcl9iaXRzPTE4LCB0aGUgcmVz
+dWx0IG9mIGxlZnQgc2hpZnQNCm9wZXJhdGlvbiB3aWxsIGJlIDB4ODAwMDAwMDAuIENhdXNlIGFy
+Z3VtZW50IGkgaXMgb2Ygc2lnbmVkIGludGVnZXIgdHlwZSwNCnRoZSByZXN1bHQgaXMgYXV0b21h
+dGljYWxseSBwcm9tb3RlZCB0byAweGZmZmZmZmZmODAwMDAwMDAgd2hpY2ggaXMgbm90DQp3ZSBl
+eHBlY3RlZA0KDQpUaGUgd2F5IHRvIHRyaWdnZXIgdGhlIGFzc2VydGlvbiBlcnJvcjoNCiAgcWVt
+dS1pbWcgY3JlYXRlIC1mIHFjb3cyIC1vIHByZWFsbG9jYXRpb249ZnVsbCxjbHVzdGVyX3NpemU9
+MjU2ayB0bXBkaXNrIDEwRw0KDQpUaGlzIHBhdGNoIGZpeCBpdCBieSBjYXN0aW5nIEBpIHRvIHVp
+bnQ2NF90IGJlZm9yZSBkb2luZyBsZWZ0IHNoaWZ0IG9wZXJhdGlvbg0KDQpTaWduZWQtb2ZmLWJ5
+OiBHdW95aSBUdSA8dHUuZ3VveWlAaDNjLmNvbT4NCi0tLQ0KIGJsb2NrL3Fjb3cyLWNsdXN0ZXIu
+YyB8IDIgKy0NCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkN
+Cg0KZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLWNsdXN0ZXIuYyBiL2Jsb2NrL3Fjb3cyLWNsdXN0
+ZXIuYw0KaW5kZXggYTY3N2JhOS4uNTUwODUwYiAxMDA2NDQNCi0tLSBhL2Jsb2NrL3Fjb3cyLWNs
+dXN0ZXIuYw0KKysrIGIvYmxvY2svcWNvdzItY2x1c3Rlci5jDQpAQCAtOTgwLDcgKzk4MCw3IEBA
+IGludCBxY293Ml9hbGxvY19jbHVzdGVyX2xpbmtfbDIoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIFFD
+b3dMMk1ldGEgKm0pDQogDQogICAgIGFzc2VydChsMl9pbmRleCArIG0tPm5iX2NsdXN0ZXJzIDw9
+IHMtPmwyX3NsaWNlX3NpemUpOw0KICAgICBmb3IgKGkgPSAwOyBpIDwgbS0+bmJfY2x1c3RlcnM7
+IGkrKykgew0KLSAgICAgICAgdWludDY0X3Qgb2Zmc2V0ID0gY2x1c3Rlcl9vZmZzZXQgKyAoaSA8
+PCBzLT5jbHVzdGVyX2JpdHMpOw0KKyAgICAgICAgdWludDY0X3Qgb2Zmc2V0ID0gY2x1c3Rlcl9v
+ZmZzZXQgKyAoKHVpbnQ2NF90KWkgPDwgcy0+Y2x1c3Rlcl9iaXRzKTsNCiAgICAgICAgIC8qIGlm
+IHR3byBjb25jdXJyZW50IHdyaXRlcyBoYXBwZW4gdG8gdGhlIHNhbWUgdW5hbGxvY2F0ZWQgY2x1
+c3Rlcg0KICAgICAgICAgICogZWFjaCB3cml0ZSBhbGxvY2F0ZXMgc2VwYXJhdGUgY2x1c3RlciBh
+bmQgd3JpdGVzIGRhdGEgY29uY3VycmVudGx5Lg0KICAgICAgICAgICogVGhlIGZpcnN0IG9uZSB0
+byBjb21wbGV0ZSB1cGRhdGVzIGwyIHRhYmxlIHdpdGggcG9pbnRlciB0byBpdHMNCi0tIA0KMi43
+LjQNCg0KLS0NCkJlc3QgcmVnYXJkcywNCkd1b3lpDQoNCg==
 
