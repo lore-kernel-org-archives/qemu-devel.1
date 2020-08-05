@@ -4,76 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 744C3C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 19:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEEBAC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 19:05:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A32822CA1
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 19:03:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA36A22CA1
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 19:05:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yzE93/A+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A32822CA1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xrLUkmyM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA36A22CA1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3OhT-000830-Fy
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 15:03:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59652)
+	id 1k3Oio-00015q-22
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 15:05:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3Ogs-0007Uc-NX
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 15:03:06 -0400
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:36763)
+ id 1k3OiA-0000WU-8t
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 15:04:26 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46742)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3Ogp-0003S1-1f
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 15:03:06 -0400
-Received: by mail-oi1-x22a.google.com with SMTP id l204so11804220oib.3
- for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 12:03:02 -0700 (PDT)
+ id 1k3Oi8-0003bR-29
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 15:04:25 -0400
+Received: by mail-oi1-x242.google.com with SMTP id v13so23934659oiv.13
+ for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 12:04:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=iREQpVcvmUgkRTy82rJE18VB38/uIikwuQyiEWDCr0Q=;
- b=yzE93/A+vvmyc2tni7zWiCCToouuSsHdIXdFpJ0Ed7nwXClToBqE9BFoNhRJikFTs7
- /FxrmBzPMMqKA3N6Ln/j1XtkD0UEVsPEmL38KQmoQY/uzF3OLOyeSZfz2z2KWx5dNwrd
- /Nw8jTsGiPB1LTtxRcvHVkaomvniF8Fjva55iEOsSHT39ok0MyJXC/j1iQgXP/qIGxN0
- rdbJ+jvW5+FZou8n3dMQVtfHTU82RC4KjnVLIp7YqQ8w2P4XrQT5MvQ+zy9+iZ6LT151
- PEMSrK4MVztLngMVW2n3vc/2EEpt4YYKmBGJnVyDrwQGYHY/Uim8jNo15rrl8Tv6taNq
- c7EQ==
+ :cc; bh=HVkA4GtPY9nHRy8TNBrSpNj+Za8pZISkS+dRzZ7Myaw=;
+ b=xrLUkmyMWFPWqqosnYzwto6K+QgsyClnxO+MRq8teV8/8VoeKvG0hx//BTbNT4xRJ1
+ vJOVU1a3HCDTDTX+dHzonFZHVGPIobvCAn5+IKkpujGy0AW0NE2j6+NCj0SnyOy+sXk1
+ IGTKrN0KYi4I0eF8DPgoY7arZYpak3NZmmAqv/D3Gz/VoPB7yGuCRSrR2xZynvNEwLJH
+ 7kQjODJxbNZ5kjPOhJ/iwFER53JtIyf9+tn5b7f/qM5z7m/qBG4EobaRJygvDFaouIdS
+ ADDqqB0R4NBzz7FypgfNUDER7w2+k1IkXcjnBI6Jkw4spIDeDYYXSxCj7JvMjzDnVXxe
+ rGTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=iREQpVcvmUgkRTy82rJE18VB38/uIikwuQyiEWDCr0Q=;
- b=gQwYeIccx997FRGeKvrJpq1UtMaLzhJImYAE5K0l4liNNJ0xQbG03278FWFz5mUCVI
- I5iQsRIrF2Q38WO95rk9TFQLhJkIQ4ZVaoIqeVYeXxl++KfY9Krq/GIVhLv5tI1KHI77
- 2eanWc1IEfcG0uEK+bqmPtPHTo26HfFVHqtEfWAo0nBX+dijRWeiCOSREPfbjlS5Wsq4
- N1bNhRTGBZyyNO5hjpN7mQc1YaGL9MCFQpYzDeNzqVUiQkKPi2v9tTR8+dj/OvE2cHPZ
- tiqJ3FvspBeLwoF5zmQm3ENjxcfCAwUqDFrmUA+C6fYRSFIf33F+y2YKudCCAjcuAMgo
- iDzA==
-X-Gm-Message-State: AOAM530tgsEUf/0K0lN85cEWf7MLdiJipI+1coZBMO6WQLSgHnGUfeHy
- Ie/qRqUnPbykXkSBl1TBuLvIkymdqRJJZjoc/DIcpQ==
-X-Google-Smtp-Source: ABdhPJwkH7R1Fb+tri/6ZRD69nfZsXATUAIIjVHriW/AwHlvHgmDLL8K7vMRfMjZgIsxQPePO1xz6gLTxuH5uSZ1v2Q=
-X-Received: by 2002:aca:5703:: with SMTP id l3mr3727440oib.48.1596654181520;
- Wed, 05 Aug 2020 12:03:01 -0700 (PDT)
+ bh=HVkA4GtPY9nHRy8TNBrSpNj+Za8pZISkS+dRzZ7Myaw=;
+ b=sDJJTvhRYLFFoVXZRq8rt/gZrtw41NKaNLAHXMvLauvIE94OK9QkWCtetbj0WfDnV4
+ u4sEhe1WkgQdgcJucM+U/i1MiF/h26xeiY4w33EH3VNNO0v3t3JFfVwr0hTVrT7sze7W
+ wAEjw/p545kCIhoGywGKC6Jf4MWn/JhfJcDg5DRRw3usJO6bRTZdji4/k6oVQE7ts2aY
+ oT/4YMvN+3D2D6DQwcxAVYkzAlStxEHlzZwoXpIVmhWDaZjrVMfYBkIOXxR2IfxIiuHb
+ U944FxORD8bt5koGnvVpY1BRtRypKNipZsa0j0YU5rcFP8DzeoBv/30NfaIPKUaCkFe+
+ TrIg==
+X-Gm-Message-State: AOAM532/tuStApE3Rnj6LMdVk8+EwzE2+iNfJTEOdCXRZxhZcW0E65e0
+ HLm3EGY+3QTRtMbv3TRenv2DdCZ8Z/dF15D/UTszMw==
+X-Google-Smtp-Source: ABdhPJwvSu65hCJszv0lzZUyX4PIVE65nQeHFQJCqDY8hKlv8rau1wJHcSnhWIxGV3tTBllnbZtfE5oSoUQnqOEkkYQ=
+X-Received: by 2002:aca:4a96:: with SMTP id x144mr3975116oia.163.1596654262673; 
+ Wed, 05 Aug 2020 12:04:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAFEAcA_6zbOfdVi+Tp18seaEy4don1GurVya+E+QXRGrZ_WVLg@mail.gmail.com>
- <2c5ed9d8-6d79-1b53-5588-8fb9efebf0fa@linaro.org> <87tuxhkpo2.fsf@linaro.org>
- <CAFEAcA8+acTg6KoBDW5-7FvnrW=vDMXohWfTAXtTFv6BDqyuRQ@mail.gmail.com>
- <a1e53e0c-fbab-a789-5f07-cfae99b6042a@linaro.org>
-In-Reply-To: <a1e53e0c-fbab-a789-5f07-cfae99b6042a@linaro.org>
+References: <20200723025657.644724-1-bauerman@linux.ibm.com>
+ <878sf3uojf.fsf@morokweng.localdomain>
+ <20200730005947.GO84173@umbus.fritz.box>
+ <CAAdtpL5Mtaf7Xwu74U33eGTCAiFZNNXeCST8COwQeW8S9j8ZVQ@mail.gmail.com>
+ <87a6zh3uyv.fsf@morokweng.localdomain> <874kph58o5.fsf@morokweng.localdomain>
+In-Reply-To: <874kph58o5.fsf@morokweng.localdomain>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 5 Aug 2020 20:02:50 +0100
-Message-ID: <CAFEAcA96CBz_h6xzwdRL_Ls2rGjLEKi02uXB6DS2Bp-56Bhe8g@mail.gmail.com>
-Subject: Re: v8.1M cpu emulation and target-arm feature-identification strategy
-To: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 5 Aug 2020 20:04:11 +0100
+Message-ID: <CAFEAcA-Yi754zyxHd+bggjny5vXw=rrs5fm6SZCcxwVUeoTtOg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/8] Generalize start-powered-off property from ARM
+To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22a;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x22a.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,30 +96,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ David Hildenbrand <david@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Richard Henderson <rth@twiddle.net>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 5 Aug 2020 at 18:00, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> I've always assumed we'd never get rid of all of them.
->
-> Older ones like XSCALE are obvious, but I don't think there's a clear indicator
-> for V{5,6,7,8} either.
+On Wed, 5 Aug 2020 at 18:01, Thiago Jung Bauermann
+<bauerman@linux.ibm.com> wrote:
+> Any news on this? Is there something I should be doing? I saw -rc3 today
+> but not these patches.
 
-MIDR.Architecture lets you distinguish v4/v4T/v5/v5T/v5TE/v5TEJ/v6,
-and there are also some separate per-feature ID register fields for
-things which we currently hang off those ARM_FEATURE_Vx flags.
-In theory all the v7-and-later stuff should have its own ID register
-field...
+Sorry, you've missed the bus for 5.1 at this point. I'd assumed
+that the relevant bits of the patchset would go into a PPC pullreq
+if it was important for 5.1.
 
-Regardless, it's hard to see a clear benefit from a hypothetical
-concerted effort to convert all the ARM_FEATURE_* uses to ID
-register checks, though we might choose to convert a few here
-and there if we need to overhaul the code anyway.
+As I understand it, this isn't a regression from 5.0, right?
 
 thanks
 -- PMM
