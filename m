@@ -2,104 +2,95 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D5CFC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 08:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E6CC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 08:48:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24D4921744
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 08:48:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 888F621744
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 08:48:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uf1T2c13"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24D4921744
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UAET+ezF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 888F621744
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3F5z-0000Uz-DH
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 04:48:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50730)
+	id 1k3F6A-0000mw-O8
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 04:48:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3F58-00086U-Kg
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 04:47:30 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31842
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3F5I-0008Es-5W
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 04:47:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30708
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3F57-000062-2y
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 04:47:30 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3F5G-000070-HH
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 04:47:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596617248;
+ s=mimecast20190719; t=1596617257;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qPzHiRCQIBm6m1SbM6dI20X9cTUcQeydWc0V/h3Ar8c=;
- b=Uf1T2c13vYrG819TVjPrjhm2Wds/14h+xX1UnlrsV13R8Qm2s/w3oenJ6HXa3pg0HEAmN7
- k5xViEcs/+SLEq8ArTApcgp2mbnhnKPY4HJY/NvaGvLK1PASnWPxg1XzYvDAn2wVvk72V9
- 3xRQ9V0cR3lerX6uAw8ZZUD9a2q2/c8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-PWZzpe7PMGi6DPFKJw4FVw-1; Wed, 05 Aug 2020 04:47:26 -0400
-X-MC-Unique: PWZzpe7PMGi6DPFKJw4FVw-1
-Received: by mail-wm1-f72.google.com with SMTP id s4so2193407wmh.1
- for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 01:47:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qPzHiRCQIBm6m1SbM6dI20X9cTUcQeydWc0V/h3Ar8c=;
- b=WPxKlkVapiI2uM2aKO+Wu5AstmsCCk78s9kOUQBErJdrRbqFZQ+Lqe/nX9HmbkdhfP
- 58lfLt3GYpno4nuIb9bMC1m/JpkmpkFNvqu3y2mOvatdq/SZ3PA4kZLlC+QyhkjEMGfg
- VjjIt1B8PQfeDptpxlsjPNTFamM34VyjHAbQpSuQFFpirlgEeUxZq9QabpomFD1WXe8Y
- j1dVlGq0ookrHcASLPe/6vT7/e5Kj9afD1nN42+IHjKQ4nK01q8napEgd3vsPFRF/ma/
- DP0dZmMRyBxb7vJg2w+BhpdM96kM6CMboqt+rosCAUgnq8fibXJoU9bWDWi1fBvHi3Bn
- HPmQ==
-X-Gm-Message-State: AOAM533c1XzCh2Z7MFI0HLHf2qrtjOByQjoijJEWoh4NBG/J1lAWdCRq
- iwSwW3SpiuNpeIZxF9xYyBmUIJuziYjt5nVj0H1fMr2mmswF16ApW0qu/KFYMwjuI084z9hpeW0
- rHQStEPZmR8eTMBg=
-X-Received: by 2002:adf:f5d0:: with SMTP id k16mr1784280wrp.78.1596617245793; 
- Wed, 05 Aug 2020 01:47:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzYLaKwpMo2BxNbja9T1zt6WNUgJXkX992vsyBlE1OTyUVOkdSqxGxefLpPlpeCRsItKuQusA==
-X-Received: by 2002:adf:f5d0:: with SMTP id k16mr1784254wrp.78.1596617245593; 
- Wed, 05 Aug 2020 01:47:25 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7841:78cc:18c6:1e20?
- ([2001:b07:6468:f312:7841:78cc:18c6:1e20])
- by smtp.gmail.com with ESMTPSA id y145sm1898551wmd.48.2020.08.05.01.47.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 05 Aug 2020 01:47:24 -0700 (PDT)
-Subject: Re: [RFC v3 2/8] cpus: prepare new CpusAccel cpu accelerator interface
-To: Claudio Fontana <cfontana@suse.de>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200803090533.7410-1-cfontana@suse.de>
- <20200803090533.7410-3-cfontana@suse.de>
- <cf676419-09e6-4c36-c511-031edddf8cba@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5594481c-e887-e48e-630b-c9ebbe542212@redhat.com>
-Date: Wed, 5 Aug 2020 10:47:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ bh=/yCbfwxtl5L5vnoFfxfoBjGlugzZypImnu2KxWv8PgI=;
+ b=UAET+ezFnymFanq5Y/vNAy1cfpuQtTFXLrqOAQvvsGyfmefVDcnV7u5eL05nr3aDctWvra
+ JVJrRKX1glJFnLqn2LlD43qDqQyD5jVAqKDHk3nFRvORcSmnXK5ize5GwoIzDgUolc1m3E
+ MgoPs01mSoT7E0cVqOTQvR6etc648a4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-120-EmnyEfxRP0qscTtB0hs3oA-1; Wed, 05 Aug 2020 04:47:34 -0400
+X-MC-Unique: EmnyEfxRP0qscTtB0hs3oA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50573102C7ED;
+ Wed,  5 Aug 2020 08:47:33 +0000 (UTC)
+Received: from gondolin (ovpn-113-4.ams2.redhat.com [10.36.113.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8061F10013D0;
+ Wed,  5 Aug 2020 08:47:20 +0000 (UTC)
+Date: Wed, 5 Aug 2020 10:47:18 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: cleanups with long-term benefits
+Message-ID: <20200805104718.5465a896.cohuck@redhat.com>
+In-Reply-To: <9f83eb93-5389-7aad-3031-0777de0c35b0@redhat.com>
+References: <20200729185024.121766-1-abologna@redhat.com>
+ <87ime52wxd.fsf@dusky.pond.sub.org>
+ <20200730093732.GB3477223@redhat.com>
+ <87k0ylz0ep.fsf@dusky.pond.sub.org>
+ <20200730132446.GL3477223@redhat.com>
+ <875za33ku1.fsf@dusky.pond.sub.org>
+ <20200731150738.GB3660103@redhat.com>
+ <2cf1a431-9d2c-8ad6-446e-f10b36219764@redhat.com>
+ <87d048i1m2.fsf@dusky.pond.sub.org>
+ <83bbe0b0-c5e0-e3b7-5ba1-5946098370d5@redhat.com>
+ <87ft94klyl.fsf@dusky.pond.sub.org>
+ <490a0786-73f3-411e-4dfe-8c2ae90de251@redhat.com>
+ <87y2mvhg3k.fsf@dusky.pond.sub.org>
+ <facfef76-d880-82dd-f862-a64f8f487ba2@redhat.com>
+ <87k0yeg7mc.fsf@dusky.pond.sub.org>
+ <6e5df5fc-94f8-ee8e-0c14-f56135de25e4@redhat.com>
+ <87o8np5ysp.fsf@dusky.pond.sub.org>
+ <9f83eb93-5389-7aad-3031-0777de0c35b0@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <cf676419-09e6-4c36-c511-031edddf8cba@suse.de>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 03:37:07
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 00:45:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -120,36 +111,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Wenchao Wang <wenchao.wang@intel.com>, haxm-team@intel.com,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
- Colin Xu <colin.xu@intel.com>
+Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Michael S.
+ Tsirkin" <mst@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Andrea Bolognani <abologna@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/08/20 10:40, Claudio Fontana wrote:
->>  #ifdef _WIN32
->> -    /* Eat dummy APC queued by qemu_cpu_kick_thread.  */
->> +    /* Eat dummy APC queued by qemu_cpu_kick_thread. */
->> +    /* NB!!! Should not this be if (hax_enabled)? Is this wrong for whpx? */
->>      if (!tcg_enabled()) {
->>          SleepEx(0, TRUE);
->>      }
+On Wed, 5 Aug 2020 10:25:30 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> On 05/08/20 09:36, Markus Armbruster wrote:
+> > There's also the longer term pain of having to work around git-blame
+> > unable to see beyond the flag day.  
 > 
-> Looking at the history here, I think this should be if (hax_enabled());
-> this check was added at a time when whpx did not exist, so I _think_ there might have been an assumption here
-> that !tcg_enabled() on windows means actually hax_enabled() for eating this dummy APC.
+> Do you really use "git blame" that much?  "git log -S" does more or less
+> the same function (in a different way) and is not affected as much by
+> large code movement and transformation patches.
 
-Yes, that matches the condition under which QueueUserAPC is called in
-qemu_cpu_kick_thread.
+I'm not sure the two of them really perform the same function.
 
-Paolo
-
-> Probably it does not cause problems, because whpx does not end up calling qemu_wait_io_event,
-> instead it calls qemu_wait_io_event_common. But it would be more expressive to use if (hax_enabled()) I think.
+FWIW, I like using git {blame|annotate} to find out when/why some code
+areas were changed, and it's often not "when was this line introduced",
+but "I see some commits changing this function, let's find out more
+about them." And yes, I use that quite regularly.
 
 
