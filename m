@@ -2,80 +2,88 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB5DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B200C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:42:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFC53206D4
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:36:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFC53206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0AE08206D4
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:42:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MeCRnp3+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AE08206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3Q98-0006dm-2V
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 16:36:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50108)
+	id 1k3QEy-0008BQ-9a
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 16:42:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3Q8X-0006EM-Ug
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 16:35:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33842)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k3QEJ-0007hT-Aa
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 16:41:43 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40856)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3Q8V-0005Np-J9
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 16:35:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k3Q8S-0000IW-IX
- for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 20:35:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8AFB72E80EE
- for <qemu-devel@nongnu.org>; Wed,  5 Aug 2020 20:35:40 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k3QEE-000689-C1
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 16:41:42 -0400
+Received: by mail-ot1-x342.google.com with SMTP id h16so14375679oti.7
+ for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 13:41:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=56lTE6Yn48eYbbnrbtiEUvbxsjuTwdnLJdBv+VjKung=;
+ b=MeCRnp3+fzQiH8WKuIqtsUiqBTL1USmHK0WHyUpYRTG75XyWBm3ClGC6cLELUlJiWI
+ v6nBfTGluNP+WolOgtJ794jXTGdGmJuwAdr7rKkP7cZlQa4PKtW99TOPeUUpYUsbyf7t
+ K8H0PPDza9ucSmqCTn5ginDlzoF3aeav0NVmIrpng7B61YY+1B6PLI5Tjiws1wwuA2H3
+ PiKGgTdjA6Hqy9YEz3UlVhyjiHUFux2JAjTWhBnq5gpZ3kVC3tpw3tUTOGr6Tf6pk9zk
+ FsUZk+E5nVNbAx3bmqhhdhwKkbm53iiCnCVTkO5CLTsxpwRX4QeCRx+aUQI57U2Tjn2Y
+ x7Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=56lTE6Yn48eYbbnrbtiEUvbxsjuTwdnLJdBv+VjKung=;
+ b=AfoG+iq3KWhn3wLcTvk5Pg9RJAIW4J+SY+ssA6L8vfxOisyObdOFjMNr+rijsyf8V1
+ Yc2rtuhYYw+H7b2YZOq3pVWbSib44ARX1uhz5JhRITAuvBB8Z21yFLrNGS36y0qe+RXv
+ UULZzFe5/nKNe4XQzmhITgse5MS1y3BB74V3kDsOdsHC+73/yDkDxUD8hRtPh8VQcalj
+ IhV92CZUv8LdEUql2iwzKJfMZ/VgTVGDmSG9yl9k0yixBL6n2xtBHBPXsL2kjRZ6iq5x
+ YFS97br+24WNXMNqGIZUuOzOEhFA2Dcx9cKwLlRaR9xhhEn/GyBh7DGCbVb65hrkhugm
+ qICA==
+X-Gm-Message-State: AOAM531bUqx75+oZyFp2VQY98xXZvL6unUnJvNWRB7sn5luy69HeMWmo
+ yxKfGS6gZLYn/jpgb7bGxNh3k+uOaIaVRMaEESchmg==
+X-Google-Smtp-Source: ABdhPJxW5FWiGkqMYJrWhPAadkMkQip67LQ18ukcKwNhVlB+DVTh2dr1Ok82L0ET7GPoB/1lmiDK/JOUi+kdfR7zJUM=
+X-Received: by 2002:a9d:3b61:: with SMTP id z88mr4422244otb.135.1596660096947; 
+ Wed, 05 Aug 2020 13:41:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Aug 2020 20:25:42 -0000
-From: Helge Deller <1890370@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=deller@gmx.de; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Helge Deller (hdeller)
-References: <159660104285.4629.16787901721110187136.malonedeb@soybean.canonical.com>
-Message-Id: <159665914362.15346.16911039559757904393.launchpad@wampee.canonical.com>
-Subject: [Bug 1890370] Re: Segfault in artist vram_bit_write
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b5e970a56bfd76657acc35b1141d5691237cf5f7
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 16:35:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <20200805194812.1735218-1-ehabkost@redhat.com>
+In-Reply-To: <20200805194812.1735218-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 5 Aug 2020 21:41:25 +0100
+Message-ID: <CAFEAcA8-REfRgq=713Tq9PfSNmRPZVzBKmLzoWLauZjqF5q5eQ@mail.gmail.com>
+Subject: Re: [PATCH] ide: Get rid of IDEDrive struct
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,118 +92,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890370 <1890370@bugs.launchpad.net>
+Cc: John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Helge Deller (hdeller)
+On Wed, 5 Aug 2020 at 20:49, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> The struct had a single field (IDEDevice dev), and is only used
+> in the QOM type declarations and property lists.  We can simply
+> use the IDEDevice struct directly instead.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> @@ -327,7 +323,6 @@ static void ide_hd_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo ide_hd_info = {
+>      .name          = "ide-hd",
+>      .parent        = TYPE_IDE_DEVICE,
+> -    .instance_size = sizeof(IDEDrive),
+>      .class_init    = ide_hd_class_init,
+>  };
 
--- =
+This is one of those areas where this change works and reduces
+amount of code, but on the other hand it means the QOM type
+doesn't follow the common pattern for a leaf type of:
+ * it has a struct
+ * it has cast macros that cast to that struct
+ * the typeinfo instance_size is the size of that struct
+(it wasn't exactly following this pattern before, of course).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890370
+We define in https://wiki.qemu.org/Documentation/QOMConventions
+(in the 'When to create class types and macros' bit at the bottom)
+what we expect for whether to provide class cast macros/a
+class struct/class_size in the TypeInfo, essentially recommending
+that types follow one of two patterns (simple leaf class with no
+methods or class members, vs everything else) even if in a
+particular case you could take a short-cut and not define
+everything. We haven't really defined similar "this is the
+standard pattern, provide it all even if you don't strictly
+need it" rules for the instance struct/macros. Maybe we should?
 
-Title:
-  Segfault in artist vram_bit_write
+Just a thought, not a nak; I know we have quite a number
+of types that take this kind of "we don't really need to
+provide all the standard QOM macros/structs/etc" approach
+(some of which I wrote!).
 
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Hello,
-  Reproducer:
-
-  cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
-  -qtest stdio -accel qtest
-  writeq 0xf810049f 0xffffffffffffffff
-  writew 0xf8118001 0xff7c
-  writew 0xf8118000 0x8300
-  writeq 0xf81005fb 0x5c18006400189e
-  EOF
-
-  =
-
-  SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /hw/display/artis=
-t.c:402:17 in
-  AddressSanitizer:DEADLYSIGNAL
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =3D=3D23157=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7f175=
-63fffff (pc 0x560ce3ad742c bp 0x7ffe310c62e0 sp 0x7ffe310c5a60 T0)
-  =3D=3D23157=3D=3DThe signal is caused by a WRITE memory access.
-      #0 0x560ce3ad742c in vram_bit_write /hw/display/artist.c:402:43
-      #1 0x560ce3acf2ab in artist_reg_write /hw/display/artist.c:892:9
-      #2 0x560ce31c37a3 in memory_region_write_accessor /softmmu/memory.c:4=
-83:5
-      #3 0x560ce31c2adc in access_with_adjusted_size /softmmu/memory.c:539:=
-18
-      #4 0x560ce31c0873 in memory_region_dispatch_write /softmmu/memory.c:1=
-466:16
-      #5 0x560ce286e056 in flatview_write_continue /exec.c:3176:23
-      #6 0x560ce2856866 in flatview_write /exec.c:3216:14
-      #7 0x560ce2856387 in address_space_write /exec.c:3308:18
-      #8 0x560ce326a604 in qtest_process_command /softmmu/qtest.c:452:13
-      #9 0x560ce3261c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
-      #10 0x560ce3260895 in qtest_read /softmmu/qtest.c:722:5
-      #11 0x560ce571d343 in qemu_chr_be_write_impl /chardev/char.c:188:9
-      #12 0x560ce571d4c7 in qemu_chr_be_write /chardev/char.c:200:9
-      #13 0x560ce57317b3 in fd_chr_read /chardev/char-fd.c:68:9
-      #14 0x560ce5885b74 in qio_channel_fd_source_dispatch /io/channel-watc=
-h.c:84:12
-      #15 0x7f1665259897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e897)
-      #16 0x560ce5c7da7b in glib_pollfds_poll /util/main-loop.c:217:9
-      #17 0x560ce5c7b1ab in os_host_main_loop_wait /util/main-loop.c:240:5
-      #18 0x560ce5c7ab44 in main_loop_wait /util/main-loop.c:516:11
-      #19 0x560ce3282d00 in qemu_main_loop /softmmu/vl.c:1676:9
-      #20 0x560ce58bd961 in main /softmmu/main.c:49:5
-      #21 0x7f1663ddfe0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #22 0x560ce2761729 in _start (/home/alxndr/Development/qemu/general-f=
-uzz/build/hppa-softmmu/qemu-system-hppa+0x22d4729)
-
-  =
-
-  With -trace artist\*
-
-  [I 1596601002.853158] OPENED
-  [R +0.047035] writeq 0xf810049f 0xffffffffffffffff
-  24590@1596601002.900238:artist_reg_write 1 0x10049f <- 0xff
-  24590@1596601002.900258:artist_reg_write 4 0x1004a0 VRAM_IDX <- 0xffffffff
-  24590@1596601002.900269:artist_reg_write 2 0x1004a4 <- 0xffff
-  24590@1596601002.900280:artist_reg_write 1 0x1004a6 <- 0xff
-  OK
-  [S +0.047130] OK
-  [R +0.047159] writew 0xf8118001 0xff7c
-  24590@1596601002.900331:artist_reg_write 1 0x118001 CMAP_BM_ACCESS <- 0xff
-  24590@1596601002.900344:artist_reg_write 1 0x118002 CMAP_BM_ACCESS <- 0x7c
-  OK
-  [S +0.047194] OK
-  [R +0.047213] writew 0xf8118000 0x8300
-  24590@1596601002.900383:artist_reg_write 2 0x118000 CMAP_BM_ACCESS <- 0x8=
-300
-  OK
-  [S +0.047231] OK
-  [R +0.047243] writeq 0xf81005fb 0x5c18006400189e
-  24590@1596601002.900410:artist_reg_write 1 0x1005fb <- 0x0
-  24590@1596601002.900418:artist_reg_write 4 0x1005fc <- 0x5c180064
-  24590@1596601002.900424:artist_reg_write 2 0x100600 VRAM_WRITE_INCR_X <- =
-0x18
-  /home/alxndr/Development/qemu/general-fuzz/hw/display/artist.c:402:17: ru=
-ntime error: store to misaligned address 0x7fd01d3fffff for type 'uint32_t'=
- (aka 'unsigned int'), which requires 4 byte alignment
-  0x7fd01d3fffff: note: pointer points here
-  <memory cannot be printed>
-  SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/alxndr/Deve=
-lopment/qemu/general-fuzz/hw/display/artist.c:402:17 in
-  AddressSanitizer:DEADLYSIGNAL
-
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890370/+subscriptions
+thanks
+-- PMM
 
