@@ -6,107 +6,76 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2AFAC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB5DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:36:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D08E206A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:24:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D08E206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id BFC53206D4
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:36:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFC53206D4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3PxO-0002kG-RE
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 16:24:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46128)
+	id 1k3Q98-0006dm-2V
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 16:36:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1k3Pwg-0001xE-Sk; Wed, 05 Aug 2020 16:23:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20924
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1k3Pwf-0003fB-0s; Wed, 05 Aug 2020 16:23:30 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 075KJF7P111331; Wed, 5 Aug 2020 16:23:02 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32r3a3grs9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 05 Aug 2020 16:23:02 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 075KJGpE111426;
- Wed, 5 Aug 2020 16:23:01 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32r3a3grry-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 05 Aug 2020 16:23:01 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 075KK5EJ014424;
- Wed, 5 Aug 2020 20:23:00 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma04wdc.us.ibm.com with ESMTP id 32n019bmqj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 05 Aug 2020 20:23:00 +0000
-Received: from b03ledav004.gho.boulder.ibm.com
- (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 075KMvbU30474750
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 5 Aug 2020 20:22:57 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CE6DC78060;
- Wed,  5 Aug 2020 20:22:59 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 52C8C7805E;
- Wed,  5 Aug 2020 20:22:55 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.163.53.138])
- by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Wed,  5 Aug 2020 20:22:54 +0000 (GMT)
-References: <20200723025657.644724-1-bauerman@linux.ibm.com>
- <878sf3uojf.fsf@morokweng.localdomain>
- <20200730005947.GO84173@umbus.fritz.box>
- <CAAdtpL5Mtaf7Xwu74U33eGTCAiFZNNXeCST8COwQeW8S9j8ZVQ@mail.gmail.com>
- <87a6zh3uyv.fsf@morokweng.localdomain> <874kph58o5.fsf@morokweng.localdomain>
- <CAFEAcA-Yi754zyxHd+bggjny5vXw=rrs5fm6SZCcxwVUeoTtOg@mail.gmail.com>
-User-agent: mu4e 1.2.0; emacs 26.3
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v3 0/8] Generalize start-powered-off property from ARM
-In-reply-to: <CAFEAcA-Yi754zyxHd+bggjny5vXw=rrs5fm6SZCcxwVUeoTtOg@mail.gmail.com>
-Date: Wed, 05 Aug 2020 17:22:51 -0300
-Message-ID: <8736506dwk.fsf@morokweng.localdomain>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3Q8X-0006EM-Ug
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 16:35:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33842)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3Q8V-0005Np-J9
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 16:35:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k3Q8S-0000IW-IX
+ for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 20:35:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8AFB72E80EE
+ for <qemu-devel@nongnu.org>; Wed,  5 Aug 2020 20:35:40 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-08-05_17:2020-08-03,
- 2020-08-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 malwarescore=0
- phishscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
- mlxlogscore=920 suspectscore=0 clxscore=1015 impostorscore=0 adultscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008050152
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 16:23:26
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 05 Aug 2020 20:25:42 -0000
+From: Helge Deller <1890370@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=deller@gmx.de; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: Helge Deller (hdeller)
+References: <159660104285.4629.16787901721110187136.malonedeb@soybean.canonical.com>
+Message-Id: <159665914362.15346.16911039559757904393.launchpad@wampee.canonical.com>
+Subject: [Bug 1890370] Re: Segfault in artist vram_bit_write
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: b5e970a56bfd76657acc35b1141d5691237cf5f7
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 16:35:41
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -115,41 +84,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- David Hildenbrand <david@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>,
- Richard Henderson <rth@twiddle.net>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1890370 <1890370@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Helge Deller (hdeller)
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+-- =
 
-> On Wed, 5 Aug 2020 at 18:01, Thiago Jung Bauermann
-> <bauerman@linux.ibm.com> wrote:
->> Any news on this? Is there something I should be doing? I saw -rc3 today
->> but not these patches.
->
-> Sorry, you've missed the bus for 5.1 at this point. I'd assumed
-> that the relevant bits of the patchset would go into a PPC pullreq
-> if it was important for 5.1.
->
-> As I understand it, this isn't a regression from 5.0, right?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890370
 
-Right, it isn't.
+Title:
+  Segfault in artist vram_bit_write
 
--- 
-Thiago Jung Bauermann
-IBM Linux Technology Center
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Hello,
+  Reproducer:
+
+  cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
+  -qtest stdio -accel qtest
+  writeq 0xf810049f 0xffffffffffffffff
+  writew 0xf8118001 0xff7c
+  writew 0xf8118000 0x8300
+  writeq 0xf81005fb 0x5c18006400189e
+  EOF
+
+  =
+
+  SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /hw/display/artis=
+t.c:402:17 in
+  AddressSanitizer:DEADLYSIGNAL
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  =3D=3D23157=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7f175=
+63fffff (pc 0x560ce3ad742c bp 0x7ffe310c62e0 sp 0x7ffe310c5a60 T0)
+  =3D=3D23157=3D=3DThe signal is caused by a WRITE memory access.
+      #0 0x560ce3ad742c in vram_bit_write /hw/display/artist.c:402:43
+      #1 0x560ce3acf2ab in artist_reg_write /hw/display/artist.c:892:9
+      #2 0x560ce31c37a3 in memory_region_write_accessor /softmmu/memory.c:4=
+83:5
+      #3 0x560ce31c2adc in access_with_adjusted_size /softmmu/memory.c:539:=
+18
+      #4 0x560ce31c0873 in memory_region_dispatch_write /softmmu/memory.c:1=
+466:16
+      #5 0x560ce286e056 in flatview_write_continue /exec.c:3176:23
+      #6 0x560ce2856866 in flatview_write /exec.c:3216:14
+      #7 0x560ce2856387 in address_space_write /exec.c:3308:18
+      #8 0x560ce326a604 in qtest_process_command /softmmu/qtest.c:452:13
+      #9 0x560ce3261c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
+      #10 0x560ce3260895 in qtest_read /softmmu/qtest.c:722:5
+      #11 0x560ce571d343 in qemu_chr_be_write_impl /chardev/char.c:188:9
+      #12 0x560ce571d4c7 in qemu_chr_be_write /chardev/char.c:200:9
+      #13 0x560ce57317b3 in fd_chr_read /chardev/char-fd.c:68:9
+      #14 0x560ce5885b74 in qio_channel_fd_source_dispatch /io/channel-watc=
+h.c:84:12
+      #15 0x7f1665259897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x4e897)
+      #16 0x560ce5c7da7b in glib_pollfds_poll /util/main-loop.c:217:9
+      #17 0x560ce5c7b1ab in os_host_main_loop_wait /util/main-loop.c:240:5
+      #18 0x560ce5c7ab44 in main_loop_wait /util/main-loop.c:516:11
+      #19 0x560ce3282d00 in qemu_main_loop /softmmu/vl.c:1676:9
+      #20 0x560ce58bd961 in main /softmmu/main.c:49:5
+      #21 0x7f1663ddfe0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
+0/csu/../csu/libc-start.c:308:16
+      #22 0x560ce2761729 in _start (/home/alxndr/Development/qemu/general-f=
+uzz/build/hppa-softmmu/qemu-system-hppa+0x22d4729)
+
+  =
+
+  With -trace artist\*
+
+  [I 1596601002.853158] OPENED
+  [R +0.047035] writeq 0xf810049f 0xffffffffffffffff
+  24590@1596601002.900238:artist_reg_write 1 0x10049f <- 0xff
+  24590@1596601002.900258:artist_reg_write 4 0x1004a0 VRAM_IDX <- 0xffffffff
+  24590@1596601002.900269:artist_reg_write 2 0x1004a4 <- 0xffff
+  24590@1596601002.900280:artist_reg_write 1 0x1004a6 <- 0xff
+  OK
+  [S +0.047130] OK
+  [R +0.047159] writew 0xf8118001 0xff7c
+  24590@1596601002.900331:artist_reg_write 1 0x118001 CMAP_BM_ACCESS <- 0xff
+  24590@1596601002.900344:artist_reg_write 1 0x118002 CMAP_BM_ACCESS <- 0x7c
+  OK
+  [S +0.047194] OK
+  [R +0.047213] writew 0xf8118000 0x8300
+  24590@1596601002.900383:artist_reg_write 2 0x118000 CMAP_BM_ACCESS <- 0x8=
+300
+  OK
+  [S +0.047231] OK
+  [R +0.047243] writeq 0xf81005fb 0x5c18006400189e
+  24590@1596601002.900410:artist_reg_write 1 0x1005fb <- 0x0
+  24590@1596601002.900418:artist_reg_write 4 0x1005fc <- 0x5c180064
+  24590@1596601002.900424:artist_reg_write 2 0x100600 VRAM_WRITE_INCR_X <- =
+0x18
+  /home/alxndr/Development/qemu/general-fuzz/hw/display/artist.c:402:17: ru=
+ntime error: store to misaligned address 0x7fd01d3fffff for type 'uint32_t'=
+ (aka 'unsigned int'), which requires 4 byte alignment
+  0x7fd01d3fffff: note: pointer points here
+  <memory cannot be printed>
+  SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/alxndr/Deve=
+lopment/qemu/general-fuzz/hw/display/artist.c:402:17 in
+  AddressSanitizer:DEADLYSIGNAL
+
+  -Alex
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890370/+subscriptions
 
