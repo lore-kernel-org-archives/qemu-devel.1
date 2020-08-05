@@ -2,87 +2,87 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B481C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 10:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C04F3C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 10:34:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E392206B6
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 10:34:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D0FE206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 10:34:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d40HqwM7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E392206B6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eh4YJhx6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D0FE206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3GkS-00082S-Dp
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 06:34:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46080)
+	id 1k3Gkf-0008NU-Oe
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 06:34:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k3Gjb-00073Q-4e
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 06:33:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40356)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k3Gjp-0007Qz-Kx
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 06:33:37 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46215)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k3GjZ-0004gp-Ae
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 06:33:22 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k3Gjm-0004iw-S3
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 06:33:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596623600;
+ s=mimecast20190719; t=1596623614;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=hRuOlKALyPZm4jnRCLEOKp4XoIgDtMYJQ57vgPiYc2U=;
- b=d40HqwM78z+y44O5ybA2TYPxKDCZ18UGq273XYprcUQCaaivufACf+UCt5dacrOQ6nhXfA
- +PosnYcch7vjJBYGVmW8083xS+Zbn8WpZVkFelP5gI0fr/DuCassvFpR5JsJAokiTYvfyW
- 3xdpz+4TCiSjT1gQH2vEpVOtDLr2AA0=
+ bh=cI/+VorT1Ljnb6BhASmU+msZvXbdHZEE05ALnx+JrnY=;
+ b=Eh4YJhx6boAFGBQH/gYC5jVjmuu9f9r5HPeiu5psNTSaeV2YSZaEaA2hXyMT7sDFPfH0XW
+ /ZGpKkZvj/XuQ0JrMcSjOWSC0ZQ4IEFTDsWJClXUOAFlpeW7m1X/sJcFVLlnOuIywdA7uK
+ DSs+oaljK7pcK4qwYUtSn9J07buYjUU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-nDmIqGj0M_CHZDLjlcX_tQ-1; Wed, 05 Aug 2020 06:33:18 -0400
-X-MC-Unique: nDmIqGj0M_CHZDLjlcX_tQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-5-4IBPnd10OzWGYHxJghib6Q-1; Wed, 05 Aug 2020 06:33:31 -0400
+X-MC-Unique: 4IBPnd10OzWGYHxJghib6Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 695261DE1;
- Wed,  5 Aug 2020 10:33:17 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 624C85C1BD;
- Wed,  5 Aug 2020 10:33:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id ECE751141D60; Wed,  5 Aug 2020 12:33:14 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v6 09/12] hmp: Add support for coroutine command handlers
-References: <20200528153742.274164-1-kwolf@redhat.com>
- <20200528153742.274164-10-kwolf@redhat.com>
-Date: Wed, 05 Aug 2020 12:33:14 +0200
-In-Reply-To: <20200528153742.274164-10-kwolf@redhat.com> (Kevin Wolf's message
- of "Thu, 28 May 2020 17:37:39 +0200")
-Message-ID: <87imdx2xhx.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8B2510059A2;
+ Wed,  5 Aug 2020 10:33:30 +0000 (UTC)
+Received: from localhost (ovpn-114-155.ams2.redhat.com [10.36.114.155])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9A4A15F21A;
+ Wed,  5 Aug 2020 10:33:27 +0000 (UTC)
+Date: Wed, 5 Aug 2020 11:33:26 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v3 4/7] device-core: use atomic_set on .realized property
+Message-ID: <20200805103326.GB361702@stefanha-x1.localdomain>
+References: <20200715150159.95050-1-mlevitsk@redhat.com>
+ <20200715150159.95050-5-mlevitsk@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200715150159.95050-5-mlevitsk@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 06:27:34
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 03:37:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,103 +95,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, armbru@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+--IiVenqGWf+H9Y6IX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Often, QMP command handlers are not only called to handle QMP commands,
-> but also from a corresponding HMP command handler. In order to give them
-> a consistent environment, optionally run HMP command handlers in a
-> coroutine, too.
->
-> The implementation is a lot simpler than in QMP because for HMP, we
-> still block the VM while the coroutine is running.
->
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On Wed, Jul 15, 2020 at 06:01:56PM +0300, Maxim Levitsky wrote:
+> Some code might race with placement of new devices on a bus.
+> We currently first place a (unrealized) device on the bus
+> and then realize it.
+>=20
+> As a workaround, users that scan the child device list, can
+> check the realized property to see if it is safe to access such a device.
+> Use an atomic write here too to aid with this.
+>=20
+> A separate discussion is what to do with devices that are unrealized:
+> It looks like for this case we only call the hotplug handler's unplug
+> callback and its up to it to unrealize the device.
+> An atomic operation doesn't cause harm for this code path though.
+>=20
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  monitor/monitor-internal.h |  1 +
->  monitor/hmp.c              | 38 ++++++++++++++++++++++++++++++++------
->  2 files changed, 33 insertions(+), 6 deletions(-)
->
-> diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
-> index b55d6df07f..ad2e64be13 100644
-> --- a/monitor/monitor-internal.h
-> +++ b/monitor/monitor-internal.h
-> @@ -74,6 +74,7 @@ typedef struct HMPCommand {
->      const char *help;
->      const char *flags; /* p=preconfig */
->      void (*cmd)(Monitor *mon, const QDict *qdict);
-> +    bool coroutine;
->      /*
->       * @sub_table is a list of 2nd level of commands. If it does not exist,
->       * cmd should be used. If it exists, sub_table[?].cmd should be
-> diff --git a/monitor/hmp.c b/monitor/hmp.c
-> index 3e73a4c3ce..ab0e3e279f 100644
-> --- a/monitor/hmp.c
-> +++ b/monitor/hmp.c
-> @@ -1056,12 +1056,25 @@ fail:
->      return NULL;
->  }
->  
-> +typedef struct HandleHmpCommandCo {
-> +    Monitor *mon;
-> +    const HMPCommand *cmd;
-> +    QDict *qdict;
-> +    bool done;
-> +} HandleHmpCommandCo;
-> +
-> +static void handle_hmp_command_co(void *opaque)
-> +{
-> +    HandleHmpCommandCo *data = opaque;
-> +    data->cmd->cmd(data->mon, data->qdict);
-> +    data->done = true;
-> +}
-> +
->  void handle_hmp_command(MonitorHMP *mon, const char *cmdline)
->  {
->      QDict *qdict;
->      const HMPCommand *cmd;
->      const char *cmd_start = cmdline;
-> -    Monitor *old_mon;
->  
->      trace_handle_hmp_command(mon, cmdline);
->  
-> @@ -1080,11 +1093,24 @@ void handle_hmp_command(MonitorHMP *mon, const char *cmdline)
->          return;
->      }
->  
-> -    /* old_mon is non-NULL when called from qmp_human_monitor_command() */
-> -    old_mon = monitor_cur();
-> -    monitor_set_cur(qemu_coroutine_self(), &mon->common);
-> -    cmd->cmd(&mon->common, qdict);
-> -    monitor_set_cur(qemu_coroutine_self(), old_mon);
-> +    if (!cmd->coroutine) {
-> +        /* old_mon is non-NULL when called from qmp_human_monitor_command() */
-> +        Monitor *old_mon = monitor_cur();
-> +        monitor_set_cur(qemu_coroutine_self(), &mon->common);
-> +        cmd->cmd(&mon->common, qdict);
-> +        monitor_set_cur(qemu_coroutine_self(), old_mon);
-> +    } else {
-> +        HandleHmpCommandCo data = {
-> +            .mon = &mon->common,
-> +            .cmd = cmd,
-> +            .qdict = qdict,
-> +            .done = false,
-> +        };
-> +        Coroutine *co = qemu_coroutine_create(handle_hmp_command_co, &data);
-> +        monitor_set_cur(co, &mon->common);
+>  hw/core/qdev.c         | 19 ++++++++++++++++++-
+>  include/hw/qdev-core.h |  2 ++
+>  2 files changed, 20 insertions(+), 1 deletion(-)
 
-Where is the matching monitor_set_cur(co, NULL)?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-> +        aio_co_enter(qemu_get_aio_context(), co);
-> +        AIO_WAIT_WHILE(qemu_get_aio_context(), !data.done);
-> +    }
->  
->      qobject_unref(qdict);
->  }
+--IiVenqGWf+H9Y6IX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8qivYACgkQnKSrs4Gr
+c8h66AgApcTydXq58WdArWM6fyeUiwZfKpuBNuwC9KtO4lFPiEzzlulRWK2bjD8y
+6mt+QqjiCKD1EFfctk2Xi/A6JzxC96tEu2h2Vfb+CxdvAaL9bsWA65422s1Blegr
+2hW1nCBxflwamEmPgRVTMAexSyyusIiJT5MKZIuMacPk9xu+OmsgG3u/s+suX2WF
+vIHNXDgS9hMjUmfE6hUGY1I8HXNh5p1k6aS6KvXbpc6+IIL0QcV57Nca6+h/Rmas
+ZXbt0WonxpomNN595CJ26Mr1QLaUKUc1o+2hmEv+B7S1WoBq7yx75CgrGoAMh144
+hhsOMAozS9sFFGLXXw3y5oHVNmMBkw==
+=9Y/d
+-----END PGP SIGNATURE-----
+
+--IiVenqGWf+H9Y6IX--
 
 
