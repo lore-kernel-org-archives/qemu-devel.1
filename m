@@ -2,82 +2,102 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C426C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 15:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3EFC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 15:14:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16FED23333
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 15:12:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16FED23333
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 63F3223333
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 15:14:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="FLtQIh32";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XiOPtBMP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63F3223333
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3L5G-0001tQ-O2
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 11:12:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58950)
+	id 1k3L7T-0002wB-7T
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 11:14:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3L4O-0001Q8-58
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 11:11:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46830)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3L4L-0006k5-Ol
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 11:11:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k3L4J-0000Ih-8o
- for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 15:11:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 360332E80ED
- for <qemu-devel@nongnu.org>; Wed,  5 Aug 2020 15:11:03 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1k3L6P-0002Ta-NZ
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 11:13:13 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:35299)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1k3L6N-00083u-8j
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 11:13:13 -0400
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+ by mailout.nyi.internal (Postfix) with ESMTP id AAC445C0099;
+ Wed,  5 Aug 2020 11:13:08 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute2.internal (MEProxy); Wed, 05 Aug 2020 11:13:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=
+ from:to:subject:date:message-id:mime-version:content-type; s=
+ fm3; bh=t/1haAjNM+f8995x/K7pnGuoXGWpgPXRwC7TQTue9gs=; b=FLtQIh32
+ 5z3frzMQ8IWsnEXIHlGgxIMYZs6BmxqpsWIBG1VbRTzQziU3gqnVntNXdw7bCbyE
+ zoQOi+lvpSmEdW7SJOqTUsaXVzowJ1VCPV8vmBaJ96G6vRqG6UE5R05+QouLB2nn
+ xghAEP+DS7VOGFs+kN22B9zk96ZM8HuRTKzj7x9lvIsqSPh/c7aJdStWUvzNEsTB
+ H272uSwUtgiZU18C1TgGwuui3LdtvVpu5QKG9QlQtS6WKvdMU9KZQp/0Il8U36F2
+ hWvZhzeQj4rL+UpqJvSzhHxDEPkDAY+GmlDzx/bmWPWAwJ07ESHbQPvSSSYKB9LI
+ 8Z4vQo3x9Mx/Xw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=content-type:date:from:message-id
+ :mime-version:subject:to:x-me-proxy:x-me-proxy:x-me-sender
+ :x-me-sender:x-sasl-enc; s=fm3; bh=t/1haAjNM+f8995x/K7pnGuoXGWpg
+ PXRwC7TQTue9gs=; b=XiOPtBMPxSTVBSX1+UMaHcQ3eFVu+p8hvLMKC36b6oDbr
+ IQcOSV+MrsOdchjZ7e6uxaSxPotVwfQHpkoGxEd3ra03I+RWTCk252Ws0Vy7ztdg
+ ZbNySs4JQwZjfRuyrsYudqlRJngv0fSwqPmv+VrklNSrXBF8ck3GnAWfAEDZroNu
+ YO8wVZhASi+Hc0DYJIlMdixujCDXYcw54MB1v5IIHsOSwNu63TcZRNSUjgzGFXF7
+ S3yS4u+Jjy/C6o8H0qX3/PLv008H/l33+80IDT9Ntul5KgRzzFxkeDbt3dxilmQJ
+ vfTn9ksB5u+6b+gZwVJzN58aGwlL53RTRZFiDxAbg==
+X-ME-Sender: <xms:hMwqX5oJmtsBB6kPg4mSwAjz3z-oWNF9aVqqs3ngrRVDegJvZQHqLw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrjeekgdekkecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkfggtgesthdtredttddttd
+ enucfhrhhomheptehlhihsshgrucftohhsshcuoehhihesrghlhihsshgrrdhisheqnecu
+ ggftrfgrthhtvghrnhepiefhheduffetjeelteevfeejleejiedvleejjefhueefffekud
+ dvteejieefveeknecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkphepkeegrddu
+ keegrddvvdelrddvgeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+ hilhhfrhhomhephhhisegrlhihshhsrgdrihhs
+X-ME-Proxy: <xmx:hMwqX7qOJJM4K1PZm-FTcSQ3Rxb2fjLzKg6oBENaA67I07SIvAmuUA>
+ <xmx:hMwqX2M5pFXnUoXN9HTkARujDs4AhbEIBsOQzVJs-dIuxEVFvCUYjg>
+ <xmx:hMwqX07NogilmW4hM2Qad8La2or5qbx6vFaf4W3TqWRmYYH_lpDatw>
+ <xmx:hMwqX6FNZJD7I3KHrhjFpOnlZDUgURIlDFSBopNc3iZLC8f6qKr1Dw>
+Received: from x220.qyliss.net (p54b8e5f4.dip0.t-ipconnect.de [84.184.229.244])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 163A63060067;
+ Wed,  5 Aug 2020 11:13:08 -0400 (EDT)
+Received: by x220.qyliss.net (Postfix, from userid 1000)
+ id 9D90687B; Wed,  5 Aug 2020 15:13:06 +0000 (UTC)
+From: Alyssa Ross <hi@alyssa.is>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Subject: vhost-user protocol feature negotiation
+Date: Wed, 05 Aug 2020 15:13:06 +0000
+Message-ID: <87sgd1ktx9.fsf@alyssa.is>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Aug 2020 15:05:35 -0000
-From: Julien Freche <1879587@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jfreche pmaydell
-X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
-X-Launchpad-Bug-Modifier: Julien Freche (jfreche)
-References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
-Message-Id: <159663993585.16036.12327737528332647433.malone@wampee.canonical.com>
-Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
- banked registers when switching from AA32 to AA64
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: cb34077849bef1b2737bc4f458e5654f1e2ff799
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 10:30:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+Received-SPF: pass client-ip=66.111.4.28; envelope-from=hi@alyssa.is;
+ helo=out4-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 11:13:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,55 +106,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1879587 <1879587@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It seems like this is your patch plus my fixup so this is good to me and
-already tested locally. Thanks again.
+Quoting from the definition of VHOST_USER_SET_PROTOCOL_FEATURES in
+vhost-user.rst:
 
--- =
+>   Only legal if feature bit ``VHOST_USER_F_PROTOCOL_FEATURES`` is present in
+>   ``VHOST_USER_GET_FEATURES``.
+> 
+> .. Note::
+>    Slave that reported ``VHOST_USER_F_PROTOCOL_FEATURES`` must support
+>    this message even before ``VHOST_USER_SET_FEATURES`` was called.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1879587
+To me, this could mean either of two things:
 
-Title:
-  Register number in ESR is incorrect for certain banked registers when
-  switching from AA32 to AA64
+(1) If VHOST_USER_F_PROTOCOL_FEATURES hasn't been set, upon receiving
+    VHOST_USER_SET_PROTOCOL_FEATURES, a backend should enable the
+    protocol features immediately.
 
-Status in QEMU:
-  In Progress
+(2) If VHOST_USER_F_PROTOCOL_FEATURES hasn't been set, upon receiving
+    VHOST_USER_SET_PROTOCOL_FEATURES, a backend should store those
+    feature bits, but not actually consider them to be enabled until
+    after VHOST_USER_SET_FEATURES has been received (presumably
+    containing VHOST_USER_F_PROTOCOL_FEATURES).
 
-Bug description:
-  I am running into a situation where I have:
-  - A hypervisor running in EL2, AA64
-  - A guest running in EL1, AA32
+The reason I bring this up is that QEMU appears to interpret it as (1),
+while the vhost-user-net backend in Intel's cloud-hypervisor[1]
+interprets it as (2).  So I'm looking for a clarification.
 
-  We trap certain accesses to special registers such as DACR (via
-  HCR.TVM). One instruction that is trapped is:
+[1]: https://github.com/cloud-hypervisor/cloud-hypervisor
 
-  ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
-
-  The guest is running in SVC mode. So, LR should refer to LR_svc there.
-  LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
-  the actual ESR value is: 0xfe00dc0
-
-  If we decode the 'rt':
-  >>> (0xfe00dc0 >> 5) & 0x1f
-  14
-
-  My understanding is that 14 is incorrect in the context of AA64. rt
-  should be set to 18. The current mode being SVC, LR refers to LR_svc
-  not LR_usr. In other words, the mapping between registers in AA64 and
-  AA32 doesn't seem to be accounted for. I've tested this with Qemu
-  5.0.0
-
-  Let me know if that makes sense and if you would like more info. I am als=
-o happy to test patches.
-  Thanks for all the great work on Qemu!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1879587/+subscriptions
+Thanks in advance.
 
