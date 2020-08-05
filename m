@@ -2,62 +2,126 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 109A3C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 17:04:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49819C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 17:05:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D96122D00
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 17:04:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D96122D00
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 0F8E322CF7
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 17:05:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Ylm4PQ/6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F8E322CF7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3Mq7-0007IS-Py
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 13:04:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60486)
+	id 1k3MrG-0008MZ-8W
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 13:05:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k3Moo-0006Q6-Ar
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 13:03:10 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55614)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k3MqG-0007ZK-R3; Wed, 05 Aug 2020 13:04:41 -0400
+Received: from mail-eopbgr70108.outbound.protection.outlook.com
+ ([40.107.7.108]:18501 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k3Mol-0005zw-Es
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 13:03:09 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 1E892AF2C;
- Wed,  5 Aug 2020 17:03:22 +0000 (UTC)
-Subject: Re: [RFC v3 0/8] QEMU cpus.c refactoring part2
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200803090533.7410-1-cfontana@suse.de>
- <875za0ne65.fsf@linaro.org>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <c0d13c9d-3cb2-3f55-1e89-842dbb7c1610@suse.de>
-Date: Wed, 5 Aug 2020 19:03:04 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k3MqC-00066o-TK; Wed, 05 Aug 2020 13:04:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BK5hO3WbqWkVwToI798m5VR+leYgO8Hxl7fjl3cWiw7osEkzlCw8EpPAS72CchbR/rlLXi/Vnb7NicS2LrWv91U/VBL/MY/VTBZEKwCCOn1TACmNSY3I/jYEqkc8LkDIdnUNtnSXzz1UIyke9XCpDpsGcSO+j0NHR6esZlaSnRcDy+4QVrefLMWSlMiKka/m7juKTUF+X1q+PpATRYxbq5kzD1xqI4pka8IzRu+kIATf3U1sUvFkfud2rWo2L5m5zOXWL0T9IesdwTZPBo5kOy7onVHZM/XCwVgqhup52Yok29kCiGmnUGUe9+1qWkvwSFd9Bmf5Xvts066M7Och8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2Dr6SUbIppU2aqiGJGzPLjGeaErwDwB/o7DepjfcfSA=;
+ b=IzQ6dOTTBdooQVs0YUjvqBlOMfyl1smdRjiHIqeNAGxnXYF+pJ5fSW8ww+wSFxjoUJos1RX9cLq8U/jmd0G186IDIeMKRGE+m/7INuUl7xEHUJSwLzvE5UZXxiYejwIkSeQQ5+pFvAQuX8ln2KEJ0YaxgxISkD+R2+jEZ9XRPPCyhwUZL8ccmqz4V6/xMZ98wtmH1RYFsVYaIClCoO8I+I6kQc1qh+YmdlSPgXMcUzO4Kb55i1z1Rx7MKTAOkfASHlcGRcDLHLgFheC+EfnLKZTMFISzS6sfPf5fJiXcBntqeUGOW5+27OWE0okvtb0RTkMYapiOBDwos276iSL2TA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2Dr6SUbIppU2aqiGJGzPLjGeaErwDwB/o7DepjfcfSA=;
+ b=Ylm4PQ/6QJfWu4jqyh805r9cKNdfl7SiJskSgOMB0K9wgBsRoPkRTgxYk6i8pfKF3gq2cYJwujd0I61qnKbGECPbEuP4tjJTw7jYtBRwS9YcbcWx9e0vnrJbe2S2ArM52SCuPxMNaxQyJzwDaa6KcFtPZ5B9pjSH16I8qbj6EY0=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0802MB2609.eurprd08.prod.outlook.com (2603:10a6:203:98::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.15; Wed, 5 Aug
+ 2020 17:04:34 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3261.016; Wed, 5 Aug 2020
+ 17:04:34 +0000
+Subject: Re: [PATCH v12 10/11] qcow2_format.py: support dumping metadata in
+ JSON format
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1596118512-424960-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1596118512-424960-11-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <41652301-1c25-3454-ad77-3880d98a91f8@virtuozzo.com>
+Date: Wed, 5 Aug 2020 20:04:31 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <875za0ne65.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
+ Thunderbird/68.10.0
+In-Reply-To: <1596118512-424960-11-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 00:43:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR06CA0142.eurprd06.prod.outlook.com
+ (2603:10a6:208:ab::47) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.157) by
+ AM0PR06CA0142.eurprd06.prod.outlook.com (2603:10a6:208:ab::47) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3261.17 via Frontend Transport; Wed, 5 Aug 2020 17:04:33 +0000
+X-Originating-IP: [185.215.60.157]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 95667193-fbc4-46b4-1f0e-08d83961a074
+X-MS-TrafficTypeDiagnostic: AM5PR0802MB2609:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0802MB2609FFBD3EE60FB5F4F21E39C14B0@AM5PR0802MB2609.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2582;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oOA23aP92KDdjaGmyUqqEIFask87eoq8sbYH5uSzYvbLOYdUDQz7ZMtZtzpxnVqnbLhP4w1se9/5hi8HMVRwvKvoBUz99BBuIt08aV7att5iSmNJ9VMypCoSRJzYvSbViHfwBphV4LNq2H0/Pxsp0+VocHUBE6KcoHPuxO+pgisB1LWYXL7c4ktRyWfTSnymRYO1fj40Te4Bnkzr+Ab6yuMMY4FcmS2fGRY5tHL4St/GhrSUXQYKYpIZAkLfdDPukqiD4EwJOit3lgDN5rDcsOMkiEGpHcD0rNKqw5fWQPIibANJjWlk+7U1qoHxbIAIHs9sAqooggiKkg233rECOlT7alpy11676tz2XTcYYkVyNOYJONuJsySaB8T82mm/
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(136003)(396003)(39840400004)(366004)(376002)(346002)(107886003)(86362001)(2906002)(31686004)(6486002)(8676002)(316002)(31696002)(16576012)(16526019)(36756003)(5660300002)(4326008)(956004)(186003)(66946007)(66476007)(26005)(2616005)(66556008)(52116002)(8936002)(478600001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: cR/KB/m9iL+xKyBX/T6ETsNU6Y1vOx7xBL/zaQfv/oJLbapTKYE2Bl2/3G0ufhQjgNVNRFy0KB3+J/dNm+u/mmBNRZmH63ay0a+IEZOGzJZBZ5vEgMS0oiz3Hh5N07c8Cot5YIBzv0+PaTBmlKA3sGlqfx1mtsjUAU4ayR59Ju/Qv7KJB9E53f74Ssj/Ldzagyx5B+f5JmNCy8CsP+8fAw0aJJIxZAhUqCUjMh/jvfqh8RyRcl5nredR1p+7gYFCXZ/uhtZU0l1Beb0hwAdA6tazFeV9NqxO3AnbLhHwxq3R0Ggx1V+5To3QUFrBug+IilIjVYESA2qxoegYgBCF/33561j90fFgtPaaKj/rK+Xx+wmY5D7V6Rj4WlRD+VcHjSwXbwcBJFm7n/haZlhlXRuToUnqRGVaRAu/armgQhdLU/IUw1eyEMh2uyureSi9fO9hu9jH0b0t6WfR4KQJFC3c+TT2yOMPX/IQzH0ZFeKvmrGDrYjndX78iDVk962wP66YxIFaEhxP9HLLC45ioPh4aKSW3b9LW60sC2kP7tVMcs5EqIci0Vx1U6mJdWiWiJxIy8msDNFvR/ufzqfNpuaU/8ZNMyhrc1JQ4qL4q6pG9svc3isjFJIbzODNGDcPysMl5B5HEkdAgfm9h46J4A==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95667193-fbc4-46b4-1f0e-08d83961a074
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2020 17:04:34.0994 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6SPb7BDKDp5Gk3jX15di1PSKtzZul7Qz9qAGnSWP076R80g1cppuwJjPB1NfaFyns/kvxFd9lGiiMzPmwcc7smszTxFPYC0E0EFo/ZAO1/4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2609
+Received-SPF: pass client-ip=40.107.7.108;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 13:04:35
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,347 +134,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Colin Xu <colin.xu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- haxm-team@intel.com, Sunil Muthuswamy <sunilmut@microsoft.com>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Wenchao Wang <wenchao.wang@intel.com>
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/3/20 1:48 PM, Alex Bennée wrote:
+30.07.2020 17:15, Andrey Shinkevich wrote:
+> Implementation of dumping QCOW2 image metadata.
+> The sample output:
+> {
+>      "Header_extensions": [
+>          {
+>              "name": "Feature table",
+>              "magic": 1745090647,
+>              "length": 192,
+>              "data_str": "<binary>"
+>          },
+>          {
+>              "name": "Bitmaps",
+>              "magic": 595929205,
+>              "length": 24,
+>              "data": {
+>                  "nb_bitmaps": 2,
+>                  "reserved32": 0,
+>                  "bitmap_directory_size": 64,
+>                  "bitmap_directory_offset": 1048576,
+>                  "bitmap_directory": [
+>                      {
+>                          "name": "bitmap-1",
+>                          "bitmap_table_offset": 589824,
+>                          "bitmap_table_size": 1,
+>                          "flags": 2,
+>                          "type": 1,
+>                          "granularity_bits": 15,
+>                          "name_size": 8,
+>                          "extra_data_size": 0,
+>                          "bitmap_table": [
+>                              {
+>                                  "type": "serialized",
+>                                  "offset": 655360
+>                              },
+>                              ...
 > 
-> Claudio Fontana <cfontana@suse.de> writes:
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/qcow2_format.py | 17 +++++++++++++++++
+>   1 file changed, 17 insertions(+)
 > 
->> Motivation and higher level steps:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
->>
->> The biggest open item for me is, does it makes sense to:
->>
->>
->> 1) make icount TCG-only (building the icount module only under
->> CONFIG_TCG), as this series suggests, and provide a separate virtual
->> counter for qtest,
-> 
-> Well icount certainly never has any use except with TCG - the fields are
-> all wasted in the KVM case.
-> 
->> or
->>
->>
->> 2) continue to keep icount functions and fields, including vmstate,
->> in all softmmu builds because of qtest current use of field
->> qemu_icount_bias to implement its virtual counter for
->> qtest_clock_warp?
-> 
-> Is this just a case of maintaining compatibility for saved VM images? We
-> could certainly keep the fields in VM state and stub out (or warn?) if a
-> icount related field turned up when reloading a VM into a KVM only build
-> or a build with !tcg_enabled().
-> 
-> I would defer to the vmstate experts on the best way to do this? Is the
-> field currently unconditional? Certainly the rr bits are only registered
-> when RR is enabled.
-
-
-Hi Alex and all,
-
-do we have a compatibility issue to worry about?
-
-Ie, I assumed looking at the "needed" functions in vmstate that
-if a VM contains a subfield that is unneeded when loaded, it would just be ignored.
-
-But maybe this was a too optimistic assumption?
-
-Thank you,
-
-Claudio
-
-
-> 
->> If I understand correctly Paolo might be for 2) (?)
->> would also welcome additional input from the community in any direction
->> (Alex, Peter, Philippe?)
->>
->> ----
->>
->> RFC v2 -> v3:
->>
->> * provided defaults for all methods.
->>   Only create_vcpu_thread is now a mandatory field. (Paolo)
->>
->> * separated new CpusAccel patch from its first user, new patch nr. 2:
->>   "cpus: prepare new CpusAccel cpu accelerator interface"
->>
->> * new CpusAccel methods: get_virtual_clock and get_elapsed_ticks.
->>   (Paolo)
->>
->>   In this series, get_virtual_clock has a separate implementation
->>   between TCG/icount and qtest,
->>   while get_elapsed_ticks only returns a virtual counter for icount.
->>
->>   Looking for more comments in this area.
->>
->> ----
->>
->> RFC v1 -> v2:
->>
->> * split the cpus.c accelerator refactoring into 6 patches.
->>
->> * other minor changes to be able to proceed step by step.
->>
->> ----
->>
->> * Rebased on commit 255ae6e2158c743717bed76c9a2365ee4bcd326e,
->> "replay: notify the main loop when there are no instructions"
->>
->> [SPLIT into part1 and part2]
->>
->> ----
->>
->> v6 -> v7:
->>
->> * rebased changes on top of Pavel Dovgalyuk changes to dma-helpers.c
->>   "icount: make dma reads deterministic"
->>
->> ----
->>
->> v5 -> v6:
->>
->> * rebased changes on top of Emilio G. Cota changes to cpus.c
->>   "cpu: convert queued work to a QSIMPLEQ"
->>
->> * keep a pointer in cpus.c instead of a copy of CpusAccel
->>   (Alex)
->>
->> ----
->>
->>
->> v4 -> v5: rebase on latest master
->>
->> * rebased changes on top of roman series to remove one of the extra states for hvf.
->>   (Is the result now functional for HVF?)
->>
->> * rebased changes on top of icount changes and fixes to icount_configure and
->>   the new shift vmstate. (Markus)
->>
->> v3 -> v4:
->>
->> * overall: added copyright headers to all files that were missing them
->>   (used copyright and license of the module the stuff was extracted from).
->>   For the new interface files, added SUSE LLC.
->>
->> * 1/4 (move softmmu only files from root):
->>
->>   MAINTAINERS: moved softmmu/cpus.c to its final location (from patch 2)
->>
->> * 2/4 (cpu-throttle):
->>
->>   MAINTAINERS (to patch 1),
->>   copyright Fabrice Bellard and license from cpus.c
->>
->> * 3/4 (cpu-timers, icount):
->>
->>   - MAINTAINERS: add cpu-timers.c and icount.c to Paolo
->>
->>   - break very long lines (patchew)
->>
->>   - add copyright SUSE LLC, GPLv2 to cpu-timers.h
->>
->>   - add copyright Fabrice Bellard and license from cpus.c to timers-state.h
->>     as it is lifted from cpus.c
->>
->>   - vl.c: in configure_accelerators bail out if icount_enabled()
->>     and !tcg_enabled() as qtest does not enable icount anymore.
->>
->> * 4/4 (accel stuff to accel):
->>
->>   - add copyright SUSE LLC to files that mostly only consist of the
->>     new interface. Add whatever copyright was in the accelerator code
->>     if instead they mostly consist of accelerator code.
->>
->>   - change a comment to mention the result of the AccelClass experiment
->>
->>   - moved qtest accelerator into accel/qtest/ , make it like the others.
->>
->>   - rename xxx-cpus-interface to xxx-cpus (remove "interface" from names)
->>
->>   - rename accel_int to cpus_accel
->>
->>   - rename CpusAccel functions from cpu_synchronize_* to synchronize_*
->>
->>
->> --------
->>
->> v2 -> v3:
->>
->> * turned into a 4 patch series, adding a first patch moving
->>   softmmu code currently in top_srcdir to softmmu/
->>
->> * cpu-throttle: moved to softmmu/
->>
->> * cpu-timers, icount:
->>
->>   - moved to softmmu/
->>
->>   - fixed assumption of qtest_enabled() => icount_enabled()
->>   causing the failure of check-qtest-arm goal, in test-arm-mptimer.c
->>
->>   Fix is in hw/core/ptimer.c,
->>
->>   where the artificial timeout rate limit should not be applied
->>   under qtest_enabled(), in a similar way to how it is not applied
->>   for icount_enabled().
->>
->> * CpuAccelInterface: no change.
->>
->>
->> --------
->>
->>
->> v1 -> v2:
->>
->> * 1/3 (cpu-throttle): provide a description in the commit message
->>
->> * 2/3 (cpu-timers, icount): in this v2 separate icount from cpu-timers,
->>   as icount is actually TCG-specific. Only build it under CONFIG_TCG.
->>
->>   To do this, qtest had to be detached from icount. To this end, a
->>   trivial global counter for qtest has been introduced.
->>
->> * 3/3 (CpuAccelInterface): provided a description.
->>
->> This is point 8) in that plan. The idea is to extract the unrelated parts
->> in cpus, and register interfaces from each single accelerator to the main
->> cpus module (cpus.c).
->>
->> While doing this RFC, I noticed some assumptions about Windows being
->> either TCG or HAX (not considering WHPX) that might need to be revisited.
->> I added a comment there.
->>
->> The thing builds successfully based on Linux cross-compilations for
->> windows/hax, windows/whpx, and I got a good build on Darwin/hvf.
->>
->> Tests run successully for tcg and kvm configurations, but did not test on
->> windows or darwin.
->>
->> Welcome your feedback and help on this,
->>
->> Claudio
->>
->> Claudio Fontana (8):
->>   cpu-timers, icount: new modules
->>   cpus: prepare new CpusAccel cpu accelerator interface
->>   cpus: extract out TCG-specific code to accel/tcg
->>   cpus: extract out qtest-specific code to accel/qtest
->>   cpus: extract out kvm-specific code to accel/kvm
->>   cpus: extract out hax-specific code to target/i386/
->>   cpus: extract out whpx-specific code to target/i386/
->>   cpus: extract out hvf-specific code to target/i386/hvf/
->>
->>  MAINTAINERS                    |    5 +-
->>  accel/Makefile.objs            |    2 +-
->>  accel/kvm/Makefile.objs        |    2 +
->>  accel/kvm/kvm-all.c            |   14 +-
->>  accel/kvm/kvm-cpus.c           |   88 +++
->>  accel/kvm/kvm-cpus.h           |   17 +
->>  accel/qtest/Makefile.objs      |    2 +
->>  accel/qtest/qtest-cpus.c       |   91 +++
->>  accel/qtest/qtest-cpus.h       |   17 +
->>  accel/{ => qtest}/qtest.c      |   13 +-
->>  accel/stubs/kvm-stub.c         |    3 +-
->>  accel/tcg/Makefile.objs        |    1 +
->>  accel/tcg/cpu-exec.c           |   43 +-
->>  accel/tcg/tcg-all.c            |   19 +-
->>  accel/tcg/tcg-cpus.c           |  541 +++++++++++++
->>  accel/tcg/tcg-cpus.h           |   17 +
->>  accel/tcg/translate-all.c      |    3 +-
->>  dma-helpers.c                  |    4 +-
->>  docs/replay.txt                |    6 +-
->>  exec.c                         |    4 -
->>  hw/core/cpu.c                  |    1 +
->>  hw/core/ptimer.c               |    8 +-
->>  hw/i386/x86.c                  |    3 +-
->>  include/exec/cpu-all.h         |    4 +
->>  include/exec/exec-all.h        |    4 +-
->>  include/qemu/timer.h           |   24 +-
->>  include/sysemu/cpu-timers.h    |   84 ++
->>  include/sysemu/cpus.h          |   48 +-
->>  include/sysemu/hw_accel.h      |   69 +-
->>  include/sysemu/kvm.h           |    2 +-
->>  include/sysemu/qtest.h         |    2 +
->>  include/sysemu/replay.h        |    4 +-
->>  replay/replay.c                |    6 +-
->>  softmmu/Makefile.objs          |    2 +
->>  softmmu/cpu-timers.c           |  279 +++++++
->>  softmmu/cpus.c                 | 1661 +++-------------------------------------
->>  softmmu/icount.c               |  497 ++++++++++++
->>  softmmu/qtest.c                |   34 +-
->>  softmmu/timers-state.h         |   69 ++
->>  softmmu/vl.c                   |   11 +-
->>  stubs/Makefile.objs            |    6 +-
->>  stubs/clock-warp.c             |    7 -
->>  stubs/cpu-get-clock.c          |    3 +-
->>  stubs/cpu-get-icount.c         |   21 -
->>  stubs/cpu-synchronize-state.c  |   15 +
->>  stubs/cpus-get-virtual-clock.c |    8 +
->>  stubs/icount.c                 |   52 ++
->>  stubs/qemu-timer-notify-cb.c   |    8 +
->>  stubs/qtest.c                  |    5 +
->>  target/alpha/translate.c       |    3 +-
->>  target/arm/helper.c            |    7 +-
->>  target/i386/Makefile.objs      |    7 +-
->>  target/i386/hax-all.c          |    6 +-
->>  target/i386/hax-cpus.c         |   85 ++
->>  target/i386/hax-cpus.h         |   17 +
->>  target/i386/hax-i386.h         |    2 +
->>  target/i386/hax-posix.c        |   12 +
->>  target/i386/hax-windows.c      |   20 +
->>  target/i386/hvf/Makefile.objs  |    2 +-
->>  target/i386/hvf/hvf-cpus.c     |  131 ++++
->>  target/i386/hvf/hvf-cpus.h     |   17 +
->>  target/i386/hvf/hvf.c          |    3 +
->>  target/i386/whpx-all.c         |    3 +
->>  target/i386/whpx-cpus.c        |   96 +++
->>  target/i386/whpx-cpus.h        |   17 +
->>  target/riscv/csr.c             |    8 +-
->>  tests/ptimer-test-stubs.c      |    7 +-
->>  tests/test-timed-average.c     |    2 +-
->>  util/main-loop.c               |   12 +-
->>  util/qemu-timer.c              |   14 +-
->>  70 files changed, 2528 insertions(+), 1772 deletions(-)
->>  create mode 100644 accel/kvm/kvm-cpus.c
->>  create mode 100644 accel/kvm/kvm-cpus.h
->>  create mode 100644 accel/qtest/Makefile.objs
->>  create mode 100644 accel/qtest/qtest-cpus.c
->>  create mode 100644 accel/qtest/qtest-cpus.h
->>  rename accel/{ => qtest}/qtest.c (81%)
->>  create mode 100644 accel/tcg/tcg-cpus.c
->>  create mode 100644 accel/tcg/tcg-cpus.h
->>  create mode 100644 include/sysemu/cpu-timers.h
->>  create mode 100644 softmmu/cpu-timers.c
->>  create mode 100644 softmmu/icount.c
->>  create mode 100644 softmmu/timers-state.h
->>  delete mode 100644 stubs/clock-warp.c
->>  delete mode 100644 stubs/cpu-get-icount.c
->>  create mode 100644 stubs/cpu-synchronize-state.c
->>  create mode 100644 stubs/cpus-get-virtual-clock.c
->>  create mode 100644 stubs/icount.c
->>  create mode 100644 stubs/qemu-timer-notify-cb.c
->>  create mode 100644 target/i386/hax-cpus.c
->>  create mode 100644 target/i386/hax-cpus.h
->>  create mode 100644 target/i386/hvf/hvf-cpus.c
->>  create mode 100644 target/i386/hvf/hvf-cpus.h
->>  create mode 100644 target/i386/whpx-cpus.c
->>  create mode 100644 target/i386/whpx-cpus.h
-> 
+> diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+> index a4114cb..7487720 100644
+> --- a/tests/qemu-iotests/qcow2_format.py
+> +++ b/tests/qemu-iotests/qcow2_format.py
+> @@ -19,6 +19,15 @@
+>   
+>   import struct
+>   import string
+> +import json
+> +
+> +
+> +class ComplexEncoder(json.JSONEncoder):
+> +    def default(self, obj):
+> +        if hasattr(obj, 'to_dict'):
+> +            return obj.to_dict()
+> +        else:
+> +            return json.JSONEncoder.default(self, obj)
+>   
+>   
+>   class Qcow2Field:
+> @@ -110,6 +119,10 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
+>                                for i, field in enumerate(self.fields))
+>   
+>       def dump(self, is_json=False):
+> +        if is_json:
+> +            print(json.dumps(self.to_dict(), indent=4, cls=ComplexEncoder))
+> +            return
+> +
+>           for f in self.fields:
+>               value = self.__dict__[f[2]]
+>               if isinstance(f[1], str):
+> @@ -440,6 +453,10 @@ class QcowHeader(Qcow2Struct):
+>           fd.write(buf)
+>   
+>       def dump_extensions(self, is_json=False):
+> +        if is_json:
+> +            print(json.dumps(self.extensions, indent=4, cls=ComplexEncoder))
+> +            return
+> +
+>           for ex in self.extensions:
+>               print('Header extension:')
+>               ex.dump()
 > 
 
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+-- 
+Best regards,
+Vladimir
 
