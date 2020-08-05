@@ -2,87 +2,110 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D89C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 16:33:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50FA6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 16:38:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EAEB22DA9
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 16:33:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1903722CF7
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 16:38:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZRNgneoK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EAEB22DA9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TdAIVxxs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1903722CF7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3MM2-0001QD-Te
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 12:33:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53620)
+	id 1k3MQx-000335-CE
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 12:38:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55020)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3MLM-0000tI-09
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 12:32:44 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41820)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3MLJ-0002aK-6H
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 12:32:43 -0400
-Received: by mail-ot1-x344.google.com with SMTP id a65so24651163otc.8
- for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 09:32:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=wsQxH89XzZQOtnF97UVCoY2SF9sHY7PsuDgF0KNX6xc=;
- b=ZRNgneoKd3dPzxRqHd8Ygn8wZghci/+w9SYcENWHOQ9cX0yyvFBUto9APG/WOuTIn3
- zeUm6kFS6q0kyMUCYTSs3d90GerMzVTKABwmwzFqy0X0WUN5ed5kXfQYZklcMuX8Bx/K
- FBFsjeCJeM9zPRW6AeTA2Ha4a8frTBxIbPgozgbT5eo6xONgwTZ8v0zS/fckomsKbKHr
- 2fClisuQok4qbXrGc0HRzjiFfDM8LcsuFiCUULI+0FS6/I+qJuaTf4xoS0RN8vkuBIb8
- tu4fkhjbcuESS1Gyzw1hvD2kF1ayq+JddmuB78ZTtKlfufy0a9A69jcNDCDXd45lxntM
- C3Kw==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k3MQM-0002XN-P7
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 12:37:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25451
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k3MQK-0003F6-5d
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 12:37:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596645471;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1RJ0dvC85dV1yS4u5jajJXyBksh2pnCkNTYK/LipD60=;
+ b=TdAIVxxsCovY50r3zP0RTAZfA1tTt2VqEkm7zpRW31k7WBLXPYvZv8N4h1JnmUKTkaTk+P
+ BHL70fnzTtuB/3XV5DH/UfL9LOj40Ka+h3lYF6c1o3LlBQHEEJdlEE8tKiwSMPpEFIft81
+ NHJdp/GxdPtxQCmRrChoEPQRQ+xl1JA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-114-7ld9s7SbMIOgQBCKOV91dQ-1; Wed, 05 Aug 2020 12:37:49 -0400
+X-MC-Unique: 7ld9s7SbMIOgQBCKOV91dQ-1
+Received: by mail-wr1-f71.google.com with SMTP id f7so13750659wrs.8
+ for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 09:37:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=wsQxH89XzZQOtnF97UVCoY2SF9sHY7PsuDgF0KNX6xc=;
- b=dsgyK6DU5n/FEG/PitfCcXgYShSpLt4UlHUuXkIqiTa0MbuhUksDg2PsKGuGrr31Rw
- Nn1IPAM4Y7mYkCD5pEkDd1IRbCco0MWOJb3Gih8JYR9nkz+VyM8OhCz4h+SBEI32OnjY
- Q0cVsTgYSYB8M9bTVl7V5+WP/+imXyGinL0H8TFRUFHj8DBLA4CAmGFbLAIge7PwS3sG
- 4rEpJfvt4RK/00n2rQfU23dFaqYfb6HnaMdHACrROiAp9Yn3HVVD1pC2FzK6tfHJbYv/
- Q+7G1EXWZ0qFesyJB+rW/TIP3HTMrDcvYoLxhvrQOHe2rb/l7NO/hBibSHzKENFBFyjO
- MedQ==
-X-Gm-Message-State: AOAM530E7Qa/DFjplfTfvcvZCdsYs8Bdq0X+O8iwDbuAYDfIyM3Kmg/S
- sSz6TkzCKxHg1ony2QuQeXQX+sZ12d4pYnZ7kWMFgA==
-X-Google-Smtp-Source: ABdhPJwAimqLyHIOhboafh5FS6nYV8IGNVJc7/1693Ga6h/1GqrJupP+bCBpkU61Npr8mcBD49N/Jwhi8g41y4Bd3Ss=
-X-Received: by 2002:a9d:5504:: with SMTP id l4mr3251509oth.221.1596645159741; 
- Wed, 05 Aug 2020 09:32:39 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1RJ0dvC85dV1yS4u5jajJXyBksh2pnCkNTYK/LipD60=;
+ b=GpxdFIrtOJg6T2UgSHtGkWDG7YYaz3z4rncf8pZqlLvnL6QgWDxpXRI1etZc3xkr71
+ SSTgNhElkuS5zLojuWFZMLo5yZunXg0KDYluX5oZorqp7cYYHug2or/NYBSRUxSrBjvw
+ xUare57h+C45bDCW82P2FHE6cye4Mb/c9T9LjWAszHiKe0K/efCNDdmpTmzBwVIMkI97
+ eE0qLN71WuWli2lu2Vf5HZBLZbAN+O0RKWO20Fra1ycROG8F1YshkzpQj8fUDG7/43Si
+ aWV+itykMxyBDa1ZdEUf+Y37ZThvlvlems0N3MubWymKxrB6PGjzmdY8Ay/OEjK0Efu3
+ 2NDw==
+X-Gm-Message-State: AOAM5332V35khau9y8m4hC58y1uOiMs0ebM/sfjOm0XQm+mZK7vPd8jh
+ r2oXaAKLEpHPDcY/EE9phIjCFarsFgeqtiINnDvbLuVel4EyaKOfdkpDtmctr1e3UxIKBeMbGVo
+ MnsjIn23JMYWkOtQ=
+X-Received: by 2002:adf:e9cd:: with SMTP id l13mr3887505wrn.340.1596645467654; 
+ Wed, 05 Aug 2020 09:37:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxT/yl+lizFbXJHDoKqS/ouzQHU4Xoio4JnXtPd051ykYtcXe31tQmBiIjKBBpuYFx1lhyvvw==
+X-Received: by 2002:adf:e9cd:: with SMTP id l13mr3887485wrn.340.1596645467360; 
+ Wed, 05 Aug 2020 09:37:47 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7841:78cc:18c6:1e20?
+ ([2001:b07:6468:f312:7841:78cc:18c6:1e20])
+ by smtp.gmail.com with ESMTPSA id m20sm13915163wmc.1.2020.08.05.09.37.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 05 Aug 2020 09:37:46 -0700 (PDT)
+Subject: Re: [PATCH v2 3/3] aio-posix: keep aio_notify_me disabled during
+ polling
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20200805100051.361547-1-stefanha@redhat.com>
+ <20200805100051.361547-4-stefanha@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8e066cf0-e5f9-283c-eedd-47974bf4bbac@redhat.com>
+Date: Wed, 5 Aug 2020 18:37:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200804193903.31240-1-peter.maydell@linaro.org>
- <e710d6bb-564d-88bb-aa60-894ddc1280c8@linaro.org>
-In-Reply-To: <e710d6bb-564d-88bb-aa60-894ddc1280c8@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 5 Aug 2020 17:32:28 +0100
-Message-ID: <CAFEAcA8bfQucS=0OJRCOvhZdef_d+TUJEyjgYHAx3A7sHMWhSQ@mail.gmail.com>
-Subject: Re: [PATCH v2 for-5.1?] target/arm: Fix Rt/Rt2 in ESR_ELx for copro
- traps from AArch32 to 64
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <20200805100051.361547-4-stefanha@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 04:10:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,42 +118,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc Zyngier <maz@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Julien Freche <julien@bedrocksystems.com>
+Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 5 Aug 2020 at 16:26, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 8/4/20 12:39 PM, Peter Maydell wrote:
-> > When a coprocessor instruction in an  AArch32 guest traps to AArch32
-> > Hyp mode, the syndrome register (HSR) includes Rt and Rt2 fields
-> > which are simply copies of the Rt and Rt2 fields from the trapped
-> > instruction.  However, if the instruction is trapped from AArch32 to
-> > an AArch64 higher exception level, the Rt and Rt2 fields in the
-> > syndrome register (ESR_ELx) must be the AArch64 view of the register.
-> > This makes a difference if the AArch32 guest was in a mode other than
-> > User or System and it was using r13 or r14, or if it was in FIQ mode
-> > and using r8-r14.
-> >
-> > We don't know at translate time which AArch32 CPU mode we are in, so
-> > we leave the values we generate in our prototype syndrome register
-> > value at translate time as the raw Rt/Rt2 from the instruction, and
-> > instead correct them to the AArch64 view when we find we need to take
-> > an exception from AArch32 to AArch64 with one of these syndrome
-> > values.
-> >
-> > Fixes: https://bugs.launchpad.net/qemu/+bug/1879587
-> > Reported-by: Julien Freche <julien@bedrocksystems.com>
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 05/08/20 12:00, Stefan Hajnoczi wrote:
+> +
+> +        /*
+> +         * aio_notify can avoid the expensive event_notifier_set if
+> +         * everything (file descriptors, bottom halves, timers) will
+> +         * be re-evaluated before the next blocking poll().  This is
+> +         * already true when aio_poll is called with blocking == false;
+> +         * if blocking == true, it is only true after poll() returns,
+> +         * so disable the optimization now.
+> +         */
+> +        if (use_notify_me) {
+> +            atomic_set(&ctx->notify_me, atomic_read(&ctx->notify_me) + 2);
+> +            /*
+> +             * Write ctx->notify_me before reading ctx->notified.  Pairs with
+> +             * smp_mb in aio_notify().
+> +             */
+> +            smp_mb();
+> +
+> +            /* Don't block if aio_notify() was called */
+> +            if (atomic_read(&ctx->notified)) {
+> +                timeout = 0;
+> +            }
 
-Thanks; applied to master for 5.1.
+Aha, this is the trick: "timeout = 0" also applies if a timer was moved 
+early.  In this case you uselessly keep notify_me set for a bit, but 
+it's okay. Nice!
 
--- PMM
+The code can be simplified a bit more, since the use_notify_me variable 
+is just "timeout":
+
+    use_notify_me = (timeout != 0);
+    if (use_notify_me) {
+         /*
+          * aio_notify can avoid the expensive event_notifier_set if
+          * everything (file descriptors, bottom halves, timers) will
+          * be re-evaluated before the next blocking poll().  This is
+          * already true when aio_poll is called with blocking == false;
+          * if blocking == true, it is only true after poll() returns,
+          * so disable the optimization now.
+          */
+         atomic_set(&ctx->notify_me, atomic_read(&ctx->notify_me) + 2);
+         /*
+          * Write ctx->notify_me before reading ctx->notified.  Pairs with
+          * smp_mb in aio_notify().
+          */
+         smp_mb();
+ 
+         /* Don't block if aio_notify() was called */
+         if (atomic_read(&ctx->notified)) {
+             timeout = 0;
+         }
+     }
+     if (timeout || ctx->fdmon_ops->need_wait(ctx)) {
+         ret = ctx->fdmon_ops->wait(ctx, &ready_list, timeout);
+     }
+     if (use_notify_me) {
+         /* Finish the poll before clearing the flag.  */
+         atomic_store_release(&ctx->notify_me,
+                              atomic_read(&ctx->notify_me) - 2);
+     }
+
+Paolo
+
 
