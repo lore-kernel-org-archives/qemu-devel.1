@@ -2,98 +2,91 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD54C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:48:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F28C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 21:07:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 009A72075A
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 20:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D08FE2063A
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 21:07:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="HvIH+zgi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 009A72075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TVMkPebO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D08FE2063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3QKx-0001Ej-3D
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 16:48:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52042)
+	id 1k3Qct-0004Jb-15
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 17:07:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k3QHt-0000aV-3p
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 16:45:25 -0400
-Received: from mout.gmx.net ([212.227.17.21]:45419)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k3QHq-0006Oq-8K
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 16:45:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1596660302;
- bh=1lKZHcjbZ+wRVv21l6KWMMyv/4nHbn5ZVm6Txcrus9k=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:References:In-Reply-To;
- b=HvIH+zgiIOd+SRwN/2vL4/s4/1QdU9uAZ3x1/2EeqH0SU9H2ef9m5SWgwUhSVN77n
- eOx1HjGxL+rET1P/FMP3xmVdwAf9NMM+sDsIcrVjxwh/OCvkQn36hyf7nkeG2hVr/k
- MiNUTOCGbCZ5gMCpPhQSV56Gr9T7007Oc53NG4ds=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530.fritz.box ([92.116.172.17]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MoO6C-1kWAT8207M-00oqVk; Wed, 05
- Aug 2020 22:45:02 +0200
-Date: Wed, 5 Aug 2020 22:44:59 +0200
-From: Helge Deller <deller@gmx.de>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH v3 7/8] hw/display/artist: Refactor artist_rop8() to
- avoid buffer over-run
-Message-ID: <20200805204459.GA23951@ls3530.fritz.box>
-References: <20200804140056.7690-1-deller@gmx.de>
- <20200804140056.7690-8-deller@gmx.de>
- <20200804163954.4dzistybjwby7pzx@mozz.bu.edu>
- <20200804212019.GA876@ls3530.fritz.box>
- <20200804220145.yjq265pk363466hx@mozz.bu.edu>
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1k3Qc6-0003sb-Ag
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 17:06:18 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:33775)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1k3Qc4-0000Af-2C
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 17:06:17 -0400
+Received: by mail-ot1-x335.google.com with SMTP id t7so20656820otp.0
+ for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 14:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:mime-version:content-transfer-encoding:from:cc:user-agent:to
+ :message-id:subject:date;
+ bh=hT+eQLgR0M4dFUAEvqnQEr8yJksS2Tqs27V64vQkmJg=;
+ b=TVMkPebOOvHxXjv5qseD+grtLa4wy+ZaE4d87FjEVeQsko6C9zpJRo/cXjZTe5EIYR
+ 9Z26Ei6ArJt+GCKEXapPFy39eED1jM49KXYp9HCp9245vKc6umlXRSIBwzzJOAMq1YNC
+ aFJreDcPKtzDUxVWebyWGa/X4LG5UTDQV8SVskf1PiUuuHBBF6bqvVhbSGgOcJr1XgR0
+ ecrLJblqV5RuMdu2/Sah9DBAyvAwjXAGjnzbuIM1WHawvehfT00d69QA+BnF6VykvMcW
+ j5/ors2LGu1cmvfLKw02rLJ+YOHhFOkAAZJfYl8kWqkSETA2W/I33PWrmu3jTjX8nZqm
+ mEtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:mime-version:content-transfer-encoding
+ :from:cc:user-agent:to:message-id:subject:date;
+ bh=hT+eQLgR0M4dFUAEvqnQEr8yJksS2Tqs27V64vQkmJg=;
+ b=X2p2JpkUjtzw1/QNTMJIwY/cY+G6KCfA+5E/62asHqUAdlNSGxaMNbEJXs/P3qLDF6
+ 6uv3IaFmr/jdJwDZU10flrcrCJLGXZcb2cy7aM5XoPtDSu7999qc7vyECWOzaPKOkbbV
+ s2Ugmb/jl8HxX9iJbpddm4kUGY2sP/cHYpkG08cJqAcQ2cx5SGiIx3QHi0+mLBKZFbtq
+ TFBBBVOeo81cUe3GNVoLSBN8dmfaQ6GZ8D0Q9oYei6awcgmMy8ASjWi5zsk0I+OkMi/Y
+ fpG1oCjXe6ojPgmfOcUcmYJebXPc0FLzIyMqSfoP3u03KAseDkWgdb81vEwnQtSxO3ku
+ Estg==
+X-Gm-Message-State: AOAM532MbSJ9+rwbW0RdEd43lFxTWJSNWcgKQNnsrGHo5CYomwyw0Il3
+ ofTNPiG9IFpmveLjZkZYWyw=
+X-Google-Smtp-Source: ABdhPJwpYL/bMMDnFPT8OpASD0j0GpYaaqPv0xGmYmqrCFgE10CYR5dY1WBFn46ImpcOwh5E7cGSEQ==
+X-Received: by 2002:a9d:4c12:: with SMTP id l18mr4585483otf.260.1596661574172; 
+ Wed, 05 Aug 2020 14:06:14 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id k1sm687937oic.2.2020.08.05.14.06.13
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Wed, 05 Aug 2020 14:06:13 -0700 (PDT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200804220145.yjq265pk363466hx@mozz.bu.edu>
-X-Provags-ID: V03:K1:Mwz0/3/noDDLg94njnlnLYnvcd/0XQFnGPrOA2zz+0BQVeOR270
- Yfdr6jW2TqwLrh8g1dWz8me+rRyulWhUW4ouGRHzGnDncKRWabvi0GIMJV4Sv+TuIvFXnPx
- +3zm1qYABvEZ/M3QWYD1TJGqM9i4EEY+khMLzPF3x8uEQ3jCYyWwMUWYz/4092gb8aUOWsV
- 1YhY1EnzeqhAfKdYDvREw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:N0jaflfPriI=:KsWL7Krz0PhQdJIFcxMQCh
- IqtY349R+t30nw43FzXmCqJFNxpFXt7YX6OFqHxnReuRtTNMcU2n7FMMaIzCWN93ZQlBOUo5r
- REuKeZ2w4eFv2CMvUx1axY36QQqqcqa9Bgor24nnaFU2vEgDJomKpuINnDRksJ9JYHu1+2bog
- dnmf4qBR9kxSOIXz9kpkTO3csejJ1f1h4JlUjYPIZ0lyg3bXPS38evIy/EKC7JfbDqDTqHmlA
- lEATzi+KNVB19Clgltll1VO0Z8wcvHoSaaQ7zkWsbi4jA7VJncaRKmuS8SgNZ1sUCs6NdqDK3
- 9wNUnNLRkHluFq23jUpOvyfC5RWQbWUVGMPtuaHKNR8tz7Y4HYHAVIGsOpLmNfF3dI7Mib9oJ
- Qgf2tnDwWV1SUqwOL9kBPyZomzqz7ZT5dR+VodOI3xacHft1f5ZllViyil26XJPK71iJItWEq
- rqaOWEZab6Fh7PYmYFNItM3hFsREWQQl0P9Myy7HTy5AyWtJ9/xDdzSdZbOpvS6JCsChLDBb2
- siAOmqgmJXs4OVymMFoPOBgry9blS4x+pKqxqclH4X2U0nBJGrFE8HrT9uWmCOdxAMA2IpAHN
- ac0FuIdNprQClpZX2o6h1skmHJhpSqfo/2YfLursjuslK6n/eMhbAIoCVeo1QScZzHpAK2Cjd
- JdIANpd5OxR6n4yFzldZ5ecgDE3gP50gbH9SFsQWffOfw6i4+LL0rZvriHEOrgRwqHR4XriNP
- PgO+vMU+RIHRudX44ZcVuIZjMzlYPvpmkLtmBIipOkDjPoLAGGnGPA9MqTRqJpryPyByWLeIn
- DUMISTIjysJkfiCa2K32b/ybx20iJvSZXHkJFe5A994KP5gLJdGd8ZJ1B6bgDxrW5Ojyz7qWl
- qV5OkzKguZMf/keypsz2WCTpuFXM6sXzwxqzz6SnzuriIDuf4kT2ek6tAcBpQE5w86rOO1cEE
- dBkurlH7cskUBQa8yw98oMMDMMiurSqJknaQAeDrYIBBWKJ8gh6nw4bnd+JmOp83pbKbFAXFA
- pI/e2HIOl+kPhC6Vt16RwbCOozmwVhx4iRq2+YWzW9Wyb06sAgato9a0CugZVVUu7/mbOIvPx
- 4yaoEL8xLzFC22UGxL3ZZhEqqjObMi+fdYsgjXfIWMmHJxEHl7NzV0qd58uP/2D6L7NxjAhFy
- ogXdziP4smNjlWZy19PMhOESXHhYIVDRiTnnqn1lykkUdnw/HJy3QIauht5znP8FUbzko8K/C
- Aiv2IwPAJBbCIc+EZ
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=212.227.17.21; envelope-from=deller@gmx.de;
- helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 16:45:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
-X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+User-Agent: alot/0.7
+To: qemu-devel@nongnu.org
+Message-ID: <159666156839.15098.4166343745625824849@sif>
+Subject: [ANNOUNCE] QEMU 5.1.0-rc3 is now available
+Date: Wed, 05 Aug 2020 16:06:08 -0500
+Received-SPF: pass client-ip=2607:f8b0:4864:20::335;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x335.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,329 +99,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org,
- Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello Alexander,
+Hello,
 
-* Alexander Bulekov <alxndr@bu.edu>:
-> On 200804 2320, Helge Deller wrote:
-> > * Alexander Bulekov <alxndr@bu.edu>:
-> > > I applied this series and it fixes most of the problems I saw before=
-.
-> > > I still see a few crashes - I made issues for them on launchpad:
-> > > https://bugs.launchpad.net/qemu/+bug/1890310
-> > > https://bugs.launchpad.net/qemu/+bug/1890311
-> > > https://bugs.launchpad.net/qemu/+bug/1890312
-> Hi Helge, I can still reproduce this one  ^^^
-> I'll fuzz it some more, but so far I am not finding anything else.
+On behalf of the QEMU Team, I'd like to announce the availability of the
+fourth release candidate for the QEMU 5.1 release.  This release is meant
+for testing purposes and should not be used in a production environment.
 
-I've now updated the patch which does address all issues you found
-so far. It's attached below.
+  http://download.qemu-project.org/qemu-5.1.0-rc3.tar.xz
+  http://download.qemu-project.org/qemu-5.1.0-rc3.tar.xz.sig
 
-If you like you can pull the full series from
-https://github.com/hdeller/qemu-hppa/commits/target-hppa
+A note from the maintainer:
 
-I'd be happy if you could recheck if you find anything else.
+  Unless any last minute release-critical bugs are discovered, this will
+  be the last release candidate before we release 5.1. (If anything
+  does turn up, as usual we'll roll another rc and do the full release
+  a bit later than scheduled).
 
-In the next step I need to check if everything still works on HP-UX. If
-that's Ok, I'd like to send out a new pull request.  If you could give
-your Acked-by or Reviewed-by it would be great.
+You can help improve the quality of the QEMU 5.1 release by testing this
+release and reporting bugs on Launchpad:
 
-Thanks!
-Helge
+  https://bugs.launchpad.net/qemu/
 
-=2D--
-=46rom 1657a7a95adc15552138c2b4d310a06128093892 Mon Sep 17 00:00:00 2001
-From: Helge Deller <deller@gmx.de>
-Date: Tue, 4 Aug 2020 15:35:38 +0200
-Subject: [PATCH] hw/display/artist: Prevent out of VRAM buffer accesses
+The release plan, as well a documented known issues for release
+candidates, are available at:
 
-Simplify various bounds checks by changing parameters like row and column
-numbers to become unsigned instead of signed.
-With that we can check if the calculated offset is bigger than the size of=
- the
-VRAM region and bail out if not.
+  http://wiki.qemu.org/Planning/5.1
 
-Reported-by: LLVM libFuzzer
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1880326
-Buglink: https://bugs.launchpad.net/qemu/+bug/1890310
-Buglink: https://bugs.launchpad.net/qemu/+bug/1890311
-Buglink: https://bugs.launchpad.net/qemu/+bug/1890312
-Buglink: https://bugs.launchpad.net/qemu/+bug/1890370
-Signed-off-by: Helge Deller <deller@gmx.de>
+Please add entries to the ChangeLog for the 5.1 release below:
 
-diff --git a/hw/display/artist.c b/hw/display/artist.c
-index 47de17b9e9..570811030f 100644
-=2D-- a/hw/display/artist.c
-+++ b/hw/display/artist.c
-@@ -35,9 +35,9 @@
- struct vram_buffer {
-     MemoryRegion mr;
-     uint8_t *data;
--    int size;
--    int width;
--    int height;
-+    unsigned int size;
-+    unsigned int width;
-+    unsigned int height;
- };
+  http://wiki.qemu.org/ChangeLog/5.1
 
- typedef struct ARTISTState {
-@@ -203,14 +203,18 @@ static int16_t artist_get_y(uint32_t reg)
- }
+Thank you to everyone involved!
 
- static void artist_invalidate_lines(struct vram_buffer *buf,
--                                    int starty, int height)
-+                                    unsigned int starty, unsigned int hei=
-ght)
- {
--    int start =3D starty * buf->width;
--    int size =3D height * buf->width;
-+    unsigned int start, size;
+Changes since rc2:
 
--    if (start + size <=3D buf->size) {
--        memory_region_set_dirty(&buf->mr, start, size);
-+    if (starty >=3D buf->height) {
-+        return;
-     }
-+
-+    start =3D starty * buf->width;
-+    size =3D MIN(height * buf->width, buf->size - start);
-+
-+    memory_region_set_dirty(&buf->mr, start, size);
- }
-
- static int vram_write_pix_per_transfer(ARTISTState *s)
-@@ -274,15 +278,15 @@ static artist_rop_t artist_get_op(ARTISTState *s)
- }
-
- static void artist_rop8(ARTISTState *s, struct vram_buffer *buf,
--                        int offset, uint8_t val)
-+                        unsigned int offset, uint8_t val)
- {
-     const artist_rop_t op =3D artist_get_op(s);
-     uint8_t plane_mask;
-     uint8_t *dst;
-
--    if (offset < 0 || offset >=3D buf->size) {
-+    if (offset >=3D buf->size) {
-         qemu_log_mask(LOG_GUEST_ERROR,
--                      "rop8 offset:%d bufsize:%u\n", offset, buf->size);
-+                      "rop8 offset:%u bufsize:%u\n", offset, buf->size);
-         return;
-     }
-     dst =3D buf->data + offset;
-@@ -294,8 +298,7 @@ static void artist_rop8(ARTISTState *s, struct vram_bu=
-ffer *buf,
-         break;
-
-     case ARTIST_ROP_COPY:
--        *dst &=3D ~plane_mask;
--        *dst |=3D val & plane_mask;
-+        *dst =3D (*dst & ~plane_mask) | (val & plane_mask);
-         break;
-
-     case ARTIST_ROP_XOR:
-@@ -349,7 +352,8 @@ static void vram_bit_write(ARTISTState *s, int posx, i=
-nt posy, bool incr_x,
- {
-     struct vram_buffer *buf;
-     uint32_t vram_bitmask =3D s->vram_bitmask;
--    int mask, i, pix_count, pix_length, offset, width;
-+    int mask, i, pix_count, pix_length;
-+    unsigned int offset, width;
-     uint8_t *data8, *p;
-
-     pix_count =3D vram_write_pix_per_transfer(s);
-@@ -364,8 +368,7 @@ static void vram_bit_write(ARTISTState *s, int posx, i=
-nt posy, bool incr_x,
-         offset =3D posy * width + posx;
-     }
-
--    if (!buf->size) {
--        qemu_log("write to non-existent buffer\n");
-+    if (!buf->size || offset >=3D buf->size) {
-         return;
-     }
-
-@@ -394,7 +397,9 @@ static void vram_bit_write(ARTISTState *s, int posx, i=
-nt posy, bool incr_x,
-
-     case 3:
-         if (s->cmap_bm_access) {
--            *(uint32_t *)(p + offset) =3D data;
-+            if (offset + 3 < buf->size) {
-+                *(uint32_t *)(p + offset) =3D data;
-+            }
-             break;
-         }
-         data8 =3D (uint8_t *)&data;
-@@ -464,12 +469,14 @@ static void vram_bit_write(ARTISTState *s, int posx,=
- int posy, bool incr_x,
-     }
- }
-
--static void block_move(ARTISTState *s, int source_x, int source_y, int de=
-st_x,
--                       int dest_y, int width, int height)
-+static void block_move(ARTISTState *s,
-+                       unsigned int source_x, unsigned int source_y,
-+                       unsigned int dest_x,   unsigned int dest_y,
-+                       unsigned int width,    unsigned int height)
- {
-     struct vram_buffer *buf;
-     int line, endline, lineincr, startcolumn, endcolumn, columnincr, colu=
-mn;
--    uint32_t dst, src;
-+    unsigned int dst, src;
-
-     trace_artist_block_move(source_x, source_y, dest_x, dest_y, width, he=
-ight);
-
-@@ -481,6 +488,12 @@ static void block_move(ARTISTState *s, int source_x, =
-int source_y, int dest_x,
-     }
-
-     buf =3D &s->vram_buffer[ARTIST_BUFFER_AP];
-+    if (height > buf->height) {
-+        height =3D buf->height;
-+    }
-+    if (width > buf->width) {
-+        width =3D buf->width;
-+    }
-
-     if (dest_y > source_y) {
-         /* move down */
-@@ -507,24 +520,27 @@ static void block_move(ARTISTState *s, int source_x,=
- int source_y, int dest_x,
-     }
-
-     for ( ; line !=3D endline; line +=3D lineincr) {
--        src =3D source_x + ((line + source_y) * buf->width);
--        dst =3D dest_x + ((line + dest_y) * buf->width);
-+        src =3D source_x + ((line + source_y) * buf->width) + startcolumn=
-;
-+        dst =3D dest_x + ((line + dest_y) * buf->width) + startcolumn;
-
-         for (column =3D startcolumn; column !=3D endcolumn; column +=3D c=
-olumnincr) {
--            if (dst + column > buf->size || src + column > buf->size) {
-+            if (dst >=3D buf->size || src >=3D buf->size) {
-                 continue;
-             }
--            artist_rop8(s, buf, dst + column, buf->data[src + column]);
-+            artist_rop8(s, buf, dst, buf->data[src]);
-+            src +=3D columnincr;
-+            dst +=3D columnincr;
-         }
-     }
-
-     artist_invalidate_lines(buf, dest_y, height);
- }
-
--static void fill_window(ARTISTState *s, int startx, int starty,
--                        int width, int height)
-+static void fill_window(ARTISTState *s,
-+                        unsigned int startx, unsigned int starty,
-+                        unsigned int width,  unsigned int height)
- {
--    uint32_t offset;
-+    unsigned int offset;
-     uint8_t color =3D artist_get_color(s);
-     struct vram_buffer *buf;
-     int x, y;
-@@ -561,7 +577,9 @@ static void fill_window(ARTISTState *s, int startx, in=
-t starty,
-     artist_invalidate_lines(buf, starty, height);
- }
-
--static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
-+static void draw_line(ARTISTState *s,
-+                      unsigned int x1, unsigned int y1,
-+                      unsigned int x2, unsigned int y2,
-                       bool update_start, int skip_pix, int max_pix)
- {
-     struct vram_buffer *buf =3D &s->vram_buffer[ARTIST_BUFFER_AP];
-@@ -636,7 +654,7 @@ static void draw_line(ARTISTState *s, int x1, int y1, =
-int x2, int y2,
-     color =3D artist_get_color(s);
-
-     do {
--        int ofs;
-+        unsigned int ofs;
-
-         if (c1) {
-             ofs =3D x * s->width + y;
-@@ -768,13 +786,14 @@ static void font_write16(ARTISTState *s, uint16_t va=
-l)
-     uint16_t mask;
-     int i;
-
--    int startx =3D artist_get_x(s->vram_start);
--    int starty =3D artist_get_y(s->vram_start) + s->font_write_pos_y;
--    int offset =3D starty * s->width + startx;
-+    unsigned int startx =3D artist_get_x(s->vram_start);
-+    unsigned int starty =3D artist_get_y(s->vram_start) + s->font_write_p=
-os_y;
-+    unsigned int offset =3D starty * s->width + startx;
-
-     buf =3D &s->vram_buffer[ARTIST_BUFFER_AP];
-
--    if (offset + 16 > buf->size) {
-+    if (startx >=3D buf->width || starty >=3D buf->height ||
-+        offset + 16 >=3D buf->size) {
-         return;
-     }
-
-@@ -1138,7 +1157,7 @@ static void artist_vram_write(void *opaque, hwaddr a=
-ddr, uint64_t val,
-     struct vram_buffer *buf;
-     int posy =3D (addr >> 11) & 0x3ff;
-     int posx =3D addr & 0x7ff;
--    uint32_t offset;
-+    unsigned int offset;
-     trace_artist_vram_write(size, addr, val);
-
-     if (s->cmap_bm_access) {
-@@ -1159,18 +1178,28 @@ static void artist_vram_write(void *opaque, hwaddr=
- addr, uint64_t val,
-     }
-
-     offset =3D posy * buf->width + posx;
-+    if (offset >=3D buf->size) {
-+        return;
-+    }
-+
-     switch (size) {
-     case 4:
--        *(uint32_t *)(buf->data + offset) =3D be32_to_cpu(val);
--        memory_region_set_dirty(&buf->mr, offset, 4);
-+        if (offset + 3 < buf->size) {
-+            *(uint32_t *)(buf->data + offset) =3D be32_to_cpu(val);
-+            memory_region_set_dirty(&buf->mr, offset, 4);
-+        }
-         break;
-     case 2:
--        *(uint16_t *)(buf->data + offset) =3D be16_to_cpu(val);
--        memory_region_set_dirty(&buf->mr, offset, 2);
-+        if (offset + 1 < buf->size) {
-+            *(uint16_t *)(buf->data + offset) =3D be16_to_cpu(val);
-+            memory_region_set_dirty(&buf->mr, offset, 2);
-+        }
-         break;
-     case 1:
--        *(uint8_t *)(buf->data + offset) =3D val;
--        memory_region_set_dirty(&buf->mr, offset, 1);
-+        if (offset < buf->size) {
-+            *(uint8_t *)(buf->data + offset) =3D val;
-+            memory_region_set_dirty(&buf->mr, offset, 1);
-+        }
-         break;
-     default:
-         break;
+e1d322c405: Update version for v5.1.0-rc3 release (Peter Maydell)
+a65dabf71a: target/arm: Fix Rt/Rt2 in ESR_ELx for copro traps from AArch32 =
+to 64 (Peter Maydell)
+348fcc4f7a: qcow2-cluster: Fix integer left shift error in qcow2_alloc_clus=
+ter_link_l2() (Tuguoyi)
+d2a71d7474: Get rid of the libqemustub.a remainders (Thomas Huth)
+35c7f5254b: target/riscv/vector_helper: Fix build on 32-bit big endian host=
+s (Thomas Huth)
+5896c53954: gitlab-ci: Fix Avocado cache usage (Thomas Huth)
+699616db64: gitlab-ci.yml: Add build-system-debian and build-system-centos =
+jobs (Thomas Huth)
+4d6862ffc7: tests/acceptance: Disable the rx sash and arm cubieboard replay=
+ test on Gitlab (Thomas Huth)
+1caac1c0e4: tests/docker: Add python3-venv and netcat to the debian-amd64 c=
+ontainer (Thomas Huth)
+facc68516a: virtio-mem: Correct format specifier mismatch for RISC-V (Bruce=
+ Rogers)
+d250bb19ce: target/arm: Fix decode of LDRA[AB] instructions (Peter Collingb=
+ourne)
+ffdfca6fac: docs/devel: Document decodetree no-overlap groups (Richard Hend=
+erson)
+8e0ef06894: accel/xen: Fix xen_enabled() behavior on target-agnostic object=
+s (Philippe Mathieu-Daud=C3=A9)
+035e69b063: hw/net/net_tx_pkt: fix assertion failure in net_tx_pkt_add_raw_=
+fragment() (Mauro Matteo Cascella)
+f81cddfe8a: colo-compare: Remove superfluous NULL-pointer checks for s->iot=
+hread (Lukas Straub)
+13557fd392: hw/timer/imx_epit: Avoid assertion when CR.SWR is written (Pete=
+r Maydell)
+ce4f70e81e: hw/arm/nrf51_soc: Set system_clock_scale (Peter Maydell)
+88a90e3de6: target/arm: Avoid maybe-uninitialized warning with gcc 4.9 (Kai=
+ge Li)
+8796fe40dd: target/arm: Fix AddPAC error indication (Richard Henderson)
+fc6bb6e67e: msf2-soc, stellaris: Don't wire up SYSRESETREQ (Peter Maydell)
+9e60d759d3: hw/intc/armv7m_nvic: Provide default "reset the system" behavio=
+ur for SYSRESETREQ (Peter Maydell)
+faf7c6de34: include/hw/irq.h: New function qemu_irq_is_connected() (Peter M=
+aydell)
+e7e5a9595a: hw/arm/netduino2, netduinoplus2: Set system_clock_scale (Peter =
+Maydell)
+edadc99a2e: iotests/169: Test source cont with backing bmap (Max Reitz)
+fe16c7ddf8: qcow2: Release read-only bitmaps when inactivated (Max Reitz)
+f7160f3218: schemas: Add vim modeline (Andrea Bolognani)
+fbeed19761: qapi: Delete unwanted indentation of top-level expressions (Mar=
+kus Armbruster)
+6ac3f1e799: qapi/machine.json: Fix missing newline in doc comment (Peter Ma=
+ydell)
+1f42e24699: seabios: update to master snapshot (Gerd Hoffmann)
+000822441e: tracetool: carefully define SDT_USE_VARIADIC (Stefan Hajnoczi)
+148d25e0f6: s390x/s390-virtio-ccw: fix off-by-one in loadparm getter (Halil=
+ Pasic)
+1b7157be3a: trace/simple: Allow enabling simple traces from command line (J=
+osh DuBois)
 
