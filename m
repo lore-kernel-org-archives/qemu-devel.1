@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1904CC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 18:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FD9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 18:54:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D70EB2084D
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 18:50:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7DEE2343F
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 18:54:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J57VkUiv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D70EB2084D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XSRvKwUp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7DEE2343F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3OUy-000434-41
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 14:50:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56296)
+	id 1k3OYv-0005Mg-36
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 14:54:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3OTq-0003Qr-0e
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 14:49:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34285
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3OYK-0004si-Gr
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 14:54:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30775
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3OTn-0001ig-Hv
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 14:49:37 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3OYI-0002Ms-3Y
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 14:54:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596653373;
+ s=mimecast20190719; t=1596653652;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type;
- bh=dNdMo7AeNS+sDK5o7kW5ZLmSFzg9R3rbVIubsszgzGc=;
- b=J57VkUivkX5Z2zEyPzGy/Uxc+QsN3WAL2fCUczLaK+1RJ8vtul4vsowiXIhED468MixxuP
- ZmurPiQGWdOvrnmAipHcnq2n4WaOdtG+DxhPdJ20lONxl4KfvFY3tn+xM7jAh1zMQXQw5s
- W6Bd8WV/gNzPkcTp6q5TKHjmw75KfsU=
+ bh=/GUn8fcsEi9RDhhxXz/ShIcjf41mu/Zon+Ud/Yu+ZQc=;
+ b=XSRvKwUpsGIJ+66wpFw1vX3REYUjmzmdtKTe4O7jsYf2UdRBvfJMifImfpOAmi3UKSB2Av
+ 68iT5ZbmUdPTgymLhdKNMQ4j/AB4xHXBuid1mBXsnJxMYmmGN4Cz8NUv1eIIf8Zpe/xyXm
+ 7Ide9Xld1VBWuwaYSINpSLr0kj7o1fs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-SL2lI6qiO_aP6iN-fLdypg-1; Wed, 05 Aug 2020 14:49:32 -0400
-X-MC-Unique: SL2lI6qiO_aP6iN-fLdypg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-209-Ur6OF0XPOi-ROCu5sytvVQ-1; Wed, 05 Aug 2020 14:54:08 -0400
+X-MC-Unique: Ur6OF0XPOi-ROCu5sytvVQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 281C918C63DE;
- Wed,  5 Aug 2020 18:49:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9D991932480;
+ Wed,  5 Aug 2020 18:54:07 +0000 (UTC)
 Received: from thuth.com (ovpn-112-142.ams2.redhat.com [10.36.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4870419D71;
- Wed,  5 Aug 2020 18:49:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2C8127B910;
+ Wed,  5 Aug 2020 18:54:05 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH 2/2] travis.yml: Drop the Python 3.5 and 3.6 builds
-Date: Wed,  5 Aug 2020 20:49:26 +0200
-Message-Id: <20200805184926.15071-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Subject: [RFC PATCH] travis.yml: Drop the default softmmu builds
+Date: Wed,  5 Aug 2020 20:54:03 +0200
+Message-Id: <20200805185403.15227-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 00:45:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 12:04:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -95,44 +95,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Python 3.5 is already the default in Ubuntu Xenial (which we use for
-most jobs on Travis), and Python 3.6 is the default on Ubuntu Bionic
-(which we use for the s390x jobs on Travis for example already), so
-explicitely defining tests for Python 3.5 and 3.6 seems redundant.
+The total runtime of all Travis jobs is very long and we are testing
+all softmmu targets in the gitlab-CI already - so we can speed up the
+Travis testing a little bit by not testing the softmmu targets here
+anymore.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- .travis.yml | 17 -----------------
- 1 file changed, 17 deletions(-)
+ Well, ok, we do not test all the softmmu targets on gitlab-CI with
+ that same ancient version of Ubuntu ... but do we still care about
+ testing all softmmut targets on Ubuntu Xenial at all? ... at least
+ according to our support policy, we do not care about Xenial anymore.
+
+ .travis.yml | 14 --------------
+ 1 file changed, 14 deletions(-)
 
 diff --git a/.travis.yml b/.travis.yml
-index 18290bc51d..b4c603f0ec 100644
+index 6695c0620f..18290bc51d 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -258,23 +258,6 @@ jobs:
-         - TEST_CMD=""
+@@ -123,20 +123,6 @@ jobs:
+         - CONFIG="--disable-system --static"
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
  
- 
--    # Python builds
--    - name: "GCC Python 3.5 (x86_64-softmmu)"
+-
+-    # we split the system builds as it takes a while to build them all
+-    - name: "GCC (main-softmmu)"
 -      env:
--        - CONFIG="--target-list=x86_64-softmmu"
+-        - CONFIG="--disable-user --target-list=${MAIN_SOFTMMU_TARGETS}"
 -        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
--      language: python
--      python: 3.5
 -
 -
--    - name: "GCC Python 3.6 (x86_64-softmmu)"
+-    - name: "GCC (other-softmmu)"
 -      env:
--        - CONFIG="--target-list=x86_64-softmmu"
+-       - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
 -        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
--      language: python
--      python: 3.6
 -
 -
-     # Using newer GCC with sanitizers
-     - name: "GCC9 with sanitizers (softmmu)"
-       addons:
+     # Just build tools and run minimal unit and softfloat checks
+     - name: "GCC check-softfloat (user)"
+       env:
 -- 
 2.18.1
 
