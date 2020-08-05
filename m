@@ -4,72 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBF7C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 17:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B86DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 17:38:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52E4522D2B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 17:36:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52E4522D2B
+	by mail.kernel.org (Postfix) with ESMTPS id 6011D22D37
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 17:38:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6011D22D37
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3NLN-0008Cr-J8
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 13:36:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39970)
+	id 1k3NMV-0001vX-MX
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 13:37:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k3NK8-0006Qk-6R
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 13:35:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41744
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k3NKY-0007As-U2
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 13:35:59 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35173
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k3NK6-0001Sb-Fg
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 13:35:31 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k3NKT-0001aE-P0
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 13:35:58 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-B98oybcePsek3ifEjpF33A-1; Wed, 05 Aug 2020 13:35:25 -0400
-X-MC-Unique: B98oybcePsek3ifEjpF33A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-246-Km0eNhT2PM27S1DmYzNv3A-1; Wed, 05 Aug 2020 13:35:47 -0400
+X-MC-Unique: Km0eNhT2PM27S1DmYzNv3A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6B1B184C605;
- Wed,  5 Aug 2020 17:35:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A44641005504;
+ Wed,  5 Aug 2020 17:35:46 +0000 (UTC)
 Received: from bahia.lan (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A876F7B910;
- Wed,  5 Aug 2020 17:35:23 +0000 (UTC)
-Subject: [PATCH for-5.2 1/5] spapr/xive: Fix xive->fd if kvm_create_device()
- fails
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7892100239B;
+ Wed,  5 Aug 2020 17:35:45 +0000 (UTC)
+Subject: [PATCH for-5.2 4/5] spapr/xive: Convert KVM device fd checks to
+ assert()
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 05 Aug 2020 19:35:22 +0200
-Message-ID: <159664892278.638781.2910775856690967369.stgit@bahia.lan>
+Date: Wed, 05 Aug 2020 19:35:44 +0200
+Message-ID: <159664894478.638781.7802223440952803421.stgit@bahia.lan>
 In-Reply-To: <159664891296.638781.18417631893299150932.stgit@bahia.lan>
 References: <159664891296.638781.18417631893299150932.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=207.211.31.120; envelope-from=groug@kaod.org;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 12:04:33
+Received-SPF: softfail client-ip=205.139.110.61; envelope-from=groug@kaod.org;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 04:10:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -12
-X-Spam_score: -1.3
-X-Spam_bar: -
-X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_SOFTFAIL=0.665 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,52 +89,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the creation of the KVM XIVE device fails for some reasons, the
-negative errno ends up in xive->fd, but the rest of the code assumes
-that xive->fd either contains an open fd, ie. positive value, or -1.
+All callers guard these functions with kvmppc_xive_in_kernel() or one
+of its variants. Make it clear that these functions are only to be
+called when the KVM XIVE device is active.
 
-This doesn't cause any misbehavior except kvmppc_xive_disconnect()
-that will try to close(xive->fd) during rollback and likely be
-rewarded with an EBADF.
-
-Only set xive->fd with a open fd.
+Note that the check on xive is dropped in kvmppc_xive_disconnect(). It
+really cannot be NULL since it comes from set_active_intc() which only
+passes pointers to allocated objects.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/spapr_xive_kvm.c |    8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ hw/intc/spapr_xive_kvm.c |   35 +++++++----------------------------
+ 1 file changed, 7 insertions(+), 28 deletions(-)
 
 diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index edb7ee0e74f1..d55ea4670e0e 100644
+index a9657e2b0cda..3364832de83a 100644
 --- a/hw/intc/spapr_xive_kvm.c
 +++ b/hw/intc/spapr_xive_kvm.c
-@@ -745,6 +745,7 @@ int kvmppc_xive_connect(SpaprInterruptController *intc,=
- uint32_t nr_servers,
-     size_t esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-     size_t tima_len =3D 4ull << TM_SHIFT;
-     CPUState *cs;
-+    int fd;
+@@ -79,10 +79,7 @@ void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **e=
+rrp)
+     uint64_t state[2];
+     int ret;
+=20
+-    /* The KVM XIVE device is not in use yet */
+-    if (xive->fd =3D=3D -1) {
+-        return;
+-    }
++    assert(xive->fd !=3D -1);
+=20
+     /* word0 and word1 of the OS ring. */
+     state[0] =3D *((uint64_t *) &tctx->regs[TM_QW1_OS]);
+@@ -101,10 +98,7 @@ void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **=
+errp)
+     uint64_t state[2] =3D { 0 };
+     int ret;
+=20
+-    /* The KVM XIVE device is not in use */
+-    if (xive->fd =3D=3D -1) {
+-        return;
+-    }
++    assert(xive->fd !=3D -1);
+=20
+     ret =3D kvm_get_one_reg(tctx->cs, KVM_REG_PPC_VP_STATE, state);
+     if (ret !=3D 0) {
+@@ -156,10 +150,7 @@ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **e=
+rrp)
+     unsigned long vcpu_id;
+     int ret;
+=20
+-    /* The KVM XIVE device is not in use */
+-    if (xive->fd =3D=3D -1) {
+-        return;
+-    }
++    assert(xive->fd !=3D -1);
+=20
+     /* Check if CPU was hot unplugged and replugged. */
+     if (kvm_cpu_is_enabled(tctx->cs)) {
+@@ -245,10 +236,7 @@ int kvmppc_xive_source_reset_one(XiveSource *xsrc, int=
+ srcno, Error **errp)
+     SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
+     uint64_t state =3D 0;
+=20
+-    /* The KVM XIVE device is not in use */
+-    if (xive->fd =3D=3D -1) {
+-        return -ENODEV;
+-    }
++    assert(xive->fd !=3D -1);
+=20
+     if (xive_source_irq_is_lsi(xsrc, srcno)) {
+         state |=3D KVM_XIVE_LEVEL_SENSITIVE;
+@@ -592,10 +580,7 @@ static void kvmppc_xive_change_state_handler(void *opa=
+que, int running,
+=20
+ void kvmppc_xive_synchronize_state(SpaprXive *xive, Error **errp)
+ {
+-    /* The KVM XIVE device is not in use */
+-    if (xive->fd =3D=3D -1) {
+-        return;
+-    }
++    assert(xive->fd !=3D -1);
 =20
      /*
-      * The KVM XIVE device already in use. This is the case when
-@@ -760,11 +761,12 @@ int kvmppc_xive_connect(SpaprInterruptController *int=
-c, uint32_t nr_servers,
-     }
+      * When the VM is stopped, the sources are masked and the previous
+@@ -622,10 +607,7 @@ int kvmppc_xive_pre_save(SpaprXive *xive)
+ {
+     Error *local_err =3D NULL;
 =20
-     /* First, create the KVM XIVE device */
--    xive->fd =3D kvm_create_device(kvm_state, KVM_DEV_TYPE_XIVE, false);
--    if (xive->fd < 0) {
--        error_setg_errno(errp, -xive->fd, "XIVE: error creating KVM device=
-");
-+    fd =3D kvm_create_device(kvm_state, KVM_DEV_TYPE_XIVE, false);
-+    if (fd < 0) {
-+        error_setg_errno(errp, -fd, "XIVE: error creating KVM device");
-         return -1;
-     }
-+    xive->fd =3D fd;
+-    /* The KVM XIVE device is not in use */
+-    if (xive->fd =3D=3D -1) {
+-        return 0;
+-    }
++    assert(xive->fd !=3D -1);
 =20
-     /* Tell KVM about the # of VCPUs we may have */
-     if (kvm_device_check_attr(xive->fd, KVM_DEV_XIVE_GRP_CTRL,
+     /* EAT: there is no extra state to query from KVM */
+=20
+@@ -845,10 +827,7 @@ void kvmppc_xive_disconnect(SpaprInterruptController *=
+intc)
+     XiveSource *xsrc;
+     size_t esb_len;
+=20
+-    /* The KVM XIVE device is not in use */
+-    if (!xive || xive->fd =3D=3D -1) {
+-        return;
+-    }
++    assert(xive->fd !=3D -1);
+=20
+     /* Clear the KVM mapping */
+     xsrc =3D &xive->source;
 
 
 
