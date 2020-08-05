@@ -2,94 +2,89 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB27C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD6CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:17:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BEE122CA1
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:13:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B991622CF8
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:17:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T4ofjh/t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BEE122CA1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TPPVotjb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B991622CF8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3FUj-0005jk-7y
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 05:13:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56292)
+	id 1k3FYA-0007Ib-PN
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 05:17:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3FT4-0004Ij-QM
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:12:14 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26275
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3FX4-0006lB-3N
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:16:22 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30640
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3FT3-0003Bu-5L
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:12:14 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3FX0-0003hJ-Fl
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:16:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596618732;
+ s=mimecast20190719; t=1596618977;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0DEsANkbLbGcSWPjjdtbAHQUu/vJ5DaDyj75MEXJWpA=;
- b=T4ofjh/t1ulkS/RQdzfA1iRXXdl9r4BVT8OV7z81ir1bPzeC4VBcpTcoiq8TIHbzJ4GUD/
- zRsjKIVNaqM95LwiTdzNeZxc/PfxyH8iDePemRU0/n/1kFk4oHMC4mEEpJK9+Z5pgdsvPq
- se5BVaEjuvY9IVSoQtlUCzLK8lBnUgM=
+ bh=PsEjecBTSLJ4ftcms3D8R+or2TN4CMjjwvtPDvMx4Hk=;
+ b=TPPVotjbs6QTbioauViFIptUFOMcrnxzSpTxdh1ua+RoMABqlC9kwdjDPev41fe8+xVEF1
+ j/RkjnYd0N71H0MLHsmaDdPGf+NlYRldhRnrurwc6L2CY2hCvQx6yBn+bBDVJQxCVao/wp
+ C1fgkh/caMJ+Lseo5wxFgNutSmXGKss=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-26vUYQcjOHye5kOfSPKFoA-1; Wed, 05 Aug 2020 05:12:11 -0400
-X-MC-Unique: 26vUYQcjOHye5kOfSPKFoA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-223-cbd4H_VAOvib9oWTveTLZw-1; Wed, 05 Aug 2020 05:16:15 -0400
+X-MC-Unique: cbd4H_VAOvib9oWTveTLZw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9C78102C7E9;
- Wed,  5 Aug 2020 09:12:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAB4A19057A2;
+ Wed,  5 Aug 2020 09:16:13 +0000 (UTC)
 Received: from gondolin (ovpn-113-4.ams2.redhat.com [10.36.113.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1082910013D0;
- Wed,  5 Aug 2020 09:11:57 +0000 (UTC)
-Date: Wed, 5 Aug 2020 11:11:55 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 454925DA88;
+ Wed,  5 Aug 2020 09:16:11 +0000 (UTC)
+Date: Wed, 5 Aug 2020 11:16:09 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Subject: Re: cleanups with long-term benefits
-Message-ID: <20200805111155.25abfd26.cohuck@redhat.com>
-In-Reply-To: <20200805090540.GC4127670@redhat.com>
-References: <87ft94klyl.fsf@dusky.pond.sub.org>
- <490a0786-73f3-411e-4dfe-8c2ae90de251@redhat.com>
- <87y2mvhg3k.fsf@dusky.pond.sub.org>
- <facfef76-d880-82dd-f862-a64f8f487ba2@redhat.com>
- <87k0yeg7mc.fsf@dusky.pond.sub.org>
- <6e5df5fc-94f8-ee8e-0c14-f56135de25e4@redhat.com>
- <87o8np5ysp.fsf@dusky.pond.sub.org>
- <9f83eb93-5389-7aad-3031-0777de0c35b0@redhat.com>
- <20200805083949.GA3004@work-vm>
- <241436db-1aec-b804-314f-7893954e981b@redhat.com>
- <20200805090540.GC4127670@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH for-5.2 2/6] pc-bios/s390-ccw: Move ipl-related code
+ from main() into a separate function
+Message-ID: <20200805111609.64107a1b.cohuck@redhat.com>
+In-Reply-To: <6be1e380-4841-a5ea-f710-26988cdcc441@redhat.com>
+References: <20200728183734.7838-1-thuth@redhat.com>
+ <20200728183734.7838-3-thuth@redhat.com>
+ <20200729104721.6f2b8162.cohuck@redhat.com>
+ <6be1e380-4841-a5ea-f710-26988cdcc441@redhat.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 04:10:11
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 03:37:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,45 +97,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Yuval Shaia <yuval.shaia.ml@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Andrea Bolognani <abologna@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+ Collin Walling <walling@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x@nongnu.org, Claudio Imbrenda <imbrenda@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 5 Aug 2020 10:05:40 +0100
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+On Wed, 29 Jul 2020 13:05:08 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-> On Wed, Aug 05, 2020 at 10:49:35AM +0200, Paolo Bonzini wrote:
-> > On 05/08/20 10:39, Dr. David Alan Gilbert wrote: =20
-> > >> Do you really use "git blame" that much?  "git log -S" does more or =
-less
-> > >> the same function (in a different way) and is not affected as much b=
-y
-> > >> large code movement and transformation patches. =20
-> > >
-> > > I use it a lot!   Following stuff back to find where a change came
-> > > from and then asking people. =20
-> >=20
-> > Indeed, but I use "git log -S" instead. :)  Another possibility is to
-> > just do "git log -p" and search for a relevant line of the code I'm
-> > "blaming". =20
->=20
-> I used git blame alot too, but I don't think its a reason to not do the
-> cleanups. It is easy enough to just tell blame to use an earlier commit
-> if you see it displaying a refactor. I don't think such mild inconvenienc=
-e
-> should stop us making otherwise desirable code changes
+> On 29/07/2020 10.47, Cornelia Huck wrote:
+> > On Tue, 28 Jul 2020 20:37:30 +0200
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >   
+> >> Let's move this part of the code into a separate function to be able
+> >> to use it from multiple spots later.
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  pc-bios/s390-ccw/main.c | 20 ++++++++++++--------
+> >>  1 file changed, 12 insertions(+), 8 deletions(-)
+> >>
+> >> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> >> index 146a50760b..9b64eb0c24 100644
+> >> --- a/pc-bios/s390-ccw/main.c
+> >> +++ b/pc-bios/s390-ccw/main.c
+> >> @@ -223,14 +223,8 @@ static void virtio_setup(void)
+> >>      }
+> >>  }
+> >>  
+> >> -int main(void)
+> >> +static void ipl_boot_device(void)
+> >>  {
+> >> -    sclp_setup();
+> >> -    css_setup();
+> >> -    boot_setup();
+> >> -    find_boot_device();
+> >> -    enable_subchannel(blk_schid);
+> >> -
+> >>      switch (cutype) {
+> >>      case CU_TYPE_DASD_3990:
+> >>      case CU_TYPE_DASD_2107:
+> >> @@ -242,8 +236,18 @@ int main(void)
+> >>          break;
+> >>      default:
+> >>          print_int("Attempting to boot from unexpected device type", cutype);
+> >> -        panic("");
+> >> +        panic("\nBoot failed.\n");  
+> > 
+> > Maybe "Boot failed: no supported device type"?  
+> 
+> The print_int right before already talks about "unexpected device type",
+> so I think the simple "Boot failed" should be enough?
 
-I don't think people argue that it should block changes; it it simply
-another thing to consider when weighing benefits vs. drawbacks.
+Yes, as long as we don't end up with other boot failures printing the
+same messages.
 
 
