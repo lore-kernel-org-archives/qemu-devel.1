@@ -2,109 +2,94 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50FA6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 16:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9025C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 16:46:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1903722CF7
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 16:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 747762076E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 16:46:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TdAIVxxs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1903722CF7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vYUZbhQ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 747762076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3MQx-000335-CE
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 12:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55020)
+	id 1k3MYK-0005GD-Lp
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 12:46:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3MQM-0002XN-P7
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 12:37:54 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25451
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3MQK-0003F6-5d
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 12:37:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596645471;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1RJ0dvC85dV1yS4u5jajJXyBksh2pnCkNTYK/LipD60=;
- b=TdAIVxxsCovY50r3zP0RTAZfA1tTt2VqEkm7zpRW31k7WBLXPYvZv8N4h1JnmUKTkaTk+P
- BHL70fnzTtuB/3XV5DH/UfL9LOj40Ka+h3lYF6c1o3LlBQHEEJdlEE8tKiwSMPpEFIft81
- NHJdp/GxdPtxQCmRrChoEPQRQ+xl1JA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-7ld9s7SbMIOgQBCKOV91dQ-1; Wed, 05 Aug 2020 12:37:49 -0400
-X-MC-Unique: 7ld9s7SbMIOgQBCKOV91dQ-1
-Received: by mail-wr1-f71.google.com with SMTP id f7so13750659wrs.8
- for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 09:37:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k3MXO-0004O7-Qr
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 12:45:11 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:36778)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k3MXL-0003uM-Lw
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 12:45:09 -0400
+Received: by mail-wr1-x433.google.com with SMTP id 88so41313482wrh.3
+ for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 09:45:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=3NW94LMPzCnDG/PqclW9ZM0ecyFoJ5qStb8X/NxQc6w=;
+ b=vYUZbhQ+NPbaBW0byaP/kTVaXo1tHOha1TFUAacRj/kAgIL16XwG5JrvTqL0ujv7BL
+ tRQgcqX1XsNAph3bRzpZaHoNsxsjipKugy3sWhcHI18wI4qEWBMgTeq6LtCwjOyM5gsD
+ 1Fff0w5tOCkpaWom+J3QeA97qCvfe3a62TS3x5HundVzrneBl6bzChpPo0phsZ+wjLgT
+ ASQP2HhItMpQe9KvzsB95YL/uxyfWss6kan0bLSEMWIJJv1iuSvZR8+X26duDO61EG/R
+ e6lF9peJ6T6RlvYjUjrDuk8GTsXhQ+QHsXy00m+WkQwNxsH06/zOutgeyNdPbQUa8bXS
+ q57Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1RJ0dvC85dV1yS4u5jajJXyBksh2pnCkNTYK/LipD60=;
- b=GpxdFIrtOJg6T2UgSHtGkWDG7YYaz3z4rncf8pZqlLvnL6QgWDxpXRI1etZc3xkr71
- SSTgNhElkuS5zLojuWFZMLo5yZunXg0KDYluX5oZorqp7cYYHug2or/NYBSRUxSrBjvw
- xUare57h+C45bDCW82P2FHE6cye4Mb/c9T9LjWAszHiKe0K/efCNDdmpTmzBwVIMkI97
- eE0qLN71WuWli2lu2Vf5HZBLZbAN+O0RKWO20Fra1ycROG8F1YshkzpQj8fUDG7/43Si
- aWV+itykMxyBDa1ZdEUf+Y37ZThvlvlems0N3MubWymKxrB6PGjzmdY8Ay/OEjK0Efu3
- 2NDw==
-X-Gm-Message-State: AOAM5332V35khau9y8m4hC58y1uOiMs0ebM/sfjOm0XQm+mZK7vPd8jh
- r2oXaAKLEpHPDcY/EE9phIjCFarsFgeqtiINnDvbLuVel4EyaKOfdkpDtmctr1e3UxIKBeMbGVo
- MnsjIn23JMYWkOtQ=
-X-Received: by 2002:adf:e9cd:: with SMTP id l13mr3887505wrn.340.1596645467654; 
- Wed, 05 Aug 2020 09:37:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxT/yl+lizFbXJHDoKqS/ouzQHU4Xoio4JnXtPd051ykYtcXe31tQmBiIjKBBpuYFx1lhyvvw==
-X-Received: by 2002:adf:e9cd:: with SMTP id l13mr3887485wrn.340.1596645467360; 
- Wed, 05 Aug 2020 09:37:47 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7841:78cc:18c6:1e20?
- ([2001:b07:6468:f312:7841:78cc:18c6:1e20])
- by smtp.gmail.com with ESMTPSA id m20sm13915163wmc.1.2020.08.05.09.37.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 05 Aug 2020 09:37:46 -0700 (PDT)
-Subject: Re: [PATCH v2 3/3] aio-posix: keep aio_notify_me disabled during
- polling
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20200805100051.361547-1-stefanha@redhat.com>
- <20200805100051.361547-4-stefanha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8e066cf0-e5f9-283c-eedd-47974bf4bbac@redhat.com>
-Date: Wed, 5 Aug 2020 18:37:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=3NW94LMPzCnDG/PqclW9ZM0ecyFoJ5qStb8X/NxQc6w=;
+ b=IwkgF7mVHlz/zgvf4ERDrbvnvG60jaLeXxKeKZ5EA23l8Nq2W9G/fVOyEh7qVdulUA
+ MCWUnFNAUShJR6IKWe1hOB/OvqwyOfgbYtIetpuwgSEsNhqxlul0NIu582M2fR313SsO
+ rM7XNiypti6+WOTWSaVcBJs+1Ps9M5la8/zUXTANbJXU+YwkzSuYAKFiGC3zrK0kZto+
+ 4NXCGPiDcPIBCE21u4sPkAckZsedbxPr3ZJg1CtOgW1mvkGBkfLwxmfGeLFz05z9CZcX
+ D3i9GyN8zXS7t2QgjR2jQIz2ZnzEI1Kfcmc41vLaCd8xejoMqG0plM4XcddNGLyHNvSm
+ dZzw==
+X-Gm-Message-State: AOAM532+Pgr7Fo0aLmNuuoy49F7o/Qlvt5LyxNS2lcyIB/wz2C/fC9ps
+ X/Syfrf/AFSybvBF3ltkNIJeeg==
+X-Google-Smtp-Source: ABdhPJw3lG3jSo8QZK3iQ1akH9vocsUhKGqwpkhfMwWTDr287fNUjuFZah7JXpvZ3l0emF/V2kRrrw==
+X-Received: by 2002:adf:f247:: with SMTP id b7mr3773403wrp.128.1596645904043; 
+ Wed, 05 Aug 2020 09:45:04 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id i4sm3396892wrw.26.2020.08.05.09.45.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 05 Aug 2020 09:45:02 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id F02B41FF7E;
+ Wed,  5 Aug 2020 17:45:01 +0100 (BST)
+References: <CAFEAcA_6zbOfdVi+Tp18seaEy4don1GurVya+E+QXRGrZ_WVLg@mail.gmail.com>
+ <2c5ed9d8-6d79-1b53-5588-8fb9efebf0fa@linaro.org>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: v8.1M cpu emulation and target-arm feature-identification strategy
+In-reply-to: <2c5ed9d8-6d79-1b53-5588-8fb9efebf0fa@linaro.org>
+Date: Wed, 05 Aug 2020 17:45:01 +0100
+Message-ID: <87tuxhkpo2.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200805100051.361547-4-stefanha@redhat.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 04:10:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::433;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x433.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,72 +103,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/08/20 12:00, Stefan Hajnoczi wrote:
-> +
-> +        /*
-> +         * aio_notify can avoid the expensive event_notifier_set if
-> +         * everything (file descriptors, bottom halves, timers) will
-> +         * be re-evaluated before the next blocking poll().  This is
-> +         * already true when aio_poll is called with blocking == false;
-> +         * if blocking == true, it is only true after poll() returns,
-> +         * so disable the optimization now.
-> +         */
-> +        if (use_notify_me) {
-> +            atomic_set(&ctx->notify_me, atomic_read(&ctx->notify_me) + 2);
-> +            /*
-> +             * Write ctx->notify_me before reading ctx->notified.  Pairs with
-> +             * smp_mb in aio_notify().
-> +             */
-> +            smp_mb();
-> +
-> +            /* Don't block if aio_notify() was called */
-> +            if (atomic_read(&ctx->notified)) {
-> +                timeout = 0;
-> +            }
 
-Aha, this is the trick: "timeout = 0" also applies if a timer was moved 
-early.  In this case you uselessly keep notify_me set for a bit, but 
-it's okay. Nice!
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-The code can be simplified a bit more, since the use_notify_me variable 
-is just "timeout":
+> On 8/5/20 4:08 AM, Peter Maydell wrote:
+>> Mostly recently we've been aiming for QEMU emulation code in
+>> target/arm to use ID register fields to determine whether a
+>> feature is present or not (the isar_feature_* functions) rather
+>> than the old style of defining ARM_FEATURE_* flags. This seems to
+>> be working out well for A-profile. However, for v8.1M there are
+>> a small handful of minor behaviour differences which don't have an
+>> associated ID register field, but which are instead in the spec
+>> and pseudocode just called out as "if this is a v8.1M CPU".
+>> (The major v8.1M new features do have ID register fields.)
+>>=20
+>> I can think of two ways to handle this:
+>>  (1) define an ARM_FEATURE_V81M flag
+>>  (2) define an isar_feature_aa32_v81m() function which under the
+>>      hood is actually testing for a specific feature which happens
+>>      to be known to be always present in v8.1M, like low-overhead-branch=
+es
+>>      (ie ID_ISAR0.CmpBranch >=3D3)
+>
+> I think (2) has the potential to be confusing in odd ways.  If there real=
+ly is
+> no official flag for this, I think we should use (1).
 
-    use_notify_me = (timeout != 0);
-    if (use_notify_me) {
-         /*
-          * aio_notify can avoid the expensive event_notifier_set if
-          * everything (file descriptors, bottom halves, timers) will
-          * be re-evaluated before the next blocking poll().  This is
-          * already true when aio_poll is called with blocking == false;
-          * if blocking == true, it is only true after poll() returns,
-          * so disable the optimization now.
-          */
-         atomic_set(&ctx->notify_me, atomic_read(&ctx->notify_me) + 2);
-         /*
-          * Write ctx->notify_me before reading ctx->notified.  Pairs with
-          * smp_mb in aio_notify().
-          */
-         smp_mb();
- 
-         /* Don't block if aio_notify() was called */
-         if (atomic_read(&ctx->notified)) {
-             timeout = 0;
-         }
-     }
-     if (timeout || ctx->fdmon_ops->need_wait(ctx)) {
-         ret = ctx->fdmon_ops->wait(ctx, &ready_list, timeout);
-     }
-     if (use_notify_me) {
-         /* Finish the poll before clearing the flag.  */
-         atomic_store_release(&ctx->notify_me,
-                              atomic_read(&ctx->notify_me) - 2);
-     }
+I wouldn't test other feature bits but what stopping us adding:
 
-Paolo
+    struct ARMISARegisters {
+        uint32_t id_isar0;
+        ...
+        uint64_t id_aa64dfr1;
+        /*
+         * The following are synthetic flags for features not exposed to
+         * the directly exposed to the guest but needed by QEMU's
+         * feature detection.
+         */
+        bool v81m_lob;
+    } isar;
+=20=20
 
+And having the normal:
+
+    static inline bool isar_feature_aa32_v81m_lob(const ARMISARegisters *id)
+    {
+        return id->v81m_lob;
+    }
+
+That said we still seem to have a number of ARM_FEATURE flags, are we
+hoping they all go away eventually?
+
+>
+>
+> r~
+
+
+--=20
+Alex Benn=C3=A9e
 
