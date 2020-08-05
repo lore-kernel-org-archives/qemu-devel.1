@@ -2,78 +2,79 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72426C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4925BC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:19:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43E4522D00
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:18:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14DBF22CAD
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 09:19:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V0KPMD/+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E4522D00
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zuk+qMAR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14DBF22CAD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3FYr-0000LH-GL
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 05:18:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57306)
+	id 1k3Fa0-0002Lk-9m
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 05:19:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k3FXX-0007Da-B2
+ id 1k3FXX-0007Dg-Qy
  for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:16:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22426
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51255
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k3FXT-0003ie-Cc
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:16:50 -0400
+ id 1k3FXV-0003im-44
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:16:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596619006;
+ s=mimecast20190719; t=1596619007;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=EmJZVmdebOHatacpSeSNz+jVmDzT3ZPy43FzP5Jq9pg=;
- b=V0KPMD/+dJ11oSyBZ007/kVqDuqNBPMYmk7IQsKBfwzg3J+ZddFPv5CPkFlrHEprRWUDku
- PmL7zSl+vbxV/f+9E7/AUURE0JtIybZxqvfye3PUJLyf44S0DMExoNd9dG7S0PYZ/cHrxL
- MHxOO3KLxzVEfIrGqI1r5tkq+Uge+iY=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=l9MiLHEL0ZusiqXXJdZN9mvCOzvDNMq7vWBxDe63SLg=;
+ b=Zuk+qMARTeKFSVBUTVNStKu/65Cir1jvSLWUmUK6BqHZBzp1qUUwRG6wtbTARhcKJN9p42
+ WDDD2Ryv+iP8UaQuLOYJXXYterUksy5ctDe562+uTfu3IEL2vloX4Q0NrePlXIf0Zi0zkE
+ TFv2WQ3AbGjXiGaxJnvDdisrpHEe4Fo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-4JWeeRc-MOCHK-M7iMNS1A-1; Wed, 05 Aug 2020 05:16:43 -0400
-X-MC-Unique: 4JWeeRc-MOCHK-M7iMNS1A-1
+ us-mta-329-hHurUTLGNS2Ix1xfwAtT6Q-1; Wed, 05 Aug 2020 05:16:45 -0400
+X-MC-Unique: hHurUTLGNS2Ix1xfwAtT6Q-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E43C9100AA21;
- Wed,  5 Aug 2020 09:16:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8ABA7100CCC0;
+ Wed,  5 Aug 2020 09:16:44 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.31])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A630D2DE73;
- Wed,  5 Aug 2020 09:16:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D4072DE66;
+ Wed,  5 Aug 2020 09:16:43 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org
-Subject: [PATCH v2 0/5] hw/arm/virt: Introduce kvm-steal-time
-Date: Wed,  5 Aug 2020 11:16:35 +0200
-Message-Id: <20200805091640.11134-1-drjones@redhat.com>
+Subject: [PATCH v2 1/5] hw: add compat machines for 5.2
+Date: Wed,  5 Aug 2020 11:16:36 +0200
+Message-Id: <20200805091640.11134-2-drjones@redhat.com>
+In-Reply-To: <20200805091640.11134-1-drjones@redhat.com>
+References: <20200805091640.11134-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=drjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 00:45:55
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=drjones@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 03:37:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -81,8 +82,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,117 +100,233 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2:
-  - Changed the introduction of the feature to 5.2 from 5.1
-    (The 5.2 machine type patch posted by Cornelia was thrown
-     in for completeness, but I suppose that'll get picked up
-     separately.)
-  - Added a patch adding g_assert_not_reached() to many KVM
-    stubs. (This isn't exactly related to the series, but the
-    series does add two more stubs that can now be added in
-    the same way.)
-  - Fixed a patch that wasn't suppose to have a functional
-    change, but did (fdt_add_gic_node() shouldn't generate
-    the node without the PMU) [Peter]
-  - Pass sysmem to virt_cpu_post_init() [Peter]
-  - Introduced a define for the pvtime struct size
-  - Calculate the pvtime memory region size based on max-cpus
-    and host-page-size [Beata]
-  - Renamed kvm_no_steal_time to no_kvm_steal_time [Peter]
-  - Fixed a parameter misordering with object_property_set_bool()
-  - Added a comment explaining why the feature isn't supported
-    for AArch32 guests
-  - Changed a !kvm_steal_time to a kvm_steal_time == ON_OFF_AUTO_OFF
-    as it should be
-  - Picked up one r-b from Peter
+From: Cornelia Huck <cohuck@redhat.com>
 
+Add 5.2 machine types for arm/i440fx/q35/s390x/spapr.
 
-KVM supports the ability to publish the amount of time that VCPUs
-were runnable, but not running due to other host threads running
-instead, to the guest. The guest scheduler may use that information
-when making decisions and the guest may expose it to its userspace
-(Linux publishes this information in /proc/stat). This feature is
-called "steal time" as it represents the amount of time stolen from
-a guest by scheduling out its VCPUs. To enable this feature KVM
-userspace must provide a memory region that will be used to publish
-the information to the guest. The memory region is typical migratable
-region. The GPA of the region is given to KVM through a VCPU device
-ioctl interface. This feature is only available for 64-bit hosts
-running 64-bit guests.
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/arm/virt.c              |  9 ++++++++-
+ hw/core/machine.c          |  3 +++
+ hw/i386/pc.c               |  6 ++++--
+ hw/i386/pc_piix.c          | 14 +++++++++++++-
+ hw/i386/pc_q35.c           | 13 ++++++++++++-
+ hw/ppc/spapr.c             | 15 +++++++++++++--
+ hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
+ include/hw/boards.h        |  3 +++
+ include/hw/i386/pc.h       |  3 +++
+ 9 files changed, 72 insertions(+), 8 deletions(-)
 
-This series provides the QEMU support of this feature. It will
-be enabled by default for 5.2 machine types and later, but may
-be disabled with a new CPU property "kvm-steal-time".
-
-While testing migration it was observed that the amount of
-steal time as viewed by the guest was getting reset on each
-migration. Patch 4/6 of a pvtime fix series posted[*] for KVM
-should fix that. Also, we may still want to change the way we
-probe KVM for the feature in this QEMU series to the new KVM
-cap proposed in that KVM series.
-
-Migration testing:
-
-* virt-5.1 can migrate as usual, no steal-time enabled
-
-* virt-5.2 can migrate between hosts with steal-time enabled
-  (the default) and disabled when both hosts support steal-time
-
-* virt-5.2 with steal-time disabled can migrate to a host that
-  does not support steal-time
-
-* virt-5.2 with steal-time enabled will cleanly fail when migrating
-  to a host that does not support steal-time
-
-* virt-5.2 without the kvm-steal-time property specified can
-  boot on a host that does not support the feature - the feature
-  will be disabled. However, if the guest is migrated to a host
-  that does support the feature, then after the guest has reboot
-  the feature will become available with the guest kernel supports
-  it (this is the nature of migrating guests that use '-cpu host').
-  Additionally, once this guest has been migrated to a host that
-  does have the feature, then it will fail (cleanly) to migrate to
-  a host that does not have the feature. If this behavior isn't
-  desired, then the user should explicitly disable steal-time with
-  the kvm-steal-time property if they want to boot a 5.2 guest on
-  a host that doesn't support steal-time.
-
-[*] https://lists.cs.columbia.edu/pipermail/kvmarm/2020-August/041823.html
-
-Thanks,
-drew
-
-
-Andrew Jones (4):
-  target/arm/kvm: Make uncalled stubs explicitly unreachable
-  hw/arm/virt: Move post cpu realize check into its own function
-  hw/arm/virt: Move kvm pmu setup to virt_cpu_post_init
-  hw/arm/virt: Implement kvm-steal-time
-
-Cornelia Huck (1):
-  hw: add compat machines for 5.2
-
- docs/system/arm/cpu-features.rst |  11 +++
- hw/arm/virt.c                    | 119 +++++++++++++++++++++++--------
- hw/core/machine.c                |   3 +
- hw/i386/pc.c                     |   6 +-
- hw/i386/pc_piix.c                |  14 +++-
- hw/i386/pc_q35.c                 |  13 +++-
- hw/ppc/spapr.c                   |  15 +++-
- hw/s390x/s390-virtio-ccw.c       |  14 +++-
- include/hw/arm/virt.h            |   5 ++
- include/hw/boards.h              |   3 +
- include/hw/i386/pc.h             |   3 +
- target/arm/cpu.c                 |  10 +++
- target/arm/cpu.h                 |   4 ++
- target/arm/kvm.c                 |  20 ++++++
- target/arm/kvm32.c               |   5 ++
- target/arm/kvm64.c               |  77 ++++++++++++++++++--
- target/arm/kvm_arm.h             |  74 ++++++++++++++-----
- target/arm/monitor.c             |   2 +-
- tests/qtest/arm-cpu-features.c   |  25 +++++--
- 19 files changed, 358 insertions(+), 65 deletions(-)
-
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index ecfee362a182..acf9bfbeceaf 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2546,10 +2546,17 @@ static void machvirt_machine_init(void)
+ }
+ type_init(machvirt_machine_init);
+ 
++static void virt_machine_5_2_options(MachineClass *mc)
++{
++}
++DEFINE_VIRT_MACHINE_AS_LATEST(5, 2)
++
+ static void virt_machine_5_1_options(MachineClass *mc)
+ {
++    virt_machine_5_2_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(5, 1)
++DEFINE_VIRT_MACHINE(5, 1)
+ 
+ static void virt_machine_5_0_options(MachineClass *mc)
+ {
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 8d1a90c6cf45..cf5f2dfaeb34 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -28,6 +28,9 @@
+ #include "hw/mem/nvdimm.h"
+ #include "migration/vmstate.h"
+ 
++GlobalProperty hw_compat_5_1[] = {};
++const size_t hw_compat_5_1_len = G_N_ELEMENTS(hw_compat_5_1);
++
+ GlobalProperty hw_compat_5_0[] = {
+     { "pci-host-bridge", "x-config-reg-migration-enabled", "off" },
+     { "virtio-balloon-device", "page-poison", "false" },
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 47c5ca3e342b..1733b5341a62 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -97,8 +97,10 @@
+ #include "fw_cfg.h"
+ #include "trace.h"
+ 
+-GlobalProperty pc_compat_5_0[] = {
+-};
++GlobalProperty pc_compat_5_1[] = {};
++const size_t pc_compat_5_1_len = G_N_ELEMENTS(pc_compat_5_1);
++
++GlobalProperty pc_compat_5_0[] = {};
+ const size_t pc_compat_5_0_len = G_N_ELEMENTS(pc_compat_5_0);
+ 
+ GlobalProperty pc_compat_4_2[] = {
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index b789e83f9acb..c5ba70ca17cb 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -426,7 +426,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_VMBUS_BRIDGE);
+ }
+ 
+-static void pc_i440fx_5_1_machine_options(MachineClass *m)
++static void pc_i440fx_5_2_machine_options(MachineClass *m)
+ {
+     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+     pc_i440fx_machine_options(m);
+@@ -435,6 +435,18 @@ static void pc_i440fx_5_1_machine_options(MachineClass *m)
+     pcmc->default_cpu_version = 1;
+ }
+ 
++DEFINE_I440FX_MACHINE(v5_2, "pc-i440fx-5.2", NULL,
++                      pc_i440fx_5_2_machine_options);
++
++static void pc_i440fx_5_1_machine_options(MachineClass *m)
++{
++    pc_i440fx_5_2_machine_options(m);
++    m->alias = NULL;
++    m->is_default = false;
++    compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
++    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
++}
++
+ DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
+                       pc_i440fx_5_1_machine_options);
+ 
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index a3e607a544a5..0cb9c18cd44d 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -353,7 +353,7 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->max_cpus = 288;
+ }
+ 
+-static void pc_q35_5_1_machine_options(MachineClass *m)
++static void pc_q35_5_2_machine_options(MachineClass *m)
+ {
+     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+     pc_q35_machine_options(m);
+@@ -361,6 +361,17 @@ static void pc_q35_5_1_machine_options(MachineClass *m)
+     pcmc->default_cpu_version = 1;
+ }
+ 
++DEFINE_Q35_MACHINE(v5_2, "pc-q35-5.2", NULL,
++                   pc_q35_5_2_machine_options);
++
++static void pc_q35_5_1_machine_options(MachineClass *m)
++{
++    pc_q35_5_2_machine_options(m);
++    m->alias = NULL;
++    compat_props_add(m->compat_props, hw_compat_5_1, hw_compat_5_1_len);
++    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
++}
++
+ DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
+                    pc_q35_5_1_machine_options);
+ 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 0ae293ec9431..1c8d0981b382 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4579,15 +4579,26 @@ static void spapr_machine_latest_class_options(MachineClass *mc)
+     }                                                                \
+     type_init(spapr_machine_register_##suffix)
+ 
++/*
++ * pseries-5.2
++ */
++static void spapr_machine_5_2_class_options(MachineClass *mc)
++{
++    /* Defaults for the latest behaviour inherited from the base class */
++}
++
++DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
++
+ /*
+  * pseries-5.1
+  */
+ static void spapr_machine_5_1_class_options(MachineClass *mc)
+ {
+-    /* Defaults for the latest behaviour inherited from the base class */
++    spapr_machine_5_2_class_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+ }
+ 
+-DEFINE_SPAPR_MACHINE(5_1, "5.1", true);
++DEFINE_SPAPR_MACHINE(5_1, "5.1", false);
+ 
+ /*
+  * pseries-5.0
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index e72c61d2eae0..f4ea6a954597 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -801,14 +801,26 @@ bool css_migration_enabled(void)
+     }                                                                         \
+     type_init(ccw_machine_register_##suffix)
+ 
++static void ccw_machine_5_2_instance_options(MachineState *machine)
++{
++}
++
++static void ccw_machine_5_2_class_options(MachineClass *mc)
++{
++}
++DEFINE_CCW_MACHINE(5_2, "5.2", true);
++
+ static void ccw_machine_5_1_instance_options(MachineState *machine)
+ {
++    ccw_machine_5_2_instance_options(machine);
+ }
+ 
+ static void ccw_machine_5_1_class_options(MachineClass *mc)
+ {
++    ccw_machine_5_2_class_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+ }
+-DEFINE_CCW_MACHINE(5_1, "5.1", true);
++DEFINE_CCW_MACHINE(5_1, "5.1", false);
+ 
+ static void ccw_machine_5_0_instance_options(MachineState *machine)
+ {
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 426ce5f625a4..bc5b82ad209e 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -319,6 +319,9 @@ struct MachineState {
+     } \
+     type_init(machine_initfn##_register_types)
+ 
++extern GlobalProperty hw_compat_5_1[];
++extern const size_t hw_compat_5_1_len;
++
+ extern GlobalProperty hw_compat_5_0[];
+ extern const size_t hw_compat_5_0_len;
+ 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 3d7ed3a55e30..fe52e165b27c 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -193,6 +193,9 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
+ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+                        const CPUArchIdList *apic_ids, GArray *entry);
+ 
++extern GlobalProperty pc_compat_5_1[];
++extern const size_t pc_compat_5_1_len;
++
+ extern GlobalProperty pc_compat_5_0[];
+ extern const size_t pc_compat_5_0_len;
+ 
 -- 
 2.25.4
 
