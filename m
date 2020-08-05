@@ -2,72 +2,75 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F85C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 08:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0906C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 08:33:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53A2720792
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 08:26:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D21D20792
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 08:33:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AMqTePED"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53A2720792
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B/+2xwk+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D21D20792
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3El1-0006Si-KB
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 04:26:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46028)
+	id 1k3Er5-00006n-TY
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 04:32:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k3EkE-0005Zf-Ll
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 04:25:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38038
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k3EqL-0007xe-6H
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 04:32:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45811
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k3EkD-00063f-24
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 04:25:54 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k3EqJ-0006db-3u
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 04:32:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596615952;
+ s=mimecast20190719; t=1596616330;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=5QGEqCpi5QQT6OfiaWJJsqFQAznUF5cLCWJdGfF1hAU=;
- b=AMqTePEDC4bkINUip47jRgZcsQYT/Mlqc/Pxsii9/Ai5VB0eb3s3NjDDJeovBOIBGRw/7Y
- +yznUKflOAmiOeOknTA59BI4mjiKWiey8deJt22WTXJ7OH4x8geJoANFsrde92oTyn2iT9
- IQ6qCj6M4nkyiP+jUd9Po4eLFNma1Sw=
+ bh=Z4pQR/gNAa1udyzfqCrap+YDtxtgJnp94XkfWRT8zkU=;
+ b=B/+2xwk+Eh5H8a/oAazRiJ/CuoP2NcyFs4KJ+q9AfFcvtCsVav7yLZaWAPp50BRBycTiwb
+ GjnNKd7eD9PiEu+ts2uZkWAl8xF2LUOaVN202il71PMqh3Puhg7clRFfwI8u3132Y08DtD
+ QRVqBeKf4mLGiWt4gpmF0V1ctTAJ08U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-W78PFr5RNdiIffgqbtaw9A-1; Wed, 05 Aug 2020 04:25:50 -0400
-X-MC-Unique: W78PFr5RNdiIffgqbtaw9A-1
+ us-mta-128-XmGIycUvOCWNcfT0g0pasw-1; Wed, 05 Aug 2020 04:32:08 -0400
+X-MC-Unique: XmGIycUvOCWNcfT0g0pasw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6295018C63C5;
- Wed,  5 Aug 2020 08:25:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 904D8106B244;
+ Wed,  5 Aug 2020 08:32:07 +0000 (UTC)
 Received: from linux.fritz.box (ovpn-113-121.ams2.redhat.com [10.36.113.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DC308AC23;
- Wed,  5 Aug 2020 08:25:48 +0000 (UTC)
-Date: Wed, 5 Aug 2020 10:25:46 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 440128AC0C;
+ Wed,  5 Aug 2020 08:32:06 +0000 (UTC)
+Date: Wed, 5 Aug 2020 10:32:04 +0200
 From: Kevin Wolf <kwolf@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v6 02/12] monitor: Use getter/setter functions for cur_mon
-Message-ID: <20200805082546.GA4679@linux.fritz.box>
+Subject: Re: [PATCH v6 06/12] monitor: Make current monitor a per-coroutine
+ property
+Message-ID: <20200805083204.GB4679@linux.fritz.box>
 References: <20200528153742.274164-1-kwolf@redhat.com>
- <20200528153742.274164-3-kwolf@redhat.com>
- <87lfiubmu3.fsf@dusky.pond.sub.org>
- <20200804161634.GC4860@linux.fritz.box>
- <87wo2d5zky.fsf@dusky.pond.sub.org>
+ <20200528153742.274164-7-kwolf@redhat.com>
+ <87tuxia5a9.fsf@dusky.pond.sub.org>
+ <20200804160604.GB4860@linux.fritz.box>
+ <87sgd15z5w.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87wo2d5zky.fsf@dusky.pond.sub.org>
+In-Reply-To: <87sgd15z5w.fsf@dusky.pond.sub.org>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
@@ -100,50 +103,177 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 05.08.2020 um 09:19 hat Markus Armbruster geschrieben:
+Am 05.08.2020 um 09:28 hat Markus Armbruster geschrieben:
 > Kevin Wolf <kwolf@redhat.com> writes:
 > 
-> > Am 04.08.2020 um 14:46 hat Markus Armbruster geschrieben:
+> > Am 04.08.2020 um 15:50 hat Markus Armbruster geschrieben:
+> >> Kevin Wolf <kwolf@redhat.com> writes:
+> >> 
+> >> > This way, a monitor command handler will still be able to access the
+> >> > current monitor, but when it yields, all other code code will correctly
+> >> > get NULL from monitor_cur().
+> >> >
+> >> > Outside of coroutine context, qemu_coroutine_self() returns the leader
+> >> > coroutine of the current thread.
+> >> 
+> >> Unsaid: you use it as a hash table key to map from coroutine to monitor,
+> >> and for that you need it to return a value unique to the coroutine in
+> >> coroutine context, and a value unique to the thread outside coroutine
+> >> context.  Which qemu_coroutine_self() does.  Correct?
+> >
+> > Correct.
+> >
+> >> The hash table works, but I hate it just as much as I hate
+> >> pthread_getspecific() / pthread_setspecific().
+> >> 
+> >> What we have here is a need for coroutine-local data.  Feels like a
+> >> perfectly natural concept to me.
+> >
+> > If you have a good concept how to implement this in a generic way that
+> > doesn't impact the I/O fast path, feel free to implement it and I'll
+> > happily use it.
+> 
+> Fair enough; I'll give it a shot.
+> 
+> > But the hash table is simple and works for this use case, so I see
+> > little reason to invest a lot of time in something that we haven't ever
+> > had another user for.
+> >
+> >> Are we going to create another hash table whenever we need another piece
+> >> of coroutine-local data?  Or shall we reuse the hash table, suitably
+> >> renamed and moved to another file?
+> >
+> > I think I would vote for separate hash tables rather than having a hash
+> > table containing a struct that mixes values from all subsystems, but
+> > this can be discussed when (if) the need arises.
+> >
+> >> Why not simply associate an opaque pointer with each coroutine?  All it
+> >> takes is one more member of struct Coroutine.  Whatever creates the
+> >> coroutine decides what to use it for.  The monitor coroutine would use
+> >> it to point to the monitor.
+> >
+> > This doesn't work. error_report() is called from all kinds of
+> > coroutines, not just from coroutines created from the monitor, and it
+> > wants to know the current monitor.
+> 
+> Yup, monitor_cur() and monitor_set_cur() need to work both in coroutine
+> context and outside coroutine context.
+
+And in coroutine contexts, but in coroutine created by someone else than
+the monitor.
+
+> >> At least, discuss the design alternatives in the commit message.
+> >
+> > *sigh* Fine. Tell me which set of alternatives to discuss.
+> 
+> Let me first play with the alternative I suggested.
+> 
+> >> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> >> > ---
+> >> >  include/monitor/monitor.h |  2 +-
+> >> >  monitor/hmp.c             |  4 ++--
+> >> >  monitor/monitor.c         | 27 +++++++++++++++++++++------
+> >> >  qapi/qmp-dispatch.c       |  4 ++--
+> >> >  stubs/monitor-core.c      |  2 +-
+> >> >  5 files changed, 27 insertions(+), 12 deletions(-)
+> >> >
+> >> > diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+> >> > index 43cc746078..16072e325c 100644
+> >> > --- a/include/monitor/monitor.h
+> >> > +++ b/include/monitor/monitor.h
+> >> > @@ -13,7 +13,7 @@ typedef struct MonitorOptions MonitorOptions;
+> >> >  extern QemuOptsList qemu_mon_opts;
+> >> >  
+> >> >  Monitor *monitor_cur(void);
+> >> > -void monitor_set_cur(Monitor *mon);
+> >> > +void monitor_set_cur(Coroutine *co, Monitor *mon);
+> >> >  bool monitor_cur_is_qmp(void);
+> >> >  
+> >> >  void monitor_init_globals(void);
 > >> > diff --git a/monitor/hmp.c b/monitor/hmp.c
-> >> > index d598dd02bb..f609fcf75b 100644
+> >> > index 79be6f26de..3e73a4c3ce 100644
 > >> > --- a/monitor/hmp.c
 > >> > +++ b/monitor/hmp.c
-> >> > @@ -1301,11 +1301,11 @@ cleanup:
-> >> >  static void monitor_read(void *opaque, const uint8_t *buf, int size)
-> >> >  {
-> >> >      MonitorHMP *mon;
-> >> > -    Monitor *old_mon = cur_mon;
-> >> > +    Monitor *old_mon = monitor_cur();
-> >> >      int i;
+> >> > @@ -1082,9 +1082,9 @@ void handle_hmp_command(MonitorHMP *mon, const char *cmdline)
 > >> >  
-> >> > -    cur_mon = opaque;
-> >> > -    mon = container_of(cur_mon, MonitorHMP, common);
-> >> > +    monitor_set_cur(opaque);
-> >> > +    mon = container_of(monitor_cur(), MonitorHMP, common);
+> >> >      /* old_mon is non-NULL when called from qmp_human_monitor_command() */
+> >> >      old_mon = monitor_cur();
+> >> > -    monitor_set_cur(&mon->common);
+> >> > +    monitor_set_cur(qemu_coroutine_self(), &mon->common);
+> >> >      cmd->cmd(&mon->common, qdict);
+> >> > -    monitor_set_cur(old_mon);
+> >> > +    monitor_set_cur(qemu_coroutine_self(), old_mon);
+> >> >  
+> >> >      qobject_unref(qdict);
+> >> >  }
+> >> > diff --git a/monitor/monitor.c b/monitor/monitor.c
+> >> > index 182ba136b4..35003bb486 100644
+> >> > --- a/monitor/monitor.c
+> >> > +++ b/monitor/monitor.c
+> >> > @@ -58,24 +58,38 @@ IOThread *mon_iothread;
+> >> >  /* Bottom half to dispatch the requests received from I/O thread */
+> >> >  QEMUBH *qmp_dispatcher_bh;
+> >> >  
+> >> > -/* Protects mon_list, monitor_qapi_event_state, monitor_destroyed.  */
+> >> > +/*
+> >> > + * Protects mon_list, monitor_qapi_event_state, coroutine_mon,
+> >> > + * monitor_destroyed.
+> >> > + */
+> >> >  QemuMutex monitor_lock;
+> >> >  static GHashTable *monitor_qapi_event_state;
+> >> > +static GHashTable *coroutine_mon; /* Maps Coroutine* to Monitor* */
+> >> >  
+> >> >  MonitorList mon_list;
+> >> >  int mon_refcount;
+> >> >  static bool monitor_destroyed;
+> >> >  
+> >> > -static __thread Monitor *cur_monitor;
+> >> > -
+> >> >  Monitor *monitor_cur(void)
+> >> >  {
+> >> > -    return cur_monitor;
+> >> > +    Monitor *mon;
+> >> > +
+> >> > +    qemu_mutex_lock(&monitor_lock);
+> >> > +    mon = g_hash_table_lookup(coroutine_mon, qemu_coroutine_self());
+> >> > +    qemu_mutex_unlock(&monitor_lock);
+> >> > +
+> >> > +    return mon;
+> >> >  }
+> >> >  
+> >> > -void monitor_set_cur(Monitor *mon)
+> >> > +void monitor_set_cur(Coroutine *co, Monitor *mon)
+> >> >  {
+> >> > -    cur_monitor = mon;
+> >> > +    qemu_mutex_lock(&monitor_lock);
+> >> > +    if (mon) {
+> >> > +        g_hash_table_replace(coroutine_mon, co, mon);
+> >> > +    } else {
+> >> > +        g_hash_table_remove(coroutine_mon, co);
+> >> > +    }
+> >> > +    qemu_mutex_unlock(&monitor_lock);
+> >> >  }
 > >> 
-> >> Simpler:
-> >> 
-> >>        MonitorHMP *mon = container_of(opaque, MonitorHMP, common);
+> >> You really need a contract now: any call to monitor_set_cur() with a
+> >> non-null @mon must be followed by a call with a null @mon.
 > >
-> > opaque is void*, so it doesn't have a field 'common'.
+> > Why? g_hash_table_replace() removes the old value and replaces it with
+> > the new one.
 > 
-> I actually compile-tested before I sent this.  For once ;)
-> 
-> Here's container_of():
-> 
->     #define container_of(ptr, type, member) ({                      \
->             const typeof(((type *) 0)->member) *__mptr = (ptr);     \
->             (type *) ((char *) __mptr - offsetof(type, member));})
-> 
-> Its first argument's only use is as an initializer for a pointer
-> variable.  Both type * and void * work fine there.
+> If you monitor_set_cur(NULL) is forgotten or bypassed somehow, the hash
+> table entry stays even when the coroutine dies.  Minor memory leak.  If
+> another coroutine gets created at the same address, it "inherits" the
+> current monitor.  Not good.  If the monitor has died meanwhile, dangling
+> pointer.  Fortunately, monitors die only during shutdown, except for the
+> dummy in qmp_human_monitor_command().
 
-Ah, we just lose type checking.
+Ah, yes, fair. I can document this.
 
-That's what I get for replying from what I remember from over two months
-ago. I was pretty sure I didn't like this way, but went with it because
-the other way didn't work. Maybe I just assumed it didn't work, or tried
-something different that actually fails. Who knows.
+In practice not a problem because the QMP dispatcher coroutine and HMP
+command handler coroutines are the only places that set (and reset) it.
+
+In fact, HMP needs to be fixed to reset to NULL before the coroutine
+terminates.
 
 Kevin
 
