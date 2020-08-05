@@ -2,81 +2,88 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 814D5C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 21:09:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2738FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 21:12:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 499F22063A
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 21:09:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0D442063A
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 21:12:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WXC0RE0Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 499F22063A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U9ixiADJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0D442063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3QfN-0005M3-Jg
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 17:09:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55780)
+	id 1k3QiJ-0006cj-65
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 17:12:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3Qec-0004sq-AG
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 17:08:54 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33548)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k3QhG-00065c-6o
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 17:11:39 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37497)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3Qea-0000SZ-GN
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 17:08:53 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f18so5178420wmc.0
- for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 14:08:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k3QhD-0000nb-Kn
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 17:11:37 -0400
+Received: by mail-pl1-x641.google.com with SMTP id p1so26227428pls.4
+ for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 14:11:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ZETMc4CfZhy2eJWBeDKW9CaWM4uEKiDWd22Cf9UUe+4=;
- b=WXC0RE0YjMx6zRsnBzS9LBHXC7DJcAIEdnwb0hA1iRPg6/rV1pDorzahdjWVe5l7C2
- mazAf57PKjS69G0oMbc6HYMypaQKCi+bxlD1TIpNEvdT6gGVuOhX45LNBa3EiXL6KNkr
- yadocEyAmvcTUFRK6RVRuKAAV2Lzr1EdkSyEAFpCi/Lahfp1RoAxqbTPGNcpMUyndJiW
- 715B4OYRN1na4LQWN2Rj09+xLcRYId+zJQoZiwtwEouOP0eKYRs9Q1NLn5OiNtHl/gPM
- SCRlgY7qQ0kCuEPe4orJ+VV0XfiEs5W7P362kuTHZGrqPdiXB0g8wo+KUPMQD6/QLHR3
- 2opA==
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=nykug7OBkKT8FIPOakEQS12YWRPjq4aLZnOHHuZdFfQ=;
+ b=U9ixiADJq31jCbxqvdt3AbYtFNOl2CHgeb5P64QjEBAHSivQYTjBW7jEvTavPkcKG/
+ s3s88C8xCxPc/oWoERiZK+KTOklPYrOSH2ppGQWFSv6ZcJEYWIs1ICE2KZhqmL2avbl9
+ SVjTXCD5BwlNTxpU+gu6sB2bbAiEiGPpKIEHMaKiOMxLZsv3jvZdPIeA9yeBxKnjfVYP
+ M4Pksaqo64H+DdX3Vs481cxRbScOZTlxv9Rn2ICuza/TTUqNYZGp0XCY3pNDgm3pexbN
+ zB6onC81juJAJ986KomZ5JGtqIPLEz/sy/a/FEGP4zNB31jbjUHL2xHeZtS9dq1fg2jT
+ 4NEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ZETMc4CfZhy2eJWBeDKW9CaWM4uEKiDWd22Cf9UUe+4=;
- b=mjfJgPgpvfnTR3zAhJPqo53duEr+E7smOJEYtjITtoJONJPYLaXwP7EixAUFdCX88/
- eYicECwJI3mW6R2LLMBfnLG1fVJ6q4ChtIoqwDaBD599fNpur6cqgT38orUtDAd2pSZ5
- g4Mz7qa8Sl9KChNb0VK/+/PWNN6gE48diDhACghuZYdfdKtwg4m0bikdBfaBRec0djLY
- XkCNWd5J+te7+dz0z46KpXzDThwR6ykfoMrPaDwCF6uehScBqgpYbUveqVgmvra2yShr
- gxY3Md+RgCP0X8NWAK8M/dI65JvnVb75aANqvQ0UAfXsBeiMIKSdi9zuh6zHtMpR8abW
- 4Szw==
-X-Gm-Message-State: AOAM533YjOBAheIugW0byAb3x9IHDxMG7zy42CFzkjzywPZjsJoMzfL/
- kSJ2PXVcxNnyrE8LeEKPVyzb5w==
-X-Google-Smtp-Source: ABdhPJy1Wliqs/cXieTg6KoFxZ3Zbl1VX+N0l1k+Fch386TiMjSbBI9lem4MO4CyL0ojpZd9A95Pdw==
-X-Received: by 2002:a7b:c1c3:: with SMTP id a3mr5047842wmj.111.1596661730143; 
- Wed, 05 Aug 2020 14:08:50 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y142sm4398690wmd.3.2020.08.05.14.08.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 05 Aug 2020 14:08:49 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH] target/arm: Delete unused ARM_FEATURE_CRC
-Date: Wed,  5 Aug 2020 22:08:48 +0100
-Message-Id: <20200805210848.6688-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ bh=nykug7OBkKT8FIPOakEQS12YWRPjq4aLZnOHHuZdFfQ=;
+ b=c8R4XCdazr3yRcuAUwZv/Rv1tb2ofBQ06i+tXAEeOvNp/dyy/jl4xArwkx4tImoalq
+ 0BU/ZpdBgg1NBTlTSAf82HjpaLGqMzoWQp3cAOGilOD5/aERr6aWkW7Fw1N8/paGa/Ks
+ djIKPpWhW+fu6cV/ZcoLlScBbcQD+bA1D8YuGY6x5P7HqiHoehJZcVP6BiWfdaWyk3yG
+ uxBbOGOoX2/bBUfXtOT6x4kd3vmH/8h+iYogEkYXgcc/uQBsTvMWtP9/QMgFdNfm/DEN
+ Y329UZA+6eyQLT2R/BmNWBXA5+/LsJSAbqgU/JWfBhQmNF0yaUDEn59JKc21SwHV0nwe
+ 6t8g==
+X-Gm-Message-State: AOAM53258H/J+y6g6qtAwEMXmMmriS5V+T3UuifR99WkVBxvTOzY/rfz
+ 3DIDeoU/az46vwWLpiHuiL2szE7e4EE=
+X-Google-Smtp-Source: ABdhPJxhexH7NUgTtfjyTbvFAT7cjGiYDrdH5kX9C3UGu9TUKfmCtjD+H+cxRiKV97uoutGNIaXw+w==
+X-Received: by 2002:a17:902:9883:: with SMTP id
+ s3mr4621699plp.271.1596661893664; 
+ Wed, 05 Aug 2020 14:11:33 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id np4sm4355712pjb.4.2020.08.05.14.11.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 05 Aug 2020 14:11:32 -0700 (PDT)
+Subject: Re: [PATCH] target/arm: Delete unused ARM_FEATURE_CRC
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200805210848.6688-1-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cc82d899-fe0a-87f1-8061-d1265d919873@linaro.org>
+Date: Wed, 5 Aug 2020 14:11:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
+In-Reply-To: <20200805210848.6688-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -85,7 +92,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,29 +109,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In commit 962fcbf2efe57231a9f5df we converted the uses of the
-ARM_FEATURE_CRC bit to use the aa32_crc32 isar_feature test
-instead. However we forgot to remove the now-unused definition
-of the feature name in the enum. Delete it now.
+On 8/5/20 2:08 PM, Peter Maydell wrote:
+> In commit 962fcbf2efe57231a9f5df we converted the uses of the
+> ARM_FEATURE_CRC bit to use the aa32_crc32 isar_feature test
+> instead. However we forgot to remove the now-unused definition
+> of the feature name in the enum. Delete it now.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.h | 1 -
+>  1 file changed, 1 deletion(-)
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.h | 1 -
- 1 file changed, 1 deletion(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 9e8ed423ea1..9d2845c1797 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1950,7 +1950,6 @@ enum arm_features {
-     ARM_FEATURE_V8,
-     ARM_FEATURE_AARCH64, /* supports 64 bit mode */
-     ARM_FEATURE_CBAR, /* has cp15 CBAR */
--    ARM_FEATURE_CRC, /* ARMv8 CRC instructions */
-     ARM_FEATURE_CBAR_RO, /* has cp15 CBAR and it is read-only */
-     ARM_FEATURE_EL2, /* has EL2 Virtualization support */
-     ARM_FEATURE_EL3, /* has EL3 Secure monitor support */
--- 
-2.20.1
-
+r~
 
