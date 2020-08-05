@@ -7,81 +7,76 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F9CC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 10:02:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E77F9C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 10:02:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBC1F20792
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 10:02:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B605220792
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 10:02:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DLQYbChZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBC1F20792
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0oDC3dz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B605220792
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3GFJ-0006KC-1C
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 06:02:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36790)
+	id 1k3GFM-0006Ui-UA
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 06:02:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3GBb-0001HQ-17
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:58:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59990
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3GBf-0001SD-Fe
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:58:19 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25266
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3GBZ-0008Ub-Ba
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:58:14 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3GBd-0008Uy-QH
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 05:58:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596621492;
+ s=mimecast20190719; t=1596621497;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6jx2qylKcvN6NzTed3PdPwRPSAZCFaqWf1eI4aJ+Lrc=;
- b=DLQYbChZmAuhuN11Hy3t9ITIw6PFXQ2qGeRsDedOHiddYpvtjuylJHc+C9s5wVARv4zR+M
- ky+iQprVdkIEBglYJTlQzC0NU/EUiUAdXBTZu2xgBmAx/+ryBSvaJ9PeuskAG7HsoYwkjp
- Bf9NoEgtmt3qx4AEz4C2LSo3bEfentk=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=LtZEzYneV122+4SlhLUgLrkSWw8f4SHDCvejXOhjpGA=;
+ b=C0oDC3dzyOnY4f4J1Cl31iMMdV4j6/n8JJjR3c8iHRxSCr9BSV/EvfaTUnN2/VFMldG0Mt
+ EENBHLOyDF+DaHlm0x4j8eR1BPFT5GCAHt7JTqVGWOaQAHjojB8KcbEM4rrGrrpN7n7mUf
+ 8M12wrLbxTnSHjdHpgscHq1G1TERFQk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-45oVmDv8P8memMfU91lFGQ-1; Wed, 05 Aug 2020 05:58:10 -0400
-X-MC-Unique: 45oVmDv8P8memMfU91lFGQ-1
+ us-mta-497-p95vI8k3MWaDeWabmgkxHQ-1; Wed, 05 Aug 2020 05:58:12 -0400
+X-MC-Unique: p95vI8k3MWaDeWabmgkxHQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABB4E8027E3;
- Wed,  5 Aug 2020 09:58:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4232910082EC;
+ Wed,  5 Aug 2020 09:58:11 +0000 (UTC)
 Received: from thuth.com (ovpn-112-142.ams2.redhat.com [10.36.112.142])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2EE932DE77;
- Wed,  5 Aug 2020 09:58:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 164DB2DE7E;
+ Wed,  5 Aug 2020 09:58:09 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 5/6] target/riscv/vector_helper: Fix build on 32-bit big endian
- hosts
-Date: Wed,  5 Aug 2020 11:57:54 +0200
-Message-Id: <20200805095755.16414-6-thuth@redhat.com>
+Subject: [PULL 6/6] Get rid of the libqemustub.a remainders
+Date: Wed,  5 Aug 2020 11:57:55 +0200
+Message-Id: <20200805095755.16414-7-thuth@redhat.com>
 In-Reply-To: <20200805095755.16414-1-thuth@redhat.com>
 References: <20200805095755.16414-1-thuth@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 04:10:11
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 03:37:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,46 +94,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The code currently fails to compile on 32-bit big endian hosts:
+libqemustub.a has been removed in commit ebedb37c8d ("Makefile: Remove
+libqemustub.a"). Some remainders have been missed. Remove them now.
 
- target/riscv/vector_helper.c: In function 'vext_clear':
- target/riscv/vector_helper.c:154:16: error: cast to pointer from integer
- of different size [-Werror=int-to-pointer-cast]
-         memset((void *)((uintptr_t)tail & ~(7ULL)), 0, part1);
-                ^
- target/riscv/vector_helper.c:155:16: error: cast to pointer from integer
- of different size [-Werror=int-to-pointer-cast]
-         memset((void *)(((uintptr_t)tail + 8) & ~(7ULL)), 0, part2);
-                ^
- cc1: all warnings being treated as errors
-
-We should not use "long long" (i.e. 64-bit) values here to avoid the
-problem. Switch to our QEMU_ALIGN_PTR_DOWN/UP macros instead.
-
-Fixes: 751538d5da ("add vector stride load and store instructions")
-Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200804170055.2851-3-thuth@redhat.com>
+Message-Id: <20200804170055.2851-8-thuth@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- target/riscv/vector_helper.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Makefile                                | 2 +-
+ scripts/coverity-scan/run-coverity-scan | 3 ---
+ tests/test-util-sockets.c               | 3 ++-
+ 3 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 39f44d1029..793af99067 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -151,8 +151,8 @@ static void vext_clear(void *tail, uint32_t cnt, uint32_t tot)
-     if (cnt % 8) {
-         part1 = 8 - (cnt % 8);
-         part2 = tot - cnt - part1;
--        memset((void *)((uintptr_t)tail & ~(7ULL)), 0, part1);
--        memset((void *)(((uintptr_t)tail + 8) & ~(7ULL)), 0, part2);
-+        memset(QEMU_ALIGN_PTR_DOWN(tail, 8), 0, part1);
-+        memset(QEMU_ALIGN_PTR_UP(tail, 8), 0, part2);
-     } else {
-         memset(tail, 0, part2);
-     }
+diff --git a/Makefile b/Makefile
+index c2120d8d48..13dd708c4a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -726,7 +726,7 @@ virtiofsd$(EXESUF): $(virtiofsd-obj-y) libvhost-user.a $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ endif
+ 
+-vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) libqemuutil.a libqemustub.a
++vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) libqemuutil.a
+ 	$(call LINK, $^)
+ 
+ ifdef CONFIG_VHOST_USER_INPUT
+diff --git a/scripts/coverity-scan/run-coverity-scan b/scripts/coverity-scan/run-coverity-scan
+index 03a791dec9..6eefb4b558 100755
+--- a/scripts/coverity-scan/run-coverity-scan
++++ b/scripts/coverity-scan/run-coverity-scan
+@@ -403,9 +403,6 @@ echo "Configuring..."
+     --enable-mpath --enable-libxml2 --enable-glusterfs \
+     --enable-virtfs --enable-zstd
+ 
+-echo "Making libqemustub.a..."
+-make libqemustub.a
+-
+ echo "Running cov-build..."
+ rm -rf cov-int
+ mkdir cov-int
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index 2ca1e99f17..261dc48c03 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -64,7 +64,8 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+     return dup(mon_fd);
+ }
+ 
+-/* Syms in libqemustub.a are discarded at .o file granularity.
++/*
++ * Syms of stubs in libqemuutil.a are discarded at .o file granularity.
+  * To replace monitor_get_fd() we must ensure everything in
+  * stubs/monitor.c is defined, to make sure monitor.o is discarded
+  * otherwise we get duplicate syms at link time.
 -- 
 2.18.1
 
