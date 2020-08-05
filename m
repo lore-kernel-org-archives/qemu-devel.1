@@ -2,78 +2,71 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E59F0C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 04:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 327C5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 04:34:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C19F32177B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 04:26:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C19F32177B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E8CBF22CA0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 04:34:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8CBF22CA0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3B0L-0008Iz-Ta
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 00:26:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60316)
+	id 1k3B8X-0001gA-6a
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 00:34:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3Azl-0007t8-6e
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 00:25:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58476)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3Azi-0008N8-QA
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 00:25:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k3Azg-0002jx-DR
- for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 04:25:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 625C92E80D2
- for <qemu-devel@nongnu.org>; Wed,  5 Aug 2020 04:25:36 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k3B7v-00016k-7j
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 00:34:07 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:40737)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k3B7s-0002gS-CZ
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 00:34:06 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 0754X8CR005304
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 5 Aug 2020 00:33:12 -0400
+Date: Wed, 5 Aug 2020 00:33:08 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Helge Deller <deller@gmx.de>
+Subject: Re: [PATCH v3 7/8] hw/display/artist: Refactor artist_rop8() to
+ avoid buffer over-run
+Message-ID: <20200805043258.uc3s3c2av4ulsljh@mozz.bu.edu>
+References: <20200804140056.7690-1-deller@gmx.de>
+ <20200804140056.7690-8-deller@gmx.de>
+ <20200804163954.4dzistybjwby7pzx@mozz.bu.edu>
+ <20200804212019.GA876@ls3530.fritz.box>
+ <20200804220145.yjq265pk363466hx@mozz.bu.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 05 Aug 2020 04:17:22 -0000
-From: Alexander Bulekov <1890370@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-Message-Id: <159660104285.4629.16787901721110187136.malonedeb@soybean.canonical.com>
-Subject: [Bug 1890370] [NEW] Segfault in artist vram_bit_write
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 82b944c455931c9df61efca044d2979b377e4014
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 00:25:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200804220145.yjq265pk363466hx@mozz.bu.edu>
+User-Agent: NeoMutt/20180716
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 00:34:03
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,208 +75,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890370 <1890370@bugs.launchpad.net>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 200804 1801, Alexander Bulekov wrote:
+> On 200804 2320, Helge Deller wrote:
+> > Hi Alexander,
+> > 
+> > * Alexander Bulekov <alxndr@bu.edu>:
+> > > I applied this series and it fixes most of the problems I saw before.
+> > > I still see a few crashes - I made issues for them on launchpad:
+> > > https://bugs.launchpad.net/qemu/+bug/1890310
+> > > https://bugs.launchpad.net/qemu/+bug/1890311
+> 
+> > > https://bugs.launchpad.net/qemu/+bug/1890312
+> Hi Helge, I can still reproduce this one  ^^^
+> I'll fuzz it some more, but so far I am not finding anything else.
+> Thanks!
+> -Alex
 
-Hello,
-Reproducer:
+Found one more. It doesn't occur without these patches, but I forgot to
+check and submitted a bug:
+https://bugs.launchpad.net/qemu/+bug/1890370
 
-cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
--qtest stdio -accel qtest
-writeq 0xf810049f 0xffffffffffffffff
-writew 0xf8118001 0xff7c
-writew 0xf8118000 0x8300
-writeq 0xf81005fb 0x5c18006400189e
-EOF
-
-
-SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /hw/display/artist.=
-c:402:17 in
-AddressSanitizer:DEADLYSIGNAL
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=3D=3D23157=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7f17563=
-fffff (pc 0x560ce3ad742c bp 0x7ffe310c62e0 sp 0x7ffe310c5a60 T0)
-=3D=3D23157=3D=3DThe signal is caused by a WRITE memory access.
-    #0 0x560ce3ad742c in vram_bit_write /hw/display/artist.c:402:43
-    #1 0x560ce3acf2ab in artist_reg_write /hw/display/artist.c:892:9
-    #2 0x560ce31c37a3 in memory_region_write_accessor /softmmu/memory.c:483=
-:5
-    #3 0x560ce31c2adc in access_with_adjusted_size /softmmu/memory.c:539:18
-    #4 0x560ce31c0873 in memory_region_dispatch_write /softmmu/memory.c:146=
-6:16
-    #5 0x560ce286e056 in flatview_write_continue /exec.c:3176:23
-    #6 0x560ce2856866 in flatview_write /exec.c:3216:14
-    #7 0x560ce2856387 in address_space_write /exec.c:3308:18
-    #8 0x560ce326a604 in qtest_process_command /softmmu/qtest.c:452:13
-    #9 0x560ce3261c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
-    #10 0x560ce3260895 in qtest_read /softmmu/qtest.c:722:5
-    #11 0x560ce571d343 in qemu_chr_be_write_impl /chardev/char.c:188:9
-    #12 0x560ce571d4c7 in qemu_chr_be_write /chardev/char.c:200:9
-    #13 0x560ce57317b3 in fd_chr_read /chardev/char-fd.c:68:9
-    #14 0x560ce5885b74 in qio_channel_fd_source_dispatch /io/channel-watch.=
-c:84:12
-    #15 0x7f1665259897 in g_main_context_dispatch (/usr/lib/x86_64-linux-gn=
-u/libglib-2.0.so.0+0x4e897)
-    #16 0x560ce5c7da7b in glib_pollfds_poll /util/main-loop.c:217:9
-    #17 0x560ce5c7b1ab in os_host_main_loop_wait /util/main-loop.c:240:5
-    #18 0x560ce5c7ab44 in main_loop_wait /util/main-loop.c:516:11
-    #19 0x560ce3282d00 in qemu_main_loop /softmmu/vl.c:1676:9
-    #20 0x560ce58bd961 in main /softmmu/main.c:49:5
-    #21 0x7f1663ddfe0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.30/=
-csu/../csu/libc-start.c:308:16
-    #22 0x560ce2761729 in _start (/home/alxndr/Development/qemu/general-fuz=
-z/build/hppa-softmmu/qemu-system-hppa+0x22d4729)
-
-
-With -trace artist\*
-
-[I 1596601002.853158] OPENED
-[R +0.047035] writeq 0xf810049f 0xffffffffffffffff
-24590@1596601002.900238:artist_reg_write 1 0x10049f <- 0xff
-24590@1596601002.900258:artist_reg_write 4 0x1004a0 VRAM_IDX <- 0xffffffff
-24590@1596601002.900269:artist_reg_write 2 0x1004a4 <- 0xffff
-24590@1596601002.900280:artist_reg_write 1 0x1004a6 <- 0xff
-OK
-[S +0.047130] OK
-[R +0.047159] writew 0xf8118001 0xff7c
-24590@1596601002.900331:artist_reg_write 1 0x118001 CMAP_BM_ACCESS <- 0xff
-24590@1596601002.900344:artist_reg_write 1 0x118002 CMAP_BM_ACCESS <- 0x7c
-OK
-[S +0.047194] OK
-[R +0.047213] writew 0xf8118000 0x8300
-24590@1596601002.900383:artist_reg_write 2 0x118000 CMAP_BM_ACCESS <- 0x8300
-OK
-[S +0.047231] OK
-[R +0.047243] writeq 0xf81005fb 0x5c18006400189e
-24590@1596601002.900410:artist_reg_write 1 0x1005fb <- 0x0
-24590@1596601002.900418:artist_reg_write 4 0x1005fc <- 0x5c180064
-24590@1596601002.900424:artist_reg_write 2 0x100600 VRAM_WRITE_INCR_X <- 0x=
-18
-/home/alxndr/Development/qemu/general-fuzz/hw/display/artist.c:402:17: runt=
-ime error: store to misaligned address 0x7fd01d3fffff for type 'uint32_t' (=
-aka 'unsigned int'), which requires 4 byte alignment
-0x7fd01d3fffff: note: pointer points here
-<memory cannot be printed>
-SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/alxndr/Develo=
-pment/qemu/general-fuzz/hw/display/artist.c:402:17 in
-AddressSanitizer:DEADLYSIGNAL
-
+Oops.. Closed the report, but the details about the segfault are there.
+I think I hit the limits of how much code I will be able to cover, so
+I'll probably stop testing now.
+Thanks
 -Alex
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890370
-
-Title:
-  Segfault in artist vram_bit_write
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello,
-  Reproducer:
-
-  cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
-  -qtest stdio -accel qtest
-  writeq 0xf810049f 0xffffffffffffffff
-  writew 0xf8118001 0xff7c
-  writew 0xf8118000 0x8300
-  writeq 0xf81005fb 0x5c18006400189e
-  EOF
-
-  =
-
-  SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /hw/display/artis=
-t.c:402:17 in
-  AddressSanitizer:DEADLYSIGNAL
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-  =3D=3D23157=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x7f175=
-63fffff (pc 0x560ce3ad742c bp 0x7ffe310c62e0 sp 0x7ffe310c5a60 T0)
-  =3D=3D23157=3D=3DThe signal is caused by a WRITE memory access.
-      #0 0x560ce3ad742c in vram_bit_write /hw/display/artist.c:402:43
-      #1 0x560ce3acf2ab in artist_reg_write /hw/display/artist.c:892:9
-      #2 0x560ce31c37a3 in memory_region_write_accessor /softmmu/memory.c:4=
-83:5
-      #3 0x560ce31c2adc in access_with_adjusted_size /softmmu/memory.c:539:=
-18
-      #4 0x560ce31c0873 in memory_region_dispatch_write /softmmu/memory.c:1=
-466:16
-      #5 0x560ce286e056 in flatview_write_continue /exec.c:3176:23
-      #6 0x560ce2856866 in flatview_write /exec.c:3216:14
-      #7 0x560ce2856387 in address_space_write /exec.c:3308:18
-      #8 0x560ce326a604 in qtest_process_command /softmmu/qtest.c:452:13
-      #9 0x560ce3261c08 in qtest_process_inbuf /softmmu/qtest.c:710:9
-      #10 0x560ce3260895 in qtest_read /softmmu/qtest.c:722:5
-      #11 0x560ce571d343 in qemu_chr_be_write_impl /chardev/char.c:188:9
-      #12 0x560ce571d4c7 in qemu_chr_be_write /chardev/char.c:200:9
-      #13 0x560ce57317b3 in fd_chr_read /chardev/char-fd.c:68:9
-      #14 0x560ce5885b74 in qio_channel_fd_source_dispatch /io/channel-watc=
-h.c:84:12
-      #15 0x7f1665259897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e897)
-      #16 0x560ce5c7da7b in glib_pollfds_poll /util/main-loop.c:217:9
-      #17 0x560ce5c7b1ab in os_host_main_loop_wait /util/main-loop.c:240:5
-      #18 0x560ce5c7ab44 in main_loop_wait /util/main-loop.c:516:11
-      #19 0x560ce3282d00 in qemu_main_loop /softmmu/vl.c:1676:9
-      #20 0x560ce58bd961 in main /softmmu/main.c:49:5
-      #21 0x7f1663ddfe0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #22 0x560ce2761729 in _start (/home/alxndr/Development/qemu/general-f=
-uzz/build/hppa-softmmu/qemu-system-hppa+0x22d4729)
-
-  =
-
-  With -trace artist\*
-
-  [I 1596601002.853158] OPENED
-  [R +0.047035] writeq 0xf810049f 0xffffffffffffffff
-  24590@1596601002.900238:artist_reg_write 1 0x10049f <- 0xff
-  24590@1596601002.900258:artist_reg_write 4 0x1004a0 VRAM_IDX <- 0xffffffff
-  24590@1596601002.900269:artist_reg_write 2 0x1004a4 <- 0xffff
-  24590@1596601002.900280:artist_reg_write 1 0x1004a6 <- 0xff
-  OK
-  [S +0.047130] OK
-  [R +0.047159] writew 0xf8118001 0xff7c
-  24590@1596601002.900331:artist_reg_write 1 0x118001 CMAP_BM_ACCESS <- 0xff
-  24590@1596601002.900344:artist_reg_write 1 0x118002 CMAP_BM_ACCESS <- 0x7c
-  OK
-  [S +0.047194] OK
-  [R +0.047213] writew 0xf8118000 0x8300
-  24590@1596601002.900383:artist_reg_write 2 0x118000 CMAP_BM_ACCESS <- 0x8=
-300
-  OK
-  [S +0.047231] OK
-  [R +0.047243] writeq 0xf81005fb 0x5c18006400189e
-  24590@1596601002.900410:artist_reg_write 1 0x1005fb <- 0x0
-  24590@1596601002.900418:artist_reg_write 4 0x1005fc <- 0x5c180064
-  24590@1596601002.900424:artist_reg_write 2 0x100600 VRAM_WRITE_INCR_X <- =
-0x18
-  /home/alxndr/Development/qemu/general-fuzz/hw/display/artist.c:402:17: ru=
-ntime error: store to misaligned address 0x7fd01d3fffff for type 'uint32_t'=
- (aka 'unsigned int'), which requires 4 byte alignment
-  0x7fd01d3fffff: note: pointer points here
-  <memory cannot be printed>
-  SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /home/alxndr/Deve=
-lopment/qemu/general-fuzz/hw/display/artist.c:402:17 in
-  AddressSanitizer:DEADLYSIGNAL
-
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890370/+subscriptions
+> > 
+> > Thanks for testing!
+> > Below is the updated patch which fixes all of the issues you reported so
+> > far. Can you please test again?
+> > If you like you can pull all changes from
+> > https://github.com/hdeller/qemu-hppa/commits/target-hppa
+> > 
+> > Thanks!
+> > Helge
+> > 
+> > ---------------
+> > 
+> > From ee31d3aa9dd91cde3a4df8fce97239a0ff26f7cc Mon Sep 17 00:00:00 2001
+> > From: Helge Deller <deller@gmx.de>
+> > Date: Tue, 4 Aug 2020 15:35:38 +0200
+> > Subject: [PATCH] hw/display/artist: Prevent out of VRAM buffer accesses
+> > 
+> > Simplify bounds checks by changing some parameters like row or column
+> > numbers to become unsigned instead of signed.
+> > With that we can check if the calculated offset is bigger than the size
+> > of the VRAM region and bail out if not.
+> > 
+> > Reported-by: LLVM libFuzzer
+> > Reported-by: Alexander Bulekov <alxndr@bu.edu>
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1880326
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1890310
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1890311
+> > Buglink: https://bugs.launchpad.net/qemu/+bug/1890312
+> > Signed-off-by: Helge Deller <deller@gmx.de>
+> > 
+> > diff --git a/hw/display/artist.c b/hw/display/artist.c
+> > index 47de17b9e9..66a230bbd5 100644
+> > --- a/hw/display/artist.c
+> > +++ b/hw/display/artist.c
+> > @@ -35,9 +35,9 @@
+> >  struct vram_buffer {
+> >      MemoryRegion mr;
+> >      uint8_t *data;
+> > -    int size;
+> > -    int width;
+> > -    int height;
+> > +    unsigned int size;
+> > +    unsigned int width;
+> > +    unsigned int height;
+> >  };
+> > 
+> >  typedef struct ARTISTState {
+> > @@ -203,14 +203,18 @@ static int16_t artist_get_y(uint32_t reg)
+> >  }
+> > 
+> >  static void artist_invalidate_lines(struct vram_buffer *buf,
+> > -                                    int starty, int height)
+> > +                                    unsigned int starty, unsigned int height)
+> >  {
+> > -    int start = starty * buf->width;
+> > -    int size = height * buf->width;
+> > +    unsigned int start, size;
+> > 
+> > -    if (start + size <= buf->size) {
+> > -        memory_region_set_dirty(&buf->mr, start, size);
+> > +    if (starty >= buf->height) {
+> > +        return;
+> >      }
+> > +
+> > +    start = starty * buf->width;
+> > +    size = MIN(height * buf->width, buf->size - start);
+> > +
+> > +    memory_region_set_dirty(&buf->mr, start, size);
+> >  }
+> > 
+> >  static int vram_write_pix_per_transfer(ARTISTState *s)
+> > @@ -274,15 +278,15 @@ static artist_rop_t artist_get_op(ARTISTState *s)
+> >  }
+> > 
+> >  static void artist_rop8(ARTISTState *s, struct vram_buffer *buf,
+> > -                        int offset, uint8_t val)
+> > +                        unsigned int offset, uint8_t val)
+> >  {
+> >      const artist_rop_t op = artist_get_op(s);
+> >      uint8_t plane_mask;
+> >      uint8_t *dst;
+> > 
+> > -    if (offset < 0 || offset >= buf->size) {
+> > +    if (offset >= buf->size) {
+> >          qemu_log_mask(LOG_GUEST_ERROR,
+> > -                      "rop8 offset:%d bufsize:%u\n", offset, buf->size);
+> > +                      "rop8 offset:%u bufsize:%u\n", offset, buf->size);
+> >          return;
+> >      }
+> >      dst = buf->data + offset;
+> > @@ -294,8 +298,7 @@ static void artist_rop8(ARTISTState *s, struct vram_buffer *buf,
+> >          break;
+> > 
+> >      case ARTIST_ROP_COPY:
+> > -        *dst &= ~plane_mask;
+> > -        *dst |= val & plane_mask;
+> > +        *dst = (*dst & ~plane_mask) | (val & plane_mask);
+> >          break;
+> > 
+> >      case ARTIST_ROP_XOR:
+> > @@ -349,7 +352,8 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+> >  {
+> >      struct vram_buffer *buf;
+> >      uint32_t vram_bitmask = s->vram_bitmask;
+> > -    int mask, i, pix_count, pix_length, offset, width;
+> > +    int mask, i, pix_count, pix_length;
+> > +    unsigned int offset, width;
+> >      uint8_t *data8, *p;
+> > 
+> >      pix_count = vram_write_pix_per_transfer(s);
+> > @@ -394,7 +398,9 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+> > 
+> >      case 3:
+> >          if (s->cmap_bm_access) {
+> > -            *(uint32_t *)(p + offset) = data;
+> > +            if (offset + 3 < buf->size) {
+> > +                *(uint32_t *)(p + offset) = data;
+> > +            }
+> >              break;
+> >          }
+> >          data8 = (uint8_t *)&data;
+> > @@ -464,12 +470,14 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
+> >      }
+> >  }
+> > 
+> > -static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
+> > -                       int dest_y, int width, int height)
+> > +static void block_move(ARTISTState *s,
+> > +                       unsigned int source_x, unsigned int source_y,
+> > +                       unsigned int dest_x,   unsigned int dest_y,
+> > +                       unsigned int width,    unsigned int height)
+> >  {
+> >      struct vram_buffer *buf;
+> >      int line, endline, lineincr, startcolumn, endcolumn, columnincr, column;
+> > -    uint32_t dst, src;
+> > +    unsigned int dst, src;
+> > 
+> >      trace_artist_block_move(source_x, source_y, dest_x, dest_y, width, height);
+> > 
+> > @@ -481,6 +489,12 @@ static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
+> >      }
+> > 
+> >      buf = &s->vram_buffer[ARTIST_BUFFER_AP];
+> > +    if (height > buf->height) {
+> > +        height = buf->height;
+> > +    }
+> > +    if (width > buf->width) {
+> > +        width = buf->width;
+> > +    }
+> > 
+> >      if (dest_y > source_y) {
+> >          /* move down */
+> > @@ -507,24 +521,27 @@ static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
+> >      }
+> > 
+> >      for ( ; line != endline; line += lineincr) {
+> > -        src = source_x + ((line + source_y) * buf->width);
+> > -        dst = dest_x + ((line + dest_y) * buf->width);
+> > +        src = source_x + ((line + source_y) * buf->width) + startcolumn;
+> > +        dst = dest_x + ((line + dest_y) * buf->width) + startcolumn;
+> > 
+> >          for (column = startcolumn; column != endcolumn; column += columnincr) {
+> > -            if (dst + column > buf->size || src + column > buf->size) {
+> > +            if (dst >= buf->size || src >= buf->size) {
+> >                  continue;
+> >              }
+> > -            artist_rop8(s, buf, dst + column, buf->data[src + column]);
+> > +            artist_rop8(s, buf, dst, buf->data[src]);
+> > +            src += columnincr;
+> > +            dst += columnincr;
+> >          }
+> >      }
+> > 
+> >      artist_invalidate_lines(buf, dest_y, height);
+> >  }
+> > 
+> > -static void fill_window(ARTISTState *s, int startx, int starty,
+> > -                        int width, int height)
+> > +static void fill_window(ARTISTState *s,
+> > +                        unsigned int startx, unsigned int starty,
+> > +                        unsigned int width,  unsigned int height)
+> >  {
+> > -    uint32_t offset;
+> > +    unsigned int offset;
+> >      uint8_t color = artist_get_color(s);
+> >      struct vram_buffer *buf;
+> >      int x, y;
+> > @@ -561,7 +578,9 @@ static void fill_window(ARTISTState *s, int startx, int starty,
+> >      artist_invalidate_lines(buf, starty, height);
+> >  }
+> > 
+> > -static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
+> > +static void draw_line(ARTISTState *s,
+> > +                      unsigned int x1, unsigned int y1,
+> > +                      unsigned int x2, unsigned int y2,
+> >                        bool update_start, int skip_pix, int max_pix)
+> >  {
+> >      struct vram_buffer *buf = &s->vram_buffer[ARTIST_BUFFER_AP];
+> > @@ -636,7 +655,7 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
+> >      color = artist_get_color(s);
+> > 
+> >      do {
+> > -        int ofs;
+> > +        unsigned int ofs;
+> > 
+> >          if (c1) {
+> >              ofs = x * s->width + y;
+> > @@ -768,13 +787,13 @@ static void font_write16(ARTISTState *s, uint16_t val)
+> >      uint16_t mask;
+> >      int i;
+> > 
+> > -    int startx = artist_get_x(s->vram_start);
+> > -    int starty = artist_get_y(s->vram_start) + s->font_write_pos_y;
+> > -    int offset = starty * s->width + startx;
+> > +    unsigned int startx = artist_get_x(s->vram_start);
+> > +    unsigned int starty = artist_get_y(s->vram_start) + s->font_write_pos_y;
+> > +    unsigned int offset = starty * s->width + startx;
+> > 
+> >      buf = &s->vram_buffer[ARTIST_BUFFER_AP];
+> > 
+> > -    if (offset + 16 > buf->size) {
+> > +    if (offset + 16 >= buf->size) {
+> >          return;
+> >      }
+> > 
+> > @@ -1138,7 +1157,7 @@ static void artist_vram_write(void *opaque, hwaddr addr, uint64_t val,
+> >      struct vram_buffer *buf;
+> >      int posy = (addr >> 11) & 0x3ff;
+> >      int posx = addr & 0x7ff;
+> > -    uint32_t offset;
+> > +    unsigned int offset;
+> >      trace_artist_vram_write(size, addr, val);
+> > 
+> >      if (s->cmap_bm_access) {
+> > @@ -1161,16 +1180,22 @@ static void artist_vram_write(void *opaque, hwaddr addr, uint64_t val,
+> >      offset = posy * buf->width + posx;
+> >      switch (size) {
+> >      case 4:
+> > -        *(uint32_t *)(buf->data + offset) = be32_to_cpu(val);
+> > -        memory_region_set_dirty(&buf->mr, offset, 4);
+> > +        if (offset + 3 < buf->size) {
+> > +            *(uint32_t *)(buf->data + offset) = be32_to_cpu(val);
+> > +            memory_region_set_dirty(&buf->mr, offset, 4);
+> > +        }
+> >          break;
+> >      case 2:
+> > -        *(uint16_t *)(buf->data + offset) = be16_to_cpu(val);
+> > -        memory_region_set_dirty(&buf->mr, offset, 2);
+> > +        if (offset + 1 < buf->size) {
+> > +            *(uint16_t *)(buf->data + offset) = be16_to_cpu(val);
+> > +            memory_region_set_dirty(&buf->mr, offset, 2);
+> > +        }
+> >          break;
+> >      case 1:
+> > -        *(uint8_t *)(buf->data + offset) = val;
+> > -        memory_region_set_dirty(&buf->mr, offset, 1);
+> > +        if (offset < buf->size) {
+> > +            *(uint8_t *)(buf->data + offset) = val;
+> > +            memory_region_set_dirty(&buf->mr, offset, 1);
+> > +        }
+> >          break;
+> >      default:
+> >          break;
 
