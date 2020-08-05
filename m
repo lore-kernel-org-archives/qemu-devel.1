@@ -2,87 +2,82 @@ Return-Path: <SRS0=Uy1J=BP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D26C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 15:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C426C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 15:12:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D54EF23332
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 15:02:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="iQ7sqD78"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D54EF23332
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	by mail.kernel.org (Postfix) with ESMTPS id 16FED23333
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Aug 2020 15:12:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16FED23333
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3Kvb-00079r-1u
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 11:02:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56126)
+	id 1k3L5G-0001tQ-O2
+	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 11:12:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58950)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <i.kononenko@yadro.com>)
- id 1k3Kro-0005xb-8u; Wed, 05 Aug 2020 10:58:08 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:38884 helo=mta-01.yadro.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <i.kononenko@yadro.com>)
- id 1k3Krm-0004IV-7B; Wed, 05 Aug 2020 10:58:07 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 8AA7D4C1AD;
- Wed,  5 Aug 2020 14:58:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- content-type:content-type:mime-version:x-mailer:message-id:date
- :date:subject:subject:from:from:received:received:received; s=
- mta-01; t=1596639480; x=1598453881; bh=WOYV8Dcju5qv3HfKHXNFX+ZY5
- r8qAa6xXt8iK++1BLw=; b=iQ7sqD78hCxnby69ooje5z/tYFp5Avau4LviPjeDc
- lxpxBJPKOIfkxCW6BHFYSBCcT2hQW4wk1Ny0TECV5V2ooM33Jcf2UdRWI6QXp+3j
- 1xrd4SPm6hN+8WLCMxqn5ZbHA/XCm5DwTrnS7HZwp9Kg+5BXcMaf49JYhEwX7uds
- Yk=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v2EUduJLtVuQ; Wed,  5 Aug 2020 17:58:00 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 2EFC641282;
- Wed,  5 Aug 2020 17:58:00 +0300 (MSK)
-Received: from ik-ThinkPad-T490.yadro.com (172.17.4.251) by
- T-EXCH-02.corp.yadro.com (172.17.10.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id
- 15.1.669.32; Wed, 5 Aug 2020 17:58:00 +0300
-From: Igor Kononenko <i.kononenko@yadro.com>
-To: 
-Subject: [PATCH v1] aspeed: include build AT24X EEPROM devices
-Date: Wed, 5 Aug 2020 17:57:49 +0300
-Message-ID: <20200805145749.23929-1-i.kononenko@yadro.com>
-X-Mailer: git-send-email 2.17.1
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3L4O-0001Q8-58
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 11:11:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46830)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3L4L-0006k5-Ol
+ for qemu-devel@nongnu.org; Wed, 05 Aug 2020 11:11:07 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k3L4J-0000Ih-8o
+ for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 15:11:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 360332E80ED
+ for <qemu-devel@nongnu.org>; Wed,  5 Aug 2020 15:11:03 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.17.4.251]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=i.kononenko@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 10:58:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 05 Aug 2020 15:05:35 -0000
+From: Julien Freche <1879587@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jfreche pmaydell
+X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
+X-Launchpad-Bug-Modifier: Julien Freche (jfreche)
+References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
+Message-Id: <159663993585.16036.12327737528332647433.malone@wampee.canonical.com>
+Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
+ banked registers when switching from AA32 to AA64
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: cb34077849bef1b2737bc4f458e5654f1e2ff799
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 10:30:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Wed, 05 Aug 2020 11:00:44 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,37 +86,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- Igor Kononenko <i.kononenko@yadro.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Reply-To: Bug 1879587 <1879587@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since Yadro, Intel and many other manufactures use ASPEED-based BMCs
-with attached ATMEL AT24X EEPROM devices, the qemu-device AT24C must be
-added to ASPEED_SOC dependencies.
+It seems like this is your patch plus my fixup so this is good to me and
+already tested locally. Thanks again.
 
-Signed-off-by: Igor Kononenko <i.kononenko@yadro.com>
-Change-Id: Ibf4fb7a3057bd43998c94d44609f402d3f088863
----
- hw/arm/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+-- =
 
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 2de34f0b73..0c6a032190 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -367,6 +367,7 @@ config ASPEED_SOC
-     select IBM_CFFPS
-     select IR35221
-     select APB2OPB_ASPEED
-+    select AT24C
- 
- config MPS2
-     bool
--- 
-2.17.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1879587
 
+Title:
+  Register number in ESR is incorrect for certain banked registers when
+  switching from AA32 to AA64
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  I am running into a situation where I have:
+  - A hypervisor running in EL2, AA64
+  - A guest running in EL1, AA32
+
+  We trap certain accesses to special registers such as DACR (via
+  HCR.TVM). One instruction that is trapped is:
+
+  ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
+
+  The guest is running in SVC mode. So, LR should refer to LR_svc there.
+  LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
+  the actual ESR value is: 0xfe00dc0
+
+  If we decode the 'rt':
+  >>> (0xfe00dc0 >> 5) & 0x1f
+  14
+
+  My understanding is that 14 is incorrect in the context of AA64. rt
+  should be set to 18. The current mode being SVC, LR refers to LR_svc
+  not LR_usr. In other words, the mapping between registers in AA64 and
+  AA32 doesn't seem to be accounted for. I've tested this with Qemu
+  5.0.0
+
+  Let me know if that makes sense and if you would like more info. I am als=
+o happy to test patches.
+  Thanks for all the great work on Qemu!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1879587/+subscriptions
 
