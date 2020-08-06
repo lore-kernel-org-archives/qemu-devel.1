@@ -2,92 +2,83 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1885C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A25C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:54:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81F4B22CF7
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:54:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7EE422CF7
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:54:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="mqYiPR/g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81F4B22CF7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJERPI3G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7EE422CF7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3deA-0007VK-3J
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:01:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40958)
+	id 1k3d5A-0008O6-OY
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 06:25:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dRz-0002qb-Ed
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:43 -0400
-Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:40066)
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k3d4X-0007xG-Ii
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:24:29 -0400
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:42615)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dRx-0007tm-Lz
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:43 -0400
-Received: by mail-pj1-x102e.google.com with SMTP id d4so6278250pjx.5
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:48:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=niwd/9paMqIL8hcplotNtS4oZD1k6w/rLSwgSJcTeiU=;
- b=mqYiPR/g1u8+p3+PiR+UgHWxHka6vveg8cWFqizIVPXw4tnHUtVemTy3sv+na1twsY
- R9R7ilV/rpRxX+K+W4ujAE2HMz55FvpHnFxOPJgvCJZkBViFj6c9+Fwo82N738cBHRUR
- ++MpyCSM2BdTo5Bj3oP74LTJORq6cIzcLWxAVZ2WGaiTr/im90hper9EqZYKRMJ6Cq77
- ITCTWZXwWxLOypRD6mEMZi7h6F3NvpX1c94DcN+YAqAoKzcQYBOXDhBv4veg84YCm5Wl
- 4sJI7LUEIDFxlZHV4gLD5O1Xi7qXXRmSlECFkmfMwtsrDItZYntobuTxsjE4ya2kl2lU
- 3SvA==
+ (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
+ id 1k3d4V-0004j8-9R
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:24:29 -0400
+Received: by mail-pl1-x62d.google.com with SMTP id q17so27253550pls.9
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:24:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=4ER4fkikP/KS0w1Gum0nBUXhNQjCgF+lmRdY/Ay4+y4=;
+ b=XJERPI3GxXFimrrJzmzqhxCU65CxZc79HhiU3GHtenAr/ZXMdHQEMj/yK7jp2fCIp7
+ 1rLsXzXS4dd4Is229EG7JMxhsnyJf27rChCBJ4ZQPR2qI/ST1uCZhd4Yq8cvVnTFzFu1
+ XSj9u2Wdt5kZw8NO1HzUWbDOsX8N0LdQHJ267yDim8LBnYQnwyjkrH3PLH0EsxpCHURF
+ YS1lpNaDRLztyuB+0zq07FEkMDhp28XNVBm6DcSrAjLYeihDDVJCOCi1KvGgANKZgXyR
+ HRFxJbUQyQBlMk6zHkj2Vo21lghDpX5whkN0BaPLE73QVPvTqqsPdDxcAEI+q3qcBBBm
+ 4uPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=niwd/9paMqIL8hcplotNtS4oZD1k6w/rLSwgSJcTeiU=;
- b=MnAnCURH3gRxhy4+GsEKDZavuMVyQcqpvZPv/l8eshETvkkkVnL/wDp08fcv4oVnbO
- j+I6DWxQSSHgEspSwPHNXrj3fNRzAWBoNCX5UYB8CIDswtQ/qFawnsgxAa3FPdyarVMK
- iE1+mSmh0EvTNK95A+0WeHuPbCVnNooKlyWDzkfc/Ku69pKRiJNFBuAFF9Ou1Sx92B99
- JaIZTPBk/8G5GSLhqiWVUP4th5xHfiltNYIqXCn30o3WtrfxdDgZbudmVRj4WoSg1C1a
- 00xujhAxCthA9BzEG7TcK7lLrGPGyv74kiqpCazxXOwYEl10v93z/n2yDKw9P8lnRQ+B
- UGpA==
-X-Gm-Message-State: AOAM530w3CDzd5IHC0ctQKD/scYG1L0DlL3IDD2ob5sxylRivmczc7U9
- F5vphviwwHsql7xT0HXCfLIMprXc/us=
-X-Google-Smtp-Source: ABdhPJyRJQNqWr8Y4a81R+/cko/P8xezvuqr6h8pNUfA2gV3qvsGGaER1UY9hJ0+mYMA8Xi4g+pwfQ==
-X-Received: by 2002:a17:90b:4d0f:: with SMTP id
- mw15mr7591466pjb.174.1596710920158; 
- Thu, 06 Aug 2020 03:48:40 -0700 (PDT)
-Received: from frankchang-ThinkPad-T490.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.48.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 03:48:39 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC v3 32/71] target/riscv: rvv-1.0: set-X-first mask bit
- instructions
-Date: Thu,  6 Aug 2020 18:46:29 +0800
-Message-Id: <20200806104709.13235-33-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
-References: <20200806104709.13235-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102e;
- envelope-from=frank.chang@sifive.com; helo=mail-pj1-x102e.google.com
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=4ER4fkikP/KS0w1Gum0nBUXhNQjCgF+lmRdY/Ay4+y4=;
+ b=az1gX+M3kELlNjihvceCzCq5VfRhu0pxBjWrT8r2fpiAIbRqFj/+YDHibcfZtYtsRT
+ euDeMykV2CugQroBg1Xif7gto6tQQ4gJCr3ORVL7gnDXsY9fybA/7wGH6PE8iRuVkkSn
+ jyAhwh8t0CYJ0q/31Vi9RGERGd1v6B8yYPhjiSvTAr+1ElCHou/qYC1wruLIem7kspHN
+ rZNOA4xu9TcUMxdloR2GqNnnGM8Sjlmm++nvPFtWbHYMG69hB6vY2NWjRa3Q2abLEqU1
+ 2IGhX0qPDxvkLKxf11t1XLkIDlig+WhggEo08SxEqY+tDUXxuTe2nO0Pprrq75kVAlba
+ eGUg==
+X-Gm-Message-State: AOAM533Cj7gQGDtnOLyDD+5CY+bSyvgy0jRHtI5BBLoUCM1x74XxTIMF
+ OOICPPoLDO1W+nGt7hO7TC7AqkQPQ29hSQ22aYcYWtddArs=
+X-Google-Smtp-Source: ABdhPJz26CtuxJHuodPkItETFpK9ZeOyHnlnPsbFUNCVig8D5IHMXIWuw/82FDhXKOg/KXZp5CAxzEDxZtV80k11sbY=
+X-Received: by 2002:a17:902:6b45:: with SMTP id
+ g5mr7240015plt.42.1596709464392; 
+ Thu, 06 Aug 2020 03:24:24 -0700 (PDT)
+MIME-Version: 1.0
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 6 Aug 2020 11:24:13 +0100
+Message-ID: <CAJSP0QWF8g7r5VqU_PRbskWZU3ahCq+eobR8GexUcPrAiYoCPQ@mail.gmail.com>
+Subject: Why QEMU should move from C to Rust (clickbait alert ;))
+To: qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::62d;
+ envelope-from=stefanha@gmail.com; helo=mail-pl1-x62d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,81 +91,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ Dave Gilbert <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Oleinik, Alexander" <alxndr@bu.edu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+I just posted this on my blog, but my intention is to continue the
+discussion around moving to Rust in the QEMU community. Thoughts about
+how to increase safety in QEMU, both for and against moving to Rust
+are welcome!
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/insn32.decode              | 6 +++---
- target/riscv/insn_trans/trans_rvv.inc.c | 5 ++++-
- target/riscv/vector_helper.c            | 4 ----
- 3 files changed, 7 insertions(+), 8 deletions(-)
+My KVM Forum 2018 presentation titled Security in QEMU: How Virtual
+Machines provide Isolation reviewed security bugs in QEMU and found
+the most common causes were C programming bugs. This includes buffer
+overflows, use-after-free, uninitialized memory, and more. In this
+post I will argue for using Rust as a safer language that prevents
+these classes of bugs.
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index d72120cfd85..0992d6ac86d 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -593,9 +593,9 @@ vmornot_mm      011100 - ..... ..... 010 ..... 1010111 @r
- vmxnor_mm       011111 - ..... ..... 010 ..... 1010111 @r
- vpopc_m         010000 . ..... 10000 010 ..... 1010111 @r2_vm
- vfirst_m        010000 . ..... 10001 010 ..... 1010111 @r2_vm
--vmsbf_m         010110 . ..... 00001 010 ..... 1010111 @r2_vm
--vmsif_m         010110 . ..... 00011 010 ..... 1010111 @r2_vm
--vmsof_m         010110 . ..... 00010 010 ..... 1010111 @r2_vm
-+vmsbf_m         010100 . ..... 00001 010 ..... 1010111 @r2_vm
-+vmsif_m         010100 . ..... 00011 010 ..... 1010111 @r2_vm
-+vmsof_m         010100 . ..... 00010 010 ..... 1010111 @r2_vm
- viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
- vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 3b781252df0..62c6b469364 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -2955,7 +2955,10 @@ static bool trans_vfirst_m(DisasContext *s, arg_rmr *a)
- #define GEN_M_TRANS(NAME)                                          \
- static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
- {                                                                  \
--    if (vext_check_isa_ill(s)) {                                   \
-+    if (require_rvv(s) &&                                          \
-+        vext_check_isa_ill(s) &&                                   \
-+        require_vm(a->vm, a->rd) &&                                \
-+        (a->rd != a->rs2)) {                                       \
-         uint32_t data = 0;                                         \
-         gen_helper_gvec_3_ptr *fn = gen_helper_##NAME;             \
-         TCGLabel *over = gen_new_label();                          \
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index 52902b680d7..13ce6f33a9e 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -4511,7 +4511,6 @@ enum set_mask_type {
- static void vmsetm(void *vd, void *v0, void *vs2, CPURISCVState *env,
-                    uint32_t desc, enum set_mask_type type)
- {
--    uint32_t vlmax = env_archcpu(env)->cfg.vlen;
-     uint32_t vm = vext_vm(desc);
-     uint32_t vl = env->vl;
-     int i;
-@@ -4541,9 +4540,6 @@ static void vmsetm(void *vd, void *v0, void *vs2, CPURISCVState *env,
-             }
-         }
-     }
--    for (; i < vlmax; i++) {
--        vext_set_elem_mask(vd, i, 0);
--    }
- }
- 
- void HELPER(vmsbf_m)(void *vd, void *v0, void *vs2, CPURISCVState *env,
--- 
-2.17.1
+In 2018 the choice of a safer language was not clear. C++ offered safe
+abstractions without an effective way to prohibit unsafe language
+features. Go also offered safety but with concerns about runtime
+costs. Rust looked promising but few people had deep experience with
+it. In 2018 I was not able to argue confidently for moving away from C
+in QEMU.
 
+Now in 2020 the situation is clearer. C programming bugs are still the
+main cause of CVEs in QEMU. Rust has matured, its ecosystem is growing
+and healthy, and there are virtualization projects like Crosvm,
+Firecracker, and cloud-hypervisor that prove Rust is an effective
+language for writing Virtual Machine Monitors (VMM). In the QEMU
+community Paolo Bonzini and Sergio Lopez's work on rust-vmm and
+vhost-user code inspired me to look more closely at moving away from
+C.
+
+Do we need to change programming language?
+---------------------------------------------------------------
+Most security bugs in QEMU are C programming bugs. This is easy to
+verify by looking through the CVE listings. Although I have only
+reviewed CVEs it seems likely that non-security bugs are also mostly C
+programming bugs.
+
+Eliminating C programming bugs does not necessarily require switching
+programming languages. Other approaches to reducing bug rates in
+software include:
+
+Coding style rules that forbid unsafe language features.
+Building safe abstractions and prohibiting unsafe language features or
+library APIs.
+Static checkers that scan source code for bugs.
+Dynamic sanitizers that run software with instrumentation to identify bugs.
+Unit testing and fuzzing.
+
+The problem is, the QEMU community has been doing these things for
+years but new bugs are still introduced despite these efforts. It is
+certainly possible to spend more energy on these efforts but the
+evidence shows that bugs continue to slip through.
+
+There are two issues with these approaches to reducing bugs. First,
+although these approaches help find existing bugs, eliminating classes
+of bugs so they cannot exist in the first place is a stronger
+approach. This is hard to do with C since the language is unsafe,
+placing the burden of safety on the programmer.
+
+Second, much of the ability to write safe C code comes with
+experience. Custom conventions, APIs, tooling, and processes to reduce
+bugs is a hurdle for one-time contributors or newcomers. It makes the
+codebase inaccessible unless we accept lower standards for some
+contributors. Code quality should depend as little on experience as
+possible but C is notorious for being a programming language that
+requires a lot of practice before you can write production-quality
+code.
+
+Why Rust?
+--------------
+Safe languages eliminate memory safety bugs (and other classes like
+concurrency bugs). Rust made this a priority in its design:
+
+Use-after-free, double-free, memory leaks, and other lifetime bugs are
+prevented at compile-time by the borrow checker where the compiler
+checks ownership of data.
+Buffer overflows and other memory corruptions are prevented by
+compile-time and runtime bounds-checking.
+Pointer deference bugs are prevented by the absense of NULL pointers
+and strict ownership rules.
+Uninitialized memory is prevented because all variables and fields
+must be initialized.
+
+Rust programs can still "panic" at runtime when safety cannot be
+proven at compile time but this does not result in undefined behavior
+as seen in C programs. The program simply aborts with a backtrace.
+Bugs that could have resulted in arbitrary code execution in C become
+at most denial-of-service bugs in Rust. This reduces the severity of
+bugs.
+
+As a result of this language design most C programming bugs that
+plague QEMU today are either caught by the compiler or turn into a
+safe program termination. It is reasonable to expect CVEs to reduce in
+number and in severity when switching to Rust.
+
+At the same time Rust eliminates the need for many of the measures
+that the QEMU community added onto C because the Rust programming
+language and its compiler already enforce safety. This means newcomers
+and one-time contributors will not need QEMU-specific experience, can
+write production-quality code more easily, and can get their code
+merged more quickly. It also means reviewers will have to spend less
+time pointing out C programming bugs or asking for changes that comply
+with QEMU's way of doing things.
+
+That said, Rust has a reputation for being a scary language due to the
+borrow checker. Most programmers have not thought about object
+lifetimes and ownership as systematically and explicitly as required
+by Rust. This raises the bar to learning the language, but I look at
+it this way: learning Rust is humanly possible, writing bug-free C
+code is not.
+
+How can we change programming language?
+------------------------------------------------------------
+When I checked in 2018 QEMU was 1.5 million lines of code. It has
+grown since then. Moving a large codebase to a new programming
+language is extremely difficult. If people want to convert QEMU to
+Rust that would be great, but I personally don't have the appetite to
+do it because I think the integration will be messy, result in a lot
+of duplication, and there is too much un(der)maintained code that is
+hard to convert.
+
+The reason I am writing this post is because device emulation, the
+main security attack surface for VMMs, can be done in a separate
+program. That program can be written in any language and this is where
+Rust comes in. For vhost devices it is possible to write Rust device
+backends today and I hope this will become the default approach to
+writing new devices.
+
+For non-vhost devices the vfio-user project is working on an interface
+out-of-process device emulation. It will be possible to implement
+devices in Rust there too.
+
+If you are implementing new device emulation code please consider
+doing it in Rust!
+
+Conclusion
+---------------
+Most security bugs in QEMU today are C programming bugs. Switching to
+a safer programming language will significantly reduce security bugs
+in QEMU. Rust is now mature and proven enough to use as the language
+for device emulation code. Thanks to vhost-user and vfio-user using
+Rust for device emulation does not require a big conversion of QEMU
+code, it can simply be done in a separate program. This way attack
+surfaces can be written in Rust to make them less susceptible to
+security bugs going forward.
 
