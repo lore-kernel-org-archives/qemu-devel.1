@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEDF1C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05155C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:46:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D48E1206B5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:45:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E23BF206B5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:46:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rj/b+52X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D48E1206B5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X7VuHdv/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E23BF206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3lpr-0006OL-Qy
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:45:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43266)
+	id 1k3lqJ-00074E-UL
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:46:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lP4-0006GG-T8
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47952
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k3lPN-0006yD-IC
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58023
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lP1-0006Z3-Hq
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:14 -0400
+ id 1k3lPL-0006eH-Fl
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741490;
+ s=mimecast20190719; t=1596741510;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dWTfOk46pMCApK/T2O+Rbuk9JMkglVMf7iwujR+p9Us=;
- b=Rj/b+52XeVaBlT1Y/40IQA8TTSeduHy986Lg3DOrZNb7ve3IUtZd6w8ZJV0Rza8RVZIcQe
- Plf2q7tlx0LRrE1day72vYUmvDIR2XLafAGsFhuHF/rR2MA/4Y5mjuzArTSa5PtJZaTq54
- tB6LZSFiYHvZWESIf0QYeAo0/jD24CM=
+ bh=9dML5eCovLgLX7NmYqgD15Mx8pEcIi5cjKd7b0sYFUU=;
+ b=X7VuHdv/cJD8s7pY8QkNrmnSisYU1Dr/uE9lzqDMzVwyQkHMivPdrg+a8Z1gNi6phi4L0H
+ hidGCaXYXmduA9omD9s+NVP7mDK3aQYUEqD9PnpFwqmlgRwA4vxX61dH+defpm+iwFDp5X
+ tn1R9fuvgsrgsy481+tr5Fhz/g4QxZ4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-451-SbSJcRoSMxaENZIhrQBJcA-1; Thu, 06 Aug 2020 15:18:09 -0400
-X-MC-Unique: SbSJcRoSMxaENZIhrQBJcA-1
+ us-mta-502-3Y-OfsmoOOSHeW_91DzExg-1; Thu, 06 Aug 2020 15:18:28 -0400
+X-MC-Unique: 3Y-OfsmoOOSHeW_91DzExg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A3BB1800D42
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:18:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C4A3100AA22
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:18:27 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5AE0369315;
- Thu,  6 Aug 2020 19:18:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8D8D95F9DC;
+ Thu,  6 Aug 2020 19:18:26 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 060/143] meson: qemu-pr-helper
-Date: Thu,  6 Aug 2020 21:14:56 +0200
-Message-Id: <1596741379-12902-61-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 072/143] meson: convert common QMP bits for qemu and
+ qemu-storage-daemon
+Date: Thu,  6 Aug 2020 21:15:08 +0200
+Message-Id: <1596741379-12902-73-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +74,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:24:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -102,104 +103,153 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile    |  7 +------
- configure   |  3 ---
- meson.build | 10 ++++++++++
- 3 files changed, 11 insertions(+), 9 deletions(-)
+ Makefile.objs         |  8 +++++---
+ Makefile.target       |  1 -
+ meson.build           | 10 ++++++++++
+ monitor/Makefile.objs |  6 ------
+ monitor/meson.build   |  9 +++++++++
+ qom/Makefile.objs     |  2 --
+ qom/meson.build       |  3 +++
+ 7 files changed, 27 insertions(+), 12 deletions(-)
+ delete mode 100644 monitor/Makefile.objs
+ create mode 100644 monitor/meson.build
+ delete mode 100644 qom/Makefile.objs
 
-diff --git a/Makefile b/Makefile
-index 27e66aa..50e02c0 100644
---- a/Makefile
-+++ b/Makefile
-@@ -123,7 +123,7 @@ $(call set-vpath, $(SRC_PATH))
+diff --git a/Makefile.objs b/Makefile.objs
+index 11ca458..9b9bb40 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -36,10 +36,11 @@ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
+ # storage-daemon-obj-y is code used by qemu-storage-daemon (these objects are
+ # used for system emulation, too, but specified separately there)
  
- LIBS+=-lz $(LIBS_TOOLS)
+-storage-daemon-obj-y = block/ monitor/ qapi/ qom/ storage-daemon/
++storage-daemon-obj-y = block/ qapi/ qom/ storage-daemon/
+ storage-daemon-obj-y += blockdev.o blockdev-nbd.o iothread.o job-qmp.o
+ storage-daemon-obj-$(CONFIG_WIN32) += os-win32.o
+ storage-daemon-obj-$(CONFIG_POSIX) += os-posix.o
++storage-daemon-obj-y += libqmp.fa
  
--HELPERS-y = $(HELPERS)
-+HELPERS-y =
+ ######################################################################
+ # Target independent part of system emulation. The long term path is to
+@@ -47,8 +48,7 @@ storage-daemon-obj-$(CONFIG_POSIX) += os-posix.o
+ # single QEMU executable should support all CPUs and machines.
  
- # Sphinx does not allow building manuals into the same directory as
- # the source files, so if we're doing an in-tree QEMU build we must
-@@ -276,11 +276,6 @@ COMMON_LDADDS = libqemuutil.a
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = monitor/
+-common-obj-y += net/
++common-obj-y = net/
+ common-obj-$(CONFIG_LINUX) += fsdev/
  
- qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
+ common-obj-y += accel/
+@@ -82,6 +82,8 @@ common-obj-y += backends/
  
--scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--ifdef CONFIG_MPATH
--scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
--endif
--
- clean: recurse-clean
- # avoid old build problems by removing potentially incorrect old files
- 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
-diff --git a/configure b/configure
-index 809fa3b..962e314 100755
---- a/configure
-+++ b/configure
-@@ -6642,7 +6642,6 @@ if [ "$eventfd" = "yes" ]; then
- fi
+ common-obj-y += qapi/
  
- tools=""
--helpers=""
- if test "$want_tools" = "yes" ; then
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-storage-daemon\$(EXESUF) $tools"
-@@ -6666,7 +6665,6 @@ if test "$softmmu" = yes ; then
-       fi
-       mpath=no
-     fi
--    helpers="$helpers scsi/qemu-pr-helper\$(EXESUF)"
-   else
-     if test "$virtfs" = yes; then
-       error_exit "VirtFS is supported only on Linux"
-@@ -7742,7 +7740,6 @@ else
-   QEMU_INCLUDES="-iquote ${source_path}/tcg/\$(ARCH) $QEMU_INCLUDES"
- fi
++common-obj-y += libqmp.fa
++
+ endif # CONFIG_SOFTMMU
  
--echo "HELPERS=$helpers" >> $config_host_mak
- echo "TOOLS=$tools" >> $config_host_mak
- echo "ROMS=$roms" >> $config_host_mak
- echo "MAKE=$make" >> $config_host_mak
+ #######################################################################
+diff --git a/Makefile.target b/Makefile.target
+index c8f7a6c..54a9ef1 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -157,7 +157,6 @@ ifdef CONFIG_SOFTMMU
+ obj-y += softmmu/
+ obj-y += gdbstub.o
+ obj-y += hw/
+-obj-y += monitor/
+ obj-y += qapi/
+ obj-y += migration/ram.o
+ LIBS := $(libs_softmmu) $(LIBS)
 diff --git a/meson.build b/meson.build
-index f2496e4..1743ae7 100644
+index f025ac5..cfc57f8 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -136,6 +136,10 @@ if 'CONFIG_XKBCOMMON' in config_host
-                                  link_args: config_host['XKBCOMMON_LIBS'].split())
- endif
- rt = cc.find_library('rt', required: false)
-+libmpathpersist = not_found
-+if config_host.has_key('CONFIG_MPATH')
-+  libmpathpersist = cc.find_library('mpathpersist')
-+endif
- libiscsi = not_found
- if 'CONFIG_LIBISCSI' in config_host
-   libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
-@@ -609,6 +613,7 @@ foreach target : target_dirs
- endforeach
+@@ -451,6 +451,7 @@ stub_ss = ss.source_set()
+ trace_ss = ss.source_set()
+ block_ss = ss.source_set()
+ blockdev_ss = ss.source_set()
++qmp_ss = ss.source_set()
+ common_ss = ss.source_set()
+ softmmu_ss = ss.source_set()
+ user_ss = ss.source_set()
+@@ -628,6 +629,7 @@ softmmu_ss.add(when: ['CONFIG_FDT', fdt],  if_true: [files('device_tree.c')])
+ common_ss.add(files('cpus-common.c'))
  
- # Other build targets
-+
- if 'CONFIG_GUEST_AGENT' in config_host
-   subdir('qga')
- endif
-@@ -649,6 +654,11 @@ if have_tools
-                dependencies: [qemuutil, libcap_ng],
-                install: true,
-                install_dir: get_option('libexecdir'))
-+
-+    executable('qemu-pr-helper', files('scsi/qemu-pr-helper.c', 'scsi/utils.c'),
-+               dependencies: [authz, crypto, io, qom, qemuutil,
-+                              libcap_ng, libudev, libmpathpersist],
-+               install: true)
-   endif
+ subdir('softmmu')
++subdir('monitor')
  
-   if 'CONFIG_IVSHMEM' in config_host
+ # needed for fuzzing binaries
+ subdir('tests/qtest/libqos')
+@@ -677,6 +679,14 @@ block = declare_dependency(link_whole: [libblock],
+                            link_args: '@block.syms',
+                            dependencies: [crypto, io])
+ 
++qmp_ss = qmp_ss.apply(config_host, strict: false)
++libqmp = static_library('qmp', qmp_ss.sources(),
++                        dependencies: qmp_ss.dependencies(),
++                        name_suffix: 'fa',
++                        build_by_default: false)
++
++qmp = declare_dependency(link_whole: [libqmp])
++
+ foreach m : mods
+   shared_module(m['dir'] + '-' + m['name'],
+                 name_prefix: '',
+diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
+deleted file mode 100644
+index a8533c9..0000000
+--- a/monitor/Makefile.objs
++++ /dev/null
+@@ -1,6 +0,0 @@
+-obj-y += misc.o
+-common-obj-y += monitor.o qmp.o hmp.o
+-common-obj-y += qmp-cmds.o qmp-cmds-control.o
+-common-obj-y += hmp-cmds.o
+-
+-storage-daemon-obj-y += monitor.o qmp.o qmp-cmds-control.o
+diff --git a/monitor/meson.build b/monitor/meson.build
+new file mode 100644
+index 0000000..0484a64
+--- /dev/null
++++ b/monitor/meson.build
+@@ -0,0 +1,9 @@
++qmp_ss.add(files('monitor.c', 'qmp.c', 'qmp-cmds-control.c'))
++
++softmmu_ss.add(files(
++  'hmp-cmds.c',
++  'hmp.c',
++  'qmp-cmds.c',
++))
++
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files('misc.c'))
+diff --git a/qom/Makefile.objs b/qom/Makefile.objs
+deleted file mode 100644
+index b962904..0000000
+--- a/qom/Makefile.objs
++++ /dev/null
+@@ -1,2 +0,0 @@
+-common-obj-$(CONFIG_SOFTMMU) += qom-hmp-cmds.o qom-qmp-cmds.o
+-storage-daemon-obj-y += qom-qmp-cmds.o
+diff --git a/qom/meson.build b/qom/meson.build
+index 4af044d..35815f6 100644
+--- a/qom/meson.build
++++ b/qom/meson.build
+@@ -7,6 +7,9 @@ qom_ss.add(files(
+   'qom-qobject.c',
+ ))
+ 
++qmp_ss.add(files('qom-qmp-cmds.c'))
++softmmu_ss.add(files('qom-hmp-cmds.c'))
++
+ qom_ss = qom_ss.apply(config_host, strict: false)
+ libqom = static_library('qom', qom_ss.sources(),
+                         dependencies: [qom_ss.dependencies()],
 -- 
 1.8.3.1
 
