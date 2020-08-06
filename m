@@ -7,86 +7,88 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FFAC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E610FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C33D8204FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B34B1204FD
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="RKHqI6Vw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C33D8204FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwoTuFlW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B34B1204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3dxy-0007Ma-Nv
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:21:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42204)
+	id 1k3azI-0007J8-3Y
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 04:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dTP-0004yy-8N
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:50:11 -0400
-Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:45107)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3ax0-0002Il-IV; Thu, 06 Aug 2020 04:08:34 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:39162)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dTN-00088B-BD
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:50:10 -0400
-Received: by mail-pg1-x52c.google.com with SMTP id x6so11304728pgx.12
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:50:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=IIDpnVDv9+trjyRRch9JAqW8+nRxIqRgOoCbDIBNhSI=;
- b=RKHqI6VwLczu40Mzi4tovT6whrhzMPKSu3I0BZKU7GV7L/WgGOggJklnIg4nC6HiKI
- x+5jDKBhtcvtPxGCkGzVstkxlCc/Jl9fwFCqgOQYM4PfW/arSaLyxGH3v57lIbKlwoI1
- 0PkkhrT0tHf3RPk6E/+0Z+XtKuqo3ppMWLgLWejvBPZMeiF1BU/6p6NL2W/LdD5t04Sq
- RFGVddN6QFbcuex4J8EWClc1jaJ0myDPNbxiFYT8Gm9yI5whqwnwCdxXUzSE3zgpIN/h
- +lCR1mVgyCLDHOZqc+8M65kc3Ahju+8jWXeYVUDtDqI0RlDeqMjqw661B2Iq4YkPBK9U
- PNlg==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3awy-0005gD-S3; Thu, 06 Aug 2020 04:08:34 -0400
+Received: by mail-wr1-x430.google.com with SMTP id a5so33116377wrm.6;
+ Thu, 06 Aug 2020 01:08:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=aNqGoj9XEuK6FXLTe1Hk7gTK5CIz55oFAjsctzZx5hc=;
+ b=YwoTuFlWhAhJ1u06Ry7qUkbdpDuuky9kAz6KS7zMs1BIw6Sb19k4aAcd9sbZXqXVJ7
+ IoTPR42VSGyi0GHH/CzCwstaBTuWAR52Cd/88iyqTZjCUIs5g0UM4BKsJlggWBfqDjTL
+ lkksyd1wRvDf6elv3HqBhTS6df7FH1eDdosoKqT+XhaMKjvoCVYzB80mxeNyr4pr+HWl
+ ggYVMf8cnMKGa7MfndxljT9IdGD9kxUzQsq9IrOKC7gtSR9cHmjDtROpe72j5VULcBKm
+ /XZbtGEw4xMgq5LtQEz6sAygMTK/kau3N3GAjNyHJvT6Kv8AEN33E91SaG/1uEUUmMMr
+ Xtsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=IIDpnVDv9+trjyRRch9JAqW8+nRxIqRgOoCbDIBNhSI=;
- b=tLOHT1mxbd2qHjmZCTwOHShq25V1/NLDjmZzQ5htjEpTi/AXtHKsB4G9cEO97zMgAV
- kGJExE2VYvWTHH6K+/CaA7ihpd9UkLRN3/ssQsqChYBEoIpBlBU2oiqQlNiYdzBqPvYn
- bxuvWbm5OeEI4Sl3F4d0mcGhYAR0jXohCHze5OQj0S3GwDyhREzQueN5YU5BG8AXxJm4
- I1UvTvc/XZqJDtTw2isysgLGzlO4U0uZhJhVVvoUxvgYBTpY4peZaEgmZFVER6lJrg83
- /KNQH8MinPOHUNcOljOGOb8Abs05SfAGpNuEKLUhHGBEO3JtOcaRj0k13V5xLFklkfwc
- 90Tg==
-X-Gm-Message-State: AOAM532t9qWEapgJnbr4xUbFJ3J3VGM2R8iwth1mOe8yivn77j21J+Jw
- K71jUe/aj4jPAMDiK0uuYkWHk6QL7WU=
-X-Google-Smtp-Source: ABdhPJzhrMYrvQvPv63/LNaS30whVMcFUFUEYzig5CvqFVXlvdzsvn4GgE78fl/n0nIeLRtP21B/Qw==
-X-Received: by 2002:a62:1d0a:: with SMTP id d10mr7574400pfd.270.1596711007847; 
- Thu, 06 Aug 2020 03:50:07 -0700 (PDT)
-Received: from frankchang-ThinkPad-T490.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.50.05
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=aNqGoj9XEuK6FXLTe1Hk7gTK5CIz55oFAjsctzZx5hc=;
+ b=EfuUZaaJO0ajoNlJUz22wOYdwGrYDcklFQljOpINvR1q7AflMzU9jv4oBbRMNB+p1D
+ 6zOM8tgVaTm/HB3kPqbsHvVyrHz/eBuGQ9THMpyoreeQkePdv+35rwmfwj+AYYEpTVqM
+ FnLaYYDZ1Gku+l+pUm7seRD6b/NoGJic01467FAlusNnv16v+JRNJRbn1N59yCNDG4ip
+ sdeNHw67S4vfxGh2O/SbhXfJwlzZi5sW5jOTWCZZI9droygvdpa3LXm5fXWnSMC6xB7I
+ HJ93mYmNDnSVbRf1yAvViGmQo5yDh9RAMxB93QzR6BHx5SJZSFLC2zZVHtcJ8olU6PZH
+ NSXQ==
+X-Gm-Message-State: AOAM532o7bVs5TnCUFOckglPjNTlBC4ysAf71GqMGW/Vjj8DPyO/TgVP
+ DB2XBKYzx5Nr3+yZy7/IAlXY53Ef
+X-Google-Smtp-Source: ABdhPJy8uhbLGRzwvC20F0yyO8FoOirgX8AyP2EB1JUr8RoP52AwKxS5ooSCWR2kHcPNGk1QSw1iXw==
+X-Received: by 2002:a5d:68cf:: with SMTP id p15mr6378477wrw.148.1596701310699; 
+ Thu, 06 Aug 2020 01:08:30 -0700 (PDT)
+Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id w2sm6039587wre.5.2020.08.06.01.08.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 03:50:07 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC v3 69/71] target/riscv: gdb: modify gdb csr xml file to align
- with csr register map
-Date: Thu,  6 Aug 2020 18:47:06 +0800
-Message-Id: <20200806104709.13235-70-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
-References: <20200806104709.13235-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52c;
- envelope-from=frank.chang@sifive.com; helo=mail-pg1-x52c.google.com
+ Thu, 06 Aug 2020 01:08:30 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.2 3/7] hw/block/fdc: Use warn_report() instead of debug
+ FLOPPY_DPRINTF() calls
+Date: Thu,  6 Aug 2020 10:08:20 +0200
+Message-Id: <20200806080824.21567-4-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200806080824.21567-1-f4bug@amsat.org>
+References: <20200806080824.21567-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::430;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x430.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,108 +101,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Frank Chang <frank.chang@sifive.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Hsiangkai Wang <kai.wang@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Hsiangkai Wang <kai.wang@sifive.com>
+Use warn_report() instead of debug FLOPPY_DPRINTF() calls.
 
-Signed-off-by: Hsiangkai Wang <kai.wang@sifive.com>
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- gdb-xml/riscv-32bit-csr.xml | 11 ++++++-----
- gdb-xml/riscv-64bit-csr.xml | 11 ++++++-----
- target/riscv/gdbstub.c      |  4 ++--
- 3 files changed, 14 insertions(+), 12 deletions(-)
+ hw/block/fdc.c | 32 +++++++++++++++-----------------
+ 1 file changed, 15 insertions(+), 17 deletions(-)
 
-diff --git a/gdb-xml/riscv-32bit-csr.xml b/gdb-xml/riscv-32bit-csr.xml
-index da1bf19e2f4..3d2031da7dc 100644
---- a/gdb-xml/riscv-32bit-csr.xml
-+++ b/gdb-xml/riscv-32bit-csr.xml
-@@ -110,6 +110,8 @@
-   <reg name="mcause" bitsize="32"/>
-   <reg name="mtval" bitsize="32"/>
-   <reg name="mip" bitsize="32"/>
-+  <reg name="mtinst" bitsize="32"/>
-+  <reg name="mtval2" bitsize="32"/>
-   <reg name="pmpcfg0" bitsize="32"/>
-   <reg name="pmpcfg1" bitsize="32"/>
-   <reg name="pmpcfg2" bitsize="32"/>
-@@ -232,12 +234,11 @@
-   <reg name="hedeleg" bitsize="32"/>
-   <reg name="hideleg" bitsize="32"/>
-   <reg name="hie" bitsize="32"/>
--  <reg name="htvec" bitsize="32"/>
--  <reg name="hscratch" bitsize="32"/>
--  <reg name="hepc" bitsize="32"/>
--  <reg name="hcause" bitsize="32"/>
--  <reg name="hbadaddr" bitsize="32"/>
-+  <reg name="hcounteren" bitsize="32"/>
-+  <reg name="htval" bitsize="32"/>
-   <reg name="hip" bitsize="32"/>
-+  <reg name="htinst" bitsize="32"/>
-+  <reg name="hgatp" bitsize="32"/>
-   <reg name="mbase" bitsize="32"/>
-   <reg name="mbound" bitsize="32"/>
-   <reg name="mibase" bitsize="32"/>
-diff --git a/gdb-xml/riscv-64bit-csr.xml b/gdb-xml/riscv-64bit-csr.xml
-index 6aa4bed9f50..90394562930 100644
---- a/gdb-xml/riscv-64bit-csr.xml
-+++ b/gdb-xml/riscv-64bit-csr.xml
-@@ -110,6 +110,8 @@
-   <reg name="mcause" bitsize="64"/>
-   <reg name="mtval" bitsize="64"/>
-   <reg name="mip" bitsize="64"/>
-+  <reg name="mtinst" bitsize="64"/>
-+  <reg name="mtval2" bitsize="64"/>
-   <reg name="pmpcfg0" bitsize="64"/>
-   <reg name="pmpcfg1" bitsize="64"/>
-   <reg name="pmpcfg2" bitsize="64"/>
-@@ -232,12 +234,11 @@
-   <reg name="hedeleg" bitsize="64"/>
-   <reg name="hideleg" bitsize="64"/>
-   <reg name="hie" bitsize="64"/>
--  <reg name="htvec" bitsize="64"/>
--  <reg name="hscratch" bitsize="64"/>
--  <reg name="hepc" bitsize="64"/>
--  <reg name="hcause" bitsize="64"/>
--  <reg name="hbadaddr" bitsize="64"/>
-+  <reg name="hcounteren" bitsize="64"/>
-+  <reg name="htval" bitsize="64"/>
-   <reg name="hip" bitsize="64"/>
-+  <reg name="htinst" bitsize="64"/>
-+  <reg name="hgatp" bitsize="64"/>
-   <reg name="mbase" bitsize="64"/>
-   <reg name="mbound" bitsize="64"/>
-   <reg name="mibase" bitsize="64"/>
-diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-index eba12a86f2e..f7c5212e274 100644
---- a/target/riscv/gdbstub.c
-+++ b/target/riscv/gdbstub.c
-@@ -418,13 +418,13 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
-     }
- #if defined(TARGET_RISCV32)
-     gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
--                             240, "riscv-32bit-csr.xml", 0);
-+                             241, "riscv-32bit-csr.xml", 0);
- 
-     gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
-                              1, "riscv-32bit-virtual.xml", 0);
- #elif defined(TARGET_RISCV64)
-     gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
--                             240, "riscv-64bit-csr.xml", 0);
-+                             241, "riscv-64bit-csr.xml", 0);
- 
-     gdb_register_coprocessor(cs, riscv_gdb_get_virtual, riscv_gdb_set_virtual,
-                              1, "riscv-64bit-virtual.xml", 0);
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index c91ed7ee2d..ee45ec0b27 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -395,12 +395,10 @@ static int pick_geometry(FDrive *drv)
+     if (match == -1) {
+         if (size_match != -1) {
+             parse = &fd_formats[size_match];
+-            FLOPPY_DPRINTF("User requested floppy drive type '%s', "
+-                           "but inserted medium appears to be a "
+-                           "%"PRId64" sector '%s' type\n",
+-                           FloppyDriveType_str(drv->drive),
+-                           nb_sectors,
+-                           FloppyDriveType_str(parse->drive));
++            warn_report("User requested floppy drive type '%s', but inserted "
++                        "medium appears to be a %"PRId64" sector '%s' type",
++                        FloppyDriveType_str(drv->drive), nb_sectors,
++                        FloppyDriveType_str(parse->drive));
+         }
+         assert(type_match != -1 && "misconfigured fd_format");
+         match = type_match;
+@@ -1805,8 +1803,8 @@ static int fdctrl_transfer_handler (void *opaque, int nchan,
+             /* READ & SCAN commands and realign to a sector for WRITE */
+             if (blk_pread(cur_drv->blk, fd_offset(cur_drv),
+                           fdctrl->fifo, BDRV_SECTOR_SIZE) < 0) {
+-                FLOPPY_DPRINTF("Floppy: error getting sector %d\n",
+-                               fd_sector(cur_drv));
++                warn_report("Floppy: error getting sector %" PRIu32,
++                            fd_sector(cur_drv));
+                 /* Sure, image size is too small... */
+                 memset(fdctrl->fifo, 0, FD_SECTOR_LEN);
+             }
+@@ -1833,8 +1831,8 @@ static int fdctrl_transfer_handler (void *opaque, int nchan,
+                            fdctrl->data_pos, len);
+             if (blk_pwrite(cur_drv->blk, fd_offset(cur_drv),
+                            fdctrl->fifo, BDRV_SECTOR_SIZE, 0) < 0) {
+-                FLOPPY_DPRINTF("error writing sector %d\n",
+-                               fd_sector(cur_drv));
++                warn_report("error writing sector %" PRIu32,
++                            fd_sector(cur_drv));
+                 fdctrl_stop_transfer(fdctrl, FD_SR0_ABNTERM | FD_SR0_SEEK, 0x00, 0x00);
+                 goto transfer_error;
+             }
+@@ -1911,8 +1909,8 @@ static uint32_t fdctrl_read_data(FDCtrl *fdctrl)
+         if (pos == 0) {
+             if (fdctrl->data_pos != 0)
+                 if (!fdctrl_seek_to_next_sect(fdctrl, cur_drv)) {
+-                    FLOPPY_DPRINTF("error seeking to next sector %d\n",
+-                                   fd_sector(cur_drv));
++                    warn_report("error seeking to next sector %" PRIu32,
++                                fd_sector(cur_drv));
+                     return 0;
+                 }
+             if (blk_pread(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo,
+@@ -1997,7 +1995,7 @@ static void fdctrl_format_sector(FDCtrl *fdctrl)
+     if (cur_drv->blk == NULL ||
+         blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo,
+                    BDRV_SECTOR_SIZE, 0) < 0) {
+-        FLOPPY_DPRINTF("error formatting sector %d\n", fd_sector(cur_drv));
++        warn_report("error formatting sector %" PRIu32, fd_sector(cur_drv));
+         fdctrl_stop_transfer(fdctrl, FD_SR0_ABNTERM | FD_SR0_SEEK, 0x00, 0x00);
+     } else {
+         if (cur_drv->sect == cur_drv->last_sect) {
+@@ -2421,13 +2419,13 @@ static void fdctrl_write_data(FDCtrl *fdctrl, uint32_t value)
+             cur_drv = get_cur_drv(fdctrl);
+             if (blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo,
+                            BDRV_SECTOR_SIZE, 0) < 0) {
+-                FLOPPY_DPRINTF("error writing sector %d\n",
+-                               fd_sector(cur_drv));
++                warn_report("error writing sector %" PRIu32,
++                            fd_sector(cur_drv));
+                 break;
+             }
+             if (!fdctrl_seek_to_next_sect(fdctrl, cur_drv)) {
+-                FLOPPY_DPRINTF("error seeking to next sector %d\n",
+-                               fd_sector(cur_drv));
++                warn_report("error seeking to next sector %" PRIu32,
++                            fd_sector(cur_drv));
+                 break;
+             }
+         }
 -- 
-2.17.1
+2.21.3
 
 
