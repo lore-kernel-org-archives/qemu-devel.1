@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90196C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 23:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9E4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 23:53:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 880ED2075D
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 23:50:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E5D0204EF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 23:53:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="DMZE+cVg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 880ED2075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="QB41AFds"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E5D0204EF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3ped-0008VL-FN
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 19:50:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40658)
+	id 1k3phL-00020k-Iz
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 19:53:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1k3pbk-0007Xi-KL; Thu, 06 Aug 2020 19:47:36 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35231)
+ id 1k3pcV-0007vY-30; Thu, 06 Aug 2020 19:48:23 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:46223)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1k3pbj-0004dM-2G; Thu, 06 Aug 2020 19:47:36 -0400
-Received: by mail-ed1-x542.google.com with SMTP id m20so26908659eds.2;
- Thu, 06 Aug 2020 16:47:34 -0700 (PDT)
+ id 1k3pcT-0004eh-K8; Thu, 06 Aug 2020 19:48:22 -0400
+Received: by mail-ed1-x542.google.com with SMTP id q4so33173799edv.13;
+ Thu, 06 Aug 2020 16:48:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=MqG69mo06b8/njU6u2OaiwDXzJPGk81pA8dJpDSpz+A=;
- b=DMZE+cVgEtdMnT8UC9GCIuGNRcUIy+26FpxBWq9kkj3i4VbbVKw/g4dYWldZqwTFLL
- y6xFnkiMlhYWnZp+5d1UVBQ8cWiQ+asmlQI33PsdDn9+02380oVgWdjtE3De1W09X5zn
- qyBrSaOPa7AhjCjmj3/0ZyIlvzJ3bRskDoMFc=
+ bh=gC87vBsUsvMkWV5AOgd6HXISOv8B5xWjWIbBBoAT/5E=;
+ b=QB41AFdsQUVAwcUYFqyiWg2UpLXbQ955MbVBOk2v4ziZ9g6sCWwVlYG1kzwRrRCFlZ
+ +qWWNi8x8GOxJGOW7EpjhEZxVmTy6MXJqWrFOdWmJ1+12t5SU/ZGrdCWAS9ulosvuiow
+ gEFnmUZ7mZ9mliKNl/ymqUbW+lLZ1Lg9EvKns=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=MqG69mo06b8/njU6u2OaiwDXzJPGk81pA8dJpDSpz+A=;
- b=QO8UyTz5cuP93+Px283IoG2CEhrCuujlX/DIBtoD3ohsyLcrVR5m/pIka0BNEBr+w5
- F2DDsTGDJ/Qu7MMrSdgyWQ1gWPUhAWsDI0GkuSjFV+Yw4CqQewddHhcvtSBwLltCHBwa
- D2ZwpjjnCZscComaT2DC8pWUSpYw7laLqbzLKKM9PsFV6BjxVISJ8n3VHCSbe6c67kaR
- JsP7EytlkulBrH3jn2jD+TKyH0iXhL0qT6lERbG/C2fBUZUsmrb9+6PhcgpkDU4hgtcE
- 0yeFJekI2Q4gKUAbX3aKRvZ6cUYKJpAzl5oCLyFWHJlGwlDFQEeY8HVbQgE7Z7cf4o09
- 1H5w==
-X-Gm-Message-State: AOAM531advqPsVMGqx0g2+vgiYrSkRG5eNkBzQw7Cq86de9NkuOAjS4R
- Z8SDZjn2l9zhqiElMIeUh2GFG1KD1xt3p6Dq5vXtbN/4
-X-Google-Smtp-Source: ABdhPJwBHqdrWyQlP/hGGtmER5qjIg/QIEbKsZ3632inWrJoVwmYOkqIma+8R1FBLSU3aPnx2/ZwscnRWrRXhQclWHs=
-X-Received: by 2002:aa7:d304:: with SMTP id p4mr6072060edq.267.1596757653188; 
- Thu, 06 Aug 2020 16:47:33 -0700 (PDT)
+ bh=gC87vBsUsvMkWV5AOgd6HXISOv8B5xWjWIbBBoAT/5E=;
+ b=cJAnSKtcQ2es9G9wcNS6aYuXRe3kJrxBRgHR+aPOt9uTwhjoVN9iKnTtAm5ybqYsV4
+ vFI9gUrE/fxJ7EROsqjCiaHJ6cFnjPmd5Wn9BTAQAe98Xz3SvL682B2JeIJfd4fJZUeS
+ 8K6yWmTxlYNPX4ht6fKM2WCMETj/JfbF5sq2M0+J3vvZOYzmzi6OOJ2lqK6J0Udl66bF
+ bZ4bxQ+gQ4DQr67Tnj9wo8ecIkugyIbaOVAmMg/VA1acQhI0i73822udS6fNmdW4A6DS
+ qP48UGysqjJpnyDH3/I2YdLXMU5I6F4TJqkhzQ8MThGvcgBVFSEjh1M31OII/xjd/ykI
+ mKJA==
+X-Gm-Message-State: AOAM53046/VD97wt6ntHj43LZmi3TyILyxviVwX7dCUobcEJRPk0AS3H
+ U/kfg9jgKywxanJjBA5pvxb4CY5wcuqIz8O39mI=
+X-Google-Smtp-Source: ABdhPJxebV5fM2teDsyOBsxGnPs7MRZ3qFqMy5UtA2gpyI8grgV6wOr1hgPmXc7o4Rbr5zerPM/G5G5fF7z/IMRgEz8=
+X-Received: by 2002:aa7:dc02:: with SMTP id b2mr6266764edu.260.1596757699375; 
+ Thu, 06 Aug 2020 16:48:19 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200806132106.747414-1-clg@kaod.org>
- <20200806132106.747414-11-clg@kaod.org>
-In-Reply-To: <20200806132106.747414-11-clg@kaod.org>
+ <20200806132106.747414-12-clg@kaod.org>
+In-Reply-To: <20200806132106.747414-12-clg@kaod.org>
 From: Joel Stanley <joel@jms.id.au>
-Date: Thu, 6 Aug 2020 23:47:21 +0000
-Message-ID: <CACPK8XdWztzwTfqX5Mkk8wbdrL13nfhw_pTw0R6ra06cOXenBA@mail.gmail.com>
-Subject: Re: [PATCH for-5.2 10/19] ftgmac100: Fix interrupt status "Packet
- transmitted on ethernet"
+Date: Thu, 6 Aug 2020 23:48:07 +0000
+Message-ID: <CACPK8XcpXWPLhj7aCiJkDK+2iqEvwA1Mh2+d0a77TxJg_u1opw@mail.gmail.com>
+Subject: Re: [PATCH for-5.2 11/19] ftgmac100: Fix interrupt status "Packet
+ moved to RX FIFO"
 To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -102,46 +102,41 @@ Sender: "Qemu-devel"
 
 On Thu, 6 Aug 2020 at 13:21, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >
-> The second field of the TX descriptor has a set of flags to choose
-> when the transmit interrupt is raised : after the packet has been sent
-> on the ethernet or after it has been moved into the TX FIFO. But we
-> don't model that today.
-
-Does any software depend on this behaviour? Perhaps mention it in the
-commit message so we remember why we changed it.
-
->
-> Simply raise the "Packet transmitted on ethernet" the interrupt status
-> bit as soon as the packet is sent by QEMU.
-
-delete the second 'the'?
-
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-
+> As we don't model the RX or TX FIFO, raise the "Packet moved to RX
+> FIFO" interrupt status bit as soon as we are handling a RX packet.
 >
 > Cc: Frederic Konrad <konrad.frederic@yahoo.fr>
 > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+
 > ---
->  hw/net/ftgmac100.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+>  hw/net/ftgmac100.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 >
 > diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-> index 0348fcf45676..aa3c05ef9882 100644
+> index aa3c05ef9882..5c0fe2d8cb75 100644
 > --- a/hw/net/ftgmac100.c
 > +++ b/hw/net/ftgmac100.c
-> @@ -547,9 +547,7 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32=
-_t tx_ring,
->              qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_siz=
-e);
->              ptr =3D s->frame;
->              frame_size =3D 0;
-> -            if (flags & FTGMAC100_TXDES1_TXIC) {
-> -                s->isr |=3D FTGMAC100_INT_XPKT_ETH;
-> -            }
-> +            s->isr |=3D FTGMAC100_INT_XPKT_ETH;
->          }
+> @@ -950,6 +950,7 @@ static ssize_t ftgmac100_receive(NetClientState *nc, =
+const uint8_t *buf,
+>          break;
+>      }
 >
->          if (flags & FTGMAC100_TXDES1_TX2FIC) {
+> +    s->isr |=3D FTGMAC100_INT_RPKT_FIFO;
+>      addr =3D s->rx_descriptor;
+>      while (size > 0) {
+>          if (!ftgmac100_can_receive(nc)) {
+> @@ -1001,8 +1002,6 @@ static ssize_t ftgmac100_receive(NetClientState *nc=
+, const uint8_t *buf,
+>              /* Last buffer in frame.  */
+>              bd.des0 |=3D flags | FTGMAC100_RXDES0_LRS;
+>              s->isr |=3D FTGMAC100_INT_RPKT_BUF;
+> -        } else {
+> -            s->isr |=3D FTGMAC100_INT_RPKT_FIFO;
+>          }
+>          ftgmac100_write_bd(&bd, addr);
+>          if (bd.des0 & s->rxdes0_edorr) {
 > --
 > 2.25.4
 >
