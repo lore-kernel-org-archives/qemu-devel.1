@@ -2,91 +2,68 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13604C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B82C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7CC522D0B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:07:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="R6du+1Dc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7CC522D0B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id ADC5C22D0B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:08:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC5C22D0B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3dbo-0003n7-78
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 06:58:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40856)
+	id 1k3aSn-0006wL-5m
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 03:37:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56174)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dRs-0002jr-IK
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:36 -0400
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:37214)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dRr-0007sF-1z
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:36 -0400
-Received: by mail-pf1-x429.google.com with SMTP id s26so24714720pfm.4
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:48:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=fGmZi4G6G8HBm6kSF0AhkPZa7UesVkFkZsuvcd4O+2c=;
- b=R6du+1DcDEU9q9Jf4F1QYzrnwFdudp1yW+7VoColi7zvPA59WzLSmiK75KQpExyWq3
- 6RZqhL49s9j7qsT7OM/dkLgPsz0cO/WfWs+0zWfoKmnq16A0k76wdFTL7pUWBApxuQxY
- krcVRaFlNnzszC4DbTYP84tH6jkh2IK+M5WDsn+xjto/RWUrVk6lvhxcrAKNjGiNXNlI
- GKIj8062kQfbNQx9jplX/RXzFOTGEEyP1MFENteo++uof1NExHk/hxTC8XeeY30I8g0t
- Afkq4ao04vvoy3YjhM+9QLDtKl+I8P/44q3E1O3/V/Ka7djoXLJ9U8+orhlSepYTeO70
- uJTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=fGmZi4G6G8HBm6kSF0AhkPZa7UesVkFkZsuvcd4O+2c=;
- b=g1AzlFcnoVbCcZTiCL9b1sbm9ukLm3yx/kIcnOeWKutFYeHf6jHUfVjp+zT8EKxr8E
- fmEWM+nqpMrNsmrLh3G6jkCA4A7nVVGEEAvEHuloHTH8bxqRFjAZBIbK0MsJNicmVitB
- 86BB0F1K0USDxQrums6f+8vHQad3Msr1Iq5BfM+qXVQtVAKaLo8rz2EbwDUvdJuMel/A
- LXyuQT9VCX1xd1b1aAz4O1kytiSoHnn8ZWkc4qq4tANeAP2Q2HCVHgmS4DecyYi+B7dU
- fwf7CSsg8QiisWYLld6i7nSLqfJD8DGNRwNhyOs2VDQZ8TMp5Bkk7OGajMJsppjep68L
- VLlw==
-X-Gm-Message-State: AOAM531ISGNSfbb+zdGoWcxOmhDf3+SONbtkyJZWPgjbidTip/oa9E9y
- yRVPAk5/YbEbyhdT6mejsSxE9nWu5i0=
-X-Google-Smtp-Source: ABdhPJyHub4FH4VlmHxGOsZRReb6OeUHPTUSIJgyxSf1cgG91ZvKqUHD0KCU8+22OizWLqKGF9h0PQ==
-X-Received: by 2002:a65:43c9:: with SMTP id n9mr6578329pgp.452.1596710913213; 
- Thu, 06 Aug 2020 03:48:33 -0700 (PDT)
-Received: from frankchang-ThinkPad-T490.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.48.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 03:48:32 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC v3 29/71] target/riscv: rvv-1.0: floating-point classify
- instructions
-Date: Thu,  6 Aug 2020 18:46:26 +0800
-Message-Id: <20200806104709.13235-30-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
-References: <20200806104709.13235-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::429;
- envelope-from=frank.chang@sifive.com; helo=mail-pf1-x429.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k3aS6-0006C7-Jp
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 03:36:38 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:34816 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k3aS4-0002Gb-2O
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 03:36:38 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 34D8BA22444E0E738451;
+ Thu,  6 Aug 2020 15:36:22 +0800 (CST)
+Received: from [127.0.0.1] (10.174.186.4) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Thu, 6 Aug 2020
+ 15:36:14 +0800
+From: Zheng Chuan <zhengchuan@huawei.com>
+Subject: Re: [RFC PATCH 0/8] *** A Method for evaluating dirty page rate ***
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <1595646669-109310-1-git-send-email-zhengchuan@huawei.com>
+ <20200804161902.GC2659@work-vm>
+Message-ID: <fdb4afcb-8c99-1a97-a211-5eaa0573398d@huawei.com>
+Date: Thu, 6 Aug 2020 15:36:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20200804161902.GC2659@work-vm>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.186.4]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 03:36:23
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,37 +76,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, linyilu@huawei.com,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/insn32.decode | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index f142aa5d073..a800c989050 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -550,7 +550,7 @@ vmfgt_vf        011101 . ..... ..... 101 ..... 1010111 @r_vm
- vmfge_vf        011111 . ..... ..... 101 ..... 1010111 @r_vm
- vmford_vv       011010 . ..... ..... 001 ..... 1010111 @r_vm
- vmford_vf       011010 . ..... ..... 101 ..... 1010111 @r_vm
--vfclass_v       100011 . ..... 10000 001 ..... 1010111 @r2_vm
-+vfclass_v       010011 . ..... 10000 001 ..... 1010111 @r2_vm
- vfmerge_vfm     010111 0 ..... ..... 101 ..... 1010111 @r_vm_0
- vfmv_v_f        010111 1 00000 ..... 101 ..... 1010111 @r2
- vfcvt_xu_f_v    100010 . ..... 00000 001 ..... 1010111 @r2_vm
--- 
-2.17.1
+On 2020/8/5 0:19, Dr. David Alan Gilbert wrote:
+> * Chuan Zheng (zhengchuan@huawei.com) wrote:
+>> From: Zheng Chuan <zhengchuan@huawei.com>
+> 
+> Hi,
+> 
+>> Sometimes it is neccessary to evaluate dirty page rate before migration.
+>> Users could decide whether to proceed migration based on the evaluation
+>> in case of vm performance loss due to heavy workload.
+>> Unlikey simulating dirtylog sync which could do harm on runnning vm,
+>> we provide a sample-hash method to compare hash results for samping page.
+>> In this way, it would have hardly no impact on vm performance.
+>>
+>> We evaluate the dirtypage rate on running vm.
+>> The VM specifications for migration are as follows:
+>> - VM use 4-K page;
+>> - the number of VCPU is 32;
+>> - the total memory is 32Gigabit;
+>> - use 'mempress' tool to pressurize VM(mempress 4096 1024);
+>>
+>> ++++++++++++++++++++++++++++++++++++++++++
+>> |                      |    dirtyrate    |
+>> ++++++++++++++++++++++++++++++++++++++++++
+>> | no mempress          |     4MB/s       |
+>> ------------------------------------------
+>> | mempress 4096 1024   |    1204MB/s     |
+>> ++++++++++++++++++++++++++++++++++++++++++
+>> | mempress 4096 4096   |    4000Mb/s     |
+>> ++++++++++++++++++++++++++++++++++++++++++
+> 
+> This is quite neat; I know we've got other people who have asked
+> for a similar feature!
+> Have you tried to validate these numbers against a real migration - e.g.
+> try setting mempress to dirty just under 1GByte/s and see if you can
+> migrate it over a 10Gbps link?
+> 
+> Dave
+> 
+Hi, Dave.
+Thank you for your review.
+
+Note that, the original intention is evaluating dirty rate before migration.
+
+However, I test dirty rate against a real migration over a bandwidth of 10Gps with various mempress, which shows as below:
+++++++++++++++++++++++++++++++++++++++++++
+|                      |    dirtyrate    |
+++++++++++++++++++++++++++++++++++++++++++
+| no mempress          |     8MB/s       |
+------------------------------------------
+| mempress 4096 1024   |    1188MB/s     |
+++++++++++++++++++++++++++++++++++++++++++
+
+It looks still close to actual dirty rate:)
+
+Test results against a real migration will be posted in V2.
+
+>> Test dirtyrate by qmp command like this:
+>> 1.  virsh qemu-monitor-command [vmname] '{"execute":"cal_dirty_rate", "arguments": {"value": [sampletime]}}'
+>> 2.  virsh qemu-monitor-command [vmname] '{"execute":"get_dirty_rate"}'
+>>
+>> Further test dirtyrate by libvirt api like this:
+>> virsh getdirtyrate [vmname] [sampletime]
+>>
+>> Zheng Chuan (8):
+>>   migration/dirtyrate: Add get_dirtyrate_thread() function
+>>   migration/dirtyrate: Add block_dirty_info to store dirtypage info
+>>   migration/dirtyrate: Add dirtyrate statistics series functions
+>>   migration/dirtyrate: Record hash results for each ramblock
+>>   migration/dirtyrate: Compare hash results for recorded ramblock
+>>   migration/dirtyrate: Implement get_sample_gap_period() and
+>>     block_sample_gap_period()
+>>   migration/dirtyrate: Implement calculate_dirtyrate() function
+>>   migration/dirtyrate: Implement
+>>     qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
+>>
+>>  migration/Makefile.objs |   1 +
+>>  migration/dirtyrate.c   | 424 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>  migration/dirtyrate.h   |  67 ++++++++
+>>  qapi/migration.json     |  24 +++
+>>  qapi/pragma.json        |   3 +-
+>>  5 files changed, 518 insertions(+), 1 deletion(-)
+>>  create mode 100644 migration/dirtyrate.c
+>>  create mode 100644 migration/dirtyrate.h
+>>
+>> -- 
+>> 1.8.3.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> 
+> .
+> 
 
 
