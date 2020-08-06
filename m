@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 633A8C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:13:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 108A3C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:14:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39791221E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:13:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C84F3221E3
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:14:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IuuUcrx5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39791221E2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6UU/FWG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C84F3221E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3mGb-0000pM-9M
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:13:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44578)
+	id 1k3mH2-0001WM-Tc
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:14:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lRF-00032b-BJ
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44644
- helo=us-smtp-1.mimecast.com)
+ id 1k3lRR-0003Vy-SJ
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53327
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lRA-0006ty-Qz
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:28 -0400
+ id 1k3lRM-00071q-Ns
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741624;
+ s=mimecast20190719; t=1596741636;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CZmvokhdxFwr1mSTGE/qcupEr3UKG9pHkaRMS8v5UVU=;
- b=IuuUcrx5eFXA8Ue+5Dav9qDNK6RkMv8fB6RbIS+IPCtsD6gvL1oP/7ujIXlxF3TeWt/Kbp
- Cxxha8ywPMp99AozAZBJrPw2UAErvFWWUjmzr6Ur8Bc9EoligOVAGOiuRVxMjwVJ+T3nex
- hf3++4XH/HundTcFuEi8RWxyj73aTos=
+ bh=iMqiVGkfTXBbd/uGgjukbP8TbjyGiH/6P2i6AizPOi8=;
+ b=Q6UU/FWGHjxHhOHPVk7FAmKq1z8cgQKxZ3ChIv4zU+NLOc8edzfsOMzg30QBIktpocp/YV
+ 1XfOLRmKNqIn5bIag9BlR3scXSnkuAhOPLuD1Y6uwZPXU6hCMs41Bkg2rpkf4CkxUy+GFp
+ b0jVxh73SikkroVbenObti1wSYb5cXQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-2D0awKMEOFS-WCCMg15Oog-1; Thu, 06 Aug 2020 15:20:22 -0400
-X-MC-Unique: 2D0awKMEOFS-WCCMg15Oog-1
+ us-mta-423-21hHZzNuNdukS9xQjtwspA-1; Thu, 06 Aug 2020 15:20:31 -0400
+X-MC-Unique: 21hHZzNuNdukS9xQjtwspA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F6BD1DE9
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:20:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BEC6107BEF5
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:20:30 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 33FD45F9DC;
- Thu,  6 Aug 2020 19:20:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 73FA35F9DC
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:20:29 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 130/143] meson: link emulators without Makefile.target
-Date: Thu,  6 Aug 2020 21:16:06 +0200
-Message-Id: <1596741379-12902-131-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 137/143] rules.mak: drop unneeded macros
+Date: Thu,  6 Aug 2020 21:16:13 +0200
+Message-Id: <1596741379-12902-138-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 03:10:56
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,991 +97,455 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- .gitlab-ci.yml                            |   4 +-
- Makefile                                  |  34 +------
- Makefile.objs                             |  32 -------
- Makefile.target                           | 153 +-----------------------------
- configure                                 |  22 ++---
- docs/devel/blkverify.txt                  |   4 +-
- docs/devel/testing.rst                    |   4 +-
- docs/interop/live-block-operations.rst    |   4 +-
- meson.build                               |  81 +++++++++++++++-
- os-posix.c                                |   2 +-
- plugins/meson.build                       |  10 +-
- rules.mak                                 |   1 -
- scripts/device-crash-test                 |   2 +-
- softmmu/Makefile.objs                     |   3 -
- softmmu/meson.build                       |   4 +
- tests/Makefile.include                    |   2 +-
- tests/acceptance/avocado_qemu/__init__.py |   3 +-
- tests/data/acpi/rebuild-expected-aml.sh   |   2 +-
- tests/multiboot/run_test.sh               |   2 +-
- tests/qemu-iotests/check                  |   6 +-
- tests/qtest/fuzz/Makefile.include         |  39 --------
- tests/qtest/fuzz/i440fx_fuzz.c            |   4 +-
- tests/qtest/fuzz/meson.build              |  34 +++++++
- tests/qtest/fuzz/virtio_net_fuzz.c        |   3 +-
- tests/qtest/libqos/qgraph.h               |   2 +-
- tests/qtest/meson.build                   |   2 +-
- tests/qtest/rtas-test.c                   |   2 +-
- tests/tcg/configure.sh                    |   4 +-
- 28 files changed, 161 insertions(+), 304 deletions(-)
- delete mode 100644 softmmu/Makefile.objs
- delete mode 100644 tests/qtest/fuzz/Makefile.include
- create mode 100644 tests/qtest/fuzz/meson.build
+ .gitignore                  |   1 -
+ Makefile                    |   7 +-
+ configure                   |  32 +-----
+ docs/devel/build-system.txt |   5 +-
+ rules.mak                   | 231 +-------------------------------------------
+ scripts/create_config       |   6 +-
+ 6 files changed, 14 insertions(+), 268 deletions(-)
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 9820066..f6556e5 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -269,5 +269,5 @@ build-tci:
-         ./tests/qtest/boot-serial-test || exit 1 ;
-         ./tests/qtest/cdrom-test || exit 1 ;
-       done
--    - QTEST_QEMU_BINARY="x86_64-softmmu/qemu-system-x86_64" ./tests/qtest/pxe-test
--    - QTEST_QEMU_BINARY="s390x-softmmu/qemu-system-s390x" ./tests/qtest/pxe-test -m slow
-+    - QTEST_QEMU_BINARY="./qemu-system-x86_64" ./tests/qtest/pxe-test
-+    - QTEST_QEMU_BINARY="./qemu-system-s390x" ./tests/qtest/pxe-test -m slow
+diff --git a/.gitignore b/.gitignore
+index de1f20e..5eaeada 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -78,7 +78,6 @@
+ *.msi
+ *.dll
+ *.so
+-*.mo
+ *.fn
+ *.ky
+ *.log
 diff --git a/Makefile b/Makefile
-index 5320a06..1f89680 100644
+index 6735832..cc0b053 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -105,9 +105,6 @@ include $(SRC_PATH)/rules.mak
- # lor is defined in rules.mak
- CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
+@@ -127,7 +127,7 @@ endif
  
--generated-files-y += target/s390x/gen-features.h
--target/s390x/gen-features.h: Makefile.ninja
--
- generated-files-y += .git-submodule-status
+ include $(SRC_PATH)/tests/Makefile.include
  
- edk2-decompressed = $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
-@@ -172,29 +169,6 @@ config-host.h-timestamp: config-host.mak
+-all: recurse-all modules
++all: recurse-all
  
- TARGET_DIRS_RULES := $(foreach t, all fuzz clean install, $(addsuffix /$(t), $(TARGET_DIRS)))
- 
--SOFTMMU_ALL_RULES=$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
--$(SOFTMMU_ALL_RULES): $(authz-obj-y)
--$(SOFTMMU_ALL_RULES): $(block-obj-y)
--$(SOFTMMU_ALL_RULES): $(chardev-obj-y)
--$(SOFTMMU_ALL_RULES): $(crypto-obj-y)
--$(SOFTMMU_ALL_RULES): $(io-obj-y)
--$(SOFTMMU_ALL_RULES): $(qom-obj-y)
--$(SOFTMMU_ALL_RULES): config-all-devices.mak
--
--SOFTMMU_FUZZ_RULES=$(filter %-softmmu/fuzz, $(TARGET_DIRS_RULES))
--$(SOFTMMU_FUZZ_RULES): $(authz-obj-y)
--$(SOFTMMU_FUZZ_RULES): $(block-obj-y)
--$(SOFTMMU_FUZZ_RULES): $(chardev-obj-y)
--$(SOFTMMU_FUZZ_RULES): $(crypto-obj-y)
--$(SOFTMMU_FUZZ_RULES): $(io-obj-y)
--$(SOFTMMU_FUZZ_RULES): config-all-devices.mak
--$(SOFTMMU_FUZZ_RULES): $(edk2-decompressed)
--
--# meson: this is sub-optimal but going away after conversion
--TARGET_DEPS = $(patsubst %,%-config-target.h, $(TARGET_DIRS))
--TARGET_DEPS += $(patsubst %,%-config-devices.h, $(filter %-softmmu,$(TARGET_DIRS)))
--TARGET_DEPS += $(patsubst %,libqemu-%.fa, $(TARGET_DIRS))
--
- .PHONY: $(TARGET_DIRS_RULES)
- # The $(TARGET_DIRS_RULES) are of the form SUBDIR/GOAL, so that
- # $(dir $@) yields the sub-directory, and $(notdir $@) yields the sub-goal
-@@ -237,11 +211,7 @@ slirp/all: .git-submodule-status
- 		CC="$(CC)" AR="$(AR)" 	LD="$(LD)" RANLIB="$(RANLIB)"	\
- 		CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(QEMU_LDFLAGS)")
- 
--$(filter %/all, $(TARGET_DIRS_RULES)): libqemuutil.a $(common-obj-y) \
--	$(qom-obj-y) block.syms qemu.syms
--
--$(filter %/fuzz, $(TARGET_DIRS_RULES)): libqemuutil.a $(common-obj-y) \
--	$(qom-obj-y) $(crypto-user-obj-$(CONFIG_USER_ONLY))
-+$(filter %/all, $(TARGET_DIRS_RULES)):
- 
- ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
- ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
-@@ -263,8 +233,6 @@ Makefile: $(version-obj-y)
- 
- ######################################################################
- 
--COMMON_LDADDS = libqemuutil.a
--
+ # LIBFDT_lib="": avoid breaking existing trees with objects requiring -fPIC
+ DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_lib=""
+@@ -181,7 +181,7 @@ recurse-clean: $(addsuffix /clean, $(ROM_DIRS))
  clean: recurse-clean
  # avoid old build problems by removing potentially incorrect old files
  	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
-diff --git a/Makefile.objs b/Makefile.objs
-index 40e23a2..9f73e86 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -33,37 +33,5 @@ io-obj-y = io/libio.fa
- endif # CONFIG_SOFTMMU or CONFIG_TOOLS
- 
- ######################################################################
--# Target independent part of system emulation. The long term path is to
--# suppress *all* target specific code in case of system emulation, i.e. a
--# single QEMU executable should support all CPUs and machines.
--
--ifeq ($(CONFIG_SOFTMMU),y)
--common-obj-y =
--
--common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
--common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
--common-obj-$(CONFIG_AUDIO_PA) += audio-pa$(DSOSUF)
--common-obj-$(CONFIG_AUDIO_SDL) += audio-sdl$(DSOSUF)
--
--common-obj-$(if $(CONFIG_CURSES),m) += ui-curses$(DSOSUF)
--common-obj-$(if $(CONFIG_GTK),m) += ui-gtk$(DSOSUF)
--common-obj-$(if $(CONFIG_SDL),m) += ui-sdl$(DSOSUF)
--common-obj-$(if $(CONFIG_SPICE),m) += ui-spice-app$(DSOSUF)
--
--common-obj-$(if $(CONFIG_CURL),m) += block-curl$(DSOSUF)
--common-obj-$(if $(CONFIG_GLUSTERFS),m) += block-gluster$(DSOSUF)
--common-obj-$(if $(CONFIG_LIBISCSI),m) += block-iscsi$(DSOSUF)
--common-obj-$(if $(CONFIG_LIBNFS),m) += block-nfs$(DSOSUF)
--common-obj-$(if $(CONFIG_LIBSSH),m) += block-ssh$(DSOSUF)
--common-obj-$(if $(CONFIG_RBD),m) += block-rbd$(DSOSUF)
--
--common-obj-$(if $(CONFIG_LZFSE),m) += block-dmg-lzfse$(DSOSUF)
--common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF)
--
--common-obj-y += libqmp.fa
--
--endif # CONFIG_SOFTMMU
--
--######################################################################
- # Resource file for Windows executables
- version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
-diff --git a/Makefile.target b/Makefile.target
-index 2b7280b..8ee4c78 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -6,43 +6,16 @@ include ../config-host.mak
- include config-target.mak
- include $(SRC_PATH)/rules.mak
- 
--FULL_TARGET_NAME=$(TARGET_NAME)-$(if $(CONFIG_SOFTMMU),softmmu,linux-user)
--
--ifdef CONFIG_SOFTMMU
--include ../$(FULL_TARGET_NAME)-config-devices.mak
+-	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f \
++	find . \( -name '*.so' -o -name '*.dll' -o -name '*.[oda]' \) -type f \
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
+ 		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
+@@ -383,9 +383,6 @@ print-help = $(quiet-@)$(call print-help-run,$1,$2)
+ help:
+ 	@echo  'Generic targets:'
+ 	$(call print-help,all,Build all)
+-ifdef CONFIG_MODULES
+-	$(call print-help,modules,Build all modules)
 -endif
--
- $(call set-vpath, $(SRC_PATH):$(BUILD_DIR))
--ifdef CONFIG_LINUX
--QEMU_CFLAGS += -isystem ../linux-headers
--endif
--QEMU_CFLAGS += -iquote .. -iquote $(SRC_PATH)/target/$(TARGET_BASE_ARCH) -DNEED_CPU_H
--
--QEMU_CFLAGS+=-iquote $(SRC_PATH)/include
--
--QEMU_CFLAGS += -DCONFIG_TARGET=\"../$(FULL_TARGET_NAME)-config-target.h\"
--QEMU_CFLAGS += -DCONFIG_DEVICES=\"../$(FULL_TARGET_NAME)-config-devices.h\"
- 
- ifdef CONFIG_USER_ONLY
- # user emulator name
- QEMU_PROG=qemu-$(TARGET_NAME)
--QEMU_PROG_BUILD = $(QEMU_PROG)
- else
- # system emulator name
- QEMU_PROG=qemu-system-$(TARGET_NAME)$(EXESUF)
--ifneq (,$(findstring -mwindows,$(SDL_LIBS)))
--# Terminate program name with a 'w' because the linker builds a windows executable.
--QEMU_PROGW=qemu-system-$(TARGET_NAME)w$(EXESUF)
--$(QEMU_PROG): $(QEMU_PROGW)
--	$(call quiet-command,$(OBJCOPY) --subsystem console $(QEMU_PROGW) $(QEMU_PROG),"GEN","$(TARGET_DIR)$(QEMU_PROG)")
--QEMU_PROG_BUILD = $(QEMU_PROGW)
--else
--QEMU_PROG_BUILD = $(QEMU_PROG)
--endif
- endif
- 
--LIBQEMU = ../libqemu-$(FULL_TARGET_NAME).fa
--PROGS=$(QEMU_PROG) $(QEMU_PROGW)
- STPFILES=
- 
- ifdef CONFIG_TRACE_SYSTEMTAP
-@@ -98,109 +71,10 @@ stap:
- endif
- .PHONY: stap
- 
--all: $(PROGS) stap
--
--# Dummy command so that make thinks it has done something
--	@true
--
--obj-y += $(LIBQEMU)
--
--obj-y += trace/
--
--#########################################################
--LIBS := $(libs_cpu) $(LIBS)
--
--#########################################################
--# Linux user emulator target
--
--ifdef CONFIG_LINUX_USER
--
--QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \
--             -I$(SRC_PATH)/linux-user/host/$(ARCH) \
--             -I$(SRC_PATH)/linux-user \
--             -Ilinux-user/$(TARGET_ABI_DIR)
--
--endif #CONFIG_LINUX_USER
--
--#########################################################
--# BSD user emulator target
--
--ifdef CONFIG_BSD_USER
--
--QEMU_CFLAGS+=-I$(SRC_PATH)/bsd-user -I$(SRC_PATH)/bsd-user/$(TARGET_ABI_DIR) \
--			 -I$(SRC_PATH)/bsd-user/$(HOST_VARIANT_DIR)
--
--endif #CONFIG_BSD_USER
--
--#########################################################
--# System emulator target
--ifdef CONFIG_SOFTMMU
--obj-y += softmmu/
--obj-y += gdbstub.o
--LIBS := $(libs_softmmu) $(LIBS)
--
--# Temporary until emulators are linked by Meson
--LIBS := $(LIBS) @../block.syms @../qemu.syms
--ifneq ($(CONFIG_MODULES),y)
--LIBS := $(LIBS) $(ALSA_LIBS) $(OSS_LIBS) $(PULSE_LIBS) $(SDL_LIBS)
--LIBS := $(LIBS) $(GTK_LIBS) $(VTE_LIBS) $(X11_LIBS) $(CURSES_LIBS) $(ICONV_LIBS) $(GIO_LIBS)
--endif
--LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS) $(OPENGL_LIBS) $(SECCOMP_LIBS)
--LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
--LIBS := $(LIBS) $(VDE_LIBS) $(SLIRP_LIBS)
--LIBS := $(LIBS) $(LIBUSB_LIBS) $(SMARTCARD_LIBS) $(USB_REDIR_LIBS)
--LIBS := $(LIBS) $(VIRGL_LIBS) $(CURSES_LIBS)
--
--ifeq ($(CONFIG_PLUGIN),y)
--ifdef CONFIG_HAS_LD_DYNAMIC_LIST
--LIBS += -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
--else
--ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
--LIBS += -Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
--endif
--endif
--endif
--
--generated-files-y += hmp-commands.h hmp-commands-info.h
--
--endif # CONFIG_SOFTMMU
--
--dummy := $(call unnest-vars,,obj-y)
--all-obj-y := $(obj-y)
--
--include $(SRC_PATH)/Makefile.objs
--dummy := $(call fix-paths,../,, \
--              authz-obj-y \
--              block-obj-y \
--              chardev-obj-y \
--              crypto-obj-y \
--              io-obj-y \
--              qom-obj-y)
--dummy := $(call unnest-vars,..,common-obj-y)
--
--all-obj-y += $(common-obj-y)
--all-obj-y += $(qom-obj-y)
--all-obj-$(CONFIG_SOFTMMU) += $(authz-obj-y)
--all-obj-$(CONFIG_SOFTMMU) += $(block-obj-y) $(chardev-obj-y)
--all-obj-$(CONFIG_SOFTMMU) += $(crypto-obj-y)
--all-obj-$(CONFIG_SOFTMMU) += $(io-obj-y)
--
--ifdef CONFIG_SOFTMMU
--$(QEMU_PROG_BUILD): ../$(FULL_TARGET_NAME)-config-devices.mak
--endif
--
--COMMON_LDADDS = ../libqemuutil.a
--
--# build either PROG or PROGW
--$(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS) $(softmmu-main-y)
--	$(call LINK, $(filter-out %.mak, $^))
--ifdef CONFIG_DARWIN
--	$(call quiet-command,Rez -append $(SRC_PATH)/pc-bios/qemu.rsrc -o $@,"REZ","$(TARGET_DIR)$@")
--	$(call quiet-command,SetFile -a C $@,"SETFILE","$(TARGET_DIR)$@")
--endif
-+all: stap
- 
--clean: clean-target
--	rm -f *.a *~ $(PROGS)
-+clean:
-+	rm -f *.a *~
- 	rm -f $(shell find . -name '*.[od]')
- 	rm -f hmp-commands.h gdbstub-xml.c
- 	rm -f trace/generated-helpers.c trace/generated-helpers.c-timestamp
-@@ -208,26 +82,7 @@ ifdef CONFIG_TRACE_SYSTEMTAP
- 	rm -f *.stp
- endif
- 
--ifdef CONFIG_FUZZ
--include $(SRC_PATH)/tests/qtest/fuzz/Makefile.include
--include $(SRC_PATH)/tests/qtest/Makefile.include
--
--fuzz: fuzz-vars
--fuzz-vars: QEMU_CFLAGS := $(FUZZ_CFLAGS) $(QEMU_CFLAGS)
--fuzz-vars: QEMU_LDFLAGS := $(FUZZ_LDFLAGS) $(QEMU_LDFLAGS)
--fuzz-vars: $(QEMU_PROG_FUZZ)
--dummy := $(call unnest-vars,, fuzz-obj-y)
--
--
--$(QEMU_PROG_FUZZ): config-devices.mak $(all-obj-y) $(COMMON_LDADDS) $(fuzz-obj-y)
--	$(call LINK, $(filter-out %.mak, $^))
--
--endif
--
- install: all
--ifneq ($(PROGS),)
--	$(call install-prog,$(PROGS),$(DESTDIR)$(bindir))
--endif
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset"
- 	$(INSTALL_DATA) $(QEMU_PROG).stp-installed "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset/$(QEMU_PROG).stp"
-@@ -235,4 +90,4 @@ ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_DATA) $(QEMU_PROG)-log.stp "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset/$(QEMU_PROG)-log.stp"
- endif
- 
--Makefile: $(generated-files-y)
-+.PHONY: all clean install
+ 	$(call print-help,dir/file.o,Build specified target only)
+ 	$(call print-help,install,Install QEMU, documentation and tools)
+ 	$(call print-help,ctags/TAGS,Generate tags file for editors)
 diff --git a/configure b/configure
-index a7a4538..61100c1 100755
+index 08aee81..99ed6fa 100755
 --- a/configure
 +++ b/configure
-@@ -316,7 +316,6 @@ audio_drv_list=""
- block_drv_rw_whitelist=""
- block_drv_ro_whitelist=""
- host_cc="cc"
--libs_cpu=""
- libs_softmmu=""
- libs_tools=""
- audio_win_int=""
-@@ -5415,7 +5414,6 @@ case "$capstone" in
-     else
-       LIBCAPSTONE=libcapstone.a
-     fi
--    libs_cpu="-L$PWD/capstone -lcapstone $libs_cpu"
-     capstone_libs="-L$PWD/capstone -lcapstone"
-     capstone_cflags="-I${source_path}/capstone/include"
-     ;;
-@@ -5424,7 +5422,6 @@ case "$capstone" in
-     capstone_libs="$($pkg_config --libs capstone)"
-     capstone_cflags="$($pkg_config --cflags capstone)"
-     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
--    libs_cpu="$($pkg_config --libs capstone) $libs_cpu"
-     ;;
+@@ -29,7 +29,6 @@ TMPC="${TMPDIR1}/${TMPB}.c"
+ TMPO="${TMPDIR1}/${TMPB}.o"
+ TMPCXX="${TMPDIR1}/${TMPB}.cxx"
+ TMPE="${TMPDIR1}/${TMPB}.exe"
+-TMPMO="${TMPDIR1}/${TMPB}.mo"
+ TMPTXT="${TMPDIR1}/${TMPB}.txt"
  
-   no)
-@@ -6342,7 +6339,10 @@ fi
- if test "$fuzzing" = "yes" ; then
-   write_c_fuzzer_skeleton
-   if compile_prog "$CPU_CFLAGS -Werror -fsanitize=fuzzer" ""; then
--      have_fuzzer=yes
-+    have_fuzzer=yes
-+  else
-+    error_exit "Your compiler doesn't support -fsanitize=fuzzer"
-+    exit 1
+ rm -f config.log
+@@ -424,7 +423,7 @@ bigendian="no"
+ mingw32="no"
+ gcov="no"
+ EXESUF=""
+-DSOSUF=".so"
++HOST_DSOSUF=".so"
+ LDFLAGS_SHARED="-shared"
+ modules="no"
+ module_upgrades="no"
+@@ -958,7 +957,7 @@ fi
+ 
+ if test "$mingw32" = "yes" ; then
+   EXESUF=".exe"
+-  DSOSUF=".dll"
++  HOST_DSOSUF=".dll"
+   # MinGW needs -mthreads for TLS and macro _MT.
+   QEMU_CFLAGS="-mthreads $QEMU_CFLAGS"
+   LIBS="-lwinmm -lws2_32 $LIBS"
+@@ -6205,31 +6204,6 @@ EOF
    fi
  fi
  
-@@ -6842,7 +6842,6 @@ echo "qemu_helperdir=$libexecdir" >> $config_host_mak
- echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
- echo "qemu_icondir=$qemu_icondir" >> $config_host_mak
- echo "qemu_desktopdir=$qemu_desktopdir" >> $config_host_mak
--echo "libs_cpu=$libs_cpu" >> $config_host_mak
- echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
- echo "GIT=$git" >> $config_host_mak
- echo "GIT_SUBMODULES=$git_submodules" >> $config_host_mak
-@@ -7705,14 +7704,7 @@ if test "$have_mlockall" = "yes" ; then
-   echo "HAVE_MLOCKALL=y" >> $config_host_mak
- fi
- if test "$fuzzing" = "yes" ; then
--  if test "$have_fuzzer" = "yes"; then
--    FUZZ_LDFLAGS=" -fsanitize=fuzzer"
--    FUZZ_CFLAGS=" -fsanitize=fuzzer"
--    CFLAGS="$CFLAGS -fsanitize=fuzzer-no-link"
--  else
--    error_exit "Your compiler doesn't support -fsanitize=fuzzer"
--    exit 1
+-#################################################
+-# Sparc implicitly links with --relax, which is
+-# incompatible with -r, so --no-relax should be
+-# given. It does no harm to give it on other
+-# platforms too.
+-
+-# Note: the prototype is needed since QEMU_CFLAGS
+-#       contains -Wmissing-prototypes
+-cat > $TMPC << EOF
+-extern int foo(void);
+-int foo(void) { return 0; }
+-EOF
+-if ! compile_object ""; then
+-  error_exit "Failed to compile object file for LD_REL_FLAGS test"
+-fi
+-for i in '-Wl,-r -Wl,--no-relax' -Wl,-r -r; do
+-  if do_cc -nostdlib $i -o $TMPMO $TMPO; then
+-    LD_REL_FLAGS=$i
+-    break
 -  fi
-+  CFLAGS="$CFLAGS -fsanitize=fuzzer-no-link"
- fi
+-done
+-if test "$modules" = "yes" && test "$LD_REL_FLAGS" = ""; then
+-  feature_not_found "modules" "Cannot find how to build relocatable objects"
+-fi
+-
+ ##########################################
+ # check for sysmacros.h
  
- if test "$plugins" = "yes" ; then
-@@ -8299,8 +8291,8 @@ if test "$TARGET_ARCH" = "s390x" && test "$target_softmmu" = "yes" && \
-     fi
- fi
+@@ -7803,7 +7777,7 @@ echo "LIBS+=$LIBS" >> $config_host_mak
+ echo "LIBS_TOOLS+=$libs_tools" >> $config_host_mak
+ echo "PTHREAD_LIB=$PTHREAD_LIB" >> $config_host_mak
+ echo "EXESUF=$EXESUF" >> $config_host_mak
+-echo "DSOSUF=$DSOSUF" >> $config_host_mak
++echo "HOST_DSOSUF=$HOST_DSOSUF" >> $config_host_mak
+ echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
+ echo "LIBS_QGA=$libs_qga" >> $config_host_mak
+ echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
+diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
+index 41bd08e..fea67b2 100644
+--- a/docs/devel/build-system.txt
++++ b/docs/devel/build-system.txt
+@@ -404,10 +404,7 @@ using Makefile.target for the build rules.
+ - rules.mak
  
--echo "QEMU_LDFLAGS+=$ldflags" >> $config_target_mak
--echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
-+echo "QEMU_LDFLAGS=$ldflags" >> $config_target_mak
-+echo "QEMU_CFLAGS=$cflags" >> $config_target_mak
+ This file provides the generic helper rules for invoking build tools, in
+-particular the compiler and linker. This also contains the magic (hairy)
+-'unnest-vars' function which is used to merge the variable definitions
+-from all Makefile.objs in the source tree down into the main Makefile
+-context.
++particular the compiler and linker.
  
- done # for target in $targets
  
-diff --git a/docs/devel/blkverify.txt b/docs/devel/blkverify.txt
-index d556dc4..aca826c 100644
---- a/docs/devel/blkverify.txt
-+++ b/docs/devel/blkverify.txt
-@@ -62,8 +62,8 @@ A more realistic scenario is verifying the installation of a guest OS:
- 
-     $ ./qemu-img create raw.img 16G
-     $ ./qemu-img create -f qcow2 test.qcow2 16G
--    $ x86_64-softmmu/qemu-system-x86_64 -cdrom debian.iso \
--                                        -drive file=blkverify:raw.img:test.qcow2
-+    $ ./qemu-system-x86_64 -cdrom debian.iso \
-+          -drive file=blkverify:raw.img:test.qcow2
- 
- If the installation is aborted when blkverify detects corruption, use qemu-io
- to explore the contents of the disk image at the sector in question.
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index a426469..196e3bc 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -819,7 +819,7 @@ the following approaches:
- 1) Set ``qemu_bin``, and use the given binary
- 
- 2) Do not set ``qemu_bin``, and use a QEMU binary named like
--   "${arch}-softmmu/qemu-system-${arch}", either in the current
-+   "qemu-system-${arch}", either in the current
-    working directory, or in the current source tree.
- 
- The resulting ``qemu_bin`` value will be preserved in the
-@@ -886,7 +886,7 @@ like the following:
- 
- .. code::
- 
--  PARAMS (key=qemu_bin, path=*, default=x86_64-softmmu/qemu-system-x86_64) => 'x86_64-softmmu/qemu-system-x86_64
-+  PARAMS (key=qemu_bin, path=*, default=./qemu-system-x86_64) => './qemu-system-x86_64
- 
- arch
- ~~~~
-diff --git a/docs/interop/live-block-operations.rst b/docs/interop/live-block-operations.rst
-index 48afdc7..e13f5a2 100644
---- a/docs/interop/live-block-operations.rst
-+++ b/docs/interop/live-block-operations.rst
-@@ -129,7 +129,7 @@ To show some example invocations of command-line, we will use the
- following invocation of QEMU, with a QMP server running over UNIX
- socket::
- 
--    $ ./x86_64-softmmu/qemu-system-x86_64 -display none -no-user-config \
-+    $ ./qemu-system-x86_64 -display none -no-user-config \
-         -M q35 -nodefaults -m 512 \
-         -blockdev node-name=node-A,driver=qcow2,file.driver=file,file.node-name=file,file.filename=./a.qcow2 \
-         -device virtio-blk,drive=node-A,id=virtio0 \
-@@ -694,7 +694,7 @@ instance, with the following invocation.  (As noted earlier, for
- simplicity's sake, the destination QEMU is started on the same host, but
- it could be located elsewhere)::
- 
--    $ ./x86_64-softmmu/qemu-system-x86_64 -display none -no-user-config \
-+    $ ./qemu-system-x86_64 -display none -no-user-config \
-         -M q35 -nodefaults -m 512 \
-         -blockdev node-name=node-TargetDisk,driver=qcow2,file.driver=file,file.node-name=file,file.filename=./target-disk.qcow2 \
-         -device virtio-blk,drive=node-TargetDisk,id=virtio0 \
-diff --git a/meson.build b/meson.build
-index 58f84e8..5052165 100644
---- a/meson.build
-+++ b/meson.build
-@@ -198,10 +198,12 @@ brlapi = not_found
- if 'CONFIG_BRLAPI' in config_host
-   brlapi = declare_dependency(link_args: config_host['BRLAPI_LIBS'].split())
- endif
-+sdlwindows = false
- sdl = not_found
- if 'CONFIG_SDL' in config_host
-   sdl = declare_dependency(compile_args: config_host['SDL_CFLAGS'].split(),
-                            link_args: config_host['SDL_LIBS'].split())
-+  sdlwindows = config_host['SDL_LIBS'].contains('-mwindows')
- endif
- rbd = not_found
- if 'CONFIG_RBD' in config_host
-@@ -501,10 +503,12 @@ blockdev_ss = ss.source_set()
- qmp_ss = ss.source_set()
- common_ss = ss.source_set()
- softmmu_ss = ss.source_set()
-+softmmu_emulator_ss = ss.source_set()
- user_ss = ss.source_set()
- bsd_user_ss = ss.source_set()
- linux_user_ss = ss.source_set()
- specific_ss = ss.source_set()
-+specific_fuzz_ss = ss.source_set()
- 
- modules = {}
- hw_arch = {}
-@@ -716,6 +720,7 @@ specific_ss.add_all(when: 'CONFIG_LINUX_USER', if_true: linux_user_ss)
- 
- # needed for fuzzing binaries
- subdir('tests/qtest/libqos')
-+subdir('tests/qtest/fuzz')
- 
- mods = []
- block_mods = []
-@@ -770,6 +775,9 @@ libqmp = static_library('qmp', qmp_ss.sources(),
- 
- qmp = declare_dependency(link_whole: [libqmp])
- 
-+softmmu_ss.add(authz, block, chardev, crypto, io, qmp)
-+common_ss.add(qom, qemuutil)
-+
- foreach m : mods
-   shared_module(m['dir'] + '-' + m['name'],
-                 name_prefix: '',
-@@ -778,7 +786,7 @@ foreach m : mods
-                 install_dir: config_host['qemu_moddir'])
- endforeach
- 
--common_ss.add_all(when: 'CONFIG_SOFTMMU', if_true: softmmu_ss)
-+common_ss.add_all(when: 'CONFIG_SOFTMMU', if_true: [softmmu_ss, softmmu_emulator_ss])
- common_ss.add_all(when: 'CONFIG_USER_ONLY', if_true: user_ss)
- 
- common_all = common_ss.apply(config_all, strict: false)
-@@ -790,11 +798,17 @@ common_all = static_library('common',
- 
- feature_to_c = find_program('scripts/feature_to_c.sh')
- 
-+emulators = []
- foreach target : target_dirs
-   config_target = config_target_mak[target]
-   target_name = config_target['TARGET_NAME']
-   arch = config_target['TARGET_BASE_ARCH']
-   arch_srcs = []
-+  arch_deps = []
-+  c_args = config_target['QEMU_CFLAGS'].split() + ['-DNEED_CPU_H',
-+                  '-DCONFIG_TARGET="@0@-config-target.h"'.format(target),
-+                  '-DCONFIG_DEVICES="@0@-config-devices.h"'.format(target)]
-+  link_args = config_target['QEMU_LDFLAGS'].split()
- 
-   target_inc = [include_directories('target' / config_target['TARGET_BASE_ARCH'])]
-   if host_machine.system() == 'linux'
-@@ -805,12 +819,15 @@ foreach target : target_dirs
-     target_type='system'
-     t = target_softmmu_arch[arch].apply(config_target, strict: false)
-     arch_srcs += t.sources()
-+    arch_deps += t.dependencies()
- 
-     hw_dir = target_name == 'sparc64' ? 'sparc64' : arch
-     hw = hw_arch[hw_dir].apply(config_target, strict: false)
-     arch_srcs += hw.sources()
-+    arch_deps += hw.dependencies()
- 
-     arch_srcs += config_devices_h[target]
-+    link_args += ['@block.syms', '@qemu.syms']
-   else
-     abi = config_target['TARGET_ABI_DIR']
-     target_type='user'
-@@ -847,9 +864,11 @@ foreach target : target_dirs
- 
-   t = target_arch[arch].apply(config_target, strict: false)
-   arch_srcs += t.sources()
-+  arch_deps += t.dependencies()
- 
-   target_common = common_ss.apply(config_target, strict: false)
-   objects = common_all.extract_objects(target_common.sources())
-+  deps = target_common.dependencies()
- 
-   # TODO: Change to generator once obj-y goes away
-   config_target_h = custom_target(target + '-config-target.h',
-@@ -860,15 +879,67 @@ foreach target : target_dirs
- 
-   target_specific = specific_ss.apply(config_target, strict: false)
-   arch_srcs += target_specific.sources()
-+  arch_deps += target_specific.dependencies()
- 
--  static_library('qemu-' + target,
-+  lib = static_library('qemu-' + target,
-                  sources: arch_srcs + [config_target_h] + genh,
-                  objects: objects,
-                  include_directories: target_inc,
--                 c_args: ['-DNEED_CPU_H',
--                          '-DCONFIG_TARGET="@0@-config-target.h"'.format(target),
--                          '-DCONFIG_DEVICES="@0@-config-devices.h"'.format(target)],
-+                 c_args: c_args,
-+                 build_by_default: false,
-                  name_suffix: 'fa')
-+
-+  if target.endswith('-softmmu')
-+    softmmu_emulator = softmmu_emulator_ss.apply(config_target, strict: false)
-+    softmmu_emulator_objs = common_all.extract_objects(softmmu_emulator.sources())
-+    softmmu_emulator_deps = softmmu_emulator.dependencies()
-+    execs = [{
-+      'name': 'qemu-system-' + target_name,
-+      'gui': false,
-+      'sources': [],
-+      'objects': softmmu_emulator_objs,
-+      'dependencies': softmmu_emulator_deps
-+    }]
-+    if sdlwindows
-+      execs += [{
-+        'name': 'qemu-system-' + target_name + 'w',
-+        'gui': true,
-+        'sources': [],
-+        'objects': softmmu_emulator_objs,
-+        'dependencies': softmmu_emulator_deps
-+      }]
-+    endif
-+    if config_host.has_key('CONFIG_FUZZ')
-+      specific_fuzz = specific_fuzz_ss.apply(config_target, strict: false)
-+      execs += [{
-+        'name': 'qemu-fuzz-' + target_name,
-+        'gui': false,
-+        'sources': specific_fuzz.sources(),
-+        'dependencies': specific_fuzz.dependencies(),
-+        'objects': [],
-+        'link_depends': [files('tests/qtest/fuzz/fork_fuzz.ld')],
-+      }]
-+    endif
-+  else
-+    execs = [{
-+      'name': 'qemu-' + target_name,
-+      'gui': false,
-+      'sources': [],
-+      'objects': [],
-+      'dependencies': []
-+    }]
-+  endif
-+  foreach exe: execs
-+    emulators += executable(exe['name'], exe['sources'],
-+               install: true,
-+               c_args: c_args,
-+               dependencies: arch_deps + deps + exe['dependencies'],
-+               objects: [lib.extract_all_objects(recursive: true), exe['objects']],
-+               link_language: 'cpp',
-+               link_depends: [block_syms, qemu_syms] + exe.get('link_depends', []),
-+               link_args: link_args,
-+               gui_app: exe['gui'])
-+  endforeach
- endforeach
- 
- # Other build targets
-diff --git a/os-posix.c b/os-posix.c
-index 3572db3..8334193 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -96,7 +96,7 @@ char *os_find_datadir(void)
-     exec_dir = qemu_get_exec_dir();
-     g_return_val_if_fail(exec_dir != NULL, NULL);
- 
--    dir = g_build_filename(exec_dir, "..", "pc-bios", NULL);
-+    dir = g_build_filename(exec_dir, "pc-bios", NULL);
-     if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-         return g_steal_pointer(&dir);
-     }
-diff --git a/plugins/meson.build b/plugins/meson.build
-index 9608e52..e777230 100644
---- a/plugins/meson.build
-+++ b/plugins/meson.build
-@@ -1,5 +1,13 @@
-+if 'CONFIG_HAS_LD_DYNAMIC_LIST' in config_host
-+  plugin_ldflags = ['-Wl,--dynamic-list=' + (meson.build_root() / 'qemu-plugins-ld.symbols')]
-+elif 'CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST' in config_host
-+  plugin_ldflags = ['-Wl,-exported_symbols_list,' + (meson.build_root() / 'qemu-plugins-ld64.symbols')]
-+else
-+  plugin_ldflags = []
-+endif
-+
- specific_ss.add(when: 'CONFIG_PLUGIN', if_true: [files(
-   'loader.c',
-   'core.c',
-   'api.c',
--)])
-+), declare_dependency(link_args: plugin_ldflags)])
+ - default-configs/*.mak
 diff --git a/rules.mak b/rules.mak
-index 8285fe5..6488dc3 100644
+index 6cab0b9..c66c821 100644
 --- a/rules.mak
 +++ b/rules.mak
-@@ -21,7 +21,6 @@ MAKEFLAGS += -rR
- %.cpp:
- %.m:
- %.mak:
--clean-target:
+@@ -33,11 +33,6 @@ QEMU_DGFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
+ # different for target-dependent ones.
+ QEMU_LOCAL_INCLUDES = -iquote $(BUILD_DIR) -iquote $(BUILD_DIR)/$(@D) -iquote $(@D)
  
- # Flags for dependency generation
- QEMU_DGFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index 305d042..866baf7 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -383,7 +383,7 @@ def binariesToTest(args, testcase):
-     if args.qemu:
-         r = args.qemu
-     else:
--        r = glob.glob('./*-softmmu/qemu-system-*')
-+        r = glob.glob('./qemu-system-*')
-     return r
- 
- 
-diff --git a/softmmu/Makefile.objs b/softmmu/Makefile.objs
-deleted file mode 100644
-index dd15c24..0000000
---- a/softmmu/Makefile.objs
-+++ /dev/null
-@@ -1,3 +0,0 @@
--softmmu-main-y = softmmu/main.o
--obj-y += vl.o
--vl.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS)
-diff --git a/softmmu/meson.build b/softmmu/meson.build
-index 95d38df..28eeb78 100644
---- a/softmmu/meson.build
-+++ b/softmmu/meson.build
-@@ -8,3 +8,7 @@ specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
-   'memory_mapping.c',
-   'qtest.c',
-   'vl.c'))
-+
-+softmmu_emulator_ss.add(files(
-+  'main.c',
-+), sdl)
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 567ad69..7468e99 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -494,7 +494,7 @@ tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_hel
- .PHONY: check-tests/check-block.sh
- check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) \
- 		qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y) \
--		$(patsubst %,%/all,$(filter %-softmmu,$(TARGET_DIRS)))
-+		$(patsubst %-softmmu,qemu-system-%,$(filter %-softmmu,$(TARGET_DIRS)))
- 	@$<
- 
- # Python venv for running tests
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-index 77d1c1d..71ed812 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -57,8 +57,7 @@ def pick_default_qemu_bin(arch=None):
-     # qemu binary path does not match arch for powerpc, handle it
-     if 'ppc64le' in arch:
-         arch = 'ppc64'
--    qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
--                                          "qemu-system-%s" % arch)
-+    qemu_bin_relative_path = "qemu-system-%s" % arch
-     if is_readable_executable_file(qemu_bin_relative_path):
-         return qemu_bin_relative_path
- 
-diff --git a/tests/data/acpi/rebuild-expected-aml.sh b/tests/data/acpi/rebuild-expected-aml.sh
-index 76cd797..fc78770 100755
---- a/tests/data/acpi/rebuild-expected-aml.sh
-+++ b/tests/data/acpi/rebuild-expected-aml.sh
-@@ -12,7 +12,7 @@
- # This work is licensed under the terms of the GNU GPLv2.
- # See the COPYING.LIB file in the top-level directory.
- 
--qemu_bins="x86_64-softmmu/qemu-system-x86_64 aarch64-softmmu/qemu-system-aarch64"
-+qemu_bins="./qemu-system-x86_64 ./qemu-system-aarch64"
- 
- if [ ! -e "tests/qtest/bios-tables-test" ]; then
-     echo "Test: bios-tables-test is required! Run make check before this script."
-diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
-index 98df91e..f968bf7 100755
---- a/tests/multiboot/run_test.sh
-+++ b/tests/multiboot/run_test.sh
-@@ -20,7 +20,7 @@
- # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- # THE SOFTWARE.
- 
--QEMU=${QEMU:-"../../x86_64-softmmu/qemu-system-x86_64"}
-+QEMU=${QEMU:-"../../qemu-system-x86_64"}
- 
- run_qemu() {
-     local kernel=$1
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 0657f72..3ab859a 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -577,11 +577,11 @@ if [ -z "$QEMU_PROG" ]
- then
-     if [ -x "$build_iotests/qemu" ]; then
-         export QEMU_PROG="$build_iotests/qemu"
--    elif [ -x "$build_root/${qemu_arch}-softmmu/qemu-system-${qemu_arch}" ]; then
--        export QEMU_PROG="$build_root/${qemu_arch}-softmmu/qemu-system-${qemu_arch}"
-+    elif [ -x "$build_root/qemu-system-${qemu_arch}" ]; then
-+        export QEMU_PROG="$build_root/qemu-system-${qemu_arch}"
-     else
-         pushd "$build_root" > /dev/null
--        for binary in *-softmmu/qemu-system-*
-+        for binary in qemu-system-*
-         do
-             if [ -x "$binary" ]
-             then
-diff --git a/tests/qtest/fuzz/Makefile.include b/tests/qtest/fuzz/Makefile.include
-deleted file mode 100644
-index 5bde793..0000000
---- a/tests/qtest/fuzz/Makefile.include
-+++ /dev/null
-@@ -1,39 +0,0 @@
--QEMU_PROG_FUZZ=qemu-fuzz-$(TARGET_NAME)$(EXESUF)
+-WL_U := -Wl,-u,
+-find-symbols = $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
+-defined-symbols = $(call find-symbols,$1,awk '$$2!="U"{print $$1}')
+-undefined-symbols = $(call find-symbols,$1,awk '$$2=="U"{print $$1}')
 -
--fuzz-obj-y += tests/qtest/libqtest.o
--fuzz-obj-y += $(libqos-obj-y)
--fuzz-obj-y += tests/qtest/fuzz/fuzz.o # Fuzzer skeleton
--fuzz-obj-y += tests/qtest/fuzz/fork_fuzz.o
--fuzz-obj-y += tests/qtest/fuzz/qos_fuzz.o
--fuzz-obj-y += tests/qtest/fuzz/qtest_wrappers.o
--
--# Targets
--fuzz-obj-$(CONFIG_PCI_I440FX) += tests/qtest/fuzz/i440fx_fuzz.o
--fuzz-obj-$(CONFIG_VIRTIO_NET) += tests/qtest/fuzz/virtio_net_fuzz.o
--fuzz-obj-$(CONFIG_SCSI) += tests/qtest/fuzz/virtio_scsi_fuzz.o
--
--FUZZ_CFLAGS += -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
--
--# Linker Script to force coverage-counters into known regions which we can mark
--# shared
--FUZZ_LDFLAGS += -Xlinker -T$(SRC_PATH)/tests/qtest/fuzz/fork_fuzz.ld
--
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_inb
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_inw
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_inl
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_outb
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_outw
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_outl
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_readb
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_readw
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_readl
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_readq
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_writeb
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_writew
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_writel
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_writeq
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_memread
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_bufread
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_memwrite
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_bufwrite
--FUZZ_LDFLAGS += -Wl,-wrap,qtest_memset
-diff --git a/tests/qtest/fuzz/i440fx_fuzz.c b/tests/qtest/fuzz/i440fx_fuzz.c
-index f45373f..86796bf 100644
---- a/tests/qtest/fuzz/i440fx_fuzz.c
-+++ b/tests/qtest/fuzz/i440fx_fuzz.c
-@@ -17,8 +17,8 @@
- #include "tests/qtest/libqos/pci.h"
- #include "tests/qtest/libqos/pci-pc.h"
- #include "fuzz.h"
--#include "fuzz/qos_fuzz.h"
--#include "fuzz/fork_fuzz.h"
-+#include "qos_fuzz.h"
-+#include "fork_fuzz.h"
+ WL := -Wl,
+ ifdef CONFIG_DARWIN
+ whole-archive = $(WL)-force_load,$1
+@@ -45,32 +40,7 @@ else
+ whole-archive = $(WL)--whole-archive $1 $(WL)--no-whole-archive
+ endif
  
+-# All the .mo objects in -m variables are also added into corresponding -y
+-# variable in unnest-vars, but filtered out here, when LINK is called.
+-#
+-# The .mo objects are supposed to be linked as a DSO, for module build. So here
+-# they are only used as a placeholders to generate those "archive undefined"
+-# symbol options (-Wl,-u,$symbol_name), which are the archive functions
+-# referenced by the code in the DSO.
+-#
+-# Also the presence in -y variables will also guarantee they are built before
+-# linking executables that will load them. So we can look up symbol reference
+-# in LINK.
+-#
+-# This is necessary because the exectuable itself may not use the function, in
+-# which case the function would not be linked in. Then the DSO loading will
+-# fail because of the missing symbol.
+-process-archive-undefs = $(filter-out %.a %.fa %.mo %$(DSOSUF),$1) \
+-                $(addprefix $(WL_U), \
+-                     $(filter $(call defined-symbols,$(filter %.a %.fa, $1)), \
+-		$(call undefined-symbols,$(filter %.mo %$(DSOSUF),$1)))) \
+-		$(foreach l,$(filter %.fa,$1),$(call whole-archive,$l)) \
+-		$(filter %.a,$1)
+-
+-extract-libs = $(strip $(foreach o,$(filter-out %.mo %$(DSOSUF),$1),$($o-libs)))
+-expand-objs = $(strip $(sort $(filter %.o,$1)) \
+-		$(foreach o,$(filter %.mo %$(DSOSUF),$1),$($o-objs)) \
+-		$(filter-out %.o %.mo %$(DSOSUF),$1))
++extract-libs = $(strip $(foreach o,$1,$($o-libs)))
  
- #define I440FX_PCI_HOST_BRIDGE_CFG 0xcf8
-diff --git a/tests/qtest/fuzz/meson.build b/tests/qtest/fuzz/meson.build
-new file mode 100644
-index 0000000..58ab69a
---- /dev/null
-+++ b/tests/qtest/fuzz/meson.build
-@@ -0,0 +1,34 @@
-+specific_fuzz_ss.add(files('fuzz.c', 'fork_fuzz.c', 'qos_fuzz.c'), qos)
-+
-+# Targets
-+specific_fuzz_ss.add(when: 'CONFIG_I440FX', if_true: files('i440fx_fuzz.c'))
-+specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio_net_fuzz.c'))
-+specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio_scsi_fuzz.c'))
-+
-+# unfortunately declare_dependency does not support link_depends, so
-+# this will be duplicated in meson.build
-+fork_fuzz = declare_dependency(
-+  link_args: ['-fsanitize=fuzzer',
-+              '-Ttests/qtest/fuzz/fork_fuzz.ld',
-+              '-wrap', 'qtest_inb',
-+              '-wrap', 'qtest_inw',
-+              '-wrap', 'qtest_inl',
-+              '-wrap', 'qtest_outb',
-+              '-wrap', 'qtest_outw',
-+              '-wrap', 'qtest_outl',
-+              '-wrap', 'qtest_readb',
-+              '-wrap', 'qtest_readw',
-+              '-wrap', 'qtest_readl',
-+              '-wrap', 'qtest_readq',
-+              '-wrap', 'qtest_writeb',
-+              '-wrap', 'qtest_writew',
-+              '-wrap', 'qtest_writel',
-+              '-wrap', 'qtest_writeq',
-+              '-wrap', 'qtest_memread',
-+              '-wrap', 'qtest_bufread',
-+              '-wrap', 'qtest_memwrite',
-+              '-wrap', 'qtest_bufwrite',
-+              '-wrap', 'qtest_memset']
-+)
-+
-+specific_fuzz_ss.add(fork_fuzz)
-diff --git a/tests/qtest/fuzz/virtio_net_fuzz.c b/tests/qtest/fuzz/virtio_net_fuzz.c
-index 277a9e2..0e873ab 100644
---- a/tests/qtest/fuzz/virtio_net_fuzz.c
-+++ b/tests/qtest/fuzz/virtio_net_fuzz.c
-@@ -61,7 +61,8 @@ static void virtio_net_fuzz_multi(QTestState *s,
-          * backend. Otherwise, always place the input on a virtqueue.
-          */
-         if (vqa.rx && sockfds_initialized) {
--            write(sockfds[0], Data, vqa.length);
-+            int ignored = write(sockfds[0], Data, vqa.length);
-+            (void) ignored;
-         } else {
-             vqa.rx = 0;
-             uint64_t req_addr = guest_alloc(t_alloc, vqa.length);
-diff --git a/tests/qtest/libqos/qgraph.h b/tests/qtest/libqos/qgraph.h
-index 1054326..5f63d35 100644
---- a/tests/qtest/libqos/qgraph.h
-+++ b/tests/qtest/libqos/qgraph.h
-@@ -226,7 +226,7 @@ typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
-  *        my_test <--consumed_by-- my_interface <--produces--+
-  *
-  * Assuming there the binary is
-- * QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
-+ * QTEST_QEMU_BINARY=./qemu-system-x86_64
-  * a valid test path will be:
-  * "/x86_64/pc/other_node/my_driver/my_interface/my_test".
-  *
-diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-index 820c15c..c2601d9 100644
---- a/tests/qtest/meson.build
-+++ b/tests/qtest/meson.build
-@@ -231,7 +231,7 @@ foreach dir : target_dirs
-   qtest_env = environment()
-   qtest_env.set('QTEST_QEMU_IMG', './qemu-img')
-   qtest_env.set('G_TEST_DBUS_DAEMON', meson.source_root() / 'tests/dbus-vmstate-daemon.sh')
--  qtest_env.set('QTEST_QEMU_BINARY', '@0@-softmmu/qemu-system-@0@'.format(target_base))
-+  qtest_env.set('QTEST_QEMU_BINARY', './qemu-system-' + target_base)
-   
-   foreach test : qtests
-     # Executables are shared across targets, declare them only the first time we
-diff --git a/tests/qtest/rtas-test.c b/tests/qtest/rtas-test.c
-index a7e83e7..16751db 100644
---- a/tests/qtest/rtas-test.c
-+++ b/tests/qtest/rtas-test.c
-@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
-     g_test_init(&argc, &argv, NULL);
+ %.o: %.c
+ 	@mkdir -p $(dir $@)
+@@ -83,7 +53,9 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
+ LINKPROG = $(or $(CXX),$(CC))
  
-     if (strcmp(arch, "ppc64")) {
--        g_printerr("RTAS requires ppc64-softmmu/qemu-system-ppc64\n");
-+        g_printerr("RTAS requires qemu-system-ppc64\n");
-         exit(EXIT_FAILURE);
-     }
-     qtest_add_func("rtas/get-time-of-day", test_rtas_get_time_of_day);
-diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-index 102578c..7d714f9 100755
---- a/tests/tcg/configure.sh
-+++ b/tests/tcg/configure.sh
-@@ -193,11 +193,11 @@ for target in $target_list; do
-   case $target in
-     *-linux-user | *-bsd-user)
-       echo "CONFIG_USER_ONLY=y" >> $config_target_mak
--      echo "QEMU=\$(BUILD_DIR)/$target/qemu-$arch" >> $config_target_mak
-+      echo "QEMU=\$(BUILD_DIR)/qemu-$arch" >> $config_target_mak
-       ;;
-     *-softmmu)
-       echo "CONFIG_SOFTMMU=y" >> $config_target_mak
--      echo "QEMU=\$(BUILD_DIR)/$target/qemu-system-$arch" >> $config_target_mak
-+      echo "QEMU=\$(BUILD_DIR)/qemu-system-$arch" >> $config_target_mak
-       ;;
-   esac
+ LINK = $(call quiet-command, $(LINKPROG) $(CFLAGS) $(QEMU_LDFLAGS) -o $@ \
+-       $(call process-archive-undefs, $1) \
++       $(filter-out %.a %.fa,$1) \
++       $(foreach l,$(filter %.fa,$1),$(call whole-archive,$l)) \
++       $(filter %.a,$1) \
+        $(call extract-libs,$1) $(LIBS),"LINK","$(TARGET_DIR)$@")
  
+ %.o: %.S
+@@ -109,25 +81,11 @@ LINK = $(call quiet-command, $(LINKPROG) $(CFLAGS) $(QEMU_LDFLAGS) -o $@ \
+ %.o: %.dtrace
+ 	$(call quiet-command,dtrace -o $@ -G -s $<,"GEN","$(TARGET_DIR)$@")
+ 
+-DSO_OBJ_CFLAGS := -fPIC -DBUILD_DSO
+-module-common.o: CFLAGS += $(DSO_OBJ_CFLAGS)
+-%$(DSOSUF): QEMU_LDFLAGS += $(LDFLAGS_SHARED)
+-%$(DSOSUF): %.mo
+-	$(call LINK,$^)
+-	@# Copy to build root so modules can be loaded when program started without install
+-	$(if $(findstring /,$@),$(call quiet-command,cp $@ $(subst /,-,$@),"CP","$(subst /,-,$@)"))
+-
+-
+-LD_REL := $(CC) -nostdlib $(LD_REL_FLAGS)
+-
+-%.mo:
+-	$(call quiet-command,$(LD_REL) -o $@ $^,"LD","$(TARGET_DIR)$@")
+-
+ .PHONY: modules
+ modules:
+ 
+ %$(EXESUF): %.o
+-	$(call LINK,$(filter %.o %.a %.mo %.fa, $^))
++	$(call LINK,$(filter %.o %.a %.fa, $^))
+ 
+ %.a:
+ 	$(call quiet-command,rm -f $@ && $(AR) rcs $@ $^,"AR","$(TARGET_DIR)$@")
+@@ -160,15 +118,6 @@ define install-prog
+ 	$(if $(STRIP),$(STRIP) $(foreach T,$1,"$2/$(notdir $T)"),)
+ endef
+ 
+-# find-in-path
+-# Usage: $(call find-in-path, prog)
+-# Looks in the PATH if the argument contains no slash, else only considers one
+-# specific directory.  Returns an # empty string if the program doesn't exist
+-# there.
+-find-in-path = $(if $(findstring /, $1), \
+-        $(wildcard $1), \
+-        $(wildcard $(patsubst %, %/$1, $(subst :, ,$(PATH)))))
+-
+ # Logical functions (for operating on y/n values like CONFIG_FOO vars)
+ # Inputs to these must be either "y" (true) or "n" or "" (both false)
+ # Output is always either "y" or "n".
+@@ -205,175 +154,5 @@ clean: clean-timestamp
+ # will delete the target of a rule if commands exit with a nonzero exit status
+ .DELETE_ON_ERROR:
+ 
+-# save-vars
+-# Usage: $(call save-vars, vars)
+-# Save each variable $v in $vars as save-vars-$v, save their object's
+-# variables, then clear $v.  saved-vars-$v contains the variables that
+-# where saved for the objects, in order to speedup load-vars.
+-define save-vars
+-    $(foreach v,$1,
+-        $(eval save-vars-$v := $(value $v))
+-        $(eval saved-vars-$v := $(foreach o,$($v), \
+-            $(if $($o-cflags), $o-cflags $(eval save-vars-$o-cflags := $($o-cflags))$(eval $o-cflags := )) \
+-            $(if $($o-libs), $o-libs $(eval save-vars-$o-libs := $($o-libs))$(eval $o-libs := )) \
+-            $(if $($o-objs), $o-objs $(eval save-vars-$o-objs := $($o-objs))$(eval $o-objs := ))))
+-        $(eval $v := ))
+-endef
+-
+-# load-vars
+-# Usage: $(call load-vars, vars, add_var)
+-# Load the saved value for each variable in @vars, and the per object
+-# variables.
+-# Append @add_var's current value to the loaded value.
+-define load-vars
+-    $(eval $2-new-value := $(value $2))
+-    $(foreach v,$1,
+-        $(eval $v := $(value save-vars-$v))
+-        $(foreach o,$(saved-vars-$v),
+-            $(eval $o := $(save-vars-$o)) $(eval save-vars-$o := ))
+-        $(eval save-vars-$v := )
+-        $(eval saved-vars-$v := ))
+-    $(eval $2 := $(value $2) $($2-new-value))
+-endef
+-
+-# fix-paths
+-# Usage: $(call fix-paths, obj_path, src_path, vars)
+-# Add prefix @obj_path to all objects in @vars, and add prefix @src_path to all
+-# directories in @vars.
+-define fix-paths
+-    $(foreach v,$3,
+-        $(foreach o,$($v),
+-            $(if $($o-libs),
+-                $(eval $1$o-libs := $($o-libs)))
+-            $(if $($o-cflags),
+-                $(eval $1$o-cflags := $($o-cflags)))
+-            $(if $($o-objs),
+-                $(eval $1$o-objs := $(addprefix $1,$($o-objs)))))
+-        $(eval $v := $(addprefix $1,$(filter-out %/,$($v))) \
+-                     $(addprefix $2,$(filter %/,$($v)))))
+-endef
+-
+-# unnest-var-recursive
+-# Usage: $(call unnest-var-recursive, obj_prefix, vars, var)
+-#
+-# Unnest @var by including subdir Makefile.objs, while protect others in @vars
+-# unchanged.
+-#
+-# @obj_prefix is the starting point of object path prefix.
+-#
+-define unnest-var-recursive
+-    $(eval dirs := $(sort $(filter %/,$($3))))
+-    $(eval $3 := $(filter-out %/,$($3)))
+-    $(foreach d,$(dirs:%/=%),
+-            $(call save-vars,$2)
+-            $(eval obj := $(if $1,$1/)$d)
+-            $(eval -include $(SRC_PATH)/$d/Makefile.objs)
+-            $(call fix-paths,$(if $1,$1/)$d/,$d/,$2)
+-            $(call load-vars,$2,$3)
+-            $(call unnest-var-recursive,$1,$2,$3))
+-endef
+-
+-# unnest-vars
+-# Usage: $(call unnest-vars, obj_prefix, vars)
+-#
+-# @obj_prefix: object path prefix, can be empty, or '..', etc. Don't include
+-# ending '/'.
+-#
+-# @vars: the list of variable names to unnest.
+-#
+-# This macro will scan subdirectories's Makefile.objs, include them, to build
+-# up each variable listed in @vars.
+-#
+-# Per object and per module cflags and libs are saved with relative path fixed
+-# as well, those variables include -libs, -cflags and -objs. Items in -objs are
+-# also fixed to relative path against SRC_PATH plus the prefix @obj_prefix.
+-#
+-# All nested variables postfixed by -m in names are treated as DSO variables,
+-# and will be built as modules, if enabled.
+-#
+-# A simple example of the unnest:
+-#
+-#     obj_prefix = ..
+-#     vars = hot cold
+-#     hot  = fire.o sun.o season/
+-#     cold = snow.o water/ season/
+-#
+-# Unnest through a faked source directory structure:
+-#
+-#     SRC_PATH
+-#        ├── water
+-#        │   └── Makefile.objs──────────────────┐
+-#        │       │ hot += steam.o               │
+-#        │       │ cold += ice.mo               │
+-#        │       │ ice.mo-libs := -licemaker    │
+-#        │       │ ice.mo-objs := ice1.o ice2.o │
+-#        │       └──────────────────────────────┘
+-#        │
+-#        └── season
+-#            └── Makefile.objs──────┐
+-#                │ hot += summer.o  │
+-#                │ cold += winter.o │
+-#                └──────────────────┘
+-#
+-# In the end, the result will be:
+-#
+-#     hot  = ../fire.o ../sun.o ../season/summer.o
+-#     cold = ../snow.o ../water/ice.mo ../season/winter.o
+-#     ../water/ice.mo-libs = -licemaker
+-#     ../water/ice.mo-objs = ../water/ice1.o ../water/ice2.o
+-#
+-# Note that 'hot' didn't include 'water/' in the input, so 'steam.o' is not
+-# included.
+-#
+-define unnest-vars
+-    # In the case of target build (i.e. $1 == ..), fix path for top level
+-    # Makefile.objs objects
+-    $(if $1,$(call fix-paths,$1/,,$2))
+-
+-    # Descend and include every subdir Makefile.objs
+-    $(foreach v, $2,
+-        $(call unnest-var-recursive,$1,$2,$v)
+-        # Pass the .mo-cflags and .mo-libs along to its member objects
+-        $(foreach o, $(filter %.mo,$($v)),
+-            $(foreach p,$($o-objs),
+-                $(if $($o-cflags), $(eval $p-cflags += $($o-cflags)))
+-                $(if $($o-libs), $(eval $p-libs += $($o-libs))))))
+-
+-    # For all %.mo objects that are directly added into -y, just expand them
+-    $(foreach v,$(filter %-y,$2),
+-        $(eval $v := $(foreach o,$($v),$(if $($o-objs),$($o-objs),$o))))
+-
+-    $(foreach v,$(filter %-m,$2),
+-        # All .o found in *-m variables are single object modules, create .mo
+-        # for them
+-        $(foreach o,$(filter %.o,$($v)),
+-            $(eval $(o:%.o=%.mo)-objs := $o))
+-        # Now unify .o in -m variable to .mo
+-        $(eval $v := $($v:%.o=%.mo))
+-        $(eval modules-m += $($v))
+-
+-        # For module build, build shared libraries during "make modules"
+-        # For non-module build, add -m to -y
+-        $(if $(CONFIG_MODULES),
+-             $(foreach o,$($v),
+-                   $(eval $($o-objs): CFLAGS += $(DSO_OBJ_CFLAGS))
+-                   $(eval $o: $($o-objs)))
+-             $(eval $(patsubst %-m,%-y,$v) += $($v))
+-             $(eval modules: $($v:%.mo=%$(DSOSUF))),
+-             $(eval $(patsubst %-m,%-y,$v) += $(call expand-objs, $($v)))))
+-
+-    # Post-process all the unnested vars
+-    $(foreach v,$2,
+-        $(foreach o, $(filter %.mo,$($v)),
+-            # Find all the .mo objects in variables and add dependency rules
+-            # according to .mo-objs. Report error if not set
+-            $(if $($o-objs),
+-                $(eval $(o:%.mo=%$(DSOSUF)): module-common.o $($o-objs))))
+-        $(shell mkdir -p ./ $(sort $(dir $($v))))
+-        # Include all the .d files
+-        $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$(filter %.o,$($v)))))
+-        $(eval $v := $(filter-out %/,$($v))))
+-endef
+-
+ print-%:
+ 	@echo '$*=$($*)'
+diff --git a/scripts/create_config b/scripts/create_config
+index bc82661..ec5c0b4 100755
+--- a/scripts/create_config
++++ b/scripts/create_config
+@@ -91,6 +91,9 @@ case $line in
+     name=${line%=*}
+     echo "#define $name 1"
+     ;;
++ HOST_DSOSUF=*)
++    echo "#define HOST_DSOSUF \"${line#*=}\""
++    ;;
+  HOST_*=*) # configuration
+     name=${line%=*}
+     value=${line#*=}
+@@ -123,9 +126,6 @@ case $line in
+     value=${line#*=}
+     echo "#define $name $value"
+     ;;
+- DSOSUF=*)
+-    echo "#define HOST_DSOSUF \"${line#*=}\""
+-    ;;
+ esac
+ 
+ done # read
 -- 
 1.8.3.1
 
