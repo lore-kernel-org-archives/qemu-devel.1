@@ -2,92 +2,134 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 682DCC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:51:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A44C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15C8D22CF7
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:51:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E805D22CF7
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:51:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="WWZbxyVM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15C8D22CF7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (1024-bit key) header.d=fujitsu.onmicrosoft.com header.i=@fujitsu.onmicrosoft.com header.b="GLtvG6ce"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E805D22CF7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fujitsu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3dmg-0007hO-J2
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:10:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41352)
+	id 1k3bAg-0002co-DQ
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 04:22:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dSV-0003XB-CV
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:49:15 -0400
-Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:41192)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dST-0007yG-CP
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:49:15 -0400
-Received: by mail-pl1-x631.google.com with SMTP id f10so2369641plj.8
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:49:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=t5TdNymrfAwyT+igaZNWETD1kgD/z8803rpu85e4jYo=;
- b=WWZbxyVMptF6AvCGcxBpQtajoecfAEYR2ybYFLCLMbpN8NuUiqYOwZGMLLk8CpXRoV
- tJU12AblsN503mALlEITdxPfyCrCZ2z0dDj5BJrU9MtIwxtf4u10aZtEHkqKt3SQKH6H
- /SOwiQHUBxDPZHuy3NV3fQX4OhRcxOGYleXT8c3D0VH5WH9E4zzgRu69fzO0N03z2et0
- WBBrCwdGB6E2Z36Bh+mVJ8dP4z9dSwFDFhTlKSe6bazumoyyBeWq3BItSsz545+4/m+F
- TnlsKADV8wRrlhzUH35RGQgx2PSzRE36kSvUPyhv3e9zF3hVh/4rb9z7Td4UXD3f0v8O
- BWgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=t5TdNymrfAwyT+igaZNWETD1kgD/z8803rpu85e4jYo=;
- b=n3aJCtoKj6BAhylWAt30pjxHb7BWffv5bBJTKMeDGjPTyoj9zQzR8BLYMl/zmbBPpm
- 3eui14QjZraofC4ZpxuyZosYtrBcgjkdHgl697gK4GplkO2bDsJu9zegsfW6bDicSonG
- ZnvLQ7zpZorvQLQH6pCatAd/SuIpYT1zeB5+9H2bAAUMNl5fzTLsKhJixuv3fagt7abk
- 0fcu9WmssbTOL5LoTaahHBUHDwJuPMwoUGLcqs7uqz3PhO6EST1pHqVX+t3/10z4ve9j
- oAKYUL/YACzAE0RluM+dg1IPExxaX49FQR3Rw53jnX0RDVhK8jm4cirIBQqyj6X173MB
- SeNA==
-X-Gm-Message-State: AOAM533AJ7DWLKMKeku3EbnBGrN51CfG2PnF/bECZ8d2ziEobb5WTBMB
- 09lu0h8G+C/PSL1PjufehJdvxg6PKh8=
-X-Google-Smtp-Source: ABdhPJz0wKE9Qv5bkNP9UuzqvOrC8ZJ6TE4po4Cu534ouT5sLkqkGVijnmMDQnDsDSpqV2NMagl6ww==
-X-Received: by 2002:a17:90a:c208:: with SMTP id
- e8mr7633701pjt.73.1596710951797; 
- Thu, 06 Aug 2020 03:49:11 -0700 (PDT)
-Received: from frankchang-ThinkPad-T490.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.49.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 03:49:11 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC v3 45/71] target/riscv: rvv-1.0: narrowing integer right shift
- instructions
-Date: Thu,  6 Aug 2020 18:46:42 +0800
-Message-Id: <20200806104709.13235-46-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
-References: <20200806104709.13235-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::631;
- envelope-from=frank.chang@sifive.com; helo=mail-pl1-x631.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <misono.tomohiro@fujitsu.com>)
+ id 1k3bA3-0002D0-Ac
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 04:22:03 -0400
+Received: from esa14.fujitsucc.c3s2.iphmx.com ([68.232.156.101]:62250)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <misono.tomohiro@fujitsu.com>)
+ id 1k3b9w-0007MK-Sv
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 04:22:02 -0400
+IronPort-SDR: RJQi2G343fbyRqg5PGONtFPfoSx7Ydq9/m2B2mJRYxkKbJDiIooaNSOZfp64KRYXAHPSfOjhHK
+ dIaMWjoWocSSdNh9VrldMrJmanaRAN5PhIc1AWiGkCAQCE3SW9n0BkVOSdvgWpfiUtvSk0pGRG
+ 1LcU1jKGi4OBBUvE0o96MhrkUfn2Huo3B+Rwb6A0VpY9ejAj/b442of2PaEwy+gRJd07GZdqPg
+ PCbr1X+hsOcHI3iE2OWbI7WWs9GvbFaj6eMzedeHfB8AcW9BLYfghe0JPZ+e+SnTjDX82qyiKm
+ pnQ=
+X-IronPort-AV: E=McAfee;i="6000,8403,9704"; a="16468998"
+X-IronPort-AV: E=Sophos;i="5.75,441,1589209200"; d="scan'208";a="16468998"
+Received: from mail-os2jpn01lp2050.outbound.protection.outlook.com (HELO
+ JPN01-OS2-obe.outbound.protection.outlook.com) ([104.47.92.50])
+ by ob1.fujitsucc.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 06 Aug 2020 17:21:50 +0900
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RM+VxqpKvf8AtOpuwKaqGibR5Q0ZEF/dkkJrgXHVEFnKPxh9znxVU018SNpY0si55AIYXTkQXie/H+wIkS6ZeM3hQC2PL0hC0xhlKL+XZRL8QjgXMpdP3USdm3F2mL0wlAzz0/zFMHmiI8m4KaWWWsLUgaSE/IzvcLSIpvXypKdVTDP2jwgQ0Zgddzy7OV8i+Rb+h+X4Ry5eCygrj4zPozqcAaWx/0VJVOBA8V2t7lP3Ye1UAbCMI7x5IOSF+JFzlZKw7Qy73DoOAKfBgUU/9uaZ821yQYHzLNoGZNz28JUPYXwOuRUpoJIjW5m7eRRMlhffHwptIEHvzPVktwGhCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4bniU8zPH+52MQmMc/EX4E81xCFPz4/8Bdos46VqOmc=;
+ b=iodhjTXNPOuqv1moFqiW9Ld4SOGxAM+94YCYE/frODMatXiVM8Pq9RZzZUii1pFmhJ9j7nEtY3AimDWsZWKTtOHlEUK3+EB2NG4LhSU3icsxqQ9nXzpg1wbOEYvZOhfZfAvAylvpK5BKyN1NpxRu0wvgSegzmHeB7bzMBAz5kBvA61P7DRVC8K7cr3lwlVX3ANuFfY3PdlpiNXUdW8OLNRGt9YL8GvnjUxDZDUD+oe7FBGwYkTm04ErxCo2nsdwnXHclB2HIyxPzBD5QXjmNVFyPtL7yZP8kURKJgminx3mjIpV7j8AnC557PhAJhc/V7Cbz16f3E4KKxg9vCWpJKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fujitsu.com; dmarc=pass action=none header.from=fujitsu.com;
+ dkim=pass header.d=fujitsu.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=fujitsu.onmicrosoft.com; s=selector2-fujitsu-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4bniU8zPH+52MQmMc/EX4E81xCFPz4/8Bdos46VqOmc=;
+ b=GLtvG6ce/RATRHdUe9cZRwvmohnMPQBIhT+JFK8cgyC4rbLFOQVY4Dh15A+lvu7cB0zYFdZ3HxHVKSOTtuEjSvVZU4uAEymRT4Eeg+PUyycVdYBHldk6HcJya6tVyRU/CTPQqEJV4dJSbMq6tCdMA6VcjQCCJY0ca+y7SZwF0l8=
+Received: from OSBPR01MB4582.jpnprd01.prod.outlook.com (2603:1096:604:74::21)
+ by OSAPR01MB2210.jpnprd01.prod.outlook.com (2603:1096:603:1c::10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3239.18; Thu, 6 Aug
+ 2020 08:21:45 +0000
+Received: from OSBPR01MB4582.jpnprd01.prod.outlook.com
+ ([fe80::d8f2:88cb:21f7:f426]) by OSBPR01MB4582.jpnprd01.prod.outlook.com
+ ([fe80::d8f2:88cb:21f7:f426%3]) with mapi id 15.20.3239.021; Thu, 6 Aug 2020
+ 08:21:45 +0000
+From: "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>
+To: 'Vivek Goyal' <vgoyal@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [Virtio-fs] [PATCH] virtiofsd: Disable remote posix locks by
+ default
+Thread-Topic: [Virtio-fs] [PATCH] virtiofsd: Disable remote posix locks by
+ default
+Thread-Index: AQHWZDG1j+TP8kU1ME2sQZoeeTEaZqkqynUg
+Date: Thu, 6 Aug 2020 08:20:39 +0000
+Deferred-Delivery: Thu, 6 Aug 2020 08:21:38 +0000
+Message-ID: <OSBPR01MB4582AB9CD2DB32A48A8BB13FE5480@OSBPR01MB4582.jpnprd01.prod.outlook.com>
+References: <20200727161841.GA54539@redhat.com>
+In-Reply-To: <20200727161841.GA54539@redhat.com>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-shieldmailcheckermailid: 15c36ae158b242e8b2addb0eccccc124
+x-securitypolicycheck: OK by SHieldMailChecker v2.6.3
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=fujitsu.com;
+x-originating-ip: [118.155.224.184]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 306794f8-612d-45e1-e978-08d839e1c198
+x-ms-traffictypediagnostic: OSAPR01MB2210:
+x-microsoft-antispam-prvs: <OSAPR01MB2210F5E41E5B744709C1F39DE5480@OSAPR01MB2210.jpnprd01.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: U1ODWfq9fVoj+a9EuA+UU0yhA0KmrPseH/Q2/hRGLi8Ynq6+J6TqyJRqDw+VSp84l8ClhCIikl1to+F5s/jmPGbJGw2A1OL0WqeNEHN8RMEtaKcByjV+KPbVlZ7tpfSuszBVel7ZVAV6J8hlkF41knmWR/ccB13IHUwZ3w3v+Wzdi1eS9X4g8GRN4teUK+Aus92Fu/KxvH+0yNpMYZwNLSCs326PFKzn/guFfgnarb3vRP11CW09dfS4u631TPR/WcjA5qUn7eq6JKNibulBnKfQBZZsdty+AlWwTlYb/ZUYmCXTvTjsM373n16o/XluLB5l1rpoBUyQgxAz/quIC8ie5GkYtGimOFO25j2vwKLxj/zI32D47u/877XNAEXs
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:OSBPR01MB4582.jpnprd01.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(366004)(136003)(376002)(39860400002)(396003)(346002)(4326008)(478600001)(8676002)(71200400001)(83380400001)(8936002)(6666004)(86362001)(2906002)(7696005)(55016002)(66946007)(76116006)(85182001)(6506007)(186003)(5660300002)(316002)(110136005)(66446008)(9686003)(66476007)(26005)(66556008)(64756008)(52536014)(33656002)(777600001);
+ DIR:OUT; SFP:1101; 
+x-ms-exchange-antispam-messagedata: yKek8HLpnaNyi9UOyrNS1fT2DOhLX39MsI9Jz0Ia0Y8TyxpYv5FQwwPwKs7RMS8WLvlxTFkorZTfyspypPjnG9N4QlzsI4hQKISn6+yNT62vQZbAWQJLglOF7II+3qoLtfB6dacqqI/+iZg3wlyWRm2HtAhynjK+rEvCtqkLWkPvrZ6wVKMbo17fttX+rZLAmqoEQl9dGjziNWfymMgUR3cluCglqrbv4ks/UtPICuqPOGx6RLnJyGQVyiZX5wu0Nv6EPWIiNrXbESPAXhSCfeUSdLYmQXXWtjxgSDPS7maXwkXMLB9KUDW13f4+oxoU0yLvxAzdr8aKYmdRtWSc4YC2S0Xl96O0zfsG+9Gqxznk/44BjrnKMSopl5CS63iS/yRkU7Ck/VNlQwQySKel+Rh/pVhsEBFe7hf2LiO6oQtlEfbsDOJxvtlPHKxujDPYlnrNKF8unQFSeN05AtEx5xVkvzS8JpMerPP8DQ7ma1FJU4/N/2fstVR/i1aVAmQVVhuPQZXjrIwAgFJRInFjEC3kWe0q+bNgfTiD4/ZLyVm4fl6m8HtTyTlNEb/tpKq9fKChpkgePq7Uv/JWBYgyzz8nIefxWpbhaYhwnrksBrAU07FSyaQxl2bSIeyOz51oWAfbm7Cjg+iVpsPjoDmgBw==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: fujitsu.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: OSBPR01MB4582.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 306794f8-612d-45e1-e978-08d839e1c198
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Aug 2020 08:21:45.1044 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a19f121d-81e1-4858-a9d8-736e267fd4c7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rN16A0qn1cs45kgwVx9J9HYrkWUfxTFI2UpKwICwK55IjDyQOn02g8JukgiYXH6jUByWIseNxPrWkFXw2tOafSYcHy6M87wc8aaec36Rs8Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSAPR01MB2210
+Received-SPF: pass client-ip=68.232.156.101;
+ envelope-from=misono.tomohiro@fujitsu.com; helo=esa14.fujitsucc.c3s2.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 04:21:50
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,204 +142,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: virtio-fs-list <virtio-fs@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+> Right now we enable remote posix locks by default. That means when guest =
+does a posix lock it sends request to server
+> (virtiofsd). But currently we only support non-blocking posix lock and re=
+turn -EOPNOTSUPP for blocking version.
+>=20
+> This means that existing applications which are doing blocking posix lock=
+s get -EOPNOTSUPP and fail. To avoid this,
+> people have been running virtiosd with option "-o no_posix_lock". For new=
+ users it is still a surprise and trial and error
+> takes them to this option.
+>=20
+> Given posix lock implementation is not complete in virtiofsd, disable it =
+by default. This means that posix locks will work
+> with-in applications in a guest but not across guests. Anyway we don't su=
+pport sharing filesystem among different guests
+> yet in virtiofs so this should not lead to any kind of surprise or regres=
+sion and will make life little easier for virtiofs users.
+>=20
+> Reported-by: Aa Aa <jimbothom@yandex.com>
+> Suggested-by: Miklos Szeredi <mszeredi@redhat.com>
+> Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+> ---
+>  tools/virtiofsd/passthrough_ll.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/helper.h                   | 24 ++++++++++----------
- target/riscv/insn32.decode              | 12 +++++-----
- target/riscv/insn_trans/trans_rvv.inc.c | 30 ++++++++++++-------------
- target/riscv/vector_helper.c            | 24 ++++++++++----------
- 4 files changed, 45 insertions(+), 45 deletions(-)
-
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 3560bf1d4f5..fe37bd2f4af 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -397,18 +397,18 @@ DEF_HELPER_6(vsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_6(vsra_vx_d, void, ptr, ptr, tl, ptr, env, i32)
- 
--DEF_HELPER_6(vnsrl_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
--DEF_HELPER_6(vnsrl_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
--DEF_HELPER_6(vnsrl_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
--DEF_HELPER_6(vnsra_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
--DEF_HELPER_6(vnsra_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
--DEF_HELPER_6(vnsra_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
--DEF_HELPER_6(vnsrl_vx_b, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vnsrl_vx_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vnsrl_vx_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vnsra_vx_b, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vnsra_vx_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vnsra_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_wv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsra_wv_b, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsra_wv_h, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsra_wv_w, void, ptr, ptr, ptr, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_wx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_wx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsrl_wx_w, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsra_wx_b, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsra_wx_h, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vnsra_wx_w, void, ptr, ptr, tl, ptr, env, i32)
- 
- DEF_HELPER_6(vmseq_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
- DEF_HELPER_6(vmseq_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index e62bad906a3..c4fe9767585 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -370,12 +370,12 @@ vsrl_vi         101000 . ..... ..... 011 ..... 1010111 @r_vm
- vsra_vv         101001 . ..... ..... 000 ..... 1010111 @r_vm
- vsra_vx         101001 . ..... ..... 100 ..... 1010111 @r_vm
- vsra_vi         101001 . ..... ..... 011 ..... 1010111 @r_vm
--vnsrl_vv        101100 . ..... ..... 000 ..... 1010111 @r_vm
--vnsrl_vx        101100 . ..... ..... 100 ..... 1010111 @r_vm
--vnsrl_vi        101100 . ..... ..... 011 ..... 1010111 @r_vm
--vnsra_vv        101101 . ..... ..... 000 ..... 1010111 @r_vm
--vnsra_vx        101101 . ..... ..... 100 ..... 1010111 @r_vm
--vnsra_vi        101101 . ..... ..... 011 ..... 1010111 @r_vm
-+vnsrl_wv        101100 . ..... ..... 000 ..... 1010111 @r_vm
-+vnsrl_wx        101100 . ..... ..... 100 ..... 1010111 @r_vm
-+vnsrl_wi        101100 . ..... ..... 011 ..... 1010111 @r_vm
-+vnsra_wv        101101 . ..... ..... 000 ..... 1010111 @r_vm
-+vnsra_wx        101101 . ..... ..... 100 ..... 1010111 @r_vm
-+vnsra_wi        101101 . ..... ..... 011 ..... 1010111 @r_vm
- vmseq_vv        011000 . ..... ..... 000 ..... 1010111 @r_vm
- vmseq_vx        011000 . ..... ..... 100 ..... 1010111 @r_vm
- vmseq_vi        011000 . ..... ..... 011 ..... 1010111 @r_vm
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 2f5846fe4f0..196f1858465 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -1906,7 +1906,7 @@ GEN_OPIVI_GVEC_TRANS(vsrl_vi, IMM_TRUNC_SEW, vsrl_vx, shri)
- GEN_OPIVI_GVEC_TRANS(vsra_vi, IMM_TRUNC_SEW, vsra_vx, sari)
- 
- /* Vector Narrowing Integer Right Shift Instructions */
--static bool opivv_narrow_check(DisasContext *s, arg_rmrr *a)
-+static bool opiwv_narrow_check(DisasContext *s, arg_rmrr *a)
- {
-     return require_rvv(s) &&
-            vext_check_isa_ill(s) &&
-@@ -1914,10 +1914,10 @@ static bool opivv_narrow_check(DisasContext *s, arg_rmrr *a)
- }
- 
- /* OPIVV with NARROW */
--#define GEN_OPIVV_NARROW_TRANS(NAME)                               \
-+#define GEN_OPIWV_NARROW_TRANS(NAME)                               \
- static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
- {                                                                  \
--    if (opivv_narrow_check(s, a)) {                                \
-+    if (opiwv_narrow_check(s, a)) {                                \
-         uint32_t data = 0;                                         \
-         static gen_helper_gvec_4_ptr * const fns[3] = {            \
-             gen_helper_##NAME##_b,                                 \
-@@ -1939,10 +1939,10 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)             \
-     }                                                              \
-     return false;                                                  \
- }
--GEN_OPIVV_NARROW_TRANS(vnsra_vv)
--GEN_OPIVV_NARROW_TRANS(vnsrl_vv)
-+GEN_OPIWV_NARROW_TRANS(vnsra_wv)
-+GEN_OPIWV_NARROW_TRANS(vnsrl_wv)
- 
--static bool opivx_narrow_check(DisasContext *s, arg_rmrr *a)
-+static bool opiwx_narrow_check(DisasContext *s, arg_rmrr *a)
- {
-     return require_rvv(s) &&
-            vext_check_isa_ill(s) &&
-@@ -1950,10 +1950,10 @@ static bool opivx_narrow_check(DisasContext *s, arg_rmrr *a)
- }
- 
- /* OPIVX with NARROW */
--#define GEN_OPIVX_NARROW_TRANS(NAME)                                     \
-+#define GEN_OPIWX_NARROW_TRANS(NAME)                                     \
- static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
- {                                                                        \
--    if (opivx_narrow_check(s, a)) {                                      \
-+    if (opiwx_narrow_check(s, a)) {                                      \
-         static gen_helper_opivx * const fns[3] = {                       \
-             gen_helper_##NAME##_b,                                       \
-             gen_helper_##NAME##_h,                                       \
-@@ -1964,14 +1964,14 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-     return false;                                                        \
- }
- 
--GEN_OPIVX_NARROW_TRANS(vnsra_vx)
--GEN_OPIVX_NARROW_TRANS(vnsrl_vx)
-+GEN_OPIWX_NARROW_TRANS(vnsra_wx)
-+GEN_OPIWX_NARROW_TRANS(vnsrl_wx)
- 
--/* OPIVI with NARROW */
--#define GEN_OPIVI_NARROW_TRANS(NAME, IMM_MODE, OPIVX)                    \
-+/* OPIWI with NARROW */
-+#define GEN_OPIWI_NARROW_TRANS(NAME, IMM_MODE, OPIVX)                    \
- static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
- {                                                                        \
--    if (opivx_narrow_check(s, a)) {                                      \
-+    if (opiwx_narrow_check(s, a)) {                                      \
-         static gen_helper_opivx * const fns[3] = {                       \
-             gen_helper_##OPIVX##_b,                                      \
-             gen_helper_##OPIVX##_h,                                      \
-@@ -1983,8 +1983,8 @@ static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                   \
-     return false;                                                        \
- }
- 
--GEN_OPIVI_NARROW_TRANS(vnsra_vi, IMM_ZX, vnsra_vx)
--GEN_OPIVI_NARROW_TRANS(vnsrl_vi, IMM_ZX, vnsrl_vx)
-+GEN_OPIWI_NARROW_TRANS(vnsra_wi, IMM_ZX, vnsra_wx)
-+GEN_OPIWI_NARROW_TRANS(vnsrl_wi, IMM_ZX, vnsrl_wx)
- 
- /* Vector Integer Comparison Instructions */
- /*
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index cc501a7cb44..0bed365c8f0 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -1395,18 +1395,18 @@ GEN_VEXT_SHIFT_VX(vsra_vx_w, int32_t, int32_t, H4, H4, DO_SRL, 0x1f)
- GEN_VEXT_SHIFT_VX(vsra_vx_d, int64_t, int64_t, H8, H8, DO_SRL, 0x3f)
- 
- /* Vector Narrowing Integer Right Shift Instructions */
--GEN_VEXT_SHIFT_VV(vnsrl_vv_b, uint8_t,  uint16_t, H1, H2, DO_SRL, 0xf)
--GEN_VEXT_SHIFT_VV(vnsrl_vv_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f)
--GEN_VEXT_SHIFT_VV(vnsrl_vv_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f)
--GEN_VEXT_SHIFT_VV(vnsra_vv_b, uint8_t,  int16_t, H1, H2, DO_SRL, 0xf)
--GEN_VEXT_SHIFT_VV(vnsra_vv_h, uint16_t, int32_t, H2, H4, DO_SRL, 0x1f)
--GEN_VEXT_SHIFT_VV(vnsra_vv_w, uint32_t, int64_t, H4, H8, DO_SRL, 0x3f)
--GEN_VEXT_SHIFT_VX(vnsrl_vx_b, uint8_t, uint16_t, H1, H2, DO_SRL, 0xf)
--GEN_VEXT_SHIFT_VX(vnsrl_vx_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f)
--GEN_VEXT_SHIFT_VX(vnsrl_vx_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f)
--GEN_VEXT_SHIFT_VX(vnsra_vx_b, int8_t, int16_t, H1, H2, DO_SRL, 0xf)
--GEN_VEXT_SHIFT_VX(vnsra_vx_h, int16_t, int32_t, H2, H4, DO_SRL, 0x1f)
--GEN_VEXT_SHIFT_VX(vnsra_vx_w, int32_t, int64_t, H4, H8, DO_SRL, 0x3f)
-+GEN_VEXT_SHIFT_VV(vnsrl_wv_b, uint8_t,  uint16_t, H1, H2, DO_SRL, 0xf)
-+GEN_VEXT_SHIFT_VV(vnsrl_wv_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f)
-+GEN_VEXT_SHIFT_VV(vnsrl_wv_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f)
-+GEN_VEXT_SHIFT_VV(vnsra_wv_b, uint8_t,  int16_t, H1, H2, DO_SRL, 0xf)
-+GEN_VEXT_SHIFT_VV(vnsra_wv_h, uint16_t, int32_t, H2, H4, DO_SRL, 0x1f)
-+GEN_VEXT_SHIFT_VV(vnsra_wv_w, uint32_t, int64_t, H4, H8, DO_SRL, 0x3f)
-+GEN_VEXT_SHIFT_VX(vnsrl_wx_b, uint8_t, uint16_t, H1, H2, DO_SRL, 0xf)
-+GEN_VEXT_SHIFT_VX(vnsrl_wx_h, uint16_t, uint32_t, H2, H4, DO_SRL, 0x1f)
-+GEN_VEXT_SHIFT_VX(vnsrl_wx_w, uint32_t, uint64_t, H4, H8, DO_SRL, 0x3f)
-+GEN_VEXT_SHIFT_VX(vnsra_wx_b, int8_t, int16_t, H1, H2, DO_SRL, 0xf)
-+GEN_VEXT_SHIFT_VX(vnsra_wx_h, int16_t, int32_t, H2, H4, DO_SRL, 0x1f)
-+GEN_VEXT_SHIFT_VX(vnsra_wx_w, int32_t, int64_t, H4, H8, DO_SRL, 0x3f)
- 
- /* Vector Integer Comparison Instructions */
- #define DO_MSEQ(N, M) (N == M)
--- 
-2.17.1
-
+We should update docs/tools/virtiofsd.rst as well. Given that:
+ Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
 
