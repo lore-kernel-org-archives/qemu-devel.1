@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCDF7C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F041C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:33:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B99CB2173E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B51D12173E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:33:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SbVJ16vD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B99CB2173E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sy8mPHzO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B51D12173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3lch-0001jF-Lv
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:32:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42918)
+	id 1k3ldM-0002u6-AG
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:33:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOV-0004uv-I6
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:39 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34507
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k3lOe-0005HE-PT
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48473
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOT-0006UE-Jl
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:39 -0400
+ id 1k3lOc-0006V5-KF
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741456;
+ s=mimecast20190719; t=1596741465;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=piegL1b9aUoksg/1K94HZvB1gVYOFmXv7I3AAoBNxR0=;
- b=SbVJ16vDnhfaar3YqbJD5VE29igvzl21Op4ktn0khnqDDdRSSfhZEcLmMDGuUnnnYPXHU6
- mpefMGZ+EgtkVlS2rh1ReMEWMNiW9+iAGtFXiXAP+fXpkHg6VszDjRVQkQa67rnz/B1Jus
- 8SMcnSzPnOODBWXxRPB8DKRw2C0R9xs=
+ bh=dpg0CJumR86PkkeY1Gf1cjU4KFPvEBJI2ORd8lBQyNw=;
+ b=Sy8mPHzOKiMdzpOumBbdw/aPy3tn4jsC8fWgDyRNwiKH0VY52Q2fx5gZUGkEvGJBorYYIt
+ nCtZyPXVAY3GycvoCwb1+59CKFxoB27vjxM4P0Kurounua9SCir90Eu7+YU9guklAr1xT2
+ mG4kyOKpkldaklTyt/32nO60+OaZFGo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-_4D2xr76NdWJYDaWNjHEUA-1; Thu, 06 Aug 2020 15:17:35 -0400
-X-MC-Unique: _4D2xr76NdWJYDaWNjHEUA-1
+ us-mta-230-sIGt4aQpPZmVMp2ffTABwg-1; Thu, 06 Aug 2020 15:17:44 -0400
+X-MC-Unique: sIGt4aQpPZmVMp2ffTABwg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DA741800D42
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 360398064AB
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:43 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3EE825FC3B;
- Thu,  6 Aug 2020 19:17:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 473955F9DC;
+ Thu,  6 Aug 2020 19:17:42 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 040/143] meson: add virtfs-proxy-helper
-Date: Thu,  6 Aug 2020 21:14:36 +0200
-Message-Id: <1596741379-12902-41-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 044/143] meson: generate hxtool files
+Date: Thu,  6 Aug 2020 21:14:40 +0200
+Message-Id: <1596741379-12902-45-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:24:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,107 +107,123 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile          | 2 --
- configure         | 7 +++++--
- fsdev/meson.build | 5 +++++
- meson.build       | 6 ++++++
- 4 files changed, 16 insertions(+), 4 deletions(-)
- create mode 100644 fsdev/meson.build
+ Makefile        |  8 +-------
+ Makefile.target |  6 ------
+ meson.build     | 21 +++++++++++++++++++++
+ scripts/hxtool  |  2 +-
+ 4 files changed, 23 insertions(+), 14 deletions(-)
+ mode change 100644 => 100755 scripts/hxtool
 
 diff --git a/Makefile b/Makefile
-index a961bc3..2fbbc0a 100644
+index 3fafc89..984f784 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -413,8 +413,6 @@ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io
- qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
+@@ -105,7 +105,7 @@ include $(SRC_PATH)/rules.mak
+ # lor is defined in rules.mak
+ CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
  
--fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
--
- scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- ifdef CONFIG_MPATH
+-generated-files-y = config-host.h qemu-options.def
++generated-files-y = config-host.h
+ 
+ generated-files-y += module_block.h
+ 
+@@ -247,8 +247,6 @@ all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all mo
+ 
+ config-host.h: config-host.h-timestamp
+ config-host.h-timestamp: config-host.mak
+-qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+-	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+ 
+ TARGET_DIRS_RULES := $(foreach t, all fuzz clean install, $(addsuffix /$(t), $(TARGET_DIRS)))
+ 
+@@ -355,9 +353,6 @@ ifdef CONFIG_MPATH
  scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
-diff --git a/configure b/configure
-index d123733..8026778 100755
---- a/configure
-+++ b/configure
-@@ -4320,6 +4320,7 @@ fi
- ##########################################
- # attr probe
+ endif
  
-+libattr_libs=
- if test "$attr" != "no" ; then
-   cat > $TMPC <<EOF
- #include <stdio.h>
-@@ -4336,7 +4337,8 @@ EOF
-   # Older distros have <attr/xattr.h>, and need -lattr:
-   elif compile_prog "-DCONFIG_LIBATTR" "-lattr" ; then
-     attr=yes
--    LIBS="-lattr $LIBS"
-+    libattr_libs="-lattr"
-+    LIBS="$libattr_libs $LIBS"
-     libattr=yes
-   else
-     if test "$attr" = "yes" ; then
-@@ -6639,6 +6641,7 @@ if [ "$eventfd" = "yes" ]; then
- fi
+-qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
+-	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+-
+ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+ 	$(call quiet-command,$(PYTHON) $< $@ \
+ 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
+@@ -375,7 +370,6 @@ clean: recurse-clean
+ 	rm -f $(edk2-decompressed)
+ 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
+ 	rm -f fsdev/*.pod scsi/*.pod
+-	rm -f qemu-img-cmds.h
+ 	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+ 	rm -f config-all-devices.mak
+ 	rm -f $(SUBDIR_DEVICES_MAK)
+diff --git a/Makefile.target b/Makefile.target
+index 0b32364..257afc2 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -225,12 +225,6 @@ endif
+ gdbstub-xml.c: $(TARGET_XML_FILES) $(SRC_PATH)/scripts/feature_to_c.sh
+ 	$(call quiet-command,rm -f $@ && $(SHELL) $(SRC_PATH)/scripts/feature_to_c.sh $@ $(TARGET_XML_FILES),"GEN","$(TARGET_DIR)$@")
  
- tools=""
-+helpers=""
- if test "$want_tools" = "yes" ; then
-   tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-@@ -6649,7 +6652,6 @@ if test "$softmmu" = yes ; then
-   if test "$linux" = yes; then
-     if test "$virtfs" != no && test "$cap_ng" = yes && test "$attr" = yes ; then
-       virtfs=yes
--      helpers="$helpers fsdev/virtfs-proxy-helper\$(EXESUF)"
-     else
-       if test "$virtfs" = yes; then
-         error_exit "VirtFS requires libcap-ng devel and libattr devel"
-@@ -7231,6 +7233,7 @@ if test "$linux_io_uring" = "yes" ; then
- fi
- if test "$attr" = "yes" ; then
-   echo "CONFIG_ATTR=y" >> $config_host_mak
-+  echo "LIBATTR_LIBS=$libattr_libs" >> $config_host_mak
- fi
- if test "$libattr" = "yes" ; then
-   echo "CONFIG_LIBATTR=y" >> $config_host_mak
-diff --git a/fsdev/meson.build b/fsdev/meson.build
-new file mode 100644
-index 0000000..d0daa2a
---- /dev/null
-+++ b/fsdev/meson.build
-@@ -0,0 +1,5 @@
-+have_virtfs_proxy_helper = have_tools and libattr.found() and libcap_ng.found() and 'CONFIG_VIRTFS' in config_host
-+if have_virtfs_proxy_helper
-+  executable('virtfs-proxy-helper', files('virtfs-proxy-helper.c', '9p-marshal.c', '9p-iov-marshal.c'),
-+             dependencies: [qemuutil, libattr, libcap_ng])
-+endif
+-hmp-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/scripts/hxtool
+-	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$(TARGET_DIR)$@")
+-
+-hmp-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxtool
+-	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$(TARGET_DIR)$@")
+-
+ clean: clean-target
+ 	rm -f *.a *~ $(PROGS)
+ 	rm -f $(shell find . -name '*.[od]')
 diff --git a/meson.build b/meson.build
-index c62f99f..eec72f5 100644
+index fe2be8f..892bb62 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -81,6 +81,10 @@ if 'CONFIG_GNUTLS' in config_host
- endif
- pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
-                             link_args: config_host['PIXMAN_LIBS'].split())
-+libattr = not_found
-+if 'CONFIG_ATTR' in config_host
-+  libattr = declare_dependency(link_args: config_host['LIBATTR_LIBS'].split())
-+endif
- seccomp = not_found
- if 'CONFIG_SECCOMP' in config_host
-   seccomp = declare_dependency(compile_args: config_host['SECCOMP_CFLAGS'].split(),
-@@ -274,6 +278,8 @@ libqemuutil = static_library('qemuutil',
- qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: genh + version_res)
+@@ -138,6 +138,7 @@ have_block = have_system or have_tools
+ # Generators
  
-+subdir('fsdev')
+ genh = []
++hxtool = find_program('scripts/hxtool')
+ shaderinclude = find_program('scripts/shaderinclude.pl')
+ qapi_gen = find_program('scripts/qapi-gen.py')
+ qapi_gen_depends = [ meson.source_root() / 'scripts/qapi/__init__.py',
+@@ -169,6 +170,26 @@ qemu_version = custom_target('qemu-version.h',
+                              build_always_stale: true)
+ genh += qemu_version
+ 
++hxdep = []
++hx_headers = [
++  ['qemu-options.hx', 'qemu-options.def'],
++  ['qemu-img-cmds.hx', 'qemu-img-cmds.h'],
++]
++if have_system
++  hx_headers += [
++    ['hmp-commands.hx', 'hmp-commands.h'],
++    ['hmp-commands-info.hx', 'hmp-commands-info.h'],
++  ]
++endif
++foreach d : hx_headers
++  custom_target(d[1],
++                input: files(d[0]),
++                output: d[1],
++                capture: true,
++                build_by_default: true, # to be removed when added to a target
++                command: [hxtool, '-h', '@INPUT0@'])
++endforeach
 +
- # Other build targets
- if 'CONFIG_GUEST_AGENT' in config_host
-   subdir('qga')
+ # Collect sourcesets.
+ 
+ util_ss = ss.source_set()
+diff --git a/scripts/hxtool b/scripts/hxtool
+old mode 100644
+new mode 100755
+index 7b1452f..80516b9
+--- a/scripts/hxtool
++++ b/scripts/hxtool
+@@ -19,6 +19,6 @@ hxtoh()
+ case "$1" in
+ "-h") hxtoh ;;
+ *) exit 1 ;;
+-esac
++esac < "$2"
+ 
+ exit 0
 -- 
 1.8.3.1
 
