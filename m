@@ -2,82 +2,104 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED49DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F4FC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:38:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6F5A20855
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:22:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6F5A20855
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EF525221E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:38:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bg16maN7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF525221E2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3nLG-0005Xv-1v
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 17:22:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43190)
+	id 1k3nb4-0000Tq-2R
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 17:38:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3nKg-00058q-D8
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:21:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38666)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3naC-0008RS-Gu
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:37:52 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:37927)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3nKe-0005j9-Fz
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:21:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k3nKc-0004HF-Rl
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 21:21:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C93EF2E8075
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 21:21:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3naB-0007Rc-1V
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:37:52 -0400
+Received: by mail-wr1-x435.google.com with SMTP id a14so45386331wra.5
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 14:37:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=fBxvvlC37pPeDsRlTaA29QNcZkLbhDMohAa1v+BwemI=;
+ b=Bg16maN75XaaAp/GOeRc3n+8jmMuAHlA92Ap8QfG2t2Rlgn1Ej21H2RigdWdzZIoif
+ +VaJlijyDxzJxmW7OxxOmQGSCpHqX2xJNht6EUeO2snW6hFS5S38UJpAebL7MtYDKwR+
+ JRvX+TtIrH0oWZxmjkFDR9gM2NVqEo65r5RXgswA+cESgC+BzL5Pd+RwclLxoRBjF6ow
+ XbE4SPMlyS9020HKwgzRfWZfXS80agOS9JSO2EAZ8eK8qNiihEL1tqiN9E+9JiSHc3CE
+ gb8nImZYJiSun80g0XTQwMrCQ4Y0hHmoD7rW1+ipLD15f99MaGliKeS5//BM2VZIzUzg
+ 5X7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fBxvvlC37pPeDsRlTaA29QNcZkLbhDMohAa1v+BwemI=;
+ b=XV3Gnq0DFqp+eL/2QnnZmn1Boh19t4ySTtaKi49wUrYsYE04A/caXIaA+So6OU7W4Y
+ LlHOHDKBt+LKUWXT4xrEtBKW0NlI8coJJedLH12Orlj4JU/aRPy3CD/ls7HJppLRYrjv
+ tH5GUh44Z1s0aiJBH8Cxenm3TjUwQ4+2BzNCuRCpNsebl9e7qI04ULXL4NfqAZM8W5UH
+ ZfBUrYwtb50Dzwmw2C6U1ekJLArwCpBzttpQLabeom2rXDreT1jcr9SL6xY2QR7XlIwz
+ 7ZRJ9tg4/ITtWgRsi2f6HrUJScxHjS5by/TsxALkuq5f1iR7m2qpGBxvHuADrgulsZ0C
+ 9xCg==
+X-Gm-Message-State: AOAM531fiGzbzooNxgfPlXq4KYDiFikAv2VVvH+CMjIWkKKwLJqs16ty
+ /doEndPS9adtZ4DGurmZ0Z0=
+X-Google-Smtp-Source: ABdhPJzvqOo95cJ8KTTRYSh5K8D3aaXcvNly1OCiceQQPm+Bas9gxEBComaGsClyVMfXSVMJwobY0A==
+X-Received: by 2002:a5d:550e:: with SMTP id b14mr9734853wrv.392.1596749867751; 
+ Thu, 06 Aug 2020 14:37:47 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id 130sm7681018wme.26.2020.08.06.14.37.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 06 Aug 2020 14:37:47 -0700 (PDT)
+Subject: Re: [PATCH-for-5.2] target/mips: Report unimplemented cache()
+ operations
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200806122612.17167-1-f4bug@amsat.org>
+ <e55da0ff-e88c-f2f4-0430-32255f7e58fe@flygoat.com>
+ <ec0ff553-a5e7-6c93-5ab3-093721b044a6@amsat.org>
+ <CAFEAcA8iXXW=eD+w-UdPqdjtbfc45Qu+DyfZBmaVe0TgMt_jmg@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a620f323-e42a-e75e-0491-228c480fa55b@amsat.org>
+Date: Thu, 6 Aug 2020 23:37:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Aug 2020 21:09:18 -0000
-From: Steve Dodd <1594394@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: anarchetic jrtc27 kb9vqf laurent-vivier legoll
- pmaydell
-X-Launchpad-Bug-Reporter: Timothy Pearson (kb9vqf)
-X-Launchpad-Bug-Modifier: Steve Dodd (anarchetic)
-References: <20160620140124.12349.60184.malonedeb@wampee.canonical.com>
-Message-Id: <159674815827.3361.5874412005960424060.malone@gac.canonical.com>
-Subject: [Bug 1594394] Re: Using setreuid / setegid crashes x86_64 user-mode
- target
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e364dca27f28460e357751b3187068a309bd002a
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 17:11:16
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA8iXXW=eD+w-UdPqdjtbfc45Qu+DyfZBmaVe0TgMt_jmg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::435;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x435.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,99 +108,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1594394 <1594394@bugs.launchpad.net>
+Cc: Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sorry, heat is definitely getting to me - just realized this is an
-upstream bug, not an Ubuntu one! Ubuntu package version is 1:2.11+dfsg-
-1ubuntu7.26. At some point I will look at building qemu from source, but
-won't be an immediate thing. Apologies for noise .. though if anyone
-knows off-hand that a fix for this did or didn't get merged that would
-useful ..
+On 8/6/20 10:51 PM, Peter Maydell wrote:
+> On Thu, 6 Aug 2020 at 21:31, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> On 8/6/20 8:01 PM, Jiaxun Yang wrote:
+>>> 在 2020/8/6 下午8:26, Philippe Mathieu-Daudé 写道:
+>>>> We only implement the Index[Store/Load]Tag from the 'cache' opcode.
+>>>> Instead of ignoring the other cache operations, report them as
+>>>> unimplemented.
+>>>
+>>> Hmm, I don't think we have anything to do with Invalidate/Writeback etc.
+>>> opcodes
+>>> in QEMU. Why do we log this?
+>>
+>> I'm noticed this code is run on Linux 3.3.8 (4KEc):
+>>
+>>     8880:       3082000f        andi    v0,a0,0xf
+>>     8884:       10800008        beqz    a0,88a8
+>>     8888:       00a21021        addu    v0,a1,v0
+>>     888c:       08002227        j       889c
+>>     8890:       00001821        move    v1,zero
+>>     8894:       bcf90000        cache   0x19,0(a3)
+>>     8898:       24630010        addiu   v1,v1,16
+>>     889c:       0062302b        sltu    a2,v1,v0
+>>     88a0:       14c0fffc        bnez    a2,8894
+>>     88a4:       00833821        addu    a3,a0,v1
+>>     88a8:       03e00008        jr      ra
+>>     88ac:       00000000        nop
+>>
+>> Why silently ignore the opcode is not implemented instead of logging it?
+> 
+> I think the question is whether the opcode is supposed to have
+> some behaviour which we're not implementing, or whether "no-op"
+> is the correct behaviour for it (which it usually is for
+> cache invalidate type operations; compare the way the Arm
+> cache ops like IC_IALLU are just ARM_CP_NOP ops).
 
--- =
+OK now I understand better, thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1594394
+I haven't found useful information about this 0x19=25 opcode value.
 
-Title:
-  Using setreuid / setegid crashes x86_64 user-mode target
+On a r10k core it is listed as 'Hit Writeback Invalidate (D)' but here
+this is a 4kEc. The address used is a SRAM shared with a embedded DSP
+on the same SoC. From a RevEng PoV it is helpful to see there is a such
+cache access, as I can separate better the peripheral involved.
+I'm happy using a trace event instead.
 
-Status in QEMU:
-  New
+Jiaxun, can you list me the list of opcodes QEMU can safely ignore from
+the TCG emulation PoV? That way we can comment them in the code such:
 
-Bug description:
-  When setreuid() or setegid() are called from x86_64 target code in
-  user mode, qemu crashes inside the NPTL signal handlers.  x86 targets
-  do not directly use a syscall to handle setreuid() / setegid();
-  instead the x86 NPTL implementation sets up a temporary data region in
-  memory (__xidcmd) and issues a signal (SIGRT1) to all threads,
-  allowing the handler for that signal to issue the syscall.  Under
-  qemu, __xidcmd remains null (see variable display below backtrace).
+    switch (op) {
+    case 9:
+        /* Index Store Tag */
+        ...
+        break;
+    case 5:
+        /* Index Load Tag */
+        ...
+        break;
+    case X:
+    case Y:
+    case Z:
+        /* No-Op for QEMU */
+        ...
+        break;
+    default:
+        qemu_log_mask(LOG_UNIMP, "cache %u\n", op);
+    }
 
-  Backtrace:
-  Program received signal SIGSEGV, Segmentation fault.
-  [Switching to Thread 0x3fff85c74fc0 (LWP 74517)]
-  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d08, c=
-tx=3D0x3fff85c71f90) at nptl-init.c:263
-  263     nptl-init.c: No such file or directory.
-  (gdb) thread apply all bt
+Thanks,
 
-  Thread 3 (Thread 0x3fff87e8efc0 (LWP 74515)):
-  #0  0x00000000601cc430 in syscall ()
-  #1  0x0000000060109080 in futex_wait (val=3D<optimized out>, ev=3D<optimi=
-zed out>) at /build/qemu/util/qemu-thread-posix.c:292
-  #2  qemu_event_wait (ev=3D0x62367bb0 <rcu_call_ready_event>) at /build/qe=
-mu/util/qemu-thread-posix.c:399
-  #3  0x000000006010f73c in call_rcu_thread (opaque=3D<optimized out>) at /=
-build/qemu/util/rcu.c:250
-  #4  0x0000000060176f8c in start_thread (arg=3D0x3fff87e8efc0) at pthread_=
-create.c:336
-  #5  0x00000000601cebf4 in clone ()
+Phil.
 
-  Thread 2 (Thread 0x3fff85c74fc0 (LWP 74517)):
-  #0  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d0=
-8, ctx=3D0x3fff85c71f90) at nptl-init.c:263
-  #1  <signal handler called>
-  #2  0x00000000601cc42c in syscall ()
-  #3  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
-0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
-imized out>) at /build/qemu/linux-user/syscall.c:748
-  #4  do_futex (val3=3D<optimized out>, uaddr2=3D275186650880, timeout=3D0,=
- val=3D1129, op=3D128, uaddr=3D275186651116) at /build/qemu/linux-user/sysc=
-all.c:6201
-  #5  do_syscall (cpu_env=3D0x1000abfd350, num=3D<optimized out>, arg1=3D27=
-5186651116, arg2=3D<optimized out>, arg3=3D1129, arg4=3D0, arg5=3D275186650=
-880, arg6=3D<optimized out>, arg7=3D0, arg8=3D0)
-      at /build/qemu/linux-user/syscall.c:10651
-  #6  0x00000000600347b8 in cpu_loop (env=3D0x1000abfd350) at /build/qemu/l=
-inux-user/main.c:317
-  #7  0x0000000060036ae0 in clone_func (arg=3D0x3fffc4c2ca38) at /build/qem=
-u/linux-user/syscall.c:5445
-  #8  0x0000000060176f8c in start_thread (arg=3D0x3fff85c74fc0) at pthread_=
-create.c:336
-  #9  0x00000000601cebf4 in clone ()
-
-  Thread 1 (Thread 0x1000aa05000 (LWP 74511)):
-  #0  0x00000000601cc430 in syscall ()
-  #1  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
-0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
-imized out>) at /build/qemu/linux-user/syscall.c:748
-  #2  do_futex (val3=3D<optimized out>, uaddr2=3D1, timeout=3D0, val=3D1, o=
-p=3D128, uaddr=3D275078324992) at /build/qemu/linux-user/syscall.c:6201
-  #3  do_syscall (cpu_env=3D0x1000aa23890, num=3D<optimized out>, arg1=3D27=
-5078324992, arg2=3D<optimized out>, arg3=3D1, arg4=3D0, arg5=3D1, arg6=3D<o=
-ptimized out>, arg7=3D0, arg8=3D0) at /build/qemu/linux-user/syscall.c:10651
-  #4  0x00000000600347b8 in cpu_loop (env=3D0x1000aa23890) at /build/qemu/l=
-inux-user/main.c:317
-  #5  0x00000000600020e4 in main (argc=3D<optimized out>, argv=3D<optimized=
- out>, envp=3D<optimized out>) at /build/qemu/linux-user/main.c:4779
-  (gdb) p __xidcmd
-  $1 =3D (struct xid_command *) 0x0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1594394/+subscriptions
+> 
+> thanks
+> -- PMM
+> 
 
