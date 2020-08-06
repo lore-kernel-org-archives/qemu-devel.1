@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 991A9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A876CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:29:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B7262177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:28:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A897D2177B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:29:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h7poCE4B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B7262177B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FQALa2K9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A897D2177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3lZI-0003FY-Jv
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:28:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42802)
+	id 1k3lZo-0004Oq-Hm
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:29:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOM-0004Wh-19
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43695
+ id 1k3lON-0004aI-T4
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43414
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOJ-0006SZ-61
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:29 -0400
+ id 1k3lOL-0006Sw-M5
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741446;
+ s=mimecast20190719; t=1596741448;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=A9EalWruB0XXfdHoY9b3qLGS+6bikzKNemtBy8PRrvg=;
- b=h7poCE4BqKPnpgd1TMUpnWzWxXUdkPTVlH+WCcocKQTAmaZJmiaObtyiRprydT8AgjnO1g
- xOi9QIHuY9vvzvBgF0O4n8LZiTGTTe3gO74DytzKUQQsrduh2LNSd0ZCGJMm+Xv0fI4RF3
- /20U1CpGu9Q1x1JThAQUSKtDfXPP4I0=
+ bh=FWzeLdA7AjO9LbE9ZvfOW7pkv/2p9dgjl+PlSuJV4KU=;
+ b=FQALa2K9PdUWEEeRJWbG/6oN/U6qV34JptYfczlSlwcMjmMzV+wACXoWJp2CpOSTq2zrcV
+ YdCC6qy0q2wsBrMm97LkG05oQvGb+SV9cR2ceDtfLHvKkFvbTGrZFM2zUE7u7bUAFetliZ
+ egxRW6AuWBUexgkjwx+C44ym/WZ9NGU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-ZboJwsoZPAC1ZJ0dhlk9iA-1; Thu, 06 Aug 2020 15:17:22 -0400
-X-MC-Unique: ZboJwsoZPAC1ZJ0dhlk9iA-1
+ us-mta-367-4NbhU9TAMJu2iMkkU8t32w-1; Thu, 06 Aug 2020 15:17:27 -0400
+X-MC-Unique: 4NbhU9TAMJu2iMkkU8t32w-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DFB0107BEF6
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 358F08014C1
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:26 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2F1925F9DC;
- Thu,  6 Aug 2020 19:17:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 459EB5FC30;
+ Thu,  6 Aug 2020 19:17:25 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 031/143] contrib/ivshmem: convert to meson
-Date: Thu,  6 Aug 2020 21:14:27 +0200
-Message-Id: <1596741379-12902-32-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 034/143] meson: convert vss-win32
+Date: Thu,  6 Aug 2020 21:14:30 +0200
+Message-Id: <1596741379-12902-35-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:24:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 03:10:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,129 +107,134 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                             | 9 ---------
- Makefile.objs                        | 2 --
- configure                            | 3 ---
- contrib/ivshmem-client/Makefile.objs | 1 -
- contrib/ivshmem-client/meson.build   | 3 +++
- contrib/ivshmem-server/Makefile.objs | 1 -
- contrib/ivshmem-server/meson.build   | 3 +++
- meson.build                          | 6 ++++++
- 8 files changed, 12 insertions(+), 16 deletions(-)
- delete mode 100644 contrib/ivshmem-client/Makefile.objs
- create mode 100644 contrib/ivshmem-client/meson.build
- delete mode 100644 contrib/ivshmem-server/Makefile.objs
- create mode 100644 contrib/ivshmem-server/meson.build
+ Makefile                    |  1 -
+ Makefile.objs               |  8 --------
+ qga/Makefile.objs           |  1 -
+ qga/meson.build             |  6 ++++++
+ qga/vss-win32/Makefile.objs | 23 -----------------------
+ qga/vss-win32/meson.build   | 33 +++++++++++++++++++++++++++++++++
+ 6 files changed, 39 insertions(+), 33 deletions(-)
+ delete mode 100644 qga/Makefile.objs
+ delete mode 100644 qga/vss-win32/Makefile.objs
+ create mode 100644 qga/vss-win32/meson.build
 
 diff --git a/Makefile b/Makefile
-index 128bebe..e3d54c0 100644
+index 05f774d..3451981 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -287,8 +287,6 @@ dummy := $(call unnest-vars,, \
+@@ -285,7 +285,6 @@ endif
+ dummy := $(call unnest-vars,, \
+                 authz-obj-y \
                  chardev-obj-y \
-                 qga-obj-y \
-                 elf2dmp-obj-y \
--                ivshmem-client-obj-y \
--                ivshmem-server-obj-y \
-                 qga-vss-dll-obj-y \
+-                qga-vss-dll-obj-y \
                  block-obj-y \
                  block-obj-m \
-@@ -501,13 +499,6 @@ endif
- elf2dmp$(EXESUF): $(elf2dmp-obj-y)
- 	$(call LINK, $^)
- 
--ifdef CONFIG_IVSHMEM
--ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
--	$(call LINK, $^)
--ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
--	$(call LINK, $^)
--endif
--
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
+                 storage-daemon-obj-y \
 diff --git a/Makefile.objs b/Makefile.objs
-index 2f2d4b2..336a684 100644
+index 259f993..baf1565 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -104,7 +104,5 @@ qga-vss-dll-obj-y = qga/
+@@ -91,11 +91,3 @@ common-obj-y += disas/
  ######################################################################
- # contrib
- elf2dmp-obj-y = contrib/elf2dmp/
--ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
--ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
- 
- ######################################################################
-diff --git a/configure b/configure
-index bb44d39..473173d 100755
---- a/configure
-+++ b/configure
-@@ -6647,9 +6647,6 @@ if test "$want_tools" = "yes" ; then
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-nbd\$(EXESUF) qemu-storage-daemon\$(EXESUF) $tools"
-   fi
--  if [ "$ivshmem" = "yes" ]; then
--    tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
--  fi
-   if [ "$curl" = "yes" ]; then
-       tools="elf2dmp\$(EXESUF) $tools"
-   fi
-diff --git a/contrib/ivshmem-client/Makefile.objs b/contrib/ivshmem-client/Makefile.objs
+ # Resource file for Windows executables
+ version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
+-
+-######################################################################
+-# guest agent
+-
+-# FIXME: a few definitions from qapi/qapi-types.o and
+-# qapi/qapi-visit.o are needed by libqemuutil.a.  These should be
+-# extracted into a QAPI schema module, or perhaps a separate schema.
+-qga-vss-dll-obj-y = qga/
+diff --git a/qga/Makefile.objs b/qga/Makefile.objs
 deleted file mode 100644
-index bfab2d2..0000000
---- a/contrib/ivshmem-client/Makefile.objs
+index 9ecf249..0000000
+--- a/qga/Makefile.objs
 +++ /dev/null
 @@ -1 +0,0 @@
--ivshmem-client-obj-y = ivshmem-client.o main.o
-diff --git a/contrib/ivshmem-client/meson.build b/contrib/ivshmem-client/meson.build
-new file mode 100644
-index 0000000..92ad844
---- /dev/null
-+++ b/contrib/ivshmem-client/meson.build
-@@ -0,0 +1,3 @@
-+executable('ivshmem-client', files('ivshmem-client.c', 'main.c'),
-+           dependencies: glib,
-+           install: true)
-diff --git a/contrib/ivshmem-server/Makefile.objs b/contrib/ivshmem-server/Makefile.objs
-deleted file mode 100644
-index c060dd3..0000000
---- a/contrib/ivshmem-server/Makefile.objs
-+++ /dev/null
-@@ -1 +0,0 @@
--ivshmem-server-obj-y = ivshmem-server.o main.o
-diff --git a/contrib/ivshmem-server/meson.build b/contrib/ivshmem-server/meson.build
-new file mode 100644
-index 0000000..6dbe240
---- /dev/null
-+++ b/contrib/ivshmem-server/meson.build
-@@ -0,0 +1,3 @@
-+executable('ivshmem-server', files('ivshmem-server.c', 'main.c'),
-+           dependencies: [qemuutil, rt],
-+           install: true)
-diff --git a/meson.build b/meson.build
-index 894584a..aa6fffa 100644
---- a/meson.build
-+++ b/meson.build
-@@ -90,6 +90,7 @@ libcap_ng = not_found
- if 'CONFIG_LIBCAP_NG' in config_host
-   libcap_ng = declare_dependency(link_args: config_host['LIBCAP_NG_LIBS'].split())
- endif
-+rt = cc.find_library('rt', required: false)
- libiscsi = not_found
- if 'CONFIG_LIBISCSI' in config_host
-   libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
-@@ -263,6 +264,11 @@ if have_tools
-     subdir('contrib/vhost-user-input')
-     subdir('contrib/vhost-user-scsi')
-   endif
+-qga-vss-dll-obj-$(CONFIG_QGA_VSS) += vss-win32/
+diff --git a/qga/meson.build b/qga/meson.build
+index e963e43..7dc031f 100644
+--- a/qga/meson.build
++++ b/qga/meson.build
+@@ -43,3 +43,9 @@ qga_ss = qga_ss.apply(config_host, strict: false)
+ qga = executable('qemu-ga', qga_ss.sources(),
+                  link_args: config_host['LIBS_QGA'].split(),
+                  dependencies: [qemuutil, libudev])
 +
-+  if 'CONFIG_IVSHMEM' in config_host
-+    subdir('contrib/ivshmem-client')
-+    subdir('contrib/ivshmem-server')
++if host_machine.system() == 'windows'
++  if 'CONFIG_QGA_VSS' in config_host
++    subdir('vss-win32')
 +  endif
- endif
- 
- subdir('tools')
++endif
+diff --git a/qga/vss-win32/Makefile.objs b/qga/vss-win32/Makefile.objs
+deleted file mode 100644
+index c82676a..0000000
+--- a/qga/vss-win32/Makefile.objs
++++ /dev/null
+@@ -1,23 +0,0 @@
+-# rules to build qga-vss.dll
+-
+-qga-vss-dll-obj-y += requester.o provider.o install.o
+-
+-obj-qga-vss-dll-obj-y = $(addprefix $(obj)/, $(qga-vss-dll-obj-y))
+-$(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS := $(filter-out -fstack-protector-all -fstack-protector-strong, $(QEMU_CXXFLAGS)) -Wno-unknown-pragmas -Wno-delete-non-virtual-dtor
+-
+-QGA_VSS_LDFLAGS = -shared -Wl,--add-stdcall-alias,--enable-stdcall-fixup -lglib-2.0 -lole32 -loleaut32 -lshlwapi -luuid -lintl -lws2_32 -static
+-$(obj)/qga-vss.dll: $(obj-qga-vss-dll-obj-y) $(SRC_PATH)/$(obj)/qga-vss.def
+-	$(call quiet-command,$(CXX) -o $@ $(qga-vss-dll-obj-y) $(SRC_PATH)/qga/vss-win32/qga-vss.def $(CXXFLAGS) $(QGA_VSS_LDFLAGS),"LINK","$(TARGET_DIR)$@")
+-
+-
+-# rules to build qga-provider.tlb
+-# Currently, only native build is supported because building .tlb
+-# (TypeLibrary) from .idl requires WindowsSDK and MIDL (and cl.exe in VC++).
+-MIDL=$(WIN_SDK)/Bin/midl
+-
+-$(obj)/qga-vss.tlb: $(SRC_PATH)/$(obj)/qga-vss.idl
+-ifeq ($(WIN_SDK),"")
+-	$(call quiet-command,cp $(dir $<)qga-vss.tlb $@,"COPY","$(TARGET_DIR)$@")
+-else
+-	$(call quiet-command,$(MIDL) -tlb $@ -I $(WIN_SDK)/Include $<,"MIDL","$(TARGET_DIR)$@")
+-endif
+diff --git a/qga/vss-win32/meson.build b/qga/vss-win32/meson.build
+new file mode 100644
+index 0000000..42c8d31
+--- /dev/null
++++ b/qga/vss-win32/meson.build
+@@ -0,0 +1,33 @@
++if add_languages('cpp', required: false)
++  glib_static = dependency('glib-2.0', static: true)
++  link_args = cc.get_supported_link_arguments(['-fstack-protector-all', '-fstack-protector-strong',
++                                               '-Wl,--add-stdcall-alias', '-Wl,--enable-stdcall-fixup'])
++  shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
++                name_prefix: '',
++                cpp_args: ['-Wno-unknown-pragmas', '-Wno-delete-non-virtual-dtor', '-Wno-non-virtual-dtor'],
++                link_args: link_args,
++                vs_module_defs: 'qga-vss.def',
++                dependencies: [glib_static, socket,
++                               cc.find_library('ole32'),
++                               cc.find_library('oleaut32'),
++                               cc.find_library('shlwapi'),
++                               cc.find_library('uuid'),
++                               cc.find_library('intl')])
++endif
++
++# rules to build qga-vss.tlb
++# Currently, only native build is supported because building .tlb
++# (TypeLibrary) from .idl requires WindowsSDK and MIDL (and cl.exe in VC++).
++midl = find_program('midl', required: false)
++if midl.found()
++  gen_tlb = custom_target('gen-tlb',
++                          input: 'qga-vss.idl',
++                          output: 'qga-vss.tlb',
++                          command: [midl, '-tlb', '-I' + config_host['WIN_SDK'],
++                                     '@INPUT@', '@OUTPUT@'])
++else
++  gen_tlb = custom_target('gen-tlb',
++                          input: 'qga-vss.tlb',
++                          output: 'qga-vss.tlb',
++                          command: ['cp', '@INPUT@', '@OUTPUT@'])
++endif
 -- 
 1.8.3.1
 
