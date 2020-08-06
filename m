@@ -2,103 +2,91 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68426C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F7EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:25:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4359D22D03
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D722D22D03
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:25:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H2hPibe/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4359D22D03
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="MX9R304G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D722D22D03
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3cXI-0004Ow-7c
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 05:50:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55100)
+	id 1k3dyI-0008DO-DR
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:22:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k3cWi-0003xW-Qi
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 05:49:32 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26178
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k3cWf-0000aQ-Ik
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 05:49:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596707367;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=uRXqjSTJguqkJgZ6GjdgmssHqoMjhP+xFdyXktR2E4I=;
- b=H2hPibe/vE5Y1qRIQxVcMvujBoU5BM7bxq0D/sF/6gaYIlmZrUGBzh2pkE/SGzOxvXi40p
- DBZCz5yEMRMCJqQzywh4ettAusgr43csKOvDjiRDhewJaBh1OFCcDVHmNi1u+U4bV629b+
- ctg4USg+YF/d28WadvQ9atTngr0KiC0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-aVDo9asBNMeUR7gYIs4mgg-1; Thu, 06 Aug 2020 05:49:18 -0400
-X-MC-Unique: aVDo9asBNMeUR7gYIs4mgg-1
-Received: by mail-wr1-f70.google.com with SMTP id w1so12592205wro.4
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 02:49:18 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k3dTN-0004v1-IK
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:50:09 -0400
+Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:39387)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k3dTK-00087T-SU
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:50:09 -0400
+Received: by mail-pf1-x432.google.com with SMTP id z188so16876834pfc.6
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:50:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=O3T15C5zXKgdWTgIeOk+Heshi2/zQEO4T1Zo++fAsNM=;
+ b=MX9R304GLvjnShKCRK1huCZ4gBViyr2R9iSysxw0sV9wRHj5xjrv8LPjUnzDARFdET
+ hktcy+dVG4o5KHDdDkcNhIgUtsBmK1U42GeSGfGPwlNpdL7H35I3GbpYa1arHPmauVb3
+ obkqLgsQorPcvf+UrfEE1PuEQqGL9WCyYEQUKzPYcOYWDmZpOj9+PxfDlLbfDO0pZqpk
+ g0D+caGOGClGV0nWJ4sViQ7NRWO2Ikr5MMRQxnTZCblAgtxiBcnWNRpzlcBjbPg+yovl
+ atO82JQLoOEzgFWrYBuaMIGXZmqbBFGHZhPpJSuILI2i5w3qLEidvyXqKlpuUpn5aNHw
+ Io7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=uRXqjSTJguqkJgZ6GjdgmssHqoMjhP+xFdyXktR2E4I=;
- b=cZ3A5FQvuw9PT5QHO7jxfOM98aKGpGxs9MGd4NzJqjHY6yVpk7obyxwwxIp/WrCjBF
- 38Lj45z6vz11IKUjFEwFs1DobiZsFVfO2H0QwOUNCRaWRsz/uPtOvZhJSNHZABHrmq+T
- c10HA2K7UL+05Qypv33gobr3396vHD5Zy6U4g/fZcDdYkbhwiqyVEvA75NfwARxFDNud
- uLINkUQfzduocJ4xGG/4VExh96Hbfva11gO6GvYLEe6ICE2d5isKRhK1Ug3Lc7neA45G
- 7PA1OL/ETjS5hxf2lVTvHNaw7c1mwJIocGC0SQ3CUE84+l3NFmCpgKJaA8ih+2oK4OsR
- sjAQ==
-X-Gm-Message-State: AOAM530OoGwcxfrq7gGLbL84THxQmmOME/aTJsKRnqOw9yuf8l8ZZva9
- dQ3yyw0G4f94MuFsJGxM6LSiaAVdfGcFs4fiZmEDWTf9vbWNcamOotnJ9TPVvDuj7RwkX+0KbJS
- MLc/OIwO5Q3w1ZbM=
-X-Received: by 2002:a1c:f605:: with SMTP id w5mr6977600wmc.26.1596707357392;
- Thu, 06 Aug 2020 02:49:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx+bnyy+GxLSleWZG55fjT23rrPNEi9E1Tlg7YgLh6vruM8ZeHg+yhMqgdi5x76fqkK3uXyTQ==
-X-Received: by 2002:a1c:f605:: with SMTP id w5mr6977572wmc.26.1596707357108;
- Thu, 06 Aug 2020 02:49:17 -0700 (PDT)
-Received: from redhat.com (bzq-79-178-123-8.red.bezeqint.net. [79.178.123.8])
- by smtp.gmail.com with ESMTPSA id
- i6sm5677889wrp.92.2020.08.06.02.49.15
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=O3T15C5zXKgdWTgIeOk+Heshi2/zQEO4T1Zo++fAsNM=;
+ b=nNGWzJep2uamhK/ePPXOYkclRSRNM6nsWl3/oyxyFXsYXT8BFdgEGNioPxwrdIg889
+ RwHqnYMGDUkFDAdKslRLXJYvTlT/tz+YvhYMKHhfhMIt/WZ7laDJA4LL0U8rRcx1gIRf
+ GkD0Ec6cvnTfaphroRhV3LCzGKdD4l1R9ZhAegbMo5L14bXtzTYgv9CWVAztFdOdArzi
+ mAowIGeiUbSzYssL17/0uJaOmNvalPsvsU9nLAumcQMOUd6Ci8C9Ko27begT3nGN1Tk8
+ gSeN9cELXH+gyddk6lCw2JUD9pL15D2CoGDCbXGVNMgVtg4fCcf/f1KP4+YWhXf3bI3l
+ 5fUQ==
+X-Gm-Message-State: AOAM532PxwHxAGcmobYWVmQMm+taQOFoCoJImPzAEVarG0zkmeM28GBQ
+ kAG9Nv72H3EAjmt/dCLQXZVzmL+O0dc=
+X-Google-Smtp-Source: ABdhPJx1UWvcEFOtX7ni/vrVhmPWHnvT9h5j0cPHk5Tcv/Z1ifTEFb3Pb47Vt7oTLKT8E7m9IUPGfQ==
+X-Received: by 2002:a63:471b:: with SMTP id u27mr6740639pga.139.1596711005168; 
+ Thu, 06 Aug 2020 03:50:05 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.50.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 02:49:16 -0700 (PDT)
-Date: Thu, 6 Aug 2020 05:49:14 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Alyssa Ross <hi@alyssa.is>
-Subject: Re: vhost-user protocol feature negotiation
-Message-ID: <20200806054622-mutt-send-email-mst@kernel.org>
-References: <87sgd1ktx9.fsf@alyssa.is>
- <20200805181352-mutt-send-email-mst@kernel.org>
- <87lfis2lr6.fsf@alyssa.is>
-MIME-Version: 1.0
-In-Reply-To: <87lfis2lr6.fsf@alyssa.is>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:07:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ Thu, 06 Aug 2020 03:50:04 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC v3 68/71] target/riscv: rvv-1.0: narrowing
+ floating-point/integer type-convert
+Date: Thu,  6 Aug 2020 18:47:05 +0800
+Message-Id: <20200806104709.13235-69-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
+References: <20200806104709.13235-1-frank.chang@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::432;
+ envelope-from=frank.chang@sifive.com; helo=mail-pf1-x432.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,119 +99,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Frank Chang <frank.chang@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 06, 2020 at 08:59:09AM +0000, Alyssa Ross wrote:
-> "Michael S. Tsirkin" <mst@redhat.com> writes:
-> 
-> > On Wed, Aug 05, 2020 at 03:13:06PM +0000, Alyssa Ross wrote:
-> >> Quoting from the definition of VHOST_USER_SET_PROTOCOL_FEATURES in
-> >> vhost-user.rst:
-> >> 
-> >> >   Only legal if feature bit ``VHOST_USER_F_PROTOCOL_FEATURES`` is present in
-> >> >   ``VHOST_USER_GET_FEATURES``.
-> >> > 
-> >> > .. Note::
-> >> >    Slave that reported ``VHOST_USER_F_PROTOCOL_FEATURES`` must support
-> >> >    this message even before ``VHOST_USER_SET_FEATURES`` was called.
-> >> 
-> >> To me, this could mean either of two things:
-> >> 
-> >> (1) If VHOST_USER_F_PROTOCOL_FEATURES hasn't been set, upon receiving
-> >>     VHOST_USER_SET_PROTOCOL_FEATURES, a backend should enable the
-> >>     protocol features immediately.
-> >> 
-> >> (2) If VHOST_USER_F_PROTOCOL_FEATURES hasn't been set, upon receiving
-> >>     VHOST_USER_SET_PROTOCOL_FEATURES, a backend should store those
-> >>     feature bits, but not actually consider them to be enabled until
-> >>     after VHOST_USER_SET_FEATURES has been received (presumably
-> >>     containing VHOST_USER_F_PROTOCOL_FEATURES).
-> >> 
-> >> The reason I bring this up is that QEMU appears to interpret it as (1),
-> >> while the vhost-user-net backend in Intel's cloud-hypervisor[1]
-> >> interprets it as (2).  So I'm looking for a clarification.
-> >> 
-> >> [1]: https://github.com/cloud-hypervisor/cloud-hypervisor
-> >> 
-> >> Thanks in advance.
-> >
-> >
-> > IMHO the intent was this: VHOST_USER_F_PROTOCOL_FEATURES bit in
-> > VHOST_USER_GET_FEATURES means that qemu can send
-> > VHOST_USER_GET_PROTOCOL_FEATURES and VHOST_USER_SET_PROTOCOL_FEATURES.
-> >
-> > With most feature bits in VHOST_USER_GET_FEATURES, the
-> > specific functionality needs to only be enabled after
-> > VHOST_USER_SET_FEATURES.
-> >
-> > However, this is for functionality dealing with guest activity.
-> > VHOST_USER_SET_PROTOCOL_FEATURES has nothing to do with guest directly,
-> > it's about negotiation between qemu and backend: it is only in
-> > VHOST_USER_GET_FEATURES for the reason that this is the only message
-> > (very) old backends reported.  Thus, the backend should not check
-> > whether VHOST_USER_SET_FEATURES sets VHOST_USER_F_PROTOCOL_FEATURES,
-> > instead it should simply always be ready to receive
-> > VHOST_USER_GET_PROTOCOL_FEATURES and VHOST_USER_SET_PROTOCOL_FEATURES.
-> >
-> > Backend that isn't always ready to handle
-> > VHOST_USER_GET_PROTOCOL_FEATURES and VHOST_USER_SET_PROTOCOL_FEATURES
-> > should not set VHOST_USER_F_PROTOCOL_FEATURES in
-> > VHOST_USER_GET_FEATURES.
-> 
-> Thanks for the explanation.  That matches what I had in mind with (1).
-> 
-> > This appears to be closer to (1), but if qemu can't distinguish
-> > then we don't care, right? For example, VHOST_USER_PROTOCOL_F_REPLY_ACK
-> > enables acks on arbitrary messages. Does the backend in question
-> > ignore the affected bit until SET_FEATURES? If yes won't this
-> > make qemu hang?
-> 
-> Yes.  That was my motivation for asking what the correct behaviour was,
-> so that I could fix the incorrect one. :)  I suspect that up to this point,
-> the cloud-hypervisor vhost-user-net backend has only been used with
-> cloud-hypervisor, and so this incompatibilty with QEMU was not noticed.
-> 
-> > How would you suggest clarifying the wording?
-> 
-> Do you think this communicates everything required?
-> 
-> ---
-> diff --git i/docs/interop/vhost-user.rst w/docs/interop/vhost-user.rst
-> index 10e3e3475e..72724d292a 100644
-> --- i/docs/interop/vhost-user.rst
-> +++ w/docs/interop/vhost-user.rst
-> @@ -854,9 +854,8 @@ Master message types
->    ``VHOST_USER_GET_FEATURES``.
->  
->  .. Note::
-> -   Slave that reported ``VHOST_USER_F_PROTOCOL_FEATURES`` must
-> -   support this message even before ``VHOST_USER_SET_FEATURES`` was
-> -   called.
-> +   ``VHOST_USER_F_PROTOCOL_FEATURES`` does not need to be acknowledged
-> +   with ``VHOST_USER_SET_FEATURES``.
->  
->  ``VHOST_USER_SET_PROTOCOL_FEATURES``
->    :id: 16
+From: Frank Chang <frank.chang@sifive.com>
 
-Hmm I find this confusing. I think it's a good policy to ask qemu to
-acknowledge it. It's just that the client should not wait for
-VHOST_USER_SET_FEATURES before handling VHOST_USER_SET_PROTOCOL_FEATURES
-or VHOST_USER_GET_PROTOCOL_FEATURES.
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
+---
+ target/riscv/helper.h                   | 30 ++++++----
+ target/riscv/insn32.decode              | 15 +++--
+ target/riscv/insn_trans/trans_rvv.inc.c | 52 ++++++++++++++---
+ target/riscv/vector_helper.c            | 76 ++++++++++++++++++-------
+ 4 files changed, 131 insertions(+), 42 deletions(-)
 
-
-> @@ -869,8 +868,8 @@ Master message types
->    ``VHOST_USER_GET_FEATURES``.
->  
->  .. Note::
-> -   Slave that reported ``VHOST_USER_F_PROTOCOL_FEATURES`` must support
-> -   this message even before ``VHOST_USER_SET_FEATURES`` was called.
-> +   ``VHOST_USER_F_PROTOCOL_FEATURES`` does not need to be acknowledged
-> +   with ``VHOST_USER_SET_FEATURES``.
->  
->  ``VHOST_USER_SET_OWNER``
->    :id: 3
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index b128610978d..2ecacdc225e 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -1009,16 +1009,26 @@ DEF_HELPER_5(vfwcvt_rtz_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfwcvt_rtz_x_f_v_h, void, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_5(vfwcvt_rtz_x_f_v_w, void, ptr, ptr, ptr, env, i32)
+ 
+-DEF_HELPER_5(vfncvt_xu_f_v_h, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_5(vfncvt_xu_f_v_w, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_5(vfncvt_x_f_v_h, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_5(vfncvt_x_f_v_w, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_5(vfncvt_f_xu_v_h, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_5(vfncvt_f_xu_v_w, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_5(vfncvt_f_x_v_h, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_5(vfncvt_f_x_v_w, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_5(vfncvt_f_f_v_h, void, ptr, ptr, ptr, env, i32)
+-DEF_HELPER_5(vfncvt_f_f_v_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_xu_f_w_b, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_xu_f_w_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_xu_f_w_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_x_f_w_b, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_x_f_w_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_x_f_w_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_xu_w_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_xu_w_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_x_w_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_x_w_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_f_w_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_f_f_w_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_rod_f_f_w_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_rod_f_f_w_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_rtz_xu_f_w_b, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_rtz_xu_f_w_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_rtz_xu_f_w_w, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_rtz_x_f_w_b, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_rtz_x_f_w_h, void, ptr, ptr, ptr, env, i32)
++DEF_HELPER_5(vfncvt_rtz_x_f_w_w, void, ptr, ptr, ptr, env, i32)
+ 
+ DEF_HELPER_6(vredsum_vs_b, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vredsum_vs_h, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index fae96194078..3b42cb01a77 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -571,11 +571,16 @@ vfwcvt_f_x_v       010010 . ..... 01011 001 ..... 1010111 @r2_vm
+ vfwcvt_f_f_v       010010 . ..... 01100 001 ..... 1010111 @r2_vm
+ vfwcvt_rtz_xu_f_v  010010 . ..... 01110 001 ..... 1010111 @r2_vm
+ vfwcvt_rtz_x_f_v   010010 . ..... 01111 001 ..... 1010111 @r2_vm
+-vfncvt_xu_f_v   100010 . ..... 10000 001 ..... 1010111 @r2_vm
+-vfncvt_x_f_v    100010 . ..... 10001 001 ..... 1010111 @r2_vm
+-vfncvt_f_xu_v   100010 . ..... 10010 001 ..... 1010111 @r2_vm
+-vfncvt_f_x_v    100010 . ..... 10011 001 ..... 1010111 @r2_vm
+-vfncvt_f_f_v    100010 . ..... 10100 001 ..... 1010111 @r2_vm
++
++vfncvt_xu_f_w      010010 . ..... 10000 001 ..... 1010111 @r2_vm
++vfncvt_x_f_w       010010 . ..... 10001 001 ..... 1010111 @r2_vm
++vfncvt_f_xu_w      010010 . ..... 10010 001 ..... 1010111 @r2_vm
++vfncvt_f_x_w       010010 . ..... 10011 001 ..... 1010111 @r2_vm
++vfncvt_f_f_w       010010 . ..... 10100 001 ..... 1010111 @r2_vm
++vfncvt_rod_f_f_w   010010 . ..... 10101 001 ..... 1010111 @r2_vm
++vfncvt_rtz_xu_f_w  010010 . ..... 10110 001 ..... 1010111 @r2_vm
++vfncvt_rtz_x_f_w   010010 . ..... 10111 001 ..... 1010111 @r2_vm
++
+ vredsum_vs      000000 . ..... ..... 010 ..... 1010111 @r_vm
+ vredand_vs      000001 . ..... ..... 010 ..... 1010111 @r_vm
+ vredor_vs       000010 . ..... ..... 010 ..... 1010111 @r_vm
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 7db3de8e032..080bff45c4f 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2925,7 +2925,7 @@ static bool opfv_narrow_check(DisasContext *s, arg_rmr *a)
+            (s->sew != 0);
+ }
+ 
+-#define GEN_OPFV_NARROW_TRANS(NAME)                                \
++#define GEN_OPFV_NARROW_TRANS(NAME, FRM)                           \
+ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+ {                                                                  \
+     if (opfv_narrow_check(s, a)) {                                 \
+@@ -2935,7 +2935,7 @@ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+             gen_helper_##NAME##_w,                                 \
+         };                                                         \
+         TCGLabel *over = gen_new_label();                          \
+-        gen_set_rm(s, FRM_DYN);                                    \
++        gen_set_rm(s, FRM);                                        \
+         tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
+                                                                    \
+         data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
+@@ -2950,11 +2950,49 @@ static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
+     return false;                                                  \
+ }
+ 
+-GEN_OPFV_NARROW_TRANS(vfncvt_xu_f_v)
+-GEN_OPFV_NARROW_TRANS(vfncvt_x_f_v)
+-GEN_OPFV_NARROW_TRANS(vfncvt_f_xu_v)
+-GEN_OPFV_NARROW_TRANS(vfncvt_f_x_v)
+-GEN_OPFV_NARROW_TRANS(vfncvt_f_f_v)
++GEN_OPFV_NARROW_TRANS(vfncvt_f_xu_w, FRM_DYN)
++GEN_OPFV_NARROW_TRANS(vfncvt_f_x_w, FRM_DYN)
++GEN_OPFV_NARROW_TRANS(vfncvt_f_f_w, FRM_DYN)
++GEN_OPFV_NARROW_TRANS(vfncvt_rod_f_f_w, FRM_ROD)
++
++static bool opxfv_narrow_check(DisasContext *s, arg_rmr *a)
++{
++    return require_rvv(s) &&
++           vext_check_isa_ill(s) &&
++           /* OPFV narrowing instructions ignore vs1 check */
++           vext_check_sds(s, a->rd, 0, a->rs2, a->vm, false);
++}
++
++#define GEN_OPXFV_NARROW_TRANS(NAME, FRM)                          \
++static bool trans_##NAME(DisasContext *s, arg_rmr *a)              \
++{                                                                  \
++    if (opxfv_narrow_check(s, a)) {                                \
++        uint32_t data = 0;                                         \
++        static gen_helper_gvec_3_ptr * const fns[3] = {            \
++            gen_helper_##NAME##_b,                                 \
++            gen_helper_##NAME##_h,                                 \
++            gen_helper_##NAME##_w,                                 \
++        };                                                         \
++        TCGLabel *over = gen_new_label();                          \
++        gen_set_rm(s, FRM);                                        \
++        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);          \
++                                                                   \
++        data = FIELD_DP32(data, VDATA, VM, a->vm);                 \
++        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);             \
++        tcg_gen_gvec_3_ptr(vreg_ofs(s, a->rd), vreg_ofs(s, 0),     \
++                           vreg_ofs(s, a->rs2), cpu_env, 0,        \
++                           s->vlen / 8, data, fns[s->sew]);        \
++        mark_vs_dirty(s);                                          \
++        gen_set_label(over);                                       \
++        return true;                                               \
++    }                                                              \
++    return false;                                                  \
++}
++
++GEN_OPXFV_NARROW_TRANS(vfncvt_xu_f_w, FRM_DYN)
++GEN_OPXFV_NARROW_TRANS(vfncvt_x_f_w, FRM_DYN)
++GEN_OPXFV_NARROW_TRANS(vfncvt_rtz_xu_f_w, FRM_RTZ)
++GEN_OPXFV_NARROW_TRANS(vfncvt_rtz_x_f_w, FRM_RTZ)
+ 
+ /*
+  *** Vector Reduction Operations
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index 2f5a2dca336..de0c02c3a16 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -4131,31 +4131,36 @@ GEN_VEXT_V_ENV(vfwcvt_f_f_v_w, 4, 8)
+ 
+ /* Narrowing Floating-Point/Integer Type-Convert Instructions */
+ /* (TD, T2, TX2) */
++#define NOP_UU_B uint8_t,  uint16_t, uint32_t
+ #define NOP_UU_H uint16_t, uint32_t, uint32_t
+ #define NOP_UU_W uint32_t, uint64_t, uint64_t
+ /* vfncvt.xu.f.v vd, vs2, vm # Convert float to unsigned integer. */
+-RVVCALL(OPFVV1, vfncvt_xu_f_v_h, NOP_UU_H, H2, H4, float32_to_uint16)
+-RVVCALL(OPFVV1, vfncvt_xu_f_v_w, NOP_UU_W, H4, H8, float64_to_uint32)
+-GEN_VEXT_V_ENV(vfncvt_xu_f_v_h, 2, 2)
+-GEN_VEXT_V_ENV(vfncvt_xu_f_v_w, 4, 4)
++RVVCALL(OPFVV1, vfncvt_xu_f_w_b, NOP_UU_B, H1, H2, float16_to_uint8)
++RVVCALL(OPFVV1, vfncvt_xu_f_w_h, NOP_UU_H, H2, H4, float32_to_uint16)
++RVVCALL(OPFVV1, vfncvt_xu_f_w_w, NOP_UU_W, H4, H8, float64_to_uint32)
++GEN_VEXT_V_ENV(vfncvt_xu_f_w_b, 1, 1)
++GEN_VEXT_V_ENV(vfncvt_xu_f_w_h, 2, 2)
++GEN_VEXT_V_ENV(vfncvt_xu_f_w_w, 4, 4)
+ 
+ /* vfncvt.x.f.v vd, vs2, vm # Convert double-width float to signed integer. */
+-RVVCALL(OPFVV1, vfncvt_x_f_v_h, NOP_UU_H, H2, H4, float32_to_int16)
+-RVVCALL(OPFVV1, vfncvt_x_f_v_w, NOP_UU_W, H4, H8, float64_to_int32)
+-GEN_VEXT_V_ENV(vfncvt_x_f_v_h, 2, 2)
+-GEN_VEXT_V_ENV(vfncvt_x_f_v_w, 4, 4)
++RVVCALL(OPFVV1, vfncvt_x_f_w_b, NOP_UU_B, H1, H2, float16_to_int8)
++RVVCALL(OPFVV1, vfncvt_x_f_w_h, NOP_UU_H, H2, H4, float32_to_int16)
++RVVCALL(OPFVV1, vfncvt_x_f_w_w, NOP_UU_W, H4, H8, float64_to_int32)
++GEN_VEXT_V_ENV(vfncvt_x_f_w_b, 1, 1)
++GEN_VEXT_V_ENV(vfncvt_x_f_w_h, 2, 2)
++GEN_VEXT_V_ENV(vfncvt_x_f_w_w, 4, 4)
+ 
+ /* vfncvt.f.xu.v vd, vs2, vm # Convert double-width unsigned integer to float */
+-RVVCALL(OPFVV1, vfncvt_f_xu_v_h, NOP_UU_H, H2, H4, uint32_to_float16)
+-RVVCALL(OPFVV1, vfncvt_f_xu_v_w, NOP_UU_W, H4, H8, uint64_to_float32)
+-GEN_VEXT_V_ENV(vfncvt_f_xu_v_h, 2, 2)
+-GEN_VEXT_V_ENV(vfncvt_f_xu_v_w, 4, 4)
++RVVCALL(OPFVV1, vfncvt_f_xu_w_h, NOP_UU_H, H2, H4, uint32_to_float16)
++RVVCALL(OPFVV1, vfncvt_f_xu_w_w, NOP_UU_W, H4, H8, uint64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_f_xu_w_h, 2, 2)
++GEN_VEXT_V_ENV(vfncvt_f_xu_w_w, 4, 4)
+ 
+ /* vfncvt.f.x.v vd, vs2, vm # Convert double-width integer to float. */
+-RVVCALL(OPFVV1, vfncvt_f_x_v_h, NOP_UU_H, H2, H4, int32_to_float16)
+-RVVCALL(OPFVV1, vfncvt_f_x_v_w, NOP_UU_W, H4, H8, int64_to_float32)
+-GEN_VEXT_V_ENV(vfncvt_f_x_v_h, 2, 2)
+-GEN_VEXT_V_ENV(vfncvt_f_x_v_w, 4, 4)
++RVVCALL(OPFVV1, vfncvt_f_x_w_h, NOP_UU_H, H2, H4, int32_to_float16)
++RVVCALL(OPFVV1, vfncvt_f_x_w_w, NOP_UU_W, H4, H8, int64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_f_x_w_h, 2, 2)
++GEN_VEXT_V_ENV(vfncvt_f_x_w_w, 4, 4)
+ 
+ /* vfncvt.f.f.v vd, vs2, vm # Convert double float to single-width float. */
+ static uint16_t vfncvtffv16(uint32_t a, float_status *s)
+@@ -4163,10 +4168,41 @@ static uint16_t vfncvtffv16(uint32_t a, float_status *s)
+     return float32_to_float16(a, true, s);
+ }
+ 
+-RVVCALL(OPFVV1, vfncvt_f_f_v_h, NOP_UU_H, H2, H4, vfncvtffv16)
+-RVVCALL(OPFVV1, vfncvt_f_f_v_w, NOP_UU_W, H4, H8, float64_to_float32)
+-GEN_VEXT_V_ENV(vfncvt_f_f_v_h, 2, 2)
+-GEN_VEXT_V_ENV(vfncvt_f_f_v_w, 4, 4)
++RVVCALL(OPFVV1, vfncvt_f_f_w_h, NOP_UU_H, H2, H4, vfncvtffv16)
++RVVCALL(OPFVV1, vfncvt_f_f_w_w, NOP_UU_W, H4, H8, float64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_f_f_w_h, 2, 2)
++GEN_VEXT_V_ENV(vfncvt_f_f_w_w, 4, 4)
++
++/*
++ * vfncvt.rod.f.f.w vd, vs2, vm
++ * Convert double-width float to single-width float, rounding towards odd.
++ */
++RVVCALL(OPFVV1, vfncvt_rod_f_f_w_h, NOP_UU_H, H2, H4, vfncvtffv16)
++RVVCALL(OPFVV1, vfncvt_rod_f_f_w_w, NOP_UU_W, H4, H8, float64_to_float32)
++GEN_VEXT_V_ENV(vfncvt_rod_f_f_w_h, 2, 2)
++GEN_VEXT_V_ENV(vfncvt_rod_f_f_w_w, 4, 4)
++
++/*
++ * vfncvt.rtz.xu.f.w vd, vs2, vm
++ * Convert double-width float to unsigned integer, truncating.
++ */
++RVVCALL(OPFVV1, vfncvt_rtz_xu_f_w_b, NOP_UU_B, H1, H2, float16_to_uint8)
++RVVCALL(OPFVV1, vfncvt_rtz_xu_f_w_h, NOP_UU_H, H2, H4, float32_to_uint16)
++RVVCALL(OPFVV1, vfncvt_rtz_xu_f_w_w, NOP_UU_W, H4, H8, float64_to_uint32)
++GEN_VEXT_V_ENV(vfncvt_rtz_xu_f_w_b, 1, 1)
++GEN_VEXT_V_ENV(vfncvt_rtz_xu_f_w_h, 2, 2)
++GEN_VEXT_V_ENV(vfncvt_rtz_xu_f_w_w, 4, 4)
++
++/*
++ * vfncvt.rtz.x.f.w  vd, vs2, vm
++ * Convert double-width float to signed integer, truncating.
++ */
++RVVCALL(OPFVV1, vfncvt_rtz_x_f_w_b, NOP_UU_B, H1, H2, float16_to_int8)
++RVVCALL(OPFVV1, vfncvt_rtz_x_f_w_h, NOP_UU_H, H2, H4, float32_to_int16)
++RVVCALL(OPFVV1, vfncvt_rtz_x_f_w_w, NOP_UU_W, H4, H8, float64_to_int32)
++GEN_VEXT_V_ENV(vfncvt_rtz_x_f_w_b, 1, 1)
++GEN_VEXT_V_ENV(vfncvt_rtz_x_f_w_h, 2, 2)
++GEN_VEXT_V_ENV(vfncvt_rtz_x_f_w_w, 4, 4)
+ 
+ /*
+  *** Vector Reduction Operations
+-- 
+2.17.1
 
 
