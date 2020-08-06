@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51743C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F2E8C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:33:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B6922173E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:33:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B68A221E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:33:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJm+Q3u9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6922173E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Brwc/tCJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B68A221E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3ldr-000497-74
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:33:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42898)
+	id 1k3le2-0004Ya-5J
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:33:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOS-0004mq-Tt
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32137
- helo=us-smtp-1.mimecast.com)
+ id 1k3lO8-0004JT-9o
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:16 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28788
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOQ-0006Tl-U3
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:36 -0400
+ id 1k3lO6-0006QK-3Z
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741454;
+ s=mimecast20190719; t=1596741433;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XOh75rxoAsjfb0+xHElNRGVkMvHGWPBEvwHjztXDd4I=;
- b=GJm+Q3u90qHIaITR8Fny4VAlNCGE9wqEBdvtNvqbANVlMZXvYlwdnskzVjP28zjl79jwxx
- 90e78+L/HoHXzka7utPdAwuc+/kXcZqDflOSFWMAREkf52nxIo0PabJVsqkQ6YzRiYgvFM
- 6FEqMOYbabqrSCsEvdCDeDxyspOW+lE=
+ bh=UjBA/HxG7q1F7dpOUbqsS5uAS/xa/0gcr7hZ5aHE5AQ=;
+ b=Brwc/tCJRrlbIsfixhbWO5zHAIHxWlUCI+m+D+3I/lFy+aXJP9IAMzzkEjevFuUNjysim1
+ ukCidwRDJWE1z2+ju71a52gcfj373fQ7Idq0WUL1vy3rs09GbYVFb9oe0zbBzy0klAwGih
+ ahPQcU4lccztPRsv8vQIEpeQui5ZPb0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-6zeWcuw6PZu6s0YmC0Xc2w-1; Thu, 06 Aug 2020 15:17:32 -0400
-X-MC-Unique: 6zeWcuw6PZu6s0YmC0Xc2w-1
+ us-mta-39-O3aRD9ABOxyhZlgkoRK0Pw-1; Thu, 06 Aug 2020 15:17:07 -0400
+X-MC-Unique: O3aRD9ABOxyhZlgkoRK0Pw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7133B80183C
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0781480183C
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:07 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 80E135F9DC;
- Thu,  6 Aug 2020 19:17:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1889C5F9DC;
+ Thu,  6 Aug 2020 19:17:05 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 038/143] meson: add qemu-keymap
-Date: Thu,  6 Aug 2020 21:14:34 +0200
-Message-Id: <1596741379-12902-39-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 023/143] meson: add version.o
+Date: Thu,  6 Aug 2020 21:14:19 +0200
+Message-Id: <1596741379-12902-24-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:24:10
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,84 +107,37 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile    |  5 -----
- configure   |  4 +---
- meson.build | 10 ++++++++++
- 3 files changed, 11 insertions(+), 8 deletions(-)
+ meson.build | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 0a2bbd5..bffe932 100644
---- a/Makefile
-+++ b/Makefile
-@@ -413,8 +413,6 @@ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io
- qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
- 
--qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
--
- qemu-edid$(EXESUF): qemu-edid.o hw/display/edid-generate.o $(COMMON_LDADDS)
- 
- fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
-@@ -427,9 +425,6 @@ endif
- qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
- 
--qemu-keymap$(EXESUF): LIBS += $(XKBCOMMON_LIBS)
--qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
--
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
-diff --git a/configure b/configure
-index e0ef3f7..f84c5cd 100755
---- a/configure
-+++ b/configure
-@@ -6675,9 +6675,6 @@ if test "$softmmu" = yes ; then
-     fi
-     mpath=no
-   fi
--  if test "$xkbcommon" = "yes"; then
--    tools="qemu-keymap\$(EXESUF) $tools"
--  fi
- fi
- 
- # Probe for guest agent support/options
-@@ -6994,6 +6991,7 @@ if test "$vnc_png" = "yes" ; then
-   echo "CONFIG_VNC_PNG=y" >> $config_host_mak
- fi
- if test "$xkbcommon" = "yes" ; then
-+  echo "CONFIG_XKBCOMMON=y" >> $config_host_mak
-   echo "XKBCOMMON_CFLAGS=$xkbcommon_cflags" >> $config_host_mak
-   echo "XKBCOMMON_LIBS=$xkbcommon_libs" >> $config_host_mak
- fi
 diff --git a/meson.build b/meson.build
-index 9eb1204..a4909f1 100644
+index ec742fe..bfaa08f 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -90,6 +90,11 @@ libcap_ng = not_found
- if 'CONFIG_LIBCAP_NG' in config_host
-   libcap_ng = declare_dependency(link_args: config_host['LIBCAP_NG_LIBS'].split())
- endif
-+xkbcommon = not_found
-+if 'CONFIG_XKBCOMMON' in config_host
-+  xkbcommon = declare_dependency(compile_args: config_host['XKBCOMMON_CFLAGS'].split(),
-+                                 link_args: config_host['XKBCOMMON_LIBS'].split())
-+endif
- rt = cc.find_library('rt', required: false)
- libiscsi = not_found
- if 'CONFIG_LIBISCSI' in config_host
-@@ -278,6 +283,11 @@ if have_tools
-   subdir('contrib/rdmacm-mux')
-   subdir('contrib/elf2dmp')
- 
-+  if 'CONFIG_XKBCOMMON' in config_host
-+    executable('qemu-keymap', files('qemu-keymap.c', 'ui/input-keymap.c'),
-+               dependencies: [qemuutil, xkbcommon], install: true)
-+  endif
+@@ -45,8 +45,14 @@ targetos = host_machine.system()
+ m = cc.find_library('m', required: false)
+ util = cc.find_library('util', required: false)
+ socket = []
++version_res = []
+ if host_machine.system() == 'windows'
+   socket = cc.find_library('ws2_32')
 +
-   if 'CONFIG_VHOST_USER' in config_host
-     subdir('contrib/libvhost-user')
-     subdir('contrib/vhost-user-blk')
++  win = import('windows')
++  version_res = win.compile_resources('version.rc',
++                                      depend_files: files('pc-bios/qemu-nsis.ico'),
++                                      include_directories: include_directories('.'))
+ endif
+ glib = declare_dependency(compile_args: config_host['GLIB_CFLAGS'].split(),
+                           link_args: config_host['GLIB_LIBS'].split())
+@@ -215,7 +221,7 @@ libqemuutil = static_library('qemuutil',
+                              sources: util_ss.sources() + stub_ss.sources() + genh,
+                              dependencies: [util_ss.dependencies(), m, glib, socket])
+ qemuutil = declare_dependency(link_with: libqemuutil,
+-                              sources: genh)
++                              sources: genh + version_res)
+ 
+ summary_info = {}
+ summary_info += {'Install prefix':    config_host['prefix']}
 -- 
 1.8.3.1
 
