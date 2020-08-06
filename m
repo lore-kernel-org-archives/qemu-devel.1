@@ -2,90 +2,62 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 592EFC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC8AC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:23:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E3AA22D05
+	by mail.kernel.org (Postfix) with ESMTPS id F0D5822D03
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:23:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="CgHmZ4C7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E3AA22D05
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0D5822D03
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3dpe-0005mh-I3
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:13:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40990)
+	id 1k3cLe-0006lR-Lf
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 05:38:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dS2-0002yB-G0
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:46 -0400
-Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:39378)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dS0-0007u1-2j
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:46 -0400
-Received: by mail-pf1-x42e.google.com with SMTP id z188so16875001pfc.6
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:48:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=99inUY6TcXre93Q9sK2twtbOOBRR6deMTZ0PhPm0qww=;
- b=CgHmZ4C7YjHiUolO2acSRX64EUMGTuX33DoYRLIOHpmC9DZxHLRGGFBeNPj6jJwG5+
- BzqPWyTWopsyKFDU4Shocpbx9HUvBO8E4zhpaJoVB5i2w7iTcmtTdF/9QQWWP1G3gwc9
- DquaIoC1NC0PgC+3PHByUlYnz2pqzc4UhDY6hobRu2xpdv0iKJzWgsxBMOQbViM0221b
- n4KzSV257uRhdCPxaIRT15iSXC9tjPWtQjK3Wel8r2IeByTkPeUBWlSBoOQx+pAa/ABO
- fWB5q4SCZTHNHl4bO3Ic7GK7WBXAaJXre+RW2gCATitwvcrwij3drDJsjBU8JAkpLU5N
- vdDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=99inUY6TcXre93Q9sK2twtbOOBRR6deMTZ0PhPm0qww=;
- b=tcAmch2P60Eqmo6LejRosSezVji6l6RqkELznsnvO9R5GmJDuMP3KBGXdQr0Sa8pb/
- I3KR2GRVL3w23WvZZZYFHQWMhiicYK8JNxEcPvK4qyeQzuWl7qbmBwJuKavXBldQor7i
- +drRJyPNlahuPvkB1ciWh0E/rUbf09AGAwhDgsheAwCEboujucmP1/unMuvZX2ahNR4u
- Jo5GIKaz3yDbHRsr9444lmQSQ9R3HNFnHhk8TVOeDLHe3d6nVhf2zJx76qQwr6WhtOjm
- plA59gPETAjzTsVEGwnaqs+3o5RV3sikfUDg47fgbZZrVDbqYCgsXuF9z7Q+yzkfcCUN
- N8ig==
-X-Gm-Message-State: AOAM533QcVCHSuZOqbeKb1RQesS33cut7Zi7KCfyRd9RWJZxwDb+o0Si
- FK5p7iv7ZQwq59WYsbD0vm3Aip7rlM8=
-X-Google-Smtp-Source: ABdhPJz+Jjzj93HVfugF2wi5Kxnuk6zCjLnxm00J2LMNF22aJeyTIW6FSLAuC/WWCJUV3W7iLOS9bQ==
-X-Received: by 2002:a62:1b4a:: with SMTP id b71mr3203100pfb.106.1596710922625; 
- Thu, 06 Aug 2020 03:48:42 -0700 (PDT)
-Received: from frankchang-ThinkPad-T490.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.48.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 03:48:42 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC v3 33/71] target/riscv: rvv-1.0: iota instruction
-Date: Thu,  6 Aug 2020 18:46:30 +0800
-Message-Id: <20200806104709.13235-34-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
-References: <20200806104709.13235-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42e;
- envelope-from=frank.chang@sifive.com; helo=mail-pf1-x42e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
+ id 1k3cKc-0005As-IX; Thu, 06 Aug 2020 05:37:02 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:41098 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
+ id 1k3cKa-0007WL-5v; Thu, 06 Aug 2020 05:37:02 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 4BC14C9C85E425E67E81;
+ Thu,  6 Aug 2020 17:36:51 +0800 (CST)
+Received: from localhost.localdomain (10.175.101.6) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 6 Aug 2020 17:36:41 +0800
+From: Peng Liang <liangpeng10@huawei.com>
+To: <qemu-trivial@nongnu.org>
+Subject: [PATCH 1/5] log: Add logs for vm start and destroy
+Date: Thu, 6 Aug 2020 17:37:16 +0800
+Message-ID: <20200806093720.2355692-2-liangpeng10@huawei.com>
+X-Mailer: git-send-email 2.18.4
+In-Reply-To: <20200806093720.2355692-1-liangpeng10@huawei.com>
+References: <20200806093720.2355692-1-liangpeng10@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35;
+ envelope-from=liangpeng10@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 03:36:23
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,37 +70,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Peng Liang <liangpeng10@huawei.com>, qemu-devel@nongnu.org,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+Add logs for vm start and destroy.
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Peng Liang <liangpeng10@huawei.com>
 ---
- target/riscv/insn32.decode | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/acpi/core.c  | 3 +++
+ hw/core/reset.c | 2 ++
+ softmmu/vl.c    | 8 ++++++++
+ 3 files changed, 13 insertions(+)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 0992d6ac86d..7a10fc27c5f 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -596,7 +596,7 @@ vfirst_m        010000 . ..... 10001 010 ..... 1010111 @r2_vm
- vmsbf_m         010100 . ..... 00001 010 ..... 1010111 @r2_vm
- vmsif_m         010100 . ..... 00011 010 ..... 1010111 @r2_vm
- vmsof_m         010100 . ..... 00010 010 ..... 1010111 @r2_vm
--viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
-+viota_m         010100 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
- vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
- vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
+diff --git a/hw/acpi/core.c b/hw/acpi/core.c
+index ac06db3450..0a24f018cf 100644
+--- a/hw/acpi/core.c
++++ b/hw/acpi/core.c
+@@ -560,13 +560,16 @@ static void acpi_pm1_cnt_write(ACPIREGS *ar, uint16_t val)
+         uint16_t sus_typ = (val >> 10) & 7;
+         switch(sus_typ) {
+         case 0: /* soft power off */
++            info_report("VM will be soft power off");
+             qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+             break;
+         case 1:
++            info_report("VM will be suspend state");
+             qemu_system_suspend_request();
+             break;
+         default:
+             if (sus_typ == ar->pm1.cnt.s4_val) { /* S4 request */
++                info_report("VM will be S4 state");
+                 qapi_event_send_suspend_disk();
+                 qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+             }
+diff --git a/hw/core/reset.c b/hw/core/reset.c
+index 9c477f2bf5..bd583c77ac 100644
+--- a/hw/core/reset.c
++++ b/hw/core/reset.c
+@@ -26,6 +26,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/queue.h"
+ #include "sysemu/reset.h"
++#include "qemu/error-report.h"
+ 
+ /* reset/shutdown handler */
+ 
+@@ -64,6 +65,7 @@ void qemu_devices_reset(void)
+ {
+     QEMUResetEntry *re, *nre;
+ 
++    info_report("reset all devices");
+     /* reset all devices */
+     QTAILQ_FOREACH_SAFE(re, &reset_handlers, entry, nre) {
+         re->func(re->opaque);
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 4eb9d1f7fd..a9f06111b3 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -1657,9 +1657,11 @@ static bool main_loop_should_exit(void)
+     }
+     if (qemu_powerdown_requested()) {
+         qemu_system_powerdown();
++        info_report("domain is power down by outside operation");
+     }
+     if (qemu_vmstop_requested(&r)) {
+         vm_stop(r);
++        info_report("domain is stopped by outside operation");
+     }
+     return false;
+ }
+@@ -1669,6 +1671,7 @@ void qemu_main_loop(void)
+ #ifdef CONFIG_PROFILER
+     int64_t ti;
+ #endif
++    info_report("qemu enter main_loop");
+     while (!main_loop_should_exit()) {
+ #ifdef CONFIG_PROFILER
+         ti = profile_getclock();
+@@ -2941,6 +2944,7 @@ void qemu_init(int argc, char **argv, char **envp)
+ 
+     autostart = 1;
+ 
++    info_report("qemu pid is %d, options parsing start", getpid());
+     /* first pass of option parsing */
+     optind = 1;
+     while (optind < argc) {
+@@ -3154,6 +3158,7 @@ void qemu_init(int argc, char **argv, char **envp)
+                 exit(0);
+                 break;
+             case QEMU_OPTION_m:
++                info_report("memory options parse start");
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("memory"),
+                                                optarg, true);
+                 if (!opts) {
+@@ -4152,6 +4157,7 @@ void qemu_init(int argc, char **argv, char **envp)
+     current_machine->maxram_size = maxram_size;
+     current_machine->ram_slots = ram_slots;
+ 
++    info_report("configure accelerator %s start", machine_class->name);
+     /*
+      * Note: uses machine properties such as kernel-irqchip, must run
+      * after machine_set_property().
+@@ -4300,6 +4306,7 @@ void qemu_init(int argc, char **argv, char **envp)
+     replay_checkpoint(CHECKPOINT_INIT);
+     qdev_machine_init();
+ 
++    info_report("machine init start");
+     current_machine->boot_order = boot_order;
+ 
+     /* parse features once if machine provides default cpu_type */
+@@ -4379,6 +4386,7 @@ void qemu_init(int argc, char **argv, char **envp)
+             exit(1);
+     }
+ 
++    info_report("device init start");
+     /* init generic devices */
+     rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
+     qemu_opts_foreach(qemu_find_opts("device"),
 -- 
-2.17.1
+2.18.4
 
 
