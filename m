@@ -2,85 +2,89 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E659C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:07:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1B3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:10:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00DA322DFA
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:07:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EFA42311B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:10:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BDs7Nszg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00DA322DFA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="otA0agxu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EFA42311B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3fc0-00074T-3p
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:07:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44274)
+	id 1k3ffV-0000b9-83
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:10:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3fa4-0004AI-Ty
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:05:12 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:44123)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3fea-0007mw-2k; Thu, 06 Aug 2020 09:09:52 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:33604)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3fa2-0007CK-5A
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:05:12 -0400
-Received: by mail-oi1-x242.google.com with SMTP id h3so19174805oie.11
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 06:05:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=a5VsPjTZL2NDQ0SByYGQq+rFR4fYGfHX+fiU31UUZdw=;
- b=BDs7NszgDlpGPZk4BcsY+K7MDuGLU5cVLI7pqokZxTALypn7B55YSuiyQZWUPs5vzl
- L7PyMC8uG/lWXoW02yOjR6x4eyZy6x19GvJuPDINY8jCrfxwvIZJzWTaChbF+aaNz8lx
- yNwzowFBaNzUFG1xMlzHXSSHzhSrvA4Wm7X8Bjcfwj4qcJ7RUVbLT0Zdcj3t807syr5p
- 5/7BfXGOlV4ShdZoD2szBEINk1+/ZGO5Pyk+O4+Wk6d34ADqmdxn1QsNAD36yGZhA0JR
- yKGyVmqPIaTZxfdoCN8PY003GUZ+jpSQ+JjlasHm9GqXpThhiKSbFSpldc9BCypI5sKU
- XGuQ==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3feY-0007oU-B7; Thu, 06 Aug 2020 09:09:51 -0400
+Received: by mail-wr1-x434.google.com with SMTP id p20so9044856wrf.0;
+ Thu, 06 Aug 2020 06:09:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nxT41juG220lt8bThopkJ0qbVj3hX8fF3UdqUGUmWoM=;
+ b=otA0agxuBK7D74CN53R9BjdfhAcbskwCVcXqxy3kVTd7BP+4cLsd2NF5bAYSs2aFdR
+ DWxwEWS1qHwX0D9oaAnAVYnRZfvjOkoq3rzlshOJurDhskj9W8Qyue4B1ixq2p3uvtzF
+ m+aLy0w+r8+r4PM2xd7D7n3M9KqERToLX6NU91zSAQw1nA20hX10To2HTTi1hIwRFpke
+ L6tk8VUDCIpG+aBsD9lVYXxSzOqV0ibEbIKeNAYDCb4s7K5P2zMrRbLFsJOylwbpUTk4
+ kzT7Z72wiFMwyn7/LoAXfBDqKATCJxzGMhOLAwb/T/jUmTiy7OwA5yX8XQzMx/M9OmFu
+ WgVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=a5VsPjTZL2NDQ0SByYGQq+rFR4fYGfHX+fiU31UUZdw=;
- b=clm8CAU7wc+eoIn+vJzlx9Jp9OPdFOlYriFaD2IP6VSoiAULIqKj8a+ttagYtkbNOP
- +qW+IuhmDiviIjxW3SPR5PUVx6VugAGOiEP2KaN/+l2wMWzZJY4SWlFKSLqF0UOVaFZT
- yhbXFWEo97z20cHoYOMtmxXGSl4dEekLFD54Ekx9q7RFgV+2ti/viUiOjmOdDZgKykQd
- niqRUIcQg+HUwhSl1UQnE6gD2vtjy7sW9Xhq3CaosEv4aoSlsQBjvGP9MgSFCJcZ7wKv
- AYqyanSWCq16GQAX6vXplBMARPsV0reoERt/tD83b8zcNPOUyD1zDUtw9jtb37Fgc5Gt
- 20vA==
-X-Gm-Message-State: AOAM530iWieY08x4P9kXpUGIEKc6XPfmRZrWSQIKES5WwUVbQQn5UJZ3
- HeKTRw9tbBu9xaUrPzs/Qck5i96VTruDjath+bQtiw==
-X-Google-Smtp-Source: ABdhPJy6Dtev5XGoLyO4ZnNmlr0VbmR9VoU+d7W6snO20kpKk6DbSwplBYtbP9FSR1DFWUcBKDBv2gwRbGH7F9nE9RU=
-X-Received: by 2002:aca:4a96:: with SMTP id x144mr6834152oia.163.1596719108443; 
- Thu, 06 Aug 2020 06:05:08 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=nxT41juG220lt8bThopkJ0qbVj3hX8fF3UdqUGUmWoM=;
+ b=k2fd50CIMSSB1S/3zk+R++3SLTbJrMzzPXiXRI/miNP0XcXhqsa3ykKuhfsmq6xlUK
+ 4CU96n8Kb1d5QoYD5muDlMom6xfBiN/Gv7Mxol7W/VerRJca4eGVkzrshVHlwDPydtdr
+ ofMyRCcfMPEeCMJjUUG1myPrg5gov7Za/XOSd12k7ohvLFzrddbjNQC4jEGzVamkA2+W
+ WmabMF4JKftIyBm4G9LcmDP696HjHHKHJZYHlManHWzS8BcrfdxEInpSndb8BwvCLRbL
+ 8OQly+g6uPifjYPrlZ2SidV9tNz8L2FGALzBmrDP/JJL8eu7hDlBbsn8ZUIlAwdZnEEZ
+ HFMg==
+X-Gm-Message-State: AOAM532/rCkPstSoxIxsfbIB+sDU1m0wAxVKbMGlUg+aPl1idy+jb8i4
+ yw6+NTmq068wj/Mchzm/36y8j1pO
+X-Google-Smtp-Source: ABdhPJxdDS31sIoEDnt55/QJBBYf0ij3LZ5bi+C2sKOwGfAyZQXc1Zn6GemSb8RybOAiEdWZxp5O5A==
+X-Received: by 2002:a5d:68cf:: with SMTP id p15mr7563631wrw.148.1596719387813; 
+ Thu, 06 Aug 2020 06:09:47 -0700 (PDT)
+Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id w2sm7092799wre.5.2020.08.06.06.09.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Aug 2020 06:09:47 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.2 0/2] hw/core/sysbus: Trivial cleanup patches
+Date: Thu,  6 Aug 2020 15:09:43 +0200
+Message-Id: <20200806130945.21629-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <20200803164749.301971-1-edgar.iglesias@gmail.com>
-In-Reply-To: <20200803164749.301971-1-edgar.iglesias@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 6 Aug 2020 14:04:57 +0100
-Message-ID: <CAFEAcA_ZAgnW4zjaTPUCVHjzWhHeiEastQVfGTP39V0og8u8Vg@mail.gmail.com>
-Subject: Re: [PATCH v1 0/1] docs/system/arm: Document the Xilinx Versal Virt
- board
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::434;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x434.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,34 +97,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, Edgar Iglesias <edgar.iglesias@xilinx.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 3 Aug 2020 at 17:47, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
->
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Hi,
->
-> This adds some basic documentation for the Xilinx Versal Virt board,
-> including a few command-line examples on how to run ARM Trusterd Firmware,
-> U-boot, Xen and Linux.
->
-> If this looks OK I'll send similar basic documentation for the ZynqMP and
-> Zynq.
+Fix a typo and assert sysbus_mmio_get_region() is called
+with correct index.
 
-Looks good to me; applied to target-arm.next for 5.2.
+Philippe Mathieu-Daudé (2):
+  hw/core/sysbus: Fix a typo
+  hw/core/sysbus: Assert memory region index is in range
 
-thanks
--- PMM
+ hw/core/sysbus.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+-- 
+2.21.3
+
 
