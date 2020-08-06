@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B84C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB755C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:44:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A05EC2177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9E242224D
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:44:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iOZ03RBj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A05EC2177B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bkPepaK8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9E242224D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3loc-0003Vz-Id
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:44:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43472)
+	id 1k3log-0003fz-L4
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:44:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lPL-0006tz-Qd
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52384
- helo=us-smtp-1.mimecast.com)
+ id 1k3lPJ-0006oV-Hg
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:29 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56757
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lPJ-0006dv-RQ
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:31 -0400
+ id 1k3lPG-0006dE-Lo
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741509;
+ s=mimecast20190719; t=1596741505;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Rr/LgwSgNZuSLNWpjkcROHHTZWCCwpODrA59c3LBhW4=;
- b=iOZ03RBjrsALZ66AcMEUUNx/x8teOkvELPiD128IaH4G+k6UMrcysJ4o7xO/z5WMTPRd8y
- QSk7BYzG6gvL9RvVPGTOVugZ3pDBzqFSjqZAm/xUBdjeeBls7KpRYdkwuP6BsqAMoQ0iBz
- 7ReufmwDzG5XBsdqHGxyr1wlZzoM6js=
+ bh=nvK8GWCEM45AcqFjSGvaDrjq5UikN+YNqiTTQ2dubFg=;
+ b=bkPepaK8rkEMwR3kLfU/6zaYMedMwL9Tt0yCO02zHQwPoME81OCQICEwRfK76sMhjnFB/w
+ TShOo+03v38Hn49TP21tbnTGXk6BRkys0itvydA6qWhbzZ/ZrC/fxapYFv1AsCf55TzMKl
+ iuyENSMWl2NInRJiL14nXH+oCCPnIYM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-5Fb9rtE6MAKckq4IQOeVgQ-1; Thu, 06 Aug 2020 15:18:26 -0400
-X-MC-Unique: 5Fb9rtE6MAKckq4IQOeVgQ-1
+ us-mta-289-gqtwxE-mN3OjAPfvvmFFaQ-1; Thu, 06 Aug 2020 15:18:19 -0400
+X-MC-Unique: gqtwxE-mN3OjAPfvvmFFaQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 232D5107BEF6
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:18:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 896FF1DE1
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:18:18 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 344BA5F9DC;
- Thu,  6 Aug 2020 19:18:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E07335F9DC;
+ Thu,  6 Aug 2020 19:18:13 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 071/143] meson: convert dump/
-Date: Thu,  6 Aug 2020 21:15:07 +0200
-Message-Id: <1596741379-12902-72-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 065/143] meson: convert ui directory to Meson
+Date: Thu,  6 Aug 2020 21:15:01 +0200
+Message-Id: <1596741379-12902-66-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 03:10:56
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,121 +107,341 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs      | 3 +--
- Makefile.target    | 1 -
- configure          | 4 ++++
- dump/Makefile.objs | 3 ---
- dump/meson.build   | 4 ++++
- meson.build        | 9 +++++++++
- 6 files changed, 18 insertions(+), 6 deletions(-)
- delete mode 100644 dump/Makefile.objs
- create mode 100644 dump/meson.build
+ Makefile.objs    |  8 +++---
+ Makefile.target  |  8 +++---
+ configure        |  6 +++++
+ meson.build      | 50 +++++++++++++++++++++++++++++++++++
+ ui/Makefile.objs | 73 ---------------------------------------------------
+ ui/meson.build   | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ ui/shader.c      |  6 ++---
+ 7 files changed, 148 insertions(+), 83 deletions(-)
+ delete mode 100644 ui/Makefile.objs
 
 diff --git a/Makefile.objs b/Makefile.objs
-index 0f3074b..11ca458 100644
+index cd916a9..2463df8 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -47,8 +47,7 @@ storage-daemon-obj-$(CONFIG_POSIX) += os-posix.o
- # single QEMU executable should support all CPUs and machines.
+@@ -68,6 +68,11 @@ common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
+ common-obj-$(CONFIG_AUDIO_PA) += audio-pa$(DSOSUF)
+ common-obj-$(CONFIG_AUDIO_SDL) += audio-sdl$(DSOSUF)
  
- ifeq ($(CONFIG_SOFTMMU),y)
--common-obj-y = dump/
--common-obj-y += monitor/
-+common-obj-y = monitor/
- common-obj-y += net/
- common-obj-$(CONFIG_LINUX) += fsdev/
++common-obj-$(if $(CONFIG_CURSES),m) += ui-curses$(DSOSUF)
++common-obj-$(if $(CONFIG_GTK),m) += ui-gtk$(DSOSUF)
++common-obj-$(if $(CONFIG_SDL),m) += ui-sdl$(DSOSUF)
++common-obj-$(if $(CONFIG_SPICE),m) += ui-spice-app$(DSOSUF)
++
+ common-obj-$(if $(CONFIG_CURL),m) += block-curl$(DSOSUF)
+ common-obj-$(if $(CONFIG_GLUSTERFS),m) += block-gluster$(DSOSUF)
+ common-obj-$(if $(CONFIG_LIBISCSI),m) += block-iscsi$(DSOSUF)
+@@ -83,9 +88,6 @@ common-obj-m += hw/
+ 
+ common-obj-y += replay/
+ 
+-common-obj-y += ui/
+-common-obj-m += ui/
+-
+ common-obj-y += dma-helpers.o
+ common-obj-$(CONFIG_TPM) += tpm.o
  
 diff --git a/Makefile.target b/Makefile.target
-index 5f926e5..c8f7a6c 100644
+index ff0e1b2..16f1e78 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -156,7 +156,6 @@ endif #CONFIG_BSD_USER
- ifdef CONFIG_SOFTMMU
- obj-y += softmmu/
- obj-y += gdbstub.o
--obj-y += dump/
- obj-y += hw/
- obj-y += monitor/
- obj-y += qapi/
+@@ -167,8 +167,9 @@ LIBS := $(libs_softmmu) $(LIBS)
+ LIBS := $(LIBS) @../block.syms @../qemu.syms
+ ifneq ($(CONFIG_MODULES),y)
+ LIBS := $(LIBS) $(ALSA_LIBS) $(OSS_LIBS) $(PULSE_LIBS) $(SDL_LIBS)
++LIBS := $(LIBS) $(GTK_LIBS) $(VTE_LIBS) $(X11_LIBS) $(CURSES_LIBS) $(ICONV_LIBS) $(GIO_LIBS)
+ endif
+-LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS)
++LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS) $(OPENGL_LIBS)
+ LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
+ 
+ # Hardware support
+@@ -207,9 +208,8 @@ dummy := $(call fix-paths,../,, \
+               crypto-obj-y \
+               io-obj-y \
+               qom-obj-y)
+-dummy := $(call unnest-vars,.., \
+-               common-obj-y \
+-               common-obj-m)
++dummy := $(call unnest-vars,..,common-obj-y)
++
+ all-obj-y += $(common-obj-y)
+ all-obj-y += $(qom-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(authz-obj-y)
 diff --git a/configure b/configure
-index 508aa60..e99af16 100755
+index 653f55b..c1bc16b 100755
 --- a/configure
 +++ b/configure
-@@ -2551,6 +2551,7 @@ int main(void) { lzo_version(); return 0; }
- EOF
-     if compile_prog "" "-llzo2" ; then
-         libs_softmmu="$libs_softmmu -llzo2"
-+        lzo_libs="-llzo2"
-         lzo="yes"
-     else
-         if test "$lzo" = "yes"; then
-@@ -2570,6 +2571,7 @@ int main(void) { snappy_max_compressed_length(4096); return 0; }
- EOF
-     if compile_prog "" "-lsnappy" ; then
-         libs_softmmu="$libs_softmmu -lsnappy"
-+        snappy_libs='-lsnappy'
-         snappy="yes"
-     else
-         if test "$snappy" = "yes"; then
-@@ -7393,10 +7395,12 @@ fi
- 
- if test "$lzo" = "yes" ; then
-   echo "CONFIG_LZO=y" >> $config_host_mak
-+  echo "LZO_LIBS=$lzo_libs" >> $config_host_mak
+@@ -6994,12 +6994,18 @@ fi
+ if test "$vnc_sasl" = "yes" ; then
+   echo "CONFIG_VNC_SASL=y" >> $config_host_mak
  fi
- 
- if test "$snappy" = "yes" ; then
-   echo "CONFIG_SNAPPY=y" >> $config_host_mak
-+  echo "SNAPPY_LIBS=$snappy_libs" >> $config_host_mak
++echo "SASL_CFLAGS=$vnc_sasl_cflags" >> $config_host_mak
++echo "SASL_LIBS=$vnc_sasl_libs" >> $config_host_mak
+ if test "$vnc_jpeg" = "yes" ; then
+   echo "CONFIG_VNC_JPEG=y" >> $config_host_mak
  fi
- 
- if test "$bzip2" = "yes" ; then
-diff --git a/dump/Makefile.objs b/dump/Makefile.objs
-deleted file mode 100644
-index d2a5db3..0000000
---- a/dump/Makefile.objs
-+++ /dev/null
-@@ -1,3 +0,0 @@
--obj-y += dump.o
--common-obj-y += dump-hmp-cmds.o
--obj-$(TARGET_X86_64) += win_dump.o
-diff --git a/dump/meson.build b/dump/meson.build
-new file mode 100644
-index 0000000..2eff29c
---- /dev/null
-+++ b/dump/meson.build
-@@ -0,0 +1,4 @@
-+softmmu_ss.add(files('dump-hmp-cmds.c'))
-+
-+specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files('dump.c'), snappy, lzo])
-+specific_ss.add(when: ['CONFIG_SOFTMMU', 'TARGET_X86_64'], if_true: files('win_dump.c'))
++echo "JPEG_CFLAGS=$vnc_jpeg_cflags" >> $config_host_mak
++echo "JPEG_LIBS=$vnc_jpeg_libs" >> $config_host_mak
+ if test "$vnc_png" = "yes" ; then
+   echo "CONFIG_VNC_PNG=y" >> $config_host_mak
+ fi
++echo "PNG_CFLAGS=$vnc_png_cflags" >> $config_host_mak
++echo "PNG_LIBS=$vnc_png_libs" >> $config_host_mak
+ if test "$xkbcommon" = "yes" ; then
+   echo "CONFIG_XKBCOMMON=y" >> $config_host_mak
+   echo "XKBCOMMON_CFLAGS=$xkbcommon_cflags" >> $config_host_mak
 diff --git a/meson.build b/meson.build
-index bab875e..f025ac5 100644
+index 6fd88bb..9b0aa18 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -283,6 +283,14 @@ if 'CONFIG_FDT' in config_host
-   fdt = declare_dependency(compile_args: config_host['FDT_CFLAGS'].split(),
-                            link_args: config_host['FDT_LIBS'].split())
+@@ -226,6 +226,56 @@ coreaudio = not_found
+ if 'CONFIG_AUDIO_COREAUDIO' in config_host
+   coreaudio = declare_dependency(link_args: config_host['COREAUDIO_LIBS'].split())
  endif
-+snappy = not_found
-+if 'CONFIG_SNAPPY' in config_host
-+  snappy = declare_dependency(link_args: config_host['SNAPPY_LIBS'].split())
++opengl = not_found
++if 'CONFIG_OPENGL' in config_host
++  opengl = declare_dependency(link_args: config_host['OPENGL_LIBS'].split())
++else
 +endif
-+lzo = not_found
-+if 'CONFIG_LZO' in config_host
-+  lzo = declare_dependency(link_args: config_host['LZO_LIBS'].split())
++gtk = not_found
++if 'CONFIG_GTK' in config_host
++  gtk = declare_dependency(compile_args: config_host['GTK_CFLAGS'].split(),
++                              link_args: config_host['GTK_LIBS'].split())
++endif
++vte = not_found
++if 'CONFIG_VTE' in config_host
++  vte = declare_dependency(compile_args: config_host['VTE_CFLAGS'].split(),
++                           link_args: config_host['VTE_LIBS'].split())
++endif
++x11 = not_found
++if 'CONFIG_X11' in config_host
++  x11 = declare_dependency(compile_args: config_host['X11_CFLAGS'].split(),
++                           link_args: config_host['X11_LIBS'].split())
++endif
++curses = not_found
++if 'CONFIG_CURSES' in config_host
++  curses = declare_dependency(compile_args: config_host['CURSES_CFLAGS'].split(),
++                              link_args: config_host['CURSES_LIBS'].split())
++endif
++iconv = not_found
++if 'CONFIG_ICONV' in config_host
++  iconv = declare_dependency(compile_args: config_host['ICONV_CFLAGS'].split(),
++                             link_args: config_host['ICONV_LIBS'].split())
++endif
++gio = not_found
++if 'CONFIG_GIO' in config_host
++  gio = declare_dependency(compile_args: config_host['GIO_CFLAGS'].split(),
++                           link_args: config_host['GIO_LIBS'].split())
++endif
++png = not_found
++if 'CONFIG_VNC_PNG' in config_host
++  png = declare_dependency(compile_args: config_host['PNG_CFLAGS'].split(),
++                           link_args: config_host['PNG_LIBS'].split())
++endif
++jpeg = not_found
++if 'CONFIG_VNC_JPEG' in config_host
++  jpeg = declare_dependency(compile_args: config_host['JPEG_CFLAGS'].split(),
++                            link_args: config_host['JPEG_LIBS'].split())
++endif
++sasl = not_found
++if 'CONFIG_VNC_SASL' in config_host
++  sasl = declare_dependency(compile_args: config_host['SASL_CFLAGS'].split(),
++                            link_args: config_host['SASL_LIBS'].split())
 +endif
  
  create_config = find_program('scripts/create_config')
  minikconf = find_program('scripts/minikconf.py')
-@@ -583,6 +591,7 @@ subdir('io')
- subdir('chardev')
- subdir('fsdev')
- subdir('target')
-+subdir('dump')
+diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+deleted file mode 100644
+index 504b196..0000000
+--- a/ui/Makefile.objs
++++ /dev/null
+@@ -1,73 +0,0 @@
+-vnc-obj-y += vnc.o
+-vnc-obj-y += vnc-enc-zlib.o vnc-enc-hextile.o
+-vnc-obj-y += vnc-enc-tight.o vnc-palette.o
+-vnc-obj-y += vnc-enc-zrle.o
+-vnc-obj-y += vnc-auth-vencrypt.o
+-vnc-obj-$(CONFIG_VNC_SASL) += vnc-auth-sasl.o
+-vnc-obj-y += vnc-ws.o
+-vnc-obj-y += vnc-jobs.o
+-
+-common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
+-common-obj-y += input.o input-keymap.o input-legacy.o kbd-state.o
+-common-obj-y += input-barrier.o
+-common-obj-$(CONFIG_LINUX) += input-linux.o
+-common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
+-common-obj-$(CONFIG_COCOA) += cocoa.o
+-common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
+-common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
+-ifneq (,$(findstring m,$(CONFIG_SDL)$(CONFIG_GTK)))
+-common-obj-$(CONFIG_WIN32) += win32-kbd-hook.o
+-endif
+-
+-# ui-sdl module
+-common-obj-$(CONFIG_SDL) += sdl.mo
+-sdl.mo-objs := sdl2.o sdl2-input.o sdl2-2d.o
+-ifeq ($(CONFIG_OPENGL),y)
+-sdl.mo-objs += sdl2-gl.o
+-endif
+-sdl.mo-cflags := $(SDL_CFLAGS)
+-sdl.mo-libs := $(SDL_LIBS)
+-
+-# ui-gtk module
+-common-obj-$(CONFIG_GTK) += gtk.mo
+-gtk.mo-objs := gtk.o
+-gtk.mo-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
+-gtk.mo-libs := $(GTK_LIBS) $(VTE_LIBS)
+-ifeq ($(CONFIG_OPENGL),y)
+-gtk.mo-objs += gtk-egl.o
+-gtk.mo-libs += $(OPENGL_LIBS)
+-ifeq ($(CONFIG_GTK_GL),y)
+-gtk.mo-objs += gtk-gl-area.o
+-endif
+-endif
+-
+-ifeq ($(CONFIG_X11),y)
+-sdl.mo-objs += x_keymap.o
+-gtk.mo-objs += x_keymap.o
+-x_keymap.o-cflags := $(X11_CFLAGS)
+-x_keymap.o-libs := $(X11_LIBS)
+-endif
+-
+-common-obj-$(CONFIG_CURSES) += curses.mo
+-curses.mo-objs := curses.o
+-curses.mo-cflags := $(CURSES_CFLAGS) $(ICONV_CFLAGS)
+-curses.mo-libs := $(CURSES_LIBS) $(ICONV_LIBS)
+-
+-ifeq ($(CONFIG_GIO)$(CONFIG_SPICE),yy)
+-common-obj-$(if $(CONFIG_MODULES),m,y) += spice-app.mo
+-endif
+-spice-app.mo-objs := spice-app.o
+-spice-app.mo-cflags := $(GIO_CFLAGS)
+-spice-app.mo-libs := $(GIO_LIBS)
+-
+-common-obj-$(CONFIG_OPENGL) += shader.o
+-common-obj-$(CONFIG_OPENGL) += console-gl.o
+-common-obj-$(CONFIG_OPENGL) += egl-helpers.o
+-common-obj-$(CONFIG_OPENGL) += egl-context.o
+-common-obj-$(CONFIG_OPENGL_DMABUF) += egl-headless.o
+-
+-shader.o-libs += $(OPENGL_LIBS)
+-console-gl.o-libs += $(OPENGL_LIBS)
+-egl-helpers.o-libs += $(OPENGL_LIBS)
+-egl-context.o-libs += $(OPENGL_LIBS)
+-egl-headless.o-libs += $(OPENGL_LIBS)
+diff --git a/ui/meson.build b/ui/meson.build
+index 8157754..36a70c3 100644
+--- a/ui/meson.build
++++ b/ui/meson.build
+@@ -1,3 +1,81 @@
++softmmu_ss.add(files(
++  'console.c',
++  'cursor.c',
++  'input-keymap.c',
++  'input-legacy.c',
++  'input-barrier.c',
++  'input.c',
++  'kbd-state.c',
++  'keymaps.c',
++  'qemu-pixman.c',
++))
++softmmu_ss.add(pixman)
++
++softmmu_ss.add(when: 'CONFIG_LINUX', if_true: files('input-linux.c'))
++softmmu_ss.add(when: 'CONFIG_SPICE', if_true: files('spice-core.c', 'spice-input.c', 'spice-display.c'))
++softmmu_ss.add(when: [cocoa, 'CONFIG_COCOA'], if_true: files('cocoa.m'))
++
++vnc_ss = ss.source_set()
++vnc_ss.add(files(
++  'vnc.c',
++  'vnc-enc-zlib.c',
++  'vnc-enc-hextile.c',
++  'vnc-enc-tight.c',
++  'vnc-palette.c',
++  'vnc-enc-zrle.c',
++  'vnc-auth-vencrypt.c',
++  'vnc-ws.c',
++  'vnc-jobs.c',
++))
++vnc_ss.add(zlib)
++vnc_ss.add(when: 'CONFIG_VNC_SASL', if_true: [files('vnc-auth-sasl.c'), sasl])
++softmmu_ss.add_all(when: 'CONFIG_VNC', if_true: vnc_ss)
++softmmu_ss.add(when: 'CONFIG_VNC', if_false: files('vnc-stubs.c'))
++softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
++softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL_DMABUF'], if_true: files('egl-headless.c'))
++softmmu_ss.add(when: 'CONFIG_VNC_PNG', if_true: png)
++softmmu_ss.add(when: 'CONFIG_VNC_JPEG', if_true: jpeg)
++
++ui_modules = []
++
++if config_host.has_key('CONFIG_CURSES')
++  ui_modules += [['curses', files('curses.c'), [curses, iconv]]]
++endif
++
++if config_host.has_key('CONFIG_GTK') and config_host.has_key('CONFIG_VTE')
++  softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('win32-kbd-hook.c'))
++
++  gtk_ss = ss.source_set()
++  gtk_ss.add(gtk, vte, files('gtk.c'))
++  gtk_ss.add(when: [x11, 'CONFIG_X11'], if_true: files('x_keymap.c'))
++  gtk_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('gtk-egl.c'))
++  gtk_ss.add(when: [opengl, 'CONFIG_GTK_GL'], if_true: files('gtk-gl-area.c'))
++  gtk_ss = gtk_ss.apply(config_host, strict: false)
++  ui_modules += [['gtk', gtk_ss.sources(), gtk_ss.dependencies()]]
++endif
++
++if config_host.has_key('CONFIG_SDL')
++  softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('win32-kbd-hook.c'))
++
++  sdl_ss = ss.source_set()
++  sdl_ss.add(pixman, glib, files(
++    'sdl2-2d.c',
++    'sdl2-input.c',
++    'sdl2.c',
++  ))
++  sdl_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('sdl2-gl.c'))
++  sdl_ss.add(when: [x11, 'CONFIG_X11'], if_true: files('x_keymap.c'))
++  sdl_ss = sdl_ss.apply(config_host, strict: false)
++  ui_modules += [['sdl', sdl_ss.sources(), sdl_ss.dependencies()]]
++endif
++
++if config_host.has_key('CONFIG_SPICE') and config_host.has_key('CONFIG_GIO')
++  spice_ss = ss.source_set()
++  spice_ss.add(spice, gio, files('spice-app.c'))
++  spice_ss = spice_ss.apply(config_host, strict: false)
++  ui_modules += [['spice-app', spice_ss.sources(), spice_ss.dependencies()]]
++endif
++
+ keymap_gen = find_program('keycodemapdb/tools/keymap-gen')
  
- block_ss.add(files(
-   'block.c',
+ keymaps = [
+@@ -34,3 +112,5 @@ foreach e : keymaps
+ endforeach
+ 
+ subdir('shader')
++
++modules += {'ui': ui_modules}
+diff --git a/ui/shader.c b/ui/shader.c
+index d78829f..e8b8d32 100644
+--- a/ui/shader.c
++++ b/ui/shader.c
+@@ -27,9 +27,9 @@
+ #include "qemu/osdep.h"
+ #include "ui/shader.h"
+ 
+-#include "shader/texture-blit-vert.h"
+-#include "shader/texture-blit-flip-vert.h"
+-#include "shader/texture-blit-frag.h"
++#include "ui/shader/texture-blit-vert.h"
++#include "ui/shader/texture-blit-flip-vert.h"
++#include "ui/shader/texture-blit-frag.h"
+ 
+ struct QemuGLShader {
+     GLint texture_blit_prog;
 -- 
 1.8.3.1
 
