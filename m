@@ -7,45 +7,44 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE70C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F81C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:34:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E387C2312D
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:33:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E387C2312D
+	by mail.kernel.org (Postfix) with ESMTPS id A18452312D
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:34:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A18452312D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3g1I-0006sR-Vo
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:33:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49036)
+	id 1k3g2g-0000UA-MH
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:34:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k3fpl-0001cY-KU; Thu, 06 Aug 2020 09:21:25 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:42065)
+ id 1k3fpm-0001fP-PR; Thu, 06 Aug 2020 09:21:27 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:58469)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k3fpf-0000vn-C1; Thu, 06 Aug 2020 09:21:25 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.1.111])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 3FEF5545F8B3;
+ id 1k3fpg-0000wX-UU; Thu, 06 Aug 2020 09:21:26 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.16.9])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 9B8F7545F8B4;
  Thu,  6 Aug 2020 15:21:15 +0200 (CEST)
 Received: from kaod.org (37.59.142.103) by DAG4EX1.mxp5.local (172.16.2.31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 6 Aug 2020
- 15:21:14 +0200
+ 15:21:15 +0200
 Authentication-Results: garm.ovh; auth=pass
- (GARM-103G00516a44fc9-6842-4507-a5e9-3945436a9983,
+ (GARM-103G00503397b68-57b0-4252-8284-b3f72d3db1f4,
  96EDEDBD7B7627A0205C40E9E2B74F8D513A659B) smtp.auth=clg@kaod.org
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH for-5.2 14/19] ftgmac100: Fix integer overflow in
- ftgmac100_do_tx()
-Date: Thu, 6 Aug 2020 15:21:01 +0200
-Message-ID: <20200806132106.747414-15-clg@kaod.org>
+Subject: [PATCH for-5.2 15/19] ftgmac100: Improve software reset
+Date: Thu, 6 Aug 2020 15:21:02 +0200
+Message-ID: <20200806132106.747414-16-clg@kaod.org>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200806132106.747414-1-clg@kaod.org>
 References: <20200806132106.747414-1-clg@kaod.org>
@@ -55,8 +54,8 @@ Content-Transfer-Encoding: 8bit
 X-Originating-IP: [37.59.142.103]
 X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG4EX1.mxp5.local
  (172.16.2.31)
-X-Ovh-Tracer-GUID: 95c5e04f-67c0-40bd-9edf-c86d7739f403
-X-Ovh-Tracer-Id: 273312204112694063
+X-Ovh-Tracer-GUID: ad1596c2-9823-4f34-bcb6-a6c4e5879378
+X-Ovh-Tracer-Id: 273312202425142121
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrkedtgdeihecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgjfhggtgfgihesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehheefgeejiedtffefteejudevjeeufeeugfdtfeeuleeuteevleeihffhgfdtleenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
@@ -82,61 +81,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mauro Matteo Cascella <mcascell@redhat.com>,
- Frederic Konrad <konrad.frederic@yahoo.fr>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+Cc: Frederic Konrad <konrad.frederic@yahoo.fr>,
+ Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
  =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Ziming Zhang <ezrakiez@gmail.com>, Joel Stanley <joel@jms.id.au>
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When inserting the VLAN tag in packets, memmove() can generate an
-integer overflow for packets whose length is less than 12 bytes.
-
-Check length against the size of the ethernet header (14 bytes) to
-avoid the crash and return FTGMAC100_INT_XPKT_LOST status. This seems
-like a good modeling choice even if Aspeed does not specify anything
-in that case.
+The software reset of the MAC needs a finer granularity. Not all
+registers are reseted and some setting in MACCR are kept.
 
 Cc: Frederic Konrad <konrad.frederic@yahoo.fr>
-Cc: Mauro Matteo Cascella <mcascell@redhat.com>
-Reported-by: Ziming Zhang <ezrakiez@gmail.com>
+Fixes: bd44300d1afc ("net: add FTGMAC100 support")
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 ---
- hw/net/ftgmac100.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
+ hw/net/ftgmac100.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 280aa3d3a1e2..987b843fabc4 100644
+index 987b843fabc4..0740049c5268 100644
 --- a/hw/net/ftgmac100.c
 +++ b/hw/net/ftgmac100.c
-@@ -540,10 +540,21 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32_t tx_ring,
-                 s->isr |= FTGMAC100_INT_XPKT_LOST;
-                 len =  sizeof(s->frame) - frame_size - 4;
-             }
--            memmove(ptr + 16, ptr + 12, len - 12);
--            stw_be_p(ptr + 12, ETH_P_VLAN);
--            stw_be_p(ptr + 14, bd.des1);
--            len += 4;
-+
-+            if (len < sizeof(struct eth_header)) {
-+                qemu_log_mask(LOG_GUEST_ERROR,
-+                         "%s: frame too small for VLAN insertion : %d bytes\n",
-+                         __func__, len);
-+                s->isr |= FTGMAC100_INT_XPKT_LOST;
-+            } else {
-+                uint8_t *vlan_hdr = ptr + (ETH_ALEN * 2);
-+                uint8_t *payload = vlan_hdr + sizeof(struct vlan_header);
-+
-+                memmove(payload, vlan_hdr, len - (ETH_ALEN * 2));
-+                stw_be_p(vlan_hdr, ETH_P_VLAN);
-+                stw_be_p(vlan_hdr + 2, FTGMAC100_TXDES1_VLANTAG_CI(bd.des1));
-+                len += sizeof(struct vlan_header);
-+            }
+@@ -655,11 +655,10 @@ static void ftgmac100_reset(DeviceState *d)
+     s->itc = 0;
+     s->aptcr = 1;
+     s->dblac = 0x00022f00;
+-    s->revr = 0;
+     s->fear1 = 0;
+     s->tpafcr = 0xf1;
+ 
+-    s->maccr = 0;
++    s->maccr &= FTGMAC100_MACCR_GIGA_MODE | FTGMAC100_MACCR_FAST_MODE;
+     s->phycr = 0;
+     s->phydata = 0;
+     s->fcr = 0x400;
+@@ -812,6 +811,7 @@ static void ftgmac100_write(void *opaque, hwaddr addr,
+     case FTGMAC100_MACCR: /* MAC Device control */
+         s->maccr = value;
+         if (value & FTGMAC100_MACCR_SW_RST) {
++            /* TODO: rework software reset to have a finer granularity */
+             ftgmac100_reset(DEVICE(s));
          }
  
-         ptr += len;
 -- 
 2.25.4
 
