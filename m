@@ -2,95 +2,85 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B08C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E659C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9967822DFA
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:06:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00DA322DFA
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:07:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gbj3uSta"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9967822DFA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BDs7Nszg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00DA322DFA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3fbc-0006RX-NH
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:06:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43796)
+	id 1k3fc0-00074T-3p
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:07:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3fYl-00024E-5y
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:03:51 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:45862)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k3fa4-0004AI-Ty
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:05:12 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:44123)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3fYj-00075v-7N
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:03:50 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id z18so40361056wrm.12
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 06:03:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=VKIjvjXxKAYQqyFjcIUepKDvVOUEUs0KY6aFq2gyyVA=;
- b=gbj3uStao4kU5RsxlA4SV8e9NFbI0t8nO4s3NRVwAzuG6ezqHr7WxMaLlrW17O61AL
- GMfKMtHb9PXCXWGlNnZSVmOyGE/mqYIjNji9JrG2zPzdi9PWuLSOLromXQf7pr84cszX
- n8kEDCVCameEYBHAQ4WXkNumz7PaL9KIPW7NWFJ04cx9TG7q5OkIsKC4rNPaX9TriXdi
- DTD92D4typv02jwj/CNSeFvbHVHBUdpai61Qt8zABqsALP9qdNsdV4bcgnFmjLbzrp0y
- BfbFaAzxxHjcxQ4prX9WTR3ZAsnYAoQGgBWL9PLuqw5HCKo4HnXp1XKE56n4t60xDFUM
- k3sw==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k3fa2-0007CK-5A
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:05:12 -0400
+Received: by mail-oi1-x242.google.com with SMTP id h3so19174805oie.11
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 06:05:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=a5VsPjTZL2NDQ0SByYGQq+rFR4fYGfHX+fiU31UUZdw=;
+ b=BDs7NszgDlpGPZk4BcsY+K7MDuGLU5cVLI7pqokZxTALypn7B55YSuiyQZWUPs5vzl
+ L7PyMC8uG/lWXoW02yOjR6x4eyZy6x19GvJuPDINY8jCrfxwvIZJzWTaChbF+aaNz8lx
+ yNwzowFBaNzUFG1xMlzHXSSHzhSrvA4Wm7X8Bjcfwj4qcJ7RUVbLT0Zdcj3t807syr5p
+ 5/7BfXGOlV4ShdZoD2szBEINk1+/ZGO5Pyk+O4+Wk6d34ADqmdxn1QsNAD36yGZhA0JR
+ yKGyVmqPIaTZxfdoCN8PY003GUZ+jpSQ+JjlasHm9GqXpThhiKSbFSpldc9BCypI5sKU
+ XGuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=VKIjvjXxKAYQqyFjcIUepKDvVOUEUs0KY6aFq2gyyVA=;
- b=hP5/BiRpXnFv4a0TrLCGSc92n1d1ZXJnzq3Nr5pZrFPSsYCeFHfSO7hBTff6I/VB05
- +0/6v50WyTnFX6cALsijWj+bCYxtmv9b8WMMorxlOPNJek3S1brRfS2qk1/5pBn5tCm0
- Ckg+xV5aOSrrmkcSy8M5kbb9AJNwbrhIhFhYiaGZ7a20D//q3jHOqTzRC4okCNMB5RTw
- JGVSkqaqcTdS2GTtxHY5R1iedH7Su+PHbAk1e4lin32xasLcJksbm4DcLXTKcNcZMzWx
- XFbvXh2yMKD5j/48LWmeJuyrUWLUaxjbvP1PKenrJRYWZ8hKVz5WmJlrMfCml75Mbwi0
- 4jNA==
-X-Gm-Message-State: AOAM5317HdWinHulTsbM+bw1V9g3UK5kmKTw2QplcyYyyy92l78QKkbV
- aB9c4jT5d8kYEo6o7QkF4BH7TlDB
-X-Google-Smtp-Source: ABdhPJybIO4Z+Ee+scM4SpveWUiz8MskSKIB9XhUuufJDnpgrElvvAz7WKaH0LtWxFWGyMHGJJYoWQ==
-X-Received: by 2002:adf:ca06:: with SMTP id o6mr7049091wrh.181.1596719027514; 
- Thu, 06 Aug 2020 06:03:47 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id e16sm6409113wrx.30.2020.08.06.06.03.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 06:03:46 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 4/4] hw/char/serial: Use the Clock API to feed the
- UART reference clock
-Date: Thu,  6 Aug 2020 15:03:40 +0200
-Message-Id: <20200806130340.17316-5-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200806130340.17316-1-f4bug@amsat.org>
-References: <20200806130340.17316-1-f4bug@amsat.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=a5VsPjTZL2NDQ0SByYGQq+rFR4fYGfHX+fiU31UUZdw=;
+ b=clm8CAU7wc+eoIn+vJzlx9Jp9OPdFOlYriFaD2IP6VSoiAULIqKj8a+ttagYtkbNOP
+ +qW+IuhmDiviIjxW3SPR5PUVx6VugAGOiEP2KaN/+l2wMWzZJY4SWlFKSLqF0UOVaFZT
+ yhbXFWEo97z20cHoYOMtmxXGSl4dEekLFD54Ekx9q7RFgV+2ti/viUiOjmOdDZgKykQd
+ niqRUIcQg+HUwhSl1UQnE6gD2vtjy7sW9Xhq3CaosEv4aoSlsQBjvGP9MgSFCJcZ7wKv
+ AYqyanSWCq16GQAX6vXplBMARPsV0reoERt/tD83b8zcNPOUyD1zDUtw9jtb37Fgc5Gt
+ 20vA==
+X-Gm-Message-State: AOAM530iWieY08x4P9kXpUGIEKc6XPfmRZrWSQIKES5WwUVbQQn5UJZ3
+ HeKTRw9tbBu9xaUrPzs/Qck5i96VTruDjath+bQtiw==
+X-Google-Smtp-Source: ABdhPJy6Dtev5XGoLyO4ZnNmlr0VbmR9VoU+d7W6snO20kpKk6DbSwplBYtbP9FSR1DFWUcBKDBv2gwRbGH7F9nE9RU=
+X-Received: by 2002:aca:4a96:: with SMTP id x144mr6834152oia.163.1596719108443; 
+ Thu, 06 Aug 2020 06:05:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42e.google.com
+References: <20200803164749.301971-1-edgar.iglesias@gmail.com>
+In-Reply-To: <20200803164749.301971-1-edgar.iglesias@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 6 Aug 2020 14:04:57 +0100
+Message-ID: <CAFEAcA_ZAgnW4zjaTPUCVHjzWhHeiEastQVfGTP39V0og8u8Vg@mail.gmail.com>
+Subject: Re: [PATCH v1 0/1] docs/system/arm: Document the Xilinx Versal Virt
+ board
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,124 +93,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: figlesia@xilinx.com, Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the same chipset, UARTs can be clocked at different rate, or the
-input clock can be changed at runtime. The Clock API allow us to
-propagate such clock rate change to the device.
-Let the SerialState have its reference input clock (called 'rclk')
-and if not clock is connected to the device, use the currently provided
-frequency, to not modify the current code behavior.
+On Mon, 3 Aug 2020 at 17:47, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Hi,
+>
+> This adds some basic documentation for the Xilinx Versal Virt board,
+> including a few command-line examples on how to run ARM Trusterd Firmware,
+> U-boot, Xen and Linux.
+>
+> If this looks OK I'll send similar basic documentation for the ZynqMP and
+> Zynq.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/char/serial.h |  3 +++
- hw/char/serial.c         | 35 ++++++++++++++++++++++++++++-------
- 2 files changed, 31 insertions(+), 7 deletions(-)
+Looks good to me; applied to target-arm.next for 5.2.
 
-diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-index 75c71adfd2..1c7a4df2ab 100644
---- a/include/hw/char/serial.h
-+++ b/include/hw/char/serial.h
-@@ -31,8 +31,10 @@
- #include "qemu/fifo8.h"
- #include "chardev/char.h"
- #include "hw/sysbus.h"
-+#include "hw/clock.h"
- 
- #define UART_FIFO_LENGTH    16      /* 16550A Fifo Length */
-+#define UART_CLOCK_DIVISOR  16      /* baudrate is input clock / 16 */
- 
- typedef struct SerialState {
-     DeviceState parent;
-@@ -57,6 +59,7 @@ typedef struct SerialState {
-     qemu_irq irq;
-     CharBackend chr;
-     int last_break_enable;
-+    Clock *rclk; /* ReceiverClock */
-     uint32_t baudbase;
-     uint32_t tsr_retry;
-     guint watch_tag;
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 2ddc73f255..701c670fd5 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -35,6 +35,7 @@
- #include "qemu/error-report.h"
- #include "trace.h"
- #include "hw/qdev-properties.h"
-+#include "hw/qdev-clock.h"
- 
- #define UART_LCR_DLAB	0x80	/* Divisor latch access bit */
- 
-@@ -921,10 +922,36 @@ static int serial_be_change(void *opaque)
-     return 0;
- }
- 
-+/* Change the main reference oscillator frequency. */
-+void serial_set_frequency(SerialState *s, uint32_t frequency)
-+{
-+    s->baudbase = frequency;
-+    serial_update_parameters(s);
-+}
-+
-+static void serial_rclk_update(void *opaque)
-+{
-+    SerialState *s = opaque;
-+
-+    serial_set_frequency(s, clock_get_hz(s->rclk) / UART_CLOCK_DIVISOR);
-+}
-+
-+static void serial_init(Object *obj)
-+{
-+    SerialState *s = SERIAL(obj);
-+
-+    s->rclk = qdev_init_clock_in(DEVICE(obj), "rclk", serial_rclk_update, s);
-+}
-+
- static void serial_realize(DeviceState *dev, Error **errp)
- {
-     SerialState *s = SERIAL(dev);
- 
-+    /* initialize the frequency in case the clock remains unconnected */
-+    if (!clock_get(s->rclk)) {
-+        clock_set_hz(s->rclk, s->baudbase);
-+    }
-+
-     s->modem_status_poll = timer_new_ns(QEMU_CLOCK_VIRTUAL, (QEMUTimerCB *) serial_update_msl, s);
- 
-     s->fifo_timeout_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, (QEMUTimerCB *) fifo_timeout_int, s);
-@@ -955,13 +982,6 @@ static void serial_unrealize(DeviceState *dev)
-     qemu_unregister_reset(serial_reset, s);
- }
- 
--/* Change the main reference oscillator frequency. */
--void serial_set_frequency(SerialState *s, uint32_t frequency)
--{
--    s->baudbase = frequency;
--    serial_update_parameters(s);
--}
--
- const MemoryRegionOps serial_io_ops = {
-     .read = serial_ioport_read,
-     .write = serial_ioport_write,
-@@ -994,6 +1014,7 @@ static const TypeInfo serial_info = {
-     .name = TYPE_SERIAL,
-     .parent = TYPE_DEVICE,
-     .instance_size = sizeof(SerialState),
-+    .instance_init = serial_init,
-     .class_init = serial_class_init,
- };
- 
--- 
-2.21.3
-
+thanks
+-- PMM
 
