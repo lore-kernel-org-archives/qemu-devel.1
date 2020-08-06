@@ -2,92 +2,97 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF6BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72CACC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D215722CF7
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:54:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3438022D07
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:54:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QvJDjjj/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D215722CF7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pVwzo/mT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3438022D07
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3cpA-00030d-6K
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 06:08:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58662)
+	id 1k3dEA-0002Lf-R5
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 06:34:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3coa-0002av-Tq
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:08:00 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45949
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3coY-0002hx-Uy
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:08:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596708478;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=COG95HzB6W4riqDfKaT8VHOJkxpvAVw5ExvX7uBMST0=;
- b=QvJDjjj/4nFRuBRaGVPr0Xbi8CsNv3/ozhNjWiQCQ1BEiO1rX0/WAksDUN6e0MxEOkBXkk
- /aTOQE9FoCUQMus2VHry98lCigAU2xt0ZyMvtGhAUXbzoaBrjidyczCwjg+wjSAjL7Gzqz
- Q0rCUoGjojw/sDuOpMYbBYEHHiIy4ks=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-hktdH_5tPpO_aUd_doo7tw-1; Thu, 06 Aug 2020 06:07:54 -0400
-X-MC-Unique: hktdH_5tPpO_aUd_doo7tw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FA4918FF662;
- Thu,  6 Aug 2020 10:07:53 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 68D2987A4D;
- Thu,  6 Aug 2020 10:07:50 +0000 (UTC)
-Subject: Re: [PATCH 1/5] log: Add logs for vm start and destroy
-To: Peng Liang <liangpeng10@huawei.com>, qemu-trivial@nongnu.org
-References: <20200806093720.2355692-1-liangpeng10@huawei.com>
- <20200806093720.2355692-2-liangpeng10@huawei.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <4c171abd-1366-6ff9-f261-a450a3a1783d@redhat.com>
-Date: Thu, 6 Aug 2020 12:07:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3dDZ-0001rD-G2; Thu, 06 Aug 2020 06:33:49 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:47090)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3dDX-0005sc-L6; Thu, 06 Aug 2020 06:33:49 -0400
+Received: by mail-wr1-x442.google.com with SMTP id f12so7649343wru.13;
+ Thu, 06 Aug 2020 03:33:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=2ngCmUgzTkVnHJM+hkMCLWY0argmW1kgruJykM0JrLg=;
+ b=pVwzo/mTwuzEkVr83CKB58Xz8hwOMlqn5DaBRWkwdZN6PtWdKw3ZZBiXf9+mHcipyo
+ 1GcZlwmKbzr0DsC0E/qu4EvlOeilVhAOdFTdOBzX6jOya3I+DQgJqpCN2lC9sN0HrfS5
+ itZUd9OCXVKcEIi7o+8iwJoRR3NDcsZw9iFOPEJXBqNUgU0H0I3uDUb3f/12+lsr4lAV
+ ZWYYMxA+d/oiA/GJO5cgkYawDJCPOtvXwe/zq4BmeoftYqU3FGmGEfFOISRAsVb86dkq
+ fs2kqZ5otDGtZXEV2EODfX3GnFACY4v+vmZL8Uo6axyVXDGC1TrXQnHSvkzxnjctou/s
+ d3gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2ngCmUgzTkVnHJM+hkMCLWY0argmW1kgruJykM0JrLg=;
+ b=ahNSQtSe4E2bUcb6z7IL8Qdujx/hef92xAcMAW4GwPUEY+5/Av/pzzLGVwK6tGilVH
+ 2GagTZ5KCqd4mdh+v7CLCDzpE7UVm4M8iUhnVW/jySqywvt5MjbKoVtq8PtlBFVXzcE0
+ sTBDaouYAKAkRnWx2FrNxsj6ipVJclFQbkW57IU//Gg+39Z/p8zOyQAUMAvoN2dKReW5
+ mv7gGGp47nFOH/tjZ9pfpIcX7wcnIuQiRcO51M89Yyk/VsYAUy3shu0n2yV34MAx4qh5
+ /zfawnsQCucCh5FKeOtqvQVvjN61PJe+xAmcYpUcGZVo3hTNvCrKHi6jKYfvGKMIyZi3
+ 9JuA==
+X-Gm-Message-State: AOAM532H7z3SheGFk6rEplD13aseTPUjlWSMw+a5ubTXVvsktbvALx7n
+ SdcfPmd2E334WDbXV75o6sw=
+X-Google-Smtp-Source: ABdhPJxSVNoOzN9t9TGo1L1VtEbAtF0Wm21qRsWzKpPXDsxrT6uNRHcV0wBsNMjQfhPPdvrHUjSOfA==
+X-Received: by 2002:adf:bc07:: with SMTP id s7mr7355913wrg.254.1596710025339; 
+ Thu, 06 Aug 2020 03:33:45 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id b77sm4912952wmb.3.2020.08.06.03.33.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 06 Aug 2020 03:33:44 -0700 (PDT)
+Subject: Re: [PATCH-for-5.2 7/7] hw/block/fdc: Add ASCII art schema of QOM
+ relations
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200806080824.21567-1-f4bug@amsat.org>
+ <20200806080824.21567-8-f4bug@amsat.org>
+ <20200806085706.GB17753@linux.fritz.box>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <71fc8f3f-97fb-a1de-a85c-fa6ef4b420bb@amsat.org>
+Date: Thu, 6 Aug 2020 12:33:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200806093720.2355692-2-liangpeng10@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200806085706.GB17753@linux.fritz.box>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:07:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,46 +105,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/08/2020 11.37, Peng Liang wrote:
-> Add logs for vm start and destroy.
+On 8/6/20 10:57 AM, Kevin Wolf wrote:
+> Am 06.08.2020 um 10:08 hat Philippe Mathieu-DaudÃƒÆ’Ã‚Â© geschrieben:
+>> Without knowing the QEMU history, it is hard to relate QEMU objects
+>> with the hardware datasheet.
+>>
+>> For example, one naively expects:
+>>
+>> * a floppy disk is plugged / unplugged on the bus
+>>
+>>   Wrong! QEMU floppy disks always sit on the bus. The block drives
+>>   are plugged / unplugged on the disks, and the disks magically
+>>   re-adapt their proprieties to match the block drive.
 > 
-> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
-> ---
->  hw/acpi/core.c  | 3 +++
->  hw/core/reset.c | 2 ++
->  softmmu/vl.c    | 8 ++++++++
->  3 files changed, 13 insertions(+)
+> This is because what sits on the bus is not a floppy disk, but a floppy
+> drive. FloppyDrive is also what the type is called.
 > 
-> diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-> index ac06db3450..0a24f018cf 100644
-> --- a/hw/acpi/core.c
-> +++ b/hw/acpi/core.c
-> @@ -560,13 +560,16 @@ static void acpi_pm1_cnt_write(ACPIREGS *ar, uint16_t val)
->          uint16_t sus_typ = (val >> 10) & 7;
->          switch(sus_typ) {
->          case 0: /* soft power off */
-> +            info_report("VM will be soft power off");
->              qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
->              break;
->          case 1:
-> +            info_report("VM will be suspend state");
->              qemu_system_suspend_request();
->              break;
->          default:
->              if (sus_typ == ar->pm1.cnt.s4_val) { /* S4 request */
-> +                info_report("VM will be S4 state");
->                  qapi_event_send_suspend_disk();
->                  qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
->              }
+> The disk is represented by the BlockDriverState (the actual image file)
+> that is inserted in the BlockBackend (which is logically part of the
+> drive).
+> 
+>> * a floppy controller has a fixed number of disks pluggable on the bus
+>>
+>>   Wrong! QEMU floppy controllers have as much slots as the number of
+>>   floppy drive provided when a machine is created. Then the ACPI table
+>>   are generated and the number of slots can not be modified. So if you
+>>   expect a dual slot controller being created with slot A and B, if
+>>   the machine is created with a single drive attached, the controller
+>>   will only have slot A created, and you will never be able to plug
+>>   drive B without risking a mismatch in the ACPI tables.
+> 
+> Hm... I guess hotplugging floppy drives might actually have worked,
+> though I have never tried it on real hardware. I'm pretty sure it wasn't
+> an official feature, though, and ACPI tables certainly won't magically
+> change if you do this because (apart from polling, I guess) software has
+> no way to detect that you tinkered with the floppy cable. :-)
+> 
+>> * a floppy controller supporting 4 disks uses 2 buses
+>>
+>>   Wrong! QEMU uses a single bus to plug the 4 disks.
+> 
+> But we don't even emulate floppy controllers that can have more than two
+> floppy drives:
+> 
+>     $ x86_64-softmmu/qemu-system-x86_64 -device floppy -device floppy -device floppy
+>     qemu-system-x86_64: -device floppy: Can't create floppy unit 2, bus supports only 2 units
 
-There is already a trace point in qemu_system_shutdown_request(), so
-this can already be used instead.
+This comment is for developers, the warning is for user.
 
- Thomas
+It comes from:
 
+    if (dev->unit >= MAX_FD) {
+        error_setg(errp, "Can't create floppy unit %d, bus supports "
+                   "only %d units", dev->unit, MAX_FD);
+        return;
+    }
+
+But you can compile QEMU with MAX_FD=4:
+
+static FDrive *get_drv(FDCtrl *fdctrl, int unit)
+{
+    switch (unit) {
+        case 0: return drv0(fdctrl);
+        case 1: return drv1(fdctrl);
+#if MAX_FD == 4
+        case 2: return drv2(fdctrl);
+        case 3: return drv3(fdctrl);
+#endif
+        default: return NULL;
+    }
+}
+
+ACPI also handles 4 slots:
+
+static void fdc_isa_build_aml(ISADevice *isadev, Aml *scope)
+{
+    Aml *dev;
+    Aml *crs;
+    int i;
+
+#define ACPI_FDE_MAX_FD 4
+    uint32_t fde_buf[5] = {
+        0, 0, 0, 0,     /* presence of floppy drives #0 - #3 */
+        cpu_to_le32(2)  /* tape presence (2 == never present) */
+    };
+
+    crs = aml_resource_template();
+    aml_append(crs, aml_io(AML_DECODE16, 0x03F2, 0x03F2, 0x00, 0x04));
+    aml_append(crs, aml_io(AML_DECODE16, 0x03F7, 0x03F7, 0x00, 0x01));
+    aml_append(crs, aml_irq_no_flags(6));
+    aml_append(crs,
+        aml_dma(AML_COMPATIBILITY, AML_NOTBUSMASTER, AML_TRANSFER8, 2));
+
+    dev = aml_device("FDC0");
+    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0700")));
+    aml_append(dev, aml_name_decl("_CRS", crs));
+
+    for (i = 0; i < MIN(MAX_FD, ACPI_FDE_MAX_FD); i++) {
+        FloppyDriveType type = isa_fdc_get_drive_type(isadev, i);
+
+        if (type < FLOPPY_DRIVE_TYPE_NONE) {
+            fde_buf[i] = cpu_to_le32(1);  /* drive present */
+            aml_append(dev, build_fdinfo_aml(i, type));
+        }
+    }
+    aml_append(dev, aml_name_decl("_FDE",
+               aml_buffer(sizeof(fde_buf), (uint8_t *)fde_buf)));
+
+    aml_append(scope, dev);
+}
+
+
+> 
+> This is checked in floppy_drive_realize(), so it applies to all
+> variants of the controller.
+> 
+> If you want more floppy drives, you have to create a second controller
+> (with a different iobase). Though I don't think I actually got this
+> working when I tried. I wasn't sure if the problem was the emulation or
+> the guest OSes (or SeaBIOS actually for DOS).
+> 
+>> As all these false assumptions are not obvious (we don't plug a disk,
+>> we plug a block drive into a disk, etc...), start documenting the QOM
+>> relationships with a simple ASCII schema.
+> 
+> Maybe be more specific to have: "floppy (drive)" and "blk (disk)".
+> Because the ASCII schema is actually true, though you seem to have
+> misunderstood what each item in it is supposed to represent.
+> 
+> Actually "blk (disk)" is not 100% accurate either because the drive
+> always has a BlockBackend present. It's really the BlockDriverState
+> inserted into the BlockBackend that is the disk.
+> 
+> In summary, to be honest, I believe since its qdevification, floppy is
+> one of the block devices that is modelled the best on the QOM + block
+> backend level. Only SCSI might be comparable, but IDE, virtio-blk and
+> usb-storage are a mess in comparison.
+
+I'm sorry I didn't want to criticize the model or hurt you, I just want
+to note the differences between how the controller is described in the
+Intel 82078 datasheet and how the QEMU model works. Maybe I'm wrong
+assuming there would be a 1:1 match.
+
+I'll repost with the name updated in the schema and removing my
+assumptions from the commit description that appears as simple
+critics.
+
+> 
+> Kevin
+> 
+>> Signed-off-by: Philippe Mathieu-DaudÃƒÆ’Ã‚Â© <f4bug@amsat.org>
+>> ---
+>>  hw/block/fdc.c | 22 ++++++++++++++++++++++
+>>  1 file changed, 22 insertions(+)
+>>
+>> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+>> index 6944b06e4b..b109f37050 100644
+>> --- a/hw/block/fdc.c
+>> +++ b/hw/block/fdc.c
+>> @@ -47,6 +47,28 @@
+>>  #include "qemu/module.h"
+>>  #include "trace.h"
+>>  
+>> +/*
+>> + * QOM relationship:
+>> + * =================
+>> + *
+>> + *                  +-------------------+
+>> + *                  |                   |
+>> + * isa/sysbus  <--->|                   |
+>> + *                  |                   |
+>> + *  irq/dma    <----|        fdc        |
+>> + *                  |
+>> + *      clk    ---->|                   |        +-+------+-+    +-+------+-+
+>> + *                  |                   |        | | blk  | |    | | blk  | |
+>> + *                  +--------+----------+        | |      | |    | |      | |
+>> + *                           |                   | +------+ |    | +------+ |
+>> + *                           |                   |          |    |          |
+>> + *                           |                   |  floppy  |    |  floppy  |
+>> + *                           |                   +----+-----+    +----+-----+
+>> + *                           |   floppy-bus           |               |
+>> + *                           +------------------------v---------------v---
+>> + *
+>> + */
+>> +
+>>  /********************************************************/
+>>  /* debug Floppy devices */
+>>  
+>> -- 
+>> 2.21.3
+>>
+> 
+> 
 
