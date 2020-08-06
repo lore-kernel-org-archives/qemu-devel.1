@@ -2,100 +2,133 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F4FC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7189DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:43:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF525221E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:38:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 568B2221E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:43:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bg16maN7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF525221E2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQZ+GOXn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 568B2221E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3nb4-0000Tq-2R
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 17:38:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45956)
+	id 1k3nf9-0001rF-Hu
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 17:42:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3naC-0008RS-Gu
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:37:52 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:37927)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3naB-0007Rc-1V
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:37:52 -0400
-Received: by mail-wr1-x435.google.com with SMTP id a14so45386331wra.5
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 14:37:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=fBxvvlC37pPeDsRlTaA29QNcZkLbhDMohAa1v+BwemI=;
- b=Bg16maN75XaaAp/GOeRc3n+8jmMuAHlA92Ap8QfG2t2Rlgn1Ej21H2RigdWdzZIoif
- +VaJlijyDxzJxmW7OxxOmQGSCpHqX2xJNht6EUeO2snW6hFS5S38UJpAebL7MtYDKwR+
- JRvX+TtIrH0oWZxmjkFDR9gM2NVqEo65r5RXgswA+cESgC+BzL5Pd+RwclLxoRBjF6ow
- XbE4SPMlyS9020HKwgzRfWZfXS80agOS9JSO2EAZ8eK8qNiihEL1tqiN9E+9JiSHc3CE
- gb8nImZYJiSun80g0XTQwMrCQ4Y0hHmoD7rW1+ipLD15f99MaGliKeS5//BM2VZIzUzg
- 5X7Q==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k3neZ-0001Py-1f
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:42:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55773
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k3neW-0007vC-6K
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:42:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596750138;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=gCd7ZnaEHsbVqEVA6/j/7uKWTnK8Rib0bj8XMTA6Oew=;
+ b=RQZ+GOXnIP9bqnRR34XAHEobSbCvlgS4AcJ1WOeheKRFVckp5ndjXlreprYmBQN6g2bG4w
+ qUCaJNdtTKbLbyBTX1t6eB0i4TUdGf1bLIzoKH1mEUsyqeDs6fJcSPljEIn+30IupW9VM1
+ G455Cv9q8tT7+//wi3vAzr4XrqXpZlw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-276-t039HH1RMBuZMRdyv9NMRA-1; Thu, 06 Aug 2020 17:42:16 -0400
+X-MC-Unique: t039HH1RMBuZMRdyv9NMRA-1
+Received: by mail-wm1-f71.google.com with SMTP id u144so4604621wmu.3
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 14:42:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fBxvvlC37pPeDsRlTaA29QNcZkLbhDMohAa1v+BwemI=;
- b=XV3Gnq0DFqp+eL/2QnnZmn1Boh19t4ySTtaKi49wUrYsYE04A/caXIaA+So6OU7W4Y
- LlHOHDKBt+LKUWXT4xrEtBKW0NlI8coJJedLH12Orlj4JU/aRPy3CD/ls7HJppLRYrjv
- tH5GUh44Z1s0aiJBH8Cxenm3TjUwQ4+2BzNCuRCpNsebl9e7qI04ULXL4NfqAZM8W5UH
- ZfBUrYwtb50Dzwmw2C6U1ekJLArwCpBzttpQLabeom2rXDreT1jcr9SL6xY2QR7XlIwz
- 7ZRJ9tg4/ITtWgRsi2f6HrUJScxHjS5by/TsxALkuq5f1iR7m2qpGBxvHuADrgulsZ0C
- 9xCg==
-X-Gm-Message-State: AOAM531fiGzbzooNxgfPlXq4KYDiFikAv2VVvH+CMjIWkKKwLJqs16ty
- /doEndPS9adtZ4DGurmZ0Z0=
-X-Google-Smtp-Source: ABdhPJzvqOo95cJ8KTTRYSh5K8D3aaXcvNly1OCiceQQPm+Bas9gxEBComaGsClyVMfXSVMJwobY0A==
-X-Received: by 2002:a5d:550e:: with SMTP id b14mr9734853wrv.392.1596749867751; 
- Thu, 06 Aug 2020 14:37:47 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=gCd7ZnaEHsbVqEVA6/j/7uKWTnK8Rib0bj8XMTA6Oew=;
+ b=oCjkUmtQait8f8GW0yePJT0Frg0QQo01W2obI/eMotblAmtXsJmuWRvFpcya9C/Jcw
+ jLxXtAvFBNXffBtQYvLhV2p+yAjjDkAqW6956LGUt51Kc2CzFyo8dkBqmPXmFqCQfCrz
+ yLE0lCsLD+mn/kbqH7hR7hevFzJgLYDzni8rcwNWLqid4Y7SWS04CNwYOGKqZb+KcbZE
+ tncDeWBJWBfuecwwOYK9WTp8/PnN+EuoYiD429K5G07v5ncj3rI5YC3dk/UDIMAUv0kH
+ +DjThy1Fw0r/bheN48x0/WWNXRM/dKRvf+ezX+KJtTsXLdyDQs3hDkMQUNE9LRJctihb
+ Ddyg==
+X-Gm-Message-State: AOAM533JVJ0cERKc30WjxNmBthLvA5QBN/+b+uEKREjMG9qDyXraPDtB
+ mHQJqPp2vCYc9jlc0x18iEu3bd7J7ABgt3KVtX/3MaF9F03V3LCJp0ZXLO+zcXWlRpa1Me+4a+l
+ Rvk5Onw29f6ST77c=
+X-Received: by 2002:adf:bb14:: with SMTP id r20mr9065907wrg.366.1596750135418; 
+ Thu, 06 Aug 2020 14:42:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz7D9RNzABGA7b0d/FoKnHi9q4iz0ddw3Zfhf35+UEMAqtTIvlc/9vZWaEDvTP8NYw0g6We0w==
+X-Received: by 2002:adf:bb14:: with SMTP id r20mr9065891wrg.366.1596750135153; 
+ Thu, 06 Aug 2020 14:42:15 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id 130sm7681018wme.26.2020.08.06.14.37.46
+ by smtp.gmail.com with ESMTPSA id c17sm8107071wrc.42.2020.08.06.14.42.14
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Aug 2020 14:37:47 -0700 (PDT)
-Subject: Re: [PATCH-for-5.2] target/mips: Report unimplemented cache()
- operations
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200806122612.17167-1-f4bug@amsat.org>
- <e55da0ff-e88c-f2f4-0430-32255f7e58fe@flygoat.com>
- <ec0ff553-a5e7-6c93-5ab3-093721b044a6@amsat.org>
- <CAFEAcA8iXXW=eD+w-UdPqdjtbfc45Qu+DyfZBmaVe0TgMt_jmg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a620f323-e42a-e75e-0491-228c480fa55b@amsat.org>
-Date: Thu, 6 Aug 2020 23:37:46 +0200
+ Thu, 06 Aug 2020 14:42:14 -0700 (PDT)
+Subject: Re: [PATCH 108/143] meson: convert hw/intc
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+ <1596741379-12902-109-git-send-email-pbonzini@redhat.com>
+ <CAFEAcA_j2N1ee3Aqjcw3cKF1ksJ9Ls4qF6eXBH058A8oNBObfw@mail.gmail.com>
+ <CABgObfYry+2he0aL_UujxaSCTNELQL+mbtD8GYc_R4b1H94x8g@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <0dc20c58-42af-e50f-4e76-1c72a33dacea@redhat.com>
+Date: Thu, 6 Aug 2020 23:42:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8iXXW=eD+w-UdPqdjtbfc45Qu+DyfZBmaVe0TgMt_jmg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CABgObfYry+2he0aL_UujxaSCTNELQL+mbtD8GYc_R4b1H94x8g@mail.gmail.com>
 Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x435.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:24:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,88 +141,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhc@lemote.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/6/20 10:51 PM, Peter Maydell wrote:
-> On Thu, 6 Aug 2020 at 21:31, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> On 8/6/20 8:01 PM, Jiaxun Yang wrote:
->>> 在 2020/8/6 下午8:26, Philippe Mathieu-Daudé 写道:
->>>> We only implement the Index[Store/Load]Tag from the 'cache' opcode.
->>>> Instead of ignoring the other cache operations, report them as
->>>> unimplemented.
->>>
->>> Hmm, I don't think we have anything to do with Invalidate/Writeback etc.
->>> opcodes
->>> in QEMU. Why do we log this?
->>
->> I'm noticed this code is run on Linux 3.3.8 (4KEc):
->>
->>     8880:       3082000f        andi    v0,a0,0xf
->>     8884:       10800008        beqz    a0,88a8
->>     8888:       00a21021        addu    v0,a1,v0
->>     888c:       08002227        j       889c
->>     8890:       00001821        move    v1,zero
->>     8894:       bcf90000        cache   0x19,0(a3)
->>     8898:       24630010        addiu   v1,v1,16
->>     889c:       0062302b        sltu    a2,v1,v0
->>     88a0:       14c0fffc        bnez    a2,8894
->>     88a4:       00833821        addu    a3,a0,v1
->>     88a8:       03e00008        jr      ra
->>     88ac:       00000000        nop
->>
->> Why silently ignore the opcode is not implemented instead of logging it?
+On 8/6/20 11:20 PM, Paolo Bonzini wrote:
 > 
-> I think the question is whether the opcode is supposed to have
-> some behaviour which we're not implementing, or whether "no-op"
-> is the correct behaviour for it (which it usually is for
-> cache invalidate type operations; compare the way the Arm
-> cache ops like IC_IALLU are just ARM_CP_NOP ops).
+> 
+> Il gio 6 ago 2020, 23:02 Peter Maydell <peter.maydell@linaro.org
+> <mailto:peter.maydell@linaro.org>> ha scritto:
+> 
+>     On Thu, 6 Aug 2020 at 21:10, Paolo Bonzini <pbonzini@redhat.com
+>     <mailto:pbonzini@redhat.com>> wrote:
+>     >
+>     > From: Marc-André Lureau <marcandre.lureau@redhat.com
+>     <mailto:marcandre.lureau@redhat.com>>
+>     >
+>     > Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com
+>     <mailto:marcandre.lureau@redhat.com>>
+>     > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com
+>     <mailto:pbonzini@redhat.com>>
+> 
+>     Compared to:
+> 
+>     > -common-obj-$(CONFIG_HEATHROW_PIC) += heathrow_pic.o
+> 
+>     > +softmmu_ss.add(when: 'CONFIG_HEATHROW_PIC', if_true:
+>     files('heathrow_pic.c'))
+> 
+>     this feels pretty clunky. Doesn't Meson have a nicer
+>     way of expressing this kind of thing? 
 
-OK now I understand better, thanks.
+Don't forget we also use:
 
-I haven't found useful information about this 0x19=25 opcode value.
-
-On a r10k core it is listed as 'Hit Writeback Invalidate (D)' but here
-this is a 4kEc. The address used is a SRAM shared with a embedded DSP
-on the same SoC. From a RevEng PoV it is helpful to see there is a such
-cache access, as I can separate better the peripheral involved.
-I'm happy using a trace event instead.
-
-Jiaxun, can you list me the list of opcodes QEMU can safely ignore from
-the TCG emulation PoV? That way we can comment them in the code such:
-
-    switch (op) {
-    case 9:
-        /* Index Store Tag */
-        ...
-        break;
-    case 5:
-        /* Index Load Tag */
-        ...
-        break;
-    case X:
-    case Y:
-    case Z:
-        /* No-Op for QEMU */
-        ...
-        break;
-    default:
-        qemu_log_mask(LOG_UNIMP, "cache %u\n", op);
-    }
-
-Thanks,
-
-Phil.
+HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) +=
+qemu-bridge-helper$(EXESUF)
+ifeq ($(CONFIG_LINUX)$(CONFIG_VIRGL)$(CONFIG_GBM)$(CONFIG_TOOLS),yyyy)
+HELPERS-y += vhost-user-gpu$(EXESUF)
+vhost-user-json-y += contrib/vhost-user-gpu/50-qemu-gpu.json
+endif
 
 > 
-> thanks
-> -- PMM
 > 
+> Nope, in fact it turns out we had to implement it ourselves because
+> there was no way to express it at all in the way that QEMU build
+> multiple binaries. My initial version didn't have the when/if_true part
+> but the maintainer was quite adamant on requiring them instead of just
+> relying on positional arguments.
+> 
+> Unfortunately, while common in QEMU, and in Linux too, it doesn't seem
+> to be a very common idiom in general; Makefiles do express it in a very
+> readable and concise way.
+> 
+> I cannot deny it looks clunky. While Meson does have a huge advantage in
+> terms of predictability and lack of surprises when doing harder things,
+> the imperative syntax is heavier when dealing with the simplest. They do
+> remain simple (it's still one line of coffee), but the quotes and commas
+> seem to be enough to "switch" our brain to a different mode.
+> 
+> My opinion is that you don't really look at these things very much, so
+> it doesn't really matter, but I can see people disagreeing.
+> 
+> (You had already pointed this out during the very first discussions, if
+> I remember correctly. I can't add much except that with extra experience
+> the balance does tilt in favor of Meson despite the heavier syntax for
+> simple cases).
+> 
+> Paolo
+> 
+>     It's really
+>     common and I'd hope that a build system language
+>     would provide less long-winded ways to write common
+>     operations...
+> 
+>     thanks
+>     -- PMM
+> 
+
 
