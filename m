@@ -4,63 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00DCCC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:19:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B966C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:21:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE9982177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:19:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C3A52177B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:21:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wv8+WR76"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE9982177B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iCpeLN3Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C3A52177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3lQj-0001RL-Of
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:19:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42570)
+	id 1k3lRx-00044q-6x
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:21:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lNr-0003xe-Ny
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:16:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36745
+ id 1k3lNd-0003Tj-RH
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:16:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55942
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lNm-0006OS-GK
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:16:59 -0400
+ id 1k3lNb-0006MO-V0
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:16:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741413;
+ s=mimecast20190719; t=1596741403;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=f4894QAYvVSJrDmy1magsfSE1L8XVzs8nrFKzFMuZsU=;
- b=Wv8+WR76UjZqIYQkLZ0NUzLqrRvIb1/eSlQz3Z9Z9mVa813Fi51CliUKFe65c9qcPTIGpQ
- O9rsuydHK31bfdMV61ebRNitqOaFhM2kcT0MnFivC621GJ9rpo1mGLlyjLkn1NmbeglPyz
- MW+JIRlophvPClH383sLfEXM4kaZfdU=
+ references:references; bh=yq1ucztHwlGcQzpGmEo8EM7HiC4hRXcqCJdE65v5Ps0=;
+ b=iCpeLN3Q2JFShiaYMRJfKXcyYPA/e3yfeGLqYnx5dEzBM0iyrmgCx4h9tJ9nx+ts1kyW2A
+ f9VEzf7zvRYVtshH3C2A6F0hfu/nNtYZ5mJSSXWgACD8/9gT/43Wno4BNPVFjQ3MEI/EaP
+ YQ4nXOqnSS/bKppeHDNL/xFMbQclWEE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-PzMw6KsIPAa4xNFmZ7OOjw-1; Thu, 06 Aug 2020 15:16:46 -0400
-X-MC-Unique: PzMw6KsIPAa4xNFmZ7OOjw-1
+ us-mta-324-xZ8glHoaNI-Vm7OXvn1L_g-1; Thu, 06 Aug 2020 15:16:41 -0400
+X-MC-Unique: xZ8glHoaNI-Vm7OXvn1L_g-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BA591DE2
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:16:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8D50800468
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:16:40 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA8221D3
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:16:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F20045FC3B
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:16:39 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 012/143] configure: integrate Meson in the build system
-Date: Thu,  6 Aug 2020 21:14:08 +0200
-Message-Id: <1596741379-12902-13-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 008/143] tests/vm: check for Python YAML parser in the Makefile
+Date: Thu,  6 Aug 2020 21:14:04 +0200
+Message-Id: <1596741379-12902-9-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
@@ -73,14 +73,13 @@ Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:24:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- PDS_OTHER_BAD_TLD=1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,1219 +96,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Meson build system is integrated in the existing configure/make steps
-by invoking Meson from the configure script and converting Meson's build.ninja
-rules to an included Makefile.
-
-build.ninja already provides tags/ctags/cscope rules, so they are removed.
+No need to do it in the configure file if it is only used for a help message.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile             |   28 +-
- configure            |   38 +-
- meson.build          |   20 +
- scripts/ninjatool.py | 1010 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 1078 insertions(+), 18 deletions(-)
- create mode 100644 meson.build
- create mode 100755 scripts/ninjatool.py
+ configure                 | 9 ---------
+ tests/vm/Makefile.include | 4 +++-
+ 2 files changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 00cadeb..c0c3b8b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -49,6 +49,15 @@ git-submodule-update:
- endif
- endif
- 
-+export NINJA=./ninjatool
-+Makefile.ninja: build.ninja ninjatool
-+	./ninjatool -t ninja2make --clean --omit dist uninstall < $< > $@
-+-include Makefile.ninja
-+
-+ninjatool: ninjatool.stamp
-+ninjatool.stamp: $(SRC_PATH)/scripts/ninjatool.py config-host.mak
-+	$(MESON) setup --reconfigure . $(SRC_PATH) && touch $@
-+
- .git-submodule-status: git-submodule-update config-host.mak
- 
- # Check that we're not trying to do an out-of-tree build from
-@@ -68,6 +77,8 @@ CONFIG_ALL=y
- -include config-all-devices.mak
- -include config-all-disas.mak
- 
-+build.ninja: meson-private/coredata.dat
-+meson-private/coredata.dat: config-host.mak
- config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/VERSION
- 	@echo $@ is out-of-date, running configure
- 	@./config.status
-@@ -933,6 +944,8 @@ ICON_SIZES=16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
- install-includedir:
- 	$(INSTALL_DIR) "$(DESTDIR)$(includedir)"
- 
-+# Needed by "meson install"
-+export DESTDIR
- install: all $(if $(BUILD_DOCS),install-doc) \
- 	install-datadir install-localstatedir install-includedir \
- 	$(if $(INSTALL_BLOBS),$(edk2-decompressed)) \
-@@ -1006,21 +1019,6 @@ endif
- 	done
- 	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir)/trace-events-all"
- 
--.PHONY: ctags
--ctags:
--	rm -f tags
--	find "$(SRC_PATH)" -name '*.[hc]' -exec ctags --append {} +
--
--.PHONY: TAGS
--TAGS:
--	rm -f TAGS
--	find "$(SRC_PATH)" -name '*.[hc]' -exec etags --append {} +
--
--cscope:
--	rm -f "$(SRC_PATH)"/cscope.*
--	find "$(SRC_PATH)/" -name "*.[chsS]" -print | sed 's,^\./,,' > "$(SRC_PATH)/cscope.files"
--	cscope -b -i"$(SRC_PATH)/cscope.files"
--
- # opengl shader programs
- ui/shader/%-vert.h: $(SRC_PATH)/ui/shader/%.vert $(SRC_PATH)/scripts/shaderinclude.pl
- 	@mkdir -p $(dir $@)
 diff --git a/configure b/configure
-index c65cf77..f2822b7 100755
+index 1c17a0f..625c14c 100755
 --- a/configure
 +++ b/configure
-@@ -506,6 +506,7 @@ fuzzing="no"
- rng_none="no"
- secret_keyring=""
- libdaxctl=""
-+meson=meson
+@@ -959,13 +959,6 @@ do
+     fi
+ done
  
- supported_cpu="no"
- supported_os="no"
-@@ -1002,6 +1003,8 @@ for opt do
-   ;;
-   --sphinx-build=*) sphinx_build="$optarg"
-   ;;
-+  --meson=*) meson="$optarg"
-+  ;;
-   --gcov=*) gcov_tool="$optarg"
-   ;;
-   --smbd=*) smbd="$optarg"
-@@ -1767,6 +1770,7 @@ Advanced options (experts only):
-   --install=INSTALL        use specified install [$install]
-   --python=PYTHON          use specified python [$python]
-   --sphinx-build=SPHINX    use specified sphinx-build [$sphinx_build]
-+  --meson=MESON            use specified meson [$meson]
-   --smbd=SMBD              use specified smbd [$smbd]
-   --with-git=GIT           use specified git [$git]
-   --static                 enable static build [$static]
-@@ -1961,6 +1965,12 @@ then
-     error_exit "Python not found. Use --python=/path/to/python"
- fi
- 
-+if ! has "$meson"
-+then
-+    error_exit "Meson not found. Use --meson=/path/to/meson"
-+fi
-+meson=$(command -v $meson)
-+
- # Note that if the Python conditional here evaluates True we will exit
- # with status 1 which is a shell 'false' value.
- if ! $python -c 'import sys; sys.exit(sys.version_info < (3,5))'; then
-@@ -6504,13 +6514,13 @@ elif test "$fortify_source" = "yes" ; then
-   QEMU_CFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $QEMU_CFLAGS"
-   debug=no
- fi
--if test "$debug" = "no"; then
--  CFLAGS="-O2 $CFLAGS"
+-# Check for existence of python3 yaml, needed to
+-# import yaml config files into vm-build.
+-python_yaml="no"
+-if $(python3 -c "import yaml" 2> /dev/null); then
+-    python_yaml="yes"
 -fi
- if test "$debug_info" = "yes"; then
-   CFLAGS="-g $CFLAGS"
-   LDFLAGS="-g $LDFLAGS"
- fi
-+if test "$debug" = "no"; then
-+  CFLAGS="-O2 $CFLAGS"
-+fi
+-
+ : ${smbd=${SMBD-/usr/sbin/smbd}}
  
- if test "$have_asan" = "yes"; then
-   QEMU_CFLAGS="-fsanitize=address $QEMU_CFLAGS"
-@@ -7943,6 +7953,7 @@ echo "PYTHON=$python" >> $config_host_mak
+ # Default objcc to clang if available, otherwise use CC
+@@ -6844,7 +6837,6 @@ if test "$docs" != "no"; then
+     echo "sphinx-build      $sphinx_build"
+ fi
+ echo "genisoimage       $genisoimage"
+-echo "python_yaml       $python_yaml"
+ echo "slirp support     $slirp $(echo_version $slirp $slirp_version)"
+ if test "$slirp" != "no" ; then
+     echo "smbd              $smbd"
+@@ -7945,7 +7937,6 @@ echo "PYTHON=$python" >> $config_host_mak
  echo "SPHINX_BUILD=$sphinx_build" >> $config_host_mak
  echo "SPHINX_WERROR=$sphinx_werror" >> $config_host_mak
  echo "GENISOIMAGE=$genisoimage" >> $config_host_mak
-+echo "MESON=$meson" >> $config_host_mak
+-echo "PYTHON_YAML=$python_yaml" >> $config_host_mak
  echo "CC=$cc" >> $config_host_mak
  if $iasl -h > /dev/null 2>&1; then
    echo "IASL=$iasl" >> $config_host_mak
-@@ -8571,6 +8582,27 @@ echo "# Automatically generated by configure - do not modify" > "$iotests_common
- echo >> "$iotests_common_env"
- echo "export PYTHON='$python'" >> "$iotests_common_env"
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 29f5a1f..70263b2 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -17,6 +17,8 @@ IMAGE_FILES := $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
  
-+rm -rf meson-private/ meson-logs/ meson-info/
-+NINJA=$PWD/ninjatool $python $meson setup \
-+        --prefix "$prefix" \
-+        --libdir "$libdir" \
-+        --libexecdir "$libexecdir" \
-+        --bindir "$bindir" \
-+        --includedir "$includedir" \
-+        --datadir "$datadir" \
-+        --mandir "$mandir" \
-+        --sysconfdir "$sysconfdir" \
-+        --localstatedir "$local_statedir" \
-+        -Doptimization=$(if test "$debug" = yes; then echo 0; else echo 2; fi) \
-+        -Ddebug=$(if test "$debug_info" = yes; then echo true; else echo false; fi) \
-+        -Dwerror=$(if test "$werror" = yes; then echo true; else echo false; fi) \
-+        -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
-+        "$PWD" "$source_path"
-+
-+if test "$?" -ne 0 ; then
-+    error_exit "meson setup failed"
-+fi
-+
- # Save the configure command line for later reuse.
- cat <<EOD >config.status
- #!/bin/sh
-diff --git a/meson.build b/meson.build
-new file mode 100644
-index 0000000..8499709
---- /dev/null
-+++ b/meson.build
-@@ -0,0 +1,20 @@
-+project('qemu', ['c', 'cpp'], meson_version: '>=0.55.0',
-+        default_options: ['warning_level=1', 'c_std=gnu99', 'cpp_std=gnu++03', 'b_lundef=false'],
-+        version: run_command('head', meson.source_root() / 'VERSION').stdout().strip())
-+
-+not_found = dependency('', required: false)
-+keyval = import('unstable-keyval')
-+config_host = keyval.load(meson.current_build_dir() / 'config-host.mak')
-+
-+add_project_arguments(config_host['QEMU_CFLAGS'].split(),
-+                      language: ['c', 'objc'])
-+add_project_arguments(config_host['QEMU_CXXFLAGS'].split(),
-+                      language: 'cpp')
-+add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
-+                           language: ['c', 'cpp', 'objc'])
-+add_project_arguments(config_host['QEMU_INCLUDES'].split(),
-+                      language: ['c', 'cpp', 'objc'])
-+
-+configure_file(input: files('scripts/ninjatool.py'),
-+               output: 'ninjatool',
-+               configuration: config_host)
-diff --git a/scripts/ninjatool.py b/scripts/ninjatool.py
-new file mode 100755
-index 0000000..e27413f
---- /dev/null
-+++ b/scripts/ninjatool.py
-@@ -0,0 +1,1010 @@
-+#! /bin/sh
-+
-+# Python module for parsing and processing .ninja files.
-+#
-+# Author: Paolo Bonzini
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+
-+
-+# We don't want to put "#! @PYTHON@" as the shebang and
-+# make the file executable, so instead we make this a
-+# Python/shell polyglot.  The first line below starts a
-+# multiline string literal for Python, while it is just
-+# ":" for bash.  The closing of the multiline string literal
-+# is never parsed by bash since it exits before.
-+
-+'''':
-+case "$0" in
-+  /*) me=$0 ;;
-+  *) me=$(command -v "$0") ;;
-+esac
-+python="@PYTHON@"
-+case $python in
-+  @*) python=python3 ;;
-+esac
-+exec $python "$me" "$@"
-+exit 1
-+'''
-+
-+
-+from collections import namedtuple, defaultdict
-+import sys
-+import os
-+import re
-+import json
-+import argparse
-+import shutil
-+
-+
-+class InvalidArgumentError(Exception):
-+    pass
-+
-+# faster version of os.path.normpath: do nothing unless there is a double
-+# slash or a "." or ".." component.  The filter does not have to be super
-+# precise, but it has to be fast.  os.path.normpath is the hottest function
-+# for ninja2make without this optimization!
-+if os.path.sep == '/':
-+    def normpath(path, _slow_re=re.compile('/[./]')):
-+        return os.path.normpath(path) if _slow_re.search(path) or path[0] == '.' else path
-+else:
-+    normpath = os.path.normpath
-+
-+
-+# ---- lexer and parser ----
-+
-+PATH_RE = r"[^$\s:|]+|\$[$ :]|\$[a-zA-Z0-9_-]+|\$\{[a-zA-Z0-9_.-]+\}"
-+
-+SIMPLE_PATH_RE = re.compile(r"[^$\s:|]+")
-+IDENT_RE = re.compile(r"[a-zA-Z0-9_.-]+$")
-+STRING_RE = re.compile(r"(" + PATH_RE + r"|[\s:|])(?:\r?\n)?|.")
-+TOPLEVEL_RE = re.compile(r"([=:#]|\|\|?|^ +|(?:" + PATH_RE + r")+)\s*|.")
-+VAR_RE=re.compile(r'\$\$|\$\{([^}]*)\}')
-+
-+BUILD = 1
-+POOL = 2
-+RULE = 3
-+DEFAULT = 4
-+EQUALS = 5
-+COLON = 6
-+PIPE = 7
-+PIPE2 = 8
-+IDENT = 9
-+INCLUDE = 10
-+INDENT = 11
-+EOL = 12
-+
-+
-+class LexerError(Exception):
-+    pass
-+
-+
-+class ParseError(Exception):
-+    pass
-+
-+
-+class NinjaParserEvents(object):
-+    def __init__(self, parser):
-+        self.parser = parser
-+
-+    def dollar_token(self, word, in_path=False):
-+        return '$$' if word == '$' else word
-+
-+    def variable_expansion_token(self, varname):
-+        return '${%s}' % varname
-+
-+    def variable(self, name, arg):
-+        pass
-+
-+    def begin_file(self):
-+        pass
-+
-+    def end_file(self):
-+        pass
-+
-+    def end_scope(self):
-+        pass
-+
-+    def begin_pool(self, name):
-+        pass
-+
-+    def begin_rule(self, name):
-+        pass
-+
-+    def begin_build(self, out, iout, rule, in_, iin, orderdep):
-+        pass
-+
-+    def default(self, targets):
-+        pass
-+
-+
-+class NinjaParser(object):
-+
-+    InputFile = namedtuple('InputFile', 'filename iter lineno')
-+
-+    def __init__(self, filename, input):
-+        self.stack = []
-+        self.top = None
-+        self.iter = None
-+        self.lineno = None
-+        self.match_keyword = False
-+        self.push(filename, input)
-+
-+    def file_changed(self):
-+        self.iter = self.top.iter
-+        self.lineno = self.top.lineno
-+        if self.top.filename is not None:
-+            os.chdir(os.path.dirname(self.top.filename) or '.')
-+
-+    def push(self, filename, input):
-+        if self.top:
-+            self.top.lineno = self.lineno
-+            self.top.iter = self.iter
-+            self.stack.append(self.top)
-+        self.top = self.InputFile(filename=filename or 'stdin',
-+                                  iter=self._tokens(input), lineno=0)
-+        self.file_changed()
-+
-+    def pop(self):
-+        if len(self.stack):
-+            self.top = self.stack[-1]
-+            self.stack.pop()
-+            self.file_changed()
-+        else:
-+            self.top = self.iter = None
-+
-+    def next_line(self, input):
-+        line = next(input).rstrip()
-+        self.lineno += 1
-+        while len(line) and line[-1] == '$':
-+            line = line[0:-1] + next(input).strip()
-+            self.lineno += 1
-+        return line
-+
-+    def print_token(self, tok):
-+        if tok == EOL:
-+            return "end of line"
-+        if tok == BUILD:
-+            return '"build"'
-+        if tok == POOL:
-+            return '"pool"'
-+        if tok == RULE:
-+            return '"rule"'
-+        if tok == DEFAULT:
-+            return '"default"'
-+        if tok == EQUALS:
-+            return '"="'
-+        if tok == COLON:
-+            return '":"'
-+        if tok == PIPE:
-+            return '"|"'
-+        if tok == PIPE2:
-+            return '"||"'
-+        if tok == INCLUDE:
-+            return '"include"'
-+        if tok == IDENT:
-+            return 'identifier'
-+        return '"%s"' % tok
-+
-+    def error(self, msg):
-+        raise LexerError("%s:%d: %s" % (self.stack[-1].filename, self.lineno, msg))
-+
-+    def parse_error(self, msg):
-+        raise ParseError("%s:%d: %s" % (self.stack[-1].filename, self.lineno, msg))
-+
-+    def expected(self, expected, tok):
-+        msg = "found %s, expected " % (self.print_token(tok), )
-+        for i, exp_tok in enumerate(expected):
-+            if i > 0:
-+                msg = msg + (' or ' if i == len(expected) - 1 else ', ')
-+            msg = msg + self.print_token(exp_tok)
-+        self.parse_error(msg)
-+
-+    def _variable_tokens(self, value):
-+        for m in STRING_RE.finditer(value):
-+            match = m.group(1)
-+            if not match:
-+                self.error("unexpected '%s'" % (m.group(0), ))
-+            yield match
-+
-+    def _tokens(self, input):
-+        while True:
-+            try:
-+                line = self.next_line(input)
-+            except StopIteration:
-+                return
-+            for m in TOPLEVEL_RE.finditer(line):
-+                match = m.group(1)
-+                if not match:
-+                    self.error("unexpected '%s'" % (m.group(0), ))
-+                if match == ':':
-+                    yield COLON
-+                    continue
-+                if match == '|':
-+                    yield PIPE
-+                    continue
-+                if match == '||':
-+                    yield PIPE2
-+                    continue
-+                if match[0] == ' ':
-+                    yield INDENT
-+                    continue
-+                if match[0] == '=':
-+                    yield EQUALS
-+                    value = line[m.start() + 1:].lstrip()
-+                    yield from self._variable_tokens(value)
-+                    break
-+                if match[0] == '#':
-+                    break
-+
-+                # identifier
-+                if self.match_keyword:
-+                    if match == 'build':
-+                        yield BUILD
-+                        continue
-+                    if match == 'pool':
-+                        yield POOL
-+                        continue
-+                    if match == 'rule':
-+                        yield RULE
-+                        continue
-+                    if match == 'default':
-+                        yield DEFAULT
-+                        continue
-+                    if match == 'include':
-+                        filename = line[m.start() + 8:].strip()
-+                        self.push(filename, open(filename, 'r'))
-+                        break
-+                    if match == 'subninja':
-+                        self.error('subninja is not supported')
-+                yield match
-+            yield EOL
-+
-+    def parse(self, events):
-+        global_var = True
-+
-+        def look_for(*expected):
-+            # The last token in the token stream is always EOL.  This
-+            # is exploited to avoid catching StopIteration everywhere.
-+            tok = next(self.iter)
-+            if tok not in expected:
-+                self.expected(expected, tok)
-+            return tok
-+
-+        def look_for_ident(*expected):
-+            tok = next(self.iter)
-+            if isinstance(tok, str):
-+                if not IDENT_RE.match(tok):
-+                    self.parse_error('variable expansion not allowed')
-+            elif tok not in expected:
-+                self.expected(expected + (IDENT,), tok)
-+            return tok
-+
-+        def parse_assignment_rhs(gen, expected, in_path):
-+            tokens = []
-+            for tok in gen:
-+                if not isinstance(tok, str):
-+                    if tok in expected:
-+                        break
-+                    self.expected(expected + (IDENT,), tok)
-+                if tok[0] != '$':
-+                    tokens.append(tok)
-+                elif tok == '$ ' or tok == '$$' or tok == '$:':
-+                    tokens.append(events.dollar_token(tok[1], in_path))
-+                else:
-+                    var = tok[2:-1] if tok[1] == '{' else tok[1:]
-+                    tokens.append(events.variable_expansion_token(var))
-+            else:
-+                # gen must have raised StopIteration
-+                tok = None
-+
-+            if tokens:
-+                # Fast path avoiding str.join()
-+                value = tokens[0] if len(tokens) == 1 else ''.join(tokens)
-+            else:
-+                value = None
-+            return value, tok
-+
-+        def look_for_path(*expected):
-+            # paths in build rules are parsed one space-separated token
-+            # at a time and expanded
-+            token = next(self.iter)
-+            if not isinstance(token, str):
-+                return None, token
-+            # Fast path if there are no dollar and variable expansion
-+            if SIMPLE_PATH_RE.match(token):
-+                return token, None
-+            gen = self._variable_tokens(token)
-+            return parse_assignment_rhs(gen, expected, True)
-+
-+        def parse_assignment(tok):
-+            name = tok
-+            assert isinstance(name, str)
-+            look_for(EQUALS)
-+            value, tok = parse_assignment_rhs(self.iter, (EOL,), False)
-+            assert tok == EOL
-+            events.variable(name, value)
-+
-+        def parse_build():
-+            # parse outputs
-+            out = []
-+            iout = []
-+            while True:
-+                value, tok = look_for_path(COLON, PIPE)
-+                if value is None:
-+                    break
-+                out.append(value)
-+            if tok == PIPE:
-+                while True:
-+                    value, tok = look_for_path(COLON)
-+                    if value is None:
-+                        break
-+                    iout.append(value)
-+
-+            # parse rule
-+            assert tok == COLON
-+            rule = look_for_ident()
-+
-+            # parse inputs and dependencies
-+            in_ = []
-+            iin = []
-+            orderdep = []
-+            while True:
-+                value, tok = look_for_path(PIPE, PIPE2, EOL)
-+                if value is None:
-+                    break
-+                in_.append(value)
-+            if tok == PIPE:
-+                while True:
-+                    value, tok = look_for_path(PIPE2, EOL)
-+                    if value is None:
-+                        break
-+                    iin.append(value)
-+            if tok == PIPE2:
-+                while True:
-+                    value, tok = look_for_path(EOL)
-+                    if value is None:
-+                        break
-+                    orderdep.append(value)
-+            assert tok == EOL
-+            events.begin_build(out, iout, rule, in_, iin, orderdep)
-+            nonlocal global_var
-+            global_var = False
-+
-+        def parse_pool():
-+            # pool declarations are ignored.  Just gobble all the variables
-+            ident = look_for_ident()
-+            look_for(EOL)
-+            events.begin_pool(ident)
-+            nonlocal global_var
-+            global_var = False
-+
-+        def parse_rule():
-+            ident = look_for_ident()
-+            look_for(EOL)
-+            events.begin_rule(ident)
-+            nonlocal global_var
-+            global_var = False
-+
-+        def parse_default():
-+            idents = []
-+            while True:
-+                ident = look_for_ident(EOL)
-+                if ident == EOL:
-+                    break
-+                idents.append(ident)
-+            events.default(idents)
-+
-+        def parse_declaration(tok):
-+            if tok == EOL:
-+                return
-+
-+            nonlocal global_var
-+            if tok == INDENT:
-+                if global_var:
-+                    self.parse_error('indented line outside rule or edge')
-+                tok = look_for_ident(EOL)
-+                if tok == EOL:
-+                    return
-+                parse_assignment(tok)
-+                return
-+
-+            if not global_var:
-+                events.end_scope()
-+                global_var = True
-+            if tok == POOL:
-+                parse_pool()
-+            elif tok == BUILD:
-+                parse_build()
-+            elif tok == RULE:
-+                parse_rule()
-+            elif tok == DEFAULT:
-+                parse_default()
-+            elif isinstance(tok, str):
-+                parse_assignment(tok)
-+            else:
-+                self.expected((POOL, BUILD, RULE, INCLUDE, DEFAULT, IDENT), tok)
-+
-+        events.begin_file()
-+        while self.iter:
-+            try:
-+                self.match_keyword = True
-+                token = next(self.iter)
-+                self.match_keyword = False
-+                parse_declaration(token)
-+            except StopIteration:
-+                self.pop()
-+        events.end_file()
-+
-+
-+# ---- variable handling ----
-+
-+def expand(x, rule_vars=None, build_vars=None, global_vars=None):
-+    if x is None:
-+        return None
-+    changed = True
-+    have_dollar_replacement = False
-+    while changed:
-+        changed = False
-+        matches = list(VAR_RE.finditer(x))
-+        if not matches:
-+            break
-+
-+        # Reverse the match so that expanding later matches does not
-+        # invalidate m.start()/m.end() for earlier ones.  Do not reduce $$ to $
-+        # until all variables are dealt with.
-+        for m in reversed(matches):
-+            name = m.group(1)
-+            if not name:
-+                have_dollar_replacement = True
-+                continue
-+            changed = True
-+            if build_vars and name in build_vars:
-+                value = build_vars[name]
-+            elif rule_vars and name in rule_vars:
-+                value = rule_vars[name]
-+            elif name in global_vars:
-+                value = global_vars[name]
-+            else:
-+                value = ''
-+            x = x[:m.start()] + value + x[m.end():]
-+    return x.replace('$$', '$') if have_dollar_replacement else x
-+
-+
-+class Scope(object):
-+    def __init__(self, events):
-+        self.events = events
-+
-+    def on_left_scope(self):
-+        pass
-+
-+    def on_variable(self, key, value):
-+        pass
-+
-+
-+class BuildScope(Scope):
-+    def __init__(self, events, out, iout, rule, in_, iin, orderdep, rule_vars):
-+        super().__init__(events)
-+        self.rule = rule
-+        self.out = [events.expand_and_normalize(x) for x in out]
-+        self.in_ = [events.expand_and_normalize(x) for x in in_]
-+        self.iin = [events.expand_and_normalize(x) for x in iin]
-+        self.orderdep = [events.expand_and_normalize(x) for x in orderdep]
-+        self.iout = [events.expand_and_normalize(x) for x in iout]
-+        self.rule_vars = rule_vars
-+        self.build_vars = dict()
-+        self._define_variable('out', ' '.join(self.out))
-+        self._define_variable('in', ' '.join(self.in_))
-+
-+    def expand(self, x):
-+        return self.events.expand(x, self.rule_vars, self.build_vars)
-+
-+    def on_left_scope(self):
-+        self.events.variable('out', self.build_vars['out'])
-+        self.events.variable('in', self.build_vars['in'])
-+        self.events.end_build(self, self.out, self.iout, self.rule, self.in_,
-+                              self.iin, self.orderdep)
-+
-+    def _define_variable(self, key, value):
-+        # The value has been expanded already, quote it for further
-+        # expansion from rule variables
-+        value = value.replace('$', '$$')
-+        self.build_vars[key] = value
-+
-+    def on_variable(self, key, value):
-+        # in and out are at the top of the lookup order and cannot
-+        # be overridden.  Also, unlike what the manual says, build
-+        # variables only lookup global variables.  They never lookup
-+        # rule variables, earlier build variables, or in/out.
-+        if key not in ('in', 'in_newline', 'out'):
-+            self._define_variable(key, self.events.expand(value))
-+
-+
-+class RuleScope(Scope):
-+    def __init__(self, events, name, vars_dict):
-+        super().__init__(events)
-+        self.name = name
-+        self.vars_dict = vars_dict
-+        self.generator = False
-+
-+    def on_left_scope(self):
-+        self.events.end_rule(self, self.name)
-+
-+    def on_variable(self, key, value):
-+        self.vars_dict[key] = value
-+        if key == 'generator':
-+            self.generator = True
-+
-+
-+class NinjaParserEventsWithVars(NinjaParserEvents):
-+    def __init__(self, parser):
-+        super().__init__(parser)
-+        self.rule_vars = defaultdict(lambda: dict())
-+        self.global_vars = dict()
-+        self.scope = None
-+
-+    def variable(self, name, value):
-+        if self.scope:
-+            self.scope.on_variable(name, value)
-+        else:
-+            self.global_vars[name] = self.expand(value)
-+
-+    def begin_build(self, out, iout, rule, in_, iin, orderdep):
-+        if rule != 'phony' and rule not in self.rule_vars:
-+            self.parser.parse_error("undefined rule '%s'" % rule)
-+
-+        self.scope = BuildScope(self, out, iout, rule, in_, iin, orderdep, self.rule_vars[rule])
-+
-+    def begin_pool(self, name):
-+        # pool declarations are ignored.  Just gobble all the variables
-+        self.scope = Scope(self)
-+
-+    def begin_rule(self, name):
-+        if name in self.rule_vars:
-+            self.parser.parse_error("duplicate rule '%s'" % name)
-+        self.scope = RuleScope(self, name, self.rule_vars[name])
-+
-+    def end_scope(self):
-+        self.scope.on_left_scope()
-+        self.scope = None
-+
-+    # utility functions:
-+
-+    def expand(self, x, rule_vars=None, build_vars=None):
-+        return expand(x, rule_vars, build_vars, self.global_vars)
-+
-+    def expand_and_normalize(self, x):
-+        return normpath(self.expand(x))
-+
-+    # extra events not present in the superclass:
-+
-+    def end_build(self, scope, out, iout, rule, in_, iin, orderdep):
-+        pass
-+
-+    def end_rule(self, scope, name):
-+        pass
-+
-+
-+# ---- test client that just prints back whatever it parsed  ----
-+
-+class Writer(NinjaParserEvents):
-+    ARGS = argparse.ArgumentParser(description='Rewrite input build.ninja to stdout.')
-+
-+    def __init__(self, output, parser, args):
-+        super().__init__(parser)
-+        self.output = output
-+        self.indent = ''
-+        self.had_vars = False
-+
-+    def dollar_token(self, word, in_path=False):
-+        return '$' + word
-+
-+    def print(self, *args, **kwargs):
-+        if len(args):
-+            self.output.write(self.indent)
-+        print(*args, **kwargs, file=self.output)
-+
-+    def variable(self, name, value):
-+        self.print('%s = %s' % (name, value))
-+        self.had_vars = True
-+
-+    def begin_scope(self):
-+        self.indent = '  '
-+        self.had_vars = False
-+
-+    def end_scope(self):
-+        if self.had_vars:
-+            self.print()
-+        self.indent = ''
-+        self.had_vars = False
-+
-+    def begin_pool(self, name):
-+        self.print('pool %s' % name)
-+        self.begin_scope()
-+
-+    def begin_rule(self, name):
-+        self.print('rule %s' % name)
-+        self.begin_scope()
-+
-+    def begin_build(self, outputs, implicit_outputs, rule, inputs, implicit, order_only):
-+        all_outputs = list(outputs)
-+        all_inputs = list(inputs)
-+
-+        if implicit:
-+            all_inputs.append('|')
-+            all_inputs.extend(implicit)
-+        if order_only:
-+            all_inputs.append('||')
-+            all_inputs.extend(order_only)
-+        if implicit_outputs:
-+            all_outputs.append('|')
-+            all_outputs.extend(implicit_outputs)
-+
-+        self.print('build %s: %s' % (' '.join(all_outputs),
-+                                     ' '.join([rule] + all_inputs)))
-+        self.begin_scope()
-+
-+    def default(self, targets):
-+        self.print('default %s' % ' '.join(targets))
-+
-+
-+# ---- emit compile_commands.json ----
-+
-+class Compdb(NinjaParserEventsWithVars):
-+    ARGS = argparse.ArgumentParser(description='Emit compile_commands.json.')
-+    ARGS.add_argument('rules', nargs='*',
-+                      help='The ninja rules to emit compilation commands for.')
-+
-+    def __init__(self, output, parser, args):
-+        super().__init__(parser)
-+        self.output = output
-+        self.rules = args.rules
-+        self.sep = ''
-+
-+    def begin_file(self):
-+        self.output.write('[')
-+        self.directory = os.getcwd()
-+
-+    def print_entry(self, **entry):
-+        entry['directory'] = self.directory
-+        self.output.write(self.sep + json.dumps(entry))
-+        self.sep = ',\n'
-+
-+    def begin_build(self, out, iout, rule, in_, iin, orderdep):
-+        if in_ and rule in self.rules:
-+            super().begin_build(out, iout, rule, in_, iin, orderdep)
-+        else:
-+            self.scope = Scope(self)
-+
-+    def end_build(self, scope, out, iout, rule, in_, iin, orderdep):
-+        self.print_entry(command=scope.expand('${command}'), file=in_[0])
-+
-+    def end_file(self):
-+        self.output.write(']\n')
-+
-+
-+# ---- clean output files ----
-+
-+class Clean(NinjaParserEventsWithVars):
-+    ARGS = argparse.ArgumentParser(description='Remove output build files.')
-+    ARGS.add_argument('-g', dest='generator', action='store_true',
-+                      help='clean generated files too')
-+
-+    def __init__(self, output, parser, args):
-+        super().__init__(parser)
-+        self.dry_run = args.dry_run
-+        self.verbose = args.verbose or args.dry_run
-+        self.generator = args.generator
-+
-+    def begin_file(self):
-+        print('Cleaning... ', end=(None if self.verbose else ''), flush=True)
-+        self.cnt = 0
-+
-+    def end_file(self):
-+        print('%d files' % self.cnt)
-+
-+    def do_clean(self, *files):
-+        for f in files:
-+            if self.dry_run:
-+                if os.path.exists(f):
-+                    self.cnt += 1
-+                    print('Would remove ' + f)
-+                    continue
-+            else:
-+                try:
-+                    if os.path.isdir(f):
-+                        shutil.rmtree(f)
-+                    else:
-+                        os.unlink(f)
-+                    self.cnt += 1
-+                    if self.verbose:
-+                        print('Removed ' + f)
-+                except FileNotFoundError:
-+                    pass
-+
-+    def end_build(self, scope, out, iout, rule, in_, iin, orderdep):
-+        if rule == 'phony':
-+            return
-+        if self.generator:
-+            rspfile = scope.expand('${rspfile}')
-+            if rspfile:
-+                self.do_clean(rspfile)
-+        if self.generator or not scope.expand('${generator}'):
-+            self.do_clean(*out, *iout)
-+            depfile = scope.expand('${depfile}')
-+            if depfile:
-+                self.do_clean(depfile)
-+
-+
-+# ---- convert build.ninja to makefile ----
-+
-+class Ninja2Make(NinjaParserEventsWithVars):
-+    ARGS = argparse.ArgumentParser(description='Convert build.ninja to a Makefile.')
-+    ARGS.add_argument('--clean', dest='emit_clean', action='store_true',
-+                      help='Emit clean/distclean rules.')
-+    ARGS.add_argument('--doublecolon', action='store_true',
-+                      help='Emit double-colon rules for phony targets.')
-+    ARGS.add_argument('--omit', metavar='TARGET', nargs='+',
-+                      help='Targets to omit.')
-+
-+    def __init__(self, output, parser, args):
-+        super().__init__(parser)
-+        self.output = output
-+
-+        self.emit_clean = args.emit_clean
-+        self.doublecolon = args.doublecolon
-+        self.omit = set(args.omit)
-+
-+        if self.emit_clean:
-+            self.omit.update(['clean', 'distclean'])
-+
-+        # Lists of targets are kept in memory and emitted only at the
-+        # end because appending is really inefficient in GNU make.
-+        # We only do it when it's O(#rules) or O(#variables), but
-+        # never when it could be O(#targets).
-+        self.depfiles = list()
-+        self.rspfiles = list()
-+        self.build_vars = defaultdict(lambda: dict())
-+        self.rule_targets = defaultdict(lambda: list())
-+        self.num_stamp = defaultdict(lambda: 0)
-+        self.all_outs = set()
-+        self.all_ins = set()
-+        self.all_phony = set()
-+        self.seen_default = False
-+
-+    def print(self, *args, **kwargs):
-+        print(*args, **kwargs, file=self.output)
-+
-+    def dollar_token(self, word, in_path=False):
-+        if in_path and word == ' ':
-+            self.parser.parse_error('Make does not support spaces in filenames')
-+        return '$$' if word == '$' else word
-+
-+    def print_phony(self, outs, ins):
-+        targets = ' '.join(outs).replace('$', '$$')
-+        deps = ' '.join(ins).replace('$', '$$')
-+        deps = deps.strip()
-+        if self.doublecolon:
-+            self.print(targets + '::' + (' ' if deps else '') + deps + ';@:')
-+        else:
-+            self.print(targets + ':' + (' ' if deps else '') + deps)
-+        self.all_phony.update(outs)
-+
-+    def begin_file(self):
-+        self.print(r'# This is an automatically generated file, and it shows.')
-+        self.print(r'ninja-default:')
-+        self.print(r'.PHONY: ninja-default')
-+        if self.emit_clean:
-+            self.print(r'ninja-clean:: ninja-clean-start; $(if $V,,@)rm -f ${ninja-depfiles}')
-+            self.print(r'ninja-clean-start:; $(if $V,,@echo Cleaning...)')
-+            self.print(r'ninja-distclean:: clean; $(if $V,,@)rm -f ${ninja-rspfiles}')
-+            self.print(r'.PHONY: ninja-clean ninja-clean-start ninja-distclean')
-+            self.print_phony(['clean'], ['ninja-clean'])
-+            self.print_phony(['distclean'], ['ninja-distclean'])
-+        self.print(r'vpath')
-+        self.print(r'NULL :=')
-+        self.print(r'SPACE := ${NULL} #')
-+        self.print(r'MAKEFLAGS += -rR')
-+        self.print(r'define NEWLINE')
-+        self.print(r'')
-+        self.print(r'endef')
-+        self.print(r'.var.in_newline = $(subst $(SPACE),$(NEWLINE),${.var.in})')
-+        self.print(r"ninja-command = $(if $V,,$(if ${.var.description},@printf '%s\n' '$(subst ','\'',${.var.description})' && ))${.var.command}")
-+        self.print(r"ninja-command-restat = $(if $V,,$(if ${.var.description},@printf '%s\n' '$(subst ','\'',${.var.description})' && ))${.var.command} && if test -e $(firstword ${.var.out}); then printf '%s\n' ${.var.out} > $@; fi")
-+
-+    def mangle_vars_for_make(self, x):
-+        matches = list(VAR_RE.finditer(x))
-+
-+        # Reverse the match so that expanding later matches does not
-+        # invalidate m.span() for earlier ones.
-+        matches.reverse()
-+        for m in matches:
-+            match = m.group(1)
-+            if not match:
-+                continue
-+            value = '${.var.' + match + '}'
-+            x = x[:m.start()] + value + x[m.end():]
-+        return x
-+
-+    def end_file(self):
-+        def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
-+            return [int(text) if text.isdigit() else text.lower()
-+                    for text in _nsre.split(s)]
-+
-+        self.print()
-+        self.print('ninja-outputdirs :=')
-+        for rule in self.rule_vars:
-+            if rule == 'phony':
-+                continue
-+            self.print('ninja-targets-%s := %s' % (rule, ' '.join(self.rule_targets[rule])))
-+            for name, value in self.rule_vars[rule].items():
-+                self.print('$(ninja-targets-%s): .var.%s = %s' % (rule, name, self.mangle_vars_for_make(value)))
-+            self.print('ninja-outputdirs += $(sort $(dir ${ninja-targets-%s}))' % rule)
-+            self.print()
-+        self.print('dummy := $(shell mkdir -p . $(sort $(ninja-outputdirs)))')
-+        self.print('ninja-depfiles :=' + ' '.join(self.depfiles))
-+        self.print('ninja-rspfiles :=' + ' '.join(self.rspfiles))
-+        self.print('-include ${ninja-depfiles}')
-+        self.print()
-+        for targets in self.build_vars:
-+            for name, value in self.build_vars[targets].items():
-+                self.print('%s: .var.%s := %s' % (targets, name, value))
-+            self.print()
-+        if not self.seen_default:
-+            default_targets = sorted(self.all_outs - self.all_ins, key=natural_sort_key)
-+            self.print('ninja-default: ' + ' '.join(default_targets))
-+
-+        # This is a hack...  Meson declares input meson.build files as
-+        # phony, because Ninja does not have an equivalent of Make's
-+        # "path/to/file:" declaration that ignores "path/to/file" even
-+        # if it is absent.  However, Makefile.ninja wants to depend on
-+        # build.ninja, which in turn depends on these phony targets which
-+        # would cause Makefile.ninja to be rebuilt in a loop.
-+        phony_targets = sorted(self.all_phony - self.all_ins, key=natural_sort_key)
-+        self.print('.PHONY: ' + ' '.join(phony_targets))
-+
-+    def variable(self, name, value):
-+        super().variable(name, value)
-+        if self.scope is None:
-+            self.global_vars[name] = self.expand(value)
-+            self.print('.var.%s := %s' % (name, self.global_vars[name]))
-+
-+    def begin_build(self, out, iout, rule, in_, iin, orderdep):
-+        if any(x in self.omit for x in out):
-+            self.scope = Scope(self)
-+            return
-+
-+        super().begin_build(out, iout, rule, in_, iin, orderdep)
-+        self.current_targets = ' '.join(self.scope.out + self.scope.iout).replace('$', '$$')
-+
-+    def end_build(self, scope, out, iout, rule, in_, iin, orderdep):
-+        self.rule_targets[rule] += self.scope.out
-+        self.rule_targets[rule] += self.scope.iout
-+
-+        self.all_outs.update(self.scope.iout)
-+        self.all_outs.update(self.scope.out)
-+        self.all_ins.update(self.scope.in_)
-+        self.all_ins.update(self.scope.iin)
-+
-+        targets = self.current_targets
-+        self.current_targets = None
-+        if rule == 'phony':
-+            # Phony rules treat order-only dependencies as normal deps
-+            self.print_phony(out + iout, in_ + iin + orderdep)
-+            return
-+
-+        inputs = ' '.join(in_ + iin).replace('$', '$$')
-+        orderonly = ' '.join(orderdep).replace('$', '$$')
-+
-+        rspfile = scope.expand('${rspfile}')
-+        if rspfile:
-+            rspfile_content = scope.expand('${rspfile_content}')
-+            with open(rspfile, 'w') as f:
-+                f.write(rspfile_content)
-+            inputs += ' ' + rspfile
-+            self.rspfiles.append(rspfile)
-+
-+        restat = 'restat' in self.scope.build_vars or 'restat' in self.rule_vars[rule]
-+        if restat:
-+            if len(out) == 1:
-+                stamp = out[0] + '.stamp'
-+            else:
-+                stamp = '%s%d.stamp' %(rule, self.num_stamp[rule])
-+                self.num_stamp[rule] += 1
-+            self.print('%s: %s; @:' % (targets, stamp))
-+            self.print('%s: %s | %s; ${ninja-command-restat}' % (stamp, inputs, orderonly))
-+            self.rule_targets[rule].append(stamp)
-+            self.build_vars[stamp] = self.scope.build_vars
-+        else:
-+            self.print('%s: %s | %s; ${ninja-command}' % (targets, inputs, orderonly))
-+            self.build_vars[targets] = self.scope.build_vars
-+
-+        depfile = scope.expand('${depfile}')
-+        if depfile:
-+            self.depfiles.append(depfile)
-+
-+    def end_rule(self, scope, name):
-+        if self.emit_clean:
-+            # Note that the generator pseudo-variable could also be attached
-+            # to a build block rather than a rule.  This is not handled here
-+            # in order to reduce the number of "rm" invocations.  However,
-+            # "ninjatool.py -t clean" does that correctly.
-+            self.print('ninja-%s:: ; $(if $V,,@)rm -rf ${ninja-targets-%s}' % (
-+                'distclean' if scope.generator else 'clean',
-+                name))
-+
-+    def default(self, targets):
-+        self.print("ninja-default: " + ' '.join(targets))
-+        self.seen_default = True
-+
-+
-+# ---- command line parsing ----
-+
-+# we cannot use subparsers because tools are chosen through the "-t"
-+# option.
-+
-+class ToolAction(argparse.Action):
-+    def __init__(self, option_strings, dest, choices, metavar='TOOL', nargs=None, **kwargs):
-+        if nargs is not None:
-+            raise ValueError("nargs not allowed")
-+        super().__init__(option_strings, dest, required=True, choices=choices,
-+                         metavar=metavar, **kwargs)
-+
-+    def __call__(self, parser, namespace, value, option_string):
-+        tool = self.choices[value]
-+        setattr(namespace, self.dest, tool)
-+        tool.ARGS.prog = '%s %s %s' % (parser.prog, option_string, value)
-+
-+
-+class ToolHelpAction(argparse.Action):
-+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-+        if nargs is not None:
-+            raise ValueError("nargs not allowed")
-+        super().__init__(option_strings, dest, nargs=0, **kwargs)
-+
-+    def __call__(self, parser, namespace, values, option_string=None):
-+        if namespace.tool:
-+            namespace.tool.ARGS.print_help()
-+        else:
-+            parser.print_help()
-+        parser.exit()
-+
-+
-+tools = {
-+    'test': Writer,
-+    'ninja2make': Ninja2Make,
-+    'compdb': Compdb,
-+    'clean': Clean,
-+}
-+
-+parser = argparse.ArgumentParser(description='Process and transform build.ninja files.',
-+                                 add_help=False)
-+parser.add_argument('-C', metavar='DIR', dest='dir', default='.',
-+                    help='change to DIR before doing anything else')
-+parser.add_argument('-f', metavar='FILE', dest='file', default='build.ninja',
-+                    help='specify input build file [default=build.ninja]')
-+parser.add_argument('-n', dest='dry_run', action='store_true',
-+                    help='do not actually do anything')
-+parser.add_argument('-v', dest='verbose', action='store_true',
-+                    help='be more verbose')
-+
-+parser.add_argument('-t', dest='tool', choices=tools, action=ToolAction,
-+                    help='choose the tool to run')
-+parser.add_argument('-h', '--help', action=ToolHelpAction,
-+                    help='show this help message and exit')
-+
-+if len(sys.argv) >= 2 and sys.argv[1] == '--version':
-+    print('1.8')
-+    sys.exit(0)
-+
-+args, tool_args = parser.parse_known_args()
-+args.tool.ARGS.parse_args(tool_args, args)
-+
-+os.chdir(args.dir)
-+with open(args.file, 'r') as f:
-+    parser = NinjaParser(args.file, f)
-+    try:
-+        events = args.tool(sys.stdout, parser, args)
-+    except InvalidArgumentError as e:
-+        parser.error(str(e))
-+    parser.parse(events)
+ .PRECIOUS: $(IMAGE_FILES)
+ 
++HAVE_PYTHON_YAML = $(shell $(PYTHON) -c "import yaml" 2> /dev/null && echo yes)
++
+ # 'vm-help' target was historically named 'vm-test'
+ vm-help vm-test:
+ 	@echo "vm-help: Test QEMU in preconfigured virtual machines"
+@@ -56,7 +58,7 @@ endif
+ 	@echo "    QEMU_LOCAL=1                 - Use QEMU binary local to this build."
+ 	@echo "    QEMU=/path/to/qemu		 - Change path to QEMU binary"
+ 	@echo "    QEMU_IMG=/path/to/qemu-img	 - Change path to qemu-img tool"
+-ifeq ($(PYTHON_YAML),yes)
++ifeq ($(HAVE_PYTHON_YAML),yes)
+ 	@echo "    QEMU_CONFIG=/path/conf.yml   - Change path to VM configuration .yml file."
+ else
+ 	@echo "    (install python3-yaml to enable support for yaml file to configure a VM.)"
 -- 
 1.8.3.1
 
