@@ -4,90 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E448C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47D63C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:07:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D356422D0B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:07:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1735B22D0B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:07:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vBIqgLBL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D356422D0B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="XoPbHHOS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1735B22D0B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3axv-0003xi-32
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 04:09:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33742)
+	id 1k3dUv-0006rk-DM
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 06:51:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3awz-0002GZ-8M; Thu, 06 Aug 2020 04:08:33 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36307)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k3dR3-00015M-4v
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:47:45 -0400
+Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:34398)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3awx-0005g1-NO; Thu, 06 Aug 2020 04:08:32 -0400
-Received: by mail-wr1-x444.google.com with SMTP id 88so43044772wrh.3;
- Thu, 06 Aug 2020 01:08:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=4+aXm2ggWfq1Fly1rmq/Lj+bQKm9iyQ1C1siDyh5+3o=;
- b=vBIqgLBL2GNNUoliO1+45+XjA00P0+68zsF6XGyQV6irjsbG0+pF3A8i+4AJpF8911
- hqYyNeTbUjnauH/vE+HyFZnMyWEdyCOiFEnEsn5SmG7fmG65uCsg4yEHAVyHrjjunwNC
- k5m/XbXEonFRdztED73Y2XmR5Tdy9RRBPEscDwN410wqfjkh37igJPEl7ZOXmG6Uh69D
- /hRMhZGMx3b7v2TzhsguyD2fci82sqETGIZTCjERzsxNSoxz/tW14M1vuE6hdcrgr+nG
- WDiOtafb0hOHp6r9T7jj4ALHUHUE0A8MjRdKiqOWrC/Jh1fgYoyxkOiOai+j+ddPA+hU
- Qhkg==
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k3dR0-0007ia-MT
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:47:44 -0400
+Received: by mail-pl1-x629.google.com with SMTP id o1so27325655plk.1
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:47:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=r/4q3H+Q35N8lb7C4VyThnkgjoxPJ/6J8Yc4D79xI48=;
+ b=XoPbHHOSOw7yFnKyTpC/3lYapo9n5myJ0ShEKDkt/3vVcop+UQISGvhm9hnBN+bPxy
+ zbY791D5ie6VDB+mPUaswmTQ5dWfjvcj06X3UUxQ/sG/lU61/gCkYRzhI+2+z2mMArN2
+ Mp8ZnVltOHjBvaDX9D10B1M+eWauLFnQMrXgVMZjCdlHlO3rGS/tAgO2f5RSZW0u1+CP
+ zNA+mSc+3bIgtFu/JeErbyfloyVM18nfXzoksPik24A0ckhQI3kXkF8KxE5asBOdfMPM
+ Xgv/T47NLw6snq+rmfwmWW8WdEiiAtYcv3gGwvSH7A6dYv2UQ37aN7XErM4WArnJthCz
+ fadQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=4+aXm2ggWfq1Fly1rmq/Lj+bQKm9iyQ1C1siDyh5+3o=;
- b=uc2XUo7Ttiq1iqAAAGSRUVETQ0aEUW15Y79sw4T+qj1D/1HAtmi6waj3DCkFtqRaIK
- atVmZOjyxoFXV83VRv6+8DC3gujFvTe/L6b2zMSRUNsAfhtOwT9EOZzEPlooJCiWwM2W
- E94byvTkFSUWvTe28bB5j13Oo8TfTeGM9gB3UxFmgVQk+ivJ28/BhQO/gzpPXdOOJVYg
- 6sfUlDolfPgsqziCS+cGhB84IKGywYzfqgS9bDiJU88ZG/pO1tPMIV0CHd9wmlooAW4V
- 4CJSHU8xwKSeyZDi9yH0L1D3zT15qG6GU9H9y/oZL5x4WkaeWaP+UhdxQFVVCr/NYCe5
- rs+A==
-X-Gm-Message-State: AOAM531RG76uHpmuZYEjj7tnk/OsrgpVnaxYb3CUcUI9HboQOhtPltLE
- dZp63kMxW0Cqhzbz4hjLElg6bzEh
-X-Google-Smtp-Source: ABdhPJzupK0w6Pw7Yv3JZ9t//wVtZZTftWvR1hHu7uKTk88NmVL83zwitQ5FW2WzZkaPUh2Vk174og==
-X-Received: by 2002:a5d:51c3:: with SMTP id n3mr6340324wrv.104.1596701309639; 
- Thu, 06 Aug 2020 01:08:29 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id w2sm6039587wre.5.2020.08.06.01.08.28
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=r/4q3H+Q35N8lb7C4VyThnkgjoxPJ/6J8Yc4D79xI48=;
+ b=dLUFw4KiMoD4zUEfmaYeIwN2RuPwIqVrA6Cy1uvuW4hF2V/b+2pcGwvkmj3jmz8Usz
+ nx4Bbq/b0gX3CPQup/7SW84Agp0/exzydyZdwGfRMJvTUHxih6VI0TTgwOVn3td0Dr2m
+ fwhZaXMbCDJTU5aZp5JV7sylxymTV11NbQ1pM2RpBePOcFle2/CS54sqT5ArIt6kUSjP
+ uKVfYZadVB7a8ln3twhjao8eqrysda5ekSu1DGk7hwW+VD+D949eZkveJfk+R0oHGTzp
+ +uuIF0SZv8nwJZyVkjptck7nIkVAXPFgvYvZC84qOr8VYxHt0lHsWNQ4wXBqsBqEiwwZ
+ BHYQ==
+X-Gm-Message-State: AOAM532p+zVeY7vnVbwTI80oI+mSj2wocC05Oc+pD1BzWmpvK2iufhFn
+ k4BD8xTz2MDIAVfPEU2gcuJ/10M2IAU=
+X-Google-Smtp-Source: ABdhPJznV08PgUvHXqAisvGRrU3rw7OjCIxmqZc8pby7RKp9qVCZY/vfKzHmZRxjGTkUIgVTuUOL2A==
+X-Received: by 2002:a17:90b:255:: with SMTP id
+ fz21mr7773213pjb.50.1596710860208; 
+ Thu, 06 Aug 2020 03:47:40 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.47.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 01:08:29 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 2/7] hw/block/fdc: Let sector offset be unsigned
-Date: Thu,  6 Aug 2020 10:08:19 +0200
-Message-Id: <20200806080824.21567-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200806080824.21567-1-f4bug@amsat.org>
-References: <20200806080824.21567-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+ Thu, 06 Aug 2020 03:47:39 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC v3 08/71] target/riscv: rvv-1.0: add vcsr register
+Date: Thu,  6 Aug 2020 18:46:05 +0800
+Message-Id: <20200806104709.13235-9-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
+References: <20200806104709.13235-1-frank.chang@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::629;
+ envelope-from=frank.chang@sifive.com; helo=mail-pl1-x629.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,34 +99,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Frank Chang <frank.chang@sifive.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sector offset can not be negative, make it unsigned.
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/block/fdc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/riscv/cpu_bits.h |  7 +++++++
+ target/riscv/csr.c      | 21 +++++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 2cec7568c1..c91ed7ee2d 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -259,7 +259,7 @@ static uint32_t fd_sector(FDrive *drv)
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 5b0be0bb888..7afdd4814bb 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -60,9 +60,16 @@
+ #define CSR_VSTART          0x008
+ #define CSR_VXSAT           0x009
+ #define CSR_VXRM            0x00a
++#define CSR_VCSR            0x00f
+ #define CSR_VL              0xc20
+ #define CSR_VTYPE           0xc21
+ 
++/* VCSR fields */
++#define VCSR_VXSAT_SHIFT    0
++#define VCSR_VXSAT          (0x1 << VCSR_VXSAT_SHIFT)
++#define VCSR_VXRM_SHIFT     1
++#define VCSR_VXRM           (0x3 << VCSR_VXRM_SHIFT)
++
+ /* User Timers and Counters */
+ #define CSR_CYCLE           0xc00
+ #define CSR_TIME            0xc01
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 34c951d5d4b..ca85a54a0f1 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -251,6 +251,26 @@ static int write_vstart(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
  }
  
- /* Returns current position, in bytes, for given drive */
--static int fd_offset(FDrive *drv)
-+static uint64_t fd_offset(FDrive *drv)
++static int read_vcsr(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = (env->vxrm << VCSR_VXRM_SHIFT) | (env->vxsat << VCSR_VXSAT_SHIFT);
++    return 0;
++}
++
++static int write_vcsr(CPURISCVState *env, int csrno, target_ulong val)
++{
++#if !defined(CONFIG_USER_ONLY)
++    if (!env->debugger && !riscv_cpu_vector_enabled(env)) {
++        return -1;
++    }
++    env->mstatus |= MSTATUS_VS;
++#endif
++
++    env->vxrm = (val & VCSR_VXRM) >> VCSR_VXRM_SHIFT;
++    env->vxsat = (val & VCSR_VXSAT) >> VCSR_VXSAT_SHIFT;
++    return 0;
++}
++
+ /* User Timers and Counters */
+ static int read_instret(CPURISCVState *env, int csrno, target_ulong *val)
  {
-     g_assert(fd_sector(drv) < INT_MAX >> BDRV_SECTOR_BITS);
-     return fd_sector(drv) << BDRV_SECTOR_BITS;
+@@ -1269,6 +1289,7 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_VSTART] =              { vs,   read_vstart,      write_vstart      },
+     [CSR_VXSAT] =               { vs,   read_vxsat,       write_vxsat       },
+     [CSR_VXRM] =                { vs,   read_vxrm,        write_vxrm        },
++    [CSR_VCSR] =                { vs,   read_vcsr,        write_vcsr        },
+     [CSR_VL] =                  { vs,   read_vl                             },
+     [CSR_VTYPE] =               { vs,   read_vtype                          },
+     /* User Timers and Counters */
 -- 
-2.21.3
+2.17.1
 
 
