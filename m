@@ -7,39 +7,38 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E7E9C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 681ECC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A95420748
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:26:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A95420748
+	by mail.kernel.org (Postfix) with ESMTPS id 5BABF20748
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:26:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BABF20748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3mSw-0006Az-BB
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:26:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47494)
+	id 1k3mT9-0006c8-Fa
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k3lgO-0002PT-8D; Thu, 06 Aug 2020 15:36:08 -0400
-Received: from relay.sw.ru ([185.231.240.75]:56481 helo=relay3.sw.ru)
+ id 1k3lgN-0002N6-8j; Thu, 06 Aug 2020 15:36:07 -0400
+Received: from relay.sw.ru ([185.231.240.75]:56464 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k3lgK-0000Kr-5A; Thu, 06 Aug 2020 15:36:07 -0400
+ id 1k3lgJ-0000Ko-PY; Thu, 06 Aug 2020 15:36:06 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k3lgB-0003k9-VR; Thu, 06 Aug 2020 22:35:55 +0300
+ id 1k3lgB-0003k9-Li; Thu, 06 Aug 2020 22:35:55 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v13 07/11] qcow2_format.py: Dump bitmap table serialized
- entries
-Date: Thu,  6 Aug 2020 22:35:53 +0300
-Message-Id: <1596742557-320265-8-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v13 01/11] iotests: add test for QCOW2 header dump
+Date: Thu,  6 Aug 2020 22:35:47 +0300
+Message-Id: <1596742557-320265-2-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1596742557-320265-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1596742557-320265-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -70,110 +69,165 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add bitmap table information to the QCOW2 metadata dump.
+The simple script creates a QCOW2 image and fills it with some data.
+Two bitmaps are created as well. Then the script reads the image header
+with extensions from the disk by running the script qcow2.py and dumps
+the information to the output. Other entities, such as snapshots, may
+be added to the test later.
 
-Bitmap name               bitmap-1
-...
-Bitmap table   type            size         offset
-0              serialized      65536        10092544
-1              all-zeroes      0            0
-2              all-zeroes      0            0
-
+Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/303.out         |  4 +++
- tests/qemu-iotests/qcow2_format.py | 50 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+)
+ tests/qemu-iotests/303     | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/303.out | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 121 insertions(+)
+ create mode 100755 tests/qemu-iotests/303
+ create mode 100644 tests/qemu-iotests/303.out
 
+diff --git a/tests/qemu-iotests/303 b/tests/qemu-iotests/303
+new file mode 100755
+index 0000000..e9accdc
+--- /dev/null
++++ b/tests/qemu-iotests/303
+@@ -0,0 +1,60 @@
++#!/usr/bin/env python3
++#
++# Test for dumping of qcow2 image metadata
++#
++# Copyright (c) 2020 Virtuozzo International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import iotests
++import subprocess
++from iotests import qemu_img_create, qemu_io, file_path, log, filter_qemu_io
++
++iotests.script_initialize(supported_fmts=['qcow2'])
++
++disk = file_path('disk')
++chunk = 1024 * 1024
++
++
++def create_bitmap(bitmap_number, disabled):
++    granularity = 1 << (14 + bitmap_number)
++    bitmap_name = 'bitmap-' + str(bitmap_number)
++    args = ['bitmap', '--add', '-g', f'{granularity}', '-f', iotests.imgfmt,
++            disk, bitmap_name]
++    if disabled:
++        args.append('--disable')
++
++    iotests.qemu_img_pipe(*args)
++
++
++def write_to_disk(offset, size):
++    write = f'write {offset} {size}'
++    log(qemu_io('-c', write, disk), filters=[filter_qemu_io])
++
++
++def add_bitmap(num, begin, end, disabled):
++    log(f'Add bitmap {num}')
++    create_bitmap(num, disabled)
++    for i in range(begin, end):
++        write_to_disk((i) * chunk, chunk)
++    log('')
++
++
++qemu_img_create('-f', iotests.imgfmt, disk, '10M')
++
++add_bitmap(1, 0, 6, False)
++add_bitmap(2, 6, 8, True)
++dump = ['qcow2.py', disk, 'dump-header']
++subprocess.run(dump)
 diff --git a/tests/qemu-iotests/303.out b/tests/qemu-iotests/303.out
-index 038ba93..70828e0 100644
---- a/tests/qemu-iotests/303.out
+new file mode 100644
+index 0000000..8d7973c
+--- /dev/null
 +++ b/tests/qemu-iotests/303.out
-@@ -66,6 +66,8 @@ type                      1
- granularity_bits          15
- name_size                 8
- extra_data_size           0
-+Bitmap table   type            size         offset
-+0              serialized      65536        10092544
- 
- Bitmap name               bitmap-2
- bitmap_table_offset       0x9c0000
-@@ -75,4 +77,6 @@ type                      1
- granularity_bits          16
- name_size                 8
- extra_data_size           0
-+Bitmap table   type            size         offset
-+0              all-zeroes      0            0
- 
-diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index ca0d350..574249b 100644
---- a/tests/qemu-iotests/qcow2_format.py
-+++ b/tests/qemu-iotests/qcow2_format.py
-@@ -175,6 +175,10 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
-         entry_raw_size = self.bitmap_dir_entry_raw_size()
-         padding = ((entry_raw_size + 7) & ~7) - entry_raw_size
-         fd.seek(padding, 1)
-+        self.bitmap_table = Qcow2BitmapTable(fd=fd,
-+                                             offset=self.bitmap_table_offset,
-+                                             nb_entries=self.bitmap_table_size,
-+                                             cluster_size=self.cluster_size)
- 
-     def bitmap_dir_entry_raw_size(self):
-         return struct.calcsize(self.fmt) + self.name_size + \
-@@ -183,6 +187,52 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
-     def dump(self):
-         print(f'{"Bitmap name":<25} {self.name}')
-         super(Qcow2BitmapDirEntry, self).dump()
-+        self.bitmap_table.dump()
+@@ -0,0 +1,60 @@
++Add bitmap 1
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++wrote 1048576/1048576 bytes at offset 1048576
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++wrote 1048576/1048576 bytes at offset 2097152
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++wrote 1048576/1048576 bytes at offset 3145728
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++wrote 1048576/1048576 bytes at offset 4194304
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++wrote 1048576/1048576 bytes at offset 5242880
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 +
 +
-+class Qcow2BitmapTableEntry(Qcow2Struct):
++Add bitmap 2
++wrote 1048576/1048576 bytes at offset 6291456
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 +
-+    fields = (
-+        ('u64',  '{}', 'entry'),
-+    )
-+
-+    BME_TABLE_ENTRY_RESERVED_MASK = 0xff000000000001fe
-+    BME_TABLE_ENTRY_OFFSET_MASK = 0x00fffffffffffe00
-+    BME_TABLE_ENTRY_FLAG_ALL_ONES = 1
-+
-+    def __init__(self, fd):
-+        super().__init__(fd=fd)
-+        self.reserved = self.entry & self.BME_TABLE_ENTRY_RESERVED_MASK
-+        self.offset = self.entry & self.BME_TABLE_ENTRY_OFFSET_MASK
-+        if self.offset:
-+            if self.entry & self.BME_TABLE_ENTRY_FLAG_ALL_ONES:
-+                self.type = 'invalid'
-+            else:
-+                self.type = 'serialized'
-+        elif self.entry & self.BME_TABLE_ENTRY_FLAG_ALL_ONES:
-+            self.type = 'all-ones'
-+        else:
-+            self.type = 'all-zeroes'
++wrote 1048576/1048576 bytes at offset 7340032
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 +
 +
-+class Qcow2BitmapTable:
++magic                     0x514649fb
++version                   3
++backing_file_offset       0x0
++backing_file_size         0x0
++cluster_bits              16
++size                      10485760
++crypt_method              0
++l1_size                   1
++l1_table_offset           0x30000
++refcount_table_offset     0x10000
++refcount_table_clusters   1
++nb_snapshots              0
++snapshot_offset           0x0
++incompatible_features     []
++compatible_features       []
++autoclear_features        [0]
++refcount_order            4
++header_length             112
 +
-+    def __init__(self, fd, offset, nb_entries, cluster_size):
-+        self.cluster_size = cluster_size
-+        position = fd.tell()
-+        fd.seek(offset)
-+        self.entries = [Qcow2BitmapTableEntry(fd) for _ in range(nb_entries)]
-+        fd.seek(position)
++Header extension:
++magic                     0x6803f857 (Feature table)
++length                    336
++data                      <binary>
 +
-+    def dump(self):
-+        bitmap_table = enumerate(self.entries)
-+        print(f'{"Bitmap table":<14} {"type":<15} {"size":<12} {"offset"}')
-+        for i, entry in bitmap_table:
-+            if entry.type == 'serialized':
-+                size = self.cluster_size
-+            else:
-+                size = 0
-+            print(f'{i:<14} {entry.type:<15} {size:<12} {entry.offset}')
- 
- 
- QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
++Header extension:
++magic                     0x23852875 (Bitmaps)
++length                    24
++nb_bitmaps                2
++reserved32                0
++bitmap_directory_size     0x40
++bitmap_directory_offset   0x9d0000
++
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 025ed52..7e12e1f 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -309,3 +309,4 @@
+ 299 auto quick
+ 301 backing quick
+ 302 quick
++303 rw quick
 -- 
 1.8.3.1
 
