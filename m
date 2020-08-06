@@ -4,62 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA69C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 790D4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:21:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC3132177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:21:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 872FD2177B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:21:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fpVLblx1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC3132177B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LMMx/rQ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 872FD2177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3lSD-0004S5-TO
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:21:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42476)
+	id 1k3lSb-0005Gt-E2
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:21:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lNi-0003dd-KB
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:16:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54500)
+ id 1k3lO2-00049Q-7Q
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60583
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lNg-0006NQ-8G
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:16:50 -0400
+ id 1k3lNy-0006Pa-HP
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741407;
+ s=mimecast20190719; t=1596741425;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=9T8BV3Ch8O5NN7zcQ2QHgAj52r6qq14nCSvLvm+VZWA=;
- b=fpVLblx1dBy63mnk+S9NBvoBmognuFm0xlw2M/mAtrv6bqiCPAr85DnnodoyhTplYEnDCa
- 5tx4kpyT05tSNoxveIbXCxEefMvWZ0arSi0cPvBr+b6JDs54+vFTBUSr35l73V/tHHptrG
- kRFv88foOQsafR8WoUwH8A898o7Y5ZU=
+ references:references; bh=ib/JJMFn6AYHdBHahDo8e8TPKoZujYWfLCTlVIdDUzw=;
+ b=LMMx/rQ0QLFQrmIBRl/tCAp62a1JkeAjCsu4M+NQTDlKv4E2/k22aXJIfb/xWe91gUElm6
+ ValvNxNPBFXjcwN3euIvCj1OKJipNjidFyLz4rnz2kTHlZY+BHiHQY2mgdTwT954Rn/PJT
+ 3gKb0U/a/lOyEt1q60CH2+4r4Tf9EJQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-St1_YbjYPEmt2W2fjr5e6Q-1; Thu, 06 Aug 2020 15:16:45 -0400
-X-MC-Unique: St1_YbjYPEmt2W2fjr5e6Q-1
+ us-mta-298-leOnZDiCNS6ghn3yOZX2AA-1; Thu, 06 Aug 2020 15:17:03 -0400
+X-MC-Unique: leOnZDiCNS6ghn3yOZX2AA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FE3619200C2
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:16:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09536107BA59
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:03 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 98D5E5FC3B
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:16:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 51BD65F9DC
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:02 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 011/143] configure: prepare CFLAGS/CXXFLAGS/LDFLAGS for Meson
-Date: Thu,  6 Aug 2020 21:14:07 +0200
-Message-Id: <1596741379-12902-12-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 020/143] meson: add testsuite Makefile generator
+Date: Thu,  6 Aug 2020 21:14:16 +0200
+Message-Id: <1596741379-12902-21-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
@@ -68,17 +69,18 @@ Authentication-Results: relay.mimecast.com;
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 12:59:11
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:24:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,157 +97,156 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Split between CFLAGS/QEMU_CFLAGS and CXXFLAGS/QEMU_CXXFLAGS so that
-we will use CFLAGS and CXXFLAGS for flags that we do not want to
-pass to add_project_arguments.
+Rules to execute tests are generated by a simple Python program
+that integrates into the existing "make check" mechanism.  This
+provides familiarity for developers, and also allows piecewise
+conversion of the testsuite Makefiles to meson.
 
+The generated rules are based on QEMU's existing test harness
+Makefile and TAP parser.
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure | 42 ++++++++++++++++++++++--------------------
- rules.mak |  4 ++--
- 2 files changed, 24 insertions(+), 22 deletions(-)
+ Makefile               |   4 ++
+ scripts/mtest2make.py  | 102 +++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include |   1 -
+ 3 files changed, 106 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/mtest2make.py
 
-diff --git a/configure b/configure
-index 29cde6a..c65cf77 100755
---- a/configure
-+++ b/configure
-@@ -107,15 +107,12 @@ update_cxxflags() {
-     # options which some versions of GCC's C++ compiler complain about
-     # because they only make sense for C programs.
-     QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS"
--
-+    CXXFLAGS=$(echo "$CFLAGS" | sed s/-std=gnu99/-std=gnu++03/)
-     for arg in $QEMU_CFLAGS; do
-         case $arg in
-             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
-             -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls)
-                 ;;
--            -std=gnu99)
--                QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }"-std=gnu++98"
--                ;;
-             *)
-                 QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
-                 ;;
-@@ -131,7 +128,7 @@ compile_object() {
- compile_prog() {
-   local_cflags="$1"
-   local_ldflags="$2"
--  do_cc $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $QEMU_LDFLAGS $local_ldflags
-+  do_cc $CFLAGS $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $LDFLAGS $QEMU_LDFLAGS $local_ldflags
- }
+diff --git a/Makefile b/Makefile
+index 9a75047..6248fd0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -58,6 +58,10 @@ ninjatool: ninjatool.stamp
+ ninjatool.stamp: $(SRC_PATH)/scripts/ninjatool.py config-host.mak
+ 	$(MESON) setup --reconfigure . $(SRC_PATH) && touch $@
  
- # symbolically link $1 to $2.  Portable version of "ln -sf".
-@@ -597,15 +594,14 @@ ARFLAGS="${ARFLAGS-rv}"
- # left shift of signed integers is well defined and has the expected
- # 2s-complement style results. (Both clang and gcc agree that it
- # provides these semantics.)
--QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv -std=gnu99 $QEMU_CFLAGS"
-+QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
- QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
- QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
- QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
- QEMU_INCLUDES="-iquote . -iquote ${source_path} -iquote ${source_path}/accel/tcg -iquote ${source_path}/include"
- QEMU_INCLUDES="$QEMU_INCLUDES -iquote ${source_path}/disas/libvixl"
--if test "$debug_info" = "yes"; then
--    CFLAGS="-g $CFLAGS"
--fi
-+CFLAGS=-std=gnu99
++Makefile.mtest: build.ninja scripts/mtest2make.py
++	$(MESON) introspect --tests | $(PYTHON) scripts/mtest2make.py > $@
++-include Makefile.mtest
 +
+ .git-submodule-status: git-submodule-update config-host.mak
  
- # running configure in the source tree?
- # we know that's the case if configure is there.
-@@ -886,7 +882,6 @@ SunOS)
-   QEMU_CFLAGS="-D_XOPEN_SOURCE=600 $QEMU_CFLAGS"
- # needed for TIOCWIN* defines in termios.h
-   QEMU_CFLAGS="-D__EXTENSIONS__ $QEMU_CFLAGS"
--  QEMU_CFLAGS="-std=gnu99 $QEMU_CFLAGS"
-   solarisnetlibs="-lsocket -lnsl -lresolv"
-   LIBS="$solarisnetlibs $LIBS"
-   libs_qga="$solarisnetlibs $libs_qga"
-@@ -2184,21 +2179,21 @@ fi
+ # Check that we're not trying to do an out-of-tree build from
+diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
+new file mode 100644
+index 0000000..e978303
+--- /dev/null
++++ b/scripts/mtest2make.py
+@@ -0,0 +1,102 @@
++#! /usr/bin/env python3
++
++# Create Makefile targets to run tests, from Meson's test introspection data.
++#
++# Author: Paolo Bonzini <pbonzini@redhat.com>
++
++from collections import defaultdict
++import json
++import os
++import shlex
++import sys
++
++class Suite(object):
++    def __init__(self):
++        self.tests = list()
++        self.slow_tests = list()
++        self.executables = set()
++
++print('''
++SPEED = quick
++
++# $1 = test command, $2 = test name
++.test-human-tap = $1 < /dev/null | ./scripts/tap-driver.pl --test-name="$2" $(if $(V),, --show-failures-only)
++.test-human-exitcode = $1 < /dev/null
++.test-tap-tap = $1 < /dev/null | sed "s/^[a-z][a-z]* [0-9]*/& $2/" || true
++.test-tap-exitcode = printf "%s\\n" 1..1 "`$1 < /dev/null > /dev/null || echo "not "`ok 1 $2"
++.test.print = echo $(if $(V),'$1','Running test $2') >&3
++.test.env = MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))}
++
++# $1 = test name, $2 = test target (human or tap)
++.test.run = $(call .test.print,$(.test.cmd.$1),$(.test.name.$1)) && $(call .test-$2-$(.test.driver.$1),$(.test.cmd.$1),$(.test.name.$1))
++
++define .test.human_k
++        @exec 3>&1; rc=0; $(foreach TEST, $1, $(call .test.run,$(TEST),human) || rc=$$?;) \\
++              exit $$rc
++endef
++define .test.human_no_k
++        $(foreach TEST, $1, @exec 3>&1; $(call .test.run,$(TEST),human)
++)
++endef
++.test.human = \\
++        $(if $(findstring k, $(MAKEFLAGS)), $(.test.human_k), $(.test.human_no_k))
++
++define .test.tap
++        @exec 3>&1; { $(foreach TEST, $1, $(call .test.run,$(TEST),tap); ) } \\
++              | ./scripts/tap-merge.pl | tee "$@" \\
++              | ./scripts/tap-driver.pl $(if $(V),, --show-failures-only)
++endef
++''')
++
++suites = defaultdict(Suite)
++i = 0
++for test in json.load(sys.stdin):
++    env = ' '.join(('%s=%s' % (shlex.quote(k), shlex.quote(v))
++                    for k, v in test['env'].items()))
++    executable = os.path.relpath(test['cmd'][0])
++    if test['workdir'] is not None:
++        test['cmd'][0] = os.path.relpath(test['cmd'][0], test['workdir'])
++    else:
++        test['cmd'][0] = executable
++    cmd = '$(.test.env) %s %s' % (env, ' '.join((shlex.quote(x) for x in test['cmd'])))
++    if test['workdir'] is not None:
++        cmd = '(cd %s && %s)' % (shlex.quote(test['workdir']), cmd)
++    driver = test['protocol'] if 'protocol' in test else 'exitcode'
++
++    i += 1
++    print('.test.name.%d := %s' % (i, test['name']))
++    print('.test.driver.%d := %s' % (i, driver))
++    print('.test.cmd.%d := %s' % (i, cmd))
++
++    test_suites = test['suite'] or ['default']
++    is_slow = any(s.endswith('-slow') for s in test_suites)
++    for s in test_suites:
++        # The suite name in the introspection info is "PROJECT:SUITE"
++        s = s.split(':')[1]
++        if s.endswith('-slow'):
++            s = s[:-5]
++        if is_slow:
++            suites[s].slow_tests.append(i)
++        else:
++            suites[s].tests.append(i)
++        suites[s].executables.add(executable)
++
++print('.PHONY: check check-report.tap')
++print('check:')
++print('check-report.tap:')
++print('\t@cat $^ | scripts/tap-merge.pl >$@')
++for name, suite in suites.items():
++    executables = ' '.join(suite.executables)
++    slow_test_numbers = ' '.join((str(x) for x in suite.slow_tests))
++    test_numbers = ' '.join((str(x) for x in suite.tests))
++    print('.test.suite-quick.%s := %s' % (name, test_numbers))
++    print('.test.suite-slow.%s := $(.test.suite-quick.%s) %s' % (name, name, slow_test_numbers))
++    print('check-build: %s' % executables)
++    print('.PHONY: check-%s' % name)
++    print('.PHONY: check-report-%s.tap' % name)
++    print('check: check-%s' % name)
++    print('check-%s: %s' % (name, executables))
++    print('\t$(call .test.human, $(.test.suite-$(SPEED).%s))' % (name, ))
++    print('check-report.tap: check-report-%s.tap' % name)
++    print('check-report-%s.tap: %s' % (name, executables))
++    print('\t$(call .test.tap, $(.test.suite-$(SPEED).%s))' % (name, ))
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 985cd14..5e9dff9 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -674,7 +674,6 @@ check-report-unit.tap: $(check-unit-y)
+ # Reports and overall runs
  
- if test "$static" = "yes"; then
-   if test "$pie" != "no" && compile_prog "-Werror -fPIE -DPIE" "-static-pie"; then
--    QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
--    QEMU_LDFLAGS="-static-pie $QEMU_LDFLAGS"
-+    CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
-+    LDFLAGS="-static-pie $QEMU_LDFLAGS"
-     pie="yes"
-   elif test "$pie" = "yes"; then
-     error_exit "-static-pie not available due to missing toolchain support"
-   else
--    QEMU_LDFLAGS="-static $QEMU_LDFLAGS"
-+    LDFLAGS="-static $QEMU_LDFLAGS"
-     pie="no"
-   fi
- elif test "$pie" = "no"; then
--  QEMU_CFLAGS="$CFLAGS_NOPIE $QEMU_CFLAGS"
--  QEMU_LDFLAGS="$LDFLAGS_NOPIE $QEMU_LDFLAGS"
-+  CFLAGS="$CFLAGS_NOPIE $QEMU_CFLAGS"
-+  LDFLAGS="$LDFLAGS_NOPIE $QEMU_LDFLAGS"
- elif compile_prog "-Werror -fPIE -DPIE" "-pie"; then
--  QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
--  QEMU_LDFLAGS="-pie $QEMU_LDFLAGS"
-+  CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
-+  LDFLAGS="-pie $QEMU_LDFLAGS"
-   pie="yes"
- elif test "$pie" = "yes"; then
-   error_exit "PIE not available due to missing toolchain support"
-@@ -3981,7 +3976,7 @@ EOF
- if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
-     if cc_has_warning_flag "-Wno-unknown-attributes"; then
-         glib_cflags="-Wno-unknown-attributes $glib_cflags"
--        CFLAGS="-Wno-unknown-attributes $CFLAGS"
-+        QEMU_CFLAGS="-Wno-unknown-attributes $CFLAGS"
-     fi
- fi
+ check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
+-	$(call quiet-command, cat $^ | scripts/tap-merge.pl >$@,"GEN","$@")
  
-@@ -6506,10 +6501,16 @@ if test "$gcov" = "yes" ; then
-   QEMU_CFLAGS="-fprofile-arcs -ftest-coverage -g $QEMU_CFLAGS"
-   QEMU_LDFLAGS="-fprofile-arcs -ftest-coverage $QEMU_LDFLAGS"
- elif test "$fortify_source" = "yes" ; then
--  CFLAGS="-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
--elif test "$debug" = "no"; then
-+  QEMU_CFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $QEMU_CFLAGS"
-+  debug=no
-+fi
-+if test "$debug" = "no"; then
-   CFLAGS="-O2 $CFLAGS"
- fi
-+if test "$debug_info" = "yes"; then
-+  CFLAGS="-g $CFLAGS"
-+  LDFLAGS="-g $LDFLAGS"
-+fi
- 
- if test "$have_asan" = "yes"; then
-   QEMU_CFLAGS="-fsanitize=address $QEMU_CFLAGS"
-@@ -7961,6 +7962,7 @@ echo "NM=$nm" >> $config_host_mak
- echo "PKG_CONFIG=$pkg_config_exe" >> $config_host_mak
- echo "WINDRES=$windres" >> $config_host_mak
- echo "CFLAGS=$CFLAGS" >> $config_host_mak
-+echo "CXXFLAGS=$CXXFLAGS" >> $config_host_mak
- echo "CFLAGS_NOPIE=$CFLAGS_NOPIE" >> $config_host_mak
- echo "QEMU_CFLAGS=$QEMU_CFLAGS" >> $config_host_mak
- echo "QEMU_CXXFLAGS=$QEMU_CXXFLAGS" >> $config_host_mak
-diff --git a/rules.mak b/rules.mak
-index 56ba540..e79a400 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -88,12 +88,12 @@ LINK = $(call quiet-command, $(LINKPROG) $(CFLAGS) $(QEMU_LDFLAGS) -o $@ \
- 
- %.o: %.cc
- 	$(call quiet-command,$(CXX) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
--	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
-+	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CXXFLAGS) $($@-cflags) \
- 	       -c -o $@ $<,"CXX","$(TARGET_DIR)$@")
- 
- %.o: %.cpp
- 	$(call quiet-command,$(CXX) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
--	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
-+	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CXXFLAGS) $($@-cflags) \
- 	       -c -o $@ $<,"CXX","$(TARGET_DIR)$@")
- 
- %.o: %.m
+ # FPU Emulation tests (aka softfloat)
+ #
 -- 
 1.8.3.1
 
