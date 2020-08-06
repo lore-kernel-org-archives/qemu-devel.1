@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB1EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D325C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:44:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 942202177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:44:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 573002177B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:44:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YzxpHPWS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942202177B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bu7rlcPL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 573002177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3loL-0002ro-He
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:44:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43254)
+	id 1k3loR-00036V-BP
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:44:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lP3-0006C2-Aa
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:13 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37403
+ id 1k3lOl-0005XP-DM
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:55 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41420
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lP0-0006Yq-7v
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:12 -0400
+ id 1k3lOj-0006Vh-CX
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741489;
+ s=mimecast20190719; t=1596741472;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=faw/TJ/76FcNHTJCpIYzv7wubC2bo8U3XrBm7Z1xxNc=;
- b=YzxpHPWStXysFOlreM3S+/0M3vXJ3xvCZJLc954yIOYtWJ4o8A7Bf7E4fzIl8JxSi5deWO
- DomysQoAiDeIyTJb9Wd1pA5LhH5la69KRybM6VYVYBFiZNMNiCU7XZRS9Bu+FTQ8ANeET0
- 1M/r8BkF2Rp+E8lqABrOCAhLfhTgeB4=
+ bh=0Hgz26lLspDRlfLbFP+kB4XdVpPCpfVJFfNl3yzttTY=;
+ b=Bu7rlcPLzfuFS1cD/2EB8rck3ekmdXtfxvrQaS3dlIH6JMPcXdBOXbj3iQ/FEYqfuZKQou
+ IH09qXZFVJMoDYsgTSlqrj9/xKcMAh3FvRm5gbBbyp2R8qXbId57FVm0ZEG8aohtb2k74a
+ CTDz0/k7Zwo0RT1XxtjLQ7ouFcnVojo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252--4zJXYGhPeO1ydpN2vxWrg-1; Thu, 06 Aug 2020 15:18:07 -0400
-X-MC-Unique: -4zJXYGhPeO1ydpN2vxWrg-1
+ us-mta-372-G3JVCA7tNauZcfdtg8c5eg-1; Thu, 06 Aug 2020 15:17:50 -0400
+X-MC-Unique: G3JVCA7tNauZcfdtg8c5eg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E47AB100AA21
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:18:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75656100AA21
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:49 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 01CE81D3;
- Thu,  6 Aug 2020 19:18:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 861D01D3;
+ Thu,  6 Aug 2020 19:17:48 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 059/143] meson: qemu-{img,io,nbd}
-Date: Thu,  6 Aug 2020 21:14:55 +0200
-Message-Id: <1596741379-12902-60-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 049/143] meson: convert qom directory to Meson (tools part)
+Date: Thu,  6 Aug 2020 21:14:45 +0200
+Message-Id: <1596741379-12902-50-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -106,81 +106,110 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile    |  5 -----
- configure   |  3 +--
- meson.build | 14 ++++++++++++--
- 3 files changed, 13 insertions(+), 9 deletions(-)
+ Makefile          |  2 +-
+ Makefile.objs     |  2 +-
+ Makefile.target   |  3 ++-
+ meson.build       |  1 +
+ qom/Makefile.objs |  3 ---
+ qom/meson.build   | 15 +++++++++++++++
+ 6 files changed, 20 insertions(+), 6 deletions(-)
+ create mode 100644 qom/meson.build
 
 diff --git a/Makefile b/Makefile
-index aa47783..27e66aa 100644
+index d277681..36f74aa 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -274,11 +274,6 @@ Makefile: $(version-obj-y)
+@@ -233,7 +233,6 @@ dummy := $(call unnest-vars,, \
+                 storage-daemon-obj-y \
+                 storage-daemon-obj-m \
+                 crypto-obj-y \
+-                qom-obj-y \
+                 io-obj-y \
+                 common-obj-y \
+                 common-obj-m)
+@@ -254,6 +253,7 @@ $(SOFTMMU_ALL_RULES): $(storage-daemon-obj-y)
+ $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
+ $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
+ $(SOFTMMU_ALL_RULES): $(io-obj-y)
++$(SOFTMMU_ALL_RULES): $(qom-obj-y)
+ $(SOFTMMU_ALL_RULES): config-all-devices.mak
  
- COMMON_LDADDS = libqemuutil.a
+ SOFTMMU_FUZZ_RULES=$(filter %-softmmu/fuzz, $(TARGET_DIRS_RULES))
+diff --git a/Makefile.objs b/Makefile.objs
+index baf1565..84bfa2a 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -1,6 +1,6 @@
+ #######################################################################
+ # Common libraries for tools and emulators
+-qom-obj-y = qom/
++qom-obj-y = qom/libqom.fa
  
--qemu-img.o: qemu-img-cmds.h
--
--qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
+ #######################################################################
+ # code used by both qemu system emulation and qemu-img
+diff --git a/Makefile.target b/Makefile.target
+index 257afc2..1e04551 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -191,13 +191,14 @@ all-obj-y := $(obj-y)
+ common-obj-m :=
  
- scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-diff --git a/configure b/configure
-index 2af211f..809fa3b 100755
---- a/configure
-+++ b/configure
-@@ -6644,9 +6644,8 @@ fi
- tools=""
- helpers=""
- if test "$want_tools" = "yes" ; then
--  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
--    tools="qemu-nbd\$(EXESUF) qemu-storage-daemon\$(EXESUF) $tools"
-+    tools="qemu-storage-daemon\$(EXESUF) $tools"
-   fi
- fi
- if test "$softmmu" = yes ; then
+ include $(SRC_PATH)/Makefile.objs
++dummy := $(call fix-paths,../,, \
++              qom-obj-y)
+ dummy := $(call unnest-vars,.., \
+                authz-obj-y \
+                block-obj-y \
+                block-obj-m \
+                chardev-obj-y \
+                crypto-obj-y \
+-               qom-obj-y \
+                io-obj-y \
+                common-obj-y \
+                common-obj-m)
 diff --git a/meson.build b/meson.build
-index ea52f43..f2496e4 100644
+index fbf27a7..57475c8 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -327,7 +327,7 @@ if have_system
-   ]
- endif
- foreach d : hx_headers
--  custom_target(d[1],
-+  hxdep += custom_target(d[1],
-                 input: files(d[0]),
-                 output: d[1],
-                 capture: true,
-@@ -535,7 +535,8 @@ libblock = static_library('block', block_ss.sources(),
-                           build_by_default: false)
+@@ -312,6 +312,7 @@ libqemuutil = static_library('qemuutil',
+ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: genh + version_res)
  
- block = declare_dependency(link_whole: [libblock],
--                           link_args: '@block.syms')
-+                           link_args: '@block.syms',
-+                           dependencies: [crypto, io])
++subdir('qom')
+ subdir('fsdev')
  
- foreach m : mods
-   shared_module(m['dir'] + '-' + m['name'],
-@@ -613,6 +614,15 @@ if 'CONFIG_GUEST_AGENT' in config_host
- endif
- 
- if have_tools
-+  qemu_img = executable('qemu-img', [files('qemu-img.c'), hxdep],
-+             dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
-+  if host_machine.system() == 'linux' or host_machine.system() == 'sunos' or host_machine.system().endswith('bsd')
-+    qemu_nbd = executable('qemu-nbd', files('qemu-nbd.c'),
-+               dependencies: [block, qemuutil], install: true)
-+  endif
-+  qemu_io = executable('qemu-io', files('qemu-io.c'),
-+             dependencies: [block, qemuutil], install: true)
+ # Other build targets
+diff --git a/qom/Makefile.objs b/qom/Makefile.objs
+index 1b45d10..b962904 100644
+--- a/qom/Makefile.objs
++++ b/qom/Makefile.objs
+@@ -1,5 +1,2 @@
+-qom-obj-y = object.o container.o qom-qobject.o
+-qom-obj-y += object_interfaces.o
+-
+ common-obj-$(CONFIG_SOFTMMU) += qom-hmp-cmds.o qom-qmp-cmds.o
+ storage-daemon-obj-y += qom-qmp-cmds.o
+diff --git a/qom/meson.build b/qom/meson.build
+new file mode 100644
+index 0000000..3c41ed3
+--- /dev/null
++++ b/qom/meson.build
+@@ -0,0 +1,15 @@
++qom_ss = ss.source_set()
++qom_ss.add(files(
++  'container.c',
++  'object.c',
++  'object_interfaces.c',
++  'qom-qobject.c',
++))
 +
-   subdir('contrib/rdmacm-mux')
-   subdir('contrib/elf2dmp')
- 
++qom_ss = qom_ss.apply(config_host, strict: false)
++libqom = static_library('qom', qom_ss.sources(),
++                        dependencies: [qom_ss.dependencies()],
++                        link_with: [libqemuutil],
++                        name_suffix: 'fa')
++
++qom = declare_dependency(link_whole: libqom)
 -- 
 1.8.3.1
 
