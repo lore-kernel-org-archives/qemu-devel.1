@@ -2,106 +2,82 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E11C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED49DC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:22:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B6B6221E3
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:21:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HZ/bkyu7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6B6221E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D6F5A20855
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 21:22:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6F5A20855
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3nK7-0004ey-Go
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 17:21:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42956)
+	id 1k3nLG-0005Xv-1v
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 17:22:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3nJV-0004EC-HE
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:20:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45733
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3nJT-0005Yz-Hh
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:20:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596748834;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=MlRQcgfY51Kp01uwREV+l6YpW7olEb2k+QC8UClRUPY=;
- b=HZ/bkyu7aa4d255jPPM15j4wnoDmUpS1HnwMlM3j9TMqVDdoE6kK6X1CybKccxddo0oCYk
- AIammQPLTkx5UDwOQkNluOrNjYbVXp0vRhF1fAl8Y3pBsEZ/d7crAABb7H5wvpOCCD0zxJ
- t24V7/6Xam5G9chqYJP9bO/ymPASh9U=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-FAdP4UcBMHe5F_XJpxpAvQ-1; Thu, 06 Aug 2020 17:20:32 -0400
-X-MC-Unique: FAdP4UcBMHe5F_XJpxpAvQ-1
-Received: by mail-ed1-f71.google.com with SMTP id b11so6428103edy.17
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 14:20:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=MlRQcgfY51Kp01uwREV+l6YpW7olEb2k+QC8UClRUPY=;
- b=uPNsaHmlrYkC64RGc4jbVHm0L0wSAKOi+aWaYzUEktrsh53tWlGR2G7qYILb5MRhLi
- uuiVnHa7BGx4Z3rumNICxY78MrAlLNvRsxeTeayMPwntoo+d+96pgV1pyQKGOYTaiyYo
- NiX55+s/muyJMTi9krlhCBLAV9tCSTBBqjKWX0UjeP2ryAHctfe7zrQ/WSBVrd6O/VCt
- fB0WNOT9onqOieXSyKv0s/DKPmA2iPTY8g8XjvIFNbrXoGQS1HQyuplRARl6gTetxEdv
- 7RuLs6UW/d1SmZ3joYUHyJ44kIAT8Xn8jOI1wQVCXm38bSeAdF+Kr4xwG+3GAElWgE7Y
- j0tg==
-X-Gm-Message-State: AOAM531rbRf/LIK3T2zAQc2wiyoAAM8zo9VPJryMvkg4Ij/mbcrZCtGG
- zymMcnG0/2fxZkwnRonoJirZqmJPwyF/LR0botl9NwVgk7NRKmBg3RBO6az8xo51n/gysn7GnlL
- 5qsjwoBrQf6E80YrLQ7Dh7+DD01Z9kyk=
-X-Received: by 2002:a17:906:82c1:: with SMTP id
- a1mr6368549ejy.172.1596748830825; 
- Thu, 06 Aug 2020 14:20:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxIKa2XEwS0CD5nvyKA3b0751rrBSZB+6q2J6qeDvr7wsZ6YoKBTqoLdQ1aJCu8AKugF0hj1g9R7QdhSizPZEg=
-X-Received: by 2002:a17:906:82c1:: with SMTP id
- a1mr6368535ejy.172.1596748830558; 
- Thu, 06 Aug 2020 14:20:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3nKg-00058q-D8
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:21:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38666)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3nKe-0005j9-Fz
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 17:21:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k3nKc-0004HF-Rl
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 21:21:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C93EF2E8075
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 21:21:46 +0000 (UTC)
 MIME-Version: 1.0
-References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <1596741379-12902-109-git-send-email-pbonzini@redhat.com>
- <CAFEAcA_j2N1ee3Aqjcw3cKF1ksJ9Ls4qF6eXBH058A8oNBObfw@mail.gmail.com>
-In-Reply-To: <CAFEAcA_j2N1ee3Aqjcw3cKF1ksJ9Ls4qF6eXBH058A8oNBObfw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 6 Aug 2020 23:20:17 +0200
-Message-ID: <CABgObfYry+2he0aL_UujxaSCTNELQL+mbtD8GYc_R4b1H94x8g@mail.gmail.com>
-Subject: Re: [PATCH 108/143] meson: convert hw/intc
-To: Peter Maydell <peter.maydell@linaro.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="000000000000d7645c05ac3c0e47"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:24:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 06 Aug 2020 21:09:18 -0000
+From: Steve Dodd <1594394@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: anarchetic jrtc27 kb9vqf laurent-vivier legoll
+ pmaydell
+X-Launchpad-Bug-Reporter: Timothy Pearson (kb9vqf)
+X-Launchpad-Bug-Modifier: Steve Dodd (anarchetic)
+References: <20160620140124.12349.60184.malonedeb@wampee.canonical.com>
+Message-Id: <159674815827.3361.5874412005960424060.malone@gac.canonical.com>
+Subject: [Bug 1594394] Re: Using setreuid / setegid crashes x86_64 user-mode
+ target
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: e364dca27f28460e357751b3187068a309bd002a
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 17:11:16
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -110,136 +86,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1594394 <1594394@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d7645c05ac3c0e47
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Sorry, heat is definitely getting to me - just realized this is an
+upstream bug, not an Ubuntu one! Ubuntu package version is 1:2.11+dfsg-
+1ubuntu7.26. At some point I will look at building qemu from source, but
+won't be an immediate thing. Apologies for noise .. though if anyone
+knows off-hand that a fix for this did or didn't get merged that would
+useful ..
 
-Il gio 6 ago 2020, 23:02 Peter Maydell <peter.maydell@linaro.org> ha
-scritto:
+-- =
 
-> On Thu, 6 Aug 2020 at 21:10, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->
-> Compared to:
->
-> > -common-obj-$(CONFIG_HEATHROW_PIC) +=3D heathrow_pic.o
->
-> > +softmmu_ss.add(when: 'CONFIG_HEATHROW_PIC', if_true:
-> files('heathrow_pic.c'))
->
-> this feels pretty clunky. Doesn't Meson have a nicer
-> way of expressing this kind of thing?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1594394
 
+Title:
+  Using setreuid / setegid crashes x86_64 user-mode target
 
-Nope, in fact it turns out we had to implement it ourselves because there
-was no way to express it at all in the way that QEMU build multiple
-binaries. My initial version didn't have the when/if_true part but the
-maintainer was quite adamant on requiring them instead of just relying on
-positional arguments.
+Status in QEMU:
+  New
 
-Unfortunately, while common in QEMU, and in Linux too, it doesn't seem to
-be a very common idiom in general; Makefiles do express it in a very
-readable and concise way.
+Bug description:
+  When setreuid() or setegid() are called from x86_64 target code in
+  user mode, qemu crashes inside the NPTL signal handlers.  x86 targets
+  do not directly use a syscall to handle setreuid() / setegid();
+  instead the x86 NPTL implementation sets up a temporary data region in
+  memory (__xidcmd) and issues a signal (SIGRT1) to all threads,
+  allowing the handler for that signal to issue the syscall.  Under
+  qemu, __xidcmd remains null (see variable display below backtrace).
 
-I cannot deny it looks clunky. While Meson does have a huge advantage in
-terms of predictability and lack of surprises when doing harder things, the
-imperative syntax is heavier when dealing with the simplest. They do remain
-simple (it's still one line of coffee), but the quotes and commas seem to
-be enough to "switch" our brain to a different mode.
+  Backtrace:
+  Program received signal SIGSEGV, Segmentation fault.
+  [Switching to Thread 0x3fff85c74fc0 (LWP 74517)]
+  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d08, c=
+tx=3D0x3fff85c71f90) at nptl-init.c:263
+  263     nptl-init.c: No such file or directory.
+  (gdb) thread apply all bt
 
-My opinion is that you don't really look at these things very much, so it
-doesn't really matter, but I can see people disagreeing.
+  Thread 3 (Thread 0x3fff87e8efc0 (LWP 74515)):
+  #0  0x00000000601cc430 in syscall ()
+  #1  0x0000000060109080 in futex_wait (val=3D<optimized out>, ev=3D<optimi=
+zed out>) at /build/qemu/util/qemu-thread-posix.c:292
+  #2  qemu_event_wait (ev=3D0x62367bb0 <rcu_call_ready_event>) at /build/qe=
+mu/util/qemu-thread-posix.c:399
+  #3  0x000000006010f73c in call_rcu_thread (opaque=3D<optimized out>) at /=
+build/qemu/util/rcu.c:250
+  #4  0x0000000060176f8c in start_thread (arg=3D0x3fff87e8efc0) at pthread_=
+create.c:336
+  #5  0x00000000601cebf4 in clone ()
 
-(You had already pointed this out during the very first discussions, if I
-remember correctly. I can't add much except that with extra experience the
-balance does tilt in favor of Meson despite the heavier syntax for simple
-cases).
+  Thread 2 (Thread 0x3fff85c74fc0 (LWP 74517)):
+  #0  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d0=
+8, ctx=3D0x3fff85c71f90) at nptl-init.c:263
+  #1  <signal handler called>
+  #2  0x00000000601cc42c in syscall ()
+  #3  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
+0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
+imized out>) at /build/qemu/linux-user/syscall.c:748
+  #4  do_futex (val3=3D<optimized out>, uaddr2=3D275186650880, timeout=3D0,=
+ val=3D1129, op=3D128, uaddr=3D275186651116) at /build/qemu/linux-user/sysc=
+all.c:6201
+  #5  do_syscall (cpu_env=3D0x1000abfd350, num=3D<optimized out>, arg1=3D27=
+5186651116, arg2=3D<optimized out>, arg3=3D1129, arg4=3D0, arg5=3D275186650=
+880, arg6=3D<optimized out>, arg7=3D0, arg8=3D0)
+      at /build/qemu/linux-user/syscall.c:10651
+  #6  0x00000000600347b8 in cpu_loop (env=3D0x1000abfd350) at /build/qemu/l=
+inux-user/main.c:317
+  #7  0x0000000060036ae0 in clone_func (arg=3D0x3fffc4c2ca38) at /build/qem=
+u/linux-user/syscall.c:5445
+  #8  0x0000000060176f8c in start_thread (arg=3D0x3fff85c74fc0) at pthread_=
+create.c:336
+  #9  0x00000000601cebf4 in clone ()
 
-Paolo
+  Thread 1 (Thread 0x1000aa05000 (LWP 74511)):
+  #0  0x00000000601cc430 in syscall ()
+  #1  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
+0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
+imized out>) at /build/qemu/linux-user/syscall.c:748
+  #2  do_futex (val3=3D<optimized out>, uaddr2=3D1, timeout=3D0, val=3D1, o=
+p=3D128, uaddr=3D275078324992) at /build/qemu/linux-user/syscall.c:6201
+  #3  do_syscall (cpu_env=3D0x1000aa23890, num=3D<optimized out>, arg1=3D27=
+5078324992, arg2=3D<optimized out>, arg3=3D1, arg4=3D0, arg5=3D1, arg6=3D<o=
+ptimized out>, arg7=3D0, arg8=3D0) at /build/qemu/linux-user/syscall.c:10651
+  #4  0x00000000600347b8 in cpu_loop (env=3D0x1000aa23890) at /build/qemu/l=
+inux-user/main.c:317
+  #5  0x00000000600020e4 in main (argc=3D<optimized out>, argv=3D<optimized=
+ out>, envp=3D<optimized out>) at /build/qemu/linux-user/main.c:4779
+  (gdb) p __xidcmd
+  $1 =3D (struct xid_command *) 0x0
 
-It's really
-> common and I'd hope that a build system language
-> would provide less long-winded ways to write common
-> operations...
->
-> thanks
-> -- PMM
->
->
-
---000000000000d7645c05ac3c0e47
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il gio 6 ago 2020, 23:02 Peter Maydell &lt;<a href=3D"=
-mailto:peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; ha scritt=
-o:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bo=
-rder-left:1px #ccc solid;padding-left:1ex">On Thu, 6 Aug 2020 at 21:10, Pao=
-lo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" target=3D"_blank" rel=
-=3D"noreferrer">pbonzini@redhat.com</a>&gt; wrote:<br>
-&gt;<br>
-&gt; From: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@re=
-dhat.com" target=3D"_blank" rel=3D"noreferrer">marcandre.lureau@redhat.com<=
-/a>&gt;<br>
-&gt;<br>
-&gt; Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.=
-lureau@redhat.com" target=3D"_blank" rel=3D"noreferrer">marcandre.lureau@re=
-dhat.com</a>&gt;<br>
-&gt; Signed-off-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com=
-" target=3D"_blank" rel=3D"noreferrer">pbonzini@redhat.com</a>&gt;<br>
-<br>
-Compared to:<br>
-<br>
-&gt; -common-obj-$(CONFIG_HEATHROW_PIC) +=3D heathrow_pic.o<br>
-<br>
-&gt; +softmmu_ss.add(when: &#39;CONFIG_HEATHROW_PIC&#39;, if_true: files(&#=
-39;heathrow_pic.c&#39;))<br>
-<br>
-this feels pretty clunky. Doesn&#39;t Meson have a nicer<br>
-way of expressing this kind of thing? </blockquote></div></div><div dir=3D"=
-auto"><br></div><div dir=3D"auto">Nope, in fact it turns out we had to impl=
-ement it ourselves because there was no way to express it at all in the way=
- that QEMU build multiple binaries. My initial version didn&#39;t have the =
-when/if_true part but the maintainer was quite adamant on requiring them in=
-stead of just relying on positional arguments.</div><div dir=3D"auto"><br><=
-/div><div dir=3D"auto">Unfortunately, while common in QEMU, and in Linux to=
-o, it doesn&#39;t seem to be a very common idiom in general; Makefiles do e=
-xpress it in a very readable and concise way.</div><div dir=3D"auto"><br></=
-div><div dir=3D"auto">I cannot deny it looks clunky. While Meson does have =
-a huge advantage in terms of predictability and lack of surprises when doin=
-g harder things, the imperative syntax is heavier when dealing with the sim=
-plest. They do remain simple (it&#39;s still one line of coffee), but the q=
-uotes and commas seem to be enough to &quot;switch&quot; our brain to a dif=
-ferent mode.</div><div dir=3D"auto"><br></div><div dir=3D"auto">My opinion =
-is that you don&#39;t really look at these things very much, so it doesn&#3=
-9;t really matter, but I can see people disagreeing.</div><div dir=3D"auto"=
-><br></div><div dir=3D"auto">(You had already pointed this out during the v=
-ery first discussions, if I remember correctly. I can&#39;t add much except=
- that with extra experience the balance does tilt in favor of Meson despite=
- the heavier syntax for simple cases).</div><div dir=3D"auto"><br></div><di=
-v dir=3D"auto">Paolo</div><div dir=3D"auto"><br></div><div dir=3D"auto"><di=
-v class=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0=
- 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">It&#39;s really<br>
-common and I&#39;d hope that a build system language<br>
-would provide less long-winded ways to write common<br>
-operations...<br>
-<br>
-thanks<br>
--- PMM<br>
-<br>
-</blockquote></div></div></div>
-
---000000000000d7645c05ac3c0e47--
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1594394/+subscriptions
 
