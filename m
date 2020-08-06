@@ -2,96 +2,96 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 029D3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87DCAC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:39:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F047123110
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:38:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80BFE23110
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:39:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R8stUgv6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F047123110
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hH2IGHkh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80BFE23110
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3g6c-0004PR-0Q
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:38:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52462)
+	id 1k3g7e-0005am-LY
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:39:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3g61-0003tg-MN; Thu, 06 Aug 2020 09:38:13 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37829)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k3g76-00055e-D3
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:39:20 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:45175)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3g60-0002t0-2D; Thu, 06 Aug 2020 09:38:13 -0400
-Received: by mail-wr1-x444.google.com with SMTP id y3so44044830wrl.4;
- Thu, 06 Aug 2020 06:38:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=OjcdhDLucSRT8FFIZv176pPKfHlgD06Q4at/uUFwg18=;
- b=R8stUgv6aD/HW5lP2fgPJMR4Pdb5o6g5P/BeSR4cCF1GcClUdqR+u3AUN7MTkzp4rf
- 64SjaeNYNVEinfZCWE6D7fGK4+QrOjmc7+keyz0+IZ51gwOqflqvlRI1kwYhWmcb0mDL
- jCr7Iem/pfUPlSIaNk78u7wBDL3FTaQNjJ6Gq8F+Qo1doQqH2zHl3q0NLVuIcyj0dlNs
- 0UfDln8+Ojd8+ZWWmXJd4YgEW2h8gL8ZBfA6yXB0FEQXBzNguz6pG9ojHs55EupUXvro
- OMFR3cXIDJbV/Ljrm4pl1MuDLai8qjHaXt7JfANnvapQoONNuquIJwR1ZcQLbFW3K1n2
- WhsA==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k3g74-0002yi-Eh
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:39:20 -0400
+Received: by mail-wr1-x429.google.com with SMTP id z18so40477561wrm.12
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 06:39:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=XwvkaOS+zlPAQxC7KOYzKBbD0RTPzA4FCgsljx8AFyA=;
+ b=hH2IGHkh5hrFOBnyH4wmwVg+Q5lpfNhXNMy/o0q5RHinZcAHuhi/nONmrUYtHFGFPh
+ MsY8w90VQS4JkPQ/UQigxIcR/VbexBzNRZpZV1RGWBOXRRl1cP6MnShdsVmj5LnEKnoU
+ rxuskXh63FMCWzTaZW1bRgIADe90MMg+5pVaD+zWSd+AJ148YHPfFDN5SjmwmEWyfLwU
+ +ZqwKwE6MvIJFvLFM/tzvIu5wiRqc2ey5xpZO91z4Wwxn4JrcMj3TBLgh1CM9LI/RzVq
+ NnHlX2QH0mhWsnLwZq8ugi7Jwh20WKxkXS5W19yEVLgKIKo41eQlUR4rD2S4aUsFBFGO
+ /qow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=OjcdhDLucSRT8FFIZv176pPKfHlgD06Q4at/uUFwg18=;
- b=c6uC2ji970tOKLO+/cJrJz/qrlIxEQjUWtYJMkPd3YN1NytB8+q8NCr4YR/VjmROJy
- 35+8FDaFXaglCpkcoXkMCgnCwutw96o7/qP337F6QMh6gLLgZ6U6EOR3KMRtNI6XLQDS
- 3N4eIp7ICbAHKhdlpbT95NoVXO1P232qWASNXg2BdjQnuu6RX+Wh8VrKovBranVdt+/L
- WvQi7m9Ugpu7QVs2fsx2oVzf8abeu9JiYNV3eq/MQLIAa4HoFEaZ0y2O86V2HXxygHoH
- 9dxF25aFQR2ioPiPmGaBk1pQGwgyHvxnkIf2wNuT5G6rcoMQiwFWUC4XtvBPx8UuiCFe
- nw8w==
-X-Gm-Message-State: AOAM530XJA+y3EKd7+P3gr+vJ45PnA9Zh2T5UJYeHhRg4sfSdNzKb8Ud
- ERomoyakqPbCocgdl+Up8HrhSwEy
-X-Google-Smtp-Source: ABdhPJxQFVDAxOK2L5UcMVG3/RWN+q7JtafbotGzZ3ui+581Z04m3XrGDVhuiP5lm831Ug4KSYQqDA==
-X-Received: by 2002:adf:a45d:: with SMTP id e29mr7578761wra.107.1596721089900; 
- Thu, 06 Aug 2020 06:38:09 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id c15sm6311768wme.23.2020.08.06.06.38.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Aug 2020 06:38:08 -0700 (PDT)
-Subject: Re: [PATCH for-5.2 16/19] aspeed/sdmc: Perform memory training
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200806132106.747414-1-clg@kaod.org>
- <20200806132106.747414-17-clg@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <56f83c0b-b5eb-241e-c848-56f038633398@amsat.org>
-Date: Thu, 6 Aug 2020 15:38:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=XwvkaOS+zlPAQxC7KOYzKBbD0RTPzA4FCgsljx8AFyA=;
+ b=L77Z3lVMZEgefRbI+fCOW9nJuVRmgNbogL4W1rxsUPtZclCQzmtl6d1W8HeS+BnFH5
+ GbfLSU7sGU+xhMQgr9cEnj6Pi4xUDGnRnxt4iK2QUeqChFm34Rhofwb4DPRlmGt6BFcN
+ 37Y+EJGtvZ92E6ziUSm5GqqS7oLrA3YyPM5yx3yzr8rlAt7CPXxSKlLwrba8BW45tHPP
+ E8PqaVYixTYvhrxo4T0kaT7lE3Q5eCfEoS1iajlHiG5Bz5SraajR0Lkbrw6s+oKy7vrb
+ cJOfMAiIHNcdrKB0jA9d5kyXKZ9c87etdq2x/XFisE9AtCKaUhwHsyh7HC5BFJDHMRQT
+ bGRg==
+X-Gm-Message-State: AOAM530iqryRNNaTW3qrPqxGrbFLtM/4ILOCFT+IjuefAPI53gfIazIJ
+ 7VQFJpfo5vJp0oQhCCSqs/siTQ==
+X-Google-Smtp-Source: ABdhPJxh3SvBWCEym3nyBVMrPVXzypgq9rJleizyVbSusoe6+vKY5qoIfH3u+mOQQWwwFx2rIfN14Q==
+X-Received: by 2002:adf:ded0:: with SMTP id i16mr7431886wrn.389.1596721155928; 
+ Thu, 06 Aug 2020 06:39:15 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id m8sm6735860wro.75.2020.08.06.06.39.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Aug 2020 06:39:14 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E6B511FF7E;
+ Thu,  6 Aug 2020 14:39:13 +0100 (BST)
+References: <CAJSP0QWF8g7r5VqU_PRbskWZU3ahCq+eobR8GexUcPrAiYoCPQ@mail.gmail.com>
+ <20200806110826.GH4159383@redhat.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: Why QEMU should move from C to Rust (clickbait alert ;))
+In-reply-to: <20200806110826.GH4159383@redhat.com>
+Date: Thu, 06 Aug 2020 14:39:13 +0100
+Message-ID: <87a6z7lwqm.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200806132106.747414-17-clg@kaod.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::429;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x429.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,122 +104,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>,
+ Dave Gilbert <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Oleinik, Alexander" <alxndr@bu.edu>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/6/20 3:21 PM, Cédric Le Goater wrote:
-> From: Joel Stanley <joel@jms.id.au>
-> 
-> This allows qemu to run the "normal" power on reset boot path through
-> u-boot, where the DDR is trained.
-> 
-> An enhancement would be to have the SCU bit stick across qemu reboots,
-> but be unset on initial boot.
-> 
-> Proper modelling would be to discard all writes to the phy setting regs
-> at offset 0x100 - 0x400 and to model the phy status regs at offset
-> 0x400.
-> 
-> The status regs model would only need to account for offets 0x00,
-> 0x50, 0x68 and 0x7c.
-> 
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> [ clg: checkpatch fixes ]
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> ---
->  include/hw/misc/aspeed_sdmc.h | 13 ++++++++++++-
->  hw/misc/aspeed_scu.c          |  2 +-
->  hw/misc/aspeed_sdmc.c         | 19 +++++++++++++++++--
->  3 files changed, 30 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/hw/misc/aspeed_sdmc.h b/include/hw/misc/aspeed_sdmc.h
-> index cea1e67fe365..c6226957dd3d 100644
-> --- a/include/hw/misc/aspeed_sdmc.h
-> +++ b/include/hw/misc/aspeed_sdmc.h
-> @@ -17,7 +17,18 @@
->  #define TYPE_ASPEED_2500_SDMC TYPE_ASPEED_SDMC "-ast2500"
->  #define TYPE_ASPEED_2600_SDMC TYPE_ASPEED_SDMC "-ast2600"
->  
-> -#define ASPEED_SDMC_NR_REGS (0x174 >> 2)
-> +/*
-> + * SDMC has 174 documented registers. In addition the u-boot device tree
-> + * describes the following regions:
-> + *  - PHY status regs at offset 0x400, length 0x200
-> + *  - PHY setting regs at offset 0x100, length 0x300
-> + *
-> + * There are two sets of MRS (Mode Registers) configuration in ast2600 memory
-> + * system: one is in the SDRAM MC (memory controller) which is used in run
-> + * time, and the other is in the DDR-PHY IP which is used during DDR-PHY
-> + * training.
-> + */
-> +#define ASPEED_SDMC_NR_REGS (0x500 >> 2)
->  
->  typedef struct AspeedSDMCState {
->      /*< private >*/
-> diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-> index 764222404bef..dc6dd87c22f4 100644
-> --- a/hw/misc/aspeed_scu.c
-> +++ b/hw/misc/aspeed_scu.c
-> @@ -656,7 +656,7 @@ static const uint32_t ast2600_a1_resets[ASPEED_AST2600_SCU_NR_REGS] = {
->      [AST2600_SYS_RST_CTRL2]     = 0xFFFFFFFC,
->      [AST2600_CLK_STOP_CTRL]     = 0xFFFF7F8A,
->      [AST2600_CLK_STOP_CTRL2]    = 0xFFF0FFF0,
-> -    [AST2600_SDRAM_HANDSHAKE]   = 0x00000040,  /* SoC completed DRAM init */
-> +    [AST2600_SDRAM_HANDSHAKE]   = 0x00000000,
->      [AST2600_HPLL_PARAM]        = 0x1000405F,
->      [AST2600_CHIP_ID0]          = 0x1234ABCD,
->      [AST2600_CHIP_ID1]          = 0x88884444,
-> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
-> index 855848b7d23a..ff2809a09965 100644
-> --- a/hw/misc/aspeed_sdmc.c
-> +++ b/hw/misc/aspeed_sdmc.c
-> @@ -113,7 +113,7 @@ static uint64_t aspeed_sdmc_read(void *opaque, hwaddr addr, unsigned size)
->      if (addr >= ARRAY_SIZE(s->regs)) {
->          qemu_log_mask(LOG_GUEST_ERROR,
->                        "%s: Out-of-bounds read at offset 0x%" HWADDR_PRIx "\n",
-> -                      __func__, addr);
-> +                      __func__, addr * 4);
->          return 0;
->      }
->  
-> @@ -206,6 +206,19 @@ static void aspeed_sdmc_reset(DeviceState *dev)
->  
->      /* Set ram size bit and defaults values */
->      s->regs[R_CONF] = asc->compute_conf(s, 0);
-> +
-> +    /*
-> +     * PHY status:
-> +     *  - set phy status ok (set bit 1)
-> +     *  - initial PVT calibration ok (clear bit 3)
-> +     *  - runtime calibration ok (clear bit 5)
-> +     */
-> +    s->regs[0x100] = BIT(1);
 
-This is usually implemented with a one-shot timer, see
-sd_ocr_powerup() in hw/sd/sd.c (migration is handled).
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-> +
-> +    /* PHY eye window: set all as passing */
-> +    s->regs[0x100 | (0x68 / 4)] = 0xff;
-> +    s->regs[0x100 | (0x7c / 4)] = 0xff;
-> +    s->regs[0x100 | (0x50 / 4)] = 0xfffffff;
->  }
->  
->  static void aspeed_sdmc_get_ram_size(Object *obj, Visitor *v, const char *name,
-> @@ -443,7 +456,9 @@ static void aspeed_2600_sdmc_write(AspeedSDMCState *s, uint32_t reg,
->      }
->  
->      if (reg != R_PROT && s->regs[R_PROT] == PROT_SOFTLOCKED) {
-> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: SDMC is locked!\n", __func__);
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: SDMC is locked! (write to MCR%02x blocked)\n",
-> +                      __func__, reg * 4);
->          return;
->      }
->  
-> 
+> On Thu, Aug 06, 2020 at 11:24:13AM +0100, Stefan Hajnoczi wrote:
+>
+> ...snip...
+>
+> I broadly agree with the points about why Rust is desirable as
+> a language for QEMU.
+>
+>> How can we change programming language?
+>> ------------------------------------------------------------
+>> When I checked in 2018 QEMU was 1.5 million lines of code. It has
+>> grown since then. Moving a large codebase to a new programming
+>> language is extremely difficult. If people want to convert QEMU to
+>> Rust that would be great, but I personally don't have the appetite to
+>> do it because I think the integration will be messy, result in a lot
+>> of duplication, and there is too much un(der)maintained code that is
+>> hard to convert.
+>>=20
+>> The reason I am writing this post is because device emulation, the
+>> main security attack surface for VMMs, can be done in a separate
+>> program. That program can be written in any language and this is where
+>> Rust comes in. For vhost devices it is possible to write Rust device
+>> backends today and I hope this will become the default approach to
+>> writing new devices.
+>>=20
+>> For non-vhost devices the vfio-user project is working on an interface
+>> out-of-process device emulation. It will be possible to implement
+>> devices in Rust there too.
+>
+> I guess this dovetails into our view of security bug classification.
+> Stuff that affects virtualization use cases is security critical,
+> while stuff that affects emulation is NOT security critical.
+>
+> With this in mind, it is not a priority to convert the whole of
+> QEMU to Rust. The priority is the subset that affects virtualization
+> use cases. It is a much more tractable problem if we're looking at
+> creating rust based vhost-user / vfio-user, only for the devices
+> that are commonly used for KVM with modern OS, and ignore the many
+> 100's of devices that are only there for emulation or foir legacy OS.
 
+I'm definitely interested in vhost-user daemons in Rust. The one I've
+been writing so far has been tried to be a minimal POSIX base without
+including QEMU utility functions but I'm sure it would be nicer to start
+with a clean standalone Rust library.
+
+>> If you are implementing new device emulation code please consider
+>> doing it in Rust!
+>
+> Yes, but I think we'll need put in significant effort to guide / assist
+> people in taking this direction, and think about what it means for the
+> future of QEMU as a brand and GIT repo.
+>
+> In many ways it is a good thing if the Rust vhost-user impls are
+> all in their own standalone git repos. They're likely to be independent
+> codebases, so there's little compelling reason to force them into the
+> QEMU git, where they'll have to use QEMU workflow, and QEMU release
+> cycle. They're better off free from QEMU where they can choose to adopt
+> modern development practices like GitLab merge requests if they
+> desire and release on a more frequent cycle than QEMU's 3-times a
+> year, etc. Would also make them more appealing for use by alternative
+> non-QEMU userspaces for KVM.
+>
+> The downside is that QEMU git would only contain the "legacy" builtin
+> C impls of the devices, and all the "recommended" modern Rust impls
+> would be elsewhere. Essentially QEMU would no longer be a self-contained
+> provider of the complete solution. Many parts would be disaggregated,
+> and users now have the burden of finding all the right pieces to build
+> the best solution. We've already seen this to some extent with existing
+> vhost-user impls, but it feels like we'd be pushing towards that as a
+> more general model for the future which would amplify problems we've
+> largely been able to ignore upto now.
+>
+> I'm not sure what a good answer here is. Perhaps QEMU could try to
+> become more of brand for an umbrella project that covers multiple
+> independant repos ? eg create new repos under gitlab.com/qemu-project/
+> but allow them to work fairly independantly from the main qemu.git ?
+> That way we can more easily promote a collection of QEMU repos as
+> showing the recommended architecture, without forcing everything
+> into qemu.git. We can leverage the QEMU website, wiki and documentation
+> in general to showcase the overall solution, while still letting the
+> pieces develop independently.
+
+I think there would be scope for a vhost-user-daemon repo with multiple
+reference implementations.
+
+So has any vhost-user stuff been prototyped in Rust yet?
+
+>
+>> Conclusion
+>> ---------------
+>> Most security bugs in QEMU today are C programming bugs. Switching to
+>> a safer programming language will significantly reduce security bugs
+>> in QEMU. Rust is now mature and proven enough to use as the language
+>> for device emulation code. Thanks to vhost-user and vfio-user using
+>> Rust for device emulation does not require a big conversion of QEMU
+>> code, it can simply be done in a separate program. This way attack
+>> surfaces can be written in Rust to make them less susceptible to
+>> security bugs going forward.
+>
+>
+> Regards,
+> Daniel
+
+
+--=20
+Alex Benn=C3=A9e
 
