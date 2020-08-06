@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44610C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:40:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E37CC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:40:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CE3023103
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:40:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 185CE23103
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:40:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jaiTm7ij"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CE3023103
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t4dT7HUL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 185CE23103
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3fBs-0000Hn-BV
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 08:40:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38590)
+	id 1k3fBu-0000N3-6x
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 08:40:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3fAn-0007VZ-Oo
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 08:39:05 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:43217)
+ id 1k3fAo-0007Vm-O0
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 08:39:06 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44830)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3fAm-0004Jd-AW
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 08:39:05 -0400
-Received: by mail-wr1-x430.google.com with SMTP id a15so43838305wrh.10
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 05:39:03 -0700 (PDT)
+ id 1k3fAn-0004Jk-2S
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 08:39:06 -0400
+Received: by mail-wr1-x443.google.com with SMTP id c15so7627991wrs.11
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 05:39:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=FNDqhM8BnSE18oBN3qPjUTS6kYdhfDUSkvSLUFeNsoY=;
- b=jaiTm7ijp25y3TICjcB7NWOez2tqEHlyDYC96MrY4tSzws85jII7tFIieDBge72i4W
- iF3+mjL9KTi0dSXvm/GgDAvK1aGpV3itb6tirRbnGr1BjcrGwHAjcf9wVd2NDo1ieYUT
- 6wDyz2OB+8u03JaJfeq1l+d7N9L4eTblIxcZVjckyvYqXkWtpZDMH96rha5BJz1pue7g
- Z80a8K9VzjgEirX9T8Tg+5rDh+7t3IaFV1hcn30fIUtIW/HDvn0urymhxi/JWrBdD/Mz
- wlFgvwAkFACnL8GNCPBgpdTF40swmJ+ZivusabUShLNFlU1MEItwb3V3H1qQqgX19KcZ
- 0nCg==
+ bh=rRIMjMRCJ85r9XPfKeWQ6ALRZZNTPRI0iIj98UEuY4s=;
+ b=t4dT7HUL6NlYdA9cKe1oGPxMwV9QWExBsG4QF8WgOiC7Nc7JiIuV8unCsqsCTQ/uyq
+ J/arIQLfCUV4NQI88svCopGqM/uq92pYYW0D7vx1ekovZ7Q9mCXgB90sd2+FSL6SgpCG
+ +wzc4SLrEc1hZa6ETmv2IC4gfBTZhdz+Ta1yaIgFwmF51r6NJtS2UpdU0VjhkS7IkOXR
+ MgHiG+cvOuLbQz9WDBrW5esHh/Y1vj3P/D8wXKTU2W7/3liry+eH//yMGOHAtVUkUgUY
+ akw1ACSDeedNOQBPgUnQ3ZFKIMjtWur3/KSP5C00kDjGYMLn651pdgaVKt7XBPzBfgIv
+ kvXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=FNDqhM8BnSE18oBN3qPjUTS6kYdhfDUSkvSLUFeNsoY=;
- b=LkZH58nCQzuSPCcVqirRRKfDRtsYzO8NjuQQLZmpsAYp1KF6U0w3Bw/ocqheXDBM61
- taTz0MmFbL96pg6fycU44HKo/PYfD1AqOQXmYs6r3ITU0uvrNLdCUEWge+edLpFECnyk
- tXZyz0x4t9ZG5n5CYFTN1nByelS85EvM71/NnWNOPDzd6IBG+2Y6qtWx/seJrGO3kcvC
- MpvyA/5c/XZSiv1MFRm01IsF5/PEroVHspmsOm0f1beIVfdxKrXEBl7FyZVo67RV2EnZ
- nX0+nQAUhA8ZYfIzJHLSBZLz92hmA8QtXtbtdcZHqf4P9d7wZACulK6fOOyHt/31WvH6
- MgMA==
-X-Gm-Message-State: AOAM531j7xc24oywwTSUGEZ1FiWQda7mTisHqQPaTr9YFZ6XJbUL/IZV
- +0hgNSmitRKGDSiVWLK+H0GZuREu
-X-Google-Smtp-Source: ABdhPJyTyt4M2RvJmPvEW8RgfXWlM34FmpwMUEYHkbvK/tYKIXrUilCFDtC6pR2KQPEa6wM/QD0GKQ==
-X-Received: by 2002:adf:ce89:: with SMTP id r9mr7790475wrn.116.1596717541819; 
- Thu, 06 Aug 2020 05:39:01 -0700 (PDT)
+ bh=rRIMjMRCJ85r9XPfKeWQ6ALRZZNTPRI0iIj98UEuY4s=;
+ b=B3FV/sLop80Pp3nGjh7E6CLZq5T8txjpnaCnTNlKlGKS4eH+hYpRehIPzSjcoyFefy
+ H5Js0gzjPQ8UTisRAWBKaph/S2g9WJUu38WTrf+hZzXlcnRPA9QjzkbOWGgGzlZnpf6L
+ TPoTDW0jPI6OWKwG8gkZ+N9YJXzTa1timf+N7NpOBRZnammvmfoVwN5NBTsRM0Njray+
+ 7yEMkHpDLbHwNwkW6CPBqORP+VNfZDxHieVpH9SrqZi1nBcjQpdVDTSSgP+h1e1gPu+F
+ hq4LnWKunHRPRrXeFMPOZl/DsJzKXoqb64e8TpB+SVa1jPbr/7UzfstFp+N+3qpCqP3U
+ K4vA==
+X-Gm-Message-State: AOAM531heAf1Hb40tnqwTRhmdN/rUZqYAvrSnwqvQoDeOFenuDrkll3I
+ gZTuJCxafIDPmmEcN1F1b5GOubMt
+X-Google-Smtp-Source: ABdhPJzKxiK1QNwsxDLfMB9vgEWq/TqwmqaTdpY+sXQKECIEIZvKXSDjEuQsG4hFalGi6mVFx9p7IA==
+X-Received: by 2002:adf:b602:: with SMTP id f2mr6942460wre.186.1596717543131; 
+ Thu, 06 Aug 2020 05:39:03 -0700 (PDT)
 Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id j5sm6615395wmb.15.2020.08.06.05.39.00
+ by smtp.gmail.com with ESMTPSA id j5sm6615395wmb.15.2020.08.06.05.39.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 05:39:01 -0700 (PDT)
+ Thu, 06 Aug 2020 05:39:02 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 1/3] hw/clock: Remove unused clock_init*() functions
-Date: Thu,  6 Aug 2020 14:38:56 +0200
-Message-Id: <20200806123858.30058-2-f4bug@amsat.org>
+Subject: [PATCH-for-5.2 2/3] hw/clock: Let clock_set() return boolean value
+Date: Thu,  6 Aug 2020 14:38:57 +0200
+Message-Id: <20200806123858.30058-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200806123858.30058-1-f4bug@amsat.org>
 References: <20200806123858.30058-1-f4bug@amsat.org>
@@ -79,8 +79,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x430.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -109,36 +109,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-clock_init*() inlined funtions are simple wrappers around
-clock_set*() and are not used. Remove them in favor of clock_set*().
+Let clock_set() return a boolean value whether the clock
+has been updated or not.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/clock.h | 13 -------------
- 1 file changed, 13 deletions(-)
+ include/hw/clock.h | 12 +++++++-----
+ hw/core/clock.c    |  7 ++++++-
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
 diff --git a/include/hw/clock.h b/include/hw/clock.h
-index f822a94220..468fed0996 100644
+index 468fed0996..d85af45c96 100644
 --- a/include/hw/clock.h
 +++ b/include/hw/clock.h
-@@ -209,17 +209,4 @@ static inline bool clock_is_enabled(const Clock *clk)
-     return clock_get(clk) != 0;
+@@ -127,17 +127,19 @@ void clock_set_source(Clock *clk, Clock *src);
+  * @value: the clock's value, 0 means unclocked
+  *
+  * Set the local cached period value of @clk to @value.
++ *
++ * @return: true if the clock is changed.
+  */
+-void clock_set(Clock *clk, uint64_t value);
++bool clock_set(Clock *clk, uint64_t value);
+ 
+-static inline void clock_set_hz(Clock *clk, unsigned hz)
++static inline bool clock_set_hz(Clock *clk, unsigned hz)
+ {
+-    clock_set(clk, CLOCK_PERIOD_FROM_HZ(hz));
++    return clock_set(clk, CLOCK_PERIOD_FROM_HZ(hz));
  }
  
--static inline void clock_init(Clock *clk, uint64_t value)
--{
--    clock_set(clk, value);
--}
--static inline void clock_init_hz(Clock *clk, uint64_t value)
--{
--    clock_set_hz(clk, value);
--}
--static inline void clock_init_ns(Clock *clk, uint64_t value)
--{
--    clock_set_ns(clk, value);
--}
--
- #endif /* QEMU_HW_CLOCK_H */
+-static inline void clock_set_ns(Clock *clk, unsigned ns)
++static inline bool clock_set_ns(Clock *clk, unsigned ns)
+ {
+-    clock_set(clk, CLOCK_PERIOD_FROM_NS(ns));
++    return clock_set(clk, CLOCK_PERIOD_FROM_NS(ns));
+ }
+ 
+ /**
+diff --git a/hw/core/clock.c b/hw/core/clock.c
+index 3c0daf7d4c..7066282f7b 100644
+--- a/hw/core/clock.c
++++ b/hw/core/clock.c
+@@ -34,11 +34,16 @@ void clock_clear_callback(Clock *clk)
+     clock_set_callback(clk, NULL, NULL);
+ }
+ 
+-void clock_set(Clock *clk, uint64_t period)
++bool clock_set(Clock *clk, uint64_t period)
+ {
++    if (clk->period == period) {
++        return false;
++    }
+     trace_clock_set(CLOCK_PATH(clk), CLOCK_PERIOD_TO_NS(clk->period),
+                     CLOCK_PERIOD_TO_NS(period));
+     clk->period = period;
++
++    return true;
+ }
+ 
+ static void clock_propagate_period(Clock *clk, bool call_callbacks)
 -- 
 2.21.3
 
