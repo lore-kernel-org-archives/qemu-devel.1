@@ -4,74 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF10C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA5E6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A116722CF6
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8132B22CF6
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B+wfnzsC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A116722CF6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3zSatZ/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8132B22CF6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3e4Y-0007H2-8c
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:28:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43192)
+	id 1k3bsY-0002rl-IJ
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 05:08:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXf-0005Cq-35
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35411
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3brd-00021H-2u
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 05:07:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21179
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXd-0000Mo-3O
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:34 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3brb-00044H-CM
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 05:07:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596711272;
+ s=mimecast20190719; t=1596704822;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=4BmZ5R/B5KF+JC5CuMlI6vsCTV8fruRdJKUwCMQH7+E=;
- b=B+wfnzsCOSErMyryXzLfOc/Kqi4/G7uNdrjMOuTbkcKHOx0KgjZ7P3qJoJl7tPRfX5M9xD
- ooiXA1orsOzS8HDEhwQ9xLK4hgkgUqSGIZRBXk2pd2jJLMb1CykSDPZDsghPwhHBErKtzb
- gQ7sUeFcXm6piCxj5VxVnJfIfTnPF/0=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lWtbWQXwtrF5BvfNrGo8OzLCBd63XVozopD1jBzPNd4=;
+ b=V3zSatZ/U4cDmN0OcvjQ9ehqvmPxh8dLwcHFwQbbyfrAGTKwPFNh/jpyKAN0yOkNmIVyII
+ kqJkA0O9ksNm7fdP9y0XUL9ioyu252f30aVZu0sLleKTodr+OxlgmmICll8EbfYqeJCwRN
+ UlFpF+8JTFZu3+3ThRKg0au61Wvq1y0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-XBrdwAbkP4CYIxmaq3YqZA-1; Thu, 06 Aug 2020 06:54:28 -0400
-X-MC-Unique: XBrdwAbkP4CYIxmaq3YqZA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-411-3Yu_RB3GNJK-m4lzUTQBtw-1; Thu, 06 Aug 2020 04:59:34 -0400
+X-MC-Unique: 3Yu_RB3GNJK-m4lzUTQBtw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 419F4100AA23;
- Thu,  6 Aug 2020 10:54:27 +0000 (UTC)
-Received: from thuth.com (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9A8BA65C82;
- Thu,  6 Aug 2020 10:54:23 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-s390x@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH for-5.2 v2 7/9] pc-bios/s390-ccw: Allow booting in case the
- first virtio-blk disk is bad
-Date: Thu,  6 Aug 2020 12:53:47 +0200
-Message-Id: <20200806105349.632-8-thuth@redhat.com>
-In-Reply-To: <20200806105349.632-1-thuth@redhat.com>
-References: <20200806105349.632-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2F16100AA21;
+ Thu,  6 Aug 2020 08:59:32 +0000 (UTC)
+Received: from gondolin (ovpn-113-2.ams2.redhat.com [10.36.113.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8C5B5C6D9;
+ Thu,  6 Aug 2020 08:59:25 +0000 (UTC)
+Date: Thu, 6 Aug 2020 10:59:23 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v1 17/21] target/s390x: add BQL to do_interrupt and
+ cpu_exec_interrupt
+Message-ID: <20200806105923.2bd2b0de.cohuck@redhat.com>
+In-Reply-To: <20200805181303.7822-18-robert.foley@linaro.org>
+References: <20200805181303.7822-1-robert.foley@linaro.org>
+ <20200805181303.7822-18-robert.foley@linaro.org>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 03:10:56
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -92,107 +97,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, qemu-block@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, "open list:S390 TCG CPUs" <qemu-s390x@nongnu.org>,
+ cota@braap.org, peter.puhov@linaro.org, pbonzini@redhat.com,
+ alex.bennee@linaro.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If you try to boot with two virtio-blk disks (without bootindex), and
-only the second one is bootable, the s390-ccw bios currently stops at
-the first disk and does not continue booting from the second one. This
-is annoying - and all other major QEMU firmwares succeed to boot from
-the second disk in this case, so we should do the same in the s390-ccw
-bios, too.
+On Wed,  5 Aug 2020 14:12:59 -0400
+Robert Foley <robert.foley@linaro.org> wrote:
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/bootmap.c | 34 +++++++++++++++++++++++-----------
- pc-bios/s390-ccw/main.c    |  2 +-
- 2 files changed, 24 insertions(+), 12 deletions(-)
+> This is part of a series of changes to remove the implied BQL
+> from the common code of cpu_handle_interrupt and
+> cpu_handle_exception.  As part of removing the implied BQL
+> from the common code, we are pushing the BQL holding
+> down into the per-arch implementation functions of
+> do_interrupt and cpu_exec_interrupt.
+> 
+> The purpose of this set of changes is to set the groundwork
+> so that an arch could move towards removing
+> the BQL from the cpu_handle_interrupt/exception paths.
+> 
+> This approach was suggested by Paolo Bonzini.
+> For reference, here are two key posts in the discussion, explaining
+> the reasoning/benefits of this approach.
+> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg08731.html
+> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00044.html
+> 
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> ---
+>  target/s390x/excp_helper.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+> index dde7afc2f0..b215b4a4a7 100644
+> --- a/target/s390x/excp_helper.c
+> +++ b/target/s390x/excp_helper.c
+> @@ -470,7 +470,10 @@ void s390_cpu_do_interrupt(CPUState *cs)
+>      S390CPU *cpu = S390_CPU(cs);
+>      CPUS390XState *env = &cpu->env;
+>      bool stopped = false;
+> -
+> +    bool bql = !qemu_mutex_iothread_locked();
+> +    if (bql) {
+> +        qemu_mutex_lock_iothread();
+> +    }
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 97205674e5..0ef6b851f3 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -289,11 +289,18 @@ static void ipl_eckd_cdl(void)
-     read_block(1, ipl2, "Cannot read IPL2 record at block 1");
- 
-     mbr = &ipl2->mbr;
--    IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL2 record.");
--    IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
--               "Bad block size in zIPL section of IPL2 record.");
--    IPL_assert(mbr->dev_type == DEV_TYPE_ECKD,
--               "Non-ECKD device type in zIPL section of IPL2 record.");
-+    if (!magic_match(mbr, ZIPL_MAGIC)) {
-+        sclp_print("No zIPL section in IPL2 record.\n");
-+        return;
-+    }
-+    if (!block_size_ok(mbr->blockptr.xeckd.bptr.size)) {
-+        sclp_print("Bad block size in zIPL section of IPL2 record.\n");
-+        return;
-+    }
-+    if (!mbr->dev_type == DEV_TYPE_ECKD) {
-+        sclp_print("Non-ECKD device type in zIPL section of IPL2 record.\n");
-+        return;
-+    }
- 
-     /* save pointer to Boot Map Table */
-     bmt_block_nr = eckd_block_num(&mbr->blockptr.xeckd.bptr.chs);
-@@ -303,10 +310,14 @@ static void ipl_eckd_cdl(void)
- 
-     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
-     read_block(2, vlbl, "Cannot read Volume Label at block 2");
--    IPL_assert(magic_match(vlbl->key, VOL1_MAGIC),
--               "Invalid magic of volume label block");
--    IPL_assert(magic_match(vlbl->f.key, VOL1_MAGIC),
--               "Invalid magic of volser block");
-+    if (!magic_match(vlbl->key, VOL1_MAGIC)) {
-+        sclp_print("Invalid magic of volume label block.\n");
-+        return;
-+    }
-+    if (!magic_match(vlbl->f.key, VOL1_MAGIC)) {
-+        sclp_print("Invalid magic of volser block.\n");
-+        return;
-+    }
-     print_volser(vlbl->f.volser);
- 
-     run_eckd_boot_script(bmt_block_nr, s1b_block_nr);
-@@ -398,7 +409,8 @@ static void ipl_eckd(void)
-     read_block(0, mbr, "Cannot read block 0 on DASD");
- 
-     if (magic_match(mbr->magic, IPL1_MAGIC)) {
--        ipl_eckd_cdl(); /* no return */
-+        ipl_eckd_cdl();         /* only returns in case of error */
-+        return;
-     }
- 
-     /* LDL/CMS? */
-@@ -825,5 +837,5 @@ void zipl_load(void)
-         panic("\n! Unknown IPL device type !\n");
-     }
- 
--    panic("\n* this can never happen *\n");
-+    sclp_print("zIPL load failed.\n");
- }
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 9b581074a1..fc17e6ab83 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -240,7 +240,7 @@ static void ipl_boot_device(void)
-         break;
-     case CU_TYPE_VIRTIO:
-         if (virtio_setup() == 0) {
--            zipl_load(); /* no return */
-+            zipl_load();             /* Only returns in case of errors */
-         }
-         break;
-     default:
--- 
-2.18.1
+I'm not sure I like that conditional locking. Can we instead create
+__s390_cpu_do_interrupt() or so, move the meat of this function there,
+take the bql unconditionally here, and...
+
+>      qemu_log_mask(CPU_LOG_INT, "%s: %d at psw=%" PRIx64 ":%" PRIx64 "\n",
+>                    __func__, cs->exception_index, env->psw.mask, env->psw.addr);
+>  
+> @@ -541,10 +544,14 @@ try_deliver:
+>          /* unhalt if we had a WAIT PSW somehwere in our injection chain */
+>          s390_cpu_unhalt(cpu);
+>      }
+> +    if (bql) {
+> +        qemu_mutex_unlock_iothread();
+> +    }
+>  }
+>  
+>  bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>  {
+> +    qemu_mutex_lock_iothread();
+>      if (interrupt_request & CPU_INTERRUPT_HARD) {
+>          S390CPU *cpu = S390_CPU(cs);
+>          CPUS390XState *env = &cpu->env;
+> @@ -552,10 +559,12 @@ bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>          if (env->ex_value) {
+>              /* Execution of the target insn is indivisible from
+>                 the parent EXECUTE insn.  */
+> +            qemu_mutex_unlock_iothread();
+>              return false;
+>          }
+>          if (s390_cpu_has_int(cpu)) {
+>              s390_cpu_do_interrupt(cs);
+
+...call __s390_cpu_do_interrupt() here?
+
+> +            qemu_mutex_unlock_iothread();
+>              return true;
+>          }
+>          if (env->psw.mask & PSW_MASK_WAIT) {
+> @@ -564,6 +573,7 @@ bool s390_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>              cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HALT);
+>          }
+>      }
+> +    qemu_mutex_unlock_iothread();
+>      return false;
+>  }
+>  
 
 
