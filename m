@@ -7,38 +7,39 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE26C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A21C1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:27:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEED820748
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:27:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEED820748
+	by mail.kernel.org (Postfix) with ESMTPS id 905FE20748
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:27:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 905FE20748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3mUQ-0000hU-24
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:27:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47502)
+	id 1k3mUX-0000wJ-OI
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:27:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k3lgO-0002Qa-Jx; Thu, 06 Aug 2020 15:36:08 -0400
-Received: from relay.sw.ru ([185.231.240.75]:56454 helo=relay3.sw.ru)
+ id 1k3lgN-0002Nu-Iz; Thu, 06 Aug 2020 15:36:07 -0400
+Received: from relay.sw.ru ([185.231.240.75]:56496 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k3lgK-0000Kj-8L; Thu, 06 Aug 2020 15:36:08 -0400
+ id 1k3lgJ-0000Ku-N7; Thu, 06 Aug 2020 15:36:07 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.93)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k3lgB-0003k9-RA; Thu, 06 Aug 2020 22:35:55 +0300
+ id 1k3lgB-0003k9-OM; Thu, 06 Aug 2020 22:35:55 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v13 05/11] qcow2_format.py: Dump bitmap directory information
-Date: Thu,  6 Aug 2020 22:35:51 +0300
-Message-Id: <1596742557-320265-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v13 03/11] qcow2_format.py: change Qcow2BitmapExt
+ initialization method
+Date: Thu,  6 Aug 2020 22:35:49 +0300
+Message-Id: <1596742557-320265-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1596742557-320265-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1596742557-320265-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -69,112 +70,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Read and dump entries from the bitmap directory of QCOW2 image.
+There are two ways to initialize a class derived from Qcow2Struct:
+1. Pass a block of binary data to the constructor.
+2. Pass the file descriptor to allow reading the file from constructor.
+Let's change the Qcow2BitmapExt initialization method from 1 to 2 to
+support a scattered reading in the initialization chain.
+The implementation comes with the patch that follows.
 
-Header extension:
-magic                     0x23852875 (Bitmaps)
-...
-Bitmap name               bitmap-1
-bitmap_table_offset       0xf0000
-bitmap_table_size         1
-flags                     0x2 (['auto'])
-type                      1
-granularity_bits          16
-name_size                 8
-extra_data_size           0
-
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/303.out         | 18 +++++++++++++++
- tests/qemu-iotests/qcow2_format.py | 47 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
+ tests/qemu-iotests/qcow2_format.py | 36 ++++++++++++++++++++++--------------
+ 1 file changed, 22 insertions(+), 14 deletions(-)
 
-diff --git a/tests/qemu-iotests/303.out b/tests/qemu-iotests/303.out
-index 8d7973c..038ba93 100644
---- a/tests/qemu-iotests/303.out
-+++ b/tests/qemu-iotests/303.out
-@@ -58,3 +58,21 @@ reserved32                0
- bitmap_directory_size     0x40
- bitmap_directory_offset   0x9d0000
- 
-+Bitmap name               bitmap-1
-+bitmap_table_offset       0x9b0000
-+bitmap_table_size         1
-+flags                     0x2 (['auto'])
-+type                      1
-+granularity_bits          15
-+name_size                 8
-+extra_data_size           0
-+
-+Bitmap name               bitmap-2
-+bitmap_table_offset       0x9c0000
-+bitmap_table_size         1
-+flags                     0x0 ([])
-+type                      1
-+granularity_bits          16
-+name_size                 8
-+extra_data_size           0
-+
 diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index b447344..05a8aa9 100644
+index 2f3681b..d4a9974 100644
 --- a/tests/qemu-iotests/qcow2_format.py
 +++ b/tests/qemu-iotests/qcow2_format.py
-@@ -134,6 +134,53 @@ class Qcow2BitmapExt(Qcow2Struct):
-         tail = struct.calcsize(self.fmt) % 8
-         if tail:
-             fd.seek(8 - tail, 1)
-+        position = fd.tell()
-+        self.read_bitmap_directory(fd)
-+        fd.seek(position)
-+
-+    def read_bitmap_directory(self, fd):
-+        fd.seek(self.bitmap_directory_offset)
-+        self.bitmap_directory = \
-+            [Qcow2BitmapDirEntry(fd) for _ in range(self.nb_bitmaps)]
-+
-+    def dump(self):
-+        super().dump()
-+        for entry in self.bitmap_directory:
-+            print()
-+            entry.dump()
-+
-+
-+class Qcow2BitmapDirEntry(Qcow2Struct):
-+
-+    fields = (
-+        ('u64', '{:#x}', 'bitmap_table_offset'),
-+        ('u32', '{}', 'bitmap_table_size'),
-+        ('u32', BitmapFlags, 'flags'),
-+        ('u8',  '{}', 'type'),
-+        ('u8',  '{}', 'granularity_bits'),
-+        ('u16', '{}', 'name_size'),
-+        ('u32', '{}', 'extra_data_size')
-+    )
-+
+@@ -113,6 +113,11 @@ class Qcow2BitmapExt(Qcow2Struct):
+         ('u64', '{:#x}', 'bitmap_directory_offset')
+     )
+ 
 +    def __init__(self, fd):
 +        super().__init__(fd=fd)
-+        # Seek relative to the current position in the file
-+        fd.seek(self.extra_data_size, 1)
-+        bitmap_name = fd.read(self.name_size)
-+        self.name = bitmap_name.decode('ascii')
-+        # Move position to the end of the entry in the directory
-+        entry_raw_size = self.bitmap_dir_entry_raw_size()
-+        padding = ((entry_raw_size + 7) & ~7) - entry_raw_size
-+        fd.seek(padding, 1)
-+
-+    def bitmap_dir_entry_raw_size(self):
-+        return struct.calcsize(self.fmt) + self.name_size + \
-+            self.extra_data_size
-+
-+    def dump(self):
-+        print(f'{"Bitmap name":<25} {self.name}')
-+        super(Qcow2BitmapDirEntry, self).dump()
-+
++        tail = struct.calcsize(self.fmt) % 8
++        if tail:
++            fd.seek(8 - tail, 1)
  
  QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
  
+@@ -161,21 +166,24 @@ class QcowHeaderExtension(Qcow2Struct):
+         else:
+             assert all(v is None for v in (magic, length, data))
+             super().__init__(fd=fd)
+-            padded = (self.length + 7) & ~7
+-            self.data = fd.read(padded)
+-            assert self.data is not None
+-
+-        data_str = self.data[:self.length]
+-        if all(c in string.printable.encode('ascii') for c in data_str):
+-            data_str = f"'{ data_str.decode('ascii') }'"
+-        else:
+-            data_str = '<binary>'
+-        self.data_str = data_str
++            if self.magic == QCOW2_EXT_MAGIC_BITMAPS:
++                self.obj = Qcow2BitmapExt(fd=fd)
++                self.data = None
++            else:
++                padded = (self.length + 7) & ~7
++                self.data = fd.read(padded)
++                assert self.data is not None
++                self.obj = None
++
++        if self.data is not None:
++            data_str = self.data[:self.length]
++            if all(c in string.printable.encode(
++                'ascii') for c in data_str):
++                data_str = f"'{ data_str.decode('ascii') }'"
++            else:
++                data_str = '<binary>'
++            self.data_str = data_str
+ 
+-        if self.magic == QCOW2_EXT_MAGIC_BITMAPS:
+-            self.obj = Qcow2BitmapExt(data=self.data)
+-        else:
+-            self.obj = None
+ 
+     def dump(self):
+         super().dump()
 -- 
 1.8.3.1
 
