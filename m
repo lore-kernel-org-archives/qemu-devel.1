@@ -2,91 +2,86 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10522C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F6BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:52:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E838E20855
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:34:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 373EB221E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:52:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cCJd3j7N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E838E20855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZW7SufAp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 373EB221E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3maQ-0003Xk-WA
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:34:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51866)
+	id 1k3mrv-0001aZ-DH
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:52:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1k3m7Y-0000Bo-SI
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 16:04:12 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:41718)
+ (Exim 4.90_1) (envelope-from <louisc363@gmail.com>)
+ id 1k3jXH-00030K-SU
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 13:18:35 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:46266)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1k3m7W-0003EM-TH
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 16:04:12 -0400
-Received: by mail-lf1-x143.google.com with SMTP id i19so26746373lfj.8
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 13:04:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hsoeGUdxWFh6vi9rrbfC7qJTPAg5ExZDCEGBLOBlaok=;
- b=cCJd3j7NbQ1Prv1w/8ZgBN3YIGF3x5bj+l99J+9zGz6mHCMQCGe3G92S2HbluetnUu
- gzmd1rAJc21O68JEY6KpwNzn+LChRPujJ88fpwMX0BJgrhspbi0GBjXQsafRAOdH2TK2
- E5b520A820BbvMjR+93vdpjcvXWZpBNRz4Z09dZyp1aXCjW9iPt3mulPyyZI5Ts+Ytdh
- FHM18fNdaWJ2a6BymbcqqkCVfDl7PXP7BaGpslEfT3kmvIFRPwkyXuilVerBzbg06woI
- Zf4tyhGZkHNSBp8J2ioBD8npSmccXT+zLh/XGlYTDy/Zlvf00MPPWwg/Vzf6O1MVE2V1
- zSCA==
+ (Exim 4.90_1) (envelope-from <louisc363@gmail.com>)
+ id 1k3jXG-000114-3X
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 13:18:35 -0400
+Received: by mail-ot1-x332.google.com with SMTP id v6so25977575ota.13
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 10:18:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=jiKhGRX52re3eIJjnsi7RVpixiQqbIrGIKUj9n8s1Zg=;
+ b=ZW7SufAprcszuG7/a2+vmjOu5LMKMGHVDWGKLHR5FYYaBa96CvIqZqL69wtdE2M+26
+ pxonoZGp3oekifSkTzPvNGVNa/NnqCYV8HK+3ZFreTk9ftBzfxWuML2N/oQFyFcVEmVT
+ cEGHPN6hVs00uxhMHFDdRDyNIH5d0Byd786sWNsS8SQkumudrn4lCBjAAUgKE3n6rRFL
+ kPo3kd/Y1AzTyoywQMrnq/Qaz/c+ySr+yP2YnFfXG5L8FnKjLWK4+LfrteK4UU2ykzhC
+ nTZDMI58vy/SJXXOIIszDNqx1adMckYe8oLiucxWuIQttNpWKhxbTCKfv4E5wFHKID5Y
+ tHGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hsoeGUdxWFh6vi9rrbfC7qJTPAg5ExZDCEGBLOBlaok=;
- b=cgZUeDqhjoEU/QN9r/8i/s7ZnEPx/SQQLRN2AlX5KBS3drTAWWGDVlWbf5/6HQi2MN
- ugzRQBNpT+PoW9CSlRFghC69z84FA3OqFAH54DrP2uEPbnxbDCXch/UyV769RxTqnjhR
- yQ3ppaQi9cF23RSyEhExjLHkkt3EG9LoiUYwJlYIejRsLJ6BrN07Vj2k5g9pNIMYXH2Z
- pt763EMZCJTSLOLAUxmZ6rm/JYND0WuIigqOzO7vToQaqYcy8/iU+JeACTnPkHUS7djE
- Ut9xE+kCGZrsQzJozH/KSV04ugBUe1WY4wivmY8dSa3jmfa8LnUVbCOZs3e2BblFTJs1
- uqEw==
-X-Gm-Message-State: AOAM533hIotYgdy+xzCadAvQHMGGjATxDTAo8hMOGqq+uheOerW8wCab
- uYSBPmHkmlTasP9lJDJx0LmtvoWuR8ayvlv8E4s+3Q==
-X-Google-Smtp-Source: ABdhPJxxrXxNrrIKkVFcE1SnYTx3fAJmpt33svWX3pJDVbbI3N2cJajpEF/CKEHjwDEOpG28dd/7Ink3cM8+FTioCsg=
-X-Received: by 2002:a19:189:: with SMTP id 131mr4732745lfb.128.1596744248362; 
- Thu, 06 Aug 2020 13:04:08 -0700 (PDT)
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=jiKhGRX52re3eIJjnsi7RVpixiQqbIrGIKUj9n8s1Zg=;
+ b=pTOnD3Y0hcFcHtgeCNg7bBSOruj+LLbnqewKueppwDr3bV4y848th9RnMYe3/zjEYv
+ 7NWQy+I5xW/bZ5m+ONKdCsP3JblnjVZGVCqGZu9VnFko2HJjiiGYi9De8DhBHcu3M4PG
+ ycAC7CAkm4AEI6Gh8Ixvj7y4Xs554EgfQ9m4/0mvocrBpGFTHrjAgn6I1auOHv2DPDEw
+ +kAbG9YxIuC77lvyNY5B/PjlrJUMwyL/M4DlBxBvkM5ktIoVulTUfeQcEtDb/WQoDVDR
+ u9yFgyCV521W3/1ky999dJKTaztQT1HIDw3HogsMmchCZKvJkhj0Cy1tfAw5foK1uxWl
+ mgSA==
+X-Gm-Message-State: AOAM530WMiw4LORty9ngNHi4wsMThZx7VAbSN0wxpe3AiOzk6o7eU7Y6
+ +zrIVcVaRxSczqyYyddgU/L6jKFa4a+0VvK3UKiFVaI7PA8=
+X-Google-Smtp-Source: ABdhPJynxpefn3OLKetlDuI7EDw0B4sDpvUolxqO9jDlSnIWTcF7KujpGkfygnhEIW3l1wlIe3bjk6aH/iWQ1c5UV3I=
+X-Received: by 2002:a05:6830:2119:: with SMTP id
+ i25mr8483708otc.131.1596734311860; 
+ Thu, 06 Aug 2020 10:18:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200805181303.7822-1-robert.foley@linaro.org>
- <20200805181303.7822-2-robert.foley@linaro.org>
- <ca24d2c5-2c5e-eace-4cf2-90011e684485@linaro.org>
- <4e678ed7-fc36-7918-ce9e-7a7e309c56df@redhat.com>
- <CAEyhzFvveC=nhpo4uyJ_89J8Wi4+9NEc2T2Mk9mg6Y9ZMQjNSA@mail.gmail.com>
-In-Reply-To: <CAEyhzFvveC=nhpo4uyJ_89J8Wi4+9NEc2T2Mk9mg6Y9ZMQjNSA@mail.gmail.com>
-From: Robert Foley <robert.foley@linaro.org>
-Date: Thu, 6 Aug 2020 16:04:29 -0400
-Message-ID: <CAEyhzFvh79ViuXYLYyihTBS3d5dviGpOXjntAt95yyuwE+HwLA@mail.gmail.com>
-Subject: Re: [PATCH v1 01/21] accel/tcg: Change interrupt/exception handling
- to remove implied BQL
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::143;
- envelope-from=robert.foley@linaro.org; helo=mail-lf1-x143.google.com
+From: Louis Cloete <louisc363@gmail.com>
+Date: Thu, 6 Aug 2020 19:18:11 +0200
+Message-ID: <CA+BhqPZP8BCefVJi554ZfvC5zK_Tkz6yWiLQZ1Hw9b96Fmp1fQ@mail.gmail.com>
+Subject: Small error in blog post
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="00000000000075913b05ac38ade5"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::332;
+ envelope-from=louisc363@gmail.com; helo=mail-ot1-x332.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Thu, 06 Aug 2020 16:51:10 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,98 +93,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>,
- Peter Puhov <peter.puhov@linaro.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: stefanha@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The comment around documenting the cpu_mutex fields and critical sections
-got us thinking and revisiting our locking assumptions in cpu_handle_interrupt.
+--00000000000075913b05ac38ade5
+Content-Type: text/plain; charset="UTF-8"
 
-Initially we were thinking that removing the BQL from cpu_handle_interrupt
-meant that we needed to replace it with the cpu mutex to protect the per cpu
-data that is accessed like interrupt_request.  We are reconsidering this and
-now thinking that the cpu mutex might not be needed here.
+Hi!
 
-BQL is clearly needed to protect the critical section around the call to
-->cpu_exec_interrupt.  What else is the BQL protecting in cpu_handle_interrupt
-that we need to consider?  Are we missing anything here?
+I read your blog post
+http://blog.vmsplice.net/2020/08/why-qemu-should-move-from-c-to-rust.html
 
-It's also worth mentioning that we did give this approach a try.
-We tried out changes to cpu_handle_interrupt(),
-dropping the BQL from all but around ->cpu_exec_interrupt, and not using the
-cpu_mutex at all.  It seemed to be functional, passing all the tests that
-we tried (so far). :)
+I thought it was a well thought out exposition of the topic of "what shall
+we do to security vulnerabilities due to C bugs. Is Rust the answer".
 
-Thanks,
--Rob
+However, one small inaccuracy caught my eye. Rust doesn't prevent memory
+leaks. Memory leaks aren't considered memory unsafe by Rust's definition.
+It is possible to leak memory in safe Rust. I believe memory leaks are not
+prevented, because trying to prove their absence at compile time boils down
+to the halting problem.
 
-On Thu, 6 Aug 2020 at 12:11, Robert Foley <robert.foley@linaro.org> wrote:
->
-> On Thu, 6 Aug 2020 at 05:22, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > On 05/08/20 21:18, Richard Henderson wrote:
-> > > On 8/5/20 11:12 AM, Robert Foley wrote:
-> > >> This change removes the implied BQL from the cpu_handle_interrupt,
-> > >> and cpu_handle_exception paths. This BQL acquire is being pushed
-> > >> down into the per arch implementation.
-> > >>
-> > >> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> > >> ---
-> > >>  accel/tcg/cpu-exec.c | 19 +++++++++++--------
-> > >>  1 file changed, 11 insertions(+), 8 deletions(-)
-> > >>
-> > >> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> > >> index 80d0e649b2..8e2bfd97a1 100644
-> > >> --- a/accel/tcg/cpu-exec.c
-> > >> +++ b/accel/tcg/cpu-exec.c
-> > >> @@ -517,9 +517,7 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
-> > >>  #else
-> > >>          if (replay_exception()) {
-> > >>              CPUClass *cc = CPU_GET_CLASS(cpu);
-> > >> -            qemu_mutex_lock_iothread();
-> > >>              cc->do_interrupt(cpu);
-> > >> -            qemu_mutex_unlock_iothread();
-> > >>              cpu->exception_index = -1;
-> > >>
-> > >
-> > > This patch is not bisectable.  The removal of the lock here needs to happen at
-> > > the end, or something.
-> >
-> > Indeed the series should be structured like this:
-> >
-> > 1) rename all *_do_interrupt functions to *_do_interrupt_locked
-> >
-> > 2) add back *_do_interrupt that takes the BQL and calls
-> > *_do_interrupt_locked, point ->do_interrupt to it, remove the BQL from
-> > cpu-exec.c
-> >
-> > 3) modify the cpu_mutex and BQL critical sections around
-> > ->cpu_exec_interrupt, so that the BQL critical section covers just the
-> > call to ->cpu_exec_interrupt.  Document which fields are now covered by
-> > cpu_mutex.
-> >
-> > 4/5) same as 1/2 for ->cpu_exec_interrupt
-> >
-> > Patches 1/2 would be pretty large, but they're trivial to review just by
-> > grepping for "->do_interrupt\s*=", and likewise for 4/5.
-> >
->
-> Thanks for the details !
->
-> It seems like we will have 3 separate patches for this series, 1/2, 3, and 4/5.
->
-> We will go in this direction.
->
-> Thanks,
-> -Rob
->
-> > Thanks,
-> >
-> > Paolo
-> >
+Regards
+Louis Cloete
+
+--00000000000075913b05ac38ade5
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi!</div><div><br></div><div>I read your blog post <a=
+ href=3D"http://blog.vmsplice.net/2020/08/why-qemu-should-move-from-c-to-ru=
+st.html">http://blog.vmsplice.net/2020/08/why-qemu-should-move-from-c-to-ru=
+st.html</a></div><div><br></div><div>I thought it was a well thought out ex=
+position of the topic of &quot;what shall we do to security vulnerabilities=
+ due to C bugs. Is Rust the answer&quot;.</div><div><br></div><div>However,=
+ one small inaccuracy caught my eye. Rust doesn&#39;t prevent memory leaks.=
+ Memory leaks aren&#39;t considered memory unsafe by Rust&#39;s definition.=
+ It is possible to leak memory in safe Rust. I believe memory leaks are not=
+ prevented, because trying to prove their absence at compile time boils dow=
+n to the halting problem.</div><div><br></div><div>Regards</div><div>Louis =
+Cloete<br></div></div>
+
+--00000000000075913b05ac38ade5--
 
