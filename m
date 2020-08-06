@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9C7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F9CEC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:02:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BAE7221E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:00:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DBAA221E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:02:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WPlot1/e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BAE7221E2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DrKMLv3Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DBAA221E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3m4Q-0001z5-4I
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:00:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43820)
+	id 1k3m64-0004s0-2s
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:02:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lPy-0008V3-U2
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35550
+ id 1k3lQe-0001nx-Bv
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20299
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lPw-0006iL-VM
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:10 -0400
+ id 1k3lQc-0006nZ-9y
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741548;
+ s=mimecast20190719; t=1596741589;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2GnJE8/7S2X2Uk5TiW2ODDJsajZPMmPTCwYS7sDXl8o=;
- b=WPlot1/en8D47hdhkRFmh50DwIp3+ZtHMIMK39aFf9IUu3gGiutsz+XkrZS0N2u57eD/zH
- n6ypCHLkrs2VVWZVHVs6ImK7x9AQ8GK57/KCVunvmUq2O/f131x1/jYNhqwx3jAlagF45h
- X8zaOBA+o/oMQ6xYoUwPOqlNiczFjqE=
+ bh=4ljzT9uBW3oam26OBDL4h2fJTNj7LbFlqlVlhCS6FiY=;
+ b=DrKMLv3ZRCM1tttUvmojHbtht8Tl9w8yYugFgPTSzXaShxqem7ku7DMaMHI3c/1MG1h5On
+ SVAazKDxQqiBTZhEPmI1B79xcEn4igyWSkOf8zD5lP+RQR8VKzU0GpCC6uC8XOCaBCfW+M
+ NC21xTIqqmdCKhznBr04vMHGWO0xhLM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-svTc1eDaOk6DMjnDtja7OA-1; Thu, 06 Aug 2020 15:19:06 -0400
-X-MC-Unique: svTc1eDaOk6DMjnDtja7OA-1
+ us-mta-457-B2IgNitVOoKmvsrJ1EuWbQ-1; Thu, 06 Aug 2020 15:19:47 -0400
+X-MC-Unique: B2IgNitVOoKmvsrJ1EuWbQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E61119200C0
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:19:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE2098014C1
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:19:46 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7FCAA69319;
- Thu,  6 Aug 2020 19:19:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D028769315;
+ Thu,  6 Aug 2020 19:19:45 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 095/143] meson: convert hw/sd
-Date: Thu,  6 Aug 2020 21:15:31 +0200
-Message-Id: <1596741379-12902-96-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 112/143] meson: convert hw/hyperv
+Date: Thu,  6 Aug 2020 21:15:48 +0200
+Message-Id: <1596741379-12902-113-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -107,74 +107,54 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs    |  1 -
- hw/meson.build      |  1 +
- hw/sd/Makefile.objs | 12 ------------
- hw/sd/meson.build   | 12 ++++++++++++
- 4 files changed, 13 insertions(+), 13 deletions(-)
- delete mode 100644 hw/sd/Makefile.objs
- create mode 100644 hw/sd/meson.build
+ hw/Makefile.objs        | 1 -
+ hw/hyperv/Makefile.objs | 3 ---
+ hw/hyperv/meson.build   | 3 +++
+ hw/meson.build          | 1 +
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+ delete mode 100644 hw/hyperv/Makefile.objs
+ create mode 100644 hw/hyperv/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index e50eb04..6f9c0b7 100644
+index 22eb804..a2c2f6d 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -25,7 +25,6 @@ devices-dirs-y += pci/
- devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
- devices-dirs-y += pcmcia/
- devices-dirs-$(CONFIG_SCSI) += scsi/
--devices-dirs-y += sd/
+@@ -9,7 +9,6 @@ devices-dirs-y += cpu/
+ devices-dirs-y += display/
+ devices-dirs-y += dma/
+ devices-dirs-y += gpio/
+-devices-dirs-$(CONFIG_HYPERV) += hyperv/
  endif
  
  common-obj-y += $(devices-dirs-y)
+diff --git a/hw/hyperv/Makefile.objs b/hw/hyperv/Makefile.objs
+deleted file mode 100644
+index 5b614e0..0000000
+--- a/hw/hyperv/Makefile.objs
++++ /dev/null
+@@ -1,3 +0,0 @@
+-obj-y += hyperv.o
+-obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+-obj-$(CONFIG_VMBUS) += vmbus.o
+diff --git a/hw/hyperv/meson.build b/hw/hyperv/meson.build
+new file mode 100644
+index 0000000..1367e29
+--- /dev/null
++++ b/hw/hyperv/meson.build
+@@ -0,0 +1,3 @@
++specific_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'))
++specific_ss.add(when: 'CONFIG_HYPERV_TESTDEV', if_true: files('hyperv_testdev.c'))
++specific_ss.add(when: 'CONFIG_VMBUS', if_true: files('vmbus.c'))
 diff --git a/hw/meson.build b/hw/meson.build
-index 7564426..a73f4ae 100644
+index 983edc1..f9e5adf 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -2,6 +2,7 @@ subdir('core')
- subdir('mem')
- subdir('nubus')
- subdir('rtc')
-+subdir('sd')
- subdir('semihosting')
- subdir('smbios')
- subdir('ssi')
-diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
-deleted file mode 100644
-index 0d1df17..0000000
---- a/hw/sd/Makefile.objs
-+++ /dev/null
-@@ -1,12 +0,0 @@
--common-obj-$(CONFIG_PL181) += pl181.o
--common-obj-$(CONFIG_SSI_SD) += ssi-sd.o
--common-obj-$(CONFIG_SD) += sd.o core.o sdmmc-internal.o
--common-obj-$(CONFIG_SDHCI) += sdhci.o
--common-obj-$(CONFIG_SDHCI_PCI) += sdhci-pci.o
--
--common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-sdhost.o
--common-obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
--common-obj-$(CONFIG_OMAP) += omap_mmc.o
--common-obj-$(CONFIG_PXA2XX) += pxa2xx_mmci.o
--common-obj-$(CONFIG_RASPI) += bcm2835_sdhost.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_sdhci.o
-diff --git a/hw/sd/meson.build b/hw/sd/meson.build
-new file mode 100644
-index 0000000..b43e59b
---- /dev/null
-+++ b/hw/sd/meson.build
-@@ -0,0 +1,12 @@
-+softmmu_ss.add(when: 'CONFIG_PL181', if_true: files('pl181.c'))
-+softmmu_ss.add(when: 'CONFIG_SD', if_true: files('sd.c', 'core.c', 'sdmmc-internal.c'))
-+softmmu_ss.add(when: 'CONFIG_SDHCI', if_true: files('sdhci.c'))
-+softmmu_ss.add(when: 'CONFIG_SDHCI_PCI', if_true: files('sdhci-pci.c'))
-+softmmu_ss.add(when: 'CONFIG_SSI_SD', if_true: files('ssi-sd.c'))
-+
-+softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-memcard.c'))
-+softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_mmc.c'))
-+softmmu_ss.add(when: 'CONFIG_PXA2XX', if_true: files('pxa2xx_mmci.c'))
-+softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_sdhost.c'))
-+softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_sdhci.c'))
-+softmmu_ss.add(when: 'CONFIG_ALLWINNER_H3', if_true: files('allwinner-sdhost.c'))
+@@ -1,4 +1,5 @@
+ subdir('core')
++subdir('hyperv')
+ subdir('i2c')
+ subdir('ide')
+ subdir('input')
 -- 
 1.8.3.1
 
