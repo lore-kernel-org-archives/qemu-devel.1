@@ -3,97 +3,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71313C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AACEC433DF
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 22:59:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69093221E2
+	by mail.kernel.org (Postfix) with ESMTPS id 3E3F620748
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 22:59:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WZhsfD9X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69093221E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="mFedqXKU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E3F620748
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3orL-0007jX-IN
+	id 1k3orL-0007BT-4T
 	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 18:59:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60172)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k3oqa-00072e-64
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 18:58:52 -0400
-Received: from mail-pj1-x1036.google.com ([2607:f8b0:4864:20::1036]:39200)
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1k3op7-00062H-FL; Thu, 06 Aug 2020 18:57:21 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:35244)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k3oqY-0007pQ-L1
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 18:58:51 -0400
-Received: by mail-pj1-x1036.google.com with SMTP id f9so7431929pju.4
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 15:58:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=QnnIcZDIbfq/i7nr6CWOpWg/8xI7vWY4gpm0Kv+LiXY=;
- b=WZhsfD9X3bvGaypquzBiYA/tQvZWFzZDAfabUfq25d1gohGpvZXaviuP41O5PzK8Px
- K/R74gBkguXMRGmO8DyaK6FpybPPDUL/3clfbvP8vz0pjqkiXssUFiqmP8t2geUOkEpv
- Y/+Kb/WnhO98OF3mSgZ8rW2IKT3jtSiwLevdgQFJk5K6s4PTNSRthKxqiYDn5TDF/ART
- Ne2HdqvqTiFGlumR3m3MV4FnA6QiY+grt1hsk664KVRDzvARLxDjFG+8kCQtejPBL0lw
- KSF5aTXuQPXvBnVhC3FRo2iuYsWST3QGilPoHxyPze3woFEDLlE3t7FCrsUlNxbYcKJ5
- I1YQ==
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1k3op5-0007iO-VM; Thu, 06 Aug 2020 18:57:21 -0400
+Received: by mail-ej1-x642.google.com with SMTP id a26so80594ejc.2;
+ Thu, 06 Aug 2020 15:57:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=X+IxDrTb6WKRXsCWuzJFD3rPRYDnU0xSRi/GSEo8MoA=;
+ b=mFedqXKUmOHwRIYhMtDBCVnB8CaJM2tMYiAlaGRdTPB5Ak6v/c3CdZVtQ8YqD2qu+L
+ Ld6hupFm3t7zuJ96ZktIZ9Mr1BiqxMWuFxgrBmWqPw7N/kqecp1xNoewtwzixu5Y5jJg
+ ahRZ45EZK8We1hdxD62AgrbkNAyKqX2cDl/go=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=QnnIcZDIbfq/i7nr6CWOpWg/8xI7vWY4gpm0Kv+LiXY=;
- b=KVAbCMUEqcX8cga62ZC7COQzu3NoFNHWBk8y9s44F1Fayfop+G/PA+aGPCR8J+ppM8
- Y8xsgIQcCOwjKda0M3JEYjJR/fSp4gPzNf/i+DJ2paE9or7OwtZQBxxCGyxa9Ec6iFJp
- 0+0YH6WpLakxUwG3P3EpNTQR9MeYDCDODxGnjiuPDjXDBVmQMQctKS9h8YjuXsFXR1ZW
- QT7/vCzNqShp6tc6VMx6FEQZ+RJ3EkM0rl62DVkPrVTRSWzcI8EgEBKUitdq+fjT5BxD
- 9tcB62AszKH89K8N35lGGoLCHwiM9d3Pd9RkbvQQNJE5z6a6uqJxLco4xN6D1/G+dqii
- zN6A==
-X-Gm-Message-State: AOAM531+bQf8gi3VhW8sJE8Oh0VuEvsZENEQ/uuie/1OoFS746V9D/mR
- elPapnLyw6Vif55e/BGMMr6CEQ==
-X-Google-Smtp-Source: ABdhPJzwt1YxRQJQzWwDgc1LeCRT2MQj4XR//FaESfnsbFn1gF8os30F7aHQdbX/Pj4PtlBAprrCUg==
-X-Received: by 2002:a17:90b:f94:: with SMTP id
- ft20mr10942495pjb.69.1596754729318; 
- Thu, 06 Aug 2020 15:58:49 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id n3sm9490152pfq.131.2020.08.06.15.58.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Aug 2020 15:58:48 -0700 (PDT)
-Subject: Re: [RFC v3 17/71] target/riscv: rvv:1.0: add translation-time
- nan-box helper function
-To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-References: <20200806104709.13235-1-frank.chang@sifive.com>
- <20200806104709.13235-18-frank.chang@sifive.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c63fa4ab-7612-6868-343a-b96b58a5586d@linaro.org>
-Date: Thu, 6 Aug 2020 15:58:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=X+IxDrTb6WKRXsCWuzJFD3rPRYDnU0xSRi/GSEo8MoA=;
+ b=IqagjM5xDIjrL3wQwLQAd4v8wYVjfNTBNnmlliOEd++9Bi9G8WYQMPxB+EvA4tt69X
+ m+oz5hHv8EmPfxcIOSJ0bno1gz9l/CMZZim1xD1Qgz3fDxEpWQxydTt+LIz+EdYjfSPM
+ dCnQzbCu3hjuhiChH/bM+rboaO8n5YWGa8sHpJi36b48LmdftQBVBS7DtRQEgOJfVA1U
+ XvsqtVd9FPbrIjT7gwVUNecNLETEDzKn8OCXTmefi7VzjDMcSx1xF0VGzaeZrcLgL+fd
+ kjWDvsvA4i54j4yv2cDjF1/lvqzWxL5MXg9bulDYqg8Om/bxhwxknlaYsjWBzB26mRv9
+ mczw==
+X-Gm-Message-State: AOAM530+FPJySjGUxYMV+IuRkFmvwam/tLdy1M51iUYx/msRDPdMCOR5
+ PaPyyV4J6qdp+QXrMJrc13lB7DK073J8agHNKtcT0QyzbUU=
+X-Google-Smtp-Source: ABdhPJynF3ombZ79DhQ8/Mj2povDNr1LJlFpigjOD9zvZ3fnliCrnWUjRfPlRP1M3SlqaM9g1XXVwZzrqDAdHkXisrI=
+X-Received: by 2002:a17:906:1ed3:: with SMTP id
+ m19mr6350906ejj.396.1596754637999; 
+ Thu, 06 Aug 2020 15:57:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200806104709.13235-18-frank.chang@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1036;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1036.google.com
+References: <20200806132106.747414-1-clg@kaod.org>
+ <20200806132106.747414-5-clg@kaod.org>
+In-Reply-To: <20200806132106.747414-5-clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Thu, 6 Aug 2020 22:57:05 +0000
+Message-ID: <CACPK8XeWDDL0L=FKho+aXe4cx1CLB2BSq-=ERGBc1X6L76ZryQ@mail.gmail.com>
+Subject: Re: [PATCH for-5.2 04/19] aspeed/scu: Fix valid access size on AST2400
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=joel.stan@gmail.com; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,28 +93,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ erik-smit <erik.lucas.smit@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/6/20 3:46 AM, frank.chang@sifive.com wrote:
-> From: Frank Chang <frank.chang@sifive.com>
-> 
-> Add do_nanbox() helper function to utilize gen_check_nanbox_X() to
-> generate the NaN-boxed floating-point values based on SEW setting.
-> 
-> Signed-off-by: Frank Chang <frank.chang@sifive.com>
+On Thu, 6 Aug 2020 at 13:21, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> The read access size of the SCU registers can be 1/2/4 bytes and write
+> is 4 bytes. Set the min access size to 1 byte to cover both read and
+> write operations on the AST2400 but keep the min access size of the
+> other SoCs to 4 bytes as this is an unusual access size.
+>
+> This fixes support for some old firmware doing 2 bytes reads on the
+> AST2400 SoC.
+>
+> Reported-by: erik-smit <erik.lucas.smit@gmail.com>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+
 > ---
->  target/riscv/insn_trans/trans_rvv.inc.c | 27 +++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
-
-Similarly, do_nanbox will Werror as an unused function.
-Otherwise looks fine.
-
-
-r~
+>  hw/misc/aspeed_scu.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+> index ec4fef900e27..764222404bef 100644
+> --- a/hw/misc/aspeed_scu.c
+> +++ b/hw/misc/aspeed_scu.c
+> @@ -328,9 +328,10 @@ static const MemoryRegionOps aspeed_ast2400_scu_ops =
+=3D {
+>      .read =3D aspeed_scu_read,
+>      .write =3D aspeed_ast2400_scu_write,
+>      .endianness =3D DEVICE_LITTLE_ENDIAN,
+> -    .valid.min_access_size =3D 4,
+> -    .valid.max_access_size =3D 4,
+> -    .valid.unaligned =3D false,
+> +    .valid =3D {
+> +        .min_access_size =3D 1,
+> +        .max_access_size =3D 4,
+> +    },
+>  };
+>
+>  static const MemoryRegionOps aspeed_ast2500_scu_ops =3D {
+> --
+> 2.25.4
+>
 
