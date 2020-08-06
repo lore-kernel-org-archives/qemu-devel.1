@@ -2,90 +2,90 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F6E6C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B3F6C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:19:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 787EF204FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:19:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5EB8204FD
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:19:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GT4APYdC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 787EF204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="J/ng0mqb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5EB8204FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3b3X-0005ZB-Lz
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 04:15:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34678)
+	id 1k3dhX-0005Ht-4K
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:04:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k3b0J-0000UM-Rt
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 04:12:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51180
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k3b0H-0006Am-Ke
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 04:11:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596701516;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=i+vkL/rWmSLNgGXHOv1NU1qrwCDKsI4zH1RF4xW5wW4=;
- b=GT4APYdCrAKr4tIS79aUkLjQN9hykyVYT8J6JG0gFyP3H4F6iPMC8khNSZuoRTXgleEqKS
- +62CbPq9tB9Of5RuBtGJh/A0l7BhRClVo2t0ccygnlO0GFoGTnKAP4xxXko9pFkmBbTI9n
- LYyDP1aWteT4HBqTa3IIUE/DvCiBvh8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-eUb1pmDNONaY8-4wc5fJPg-1; Thu, 06 Aug 2020 04:11:53 -0400
-X-MC-Unique: eUb1pmDNONaY8-4wc5fJPg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7059458;
- Thu,  6 Aug 2020 08:11:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B5D96179D;
- Thu,  6 Aug 2020 08:11:49 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A633010FDD9E; Thu,  6 Aug 2020 10:11:47 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/3] docs/qdev-device-use: Don't suggest -drive and -net can
- do USB
-Date: Thu,  6 Aug 2020 10:11:47 +0200
-Message-Id: <20200806081147.3123652-4-armbru@redhat.com>
-In-Reply-To: <20200806081147.3123652-1-armbru@redhat.com>
-References: <20200806081147.3123652-1-armbru@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:07:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k3dRi-0002RR-DS
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:26 -0400
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:35183)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k3dRf-0007pb-0p
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:26 -0400
+Received: by mail-pf1-x431.google.com with SMTP id d188so18660145pfd.2
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:48:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=j1UMGNqEzpU+WXQ2qfZ76Ij47mlNlWLfmV3is0G5tqQ=;
+ b=J/ng0mqbEQ8CYKLtLgb00crVKmHB4kERTizyXBou7dI8ETy3JFVlNCVVFF67cEdFNq
+ MtcMiWOAQCOx3q7NCQGOMffXngy+Ux+1kPlFcVl3AMweRZyTEg00cfxcqbXUBUkhrWzJ
+ cffKciODw75MYtmU2DYRTjdh8YV9SJEO2r5uIZeuJ68VDL8jxkyc1jWTVojvD9rp/QEy
+ SiS3DPcIS8cv4q+c0dcy8BK0tnFIBHd89RvCDyvQhKXMy+UIlHoCkkS4GB2GivYolVPK
+ MPNLomGCEPxkrzzzbxgtzx4WQRseOf3G+NBDZmqQKxP7udEQmY+lxI4paqqRv5LJqdra
+ pnIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=j1UMGNqEzpU+WXQ2qfZ76Ij47mlNlWLfmV3is0G5tqQ=;
+ b=ZhV8xLUu7opOmCRqeISgtPdwQxIF8ewMkmltt7fgHIBi+CYh9ipVIgTRaXUm+LATEf
+ LWX23IoWFEceLinkzXhYTd0KS0BfEF0nloOpHTmK93yFHRsYbnup/G4F0N0VYbRWvtO3
+ tz1aJQeCHhnFfFN8EdcnIcp4gTs2fH38NwLdrzbkIPuxQ+BnXCz+Y8RrXNFgFDagN0oA
+ YRpx075y1hK5AqJAUaGmum5P5vB+K8cSEsJlWDDJW2x2RdMy7IuEdXgoM7bFK0zAWN1/
+ jE1FRphlXbsY9ARla+075XmoKFDZwgmCVf4MYW6g6eUYm59etrEvzhC6Cr/o7WJXJJ5O
+ sfqA==
+X-Gm-Message-State: AOAM533sP8tGw+La11WnBq9F5hABUORciuelKZeMGnumYdCaLZ0kU9AK
+ cxY1nqjjf/fOaPNPtJ/mN6qS8HBPS0w=
+X-Google-Smtp-Source: ABdhPJxfmIq42uWKkXLFgjsUcWmqUwruEuyUsmbbUMaSuHREObHwtL7UtKE5vZz+8vaupsfCg6sVag==
+X-Received: by 2002:a63:b0a:: with SMTP id 10mr6818139pgl.166.1596710900972;
+ Thu, 06 Aug 2020 03:48:20 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.48.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Aug 2020 03:48:20 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC v3 24/71] target/riscv: rvv-1.0: amo operations
+Date: Thu,  6 Aug 2020 18:46:21 +0800
+Message-Id: <20200806104709.13235-25-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
+References: <20200806104709.13235-1-frank.chang@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::431;
+ envelope-from=frank.chang@sifive.com; helo=mail-pf1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,102 +98,761 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Frank Chang <frank.chang@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 480324ec8d "docs/qdev-device-use: Clean up the sentences
-related to -usbdevice" deleted the information on syntax that no
-longer works.  Unfortunately, the resulting text suggests you can
-configure USB block devices with -drive, and USB network devices with
--net, which is misleading.
+From: Frank Chang <frank.chang@sifive.com>
 
-Instead of rephrasing the now misleading text, I'm putting the
-information back, and just make clear it's about old versions of QEMU.
-
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
 ---
- docs/qdev-device-use.txt | 34 ++++++++++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+ target/riscv/helper.h                   | 100 +++++++---
+ target/riscv/insn32-64.decode           |  18 +-
+ target/riscv/insn32.decode              |  36 +++-
+ target/riscv/insn_trans/trans_rvv.inc.c | 220 ++++++++++++++--------
+ target/riscv/vector_helper.c            | 232 ++++++++++++++++--------
+ 5 files changed, 407 insertions(+), 199 deletions(-)
 
-diff --git a/docs/qdev-device-use.txt b/docs/qdev-device-use.txt
-index f8d0d2fe29..8532ba5224 100644
---- a/docs/qdev-device-use.txt
-+++ b/docs/qdev-device-use.txt
-@@ -125,7 +125,14 @@ The -device argument differs in detail for each type of drive:
+diff --git a/target/riscv/helper.h b/target/riscv/helper.h
+index 3d931ba0c70..9200178d25c 100644
+--- a/target/riscv/helper.h
++++ b/target/riscv/helper.h
+@@ -145,36 +145,80 @@ DEF_HELPER_5(vle16ff_v, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vle32ff_v, void, ptr, ptr, tl, env, i32)
+ DEF_HELPER_5(vle64ff_v, void, ptr, ptr, tl, env, i32)
  
- * if=pflash, if=mtd, if=sd, if=xen are not yet available with -device
++DEF_HELPER_6(vamoswapei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoswapei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoswapei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoswapei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoswapei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoswapei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
+ #ifdef TARGET_RISCV64
+-DEF_HELPER_6(vamoswapw_v_d, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoswapd_v_d, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoaddw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoaddd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoxorw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoxord_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoandw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoandd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoorw_v_d,   void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoord_v_d,   void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamominw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamomind_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamomaxw_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamomaxd_v_d,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamominuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamominud_v_d, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamomaxuw_v_d, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamomaxud_v_d, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoswapei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoswapei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoaddei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoxorei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoandei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorei64_32_v,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamoorei64_64_v,  void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamominuei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
++DEF_HELPER_6(vamomaxuei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
+ #endif
+-DEF_HELPER_6(vamoswapw_v_w, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoaddw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoxorw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoandw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamoorw_v_w,   void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamominw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamomaxw_v_w,  void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamominuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
+-DEF_HELPER_6(vamomaxuw_v_w, void, ptr, ptr, tl, ptr, env, i32)
+-
+ DEF_HELPER_6(vadd_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vadd_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
+ DEF_HELPER_6(vadd_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
+diff --git a/target/riscv/insn32-64.decode b/target/riscv/insn32-64.decode
+index 86153d93fa2..c3283a55302 100644
+--- a/target/riscv/insn32-64.decode
++++ b/target/riscv/insn32-64.decode
+@@ -58,15 +58,15 @@ amominu_d  11000 . . ..... ..... 011 ..... 0101111 @atom_st
+ amomaxu_d  11100 . . ..... ..... 011 ..... 0101111 @atom_st
  
--For USB storage devices, you can use something like:
-+For USB devices, the old way was actually different:
+ #*** Vector AMO operations (in addition to Zvamo) ***
+-vamoswapd_v     00001 . . ..... ..... 111 ..... 0101111 @r_wdvm
+-vamoaddd_v      00000 . . ..... ..... 111 ..... 0101111 @r_wdvm
+-vamoxord_v      00100 . . ..... ..... 111 ..... 0101111 @r_wdvm
+-vamoandd_v      01100 . . ..... ..... 111 ..... 0101111 @r_wdvm
+-vamoord_v       01000 . . ..... ..... 111 ..... 0101111 @r_wdvm
+-vamomind_v      10000 . . ..... ..... 111 ..... 0101111 @r_wdvm
+-vamomaxd_v      10100 . . ..... ..... 111 ..... 0101111 @r_wdvm
+-vamominud_v     11000 . . ..... ..... 111 ..... 0101111 @r_wdvm
+-vamomaxud_v     11100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoswapei64_v  00001 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoaddei64_v   00000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoxorei64_v   00100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoandei64_v   01100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamoorei64_v    01000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamominei64_v   10000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamomaxei64_v   10100 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamominuei64_v  11000 . . ..... ..... 111 ..... 0101111 @r_wdvm
++vamomaxuei64_v  11100 . . ..... ..... 111 ..... 0101111 @r_wdvm
+ 
+ # *** RV64F Standard Extension (in addition to RV32F) ***
+ fcvt_l_s   1100000  00010 ..... ... ..... 1010011 @r2_rm
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index b0aaa186b8b..6a9cf6ad534 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -268,15 +268,33 @@ vle32ff_v     ... 000 . 10000 ..... 110 ..... 0000111 @r2_nfvm
+ vle64ff_v     ... 000 . 10000 ..... 111 ..... 0000111 @r2_nfvm
+ 
+ #*** Vector AMO operations are encoded under the standard AMO major opcode ***
+-vamoswapw_v     00001 . . ..... ..... 110 ..... 0101111 @r_wdvm
+-vamoaddw_v      00000 . . ..... ..... 110 ..... 0101111 @r_wdvm
+-vamoxorw_v      00100 . . ..... ..... 110 ..... 0101111 @r_wdvm
+-vamoandw_v      01100 . . ..... ..... 110 ..... 0101111 @r_wdvm
+-vamoorw_v       01000 . . ..... ..... 110 ..... 0101111 @r_wdvm
+-vamominw_v      10000 . . ..... ..... 110 ..... 0101111 @r_wdvm
+-vamomaxw_v      10100 . . ..... ..... 110 ..... 0101111 @r_wdvm
+-vamominuw_v     11000 . . ..... ..... 110 ..... 0101111 @r_wdvm
+-vamomaxuw_v     11100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoswapei8_v   00001 . . ..... ..... 000 ..... 0101111 @r_wdvm
++vamoswapei16_v  00001 . . ..... ..... 101 ..... 0101111 @r_wdvm
++vamoswapei32_v  00001 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoaddei8_v    00000 . . ..... ..... 000 ..... 0101111 @r_wdvm
++vamoaddei16_v   00000 . . ..... ..... 101 ..... 0101111 @r_wdvm
++vamoaddei32_v   00000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoxorei8_v    00100 . . ..... ..... 000 ..... 0101111 @r_wdvm
++vamoxorei16_v   00100 . . ..... ..... 101 ..... 0101111 @r_wdvm
++vamoxorei32_v   00100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoandei8_v    01100 . . ..... ..... 000 ..... 0101111 @r_wdvm
++vamoandei16_v   01100 . . ..... ..... 101 ..... 0101111 @r_wdvm
++vamoandei32_v   01100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamoorei8_v     01000 . . ..... ..... 000 ..... 0101111 @r_wdvm
++vamoorei16_v    01000 . . ..... ..... 101 ..... 0101111 @r_wdvm
++vamoorei32_v    01000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamominei8_v    10000 . . ..... ..... 000 ..... 0101111 @r_wdvm
++vamominei16_v   10000 . . ..... ..... 101 ..... 0101111 @r_wdvm
++vamominei32_v   10000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamomaxei8_v    10100 . . ..... ..... 000 ..... 0101111 @r_wdvm
++vamomaxei16_v   10100 . . ..... ..... 101 ..... 0101111 @r_wdvm
++vamomaxei32_v   10100 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamominuei8_v   11000 . . ..... ..... 000 ..... 0101111 @r_wdvm
++vamominuei16_v  11000 . . ..... ..... 101 ..... 0101111 @r_wdvm
++vamominuei32_v  11000 . . ..... ..... 110 ..... 0101111 @r_wdvm
++vamomaxuei8_v   11100 . . ..... ..... 000 ..... 0101111 @r_wdvm
++vamomaxuei16_v  11100 . . ..... ..... 101 ..... 0101111 @r_wdvm
++vamomaxuei32_v  11100 . . ..... ..... 110 ..... 0101111 @r_wdvm
+ 
+ # *** new major opcode OP-V ***
+ vadd_vv         000000 . ..... ..... 000 ..... 1010111 @r_vm
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 81020650111..3b49c76179e 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -267,6 +267,55 @@ static bool vext_check_ld_index(DisasContext *s, int vd, int vs2,
+     return ret;
+ }
+ 
++/*
++ * Vector AMO check function.
++ *
++ * Rules to be checked here:
++ *   1. RVA must supported.
++ *   2. AMO can either operations on 64-bit (RV64 only) or 32-bit words
++ *      in memory:
++ *      For RV32: 32 <= SEW <= 32, EEW <= 32.
++ *      For RV64: 32 <= SEW <= 64, EEW <= 64.
++ *   3. Destination vector register number is multiples of LMUL.
++ *      (Section 3.3.2, 8)
++ *   4. Address vector register number is multiples of EMUL.
++ *      (Section 3.3.2, 8)
++ *   5. EMUL must within the range: 1/8 <= EMUL <= 8. (Section 7.3)
++ *   6. If wd = 1:
++ *      6.1. Destination vector register group for a masked vector
++ *           instruction cannot overlap the source mask register (v0).
++ *           (Section 5.3)
++ *      6.2. Destination vector register cannot overlap a source vector
++ *           register (vs2) group.
++ *           (Section 5.2)
++ */
++static bool vext_check_amo(DisasContext *s, int vd, int vs2,
++                           int wd, int vm, uint8_t eew)
++{
++    float emul = (float)eew / (1 << (s->sew + 3)) * s->flmul;
++    bool ret = has_ext(s, RVA) &&
++               (1 << s->sew >= 4) &&
++               (1 << s->sew <= sizeof(target_ulong)) &&
++               (eew <= (sizeof(target_ulong) << 3))  &&
++               require_align(vd, s->flmul) &&
++               require_align(vs2, emul) &&
++               (emul >= 0.125 && emul <= 8);
++    if (wd) {
++        ret &= require_vm(vm, vd);
++        if (eew > (1 << (s->sew + 3))) {
++            if (vd != vs2) {
++                ret &= require_noover(vd, s->flmul, vs2, emul);
++            }
++        } else if (eew < (1 << (s->sew + 3))) {
++            if (emul < 1) {
++                ret &= require_noover(vd, s->flmul, vs2, emul);
++            } else {
++                ret &= require_noover_widen(vd, s->flmul, vs2, emul);
++            }
++        }
++    }
++    return ret;
++}
+ 
+ /*
+  * Check function for vector instruction with format:
+@@ -1008,57 +1057,60 @@ static bool amo_op(DisasContext *s, arg_rwdvm *a, uint8_t seq)
+ {
+     uint32_t data = 0;
+     gen_helper_amo *fn;
+-    static gen_helper_amo *const fnsw[9] = {
+-        /* no atomic operation */
+-        gen_helper_vamoswapw_v_w,
+-        gen_helper_vamoaddw_v_w,
+-        gen_helper_vamoxorw_v_w,
+-        gen_helper_vamoandw_v_w,
+-        gen_helper_vamoorw_v_w,
+-        gen_helper_vamominw_v_w,
+-        gen_helper_vamomaxw_v_w,
+-        gen_helper_vamominuw_v_w,
+-        gen_helper_vamomaxuw_v_w
+-    };
++    static gen_helper_amo *const fns[36][2] = {
++        { gen_helper_vamoswapei8_32_v, gen_helper_vamoswapei8_64_v },
++        { gen_helper_vamoswapei16_32_v, gen_helper_vamoswapei16_64_v },
++        { gen_helper_vamoswapei32_32_v, gen_helper_vamoswapei32_64_v },
++        { gen_helper_vamoaddei8_32_v, gen_helper_vamoaddei8_64_v },
++        { gen_helper_vamoaddei16_32_v, gen_helper_vamoaddei16_64_v },
++        { gen_helper_vamoaddei32_32_v, gen_helper_vamoaddei32_64_v },
++        { gen_helper_vamoxorei8_32_v, gen_helper_vamoxorei8_64_v },
++        { gen_helper_vamoxorei16_32_v, gen_helper_vamoxorei16_64_v },
++        { gen_helper_vamoxorei32_32_v, gen_helper_vamoxorei32_64_v },
++        { gen_helper_vamoandei8_32_v, gen_helper_vamoandei8_64_v },
++        { gen_helper_vamoandei16_32_v, gen_helper_vamoandei16_64_v },
++        { gen_helper_vamoandei32_32_v, gen_helper_vamoandei32_64_v },
++        { gen_helper_vamoorei8_32_v, gen_helper_vamoorei8_64_v },
++        { gen_helper_vamoorei16_32_v, gen_helper_vamoorei16_64_v },
++        { gen_helper_vamoorei32_32_v, gen_helper_vamoorei32_64_v },
++        { gen_helper_vamominei8_32_v, gen_helper_vamominei8_64_v },
++        { gen_helper_vamominei16_32_v, gen_helper_vamominei16_64_v },
++        { gen_helper_vamominei32_32_v, gen_helper_vamominei32_64_v },
++        { gen_helper_vamomaxei8_32_v, gen_helper_vamomaxei8_64_v },
++        { gen_helper_vamomaxei16_32_v, gen_helper_vamomaxei16_64_v },
++        { gen_helper_vamomaxei32_32_v, gen_helper_vamomaxei32_64_v },
++        { gen_helper_vamominuei8_32_v, gen_helper_vamominuei8_64_v },
++        { gen_helper_vamominuei16_32_v, gen_helper_vamominuei16_64_v },
++        { gen_helper_vamominuei32_32_v, gen_helper_vamominuei32_64_v },
++        { gen_helper_vamomaxuei8_32_v, gen_helper_vamomaxuei8_64_v },
++        { gen_helper_vamomaxuei16_32_v, gen_helper_vamomaxuei16_64_v },
++        { gen_helper_vamomaxuei32_32_v, gen_helper_vamomaxuei32_64_v },
+ #ifdef TARGET_RISCV64
+-    static gen_helper_amo *const fnsd[18] = {
+-        gen_helper_vamoswapw_v_d,
+-        gen_helper_vamoaddw_v_d,
+-        gen_helper_vamoxorw_v_d,
+-        gen_helper_vamoandw_v_d,
+-        gen_helper_vamoorw_v_d,
+-        gen_helper_vamominw_v_d,
+-        gen_helper_vamomaxw_v_d,
+-        gen_helper_vamominuw_v_d,
+-        gen_helper_vamomaxuw_v_d,
+-        gen_helper_vamoswapd_v_d,
+-        gen_helper_vamoaddd_v_d,
+-        gen_helper_vamoxord_v_d,
+-        gen_helper_vamoandd_v_d,
+-        gen_helper_vamoord_v_d,
+-        gen_helper_vamomind_v_d,
+-        gen_helper_vamomaxd_v_d,
+-        gen_helper_vamominud_v_d,
+-        gen_helper_vamomaxud_v_d
+-    };
++        { gen_helper_vamoswapei64_32_v, gen_helper_vamoswapei64_64_v },
++        { gen_helper_vamoaddei64_32_v, gen_helper_vamoaddei64_64_v },
++        { gen_helper_vamoxorei64_32_v, gen_helper_vamoxorei64_64_v },
++        { gen_helper_vamoandei64_32_v, gen_helper_vamoandei64_64_v },
++        { gen_helper_vamoorei64_32_v, gen_helper_vamoorei64_64_v },
++        { gen_helper_vamominei64_32_v, gen_helper_vamominei64_64_v },
++        { gen_helper_vamomaxei64_32_v, gen_helper_vamomaxei64_64_v },
++        { gen_helper_vamominuei64_32_v, gen_helper_vamominuei64_64_v },
++        { gen_helper_vamomaxuei64_32_v, gen_helper_vamomaxuei64_64_v }
++#else
++        { NULL, NULL }, { NULL, NULL }, { NULL, NULL }, { NULL, NULL },
++        { NULL, NULL }, { NULL, NULL }, { NULL, NULL }, { NULL, NULL },
++        { NULL, NULL }
+ #endif
++    };
+ 
+     if (tb_cflags(s->base.tb) & CF_PARALLEL) {
+         gen_helper_exit_atomic(cpu_env);
+         s->base.is_jmp = DISAS_NORETURN;
+         return true;
+-    } else {
+-        if (s->sew == 3) {
+-#ifdef TARGET_RISCV64
+-            fn = fnsd[seq];
+-#else
+-            /* Check done in amo_check(). */
+-            g_assert_not_reached();
+-#endif
+-        } else {
+-            assert(seq < ARRAY_SIZE(fnsw));
+-            fn = fnsw[seq];
+-        }
++    }
 +
-+    -usbdevice disk:format=FMT:FILENAME
++    fn = fns[seq][s->sew - 2];
++    if (fn == NULL) {
++        return false;
+     }
+ 
+     data = FIELD_DP32(data, VDATA, VM, a->vm);
+@@ -1066,42 +1118,56 @@ static bool amo_op(DisasContext *s, arg_rwdvm *a, uint8_t seq)
+     data = FIELD_DP32(data, VDATA, WD, a->wd);
+     return amo_trans(a->rd, a->rs1, a->rs2, data, fn, s);
+ }
 +
-+"Was" because "disk:" is gone since v2.12.0.
++static bool amo_check(DisasContext *s, arg_rwdvm* a, uint8_t eew)
++{
++    return require_rvv(s) &&
++           vext_check_isa_ill(s) &&
++           vext_check_amo(s, a->rd, a->rs2, a->wd, a->vm, eew);
++}
 +
-+The old way provided much less control than -drive's OPTS...  The new
-+way fixes that:
- 
-     -device usb-storage,drive=DRIVE-ID,removable=RMB
- 
-@@ -178,6 +185,9 @@ The appropriate DEVNAME depends on the machine type.  For type "pc":
- 
-   -device usb-braille,chardev=braille -chardev braille,id=braille
- 
-+* -usbdevice serial::chardev is gone since v2.12.0.  It became
-+  -device usb-serial,chardev=dev.
++GEN_VEXT_TRANS(vamoswapei8_v,  8,  0,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoswapei16_v, 16, 1,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoswapei32_v, 32, 2,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoaddei8_v,   8,  3,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoaddei16_v,  16, 4,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoaddei32_v,  32, 5,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoxorei8_v,   8,  6,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoxorei16_v,  16, 7,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoxorei32_v,  32, 8,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoandei8_v,   8,  9,  rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoandei16_v,  16, 10, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoandei32_v,  32, 11, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoorei8_v,    8,  12, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoorei16_v,   16, 13, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoorei32_v,   32, 14, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominei8_v,   8,  15, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominei16_v,  16, 16, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominei32_v,  32, 17, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxei8_v,   8,  18, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxei16_v,  16, 19, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxei32_v,  32, 20, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominuei8_v,  8,  21, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominuei16_v, 16, 22, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominuei32_v, 32, 23, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxuei8_v,  8,  24, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxuei16_v, 16, 25, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxuei32_v, 32, 26, rwdvm, amo_op, amo_check)
 +
- LEGACY-CHARDEV translates to -chardev HOST-OPTS... as follows:
+ /*
+- * There are two rules check here.
+- *
+- * 1. SEW must be at least as wide as the AMO memory element size.
+- *
+- * 2. If SEW is greater than XLEN, an illegal instruction exception is raised.
++ * Index EEW cannot be greater than XLEN,
++ * else an illegal instruction is raised (Section 8)
+  */
+-static bool amo_check(DisasContext *s, arg_rwdvm* a)
+-{
+-    return (!s->vill && has_ext(s, RVA) &&
+-            (!a->wd || vext_check_overlap_mask(s, a->rd, a->vm, false)) &&
+-            vext_check_reg(s, a->rd, false) &&
+-            vext_check_reg(s, a->rs2, false) &&
+-            ((1 << s->sew) <= sizeof(target_ulong)) &&
+-            ((1 << s->sew) >= 4));
+-}
+-
+-GEN_VEXT_TRANS(vamoswapw_v, 0, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamoaddw_v, 1, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamoxorw_v, 2, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamoandw_v, 3, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamoorw_v, 4, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamominw_v, 5, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamomaxw_v, 6, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamominuw_v, 7, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamomaxuw_v, 8, rwdvm, amo_op, amo_check)
+ #ifdef TARGET_RISCV64
+-GEN_VEXT_TRANS(vamoswapd_v, 9, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamoaddd_v, 10, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamoxord_v, 11, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamoandd_v, 12, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamoord_v, 13, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamomind_v, 14, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamomaxd_v, 15, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamominud_v, 16, rwdvm, amo_op, amo_check)
+-GEN_VEXT_TRANS(vamomaxud_v, 17, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoswapei64_v, 64, 27, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoaddei64_v,  64, 28, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoxorei64_v,  64, 29, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoandei64_v,  64, 30, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamoorei64_v,   64, 31, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominei64_v,  64, 32, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxei64_v,  64, 33, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamominuei64_v, 64, 34, rwdvm, amo_op, amo_check)
++GEN_VEXT_TRANS(vamomaxuei64_v, 64, 35, rwdvm, amo_op, amo_check)
+ #endif
  
- * null becomes -chardev null
-@@ -231,6 +241,12 @@ The old way to define the guest part looks like this:
+ /*
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index c1762e59983..011d861d92c 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -544,23 +544,22 @@ typedef void vext_amo_noatomic_fn(void *vs3, target_ulong addr,
+                                   uint32_t wd, uint32_t idx, CPURISCVState *env,
+                                   uintptr_t retaddr);
  
-     -net nic,netdev=NET-ID,macaddr=MACADDR,model=MODEL,name=ID,addr=STR,vectors=V
+-/* no atomic opreation for vector atomic insructions */
++/* no atomic operation for vector atomic instructions */
+ #define DO_SWAP(N, M) (M)
+ #define DO_AND(N, M)  (N & M)
+ #define DO_XOR(N, M)  (N ^ M)
+ #define DO_OR(N, M)   (N | M)
+ #define DO_ADD(N, M)  (N + M)
++#define DO_MAX(N, M)  ((N) >= (M) ? (N) : (M))
++#define DO_MIN(N, M)  ((N) >= (M) ? (M) : (N))
  
-+Except for USB it looked like this:
+-#define GEN_VEXT_AMO_NOATOMIC_OP(NAME, ESZ, MSZ, H, DO_OP, SUF) \
++#define GEN_VEXT_AMO_NOATOMIC_OP(NAME, MTYPE, H, DO_OP, SUF)    \
+ static void                                                     \
+ vext_##NAME##_noatomic_op(void *vs3, target_ulong addr,         \
+                           uint32_t wd, uint32_t idx,            \
+                           CPURISCVState *env, uintptr_t retaddr)\
+ {                                                               \
+-    typedef int##ESZ##_t ETYPE;                                 \
+-    typedef int##MSZ##_t MTYPE;                                 \
+-    typedef uint##MSZ##_t UMTYPE __attribute__((unused));       \
+-    ETYPE *pe3 = (ETYPE *)vs3 + H(idx);                         \
++    MTYPE *pe3 = (MTYPE *)vs3 + H(idx);                         \
+     MTYPE  a = cpu_ld##SUF##_data(env, addr), b = *pe3;         \
+                                                                 \
+     cpu_st##SUF##_data(env, addr, DO_OP(a, b));                 \
+@@ -569,42 +568,79 @@ vext_##NAME##_noatomic_op(void *vs3, target_ulong addr,         \
+     }                                                           \
+ }
+ 
+-/* Signed min/max */
+-#define DO_MAX(N, M)  ((N) >= (M) ? (N) : (M))
+-#define DO_MIN(N, M)  ((N) >= (M) ? (M) : (N))
+-
+-/* Unsigned min/max */
+-#define DO_MAXU(N, M) DO_MAX((UMTYPE)N, (UMTYPE)M)
+-#define DO_MINU(N, M) DO_MIN((UMTYPE)N, (UMTYPE)M)
+-
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_w, 32, 32, H4, DO_SWAP, l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_w,  32, 32, H4, DO_ADD,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_w,  32, 32, H4, DO_XOR,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_w,  32, 32, H4, DO_AND,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_w,   32, 32, H4, DO_OR,   l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_w,  32, 32, H4, DO_MIN,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_w,  32, 32, H4, DO_MAX,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_w, 32, 32, H4, DO_MINU, l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_w, 32, 32, H4, DO_MAXU, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapei8_32_v,  uint32_t, H4, DO_SWAP, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapei8_64_v,  uint64_t, H8, DO_SWAP, q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapei16_32_v, uint32_t, H4, DO_SWAP, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapei16_64_v, uint64_t, H8, DO_SWAP, q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapei32_32_v, uint32_t, H4, DO_SWAP, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapei32_64_v, uint64_t, H8, DO_SWAP, q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddei8_32_v,   uint32_t, H4, DO_ADD,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddei8_64_v,   uint64_t, H8, DO_ADD,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddei16_32_v,  uint32_t, H4, DO_ADD,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddei16_64_v,  uint64_t, H8, DO_ADD,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddei32_32_v,  uint32_t, H4, DO_ADD,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddei32_64_v,  uint64_t, H8, DO_ADD,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorei8_32_v,   uint32_t, H4, DO_XOR,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorei8_64_v,   uint64_t, H8, DO_XOR,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorei16_32_v,  uint32_t, H4, DO_XOR,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorei16_64_v,  uint64_t, H8, DO_XOR,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorei32_32_v,  uint32_t, H4, DO_XOR,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorei32_64_v,  uint64_t, H8, DO_XOR,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandei8_32_v,   uint32_t, H4, DO_AND,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandei8_64_v,   uint64_t, H8, DO_AND,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandei16_32_v,  uint32_t, H4, DO_AND,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandei16_64_v,  uint64_t, H8, DO_AND,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandei32_32_v,  uint32_t, H4, DO_AND,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandei32_64_v,  uint64_t, H8, DO_AND,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorei8_32_v,    uint32_t, H4, DO_OR,   l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorei8_64_v,    uint64_t, H8, DO_OR,   q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorei16_32_v,   uint32_t, H4, DO_OR,   l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorei16_64_v,   uint64_t, H8, DO_OR,   q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorei32_32_v,   uint32_t, H4, DO_OR,   l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorei32_64_v,   uint64_t, H8, DO_OR,   q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominei8_32_v,   int32_t,  H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominei8_64_v,   int64_t,  H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominei16_32_v,  int32_t,  H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominei16_64_v,  int64_t,  H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominei32_32_v,  int32_t,  H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominei32_64_v,  int64_t,  H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxei8_32_v,   int32_t,  H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxei8_64_v,   int64_t,  H8, DO_MAX,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxei16_32_v,  int32_t,  H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxei16_64_v,  int64_t,  H8, DO_MAX,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxei32_32_v,  int32_t,  H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxei32_64_v,  int64_t,  H8, DO_MAX,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuei8_32_v,  uint32_t, H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuei8_64_v,  uint64_t, H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuei16_32_v, uint32_t, H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuei16_64_v, uint64_t, H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuei32_32_v, uint32_t, H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuei32_64_v, uint64_t, H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuei8_32_v,  uint32_t, H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuei8_64_v,  uint64_t, H8, DO_MAX,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuei16_32_v, uint32_t, H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuei16_64_v, uint64_t, H8, DO_MAX,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuei32_32_v, uint32_t, H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuei32_64_v, uint64_t, H8, DO_MAX,  q)
+ #ifdef TARGET_RISCV64
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoswapw_v_d, 64, 32, H8, DO_SWAP, l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoswapd_v_d, 64, 64, H8, DO_SWAP, q)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoaddw_v_d,  64, 32, H8, DO_ADD,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoaddd_v_d,  64, 64, H8, DO_ADD,  q)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoxorw_v_d,  64, 32, H8, DO_XOR,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoxord_v_d,  64, 64, H8, DO_XOR,  q)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoandw_v_d,  64, 32, H8, DO_AND,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoandd_v_d,  64, 64, H8, DO_AND,  q)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoorw_v_d,   64, 32, H8, DO_OR,   l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamoord_v_d,   64, 64, H8, DO_OR,   q)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamominw_v_d,  64, 32, H8, DO_MIN,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamomind_v_d,  64, 64, H8, DO_MIN,  q)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamomaxw_v_d,  64, 32, H8, DO_MAX,  l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamomaxd_v_d,  64, 64, H8, DO_MAX,  q)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamominuw_v_d, 64, 32, H8, DO_MINU, l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamominud_v_d, 64, 64, H8, DO_MINU, q)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_d, 64, 32, H8, DO_MAXU, l)
+-GEN_VEXT_AMO_NOATOMIC_OP(vamomaxud_v_d, 64, 64, H8, DO_MAXU, q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapei64_32_v, uint32_t, H4, DO_SWAP, l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoswapei64_64_v, uint64_t, H8, DO_SWAP, q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddei64_32_v,  uint32_t, H4, DO_ADD,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoaddei64_64_v,  uint64_t, H8, DO_ADD,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorei64_32_v,  uint32_t, H4, DO_XOR,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoxorei64_64_v,  uint64_t, H8, DO_XOR,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandei64_32_v,  uint32_t, H4, DO_AND,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoandei64_64_v,  uint64_t, H8, DO_AND,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorei64_32_v,   uint32_t, H4, DO_OR,   l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamoorei64_64_v,   uint64_t, H8, DO_OR,   q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominei64_32_v,  int32_t,  H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominei64_64_v,  int64_t,  H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxei64_32_v,  int32_t,  H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxei64_64_v,  int64_t,  H8, DO_MAX,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuei64_32_v, uint32_t, H4, DO_MIN,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamominuei64_64_v, uint64_t, H8, DO_MIN,  q)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuei64_32_v, uint32_t, H4, DO_MAX,  l)
++GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuei64_64_v, uint64_t, H8, DO_MAX,  q)
+ #endif
+ 
+ static inline void
+@@ -612,7 +648,7 @@ vext_amo_noatomic(void *vs3, void *v0, target_ulong base,
+                   void *vs2, CPURISCVState *env, uint32_t desc,
+                   vext_get_index_addr get_index_addr,
+                   vext_amo_noatomic_fn *noatomic_op,
+-                  uint32_t esz, uint32_t msz, uintptr_t ra)
++                  uint32_t esz, uintptr_t ra)
+ {
+     uint32_t i;
+     target_long addr;
+@@ -623,8 +659,8 @@ vext_amo_noatomic(void *vs3, void *v0, target_ulong base,
+         if (!vm && !vext_elem_mask(v0, i)) {
+             continue;
+         }
+-        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_LOAD);
+-        probe_pages(env, get_index_addr(base, i, vs2), msz, ra, MMU_DATA_STORE);
++        probe_pages(env, get_index_addr(base, i, vs2), esz, ra, MMU_DATA_LOAD);
++        probe_pages(env, get_index_addr(base, i, vs2), esz, ra, MMU_DATA_STORE);
+     }
+     for (i = 0; i < env->vl; i++) {
+         if (!vm && !vext_elem_mask(v0, i)) {
+@@ -635,45 +671,89 @@ vext_amo_noatomic(void *vs3, void *v0, target_ulong base,
+     }
+ }
+ 
+-#define GEN_VEXT_AMO(NAME, MTYPE, ETYPE, INDEX_FN)              \
++#define GEN_VEXT_AMO(NAME, ETYPE, INDEX_FN)                     \
+ void HELPER(NAME)(void *vs3, void *v0, target_ulong base,       \
+                   void *vs2, CPURISCVState *env, uint32_t desc) \
+ {                                                               \
+     vext_amo_noatomic(vs3, v0, base, vs2, env, desc,            \
+                       INDEX_FN, vext_##NAME##_noatomic_op,      \
+-                      sizeof(ETYPE), sizeof(MTYPE),             \
+-                      GETPC());                                 \
+-}
+-
++                      sizeof(ETYPE), GETPC());                  \
++}
 +
-+    -usbdevice net:netdev=NET-ID,macaddr=MACADDR,name=ID
-+
-+"Looked" because "net:" is gone since v2.12.0.
-+
- The new way is -device:
++GEN_VEXT_AMO(vamoswapei8_32_v,  int32_t, idx_b)
++GEN_VEXT_AMO(vamoswapei8_64_v,  int64_t, idx_b)
++GEN_VEXT_AMO(vamoswapei16_32_v, int32_t, idx_h)
++GEN_VEXT_AMO(vamoswapei16_64_v, int64_t, idx_h)
++GEN_VEXT_AMO(vamoswapei32_32_v, int32_t, idx_w)
++GEN_VEXT_AMO(vamoswapei32_64_v, int64_t, idx_w)
++GEN_VEXT_AMO(vamoaddei8_32_v,   int32_t, idx_b)
++GEN_VEXT_AMO(vamoaddei8_64_v,   int64_t, idx_b)
++GEN_VEXT_AMO(vamoaddei16_32_v,  int32_t, idx_h)
++GEN_VEXT_AMO(vamoaddei16_64_v,  int64_t, idx_h)
++GEN_VEXT_AMO(vamoaddei32_32_v,  int32_t, idx_w)
++GEN_VEXT_AMO(vamoaddei32_64_v,  int64_t, idx_w)
++GEN_VEXT_AMO(vamoxorei8_32_v,   int32_t, idx_b)
++GEN_VEXT_AMO(vamoxorei8_64_v,   int64_t, idx_b)
++GEN_VEXT_AMO(vamoxorei16_32_v,  int32_t, idx_h)
++GEN_VEXT_AMO(vamoxorei16_64_v,  int64_t, idx_h)
++GEN_VEXT_AMO(vamoxorei32_32_v,  int32_t, idx_w)
++GEN_VEXT_AMO(vamoxorei32_64_v,  int64_t, idx_w)
++GEN_VEXT_AMO(vamoandei8_32_v,   int32_t, idx_b)
++GEN_VEXT_AMO(vamoandei8_64_v,   int64_t, idx_b)
++GEN_VEXT_AMO(vamoandei16_32_v,  int32_t, idx_h)
++GEN_VEXT_AMO(vamoandei16_64_v,  int64_t, idx_h)
++GEN_VEXT_AMO(vamoandei32_32_v,  int32_t, idx_w)
++GEN_VEXT_AMO(vamoandei32_64_v,  int64_t, idx_w)
++GEN_VEXT_AMO(vamoorei8_32_v,    int32_t, idx_b)
++GEN_VEXT_AMO(vamoorei8_64_v,    int64_t, idx_b)
++GEN_VEXT_AMO(vamoorei16_32_v,   int32_t, idx_h)
++GEN_VEXT_AMO(vamoorei16_64_v,   int64_t, idx_h)
++GEN_VEXT_AMO(vamoorei32_32_v,   int32_t, idx_w)
++GEN_VEXT_AMO(vamoorei32_64_v,   int64_t, idx_w)
++GEN_VEXT_AMO(vamominei8_32_v,   int32_t, idx_b)
++GEN_VEXT_AMO(vamominei8_64_v,   int64_t, idx_b)
++GEN_VEXT_AMO(vamominei16_32_v,  int32_t, idx_h)
++GEN_VEXT_AMO(vamominei16_64_v,  int64_t, idx_h)
++GEN_VEXT_AMO(vamominei32_32_v,  int32_t, idx_w)
++GEN_VEXT_AMO(vamominei32_64_v,  int64_t, idx_w)
++GEN_VEXT_AMO(vamomaxei8_32_v,   int32_t, idx_b)
++GEN_VEXT_AMO(vamomaxei8_64_v,   int64_t, idx_b)
++GEN_VEXT_AMO(vamomaxei16_32_v,  int32_t, idx_h)
++GEN_VEXT_AMO(vamomaxei16_64_v,  int64_t, idx_h)
++GEN_VEXT_AMO(vamomaxei32_32_v,  int32_t, idx_w)
++GEN_VEXT_AMO(vamomaxei32_64_v,  int64_t, idx_w)
++GEN_VEXT_AMO(vamominuei8_32_v,  int32_t, idx_b)
++GEN_VEXT_AMO(vamominuei8_64_v,  int64_t, idx_b)
++GEN_VEXT_AMO(vamominuei16_32_v, int32_t, idx_h)
++GEN_VEXT_AMO(vamominuei16_64_v, int64_t, idx_h)
++GEN_VEXT_AMO(vamominuei32_32_v, int32_t, idx_w)
++GEN_VEXT_AMO(vamominuei32_64_v, int64_t, idx_w)
++GEN_VEXT_AMO(vamomaxuei8_32_v,  int32_t, idx_b)
++GEN_VEXT_AMO(vamomaxuei8_64_v,  int64_t, idx_b)
++GEN_VEXT_AMO(vamomaxuei16_32_v, int32_t, idx_h)
++GEN_VEXT_AMO(vamomaxuei16_64_v, int64_t, idx_h)
++GEN_VEXT_AMO(vamomaxuei32_32_v, int32_t, idx_w)
++GEN_VEXT_AMO(vamomaxuei32_64_v, int64_t, idx_w)
+ #ifdef TARGET_RISCV64
+-GEN_VEXT_AMO(vamoswapw_v_d, int32_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamoswapd_v_d, int64_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamoaddw_v_d,  int32_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamoaddd_v_d,  int64_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamoxorw_v_d,  int32_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamoxord_v_d,  int64_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamoandw_v_d,  int32_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamoandd_v_d,  int64_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamoorw_v_d,   int32_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamoord_v_d,   int64_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamominw_v_d,  int32_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamomind_v_d,  int64_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamomaxw_v_d,  int32_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamomaxd_v_d,  int64_t,  int64_t,  idx_d)
+-GEN_VEXT_AMO(vamominuw_v_d, uint32_t, uint64_t, idx_d)
+-GEN_VEXT_AMO(vamominud_v_d, uint64_t, uint64_t, idx_d)
+-GEN_VEXT_AMO(vamomaxuw_v_d, uint32_t, uint64_t, idx_d)
+-GEN_VEXT_AMO(vamomaxud_v_d, uint64_t, uint64_t, idx_d)
++GEN_VEXT_AMO(vamoswapei64_32_v, int32_t, idx_d)
++GEN_VEXT_AMO(vamoswapei64_64_v, int64_t, idx_d)
++GEN_VEXT_AMO(vamoaddei64_32_v,  int32_t, idx_d)
++GEN_VEXT_AMO(vamoaddei64_64_v,  int64_t, idx_d)
++GEN_VEXT_AMO(vamoxorei64_32_v,  int32_t, idx_d)
++GEN_VEXT_AMO(vamoxorei64_64_v,  int64_t, idx_d)
++GEN_VEXT_AMO(vamoandei64_32_v,  int32_t, idx_d)
++GEN_VEXT_AMO(vamoandei64_64_v,  int64_t, idx_d)
++GEN_VEXT_AMO(vamoorei64_32_v,   int32_t, idx_d)
++GEN_VEXT_AMO(vamoorei64_64_v,   int64_t, idx_d)
++GEN_VEXT_AMO(vamominei64_32_v,  int32_t, idx_d)
++GEN_VEXT_AMO(vamominei64_64_v,  int64_t, idx_d)
++GEN_VEXT_AMO(vamomaxei64_32_v,  int32_t, idx_d)
++GEN_VEXT_AMO(vamomaxei64_64_v,  int64_t, idx_d)
++GEN_VEXT_AMO(vamominuei64_32_v, int32_t, idx_d)
++GEN_VEXT_AMO(vamominuei64_64_v, int64_t, idx_d)
++GEN_VEXT_AMO(vamomaxuei64_32_v, int32_t, idx_d)
++GEN_VEXT_AMO(vamomaxuei64_64_v, int64_t, idx_d)
+ #endif
+-GEN_VEXT_AMO(vamoswapw_v_w, int32_t,  int32_t,  idx_w)
+-GEN_VEXT_AMO(vamoaddw_v_w,  int32_t,  int32_t,  idx_w)
+-GEN_VEXT_AMO(vamoxorw_v_w,  int32_t,  int32_t,  idx_w)
+-GEN_VEXT_AMO(vamoandw_v_w,  int32_t,  int32_t,  idx_w)
+-GEN_VEXT_AMO(vamoorw_v_w,   int32_t,  int32_t,  idx_w)
+-GEN_VEXT_AMO(vamominw_v_w,  int32_t,  int32_t,  idx_w)
+-GEN_VEXT_AMO(vamomaxw_v_w,  int32_t,  int32_t,  idx_w)
+-GEN_VEXT_AMO(vamominuw_v_w, uint32_t, uint32_t, idx_w)
+-GEN_VEXT_AMO(vamomaxuw_v_w, uint32_t, uint32_t, idx_w)
  
-     -device DEVNAME,netdev=NET-ID,mac=MACADDR,DEV-OPTS...
-@@ -327,6 +343,13 @@ The new way is -device DEVNAME,DEV-OPTS...  Details depend on DRIVER:
- * wacom-tablet    -device usb-wacom-tablet
- * braille         See "Character Devices"
- 
-+Until v2.12.0, we additionally had
-+
-+* host:...        See "Host Device Assignment"
-+* disk:...        See "Block Devices"
-+* serial:...      See "Character Devices"
-+* net:...         See "Network Devices"
-+
- === Watchdog Devices ===
- 
- Host and guest part of watchdog devices have always been separate.
-@@ -342,7 +365,14 @@ and host USB devices.  PCI devices can only be assigned with -device:
- 
-     -device vfio-pci,host=ADDR,id=ID
- 
--To assign a host USB device use:
-+The old way to assign a USB host device
-+
-+    -usbdevice host:auto:BUS.ADDR:VID:PRID
-+
-+was removed in v2.12.0.  Any of BUS, ADDR, VID, PRID could be the
-+wildcard *.
-+
-+The new way is
- 
-     -device usb-host,hostbus=BUS,hostaddr=ADDR,vendorid=VID,productid=PRID
- 
+ /*
+  *** Vector Integer Arithmetic Instructions
 -- 
-2.26.2
+2.17.1
 
 
