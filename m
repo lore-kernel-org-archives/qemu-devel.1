@@ -2,76 +2,85 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80CD3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93647C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:59:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48FA3221E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:59:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EF4B221E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:59:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PO4Slddc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48FA3221E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zmqo1aWv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EF4B221E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3e8x-0005dK-2L
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:33:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43078)
+	id 1k3eYb-0003fE-MK
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:59:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXR-0004po-RR
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28551
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3eY2-0003DJ-5X
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 07:59:02 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20516
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXQ-0000KM-8N
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:21 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3eXy-0008EQ-Bu
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 07:59:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596711259;
+ s=mimecast20190719; t=1596715137;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=1IQowK9NNlqpIMC+bc7iQ/baFlNISGVkiJLNBwOKRU0=;
- b=PO4SlddcX8/IU9jsoY47XodbwamC7ZP8i4DFntODkbXqgOYQQn4PV57N/GdnNIsBvsLGIY
- OA0YDDKcVTj/+z8qa5hoBymoyxvCgk4yyqZEQ5r85t6EikHnXTsEBXhN+d1eJisrz2GuIM
- Dl8KynE0WNx5AvXso6dSA3vDTciRqow=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=CCq/+yAMxF7E+Rr55HOBl8bdnV26i/+2GG//rZ190Ls=;
+ b=Zmqo1aWvYsk3ukOpeU1gxhGcnvfNJ+eBUzN5aMBoFxaUfYAngqJnrhRW/WywYlJZ65hrFC
+ 71SIbyE0NXnhB9EYFhnmKhItJl+BkK+HaW9WsRsbqcmeOAJzOODQatxGppjpNbGGCiOI7y
+ J8J50M78C5cp6WZZAZwJELKPt1gf2EQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-S5m69_wZNQKd3qfH5mpn8w-1; Thu, 06 Aug 2020 06:54:15 -0400
-X-MC-Unique: S5m69_wZNQKd3qfH5mpn8w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-153-hIfiXKw4P_uHlkHa9KIPig-1; Thu, 06 Aug 2020 07:58:53 -0400
+X-MC-Unique: hIfiXKw4P_uHlkHa9KIPig-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 808C3100AA21;
- Thu,  6 Aug 2020 10:54:14 +0000 (UTC)
-Received: from thuth.com (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE4515F202;
- Thu,  6 Aug 2020 10:54:10 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-s390x@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH for-5.2 v2 4/9] pc-bios/s390-ccw: Move the inner logic of
- find_subch() to a separate function
-Date: Thu,  6 Aug 2020 12:53:44 +0200
-Message-Id: <20200806105349.632-5-thuth@redhat.com>
-In-Reply-To: <20200806105349.632-1-thuth@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C9ED18C63E0;
+ Thu,  6 Aug 2020 11:58:52 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-229.ams2.redhat.com [10.36.112.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 783495C6D9;
+ Thu,  6 Aug 2020 11:58:49 +0000 (UTC)
+Subject: Re: [PATCH for-5.2 v2 9/9] tests/qtest/cdrom: Add more s390x-related
+ boot tests
+To: Cornelia Huck <cohuck@redhat.com>
 References: <20200806105349.632-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ <20200806105349.632-10-thuth@redhat.com>
+ <20200806132344.4a34178e.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <51c2b736-4b30-84d7-492d-a7963d79ec27@redhat.com>
+Date: Thu, 6 Aug 2020 13:58:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200806132344.4a34178e.cohuck@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:24:10
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -79,8 +88,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,147 +101,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, qemu-block@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
+ Collin Walling <walling@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
  Claudio Imbrenda <imbrenda@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move the code to a separate function to be able to re-use it from a
-different spot later.
+On 06/08/2020 13.23, Cornelia Huck wrote:
+> On Thu,  6 Aug 2020 12:53:49 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> Let's add two new tests:
+>>
+>> 1) Booting with "bootindex" is the architected default behavior on the
+>> s390x target, so we should have at least one test that is using the
+>> "bootindex" property.
+>>
+>> 2) The s390-ccw bios used to fail when other unbootable devices have
+>> been specified before the bootable device (without "bootindex"). Now
+>> that the s390-ccw bios is a little bit smarter here, we should test
+>> this scenario, too, to avoid regressions.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/qtest/cdrom-test.c | 12 ++++++++++++
+>>  1 file changed, 12 insertions(+)
+>>
+>> diff --git a/tests/qtest/cdrom-test.c b/tests/qtest/cdrom-test.c
+>> index 833a0508a1..13e22f57c1 100644
+>> --- a/tests/qtest/cdrom-test.c
+>> +++ b/tests/qtest/cdrom-test.c
+>> @@ -163,6 +163,18 @@ static void add_s390x_tests(void)
+>>      qtest_add_data_func("cdrom/boot/virtio-scsi",
+>>                          "-device virtio-scsi -device scsi-cd,drive=cdr "
+>>                          "-blockdev file,node-name=cdr,filename=", test_cdboot);
+>> +    qtest_add_data_func("cdrom/boot/with-bootindex",
+>> +                        "-device virtio-serial -device virtio-scsi "
+>> +                        "-device virtio-blk,drive=d1 "
+>> +                        "-drive driver=null-co,read-zeroes=on,if=none,id=d1 "
+>> +                        "-device virtio-blk,drive=d2,bootindex=1 "
+>> +                        "-drive if=none,id=d2,media=cdrom,file=", test_cdboot);
+>> +    qtest_add_data_func("cdrom/boot/without-bootindex",
+>> +                        "-device virtio-scsi -device virtio-serial "
+>> +                        "-device x-terminal3270 -device virtio-blk,drive=d1 "
+> 
+> Any special reason for that 3270 device here? Or just to add more
+> variety? :)
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/main.c | 99 ++++++++++++++++++++++++-----------------
- 1 file changed, 57 insertions(+), 42 deletions(-)
+Yes, there is a reason:
 
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 9b64eb0c24..0d2aabbc58 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -51,6 +51,60 @@ unsigned int get_loadparm_index(void)
-     return atoui(loadparm_str);
- }
- 
-+static int is_dev_possibly_bootable(int dev_no, int sch_no)
-+{
-+    bool is_virtio;
-+    Schib schib;
-+    int r;
-+
-+    blk_schid.sch_no = sch_no;
-+    r = stsch_err(blk_schid, &schib);
-+    if (r == 3 || r == -EIO) {
-+        return -ENODEV;
-+    }
-+    if (!schib.pmcw.dnv) {
-+        return false;
-+    }
-+
-+    enable_subchannel(blk_schid);
-+    cutype = cu_type(blk_schid);
-+
-+    /*
-+     * Note: we always have to run virtio_is_supported() here to make
-+     * sure that the vdev.senseid data gets pre-initialized correctly
-+     */
-+    is_virtio = virtio_is_supported(blk_schid);
-+
-+    /* No specific devno given, just return whether the device is possibly bootable */
-+    if (dev_no < 0) {
-+        switch (cutype) {
-+        case CU_TYPE_VIRTIO:
-+            if (is_virtio) {
-+                /*
-+                 * Skip net devices since no IPLB is created and therefore
-+                 * no network bootloader has been loaded
-+                 */
-+                if (virtio_get_device_type() != VIRTIO_ID_NET) {
-+                    return true;
-+                }
-+            }
-+            return false;
-+        case CU_TYPE_DASD_3990:
-+        case CU_TYPE_DASD_2107:
-+            return true;
-+        default:
-+            return false;
-+        }
-+    }
-+
-+    /* Caller asked for a specific devno */
-+    if (schib.pmcw.dev == dev_no) {
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
- /*
-  * Find the subchannel connected to the given device (dev_no) and fill in the
-  * subchannel information block (schib) with the connected subchannel's info.
-@@ -62,53 +116,14 @@ unsigned int get_loadparm_index(void)
-  */
- static bool find_subch(int dev_no)
- {
--    Schib schib;
-     int i, r;
--    bool is_virtio;
- 
-     for (i = 0; i < 0x10000; i++) {
--        blk_schid.sch_no = i;
--        r = stsch_err(blk_schid, &schib);
--        if ((r == 3) || (r == -EIO)) {
-+        r = is_dev_possibly_bootable(dev_no, i);
-+        if (r < 0) {
-             break;
-         }
--        if (!schib.pmcw.dnv) {
--            continue;
--        }
--
--        enable_subchannel(blk_schid);
--        cutype = cu_type(blk_schid);
--
--        /*
--         * Note: we always have to run virtio_is_supported() here to make
--         * sure that the vdev.senseid data gets pre-initialized correctly
--         */
--        is_virtio = virtio_is_supported(blk_schid);
--
--        /* No specific devno given, just return 1st possibly bootable device */
--        if (dev_no < 0) {
--            switch (cutype) {
--            case CU_TYPE_VIRTIO:
--                if (is_virtio) {
--                    /*
--                     * Skip net devices since no IPLB is created and therefore
--                     * no network bootloader has been loaded
--                     */
--                    if (virtio_get_device_type() != VIRTIO_ID_NET) {
--                        return true;
--                    }
--                }
--                continue;
--            case CU_TYPE_DASD_3990:
--            case CU_TYPE_DASD_2107:
--                return true;
--            default:
--                continue;
--            }
--        }
--
--        /* Caller asked for a specific devno */
--        if (schib.pmcw.dev == dev_no) {
-+        if (r == true) {
-             return true;
-         }
-     }
--- 
-2.18.1
+ https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07231.html
+
+... so this is a check that this does not happen again.
+
+ Thomas
 
 
