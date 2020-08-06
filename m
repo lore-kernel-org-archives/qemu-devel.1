@@ -2,91 +2,103 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0038C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:56:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B899EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:57:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87CB822D00
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:56:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C5D222D00
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:57:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Tx5ceoHW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87CB822D00
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="rV09P/9a";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Eq2C3Jee"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C5D222D00
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3dhi-0005n8-3G
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:04:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41076)
+	id 1k3e4f-0007UF-P2
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:28:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dS7-000387-U4
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:51 -0400
-Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:34959)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dS5-0007v0-1Q
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:51 -0400
-Received: by mail-pg1-x52f.google.com with SMTP id o5so8495011pgb.2
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:48:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=7zatC+tzrXp+A9xuiZ1D/H6H+NHiImlD3B/njQwKS1Y=;
- b=Tx5ceoHWHCj94/uXuRO7PxRevgEQnI1EyAiP92OlMpfhQrEFqfMkrnWoZumbY9bj6V
- 77R+5AZQOytzJU7q2ssDm37C+oW7BN/ehEihMgJCIgK7U06nIPO7ZqPcN24xjtc1MraN
- 3tRw0+N81hq+5yFtkbExJWGQCd9DiHOHliQ84d4i+0XhL7qaBhOnJmN2vxpDM3NOkd0l
- kXnL9Y1BBSbHbxKrniizH0lYBGBSpOSiCrNeRvsVqN3cyKn+4ERS90OxFGztMNHiMizw
- MoCGlW6Wnp40Z9zNuCvFvBu7D9YGlLOZ/cduCiPbx1HBe4pimTAa0O2PLCAFy79MtIPu
- rM0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=7zatC+tzrXp+A9xuiZ1D/H6H+NHiImlD3B/njQwKS1Y=;
- b=QgQ5odTxWuCcEMDT67iuDONI6KTdjsTG0WdP4sLftqObAM26H85uW1JxZwVt3gS4J0
- iMYah4Iacbjh4o3ENtHMwuCsiJWCln8py+cItJ0CzWC86Mc+6dgmRuqw8RORtKIcyliM
- gAUjtPqkvH9KWgsvKEBcPi4GF7NtQdEDjmNciytz2dbVWgAWSCbWgGP6IIX/WoZOrUbW
- 8bzgQgIKGzfBF/RXBu0bVSmm/5+vtTMwWxXOHAU54aQ+eDrm33vT7ij50UfPwXgBmsNs
- hfNVqQMX5GrEAcAmRdmBeYcjXx4Wrriz/fbDzU0YphCqtmO/DWIaTSSmNpP362sV6DdA
- D52Q==
-X-Gm-Message-State: AOAM53375qcCFldyTfS9THADxpqcysDf2haVeHCV2LHUn1J5dreVGzqj
- Y4TsjN1EjEBpdoVjMyEUjO9T2HogGZk=
-X-Google-Smtp-Source: ABdhPJzwl1xLErosET6KquJ9VcJInZFTMl1fwcmGFD/XnqZs9eg3aG+PYCf8nfhRVvwGxtrqhKujwQ==
-X-Received: by 2002:a63:3c08:: with SMTP id j8mr6476159pga.82.1596710927490;
- Thu, 06 Aug 2020 03:48:47 -0700 (PDT)
-Received: from frankchang-ThinkPad-T490.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.48.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 03:48:47 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC v3 35/71] target/riscv: rvv-1.0: allow load element with
- sign-extended
-Date: Thu,  6 Aug 2020 18:46:32 +0800
-Message-Id: <20200806104709.13235-36-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
-References: <20200806104709.13235-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
- envelope-from=frank.chang@sifive.com; helo=mail-pg1-x52f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+ (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1k3e1D-0008CI-0k
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 07:25:07 -0400
+Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:57963)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <hi@alyssa.is>) id 1k3e1A-0004AL-1k
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 07:25:06 -0400
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+ by mailout.west.internal (Postfix) with ESMTP id 1FEFE14CF;
+ Thu,  6 Aug 2020 07:25:02 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute2.internal (MEProxy); Thu, 06 Aug 2020 07:25:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=
+ from:to:cc:subject:in-reply-to:references:date:message-id
+ :mime-version:content-type; s=fm3; bh=C7eSJoYZZFo7E7Ab8D47pp5OnV
+ uwmbmagBFpNXRDV2U=; b=rV09P/9a2muknLcPeMyI4D9wE3bjnTniRuE6c+wDRB
+ puNoJtzjyqIObh4C6sIX0gWG6jXR9yEgPnj0J02i6Wx6LL6YX6wjxTBNcxwQKJIT
+ 5rBD9nwhfDELDzBjR7dUNaMRp0Qfjscg9fE/e+xXT4NiuXl6IMMIdqwK5gF1sOfY
+ k0EcH+e/Vn8K8IHoawJ00CDY8ZNqMCXntb0wpQQJcGUQjsrSOe5vdtItvA92LLIZ
+ QBvX6O0XsVFsQwetTcbIMHcquroAAo4nyliYiSZ8oKKB6I9wQb8lTxoPI08K2ShY
+ xdTvaz0QrU6IH0NbefBIWsaYxafDvGDuAMb/MZ28t1ag==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=C7eSJo
+ YZZFo7E7Ab8D47pp5OnVuwmbmagBFpNXRDV2U=; b=Eq2C3JeeKHFYh6ZoVBpTSo
+ bWYcuEnqzHnTa3yK5H6YZ2dNPQdl6POx7GND4ld8Z3QUCYaMCVqClcbkEzaBfuPy
+ WH0nJZaL0LtlzJeZZxugboIkkdaM7wQWbaFUXpLhirf+Xu+5reChd4VB1e4moKUb
+ yU58pc4ycuUcFVWous26HynGAB2ntTzmVGeIsGeIspsEY5uzEbmk41YPCqk2V4Oh
+ 4dNj+QW4bWQ7Xp4/ZtBhnIWVsmh4aHDgRGPV+8RmlcYnRPK4phfcp/oP8xc7iOVe
+ ShVmDav8tIlHUpt3+VXolkpqqmz5jWmIU/Z5Im9mswpmR1y/AFHqqiTyHg+m+dEw
+ ==
+X-ME-Sender: <xms:jegrX7e5R2CHuEYmIUpsQlI2h8884cZdxhYHWxLYdZeFd6rtf7GgVg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrkedtgdegudcutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecunecujfgurhephffvufgjfhffkfggtgesthdtredttd
+ dttdenucfhrhhomheptehlhihsshgrucftohhsshcuoehhihesrghlhihsshgrrdhisheq
+ necuggftrfgrthhtvghrnhephfetudeftdejveegudejhfeuiefgjeehuddvtddvhfejte
+ dufeelhfelhfeghfetnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkphepkeeg
+ rddukeegrddvvdelrddvgeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+ hmrghilhhfrhhomhephhhisegrlhihshhsrgdrihhs
+X-ME-Proxy: <xmx:jegrXxOZDp6ovz5dGuXaLqvBlQeMaAOxezMowqk4HzBWcTz_NZMYjg>
+ <xmx:jegrX0iXoviHi0zAEjsV8_Hmy6UbLtNa1XSn_9FqonNPtkk4k21nfA>
+ <xmx:jegrX8-FaBzlIY8b1r2MAJKOfA6UkqQCBYfZqWio1OC0RWVsau3BcA>
+ <xmx:jegrX14EWwJDD0ByWzHfj-qyLIee2qwuc1jNrF10QSF1ppJaceRqCg>
+Received: from x220.qyliss.net (p54b8e5f4.dip0.t-ipconnect.de [84.184.229.244])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 2B8E030600A6;
+ Thu,  6 Aug 2020 07:25:01 -0400 (EDT)
+Received: by x220.qyliss.net (Postfix, from userid 1000)
+ id 4058F39B; Thu,  6 Aug 2020 11:24:59 +0000 (UTC)
+From: Alyssa Ross <hi@alyssa.is>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: vhost-user protocol feature negotiation
+In-Reply-To: <20200806054622-mutt-send-email-mst@kernel.org>
+References: <87sgd1ktx9.fsf@alyssa.is>
+ <20200805181352-mutt-send-email-mst@kernel.org> <87lfis2lr6.fsf@alyssa.is>
+ <20200806054622-mutt-send-email-mst@kernel.org>
+Date: Thu, 06 Aug 2020 11:24:59 +0000
+Message-ID: <87zh7810fo.fsf@alyssa.is>
+MIME-Version: 1.0
+Content-Type: text/plain
+Received-SPF: pass client-ip=64.147.123.20; envelope-from=hi@alyssa.is;
+ helo=wout4-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 07:25:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,86 +111,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+"Michael S. Tsirkin" <mst@redhat.com> writes:
 
-For some vector instructions (e.g. vmv.s.x), the element is loaded with
-sign-extended.
+> On Thu, Aug 06, 2020 at 08:59:09AM +0000, Alyssa Ross wrote:
+>> "Michael S. Tsirkin" <mst@redhat.com> writes:
+>> 
+>> > On Wed, Aug 05, 2020 at 03:13:06PM +0000, Alyssa Ross wrote:
+>> >> Quoting from the definition of VHOST_USER_SET_PROTOCOL_FEATURES in
+>> >> vhost-user.rst:
+>> >> 
+>> >> >   Only legal if feature bit ``VHOST_USER_F_PROTOCOL_FEATURES`` is present in
+>> >> >   ``VHOST_USER_GET_FEATURES``.
+>> >> > 
+>> >> > .. Note::
+>> >> >    Slave that reported ``VHOST_USER_F_PROTOCOL_FEATURES`` must support
+>> >> >    this message even before ``VHOST_USER_SET_FEATURES`` was called.
+>> >> 
+>> >> To me, this could mean either of two things:
+>> >> 
+>> >> (1) If VHOST_USER_F_PROTOCOL_FEATURES hasn't been set, upon receiving
+>> >>     VHOST_USER_SET_PROTOCOL_FEATURES, a backend should enable the
+>> >>     protocol features immediately.
+>> >> 
+>> >> (2) If VHOST_USER_F_PROTOCOL_FEATURES hasn't been set, upon receiving
+>> >>     VHOST_USER_SET_PROTOCOL_FEATURES, a backend should store those
+>> >>     feature bits, but not actually consider them to be enabled until
+>> >>     after VHOST_USER_SET_FEATURES has been received (presumably
+>> >>     containing VHOST_USER_F_PROTOCOL_FEATURES).
+>> >> 
+>> >> The reason I bring this up is that QEMU appears to interpret it as (1),
+>> >> while the vhost-user-net backend in Intel's cloud-hypervisor[1]
+>> >> interprets it as (2).  So I'm looking for a clarification.
+>> >> 
+>> >> [1]: https://github.com/cloud-hypervisor/cloud-hypervisor
+>> >> 
+>> >> Thanks in advance.
+>> >
+>> >
+>> > IMHO the intent was this: VHOST_USER_F_PROTOCOL_FEATURES bit in
+>> > VHOST_USER_GET_FEATURES means that qemu can send
+>> > VHOST_USER_GET_PROTOCOL_FEATURES and VHOST_USER_SET_PROTOCOL_FEATURES.
+>> >
+>> > With most feature bits in VHOST_USER_GET_FEATURES, the
+>> > specific functionality needs to only be enabled after
+>> > VHOST_USER_SET_FEATURES.
+>> >
+>> > However, this is for functionality dealing with guest activity.
+>> > VHOST_USER_SET_PROTOCOL_FEATURES has nothing to do with guest directly,
+>> > it's about negotiation between qemu and backend: it is only in
+>> > VHOST_USER_GET_FEATURES for the reason that this is the only message
+>> > (very) old backends reported.  Thus, the backend should not check
+>> > whether VHOST_USER_SET_FEATURES sets VHOST_USER_F_PROTOCOL_FEATURES,
+>> > instead it should simply always be ready to receive
+>> > VHOST_USER_GET_PROTOCOL_FEATURES and VHOST_USER_SET_PROTOCOL_FEATURES.
+>> >
+>> > Backend that isn't always ready to handle
+>> > VHOST_USER_GET_PROTOCOL_FEATURES and VHOST_USER_SET_PROTOCOL_FEATURES
+>> > should not set VHOST_USER_F_PROTOCOL_FEATURES in
+>> > VHOST_USER_GET_FEATURES.
+>> 
+>> Thanks for the explanation.  That matches what I had in mind with (1).
+>> 
+>> > This appears to be closer to (1), but if qemu can't distinguish
+>> > then we don't care, right? For example, VHOST_USER_PROTOCOL_F_REPLY_ACK
+>> > enables acks on arbitrary messages. Does the backend in question
+>> > ignore the affected bit until SET_FEATURES? If yes won't this
+>> > make qemu hang?
+>> 
+>> Yes.  That was my motivation for asking what the correct behaviour was,
+>> so that I could fix the incorrect one. :)  I suspect that up to this point,
+>> the cloud-hypervisor vhost-user-net backend has only been used with
+>> cloud-hypervisor, and so this incompatibilty with QEMU was not noticed.
+>> 
+>> > How would you suggest clarifying the wording?
+>> 
+>> Do you think this communicates everything required?
+>> 
+>> ---
+>> diff --git i/docs/interop/vhost-user.rst w/docs/interop/vhost-user.rst
+>> index 10e3e3475e..72724d292a 100644
+>> --- i/docs/interop/vhost-user.rst
+>> +++ w/docs/interop/vhost-user.rst
+>> @@ -854,9 +854,8 @@ Master message types
+>>    ``VHOST_USER_GET_FEATURES``.
+>>  
+>>  .. Note::
+>> -   Slave that reported ``VHOST_USER_F_PROTOCOL_FEATURES`` must
+>> -   support this message even before ``VHOST_USER_SET_FEATURES`` was
+>> -   called.
+>> +   ``VHOST_USER_F_PROTOCOL_FEATURES`` does not need to be acknowledged
+>> +   with ``VHOST_USER_SET_FEATURES``.
+>>  
+>>  ``VHOST_USER_SET_PROTOCOL_FEATURES``
+>>    :id: 16
+>
+> Hmm I find this confusing. I think it's a good policy to ask qemu to
+> acknowledge it. It's just that the client should not wait for
+> VHOST_USER_SET_FEATURES before handling VHOST_USER_SET_PROTOCOL_FEATURES
+> or VHOST_USER_GET_PROTOCOL_FEATURES.
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+To me, it's confusing that a frontend is expected to ack
+VHOST_USER_F_PROTOCOL_FEATURES even though the ack can't have any effect
+(because VHOST_USER_GET_PROTOCOL_FEATURES and
+VHOST_USER_SET_PROTOCOL_FEATURES both have to work even if the ack
+hasn't been received yet).
+
+But, if the frontend is supposed to ack anyway, how about:
+
+Signed-off-by: Alyssa Ross <hi@alysas.is>
+
 ---
- target/riscv/insn_trans/trans_rvv.inc.c | 26 ++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
-
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 62c6b469364..469d0bad056 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -3041,17 +3041,29 @@ static bool trans_vid_v(DisasContext *s, arg_vid_v *a)
- /* Integer Extract Instruction */
+diff --git i/docs/interop/vhost-user.rst w/docs/interop/vhost-user.rst
+index 10e3e3475e..bc78c9947f 100644
+--- i/docs/interop/vhost-user.rst
++++ w/docs/interop/vhost-user.rst
+@@ -854,9 +854,9 @@ Master message types
+   ``VHOST_USER_GET_FEATURES``.
  
- static void load_element(TCGv_i64 dest, TCGv_ptr base,
--                         int ofs, int sew)
-+                         int ofs, int sew, bool sign)
- {
-     switch (sew) {
-     case MO_8:
--        tcg_gen_ld8u_i64(dest, base, ofs);
-+        if (!sign) {
-+            tcg_gen_ld8u_i64(dest, base, ofs);
-+        } else {
-+            tcg_gen_ld8s_i64(dest, base, ofs);
-+        }
-         break;
-     case MO_16:
--        tcg_gen_ld16u_i64(dest, base, ofs);
-+        if (!sign) {
-+            tcg_gen_ld16u_i64(dest, base, ofs);
-+        } else {
-+            tcg_gen_ld16s_i64(dest, base, ofs);
-+        }
-         break;
-     case MO_32:
--        tcg_gen_ld32u_i64(dest, base, ofs);
-+        if (!sign) {
-+            tcg_gen_ld32u_i64(dest, base, ofs);
-+        } else {
-+            tcg_gen_ld32s_i64(dest, base, ofs);
-+        }
-         break;
-     case MO_64:
-         tcg_gen_ld_i64(dest, base, ofs);
-@@ -3106,7 +3118,7 @@ static void vec_element_loadx(DisasContext *s, TCGv_i64 dest,
+ .. Note::
+-   Slave that reported ``VHOST_USER_F_PROTOCOL_FEATURES`` must
+-   support this message even before ``VHOST_USER_SET_FEATURES`` was
+-   called.
++   While QEMU should acknowledge ``VHOST_USER_F_PROTOCOL_FEATURES``, a
++   backend must allow ``VHOST_USER_GET_PROTOCOL_FEATURES`` even if
++   ``VHOST_USER_F_PROTOCOL_FEATURES`` has not been acknowledged yet.
  
-     /* Perform the load. */
-     load_element(dest, base,
--                 vreg_ofs(s, vreg), s->sew);
-+                 vreg_ofs(s, vreg), s->sew, false);
-     tcg_temp_free_ptr(base);
-     tcg_temp_free_i32(ofs);
+ ``VHOST_USER_SET_PROTOCOL_FEATURES``
+   :id: 16
+@@ -869,8 +869,12 @@ Master message types
+   ``VHOST_USER_GET_FEATURES``.
  
-@@ -3124,9 +3136,9 @@ static void vec_element_loadx(DisasContext *s, TCGv_i64 dest,
- }
+ .. Note::
+-   Slave that reported ``VHOST_USER_F_PROTOCOL_FEATURES`` must support
+-   this message even before ``VHOST_USER_SET_FEATURES`` was called.
++   While QEMU should acknowledge ``VHOST_USER_F_PROTOCOL_FEATURES``, a
++   backend must allow ``VHOST_USER_SET_PROTOCOL_FEATURES`` even if
++   ``VHOST_USER_F_PROTOCOL_FEATURES`` has not been acknowledged yet.
++   The backend must not wait for ``VHOST_USER_SET_FEATURES`` before
++   enabling protocol features requested with
++   ``VHOST_USER_SET_PROTOCOL_FEATURES``.
  
- static void vec_element_loadi(DisasContext *s, TCGv_i64 dest,
--                              int vreg, int idx)
-+                              int vreg, int idx, bool sign)
- {
--    load_element(dest, cpu_env, endian_ofs(s, vreg, idx), s->sew);
-+    load_element(dest, cpu_env, endian_ofs(s, vreg, idx), s->sew, sign);
- }
- 
- static bool trans_vext_x_v(DisasContext *s, arg_r *a)
--- 
-2.17.1
-
+ ``VHOST_USER_SET_OWNER``
+   :id: 3
 
