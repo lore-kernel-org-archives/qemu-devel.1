@@ -2,92 +2,84 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5859EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C75C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ECAE206B5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:01:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OLRRdB0V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ECAE206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D0152206B5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:02:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0152206B5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=digitalsignallabs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3fWO-00005E-B6
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:01:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42790)
+	id 1k3fXp-0001Kk-TU
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:02:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3fV7-0007j4-UA
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:00:05 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27115
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3fV4-0006aR-Ve
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:00:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596718801;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=MjkRPyDWj8e0wYQiKVQFu9aXImnmoKT9oI4ly82w83g=;
- b=OLRRdB0VpcSQHe9BVEzFwXOvl3G6vNOVN+4bzwAsXJQEm09UiHkQ2aFYdKpXZoAoLNBjRa
- AQplxP0Dtc03aTTl2JYGEOlD2801YzRWk58b1oQg+A9ZK8eX5/lTtrE1TssDKgNj+7bUsl
- tVAY/uo8xFJ2PZzWae6021dldq6JtXw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-k3FTrlxxPgK2_2XsPBYK2A-1; Thu, 06 Aug 2020 08:59:56 -0400
-X-MC-Unique: k3FTrlxxPgK2_2XsPBYK2A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 984978017FB;
- Thu,  6 Aug 2020 12:59:54 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EF60787A5E;
- Thu,  6 Aug 2020 12:59:49 +0000 (UTC)
-Subject: Re: Qemu web site down?
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Christophe de Dinechin <dinechin@redhat.com>
-References: <9C8E7160-7A4D-4002-8DE8-6BBFE0C2240A@redhat.com>
- <87o8nokq46.fsf@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <fe4d7cc8-aa6e-6714-097e-6ea07c078c76@redhat.com>
-Date: Thu, 6 Aug 2020 14:59:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <yates@digitalsignallabs.com>)
+ id 1k3fVC-0007n6-PV
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:00:14 -0400
+Received: from mail.onyx.syn-alias.com ([206.152.134.66]:56302
+ helo=smtp.centurylink.net)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yates@digitalsignallabs.com>)
+ id 1k3fVB-0006cq-9o
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:00:10 -0400
+X_CMAE_Category: , ,
+X-CNFS-Analysis: v=2.3 cv=QYkYQfTv c=1 sm=1 tr=0
+ a=+BvlVZVS74/p9mKwrR4qzg==:117 a=+BvlVZVS74/p9mKwrR4qzg==:17
+ a=KGjhK52YXX0A:10 a=IkcTkHD0fZMA:10 a=y4yBn9ojGxQA:10 a=PPsO2EghCewA:10
+ a=eQrCS-SpgXYA:10 a=Ixn1CAxRAAAA:8 a=riSzfaxeulHGD2guDgUA:9
+ a=gHPTvc8h__eXD_09:21 a=N-NUiAowhh9YROm2:21 a=QEXdDO2ut3YA:10
+ a=_0vDLAJOulx5KDpLVjVP:22
+X-CM-Score: 0
+X-Scanned-by: Cloudmark Authority Engine
+Feedback-ID: dfw:ctl:res:onyx
+X-Authed-Username: eWF0ZXNmcmVlZGFyYW5keUBjZW50dXJ5bGluay5uZXQ=
+Authentication-Results: smtp02.onyx.dfw.sync.lan
+ smtp.user=yatesfreedarandy@centurylink.net; auth=pass (LOGIN)
+Received: from [64.98.102.7] ([64.98.102.7:54300]
+ helo=galois.digitalsignallabs.com)
+ by smtp.centurylink.net (envelope-from <yates@digitalsignallabs.com>)
+ (ecelerity 3.6.25.56547 r(Core:3.6.25.0)) with ESMTPA
+ id 55/21-23904-5DEFB2F5; Thu, 06 Aug 2020 09:00:05 -0400
+Received: from localhost.localdomain (fv-nc-f7af8b91e1-234237-1.tingfiber.com
+ [64.98.102.7])
+ by galois.digitalsignallabs.com (Postfix) with ESMTPSA id 554D02E0ED9;
+ Thu,  6 Aug 2020 09:00:04 -0400 (EDT)
+Subject: Re: [PATCH] hw/cpu/a9mpcore: Verify the machine use Cortex-A9 cores
+To: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20200709152337.15533-1-f4bug@amsat.org>
+ <CAFEAcA_Sbaai_TPMVkGHKGGhfyjc1Mk2Z6pWSVkLcwHLVZVzNg@mail.gmail.com>
+From: Randy Yates <yates@digitalsignallabs.com>
+Message-ID: <7de5e47e-4347-1e0b-6f4b-922d3adea4fe@digitalsignallabs.com>
+Date: Thu, 6 Aug 2020 09:00:04 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <87o8nokq46.fsf@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA_Sbaai_TPMVkGHKGGhfyjc1Mk2Z6pWSVkLcwHLVZVzNg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:07:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Language: en-US
+Received-SPF: none client-ip=206.152.134.66;
+ envelope-from=yates@digitalsignallabs.com; helo=smtp.centurylink.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 09:00:05
+X-ACL-Warn: Detected OS   = Linux 2.6.x [fuzzy]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,31 +92,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org
+Cc: Rob Herring <robh@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-arm <qemu-arm@nongnu.org>,
+ Randy Yates <yates@ieee.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/08/2020 12.47, Alex Bennée wrote:
-> 
-> Christophe de Dinechin <dinechin@redhat.com> writes:
-> 
->> Hi Stefan,
+Good! Thank you, Philippe.
+
+--Randy
+
+On 8/6/20 8:54 AM, Peter Maydell wrote:
+> On Thu, 9 Jul 2020 at 16:23, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> The 'Cortex-A9MPCore internal peripheral' block can only be
+>> used with Cortex A5 and A9 cores. As we don't model the A5
+>> yet, simply check the machine cpu core is a Cortex A9. If
+>> not return an error.
 >>
->>
->> The link from https://wiki.qemu.org/Documentation pointing to
->> https://qemu.weilnetz.de/doc/qemu-doc.html seems to be dead. Is the
->> problem on your web site, or should the wiki be updated?
-> 
-> It should be pointing at:
-> 
->   https://www.qemu.org/documentation/
-> 
-> now.
-
-Done.
-
- Thomas
-
-
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   hw/cpu/a9mpcore.c | 12 +++++++++++-
+>>   1 file changed, 11 insertions(+), 1 deletion(-)
+> Applied to target-arm.next (for 5.2), thanks.
+>
+> -- PMM
 
