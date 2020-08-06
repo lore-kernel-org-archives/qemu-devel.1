@@ -2,65 +2,97 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F2BC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 03:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA77C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:45:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99B322084D
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 03:58:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99B322084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA186206C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 11:45:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A2lj1INA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA186206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3X35-0000N0-TW
-	for qemu-devel@archiver.kernel.org; Wed, 05 Aug 2020 23:58:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36930)
+	id 1k3eL0-0005QA-6r
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:45:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1k3X2M-0007Zw-5X
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 23:57:50 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4225 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1k3X2K-0001RP-8l
- for qemu-devel@nongnu.org; Wed, 05 Aug 2020 23:57:49 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 5EB811B8F1C5E96A95DB;
- Thu,  6 Aug 2020 11:57:44 +0800 (CST)
-Received: from localhost (10.174.185.104) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Thu, 6 Aug 2020
- 11:57:38 +0800
-From: Ying Fang <fangying1@huawei.com>
-To: <qemu-devel@nongnu.org>, <imammedo@redhat.com>, <mst@redhat.com>
-Subject: [PATCH v5 2/2] tests/bios-tables-test: add smbios cpu speed test
-Date: Thu, 6 Aug 2020 11:56:34 +0800
-Message-ID: <20200806035634.376-3-fangying1@huawei.com>
-X-Mailer: git-send-email 2.26.0.windows.1
-In-Reply-To: <20200806035634.376-1-fangying1@huawei.com>
-References: <20200806035634.376-1-fangying1@huawei.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k3eKI-0004op-Jh
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 07:44:50 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44199)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k3eKF-0006fm-V8
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 07:44:50 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c15so7466450wrs.11
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 04:44:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=cMatXE/DVSsnWTfBdSTx8J7Ctss0zXNvDVRfCtEXC+k=;
+ b=A2lj1INAuAiNWJ40RUVSrufDsi7MsUZnWigXW8pA9vgeOir+c+xtslUnT4zOhZcVLy
+ mV4rgD4dgLQEjPp7qgxOjvFv5eC9rKzDKJJiAcfqlmgLE1+2kn3QQzrvWvYfsdO6VvI4
+ UO94C0JXzJsqULgYcVxvIQUkK9w/l8H18mJ2oM4W1e9LGYDzCHpbf3krUSxzX6pr1RxL
+ Ldv3l4MWMEroaG8MHtoo3nWjwwl5qg4M0/M2FHWOpl5R9z7Las/F35tJ+t4ULWW4UHV4
+ YBBMtxixh+gXKlGzaYE51d/c2p7GWiMpm1+2C3ztVCdCDUm+6KeSgJWnVdYnCiNPwUHn
+ DRmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=cMatXE/DVSsnWTfBdSTx8J7Ctss0zXNvDVRfCtEXC+k=;
+ b=e/rVDo6EfHmwX8CUdMKMrP6h2iaMm9CGlT/0bbgZ9XAciW6zOstR0pRDA2ap2XySet
+ vJ/Qn1wPM5LigGVs0fwI1/hY8fUR397pMo3dcjrvHZuG1D6W10ZqQ+RRWw5UJsQGoZsi
+ ewVgSdGhCvbaTLOqjOBuh0Q9QlxmoA3PF29GdZMnkdXIE42Ak0cKD8Z6eZ+9LhDCIpkR
+ 0CVlWfaVXWXPN71r3v2EOBmU8EWaCo01FKnYrI7cPbmqMYBYriWG1CHie9wl723Bedtb
+ bruALoI24ViX0WDKjx4hN3XLTm1y2ZuAse+m2aWBNH76JDyUIeBrjtOgdBuVrlVQr9G1
+ 0kWA==
+X-Gm-Message-State: AOAM533PM/SAKqLnASda0OYeJaoeWmSzIuf4evkC42TlD3zcoGZigSJe
+ svwc3NPviKv/AQvXV8BMdhh84X/J+wY=
+X-Google-Smtp-Source: ABdhPJx5up9LNTBPyZcv0nFpkmitYI9x4VG55RBdZlypuW0bpDL8qbhlVIya3RIBIVezJ18cfJDI/w==
+X-Received: by 2002:a5d:4ad1:: with SMTP id y17mr7585835wrs.132.1596714285813; 
+ Thu, 06 Aug 2020 04:44:45 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j2sm6626781wrp.46.2020.08.06.04.44.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Aug 2020 04:44:44 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id B1D311FF7E;
+ Thu,  6 Aug 2020 12:44:43 +0100 (BST)
+References: <20200806104453.30393-1-peter.maydell@linaro.org>
+ <20200806104453.30393-2-peter.maydell@linaro.org>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 1/4] target/arm: Replace A64 get_fpstatus_ptr() with
+ generic fpstatus_ptr()
+In-reply-to: <20200806104453.30393-2-peter.maydell@linaro.org>
+Date: Thu, 06 Aug 2020 12:44:43 +0100
+Message-ID: <87lfisknh0.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.185.104]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191; envelope-from=fangying1@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/05 23:57:44
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,110 +105,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, zhang.zhanghailiang@huawei.com, alex.chen@huawei.com,
- Ying Fang <fangying1@huawei.com>, Heyi Guo <guoheyi@huawei.com>,
- philmd@redhat.com
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add smbios type 4 CPU speed check for we added new options to set
-smbios type 4 "max speed" and "current speed". The default value
-should be 2000 when no option is specified, just as the old version
-did.
 
-We add the test case to one machine of each architecture, though it
-doesn't really run on aarch64 platform for smbios test can't run on
-uefi only platform yet.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Signed-off-by: Ying Fang <fangying1@huawei.com>
-Signed-off-by: Heyi Guo <guoheyi@huawei.com>
----
- tests/bios-tables-test.c | 42 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+> We currently have two versions of get_fpstatus_ptr(), which both take
+> an effectively boolean argument:
+>  * the one for A64 takes "bool is_f16" to distinguish fp16 from other ops
+>  * the one for A32/T32 takes "int neon" to distinguish Neon from other ops
+>
+> This is confusing, and to implement ARMv8.2-FP16 the A32/T32 one will
+> need to make a four-way distinction between "non-Neon, FP16",
+> "non-Neon, single/double", "Neon, FP16" and "Neon, single/double".
+> The A64 version will then be a strict subset of the A32/T32 version.
+>
+> To clean this all up, we want to go to a single implementation which
+> takes an enum argument with values FPST_FPCR, FPST_STD,
+> FPST_FPCR_F16, and FPST_STD_F16.  We rename the function to
+> fpstatus_ptr() so that unconverted code gets a compilation error
+> rather than silently passing the wrong thing to the new function.
+>
+> This commit implements that new API, and converts A64 to use it:
+>  get_fpstatus_ptr(false) -> fpstatus_ptr(FPST_FPCR)
+>  get_fpstatus_ptr(true) -> fpstatus_ptr(FPST_FPCR_F16)
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index a356ac3489..6bd165021b 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -37,6 +37,8 @@ typedef struct {
-     GArray *tables;
-     uint32_t smbios_ep_addr;
-     struct smbios_21_entry_point smbios_ep_table;
-+    uint16_t smbios_cpu_max_speed;
-+    uint16_t smbios_cpu_curr_speed;
-     uint8_t *required_struct_types;
-     int required_struct_types_len;
-     QTestState *qts;
-@@ -516,6 +518,31 @@ static inline bool smbios_single_instance(uint8_t type)
-     }
- }
- 
-+static bool smbios_cpu_test(test_data *data, uint32_t addr)
-+{
-+    uint16_t expect_speed[2];
-+    uint16_t real;
-+    int offset[2];
-+    int i;
-+
-+    /* Check CPU speed for backward compatibility */
-+    offset[0] = offsetof(struct smbios_type_4, max_speed);
-+    offset[1] = offsetof(struct smbios_type_4, current_speed);
-+    expect_speed[0] = data->smbios_cpu_max_speed ? : 2000;
-+    expect_speed[1] = data->smbios_cpu_curr_speed ? : 2000;
-+
-+    for (i = 0; i < 2; i++) {
-+        real = qtest_readw(data->qts, addr + offset[i]);
-+        if (real != expect_speed[i]) {
-+            fprintf(stderr, "Unexpected SMBIOS CPU speed: real %u expect %u\n",
-+                    real, expect_speed[i]);
-+            return false;
-+        }
-+    }
-+
-+    return true;
-+}
-+
- static void test_smbios_structs(test_data *data)
- {
-     DECLARE_BITMAP(struct_bitmap, SMBIOS_MAX_TYPE+1) = { 0 };
-@@ -538,6 +565,10 @@ static void test_smbios_structs(test_data *data)
-         }
-         set_bit(type, struct_bitmap);
- 
-+        if (type == 4) {
-+            g_assert(smbios_cpu_test(data, addr));
-+        }
-+
-         /* seek to end of unformatted string area of this struct ("\0\0") */
-         prv = crt = 1;
-         while (prv || crt) {
-@@ -673,6 +704,11 @@ static void test_acpi_q35_tcg(void)
-     data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
-     test_acpi_one(NULL, &data);
-     free_test_data(&data);
-+
-+    data.smbios_cpu_max_speed = 3000;
-+    data.smbios_cpu_curr_speed = 2600;
-+    test_acpi_one("-smbios type=4,max-speed=3000,current-speed=2600", &data);
-+    free_test_data(&data);
- }
- 
- static void test_acpi_q35_tcg_bridge(void)
-@@ -885,6 +921,12 @@ static void test_acpi_virt_tcg(void)
- 
-     test_acpi_one("-cpu cortex-a57", &data);
-     free_test_data(&data);
-+
-+    data.smbios_cpu_max_speed = 2900;
-+    data.smbios_cpu_curr_speed = 2700;
-+    test_acpi_one("-cpu cortex-a57 "
-+                  "-smbios type=4,max-speed=2900,current-speed=2700", &data);
-+    free_test_data(&data);
- }
- 
- int main(int argc, char *argv[])
--- 
-2.23.0
+How many more can they add ;-)
 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
