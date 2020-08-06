@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66DF2C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 744DFC433E1
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52272221E2
+	by mail.kernel.org (Postfix) with ESMTPS id 63D0E221E3
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:06:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUhE422Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52272221E2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W1a0NjK3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63D0E221E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3m9i-0003cb-Ce
+	id 1k3m9i-0003bN-Fs
 	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:06:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43994)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lQO-00019o-Ub
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:36 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49865
+ id 1k3lQh-0001wP-MY
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:55 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59613
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lQN-0006mQ-35
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:36 -0400
+ id 1k3lQf-0006oM-OK
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741574;
+ s=mimecast20190719; t=1596741593;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3ONsx2fEkn/tziNLZD2HyUOZzTpMXOXStj2Sp1OmPPc=;
- b=ZUhE422Y9H8880H1a5ZeGGKK32ffn7EAA4+Z263t04l21Na6f+R2Xblq7mXiFT9uTvzDMP
- Sg9rBBLdi7cwHl4FkCmfiNwa6PwsOCi9TZ7qmMwK3XTsR/iMqjiFZKuess6n0mEh02zWDV
- qQOgwlmIoqdAN9v8nHWz9Gx3uKxtbKo=
+ bh=jgf3c/81Sz8+zccu3dp02ligzGaHLYd1poS2Bpj3JP8=;
+ b=W1a0NjK31YJSTMfNRBg+d1JLtVuy5uAN386chBEAqI2MOGaHtzrF2gyz0SJpu5Liop2upX
+ pJJ50Xeiq5VaFPYjzerdkS1w0JIM/WYEDBjmifSeN8dOEFAMncl02g9BTnnJqJrqogGpbo
+ 6zQJ2sBBDES8kWRNZ6a1p8fxHY0KC4w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-rT8PHbH2Ob6ar9q9yHyFKw-1; Thu, 06 Aug 2020 15:19:32 -0400
-X-MC-Unique: rT8PHbH2Ob6ar9q9yHyFKw-1
+ us-mta-404-xnFrrr_1MpOQ2DQ3GXIh1Q-1; Thu, 06 Aug 2020 15:19:50 -0400
+X-MC-Unique: xnFrrr_1MpOQ2DQ3GXIh1Q-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95876107BEFF
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:19:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A64A100AA23
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:19:49 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A789E5F9DC;
- Thu,  6 Aug 2020 19:19:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8C32E5F9DC;
+ Thu,  6 Aug 2020 19:19:48 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 106/143] meson: convert hw/ipmi
-Date: Thu,  6 Aug 2020 21:15:42 +0200
-Message-Id: <1596741379-12902-107-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 114/143] meson: convert hw/dma
+Date: Thu,  6 Aug 2020 21:15:50 +0200
+Message-Id: <1596741379-12902-115-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -106,67 +106,79 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/ipmi/Makefile.objs |  8 --------
- hw/ipmi/meson.build   | 11 +++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 12 insertions(+), 9 deletions(-)
- delete mode 100644 hw/ipmi/Makefile.objs
- create mode 100644 hw/ipmi/meson.build
+ hw/Makefile.objs     |  1 -
+ hw/dma/Makefile.objs | 16 ----------------
+ hw/dma/meson.build   | 15 +++++++++++++++
+ hw/meson.build       |  1 +
+ 4 files changed, 16 insertions(+), 17 deletions(-)
+ delete mode 100644 hw/dma/Makefile.objs
+ create mode 100644 hw/dma/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index a28e211..f136377 100644
+index c04dfe5..26917a4 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -15,7 +15,6 @@ devices-dirs-y += ide/
- devices-dirs-y += input/
- devices-dirs-y += intc/
- devices-dirs-$(CONFIG_IPACK) += ipack/
--devices-dirs-$(CONFIG_IPMI) += ipmi/
+@@ -7,7 +7,6 @@ devices-dirs-y += block/
+ devices-dirs-y += char/
+ devices-dirs-y += cpu/
+ devices-dirs-y += display/
+-devices-dirs-y += dma/
  endif
  
  common-obj-y += $(devices-dirs-y)
-diff --git a/hw/ipmi/Makefile.objs b/hw/ipmi/Makefile.objs
+diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
 deleted file mode 100644
-index 3cca10b..0000000
---- a/hw/ipmi/Makefile.objs
+index f4b1cfe..0000000
+--- a/hw/dma/Makefile.objs
 +++ /dev/null
-@@ -1,8 +0,0 @@
--common-obj-$(CONFIG_IPMI) += ipmi.o ipmi_kcs.o ipmi_bt.o
--common-obj-$(CONFIG_IPMI_LOCAL) += ipmi_bmc_sim.o
--common-obj-$(CONFIG_IPMI_EXTERN) += ipmi_bmc_extern.o
--common-obj-$(CONFIG_ISA_IPMI_KCS) += isa_ipmi_kcs.o
--common-obj-$(CONFIG_PCI_IPMI_KCS) += pci_ipmi_kcs.o
--common-obj-$(CONFIG_ISA_IPMI_BT) += isa_ipmi_bt.o
--common-obj-$(CONFIG_PCI_IPMI_BT) += pci_ipmi_bt.o
--common-obj-$(CONFIG_IPMI_SSIF) += smbus_ipmi.o
-diff --git a/hw/ipmi/meson.build b/hw/ipmi/meson.build
+@@ -1,16 +0,0 @@
+-common-obj-$(CONFIG_PUV3) += puv3_dma.o
+-common-obj-$(CONFIG_RC4030) += rc4030.o
+-common-obj-$(CONFIG_PL080) += pl080.o
+-common-obj-$(CONFIG_PL330) += pl330.o
+-common-obj-$(CONFIG_I82374) += i82374.o
+-common-obj-$(CONFIG_I8257) += i8257.o
+-common-obj-$(CONFIG_XILINX_AXI) += xilinx_axidma.o
+-common-obj-$(CONFIG_ZYNQ_DEVCFG) += xlnx-zynq-devcfg.o
+-common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
+-common-obj-$(CONFIG_STP2000) += sparc32_dma.o
+-common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dpdma.o
+-common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zdma.o
+-
+-common-obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
+-common-obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
+-common-obj-$(CONFIG_RASPI) += bcm2835_dma.o
+diff --git a/hw/dma/meson.build b/hw/dma/meson.build
 new file mode 100644
-index 0000000..9622ea2
+index 0000000..ff5bb37
 --- /dev/null
-+++ b/hw/ipmi/meson.build
-@@ -0,0 +1,11 @@
-+ipmi_ss = ss.source_set()
-+ipmi_ss.add(when: 'CONFIG_IPMI', if_true: files('ipmi.c', 'ipmi_kcs.c', 'ipmi_bt.c'))
-+ipmi_ss.add(when: 'CONFIG_IPMI_LOCAL', if_true: files('ipmi_bmc_sim.c'))
-+ipmi_ss.add(when: 'CONFIG_IPMI_EXTERN', if_true: files('ipmi_bmc_extern.c'))
-+ipmi_ss.add(when: 'CONFIG_ISA_IPMI_KCS', if_true: files('isa_ipmi_kcs.c'))
-+ipmi_ss.add(when: 'CONFIG_PCI_IPMI_KCS', if_true: files('pci_ipmi_kcs.c'))
-+ipmi_ss.add(when: 'CONFIG_ISA_IPMI_BT', if_true: files('isa_ipmi_bt.c'))
-+ipmi_ss.add(when: 'CONFIG_PCI_IPMI_BT', if_true: files('pci_ipmi_bt.c'))
-+ipmi_ss.add(when: 'CONFIG_IPMI_SSIF', if_true: files('smbus_ipmi.c'))
-+
-+softmmu_ss.add_all(when: 'CONFIG_IPMI', if_true: ipmi_ss)
++++ b/hw/dma/meson.build
+@@ -0,0 +1,15 @@
++softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_dma.c'))
++softmmu_ss.add(when: 'CONFIG_RC4030', if_true: files('rc4030.c'))
++softmmu_ss.add(when: 'CONFIG_PL080', if_true: files('pl080.c'))
++softmmu_ss.add(when: 'CONFIG_PL330', if_true: files('pl330.c'))
++softmmu_ss.add(when: 'CONFIG_I82374', if_true: files('i82374.c'))
++softmmu_ss.add(when: 'CONFIG_I8257', if_true: files('i8257.c'))
++softmmu_ss.add(when: 'CONFIG_XILINX_AXI', if_true: files('xilinx_axidma.c'))
++softmmu_ss.add(when: 'CONFIG_ZYNQ_DEVCFG', if_true: files('xlnx-zynq-devcfg.c'))
++softmmu_ss.add(when: 'CONFIG_ETRAXFS', if_true: files('etraxfs_dma.c'))
++softmmu_ss.add(when: 'CONFIG_STP2000', if_true: files('sparc32_dma.c'))
++softmmu_ss.add(when: 'CONFIG_XLNX_ZYNQMP_ARM', if_true: files('xlnx_dpdma.c'))
++softmmu_ss.add(when: 'CONFIG_XLNX_ZYNQMP_ARM', if_true: files('xlnx-zdma.c'))
++softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_dma.c', 'soc_dma.c'))
++softmmu_ss.add(when: 'CONFIG_PXA2XX', if_true: files('pxa2xx_dma.c'))
++softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_dma.c'))
 diff --git a/hw/meson.build b/hw/meson.build
-index 8659854..9796f95 100644
+index 52577c3..96da0bb 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
 @@ -1,4 +1,5 @@
  subdir('core')
-+subdir('ipmi')
- subdir('isa')
- subdir('mem')
- subdir('misc')
++subdir('dma')
+ subdir('gpio')
+ subdir('hyperv')
+ subdir('i2c')
 -- 
 1.8.3.1
 
