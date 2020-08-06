@@ -2,56 +2,89 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 811A8C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:18:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB6DC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:18:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7370B2177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:18:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7370B2177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3F3002177B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:18:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+KSI18c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F3002177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3mLL-0001If-Eu
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:18:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47456)
+	id 1k3mLN-0001LL-B1
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:18:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44332)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k3lgN-0002Mg-2P; Thu, 06 Aug 2020 15:36:07 -0400
-Received: from relay.sw.ru ([185.231.240.75]:56468 helo=relay3.sw.ru)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k3lgJ-0000Kt-Ns; Thu, 06 Aug 2020 15:36:06 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay3.sw.ru with esmtp (Exim 4.93)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k3lgC-0003k9-1q; Thu, 06 Aug 2020 22:35:56 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v13 09/11] qcow2_format.py: collect fields to dump in JSON
- format
-Date: Thu,  6 Aug 2020 22:35:55 +0300
-Message-Id: <1596742557-320265-10-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1596742557-320265-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1596742557-320265-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 15:35:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k3lQu-0002Lb-2w
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48129
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k3lQr-0006rN-TK
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596741605;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uMwCXBbuAcSBH1xta3qaNV59S+O7BdB/TdI6Kh9HkK4=;
+ b=K+KSI18cQgJbpoiC+CK3SLDc4T8bTJ70zjyDOuASoG7xW8yTuNxWhD2F1oygyyTM9bQJn+
+ c9Seuqh3MKQeeNk213+wsaheP/S0RelUXFKGqC88vVF7AoD/eCDk5sjn1S5ugzH0SN4rCX
+ QV6+xtaywhCXeIvQyHkX48ox8e0N5BY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-5GeoqKaPNg6DY_PT9z4THw-1; Thu, 06 Aug 2020 15:20:03 -0400
+X-MC-Unique: 5GeoqKaPNg6DY_PT9z4THw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2887800469
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:20:02 +0000 (UTC)
+Received: from 640k.localdomain.com (unknown [10.36.110.10])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C1EA81D3;
+ Thu,  6 Aug 2020 19:20:01 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 121/143] meson: convert hw/acpi
+Date: Thu,  6 Aug 2020 21:15:57 +0200
+Message-Id: <1596741379-12902-122-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 03:10:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -64,114 +97,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As __dict__ is being extended with class members we do not want to
-print, add the to_dict() method to classes that returns a dictionary
-with desired fields and their values. Extend it in subclass when
-necessary to print the final dictionary in the JSON output which
-follows.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/qemu-iotests/qcow2_format.py | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ hw/Makefile.objs      |  1 -
+ hw/acpi/Makefile.objs | 26 --------------------------
+ hw/acpi/meson.build   | 25 +++++++++++++++++++++++++
+ hw/meson.build        |  1 +
+ 4 files changed, 26 insertions(+), 27 deletions(-)
+ delete mode 100644 hw/acpi/Makefile.objs
+ create mode 100644 hw/acpi/meson.build
 
-diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index de0adcb..5a298b2 100644
---- a/tests/qemu-iotests/qcow2_format.py
-+++ b/tests/qemu-iotests/qcow2_format.py
-@@ -119,6 +119,9 @@ class Qcow2Struct(metaclass=Qcow2StructMeta):
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 4bdb674..ebae00a 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -1,6 +1,5 @@
+ ifeq ($(CONFIG_SOFTMMU), y)
+ devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+-devices-dirs-y += acpi/
+ endif
  
-             print('{:<25} {}'.format(f[2], value_str))
- 
-+    def to_json(self):
-+        return dict((f[2], self.__dict__[f[2]]) for f in self.fields)
-+
- 
- class Qcow2BitmapExt(Qcow2Struct):
- 
-@@ -151,6 +154,11 @@ class Qcow2BitmapExt(Qcow2Struct):
-             print()
-             entry.dump()
- 
-+    def to_json(self):
-+        fields_dict = super().to_json()
-+        fields_dict['bitmap_directory'] = self.bitmap_directory
-+        return fields_dict
-+
- 
- class Qcow2BitmapDirEntry(Qcow2Struct):
- 
-@@ -189,6 +197,14 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
-         super(Qcow2BitmapDirEntry, self).dump()
-         self.bitmap_table.dump()
- 
-+    def to_json(self):
-+        # Put the name ahead of the dict
-+        return {
-+            'name': self.name,
-+            **super().to_json(),
-+            'bitmap_table': self.bitmap_table
-+        }
-+
- 
- class Qcow2BitmapTableEntry(Qcow2Struct):
- 
-@@ -214,6 +230,10 @@ class Qcow2BitmapTableEntry(Qcow2Struct):
-         else:
-             self.type = 'all-zeroes'
- 
-+    def to_json(self):
-+        return {'type': self.type, 'offset': self.offset,
-+                'reserved': self.reserved}
-+
- 
- class Qcow2BitmapTable:
- 
-@@ -234,6 +254,9 @@ class Qcow2BitmapTable:
-                 size = 0
-             print(f'{i:<14} {entry.type:<15} {size:<12} {entry.offset}')
- 
-+    def to_json(self):
-+        return self.entries
-+
- 
- QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
- 
-@@ -249,6 +272,9 @@ class QcowHeaderExtension(Qcow2Struct):
-             0x44415441: 'Data file'
-         }
- 
-+        def to_json(self):
-+            return self.mapping.get(self.value, "<unknown>")
-+
-     fields = (
-         ('u32', Magic, 'magic'),
-         ('u32', '{}', 'length')
-@@ -311,6 +337,16 @@ class QcowHeaderExtension(Qcow2Struct):
-         else:
-             self.obj.dump()
- 
-+    def to_json(self):
-+        # Put the name ahead of the dict
-+        res = {'name': self.Magic(self.magic), **super().to_json()}
-+        if self.obj is not None:
-+            res['data'] = self.obj
-+        else:
-+            res['data_str'] = self.data_str
-+
-+        return res
-+
-     @classmethod
-     def create(cls, magic, data):
-         return QcowHeaderExtension(magic, len(data), data)
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+deleted file mode 100644
+index 72886c7..0000000
+--- a/hw/acpi/Makefile.objs
++++ /dev/null
+@@ -1,26 +0,0 @@
+-ifeq ($(CONFIG_ACPI),y)
+-common-obj-$(CONFIG_ACPI_X86) += core.o piix4.o pcihp.o
+-common-obj-$(CONFIG_ACPI_X86_ICH) += ich9.o tco.o
+-common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
+-common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+-common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+-common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+-common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+-common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
+-common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
+-common-obj-$(CONFIG_ACPI_APEI) += ghes.o
+-common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+-common-obj-$(call lnot,$(CONFIG_PC)) += acpi-x86-stub.o
+-
+-common-obj-y += acpi_interface.o
+-common-obj-y += bios-linker-loader.o
+-common-obj-y += aml-build.o utils.o
+-common-obj-$(CONFIG_ACPI_PCI) += pci.o
+-common-obj-$(CONFIG_TPM) += tpm.o
+-
+-common-obj-$(CONFIG_IPMI) += ipmi.o
+-common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
+-else
+-common-obj-y += acpi-stub.o aml-build-stub.o
+-endif
+-common-obj-$(CONFIG_ALL) += acpi-stub.o aml-build-stub.o acpi-x86-stub.o ipmi-stub.o
+diff --git a/hw/acpi/meson.build b/hw/acpi/meson.build
+new file mode 100644
+index 0000000..dd69577
+--- /dev/null
++++ b/hw/acpi/meson.build
+@@ -0,0 +1,25 @@
++acpi_ss = ss.source_set()
++acpi_ss.add(files(
++  'acpi_interface.c',
++  'aml-build.c',
++  'bios-linker-loader.c',
++  'utils.c',
++))
++acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu_hotplug.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_MEMORY_HOTPLUG', if_true: files('memory_hotplug.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_NVDIMM', if_true: files('nvdimm.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_PCI', if_true: files('pci.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_VMGENID', if_true: files('vmgenid.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_HW_REDUCED', if_true: files('generic_event_device.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_HMAT', if_true: files('hmat.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_APEI', if_true: files('ghes.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_X86', if_true: files('core.c', 'piix4.c', 'pcihp.c'), if_false: files('acpi-stub.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_X86_ICH', if_true: files('ich9.c', 'tco.c'))
++acpi_ss.add(when: 'CONFIG_IPMI', if_true: files('ipmi.c'), if_false: files('ipmi-stub.c'))
++acpi_ss.add(when: 'CONFIG_PC', if_false: files('acpi-x86-stub.c'))
++acpi_ss.add(when: 'CONFIG_TPM', if_true: files('tpm.c'))
++softmmu_ss.add(when: 'CONFIG_ACPI', if_false: files('acpi-stub.c', 'aml-build-stub.c'))
++softmmu_ss.add_all(when: 'CONFIG_ACPI', if_true: acpi_ss)
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('acpi-stub.c', 'aml-build-stub.c',
++                                                  'acpi-x86-stub.c', 'ipmi-stub.c'))
+diff --git a/hw/meson.build b/hw/meson.build
+index ffa3f06..55ca2b2 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,3 +1,4 @@
++subdir('acpi')
+ subdir('adc')
+ subdir('audio')
+ subdir('block')
 -- 
 1.8.3.1
+
 
 
