@@ -2,96 +2,89 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7219C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AD0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:14:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F4A222D71
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:12:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90B0E22D70
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:14:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZUR89goK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F4A222D71
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DtGaYR39"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B0E22D70
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3dn5-00009k-CV
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:10:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40612)
+	id 1k3e17-0007Rp-QZ
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:25:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47120)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dRb-0002Ak-Sh
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:19 -0400
-Received: from mail-pl1-x62b.google.com ([2607:f8b0:4864:20::62b]:42674)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k3dRX-0007nF-Rx
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:48:19 -0400
-Received: by mail-pl1-x62b.google.com with SMTP id q17so27288601pls.9
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:48:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=03dIAYYfzCGip4kGgTGn/gCLJWEOPcgGCIy3wfAQ6MI=;
- b=ZUR89goK/qXPRTt70vEJShRazzDLT7JGBBJD45l8DwWcNwdbPOEwuyWhKtJqlthba2
- ju2Cn+ncS05eYyE1jN+2XWGFR0XKgKpEncA5DIoJYMWWd2Y1KppzYlKBAbPFF3K7PIwM
- AzIui9cT7s/xzBTdVCR9xAbNCNlSImzrsP0K2dppMgOAFHIcYOZf0yieqgsbEfAswezE
- CutMmt8R4oBGCDbRTHQAABQQPXTAQzA1jb+W0TDMR0vt1SUiRlk3VpGmy1+6QOmGosFy
- eNx0ClAOmFi6xKcE8z1J669MQo2OeymZRAWioKnP6SLs0O0Rzbsksq6MGJvUy5+0gz3B
- Rg2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=03dIAYYfzCGip4kGgTGn/gCLJWEOPcgGCIy3wfAQ6MI=;
- b=r2hcz5k7AhZCLQdtkTWN2KikCk9Mhl8o0IgIBFLMtN6GVNNXSdZQgm6bwSrfG2shYH
- dD6Ued17B7gryp9WqYXmEo3cXsUXuh6DT1MIWJZhlxKTnz8U6zNSlTH7V70SCbNeE+zd
- TgCZnjlUTlrl8/AMULJbjtbFizhgMNGIJzl4+3KlBNAnqO6uxZRnuq5M1FMdMqvOXcik
- xI99iC05J9QtiNOBvB+fpgJbjhI25DP/5P1De3HEMFKPejhpIc+ogzjzT9TfpzcR4eaV
- ZuuVMQXnM6Grm5i0XhBARi4Jx6fRfAzQFJ3FgQakRfleH5AwIatP1GgYiNVhigZeZeuh
- 1pOA==
-X-Gm-Message-State: AOAM5319pMTQKZQKZcbwTfj4CPb4iSZbtiXA2+ckABwuHyc7DwK/Yk5S
- AT4z09dKpQXUDJk+CEblqiamg4nF8So=
-X-Google-Smtp-Source: ABdhPJxbGuFpAkSV8TgmIP+Nh1hsXOA0oAZNevkazHLNnaS6VQanYevZzvHpHMFzBc4D/LeKv/nXIQ==
-X-Received: by 2002:a17:902:222:: with SMTP id
- 31mr5754974plc.236.1596710893888; 
- Thu, 06 Aug 2020 03:48:13 -0700 (PDT)
-Received: from frankchang-ThinkPad-T490.internal.sifive.com
- (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.48.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 03:48:13 -0700 (PDT)
-From: frank.chang@sifive.com
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [RFC v3 21/71] target/riscv: rvv-1.0: index load and store
- instructions
-Date: Thu,  6 Aug 2020 18:46:18 +0800
-Message-Id: <20200806104709.13235-22-frank.chang@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
-References: <20200806104709.13235-1-frank.chang@sifive.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k3dlK-0005zX-Nx
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 07:08:42 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32665
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k3dlI-0002Fb-Gs
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 07:08:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596712119;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=ULrzB/PF8NcQODa8y9P80PUhlFP+2SyoOpd4oZ6dsf8=;
+ b=DtGaYR39o2zBdwPIbL2sxDbpvP47PENFiKCsc5gUir5dKFfSN87ElLgQHJcfjnmS1Am1KS
+ He/tGd+PxkykqrKQrOP0G9PAksONniVsEwJ+w7ilD9NWSLbE7gISOEtuQiCsasygM9Uk7c
+ mMdhyD/85MstM1HR5x3dYBVHOzaud10=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-VsgXipuTPwG4_BkZstFm0g-1; Thu, 06 Aug 2020 07:08:35 -0400
+X-MC-Unique: VsgXipuTPwG4_BkZstFm0g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7494C10059A7;
+ Thu,  6 Aug 2020 11:08:34 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B51F70105;
+ Thu,  6 Aug 2020 11:08:29 +0000 (UTC)
+Date: Thu, 6 Aug 2020 12:08:26 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: Why QEMU should move from C to Rust (clickbait alert ;))
+Message-ID: <20200806110826.GH4159383@redhat.com>
+References: <CAJSP0QWF8g7r5VqU_PRbskWZU3ahCq+eobR8GexUcPrAiYoCPQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::62b;
- envelope-from=frank.chang@sifive.com; helo=mail-pl1-x62b.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <CAJSP0QWF8g7r5VqU_PRbskWZU3ahCq+eobR8GexUcPrAiYoCPQ@mail.gmail.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,512 +97,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frank Chang <frank.chang@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ "Oleinik, Alexander" <alxndr@bu.edu>, Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Dave Gilbert <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Frank Chang <frank.chang@sifive.com>
+On Thu, Aug 06, 2020 at 11:24:13AM +0100, Stefan Hajnoczi wrote:
 
-Signed-off-by: Frank Chang <frank.chang@sifive.com>
----
- target/riscv/helper.h                   |  67 ++++----
- target/riscv/insn32.decode              |  21 ++-
- target/riscv/insn_trans/trans_rvv.inc.c | 193 ++++++++++++++++--------
- target/riscv/vector_helper.c            |  89 ++++++-----
- 4 files changed, 214 insertions(+), 156 deletions(-)
+...snip...
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 2311ce39cfd..8a5d97969da 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -108,41 +108,38 @@ DEF_HELPER_6(vsse8_v, void, ptr, ptr, tl, tl, env, i32)
- DEF_HELPER_6(vsse16_v, void, ptr, ptr, tl, tl, env, i32)
- DEF_HELPER_6(vsse32_v, void, ptr, ptr, tl, tl, env, i32)
- DEF_HELPER_6(vsse64_v, void, ptr, ptr, tl, tl, env, i32)
--DEF_HELPER_6(vlxb_v_b, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxb_v_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxb_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxb_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxh_v_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxh_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxh_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxw_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxw_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxe_v_b, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxe_v_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxe_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxe_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxbu_v_b, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxbu_v_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxbu_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxbu_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxhu_v_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxhu_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxhu_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxwu_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vlxwu_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxb_v_b, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxb_v_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxb_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxb_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxh_v_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxh_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxh_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxw_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxw_v_d, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxe_v_b, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxe_v_h, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxe_v_w, void, ptr, ptr, tl, ptr, env, i32)
--DEF_HELPER_6(vsxe_v_d, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei8_8_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei8_16_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei16_8_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei16_16_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei32_8_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei32_16_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei64_8_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei64_16_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vlxei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei8_8_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei8_16_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei8_32_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei8_64_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei16_8_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei16_16_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei16_32_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei16_64_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei32_8_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei32_16_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei32_32_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei32_64_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei64_8_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei64_16_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei64_32_v, void, ptr, ptr, tl, ptr, env, i32)
-+DEF_HELPER_6(vsxei64_64_v, void, ptr, ptr, tl, ptr, env, i32)
- DEF_HELPER_5(vlbff_v_b, void, ptr, ptr, tl, env, i32)
- DEF_HELPER_5(vlbff_v_h, void, ptr, ptr, tl, env, i32)
- DEF_HELPER_5(vlbff_v_w, void, ptr, ptr, tl, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 012c844f603..46542d162e6 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -257,18 +257,17 @@ vlbuff_v   ... 000 . 10000 ..... 000 ..... 0000111 @r2_nfvm
- vlhuff_v   ... 000 . 10000 ..... 101 ..... 0000111 @r2_nfvm
- vlwuff_v   ... 000 . 10000 ..... 110 ..... 0000111 @r2_nfvm
- 
--vlxb_v     ... 111 . ..... ..... 000 ..... 0000111 @r_nfvm
--vlxh_v     ... 111 . ..... ..... 101 ..... 0000111 @r_nfvm
--vlxw_v     ... 111 . ..... ..... 110 ..... 0000111 @r_nfvm
--vlxe_v     ... 011 . ..... ..... 111 ..... 0000111 @r_nfvm
--vlxbu_v    ... 011 . ..... ..... 000 ..... 0000111 @r_nfvm
--vlxhu_v    ... 011 . ..... ..... 101 ..... 0000111 @r_nfvm
--vlxwu_v    ... 011 . ..... ..... 110 ..... 0000111 @r_nfvm
-+# Vector indexed load insns.
-+vlxei8_v      ... 011 . ..... ..... 000 ..... 0000111 @r_nfvm
-+vlxei16_v     ... 011 . ..... ..... 101 ..... 0000111 @r_nfvm
-+vlxei32_v     ... 011 . ..... ..... 110 ..... 0000111 @r_nfvm
-+vlxei64_v     ... 011 . ..... ..... 111 ..... 0000111 @r_nfvm
-+
- # Vector ordered-indexed and unordered-indexed store insns.
--vsxb_v     ... -11 . ..... ..... 000 ..... 0100111 @r_nfvm
--vsxh_v     ... -11 . ..... ..... 101 ..... 0100111 @r_nfvm
--vsxw_v     ... -11 . ..... ..... 110 ..... 0100111 @r_nfvm
--vsxe_v     ... -11 . ..... ..... 111 ..... 0100111 @r_nfvm
-+vsxei8_v      ... 0-1 . ..... ..... 000 ..... 0100111 @r_nfvm
-+vsxei16_v     ... 0-1 . ..... ..... 101 ..... 0100111 @r_nfvm
-+vsxei32_v     ... 0-1 . ..... ..... 110 ..... 0100111 @r_nfvm
-+vsxei64_v     ... 0-1 . ..... ..... 111 ..... 0100111 @r_nfvm
- 
- #*** Vector AMO operations are encoded under the standard AMO major opcode ***
- vamoswapw_v     00001 . . ..... ..... 110 ..... 0101111 @r_wdvm
-diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
-index 623ced88833..6d4519d44c9 100644
---- a/target/riscv/insn_trans/trans_rvv.inc.c
-+++ b/target/riscv/insn_trans/trans_rvv.inc.c
-@@ -202,11 +202,72 @@ static bool vext_check_load(DisasContext *s, int vd, int nf, int vm,
-     return vext_check_store(s, vd, nf, eew) && require_vm(vm, vd);
- }
- 
--static bool vext_check_isa_ill(DisasContext *s)
-+/*
-+ * Vector indexed, indexed segment store check function.
-+ *
-+ * Rules to be checked here:
-+ *   1. EMUL must within the range: 1/8 <= EMUL <= 8. (Section 7.3)
-+ *   2. Index vector register number is multiples of EMUL.
-+ *      (Section 3.3.2, 7.3)
-+ *   3. Destination vector register number is multiples of LMUL.
-+ *      (Section 3.3.2, 7.3)
-+ *   4. The EMUL setting must be such that EMUL * NFIELDS ≤ 8. (Section 7.8)
-+ *   5. Vector register numbers accessed by the segment load or store
-+ *      cannot increment past 31. (Section 7.8)
-+ */
-+static bool vext_check_st_index(DisasContext *s, int vd, int vs2, int nf,
-+                                uint8_t eew)
- {
--    return !s->vill;
-+    float emul = (float)eew / (1 << (s->sew + 3)) * s->flmul;
-+    uint32_t flmul_r = s->flmul < 1 ? 1 : s->flmul;
-+    return (emul >= 0.125 && emul <= 8) &&
-+           require_align(vs2, emul) &&
-+           require_align(vd, s->flmul) &&
-+           ((nf * flmul_r) <= (NVPR / 4) &&
-+            (vd + nf * flmul_r) <= NVPR);
- }
- 
-+/*
-+ * Vector indexed, indexed segment load check function.
-+ *
-+ * Rules to be checked here:
-+ *   1. All rules applies to store instructions are applies
-+ *      to load instructions.
-+ *   2. Destination vector register group for a masked vector
-+ *      instruction cannot overlap the source mask register (v0).
-+ *      (Section 5.3)
-+ *   3. Destination vector register cannot overlap a source vector
-+ *      register (vs2) group.
-+ *      (Section 5.2)
-+ *   4. Destination vector register groups cannot overlap
-+ *      the source vector register (vs2) group for
-+ *      indexed segment load instructions. (Section 7.8.3)
-+ */
-+static bool vext_check_ld_index(DisasContext *s, int vd, int vs2,
-+                                int nf, int vm, uint8_t eew)
-+{
-+    float emul = (float)eew / (1 << (s->sew + 3)) * s->flmul;
-+    bool ret = vext_check_st_index(s, vd, vs2, nf, eew) &&
-+               require_vm(vm, vd);
-+    if (eew > (1 << (s->sew + 3))) {
-+        if (vd != vs2) {
-+            ret &= require_noover(vd, s->flmul, vs2, emul);
-+        }
-+    } else if (eew < (1 << (s->sew + 3))) {
-+        if (emul < 1) {
-+            ret &= require_noover(vd, s->flmul, vs2, emul);
-+        } else {
-+            ret &= require_noover_widen(vd, s->flmul, vs2, emul);
-+        }
-+    }
-+    if (nf > 1) {
-+        ret &= (require_noover(vd, s->flmul, vs2, emul) &&
-+                require_noover(vd, nf, vs2, 1));
-+    }
-+    return ret;
-+}
-+
-+
- /*
-  * Check function for vector instruction with format:
-  * single-width result and single-width sources (SEW = SEW op SEW)
-@@ -748,27 +809,34 @@ static bool ld_index_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
- {
-     uint32_t data = 0;
-     gen_helper_ldst_index *fn;
--    static gen_helper_ldst_index * const fns[7][4] = {
--        { gen_helper_vlxb_v_b,  gen_helper_vlxb_v_h,
--          gen_helper_vlxb_v_w,  gen_helper_vlxb_v_d },
--        { NULL,                 gen_helper_vlxh_v_h,
--          gen_helper_vlxh_v_w,  gen_helper_vlxh_v_d },
--        { NULL,                 NULL,
--          gen_helper_vlxw_v_w,  gen_helper_vlxw_v_d },
--        { gen_helper_vlxe_v_b,  gen_helper_vlxe_v_h,
--          gen_helper_vlxe_v_w,  gen_helper_vlxe_v_d },
--        { gen_helper_vlxbu_v_b, gen_helper_vlxbu_v_h,
--          gen_helper_vlxbu_v_w, gen_helper_vlxbu_v_d },
--        { NULL,                 gen_helper_vlxhu_v_h,
--          gen_helper_vlxhu_v_w, gen_helper_vlxhu_v_d },
--        { NULL,                 NULL,
--          gen_helper_vlxwu_v_w, gen_helper_vlxwu_v_d },
-+    static gen_helper_ldst_index * const fns[4][4] = {
-+        /*
-+         * offset vector register group EEW = 8,
-+         * data vector register group EEW = SEW
-+         */
-+        { gen_helper_vlxei8_8_v,  gen_helper_vlxei8_16_v,
-+          gen_helper_vlxei8_32_v, gen_helper_vlxei8_64_v },
-+        /*
-+         * offset vector register group EEW = 16,
-+         * data vector register group EEW = SEW
-+         */
-+        { gen_helper_vlxei16_8_v, gen_helper_vlxei16_16_v,
-+          gen_helper_vlxei16_32_v, gen_helper_vlxei16_64_v },
-+        /*
-+         * offset vector register group EEW = 32,
-+         * data vector register group EEW = SEW
-+         */
-+        { gen_helper_vlxei32_8_v, gen_helper_vlxei32_16_v,
-+          gen_helper_vlxei32_32_v, gen_helper_vlxei32_64_v },
-+        /*
-+         * offset vector register group EEW = 64,
-+         * data vector register group EEW = SEW
-+         */
-+        { gen_helper_vlxei64_8_v, gen_helper_vlxei64_16_v,
-+          gen_helper_vlxei64_32_v, gen_helper_vlxei64_64_v }
-     };
- 
--    fn =  fns[seq][s->sew];
--    if (fn == NULL) {
--        return false;
--    }
-+    fn = fns[seq][s->sew];
- 
-     data = FIELD_DP32(data, VDATA, VM, a->vm);
-     data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-@@ -776,50 +844,50 @@ static bool ld_index_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
-     return ldst_index_trans(a->rd, a->rs1, a->rs2, data, fn, s, false);
- }
- 
--/*
-- * For vector indexed segment loads, the destination vector register
-- * groups cannot overlap the source vector register group (specified by
-- * `vs2`), else an illegal instruction exception is raised.
-- */
--static bool ld_index_check(DisasContext *s, arg_rnfvm* a)
-+static bool ld_index_check(DisasContext *s, arg_rnfvm* a, uint8_t eew)
- {
--    return (vext_check_isa_ill(s) &&
--            vext_check_overlap_mask(s, a->rd, a->vm, false) &&
--            vext_check_reg(s, a->rd, false) &&
--            vext_check_reg(s, a->rs2, false) &&
--            vext_check_nf(s, a->nf) &&
--            ((a->nf == 1) ||
--             vext_check_overlap_group(a->rd, a->nf << s->lmul,
--                                      a->rs2, 1 << s->lmul)));
-+    return require_rvv(s) &&
-+           vext_check_isa_ill(s) &&
-+           vext_check_ld_index(s, a->rd, a->rs2, a->nf, a->vm, eew);
- }
- 
--GEN_VEXT_TRANS(vlxb_v, 0, rnfvm, ld_index_op, ld_index_check)
--GEN_VEXT_TRANS(vlxh_v, 1, rnfvm, ld_index_op, ld_index_check)
--GEN_VEXT_TRANS(vlxw_v, 2, rnfvm, ld_index_op, ld_index_check)
--GEN_VEXT_TRANS(vlxe_v, 3, rnfvm, ld_index_op, ld_index_check)
--GEN_VEXT_TRANS(vlxbu_v, 4, rnfvm, ld_index_op, ld_index_check)
--GEN_VEXT_TRANS(vlxhu_v, 5, rnfvm, ld_index_op, ld_index_check)
--GEN_VEXT_TRANS(vlxwu_v, 6, rnfvm, ld_index_op, ld_index_check)
-+GEN_VEXT_TRANS(vlxei8_v,  8,  0, rnfvm, ld_index_op, ld_index_check)
-+GEN_VEXT_TRANS(vlxei16_v, 16, 1, rnfvm, ld_index_op, ld_index_check)
-+GEN_VEXT_TRANS(vlxei32_v, 32, 2, rnfvm, ld_index_op, ld_index_check)
-+GEN_VEXT_TRANS(vlxei64_v, 64, 3, rnfvm, ld_index_op, ld_index_check)
- 
- static bool st_index_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
- {
-     uint32_t data = 0;
-     gen_helper_ldst_index *fn;
-     static gen_helper_ldst_index * const fns[4][4] = {
--        { gen_helper_vsxb_v_b,  gen_helper_vsxb_v_h,
--          gen_helper_vsxb_v_w,  gen_helper_vsxb_v_d },
--        { NULL,                 gen_helper_vsxh_v_h,
--          gen_helper_vsxh_v_w,  gen_helper_vsxh_v_d },
--        { NULL,                 NULL,
--          gen_helper_vsxw_v_w,  gen_helper_vsxw_v_d },
--        { gen_helper_vsxe_v_b,  gen_helper_vsxe_v_h,
--          gen_helper_vsxe_v_w,  gen_helper_vsxe_v_d }
-+        /*
-+         * offset vector register group EEW = 8,
-+         * data vector register group EEW = SEW
-+         */
-+        { gen_helper_vsxei8_8_v,  gen_helper_vsxei8_16_v,
-+          gen_helper_vsxei8_32_v, gen_helper_vsxei8_64_v },
-+        /*
-+         * offset vector register group EEW = 16,
-+         * data vector register group EEW = SEW
-+         */
-+        { gen_helper_vsxei16_8_v, gen_helper_vsxei16_16_v,
-+          gen_helper_vsxei16_32_v, gen_helper_vsxei16_64_v },
-+        /*
-+         * offset vector register group EEW = 32,
-+         * data vector register group EEW = SEW
-+         */
-+        { gen_helper_vsxei32_8_v, gen_helper_vsxei32_16_v,
-+          gen_helper_vsxei32_32_v, gen_helper_vsxei32_64_v },
-+        /*
-+         * offset vector register group EEW = 64,
-+         * data vector register group EEW = SEW
-+         */
-+        { gen_helper_vsxei64_8_v, gen_helper_vsxei64_16_v,
-+          gen_helper_vsxei64_32_v, gen_helper_vsxei64_64_v }
-     };
- 
--    fn =  fns[seq][s->sew];
--    if (fn == NULL) {
--        return false;
--    }
-+    fn = fns[seq][s->sew];
- 
-     data = FIELD_DP32(data, VDATA, VM, a->vm);
-     data = FIELD_DP32(data, VDATA, LMUL, s->lmul);
-@@ -827,18 +895,17 @@ static bool st_index_op(DisasContext *s, arg_rnfvm *a, uint8_t seq)
-     return ldst_index_trans(a->rd, a->rs1, a->rs2, data, fn, s, true);
- }
- 
--static bool st_index_check(DisasContext *s, arg_rnfvm* a)
-+static bool st_index_check(DisasContext *s, arg_rnfvm* a, uint8_t eew)
- {
--    return (vext_check_isa_ill(s) &&
--            vext_check_reg(s, a->rd, false) &&
--            vext_check_reg(s, a->rs2, false) &&
--            vext_check_nf(s, a->nf));
-+    return require_rvv(s) &&
-+           vext_check_isa_ill(s) &&
-+           vext_check_st_index(s, a->rd, a->rs2, a->nf, eew);
- }
- 
--GEN_VEXT_TRANS(vsxb_v, 0, rnfvm, st_index_op, st_index_check)
--GEN_VEXT_TRANS(vsxh_v, 1, rnfvm, st_index_op, st_index_check)
--GEN_VEXT_TRANS(vsxw_v, 2, rnfvm, st_index_op, st_index_check)
--GEN_VEXT_TRANS(vsxe_v, 3, rnfvm, st_index_op, st_index_check)
-+GEN_VEXT_TRANS(vsxei8_v,  8,  0, rnfvm, st_index_op, st_index_check)
-+GEN_VEXT_TRANS(vsxei16_v, 16, 1, rnfvm, st_index_op, st_index_check)
-+GEN_VEXT_TRANS(vsxei32_v, 32, 2, rnfvm, st_index_op, st_index_check)
-+GEN_VEXT_TRANS(vsxei64_v, 64, 3, rnfvm, st_index_op, st_index_check)
- 
- /*
-  *** unit stride fault-only-first load
-diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-index a66228ccd40..9ba60dd7018 100644
---- a/target/riscv/vector_helper.c
-+++ b/target/riscv/vector_helper.c
-@@ -374,8 +374,7 @@ vext_ldst_index(void *vd, void *v0, target_ulong base,
-                 void *vs2, CPURISCVState *env, uint32_t desc,
-                 vext_get_index_addr get_index_addr,
-                 vext_ldst_elem_fn *ldst_elem,
--                uint32_t esz, uint32_t msz, uintptr_t ra,
--                MMUAccessType access_type)
-+                uint32_t esz, uintptr_t ra, MMUAccessType access_type)
- {
-     uint32_t i, k;
-     uint32_t nf = vext_nf(desc);
-@@ -387,7 +386,7 @@ vext_ldst_index(void *vd, void *v0, target_ulong base,
-         if (!vm && !vext_elem_mask(v0, i)) {
-             continue;
-         }
--        probe_pages(env, get_index_addr(base, i, vs2), nf * msz, ra,
-+        probe_pages(env, get_index_addr(base, i, vs2), nf * esz, ra,
-                     access_type);
-     }
-     /* load bytes from guest memory */
-@@ -397,67 +396,63 @@ vext_ldst_index(void *vd, void *v0, target_ulong base,
-             continue;
-         }
-         while (k < nf) {
--            abi_ptr addr = get_index_addr(base, i, vs2) + k * msz;
-+            abi_ptr addr = get_index_addr(base, i, vs2) + k * esz;
-             ldst_elem(env, addr, i + k * vlmax, vd, ra);
-             k++;
-         }
-     }
- }
- 
--#define GEN_VEXT_LD_INDEX(NAME, MTYPE, ETYPE, INDEX_FN, LOAD_FN)           \
-+#define GEN_VEXT_LD_INDEX(NAME, ETYPE, INDEX_FN, LOAD_FN)                  \
- void HELPER(NAME)(void *vd, void *v0, target_ulong base,                   \
-                   void *vs2, CPURISCVState *env, uint32_t desc)            \
- {                                                                          \
-     vext_ldst_index(vd, v0, base, vs2, env, desc, INDEX_FN,                \
--                    LOAD_FN, sizeof(ETYPE), sizeof(MTYPE),                 \
--                    GETPC(), MMU_DATA_LOAD);                               \
--}
--
--GEN_VEXT_LD_INDEX(vlxb_v_b,  int8_t,   int8_t,   idx_b, ldb_b)
--GEN_VEXT_LD_INDEX(vlxb_v_h,  int8_t,   int16_t,  idx_h, ldb_h)
--GEN_VEXT_LD_INDEX(vlxb_v_w,  int8_t,   int32_t,  idx_w, ldb_w)
--GEN_VEXT_LD_INDEX(vlxb_v_d,  int8_t,   int64_t,  idx_d, ldb_d)
--GEN_VEXT_LD_INDEX(vlxh_v_h,  int16_t,  int16_t,  idx_h, ldh_h)
--GEN_VEXT_LD_INDEX(vlxh_v_w,  int16_t,  int32_t,  idx_w, ldh_w)
--GEN_VEXT_LD_INDEX(vlxh_v_d,  int16_t,  int64_t,  idx_d, ldh_d)
--GEN_VEXT_LD_INDEX(vlxw_v_w,  int32_t,  int32_t,  idx_w, ldw_w)
--GEN_VEXT_LD_INDEX(vlxw_v_d,  int32_t,  int64_t,  idx_d, ldw_d)
--GEN_VEXT_LD_INDEX(vlxe_v_b,  int8_t,   int8_t,   idx_b, lde_b)
--GEN_VEXT_LD_INDEX(vlxe_v_h,  int16_t,  int16_t,  idx_h, lde_h)
--GEN_VEXT_LD_INDEX(vlxe_v_w,  int32_t,  int32_t,  idx_w, lde_w)
--GEN_VEXT_LD_INDEX(vlxe_v_d,  int64_t,  int64_t,  idx_d, lde_d)
--GEN_VEXT_LD_INDEX(vlxbu_v_b, uint8_t,  uint8_t,  idx_b, ldbu_b)
--GEN_VEXT_LD_INDEX(vlxbu_v_h, uint8_t,  uint16_t, idx_h, ldbu_h)
--GEN_VEXT_LD_INDEX(vlxbu_v_w, uint8_t,  uint32_t, idx_w, ldbu_w)
--GEN_VEXT_LD_INDEX(vlxbu_v_d, uint8_t,  uint64_t, idx_d, ldbu_d)
--GEN_VEXT_LD_INDEX(vlxhu_v_h, uint16_t, uint16_t, idx_h, ldhu_h)
--GEN_VEXT_LD_INDEX(vlxhu_v_w, uint16_t, uint32_t, idx_w, ldhu_w)
--GEN_VEXT_LD_INDEX(vlxhu_v_d, uint16_t, uint64_t, idx_d, ldhu_d)
--GEN_VEXT_LD_INDEX(vlxwu_v_w, uint32_t, uint32_t, idx_w, ldwu_w)
--GEN_VEXT_LD_INDEX(vlxwu_v_d, uint32_t, uint64_t, idx_d, ldwu_d)
--
--#define GEN_VEXT_ST_INDEX(NAME, MTYPE, ETYPE, INDEX_FN, STORE_FN)\
-+                    LOAD_FN, sizeof(ETYPE), GETPC(), MMU_DATA_LOAD);       \
-+}
-+
-+GEN_VEXT_LD_INDEX(vlxei8_8_v,   int8_t,  idx_b, lde_b)
-+GEN_VEXT_LD_INDEX(vlxei8_16_v,  int16_t, idx_b, lde_h)
-+GEN_VEXT_LD_INDEX(vlxei8_32_v,  int32_t, idx_b, lde_w)
-+GEN_VEXT_LD_INDEX(vlxei8_64_v,  int64_t, idx_b, lde_d)
-+GEN_VEXT_LD_INDEX(vlxei16_8_v,  int8_t,  idx_h, lde_b)
-+GEN_VEXT_LD_INDEX(vlxei16_16_v, int16_t, idx_h, lde_h)
-+GEN_VEXT_LD_INDEX(vlxei16_32_v, int32_t, idx_h, lde_w)
-+GEN_VEXT_LD_INDEX(vlxei16_64_v, int64_t, idx_h, lde_d)
-+GEN_VEXT_LD_INDEX(vlxei32_8_v,  int8_t,  idx_w, lde_b)
-+GEN_VEXT_LD_INDEX(vlxei32_16_v, int16_t, idx_w, lde_h)
-+GEN_VEXT_LD_INDEX(vlxei32_32_v, int32_t, idx_w, lde_w)
-+GEN_VEXT_LD_INDEX(vlxei32_64_v, int64_t, idx_w, lde_d)
-+GEN_VEXT_LD_INDEX(vlxei64_8_v,  int8_t,  idx_d, lde_b)
-+GEN_VEXT_LD_INDEX(vlxei64_16_v, int16_t, idx_d, lde_h)
-+GEN_VEXT_LD_INDEX(vlxei64_32_v, int32_t, idx_d, lde_w)
-+GEN_VEXT_LD_INDEX(vlxei64_64_v, int64_t, idx_d, lde_d)
-+
-+#define GEN_VEXT_ST_INDEX(NAME, ETYPE, INDEX_FN, STORE_FN)       \
- void HELPER(NAME)(void *vd, void *v0, target_ulong base,         \
-                   void *vs2, CPURISCVState *env, uint32_t desc)  \
- {                                                                \
-     vext_ldst_index(vd, v0, base, vs2, env, desc, INDEX_FN,      \
--                    STORE_FN, sizeof(ETYPE), sizeof(MTYPE),      \
-+                    STORE_FN, sizeof(ETYPE),                     \
-                     GETPC(), MMU_DATA_STORE);                    \
- }
- 
--GEN_VEXT_ST_INDEX(vsxb_v_b, int8_t,  int8_t,  idx_b, stb_b)
--GEN_VEXT_ST_INDEX(vsxb_v_h, int8_t,  int16_t, idx_h, stb_h)
--GEN_VEXT_ST_INDEX(vsxb_v_w, int8_t,  int32_t, idx_w, stb_w)
--GEN_VEXT_ST_INDEX(vsxb_v_d, int8_t,  int64_t, idx_d, stb_d)
--GEN_VEXT_ST_INDEX(vsxh_v_h, int16_t, int16_t, idx_h, sth_h)
--GEN_VEXT_ST_INDEX(vsxh_v_w, int16_t, int32_t, idx_w, sth_w)
--GEN_VEXT_ST_INDEX(vsxh_v_d, int16_t, int64_t, idx_d, sth_d)
--GEN_VEXT_ST_INDEX(vsxw_v_w, int32_t, int32_t, idx_w, stw_w)
--GEN_VEXT_ST_INDEX(vsxw_v_d, int32_t, int64_t, idx_d, stw_d)
--GEN_VEXT_ST_INDEX(vsxe_v_b, int8_t,  int8_t,  idx_b, ste_b)
--GEN_VEXT_ST_INDEX(vsxe_v_h, int16_t, int16_t, idx_h, ste_h)
--GEN_VEXT_ST_INDEX(vsxe_v_w, int32_t, int32_t, idx_w, ste_w)
--GEN_VEXT_ST_INDEX(vsxe_v_d, int64_t, int64_t, idx_d, ste_d)
-+GEN_VEXT_ST_INDEX(vsxei8_8_v,   int8_t,  idx_b, ste_b)
-+GEN_VEXT_ST_INDEX(vsxei8_16_v,  int16_t, idx_b, ste_h)
-+GEN_VEXT_ST_INDEX(vsxei8_32_v,  int32_t, idx_b, ste_w)
-+GEN_VEXT_ST_INDEX(vsxei8_64_v,  int64_t, idx_b, ste_d)
-+GEN_VEXT_ST_INDEX(vsxei16_8_v,  int8_t,  idx_h, ste_b)
-+GEN_VEXT_ST_INDEX(vsxei16_16_v, int16_t, idx_h, ste_h)
-+GEN_VEXT_ST_INDEX(vsxei16_32_v, int32_t, idx_h, ste_w)
-+GEN_VEXT_ST_INDEX(vsxei16_64_v, int64_t, idx_h, ste_d)
-+GEN_VEXT_ST_INDEX(vsxei32_8_v,  int8_t,  idx_w, ste_b)
-+GEN_VEXT_ST_INDEX(vsxei32_16_v, int16_t, idx_w, ste_h)
-+GEN_VEXT_ST_INDEX(vsxei32_32_v, int32_t, idx_w, ste_w)
-+GEN_VEXT_ST_INDEX(vsxei32_64_v, int64_t, idx_w, ste_d)
-+GEN_VEXT_ST_INDEX(vsxei64_8_v,  int8_t,  idx_d, ste_b)
-+GEN_VEXT_ST_INDEX(vsxei64_16_v, int16_t, idx_d, ste_h)
-+GEN_VEXT_ST_INDEX(vsxei64_32_v, int32_t, idx_d, ste_w)
-+GEN_VEXT_ST_INDEX(vsxei64_64_v, int64_t, idx_d, ste_d)
- 
- /*
-  *** unit-stride fault-only-fisrt load instructions
+I broadly agree with the points about why Rust is desirable as
+a language for QEMU.
+
+> How can we change programming language?
+> ------------------------------------------------------------
+> When I checked in 2018 QEMU was 1.5 million lines of code. It has
+> grown since then. Moving a large codebase to a new programming
+> language is extremely difficult. If people want to convert QEMU to
+> Rust that would be great, but I personally don't have the appetite to
+> do it because I think the integration will be messy, result in a lot
+> of duplication, and there is too much un(der)maintained code that is
+> hard to convert.
+> 
+> The reason I am writing this post is because device emulation, the
+> main security attack surface for VMMs, can be done in a separate
+> program. That program can be written in any language and this is where
+> Rust comes in. For vhost devices it is possible to write Rust device
+> backends today and I hope this will become the default approach to
+> writing new devices.
+> 
+> For non-vhost devices the vfio-user project is working on an interface
+> out-of-process device emulation. It will be possible to implement
+> devices in Rust there too.
+
+I guess this dovetails into our view of security bug classification.
+Stuff that affects virtualization use cases is security critical,
+while stuff that affects emulation is NOT security critical.
+
+With this in mind, it is not a priority to convert the whole of
+QEMU to Rust. The priority is the subset that affects virtualization
+use cases. It is a much more tractable problem if we're looking at
+creating rust based vhost-user / vfio-user, only for the devices
+that are commonly used for KVM with modern OS, and ignore the many
+100's of devices that are only there for emulation or foir legacy OS.
+
+
+> If you are implementing new device emulation code please consider
+> doing it in Rust!
+
+Yes, but I think we'll need put in significant effort to guide / assist
+people in taking this direction, and think about what it means for the
+future of QEMU as a brand and GIT repo.
+
+In many ways it is a good thing if the Rust vhost-user impls are
+all in their own standalone git repos. They're likely to be independent
+codebases, so there's little compelling reason to force them into the
+QEMU git, where they'll have to use QEMU workflow, and QEMU release
+cycle. They're better off free from QEMU where they can choose to adopt
+modern development practices like GitLab merge requests if they
+desire and release on a more frequent cycle than QEMU's 3-times a
+year, etc. Would also make them more appealing for use by alternative
+non-QEMU userspaces for KVM.
+
+The downside is that QEMU git would only contain the "legacy" builtin
+C impls of the devices, and all the "recommended" modern Rust impls
+would be elsewhere. Essentially QEMU would no longer be a self-contained
+provider of the complete solution. Many parts would be disaggregated,
+and users now have the burden of finding all the right pieces to build
+the best solution. We've already seen this to some extent with existing
+vhost-user impls, but it feels like we'd be pushing towards that as a
+more general model for the future which would amplify problems we've
+largely been able to ignore upto now.
+
+I'm not sure what a good answer here is. Perhaps QEMU could try to
+become more of brand for an umbrella project that covers multiple
+independant repos ? eg create new repos under gitlab.com/qemu-project/
+but allow them to work fairly independantly from the main qemu.git ?
+That way we can more easily promote a collection of QEMU repos as
+showing the recommended architecture, without forcing everything
+into qemu.git. We can leverage the QEMU website, wiki and documentation
+in general to showcase the overall solution, while still letting the
+pieces develop independently.
+
+> Conclusion
+> ---------------
+> Most security bugs in QEMU today are C programming bugs. Switching to
+> a safer programming language will significantly reduce security bugs
+> in QEMU. Rust is now mature and proven enough to use as the language
+> for device emulation code. Thanks to vhost-user and vfio-user using
+> Rust for device emulation does not require a big conversion of QEMU
+> code, it can simply be done in a separate program. This way attack
+> surfaces can be written in Rust to make them less susceptible to
+> security bugs going forward.
+
+
+Regards,
+Daniel
 -- 
-2.17.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
