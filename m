@@ -2,87 +2,83 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0FFFC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A8A4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:02:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 845F222D02
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:02:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F04F522D02
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:02:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lVtdltBE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 845F222D02
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RR39U2Jh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F04F522D02
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3bb1-0002GX-9n
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 04:49:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42256)
+	id 1k3e11-0007HV-3s
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:24:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43146)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1k3baS-0001q1-TT
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 04:49:20 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34916)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1k3baR-00021D-3U
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 04:49:20 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 184so8888749wmb.0
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 01:49:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PKkq8xYRKOtLz5Mb8kMdvtrgQ88Mie7GXc8zOkR1xHw=;
- b=lVtdltBEVnaP0bzcj9Df4Kglfj58lQ9jA87pGbfgkor0uRbfowvk+az3Qm41PlKWTL
- kDQbTe1015o5Ro1u7fFMPvkBCgdYvOISRCOgpNAh7+xUvOcJu2Q6FoUjEH0uZ+pDC4jn
- P/qbuSz+r0YTJjPOyFWr2H6lwMa21U3T8p0nvrpuW4Fs7PWp65qesMjyizpfwljW0gC9
- Dj5vUffpWcMZnu96U/XYDcC+M7aRYjt9F4Y83BtsUsGlz19cIVLzHYAkz4CXe+vI/37L
- FO2tcIHz3qWjqc2u03agRYWsvNP2R2yJ9sU7Mw2m5r/dh+XmwyvkMVJa3ml9C90loSwY
- fvyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PKkq8xYRKOtLz5Mb8kMdvtrgQ88Mie7GXc8zOkR1xHw=;
- b=TXEWaRjo5WR26kReapq2M9DCGaHT6fyUSCKBYR0GQA+BosSFph2PPF2l0OPsw7xcGC
- wFXAmA7uQPyhE+AEHapilt6Rgw8GvCV2YEikmszyXW6jchYQQzCnrtPf5eiZjfIJCZXS
- +zH4Ufg1gaEyt0FU3TM6SHMFSPmNiB+n07riNWUMJIokKw1gJfNEdH2yh0s4jQOuAfpb
- /cSkcSkRqqQR/HjJXWV1wFKj1CfOgqO1zIItkY7ZlZWckcTkEVfdusuP1TPULjY9glut
- 0o1AHghUr1hNqsj98KTPoI82PYQ0At8ud8XoaUlTDtaguDvoJSXP6NDUrf8+yDoF7wza
- TEIg==
-X-Gm-Message-State: AOAM532eifhuU6MKhBmFYu2H5sC4/YZ76tllRLF4SzlZRosWONsXPp/z
- 1wN9XQM2Bo3WY8vH5lSVA15IKVxOjNWeSofLG+fa/jQoENg=
-X-Google-Smtp-Source: ABdhPJx3lfNqycb/I1HxJ3OZDekkoQipJOov4QoNaCcFn+amoNUbpSMNhsgAmY2GkCJzz3CQ2DN0Qs9VNLTZ6KshP14=
-X-Received: by 2002:a7b:c0c8:: with SMTP id s8mr7243239wmh.4.1596703756910;
- Thu, 06 Aug 2020 01:49:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200806081147.3123652-1-armbru@redhat.com>
- <20200806081147.3123652-2-armbru@redhat.com>
-In-Reply-To: <20200806081147.3123652-2-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 6 Aug 2020 12:49:05 +0400
-Message-ID: <CAJ+F1CJvsJ6zvLSXu1CoW+Q=vvw-zrS9PX_7GExTd6DoX9RxwQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] docs/interop/qmp-spec: Point to the QEMU QMP
- reference manual
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000003e07f305ac3190b9"
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXc-00055n-6T
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:32 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53900
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXa-0000MU-9M
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596711268;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=bAZhh42ol/yyjGGnHpznrtYUmEZhMmtP36AnH46cN78=;
+ b=RR39U2JhGTKLLm+UDViW8bWtHo9TJh8rMrBYcFKHkfkPazZchoUVanbkAkcBdyYvrFOLsC
+ EIka2O/UQPLuGRhvXdVQddpR9/Bco7hGrdaT3zcE8Ulfc9zyD/s/1482ivSp90yuCbKx/D
+ OBMMfuRXupmm9NFClJEcmX/b0fqJwZA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-ucGPa8TJOeqYo6WVJHAY5Q-1; Thu, 06 Aug 2020 06:54:24 -0400
+X-MC-Unique: ucGPa8TJOeqYo6WVJHAY5Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35CFF8017FB;
+ Thu,  6 Aug 2020 10:54:23 +0000 (UTC)
+Received: from thuth.com (ovpn-112-229.ams2.redhat.com [10.36.112.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3BE165F202;
+ Thu,  6 Aug 2020 10:54:18 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-s390x@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH for-5.2 v2 6/9] pc-bios/s390-ccw: Scan through all devices if
+ no boot device specified
+Date: Thu,  6 Aug 2020 12:53:46 +0200
+Message-Id: <20200806105349.632-7-thuth@redhat.com>
+In-Reply-To: <20200806105349.632-1-thuth@redhat.com>
+References: <20200806105349.632-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:07:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,147 +92,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU <qemu-devel@nongnu.org>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, qemu-block@nongnu.org,
+ Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000003e07f305ac3190b9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+If no boot device has been specified (via "bootindex=..."), the s390-ccw
+bios scans through all devices to find a bootable device. But so far, it
+stops at the very first block device (including virtio-scsi controllers
+without attached devices) that it finds, no matter whether it is bootable
+or not. That leads to some weird situatation where it is e.g. possible
+to boot via:
 
-On Thu, Aug 6, 2020 at 12:12 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
+ qemu-system-s390x -hda /path/to/disk.qcow2
 
-> Commit 4d8bb958fa0..231aaf3a821 integrated the contents of
-> docs/qmp-events.txt into QAPI schema doc comments.  It left dangling
-> references to qmp-events.txt behind.  Fix to point to the QEMU QMP
-> reference manual generated from the QAPI schema.
->
-> Add a similar reference for commands.
->
-> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  docs/interop/qmp-spec.txt | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
->
-sure,
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+but not if there is e.g. a virtio-scsi controller specified before:
 
+ qemu-system-s390x -device virtio-scsi -hda /path/to/disk.qcow2
 
-diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt
-> index adcf86754d..cdf5842555 100644
-> --- a/docs/interop/qmp-spec.txt
-> +++ b/docs/interop/qmp-spec.txt
-> @@ -110,6 +110,9 @@ or
->    if provided.  The "id" member can be any json-value.  A json-number
->    incremented for each successive command works fine.
->
-> +The actual commands are documented in the QEMU QMP reference manual
-> +docs/interop/qemu-qmp-ref.{7,html,info,pdf,txt}.
-> +
->  2.3.1 Out-of-band execution
->  ---------------------------
->
-> @@ -207,13 +210,13 @@ The format of asynchronous events is:
->    there is a failure to retrieve host time, both members of the
->    timestamp will be set to -1.
->
-> -For a listing of supported asynchronous events, please, refer to the
-> -qmp-events.txt file.
-> +The actual asynchronous events are documented in the QEMU QMP
-> +reference manual docs/interop/qemu-qmp-ref.{7,html,info,pdf,txt}.
->
->  Some events are rate-limited to at most one per second.  If additional
->  "similar" events arrive within one second, all but the last one are
->  dropped, and the last one is delayed.  "Similar" normally means same
-> -event type.  See qmp-events.txt for details.
-> +event type.
->
->  2.6 Forcing the JSON parser into known-good state
->  -------------------------------------------------
-> --
-> 2.26.2
->
->
->
+While using "bootindex=..." is clearly the preferred way of booting
+on s390x, we still can make the life for the users at least a little
+bit easier if we look at all available devices to find a bootable one.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1846975
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/main.c | 46 +++++++++++++++++++++++++++--------------
+ 1 file changed, 31 insertions(+), 15 deletions(-)
 
---0000000000003e07f305ac3190b9
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 7bdd12ab2e..9b581074a1 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -182,20 +182,8 @@ static void boot_setup(void)
+ static void find_boot_device(void)
+ {
+     VDev *vdev = virtio_get_device();
+-    int ssid;
+     bool found;
+ 
+-    if (!have_iplb) {
+-        for (ssid = 0; ssid < 0x3; ssid++) {
+-            blk_schid.ssid = ssid;
+-            found = find_subch(-1);
+-            if (found) {
+-                return;
+-            }
+-        }
+-        panic("Could not find a suitable boot device (none specified)\n");
+-    }
+-
+     switch (iplb.pbt) {
+     case S390_IPL_TYPE_CCW:
+         debug_print_int("device no. ", iplb.ccw.devno);
+@@ -261,14 +249,42 @@ static void ipl_boot_device(void)
+     }
+ }
+ 
++/*
++ * No boot device has been specified, so we have to scan through the
++ * channels to find one.
++ */
++static void probe_boot_device(void)
++{
++    int ssid, sch_no, ret;
++
++    for (ssid = 0; ssid < 0x3; ssid++) {
++        blk_schid.ssid = ssid;
++        for (sch_no = 0; sch_no < 0x10000; sch_no++) {
++            ret = is_dev_possibly_bootable(-1, sch_no);
++            if (ret < 0) {
++                break;
++            }
++            if (ret == true) {
++                ipl_boot_device();      /* Only returns if unsuccessful */
++            }
++        }
++    }
++
++    sclp_print("Could not find a suitable boot device (none specified)\n");
++}
++
+ int main(void)
+ {
+     sclp_setup();
+     css_setup();
+     boot_setup();
+-    find_boot_device();
+-    enable_subchannel(blk_schid);
+-    ipl_boot_device();
++    if (have_iplb) {
++        find_boot_device();
++        enable_subchannel(blk_schid);
++        ipl_boot_device();
++    } else {
++        probe_boot_device();
++    }
+ 
+     panic("Failed to load OS from hard disk\n");
+     return 0; /* make compiler happy */
+-- 
+2.18.1
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Aug 6, 2020 at 12:12 PM Marku=
-s Armbruster &lt;<a href=3D"mailto:armbru@redhat.com">armbru@redhat.com</a>=
-&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
-0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Comm=
-it 4d8bb958fa0..231aaf3a821 integrated the contents of<br>
-docs/qmp-events.txt into QAPI schema doc comments.=C2=A0 It left dangling<b=
-r>
-references to qmp-events.txt behind.=C2=A0 Fix to point to the QEMU QMP<br>
-reference manual generated from the QAPI schema.<br>
-<br>
-Add a similar reference for commands.<br>
-<br>
-Cc: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.co=
-m" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt;<br>
-Signed-off-by: Markus Armbruster &lt;<a href=3D"mailto:armbru@redhat.com" t=
-arget=3D"_blank">armbru@redhat.com</a>&gt;<br>
----<br>
-=C2=A0docs/interop/qmp-spec.txt | 9 ++++++---<br>
-=C2=A01 file changed, 6 insertions(+), 3 deletions(-)<br>
-<br></blockquote><div><br></div><div>sure,</div><div><div>Reviewed-by: Marc=
--Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com" targe=
-t=3D"_blank">marcandre.lureau@redhat.com</a>&gt;</div><div> <br></div><div>=
-<br></div> </div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
-0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-diff --git a/docs/interop/qmp-spec.txt b/docs/interop/qmp-spec.txt<br>
-index adcf86754d..cdf5842555 100644<br>
---- a/docs/interop/qmp-spec.txt<br>
-+++ b/docs/interop/qmp-spec.txt<br>
-@@ -110,6 +110,9 @@ or<br>
-=C2=A0 =C2=A0if provided.=C2=A0 The &quot;id&quot; member can be any json-v=
-alue.=C2=A0 A json-number<br>
-=C2=A0 =C2=A0incremented for each successive command works fine.<br>
-<br>
-+The actual commands are documented in the QEMU QMP reference manual<br>
-+docs/interop/qemu-qmp-ref.{7,html,info,pdf,txt}.<br>
-+<br>
-=C2=A02.3.1 Out-of-band execution<br>
-=C2=A0---------------------------<br>
-<br>
-@@ -207,13 +210,13 @@ The format of asynchronous events is:<br>
-=C2=A0 =C2=A0there is a failure to retrieve host time, both members of the<=
-br>
-=C2=A0 =C2=A0timestamp will be set to -1.<br>
-<br>
--For a listing of supported asynchronous events, please, refer to the<br>
--qmp-events.txt file.<br>
-+The actual asynchronous events are documented in the QEMU QMP<br>
-+reference manual docs/interop/qemu-qmp-ref.{7,html,info,pdf,txt}.<br>
-<br>
-=C2=A0Some events are rate-limited to at most one per second.=C2=A0 If addi=
-tional<br>
-=C2=A0&quot;similar&quot; events arrive within one second, all but the last=
- one are<br>
-=C2=A0dropped, and the last one is delayed.=C2=A0 &quot;Similar&quot; norma=
-lly means same<br>
--event type.=C2=A0 See qmp-events.txt for details.<br>
-+event type.<br>
-<br>
-=C2=A02.6 Forcing the JSON parser into known-good state<br>
-=C2=A0-------------------------------------------------<br>
--- <br>
-2.26.2<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---0000000000003e07f305ac3190b9--
 
