@@ -2,95 +2,86 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87DCAC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D6E1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:41:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80BFE23110
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:39:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97D0722D74
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:41:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hH2IGHkh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80BFE23110
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQZZNSlN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97D0722D74
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3g7e-0005am-LY
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:39:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52742)
+	id 1k3g8p-0007Yv-Kb
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:41:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52808)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k3g76-00055e-D3
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:39:20 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:45175)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k3g74-0002yi-Eh
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:39:20 -0400
-Received: by mail-wr1-x429.google.com with SMTP id z18so40477561wrm.12
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 06:39:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=XwvkaOS+zlPAQxC7KOYzKBbD0RTPzA4FCgsljx8AFyA=;
- b=hH2IGHkh5hrFOBnyH4wmwVg+Q5lpfNhXNMy/o0q5RHinZcAHuhi/nONmrUYtHFGFPh
- MsY8w90VQS4JkPQ/UQigxIcR/VbexBzNRZpZV1RGWBOXRRl1cP6MnShdsVmj5LnEKnoU
- rxuskXh63FMCWzTaZW1bRgIADe90MMg+5pVaD+zWSd+AJ148YHPfFDN5SjmwmEWyfLwU
- +ZqwKwE6MvIJFvLFM/tzvIu5wiRqc2ey5xpZO91z4Wwxn4JrcMj3TBLgh1CM9LI/RzVq
- NnHlX2QH0mhWsnLwZq8ugi7Jwh20WKxkXS5W19yEVLgKIKo41eQlUR4rD2S4aUsFBFGO
- /qow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=XwvkaOS+zlPAQxC7KOYzKBbD0RTPzA4FCgsljx8AFyA=;
- b=L77Z3lVMZEgefRbI+fCOW9nJuVRmgNbogL4W1rxsUPtZclCQzmtl6d1W8HeS+BnFH5
- GbfLSU7sGU+xhMQgr9cEnj6Pi4xUDGnRnxt4iK2QUeqChFm34Rhofwb4DPRlmGt6BFcN
- 37Y+EJGtvZ92E6ziUSm5GqqS7oLrA3YyPM5yx3yzr8rlAt7CPXxSKlLwrba8BW45tHPP
- E8PqaVYixTYvhrxo4T0kaT7lE3Q5eCfEoS1iajlHiG5Bz5SraajR0Lkbrw6s+oKy7vrb
- cJOfMAiIHNcdrKB0jA9d5kyXKZ9c87etdq2x/XFisE9AtCKaUhwHsyh7HC5BFJDHMRQT
- bGRg==
-X-Gm-Message-State: AOAM530iqryRNNaTW3qrPqxGrbFLtM/4ILOCFT+IjuefAPI53gfIazIJ
- 7VQFJpfo5vJp0oQhCCSqs/siTQ==
-X-Google-Smtp-Source: ABdhPJxh3SvBWCEym3nyBVMrPVXzypgq9rJleizyVbSusoe6+vKY5qoIfH3u+mOQQWwwFx2rIfN14Q==
-X-Received: by 2002:adf:ded0:: with SMTP id i16mr7431886wrn.389.1596721155928; 
- Thu, 06 Aug 2020 06:39:15 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m8sm6735860wro.75.2020.08.06.06.39.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 06:39:14 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E6B511FF7E;
- Thu,  6 Aug 2020 14:39:13 +0100 (BST)
-References: <CAJSP0QWF8g7r5VqU_PRbskWZU3ahCq+eobR8GexUcPrAiYoCPQ@mail.gmail.com>
- <20200806110826.GH4159383@redhat.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+ (Exim 4.90_1) (envelope-from <slp@redhat.com>) id 1k3g7k-0005qX-Dv
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:40:00 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54577
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <slp@redhat.com>) id 1k3g7h-00031V-ES
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:39:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596721195;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=lZ2xO/r9/lY7GLup8/HvCICtkmbVo2XLDZC5dlGcfGY=;
+ b=QQZZNSlNgRCLwefyW/wepUq0PCQd89raw8+rmwNc5fEtOlOQxuEm71ggxaRXcZtzBtJhtK
+ SCQIc4lKVafkvTtXbBKIIJ3Qm7YCzDF/SFGDVjUX2Dc8oeMoaziS6QGzTuQru5fm1vmf0l
+ WlDYn71pKyfTbHyOlJ+yAjC2dSfMZmE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-vM8LUwXPPoW2RjFNdA4LYQ-1; Thu, 06 Aug 2020 09:38:49 -0400
+X-MC-Unique: vM8LUwXPPoW2RjFNdA4LYQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A25CE10932E0;
+ Thu,  6 Aug 2020 13:38:47 +0000 (UTC)
+Received: from localhost (ovpn-112-129.rdu2.redhat.com [10.10.112.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 124DF6931B;
+ Thu,  6 Aug 2020 13:38:46 +0000 (UTC)
+Date: Thu, 6 Aug 2020 15:38:45 +0200
+From: Sergio Lopez <slp@redhat.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 Subject: Re: Why QEMU should move from C to Rust (clickbait alert ;))
-In-reply-to: <20200806110826.GH4159383@redhat.com>
-Date: Thu, 06 Aug 2020 14:39:13 +0100
-Message-ID: <87a6z7lwqm.fsf@linaro.org>
+Message-ID: <20200806133845.maouiwnazkjtpklr@mhamilton>
+References: <CAJSP0QWF8g7r5VqU_PRbskWZU3ahCq+eobR8GexUcPrAiYoCPQ@mail.gmail.com>
+ <20200806115148.7lz32dro645a3wv6@mhamilton>
+ <20200806120130.GK4159383@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::429;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x429.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200806120130.GK4159383@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=slp@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="eucklqdevqpgjtwc"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=slp@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:07:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,120 +95,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>,
- Dave Gilbert <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Oleinik, Alexander" <alxndr@bu.edu>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, "Oleinik, Alexander" <alxndr@bu.edu>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Dave Gilbert <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--eucklqdevqpgjtwc
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On Thu, Aug 06, 2020 at 01:01:30PM +0100, Daniel P. Berrang=E9 wrote:
+> On Thu, Aug 06, 2020 at 01:51:48PM +0200, Sergio Lopez wrote:
+> > On Thu, Aug 06, 2020 at 11:24:13AM +0100, Stefan Hajnoczi wrote:
+> > <snip>
+> > > Conclusion
+> > > ---------------
+> > > Most security bugs in QEMU today are C programming bugs. Switching to
+> > > a safer programming language will significantly reduce security bugs
+> > > in QEMU. Rust is now mature and proven enough to use as the language
+> > > for device emulation code. Thanks to vhost-user and vfio-user using
+> > > Rust for device emulation does not require a big conversion of QEMU
+> > > code, it can simply be done in a separate program. This way attack
+> > > surfaces can be written in Rust to make them less susceptible to
+> > > security bugs going forward.
+> > >=20
+> >=20
+> > Having worked on Rust implementations for vhost-user-fs and
+> > vhost-user-blk, I'm 100% sold on this idea.
+> >=20
+> > That said, there are a couple things that I think may help getting
+> > more people into implementing vhost-user devices in Rust.
+> >=20
+> >  1. Having a reference implementation for a simple device somewhere
+> >  close or inside the QEMU source tree. I'd say vhost-user-blk is a
+> >  clear candidate, given that a naive implementation for raw files
+> >  without any I/O optimization is quite easy to read and understand.
+> >=20
+> >  2. Integrating the ability to start-up vhost-user daemons from QEMU,
+> >  in an easy and portable way. I know we can always rely on daemons
+> >  like libvirt to do this for us, but I think it'd be nicer to be able
+> >  to define a vhost-user device from the command line and have QEMU
+> >  execute it with the proper parameters (BTW, Cloud-Hypervisor already
+> >  does that). This would probably require some kind of configuration
+> >  file, to be able to define which binary provides each vhost-user
+> >  device personality, but could also be a way for "sanctioning"
+> >  daemons (through the configuration defaults), and to have them adhere
+> >  to a standardized command line format.
+>=20
+> This second point is such a good idea that we already have defined
+> how todo this in QEMU - see the docs/interop/vhost-user.json file.
+> This specifies metadata files that should be installed into a
+> defined location such that QEMU/libvirt/other mgmt app can locate
+> vhost-user impls for each type of device, and priortize between
+> different impls.
 
-> On Thu, Aug 06, 2020 at 11:24:13AM +0100, Stefan Hajnoczi wrote:
->
-> ...snip...
->
-> I broadly agree with the points about why Rust is desirable as
-> a language for QEMU.
->
->> How can we change programming language?
->> ------------------------------------------------------------
->> When I checked in 2018 QEMU was 1.5 million lines of code. It has
->> grown since then. Moving a large codebase to a new programming
->> language is extremely difficult. If people want to convert QEMU to
->> Rust that would be great, but I personally don't have the appetite to
->> do it because I think the integration will be messy, result in a lot
->> of duplication, and there is too much un(der)maintained code that is
->> hard to convert.
->>=20
->> The reason I am writing this post is because device emulation, the
->> main security attack surface for VMMs, can be done in a separate
->> program. That program can be written in any language and this is where
->> Rust comes in. For vhost devices it is possible to write Rust device
->> backends today and I hope this will become the default approach to
->> writing new devices.
->>=20
->> For non-vhost devices the vfio-user project is working on an interface
->> out-of-process device emulation. It will be possible to implement
->> devices in Rust there too.
->
-> I guess this dovetails into our view of security bug classification.
-> Stuff that affects virtualization use cases is security critical,
-> while stuff that affects emulation is NOT security critical.
->
-> With this in mind, it is not a priority to convert the whole of
-> QEMU to Rust. The priority is the subset that affects virtualization
-> use cases. It is a much more tractable problem if we're looking at
-> creating rust based vhost-user / vfio-user, only for the devices
-> that are commonly used for KVM with modern OS, and ignore the many
-> 100's of devices that are only there for emulation or foir legacy OS.
+Nice, but AFAIK QEMU still lacks the ability to process those files
+and run the vhost-user device providers by itself. Or perhaps I just
+can't find it (?).
 
-I'm definitely interested in vhost-user daemons in Rust. The one I've
-been writing so far has been tried to be a minimal POSIX base without
-including QEMU utility functions but I'm sure it would be nicer to start
-with a clean standalone Rust library.
+Sergio.
 
->> If you are implementing new device emulation code please consider
->> doing it in Rust!
->
-> Yes, but I think we'll need put in significant effort to guide / assist
-> people in taking this direction, and think about what it means for the
-> future of QEMU as a brand and GIT repo.
->
-> In many ways it is a good thing if the Rust vhost-user impls are
-> all in their own standalone git repos. They're likely to be independent
-> codebases, so there's little compelling reason to force them into the
-> QEMU git, where they'll have to use QEMU workflow, and QEMU release
-> cycle. They're better off free from QEMU where they can choose to adopt
-> modern development practices like GitLab merge requests if they
-> desire and release on a more frequent cycle than QEMU's 3-times a
-> year, etc. Would also make them more appealing for use by alternative
-> non-QEMU userspaces for KVM.
->
-> The downside is that QEMU git would only contain the "legacy" builtin
-> C impls of the devices, and all the "recommended" modern Rust impls
-> would be elsewhere. Essentially QEMU would no longer be a self-contained
-> provider of the complete solution. Many parts would be disaggregated,
-> and users now have the burden of finding all the right pieces to build
-> the best solution. We've already seen this to some extent with existing
-> vhost-user impls, but it feels like we'd be pushing towards that as a
-> more general model for the future which would amplify problems we've
-> largely been able to ignore upto now.
->
-> I'm not sure what a good answer here is. Perhaps QEMU could try to
-> become more of brand for an umbrella project that covers multiple
-> independant repos ? eg create new repos under gitlab.com/qemu-project/
-> but allow them to work fairly independantly from the main qemu.git ?
-> That way we can more easily promote a collection of QEMU repos as
-> showing the recommended architecture, without forcing everything
-> into qemu.git. We can leverage the QEMU website, wiki and documentation
-> in general to showcase the overall solution, while still letting the
-> pieces develop independently.
+--eucklqdevqpgjtwc
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I think there would be scope for a vhost-user-daemon repo with multiple
-reference implementations.
+-----BEGIN PGP SIGNATURE-----
 
-So has any vhost-user stuff been prototyped in Rust yet?
+iQIzBAABCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl8sB+UACgkQ9GknjS8M
+AjV20hAAo9fiFrmnv8ajYRY11F8Y4O7CmFJzf/FCOzJtON8UHSpKNOeNqyDXzkN7
+jo8eE4aFfzqOUn2cxQe9yAjWi3eSHG/AKHNREMM8Ne2J4ZBdXuQZhaSv/7sLwltN
+H8ozV6NNaY2200Zy9GO/vgOhaHfhBMsEjR3zzmHlsT9SKQP1ioXDTdgyX2bs6WuN
+NU9aV3o7vo2sQe/hqPFyE+Nb8A3d5te5n2M4RyrpYFu7WLN0loyoIonzjxKmDcSe
+cyCEOJtZTC8IV5QAjsi2Oub0Fd4G6dMfzXh4/U2R+2y+4IGdwVDnFxyJjrKRrhow
+ZQfzgYhkCf94dZw0vUD3LYA+eFJI6+Dzd3I2OgDUf4E1erWJ+y2uHYO5TPIEl/du
+JfM4e5Zi+91dDatDGPcWIwl/femhrHga8yltDFdMSIVWt6FG/PoCB44P90vDZdcb
+0BWYBYvj4fM5gFdd+gIRruqu6fh7qJGRTi+LXOYxm/RODVOihMnTrWhyBgB3/w7N
+NiRutgTWrVeWT6ODxqVRvwC+3ZftYuE3mDZZzde+s+eqt1JOFkuZcfoFLe2KpEw4
+PQxZM+DhqF1x7JGUKyFddCNhcvk02sB16gejXlRw7MP5YyShT9WOwtJTbYvzvlGT
+QMMFzr54HkKwII6yKhFbXYPbS7jjuuBVYzXtMYxVkPGNfkG41ks=
+=eeCG
+-----END PGP SIGNATURE-----
 
->
->> Conclusion
->> ---------------
->> Most security bugs in QEMU today are C programming bugs. Switching to
->> a safer programming language will significantly reduce security bugs
->> in QEMU. Rust is now mature and proven enough to use as the language
->> for device emulation code. Thanks to vhost-user and vfio-user using
->> Rust for device emulation does not require a big conversion of QEMU
->> code, it can simply be done in a separate program. This way attack
->> surfaces can be written in Rust to make them less susceptible to
->> security bugs going forward.
->
->
-> Regards,
-> Daniel
+--eucklqdevqpgjtwc--
 
-
---=20
-Alex Benn=C3=A9e
 
