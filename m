@@ -7,62 +7,61 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26394C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15F68C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:48:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A6E62086A
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:48:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11EA22086A
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:48:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elgEUD2H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A6E62086A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KrmLRueE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11EA22086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3lrw-00022K-4l
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:48:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43560)
+	id 1k3ls0-0002EN-3d
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:48:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lPS-0007Ba-OK
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34179
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k3lPR-00077r-F4
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22462)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lPQ-0006f1-88
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:38 -0400
+ id 1k3lPO-0006en-Ub
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741515;
+ s=mimecast20190719; t=1596741514;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MmtPcwRR1QK8m2j8EH3cQcFOMKlasr20fAnjsnC2kgc=;
- b=elgEUD2HQYBAkg/RYDiMv8m4s66feOClBoB5Ox4hZYcEsdE4tBo9NhUfJ35y/OkE5MkyPb
- uRI6C7ML82pN4wfwZ2HH1ky65TsYKOw8W3xL08HgNoJ5sWLHeB4+gd1ReChbR6uAbYIkjI
- Nxl+UxSHpOmPkgq8i9fw/ByxeK7XK2I=
+ bh=vj2wqYxMQOwvyhwWO2LqIwrgRniIYHgXgAT6Vo3UcsA=;
+ b=KrmLRueEkXArWhQrd9IuHQyNLhrukr3rREQi0M23hHTU9SuBrCohdThhkqPDcakYIZKsd2
+ yDMfVkN4NnTMsWhYdSRN6S1tOr/okvZo9psa1zr9ncN4MCiJ0V+LIZpGT/6ckL8Jw4wm9i
+ vgDe4jzZJQTXB/gOGXUVg37RtgA23ck=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-9XQXihJeM8ulJt9po9ikZg-1; Thu, 06 Aug 2020 15:18:33 -0400
-X-MC-Unique: 9XQXihJeM8ulJt9po9ikZg-1
+ us-mta-41-8y7a_oPrNjWxl0BtoR141A-1; Thu, 06 Aug 2020 15:18:32 -0400
+X-MC-Unique: 8y7a_oPrNjWxl0BtoR141A-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B19111DE1
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:18:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 593D7800404
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:18:31 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C32A35FC3B;
- Thu,  6 Aug 2020 19:18:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6AB9D5F9DC;
+ Thu,  6 Aug 2020 19:18:30 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 076/143] meson: convert net directory to Meson
-Date: Thu,  6 Aug 2020 21:15:12 +0200
-Message-Id: <1596741379-12902-77-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 075/143] meson: convert migration directory to Meson
+Date: Thu,  6 Aug 2020 21:15:11 +0200
+Message-Id: <1596741379-12902-76-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,17 +72,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 12:59:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,176 +105,121 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs         |  3 +--
- Makefile.target       |  1 +
- meson.build           | 10 ++++++++++
- net/Makefile.objs     | 32 --------------------------------
- net/can/Makefile.objs |  2 --
- net/can/meson.build   |  5 +++++
- net/meson.build       | 40 ++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 57 insertions(+), 36 deletions(-)
- delete mode 100644 net/Makefile.objs
- delete mode 100644 net/can/Makefile.objs
- create mode 100644 net/can/meson.build
- create mode 100644 net/meson.build
+ Makefile.objs           |  1 -
+ Makefile.target         |  1 -
+ meson.build             |  5 +++++
+ migration/Makefile.objs | 18 ------------------
+ migration/meson.build   | 29 +++++++++++++++++++++++++++++
+ 5 files changed, 34 insertions(+), 20 deletions(-)
+ delete mode 100644 migration/Makefile.objs
+ create mode 100644 migration/meson.build
 
 diff --git a/Makefile.objs b/Makefile.objs
-index aabf709..8e73682 100644
+index 544877a..aabf709 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -38,8 +38,7 @@ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
- # single QEMU executable should support all CPUs and machines.
- 
- ifeq ($(CONFIG_SOFTMMU),y)
--common-obj-y = net/
--common-obj-$(CONFIG_LINUX) += fsdev/
-+common-obj-$(CONFIG_LINUX) = fsdev/
+@@ -42,7 +42,6 @@ common-obj-y = net/
+ common-obj-$(CONFIG_LINUX) += fsdev/
  
  common-obj-y += accel/
+-common-obj-y += migration/
  
+ common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
+ common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
 diff --git a/Makefile.target b/Makefile.target
-index 4d912df..bf3fda9 100644
+index 54a9ef1..4d912df 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -168,6 +168,7 @@ LIBS := $(LIBS) $(GTK_LIBS) $(VTE_LIBS) $(X11_LIBS) $(CURSES_LIBS) $(ICONV_LIBS)
- endif
- LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS) $(OPENGL_LIBS) $(SECCOMP_LIBS)
- LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
-+LIBS := $(LIBS) $(VDE_LIBS) $(SLIRP_LIBS)
+@@ -158,7 +158,6 @@ obj-y += softmmu/
+ obj-y += gdbstub.o
+ obj-y += hw/
+ obj-y += qapi/
+-obj-y += migration/ram.o
+ LIBS := $(libs_softmmu) $(LIBS)
  
- # Hardware support
- ifeq ($(TARGET_NAME), sparc64)
+ # Temporary until emulators are linked by Meson
 diff --git a/meson.build b/meson.build
-index f0af36f..73ad78d 100644
+index c592241..f0af36f 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -137,6 +137,15 @@ if 'CONFIG_XKBCOMMON' in config_host
-   xkbcommon = declare_dependency(compile_args: config_host['XKBCOMMON_CFLAGS'].split(),
-                                  link_args: config_host['XKBCOMMON_LIBS'].split())
+@@ -291,6 +291,10 @@ lzo = not_found
+ if 'CONFIG_LZO' in config_host
+   lzo = declare_dependency(link_args: config_host['LZO_LIBS'].split())
  endif
-+slirp = not_found
-+if config_host.has_key('CONFIG_SLIRP')
-+  slirp = declare_dependency(compile_args: config_host['SLIRP_CFLAGS'].split(),
-+                             link_args: config_host['SLIRP_LIBS'].split())
++rdma = not_found
++if 'CONFIG_RDMA' in config_host
++  rdma = declare_dependency(link_args: config_host['RDMA_LIBS'].split())
 +endif
-+vde = not_found
-+if config_host.has_key('CONFIG_VDE')
-+  vde = declare_dependency(link_args: config_host['VDE_LIBS'].split())
-+endif
- pulse = not_found
- if 'CONFIG_LIBPULSE' in config_host
-   pulse = declare_dependency(compile_args: config_host['PULSE_CFLAGS'].split(),
-@@ -634,6 +643,7 @@ common_ss.add(files('cpus-common.c'))
+ 
+ create_config = find_program('scripts/create_config')
+ minikconf = find_program('scripts/minikconf.py')
+@@ -628,6 +632,7 @@ softmmu_ss.add(when: ['CONFIG_FDT', fdt],  if_true: [files('device_tree.c')])
+ common_ss.add(files('cpus-common.c'))
+ 
  subdir('softmmu')
- subdir('migration')
++subdir('migration')
  subdir('monitor')
-+subdir('net')
  subdir('replay')
  
- # needed for fuzzing binaries
-diff --git a/net/Makefile.objs b/net/Makefile.objs
+diff --git a/migration/Makefile.objs b/migration/Makefile.objs
 deleted file mode 100644
-index 5ab4554..0000000
---- a/net/Makefile.objs
+index 0fc619e..0000000
+--- a/migration/Makefile.objs
 +++ /dev/null
-@@ -1,32 +0,0 @@
--common-obj-y = net.o queue.o checksum.o util.o hub.o
--common-obj-y += socket.o
--common-obj-y += dump.o
--common-obj-y += eth.o
--common-obj-y += announce.o
--common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
--common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET_USER)) += vhost-user.o
--common-obj-$(call land,$(call lnot,$(CONFIG_VIRTIO_NET)),$(CONFIG_VHOST_NET_USER)) += vhost-user-stub.o
--common-obj-$(CONFIG_ALL) += vhost-user-stub.o
--common-obj-$(CONFIG_SLIRP) += slirp.o
--slirp.o-cflags := $(SLIRP_CFLAGS)
--slirp.o-libs := $(SLIRP_LIBS)
--common-obj-$(CONFIG_VDE) += vde.o
--common-obj-$(CONFIG_NETMAP) += netmap.o
--common-obj-y += filter.o
--common-obj-y += filter-buffer.o
--common-obj-y += filter-mirror.o
--common-obj-y += colo-compare.o
--common-obj-y += colo.o
--common-obj-y += filter-rewriter.o
--common-obj-y += filter-replay.o
+@@ -1,18 +0,0 @@
+-common-obj-y += migration.o socket.o fd.o exec.o
+-common-obj-y += tls.o channel.o savevm.o
+-common-obj-y += colo.o colo-failover.o
+-common-obj-y += vmstate.o vmstate-types.o page_cache.o
+-common-obj-y += qemu-file.o global_state.o
+-common-obj-y += qemu-file-channel.o
+-common-obj-y += xbzrle.o postcopy-ram.o
+-common-obj-y += qjson.o
+-common-obj-y += block-dirty-bitmap.o
+-common-obj-y += multifd.o
+-common-obj-y += multifd-zlib.o
+-common-obj-$(CONFIG_ZSTD) += multifd-zstd.o
 -
--tap-obj-$(CONFIG_LINUX) = tap-linux.o
--tap-obj-$(CONFIG_BSD) = tap-bsd.o
--tap-obj-$(CONFIG_SOLARIS) = tap-solaris.o
--tap-obj-y ?= tap-stub.o
--common-obj-$(CONFIG_POSIX) += tap.o $(tap-obj-y)
--common-obj-$(CONFIG_WIN32) += tap-win32.o
--common-obj-$(CONFIG_VHOST_NET_VDPA) += vhost-vdpa.o
--vde.o-libs = $(VDE_LIBS)
+-common-obj-$(CONFIG_RDMA) += rdma.o
 -
--common-obj-$(CONFIG_CAN_BUS) += can/
-diff --git a/net/can/Makefile.objs b/net/can/Makefile.objs
-deleted file mode 100644
-index 9f35dc5..0000000
---- a/net/can/Makefile.objs
-+++ /dev/null
-@@ -1,2 +0,0 @@
--common-obj-y += can_core.o can_host.o
--common-obj-$(CONFIG_LINUX) += can_socketcan.o
-diff --git a/net/can/meson.build b/net/can/meson.build
+-common-obj-$(CONFIG_LIVE_BLOCK_MIGRATION) += block.o
+-
+-rdma.o-libs := $(RDMA_LIBS)
+diff --git a/migration/meson.build b/migration/meson.build
 new file mode 100644
-index 0000000..f53d9ec
+index 0000000..99afbac
 --- /dev/null
-+++ b/net/can/meson.build
-@@ -0,0 +1,5 @@
-+can_ss = ss.source_set()
-+can_ss.add(files('can_core.c', 'can_host.c'))
-+can_ss.add(when: 'CONFIG_LINUX', if_true: files('can_socketcan.c'))
-+
-+softmmu_ss.add_all(when: 'CONFIG_CAN_BUS', if_true: can_ss)
-diff --git a/net/meson.build b/net/meson.build
-new file mode 100644
-index 0000000..6c2ec47
---- /dev/null
-+++ b/net/meson.build
-@@ -0,0 +1,40 @@
++++ b/migration/meson.build
+@@ -0,0 +1,29 @@
 +softmmu_ss.add(files(
-+  'announce.c',
-+  'checksum.c',
-+  'colo-compare.c',
++  'block-dirty-bitmap.c',
++  'channel.c',
++  'colo-failover.c',
 +  'colo.c',
-+  'dump.c',
-+  'eth.c',
-+  'filter-buffer.c',
-+  'filter-mirror.c',
-+  'filter-replay.c',
-+  'filter-rewriter.c',
-+  'filter.c',
-+  'hub.c',
-+  'net.c',
-+  'queue.c',
++  'exec.c',
++  'fd.c',
++  'global_state.c',
++  'migration.c',
++  'multifd.c',
++  'multifd-zlib.c',
++  'page_cache.c',
++  'postcopy-ram.c',
++  'qemu-file-channel.c',
++  'qemu-file.c',
++  'qjson.c',
++  'savevm.c',
 +  'socket.c',
-+  'util.c',
++  'tls.c',
++  'vmstate-types.c',
++  'vmstate.c',
++  'xbzrle.c',
 +))
 +
-+softmmu_ss.add(when: 'CONFIG_L2TPV3', if_true: files('l2tpv3.c'))
-+softmmu_ss.add(when: ['CONFIG_SLIRP', slirp], if_true: files('slirp.c'))
-+softmmu_ss.add(when: ['CONFIG_VDE', vde], if_true: files('vde.c'))
-+softmmu_ss.add(when: 'CONFIG_NETMAP', if_true: files('netmap.c'))
-+vhost_user_ss = ss.source_set()
-+vhost_user_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('vhost-user.c'), if_false: files('vhost-user-stub.c'))
-+softmmu_ss.add_all(when: 'CONFIG_VHOST_NET_USER', if_true: vhost_user_ss)
-+softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('vhost-user-stub.c'))
++softmmu_ss.add(when: ['CONFIG_RDMA', rdma], if_true: files('rdma.c'))
++softmmu_ss.add(when: 'CONFIG_LIVE_BLOCK_MIGRATION', if_true: files('block.c'))
++softmmu_ss.add(when: 'CONFIG_ZSTD', if_true: files('multifd-zstd.c'))
 +
-+softmmu_ss.add(when: 'CONFIG_LINUX', if_true: files('tap-linux.c'))
-+softmmu_ss.add(when: 'CONFIG_BSD', if_true: files('tap-bsd.c'))
-+softmmu_ss.add(when: 'CONFIG_SOLARIS', if_true: files('tap-solaris.c'))
-+tap_posix = ['tap.c']
-+if not config_host.has_key('CONFIG_LINUX') and not config_host.has_key('CONFIG_BSD') and not config_host.has_key('CONFIG_SOLARIS')
-+  tap_posix += 'tap-stub.c'
-+endif
-+softmmu_ss.add(when: 'CONFIG_POSIX', if_true: files(tap_posix))
-+softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('tap-win32.c'))
-+softmmu_ss.add(when: 'CONFIG_VHOST_NET_VDPA', if_true: files('vhost-vdpa.c'))
-+
-+subdir('can')
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files('ram.c')])
 -- 
 1.8.3.1
 
