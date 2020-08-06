@@ -2,67 +2,68 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC76C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:36:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD19C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF19A2173E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:36:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 109BF2173E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HPtW/Yoq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF19A2173E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aHjuMTLe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109BF2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3lgl-0002rz-Nx
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:36:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43096)
+	id 1k3lgq-00033j-28
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:36:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOo-0005fE-Rf
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52057
+ id 1k3lOP-0004ef-Ij
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54516
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOl-0006WE-KM
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:58 -0400
+ id 1k3lOM-0006T1-IP
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741474;
+ s=mimecast20190719; t=1596741449;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JOmvDjeL+bFLQ0yQuGlOSZGU8CjxcAd5ihoNW0k9T/A=;
- b=HPtW/Yoqe/UWYp2pxi/V60aiit4wxlygjiydw7UdG3rKyXg/B30HcogBolmK7YzRF1GEef
- aYTi0RsrKgxXG5tE6D/XdKQcRv8WXIZQHomlBGeocgOgIKfl6QZ5FNn+ZeJMLm3J9gDlAO
- jPZq9wmIhi8Ib7XiD2mvnzcA5OM7qQw=
+ bh=uPueCnpxNL8nRrBwUbP6OFH4+X/CEejPf3/nhc7SSbw=;
+ b=aHjuMTLeyNoYx0yvSRPfNL+3Qmn+tcJr6ePn+pMgCWKYQc3DdZjIM2AGLMN0rZ7AHpvNtm
+ coserZSbqcafZ+dy/r8fEShydNO+9ez0bOegT0hZg2GfWFubLXsmA9+WpBWQ64wDqaW2wX
+ pp5vNs7IgqSWCBJMZQTBd79s4hFbrcU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-nIEw7EisMJ6IXXdDRQxWQA-1; Thu, 06 Aug 2020 15:17:53 -0400
-X-MC-Unique: nIEw7EisMJ6IXXdDRQxWQA-1
+ us-mta-389-t63TXwoQNmOCM6BpvTap7A-1; Thu, 06 Aug 2020 15:17:25 -0400
+X-MC-Unique: t63TXwoQNmOCM6BpvTap7A-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33563100AA21
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF957100AA21
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:24 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 431825F9DC;
- Thu,  6 Aug 2020 19:17:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E0D3C5FC3B;
+ Thu,  6 Aug 2020 19:17:23 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 051/143] meson: convert crypto directory to Meson
-Date: Thu,  6 Aug 2020 21:14:47 +0200
-Message-Id: <1596741379-12902-52-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 033/143] meson: convert qemu-ga
+Date: Thu,  6 Aug 2020 21:14:29 +0200
+Message-Id: <1596741379-12902-34-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -102,207 +103,379 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile             |  1 -
- Makefile.objs        |  2 +-
- Makefile.target      |  2 +-
- crypto/Makefile.objs | 37 -------------------------------------
- crypto/meson.build   | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- meson.build          |  4 ++--
- qom/meson.build      |  2 +-
- 7 files changed, 57 insertions(+), 43 deletions(-)
- delete mode 100644 crypto/Makefile.objs
+ Makefile                  | 53 ++++++-----------------------------------------
+ Makefile.objs             |  1 -
+ configure                 |  9 ++++----
+ meson.build               | 22 ++++++++++++++++++--
+ qga/Makefile.objs         |  9 --------
+ qga/installer/qemu-ga.wxs |  2 +-
+ qga/meson.build           | 45 ++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include    |  4 ++--
+ tests/test-qga.c          |  8 +++----
+ 9 files changed, 82 insertions(+), 71 deletions(-)
+ create mode 100644 qga/meson.build
 
 diff --git a/Makefile b/Makefile
-index 123b857..67e932e 100644
+index 39bf0c4..05f774d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -231,7 +231,6 @@ dummy := $(call unnest-vars,, \
+@@ -285,7 +285,6 @@ endif
+ dummy := $(call unnest-vars,, \
+                 authz-obj-y \
+                 chardev-obj-y \
+-                qga-obj-y \
+                 qga-vss-dll-obj-y \
+                 block-obj-y \
                  block-obj-m \
-                 storage-daemon-obj-y \
-                 storage-daemon-obj-m \
--                crypto-obj-y \
-                 io-obj-y \
-                 common-obj-y \
-                 common-obj-m)
+@@ -433,52 +432,15 @@ endif
+ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+ 
+-qemu-ga$(EXESUF): LIBS = $(LIBS_QGA)
+-qemu-ga$(EXESUF): QEMU_CFLAGS += -I qga/qapi-generated
+-
+ qemu-keymap$(EXESUF): LIBS += $(XKBCOMMON_LIBS)
+ qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
+ 
+-qapi-py = $(SRC_PATH)/scripts/qapi/__init__.py \
+-$(SRC_PATH)/scripts/qapi/commands.py \
+-$(SRC_PATH)/scripts/qapi/common.py \
+-$(SRC_PATH)/scripts/qapi/doc.py \
+-$(SRC_PATH)/scripts/qapi/error.py \
+-$(SRC_PATH)/scripts/qapi/events.py \
+-$(SRC_PATH)/scripts/qapi/expr.py \
+-$(SRC_PATH)/scripts/qapi/gen.py \
+-$(SRC_PATH)/scripts/qapi/introspect.py \
+-$(SRC_PATH)/scripts/qapi/parser.py \
+-$(SRC_PATH)/scripts/qapi/schema.py \
+-$(SRC_PATH)/scripts/qapi/source.py \
+-$(SRC_PATH)/scripts/qapi/types.py \
+-$(SRC_PATH)/scripts/qapi/visit.py \
+-$(SRC_PATH)/scripts/qapi-gen.py
+-
+-qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h \
+-qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h \
+-qga/qapi-generated/qga-qapi-commands.h qga/qapi-generated/qga-qapi-commands.c \
+-qga/qapi-generated/qga-qapi-init-commands.h qga/qapi-generated/qga-qapi-init-commands.c \
+-qga/qapi-generated/qga-qapi-doc.texi: \
+-qga/qapi-generated/qapi-gen-timestamp ;
+-qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
+-	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+-		-o qga/qapi-generated -p "qga-" $<, \
+-		"GEN","$(@:%-timestamp=%)")
+-	@>$@
+-
+-QGALIB_GEN=$(addprefix qga/qapi-generated/, qga-qapi-types.h qga-qapi-visit.h qga-qapi-commands.h qga-qapi-init-commands.h)
+-$(qga-obj-y): $(QGALIB_GEN)
+-
+-qemu-ga$(EXESUF): $(qga-obj-y) $(COMMON_LDADDS)
+-	$(call LINK, $^)
+-
+ ifdef QEMU_GA_MSI_ENABLED
+ QEMU_GA_MSI=qemu-ga-$(ARCH).msi
+ 
+ msi: $(QEMU_GA_MSI)
+ 
+-$(QEMU_GA_MSI): qemu-ga.exe $(QGA_VSS_PROVIDER)
++$(QEMU_GA_MSI): qga/qemu-ga.exe $(QGA_VSS_PROVIDER)
+ 
+ $(QEMU_GA_MSI): config-host.mak
+ 
+@@ -491,8 +453,8 @@ msi:
+ endif
+ 
+ ifneq ($(EXESUF),)
+-.PHONY: qemu-ga
+-qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
++.PHONY: qga/qemu-ga
++qga/qemu-ga: qga/qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+ endif
+ 
+ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+@@ -516,9 +478,6 @@ clean: recurse-clean
+ 	rm -f qemu-img-cmds.h
+ 	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+ 	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+-	rm -f qapi-gen-timestamp
+-	rm -f storage-daemon/qapi/qapi-gen-timestamp
+-	rm -rf qga/qapi-generated
+ 	rm -f config-all-devices.mak
+ 	rm -f $(SUBDIR_DEVICES_MAK)
+ 
+@@ -637,7 +596,7 @@ endif
+ ifdef CONFIG_TRACE_SYSTEMTAP
+ 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-trace-stap.1 "$(DESTDIR)$(mandir)/man1"
+ endif
+-ifneq (,$(findstring qemu-ga,$(TOOLS)))
++ifeq ($(CONFIG_GUEST_AGENT),y)
+ 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-ga.8 "$(DESTDIR)$(mandir)/man8"
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.html "$(DESTDIR)$(qemu_docdir)/interop"
+@@ -658,7 +617,7 @@ install-datadir:
+ 
+ install-localstatedir:
+ ifdef CONFIG_POSIX
+-ifneq (,$(findstring qemu-ga,$(TOOLS)))
++ifeq ($(CONFIG_GUEST_AGENT),y)
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_localstatedir)"/run
+ endif
+ endif
+@@ -850,7 +809,7 @@ $(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version.h
+ docs/interop/qemu-qmp-qapi.texi: qapi/qapi-doc.texi
+ 	@cp -p $< $@
+ 
+-docs/interop/qemu-ga-qapi.texi: qga/qapi-generated/qga-qapi-doc.texi
++docs/interop/qemu-ga-qapi.texi: qga/qga-qapi-doc.texi
+ 	@cp -p $< $@
+ 
+ html: docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html sphinxdocs
 diff --git a/Makefile.objs b/Makefile.objs
-index 0bc361d..018338d 100644
+index 1486254..259f993 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -19,7 +19,7 @@ block-obj-$(CONFIG_REPLICATION) += replication.o
+@@ -98,5 +98,4 @@ version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
+ # FIXME: a few definitions from qapi/qapi-types.o and
+ # qapi/qapi-visit.o are needed by libqemuutil.a.  These should be
+ # extracted into a QAPI schema module, or perhaps a separate schema.
+-qga-obj-y = qga/
+ qga-vss-dll-obj-y = qga/
+diff --git a/configure b/configure
+index b57968b..e0ef3f7 100755
+--- a/configure
++++ b/configure
+@@ -3949,7 +3949,6 @@ for i in $glib_modules; do
+         glib_libs=$($pkg_config --libs $i)
+         QEMU_CFLAGS="$glib_cflags $QEMU_CFLAGS"
+         LIBS="$glib_libs $LIBS"
+-        libs_qga="$glib_libs $libs_qga"
+     else
+         error_exit "glib-$glib_req_ver $i is required to compile QEMU"
+     fi
+@@ -5169,7 +5168,6 @@ if compile_prog "" "" ; then
+   :
+ elif compile_prog "" "-lm" ; then
+   LIBS="-lm $LIBS"
+-  libs_qga="-lm $libs_qga"
+ else
+   error_exit "libm check failed"
+ fi
+@@ -5194,7 +5192,6 @@ if compile_prog "" "" ; then
+ # we need pthread for static linking. use previous pthread test result
+ elif compile_prog "" "$pthread_lib -lrt" ; then
+   LIBS="$LIBS -lrt"
+-  libs_qga="$libs_qga -lrt"
+ fi
  
- block-obj-m = block/
- 
--crypto-obj-y = crypto/
-+crypto-obj-y = crypto/libcrypto.fa
- 
- io-obj-y = io/
- 
-diff --git a/Makefile.target b/Makefile.target
-index 79b6e02..b213955 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -193,12 +193,12 @@ common-obj-m :=
- include $(SRC_PATH)/Makefile.objs
- dummy := $(call fix-paths,../,, \
-               authz-obj-y \
-+              crypto-obj-y \
-               qom-obj-y)
- dummy := $(call unnest-vars,.., \
-                block-obj-y \
-                block-obj-m \
-                chardev-obj-y \
--               crypto-obj-y \
-                io-obj-y \
-                common-obj-y \
-                common-obj-m)
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-deleted file mode 100644
-index a988591..0000000
---- a/crypto/Makefile.objs
-+++ /dev/null
-@@ -1,37 +0,0 @@
--crypto-obj-y = init.o
--crypto-obj-y += hash.o
--crypto-obj-$(CONFIG_NETTLE) += hash-nettle.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += hash-gcrypt.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT),n,y)) += hash-glib.o
--crypto-obj-y += hmac.o
--crypto-obj-$(CONFIG_NETTLE) += hmac-nettle.o
--crypto-obj-$(CONFIG_GCRYPT_HMAC) += hmac-gcrypt.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += hmac-glib.o
--crypto-obj-y += aes.o
--crypto-obj-y += desrfb.o
--crypto-obj-y += cipher.o
--crypto-obj-$(CONFIG_AF_ALG) += afalg.o
--crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
--crypto-obj-$(CONFIG_AF_ALG) += hash-afalg.o
--crypto-obj-$(CONFIG_GNUTLS) += tls-cipher-suites.o
--crypto-obj-y += tlscreds.o
--crypto-obj-y += tlscredsanon.o
--crypto-obj-y += tlscredspsk.o
--crypto-obj-y += tlscredsx509.o
--crypto-obj-y += tlssession.o
--crypto-obj-y += secret_common.o
--crypto-obj-y += secret.o
--crypto-obj-$(CONFIG_SECRET_KEYRING) += secret_keyring.o
--crypto-obj-y += pbkdf.o
--crypto-obj-$(CONFIG_NETTLE) += pbkdf-nettle.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += pbkdf-gcrypt.o
--crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT),n,y)) += pbkdf-stub.o
--crypto-obj-y += ivgen.o
--crypto-obj-y += ivgen-essiv.o
--crypto-obj-y += ivgen-plain.o
--crypto-obj-y += ivgen-plain64.o
--crypto-obj-y += afsplit.o
--crypto-obj-$(CONFIG_QEMU_PRIVATE_XTS) += xts.o
--crypto-obj-y += block.o
--crypto-obj-y += block-qcow.o
--crypto-obj-y += block-luks.o
-diff --git a/crypto/meson.build b/crypto/meson.build
-index 1b24431..7aab8db 100644
---- a/crypto/meson.build
-+++ b/crypto/meson.build
-@@ -1,3 +1,55 @@
-+crypto_ss = ss.source_set()
-+crypto_ss.add(genh)
-+crypto_ss.add(files(
-+  'afsplit.c',
-+  'block-luks.c',
-+  'block-qcow.c',
-+  'block.c',
-+  'cipher.c',
-+  'desrfb.c',
-+  'hash.c',
-+  'hmac.c',
-+  'ivgen-essiv.c',
-+  'ivgen-plain.c',
-+  'ivgen-plain64.c',
-+  'ivgen.c',
-+  'pbkdf.c',
-+  'secret_common.c',
-+  'secret.c',
-+  'tlscreds.c',
-+  'tlscredsanon.c',
-+  'tlscredspsk.c',
-+  'tlscredsx509.c',
-+  'tlssession.c',
-+))
-+
-+if 'CONFIG_GCRYPT' in config_host
-+  wo_nettle = files('hash-gcrypt.c', 'pbkdf-gcrypt.c')
-+else
-+  wo_nettle = files('hash-glib.c', 'pbkdf-stub.c')
-+endif
-+if 'CONFIG_GCRYPT_HMAC' not in config_host
-+  wo_nettle += files('hmac-glib.c')
-+endif
-+crypto_ss.add(when: [nettle, 'CONFIG_NETTLE'],
-+             if_true: files('hash-nettle.c', 'hmac-nettle.c', 'pbkdf-nettle.c'),
-+             if_false: wo_nettle)
-+
-+crypto_ss.add(when: 'CONFIG_SECRET_KEYRING', if_true: files('secret_keyring.c'))
-+crypto_ss.add(when: 'CONFIG_QEMU_PRIVATE_XTS', if_true: files('xts.c'))
-+crypto_ss.add(when: 'CONFIG_GCRYPT_HMAC', if_true: files('hmac-gcrypt.c'))
-+crypto_ss.add(when: 'CONFIG_AF_ALG', if_true: files('afalg.c', 'cipher-afalg.c', 'hash-afalg.c'))
-+crypto_ss.add(when: 'CONFIG_GNUTLS', if_true: files('tls-cipher-suites.c'))
-+
-+crypto_ss = crypto_ss.apply(config_host, strict: false)
-+libcrypto = static_library('crypto', crypto_ss.sources(),
-+                           dependencies: [crypto_ss.dependencies()],
-+                           name_suffix: 'fa',
-+                           build_by_default: false)
-+
-+crypto = declare_dependency(link_whole: libcrypto,
-+                            dependencies: [authz, qom])
-+
- util_ss.add(files('aes.c'))
- util_ss.add(files('init.c'))
- if 'CONFIG_GCRYPT' in config_host
+ # Check whether we need to link libutil for openpty()
+@@ -6689,7 +6686,6 @@ if [ "$guest_agent" != "no" ]; then
+   if [ "$softmmu" = no -a "$want_tools" = no ] ; then
+       guest_agent=no
+   elif [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" -o "$mingw32" = "yes" ] ; then
+-      tools="qemu-ga\$(EXESUF) $tools"
+       guest_agent=yes
+   elif [ "$guest_agent" != yes ]; then
+       guest_agent=no
+@@ -6935,6 +6931,9 @@ fi
+ if test "$want_tools" = "yes" ; then
+   echo "CONFIG_TOOLS=y" >> $config_host_mak
+ fi
++if test "$guest_agent" = "yes" ; then
++  echo "CONFIG_GUEST_AGENT=y" >> $config_host_mak
++fi
+ if test "$slirp" != "no"; then
+   echo "CONFIG_SLIRP=y" >> $config_host_mak
+   echo "CONFIG_SMBD_COMMAND=\"$smbd\"" >> $config_host_mak
+@@ -7792,7 +7791,7 @@ echo "PTHREAD_LIB=$PTHREAD_LIB" >> $config_host_mak
+ echo "EXESUF=$EXESUF" >> $config_host_mak
+ echo "DSOSUF=$DSOSUF" >> $config_host_mak
+ echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
+-echo "LIBS_QGA+=$libs_qga" >> $config_host_mak
++echo "LIBS_QGA=$libs_qga" >> $config_host_mak
+ echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
+ echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
+ echo "POD2MAN=$POD2MAN" >> $config_host_mak
 diff --git a/meson.build b/meson.build
-index 81bd0d7..0864d07 100644
+index 21e822e..a68c7b4 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -300,6 +300,8 @@ subdir('qobject')
- subdir('stubs')
- subdir('trace')
- subdir('util')
-+subdir('qom')
-+subdir('authz')
- subdir('crypto')
- subdir('storage-daemon')
- subdir('ui')
-@@ -316,8 +318,6 @@ libqemuutil = static_library('qemuutil',
- qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: genh + version_res)
+@@ -111,6 +111,10 @@ if 'CONFIG_CURL' in config_host
+   curl = declare_dependency(compile_args: config_host['CURL_CFLAGS'].split(),
+                             link_args: config_host['CURL_LIBS'].split())
+ endif
++libudev = not_found
++if 'CONFIG_LIBUDEV' in config_host
++  libudev = declare_dependency(link_args: config_host['LIBUDEV_LIBS'].split())
++endif
  
--subdir('qom')
--subdir('authz')
- subdir('fsdev')
+ target_dirs = config_host['TARGET_DIRS'].split()
+ have_user = false
+@@ -125,13 +129,23 @@ have_block = have_system or have_tools
+ # Generators
+ 
+ qapi_gen = find_program('scripts/qapi-gen.py')
+-qapi_gen_depends = [ meson.source_root() / 'scripts/qapi/events.py',
++qapi_gen_depends = [ meson.source_root() / 'scripts/qapi/__init__.py',
++                     meson.source_root() / 'scripts/qapi/commands.py',
++                     meson.source_root() / 'scripts/qapi/common.py',
++                     meson.source_root() / 'scripts/qapi/doc.py',
++                     meson.source_root() / 'scripts/qapi/error.py',
++                     meson.source_root() / 'scripts/qapi/events.py',
++                     meson.source_root() / 'scripts/qapi/expr.py',
++                     meson.source_root() / 'scripts/qapi/gen.py',
+                      meson.source_root() / 'scripts/qapi/introspect.py',
++                     meson.source_root() / 'scripts/qapi/parser.py',
++                     meson.source_root() / 'scripts/qapi/schema.py',
++                     meson.source_root() / 'scripts/qapi/source.py',
+                      meson.source_root() / 'scripts/qapi/types.py',
+                      meson.source_root() / 'scripts/qapi/visit.py',
+                      meson.source_root() / 'scripts/qapi/common.py',
+                      meson.source_root() / 'scripts/qapi/doc.py',
+-                     meson.source_root() / 'scripts/qapi-gen.py' ]
++]
+ 
+ # Collect sourcesets.
+ 
+@@ -257,6 +271,10 @@ qemuutil = declare_dependency(link_with: libqemuutil,
  
  # Other build targets
-diff --git a/qom/meson.build b/qom/meson.build
-index 3c41ed3..4af044d 100644
---- a/qom/meson.build
-+++ b/qom/meson.build
-@@ -1,4 +1,5 @@
- qom_ss = ss.source_set()
-+qom_ss.add(genh)
- qom_ss.add(files(
-   'container.c',
-   'object.c',
-@@ -9,7 +10,6 @@ qom_ss.add(files(
- qom_ss = qom_ss.apply(config_host, strict: false)
- libqom = static_library('qom', qom_ss.sources(),
-                         dependencies: [qom_ss.dependencies()],
--                        link_with: [libqemuutil],
-                         name_suffix: 'fa')
  
- qom = declare_dependency(link_whole: libqom)
++if 'CONFIG_GUEST_AGENT' in config_host
++  subdir('qga')
++endif
++
+ if have_tools
+   subdir('contrib/rdmacm-mux')
+   subdir('contrib/elf2dmp')
+diff --git a/qga/Makefile.objs b/qga/Makefile.objs
+index 9c558ae..9ecf249 100644
+--- a/qga/Makefile.objs
++++ b/qga/Makefile.objs
+@@ -1,10 +1 @@
+-commands-posix.o-libs := $(LIBUDEV_LIBS)
+-qga-obj-y = commands.o guest-agent-command-state.o main.o
+-qga-obj-$(CONFIG_POSIX) += commands-posix.o channel-posix.o
+-qga-obj-$(CONFIG_WIN32) += commands-win32.o channel-win32.o service-win32.o
+-qga-obj-$(CONFIG_WIN32) += vss-win32.o
+-qga-obj-y += qapi-generated/qga-qapi-types.o qapi-generated/qga-qapi-visit.o
+-qga-obj-y += qapi-generated/qga-qapi-commands.o
+-qga-obj-y += qapi-generated/qga-qapi-init-commands.o
+-
+ qga-vss-dll-obj-$(CONFIG_QGA_VSS) += vss-win32/
+diff --git a/qga/installer/qemu-ga.wxs b/qga/installer/qemu-ga.wxs
+index f678175..9cb4c3d 100644
+--- a/qga/installer/qemu-ga.wxs
++++ b/qga/installer/qemu-ga.wxs
+@@ -66,7 +66,7 @@
+       <Directory Id="$(var.GaProgramFilesFolder)" Name="QEMU Guest Agent">
+         <Directory Id="qemu_ga_directory" Name="Qemu-ga">
+           <Component Id="qemu_ga" Guid="{908B7199-DE2A-4DC6-A8D0-27A5AE444FEA}">
+-            <File Id="qemu_ga.exe" Name="qemu-ga.exe" Source="$(env.BUILD_DIR)/qemu-ga.exe" KeyPath="yes" DiskId="1"/>
++            <File Id="qemu_ga.exe" Name="qemu-ga.exe" Source="$(env.BUILD_DIR)/qga/qemu-ga.exe" KeyPath="yes" DiskId="1"/>
+             <ServiceInstall
+               Id="ServiceInstaller"
+               Type="ownProcess"
+diff --git a/qga/meson.build b/qga/meson.build
+new file mode 100644
+index 0000000..e963e43
+--- /dev/null
++++ b/qga/meson.build
+@@ -0,0 +1,45 @@
++qga_qapi_outputs = [
++  'qga-qapi-commands.c',
++  'qga-qapi-commands.h',
++  'qga-qapi-doc.texi',
++  'qga-qapi-emit-events.c',
++  'qga-qapi-emit-events.h',
++  'qga-qapi-events.c',
++  'qga-qapi-events.h',
++  'qga-qapi-init-commands.c',
++  'qga-qapi-init-commands.h',
++  'qga-qapi-introspect.c',
++  'qga-qapi-introspect.h',
++  'qga-qapi-types.c',
++  'qga-qapi-types.h',
++  'qga-qapi-visit.c',
++  'qga-qapi-visit.h',
++]
++
++qga_qapi_files = custom_target('QGA QAPI files',
++                               output: qga_qapi_outputs,
++                               input: 'qapi-schema.json',
++                               command: [ qapi_gen, '-o', 'qga', '-p', 'qga-', '@INPUT0@' ],
++                               depend_files: qapi_gen_depends)
++qga_ss = ss.source_set()
++qga_ss.add(qga_qapi_files)
++qga_ss.add(files(
++  'commands.c',
++  'guest-agent-command-state.c',
++  'main.c',
++))
++qga_ss.add(when: 'CONFIG_POSIX', if_true: files(
++  'channel-posix.c',
++  'commands-posix.c'))
++qga_ss.add(when: 'CONFIG_WIN32', if_true: files(
++  'channel-win32.c',
++  'commands-win32.c',
++  'service-win32.c',
++  'vss-win32.c'
++))
++
++qga_ss = qga_ss.apply(config_host, strict: false)
++
++qga = executable('qemu-ga', qga_ss.sources(),
++                 link_args: config_host['LIBS_QGA'].split(),
++                 dependencies: [qemuutil, libudev])
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 5e9dff9..1a20657 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -129,7 +129,7 @@ ifndef CONFIG_TSAN
+ # https://github.com/google/sanitizers/issues/1116
+ check-unit-$(CONFIG_SOFTMMU) += tests/test-char$(EXESUF)
+ check-unit-$(CONFIG_SOFTMMU) += tests/test-qdev-global-props$(EXESUF)
+-ifneq (,$(findstring qemu-ga,$(TOOLS)))
++ifeq ($(CONFIG_GUEST_AGENT),y)
+ check-unit-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) += tests/test-qga$(EXESUF)
+ endif
+ endif
+@@ -603,7 +603,7 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+ 
+ include $(SRC_PATH)/tests/qtest/Makefile.include
+ 
+-tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
++tests/test-qga$(EXESUF): qga/qemu-ga$(EXESUF)
+ tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+ tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-obj-y) libvhost-user.a
+ tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index d2b2435..d1b4c3e 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -61,8 +61,8 @@ fixture_setup(TestFixture *fixture, gconstpointer data, gchar **envp)
+ 
+     path = g_build_filename(fixture->test_dir, "sock", NULL);
+     cwd = g_get_current_dir();
+-    cmd = g_strdup_printf("%s%cqemu-ga -m unix-listen -t %s -p %s %s %s",
+-                          cwd, G_DIR_SEPARATOR,
++    cmd = g_strdup_printf("%s%cqga%cqemu-ga -m unix-listen -t %s -p %s %s %s",
++                          cwd, G_DIR_SEPARATOR, G_DIR_SEPARATOR,
+                           fixture->test_dir, path,
+                           getenv("QTEST_LOG") ? "-v" : "",
+                           extra_arg ?: "");
+@@ -699,8 +699,8 @@ static void test_qga_config(gconstpointer data)
+     GKeyFile *kf;
+ 
+     cwd = g_get_current_dir();
+-    cmd = g_strdup_printf("%s%cqemu-ga -D",
+-                          cwd, G_DIR_SEPARATOR);
++    cmd = g_strdup_printf("%s%cqga%cqemu-ga -D",
++                          cwd, G_DIR_SEPARATOR, G_DIR_SEPARATOR);
+     g_free(cwd);
+     g_shell_parse_argv(cmd, NULL, &argv, &error);
+     g_free(cmd);
 -- 
 1.8.3.1
 
