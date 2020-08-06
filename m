@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C59D6C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D777C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:11:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B040D221E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:11:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65563221E3
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:11:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R7Uvjyqo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B040D221E2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GChApvAb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65563221E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3mEb-0005Gs-QH
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:11:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44118)
+	id 1k3mEx-0005n2-GW
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:11:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lQf-0001qS-An
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59854
+ id 1k3lR9-0002qa-0B
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38183
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lQd-0006ng-C3
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:19:52 -0400
+ id 1k3lR6-0006tK-T0
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741590;
+ s=mimecast20190719; t=1596741619;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XhQB4ICFW6AJbBPIjPKbDMY18H8bit53HVqzaUS2BM0=;
- b=R7UvjyqoIwM4iQWmmUWagPbm6Xws4xaZwJF+gnXFt1tGg+wSafgeGbMZMJKLlnpVKYry9Y
- zRrOhGn0C5se0vEffAUh2fugPmUrTNjrhNF4AKVR7JvahMaZ/tVJKjr6iIK66cDqpe0nd8
- IbuLqTy9OzlCNX0iJv9atkgXVhTzdgQ=
+ bh=IpCi4eicWzIIJfV5PLCWS1/H8uRwNMEo+ueEnvQ7sws=;
+ b=GChApvAbeGVVwV69F7GEHQjFgXyGryI3aoPf+W7V1RvVyeczPsYKk4fue17ADlLsX1j9Zi
+ JbwLS5v6ETcG+pckQdsvfED7c3k1wrqBrxOGe5gPhynnG332orZhbeidmt2J2ILg1+F/Ce
+ kCiZBs0W5dZ7sBqlNxVzLlCmNRf60dQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-rcoLJU3EPvW8mF-SOdcF9Q-1; Thu, 06 Aug 2020 15:19:48 -0400
-X-MC-Unique: rcoLJU3EPvW8mF-SOdcF9Q-1
+ us-mta-316-tPP6DG3dPoW2TXaAzVx6Yw-1; Thu, 06 Aug 2020 15:20:18 -0400
+X-MC-Unique: tPP6DG3dPoW2TXaAzVx6Yw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22C4919200C2
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:19:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45203100AA21
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:20:17 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3439A5FC30;
- Thu,  6 Aug 2020 19:19:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AEA5C5F9DC;
+ Thu,  6 Aug 2020 19:20:12 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 113/143] meson: convert hw/gpio
-Date: Thu,  6 Aug 2020 21:15:49 +0200
-Message-Id: <1596741379-12902-114-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 127/143] meson: bsd-user
+Date: Thu,  6 Aug 2020 21:16:03 +0200
+Message-Id: <1596741379-12902-128-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -106,72 +106,69 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/gpio/Makefile.objs | 12 ------------
- hw/gpio/meson.build   | 12 ++++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 13 insertions(+), 13 deletions(-)
- delete mode 100644 hw/gpio/Makefile.objs
- create mode 100644 hw/gpio/meson.build
+ Makefile.target        |  3 ---
+ bsd-user/Makefile.objs |  2 --
+ bsd-user/meson.build   | 10 ++++++++++
+ meson.build            |  4 ++++
+ 4 files changed, 14 insertions(+), 5 deletions(-)
+ delete mode 100644 bsd-user/Makefile.objs
+ create mode 100644 bsd-user/meson.build
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index a2c2f6d..c04dfe5 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -8,7 +8,6 @@ devices-dirs-y += char/
- devices-dirs-y += cpu/
- devices-dirs-y += display/
- devices-dirs-y += dma/
--devices-dirs-y += gpio/
- endif
+diff --git a/Makefile.target b/Makefile.target
+index a68859d..5c099fa 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -141,9 +141,6 @@ ifdef CONFIG_BSD_USER
+ QEMU_CFLAGS+=-I$(SRC_PATH)/bsd-user -I$(SRC_PATH)/bsd-user/$(TARGET_ABI_DIR) \
+ 			 -I$(SRC_PATH)/bsd-user/$(HOST_VARIANT_DIR)
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
-deleted file mode 100644
-index 3cfc261..0000000
---- a/hw/gpio/Makefile.objs
-+++ /dev/null
-@@ -1,12 +0,0 @@
--common-obj-$(CONFIG_MAX7310) += max7310.o
--common-obj-$(CONFIG_PL061) += pl061.o
--common-obj-$(CONFIG_PUV3) += puv3_gpio.o
--common-obj-$(CONFIG_ZAURUS) += zaurus.o
--common-obj-$(CONFIG_E500) += mpc8xxx.o
--common-obj-$(CONFIG_GPIO_KEY) += gpio_key.o
+-obj-y += bsd-user/
+-obj-y += gdbstub.o
 -
--common-obj-$(CONFIG_OMAP) += omap_gpio.o
--common-obj-$(CONFIG_IMX) += imx_gpio.o
--common-obj-$(CONFIG_RASPI) += bcm2835_gpio.o
--common-obj-$(CONFIG_NRF51_SOC) += nrf51_gpio.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_gpio.o
-diff --git a/hw/gpio/meson.build b/hw/gpio/meson.build
+ endif #CONFIG_BSD_USER
+ 
+ #########################################################
+diff --git a/bsd-user/Makefile.objs b/bsd-user/Makefile.objs
+deleted file mode 100644
+index 5e77f57..0000000
+--- a/bsd-user/Makefile.objs
++++ /dev/null
+@@ -1,2 +0,0 @@
+-obj-y = main.o bsdload.o elfload.o mmap.o signal.o strace.o syscall.o \
+-	        uaccess.o
+diff --git a/bsd-user/meson.build b/bsd-user/meson.build
 new file mode 100644
-index 0000000..6bcdfa6
+index 0000000..0369549
 --- /dev/null
-+++ b/hw/gpio/meson.build
-@@ -0,0 +1,12 @@
-+softmmu_ss.add(when: 'CONFIG_E500', if_true: files('mpc8xxx.c'))
-+softmmu_ss.add(when: 'CONFIG_GPIO_KEY', if_true: files('gpio_key.c'))
-+softmmu_ss.add(when: 'CONFIG_MAX7310', if_true: files('max7310.c'))
-+softmmu_ss.add(when: 'CONFIG_PL061', if_true: files('pl061.c'))
-+softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_gpio.c'))
-+softmmu_ss.add(when: 'CONFIG_ZAURUS', if_true: files('zaurus.c'))
++++ b/bsd-user/meson.build
+@@ -0,0 +1,10 @@
++bsd_user_ss.add(files(
++  'bsdload.c',
++  'elfload.c',
++  'main.c',
++  'mmap.c',
++  'signal.c',
++  'strace.c',
++  'syscall.c',
++  'uaccess.c',
++))
+diff --git a/meson.build b/meson.build
+index 483e65f..e1d7672 100644
+--- a/meson.build
++++ b/meson.build
+@@ -678,8 +678,12 @@ subdir('net')
+ subdir('replay')
+ subdir('hw')
+ subdir('accel')
++subdir('bsd-user')
+ subdir('linux-user')
+ 
++bsd_user_ss.add(files('gdbstub.c'))
++specific_ss.add_all(when: 'CONFIG_BSD_USER', if_true: bsd_user_ss)
 +
-+softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_gpio.c'))
-+softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_gpio.c'))
-+softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_gpio.c'))
-+softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_gpio.c'))
-+softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_gpio.c'))
-diff --git a/hw/meson.build b/hw/meson.build
-index f9e5adf..52577c3 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('gpio')
- subdir('hyperv')
- subdir('i2c')
- subdir('ide')
+ linux_user_ss.add(files('gdbstub.c', 'thunk.c'))
+ specific_ss.add_all(when: 'CONFIG_LINUX_USER', if_true: linux_user_ss)
+ 
 -- 
 1.8.3.1
 
