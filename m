@@ -2,98 +2,55 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3814DC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:31:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB449C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:32:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19F0020855
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:31:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UyxtZzsb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F0020855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id B7FA820855
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:32:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7FA820855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3mXi-0007PX-63
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:31:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53212)
+	id 1k3mYS-0000Nx-Se
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:32:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3mEw-0006H0-38
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 16:11:50 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45489)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3mEu-0004Bh-Hi
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 16:11:49 -0400
-Received: by mail-wr1-x443.google.com with SMTP id z18so41605893wrm.12
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 13:11:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=yGznpTt9hNOsMnxk5jyKH9aLtAcYOTWPD2BmiJHoX8g=;
- b=UyxtZzsb4an5A/RvDO0Y35juCnxDQQxR1eUEA1F4wNHbTaRMGvJdIU2mISnUWhZL6J
- pq8aIqCUQhmr80lHupJwOtWyoWjcftt2pYbL2/llqdG+D6an2HUVc1c8g0THTIOokisq
- 6OPxM0wWNuGH54OyperJfjAmThijop9A5xWRijCMhwvudmVCHKlo0zwopaCmxwrsnoDd
- vsuDqVOk4RpeyuDfHOfKCgFzkLApXa9MUgORQVCKkT++ZyjhgCFOnasaNfaoQHT9pCdg
- OCuhzjgPQmxG6Uv/uWNulfhxS2Y1Kr2A6G87XIoRetJgpwBiLCuefTYtdwD3ttCUYL6b
- p8Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=yGznpTt9hNOsMnxk5jyKH9aLtAcYOTWPD2BmiJHoX8g=;
- b=qYJjZEaePlA4zPE3Uh7izFxgWaILDJ+qYfv0bNHFrgHpdGgkK8zDYs39uU5NVAsWm3
- 5oKFCcE0GXJvBN1H4/kR7KcFNZqTMwuHZXbBcPc0vGpA1/YjQ0XbM/2MCc+gDRkw+QBs
- hK8t6IHva5lNMj7nRXVf5Fes0GJySs0mWAUPLi/HCEnAYe+kig5Nujb4pk/KowmkzO9S
- aCToxJphpeUKi/bQthBgZ3N9ZB4P61IYSJW5v/7gSEGm8urFgjg7/X3rIs8GUeGWbnqP
- jwKuEU3ApZxTZzfLxI68HD/ALY4FGaNm6WxsqEfXoWjBvkhxY3SWxTv2KJl7dsrKRDKP
- 0Jug==
-X-Gm-Message-State: AOAM531auxEVEc8CgPke+3Ax8uUNW4VUZ4uHMxjim1c9SRTl2jnknsEk
- bBwGbRG63QzTM1WQFtvQC2g=
-X-Google-Smtp-Source: ABdhPJxzQt5ablqWdzfoAhNNxZ+7S/K4ahux7pA/Fl/qH+ifxxJUF2+LcXMqh+iUsaAInSQOpsRRNA==
-X-Received: by 2002:adf:ded0:: with SMTP id i16mr8792100wrn.389.1596744706587; 
- Thu, 06 Aug 2020 13:11:46 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id o125sm8586969wma.27.2020.08.06.13.11.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 06 Aug 2020 13:11:44 -0700 (PDT)
-Subject: Re: [PATCH-for-5.2] target/mips: Report unimplemented cache()
- operations
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-devel@nongnu.org
-References: <20200806122612.17167-1-f4bug@amsat.org>
- <e55da0ff-e88c-f2f4-0430-32255f7e58fe@flygoat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ec0ff553-a5e7-6c93-5ab3-093721b044a6@amsat.org>
-Date: Thu, 6 Aug 2020 22:11:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <e55da0ff-e88c-f2f4-0430-32255f7e58fe@flygoat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k3lgf-00038m-6D; Thu, 06 Aug 2020 15:36:25 -0400
+Received: from relay.sw.ru ([185.231.240.75]:56462 helo=relay3.sw.ru)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k3lgd-0000Kp-4E; Thu, 06 Aug 2020 15:36:24 -0400
+Received: from [172.16.25.136] (helo=localhost.sw.ru)
+ by relay3.sw.ru with esmtp (Exim 4.93)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1k3lgB-0003k9-Si; Thu, 06 Aug 2020 22:35:55 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v13 06/11] qcow2_format.py: pass cluster size to substructures
+Date: Thu,  6 Aug 2020 22:35:52 +0300
+Message-Id: <1596742557-320265-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1596742557-320265-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1596742557-320265-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Received-SPF: pass client-ip=185.231.240.75;
+ envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 15:35:59
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,66 +63,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhc@lemote.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/6/20 8:01 PM, Jiaxun Yang wrote:
-> 在 2020/8/6 下午8:26, Philippe Mathieu-Daudé 写道:
->> We only implement the Index[Store/Load]Tag from the 'cache' opcode.
->> Instead of ignoring the other cache operations, report them as
->> unimplemented.
-> 
-> Hmm, I don't think we have anything to do with Invalidate/Writeback etc.
-> opcodes
-> in QEMU. Why do we log this?
+The cluster size of an image is the QcowHeader class member and may be
+obtained by dependent extension structures such as Qcow2BitmapExt for
+further bitmap table details print.
 
-I'm noticed this code is run on Linux 3.3.8 (4KEc):
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/qcow2_format.py | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-    8880:       3082000f        andi    v0,a0,0xf
-    8884:       10800008        beqz    a0,88a8
-    8888:       00a21021        addu    v0,a1,v0
-    888c:       08002227        j       889c
-    8890:       00001821        move    v1,zero
-    8894:       bcf90000        cache   0x19,0(a3)
-    8898:       24630010        addiu   v1,v1,16
-    889c:       0062302b        sltu    a2,v1,v0
-    88a0:       14c0fffc        bnez    a2,8894
-    88a4:       00833821        addu    a3,a0,v1
-    88a8:       03e00008        jr      ra
-    88ac:       00000000        nop
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+index 05a8aa9..ca0d350 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -129,19 +129,21 @@ class Qcow2BitmapExt(Qcow2Struct):
+         ('u64', '{:#x}', 'bitmap_directory_offset')
+     )
+ 
+-    def __init__(self, fd):
++    def __init__(self, fd, cluster_size):
+         super().__init__(fd=fd)
+         tail = struct.calcsize(self.fmt) % 8
+         if tail:
+             fd.seek(8 - tail, 1)
+         position = fd.tell()
++        self.cluster_size = cluster_size
+         self.read_bitmap_directory(fd)
+         fd.seek(position)
+ 
+     def read_bitmap_directory(self, fd):
+         fd.seek(self.bitmap_directory_offset)
+         self.bitmap_directory = \
+-            [Qcow2BitmapDirEntry(fd) for _ in range(self.nb_bitmaps)]
++            [Qcow2BitmapDirEntry(fd, cluster_size=self.cluster_size)
++             for _ in range(self.nb_bitmaps)]
+ 
+     def dump(self):
+         super().dump()
+@@ -162,8 +164,9 @@ class Qcow2BitmapDirEntry(Qcow2Struct):
+         ('u32', '{}', 'extra_data_size')
+     )
+ 
+-    def __init__(self, fd):
++    def __init__(self, fd, cluster_size):
+         super().__init__(fd=fd)
++        self.cluster_size = cluster_size
+         # Seek relative to the current position in the file
+         fd.seek(self.extra_data_size, 1)
+         bitmap_name = fd.read(self.name_size)
+@@ -203,11 +206,13 @@ class QcowHeaderExtension(Qcow2Struct):
+         # then padding to next multiply of 8
+     )
+ 
+-    def __init__(self, magic=None, length=None, data=None, fd=None):
++    def __init__(self, magic=None, length=None, data=None, fd=None,
++                 cluster_size=None):
+         """
+         Support both loading from fd and creation from user data.
+         For fd-based creation current position in a file will be used to read
+         the data.
++        The cluster_size value may be obtained by dependent structures.
+ 
+         This should be somehow refactored and functionality should be moved to
+         superclass (to allow creation of any qcow2 struct), but then, fields
+@@ -230,7 +235,7 @@ class QcowHeaderExtension(Qcow2Struct):
+             assert all(v is None for v in (magic, length, data))
+             super().__init__(fd=fd)
+             if self.magic == QCOW2_EXT_MAGIC_BITMAPS:
+-                self.obj = Qcow2BitmapExt(fd=fd)
++                self.obj = Qcow2BitmapExt(fd=fd, cluster_size=cluster_size)
+                 self.data = None
+             else:
+                 padded = (self.length + 7) & ~7
+@@ -319,7 +324,7 @@ class QcowHeader(Qcow2Struct):
+             end = self.cluster_size
+ 
+         while fd.tell() < end:
+-            ext = QcowHeaderExtension(fd=fd)
++            ext = QcowHeaderExtension(fd=fd, cluster_size=self.cluster_size)
+             if ext.magic == 0:
+                 break
+             else:
+-- 
+1.8.3.1
 
-Why silently ignore the opcode is not implemented instead of logging it?
-
-> 
-> Thanks.
-> 
-> - Jiaxun
-> 
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   target/mips/op_helper.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
->> index 9552b280e0..7f87e57c8e 100644
->> --- a/target/mips/op_helper.c
->> +++ b/target/mips/op_helper.c
->> @@ -1583,6 +1583,8 @@ void helper_cache(CPUMIPSState *env,
->> target_ulong addr, uint32_t op)
->>           /* Index Load Tag */
->>           memory_region_dispatch_read(env->itc_tag, index,
->> &env->CP0_TagLo,
->>                                       MO_64, MEMTXATTRS_UNSPECIFIED);
->> +    } else {
->> +        qemu_log_mask(LOG_UNIMP, "cache %u\n", op);
->>       }
->>   #endif
->>   }
-> 
 
