@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A672C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54959C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:52:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FDAF2173E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:52:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 468852173E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:52:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fC7C+FXt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FDAF2173E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iRCNyIoB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 468852173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3lvj-0000tW-6o
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:51:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43622)
+	id 1k3lvz-0001Nk-8H
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:52:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lPa-0007WU-P0
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27128
+ id 1k3lPY-0007Qe-IV
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34453
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lPY-0006g5-S0
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:46 -0400
+ id 1k3lPW-0006fr-9w
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:18:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741524;
+ s=mimecast20190719; t=1596741521;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0UaVS/O2UMjZawLBSRCIvq5m68pmtVNluuu280xtuVY=;
- b=fC7C+FXtIGxlFIGwqFV1I/Dx4tzEWLT26qWePINvbxHljxbJoBxi67xhZk086SGs9axWnq
- N+QIM3uW9swRcPSWNZw90f06rOdCKw0fBsep0JjXTFATJIgD75dFzmwKjv3cJhO04RZu7+
- FQFyK52AKxC4SgrnCsIjqgHBG91Hpx8=
+ bh=A9hI4Ze5jUncLYuHr2oKBvH4CYKaDNgLkBHdCA49jHM=;
+ b=iRCNyIoBoFFUgT25oTQbG9S1vfzRpzKa6b7y1rvf+VAi2SW9KkNsTJwcEO0z61D67qMIGx
+ KDDSm2b7tJEYX4fxXpOfWbLrJulysvRrqAZ8EHzAHofAeuQoj5AxpfZaxUxRHzbYcMc5Go
+ z1ClTTF3AYNzh5Z3UmJa2W5XYC9Lu70=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-71-z4uI4Aa0MfWGYVNcl9lKCA-1; Thu, 06 Aug 2020 15:18:42 -0400
-X-MC-Unique: z4uI4Aa0MfWGYVNcl9lKCA-1
+ us-mta-145-pL1UuROoM3GB2f3Gwn_iWg-1; Thu, 06 Aug 2020 15:18:39 -0400
+X-MC-Unique: pL1UuROoM3GB2f3Gwn_iWg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB9E41800D42
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:18:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09A648014C1
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:18:39 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CBF0C5F9DC;
- Thu,  6 Aug 2020 19:18:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 193585F9DC;
+ Thu,  6 Aug 2020 19:18:37 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 080/143] meson: convert qapi-specific to meson
-Date: Thu,  6 Aug 2020 21:15:16 +0200
-Message-Id: <1596741379-12902-81-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 078/143] meson: convert fsdev/
+Date: Thu,  6 Aug 2020 21:15:14 +0200
+Message-Id: <1596741379-12902-79-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -107,79 +107,63 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs      |  2 --
- Makefile.target    |  1 -
- qapi/Makefile.objs | 15 ---------------
- qapi/meson.build   | 10 +++++++---
- 4 files changed, 7 insertions(+), 21 deletions(-)
- delete mode 100644 qapi/Makefile.objs
+ Makefile.objs       |  4 +---
+ fsdev/Makefile.objs | 12 ------------
+ fsdev/meson.build   | 10 ++++++++++
+ 3 files changed, 11 insertions(+), 15 deletions(-)
+ delete mode 100644 fsdev/Makefile.objs
 
 diff --git a/Makefile.objs b/Makefile.objs
-index 4959d62..965f64c 100644
+index 65b0ae6..79812c4 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -63,8 +63,6 @@ common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF
- common-obj-y += hw/
- common-obj-m += hw/
+@@ -38,9 +38,7 @@ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
+ # single QEMU executable should support all CPUs and machines.
  
--common-obj-y += qapi/
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-$(CONFIG_LINUX) = fsdev/
 -
- common-obj-y += libqmp.fa
+-common-obj-y += accel/
++common-obj-y = accel/
  
- endif # CONFIG_SOFTMMU
-diff --git a/Makefile.target b/Makefile.target
-index bf3fda9..386378b 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -157,7 +157,6 @@ ifdef CONFIG_SOFTMMU
- obj-y += softmmu/
- obj-y += gdbstub.o
- obj-y += hw/
--obj-y += qapi/
- LIBS := $(libs_softmmu) $(LIBS)
- 
- # Temporary until emulators are linked by Meson
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+ common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
+ common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
+diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
 deleted file mode 100644
-index c0a31be..0000000
---- a/qapi/Makefile.objs
+index 42cd70c..0000000
+--- a/fsdev/Makefile.objs
 +++ /dev/null
-@@ -1,15 +0,0 @@
--QAPI_TARGET_MODULES = machine-target misc-target
+@@ -1,12 +0,0 @@
+-# Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+-# only pull in the actual 9p backend if we also enabled virtio or xen.
+-ifeq ($(CONFIG_FSDEV_9P),y)
+-common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+-else
+-common-obj-y = qemu-fsdev-dummy.o
+-endif
+-common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
 -
--obj-y = qapi-introspect.o
--obj-y += $(QAPI_TARGET_MODULES:%=qapi-types-%.o)
--obj-y += qapi-types.o
--obj-y += $(QAPI_TARGET_MODULES:%=qapi-visit-%.o)
--obj-y += qapi-visit.o
--obj-y += $(QAPI_TARGET_MODULES:%=qapi-events-%.o)
--obj-y += qapi-events.o
--obj-y += $(QAPI_TARGET_MODULES:%=qapi-commands-%.o)
--obj-y += qapi-commands.o
--obj-y += qapi-init-commands.o
--
--QAPI_MODULES_STORAGE_DAEMON = block-core char common control crypto
--QAPI_MODULES_STORAGE_DAEMON += introspect job qom sockets pragma transaction
-diff --git a/qapi/meson.build b/qapi/meson.build
-index 51d11ce..de5b16f 100644
---- a/qapi/meson.build
-+++ b/qapi/meson.build
-@@ -113,8 +113,12 @@ foreach output : qapi_util_outputs
-   i = i + 1
- endforeach
- 
--# These are still handled by the Makefile
--i += qapi_nonmodule_outputs.length()
--i += qapi_specific_outputs.length()
-+foreach output : qapi_specific_outputs + qapi_nonmodule_outputs
-+  if output.endswith('.h')
-+    genh += qapi_files[i]
-+  endif
-+  specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: qapi_files[i])
-+  i = i + 1
-+endforeach
- 
- qapi_doc_texi = qapi_files[i]
+-# Toplevel always builds this; targets without virtio will put it in
+-# common-obj-y
+-common-obj-$(CONFIG_ALL) += qemu-fsdev-dummy.o
+diff --git a/fsdev/meson.build b/fsdev/meson.build
+index d0daa2a..656dff6 100644
+--- a/fsdev/meson.build
++++ b/fsdev/meson.build
+@@ -1,3 +1,13 @@
++fsdev_ss = ss.source_set()
++fsdev_ss.add(files('qemu-fsdev-opts.c', 'qemu-fsdev-throttle.c'))
++fsdev_ss.add(when: 'CONFIG_ALL', if_true: files('qemu-fsdev-dummy.c'))
++fsdev_ss.add(when: ['CONFIG_FSDEV_9P'], if_true: files(
++  '9p-iov-marshal.c',
++  '9p-marshal.c',
++  'qemu-fsdev.c',
++), if_false: files('qemu-fsdev-dummy.c'))
++softmmu_ss.add_all(when: 'CONFIG_LINUX', if_true: fsdev_ss)
++
+ have_virtfs_proxy_helper = have_tools and libattr.found() and libcap_ng.found() and 'CONFIG_VIRTFS' in config_host
+ if have_virtfs_proxy_helper
+   executable('virtfs-proxy-helper', files('virtfs-proxy-helper.c', '9p-marshal.c', '9p-iov-marshal.c'),
 -- 
 1.8.3.1
 
