@@ -7,61 +7,62 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72668C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:20:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A19F2C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:21:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59FC22177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:20:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8727720748
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 20:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KHd6+hyy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59FC22177B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="drEP5YHO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8727720748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3mMx-0004fE-EJ
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:20:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44570)
+	id 1k3mOb-0007MY-ME
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 16:21:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lRE-00030c-8p
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32086)
+ id 1k3lRV-0003hB-Lj
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52575
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lRB-0006uz-QT
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:27 -0400
+ id 1k3lRT-00072b-GD
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:20:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741624;
+ s=mimecast20190719; t=1596741642;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IScVnqdJgmrqt1snimRRJFoeT095pzDRUUa9d6shcZ8=;
- b=KHd6+hyyoQM4rY35/fttrL5U04Sqng9Wb/hvt6PRcsdUCx76HjTOZlaEXTNw5IIRBYVT7p
- k2+11AZGGm32ic4eSMwIQ70YinljH2WdOhnyWLOoWy8Xw3yGCQC5gyenhCgs/kijRWGAJx
- ac9dUxaaGkGUhOHqt0nlOwQx7sZX8uI=
+ bh=QJSznbkveqHZy1ZCwpS0XtEIBD4bn2D4dFM41W+z/i8=;
+ b=drEP5YHOfbUnL8XjzPTHZKe3DQ0cGJNeOj+StVFqP10HUv+a+EZcsqH3qF8UEZqsaognjH
+ 5W6ny6T45aovwN2/FAAf6WA6hS8zfncbsB7hlKtHgTbFPwup4raDjrXWKnQ3pg2FzOH1YJ
+ 16G2+YUjyTtIA8aC/UVsuGEJy3NqWIU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-QCe1HqHVOjCxaF5Pcw_vAQ-1; Thu, 06 Aug 2020 15:20:23 -0400
-X-MC-Unique: QCe1HqHVOjCxaF5Pcw_vAQ-1
+ us-mta-219-HBBHk_bBPZGx3FH747c-mw-1; Thu, 06 Aug 2020 15:20:40 -0400
+X-MC-Unique: HBBHk_bBPZGx3FH747c-mw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CB641DE6
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:20:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF4878014C1
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:20:39 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7D82569315;
- Thu,  6 Aug 2020 19:20:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2A7115FC30;
+ Thu,  6 Aug 2020 19:20:34 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 131/143] meson: convert systemtap files
-Date: Thu,  6 Aug 2020 21:16:07 +0200
-Message-Id: <1596741379-12902-132-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 142/143] meson: convert po/
+Date: Thu,  6 Aug 2020 21:16:18 +0200
+Message-Id: <1596741379-12902-143-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -72,16 +73,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 13:48:01
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,190 +107,240 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.target   | 85 ++-----------------------------------------------------
- meson.build       | 26 +++++++++++++++++
- rules.mak         |  3 --
- trace/meson.build | 14 ++++-----
- 4 files changed, 35 insertions(+), 93 deletions(-)
+ Makefile       |  5 +---
+ configure      |  2 +-
+ meson.build    |  3 +++
+ po/LINGUAS     |  7 ++++++
+ po/Makefile    | 52 -----------------------------------------
+ po/POTFILES    |  1 +
+ po/meson.build |  5 ++++
+ po/messages.po | 74 ----------------------------------------------------------
+ 8 files changed, 18 insertions(+), 131 deletions(-)
+ create mode 100644 po/LINGUAS
+ delete mode 100644 po/Makefile
+ create mode 100644 po/POTFILES
+ create mode 100644 po/meson.build
+ delete mode 100644 po/messages.po
 
-diff --git a/Makefile.target b/Makefile.target
-index 8ee4c78..a07149c 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -6,88 +6,7 @@ include ../config-host.mak
- include config-target.mak
- include $(SRC_PATH)/rules.mak
- 
--$(call set-vpath, $(SRC_PATH):$(BUILD_DIR))
--
--ifdef CONFIG_USER_ONLY
--# user emulator name
--QEMU_PROG=qemu-$(TARGET_NAME)
--else
--# system emulator name
--QEMU_PROG=qemu-system-$(TARGET_NAME)$(EXESUF)
+diff --git a/Makefile b/Makefile
+index bab1021..a0867c5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -201,7 +201,7 @@ distclean: clean
+ 	rm -f config-host.mak config-host.h*
+ 	rm -f tests/tcg/config-*.mak
+ 	rm -f config-all-disas.mak config.status
+-	rm -f po/*.mo tests/qemu-iotests/common.env
++	rm -f tests/qemu-iotests/common.env
+ 	rm -f roms/seabios/config.mak roms/vgabios/config.mak
+ 	rm -f qemu-plugins-ld.symbols qemu-plugins-ld64.symbols
+ 	rm -f config.log
+@@ -297,9 +297,6 @@ endif
+ 	mkdir -p "$(DESTDIR)$(qemu_desktopdir)"
+ 	$(INSTALL_DATA) $(SRC_PATH)/ui/qemu.desktop \
+ 		"$(DESTDIR)$(qemu_desktopdir)/qemu.desktop"
+-ifdef CONFIG_GTK
+-	$(MAKE) -C po $@
 -endif
--
--STPFILES=
--
--ifdef CONFIG_TRACE_SYSTEMTAP
--stap: $(QEMU_PROG).stp-installed $(QEMU_PROG).stp $(QEMU_PROG)-simpletrace.stp $(QEMU_PROG)-log.stp
--
--ifdef CONFIG_USER_ONLY
--TARGET_TYPE=user
--else
--TARGET_TYPE=system
--endif
--
--tracetool-y = $(SRC_PATH)/scripts/tracetool.py
--tracetool-y += $(shell find $(SRC_PATH)/scripts/tracetool -name "*.py")
--
--$(QEMU_PROG).stp-installed: $(BUILD_DIR)/trace/trace-events-all $(tracetool-y)
--	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
--		--format=stap \
--		--backends=$(TRACE_BACKENDS) \
--		--binary=$(bindir)/$(QEMU_PROG) \
--		--target-name=$(TARGET_NAME) \
--		--target-type=$(TARGET_TYPE) \
--		$< > $@,"GEN","$(TARGET_DIR)$(QEMU_PROG).stp-installed")
--
--$(QEMU_PROG).stp: $(BUILD_DIR)/trace/trace-events-all $(tracetool-y)
--	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
--		--format=stap \
--		--backends=$(TRACE_BACKENDS) \
--		--binary=$(realpath .)/$(QEMU_PROG) \
--		--target-name=$(TARGET_NAME) \
--		--target-type=$(TARGET_TYPE) \
--		$< > $@,"GEN","$(TARGET_DIR)$(QEMU_PROG).stp")
--
--$(QEMU_PROG)-simpletrace.stp: $(BUILD_DIR)/trace/trace-events-all $(tracetool-y)
--	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
--		--format=simpletrace-stap \
--		--backends=$(TRACE_BACKENDS) \
--		--probe-prefix=qemu.$(TARGET_TYPE).$(TARGET_NAME) \
--		$< > $@,"GEN","$(TARGET_DIR)$(QEMU_PROG)-simpletrace.stp")
--
--$(QEMU_PROG)-log.stp: $(BUILD_DIR)/trace/trace-events-all $(tracetool-y)
--	$(call quiet-command,$(TRACETOOL) \
--		--group=all \
--		--format=log-stap \
--		--backends=$(TRACE_BACKENDS) \
--		--probe-prefix=qemu.$(TARGET_TYPE).$(TARGET_NAME) \
--		$< > $@,"GEN","$(TARGET_DIR)$(QEMU_PROG)-log.stp")
--
--else
--stap:
--endif
--.PHONY: stap
--
--all: stap
--
--clean:
--	rm -f *.a *~
--	rm -f $(shell find . -name '*.[od]')
--	rm -f hmp-commands.h gdbstub-xml.c
--	rm -f trace/generated-helpers.c trace/generated-helpers.c-timestamp
--ifdef CONFIG_TRACE_SYSTEMTAP
--	rm -f *.stp
--endif
--
-+all:
- install: all
--ifdef CONFIG_TRACE_SYSTEMTAP
--	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset"
--	$(INSTALL_DATA) $(QEMU_PROG).stp-installed "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset/$(QEMU_PROG).stp"
--	$(INSTALL_DATA) $(QEMU_PROG)-simpletrace.stp "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset/$(QEMU_PROG)-simpletrace.stp"
--	$(INSTALL_DATA) $(QEMU_PROG)-log.stp "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset/$(QEMU_PROG)-log.stp"
--endif
--
-+	
- .PHONY: all clean install
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/keymaps"
+ 	set -e; for x in $(KEYMAPS); do \
+ 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
+diff --git a/configure b/configure
+index cd1ab0c..5ad0f4c 100755
+--- a/configure
++++ b/configure
+@@ -8081,7 +8081,7 @@ DIRS="$DIRS docs docs/interop fsdev scsi"
+ DIRS="$DIRS pc-bios/optionrom pc-bios/s390-ccw"
+ DIRS="$DIRS roms/seabios"
+ LINKS="Makefile"
+-LINKS="$LINKS tests/tcg/lm32/Makefile po/Makefile"
++LINKS="$LINKS tests/tcg/lm32/Makefile"
+ LINKS="$LINKS tests/tcg/Makefile.target"
+ LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
+ LINKS="$LINKS pc-bios/s390-ccw/Makefile"
 diff --git a/meson.build b/meson.build
-index 5052165..44b2645 100644
+index 913f22d..e9fd237 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -797,6 +797,7 @@ common_all = static_library('common',
-                             name_suffix: 'fa')
+@@ -1091,6 +1091,9 @@ subdir('tools')
+ subdir('pc-bios')
+ subdir('tests')
+ subdir('docs')
++if 'CONFIG_GTK' in config_host
++  subdir('po')
++endif
  
- feature_to_c = find_program('scripts/feature_to_c.sh')
-+tracetool = find_program('scripts/tracetool.py')
- 
- emulators = []
- foreach target : target_dirs
-@@ -939,6 +940,31 @@ foreach target : target_dirs
-                link_depends: [block_syms, qemu_syms] + exe.get('link_depends', []),
-                link_args: link_args,
-                gui_app: exe['gui'])
-+
-+    if 'CONFIG_TRACE_SYSTEMTAP' in config_host
-+      foreach stp: [
-+        {'ext': '.stp-build', 'fmt': 'stap', 'bin': meson.current_build_dir() / exe_name, 'install': false},
-+        {'ext': '.stp', 'fmt': 'stap', 'bin': get_option('prefix') / get_option('bindir') / exe_name, 'install': true},
-+        {'ext': '-simpletrace.stp', 'fmt': 'simpletrace-stap', 'bin': '', 'install': true},
-+        {'ext': '-log.stp', 'fmt': 'log-stap', 'bin': '', 'install': true},
-+      ]
-+        custom_target(exe_name + stp['ext'],
-+                      input: trace_events_all,
-+                      output: exe_name + stp['ext'],
-+                      capture: true,
-+                      install: stp['install'],
-+                      install_dir: config_host['qemu_datadir'] / '../systemtap/tapset',
-+                      command: [
-+                        tracetool, '--group=all', '--format=' + stp['fmt'],
-+                        '--backends=' + config_host['TRACE_BACKENDS'],
-+                        '--binary=' + stp['bin'],
-+                        '--target-name=' + target_name,
-+                        '--target-type=' + target_type,
-+                        '--probe-prefix=qemu.' + target_type + '.' + target_name,
-+                        '@INPUT@',
-+                      ])
-+      endforeach
-+    endif
-   endforeach
- endforeach
- 
-diff --git a/rules.mak b/rules.mak
-index 6488dc3..b983c7f 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -199,9 +199,6 @@ ne = $(if $(subst $2,,$1)$(subst $1,,$2),y,n)
- isempty = $(if $1,n,y)
- notempty = $(if $1,y,n)
- 
--# Generate files with tracetool
--TRACETOOL=$(PYTHON) $(SRC_PATH)/scripts/tracetool.py
+ if build_docs
+   makeinfo = find_program('makeinfo', required: build_docs)
+diff --git a/po/LINGUAS b/po/LINGUAS
+new file mode 100644
+index 0000000..054930d
+--- /dev/null
++++ b/po/LINGUAS
+@@ -0,0 +1,7 @@
++bg
++de_DE
++fr_FR
++hu
++it
++tr
++zh_CN
+diff --git a/po/Makefile b/po/Makefile
+deleted file mode 100644
+index c041f4c..0000000
+--- a/po/Makefile
++++ /dev/null
+@@ -1,52 +0,0 @@
+-# This makefile is very special as it's meant to build as part of the build
+-# process and also within the source tree to update the translation files.
 -
- .PHONY: clean-timestamp
- clean-timestamp:
- 	rm -f *.timestamp
-diff --git a/trace/meson.build b/trace/meson.build
-index b113425..eb28aff 100644
---- a/trace/meson.build
-+++ b/trace/meson.build
-@@ -55,13 +55,13 @@ foreach dir : [ '.' ] + trace_events_subdirs
-   endif
- endforeach
- 
--custom_target('trace-events-all',
--              output: 'trace-events-all',
--              input: trace_events_files,
--              command: [ 'cat', '@INPUT@' ],
--              capture: true,
--              install: true,
--              install_dir: config_host['qemu_datadir'])
-+trace_events_all = custom_target('trace-events-all',
-+                                 output: 'trace-events-all',
-+                                 input: trace_events_files,
-+                                 command: [ 'cat', '@INPUT@' ],
-+                                 capture: true,
-+                                 install: true,
-+                                 install_dir: config_host['qemu_datadir'])
- 
- foreach d : [
-   ['generated-tcg-tracers.h', 'tcg-h'],
+-# Set SRC_PATH for in-tree builds without configuration.
+-SRC_PATH=..
+-
+-# The default target must come before any include statements.
+-all:
+-
+-.PHONY:	all build clean install update
+-
+-%.mo: %.po
+-	$(call quiet-command, msgfmt -o $@ $<,"GEN","$@")
+-
+--include ../config-host.mak
+-include $(SRC_PATH)/rules.mak
+-
+-PO_PATH=$(SRC_PATH)/po
+-
+-VERSION=$(shell cat $(SRC_PATH)/VERSION)
+-SRCS=$(filter-out $(PO_PATH)/messages.po,$(wildcard $(PO_PATH)/*.po))
+-OBJS=$(patsubst $(PO_PATH)/%.po,%.mo,$(SRCS))
+-
+-vpath %.po $(PO_PATH)
+-
+-all:
+-	@echo "Use 'make update' to update translation files or use 'make build'"
+-	@echo "or 'make install' to build and install the translation files."
+-
+-update: $(SRCS)
+-
+-build: $(OBJS)
+-
+-clean:
+-	rm -f $(OBJS)
+-
+-install: $(OBJS)
+-	for obj in $(OBJS); do \
+-	    base=$$(basename $$obj .mo); \
+-	    $(INSTALL) -d $(DESTDIR)$(prefix)/share/locale/$$base/LC_MESSAGES; \
+-	    $(INSTALL) -m644 $$obj $(DESTDIR)$(prefix)/share/locale/$$base/LC_MESSAGES/qemu.mo; \
+-	done
+-
+-$(PO_PATH)/messages.po: $(SRC_PATH)/ui/gtk.c
+-	$(call quiet-command, ( cd $(SRC_PATH) && \
+-          xgettext -o - --from-code=UTF-8 --foreign-user --no-location \
+-	    --package-name=QEMU --package-version=$(VERSION) \
+-	    --msgid-bugs-address=qemu-devel@nongnu.org -k_ -C ui/gtk.c | \
+-	  sed -e s/CHARSET/UTF-8/) >$@,"GEN","$@")
+-
+-$(PO_PATH)/%.po: $(PO_PATH)/messages.po
+-	$(call quiet-command, msgmerge -q $@ $< > $@.bak && mv $@.bak $@,"GEN","$@")
+diff --git a/po/POTFILES b/po/POTFILES
+new file mode 100644
+index 0000000..d34d5ed
+--- /dev/null
++++ b/po/POTFILES
+@@ -0,0 +1 @@
++ui/gtk.c
+diff --git a/po/meson.build b/po/meson.build
+new file mode 100644
+index 0000000..b99d8e2
+--- /dev/null
++++ b/po/meson.build
+@@ -0,0 +1,5 @@
++i18n = import('i18n')
++
++i18n.gettext(meson.project_name(),
++             args: '--msgid-bugs-address=qemu-devel@nongnu.org',
++             preset: 'glib')
+diff --git a/po/messages.po b/po/messages.po
+deleted file mode 100644
+index 065bd45..0000000
+--- a/po/messages.po
++++ /dev/null
+@@ -1,74 +0,0 @@
+-# SOME DESCRIPTIVE TITLE.
+-# This file is put in the public domain.
+-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+-#
+-#, fuzzy
+-msgid ""
+-msgstr ""
+-"Project-Id-Version: QEMU 2.12.91\n"
+-"Report-Msgid-Bugs-To: qemu-devel@nongnu.org\n"
+-"POT-Creation-Date: 2018-07-18 07:56+0200\n"
+-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+-"Language-Team: LANGUAGE <LL@li.org>\n"
+-"Language: \n"
+-"MIME-Version: 1.0\n"
+-"Content-Type: text/plain; charset=UTF-8\n"
+-"Content-Transfer-Encoding: 8bit\n"
+-
+-msgid " - Press Ctrl+Alt+G to release grab"
+-msgstr ""
+-
+-msgid " [Paused]"
+-msgstr ""
+-
+-msgid "_Pause"
+-msgstr ""
+-
+-msgid "_Reset"
+-msgstr ""
+-
+-msgid "Power _Down"
+-msgstr ""
+-
+-msgid "_Quit"
+-msgstr ""
+-
+-msgid "_Fullscreen"
+-msgstr ""
+-
+-msgid "_Copy"
+-msgstr ""
+-
+-msgid "Zoom _In"
+-msgstr ""
+-
+-msgid "Zoom _Out"
+-msgstr ""
+-
+-msgid "Best _Fit"
+-msgstr ""
+-
+-msgid "Zoom To _Fit"
+-msgstr ""
+-
+-msgid "Grab On _Hover"
+-msgstr ""
+-
+-msgid "_Grab Input"
+-msgstr ""
+-
+-msgid "Show _Tabs"
+-msgstr ""
+-
+-msgid "Detach Tab"
+-msgstr ""
+-
+-msgid "Show Menubar"
+-msgstr ""
+-
+-msgid "_Machine"
+-msgstr ""
+-
+-msgid "_View"
+-msgstr ""
 -- 
 1.8.3.1
 
