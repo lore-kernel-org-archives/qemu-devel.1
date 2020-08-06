@@ -2,94 +2,90 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2236C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 17:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6AB0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 17:42:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AC6020786
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 17:01:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE7A4206B2
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 17:42:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3B2nFU9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AC6020786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PgXtUSse"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE7A4206B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3jGf-0007l4-RK
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 13:01:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42908)
+	id 1k3jui-0000Li-Fh
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 13:42:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k3jFp-0007Kr-OJ
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 13:00:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59718
+ id 1k3jtp-00086Y-W2
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 13:41:54 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58889
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k3jFo-0007SQ-6F
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 13:00:33 -0400
+ id 1k3jtn-0003e3-BQ
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 13:41:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596733231;
+ s=mimecast20190719; t=1596735709;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oa2IBHIg+V4BEzf8CxZjWoAfZhwr+Zd9/tRNm8F3Y88=;
- b=P3B2nFU9qC7GLZFZtxPRDLMIVUZEF4C6GScsmyonR62MAW8ic2Uu7XIYWTl1KTvgbgzofy
- 7OeiCiiy8MkBTvM+0KjWC9tMPBLlWEbPNoZB5QqPVgUxm75TSxUaVgAPo5mbetq6qs6qaw
- 1HlE1CKXzCUOYdk+fpATtn8a2+/8JgU=
+ bh=IfZqQVb08zVDwERy79CxS6bWfvRty1789liDe8KoePU=;
+ b=PgXtUSsebaBmVk8yZFyzgTF3zUiUg26v+zvv6KuNWAsV4lagjDpbxOPE8AJHfFci9RuNvc
+ 3t9nhvTAoYduGFshdWuIMQUscEj0jTY46lqc8NkKMMcFkIEkVgBBcdFswJL7QbKdfoTfsT
+ TlbKATVA4bJ0BOUfbg8VYDW7PeNMnU0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-iuw2cOsaNMOgoWHuLtYdJg-1; Thu, 06 Aug 2020 12:59:09 -0400
-X-MC-Unique: iuw2cOsaNMOgoWHuLtYdJg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-213-sGa_kf-RPAOLvOHDMqk0Dw-1; Thu, 06 Aug 2020 13:41:37 -0400
+X-MC-Unique: sGa_kf-RPAOLvOHDMqk0Dw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFC30800688;
- Thu,  6 Aug 2020 16:59:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39CE08015FB;
+ Thu,  6 Aug 2020 17:41:36 +0000 (UTC)
 Received: from work-vm (ovpn-114-105.ams2.redhat.com [10.36.114.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 231DD65C91;
- Thu,  6 Aug 2020 16:59:04 +0000 (UTC)
-Date: Thu, 6 Aug 2020 17:59:02 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BCCE19D7E;
+ Thu,  6 Aug 2020 17:41:32 +0000 (UTC)
+Date: Thu, 6 Aug 2020 18:41:29 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Zheng Chuan <zhengchuan@huawei.com>
-Subject: Re: [RFC PATCH 2/8] migration/dirtyrate: Add block_dirty_info to
- store dirtypage info
-Message-ID: <20200806165902.GJ2711@work-vm>
-References: <1595646669-109310-1-git-send-email-zhengchuan@huawei.com>
- <1595646669-109310-3-git-send-email-zhengchuan@huawei.com>
- <20200804162829.GE2659@work-vm>
- <8ac6e996-b01d-9b7c-3f7a-aeb2b376cfa1@huawei.com>
+To: "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>
+Subject: Re: [Virtio-fs] [PATCH] virtiofsd: Disable remote posix locks by
+ default
+Message-ID: <20200806174129.GK2711@work-vm>
+References: <20200727161841.GA54539@redhat.com>
+ <OSBPR01MB4582AB9CD2DB32A48A8BB13FE5480@OSBPR01MB4582.jpnprd01.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <8ac6e996-b01d-9b7c-3f7a-aeb2b376cfa1@huawei.com>
+In-Reply-To: <OSBPR01MB4582AB9CD2DB32A48A8BB13FE5480@OSBPR01MB4582.jpnprd01.prod.outlook.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:07:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,91 +98,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, linyilu@huawei.com,
- qemu-devel@nongnu.org, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
+Cc: virtio-fs-list <virtio-fs@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ 'Vivek Goyal' <vgoyal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Zheng Chuan (zhengchuan@huawei.com) wrote:
+* misono.tomohiro@fujitsu.com (misono.tomohiro@fujitsu.com) wrote:
+> > Right now we enable remote posix locks by default. That means when guest does a posix lock it sends request to server
+> > (virtiofsd). But currently we only support non-blocking posix lock and return -EOPNOTSUPP for blocking version.
+> > 
+> > This means that existing applications which are doing blocking posix locks get -EOPNOTSUPP and fail. To avoid this,
+> > people have been running virtiosd with option "-o no_posix_lock". For new users it is still a surprise and trial and error
+> > takes them to this option.
+> > 
+> > Given posix lock implementation is not complete in virtiofsd, disable it by default. This means that posix locks will work
+> > with-in applications in a guest but not across guests. Anyway we don't support sharing filesystem among different guests
+> > yet in virtiofs so this should not lead to any kind of surprise or regression and will make life little easier for virtiofs users.
+> > 
+> > Reported-by: Aa Aa <jimbothom@yandex.com>
+> > Suggested-by: Miklos Szeredi <mszeredi@redhat.com>
+> > Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+> > ---
+> >  tools/virtiofsd/passthrough_ll.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> 
-> On 2020/8/5 0:28, Dr. David Alan Gilbert wrote:
-> > * Chuan Zheng (zhengchuan@huawei.com) wrote:
-> >> From: Zheng Chuan <zhengchuan@huawei.com>
-> >>
-> >> Add block_dirty_info to store dirtypage info for each ramblock
-> >>
-> >> Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
-> >> Signed-off-by: YanYing Zhang <ann.zhuangyanying@huawei.com>
-> >> ---
-> >>  migration/dirtyrate.h | 13 +++++++++++++
-> >>  1 file changed, 13 insertions(+)
-> >>
-> >> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-> >> index 9a5c228..342b89f 100644
-> >> --- a/migration/dirtyrate.h
-> >> +++ b/migration/dirtyrate.h
-> >> @@ -33,6 +33,19 @@ typedef enum {
-> >>      CAL_DIRTY_RATE_END   = 2,
-> >>  } CalculatingDirtyRateStage;
-> >>  
-> >> +/* 
-> >> + * Store dirtypage info for each block.
-> >> + */
-> >> +struct block_dirty_info {
-> > 
-> > Please call this ramblock_dirty_info; we use 'block' a lot to mean
-> > disk block and it gets confusing.
-> > 
-> Sure, ramblock_dirty_info is better.
-> 
-> >> +    char idstr[BLOCK_INFO_MAX_LEN];
-> > 
-> > Is there a reason you don't just use a RAMBlock *  here?
-> > 
-> >> +    uint8_t *block_addr;
-> >> +    unsigned long block_pages;
-> >> +    unsigned long *sample_page_vfn;
-> > 
-> > Please comment these; if I understand correctly, that's an array
-> > of page indexes into the block generated from the random numbers
-> > 
-> >> +    unsigned int sample_pages_count;
-> >> +    unsigned int sample_dirty_count;
-> >> +    uint8_t *hash_result;
-> > 
-> > If I understand, this is an array of hashes end-to-end for
-> > all the pages in this RAMBlock?
-> > 
-> > Dave
-> > 
-> Actually, we do not go through all pages of the RAMBlock but sample
-> some pages （for example, 256 pages per Gigabit）to make it faster.
-> Obviously it will sacrifice accuracy, but it still looks good enough
-> under practical test.
+> We should update docs/tools/virtiofsd.rst as well. Given that:
+>  Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
 
-Right yes; but that 'hash_result' is an array of hash values, one
-for each of the pages that you did measure?
+Fixed up the doc.
 
 Dave
 
-> >> +};
-> >> +
-> >>  void *get_dirtyrate_thread(void *arg);
-> >>  #endif
-> >>  
-> >> -- 
-> >> 1.8.3.1
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> > 
-> > .
-> > 
 > 
+> _______________________________________________
+> Virtio-fs mailing list
+> Virtio-fs@redhat.com
+> https://www.redhat.com/mailman/listinfo/virtio-fs
 -- 
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
