@@ -3,89 +3,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE27C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:11:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FCF7C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:11:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72348221E5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:11:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64CEE22D0B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:11:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XUbMoEcS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72348221E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZBcNKliw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64CEE22D0B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3axr-0003ph-VF
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 04:09:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33718)
+	id 1k3ZL8-0007hF-4f
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 02:25:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39808)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3awx-0002FP-9C; Thu, 06 Aug 2020 04:08:31 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:37403)
+ (Exim 4.90_1) (envelope-from <chihmin.chao@sifive.com>)
+ id 1k3ZK8-00075I-5g
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 02:24:20 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:35332)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3awv-0005fp-Na; Thu, 06 Aug 2020 04:08:31 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id y3so43079462wrl.4;
- Thu, 06 Aug 2020 01:08:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=RLlgeL2C/FYTW7vdWP0OhAQl6GDJRLGBT60ys2uJvCE=;
- b=XUbMoEcSMxGEUtED05wSHJW1i3kN7U25wPcJj2yPbhyQU/Pczn1RGZp31CAY67/gmC
- DCrLIkgepqbJ8QEpRLeSNQlVB5E4Q/kgWefqQqjl9uSpdYp8oEeoKZMZh/SdG5j5nMSg
- EuBnmEDahY2CpdSdKSlVVeUhzbt82zPQwzZZ9iQyvxeDv6I1DJ+URVONHc6uScq1qjPV
- DJWtc09ySKKXAJm02s1OVPQJyJGi2M1wCIbB3tdrQ4o2tzHEBugSqbrulakCKho5i6Ul
- tN0VCeLSOu9EggP5b6yDWOUhS9OjSSESa6EU4099PXeMtugwsX3/0iZmzlAyGIgeE8MO
- WbSA==
+ (Exim 4.90_1) (envelope-from <chihmin.chao@sifive.com>)
+ id 1k3ZK6-00024y-6y
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 02:24:19 -0400
+Received: by mail-io1-xd43.google.com with SMTP id s189so41227661iod.2
+ for <qemu-devel@nongnu.org>; Wed, 05 Aug 2020 23:24:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=hafr8k9YOgdf5KgqdQie/z85p/Ia5bt7WDCDxUBdvdg=;
+ b=ZBcNKliwxZMR5CwNl76Wp2MBF+d0mCTiEHLWCbnihmHspuuIycm0JRhajxmIqIqjD5
+ LIcVcQv7YsIPKMD/3us2JiqENp6e163Vo3Vd/jm1IDEbv0OzeKx9jUjtZ+pOrEBAloMQ
+ hUd0CRqvTG/EyGCz/SELWi0QunfTNmL75FoHyN0j9HajqPjv1o7QhZmz7GoHW24OReNW
+ 1/JJ8qgIAaQA+RfogiacEoiLGyjp9i1qhp6DI1qC65DBU4FOjfpnEaaiClibpsLQS8c4
+ NkqwVmN7GJQ4fJjguFYOOHdOpfFxdw52CF+OZyTYwzeVxANFDhtONbsljvWgMdGrKSkH
+ UBrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=RLlgeL2C/FYTW7vdWP0OhAQl6GDJRLGBT60ys2uJvCE=;
- b=TpoI3GI1r2oC/+KFiLI4gWmwAnUP74/pofGJkJiqOpKHvbFoUrA2KxTK3Wo5gz+nbs
- W+CEFfjinJktMKL75g08rCLnfL0l90gIAolA7Gp8gaqsSSVuy+TYhgId7+Pzzq+oqJXn
- YqVj8kLH9hx+N/Ggxof1itFht27S21M9zXhDy74dzX7SOxdb8RAMwVYlcMs/MXLRdHh1
- Lm2fwSTUuZEyzfGntLGG0Ljk9XDqYCnmyT+2smjWmxd+W+h8K3EJly2XPr6GZ0xpxgAK
- Ud12KpBncSGOl0pyDoBqyKZwlyLXpNgwnOBnYHIPRzSwoPAmPAb+BaXStsP24ByfMa15
- cpPQ==
-X-Gm-Message-State: AOAM53163I4eVFqXZQpF37emX7U7H6BCC/h0OfZROJBXIlkFEonWkFCV
- Um62PagwQwzlSFyiGUystydxAmLu
-X-Google-Smtp-Source: ABdhPJyNVSLQR+za7u7ezBcMNENYCasW24bMQzaXmgM7d5dxS9R1qe1h+gMkDE4P/yk+4i0Vbwokow==
-X-Received: by 2002:a5d:5151:: with SMTP id u17mr6292276wrt.154.1596701307340; 
- Thu, 06 Aug 2020 01:08:27 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id w2sm6039587wre.5.2020.08.06.01.08.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 01:08:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 0/7] hw/block/fdc: Cleanups trying to make sense of
- the floppy controllers
-Date: Thu,  6 Aug 2020 10:08:17 +0200
-Message-Id: <20200806080824.21567-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hafr8k9YOgdf5KgqdQie/z85p/Ia5bt7WDCDxUBdvdg=;
+ b=qNSBiCD+rZGhQcc/KmSNfG1VzhvBv/N3sTRMAGfw5x+ww0CeJ0ZYGYs38C9Y5k/EEC
+ 7W6dXZH0Whty/NTgCdY1cOM++01qwTn3vix8ICq7zyyBqoHvXPAvS6TZX0EOK2EleGyr
+ fCmaUht310+E7glCl76osTtWQBQcPH+JL1URBskz7y28RTftqdczi9F+v8Z+r/b6ELQ0
+ wFCF/5y++U0t1QQR5toiQuq85zAuh418+2j921JNO6RthbDoif7stJfFtZ6WRjyaib51
+ iJX279pmOpo1j3olCF8KumfLyyoUYiZKZJ9H2y+rZTAfApFgLZliiW2iyJDSi1hPijvj
+ b/Pg==
+X-Gm-Message-State: AOAM531wvEKL7gUL51sBfpxZCDVGwJjib1Uzs6jwu9iuiD0VtJeRJ8D6
+ wyYqeL0nOh3GP273SP99rFLH5BM78/nR6P0vXCCrUQ==
+X-Google-Smtp-Source: ABdhPJz2LgU4WegSavfCTiM5F1hAmXbq54wUcw3akGtW5IbEFgOmUWBOwsb1yTNcpvGgGZvYx4gXv3+4RydYcinzXJk=
+X-Received: by 2002:a6b:f911:: with SMTP id j17mr7631181iog.96.1596695053544; 
+ Wed, 05 Aug 2020 23:24:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42d.google.com
+References: <20200724002807.441147-1-richard.henderson@linaro.org>
+ <20200724002807.441147-3-richard.henderson@linaro.org>
+In-Reply-To: <20200724002807.441147-3-richard.henderson@linaro.org>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Thu, 6 Aug 2020 14:24:02 +0800
+Message-ID: <CAEiOBXWCULxgcJwme=cvS1iHpogubtTE72a5LN38WfLGKqbrjA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/7] target/riscv: Generalize gen_nanbox_fpr to
+ gen_nanbox_s
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000007b454f05ac2f8969"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=chihmin.chao@sifive.com; helo=mail-io1-xd43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,31 +95,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Frank Chang <frank.chang@sifive.com>,
+ Alistair Francis <alistair23@gmail.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ liuzhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Trivial patches while trying to make sense of the floppy
-controllers code.
+--0000000000007b454f05ac2f8969
+Content-Type: text/plain; charset="UTF-8"
 
-Philippe Mathieu-Daudé (7):
-  hw/block/fdc: Let sector count be unsigned
-  hw/block/fdc: Let sector offset be unsigned
-  hw/block/fdc: Use warn_report() instead of debug FLOPPY_DPRINTF()
-    calls
-  hw/block/fdc: Convert debug FLOPPY_DPRINTF() to trace events
-  hw/block/fdc: Drop pointless FLOPPY_DPRINTF() call
-  hw/block/fdc: Use more descriptive TypeInfo names
-  hw/block/fdc: Add ASCII art schema of QOM relations
+On Fri, Jul 24, 2020 at 8:28 AM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
- hw/block/fdc.c        | 87 +++++++++++++++++++++++++++----------------
- hw/block/trace-events |  3 ++
- 2 files changed, 57 insertions(+), 33 deletions(-)
+> Do not depend on the RVD extension, take input and output via
+> TCGv_i64 instead of fpu regno.  Move the function to translate.c
+> so that it can be used in multiple trans_*.inc.c files.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/riscv/insn_trans/trans_rvf.inc.c | 16 +---------------
+>  target/riscv/translate.c                | 11 +++++++++++
+>  2 files changed, 12 insertions(+), 15 deletions(-)
+>
+> diff --git a/target/riscv/insn_trans/trans_rvf.inc.c
+> b/target/riscv/insn_trans/trans_rvf.inc.c
+> index 3bfd8881e7..c7057482e8 100644
+> --- a/target/riscv/insn_trans/trans_rvf.inc.c
+> +++ b/target/riscv/insn_trans/trans_rvf.inc.c
+> @@ -23,20 +23,6 @@
+>          return false;                       \
+>  } while (0)
+>
+> -/*
+> - * RISC-V requires NaN-boxing of narrower width floating
+> - * point values.  This applies when a 32-bit value is
+> - * assigned to a 64-bit FP register.  Thus this does not
+> - * apply when the RVD extension is not present.
+> - */
+> -static void gen_nanbox_fpr(DisasContext *ctx, int regno)
+> -{
+> -    if (has_ext(ctx, RVD)) {
+> -        tcg_gen_ori_i64(cpu_fpr[regno], cpu_fpr[regno],
+> -                        MAKE_64BIT_MASK(32, 32));
+> -    }
+> -}
+> -
+>  static bool trans_flw(DisasContext *ctx, arg_flw *a)
+>  {
+>      TCGv t0 = tcg_temp_new();
+> @@ -46,7 +32,7 @@ static bool trans_flw(DisasContext *ctx, arg_flw *a)
+>      tcg_gen_addi_tl(t0, t0, a->imm);
+>
+>      tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
+> -    gen_nanbox_fpr(ctx, a->rd);
+> +    gen_nanbox_s(cpu_fpr[a->rd], cpu_fpr[a->rd]);
+>
+>      tcg_temp_free(t0);
+>      mark_fs_dirty(ctx);
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 9632e79cf3..12a746da97 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -90,6 +90,17 @@ static inline bool has_ext(DisasContext *ctx, uint32_t
+> ext)
+>      return ctx->misa & ext;
+>  }
+>
+> +/*
+> + * RISC-V requires NaN-boxing of narrower width floating point values.
+> + * This applies when a 32-bit value is assigned to a 64-bit FP register.
+> + * For consistency and simplicity, we nanbox results even when the RVD
+> + * extension is not present.
+> + */
+> +static void gen_nanbox_s(TCGv_i64 out, TCGv_i64 in)
+> +{
+> +    tcg_gen_ori_i64(out, in, MAKE_64BIT_MASK(32, 32));
+> +}
+> +
+>  static void generate_exception(DisasContext *ctx, int excp)
+>  {
+>      tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
+> --
+> 2.25.1
+>
+>
+>
+Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
 
--- 
-2.21.3
+--0000000000007b454f05ac2f8969
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+<div dir=3D"ltr"><div dir=3D"ltr"><div><div dir=3D"ltr" class=3D"gmail_sign=
+ature" data-smartmail=3D"gmail_signature"><div dir=3D"ltr"><br></div></div>=
+</div></div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr=
+">On Fri, Jul 24, 2020 at 8:28 AM Richard Henderson &lt;<a href=3D"mailto:r=
+ichard.henderson@linaro.org">richard.henderson@linaro.org</a>&gt; wrote:<br=
+></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;=
+border-left:1px solid rgb(204,204,204);padding-left:1ex">Do not depend on t=
+he RVD extension, take input and output via<br>
+TCGv_i64 instead of fpu regno.=C2=A0 Move the function to translate.c<br>
+so that it can be used in multiple trans_*.inc.c files.<br>
+<br>
+Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
+naro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
+---<br>
+=C2=A0target/riscv/insn_trans/trans_rvf.inc.c | 16 +---------------<br>
+=C2=A0target/riscv/translate.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 | 11 +++++++++++<br>
+=C2=A02 files changed, 12 insertions(+), 15 deletions(-)<br>
+<br>
+diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_tr=
+ans/trans_rvf.inc.c<br>
+index 3bfd8881e7..c7057482e8 100644<br>
+--- a/target/riscv/insn_trans/trans_rvf.inc.c<br>
++++ b/target/riscv/insn_trans/trans_rvf.inc.c<br>
+@@ -23,20 +23,6 @@<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return false;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
+=C2=A0} while (0)<br>
+<br>
+-/*<br>
+- * RISC-V requires NaN-boxing of narrower width floating<br>
+- * point values.=C2=A0 This applies when a 32-bit value is<br>
+- * assigned to a 64-bit FP register.=C2=A0 Thus this does not<br>
+- * apply when the RVD extension is not present.<br>
+- */<br>
+-static void gen_nanbox_fpr(DisasContext *ctx, int regno)<br>
+-{<br>
+-=C2=A0 =C2=A0 if (has_ext(ctx, RVD)) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_ori_i64(cpu_fpr[regno], cpu_fpr[regno]=
+,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 MAKE_64BIT_MASK(32, 32));<br>
+-=C2=A0 =C2=A0 }<br>
+-}<br>
+-<br>
+=C2=A0static bool trans_flw(DisasContext *ctx, arg_flw *a)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0TCGv t0 =3D tcg_temp_new();<br>
+@@ -46,7 +32,7 @@ static bool trans_flw(DisasContext *ctx, arg_flw *a)<br>
+=C2=A0 =C2=A0 =C2=A0tcg_gen_addi_tl(t0, t0, a-&gt;imm);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0tcg_gen_qemu_ld_i64(cpu_fpr[a-&gt;rd], t0, ctx-&gt;mem_=
+idx, MO_TEUL);<br>
+-=C2=A0 =C2=A0 gen_nanbox_fpr(ctx, a-&gt;rd);<br>
++=C2=A0 =C2=A0 gen_nanbox_s(cpu_fpr[a-&gt;rd], cpu_fpr[a-&gt;rd]);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0tcg_temp_free(t0);<br>
+=C2=A0 =C2=A0 =C2=A0mark_fs_dirty(ctx);<br>
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c<br>
+index 9632e79cf3..12a746da97 100644<br>
+--- a/target/riscv/translate.c<br>
++++ b/target/riscv/translate.c<br>
+@@ -90,6 +90,17 @@ static inline bool has_ext(DisasContext *ctx, uint32_t e=
+xt)<br>
+=C2=A0 =C2=A0 =C2=A0return ctx-&gt;misa &amp; ext;<br>
+=C2=A0}<br>
+<br>
++/*<br>
++ * RISC-V requires NaN-boxing of narrower width floating point values.<br>
++ * This applies when a 32-bit value is assigned to a 64-bit FP register.<b=
+r>
++ * For consistency and simplicity, we nanbox results even when the RVD<br>
++ * extension is not present.<br>
++ */<br>
++static void gen_nanbox_s(TCGv_i64 out, TCGv_i64 in)<br>
++{<br>
++=C2=A0 =C2=A0 tcg_gen_ori_i64(out, in, MAKE_64BIT_MASK(32, 32));<br>
++}<br>
++<br>
+=C2=A0static void generate_exception(DisasContext *ctx, int excp)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0tcg_gen_movi_tl(cpu_pc, ctx-&gt;base.pc_next);<br>
+-- <br>
+2.25.1<br>
+<br>
+<br></blockquote><div><br></div><div>Reviewed-by: Chih-Min Chao &lt;<a href=
+=3D"mailto:chihmin.chao@sifive.com">chihmin.chao@sifive.com</a>&gt;<br></di=
+v></div></div>
+
+--0000000000007b454f05ac2f8969--
 
