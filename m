@@ -2,81 +2,85 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8340BC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 15:54:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BA8C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 15:56:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC5DA23120
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 15:54:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+LhVl25"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC5DA23120
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 03CA522E01
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 15:56:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03CA522E01
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bupt.edu.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3iE1-0006p9-Il
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 11:54:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58336)
+	id 1k3iFY-0008KI-U5
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 11:56:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3iCn-0005vf-89
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 11:53:21 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43438
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3iCk-000701-By
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 11:53:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596729197;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=bxGj/EBbun6VkJN+vMLjiMxIZNAYHy+S1yis5KeHDk8=;
- b=h+LhVl25Rq7W2AmBVA5QZuqRBURdTJZuyDWi/3WHW7WCsBHhIZQH9fz9R9oQkFLu3TC+28
- mFOMfoR4DSj3tsrwG8uXY+F5O+whkC4t5puIj712VwZye18/PupSzNXXG5Qv3AVYUBFQ2r
- /oxjjQy2hkIVEIu5tb5TqTdBisWfEdc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-8m-ACxE7NX2HlPB7YqQnqw-1; Thu, 06 Aug 2020 11:53:15 -0400
-X-MC-Unique: 8m-ACxE7NX2HlPB7YqQnqw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5376E58;
- Thu,  6 Aug 2020 15:53:14 +0000 (UTC)
-Received: from thuth.com (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4490D5C1BD;
- Thu,  6 Aug 2020 15:53:08 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH] gitlab/travis: Rework the disabled features tests
-Date: Thu,  6 Aug 2020 17:53:06 +0200
-Message-Id: <20200806155306.13717-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:07:42
+ (Exim 4.90_1) (envelope-from <927079390@qq.com>) id 1k3iDC-0006CP-8w
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 11:53:46 -0400
+Received: from smtpbgeu1.qq.com ([52.59.177.22]:45993)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <927079390@qq.com>) id 1k3iD9-00073G-Pn
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 11:53:46 -0400
+X-QQ-FEAT: 9d8LckC02S3TpLyPKNCQUc8IKd2mI2zC8Auksu9+uNMrzg++36SKWpP4mTAzK
+ a+uYB52nYIK2v6qaO5jx8xqocdzo20PfARvyzj7MXuhUKfBG+9k1tlp/rC/3NpgSq2JzTzi
+ cF7xk/rrsgRRB7jeRiwlbLWZIOQXoxXcS7y6QtN6287v7M6sMnDQkMxNqfXDCyOenMq6FlP
+ ZQKq+GtU+3hpNXpnCwR3xGN5xNNkv9Md4RgOJ30SWOjDzwGooNaFPXMR3T6RS88ObLoDAXD
+ 09FvxdQZBh+g+wOoqKAAbR/pRzqYbaQl07aA==
+X-QQ-SSF: 00000000000000F000000000000000P
+X-QQ-XMAILINFO: NfLrmqrVhozmIKTLEzgFwFEUlSgN8XmlOxW/NdKiYnZXzS161IOT40+/yUopEh
+ 696liJk1lCnsJQ3rQA8/dq5sRNuIcCRB7piyBHy5/CE1uqL8Aex1ssldYBqMkRH6v3nUeWqS8npmw
+ h8sLEAqIFlllXOMhid+kGQ42AwlKUOLLbWT89mDXeoiBvBD9+nkp5ANaE767Tya0lXKI4jqDUUWNm
+ 87u4t+dca4MvN5WS6zpMca82u7VWFnTLMiZTeAF5fP+jOmHidFyKzyymb9vYP9B1EXJADV9joqAmK
+ 7PPV35OOE5GCgwyXtRzd40oinmaWv/4w0cTwN0Wk68d6hkB7Q4Y1KUlNXvPS3Zw+wZccZ6zf1xfHh
+ bkY0ur2HnMCXmcQBIZb6nfDZ+vWqsgx2iI3rTeZNKKWU/8GGUmOEBzDCDHa/FvmkYrpDW1D8FxIxx
+ pI9IkB/Ioc8rb3xzt2xFERWv3NXw4KMp+fPzesk1HMU7ZLvQKO27JG6mW8jv0cjXXnqHfK84CIQxP
+ pHYsvvZupvxhJZ0DGvWqxluiboAI8qIS7/+lXrEXwMyjP+/K/ujRcgJgiLZpa6JJFjHwcwoTgZBFY
+ rWZkmApxpERicXhKV5tPmMBXelxn4vu6zWj+GvEVRUYW/rpQ1I9Z9orJNvah5TRByWTO40PNqLmx4
+ PSAuIY0Cb1KANJhLtEll2AfGg3VOuVJ+RbfYPL/bfgFQE8X7l4lpE/+lwk8Y/QcW4HxJx0UXiI4/O
+ TcCkO6fQ68gg04Hm1En98rkdYvxOsyRY9T+M=
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 144.255.151.185
+X-QQ-STYLE: 
+X-QQ-mid: webmail200t1596729198t422894
+From: "=?ISO-8859-1?B?bHJ3ZWk=?=" <lrwei@bupt.edu.cn>
+To: "=?ISO-8859-1?B?QWxleCBCZW5uIGU=?=" <alex.bennee@linaro.org>
+Subject: Re: Question on implementation detail of `temp_sync`
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+Date: Thu, 6 Aug 2020 23:53:18 +0800
+X-Priority: 3
+Message-ID: <tencent_7247E05FC50CB6B5D348629C4CEA050A6907@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Thu, 06 Aug 2020 23:53:19 +0800 (CST)
+Feedback-ID: webmail:qq.com:bgforeign:bgforeign12
+X-QQ-Bgrelay: 1
+Received-SPF: pass client-ip=52.59.177.22; envelope-from=927079390@qq.com;
+ helo=smtpbgeu1.qq.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 11:53:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_ENVFROM_END_DIGIT=0.25,
+ FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001, FROM_EXCESS_BASE64=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, MSGID_FROM_MTA_HEADER=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,78 +93,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: =?ISO-8859-1?B?UmljaGFyZCBIZW5kZXJzb24=?= <richard.henderson@linaro.org>,
+ =?ISO-8859-1?B?UUVNVSBEZXZlbG9wZXJz?= <qemu-devel@nongnu.org>,
+ =?ISO-8859-1?B?cWVtdS1kaXNjdXNz?= <qemu-discuss@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's focus on the gitlab-ci when testing the compilation with disabled
-features, thus add more switches there (and while we're at it, sort them
-also alphabetically). This should cover the test from the Travis CI now,
-too, so that we can remove the now-redundant job from the Travis CI.
+PiBscndlaSA8W2hpZGRlbiBlbWFpbF0+IHdyaXRlczoKPiAKPiA+IFNvcnJ5IGZvciB0aGUg
+dW5pbnRlbnRpb25hbCBzZW5kaW5nIG9mIGFuIHVuY29tcGxldGVkIG1lc3NhZ2UuCj4gCj4g
+UXVlc3Rpb25zIGFib3V0IHRoZSBpbnRlcm5hbHMgb2YgdGhlIFRDRyBhcmUgdmVyeSBtdWNo
+IGluIHRoZSByZW1pdCBvZgo+IHFlbXUtZGV2ZWwgc28gYXJlIGxpa2VseSB0byBnZXQgbWlz
+c2VkIG9uIHFlbXUtZGlzY3VzcyB3aGljaCBpcyBtb3JlCj4gYWltZWQgYXQgdXNlciBxdWVz
+dGlvbnMuCgpUaGFua3MgZm9yIHlvdXIgcmVwbHkhIE5leHQgdGltZSBJIHdpbGwgc2VuZCBt
+eSBxdWVzdGlvbnMgdGhlcmUuCgo+IAo+IDxyZS1wYXN0ZWQgdG8gZml4IGh0bWwgbm9pc2U+
+Cj4gCj4gPiBJIHVuZGVyc3RhbmRzIHRoYXQgdGhlIGN1cnJlbnQgY29kZSB3b3JrcywgYnV0
+IGdldHMgY29uZnVzZWQgb24gd2h5Cj4gPiBgdHNgIG5lZWRzIHRvIGJlIGxvYWRlZCBpbiB0
+byBhIHJlZ2lzdGVyIHdoZW4gYGZyZWVfb3JfZGVhZGAgaXMgbm90Cj4gPiBzZXQuCj4gCj4g
+SXQgaXNuJ3QsIHRoZSBicmVhayBsZWF2ZXMgdGhlIHN3aXRjaCBzdGF0ZW1lbnQgb25jZSBp
+dCBzdG9yZXMgdGhlCj4gY29uc3RhbnQgdG8gbWVtb3J5LgoKSXQgc2VlbXMgdG8gbWUgdGhh
+dCBpZiBgZnJlZV9vcl9kZWFkYCB3YXMgemVybywgZnVydGhlciBgdGNnX291dF9zdGlgCmFu
+ZCBgYnJlYWtgIGluIHRoZSBpZi1ibG9jayB3b24ndCBiZSBleGVjdXRlZCBhdCBhbGwuIEFu
+ZCB0aGF0IGlzCmV4YWN0bHkgd2hhdCBjb25mdXNlZCBtZS4KCj4gCj4gPiBGb3IgZXhhbXBs
+ZSBpbiB0aGUgZm9sbG93aW5nIHNjZW5hcmlvOgo+ID4gbW92aV9pMzIgICAgIHIwLCAweDEK
+PiA+IGFkZF9pMzIgICAgICByMSwgcjEsIHIwCj4gPiAuLi4KPiA+ICh3aGVyZSByMCBpcyBu
+b3QgdXNlZCBhbnkgbW9yZSwgYW5kIGJvdGggcjAgYW5kIHIxIGFyZSBnbG9iYWxzKQo+IAo+
+ID4gSWYgSSBhbSBub3QgbWlzdGFrZW4sIHRoZSBjb2RlIGdlbiBwcm9jZWR1cmUgb2YgdGhl
+IGZpcnN0IElSIHdpbGwgY2FsbAo+ID4gYHRlbXBfc3luY2Agd2l0aCBgZnJlZV9vcl9kZWFk
+YCBub3Qgc2V0LCB3aGljaCBsb2FkIHRoZSBjb25zdGFudCBpbiB0bwo+ID4gYSByZWdpc3Rl
+ciBhbmQgc3RvcmUgaXQgYmFjayB0byBtZW1vcnkuIEF0IHRoaXMgdGltZSwgYHIwYCB3aWxs
+IGJlCj4gPiBgVEVNUF9WQUxfUkVHYCBpbnN0ZWFkIG9mIGBURU1QX1ZBTF9DT05TVGAsIHNv
+IHRoZSBmb2xsb3dpbmcgSVIgY2FuJ3QKPiA+IGVtYmVkIHRoaXMgY29uc3RhbnQgb3BlcmFu
+ZCBpbiB0aGUgYXNzZW1ibHkgaW5zdHJ1Y3Rpb24gaXQgcHJvZHVjZXMuCj4gPiBBbHNvLCB0
+aGlzIHJlc3VsdHMgaW4gYSBzZWVtaW5nbHkgdXNlbGVzcyByZWdpc3RlciBhbGxvY2F0aW9u
+ICgsIHdoeQo+ID4gZG9uJ3QgdGhlIGZ1cnRoZXIgdXNlIG9mIHIwIHVzZSB0aGUgY29uc3Rh
+bnQgZGlyZWN0bHk/KQo+IAo+IElzIHRoaXMgd2hhdCB5b3UgYXJlIGFjdHVhbGx5IHNlZWlu
+ZyBnZW5lcmF0ZWQ/IElmIHlvdSBydW4gd2l0aCAtZAo+IGluX2FzbSxvcCxvcF9vcHQsb3V0
+X2FzbSBpdCBzaG91bGQgYmUgY2xlYXIgd2hhdCBhY3R1YWxseSBoYXBwZW5lZC4KClRoZSBh
+Ym92ZSBleGFtcGxlIGlzIG9yaWdpbmFsbHkgbWFkZSB1cCB0byBpbGx1c3RyYXRlIG15IHF1
+ZXN0aW9uLCBidXQKSSBtb2RpZmllZCB0aGUgZnJvbnRlbmQgdG8gZGlyZWN0bHkgZW1pdCB0
+aGUgYWJvdmUgSVIgKG1lYW5pbmdsZXNzbHkpLAphbmQgaGVyZSBpcyB0aGUgcmVzdWx0OgoK
+LS0tLSBQYXN0aW5nIG91dHB1dCBvZiBRZW11IC0tLS0KClFFTVUgNS4wLjkzIG1vbml0b3Ig
+LSB0eXBlICdoZWxwJyBmb3IgbW9yZSBpbmZvcm1hdGlvbgoocWVtdSkgT1A6CiBsZF9pMzIg
+dG1wMCxlbnYsJDB4ZmZmZmZmZmZmZmZmZmZmMAogbW92aV9pMzIgdG1wMSwkMHgwCiBicmNv
+bmRfaTMyIHRtcDAsdG1wMSxsdCwkTDAKCiAtLS0tIDAwMDAwMDAwCiBtb3ZpX2kzMiByMCwk
+MHgxCiBhZGRfaTMyIHIxLHIxLHIwCiBtb3ZpX2kzMiBwYywkMHg0CiBjYWxsIGhsdCwkMHg4
+LCQwLGVudgogZXhpdF90YiAkMHgwCiBzZXRfbGFiZWwgJEwwCiBleGl0X3RiICQweDdmODUx
+MDAwMDA0MwoKT1AgYWZ0ZXIgb3B0aW1pemF0aW9uIGFuZCBsaXZlbmVzcyBhbmFseXNpczoK
+IGxkX2kzMiB0bXAwLGVudiwkMHhmZmZmZmZmZmZmZmZmZmYwICAgICAgZGVhZDogMSAgcHJl
+Zj0weGZmZmYKIG1vdmlfaTMyIHRtcDEsJDB4MCAgICAgICAgICAgICAgICAgICAgICAgcHJl
+Zj0weGZmZmYKIGJyY29uZF9pMzIgdG1wMCx0bXAxLGx0LCRMMCAgICAgICAgICAgICAgZGVh
+ZDogMCAxCgogLS0tLSAwMDAwMDAwMCAgICAgICAgICAgICAgICAgICAgICAgICAKIG1vdmlf
+aTMyIHIwLCQweDEgICAgICAgICAgICAgICAgICAgICAgICAgc3luYzogMCAgcHJlZj0weGZm
+ZmYKIGFkZF9pMzIgcjEscjEscjAgICAgICAgICAgICAgICAgICAgICAgICAgc3luYzogMCAg
+ZGVhZDogMCAxIDIgIHByZWY9MHhmZmZmCiBtb3ZpX2kzMiBwYywkMHg0ICAgICAgICAgICAg
+ICAgICAgICAgICAgIHN5bmM6IDAgIGRlYWQ6IDAgIHByZWY9MHhmZmZmCiBjYWxsIGhsdCwk
+MHg4LCQwLGVudiAgICAgICAgICAgICAgICAgICAgIGRlYWQ6IDAKIHNldF9sYWJlbCAkTDAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIAogZXhpdF90YiAkMHg3Zjg1MTAwMDAwNDMgICAg
+ICAgICAgICAgICAgCgpPVVQ6IFtzaXplPTcyXQoweDdmODUxMDAwMDEwMDogIG1vdiAgICAt
+MHgxMCglcmJwKSwlZWJ4CQlbdGIgaGVhZGVyICYgaW5pdGlhbCBpbnN0cnVjdGlvbl0KMHg3
+Zjg1MTAwMDAxMDM6ICB0ZXN0ICAgJWVieCwlZWJ4CjB4N2Y4NTEwMDAwMTA1OiAgamwgICAg
+IDB4N2Y4NTEwMDAwMTMwCjB4N2Y4NTEwMDAwMTBiOiAgbW92ICAgICQweDEsJWVieAoweDdm
+ODUxMDAwMDExMDogIG1vdiAgICAlZWJ4LDB4MCglcmJwKQoweDdmODUxMDAwMDExMzogIG1v
+diAgICAweDQoJXJicCksJXIxMmQKMHg3Zjg1MTAwMDAxMTc6ICBhZGQgICAgJXIxMmQsJWVi
+eAoweDdmODUxMDAwMDExYTogIG1vdiAgICAlZWJ4LDB4NCglcmJwKQoweDdmODUxMDAwMDEx
+ZDogIG1vdmwgICAkMHg0LDB4ODAoJXJicCkKMHg3Zjg1MTAwMDAxMjc6ICBtb3YgICAgJXJi
+cCwlcmRpCjB4N2Y4NTEwMDAwMTJhOiAgY2FsbHEgICoweDEwKCVyaXApICAgICAgICAjIDB4
+N2Y4NTEwMDAwMTQwCjB4N2Y4NTEwMDAwMTMwOiAgbGVhICAgIC0weGY0KCVyaXApLCVyYXgg
+ICAgICAgICMgMHg3Zjg1MTAwMDAwNDMKMHg3Zjg1MTAwMDAxMzc6ICBqbXBxICAgMHg3Zjg1
+MTAwMDAwMTgKICBkYXRhOiBbc2l6ZT04XQoweDdmODUxMDAwMDE0MDogIC5xdWFkICAweDAw
+MDA1NTZlMTVkMDAwZDAKCi0tLS0gRW5kIG9mIFFlbXUgb3V0cHV0IC0tLS0KClRoZSBjb25z
+dGFudCBpcyBmaXJzdCBsb2FkZWQgaW50byBgZWJ4YCBhbmQgdGhlbiBzeW5jZWQgYmFjayB0
+bwppdHMgbWVtb3J5IGxvY2F0aW9uLiBBbmQgZnVydGhlciBhZGRpdGlvbiBpcyBvZiByZWdp
+c3RlciBmb3JtYXQuCkFuZCBJIHRyaWVkIGl0IGFnYWluIGFmdGVyIHJlbW92ZSB0aGUgYGZy
+ZWVfb3JfZGVhZGAgY2hlY2sgaW4KYHRlbXBfc3luY2AsIGl0IGdpdmVzOgoKLS0tLSBQYXN0
+aW5nIG91dHB1dCBvZiBRZW11IC0tLS0KClFFTVUgNS4wLjkzIG1vbml0b3IgLSB0eXBlICdo
+ZWxwJyBmb3IgbW9yZSBpbmZvcm1hdGlvbgoocWVtdSkgT1A6CiBsZF9pMzIgdG1wMCxlbnYs
+JDB4ZmZmZmZmZmZmZmZmZmZmMAogbW92aV9pMzIgdG1wMSwkMHgwCiBicmNvbmRfaTMyIHRt
+cDAsdG1wMSxsdCwkTDAKCiAtLS0tIDAwMDAwMDAwCiBtb3ZpX2kzMiByMCwkMHgxCiBhZGRf
+aTMyIHIxLHIxLHIwCiBtb3ZpX2kzMiBwYywkMHg0CiBjYWxsIGhsdCwkMHg4LCQwLGVudgog
+ZXhpdF90YiAkMHgwCiBzZXRfbGFiZWwgJEwwCiBleGl0X3RiICQweDdmOWRiMDAwMDA0MwoK
+T1AgYWZ0ZXIgb3B0aW1pemF0aW9uIGFuZCBsaXZlbmVzcyBhbmFseXNpczoKIGxkX2kzMiB0
+bXAwLGVudiwkMHhmZmZmZmZmZmZmZmZmZmYwICAgICAgZGVhZDogMSAgcHJlZj0weGZmZmYK
+IG1vdmlfaTMyIHRtcDEsJDB4MCAgICAgICAgICAgICAgICAgICAgICAgcHJlZj0weGZmZmYK
+IGJyY29uZF9pMzIgdG1wMCx0bXAxLGx0LCRMMCAgICAgICAgICAgICAgZGVhZDogMCAxCgog
+LS0tLSAwMDAwMDAwMCAgICAgICAgICAgICAgICAgICAgICAgICAKIG1vdmlfaTMyIHIwLCQw
+eDEgICAgICAgICAgICAgICAgICAgICAgICAgc3luYzogMCAgcHJlZj0weGZmZmYKIGFkZF9p
+MzIgcjEscjEscjAgICAgICAgICAgICAgICAgICAgICAgICAgc3luYzogMCAgZGVhZDogMCAx
+IDIgIHByZWY9MHhmZmZmCiBtb3ZpX2kzMiBwYywkMHg0ICAgICAgICAgICAgICAgICAgICAg
+ICAgIHN5bmM6IDAgIGRlYWQ6IDAgIHByZWY9MHhmZmZmCiBjYWxsIGhsdCwkMHg4LCQwLGVu
+diAgICAgICAgICAgICAgICAgICAgIGRlYWQ6IDAKIHNldF9sYWJlbCAkTDAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIAogZXhpdF90YiAkMHg3ZjlkYjAwMDAwNDMgICAgICAgICAgICAg
+ICAgCgpPVVQ6IFtzaXplPTcyXQoweDdmOWRiMDAwMDEwMDogIG1vdiAgICAtMHgxMCglcmJw
+KSwlZWJ4CQlbdGIgaGVhZGVyICYgaW5pdGlhbCBpbnN0cnVjdGlvbl0KMHg3ZjlkYjAwMDAx
+MDM6ICB0ZXN0ICAgJWVieCwlZWJ4CjB4N2Y5ZGIwMDAwMTA1OiAgamwgICAgIDB4N2Y5ZGIw
+MDAwMTJkCjB4N2Y5ZGIwMDAwMTBiOiAgbW92bCAgICQweDEsMHgwKCVyYnApCjB4N2Y5ZGIw
+MDAwMTEyOiAgbW92ICAgIDB4NCglcmJwKSwlZWJ4CjB4N2Y5ZGIwMDAwMTE1OiAgaW5jICAg
+ICVlYngKMHg3ZjlkYjAwMDAxMTc6ICBtb3YgICAgJWVieCwweDQoJXJicCkKMHg3ZjlkYjAw
+MDAxMWE6ICBtb3ZsICAgJDB4NCwweDgwKCVyYnApCjB4N2Y5ZGIwMDAwMTI0OiAgbW92ICAg
+ICVyYnAsJXJkaQoweDdmOWRiMDAwMDEyNzogIGNhbGxxICAqMHgxMyglcmlwKSAgICAgICAg
+IyAweDdmOWRiMDAwMDE0MAoweDdmOWRiMDAwMDEyZDogIGxlYSAgICAtMHhmMSglcmlwKSwl
+cmF4ICAgICAgICAjIDB4N2Y5ZGIwMDAwMDQzCjB4N2Y5ZGIwMDAwMTM0OiAgam1wcSAgIDB4
+N2Y5ZGIwMDAwMDE4CiAgZGF0YTogW3NpemU9OF0KMHg3ZjlkYjAwMDAxNDA6ICAucXVhZCAg
+MHgwMDAwNTY0YWVkMjEyMGQwCgotLS0tIEVuZCBvZiBRZW11IG91dHB1dCAtLS0tCgpUaGlz
+IHN5bmNzIHRoZSBjb25zdGFudCBkaXJlY3RseSBiYWNrIHRvIG1lbW9yeSBhbmQgdXNlIGBp
+bmNgCmluc3RlYWQgb2YgcmVnaXN0ZXIgYWRkIGZvciBgYWRkX2kzMmAsIHdoaWNoIGlzIGtp
+bmQgb2YgdGhlIGludHVpdGl2ZQp0aGluZyB0byBkby4gQnV0IEknbSBub3Qgc3VyZSB3aGV0
+aGVyIGl0IHdpbGwgYnJlYWsgc29tZXRoaW5nIGVsc2UuCgpHaXZlbiB0aGUgYWJvdmUgcmVz
+dWx0LCBJJ20gY3VyaW91cyBhYm91dCB3aHkgdGhlIHJlZ2lzdGVyIGlzIGxvYWQgaGVyZS4K
+SXMgaXQgYmVjYXVzZSB0aGF0IHJlcGVhdGVkbHkgZW1iZWRkaW5nIHRoZSBzYW1lIGxhcmdl
+IGNvbnN0YW50IGluCmluc3RydWN0aW9ucyBpbmZsYXRlcyB0aGUgY29kZT8gKG9yIGl0IGNv
+dWxkIGJlIG90aGVyIHJlYXNvbnM/KSBMb29raW5nCmZvcndhcmQgdG8geW91ciBmdXJ0aGVy
+IHJlcGx5IQoKVGhhbmtzLApscndlaQoKPiAKPiA+IFNvIEkgd29uZGVyIHdoZXRoZXIgdGhl
+cmUgaXMgYW55IHJlYXNvbiBmb3IgdGhpcyBsb2FkaW5nIGEgY29uc3RhbnQKPiA+IGludG8g
+cmVnaXN0ZXIsIEknbGwgYmUgdmVyeSBhcHByZWNpYXRlZCBpZiBzb21lb25lIGNhbiBwb2lu
+dCBvdXQgdGhlCj4gPiByZWFzb24gZm9yIG1lLgo+IAo+IDxzbmlwPgo+IAo+ID4KPiA+Cj4g
+PiBUaGFua3MgaW4gYWR2YW5jZS4KPiA+IGxyd2VpCj4gPiAtLS0tLS0tLS0tLS0tLS0tLS1P
+cmlnaW5hbC0tLS0tLS0tLS0tLS0tLS0tLQo+ID4gRnJvbTogImxyd2VpIjxbaGlkZGVuIGVt
+YWlsXT4KPiA+IERhdGU6IFR1ZSwgQXVnIDQsIDIwMjAgMTI6MDYgUE0KPiA+IFRvOiAicWVt
+dS1kaXNjdXNzIjxbaGlkZGVuIGVtYWlsXT4KPiA+IFN1YmplY3Q6IFF1ZXN0aW9uIG9uIGlt
+cGxlbWVudGF0aW9uIGRldGFpbCBvZiBgdGVtcF9zeW5jYAo+ID4KPiA8cmUtcGFzdGVkIGZp
+eGluZyBodG1sIG5vaXNlPgo+IAo+ID4gSGVsbG8gdG8gdGhlIGxpc3QsCj4gPiBSZWNlbnRs
+eSBJIGhhdmUgYmVlbiBzdHVkeWluZyB0aGUgY29kZSBvZiBUQ0csIGFuZCBnZXQgY29uZnVz
+ZWQgYnkKPiA+IHRoZSBmb2xsb3dpbmcgZGV0YWlsIGluIGZ1bmN0aW9uIGB0ZW1wX3N5bmNg
+IGluIHRjZy90Y2cuYzoKPiAKPiA+ICAgICBjYXNlIFRFTVBfVkFMX0NPTlNUOgo+ID4gICAg
+ICAgICAvKiBJZiB3ZSdyZSBnb2luZyB0byBmcmVlIHRoZSB0ZW1wIGltbWVkaWF0ZWx5LCB0
+aGVuIHdlIHdvbid0Cj4gPiAgICAgICAgICAgIHJlcXVpcmUgaXQgbGF0ZXIgaW4gYSByZWdp
+c3Rlciwgc28gYXR0ZW1wdCB0byBzdG9yZSB0aGUKPiA+ICAgICAgICAgICAgY29uc3RhbnQg
+dG8gbWVtb3J5IGRpcmVjdGx5LiAgKi8KPiA+ICAgICAgICAgaWYgKGZyZWVfb3JfZGVhZAo+
+ID4gICAgICAgICAgICAgJiYgdGNnX291dF9zdGkocywgdHMtPnR5cGUsIHRzLT52YWwsCj4g
+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0cy0+bWVtX2Jhc2UtPnJlZywgdHMtPm1l
+bV9vZmZzZXQpKSB7Cj4gPiAgICAgICAgICAgICBicmVhazsKPiA+ICAgICAgICAgfQo+ID4g
+ICAgICAgICB0ZW1wX2xvYWQocywgdHMsIHRjZ190YXJnZXRfYXZhaWxhYmxlX3JlZ3NbdHMt
+PnR5cGVdLAo+ID4gICAgICAgICAgICAgICAgICAgYWxsb2NhdGVkX3JlZ3MsIHByZWZlcnJl
+ZF9yZWdzKTsKPiA+ICAgICAgICAgLyogZmFsbHRocm91Z2ggKi8KPiAKPiA+IFdvdWxkIGl0
+IGJlIGJldHRlciB0byByZW1vdmUgdGhlIGBmcmVlX29yX2RlYWRgIGluIHRoZSBpZiBzdGF0
+ZW1lbnQsCj4gPiBpLmUuIHR1cm4gdGhlIGZ1bmN0aW9uIHRvIGJlOgo+IAo+ID4gICAgIGNh
+c2UgVEVNUF9WQUxfQ09OU1Q6Cj4gPiAgICAgICAgIGlmICh0Y2dfb3V0X3N0aShzLCB0cy0+
+dHlwZSwgdHMtPnZhbCwKPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRzLT5tZW1f
+YmFzZS0+cmVnLCB0cy0+bWVtX29mZnNldCkpIHsKPiA+ICAgICAgICAgICAgIGJyZWFrOwo+
+ID4gICAgICAgICB9Cj4gPiAgICAgICAgIHRlbXBfbG9hZChzLCB0cywgdGNnX3RhcmdldF9h
+dmFpbGFibGVfcmVnc1t0cy0+dHlwZV0sCj4gPiAgICAgICAgICAgICAgICAgICBhbGxvY2F0
+ZWRfcmVncywgcHJlZmVycmVkX3JlZ3MpOwo+ID4gICAgICAgICAvKiBmYWxsdGhyb3VnaCAq
+Lwo+IAo+IAo+IC0tIAo+IEFsZXggQmVubull
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .gitlab-ci.yml | 26 +++++++++++++++++++-------
- .travis.yml    |  6 ------
- 2 files changed, 19 insertions(+), 13 deletions(-)
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 9820066379..672bd9a318 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -190,13 +190,25 @@ build-disabled:
-   <<: *native_build_job_definition
-   variables:
-     IMAGE: fedora
--    CONFIGURE_ARGS: --disable-rdma --disable-slirp --disable-curl
--      --disable-capstone --disable-live-block-migration --disable-glusterfs
--      --disable-replication --disable-coroutine-pool --disable-smartcard
--      --disable-guest-agent --disable-curses --disable-libxml2 --disable-tpm
--      --disable-qom-cast-debug --disable-spice --disable-vhost-vsock
--      --disable-vhost-net --disable-vhost-crypto --disable-vhost-user
--    TARGETS: i386-softmmu ppc64-softmmu mips64-softmmu i386-linux-user
-+    CONFIGURE_ARGS: --disable-attr --disable-avx2 --disable-bochs
-+      --disable-brlapi --disable-bzip2 --disable-cap-ng --disable-capstone
-+      --disable-cloop --disable-coroutine-pool --disable-curl --disable-curses
-+      --disable-dmg --disable-docs --disable-glusterfs --disable-gnutls
-+      --disable-gtk --disable-guest-agent --disable-iconv --disable-kvm
-+      --disable-libiscsi --disable-libpmem --disable-libssh --disable-libusb
-+      --disable-libxml2 --disable-linux-aio --disable-live-block-migration
-+      --disable-lzo --disable-malloc-trim --disable-mpath --disable-nettle
-+      --disable-numa --disable-parallels --disable-pie --disable-qcow1
-+      --disable-qed --disable-qom-cast-debug --disable-rbd --disable-rdma
-+      --disable-replication --disable-sdl --disable-seccomp --disable-sheepdog
-+      --disable-slirp --disable-smartcard --disable-snappy --disable-spice
-+      --disable-strip --disable-tpm --disable-usb-redir --disable-vdi
-+      --disable-vhost-crypto --disable-vhost-net --disable-vhost-scsi
-+      --disable-vhost-user --disable-vhost-vdpa --disable-vhost-vsock
-+      --disable-virglrenderer --disable-vnc --disable-vte --disable-vvfat
-+      --disable-xen --disable-zstd
-+    TARGETS: arm-softmmu i386-softmmu ppc64-softmmu mips64-softmmu
-+      s390x-softmmu i386-linux-user
-     MAKE_CHECK_ARGS: check-qtest SPEED=slow
- 
- build-tcg-disabled:
-diff --git a/.travis.yml b/.travis.yml
-index b4c603f0ec..9e454eea0a 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -145,12 +145,6 @@ jobs:
-         - CONFIG="--enable-debug-tcg --disable-system"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
- 
--
--    - name: "GCC some libs disabled (main-softmmu)"
--      env:
--        - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-libusb --disable-replication --target-list=${MAIN_SOFTMMU_TARGETS}"
--
--
-     # Module builds are mostly of interest to major distros
-     - name: "GCC modules (main-softmmu)"
-       env:
--- 
-2.18.1
 
 
