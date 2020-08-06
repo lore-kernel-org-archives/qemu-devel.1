@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6765C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8977BC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:30:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAEA32177B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:30:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88A032173E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 19:30:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KhwWlFSF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEA32177B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ih0gxIUH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88A032173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3laT-0005gO-MJ
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:30:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42784)
+	id 1k3lb8-0006fz-BC
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 15:30:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOK-0004UE-VG
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35965
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k3lOQ-0004gJ-9O
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53080
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3lOI-0006SU-W2
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:28 -0400
+ id 1k3lOO-0006TI-4w
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 15:17:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596741446;
+ s=mimecast20190719; t=1596741451;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=f66LBORp0lbxdmyrhmjB3U8Q1hcqWMAMFo+3DLLY2+E=;
- b=KhwWlFSFES1Nxc2r+9kLSBBfnqS2xC/Xmnq4A/+3lJnfUgxqquq+TQQqmC5jsdLAFnoggP
- rUEzbERF9irz+nqctad4tQgMa9Wa/2ZKUdTf1fl5x6QU+LQ3rku0dMRdizJCsXkzPpFf52
- B0PfRMp6+pC4GLH9I+NAuQkJgCUUWEw=
+ bh=/nygjzFAWrBE2g18NJNO7roesr7Z9xR2ejDhLuREhLw=;
+ b=ih0gxIUH44BPKAgmDhWrPFNyg5sWTCsvkoW9QnkfnBhD19XihJSnsyRb2JoMsTQm3KaZoM
+ wuz0+64dHc+4lQ+WjlAOY+aWP/g2C9TGKPKKKt1XL+/HNdLA/2qHk3GXvkMjltiwu+P5rt
+ WAg/ii8EYQ2ueHmeB9+WdJHvVuD++KQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-W5uoWXi2NlSmOC_X2MK_3g-1; Thu, 06 Aug 2020 15:17:24 -0400
-X-MC-Unique: W5uoWXi2NlSmOC_X2MK_3g-1
+ us-mta-475-sqv826byMBGo0Qvzdd3AAw-1; Thu, 06 Aug 2020 15:17:28 -0400
+X-MC-Unique: sqv826byMBGo0Qvzdd3AAw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76EBF8014C1
- for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E808107BEF6
+ for <qemu-devel@nongnu.org>; Thu,  6 Aug 2020 19:17:27 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 87E315F9DC;
- Thu,  6 Aug 2020 19:17:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9FB0B1D3;
+ Thu,  6 Aug 2020 19:17:26 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 032/143] contrib/elf2dmp: convert to meson
-Date: Thu,  6 Aug 2020 21:14:28 +0200
-Message-Id: <1596741379-12902-33-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 035/143] meson: add msi generation
+Date: Thu,  6 Aug 2020 21:14:31 +0200
+Message-Id: <1596741379-12902-36-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 05:03:13
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 03:10:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,110 +107,96 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                      | 4 ----
- Makefile.objs                 | 6 ------
- configure                     | 3 ---
- contrib/elf2dmp/Makefile.objs | 4 ----
- contrib/elf2dmp/meson.build   | 4 ++++
- meson.build                   | 6 ++++++
- 6 files changed, 10 insertions(+), 17 deletions(-)
- delete mode 100644 contrib/elf2dmp/Makefile.objs
- create mode 100644 contrib/elf2dmp/meson.build
+ Makefile                  | 18 ------------------
+ qga/meson.build           | 25 +++++++++++++++++++++++++
+ qga/vss-win32/meson.build |  3 ++-
+ 3 files changed, 27 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index e3d54c0..39bf0c4 100644
+index 3451981..7c4a34a 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -286,7 +286,6 @@ dummy := $(call unnest-vars,, \
-                 authz-obj-y \
-                 chardev-obj-y \
-                 qga-obj-y \
--                elf2dmp-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -496,9 +495,6 @@ ifneq ($(EXESUF),)
- qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+@@ -434,23 +434,6 @@ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
+ qemu-keymap$(EXESUF): LIBS += $(XKBCOMMON_LIBS)
+ qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
+ 
+-ifdef QEMU_GA_MSI_ENABLED
+-QEMU_GA_MSI=qemu-ga-$(ARCH).msi
+-
+-msi: $(QEMU_GA_MSI)
+-
+-$(QEMU_GA_MSI): qga/qemu-ga.exe $(QGA_VSS_PROVIDER)
+-
+-$(QEMU_GA_MSI): config-host.mak
+-
+-$(QEMU_GA_MSI):  $(SRC_PATH)/qga/installer/qemu-ga.wxs
+-	$(call quiet-command,QEMU_GA_VERSION="$(QEMU_GA_VERSION)" QEMU_GA_MANUFACTURER="$(QEMU_GA_MANUFACTURER)" QEMU_GA_DISTRO="$(QEMU_GA_DISTRO)" BUILD_DIR="$(BUILD_DIR)" \
+-	wixl -o $@ $(QEMU_GA_MSI_ARCH) $(QEMU_GA_MSI_WITH_VSS) $(QEMU_GA_MSI_MINGW_DLL_PATH) $<,"WIXL","$@")
+-else
+-msi:
+-	@echo "MSI build not configured or dependency resolution failed (reconfigure with --enable-guest-agent-msi option)"
+-endif
+-
+ ifneq ($(EXESUF),)
+ .PHONY: qga/qemu-ga
+ qga/qemu-ga: qga/qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+@@ -465,7 +448,6 @@ clean: recurse-clean
+ # avoid old build problems by removing potentially incorrect old files
+ 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
+ 	rm -f qemu-options.def
+-	rm -f *.msi
+ 	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f \
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
+diff --git a/qga/meson.build b/qga/meson.build
+index 7dc031f..9246575 100644
+--- a/qga/meson.build
++++ b/qga/meson.build
+@@ -47,5 +47,30 @@ qga = executable('qemu-ga', qga_ss.sources(),
+ if host_machine.system() == 'windows'
+   if 'CONFIG_QGA_VSS' in config_host
+     subdir('vss-win32')
++  else
++    gen_tlb = []
++  endif
++
++  wixl = find_program('wixl', required: false)
++  if wixl.found()
++    deps = [gen_tlb, qga]
++    if 'QEMU_GA_MSI_WITH_VSS' in config_host
++      deps += qga_vss
++    endif
++    qga_msi = custom_target('QGA MSI',
++                            input: files('installer/qemu-ga.wxs'),
++                            output: 'qemu-ga-@0@.msi'.format(config_host['ARCH']),
++                            depends: deps,
++                            command: [
++                              'QEMU_GA_VERSION=' + config_host['QEMU_GA_VERSION'],
++                              'QEMU_GA_MANUFACTURER=' + config_host['QEMU_GA_MANUFACTURER'],
++                              'QEMU_GA_DISTRO=' + config_host['QEMU_GA_DISTRO'],
++                              'BUILD_DIR=' + meson.build_root(),
++                              wixl, '-o', '@OUTPUT0@', '@INPUT0@',
++                              config_host['QEMU_GA_MSI_ARCH'].split(),
++                              config_host['QEMU_GA_MSI_WITH_VSS'].split(),
++                              config_host['QEMU_GA_MSI_MINGW_DLL_PATH'].split(),
++                            ])
++    alias_target('msi', qga_msi)
+   endif
  endif
- 
--elf2dmp$(EXESUF): $(elf2dmp-obj-y)
--	$(call LINK, $^)
--
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
-diff --git a/Makefile.objs b/Makefile.objs
-index 336a684..1486254 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -100,9 +100,3 @@ version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
- # extracted into a QAPI schema module, or perhaps a separate schema.
- qga-obj-y = qga/
- qga-vss-dll-obj-y = qga/
--
--######################################################################
--# contrib
--elf2dmp-obj-y = contrib/elf2dmp/
--
--######################################################################
-diff --git a/configure b/configure
-index 473173d..b57968b 100755
---- a/configure
-+++ b/configure
-@@ -6647,9 +6647,6 @@ if test "$want_tools" = "yes" ; then
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-nbd\$(EXESUF) qemu-storage-daemon\$(EXESUF) $tools"
-   fi
--  if [ "$curl" = "yes" ]; then
--      tools="elf2dmp\$(EXESUF) $tools"
--  fi
- fi
- if test "$softmmu" = yes ; then
-   if test "$linux" = yes; then
-diff --git a/contrib/elf2dmp/Makefile.objs b/contrib/elf2dmp/Makefile.objs
-deleted file mode 100644
-index 1505716..0000000
---- a/contrib/elf2dmp/Makefile.objs
-+++ /dev/null
-@@ -1,4 +0,0 @@
--elf2dmp-obj-y = main.o addrspace.o download.o pdb.o qemu_elf.o
--
--download.o-cflags := $(CURL_CFLAGS)
--download.o-libs   := $(CURL_LIBS)
-diff --git a/contrib/elf2dmp/meson.build b/contrib/elf2dmp/meson.build
-new file mode 100644
-index 0000000..b9e5199
---- /dev/null
-+++ b/contrib/elf2dmp/meson.build
-@@ -0,0 +1,4 @@
-+if 'CONFIG_CURL' in config_host
-+  executable('elf2dmp', files('main.c', 'addrspace.c', 'download.c', 'pdb.c', 'qemu_elf.c'),
-+             dependencies: [glib, curl])
-+endif
-diff --git a/meson.build b/meson.build
-index aa6fffa..21e822e 100644
---- a/meson.build
-+++ b/meson.build
-@@ -106,6 +106,11 @@ if 'CONFIG_VIRGL' in config_host
-   virgl = declare_dependency(compile_args: config_host['VIRGL_CFLAGS'].split(),
-                              link_args: config_host['VIRGL_LIBS'].split())
- endif
-+curl = not_found
-+if 'CONFIG_CURL' in config_host
-+  curl = declare_dependency(compile_args: config_host['CURL_CFLAGS'].split(),
-+                            link_args: config_host['CURL_LIBS'].split())
-+endif
- 
- target_dirs = config_host['TARGET_DIRS'].split()
- have_user = false
-@@ -254,6 +259,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
- 
- if have_tools
-   subdir('contrib/rdmacm-mux')
-+  subdir('contrib/elf2dmp')
- 
-   if 'CONFIG_VHOST_USER' in config_host
-     subdir('contrib/libvhost-user')
+diff --git a/qga/vss-win32/meson.build b/qga/vss-win32/meson.build
+index 42c8d31..1f39e05 100644
+--- a/qga/vss-win32/meson.build
++++ b/qga/vss-win32/meson.build
+@@ -2,7 +2,8 @@ if add_languages('cpp', required: false)
+   glib_static = dependency('glib-2.0', static: true)
+   link_args = cc.get_supported_link_arguments(['-fstack-protector-all', '-fstack-protector-strong',
+                                                '-Wl,--add-stdcall-alias', '-Wl,--enable-stdcall-fixup'])
+-  shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
++
++  qga_vss = shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
+                 name_prefix: '',
+                 cpp_args: ['-Wno-unknown-pragmas', '-Wno-delete-non-virtual-dtor', '-Wno-non-virtual-dtor'],
+                 link_args: link_args,
 -- 
 1.8.3.1
 
