@@ -2,68 +2,91 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3ACAC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B13AEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:19:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE26222D2C
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:19:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82B2322D2C
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:19:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jNrKrLfJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE26222D2C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="MsB8JrE7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82B2322D2C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3YEX-0005aQ-7V
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 01:14:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50702)
+	id 1k3dqX-0007y7-Rl
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:14:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k3YBC-0001Ch-34; Thu, 06 Aug 2020 01:11:02 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:54419)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k3YB7-0001cq-JG; Thu, 06 Aug 2020 01:11:01 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BMc5N0TgZz9sTR; Thu,  6 Aug 2020 15:10:47 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1596690648;
- bh=JsDsI51HT4SqEg29zaHViwyxEl5MDXP+6OYyrRUK5U8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=jNrKrLfJa8UkKpQTJSGobz1nxBX0MZqXBFVJ3RmhhT8fA2b4MXcFufslevDkVBQRA
- squM+y9LToErSvPkemCdtEP3zx3NW5NrENKEjPKbbOP6tmINuB/8/afzsK80buMK/O
- RM3/v6EnoA3SNK9iECPRilx/otlGZQI+lWsfP/3A=
-Date: Thu, 6 Aug 2020 15:05:54 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH for-5.2 2/5] spapr/xive: Simplify kvmppc_xive_disconnect()
-Message-ID: <20200806050554.GB100968@yekko.fritz.box>
-References: <159664891296.638781.18417631893299150932.stgit@bahia.lan>
- <159664892990.638781.13517846040386267779.stgit@bahia.lan>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="OwLcNYc0lM97+oe1"
-Content-Disposition: inline
-In-Reply-To: <159664892990.638781.13517846040386267779.stgit@bahia.lan>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k3dSI-0003H1-Mo
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:49:03 -0400
+Received: from mail-pj1-x1032.google.com ([2607:f8b0:4864:20::1032]:50787)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k3dSF-0007wC-IQ
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:49:02 -0400
+Received: by mail-pj1-x1032.google.com with SMTP id e4so6462233pjd.0
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 03:48:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=PiCEwek3GwYlV43qpUnwxVVCiWPiDa7KHjCJA4ZX0UQ=;
+ b=MsB8JrE7I5MFPmHot0vneajUmpA6M7gNqOTOAUpo04jMn1X2BMZrvHj8dCwvglpBp3
+ qnxM2oukwU3ASvtzMlPRpgXniMFnkSRTt5AH6D2lFmfp4lmyHK3cQLtzkFtrtXa/tPzQ
+ yHIAKx6V/fnCoHEDuUnQx9NTgncHv0NLEb5MhGqM79Om3tqM6BBZvfMsGx5GPMD7Ao0F
+ WQEh5OWQqdBg+aajKQjdT4PNebzgrSKEYv7TSUIwxHhFs5p/whMYTK6zFKdlEXX5d0UF
+ 3RAFGn71QuCsWFfiJMPrSlNQkxHV8pidDnPXYFh18thdc3cSjP9Q1N9LNfHLmSM/OUwf
+ huAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=PiCEwek3GwYlV43qpUnwxVVCiWPiDa7KHjCJA4ZX0UQ=;
+ b=f62V86DHmBBhN8JGbQykRDEHxJkOvFrpsKRwmEX4tofoK6Cg3L6GfPAKQ4L6tTMD/B
+ zZ2Ssx52BRGjo9Vsbzjw4ZPCqhYzArE5mgwXVliEsJeOQv8JNPlcQFZxY3Qs14OUoTaC
+ U0CrtkBlxkfHWvWkNgYVvosWREzhd3/vc/oRZg/n0v86dYxnkae16AQU+5BI1vpqTKVo
+ YkTanxx2EzIEiWDNafa/3egkir2tNfUxAPu1jldbUtZE72907j1lIFiLIwaqvljWx6q7
+ goFwEM9Str6rejHw97qG+JCaHtVMx7vXuagl+2aAWwI6qeKvYaHzlnN+F34MkzakdRkm
+ KGHA==
+X-Gm-Message-State: AOAM5302B0K8LOqwcN3T7U/eCVYmGqJ1TlPnMZaVOk71qEwHsNuyGyEw
+ QdeswG3T6+mDv8OG58KwI3x9H89W0Cg=
+X-Google-Smtp-Source: ABdhPJz10N+TBes7c7VQd+tZVK5m/60+N6vJWOcd/0LqTnB1MU0e/stF0NLfw9JVjCjX3XvjIzKQLQ==
+X-Received: by 2002:a17:90a:c003:: with SMTP id
+ p3mr7718660pjt.120.1596710935496; 
+ Thu, 06 Aug 2020 03:48:55 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id f18sm6567309pgv.84.2020.08.06.03.48.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 06 Aug 2020 03:48:55 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC v3 38/71] target/riscv: rvv-1.0: floating-point move instruction
+Date: Thu,  6 Aug 2020 18:46:35 +0800
+Message-Id: <20200806104709.13235-39-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200806104709.13235-1-frank.chang@sifive.com>
+References: <20200806104709.13235-1-frank.chang@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1032;
+ envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1032.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,82 +99,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>, qemu-ppc@nongnu.org,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: Frank Chang <frank.chang@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Frank Chang <frank.chang@sifive.com>
 
---OwLcNYc0lM97+oe1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+NaN-boxed the scalar floating-point register based on RVV 1.0's rules.
 
-On Wed, Aug 05, 2020 at 07:35:29PM +0200, Greg Kurz wrote:
-> Since this function begins with:
->=20
->     /* The KVM XIVE device is not in use */
->     if (!xive || xive->fd =3D=3D -1) {
->         return;
->     }
->=20
-> we obviously don't need to check xive->fd again.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Frank Chang <frank.chang@sifive.com>
+---
+ target/riscv/insn_trans/trans_rvv.inc.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-Applied to ppc-for-5.2.
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc.c
+index 61d913fb4d9..60ec83e412e 100644
+--- a/target/riscv/insn_trans/trans_rvv.inc.c
++++ b/target/riscv/insn_trans/trans_rvv.inc.c
+@@ -2678,12 +2678,17 @@ GEN_OPFVF_TRANS(vfmerge_vfm,  opfvf_check)
+ static bool trans_vfmv_v_f(DisasContext *s, arg_vfmv_v_f *a)
+ {
+     if (require_rvv(s) &&
++        has_ext(s, RVF) &&
+         vext_check_isa_ill(s) &&
+         require_align(a->rd, s->flmul) &&
+         (s->sew != 0)) {
++        TCGv_i64 t1 = tcg_temp_local_new_i64();
++        /* NaN-box f[rs1] */
++        do_nanbox(s, t1, cpu_fpr[a->rs1]);
++
+         if (s->vl_eq_vlmax) {
+             tcg_gen_gvec_dup_i64(s->sew, vreg_ofs(s, a->rd),
+-                                 MAXSZ(s), MAXSZ(s), cpu_fpr[a->rs1]);
++                                 MAXSZ(s), MAXSZ(s), t1);
+             mark_vs_dirty(s);
+         } else {
+             TCGv_ptr dest;
+@@ -2700,13 +2705,15 @@ static bool trans_vfmv_v_f(DisasContext *s, arg_vfmv_v_f *a)
+             dest = tcg_temp_new_ptr();
+             desc = tcg_const_i32(simd_desc(0, s->vlen / 8, data));
+             tcg_gen_addi_ptr(dest, cpu_env, vreg_ofs(s, a->rd));
+-            fns[s->sew - 1](dest, cpu_fpr[a->rs1], cpu_env, desc);
++
++            fns[s->sew - 1](dest, t1, cpu_env, desc);
+ 
+             tcg_temp_free_ptr(dest);
+             tcg_temp_free_i32(desc);
+             mark_vs_dirty(s);
+             gen_set_label(over);
+         }
++        tcg_temp_free_i64(t1);
+         return true;
+     }
+     return false;
+-- 
+2.17.1
 
-> ---
->  hw/intc/spapr_xive_kvm.c |    6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index d55ea4670e0e..893a1ee77e70 100644
-> --- a/hw/intc/spapr_xive_kvm.c
-> +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -873,10 +873,8 @@ void kvmppc_xive_disconnect(SpaprInterruptController=
- *intc)
->       * and removed from the list of devices of the VM. The VCPU
->       * presenters are also detached from the device.
->       */
-> -    if (xive->fd !=3D -1) {
-> -        close(xive->fd);
-> -        xive->fd =3D -1;
-> -    }
-> +    close(xive->fd);
-> +    xive->fd =3D -1;
-> =20
->      kvm_kernel_irqchip =3D false;
->      kvm_msi_via_irqfd_allowed =3D false;
->=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---OwLcNYc0lM97+oe1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8rj7EACgkQbDjKyiDZ
-s5LyaRAAzGeXQc82khP+S6Ta8ccI2jUSx7sRS//ZIV4Clj3ryKPk8t1FE3kDD6bN
-0LUBFUu7IYQUs+nKVMKOsh98jDd0s+AXf/E+hj6R0f08bIw/4mTKB3vzp646imib
-LunBQiMFRti1LQme4mIctELg+YXtIC/kxTEEmjlTyTacmXbGvdQro1xvmS2A1EMN
-D5zbqFibaX//Mjl4uk92ghWzAhyCxspVADCNRR5giKu+hcasHM7Y9JqOcOUbHsyI
-r4p8xdlKc1xLcG+B/zMAbvtLCxZnejoc0n/OZg4THuKnNyfiY/KQmQBWS6tza0bB
-VwT6O49olesuTnMesrYHOV0kRHzAsp8z4FFAPP7ffYVgcYFAASc+ACW5twI25OIE
-gylNjST/seGjL4WSqJzgHM7JOzCJ40PCvcWSZNwHjrRplSCW6HMAdyBYkoews+UK
-6mRrq9Ze06Qe4ftbXMiHpiLxppRHmaFu6sgtBOaT9pAeEiykl3qsK33Mv6LpQ8/9
-25COowFMUGRqDDz2FqF1573IEwAcuGJWRyy7n2Ti1Kl2ZOtujezGsVnOdmDooU8N
-+warHMv1ChStrPkmsuZT/4EewRdGxXrFtL+iY83mS4LxdPUS1FyG+vF/FhZC6vv3
-w7a06GUUPfS8Xy+roFoV2SPqDTFIcr5YM2zb2d6c6ia265LSbY0=
-=rHij
------END PGP SIGNATURE-----
-
---OwLcNYc0lM97+oe1--
 
