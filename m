@@ -2,84 +2,72 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29512C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE2D1C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2ABC204FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A38FE204FD
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zj5CP2H2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2ABC204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lV3E2aFm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A38FE204FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3dzl-0003ba-8n
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:23:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42966)
+	id 1k3Yql-0006xI-DH
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 01:53:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXI-0004TR-Lh
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:12 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60805
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXH-0000J7-29
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596711247;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=h8EvJZ035WHxSXid+8QTy6DZMmKeb3NVgaxvccUMGDI=;
- b=Zj5CP2H2y/GWgNTaMnaZautxX5qxMms9HZXYkVWtEoYBk7UJ1vjNWju1xfmF8QedvRqjiQ
- cwuG7T9Zq6KcBbaEFJsjeRW1eRAV2Vgcx6BHEYQBMO0T7UKSsBKhsRWy/k2no2Z9YV5Tk2
- P45E6J6JXm1g+eBJVV1+msI1IyL71Qs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-D84FcchVPb6dABKfuvEF1A-1; Thu, 06 Aug 2020 06:54:03 -0400
-X-MC-Unique: D84FcchVPb6dABKfuvEF1A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3838100AA22;
- Thu,  6 Aug 2020 10:54:01 +0000 (UTC)
-Received: from thuth.com (ovpn-112-229.ams2.redhat.com [10.36.112.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0AE9D5F202;
- Thu,  6 Aug 2020 10:53:57 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-s390x@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH for-5.2 v2 1/9] pc-bios/s390-ccw/Makefile: Compile with
- -std=gnu99, -fwrapv and -fno-common
-Date: Thu,  6 Aug 2020 12:53:41 +0200
-Message-Id: <20200806105349.632-2-thuth@redhat.com>
-In-Reply-To: <20200806105349.632-1-thuth@redhat.com>
-References: <20200806105349.632-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 00:07:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k3Ypv-0005n0-6R; Thu, 06 Aug 2020 01:53:07 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:39153)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k3Ypt-0006wO-Dx; Thu, 06 Aug 2020 01:53:06 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BMd232B6wz9sSG; Thu,  6 Aug 2020 15:52:59 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1596693179;
+ bh=lgTsRzjMmVBG5qWj5LT5in6hUMox5nSoTbrkFoowdRQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=lV3E2aFmWelN1iQaXE5dVCnS25ujrdUEbYcoWliszaYb/p7qMnzmaBHnTtnE9SlPn
+ J++K4R86UY9yXit+FW/zP5E4OHjGl6Ux+GUe1fS0s1WVGj7pWXoossumQWk4TWfJsj
+ xwIgrkKDVQmuGLjCmth+yhBK3Af+10NSw7RcE9nI=
+Date: Thu, 6 Aug 2020 15:13:55 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 0/8] Generalize start-powered-off property from ARM
+Message-ID: <20200806051355.GA157233@yekko.fritz.box>
+References: <20200723025657.644724-1-bauerman@linux.ibm.com>
+ <878sf3uojf.fsf@morokweng.localdomain>
+ <20200730005947.GO84173@umbus.fritz.box>
+ <CAAdtpL5Mtaf7Xwu74U33eGTCAiFZNNXeCST8COwQeW8S9j8ZVQ@mail.gmail.com>
+ <87a6zh3uyv.fsf@morokweng.localdomain>
+ <874kph58o5.fsf@morokweng.localdomain>
+ <CAFEAcA-Yi754zyxHd+bggjny5vXw=rrs5fm6SZCcxwVUeoTtOg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="J2SCkAp4GZ/dPZZf"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-Yi754zyxHd+bggjny5vXw=rrs5fm6SZCcxwVUeoTtOg@mail.gmail.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,53 +80,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, qemu-block@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ David Hildenbrand <david@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Thiago Jung Bauermann <bauerman@linux.ibm.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The main QEMU code is compiled with -std=gnu99, -fwrapv and -fno-common.
-We should use the same flags for the s390-ccw bios, too, to avoid that
-we get different behavior with different compiler versions that changed
-their default settings in the course of time (it happened at least with
--std=... and -fno-common in the past already).
 
-While we're at it, also group the other flags here in a little bit nicer
-fashion: Move the two "-m" flags out of the "-f" area and specify them on
-a separate line.
+--J2SCkAp4GZ/dPZZf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/Makefile | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+On Wed, Aug 05, 2020 at 08:04:11PM +0100, Peter Maydell wrote:
+> On Wed, 5 Aug 2020 at 18:01, Thiago Jung Bauermann
+> <bauerman@linux.ibm.com> wrote:
+> > Any news on this? Is there something I should be doing? I saw -rc3 today
+> > but not these patches.
+>=20
+> Sorry, you've missed the bus for 5.1 at this point. I'd assumed
+> that the relevant bits of the patchset would go into a PPC pullreq
+> if it was important for 5.1.
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 50bc880272..9abb0ea4c0 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -13,10 +13,11 @@ OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
- 	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o cio.o dasd-ipl.o
- 
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
--QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
--QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
--QEMU_CFLAGS += -fno-asynchronous-unwind-tables
-+QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -fno-common -fPIE
-+QEMU_CFLAGS += -fwrapv -fno-strict-aliasing -fno-asynchronous-unwind-tables
- QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
-+QEMU_CFLAGS += -msoft-float -march=z900
-+QEMU_CFLAGS += -std=gnu99
- LDFLAGS += -Wl,-pie -nostdlib
- 
- build-all: s390-ccw.img s390-netboot.img
--- 
-2.18.1
+Ah, bother.  Meanwhile I assumed that since it was cross-target it was
+going in separately, so I didn't take it through my tree.
 
+Oh well, I guess we apply ASAP in 5.2 and we'll do a backport
+downstream.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--J2SCkAp4GZ/dPZZf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8rkZMACgkQbDjKyiDZ
+s5Kjug//YImhtTXWaAu4zBB39Ef1w1Ff+d+LbgxUQnLKZtEyG4c/hLHYpKyzdntK
+jxrpJ55yFL8M2+nfqJ8e8J0iO1c9/uyO4o2OR7y4jisX+NoIJxl7ngoeKP7CiiSo
+wr+wzvNBf64AjKZy/L9ddAkk+ZKrm7M8SKcFRaPxbkRbsPL386SvvURHG2R3UZp5
+HZiul6Ge9Qg97MEvp5KQizWeWHrXIhR6mW5da4voPtAJVxDPG7ES4gE5KEpost9p
+kB3heCy2e5wLEyjXb0JFwUErKo3Fz+XsYmh+jpugE5luDnUwnUfIuA9J4bhcDUsG
+2XrU9wxoifWhInrSYtgX1/7kHu0yAqZuW9+wqjlYXi+uJrJxIIicOWamta3tc7l6
+czfN+jVLp2EP8X0alp8S7QcKcNDDkcO6WEHXJ1pO/LrZzwChydPFn6XYvOnTVfF0
+XUj3QRbIGOI0JyR6xkOhUxPkkv8ZEopkb2D3XzU+/N0T8lt0lRO583yWCNLtrslq
+GddoWrdf/RZ24JxzFrSHspMfPqZDR2C5wPfi1bUbjdOyapynNKKRJFNRbC9CM6pu
+O4EF5fCS0SH//Q9pD4ngrnEbhQjmRxPVC9xY4r3edHFlrYKAL+oNoBWPWfvw3jZ2
+ehSsheA5Ry4cRlb7XcGjWcJBG/ZhM94uYLNsx04XcbexDgnK3eg=
+=B/Xv
+-----END PGP SIGNATURE-----
+
+--J2SCkAp4GZ/dPZZf--
 
