@@ -2,93 +2,84 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E610FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF10C433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B34B1204FD
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A116722CF6
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 12:24:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwoTuFlW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B34B1204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B+wfnzsC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A116722CF6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3azI-0007J8-3Y
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 04:10:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33752)
+	id 1k3e4Y-0007H2-8c
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 07:28:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3ax0-0002Il-IV; Thu, 06 Aug 2020 04:08:34 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:39162)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3awy-0005gD-S3; Thu, 06 Aug 2020 04:08:34 -0400
-Received: by mail-wr1-x430.google.com with SMTP id a5so33116377wrm.6;
- Thu, 06 Aug 2020 01:08:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=aNqGoj9XEuK6FXLTe1Hk7gTK5CIz55oFAjsctzZx5hc=;
- b=YwoTuFlWhAhJ1u06Ry7qUkbdpDuuky9kAz6KS7zMs1BIw6Sb19k4aAcd9sbZXqXVJ7
- IoTPR42VSGyi0GHH/CzCwstaBTuWAR52Cd/88iyqTZjCUIs5g0UM4BKsJlggWBfqDjTL
- lkksyd1wRvDf6elv3HqBhTS6df7FH1eDdosoKqT+XhaMKjvoCVYzB80mxeNyr4pr+HWl
- ggYVMf8cnMKGa7MfndxljT9IdGD9kxUzQsq9IrOKC7gtSR9cHmjDtROpe72j5VULcBKm
- /XZbtGEw4xMgq5LtQEz6sAygMTK/kau3N3GAjNyHJvT6Kv8AEN33E91SaG/1uEUUmMMr
- Xtsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=aNqGoj9XEuK6FXLTe1Hk7gTK5CIz55oFAjsctzZx5hc=;
- b=EfuUZaaJO0ajoNlJUz22wOYdwGrYDcklFQljOpINvR1q7AflMzU9jv4oBbRMNB+p1D
- 6zOM8tgVaTm/HB3kPqbsHvVyrHz/eBuGQ9THMpyoreeQkePdv+35rwmfwj+AYYEpTVqM
- FnLaYYDZ1Gku+l+pUm7seRD6b/NoGJic01467FAlusNnv16v+JRNJRbn1N59yCNDG4ip
- sdeNHw67S4vfxGh2O/SbhXfJwlzZi5sW5jOTWCZZI9droygvdpa3LXm5fXWnSMC6xB7I
- HJ93mYmNDnSVbRf1yAvViGmQo5yDh9RAMxB93QzR6BHx5SJZSFLC2zZVHtcJ8olU6PZH
- NSXQ==
-X-Gm-Message-State: AOAM532o7bVs5TnCUFOckglPjNTlBC4ysAf71GqMGW/Vjj8DPyO/TgVP
- DB2XBKYzx5Nr3+yZy7/IAlXY53Ef
-X-Google-Smtp-Source: ABdhPJy8uhbLGRzwvC20F0yyO8FoOirgX8AyP2EB1JUr8RoP52AwKxS5ooSCWR2kHcPNGk1QSw1iXw==
-X-Received: by 2002:a5d:68cf:: with SMTP id p15mr6378477wrw.148.1596701310699; 
- Thu, 06 Aug 2020 01:08:30 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id w2sm6039587wre.5.2020.08.06.01.08.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 01:08:30 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 3/7] hw/block/fdc: Use warn_report() instead of debug
- FLOPPY_DPRINTF() calls
-Date: Thu,  6 Aug 2020 10:08:20 +0200
-Message-Id: <20200806080824.21567-4-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200806080824.21567-1-f4bug@amsat.org>
-References: <20200806080824.21567-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x430.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXf-0005Cq-35
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35411
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3dXd-0000Mo-3O
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 06:54:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596711272;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=4BmZ5R/B5KF+JC5CuMlI6vsCTV8fruRdJKUwCMQH7+E=;
+ b=B+wfnzsCOSErMyryXzLfOc/Kqi4/G7uNdrjMOuTbkcKHOx0KgjZ7P3qJoJl7tPRfX5M9xD
+ ooiXA1orsOzS8HDEhwQ9xLK4hgkgUqSGIZRBXk2pd2jJLMb1CykSDPZDsghPwhHBErKtzb
+ gQ7sUeFcXm6piCxj5VxVnJfIfTnPF/0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-441-XBrdwAbkP4CYIxmaq3YqZA-1; Thu, 06 Aug 2020 06:54:28 -0400
+X-MC-Unique: XBrdwAbkP4CYIxmaq3YqZA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 419F4100AA23;
+ Thu,  6 Aug 2020 10:54:27 +0000 (UTC)
+Received: from thuth.com (ovpn-112-229.ams2.redhat.com [10.36.112.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9A8BA65C82;
+ Thu,  6 Aug 2020 10:54:23 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-s390x@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH for-5.2 v2 7/9] pc-bios/s390-ccw: Allow booting in case the
+ first virtio-blk disk is bad
+Date: Thu,  6 Aug 2020 12:53:47 +0200
+Message-Id: <20200806105349.632-8-thuth@redhat.com>
+In-Reply-To: <20200806105349.632-1-thuth@redhat.com>
+References: <20200806105349.632-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 03:10:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,102 +92,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, qemu-block@nongnu.org,
+ Cornelia Huck <cohuck@redhat.com>, Collin Walling <walling@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use warn_report() instead of debug FLOPPY_DPRINTF() calls.
+If you try to boot with two virtio-blk disks (without bootindex), and
+only the second one is bootable, the s390-ccw bios currently stops at
+the first disk and does not continue booting from the second one. This
+is annoying - and all other major QEMU firmwares succeed to boot from
+the second disk in this case, so we should do the same in the s390-ccw
+bios, too.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/block/fdc.c | 32 +++++++++++++++-----------------
- 1 file changed, 15 insertions(+), 17 deletions(-)
+ pc-bios/s390-ccw/bootmap.c | 34 +++++++++++++++++++++++-----------
+ pc-bios/s390-ccw/main.c    |  2 +-
+ 2 files changed, 24 insertions(+), 12 deletions(-)
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index c91ed7ee2d..ee45ec0b27 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -395,12 +395,10 @@ static int pick_geometry(FDrive *drv)
-     if (match == -1) {
-         if (size_match != -1) {
-             parse = &fd_formats[size_match];
--            FLOPPY_DPRINTF("User requested floppy drive type '%s', "
--                           "but inserted medium appears to be a "
--                           "%"PRId64" sector '%s' type\n",
--                           FloppyDriveType_str(drv->drive),
--                           nb_sectors,
--                           FloppyDriveType_str(parse->drive));
-+            warn_report("User requested floppy drive type '%s', but inserted "
-+                        "medium appears to be a %"PRId64" sector '%s' type",
-+                        FloppyDriveType_str(drv->drive), nb_sectors,
-+                        FloppyDriveType_str(parse->drive));
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 97205674e5..0ef6b851f3 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -289,11 +289,18 @@ static void ipl_eckd_cdl(void)
+     read_block(1, ipl2, "Cannot read IPL2 record at block 1");
+ 
+     mbr = &ipl2->mbr;
+-    IPL_assert(magic_match(mbr, ZIPL_MAGIC), "No zIPL section in IPL2 record.");
+-    IPL_assert(block_size_ok(mbr->blockptr.xeckd.bptr.size),
+-               "Bad block size in zIPL section of IPL2 record.");
+-    IPL_assert(mbr->dev_type == DEV_TYPE_ECKD,
+-               "Non-ECKD device type in zIPL section of IPL2 record.");
++    if (!magic_match(mbr, ZIPL_MAGIC)) {
++        sclp_print("No zIPL section in IPL2 record.\n");
++        return;
++    }
++    if (!block_size_ok(mbr->blockptr.xeckd.bptr.size)) {
++        sclp_print("Bad block size in zIPL section of IPL2 record.\n");
++        return;
++    }
++    if (!mbr->dev_type == DEV_TYPE_ECKD) {
++        sclp_print("Non-ECKD device type in zIPL section of IPL2 record.\n");
++        return;
++    }
+ 
+     /* save pointer to Boot Map Table */
+     bmt_block_nr = eckd_block_num(&mbr->blockptr.xeckd.bptr.chs);
+@@ -303,10 +310,14 @@ static void ipl_eckd_cdl(void)
+ 
+     memset(sec, FREE_SPACE_FILLER, sizeof(sec));
+     read_block(2, vlbl, "Cannot read Volume Label at block 2");
+-    IPL_assert(magic_match(vlbl->key, VOL1_MAGIC),
+-               "Invalid magic of volume label block");
+-    IPL_assert(magic_match(vlbl->f.key, VOL1_MAGIC),
+-               "Invalid magic of volser block");
++    if (!magic_match(vlbl->key, VOL1_MAGIC)) {
++        sclp_print("Invalid magic of volume label block.\n");
++        return;
++    }
++    if (!magic_match(vlbl->f.key, VOL1_MAGIC)) {
++        sclp_print("Invalid magic of volser block.\n");
++        return;
++    }
+     print_volser(vlbl->f.volser);
+ 
+     run_eckd_boot_script(bmt_block_nr, s1b_block_nr);
+@@ -398,7 +409,8 @@ static void ipl_eckd(void)
+     read_block(0, mbr, "Cannot read block 0 on DASD");
+ 
+     if (magic_match(mbr->magic, IPL1_MAGIC)) {
+-        ipl_eckd_cdl(); /* no return */
++        ipl_eckd_cdl();         /* only returns in case of error */
++        return;
+     }
+ 
+     /* LDL/CMS? */
+@@ -825,5 +837,5 @@ void zipl_load(void)
+         panic("\n! Unknown IPL device type !\n");
+     }
+ 
+-    panic("\n* this can never happen *\n");
++    sclp_print("zIPL load failed.\n");
+ }
+diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+index 9b581074a1..fc17e6ab83 100644
+--- a/pc-bios/s390-ccw/main.c
++++ b/pc-bios/s390-ccw/main.c
+@@ -240,7 +240,7 @@ static void ipl_boot_device(void)
+         break;
+     case CU_TYPE_VIRTIO:
+         if (virtio_setup() == 0) {
+-            zipl_load(); /* no return */
++            zipl_load();             /* Only returns in case of errors */
          }
-         assert(type_match != -1 && "misconfigured fd_format");
-         match = type_match;
-@@ -1805,8 +1803,8 @@ static int fdctrl_transfer_handler (void *opaque, int nchan,
-             /* READ & SCAN commands and realign to a sector for WRITE */
-             if (blk_pread(cur_drv->blk, fd_offset(cur_drv),
-                           fdctrl->fifo, BDRV_SECTOR_SIZE) < 0) {
--                FLOPPY_DPRINTF("Floppy: error getting sector %d\n",
--                               fd_sector(cur_drv));
-+                warn_report("Floppy: error getting sector %" PRIu32,
-+                            fd_sector(cur_drv));
-                 /* Sure, image size is too small... */
-                 memset(fdctrl->fifo, 0, FD_SECTOR_LEN);
-             }
-@@ -1833,8 +1831,8 @@ static int fdctrl_transfer_handler (void *opaque, int nchan,
-                            fdctrl->data_pos, len);
-             if (blk_pwrite(cur_drv->blk, fd_offset(cur_drv),
-                            fdctrl->fifo, BDRV_SECTOR_SIZE, 0) < 0) {
--                FLOPPY_DPRINTF("error writing sector %d\n",
--                               fd_sector(cur_drv));
-+                warn_report("error writing sector %" PRIu32,
-+                            fd_sector(cur_drv));
-                 fdctrl_stop_transfer(fdctrl, FD_SR0_ABNTERM | FD_SR0_SEEK, 0x00, 0x00);
-                 goto transfer_error;
-             }
-@@ -1911,8 +1909,8 @@ static uint32_t fdctrl_read_data(FDCtrl *fdctrl)
-         if (pos == 0) {
-             if (fdctrl->data_pos != 0)
-                 if (!fdctrl_seek_to_next_sect(fdctrl, cur_drv)) {
--                    FLOPPY_DPRINTF("error seeking to next sector %d\n",
--                                   fd_sector(cur_drv));
-+                    warn_report("error seeking to next sector %" PRIu32,
-+                                fd_sector(cur_drv));
-                     return 0;
-                 }
-             if (blk_pread(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo,
-@@ -1997,7 +1995,7 @@ static void fdctrl_format_sector(FDCtrl *fdctrl)
-     if (cur_drv->blk == NULL ||
-         blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo,
-                    BDRV_SECTOR_SIZE, 0) < 0) {
--        FLOPPY_DPRINTF("error formatting sector %d\n", fd_sector(cur_drv));
-+        warn_report("error formatting sector %" PRIu32, fd_sector(cur_drv));
-         fdctrl_stop_transfer(fdctrl, FD_SR0_ABNTERM | FD_SR0_SEEK, 0x00, 0x00);
-     } else {
-         if (cur_drv->sect == cur_drv->last_sect) {
-@@ -2421,13 +2419,13 @@ static void fdctrl_write_data(FDCtrl *fdctrl, uint32_t value)
-             cur_drv = get_cur_drv(fdctrl);
-             if (blk_pwrite(cur_drv->blk, fd_offset(cur_drv), fdctrl->fifo,
-                            BDRV_SECTOR_SIZE, 0) < 0) {
--                FLOPPY_DPRINTF("error writing sector %d\n",
--                               fd_sector(cur_drv));
-+                warn_report("error writing sector %" PRIu32,
-+                            fd_sector(cur_drv));
-                 break;
-             }
-             if (!fdctrl_seek_to_next_sect(fdctrl, cur_drv)) {
--                FLOPPY_DPRINTF("error seeking to next sector %d\n",
--                               fd_sector(cur_drv));
-+                warn_report("error seeking to next sector %" PRIu32,
-+                            fd_sector(cur_drv));
-                 break;
-             }
-         }
+         break;
+     default:
 -- 
-2.21.3
+2.18.1
 
 
