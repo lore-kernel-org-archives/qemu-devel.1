@@ -2,73 +2,96 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F81C433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA1AC433E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A18452312D
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:34:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A18452312D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A836A2312D
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:34:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QZPwcpg6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A836A2312D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3g2g-0000UA-MH
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:34:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49062)
+	id 1k3g2o-0000oU-Om
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:34:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k3fpm-0001fP-PR; Thu, 06 Aug 2020 09:21:27 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:58469)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k3fpg-0000wX-UU; Thu, 06 Aug 2020 09:21:26 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.9])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 9B8F7545F8B4;
- Thu,  6 Aug 2020 15:21:15 +0200 (CEST)
-Received: from kaod.org (37.59.142.103) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 6 Aug 2020
- 15:21:15 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-103G00503397b68-57b0-4252-8284-b3f72d3db1f4,
- 96EDEDBD7B7627A0205C40E9E2B74F8D513A659B) smtp.auth=clg@kaod.org
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH for-5.2 15/19] ftgmac100: Improve software reset
-Date: Thu, 6 Aug 2020 15:21:02 +0200
-Message-ID: <20200806132106.747414-16-clg@kaod.org>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20200806132106.747414-1-clg@kaod.org>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3g1v-000802-O1; Thu, 06 Aug 2020 09:33:59 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34975)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k3g1u-0002Nr-2a; Thu, 06 Aug 2020 09:33:59 -0400
+Received: by mail-wr1-x443.google.com with SMTP id f1so43484499wro.2;
+ Thu, 06 Aug 2020 06:33:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=D9NfrfC0Ig01+bi+8DPpUem5HnxjvhzhF8q23cyqaA0=;
+ b=QZPwcpg6ozffs4LvP8E3MOi2QTuk4e7khLtUzxKDhiNCpC3vuPFEmOoHwdHmJ4ZSrC
+ qXGlbMbj0fRmbK8UmyAlccDoP7Rnw2zljPCKS0cQ/sWomCdLuIWsgzdyA3L2cXUCSHHr
+ gZiUi/jxtkq+CQp1lguApZOxkm3dHg2sq/W914extDkCM7q7JJ4CZX1RhLOPhv3pYMhy
+ pE5blyKl0ZJ3bxZONCvlYTXmRlMxTGfCa/8awTau/d0lvJDPsbd8vtufyJKGlvvdPmlo
+ mMUhdswiK5wKdvTxv0piSWAiHNfT1q2qE7s/P2+4hP7k7js9m3bqd1xmh1uA0RSeU++Y
+ /5Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=D9NfrfC0Ig01+bi+8DPpUem5HnxjvhzhF8q23cyqaA0=;
+ b=rszWVy6RNU13YRZBAaYDhAXeQDc5QVfOzGNiWyGe4E9DPk6BwGr6xsqkGT3ONgNNnu
+ hkQnowYSTud+ZZOeiSNVt5WK8rJ26ZOEXIZ5dS+5ty7c+d9Gh1qqqra4ZM/6y7//hMID
+ /AkuC4ZgD15niF5sPyuCuMtjsycxV2MxL0JZM/3HP/R9jmT4F/x2QkltbgN/nCPY4C8a
+ mDg3LMoZFtGzTCbsz5eIjpYM1Fb2oyWBjLlwb3+XLCk+lEE1xWktmsfJZ9zH2rxn1Glw
+ iu8yFtAkgK05HZl6usr74y2eQjKxi4Y93DCbbJX6ojWYD9Q3oIuOrRMFm4J5+7W4R/5N
+ VP9g==
+X-Gm-Message-State: AOAM533+OwWZT5i4bDco2LGjJqlJW702n6v845RAd+ppyCZ3yjzV3HBj
+ PctK6T9JDD4H6I0J1PlY5R0=
+X-Google-Smtp-Source: ABdhPJwcXTAlXHwMA+eRT4PgbXcn6gLnWKwpHw7rGkh6l9kocZ9NGX3IlS/mrELYQuyF4UaKH1P7Mg==
+X-Received: by 2002:adf:a3d0:: with SMTP id m16mr7095362wrb.232.1596720835989; 
+ Thu, 06 Aug 2020 06:33:55 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id 69sm6914842wmb.8.2020.08.06.06.33.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 06 Aug 2020 06:33:55 -0700 (PDT)
+Subject: Re: [PATCH for-5.2 09/19] ftgmac100: Fix registers that can be read
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 References: <20200806132106.747414-1-clg@kaod.org>
+ <20200806132106.747414-10-clg@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ac8565d5-07ee-c8e1-88bd-be5e19135489@amsat.org>
+Date: Thu, 6 Aug 2020 15:33:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200806132106.747414-10-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.103]
-X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: ad1596c2-9823-4f34-bcb6-a6c4e5879378
-X-Ovh-Tracer-Id: 273312202425142121
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrkedtgdeihecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgjfhggtgfgihesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehheefgeejiedtffefteejudevjeeufeeugfdtfeeuleeuteevleeihffhgfdtleenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 09:21:12
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,50 +104,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Frederic Konrad <konrad.frederic@yahoo.fr>,
- Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org,
+ Frederic Konrad <konrad.frederic@yahoo.fr>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The software reset of the MAC needs a finer granularity. Not all
-registers are reseted and some setting in MACCR are kept.
+On 8/6/20 3:20 PM, Cédric Le Goater wrote:
+> Receive Ring Base Address Register (RXR_BADR) and the Normal Priority
+> Transmit Receive Ring Base Address Register (NPTXR_BADR) can als be
 
-Cc: Frederic Konrad <konrad.frederic@yahoo.fr>
-Fixes: bd44300d1afc ("net: add FTGMAC100 support")
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
----
- hw/net/ftgmac100.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+typo "also"
 
-diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 987b843fabc4..0740049c5268 100644
---- a/hw/net/ftgmac100.c
-+++ b/hw/net/ftgmac100.c
-@@ -655,11 +655,10 @@ static void ftgmac100_reset(DeviceState *d)
-     s->itc = 0;
-     s->aptcr = 1;
-     s->dblac = 0x00022f00;
--    s->revr = 0;
-     s->fear1 = 0;
-     s->tpafcr = 0xf1;
- 
--    s->maccr = 0;
-+    s->maccr &= FTGMAC100_MACCR_GIGA_MODE | FTGMAC100_MACCR_FAST_MODE;
-     s->phycr = 0;
-     s->phydata = 0;
-     s->fcr = 0x400;
-@@ -812,6 +811,7 @@ static void ftgmac100_write(void *opaque, hwaddr addr,
-     case FTGMAC100_MACCR: /* MAC Device control */
-         s->maccr = value;
-         if (value & FTGMAC100_MACCR_SW_RST) {
-+            /* TODO: rework software reset to have a finer granularity */
-             ftgmac100_reset(DEVICE(s));
-         }
- 
--- 
-2.25.4
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> read.
+> 
+> Cc: Frederic Konrad <konrad.frederic@yahoo.fr>
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> ---
+>  hw/net/ftgmac100.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+> index 5f4b26fc5f3c..0348fcf45676 100644
+> --- a/hw/net/ftgmac100.c
+> +++ b/hw/net/ftgmac100.c
+> @@ -669,6 +669,10 @@ static uint64_t ftgmac100_read(void *opaque, hwaddr addr, unsigned size)
+>          return s->math[0];
+>      case FTGMAC100_MATH1:
+>          return s->math[1];
+> +    case FTGMAC100_RXR_BADR:
+> +        return s->rx_ring;
+> +    case FTGMAC100_NPTXR_BADR:
+> +        return s->tx_ring;
+>      case FTGMAC100_ITC:
+>          return s->itc;
+>      case FTGMAC100_DBLAC:
+> 
 
 
