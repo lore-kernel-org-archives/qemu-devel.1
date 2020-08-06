@@ -2,77 +2,77 @@ Return-Path: <SRS0=Z/nf=BQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B826EC433E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D144C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:05:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA7A622DFA
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:05:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32C02206B5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Aug 2020 13:05:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGCvQOZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA7A622DFA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dP7xjfYY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32C02206B5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3fa0-0003ZF-MS
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:05:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43752)
+	id 1k3faD-0003gt-8g
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 09:05:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3fYh-0001yp-EC
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:03:47 -0400
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:33543)
+ id 1k3fYj-00020z-IQ
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:03:49 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34926)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k3fYf-00075Y-Ig
- for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:03:47 -0400
-Received: by mail-wr1-x42e.google.com with SMTP id p20so9025367wrf.0
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 06:03:45 -0700 (PDT)
+ id 1k3fYi-00075f-29
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 09:03:49 -0400
+Received: by mail-wr1-x434.google.com with SMTP id f1so43384799wro.2
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 06:03:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JPJZIC6+INx85XXFh6H5vaAGpImRMQUrGLjtvHHxslE=;
- b=TGCvQOZ6YusWMBPtoYADDGjSpGqoa4CDAUITpXH6clMirt8oDFkD1FyuwVD9K0jiQ4
- 7ci7FlWkTnUoAPix3e0A07HGkFaBWp8E5ie1rlwO5PZZL1WqgWpuF+zUufDxp3zehJJ1
- S6TkLIhHtF5x2agTSMgSLiChxoQxp0LkMs89w7Elfmv3ZF2rLr05OdLfVkV2cDyg+vk5
- OARGhDJ8nNbTZlazPuPGijDBUqnfCKqPqU7vyRj7ZVRdFamZb5QCdY5l/HAE96qks/wb
- VFi7VAzZAMM4qcd7bXOaygG1ncU61tUIn4B7JJhSl2pcSglt5s5ChFzgBHje45f+2JCp
- M/hA==
+ bh=5MyJt4saRNOH+wyZ/PYBkEhqoYePEqFCcALpsJUGNbo=;
+ b=dP7xjfYYT2X081rx02yrllcPZZKmM8Zcb4kmIqwXlwUoJ9txzNh93JFg5uC3a0wGO6
+ f79jDzGsCI5/ieC++aAiwfOHYyjfypz8MnAK7hny3oGNsunzcS2u4GiifPjCeftKdaOh
+ 6BzkbLIfn2SsTZUe2XgWHAEqFV6N32WxFcZpxU1sOJi4mrdGFur5w1ncpegPT+tq33/0
+ jxTTRbWSWZc4QzCfuAFqVDeMY4F8hOw5aaK2EaV2ixwCaKQES3euCQ2NRBHmfUTAUSie
+ trmIJsD1veNMC0JmllqIkKxszFrW2++qdQXEHXWlMA6hxpY3HmniZlItIZrjknWTm+GD
+ ZPaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=JPJZIC6+INx85XXFh6H5vaAGpImRMQUrGLjtvHHxslE=;
- b=BWe3dCgeo6KBEZ96RXGIbyooUFta7Jkp62YKuamfz7vwH2NtMDeHXSvWXz7M+LAgKB
- ca77dLxrTwZp3knOHs7QypFzT/ST3d3i/Vb51M1+lztXoS9gmv02W2gdW+qtFTOBFJFx
- w6Pn83etUl4OLFQILbO0aH5zD42VAXRaidmdvrLbst+BZxcOKT3dTCb3HleUrKNJvlWu
- FJ0eXzUy8dy+6BUeb+y3D33egcS9bZiCCp4320jphPFrm8XZlHOgnsRJnrZEyLlQJsK1
- K/6SwgJKZ4hOpr7HR/B6UOjg7zheYcVo+HQnej/E+Qn+n+gx5IWo5ccMSwa1f0Zmx9Xn
- NFJw==
-X-Gm-Message-State: AOAM532CAvaH4xyD8Pe55MnHVsoLycP5P2IHetcGadyEWvC8Hn+gnSoI
- e2rPq6t123sKPREicdPFQwHeFNY7
-X-Google-Smtp-Source: ABdhPJywascbo0wAyURK6AAbrMrxXY2lymgjZsX+QRFMzK/wnml+VUqfPAq8eCu8Cw5waFxvEFTyiA==
-X-Received: by 2002:adf:f488:: with SMTP id l8mr7184330wro.123.1596719023478; 
- Thu, 06 Aug 2020 06:03:43 -0700 (PDT)
+ bh=5MyJt4saRNOH+wyZ/PYBkEhqoYePEqFCcALpsJUGNbo=;
+ b=geyhuL2ZmpvoOofIfbejsr329LkSEG1I2nQPfPjht32YmCugiatoqgv4cB9sH5k2D0
+ zF+z2o5r/V3BzB+sjRDpzjbLKPWKgovldk1WmZNfuDuOC9gd1y7cfK3nPfNQndJLIfj1
+ ErlpCz2ZB2zAT6jw9IhRAQcHiJgR3JUWrXvMUJ+BMtg801FqZam35SGeKSjtN0eQqQj4
+ ZGyPv8p6wK9ABJDz12+W5+FM1577SY2vIetCDK1VTP/m3FfRT5BMV4yLWiZcexj3mOI5
+ dFp1WgKV8szeAu/TftOweiv/FTySjLdKVaInquvge1+Yq0iJR99dhPSTT2N3VivDZL0P
+ f0ig==
+X-Gm-Message-State: AOAM531Lwuehnq4rp9t0r8LfzTPZk0VT4W/ZeL5MNEzAmdVVOWzIQyqO
+ DFuXfCZkAutIT2eJS2yjFi4zetZP
+X-Google-Smtp-Source: ABdhPJwZsWhlDzTpVb/LMW/RsMjOZcjFewMMoRexCAZ2wW8m+gXxAH/Fmw341YKtp+1s5t9nly9/iw==
+X-Received: by 2002:adf:e98c:: with SMTP id h12mr7197919wrm.3.1596719024786;
+ Thu, 06 Aug 2020 06:03:44 -0700 (PDT)
 Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id e16sm6409113wrx.30.2020.08.06.06.03.42
+ by smtp.gmail.com with ESMTPSA id e16sm6409113wrx.30.2020.08.06.06.03.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Aug 2020 06:03:42 -0700 (PDT)
+ Thu, 06 Aug 2020 06:03:44 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2 1/4] hw/char/serial: Replace commented DPRINTF() by
- trace event
-Date: Thu,  6 Aug 2020 15:03:37 +0200
-Message-Id: <20200806130340.17316-2-f4bug@amsat.org>
+Subject: [PATCH-for-5.2 2/4] hw/char/serial: Remove old DEBUG_SERIAL commented
+ code
+Date: Thu,  6 Aug 2020 15:03:38 +0200
+Message-Id: <20200806130340.17316-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200806130340.17316-1-f4bug@amsat.org>
 References: <20200806130340.17316-1-f4bug@amsat.org>
@@ -80,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42e.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::434;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x434.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -113,42 +113,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the old debug PRINTF() call to display the UART
-baudrate to a trace event.
+All useful DPRINTF() calls have been converted to trace
+events.  Remove a pointless one in the IOEventHandler,
+and drop the DEBUG_SERIAL ifdef'ry.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/char/serial.c     | 4 +---
- hw/char/trace-events | 1 +
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ hw/char/serial.c | 11 -----------
+ 1 file changed, 11 deletions(-)
 
 diff --git a/hw/char/serial.c b/hw/char/serial.c
-index fd80ae5592..3e903d5fad 100644
+index 3e903d5fad..758a3aa49b 100644
 --- a/hw/char/serial.c
 +++ b/hw/char/serial.c
-@@ -187,9 +187,7 @@ static void serial_update_parameters(SerialState *s)
-     ssp.stop_bits = stop_bits;
-     s->char_transmit_time =  (NANOSECONDS_PER_SECOND / speed) * frame_size;
-     qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_PARAMS, &ssp);
+@@ -36,8 +36,6 @@
+ #include "trace.h"
+ #include "hw/qdev-properties.h"
+ 
+-//#define DEBUG_SERIAL
 -
--    DPRINTF("speed=%.2f parity=%c data=%d stop=%d\n",
--           speed, parity, data_bits, stop_bits);
-+    trace_serial_update_parameters(speed, parity, data_bits, stop_bits);
+ #define UART_LCR_DLAB	0x80	/* Divisor latch access bit */
+ 
+ #define UART_IER_MSI	0x08	/* Enable Modem status interrupt */
+@@ -102,14 +100,6 @@
+ 
+ #define MAX_XMIT_RETRY      4
+ 
+-#ifdef DEBUG_SERIAL
+-#define DPRINTF(fmt, ...) \
+-do { fprintf(stderr, "serial: " fmt , ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) \
+-do {} while (0)
+-#endif
+-
+ static void serial_receive1(void *opaque, const uint8_t *buf, int size);
+ static void serial_xmit(SerialState *s);
+ 
+@@ -636,7 +626,6 @@ static void serial_receive1(void *opaque, const uint8_t *buf, int size)
+ static void serial_event(void *opaque, QEMUChrEvent event)
+ {
+     SerialState *s = opaque;
+-    DPRINTF("event %x\n", event);
+     if (event == CHR_EVENT_BREAK)
+         serial_receive_break(s);
  }
- 
- static void serial_update_msl(SerialState *s)
-diff --git a/hw/char/trace-events b/hw/char/trace-events
-index d20eafd56f..85e39d9d62 100644
---- a/hw/char/trace-events
-+++ b/hw/char/trace-events
-@@ -7,6 +7,7 @@ parallel_ioport_write(const char *desc, uint16_t addr, uint8_t value) "write [%s
- # serial.c
- serial_ioport_read(uint16_t addr, uint8_t value) "read addr 0x%02x val 0x%02x"
- serial_ioport_write(uint16_t addr, uint8_t value) "write addr 0x%02x val 0x%02x"
-+serial_update_parameters(uint64_t baudrate, char parity, int data_bits, int stop_bits) "baudrate=%"PRIu64" parity='%c' data=%d stop=%d"
- 
- # virtio-serial-bus.c
- virtio_serial_send_control_event(unsigned int port, uint16_t event, uint16_t value) "port %u, event %u, value %u"
 -- 
 2.21.3
 
