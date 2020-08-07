@@ -2,83 +2,70 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0BBDC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:21:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6377C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:43:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95DB420866
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:21:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DB420866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9C2B4206B5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:43:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2B4206B5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3wgu-0005Pf-Tl
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 03:21:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34810)
+	id 1k3x2Y-000385-Tx
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 03:43:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3wgI-0004fs-83
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 03:20:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52506)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3wgF-0003ys-TM
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 03:20:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k3wgD-0008Rr-Sg
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 07:20:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D76F62E804E
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 07:20:41 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1k3x1w-0002eU-Se; Fri, 07 Aug 2020 03:43:09 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4167 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1k3x1s-0006YF-Ql; Fri, 07 Aug 2020 03:43:08 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 8F69BAF8AB191D929C21;
+ Fri,  7 Aug 2020 15:42:47 +0800 (CST)
+Received: from [10.174.185.104] (10.174.185.104) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Fri, 7 Aug 2020 15:42:38 +0800
+Subject: Re: [PATCH] qcow2: flush qcow2 l2 meta for new allocated clusters
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200805023826.184-1-fangying1@huawei.com>
+ <20200806091326.GC17753@linux.fritz.box>
+From: Ying Fang <fangying1@huawei.com>
+Message-ID: <1c2447af-1265-c45c-6374-f20d482f51be@huawei.com>
+Date: Fri, 7 Aug 2020 15:42:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2020 07:10:22 -0000
-From: Satheesh Rajendran <1890290@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=groug@kaod.org; 
-X-Launchpad-Bug-Tags: nested powerpc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gkurz sathnaga
-X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
-X-Launchpad-Bug-Modifier: Satheesh Rajendran (sathnaga)
-References: <159655059319.10948.7356744312155765003.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159678422209.15668.11598367117061646669.malone@wampee.canonical.com>
-Subject: [Bug 1890290] Re: PowerPC L2(nested virt) kvm guest fails to boot
- with ic-mode=dual, kernel-irqchip=on - `KVM is too old to support ic-mode=dual,
- kernel-irqchip=on`
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f8d08067c099760e601af1107308eb5ba131a069
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
+In-Reply-To: <20200806091326.GC17753@linux.fritz.box>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.185.104]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190; envelope-from=fangying1@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:13:15
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,160 +74,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890290 <1890290@bugs.launchpad.net>
+Cc: alex.chen@huawei.com, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-@Greg,
-
-Thanks for the patch, I see it already got applied into 5.2, tested and
-works fine,
-
-# git log -2 --oneline
-1972794 (HEAD -> master) spapr: Clarify error and documentation for broken =
-KVM XICS
-e1d322c (grafted, tag: v5.1.0-rc3, origin/master, origin/HEAD) Update versi=
-on for v5.1.0-rc3 release
 
 
-# /usr/bin/virt-install --connect=3Dqemu:///system --hvm --accelerate
---name 'vm1' --machine pseries --memory=3D8192
---vcpu=3D8,maxvcpus=3D8,sockets=3D1,cores=3D8,threads=3D1 --import --nograp=
-hics
---serial pty --memballoon model=3Dvirtio --controller type=3Dscsi,model
-=3Dvirtio-scsi --disk path=3D/home/tests/data/avocado-
-vt/images/f31-ppc64le.qcow2,bus=3Dscsi,size=3D10,format=3Dqcow2
---network=3Dbridge=3Dvirbr0,model=3Dvirtio,mac=3D52:54:00:5c:f1:fe
---mac=3D52:54:00:5c:f1:fe --boot emulator=3D/home/qemu/ppc64-softmmu/qemu-
-system-
-ppc64,kernel=3D/boot/vmlinuz-5.8.0-rc5-ge9919e11e,kernel_args=3D"root=3D/de=
-v/sda2
-rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcall_debug
-selinux=3D0" --noautoconsole --qemu-commandline=3D" -M pseries,ic-mode=3Ddu=
-al
-,kernel-irqchip=3Don";virsh console vm1
+On 8/6/2020 5:13 PM, Kevin Wolf wrote:
+> Am 05.08.2020 um 04:38 hat Ying Fang geschrieben:
+>> From: fangying <fangying1@huawei.com>
+>>
+>> When qemu or qemu-nbd process uses a qcow2 image and configured with
+>> 'cache = none', it will write to the qcow2 image with a cache to cache
+>> L2 tables, however the process will not use L2 tables without explicitly
+>> calling the flush command or closing the mirror flash into the disk.
+>> Which may cause the disk data inconsistent with the written data for
+>> a long time. If an abnormal process exit occurs here, the issued written
+>> data will be lost.
+>>
+>> Therefore, in order to keep data consistency we need to flush the changes
+>> to the L2 entry to the disk in time for the newly allocated cluster.
+>>
+>> Signed-off-by: Ying Fang <fangying1@huawei.com>
+> 
+> If you want to have data safely written to the disk after each write
+> request, you need to use cache=writethrough/directsync (in other words,
+> aliases that are equivalent to setting -device ...,write-cache=off).
+> Note that this will have a major impact on write performance.
+> 
+> cache=none means bypassing the kernel page cache (O_DIRECT), but not
+> flushing after each write request.
 
-Starting install...
-ERROR    internal error: process exited while connecting to monitor: 2020-0=
-8-07T07:05:38.633057Z qemu-system-ppc64: KVM is incompatible with ic-mode=
-=3Ddual,kernel-irqchip=3Don
-This can happen with an old KVM or in a KVM nested guest.
-Try without kernel-irqchip or with kernel-irqchip=3Doff.
+Well, IIUC, cache=none does not guarantee data safety and we should not
+expect that. Then this patch can be ignored.
 
-Regards,
--Satheesh
-
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890290
-
-Title:
-  PowerPC L2(nested virt) kvm guest fails to boot with ic-mode=3Ddual
-  ,kernel-irqchip=3Don - `KVM is too old to support ic-mode=3Ddual,kernel-
-  irqchip=3Don`
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  Env:
-  HW: Power 9 DD2.3
-  Host L0: 5.8.0-rc5-g8ba4ffcd8
-  Qemu: 5.0.50 (v5.0.0-533-gdebe78ce14)
-  Libvirt: 6.4.0
-  L1: 5.8.0-rc5-ge9919e11e
-  qemu_version': '5.0.50 (v5.1.0-rc2-dirty)
-  libvirt_version': '6.4.0'
-  L2: 5.8.0-rc7-g6ba1b005f
-
-  =
-
-  1. boot a L2 KVM guest with `ic-mode=3Ddual,kernel-irqchip=3Don`
-
-  /usr/bin/virt-install --connect=3Dqemu:///system --hvm --accelerate --nam=
-e 'vm1' --machine pseries --memory=3D8192 --vcpu=3D8,maxvcpus=3D8,sockets=
-=3D1,cores=3D2,t
-  hreads=3D4 --import --nographics --serial pty --memballoon model=3Dvirtio=
- --disk path=3D/home/tests/data/avocado-vt/images/f31-ppc64le.qcow2,bus=3Dv=
-irtio,size=3D10,format=3Dqcow2 --network
-  =3Dbridge=3Dvirbr0,model=3Dvirtio,mac=3D52:54:00:e6:fe:f6 --mac=3D52:54:0=
-0:e6:fe:f6 --boot emulator=3D/usr/share/avocado-plugins-vt/bin/qemu,kernel=
-=3D/tmp/linux/vmlinux,kernel_args=3D"root=3D/de
-  v/vda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcal=
-l_debug selinux=3D0" --noautoconsole --qemu-commandline=3D" -M pseries,ic-m=
-ode=3Ddual,kernel-irqchip=3Don"
-
-  =
-
-  ERROR    internal error: process exited while connecting to monitor: 2020=
--08-04T11:12:53.304482Z qemu: KVM is too old to support ic-mode=3Ddual,kern=
-el-irqchip=3Don
-
-
-  =
-
-  Qemu Log:
-  ```
-  /usr/share/avocado-plugins-vt/bin/qemu \
-  -name guest=3Dvm1,debug-threads=3Don \
-  -S \
-  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
-domain-5-vm1/master-key.aes \
-  -machine pseries-5.1,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff \
-  -cpu POWER9 \
-  -m 8192 \
-  -overcommit mem-lock=3Doff \
-  -smp 8,sockets=3D1,dies=3D1,cores=3D2,threads=3D4 \
-  -uuid 20a3351b-2776-4e75-9059-c070fe3dd44b \
-  -display none \
-  -no-user-config \
-  -nodefaults \
-  -chardev socket,id=3Dcharmonitor,fd=3D34,server,nowait \
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
-  -rtc base=3Dutc \
-  -no-shutdown \
-  -boot strict=3Don \
-  -kernel /tmp/linux/vmlinux \
-  -append 'root=3D/dev/vda2 rw console=3Dtty0 console=3DttyS0,115200 init=
-=3D/sbin/init initcall_debug selinux=3D0' \
-  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.0,addr=3D0x2 \
-  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 \
-  -blockdev '{"driver":"file","filename":"/home/tests/data/avocado-vt/image=
-s/f31-ppc64le.qcow2","node-name":"libvirt-1-storage","auto-read-only":true,=
-"discard":"unmap"}' \
-  -blockdev '{"node-name":"libvirt-1-format","read-only":false,"driver":"qc=
-ow2","file":"libvirt-1-storage","backing":null}' \
-  -device virtio-blk-pci,bus=3Dpci.0,addr=3D0x4,drive=3Dlibvirt-1-format,id=
-=3Dvirtio-disk0,bootindex=3D1 \
-  -netdev tap,fd=3D37,id=3Dhostnet0,vhost=3Don,vhostfd=3D38 \
-  -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:fe:f=
-6,bus=3Dpci.0,addr=3D0x1 \
-  -chardev pty,id=3Dcharserial0 \
-  -device spapr-vty,chardev=3Dcharserial0,id=3Dserial0,reg=3D0x30000000 \
-  -chardev socket,id=3Dcharchannel0,fd=3D39,server,nowait \
-  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
-l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
-  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 \
-  -M pseries,ic-mode=3Ddual,kernel-irqchip=3Don \
-  -msg timestamp=3Don
-  2020-08-04 11:12:53.169+0000: Domain id=3D5 is tainted: custom-argv
-  2020-08-04 11:12:53.179+0000: 11120: info : libvirt version: 6.4.0, packa=
-ge: 1.fc31 (Unknown, 2020-06-02-05:09:40, ltc-wspoon4.aus.stglabs.ibm.com)
-  2020-08-04 11:12:53.179+0000: 11120: info : hostname: atest-guest
-  2020-08-04 11:12:53.179+0000: 11120: info : virObjectUnref:347 : OBJECT_U=
-NREF: obj=3D0x7fff0c117c40
-  char device redirected to /dev/pts/0 (label charserial0)
-  2020-08-04T11:12:53.304482Z qemu: KVM is too old to support ic-mode=3Ddua=
-l,kernel-irqchip=3Don
-  2020-08-04 11:12:53.694+0000: shutting down, reason=3Dfailed
-  ```
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890290/+subscriptions
+Thanks.
+> 
+> Kevin
+> 
+> .
+> 
 
