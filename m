@@ -2,81 +2,58 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B4BAC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 11:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA79C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 11:16:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66CAF2177B
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 11:15:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CAF2177B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B3E3A2075D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 11:16:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3E3A2075D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k40LY-0003N1-GO
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 07:15:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53216)
+	id 1k40Mk-0004NL-VK
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 07:16:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k40Ku-0002w9-Ng
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 07:14:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48862)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k40Ks-000769-IU
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 07:14:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k40Kq-00018x-Mb
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 11:14:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9B8E22E8055
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 11:14:52 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2020 11:01:29 -0000
-From: Peter Maydell <1277433@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell sebastian-huber th-huth
-X-Launchpad-Bug-Reporter: Sebastian Huber (sebastian-huber)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <20140207101533.1830.3618.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159679808995.21623.2352286576359638175.malone@chaenomeles.canonical.com>
-Subject: [Bug 1277433] Re: GDB context is inconsistent after "monitor
- system_reset"
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: fe892987362ab3381cddc8c3915e15f6c08eeaab
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k40Kw-0002wr-7L
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 07:14:58 -0400
+Received: from mx2.suse.de ([195.135.220.15]:46210)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k40Ku-00076j-DY
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 07:14:57 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 9B001B6C8;
+ Fri,  7 Aug 2020 11:15:12 +0000 (UTC)
+From: Claudio Fontana <cfontana@suse.de>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: [RFC v2] checkpatch: detect missing changes to trace-events
+Date: Fri,  7 Aug 2020 13:14:47 +0200
+Message-Id: <20200807111447.15599-1-cfontana@suse.de>
+X-Mailer: git-send-email 2.16.4
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/06 23:38:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,125 +62,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1277433 <1277433@bugs.launchpad.net>
+Cc: "Michael S . Tsirkin" <mst@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Claudio Fontana <cfontana@suse.de>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I suspect that gdb has cached the values of the registers and we haven't
-done anything to tell it that they're now stale. I'm not sure the
-gdbstub protocol even has a mechanism for doing this -- after all, from
-gdb's point of view the target is stopped and it does not expect that
-its state will change until gdb asks it to resume execution.
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+---
+ scripts/checkpatch.pl | 37 ++++++++++++++++++++++++++++++-------
+ 1 file changed, 30 insertions(+), 7 deletions(-)
 
-I'm not sure how this could be dealt with -- in theory one could forbid
-actions like system reset while the gdbstub had control, but that seems
-likely to have unwelcome side-effects...
+v1 -> v2 :
 
--- =
+* track the "from" file in addition to the "to" file,
+  and grep into both (if they exist), looking for trace.h, trace-root.h
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1277433
+  If files are reachable and readable, emit a warning if there is no
+  update to trace-events.
 
-Title:
-  GDB context is inconsistent after "monitor system_reset"
 
-Status in QEMU:
-  Incomplete
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index bd3faa154c..37db212fc6 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1300,6 +1300,7 @@ sub process {
+ 	my $in_header_lines = $file ? 0 : 1;
+ 	my $in_commit_log = 0;		#Scanning lines before patch
+ 	my $reported_maintainer_file = 0;
++	my $reported_trace_events_file = 0;
+ 	my $non_utf8_charset = 0;
+ 
+ 	our @report = ();
+@@ -1309,6 +1310,7 @@ sub process {
+ 	our $cnt_chk = 0;
+ 
+ 	# Trace the real file/line as we go.
++	my $fromfile = '';
+ 	my $realfile = '';
+ 	my $realline = 0;
+ 	my $realcnt = 0;
+@@ -1454,10 +1456,15 @@ sub process {
+ 		$here = "#$realline: " if ($file);
+ 
+ 		# extract the filename as it passes
+-		if ($line =~ /^diff --git.*?(\S+)$/) {
+-			$realfile = $1;
+-			$realfile =~ s@^([^/]*)/@@ if (!$file);
++		if ($line =~ /^diff --git.*?(\S+).*?(\S+)$/) {
++			$fromfile = $1;
++			$realfile = $2;
++			if (!$file) {
++				$fromfile =~ s@^([^/]*)/@@ ;
++				$realfile =~ s@^([^/]*)/@@ ;
++			}
+ 	                checkfilename($realfile, \$acpi_testexpected, \$acpi_nontestexpected);
++
+ 		} elsif ($line =~ /^\+\+\+\s+(\S+)/) {
+ 			$realfile = $1;
+ 			$realfile =~ s@^([^/]*)/@@ if (!$file);
+@@ -1470,6 +1477,11 @@ sub process {
+ 			}
+ 
+ 			next;
++
++		} elsif ($line =~ /^---\s+(\S+)/) {
++			$fromfile = $1;
++			$fromfile =~ s@^([^/]*)/@@ if (!$file);
++			next;
+ 		}
+ 
+ 		$here .= "FILE: $realfile:$realline:" if ($realcnt != 0);
+@@ -1524,15 +1536,26 @@ sub process {
+ 		if ($line =~ /^\s*MAINTAINERS\s*\|/) {
+ 			$reported_maintainer_file = 1;
+ 		}
+-
++# similar check for trace-events
++		if ($line =~ /^\s*trace-events\s*\|/) {
++			$reported_trace_events_file = 1;
++		}
+ # Check for added, moved or deleted files
+-		if (!$reported_maintainer_file && !$in_commit_log &&
++		if (!$in_commit_log &&
+ 		    ($line =~ /^(?:new|deleted) file mode\s*\d+\s*$/ ||
+ 		     $line =~ /^rename (?:from|to) [\w\/\.\-]+\s*$/ ||
+ 		     ($line =~ /\{\s*([\w\/\.\-]*)\s*\=\>\s*([\w\/\.\-]*)\s*\}/ &&
+ 		      (defined($1) || defined($2))))) {
+-			$reported_maintainer_file = 1;
+-			WARN("added, moved or deleted file(s), does MAINTAINERS need updating?\n" . $herecurr);
++			if (!$reported_maintainer_file) {
++				$reported_maintainer_file = 1;
++				WARN("added, moved or deleted file(s), does MAINTAINERS need updating?\n" . $herecurr);
++			}
++			if (!$reported_trace_events_file) {
++				if (`grep -F -s -e trace.h -e trace-root.h ${fromfile} ${realfile}` ne '') {
++					$reported_trace_events_file = 1;
++					WARN("added, moved or deleted file(s), does trace-events need updating?\n" . $herecurr);
++				}
++			}
+ 		}
+ 
+ # Check for wrappage within a valid hunk of the file
+-- 
+2.16.4
 
-Bug description:
-  After a "monitor system_reset" the GDB view to the system state
-  differs from QEMUs processor state.
-
-  Breakpoint 8, _ARMV4_Exception_interrupt () at /home/sh/rtems-4.11/c/src/=
-../../cpukit/score/cpu/arm/arm_exc_interrupt.S:74
-  74              mov     EXCHANGE_LR, lr
-  (gdb) info registers
-  r0             0x2027e8 2107368
-  r1             0x204208 2114056
-  r2             0x13     19
-  r3             0x204238 2114104
-  r4             0x0      0
-  r5             0x0      0
-  r6             0x0      0
-  r7             0x0      0
-  r8             0x0      0
-  r9             0x0      0
-  r10            0x0      0
-  r11            0x0      0
-  r12            0x0      0
-  sp             0x201480 0x201480
-  lr             0x110958 1116504
-  pc             0x11073c 0x11073c <_ARMV4_Exception_interrupt+4>
-  cpsr           0x192    402
-  (gdb) monitor info registers
-  R00=3D002027e8 R01=3D00204208 R02=3D00000013 R03=3D00204238
-  R04=3D00000000 R05=3D00000000 R06=3D00000000 R07=3D00000000
-  R08=3D00000000 R09=3D00000000 R10=3D00000000 R11=3D00000000
-  R12=3D00000000 R13=3D00201480 R14=3D00110958 R15=3D0011073c
-  PSR=3D00000192 ---- A irq32
-  (gdb) monitor system_reset
-  (gdb) info registers
-  r0             0x2027e8 2107368
-  r1             0x204208 2114056
-  r2             0x13     19
-  r3             0x204238 2114104
-  r4             0x0      0
-  r5             0x0      0
-  r6             0x0      0
-  r7             0x0      0
-  r8             0x0      0
-  r9             0x0      0
-  r10            0x0      0
-  r11            0x0      0
-  r12            0x0      0
-  sp             0x201480 0x201480
-  lr             0x110958 1116504
-  pc             0x11073c 0x11073c <_ARMV4_Exception_interrupt+4>
-  cpsr           0x192    402
-  (gdb) monitor info registers
-  R00=3D00000000 R01=3D00000000 R02=3D00000000 R03=3D00000000
-  R04=3D00000000 R05=3D00000000 R06=3D00000000 R07=3D00000000
-  R08=3D00000000 R09=3D00000000 R10=3D00000000 R11=3D00000000
-  R12=3D00000000 R13=3D00000000 R14=3D00000000 R15=3D00100040
-  PSR=3D400001d3 -Z-- A svc32
-
-  Why does the second "info registers" and "monitor info registers"
-  differ?
-
-  After a single instruction step they are synchronized at least on ARM
-  (on SPARC this is different).
-
-  (gdb) si
-  bsp_start_vector_table_end () at /home/sh/rtems-4.11/c/src/lib/libbsp/arm=
-/realview-pbx-a9/../shared/start/start.S:144
-  144             msr     cpsr, r0
-  (gdb) info registers
-  r0             0xd3     211
-  r1             0x0      0
-  r2             0x0      0
-  r3             0x0      0
-  r4             0x0      0
-  r5             0x0      0
-  r6             0x0      0
-  r7             0x0      0
-  r8             0x0      0
-  r9             0x0      0
-  r10            0x0      0
-  r11            0x0      0
-  r12            0x0      0
-  sp             0x0      0x0
-  lr             0x0      0
-  pc             0x100044 0x100044 <bsp_start_vector_table_end+4>
-  cpsr           0x400001d3       1073742291
-  (gdb) monitor info registers
-  R00=3D000000d3 R01=3D00000000 R02=3D00000000 R03=3D00000000
-  R04=3D00000000 R05=3D00000000 R06=3D00000000 R07=3D00000000
-  R08=3D00000000 R09=3D00000000 R10=3D00000000 R11=3D00000000
-  R12=3D00000000 R13=3D00000000 R14=3D00000000 R15=3D00100044
-  PSR=3D400001d3 -Z-- A svc32
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1277433/+subscriptions
 
