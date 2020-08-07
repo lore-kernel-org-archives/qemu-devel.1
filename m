@@ -2,90 +2,90 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DCB5C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D0BC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:01:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C999522CAE
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:59:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B9B320748
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:01:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WeRaEotb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C999522CAE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BRSrKGOy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B9B320748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3z9t-0000K6-3x
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:59:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37690)
+	id 1k3zBZ-0001gK-9R
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 06:01:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k3z9C-0008KF-G6
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:58:46 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48050
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k3zAT-0000t2-Au
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:00:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24448)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k3z9A-0005yu-Nj
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:58:46 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k3zAR-00062z-8A
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:00:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596794323;
+ s=mimecast20190719; t=1596794401;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XrAmAfn4VRlApIF6Wrz2pv+pfbstgdQC64Ltg0xEtks=;
- b=WeRaEotbeHw2FuSXibGh+XSym6aChmFqb5/iI3zpi7AL+VS4cr5zJBuAtgTeuP8I268pLm
- c3DjUAKDLdUxlQjmALeN1xOohC0wlvyJiRWjttWHM5VhRWuXXtheCNUgD+dgkDgMZfP2jG
- wSMT2SKAVIMY0Ujhzgu/GLIQQaenvPU=
+ bh=J/CD+TQeEYBTmluSgdrhYTDAaZsu4FTbtqsB4Lsglp0=;
+ b=BRSrKGOyQPvrdW2TXq3z13vZ9uGFUIlkpDKhQV44f0Z18BAfGlC4Wktm+2A1nyV6gr64as
+ ByFkKkjwXmB3tEINEZ/9zzpt+alHaJoUyvC6SIMKPHJQ5sXVQjUQLvRnLfZbX4tT/OpudB
+ NDeT8uctYfFBly9oPnYLcsYhxzaXfZk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-y05SiudNMVyJ3y2daM5b6Q-1; Fri, 07 Aug 2020 05:58:42 -0400
-X-MC-Unique: y05SiudNMVyJ3y2daM5b6Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-86-lpYnJP01MTm_1V-vaTwTVQ-1; Fri, 07 Aug 2020 05:59:58 -0400
+X-MC-Unique: lpYnJP01MTm_1V-vaTwTVQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E370F106B242
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 09:58:40 +0000 (UTC)
-Received: from work-vm (ovpn-114-9.ams2.redhat.com [10.36.114.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B8FC5619B5;
- Fri,  7 Aug 2020 09:58:33 +0000 (UTC)
-Date: Fri, 7 Aug 2020 10:58:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH v2] virtiofsd: Remove "norace" from cmdline help and docs
-Message-ID: <20200807095831.GA2780@work-vm>
-References: <20200717121110.50580-1-slp@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF7B757;
+ Fri,  7 Aug 2020 09:59:57 +0000 (UTC)
+Received: from localhost (ovpn-114-16.ams2.redhat.com [10.36.114.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C7FCE87A78;
+ Fri,  7 Aug 2020 09:59:54 +0000 (UTC)
+Date: Fri, 7 Aug 2020 10:59:53 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: Any reason VIRTQUEUE_MAX_SIZE is 1024? Can we increase this limit?
+Message-ID: <20200807095953.GA600298@stefanha-x1.localdomain>
+References: <AM7PR05MB6695D4FF6766BF2942C345D6BB710@AM7PR05MB6695.eurprd05.prod.outlook.com>
+ <20200805121107.GG361702@stefanha-x1.localdomain>
+ <20200805081144-mutt-send-email-mst@kernel.org>
+ <20200806123708.GC379937@stefanha-x1.localdomain>
+ <e9f6ae61-c2d5-e204-f9b0-5113ef7fc330@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200717121110.50580-1-slp@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <e9f6ae61-c2d5-e204-f9b0-5113ef7fc330@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="sm4nu43k4a2Rpi4c"
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:11:35
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 05:20:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,67 +98,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Miklos Szeredi <mszeredi@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Yajun Wu <yajunw@mellanox.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Sergio Lopez (slp@redhat.com) wrote:
-> Commit 93bb3d8d4cda ("virtiofsd: remove symlink fallbacks") removed
-> the implementation of the "norace" option, so remove it from the
-> cmdline help and the documentation too.
-> 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
-> v2:
->  * Drop "norace" from the documentation too (Stefano Garzarella)
+--sm4nu43k4a2Rpi4c
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I've added this to my dev world; I'll post it to qemu when it opens up.
+On Fri, Aug 07, 2020 at 11:35:08AM +0800, Jason Wang wrote:
+>=20
+> On 2020/8/6 =E4=B8=8B=E5=8D=888:37, Stefan Hajnoczi wrote:
+> > On Wed, Aug 05, 2020 at 08:13:29AM -0400, Michael S. Tsirkin wrote:
+> > > On Wed, Aug 05, 2020 at 01:11:07PM +0100, Stefan Hajnoczi wrote:
+> > > > On Thu, Jul 30, 2020 at 07:46:09AM +0000, Yajun Wu wrote:
+> > > > > I'm doing iperf test on VIRTIO net through vhost-user(HW VDPA).
+> > > > > Find maximal acceptable tx_queue_size/rx_queue_size is 1024.
+> > > > > Basically increase queue size can get better RX rate for my case.
+> > > > >=20
+> > > > > Can we increase the limit(VIRTQUEUE_MAX_SIZE) to 8192 to possibly=
+ gain better performance?
+> > > > Hi,
+> > > > The VIRTIO 1.1 specification says the maximum number of descriptors=
+ is
+> > > > 32768 for both split and packed virtqueues.
+> > > >=20
+> > > > The vhost kernel code seems to support 32768.
+> > > >=20
+> > > > The 1024 limit is an implementation limit in QEMU. Increasing it wo=
+uld
+> > > > require QEMU code changes. For example, VIRTQUEUE_MAX_SIZE is used =
+as
+> > > > the size of arrays.
+> > > >=20
+> > > > I can't think of a fundamental reason why QEMU needs to limit itsel=
+f to
+> > > > 1024 descriptors. Raising the limit would require fixing up the cod=
+e and
+> > > > ensuring that live migration remains compatible with older versions=
+ of
+> > > > QEMU.
+> > > >=20
+> > > > Stefan
+> > > There's actually a reason for a limit: in theory the vq size
+> > > also sets a limit on the number of scatter/gather entries.
+> > > both QEMU and vhost can't handle a packet split over > 1k chunks.
+> > >=20
+> > > We could add an extra limit for s/g size like block and scsi do,
+> > > this will need spec, guest and host side work.
+> > Interesting, thanks for explaining! This could be made explicit by
+> > changing the QEMU code to:
+> >=20
+> > include/hw/virtio/virtio.h:#define VIRTQUEUE_MAX_SIZE IOV_MAX
+> >=20
+> > Looking more closely at the vhost kernel code I see that UIO_MAXIOV is
+> > used in some places but not in vhost_vring_set_num() (ioctl
+> > VHOST_SET_VRING_NUM). Is there a reason why UIO_MAXIOV isn't enforced
+> > when the application sets the queue size?
+>=20
+>=20
+> Actually three things:
+>=20
+> 1) queue size
+> 2) #descriptors in a list
+> 3) IOV size
+>=20
+> Spec limit the 2) to 1) but 2) may not equal to 3).
+>=20
+> So enforcing UIO_MAXIOV can not solve the problem completely.
+>=20
+> For vhost-net, it depends on socket to build skb which requires an iov ar=
+ray
+> to work. We need remove this limitation by:
+>=20
+> - build skb by vhost-net itself
+> - do piecewise copying
+>=20
+> Then we're not limited with #iov and more and support up to what spec
+> supports.
 
+If I understand correctly, you are saying vhost_net.ko does not support
+more than UIO_MAXIOV descriptors today but it could be fixed as you
+described.
 
-Dave
+Thanks!
 
-> ---
->  docs/tools/virtiofsd.rst | 3 ---
->  tools/virtiofsd/helper.c | 2 --
->  2 files changed, 5 deletions(-)
-> 
-> diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
-> index 824e713491..58666a4495 100644
-> --- a/docs/tools/virtiofsd.rst
-> +++ b/docs/tools/virtiofsd.rst
-> @@ -63,9 +63,6 @@ Options
->      Print only log messages matching LEVEL or more severe.  LEVEL is one of
->      ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
->  
-> -  * norace -
-> -    Disable racy fallback.  The default is false.
-> -
->    * posix_lock|no_posix_lock -
->      Enable/disable remote POSIX locks.  The default is ``posix_lock``.
->  
-> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-> index 3105b6c23a..7bc5d7dc5a 100644
-> --- a/tools/virtiofsd/helper.c
-> +++ b/tools/virtiofsd/helper.c
-> @@ -159,8 +159,6 @@ void fuse_cmdline_help(void)
->             "    -o max_idle_threads        the maximum number of idle worker "
->             "threads\n"
->             "                               allowed (default: 10)\n"
-> -           "    -o norace                  disable racy fallback\n"
-> -           "                               default: false\n"
->             "    -o posix_lock|no_posix_lock\n"
->             "                               enable/disable remote posix lock\n"
->             "                               default: posix_lock\n"
-> -- 
-> 2.26.2
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Stefan
+
+--sm4nu43k4a2Rpi4c
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8tJhkACgkQnKSrs4Gr
+c8hecQgAmCGB/vTSausyz5sg29IQC553G7CG6ZfAQiBmsQGE/hWVkS6wPvz6+90I
+Pytv8I8ldVd6XUuH2Yix+JM1cbAm2mfV6T8VV7SUnrIxI7sGbuA5aFA1DfUB36F8
+j8AT7Cs9LvvKA61JUOBtDN1+zDdo79N8IVbkA8OBdIfF5rPmiLeNjSFJvZ5llOtQ
+It+8GBrp3+uhO1zADxPB9VXS5dv7lOiFw49auvRbOGcysoj1r5Il9a/VX3zWcslL
++fNDPsOU6NXaCA3jn/fVF4IpUX/vx+2TYK2pHEIHmR64IrFBhVC1Vr7pKGMdWjWR
+ZeJ638+9+T5ne4POuRud0xG99K9eyA==
+=oZXU
+-----END PGP SIGNATURE-----
+
+--sm4nu43k4a2Rpi4c--
 
 
