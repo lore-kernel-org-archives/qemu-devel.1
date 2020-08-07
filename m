@@ -2,41 +2,41 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF09DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A6CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:45:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97F80221E5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:44:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97F80221E5
+	by mail.kernel.org (Postfix) with ESMTPS id 3011621744
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:45:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3011621744
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3yvi-0001U2-Qn
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:44:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35478)
+	id 1k3yvv-0001u5-9T
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:45:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k3yv2-0000nV-8u
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:44:08 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:55721)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k3yvA-0000w1-WE
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:44:17 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:49455)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k3yv0-0004Oo-HH
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:44:08 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k3yv9-0004PK-A8
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:44:16 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M8QNy-1k8Oll2oca-004Shq; Fri, 07 Aug 2020 11:44:01 +0200
-Subject: Re: [PATCH 1/2] linux-user: Validate mmap/mprotect prot value
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MLhsE-1kLeIP03HM-00HgVk; Fri, 07 Aug 2020 11:44:13 +0200
+Subject: Re: [PATCH 2/2] linux-user: Adjust guest page protection for the host
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20200519185645.3915-1-richard.henderson@linaro.org>
- <20200519185645.3915-2-richard.henderson@linaro.org>
+ <20200519185645.3915-3-richard.henderson@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,32 +80,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <a8e6d223-30ee-bf8b-bd97-ee3b266f2755@vivier.eu>
-Date: Fri, 7 Aug 2020 11:44:00 +0200
+Message-ID: <fca0f4c8-8018-e765-d997-27869f68c843@vivier.eu>
+Date: Fri, 7 Aug 2020 11:44:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200519185645.3915-2-richard.henderson@linaro.org>
+In-Reply-To: <20200519185645.3915-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:h8I8ODKDLx/zghnLf08fZP+GQzS98vUuavcUPWSDe358vu9E78/
- zcxUFoKOtrDl1+01lbfwqzdLbPqdbgAz/hhEZFPY6MkWJqYmX5yek7hKNqvuD9FMHw0Hke+
- svgG48bHrvQu5tjyp96+OXrPASaJLhhBLeSh/TOpSXnGXY1kR7qrfoBspaSqFRX9W9TNm0J
- iHIBVjUOSUUtp7pKQbo6w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8yy10CPU7Fk=:NGpfxopZHtS+Xe5k8P1B9J
- f2nhXmYdGHsULOJHDwCGf55bWfQ/akF1NW/HFulXfW+LNddKhAHtiQgjkj/B5q/pClpNHx3Do
- dhmGTyjEKfwOcjXTgGuAOYTJ0pnTEBVevI6vrfhi9fEwPUPrjJdZVGDxEngQ+piiHUG3NUdGQ
- w/8Im7MWbHz5wC8kavzfr+H4ZhXtYjA35dJYeMDPnvv4xz1dV8m5GDh4ny1AC6EPa5XKEtFZS
- lEQrPjiEyK5IMT0bqpVAxcoA1jq8wuXID5nmzCMzKJBvPpocf1SnJUWZnp0VdE/2hCIRfO50l
- 7Z3ZSWjrCT9wsPN8FM8Tn6TcyXtL8NOj4ER/HzM9v+GPQMqzScqvAjWVJlZaArx1HjUOPHrBH
- BZyoT0oIviiRz2sHQgsOmrGrdAs7NbX9GG4+WAzt05vi0c629FbZ5nBaJCGzWz7CpQ3LeExAz
- D2Kww4P34JW+9f3hRjOi0R/zSVf2xXBGmHAehxMrHg0FPYaoK0gZlRS7c/jbZqK/RvngOPNsH
- 2fOeJZ8JSDEl/nSyrNjYsn/UHp7k5YrgaY8vjB/dFDsmxvwlAz0RcjQjAt3i/yo+56HfXksw0
- 3eZVLJ57mArAZaYSMg6GISu8EDd/2Bsmwj4lJ8CWChU4REptN+HkX5MrgZd2g3hiAf8QJAukJ
- kmK7VejxxfLEcd5AFl4YcMZA2lGog7chembjl/NpLGCYvYI2cj3Z3/DJ9pQGlQEPaT+Jywo9r
- nWckBBgFTj3YHJwg1Kt9211/1AocVESEv3IDcq1trujYm5JzA2Vpg+2b6Yye414IutTG1XLr2
- jUZSSZnYIQG+6sAEsxpLazllMqGB5gK9M7RZGwTPltFbKype/6ilPU/W26zGwgzHknFfXRr
+X-Provags-ID: V03:K1:PpLHzCyW9mYmyk5hbwQimPbeuaciUgqgY3ztXhOZxrNxTc4ZNF6
+ QJadxS4iDrK5OodozSEE0e3y6w4xB4NNiTp8rYWBaq1DXjI7IxhOhpJIy6vuIQ3Dgp0UnQX
+ r9O+QOG4UFf19rRXFLhLjCk2zdnTNIbUApSzvy6rTAUmoQOYdMaFAHunA8KvzWSUO/f3dLE
+ ECsgibUICE2AGBvvkcgjg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ynwrj4Ms0+E=:X1vc7rNDSJ0kuPbjI8A4NV
+ e9ca7OQjIbCgaO2suv0n81i9KzQIsJikP7Yw2+m0u87RSJGZFH+mLJ9+jPjOHlCpE9gvQZiGg
+ fvB79s25nWZ5YeCsgps2D8fJ23ebrKxAEuyO5m48Hp2B3+RgV9813CdUhjFqwDuwO1jDPct3j
+ iUXxDmROXMgj5vf2Z6zAyBzGuUpHCJQteUFK7H1UWdL0I0raDkaVieLCmx58juADG5ObFPp4j
+ 2VFwQ2zDP86Mh1G0uMx1eW4d5y1SOf1rNS/iNxqxaZlrowZEwIyLGeVlanirXdl/zVQk6LVEV
+ 2LG8D20spYVyYy7O/Fr/DvtVjuACHrFaON4eLAEz32KkNl/TBF0VOhwFfeKwwvojeH7KvfOmF
+ m5Ntd21sW6ZOWUxGR6cKTN3DcxKLCx8/MMW+VvuDq61tuYAYGV0UwRhFsd4hIg8ZtQMXp2JM7
+ y4cP5po0VC3CGVDRnmMnN3YxQfaIw9rMjIvdrN0cmXvBbh20W1rkO9QHGW3N1MVK7f77n3/sR
+ +KLjQHJ5twZNykiwH5jG7IsD4P9QcezfE+DzH04q3ZuzjudX/nNOsY98U3MX0XQQxNqbZLltM
+ +oOCWJpO56eMgQbd/nT2slSIvSnFKR8LoL5QRVeFX7T3u+HrysNxF/z1hpvzQQiKhWZ8PXfku
+ BDPKG7uLe9w5QEv1cfPSwCr25epCzaqeyG+GE6E2ibA8t6fZdoEQ6YHRtzdndJcXZh+15/EaI
+ lFVsh9iO8PZZ0v5obrRT1ih4l9WDrfteswHKGIQzCVJPm4Dzn2xpERdiGq0LjRf6hGFRT3IQ4
+ 1nKzPVDerHTopy3yLkz0rULgBkPGZSayC52YBNcqJw/LXrrD/A7/1Odju748oj/uZdSzg42
 Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 05:44:03
@@ -133,24 +133,36 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 19/05/2020 à 20:56, Richard Henderson a écrit :
-> The kernel will return -EINVAL for bits set in the prot argument
-> that are unknown or invalid.  Previously we were simply cropping
-> out the bits that we care about.
-> 
-> Introduce validate_prot_to_pageflags to perform this check in a
-> single place between the two syscalls.  Differentiate between
-> the target and host versions of prot.  Compute the qemu internal
-> page_flags value at the same time.
+> Executable guest pages are never directly executed by
+> the host, but do need to be readable for translation.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  linux-user/mmap.c | 106 +++++++++++++++++++++++++++++++---------------
->  1 file changed, 73 insertions(+), 33 deletions(-)
+>  linux-user/mmap.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+> index 36fd1e2250..84662c3311 100644
+> --- a/linux-user/mmap.c
+> +++ b/linux-user/mmap.c
+> @@ -76,8 +76,12 @@ static int validate_prot_to_pageflags(int *host_prot, int prot)
+>       * don't bother transforming guest bit to host bit.  Any other
+>       * target-specific prot bits will not be understood by the host
+>       * and will need to be encoded into page_flags for qemu emulation.
+> +     *
+> +     * Pages that are executable by the guest will never be executed
+> +     * by the host, but the host will need to be able to read them.
+>       */
+> -    *host_prot = prot & (PROT_READ | PROT_WRITE | PROT_EXEC);
+> +    *host_prot = (prot & (PROT_READ | PROT_WRITE))
+> +               | (prot & PROT_EXEC ? PROT_READ : 0);
+>  
+>      return prot & ~valid ? 0 : page_flags;
+>  }
 > 
 
 Applied to my linux-user-for-5.2 branch.
 
 Thanks,
 Laurent
-
 
