@@ -2,125 +2,81 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8999EC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 11:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B4BAC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 11:15:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5083B22C9F
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 11:13:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5083B22C9F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 66CAF2177B
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 11:15:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CAF2177B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k40Js-0001yu-JK
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 07:13:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52826)
+	id 1k40LY-0003N1-GO
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 07:15:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k40JI-0001ZQ-Vn
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 07:13:16 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:40485)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k40JG-0006wc-RR
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 07:13:16 -0400
-Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MORVA-1kNJ3B079K-00Prps; Fri, 07 Aug 2020 13:13:11 +0200
-Subject: Re: [PATCH v2 2/2] linux-user: Add support for a group of 2038 safe
- syscalls
-To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
-References: <20200722153421.295411-1-Filip.Bozuta@syrmia.com>
- <20200722153421.295411-3-Filip.Bozuta@syrmia.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <920f9ff0-157b-af0c-8001-bc9357474318@vivier.eu>
-Date: Fri, 7 Aug 2020 13:13:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k40Ku-0002w9-Ng
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 07:14:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48862)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k40Ks-000769-IU
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 07:14:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k40Kq-00018x-Mb
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 11:14:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 9B8E22E8055
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 11:14:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200722153421.295411-3-Filip.Bozuta@syrmia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:iez3NOZ/vrzVAf9GDiJnIrOExNhfqr3kXbfT713QYF5qA2LxTfy
- /D8tDbm3CnklW8jvBG2pzppfapdU56BsGws93KQvW1+wIVnUjxNV7Hn3dvqA9P3TFDZHp5k
- lKLHJ7I1nVGZ5AF5PPgDMveNBxvtokZaSS2xteHgomqcwPtyb0F9PfkXmLqHIFr2EuWTLvO
- NaHMJkMWva61m51pvUUnw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:/JZSyLpMsJA=:1jzcyIvvBi0j/3srJ0bv+m
- z0EXrB0bsay5qZRN1sb32yyxu2sEqs8UCb5/2cKJcxLVoQzNLz3WOq4f8gdTQCi4eJ+fsXYV6
- FoRCB+FP/GWDqj8Bxj1WZ9wNTOpendto/2mBNxdkfVXq1R8/1havS+d+OGAUQcEpts9ZoWXtx
- WmDA9glq9QtL358H5nsdh142B9E6Nk0eobtN7ChA/QAIRrruOKjxOh/CoA0r7Nfl8V2zcR5Bq
- GwMd1GEGI+ZfWUa7VOvIpVMfITcpgXKIEV8ytyK+kQsKqzkVuR03VcYUJgy+7aaycCPxZjrr0
- 7F/2eNbipXv27K2xWcLD5kuMOBnjksYm9ssQkK5tlPeFwADdfLrIgIVjL8IlL1nvRVbmDfboL
- /3KteomBtP+89jUbGptUoRXVNOCW927EFE/Lduprbz/WtubzX5WWCFkobV2HEBKOgFkc7AsTE
- wtvkAFnuF0Rt4a2L257QHWia5N6Vj11arTEUzbixTBg6pR/mTI3H7hT3uNwP/trLGln38MOTH
- k4DMVtNwsgFcbEHDNfuOF8KDEEAGCUoaa7qZF7O+8K2YxUyCtKnaonG79Bmlo9Lggs45q5nLt
- erzs0PP9Sl9j1DbDv1l/91nFWv9uZKVu1oLmWDAVg/aG2tQ2osFxmoiRtA/JKwhM8Ci/F3Rk+
- wE+4LT2R3JmZQ8wQBCjgKBG/iEH1+GdA7ttQK3uHAJLhF2jyY3Dk1X3c4lBmZjl3rJYabGeqk
- 3Yw4Nt4COTfU1CegoGVAL+0yn9qUf3QDPTwex2MVfYnhGcNi9d8cO6THBBNvRraFPX+76YuYA
- y+0bshjCTu2KFJHXWBa1I380d8Yc0beG9TZy5CDeZYsde7HB9EljWYdI1rCttXXlk6YzUk5
-Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 05:56:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Aug 2020 11:01:29 -0000
+From: Peter Maydell <1277433@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pmaydell sebastian-huber th-huth
+X-Launchpad-Bug-Reporter: Sebastian Huber (sebastian-huber)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <20140207101533.1830.3618.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159679808995.21623.2352286576359638175.malone@chaenomeles.canonical.com>
+Subject: [Bug 1277433] Re: GDB context is inconsistent after "monitor
+ system_reset"
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: fe892987362ab3381cddc8c3915e15f6c08eeaab
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -129,70 +85,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1277433 <1277433@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 22/07/2020 à 17:34, Filip Bozuta a écrit :
-> This patch implements functionality for following time64 syscalls:
-> 
-> *clock_getres_time64
-> 
->      This a year 2038 safe variant of syscall:
-> 
->      int clock_getres(clockid_t clockid, struct timespec *res)
->      --finding the resoultion of a specified clock--
->      man page: https://man7.org/linux/man-pages/man2/clock_getres.2.html
-> 
-> *timer_gettime64
-> *timer_settime64
-> 
->      These are year 2038 safe variants of syscalls:
-> 
->      int timer_settime(timer_t timerid, int flags,
->                        const struct itimerspec *new_value,
->                        struct itimerspec *old_value)
->      int timer_gettime(timer_t timerid, struct itimerspec *curr_value)
->      --arming/dissarming and fetching state of POSIX per-process timer--
->      man page: https://man7.org/linux/man-pages/man2/timer_settime.2.html
-> 
-> *timerfd_gettime64
-> *timerfd_settime64
-> 
->      These are year 2038 safe variants of syscalls:
-> 
->      int timerfd_settime(int fd, int flags,
->                          const struct itimerspec *new_value,
->                          struct itimerspec *old_value)
->      int timerfd_gettime(int fd, struct itimerspec *curr_value)
->      --timers that notify via file descriptor--
->      man page: https://man7.org/linux/man-pages/man2/timerfd_settime.2.html
-> 
-> Implementation notes:
-> 
->      Syscall 'clock_getres_time64' was implemented similarly to 'clock_getres()'.
->      The only difference was that for the conversion of 'struct timespec' from
->      host to target, function 'host_to_target_timespec64()' was used instead of
->      'host_to_target_timespec()'.
-> 
->      For other syscalls, new functions 'host_to_target_itimerspec64()' and
->      'target_to_host_itimerspec64()' were added to convert the value of the
->      'struct itimerspec' from host to target and vice versa. A new type
->      'struct target__kernel_itimerspec' was added in 'syscall_defs.h'. This
->      type was defined with fields which are of the already defined type
->      'struct target_timespec'. This new 'struct target__kernel_itimerspec'
->      type is used in these new converting functions. These new functions were
->      defined similarly to 'host_to_target_itimerspec()' and 'target_to_host_itimerspec()'
->      the only difference being that 'target_to_host_timespec64()' and
->      'host_to_target_timespec64()' were used.
-> 
-> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-> ---
->  linux-user/syscall.c      | 139 +++++++++++++++++++++++++++++++++++++-
->  linux-user/syscall_defs.h |   5 ++
->  2 files changed, 143 insertions(+), 1 deletion(-)
-> 
+I suspect that gdb has cached the values of the registers and we haven't
+done anything to tell it that they're now stale. I'm not sure the
+gdbstub protocol even has a mechanism for doing this -- after all, from
+gdb's point of view the target is stopped and it does not expect that
+its state will change until gdb asks it to resume execution.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+I'm not sure how this could be dealt with -- in theory one could forbid
+actions like system reset while the gdbstub had control, but that seems
+likely to have unwelcome side-effects...
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1277433
+
+Title:
+  GDB context is inconsistent after "monitor system_reset"
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  After a "monitor system_reset" the GDB view to the system state
+  differs from QEMUs processor state.
+
+  Breakpoint 8, _ARMV4_Exception_interrupt () at /home/sh/rtems-4.11/c/src/=
+../../cpukit/score/cpu/arm/arm_exc_interrupt.S:74
+  74              mov     EXCHANGE_LR, lr
+  (gdb) info registers
+  r0             0x2027e8 2107368
+  r1             0x204208 2114056
+  r2             0x13     19
+  r3             0x204238 2114104
+  r4             0x0      0
+  r5             0x0      0
+  r6             0x0      0
+  r7             0x0      0
+  r8             0x0      0
+  r9             0x0      0
+  r10            0x0      0
+  r11            0x0      0
+  r12            0x0      0
+  sp             0x201480 0x201480
+  lr             0x110958 1116504
+  pc             0x11073c 0x11073c <_ARMV4_Exception_interrupt+4>
+  cpsr           0x192    402
+  (gdb) monitor info registers
+  R00=3D002027e8 R01=3D00204208 R02=3D00000013 R03=3D00204238
+  R04=3D00000000 R05=3D00000000 R06=3D00000000 R07=3D00000000
+  R08=3D00000000 R09=3D00000000 R10=3D00000000 R11=3D00000000
+  R12=3D00000000 R13=3D00201480 R14=3D00110958 R15=3D0011073c
+  PSR=3D00000192 ---- A irq32
+  (gdb) monitor system_reset
+  (gdb) info registers
+  r0             0x2027e8 2107368
+  r1             0x204208 2114056
+  r2             0x13     19
+  r3             0x204238 2114104
+  r4             0x0      0
+  r5             0x0      0
+  r6             0x0      0
+  r7             0x0      0
+  r8             0x0      0
+  r9             0x0      0
+  r10            0x0      0
+  r11            0x0      0
+  r12            0x0      0
+  sp             0x201480 0x201480
+  lr             0x110958 1116504
+  pc             0x11073c 0x11073c <_ARMV4_Exception_interrupt+4>
+  cpsr           0x192    402
+  (gdb) monitor info registers
+  R00=3D00000000 R01=3D00000000 R02=3D00000000 R03=3D00000000
+  R04=3D00000000 R05=3D00000000 R06=3D00000000 R07=3D00000000
+  R08=3D00000000 R09=3D00000000 R10=3D00000000 R11=3D00000000
+  R12=3D00000000 R13=3D00000000 R14=3D00000000 R15=3D00100040
+  PSR=3D400001d3 -Z-- A svc32
+
+  Why does the second "info registers" and "monitor info registers"
+  differ?
+
+  After a single instruction step they are synchronized at least on ARM
+  (on SPARC this is different).
+
+  (gdb) si
+  bsp_start_vector_table_end () at /home/sh/rtems-4.11/c/src/lib/libbsp/arm=
+/realview-pbx-a9/../shared/start/start.S:144
+  144             msr     cpsr, r0
+  (gdb) info registers
+  r0             0xd3     211
+  r1             0x0      0
+  r2             0x0      0
+  r3             0x0      0
+  r4             0x0      0
+  r5             0x0      0
+  r6             0x0      0
+  r7             0x0      0
+  r8             0x0      0
+  r9             0x0      0
+  r10            0x0      0
+  r11            0x0      0
+  r12            0x0      0
+  sp             0x0      0x0
+  lr             0x0      0
+  pc             0x100044 0x100044 <bsp_start_vector_table_end+4>
+  cpsr           0x400001d3       1073742291
+  (gdb) monitor info registers
+  R00=3D000000d3 R01=3D00000000 R02=3D00000000 R03=3D00000000
+  R04=3D00000000 R05=3D00000000 R06=3D00000000 R07=3D00000000
+  R08=3D00000000 R09=3D00000000 R10=3D00000000 R11=3D00000000
+  R12=3D00000000 R13=3D00000000 R14=3D00000000 R15=3D00100044
+  PSR=3D400001d3 -Z-- A svc32
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1277433/+subscriptions
 
