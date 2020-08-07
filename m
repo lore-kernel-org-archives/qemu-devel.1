@@ -2,118 +2,77 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1774C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 136B6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC7922086A
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:41:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfwSmzlr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC7922086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE3F12086A
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:43:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE3F12086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k41gp-00065z-UP
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 08:41:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43110)
+	id 1k41ih-00079B-0h
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 08:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k41gF-0005gJ-8F
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 08:41:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21569
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k41g9-0000zI-A1
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 08:41:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596804055;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JcmIDAaZfabtLg7j8PakAMc6CotpzpvU1OfmLZjGXII=;
- b=BfwSmzlrrLgLFWCLLAem2JJnJsFP8H3lswnE6jdWW6aEbPTjOpPYQepqC51uRS65oteXzx
- raPmLI/RjcYYYPy1sFC7FTyVOUbXffmkjRThZJOBdAyoGZImeWfm2DocGrHY/8PR0HHMvD
- 0RqUjAxs/BXt4a20zkC0kuWi2Nk++sU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-6qF1sMrgO8yGmVlFZk_Feg-1; Fri, 07 Aug 2020 08:40:53 -0400
-X-MC-Unique: 6qF1sMrgO8yGmVlFZk_Feg-1
-Received: by mail-wr1-f70.google.com with SMTP id f7so710575wrs.8
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 05:40:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=JcmIDAaZfabtLg7j8PakAMc6CotpzpvU1OfmLZjGXII=;
- b=fgwJIJz8DmX40/YBBkQFE7g8xDn6GFi02ueHMAwAgUj8jHXZ6tMBC0SKJDlVAsghqC
- T37o+36G9ejUyQ6L0S8/AvaBy3ubsJdJ3djzEOJC1eV+or/n5v+Skwh9YSznRrOBPIDO
- bWxjRwcqdLPO9Whuoy6F2T0+aPPn0ymc8laq9cukNUjkDsX3FRnIH6b6aI0m9MqsaY9A
- XnV1D9JZmfRIDNdUpLUN8H0HO2XftxYvVAA+Yih3ZvtMcOqRwkddgxD1oThGAZJz8hu7
- o5z37ai39YvOV5KoWRDv/obn7aEckPonjmnIFeEVhDdA0LIh4u3a05g/TGdOeq3+1a/L
- dfyQ==
-X-Gm-Message-State: AOAM531NT1Vmt3Z+o6ypvNpDHNAiuP5aLeIOMJb5QpqOM0utRb6JUmDY
- /LVA4Efp+mhdmng3Dl7/lqcVxpnvlq/KJNCvnR0liiLTqnbapYQ8EMgi0gupEN2FbjPsUgPRDSo
- HnbT6iiC8plpceks=
-X-Received: by 2002:a1c:5581:: with SMTP id j123mr12281365wmb.75.1596804052541; 
- Fri, 07 Aug 2020 05:40:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz5fJKlHzMCZPjuY8W8vfAuJJYFwUE0wQnsjsho48Jlpf5ok0ZiZZ1y3WegBYj0astkaS+OQg==
-X-Received: by 2002:a1c:5581:: with SMTP id j123mr12281351wmb.75.1596804052335; 
- Fri, 07 Aug 2020 05:40:52 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.136.3])
- by smtp.gmail.com with ESMTPSA id p15sm10096101wrj.61.2020.08.07.05.40.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Aug 2020 05:40:51 -0700 (PDT)
-Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <761b4058-7a2b-d992-2cc2-6efe654ee62e@redhat.com>
- <9c894412-b156-607e-1ea9-9e9ba14cbf1a@redhat.com>
- <6f6e9c9b-fdf6-951e-9112-3913fe44c455@redhat.com>
- <ac18da61-6f54-b9d4-7591-e1296f9d3a32@redhat.com>
- <353ff6f7-c67f-7665-b631-967512417fa2@redhat.com>
- <fa3570e7-1f2a-c44c-91f2-411c1f51e6ef@redhat.com>
- <d9cc3875-1780-5fcc-5c2a-5408e6aba2e5@redhat.com>
- <cd17b073-57bb-e121-f55e-c89f6e005801@redhat.com>
- <b20db8c2-3201-0172-b6e9-ca1f2c0ef05b@redhat.com>
- <80039400-81e7-9c14-60c5-839b0ea5aef4@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e0056a04-1710-7676-fcec-1cf4269b7622@redhat.com>
-Date: Fri, 7 Aug 2020 14:40:43 +0200
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1k41hj-0006az-NI; Fri, 07 Aug 2020 08:42:35 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:50763)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1k41hg-00015M-UX; Fri, 07 Aug 2020 08:42:35 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.21])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 007C054C124D;
+ Fri,  7 Aug 2020 14:42:28 +0200 (CEST)
+Received: from kaod.org (37.59.142.95) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Fri, 7 Aug 2020
+ 14:42:28 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-95G001e9d231db-2103-463c-846e-af811528c085,
+ 9C6B65F6CFD3D723D723CC07BEDAC6F805E88D1E) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v3 for-5.2 2/3] ppc/xive: Introduce dedicated
+ kvm_irqchip_in_kernel() wrappers
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <159679991916.876294.8967140647442842745.stgit@bahia.lan>
+ <159679993438.876294.7285654331498605426.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <f48d7256-1383-fe53-a745-23285875417e@kaod.org>
+Date: Fri, 7 Aug 2020 14:42:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <80039400-81e7-9c14-60c5-839b0ea5aef4@redhat.com>
+In-Reply-To: <159679993438.876294.7285654331498605426.stgit@bahia.lan>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:00:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 88e51708-2cf7-442d-a45d-9755896588ab
+X-Ovh-Tracer-Id: 5491013849227889571
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrkedvgdehjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehgrhhouhhgsehkrghougdrohhrgh
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 08:42:29
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,28 +85,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, philmd@redhat.com,
- armbru@redhat.com, jsnow@redhat.com, stefanha@redhat.com,
- alex.bennee@linaro.org
+Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/08/20 14:20, Thomas Huth wrote:
-> Nice, we're getting there, now macOS starts compiling, but then fails here:
+On 8/7/20 1:32 PM, Greg Kurz wrote:
+> Calls to the KVM XIVE device are guarded by kvm_irqchip_in_kernel(). This
+> ensures that QEMU won't try to use the device if KVM is disabled or if
+> an in-kernel irqchip isn't required.
 > 
->  ../contrib/libvhost-user/libvhost-user.c:27:10: fatal error:
-> 'sys/eventfd.h' file not found
-> ../contrib/libvhost-user/libvhost-user.h:21:10: fatal error:
-> 'linux/vhost.h' file not found
->  https://cirrus-ci.com/task/5170197348745216?command=main#L810
+> When using ic-mode=dual with the pseries machine, we have two possible
+> interrupt controllers: XIVE and XICS. The kvm_irqchip_in_kernel() helper
+> will return true as soon as any of the KVM device is created. It might
+> lure QEMU to think that the other one is also around, while it is not.
+> This is exactly what happens with ic-mode=dual at machine init when
+> claiming IRQ numbers, which must be done on all possible IRQ backends,
+> eg. RTAS event sources or the PHB0 LSI table : only the KVM XICS device
+> is active but we end up calling kvmppc_xive_source_reset_one() anyway,
+> which fails. This doesn't cause any trouble because of another bug :
+> kvmppc_xive_source_reset_one() lacks an error_setg() and callers don't
+> see the failure.
 > 
-> (and FWIW, there are some weird "file: ... has no symbols" earlier in
-> the log when running AR on the capstone files)
+> Most of the other kvmppc_xive_* functions have similar xive->fd
+> checks to filter out the case when KVM XIVE isn't active. It
+> might look safer to have idempotent functions but it doesn't
+> really help to understand what's going on when debugging.
+> 
+> Since we already have all the kvm_irqchip_in_kernel() in place,
+> also have the callers to check xive->fd as well before calling
+> KVM XIVE specific code. This is straight-forward for the spapr
+> specific XIVE code. Some more care is needed for the platform
+> agnostic XIVE code since it cannot access xive->fd directly.
+> Introduce new in_kernel() methods in some base XIVE classes
+> for this purpose and implement them only in spapr.
+> 
+> In all cases, we still need to call kvm_irqchip_in_kernel() so that
+> compilers can optimize the kvmppc_xive_* calls away when CONFIG_KVM
+> isn't defined, thus avoiding the need for stubs.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-It's not supposed to build at all.  I'll check the "AR" errors and
-Conny's reported zstd failure.
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
-Paolo
+
+> ---
+> v3: Method for XiveNotifierClass no longer needed
+> 
+> v2: Introduce in_kernel() abstract methods in the base XIVE classes
+> ---
+>  hw/intc/spapr_xive.c  |   45 +++++++++++++++++++++++++++++++--------------
+>  hw/intc/xive.c        |   25 +++++++++++++++++++------
+>  include/hw/ppc/xive.h |    1 +
+>  3 files changed, 51 insertions(+), 20 deletions(-)
+> 
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 89c8cd96670b..3c84f64dc464 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -148,12 +148,19 @@ static void spapr_xive_end_pic_print_info(SpaprXive *xive, XiveEND *end,
+>      xive_end_queue_pic_print_info(end, 6, mon);
+>  }
+>  
+> +/*
+> + * kvm_irqchip_in_kernel() will cause the compiler to turn this
+> + * info a nop if CONFIG_KVM isn't defined.
+> + */
+> +#define spapr_xive_in_kernel(xive) \
+> +    (kvm_irqchip_in_kernel() && (xive)->fd != -1)
+> +
+>  void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon)
+>  {
+>      XiveSource *xsrc = &xive->source;
+>      int i;
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          Error *local_err = NULL;
+>  
+>          kvmppc_xive_synchronize_state(xive, &local_err);
+> @@ -507,8 +514,10 @@ static const VMStateDescription vmstate_spapr_xive_eas = {
+>  
+>  static int vmstate_spapr_xive_pre_save(void *opaque)
+>  {
+> -    if (kvm_irqchip_in_kernel()) {
+> -        return kvmppc_xive_pre_save(SPAPR_XIVE(opaque));
+> +    SpaprXive *xive = SPAPR_XIVE(opaque);
+> +
+> +    if (spapr_xive_in_kernel(xive)) {
+> +        return kvmppc_xive_pre_save(xive);
+>      }
+>  
+>      return 0;
+> @@ -520,8 +529,10 @@ static int vmstate_spapr_xive_pre_save(void *opaque)
+>   */
+>  static int spapr_xive_post_load(SpaprInterruptController *intc, int version_id)
+>  {
+> -    if (kvm_irqchip_in_kernel()) {
+> -        return kvmppc_xive_post_load(SPAPR_XIVE(intc), version_id);
+> +    SpaprXive *xive = SPAPR_XIVE(intc);
+> +
+> +    if (spapr_xive_in_kernel(xive)) {
+> +        return kvmppc_xive_post_load(xive, version_id);
+>      }
+>  
+>      return 0;
+> @@ -564,7 +575,7 @@ static int spapr_xive_claim_irq(SpaprInterruptController *intc, int lisn,
+>          xive_source_irq_set_lsi(xsrc, lisn);
+>      }
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          return kvmppc_xive_source_reset_one(xsrc, lisn, errp);
+>      }
+>  
+> @@ -641,7 +652,7 @@ static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, int val)
+>  {
+>      SpaprXive *xive = SPAPR_XIVE(intc);
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          kvmppc_xive_source_set_irq(&xive->source, irq, val);
+>      } else {
+>          xive_source_set_irq(&xive->source, irq, val);
+> @@ -749,11 +760,16 @@ static void spapr_xive_deactivate(SpaprInterruptController *intc)
+>  
+>      spapr_xive_mmio_set_enabled(xive, false);
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          kvmppc_xive_disconnect(intc);
+>      }
+>  }
+>  
+> +static bool spapr_xive_in_kernel_xptr(const XivePresenter *xptr)
+> +{
+> +    return spapr_xive_in_kernel(SPAPR_XIVE(xptr));
+> +}
+> +
+>  static void spapr_xive_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -788,6 +804,7 @@ static void spapr_xive_class_init(ObjectClass *klass, void *data)
+>      sicc->post_load = spapr_xive_post_load;
+>  
+>      xpc->match_nvt  = spapr_xive_match_nvt;
+> +    xpc->in_kernel  = spapr_xive_in_kernel_xptr;
+>  }
+>  
+>  static const TypeInfo spapr_xive_info = {
+> @@ -1058,7 +1075,7 @@ static target_ulong h_int_set_source_config(PowerPCCPU *cpu,
+>          new_eas.w = xive_set_field64(EAS_END_DATA, new_eas.w, eisn);
+>      }
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          Error *local_err = NULL;
+>  
+>          kvmppc_xive_set_source_config(xive, lisn, &new_eas, &local_err);
+> @@ -1379,7 +1396,7 @@ static target_ulong h_int_set_queue_config(PowerPCCPU *cpu,
+>       */
+>  
+>  out:
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          Error *local_err = NULL;
+>  
+>          kvmppc_xive_set_queue_config(xive, end_blk, end_idx, &end, &local_err);
+> @@ -1480,7 +1497,7 @@ static target_ulong h_int_get_queue_config(PowerPCCPU *cpu,
+>          args[2] = 0;
+>      }
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          Error *local_err = NULL;
+>  
+>          kvmppc_xive_get_queue_config(xive, end_blk, end_idx, end, &local_err);
+> @@ -1642,7 +1659,7 @@ static target_ulong h_int_esb(PowerPCCPU *cpu,
+>          return H_P3;
+>      }
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          args[0] = kvmppc_xive_esb_rw(xsrc, lisn, offset, data,
+>                                       flags & SPAPR_XIVE_ESB_STORE);
+>      } else {
+> @@ -1717,7 +1734,7 @@ static target_ulong h_int_sync(PowerPCCPU *cpu,
+>       * under KVM
+>       */
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          Error *local_err = NULL;
+>  
+>          kvmppc_xive_sync_source(xive, lisn, &local_err);
+> @@ -1761,7 +1778,7 @@ static target_ulong h_int_reset(PowerPCCPU *cpu,
+>  
+>      device_legacy_reset(DEVICE(xive));
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (spapr_xive_in_kernel(xive)) {
+>          Error *local_err = NULL;
+>  
+>          kvmppc_xive_reset(xive, &local_err);
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 561d746cd1da..a453e8f4dcbe 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -592,6 +592,17 @@ static const char * const xive_tctx_ring_names[] = {
+>      "USER", "OS", "POOL", "PHYS",
+>  };
+>  
+> +/*
+> + * kvm_irqchip_in_kernel() will cause the compiler to turn this
+> + * info a nop if CONFIG_KVM isn't defined.
+> + */
+> +#define xive_in_kernel(xptr)                                            \
+> +    (kvm_irqchip_in_kernel() &&                                         \
+> +     ({                                                                 \
+> +         XivePresenterClass *xpc = XIVE_PRESENTER_GET_CLASS(xptr);      \
+> +         xpc->in_kernel ? xpc->in_kernel(xptr) : false;                 \
+> +     }))
+> +
+>  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon)
+>  {
+>      int cpu_index;
+> @@ -606,7 +617,7 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon)
+>  
+>      cpu_index = tctx->cs ? tctx->cs->cpu_index : -1;
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (xive_in_kernel(tctx->xptr)) {
+>          Error *local_err = NULL;
+>  
+>          kvmppc_xive_cpu_synchronize_state(tctx, &local_err);
+> @@ -671,7 +682,7 @@ static void xive_tctx_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      /* Connect the presenter to the VCPU (required for CPU hotplug) */
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (xive_in_kernel(tctx->xptr)) {
+>          kvmppc_xive_cpu_connect(tctx, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+> @@ -682,10 +693,11 @@ static void xive_tctx_realize(DeviceState *dev, Error **errp)
+>  
+>  static int vmstate_xive_tctx_pre_save(void *opaque)
+>  {
+> +    XiveTCTX *tctx = XIVE_TCTX(opaque);
+>      Error *local_err = NULL;
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> -        kvmppc_xive_cpu_get_state(XIVE_TCTX(opaque), &local_err);
+> +    if (xive_in_kernel(tctx->xptr)) {
+> +        kvmppc_xive_cpu_get_state(tctx, &local_err);
+>          if (local_err) {
+>              error_report_err(local_err);
+>              return -1;
+> @@ -697,14 +709,15 @@ static int vmstate_xive_tctx_pre_save(void *opaque)
+>  
+>  static int vmstate_xive_tctx_post_load(void *opaque, int version_id)
+>  {
+> +    XiveTCTX *tctx = XIVE_TCTX(opaque);
+>      Error *local_err = NULL;
+>  
+> -    if (kvm_irqchip_in_kernel()) {
+> +    if (xive_in_kernel(tctx->xptr)) {
+>          /*
+>           * Required for hotplugged CPU, for which the state comes
+>           * after all states of the machine.
+>           */
+> -        kvmppc_xive_cpu_set_state(XIVE_TCTX(opaque), &local_err);
+> +        kvmppc_xive_cpu_set_state(tctx, &local_err);
+>          if (local_err) {
+>              error_report_err(local_err);
+>              return -1;
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index 82a61eaca74f..2f3c5af810bb 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -402,6 +402,7 @@ typedef struct XivePresenterClass {
+>                       uint8_t nvt_blk, uint32_t nvt_idx,
+>                       bool cam_ignore, uint8_t priority,
+>                       uint32_t logic_serv, XiveTCTXMatch *match);
+> +    bool (*in_kernel)(const XivePresenter *xptr);
+>  } XivePresenterClass;
+>  
+>  int xive_presenter_tctx_match(XivePresenter *xptr, XiveTCTX *tctx,
+> 
+> 
 
 
