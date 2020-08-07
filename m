@@ -7,71 +7,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B0BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:02:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9361EC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:05:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A59462075A
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:02:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 837372075A
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:05:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="D3N/ufOp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59462075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="X0K1p8U+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 837372075A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3pq7-0005Jn-FG
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 20:02:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41196)
+	id 1k3ptP-0006sX-GT
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 20:05:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1k3pfw-0001Ga-N4; Thu, 06 Aug 2020 19:51:56 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:38913)
+ id 1k3pqw-0005vu-Hv; Thu, 06 Aug 2020 20:03:18 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:33362)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1k3pfv-00050q-0J; Thu, 06 Aug 2020 19:51:56 -0400
-Received: by mail-ej1-x643.google.com with SMTP id f24so170746ejx.6;
- Thu, 06 Aug 2020 16:51:54 -0700 (PDT)
+ id 1k3pqv-0006K9-1Z; Thu, 06 Aug 2020 20:03:18 -0400
+Received: by mail-ed1-x541.google.com with SMTP id v22so8051edy.0;
+ Thu, 06 Aug 2020 17:03:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=d+9pBZZwPa0pV77+wNPY0Un0t5VNfMN9t4dWRP7btB0=;
- b=D3N/ufOpiYAQHcaWoKDlV+6OaIu3LAhP3wfT+QMvgxFTwgi3MqUXU7sTXp0Wr5Q2vh
- VwAJfMu7APpMIZAgz9SPKK6l9t/vin6zT9TfMN6c0/YxAjw+Cw7cweFwBpbxpKSn7GD3
- HY09XV1Q+qW61i0sBQL0li3q3dk3l8GC7IPKY=
+ bh=36skZ/Fqp0hzGFyizluyH7sOhrXB27+uSzT8RYATHZw=;
+ b=X0K1p8U+6sh6cvpVPLBNTUR1452pTRNBgAYBrrsZMjs0xW5RsJaaRzJB383cTH+R2L
+ RBd8aSZsWS6f/67hrDibWwsJ82UtBB49lD45iS+MI2PWfU7ifTJ922CzeNmcw8VrXneA
+ VOMrjmkZVxejA0uOGPLtyMJcGT/caO2pSgWmQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=d+9pBZZwPa0pV77+wNPY0Un0t5VNfMN9t4dWRP7btB0=;
- b=AylEoxM5dSmX9lz7gyQJJTnFxpQoRSYiuUjQmC52dDqv6SDUfBNcy4RoTflrVUpNYR
- dL2PVFVHcWyDG3zDmNuolgFFvbUDCW1t6IJt19iqktLVx118KLoo6sihHOAS9pez2mLz
- iJ8b6YazkiD9zLC9PIhhsn+sJFfPMx2IhQjEuD/kNYHMvg+QmF+SFlXTyGwxEv8J9OUp
- NCELh0TuQPF1sDcW3ZCMkVrzYkXds8M/d5ni9VM6SQ+LCxxjwWZ8oGVuvdz/eYM1c2ta
- 6vMxPj5kQmUe/S3nY8986inu96s4rcAfFN6aPFByXDY2ZF47/ggb9k2CPnNwn9Cs2pkk
- ebkg==
-X-Gm-Message-State: AOAM531k7zO2xYu2/9bAxELSJoN94uDKLynMRbCtlX3LcUO3kfwK7lzh
- ngGOseJupGbR0GlgEm4if6yY7Q8SckFsI1zQ5kI=
-X-Google-Smtp-Source: ABdhPJyta5YbOnXfQYvOKApR2DT3LfCjEgyRvg+NzIcqRA1gfz+5fYJ0xDr7b1KZ5mmtHv/91OE1Hs5GVkTzFdt8vlM=
-X-Received: by 2002:a17:906:4ec3:: with SMTP id
- i3mr6634458ejv.215.1596757913041; 
- Thu, 06 Aug 2020 16:51:53 -0700 (PDT)
+ bh=36skZ/Fqp0hzGFyizluyH7sOhrXB27+uSzT8RYATHZw=;
+ b=QRBOv8coP8NAk2UswR5WpUrO7uBuCuvskcMlGtimXq52d/HU3LeZhwsBpbxldA7yOi
+ 7D0/taqbSTGgf8ILXu4vMYC3jzegFIqxmaB4dmcfUxbngi6V8juDU38V8AdStfs00au7
+ x6HziwBGXtmfZjOpIWgR3XUxo219Dv2LLsI/MPHLk6bxxsqs+6j9Wa+gd0R/+7dRa2wU
+ xN4rooLwa3bFeAhNfFb3roFBFrFYe/7M6kQFso6m4u8ORiy60pIpTw30NU/PBpcWjCiO
+ C+cLsXBT4WAVaYm+i3Z8YKIplUlou0/WiTXu+JdfUoxT/3iOlXD/m7aYP5ub+D91jEt1
+ o87A==
+X-Gm-Message-State: AOAM530WksHpkOtqDuFaO6JCqRNnZT9kIkkU0hDcfMqoF1AmpOv04lz7
+ pLNRSQ1WYLhn/N3zslWv2dml6v7JJ1+yBPLSuss=
+X-Google-Smtp-Source: ABdhPJwBJ+rUhp17CDFpcMD16KhB6mQPiVzL1gXprgmRq4MOCyvHbBBFeXPuSEq6CzoWnRW/OcVVFsZR4bG9bsc81f0=
+X-Received: by 2002:aa7:c406:: with SMTP id j6mr6310927edq.143.1596758594814; 
+ Thu, 06 Aug 2020 17:03:14 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200806132106.747414-1-clg@kaod.org>
- <20200806132106.747414-14-clg@kaod.org>
-In-Reply-To: <20200806132106.747414-14-clg@kaod.org>
+ <20200806132106.747414-16-clg@kaod.org>
+In-Reply-To: <20200806132106.747414-16-clg@kaod.org>
 From: Joel Stanley <joel@jms.id.au>
-Date: Thu, 6 Aug 2020 23:51:41 +0000
-Message-ID: <CACPK8XeB=G12CyJNm5Zt7F6NGfq-fX8MgZMOXLgm7yNFHDJBvA@mail.gmail.com>
-Subject: Re: [PATCH for-5.2 13/19] ftgmac100: Check for invalid len and
- address before doing a DMA transfer
+Date: Fri, 7 Aug 2020 00:03:02 +0000
+Message-ID: <CACPK8XdW0nysvS99Su7edNN7vzxwvYgZJRQ=VGV073UEik3YGQ@mail.gmail.com>
+Subject: Re: [PATCH for-5.2 15/19] ftgmac100: Improve software reset
 To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=joel.stan@gmail.com; helo=mail-ej1-x643.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=joel.stan@gmail.com; helo=mail-ed1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -103,41 +101,51 @@ Sender: "Qemu-devel"
 
 On Thu, 6 Aug 2020 at 13:21, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >
-> According to the Aspeed specs, no interrupts are raised in that case
-> but a "Tx-packets lost" status seems like a good modeling choice for
-> all implementations. It is covered by the Linux kernel.
+> The software reset of the MAC needs a finer granularity. Not all
+> registers are reseted and some setting in MACCR are kept.
+
+'settings'
+
+This makes the software reset incorrect, but the power on reset values
+correct. Was that your goal?
+
+If so, perhaps put that in the commit message.
+
 >
 > Cc: Frederic Konrad <konrad.frederic@yahoo.fr>
+> Fixes: bd44300d1afc ("net: add FTGMAC100 support")
 > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-
 > ---
->  hw/net/ftgmac100.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  hw/net/ftgmac100.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
 > diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-> index 014980d30aca..280aa3d3a1e2 100644
+> index 987b843fabc4..0740049c5268 100644
 > --- a/hw/net/ftgmac100.c
 > +++ b/hw/net/ftgmac100.c
-> @@ -507,6 +507,15 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint3=
-2_t tx_ring,
+> @@ -655,11 +655,10 @@ static void ftgmac100_reset(DeviceState *d)
+>      s->itc =3D 0;
+>      s->aptcr =3D 1;
+>      s->dblac =3D 0x00022f00;
+> -    s->revr =3D 0;
+>      s->fear1 =3D 0;
+>      s->tpafcr =3D 0xf1;
+>
+> -    s->maccr =3D 0;
+> +    s->maccr &=3D FTGMAC100_MACCR_GIGA_MODE | FTGMAC100_MACCR_FAST_MODE;
+>      s->phycr =3D 0;
+>      s->phydata =3D 0;
+>      s->fcr =3D 0x400;
+> @@ -812,6 +811,7 @@ static void ftgmac100_write(void *opaque, hwaddr addr=
+,
+>      case FTGMAC100_MACCR: /* MAC Device control */
+>          s->maccr =3D value;
+>          if (value & FTGMAC100_MACCR_SW_RST) {
+> +            /* TODO: rework software reset to have a finer granularity *=
+/
+>              ftgmac100_reset(DEVICE(s));
 >          }
 >
->          len =3D FTGMAC100_TXDES0_TXBUF_SIZE(bd.des0);
-> +        if (!len) {
-> +            /*
-> +             * 0 is an invalid size, however the HW does not raise any
-> +             * interrupt. Flag an error because the guest is buggy.
-> +             */
-> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid segment size\n",
-> +                          __func__);
-> +        }
-> +
->          if (frame_size + len > sizeof(s->frame)) {
->              qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too big : %d bytes=
-\n",
->                            __func__, len);
 > --
 > 2.25.4
 >
