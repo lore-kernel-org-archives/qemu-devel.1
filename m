@@ -2,67 +2,66 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D2FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 18:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2FB1C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 19:01:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A301E20866
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 18:48:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A301E20866
+	by mail.kernel.org (Postfix) with ESMTPS id 814852086A
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 19:01:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 814852086A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k47Pc-0001Hu-0Q
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 14:48:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37076)
+	id 1k47ce-0004G3-N6
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 15:01:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k47N5-0007MD-Ns
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 14:45:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34402)
+ id 1k47c0-0003pt-KN
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 15:01:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36766)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k47N2-0000kK-3m
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 14:45:39 -0400
+ id 1k47by-0002QQ-3G
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 15:01:04 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k47Mv-0005EH-U4
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 18:45:29 +0000
+ id 1k47bw-0006gS-0Q
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 19:01:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DE9F22E8081
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 18:45:29 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 87F3B2E80AB
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 19:00:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2020 18:31:26 -0000
-From: Thomas Huth <1503031@bugs.launchpad.net>
+Date: Fri, 07 Aug 2020 18:53:21 -0000
+From: "Dr. David Alan Gilbert" <1888601@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrewoates th-huth
-X-Launchpad-Bug-Reporter: Andrew Oates (andrewoates)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20151005203328.1986.66361.malonedeb@wampee.canonical.com>
-Message-Id: <159682508643.26498.4252052376498889849.malone@gac.canonical.com>
-Subject: [Bug 1503031] Re: 32-to-64-bit call gate unsupported in IA32e mode
+X-Launchpad-Bug-Commenters: dgilbert-h jasowang skaegi
+X-Launchpad-Bug-Reporter: Simon Kaegi (skaegi)
+X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
+References: <159547584008.11100.1316842366379773629.malonedeb@wampee.canonical.com>
+Message-Id: <159682640111.27188.13983446699844703894.malone@gac.canonical.com>
+Subject: [Bug 1888601] Re: QEMU v5.1.0-rc0/rc1 hang with nested virtualization
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 4d362a8e1e2709349b73d9f806bb468c61e21075
+X-Launchpad-Hash: a10330f907b174bac82553daff45bf3850332404
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
@@ -84,52 +83,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1503031 <1503031@bugs.launchpad.net>
+Reply-To: Bug 1888601 <1888601@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looking through old bug tickets... is this still an issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+If even with that fix it's failing =3Dand giving a similar back trace,
+then:
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Thread 4 (LWP 23729):
+#0 0x00007f9ae5fed337 in __strcmp_sse2 ()
+#1 0x00007f9ae5d9a8ad in g_str_equal () at pthread_create.c:679
+#2 0x00007f9ae5d99a9d in g_hash_table_lookup () at pthread_create.c:679
+#3 0x00007f9ae5ac728f in type_table_lookup (name=3D0x7f9ae609c9dd "virtio-b=
+us") at qom/object.c:84
+#4 type_get_by_name (name=3D0x7f9ae609c9dd "virtio-bus") at qom/object.c:171
+#5 object_class_dynamic_cast (class=3Dclass@entry=3D0x5555572d1ac0, typenam=
+e=3Dtypename@entry=3D0x7f9ae609c9dd "virtio-bus") at qom/object.c:879
+
+seems weird to me - why would you be stuck in a g_str_equal for any length =
+of time (yet 2 of your backtraces both have it); yet the filename and symbo=
+l name don't really look like they're matching so I'm suspicious.
+Have you got a minimal non-kata way to reproduce this?
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1503031
+https://bugs.launchpad.net/bugs/1888601
 
 Title:
-  32-to-64-bit call gate unsupported in IA32e mode
+  QEMU v5.1.0-rc0/rc1 hang with nested virtualization
 
 Status in QEMU:
-  Incomplete
+  New
 
 Bug description:
-  In particular, the lcall implementation doesn't support the 64-bit
-  TSS.
+  We're running Kata Containers using QEMU and with v5.1.0rc0 and rc1
+  have noticed a problem at startup where QEMu appears to hang. We are
+  not seeing this problem on our bare metal nodes and only on a VSI that
+  supports nested virtualization.
 
-  helper_lcall_protected (target-i386/seg_helper.c:1884) calls
-  get_ss_esp_from_tss() on a call gate to a lower privilege level, which
-  tries to extract a 32-bit ESP and 16-bit SS from the TSS.  In IA32e
-  mode (64-bit or compatibility mode), this instead grabs the lower
-  32-bits of the target RSP, and 16 of the upper bits as the SS.
-  Additionally, several of the subsequent checks are incorrect (even if
-  the correct stack pointer were extracted).
+  We unfortunately see nothing at all in the QEMU logs to help
+  understand the problem and a hung process is just a guess at this
+  point.
 
-  This isn't a problem for interrupts since the interrupts are given
-  their own implementation entirely, that uses get_rsp_from_tss() rather
-  than get_ss_esp_from_tss().
+  Using git bisect we first see the problem with...
 
-  I believe the missing logic is from the branch starting "ELSE (*
-  current TSS is 64-bit *)" in the CALL pseudocode in the Intel manual
-  (page 3-124 of the PDF I have).
+  ---
 
-  Reproduced at master (c0b520dfb8890294a9f8879f4759172900585995), and
-  also as of a qemu built a year ago.
+  f19bcdfedd53ee93412d535a842a89fa27cae7f2 is the first bad commit
+  commit f19bcdfedd53ee93412d535a842a89fa27cae7f2
+  Author: Jason Wang <jasowang@redhat.com>
+  Date:   Wed Jul 1 22:55:28 2020 +0800
+
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio-pci: implement queue_enabled method
+
+  =C2=A0=C2=A0=C2=A0=C2=A0With version 1, we can detect whether a queue is =
+enabled via
+  =C2=A0=C2=A0=C2=A0=C2=A0queue_enabled.
+
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Jason Wang <jasowang@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Cindy Lu <lulu@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <20200701145538.22333-5-lulu@redhat.c=
+om>
+  =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Acked-by: Jason Wang <jasowang@redhat.com>
+
+  =C2=A0hw/virtio/virtio-pci.c | 13 +++++++++++++
+  =C2=A01 file changed, 13 insertions(+)
+
+  ---
+
+  Reverting this commit (on top of 5.1.0-rc1) seems to work and prevent
+  the hanging.
+
+  ---
+
+  Here's how kata ends up launching qemu in our environment --
+  /opt/kata/bin/qemu-system-x86_64 -name sandbox-849df14c6065931adedb9d18bc=
+9260a6d896f1814a8c5cfa239865772f1b7a5f -uuid 6bec458e-1da7-4847-a5d7-5ab31d=
+4d2465 -machine pc,accel=3Dkvm,kernel_irqchip -cpu host,pmu=3Doff -qmp unix=
+:/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5=
+f/qmp.sock,server,nowait -m 4096M,slots=3D10,maxmem=3D30978M -device pci-br=
+idge,bus=3Dpci.0,id=3Dpci-bridge-0,chassis_nr=3D1,shpc=3Don,addr=3D2,romfil=
+e=3D -device virtio-serial-pci,disable-modern=3Dtrue,id=3Dserial0,romfile=
+=3D -device virtconsole,chardev=3Dcharconsole0,id=3Dconsole0 -chardev socke=
+t,id=3Dcharconsole0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f=
+1814a8c5cfa239865772f1b7a5f/console.sock,server,nowait -device virtio-scsi-=
+pci,id=3Dscsi0,disable-modern=3Dtrue,romfile=3D -object rng-random,id=3Drng=
+0,filename=3D/dev/urandom -device virtio-rng-pci,rng=3Drng0,romfile=3D -dev=
+ice virtserialport,chardev=3Dcharch0,id=3Dchannel0,name=3Dagent.channel.0 -=
+chardev socket,id=3Dcharch0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
+0a6d896f1814a8c5cfa239865772f1b7a5f/kata.sock,server,nowait -chardev socket=
+,id=3Dchar-396c5c3e19e29353,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
+0a6d896f1814a8c5cfa239865772f1b7a5f/vhost-fs.sock -device vhost-user-fs-pci=
+,chardev=3Dchar-396c5c3e19e29353,tag=3DkataShared,romfile=3D -netdev tap,id=
+=3Dnetwork-0,vhost=3Don,vhostfds=3D3:4,fds=3D5:6 -device driver=3Dvirtio-ne=
+t-pci,netdev=3Dnetwork-0,mac=3D52:ac:2d:02:1f:6f,disable-modern=3Dtrue,mq=
+=3Don,vectors=3D6,romfile=3D -global kvm-pit.lost_tick_policy=3Ddiscard -vg=
+a none -no-user-config -nodefaults -nographic -daemonize -object memory-bac=
+kend-file,id=3Ddimm1,size=3D4096M,mem-path=3D/dev/shm,share=3Don -numa node=
+,memdev=3Ddimm1 -kernel /opt/kata/share/kata-containers/vmlinuz-5.7.9-74 -i=
+nitrd /opt/kata/share/kata-containers/kata-containers-initrd_alpine_1.11.2-=
+6_agent.initrd -append tsc=3Dreliable no_timer_check rcupdate.rcu_expedited=
+=3D1 i8042.direct=3D1 i8042.dumbkbd=3D1 i8042.nopnp=3D1 i8042.noaux=3D1 nor=
+eplace-smp reboot=3Dk console=3Dhvc0 console=3Dhvc1 iommu=3Doff cryptomgr.n=
+otests net.ifnames=3D0 pci=3Dlastbus=3D0 debug panic=3D1 nr_cpus=3D4 agent.=
+use_vsock=3Dfalse scsi_mod.scan=3Dnone init=3D/usr/bin/kata-agent -pidfile =
+/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5f=
+/pid -D /run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa23986577=
+2f1b7a5f/qemu.log -smp 2,cores=3D1,threads=3D1,sockets=3D4,maxcpus=3D4
+
+  ---
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1503031/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1888601/+subscriptions
 
