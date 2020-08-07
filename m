@@ -2,80 +2,123 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF0D3C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 13:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BBA5C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 13:07:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85872221E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 13:01:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56392221E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 13:07:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GukC09O7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85872221E2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hn48uD0A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56392221E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k420J-0004H2-OI
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 09:01:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46612)
+	id 1k425x-0005Yr-In
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 09:07:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k41ze-0003qE-1y
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 09:01:06 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37797
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k425H-00059L-HV
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 09:06:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57360
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k41zb-00036D-VC
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 09:01:05 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k425F-0003hn-QM
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 09:06:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596805262;
+ s=mimecast20190719; t=1596805612;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=K+rDJw4j+pDtsgZvrDoNfKW9XxfZbdOco9pDrv4bwrk=;
- b=GukC09O7oWeFI9EqoSqjRlln+9qMQMZF4kYkXEyL4q0YQQ/7Nsg5powEGFdgBlsftiYOFE
- 25j9FJAg2IhfSCJp+pjbcINQ1NJ5mcNHZu5uJMylUpx+7VIB5PQgMIj4oPtosDKTGxgn2J
- Anzozx53BYMgBQ6wzV/eov4fxtXQlDY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-94SzP0o4Ph2TqViiQ9qyYQ-1; Fri, 07 Aug 2020 09:00:56 -0400
-X-MC-Unique: 94SzP0o4Ph2TqViiQ9qyYQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17496800468;
- Fri,  7 Aug 2020 13:00:55 +0000 (UTC)
-Received: from localhost (ovpn-114-16.ams2.redhat.com [10.36.114.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 996BB6111F;
- Fri,  7 Aug 2020 13:00:54 +0000 (UTC)
-Date: Fri, 7 Aug 2020 14:00:53 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: Re: [PATCH v2 0/4] Add dtrace support on macOS
-Message-ID: <20200807130053.GB609387@stefanha-x1.localdomain>
-References: <20200717093517.73397-1-r.bolshakov@yadro.com>
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=LyrouOhP/W4YWMuhMM8jCR+yciv1oG1rPHrhhFlP67Y=;
+ b=Hn48uD0AJvyAibH3aYFrCCSmYGZIktmJMu6SsBtrkKlHpBk4TA474pxjhqnsUZo9Ax4f5G
+ YdV19dRuEW5rYXXYHDfWQeaA6zFOrYtRnGptOyDayxMRo9uIL4k6g85wrISNQ5QTndMgCY
+ Mp8zERtlO+bJDMkhTUlDIi03s4hZpDQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-312-oDlUe4n2MeextPKvM4S2sg-1; Fri, 07 Aug 2020 09:06:51 -0400
+X-MC-Unique: oDlUe4n2MeextPKvM4S2sg-1
+Received: by mail-wm1-f70.google.com with SMTP id s4so661365wmh.1
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 06:06:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=LyrouOhP/W4YWMuhMM8jCR+yciv1oG1rPHrhhFlP67Y=;
+ b=A8Zj2m86JkpDovDythV0MJxjw5c/ic9Yv/t0ViT1yYBNVypW63eZ6sN4G7ERr0xbMZ
+ 8Zg9v0my2eUVB18yJ3vXFCRF7G9sjQ94QPTcOgv+uCKtcV2TB0HbKVIi/uG6bUZCh9Cb
+ eqLSu0oQA3fcfmZGIYspyUMPMvlu0H0rFoCJWS9tf9PVePgCinKLFmAEL8TIiT+PTIrT
+ ERqmMf37IQtSQ0QybNwfCkP52+qLzBBUL6XDOIOxAYPit/9bXXXPdmaPvRHMA6xuhGOq
+ H6GUZC1m9uNylRVxUBcKUpbXpRPuqe5UM46/mLLLGT0sUfa3SPIbcWtPG/PKBMkXQdU2
+ x7cg==
+X-Gm-Message-State: AOAM5338p+sIiEnM4doSb8KuRrk29qRPbVMzZJY4SDmdidEceIgUHX8g
+ qCVsF1vReX+fNgnIUseXHB+Y1ORERz1nE9m1yIjXnebHzPV5Pu8AxWSNY+JU6RDJ8FqAfV6mHlU
+ 7Y8cy2KePiMbmfhk=
+X-Received: by 2002:adf:e550:: with SMTP id z16mr12066820wrm.329.1596805609621; 
+ Fri, 07 Aug 2020 06:06:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfCFsk5JuaSMCeyy8CTHzEAZv2qFgD4Dpx9FvK3xR6X8QFzUXG7G74YwYMjAIX/vCLCsl02A==
+X-Received: by 2002:adf:e550:: with SMTP id z16mr12066799wrm.329.1596805609355; 
+ Fri, 07 Aug 2020 06:06:49 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id k4sm11215072wrd.72.2020.08.07.06.06.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 07 Aug 2020 06:06:48 -0700 (PDT)
+Subject: Re: [PATCH 007/143] tests/vm: do not pollute configure with
+ --efi-aarch64
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+ <1596741379-12902-8-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <034b45cb-8b41-377d-778e-fec813357b2f@redhat.com>
+Date: Fri, 7 Aug 2020 15:06:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200717093517.73397-1-r.bolshakov@yadro.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <1596741379-12902-8-git-send-email-pbonzini@redhat.com>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="bCsyhTFzCvuiizWE"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:11:35
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:00:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -83,8 +126,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,73 +139,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---bCsyhTFzCvuiizWE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 8/6/20 9:14 PM, Paolo Bonzini wrote:
+> Just make EFI_AARCH64 a variable in the makefile that defaults to the efi
+> firmware included with QEMU.  It can be redefined on the "make" command
+> line.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  configure                 | 19 -------------------
+>  tests/vm/Makefile.include |  2 ++
+>  2 files changed, 2 insertions(+), 19 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 2acc4d1..1c17a0f 100755
+> --- a/configure
+> +++ b/configure
+> @@ -418,7 +418,6 @@ prefix="/usr/local"
+>  mandir="\${prefix}/share/man"
+>  datadir="\${prefix}/share"
+>  firmwarepath="\${prefix}/share/qemu-firmware"
+> -efi_aarch64=""
+>  qemu_docdir="\${prefix}/share/doc/qemu"
+>  bindir="\${prefix}/bin"
+>  libdir="\${prefix}/lib"
+> @@ -1109,8 +1108,6 @@ for opt do
+>    ;;
+>    --firmwarepath=*) firmwarepath="$optarg"
+>    ;;
+> -  --efi-aarch64=*) efi_aarch64="$optarg"
+> -  ;;
+>    --host=*|--build=*|\
+>    --disable-dependency-tracking|\
+>    --sbindir=*|--sharedstatedir=*|\
+> @@ -3650,20 +3647,6 @@ EOF
+>    fi
+>  fi
+>  
+> -############################################
+> -# efi-aarch64 probe
+> -# Check for efi files needed by aarch64 VMs.
+> -# By default we will use the efi included with QEMU.
+> -# Allow user to override the path for efi also.
+> -if ! test -f "$efi_aarch64"; then
+> -  if test -f $source_path/pc-bios/edk2-aarch64-code.fd.bz2; then
+> -    # valid after build
+> -    efi_aarch64=$PWD/pc-bios/edk2-aarch64-code.fd
+> -  else
+> -    efi_aarch64=""
+> -  fi
+> -fi
+> -
+>  ##########################################
+>  # libcap-ng library probe
+>  if test "$cap_ng" != "no" ; then
+> @@ -6861,7 +6844,6 @@ if test "$docs" != "no"; then
+>      echo "sphinx-build      $sphinx_build"
+>  fi
+>  echo "genisoimage       $genisoimage"
+> -echo "efi_aarch64       $efi_aarch64"
+>  echo "python_yaml       $python_yaml"
+>  echo "slirp support     $slirp $(echo_version $slirp $slirp_version)"
+>  if test "$slirp" != "no" ; then
+> @@ -7963,7 +7945,6 @@ echo "PYTHON=$python" >> $config_host_mak
+>  echo "SPHINX_BUILD=$sphinx_build" >> $config_host_mak
+>  echo "SPHINX_WERROR=$sphinx_werror" >> $config_host_mak
+>  echo "GENISOIMAGE=$genisoimage" >> $config_host_mak
+> -echo "EFI_AARCH64=$efi_aarch64" >> $config_host_mak
+>  echo "PYTHON_YAML=$python_yaml" >> $config_host_mak
+>  echo "CC=$cc" >> $config_host_mak
+>  if $iasl -h > /dev/null 2>&1; then
+> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+> index f21948c..29f5a1f 100644
+> --- a/tests/vm/Makefile.include
+> +++ b/tests/vm/Makefile.include
+> @@ -10,6 +10,8 @@ IMAGES += ubuntu.aarch64 centos.aarch64
+>  endif
+>  endif
+>  
+> +EFI_AARCH64 = $(wildcard $(SRC_PATH)/pc-bios/edk2-aarch64-code.fd)
 
-On Fri, Jul 17, 2020 at 12:35:13PM +0300, Roman Bolshakov wrote:
-> Hi,
->=20
-> This is a small series that enables dtrace tracing backend on macOS.
-> Whether or not it should go to 5.1 is up to discretion of tracing
-> maintainers.
->=20
-> Thanks,
-> Roman
->=20
-> Changes since v1:
->  - Fixed a typo ANSI C to C99, wrt to _Bool in the first patch.
->  - Prevented a few [-Wpointer-sign] warnings by converting int8_t * to
->    signed char * in static probe definitions.
->  - Moved COLO packet dump under #ifdef DEBUG_COLO_PACKETS (Daniel).
->  - Separated tracepoints in net/filter-rewriter.c to use matching
->    is-enabled probe (Daniel).
->=20
-> Roman Bolshakov (4):
->   scripts/tracetool: Fix dtrace generation for macOS
->   scripts/tracetool: Use void pointer for vcpu
->   build: Don't make object files for dtrace on macOS
->   net/colo: Match is-enabled probe to tracepoint
->=20
->  Makefile.objs                 |  2 ++
->  net/colo-compare.c            | 42 ++++++++++++++++++-----------------
->  net/filter-rewriter.c         | 10 +++++++--
->  net/trace-events              |  2 --
->  scripts/tracetool/format/d.py | 15 ++++++++++++-
->  scripts/tracetool/vcpu.py     |  2 +-
->  6 files changed, 47 insertions(+), 26 deletions(-)
->=20
-> --=20
-> 2.26.1
->=20
+I'm not sure this is correct. Shouldn't we use the '?=' operator to
+allow override? I think we want to test
+$(BUILD_DIR)/pc-bios/edk2-aarch64-code.fd instead.
 
-Thanks, applied to my tracing-next tree:
-https://github.com/stefanha/qemu/commits/tracing-next
-
-Stefan
-
---bCsyhTFzCvuiizWE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8tUIUACgkQnKSrs4Gr
-c8jMXAf+Kgu+pkwCV3qJ0AELdhUrnDLTKQ870li7E2cywce/dfygJcFMmwHM1ndR
-1XUb1zHX2BXVr/kCicl11Gl0uEZKvE6FtXkeXNRSUVJpIlFwLaHZkA2nh2NZCOJY
-AqD+0dCr4mncVS9DPZAzzoIZhS8B7mSbCOAHa7dZ2EcjrPeNjPqjqOtFnNH8TczF
-yINJQjYdKK48J/uC2bnH5Pq4whwypKL6IbSfyz1UFq/6PHZzTCKcKvY3HogcsuP2
-BEJlv1vGnZ8pUFYf0OfDmSjIWsLlUtV7MY0lUbLHJX7qD0C/99MsPDTakn3BE7i3
-6+u3d5Clbszvoseii157LVAS+mzY3A==
-=aLfq
------END PGP SIGNATURE-----
-
---bCsyhTFzCvuiizWE--
+> +
+>  IMAGES_DIR := $(HOME)/.cache/qemu-vm/images
+>  IMAGE_FILES := $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
+>  
+> 
 
 
