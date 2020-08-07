@@ -2,101 +2,85 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70FD4C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:03:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08517C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:04:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A7C62177B
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:03:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA3C622C9F
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:04:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KqdRNw6P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A7C62177B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ggNFWWTl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA3C622C9F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3yHh-0001aD-I6
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:03:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55818)
+	id 1k3yIp-0002kQ-WE
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:04:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3yH2-00013p-RN
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:02:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30048
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k3yH3-00014r-QU
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:02:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34301
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k3yGz-0007zY-D2
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:02:48 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k3yGz-0007zT-HR
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:02:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1596790964;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8GVp4zsu6d6ieOsWvsDk9XwnicLjeYUWVYrCgp6M7bc=;
- b=KqdRNw6PEYRXJsc2QE55A4f9r5GNbFXjKErE0QxU488FOMMRD2KRGS3L99ouFZaZde8t7t
- FDKEa1AjDGVOl3/Xm//ftPGKoX/AZhtN2cbsOYo1OhVLOa9z8vuSsDDyNgPr057kERyNi3
- 0Cbskw3mWQa7oGuZcl8aGgKgfR4Dhac=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-zBnRZMitOUy7IDrcrNg2UA-1; Fri, 07 Aug 2020 05:02:42 -0400
-X-MC-Unique: zBnRZMitOUy7IDrcrNg2UA-1
-Received: by mail-wm1-f70.google.com with SMTP id a5so527241wmj.5
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 02:02:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8GVp4zsu6d6ieOsWvsDk9XwnicLjeYUWVYrCgp6M7bc=;
- b=UjuRscudtWy81tZmmc9LUbssO2KDuDu8rve95S87vcTANbwEDAlZr6rGA4eUCSJnTh
- OwYZXV7kJ0DVD74LrbXQd4Tu/dsvIR9SY7soMQTdw96MUghzSLjcdGrVclRB5n/abrS8
- BIte/1FnGxr1k53ULW3yY+YnMh8xNEOf/6IcszriZJTLHEuhJrrMHTXZZ6usfpx6nHgE
- 0GYOARo2SW4w2qGEV2t/KN4AjqprnZZEmxz1fdzI2vNo4AtRZnCBFumSygB2M90djIn1
- EyvmK+3Upt7AhDb0fsZSOTdpbbC7VIyRA7DxvljBBAY62TF9e43iGXkcgOSiBquPXAX/
- 0Wig==
-X-Gm-Message-State: AOAM533mJTCzCSgZFkxtNySlY5PcOESm7NKghr/Lg4hFWDtpQzqXkP8W
- UBeD9fkVK/v8yWKMjQ06MlNgaecNriNynuruphW4QuUJI6Ias5gu0HnH6n5u4OWvdsXfFLLOqvO
- kR2MChzWt/McbHuk=
-X-Received: by 2002:a5d:4984:: with SMTP id r4mr11009103wrq.401.1596790961330; 
- Fri, 07 Aug 2020 02:02:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybp0am3mQH9Lbaf8TZY1xQHo7uE1oXXZ50nSIfMW0tUF185Di0PL2S8ekTFdL4yjG32ZMpZQ==
-X-Received: by 2002:a5d:4984:: with SMTP id r4mr11009086wrq.401.1596790961106; 
- Fri, 07 Aug 2020 02:02:41 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7841:78cc:18c6:1e20?
- ([2001:b07:6468:f312:7841:78cc:18c6:1e20])
- by smtp.gmail.com with ESMTPSA id o3sm9630294wru.64.2020.08.07.02.02.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Aug 2020 02:02:40 -0700 (PDT)
+ bh=A8YVs2lz1qleJrq/KVosvpeqdBvEWHVLYLaeP4g/WKk=;
+ b=ggNFWWTlfUvP/YAeXQPzOTxpXVi2NFKM8C9won0sN9gpsvGmtnK7qASckbgsxUdNvU6Adg
+ ha+Dk6zhZgN4Ud4dpt/mVlMCMBnToX+edEkeUvXZScGJrKap0nXqh2RuGJsPaWDsRsnQI7
+ ruVUcgrRRiyzExTpBup6SVCq+MC0ghA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-wHK9KZ0wOA6aF6Q9Oa590Q-1; Fri, 07 Aug 2020 05:02:40 -0400
+X-MC-Unique: wHK9KZ0wOA6aF6Q9Oa590Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 564471940935;
+ Fri,  7 Aug 2020 09:02:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
+ [10.36.112.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 48F641002382;
+ Fri,  7 Aug 2020 09:02:36 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C388F1132801; Fri,  7 Aug 2020 11:02:34 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
 Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
-To: Peter Maydell <peter.maydell@linaro.org>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <CAFEAcA-d0F9y2OSX5D7GrzUYU7yf4nAhHabE1dUVii3LRrueLQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dc73a810-ee9e-711e-dad0-76a566b923e4@redhat.com>
-Date: Fri, 7 Aug 2020 11:02:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ <87364y28jp.fsf@dusky.pond.sub.org>
+ <20200807082206.GC120942@redhat.com>
+Date: Fri, 07 Aug 2020 11:02:34 +0200
+In-Reply-To: <20200807082206.GC120942@redhat.com> ("Daniel P. =?utf-8?Q?Be?=
+ =?utf-8?Q?rrang=C3=A9=22's?=
+ message of "Fri, 7 Aug 2020 09:22:06 +0100")
+Message-ID: <87o8nmygk5.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-d0F9y2OSX5D7GrzUYU7yf4nAhHabE1dUVii3LRrueLQ@mail.gmail.com>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:00:03
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:21:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -117,35 +101,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, jsnow@redhat.com, qemu-devel@nongnu.org,
+ philmd@redhat.com, stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/08/20 10:49, Peter Maydell wrote:
->> This the more or less final version of the Meson conversion.  Due to
->> the sheer size of the series you have been CCed only on the cover
->> letter.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+
+> On Fri, Aug 07, 2020 at 09:56:42AM +0200, Markus Armbruster wrote:
+[...]
+>> I think it's now time to plan the end game, preferably without even more
+>> weeks of intense rebasing.
+>>=20
+>> Do we have consensus to move forward with Meson?  If yes, I'd like to
+>> propose to aim for merging as early as practical in the 5.2 cycle.
+>> Rationale: rebasing build system changes on top of the Meson work is
+>> probably easier than rebasing the Meson work, and avoids turning Paolo
+>> into an overworked bottleneck.
+>>=20
+>> In more detail:
+>>=20
+>> 1. Pick a tentative deadline.
 >
-> Does this work with actually-released versions of Meson yet?
-> I am still not very enthusiastic about the prospect of having
-> to carry around an entire build system in a submodule. That
-> still seems to me to be living closer to the bleeding edge
-> than I would like...
+> I'd suggest we need a bare minimum of half a development cycle to.
+> So if we want it tin 5.2, we need to make a strong push now and over
+> next month to review it and iron out any obvious blocking testing
+> problems.
 
-Yes it works with 0.55.0, with only a few warnings about possible future
-incompatibility.  Those will be fixed in 0.56.0, where the feature was
-stabilized without introducing any incompatibility.
+I had less than a "now and over next month" (>7 weeks!) in mind.
 
-Carrying around Meson in a submodule was mostly done to let QEMU build
-transparently on older distros.  Removing it is easy (though it would
-involve modifying the docker files to install the latest meson, so
-whatever you throw out of the door comes back through the window).
+The choice of deadline is really about how much of Paolo's time we are
+(and he is!) willing to spend on rebasing vs. how much risk of toothing
+problems in master we are willing to accept.
 
-Paolo
+"First thing after 5.2 opens" would be ideal from a "avoid more
+rebasing" point of view, but it may not be practical.
+
+Once the flood gates are open, we can probably just as well wait for the
+initial flood to subside.
+
+>> 2. Cover the testing gaps and get as much review as we can until then.
+>>    Fix defects as we go.
+>
+> In terms of testing I'd suggest the minimium bar is likely the GitLab CI
+> and Peter's merge scripts.
+>
+> Anything beyond that is just nice to have.
+
+Yup.  If you want it not to break in master, get it tested in our gating
+CI.
+
+>> 3. If the known defects are expected to disrupt others too much, goto 1.
+>>    Do not worry about unknown defects at this point.
+>>=20
+>> 4. Merge.
+>>=20
+>> 5. Deal with the fallout.
+>
+> Yep, there's no substitute for getting it used for real by a wide
+> range of people, which is why we we need leave ourselves at min
+> 1/2 a dev cycle for this.
+>
+>
+> Regards,
+> Daniel
 
 
