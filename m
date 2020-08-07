@@ -2,84 +2,97 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9361EC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE742C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:07:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 837372075A
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:05:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B7B72075A
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:07:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="X0K1p8U+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 837372075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YYCv/iJj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B7B72075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3ptP-0006sX-GT
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 20:05:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43402)
+	id 1k3pvG-00081P-DG
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 20:07:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1k3pqw-0005vu-Hv; Thu, 06 Aug 2020 20:03:18 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:33362)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k3prh-0006TE-27
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 20:04:05 -0400
+Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:46201)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1k3pqv-0006K9-1Z; Thu, 06 Aug 2020 20:03:18 -0400
-Received: by mail-ed1-x541.google.com with SMTP id v22so8051edy.0;
- Thu, 06 Aug 2020 17:03:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=36skZ/Fqp0hzGFyizluyH7sOhrXB27+uSzT8RYATHZw=;
- b=X0K1p8U+6sh6cvpVPLBNTUR1452pTRNBgAYBrrsZMjs0xW5RsJaaRzJB383cTH+R2L
- RBd8aSZsWS6f/67hrDibWwsJ82UtBB49lD45iS+MI2PWfU7ifTJ922CzeNmcw8VrXneA
- VOMrjmkZVxejA0uOGPLtyMJcGT/caO2pSgWmQ=
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k3prf-0006OI-DW
+ for qemu-devel@nongnu.org; Thu, 06 Aug 2020 20:04:04 -0400
+Received: by mail-pf1-x42f.google.com with SMTP id 74so19467pfx.13
+ for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 17:04:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ho45DBGj9ihQx+//JMUAsoSDjVWvwe+kK/BHEcqW30M=;
+ b=YYCv/iJjhGtSNYahuG6YuHgDfOWjqkrMO6zijJz0fnLQY0aVqTx5e43WrsRqpFA6Ro
+ Kbcq73XPe+wfnk6HGhaUqpXvR4e0FffexQQDveJ0WjY1FglVYc0hBpT9J6kDORBGqZVT
+ iP7CcKKv2Cjrz9sj0mTKJxsbBtVFHeR6c+hDDU3Dyun8S3wRlu1qGjvAWfB9YgF2gYsA
+ z4TnrZr9I32oA/kbckunlAL1ZxExtxlE3y8B5NOET9bcuv0qpnHDuLd4NUn0WE6pvlC5
+ ayH5eWT4VABzJDwX/8zFeHr70tzdDub1hqIZdVpVgMobNWGt38PFX0vkF67dlu2LfE4b
+ APuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=36skZ/Fqp0hzGFyizluyH7sOhrXB27+uSzT8RYATHZw=;
- b=QRBOv8coP8NAk2UswR5WpUrO7uBuCuvskcMlGtimXq52d/HU3LeZhwsBpbxldA7yOi
- 7D0/taqbSTGgf8ILXu4vMYC3jzegFIqxmaB4dmcfUxbngi6V8juDU38V8AdStfs00au7
- x6HziwBGXtmfZjOpIWgR3XUxo219Dv2LLsI/MPHLk6bxxsqs+6j9Wa+gd0R/+7dRa2wU
- xN4rooLwa3bFeAhNfFb3roFBFrFYe/7M6kQFso6m4u8ORiy60pIpTw30NU/PBpcWjCiO
- C+cLsXBT4WAVaYm+i3Z8YKIplUlou0/WiTXu+JdfUoxT/3iOlXD/m7aYP5ub+D91jEt1
- o87A==
-X-Gm-Message-State: AOAM530WksHpkOtqDuFaO6JCqRNnZT9kIkkU0hDcfMqoF1AmpOv04lz7
- pLNRSQ1WYLhn/N3zslWv2dml6v7JJ1+yBPLSuss=
-X-Google-Smtp-Source: ABdhPJwBJ+rUhp17CDFpcMD16KhB6mQPiVzL1gXprgmRq4MOCyvHbBBFeXPuSEq6CzoWnRW/OcVVFsZR4bG9bsc81f0=
-X-Received: by 2002:aa7:c406:: with SMTP id j6mr6310927edq.143.1596758594814; 
- Thu, 06 Aug 2020 17:03:14 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ho45DBGj9ihQx+//JMUAsoSDjVWvwe+kK/BHEcqW30M=;
+ b=gLwRdBNZwpFLUqzVK7W/6i9ujgY5noz95DC8dg/M8wJz9c6PCj2sO/sh4IvwxbbhMn
+ SoXw7Sw7/Qqw/GKru+4vyXykrcdBALAtZwjPzycCYUgOeCczZ830Ywxjm9NsnqrV+Ea4
+ GF6uSRd+lnaGOq4LYcB3VQ9gea+eYFRJBpnP+L3A9Ez9S+Kub0DNQ9/oYGk/x63wcKwb
+ 6QHXAl7cO+/scHCzMsLR+id1Cbx3fgXFt6zvMEwsLb5wHQT5O8rIraWfp/BPfx46oyrz
+ oQA8DrOwKm0GUru7qbKIrKL8O7d4rz/aQW6AgUnvzzvawtUZITctPSRAIredfhvCEjxO
+ kTTg==
+X-Gm-Message-State: AOAM532zLdWSf/NyhNFXjb/8KJHToVe6NG/vfwuReDKli0asw2fBvMc5
+ zgQ3Z0xLIbrvl43GBJerC5VOkw==
+X-Google-Smtp-Source: ABdhPJxY/JDNh6ff59xzGYiE0Sl24m18pTEyQyridsU2r3YLx1KQWpXWeqFPcKl3TArN324+3D4YnQ==
+X-Received: by 2002:a63:3589:: with SMTP id c131mr9344919pga.158.1596758641682; 
+ Thu, 06 Aug 2020 17:04:01 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id 144sm9754565pfu.114.2020.08.06.17.04.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 06 Aug 2020 17:04:01 -0700 (PDT)
+Subject: Re: [RFC v3 26/71] target/riscv: rvv-1.0: update vext_max_elems() for
+ load/store insns
+To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
+References: <20200806104709.13235-1-frank.chang@sifive.com>
+ <20200806104709.13235-27-frank.chang@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <90f01984-54a4-2a56-c52f-d1f4332b39d4@linaro.org>
+Date: Thu, 6 Aug 2020 17:03:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200806132106.747414-1-clg@kaod.org>
- <20200806132106.747414-16-clg@kaod.org>
-In-Reply-To: <20200806132106.747414-16-clg@kaod.org>
-From: Joel Stanley <joel@jms.id.au>
-Date: Fri, 7 Aug 2020 00:03:02 +0000
-Message-ID: <CACPK8XdW0nysvS99Su7edNN7vzxwvYgZJRQ=VGV073UEik3YGQ@mail.gmail.com>
-Subject: Re: [PATCH for-5.2 15/19] ftgmac100: Improve software reset
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=joel.stan@gmail.com; helo=mail-ed1-x541.google.com
+In-Reply-To: <20200806104709.13235-27-frank.chang@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42f;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,61 +105,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Frederic Konrad <konrad.frederic@yahoo.fr>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 6 Aug 2020 at 13:21, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> The software reset of the MAC needs a finer granularity. Not all
-> registers are reseted and some setting in MACCR are kept.
+On 8/6/20 3:46 AM, frank.chang@sifive.com wrote:
+> +static inline uint32_t vext_max_elems(uint32_t desc, uint32_t esz, bool is_ldst)
+>  {
+> -    return simd_maxsz(desc) << vext_lmul(desc);
+> +    /*
+> +     * As simd_desc support at most 256 bytes, the max vlen is 256 bits.
+> +     * so vlen in bytes (vlenb) is encoded as maxsz.
+> +     */
+> +    uint32_t vlenb = simd_maxsz(desc);
+> +
+> +    if (is_ldst) {
+> +        /*
+> +         * Vector load/store instructions have the EEW encoded
+> +         * directly in the instructions. The maximum vector size is
+> +         * calculated with EMUL rather than LMUL.
+> +         */
+> +        uint32_t eew = ctzl(esz);
+> +        uint32_t sew = vext_sew(desc);
+> +        uint32_t lmul = vext_lmul(desc);
+> +        int32_t emul = eew - sew + lmul;
+> +        uint32_t emul_r = emul < 0 ? 0 : emul;
+> +        return 1 << (ctzl(vlenb) + emul_r - ctzl(esz));
 
-'settings'
+As I said before, the is_ldst instructions should put the EEW and EMUL values
+into the SEW and LMUL desc fields, so that this does not need to be
+special-cased at all.
 
-This makes the software reset incorrect, but the power on reset values
-correct. Was that your goal?
+> +        /* Return VLMAX */
+> +        return 1 << (ctzl(vlenb) + vext_lmul(desc) - ctzl(esz));
 
-If so, perhaps put that in the commit message.
+This is overly complicated.
 
->
-> Cc: Frederic Konrad <konrad.frederic@yahoo.fr>
-> Fixes: bd44300d1afc ("net: add FTGMAC100 support")
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  hw/net/ftgmac100.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-> index 987b843fabc4..0740049c5268 100644
-> --- a/hw/net/ftgmac100.c
-> +++ b/hw/net/ftgmac100.c
-> @@ -655,11 +655,10 @@ static void ftgmac100_reset(DeviceState *d)
->      s->itc =3D 0;
->      s->aptcr =3D 1;
->      s->dblac =3D 0x00022f00;
-> -    s->revr =3D 0;
->      s->fear1 =3D 0;
->      s->tpafcr =3D 0xf1;
->
-> -    s->maccr =3D 0;
-> +    s->maccr &=3D FTGMAC100_MACCR_GIGA_MODE | FTGMAC100_MACCR_FAST_MODE;
->      s->phycr =3D 0;
->      s->phydata =3D 0;
->      s->fcr =3D 0x400;
-> @@ -812,6 +811,7 @@ static void ftgmac100_write(void *opaque, hwaddr addr=
-,
->      case FTGMAC100_MACCR: /* MAC Device control */
->          s->maccr =3D value;
->          if (value & FTGMAC100_MACCR_SW_RST) {
-> +            /* TODO: rework software reset to have a finer granularity *=
-/
->              ftgmac100_reset(DEVICE(s));
->          }
->
-> --
-> 2.25.4
->
+(1) 1 << ctzl(vlenb) == vlenb.
+(2) I'm not sure why esz is not already a log2 number.
+
+This ought to look more like
+
+  int scale = lmul - esz;
+  return (scale < 0
+          ? vlenb >> -scale
+          : vlenb << scale);
+
+
+r~
 
