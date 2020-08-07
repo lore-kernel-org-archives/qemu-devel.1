@@ -2,88 +2,73 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D29F4C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D368C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 994212177B
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:56:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hf5+N0jE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 994212177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3D92522CAE
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:57:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D92522CAE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3z6c-000623-RG
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:56:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37180)
+	id 1k3z7V-00077B-F9
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:57:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k3z5z-0005b3-J6
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:55:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33082
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k3z6d-0006B6-3O
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:56:07 -0400
+Resent-Date: Fri, 07 Aug 2020 05:56:07 -0400
+Resent-Message-Id: <E1k3z6d-0006B6-3O@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21735)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k3z5x-0005lC-PI
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:55:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596794125;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=w7uOZihK0+4ikz3MuAvWW0x0fCUiJneojLW+2c0dpT4=;
- b=hf5+N0jEI3aT0chEGl2RhzbH5Snl2Cw8QEh7WbsdiONrMjcULEXPrjr+1FZTbcUcnYEz7g
- 39pQHpZEaXvAubMiWd9crTOtoBUZt766rr/7UA64NIg4klnY5Hb01oj0DclPyUNd7I5DKq
- bzy1GJ+1PftX3JFOZeOBQeaYZMLAvOs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-2tZGRxxMNVyOrF4ZIZFlpA-1; Fri, 07 Aug 2020 05:55:21 -0400
-X-MC-Unique: 2tZGRxxMNVyOrF4ZIZFlpA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F03F8005B0;
- Fri,  7 Aug 2020 09:55:20 +0000 (UTC)
-Received: from work-vm (ovpn-114-9.ams2.redhat.com [10.36.114.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DD70B60BE2;
- Fri,  7 Aug 2020 09:55:16 +0000 (UTC)
-Date: Fri, 7 Aug 2020 10:55:14 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Subject: Re: [Virtio-fs] [PATCH] virtiofsd: Cleanup norace option description
-Message-ID: <20200807095514.GD2779@work-vm>
-References: <20200806111129.22055-1-misono.tomohiro@jp.fujitsu.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k3z6a-0005ob-N6
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:56:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1596794147; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=M3bTj1eVQCVb4xXoKI42hfY6qwHYgvr5sNtyU4kdrYtyodZyp9rBPAsfdsuV5h6Hznl0LhOsozybaYc1QsQb+SL6FDhvBFBCBaE4hhtyF5O2lhn1RT9sseGiQW83o1XO8jvdAanpmi+szBAUqI2S4CmiUQY8Zvo8uGah1vyhCbs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1596794147;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=TJLxJU4USDN3piGs/ODDxAv5YCUOGEsyu73NyH3qPzU=; 
+ b=S6UDVRXmt9Hi1O9Gvf0qwXko+yeWVJ9iVd7l3+ns4+78gZb24xVha1mtaQ99Z9m2dvc7o0ZNpGeqPBI9KGTdfn41hx2aXhNNtz3VXpSsGl+PnWAT0RLBlC2GUJR3cwbHKmwnAzApLs5p8ICnGNv7BrUXzntWw7Ya+3bR6qygHNI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1596794144695311.4409077023805;
+ Fri, 7 Aug 2020 02:55:44 -0700 (PDT)
+Subject: Re: [PATCH] vhost-user: add separate memslot counter for vhost-user
+Message-ID: <159679414415.13779.6050867074674891127@66eaa9a8a123>
+In-Reply-To: <20200807094750.13404-1-chenjiajun8@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200806111129.22055-1-misono.tomohiro@jp.fujitsu.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:00:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: chenjiajun8@huawei.com
+Date: Fri, 7 Aug 2020 02:55:44 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:25:30
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,65 +81,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: zhang.zhanghailiang@huawei.com, jasowang@redhat.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
-> Cleanup norace option as the feature was removed by below commit:
-> 
-> Fixes: 93bb3d8d4cda("virtiofsd: remove symlink fallbacks")
-> Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-
-Sergio Lopez posted an identical post a few weeks back, but only to
-qemu-devel.
-I'll merge it into my dev world.
-
-Thanks.
-
-Dave
-
-> ---
->  docs/tools/virtiofsd.rst | 3 ---
->  tools/virtiofsd/helper.c | 2 --
->  2 files changed, 5 deletions(-)
-> 
-> diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
-> index 824e713491..58666a4495 100644
-> --- a/docs/tools/virtiofsd.rst
-> +++ b/docs/tools/virtiofsd.rst
-> @@ -63,9 +63,6 @@ Options
->      Print only log messages matching LEVEL or more severe.  LEVEL is one of
->      ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
->  
-> -  * norace -
-> -    Disable racy fallback.  The default is false.
-> -
->    * posix_lock|no_posix_lock -
->      Enable/disable remote POSIX locks.  The default is ``posix_lock``.
->  
-> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-> index 2e4cdb4f49..4ded1d588a 100644
-> --- a/tools/virtiofsd/helper.c
-> +++ b/tools/virtiofsd/helper.c
-> @@ -159,8 +159,6 @@ void fuse_cmdline_help(void)
->             "    -o max_idle_threads        the maximum number of idle worker "
->             "threads\n"
->             "                               allowed (default: 10)\n"
-> -           "    -o norace                  disable racy fallback\n"
-> -           "                               default: false\n"
->             "    -o posix_lock|no_posix_lock\n"
->             "                               enable/disable remote posix lock\n"
->             "                               default: posix_lock\n"
-> -- 
-> 2.21.3
-> 
-> _______________________________________________
-> Virtio-fs mailing list
-> Virtio-fs@redhat.com
-> https://www.redhat.com/mailman/listinfo/virtio-fs
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgwNzA5NDc1MC4xMzQw
+NC0xLWNoZW5qaWFqdW44QGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
+ZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
+ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
+dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9
+MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9
+MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9n
+IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDgwNzA5NDc1MC4x
+MzQwNC0xLWNoZW5qaWFqdW44QGh1YXdlaS5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9z
+Ny8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
