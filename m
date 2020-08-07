@@ -2,80 +2,90 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53637C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 08:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9690AC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 08:18:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21F0D206B5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 08:18:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21F0D206B5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6381B206B5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 08:18:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxtjvYtf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6381B206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3xZh-0002AU-EO
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 04:18:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46780)
+	id 1k3xaM-0003BK-Mz
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 04:18:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3xWf-0006f5-26
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 04:14:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58326)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3xWd-00028N-DI
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 04:14:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k3xWc-0005Sc-7y
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 08:14:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3B5C42E808B
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 08:14:50 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k3xWq-00074C-T2
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 04:15:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41036
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k3xWp-0002A8-4R
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 04:15:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596788102;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=OmFvsq0k8m9ftuRQyGVdIFT/RmOC1l/lzFLRfLKnJ/c=;
+ b=UxtjvYtfEsfG3yLfrWZCwiNjDGj2Jf4rTaoRobSEcRx5DWEBoM2uLyiqgGjkLGgfhhKdZj
+ OdJSNnHp5twgUQ1GaOst7X0i7cwl4Ly/rzVhKb1WQukBMW8ow7YloPHcyV/lybEoq0n5V6
+ xz/HOQDqc1Zl4CE6k7IptOpzL7xBvlw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-xYSwH10OPpiw5KcjMBmBcA-1; Fri, 07 Aug 2020 04:13:40 -0400
+X-MC-Unique: xYSwH10OPpiw5KcjMBmBcA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D293B79EC0;
+ Fri,  7 Aug 2020 08:13:38 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B7C55C1D2;
+ Fri,  7 Aug 2020 08:13:37 +0000 (UTC)
+Date: Fri, 7 Aug 2020 10:13:35 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Ying Fang <fangying1@huawei.com>
+Subject: Re: [PATCH] qcow2: flush qcow2 l2 meta for new allocated clusters
+Message-ID: <20200807081335.GA4812@linux.fritz.box>
+References: <20200805023826.184-1-fangying1@huawei.com>
+ <20200806091326.GC17753@linux.fritz.box>
+ <1c2447af-1265-c45c-6374-f20d482f51be@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2020 08:03:31 -0000
-From: Thomas Huth <761471@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: neil-aldur th-huth
-X-Launchpad-Bug-Reporter: Neil Wilson (neil-aldur)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20110415073142.22650.18425.malonedeb@wampee.canonical.com>
-Message-Id: <159678741178.4422.13872747145846122523.malone@soybean.canonical.com>
-Subject: [Bug 761471] Re: Multicast VPN TTL hardcoded at 1
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a7db8acaa3467006e98931b41958995deeeb3b0a
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1c2447af-1265-c45c-6374-f20d482f51be@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:21:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,38 +94,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 761471 <761471@bugs.launchpad.net>
+Cc: alex.chen@huawei.com, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU? Or could we close this ticket nowadays?
+Am 07.08.2020 um 09:42 hat Ying Fang geschrieben:
+> 
+> 
+> On 8/6/2020 5:13 PM, Kevin Wolf wrote:
+> > Am 05.08.2020 um 04:38 hat Ying Fang geschrieben:
+> > > From: fangying <fangying1@huawei.com>
+> > > 
+> > > When qemu or qemu-nbd process uses a qcow2 image and configured with
+> > > 'cache = none', it will write to the qcow2 image with a cache to cache
+> > > L2 tables, however the process will not use L2 tables without explicitly
+> > > calling the flush command or closing the mirror flash into the disk.
+> > > Which may cause the disk data inconsistent with the written data for
+> > > a long time. If an abnormal process exit occurs here, the issued written
+> > > data will be lost.
+> > > 
+> > > Therefore, in order to keep data consistency we need to flush the changes
+> > > to the L2 entry to the disk in time for the newly allocated cluster.
+> > > 
+> > > Signed-off-by: Ying Fang <fangying1@huawei.com>
+> > 
+> > If you want to have data safely written to the disk after each write
+> > request, you need to use cache=writethrough/directsync (in other words,
+> > aliases that are equivalent to setting -device ...,write-cache=off).
+> > Note that this will have a major impact on write performance.
+> > 
+> > cache=none means bypassing the kernel page cache (O_DIRECT), but not
+> > flushing after each write request.
+> 
+> Well, IIUC, cache=none does not guarantee data safety and we should not
+> expect that. Then this patch can be ignored.
 
+Indeed, cache=none is a writeback cache mode with all of the
+consequences. In practice, this is normally good enough because the
+guest OS will send flush requests when needed (e.g. because a guest
+application called fsync()), but if the guest doesn't do this, it may
+suffer data loss. This behaviour is comparable to a volatile disk cache
+on real hard disks and is a good default, but sometimes you need a
+writethrough cache mode at the cost of a performance penalty.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Kevin
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/761471
-
-Title:
-  Multicast VPN TTL hardcoded at 1
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  The multicast VPN opens sockets with the default TTL of 1 and there
-  doesn't appear to be an option anywhere that will allow you to
-  increase that.
-
-  This limits the usability of the VPN to the local network where the
-  host server lives.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/761471/+subscriptions
 
