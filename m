@@ -2,88 +2,76 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FFF1C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1941AC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:36:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1597221E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:22:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PklumEyO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1597221E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E3BF12086A
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:36:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3BF12086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k41OC-0008MA-60
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 08:22:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39334)
+	id 1k41cH-0003vb-3A
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 08:36:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42070)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k41Mv-0007H6-Uc
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 08:21:05 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41593
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k41Mt-00077r-6Q
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 08:21:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596802862;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QlML8WqfC9apmvopRcZC0hO5nK1ZlgWBf7Z3XkLN9lc=;
- b=PklumEyOyZjWZp2zfab1TaR2RQx0NSogofHQ4MgfVPxXqhOwEZEl7TPXwIJY11Kd+pb64n
- 7/rVMRe3vIuV3zGo/tOyQ1SzX12c3pou2AMs02/bGXxm0sgwoyKShkzNVoJQVAnwkqytwu
- Ji3m8brOXRJA1Nlp/IBH5+cyGpyTI3o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-42-N8R4CN29ODaJmRWjZVtUBw-1; Fri, 07 Aug 2020 08:21:00 -0400
-X-MC-Unique: N8R4CN29ODaJmRWjZVtUBw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D9929127C;
- Fri,  7 Aug 2020 12:20:58 +0000 (UTC)
-Received: from gondolin (ovpn-112-214.ams2.redhat.com [10.36.112.214])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 94203709E1;
- Fri,  7 Aug 2020 12:20:46 +0000 (UTC)
-Date: Fri, 7 Aug 2020 14:20:21 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
-Message-ID: <20200807142021.53967299.cohuck@redhat.com>
-In-Reply-To: <20200807113557.178825af.cohuck@redhat.com>
-References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <20200807085302.7d7616df.cohuck@redhat.com>
- <499b18ae-b15d-abbb-faf5-d9bdd5262fa4@redhat.com>
- <20200807113557.178825af.cohuck@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1k41bW-0003PZ-GB; Fri, 07 Aug 2020 08:36:10 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:37605)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1k41bU-0000IO-8b; Fri, 07 Aug 2020 08:36:10 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.138.121])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 2DC904E0DC8E;
+ Fri,  7 Aug 2020 14:36:02 +0200 (CEST)
+Received: from kaod.org (37.59.142.105) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Fri, 7 Aug 2020
+ 14:36:02 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-105G0067b75e85a-6d7d-47c0-869f-b481db73e458,
+ 9C6B65F6CFD3D723D723CC07BEDAC6F805E88D1E) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH v3 for-5.2 1/3] ppc/xive: Rework setup of
+ XiveSource::esb_mmio
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <159679991916.876294.8967140647442842745.stgit@bahia.lan>
+ <159679992680.876294.7520540158586170894.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ed5e553d-0cd5-9195-ff0d-681b79d432c1@kaod.org>
+Date: Fri, 7 Aug 2020 14:36:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:53:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+In-Reply-To: <159679992680.876294.7520540158586170894.stgit@bahia.lan>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.105]
+X-ClientProxiedBy: DAG6EX2.mxp5.local (172.16.2.52) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 3490542b-5333-4ff6-81c9-5c6f686b7141
+X-Ovh-Tracer-Id: 5382364507744340899
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrkedvgdehiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepghhrohhugheskhgrohgurdhorhhg
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 08:36:03
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,52 +85,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, alex.bennee@linaro.org,
- stefanha@redhat.com, jsnow@redhat.com
+Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Aug 2020 11:35:57 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> On Fri, 7 Aug 2020 09:59:57 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> - on an s390x system, it mostly builds, but I end up with a bunch of
->   link errors for libblock.fa, where it fails to find various ZSTD_
->   symbols
-
-Still happening after switching to the latest version of your branch.
-
+On 8/7/20 1:32 PM, Greg Kurz wrote:
+> Depending on whether XIVE is emultated or backed with a KVM XIVE device,
+> the ESB MMIOs of a XIVE source point to an I/O memory region or a mapped
+> memory region.
 > 
-> > 
-> > If you want to test on s390, just testing the boot ROM would be great
-> > (patch 3).  That one does not need Meson at all; the purpose of the
-> > patch is just to decouple the boot ROM makefile from rules.mak, which
-> > allows to drop some of the contents of rules.mak.  
+> This is currently handled by checking kvm_irqchip_in_kernel() returns
+> false in xive_source_realize(). This is a bit awkward as we usually
+> need to do extra things when we're using the in-kernel backend, not
+> less. But most important, we can do better: turn the existing "xive.esb"
+> memory region into a plain container, introduce an "xive.esb-emulated"
+> I/O subregion and rename the existing "xive.esb" subregion in the KVM
+> code to "xive.esb-kvm". Since "xive.esb-kvm" is added with overlap
+> and a higher priority, it prevails over "xive.esb-emulated" (ie.
+> a guest using KVM XIVE will interact with "xive.esb-kvm" instead of
+> the default "xive.esb-emulated" region.
 > 
-> I gave it a try; no errors, but then I realized that the image does not
-> seem to get rebuilt? I'll double check later.
+> While here, consolidate the computation of the MMIO region size in
+> a common helper.
+> 
+> Suggested-by: Cédric Le Goater <clg@kaod.org>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-I re-tried with a pristine build directory (on a different system), and
-it does not look good:
+This is much better
 
-  BUILD   pc-bios/s390-ccw/s390-ccw.elf
-cc: error: start.o: No such file or directory
-cc: error: main.o: No such file or directory
-cc: error: bootmap.o: No such file or directory
-cc: error: jump2ipl.o: No such file or directory
-cc: error: sclp.o: No such file or directory
-cc: error: menu.o: No such file or directory
-cc: error: virtio.o: No such file or directory
-cc: error: virtio-scsi.o: No such file or directory
-cc: error: virtio-blkdev.o: No such file or directory
-cc: error: libc.o: No such file or directory
-cc: error: cio.o: No such file or directory
-cc: error: dasd-ipl.o: No such file or directory
-make[1]: *** [Makefile:85: s390-ccw.elf] Error 1
-make: *** [Makefile:576: pc-bios/s390-ccw/all] Error 2
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
+> ---
+>  hw/intc/spapr_xive_kvm.c |    4 ++--
+>  hw/intc/xive.c           |   11 ++++++-----
+>  include/hw/ppc/xive.h    |    6 ++++++
+>  3 files changed, 14 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> index 893a1ee77e70..6130882be678 100644
+> --- a/hw/intc/spapr_xive_kvm.c
+> +++ b/hw/intc/spapr_xive_kvm.c
+> @@ -742,7 +742,7 @@ int kvmppc_xive_connect(SpaprInterruptController *intc, uint32_t nr_servers,
+>      SpaprXive *xive = SPAPR_XIVE(intc);
+>      XiveSource *xsrc = &xive->source;
+>      Error *local_err = NULL;
+> -    size_t esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+> +    size_t esb_len = xive_source_esb_len(xsrc);
+>      size_t tima_len = 4ull << TM_SHIFT;
+>      CPUState *cs;
+>      int fd;
+> @@ -788,7 +788,7 @@ int kvmppc_xive_connect(SpaprInterruptController *intc, uint32_t nr_servers,
+>      }
+>  
+>      memory_region_init_ram_device_ptr(&xsrc->esb_mmio_kvm, OBJECT(xsrc),
+> -                                      "xive.esb", esb_len, xsrc->esb_mmap);
+> +                                      "xive.esb-kvm", esb_len, xsrc->esb_mmap);
+>      memory_region_add_subregion_overlap(&xsrc->esb_mmio, 0,
+>                                          &xsrc->esb_mmio_kvm, 1);
+>  
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 9b55e0356c62..561d746cd1da 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -1128,6 +1128,7 @@ static void xive_source_reset(void *dev)
+>  static void xive_source_realize(DeviceState *dev, Error **errp)
+>  {
+>      XiveSource *xsrc = XIVE_SOURCE(dev);
+> +    size_t esb_len = xive_source_esb_len(xsrc);
+>  
+>      assert(xsrc->xive);
+>  
+> @@ -1147,11 +1148,11 @@ static void xive_source_realize(DeviceState *dev, Error **errp)
+>      xsrc->status = g_malloc0(xsrc->nr_irqs);
+>      xsrc->lsi_map = bitmap_new(xsrc->nr_irqs);
+>  
+> -    if (!kvm_irqchip_in_kernel()) {
+> -        memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+> -                              &xive_source_esb_ops, xsrc, "xive.esb",
+> -                              (1ull << xsrc->esb_shift) * xsrc->nr_irqs);
+> -    }
+> +    memory_region_init(&xsrc->esb_mmio, OBJECT(xsrc), "xive.esb", esb_len);
+> +    memory_region_init_io(&xsrc->esb_mmio_emulated, OBJECT(xsrc),
+> +                          &xive_source_esb_ops, xsrc, "xive.esb-emulated",
+> +                          esb_len);
+> +    memory_region_add_subregion(&xsrc->esb_mmio, 0, &xsrc->esb_mmio_emulated);
+>  
+>      qemu_register_reset(xive_source_reset, dev);
+>  }
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index 705cf48176fc..82a61eaca74f 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -191,6 +191,7 @@ typedef struct XiveSource {
+>      uint64_t        esb_flags;
+>      uint32_t        esb_shift;
+>      MemoryRegion    esb_mmio;
+> +    MemoryRegion    esb_mmio_emulated;
+>  
+>      /* KVM support */
+>      void            *esb_mmap;
+> @@ -215,6 +216,11 @@ static inline bool xive_source_esb_has_2page(XiveSource *xsrc)
+>          xsrc->esb_shift == XIVE_ESB_4K_2PAGE;
+>  }
+>  
+> +static inline size_t xive_source_esb_len(XiveSource *xsrc)
+> +{
+> +    return (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+> +}
+> +
+>  /* The trigger page is always the first/even page */
+>  static inline hwaddr xive_source_esb_page(XiveSource *xsrc, uint32_t srcno)
+>  {
+> 
+> 
 
 
