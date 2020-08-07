@@ -2,121 +2,90 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3515FC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DCB5C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:59:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05FFE22CAE
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:57:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05FFE22CAE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C999522CAE
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:59:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WeRaEotb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C999522CAE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3z7o-0007b0-7p
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:57:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37396)
+	id 1k3z9t-0000K6-3x
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:59:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k3z75-0006ch-H3
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:56:35 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:48751)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k3z73-0005qw-Fa
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:56:35 -0400
-Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MuDTn-1krPrk0ZTx-00ua9M; Fri, 07 Aug 2020 11:56:29 +0200
-Subject: Re: [PATCH v2 1/2] linux-user: Modify
- 'target_to_host/host_to_target_itimerspec()'
-To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
-References: <20200722153421.295411-1-Filip.Bozuta@syrmia.com>
- <20200722153421.295411-2-Filip.Bozuta@syrmia.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
- dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
- ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
- HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
- rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
- jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
- NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
- WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
- lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
- BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
- gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
- +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
- rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
- 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
- wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
- ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
- d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
- 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
- tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
- inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
- 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
- VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
- US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
- w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
- FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
- hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
- ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
- ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
- OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
- JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
- ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <f093b4b6-1899-f101-934d-d91f1fe9d5cf@vivier.eu>
-Date: Fri, 7 Aug 2020 11:56:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k3z9C-0008KF-G6
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:58:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48050
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k3z9A-0005yu-Nj
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:58:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596794323;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XrAmAfn4VRlApIF6Wrz2pv+pfbstgdQC64Ltg0xEtks=;
+ b=WeRaEotbeHw2FuSXibGh+XSym6aChmFqb5/iI3zpi7AL+VS4cr5zJBuAtgTeuP8I268pLm
+ c3DjUAKDLdUxlQjmALeN1xOohC0wlvyJiRWjttWHM5VhRWuXXtheCNUgD+dgkDgMZfP2jG
+ wSMT2SKAVIMY0Ujhzgu/GLIQQaenvPU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-y05SiudNMVyJ3y2daM5b6Q-1; Fri, 07 Aug 2020 05:58:42 -0400
+X-MC-Unique: y05SiudNMVyJ3y2daM5b6Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E370F106B242
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 09:58:40 +0000 (UTC)
+Received: from work-vm (ovpn-114-9.ams2.redhat.com [10.36.114.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B8FC5619B5;
+ Fri,  7 Aug 2020 09:58:33 +0000 (UTC)
+Date: Fri, 7 Aug 2020 10:58:31 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH v2] virtiofsd: Remove "norace" from cmdline help and docs
+Message-ID: <20200807095831.GA2780@work-vm>
+References: <20200717121110.50580-1-slp@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200722153421.295411-2-Filip.Bozuta@syrmia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
+In-Reply-To: <20200717121110.50580-1-slp@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:yjB3Y0nNw/KAeDWKfVOI3G8FxNw6pI8GMK6Mm1hmtrY6KwP2PCK
- N+TFYiOIHhxlzjoVBHw4pxHcaYTj5k7Vi9Yd/dJZPnC8L7S7G8Yz1v5DSJAJFpNohKlJqrI
- WZ7tt/SSn+dltjVff+OTU1FG4zUCdps840f16IFesp6mCSSJpuK4G4vAHb3djVBTxSXrHSM
- RWEzLgtPUtDAMwQZQ92Dg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6YRhtbBvLhM=:HQbltrH/SRy2Ft0FrFq971
- 4gQSf6G8KrYFx2UOFMZYFJ399Q1DsoXOftFOy16vXu1kQnbRZa+89LNAV3mMYvwvZ5XxgRmb3
- tM04wXmO17Tlh9ht9ieEsPJk1uXHKEg5NASHoQBmzvZGlLhWLGTVoJIR2kLiKHFHMWWwlpguT
- pLF9ifo+9+kI8CJV452owDrHSTRBh53KGWAyVve6j9TQhupudkK6klua5KussIQgzxqBgIG0p
- N1n5sfpfx9dvgyREsArlN5+mQuqkGBLDOQFzLiDYjcpGrrGURRRlTzPuPC/IAbYUCZyuZ+BJy
- LH6ySYvSfQo64b3NNmQ637DnQrOfiGx91p/rcIFax35xHTrXMxvPDkd+lQmdTtoRLplubVsg5
- 47LuQ3huRsxlHNeiXv7Sy7gqYBC5Y/lKSVaLn/SE/52B1SVgdzMsWefv30tXwWOmaM6EVqQyX
- jtrzxmwDYQYYlbl0OZ5WC/iELZqa2yL66ksQcZQmWNo5Fj9MHyRlBGMnmkONXneRRTyfLsw7y
- aj+YCcOZoVvTFL92UL4jWIuXy8nJrsS4jKZIgEMgFlR6X/gun5zKqG2NHRcN89qYmYJ1shico
- iBx1bzYZvtVYPRcl0CoFsDpoMX878E3/HsLpvGJnLmY2HkYEAqxQzXOqVmW9r34VpC5AP+jJ1
- 38krNBJCSxSKu/dy9l0SAbAwo/4y/aP7J1Oxkup61nUo0VFRzhpHA1GrtamAK1KtjI0bDFArR
- kZ1YKEdq1obfecOyL+3WT/oyHtodGd1SPlLECQNCFmVc4m8SEpiN+C9h4C0NuF1cVGCLPQQEE
- b/IN7W3Ryzqtj99apGmZChkp1wlRlTS/Boi9Jc+XLjDo1/7vUmmDK7gK43hXiULxnwDnXb7
-Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 05:56:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:11:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,104 +98,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Miklos Szeredi <mszeredi@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 22/07/2020 à 17:34, Filip Bozuta a écrit :
-> Functions 'target_to_host_itimerspec()' and 'host_to_target_itimerspec()'
-> are used to convert values of type 'struct itimerspec' between target and
-> host. This type has 'struct timespec' as its fields. That is the reason
-> why this patch introduces a little modification to the converting functions
-> to be implemented using already existing functions that convert 'struct timespec':
-> 'target_to_host_timespec()' and 'host_to_target_timespec()'. This makes the
-> code of 'target_to_host_itimerspec()' and 'host_to_target_itimerspec()' more
-> clean and readable.
+* Sergio Lopez (slp@redhat.com) wrote:
+> Commit 93bb3d8d4cda ("virtiofsd: remove symlink fallbacks") removed
+> the implementation of the "norace" option, so remove it from the
+> cmdline help and the documentation too.
 > 
-> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->  linux-user/syscall.c | 46 ++++++++++++++++++--------------------------
->  1 file changed, 19 insertions(+), 27 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 1211e759c2..b1baed346c 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -1236,7 +1236,9 @@ static inline abi_long copy_to_user_timeval64(abi_ulong target_tv_addr,
->      defined(TARGET_NR_nanosleep) || defined(TARGET_NR_clock_settime) || \
->      defined(TARGET_NR_utimensat) || defined(TARGET_NR_mq_timedsend) || \
->      defined(TARGET_NR_mq_timedreceive) || defined(TARGET_NR_ipc) || \
-> -    defined(TARGET_NR_semop) || defined(TARGET_NR_semtimedop)
-> +    defined(TARGET_NR_semop) || defined(TARGET_NR_semtimedop) || \
-> +    defined(TARGET_NR_timer_settime) || \
-> +    (defined(TARGET_NR_timerfd_settime) && defined(CONFIG_TIMERFD))
->  static inline abi_long target_to_host_timespec(struct timespec *host_ts,
->                                                 abi_ulong target_addr)
->  {
-> @@ -6790,46 +6792,36 @@ static inline abi_long target_ftruncate64(void *cpu_env, abi_long arg1,
->  
->  #if defined(TARGET_NR_timer_settime) || \
->      (defined(TARGET_NR_timerfd_settime) && defined(CONFIG_TIMERFD))
-> -static inline abi_long target_to_host_itimerspec(struct itimerspec *host_itspec,
-> +static inline abi_long target_to_host_itimerspec(struct itimerspec *host_its,
->                                                   abi_ulong target_addr)
->  {
-> -    struct target_itimerspec *target_itspec;
-> -
-> -    if (!lock_user_struct(VERIFY_READ, target_itspec, target_addr, 1)) {
-> +    if (target_to_host_timespec(&host_its->it_interval, target_addr +
-> +                                offsetof(struct target_itimerspec,
-> +                                         it_interval)) ||
-> +        target_to_host_timespec(&host_its->it_value, target_addr +
-> +                                offsetof(struct target_itimerspec,
-> +                                         it_value))) {
->          return -TARGET_EFAULT;
->      }
->  
-> -    host_itspec->it_interval.tv_sec =
-> -                            tswapal(target_itspec->it_interval.tv_sec);
-> -    host_itspec->it_interval.tv_nsec =
-> -                            tswapal(target_itspec->it_interval.tv_nsec);
-> -    host_itspec->it_value.tv_sec = tswapal(target_itspec->it_value.tv_sec);
-> -    host_itspec->it_value.tv_nsec = tswapal(target_itspec->it_value.tv_nsec);
-> -
-> -    unlock_user_struct(target_itspec, target_addr, 1);
->      return 0;
->  }
->  #endif
->  
->  #if ((defined(TARGET_NR_timerfd_gettime) || \
->        defined(TARGET_NR_timerfd_settime)) && defined(CONFIG_TIMERFD)) || \
-> -    defined(TARGET_NR_timer_gettime) || defined(TARGET_NR_timer_settime)
-> +      defined(TARGET_NR_timer_gettime) || defined(TARGET_NR_timer_settime)
->  static inline abi_long host_to_target_itimerspec(abi_ulong target_addr,
-> -                                               struct itimerspec *host_its)
-> -{
-> -    struct target_itimerspec *target_itspec;
-> -
-> -    if (!lock_user_struct(VERIFY_WRITE, target_itspec, target_addr, 0)) {
-> +                                                 struct itimerspec *host_its)
-> +{
-> +    if (host_to_target_timespec(target_addr + offsetof(struct target_itimerspec,
-> +                                                       it_interval),
-> +                                &host_its->it_interval) ||
-> +        host_to_target_timespec(target_addr + offsetof(struct target_itimerspec,
-> +                                                       it_value),
-> +                                &host_its->it_value)) {
->          return -TARGET_EFAULT;
->      }
-> -
-> -    target_itspec->it_interval.tv_sec = tswapal(host_its->it_interval.tv_sec);
-> -    target_itspec->it_interval.tv_nsec = tswapal(host_its->it_interval.tv_nsec);
-> -
-> -    target_itspec->it_value.tv_sec = tswapal(host_its->it_value.tv_sec);
-> -    target_itspec->it_value.tv_nsec = tswapal(host_its->it_value.tv_nsec);
-> -
-> -    unlock_user_struct(target_itspec, target_addr, 0);
->      return 0;
->  }
->  #endif
-> 
+> v2:
+>  * Drop "norace" from the documentation too (Stefano Garzarella)
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+I've added this to my dev world; I'll post it to qemu when it opens up.
+
+
+Dave
+
+> ---
+>  docs/tools/virtiofsd.rst | 3 ---
+>  tools/virtiofsd/helper.c | 2 --
+>  2 files changed, 5 deletions(-)
+> 
+> diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+> index 824e713491..58666a4495 100644
+> --- a/docs/tools/virtiofsd.rst
+> +++ b/docs/tools/virtiofsd.rst
+> @@ -63,9 +63,6 @@ Options
+>      Print only log messages matching LEVEL or more severe.  LEVEL is one of
+>      ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
+>  
+> -  * norace -
+> -    Disable racy fallback.  The default is false.
+> -
+>    * posix_lock|no_posix_lock -
+>      Enable/disable remote POSIX locks.  The default is ``posix_lock``.
+>  
+> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> index 3105b6c23a..7bc5d7dc5a 100644
+> --- a/tools/virtiofsd/helper.c
+> +++ b/tools/virtiofsd/helper.c
+> @@ -159,8 +159,6 @@ void fuse_cmdline_help(void)
+>             "    -o max_idle_threads        the maximum number of idle worker "
+>             "threads\n"
+>             "                               allowed (default: 10)\n"
+> -           "    -o norace                  disable racy fallback\n"
+> -           "                               default: false\n"
+>             "    -o posix_lock|no_posix_lock\n"
+>             "                               enable/disable remote posix lock\n"
+>             "                               default: posix_lock\n"
+> -- 
+> 2.26.2
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
