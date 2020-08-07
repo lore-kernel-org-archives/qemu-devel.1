@@ -2,93 +2,82 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEA9C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 18:12:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 045DEC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 18:20:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E577A2075D
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 18:12:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqnToGVZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E577A2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF8C5204EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 18:20:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF8C5204EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k46qn-00033t-7N
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 14:12:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58994)
+	id 1k46zB-0005x1-4U
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 14:20:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k46pp-0002Az-IP
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 14:11:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25989
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k46pm-0005OG-P5
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 14:11:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596823871;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YwzY9e0x7I9yafGiPTk2uyHMq6Yp+N5y1oHlyIhf3kM=;
- b=SqnToGVZLD1exSGMo4f+wwrynzzM6p4GN41uWiSxCtI6N3nDKu0p9y7NqQIZQi44WbyjCY
- nyCrQGeXVW5y7iIyEwXHzNwhwqvaL+/MhHlI1/X5/7iJUiN4H99bQWhWPuim4Mg1P6axjf
- f/BSUpReQSpcEp2gjM97sDiywKtZxCE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-W1aXT_CQMmGuKUxYCh6KUw-1; Fri, 07 Aug 2020 14:11:10 -0400
-X-MC-Unique: W1aXT_CQMmGuKUxYCh6KUw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07368800466;
- Fri,  7 Aug 2020 18:11:09 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3E6CA5C1D3;
- Fri,  7 Aug 2020 18:11:02 +0000 (UTC)
-Date: Fri, 7 Aug 2020 20:11:00 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v3 1/3] i386: Simplify CPUID_8000_001E for AMD
-Message-ID: <20200807201100.5c141fe4@redhat.com>
-In-Reply-To: <159681796533.9679.8403552849052625336.stgit@naples-babu.amd.com>
-References: <159681772267.9679.1334429994189974662.stgit@naples-babu.amd.com>
- <159681796533.9679.8403552849052625336.stgit@naples-babu.amd.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k46yD-000508-2l
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 14:19:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58172)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k46yB-00067X-6n
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 14:19:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k46y9-0001zT-OJ
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 18:19:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B19382E808C
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 18:19:53 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:21:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Aug 2020 18:03:46 -0000
+From: Thomas Huth <1428352@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: th-huth wpaul
+X-Launchpad-Bug-Reporter: Bill Paul (wpaul)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20150304222256.6659.52366.malonedeb@wampee.canonical.com>
+Message-Id: <159682342684.9018.11225813160215913583.malone@wampee.canonical.com>
+Subject: [Bug 1428352] Re: SYSRET instruction incorrectly implemented
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: dc48287d6fcf6b90c98cfee9a4a0e65235944c56
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,130 +86,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com,
- ehabkost@redhat.com, rth@twiddle.net
+Reply-To: Bug 1428352 <1428352@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 07 Aug 2020 11:32:45 -0500
-Babu Moger <babu.moger@amd.com> wrote:
+If I've got that right, this has been fixed here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dac57622985220de0
 
-> apic_id contains all the information required to build CPUID_8000_001E.
-> Also remove the restriction on number bits on core_id and node_id.
-> Remove all the hardcoded values and replace with generalized
-> fields.
-> 
-> Refer the Processor Programming Reference (PPR) documentation
-> available from the bugzilla Link below.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+-- =
 
-> ---
->  target/i386/cpu.c |   77 +++++++++++++++++++++++++----------------------------
->  1 file changed, 36 insertions(+), 41 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 588f32e136..c892432cae 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -388,57 +388,52 @@ static void encode_topo_cpuid8000001e(X86CPUTopoInfo *topo_info, X86CPU *cpu,
->  {
->      X86CPUTopoIDs topo_ids = {0};
->      unsigned long nodes = MAX(topo_info->nodes_per_pkg, 1);
-> -    int shift;
->  
->      x86_topo_ids_from_apicid_epyc(cpu->apic_id, topo_info, &topo_ids);
->  
->      *eax = cpu->apic_id;
-> +
->      /*
-> +     * CPUID_Fn8000001E_EBX [Core Identifiers] (CoreId)
-> +     * Read-only. Reset: 0000_XXXXh.
-> +     * See Core::X86::Cpuid::ExtApicId.
-> +     * Core::X86::Cpuid::CoreId_lthree[1:0]_core[3:0]_thread[1:0];
->       * CPUID_Fn8000001E_EBX
-> -     * 31:16 Reserved
-> -     * 15:8  Threads per core (The number of threads per core is
-> -     *       Threads per core + 1)
-> -     *  7:0  Core id (see bit decoding below)
-> -     *       SMT:
-> -     *           4:3 node id
-> -     *             2 Core complex id
-> -     *           1:0 Core id
-> -     *       Non SMT:
-> -     *           5:4 node id
-> -     *             3 Core complex id
-> -     *           1:0 Core id
-> +     * Bits Description
-> +     * 31:16 Reserved.
-> +     * 15:8 ThreadsPerCore: threads per core. Read-only. Reset: XXh.
-> +     *      The number of threads per core is ThreadsPerCore+1.
-> +     *  7:0 CoreId: core ID. Read-only. Reset: XXh.
-> +     *
-> +     *  NOTE: CoreId is already part of apic_id. Just use it. We can
-> +     *  use all the 8 bits to represent the core_id here.
->       */
-> -    *ebx = ((topo_info->threads_per_core - 1) << 8) | (topo_ids.node_id << 3) |
-> -            (topo_ids.core_id);
-> +    *ebx = ((topo_info->threads_per_core - 1) << 8) | (topo_ids.core_id & 0xFF);
-> +
->      /*
-> +     * CPUID_Fn8000001E_ECX [Node Identifiers] (NodeId)
-> +     * Read-only. Reset: 0000_0XXXh.
-> +     * Core::X86::Cpuid::NodeId_lthree[1:0]_core[3:0]_thread[1:0];
->       * CPUID_Fn8000001E_ECX
-> -     * 31:11 Reserved
-> -     * 10:8  Nodes per processor (Nodes per processor is number of nodes + 1)
-> -     *  7:0  Node id (see bit decoding below)
-> -     *         2  Socket id
-> -     *       1:0  Node id
-> +     * Bits Description
-> +     * 31:11 Reserved.
-> +     * 10:8 NodesPerProcessor: Node per processor. Read-only. Reset: XXXb.
-> +     *      ValidValues:
-> +     *      Value Description
-> +     *      000b  1 node per processor.
-> +     *      001b  2 nodes per processor.
-> +     *      010b Reserved.
-> +     *      011b 4 nodes per processor.
-> +     *      111b-100b Reserved.
-> +     *  7:0 NodeId: Node ID. Read-only. Reset: XXh.
-> +     *
-> +     * NOTE: Hardware reserves 3 bits for number of nodes per processor.
-> +     * But users can create more nodes than the actual hardware can
-> +     * support. To genaralize we can use all the upper 8 bits for nodes.
-> +     * NodeId is combination of node and socket_id which is already decoded
-> +     * in apic_id. Just use it by shifting.
->       */
-> -    if (nodes <= 4) {
-> -        *ecx = ((nodes - 1) << 8) | (topo_ids.pkg_id << 2) | topo_ids.node_id;
-> -    } else {
-> -        /*
-> -         * Node id fix up. Actual hardware supports up to 4 nodes. But with
-> -         * more than 32 cores, we may end up with more than 4 nodes.
-> -         * Node id is a combination of socket id and node id. Only requirement
-> -         * here is that this number should be unique accross the system.
-> -         * Shift the socket id to accommodate more nodes. We dont expect both
-> -         * socket id and node id to be big number at the same time. This is not
-> -         * an ideal config but we need to to support it. Max nodes we can have
-> -         * is 32 (255/8) with 8 cores per node and 255 max cores. We only need
-> -         * 5 bits for nodes. Find the left most set bit to represent the total
-> -         * number of nodes. find_last_bit returns last set bit(0 based). Left
-> -         * shift(+1) the socket id to represent all the nodes.
-> -         */
-> -        nodes -= 1;
-> -        shift = find_last_bit(&nodes, 8);
-> -        *ecx = (nodes << 8) | (topo_ids.pkg_id << (shift + 1)) |
-> -               topo_ids.node_id;
-> -    }
-> +    *ecx = ((nodes - 1) << 8) | cpu->node_id;
->      *edx = 0;
->  }
->  
-> 
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1428352
 
+Title:
+  SYSRET instruction incorrectly implemented
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  The Intel architecture manual states that when returning to user mode,
+  the SYSRET instruction will re-load the stack selector (%ss) from the
+  IA32_STAR model specific register using the following logic:
+
+  SS.Selector <-- (IA32_STAR[63:48]+8) OR 3; (* RPL forced to 3 *)
+
+  Another description of the instruction behavior which shows the same
+  logic in a slightly different form can also be found here:
+
+  http://tptp.cc/mirrors/siyobik.info/instruction/SYSRET.html
+
+  [...]
+          SS(SEL) =3D IA32_STAR[63:48] + 8;
+          SS(PL) =3D 0x3;
+  [...]
+
+  In other words, the value of the %ss register is supposed to be loaded
+  from  bits 63:48 of the IA32_STAR model-specific register, incremented
+  by 8, and then ORed with 3. ORing in the 3 sets the privilege level to
+  3 (user). This is done since SYSRET returns to user mode after a
+  system call.
+
+  However, helper_sysret() in target-i386/seg_helper.c does not do the
+  "OR 3" step. The code looks like this:
+
+          cpu_x86_load_seg_cache(env, R_SS, selector + 8,
+                                 0, 0xffffffff,
+                                 DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
+                                 DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
+                                 DESC_W_MASK | DESC_A_MASK);
+
+  It should look like this:
+
+          cpu_x86_load_seg_cache(env, R_SS, (selector + 8) | 3,
+                                 0, 0xffffffff,
+                                 DESC_G_MASK | DESC_B_MASK | DESC_P_MASK |
+                                 DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
+                                 DESC_W_MASK | DESC_A_MASK);
+
+  The code does correctly set the privilege level bits for the code
+  selector register (%cs) but not for the stack selector (%ss).
+
+  The effect of this is that when SYSRET returns control to the user-
+  mode caller, %ss will be have the privilege level bits cleared. In my
+  case, it went from 0x2b to 0x28. This caused a crash later: when the
+  user-mode code was preempted by an interrupt, and the interrupt
+  handler would do an IRET, a general protection fault would occur
+  because the %ss value being loaded from the exception frame was not
+  valid for user mode. (At least, I think that's what happened.)
+
+  This behavior seems inconsistent with real hardware, and also appears
+  to be wrong with respect to the Intel documentation, so I'm pretty
+  confident in calling this a bug. :)
+
+  Note that this issue seems to have been around for a long time. I
+  discovered it while using QEMU 2.2.0, but I happened to have the
+  sources for QEMU 0.10.5, and the problem is there too (in
+  os_helper.c). I am using FreeBSD/amd64 9.1-RELEASE as my host system,
+  without KVM.
+
+  The fix is fairly simple. I'm attaching a patch which worked for me.
+  Using this fix, the code that I'm testing now behaves the same on the
+  QEMU virtual machine as on real hardware.
+
+  - Bill (wpaul@windriver.com)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1428352/+subscriptions
 
