@@ -2,89 +2,109 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A97C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D3FAC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:34:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E110206B5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:33:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C005206B5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:34:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YWx45xqB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E110206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgaCWSKD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C005206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3ykU-0007F2-IT
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:33:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32972)
+	id 1k3ylb-0008DI-B8
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:34:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3yi3-0004OK-PN
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:30:43 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39207)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3yi1-0002wc-T2
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:30:43 -0400
-Received: by mail-oi1-x241.google.com with SMTP id a24so1361217oia.6
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 02:30:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=p6CObgSy6lHIvCmzXCTrUl+FaKTxDExZUeGOK+BYGmU=;
- b=YWx45xqBuCkmY7bDSKBGssQ8VTLwL+hyFNueZ0QPXE4sqYNxyUPrrHqbETs2B2FDhw
- YdhW+XpGxh9N+hFyOp2gf2nHakygbquNJbSr2NNqn/bBD5j4+55AthVZ5bWaaETTXV7v
- 447kSroVe1vzsRK9ckOPwklMcHLRT9Pev2aoTUIwDjcFzp86/Ke1izawWquzAyB28YR1
- B/G5yGL1Y+EDPHnFML/ZAxtHz1ItqNc8wnQn3kjhCjcid8a+BmJUZBd7syZA+zrUe96W
- pxSZi5i3vCkfvv3YqTNc/b4gHPZZyIaPDWkguIC1EPvyTzr+t4BEtr3naYCVjiqSrh1S
- TPnw==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k3yj1-0005S7-PG
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:31:43 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44495
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k3yj0-000311-0k
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:31:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596792700;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=f96sXlcTus/APgqVuz0+9hxMLyyEv/PLv0GfXHUjE3A=;
+ b=MgaCWSKDPazkKul9ocD9+kA5ka1XOyvOKrbNDu0Vlugy0jWigbfgbnewVDB2RwhuJAUMAE
+ lTnqmxOK14z3nzwtNhJ9/YOiuMCbpvmuM0ajMgPrDpbZyVL8uigrxhhz0SSFlYCUafGCfT
+ eIffSOwBdYoPrTaEsEYsuF3iFhVIwX0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-375-mlrvb2yCNzirdYXDm7gwrg-1; Fri, 07 Aug 2020 05:31:38 -0400
+X-MC-Unique: mlrvb2yCNzirdYXDm7gwrg-1
+Received: by mail-wr1-f71.google.com with SMTP id 89so518168wrr.15
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 02:31:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=p6CObgSy6lHIvCmzXCTrUl+FaKTxDExZUeGOK+BYGmU=;
- b=YYPx3SrG5nemMJrJti7SyXajU67fptHUjVlV4BAv4p7zHWfm2YUIkODYqraAJSsXsH
- rvcuhrCZ4ptYR2JYGa/xyslYAfBjd7WDgVgF2e0qF+PAOPgLpNVauUhMzIJmoQbcdE2e
- /Etid0+yFNE1vxS45ypUCHKUR3RE6O2ez2IU7CoM81t8aSWd65xkbXPLB1cmFVkKM68Q
- +f8EkB5AERg5eiPb9AOG2kv87uj+CR/uf4vk4+5bNpZs4nZcjx6L1VO4g34TIwOk+Fyc
- JkfJ65afk/H+/ixUdR3UwzCXOGi52eZjPGRi4eDUcVAffiKOgIOyhqLM+fFN+RKFGNdf
- VrqQ==
-X-Gm-Message-State: AOAM531C2J8egl58TpIrTToX11dTKiLyQM/Y0ojlVJ13xDHIJx0G4NtI
- 1UnWfq/BJqVd6GoheVKkvYkUVYWbt8TfprRxMUJarQ==
-X-Google-Smtp-Source: ABdhPJxAk6RPrCBdPaaMPA62UZPMrWfHPhZoXeGdO2DkM8h5udE9wMIwPn6kmY5DWPJi4gExwIMqw7lKYwX8hXTslaQ=
-X-Received: by 2002:aca:4a96:: with SMTP id
- x144mr10394690oia.163.1596792640542; 
- Fri, 07 Aug 2020 02:30:40 -0700 (PDT)
-MIME-Version: 1.0
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=f96sXlcTus/APgqVuz0+9hxMLyyEv/PLv0GfXHUjE3A=;
+ b=U2Gb/yxjPf1tgNqB36LCfJtj2Z+I4CdDa/3UWqw6Hn53tkOAbnF5tlYNFabI9kH0sB
+ qTbdpAHdt7b3CDh9s2ZDNnn8tBTFAGN4vNHwg8AElKPFehevafvkMWtSauUi1/YzWNce
+ wljYiXs+7EI0j53Jv1zPgNakYHfG5Ki0xYN0FOwS6z8jU3Pcv3wed2nydJJny3GBWbJB
+ JOOnUKBERuOtg8nVRydKMYGGj2/M10EiaTWi5zOEC4YtJnGka1kjta1vsXLH3pOfJiwF
+ yKvP3AN7QigoZtjWFzE9BM5tyC5hs7EdVL2G+C278Va9rCvMZbPvUKhtVlWWmMg3IGlL
+ uHHw==
+X-Gm-Message-State: AOAM530pSGlyRL8NuvkHGfcoxSkwL5bmxn5lzeM6Ocvcbix+/HU4YHs9
+ duhoAshiK1YYsWDiHJmF61/Mw0Lu3qtROTL5tk1RC+nwOvZVcm89tmV2cijVUDnVuj39DUorllW
+ yhwxDvFU3A5s//9w=
+X-Received: by 2002:a7b:c205:: with SMTP id x5mr12698573wmi.161.1596792697720; 
+ Fri, 07 Aug 2020 02:31:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzjZoRJOMyQce0TMZf+T8QKPjyexNH5etfZM9vnBKt/bnXJtP/fJ2HHf3KcPcznf+TNdz1Inw==
+X-Received: by 2002:a7b:c205:: with SMTP id x5mr12698550wmi.161.1596792697484; 
+ Fri, 07 Aug 2020 02:31:37 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7841:78cc:18c6:1e20?
+ ([2001:b07:6468:f312:7841:78cc:18c6:1e20])
+ by smtp.gmail.com with ESMTPSA id a11sm10760245wrq.0.2020.08.07.02.31.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 07 Aug 2020 02:31:37 -0700 (PDT)
+Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <1596741379-12902-6-git-send-email-pbonzini@redhat.com>
- <CAFEAcA_mN3XrgxRbhq5U0B=OxBq6T3DXymb4_U-tzOya=W-AbQ@mail.gmail.com>
- <d676a107-c49d-ab3f-f6e3-f6b594af9c4f@redhat.com>
-In-Reply-To: <d676a107-c49d-ab3f-f6e3-f6b594af9c4f@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Aug 2020 10:30:29 +0100
-Message-ID: <CAFEAcA9JLqTHLLEy1WtGkvRYGSupX0PPUYAmnZ4Q_kGaJ3cSTg@mail.gmail.com>
-Subject: Re: [PATCH 005/143] meson: rename .inc.c files to .inc
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ <761b4058-7a2b-d992-2cc2-6efe654ee62e@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9c894412-b156-607e-1ea9-9e9ba14cbf1a@redhat.com>
+Date: Fri, 7 Aug 2020 11:31:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+MIME-Version: 1.0
+In-Reply-To: <761b4058-7a2b-d992-2cc2-6efe654ee62e@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:11:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,78 +117,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, philmd@redhat.com,
+ armbru@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Aug 2020 at 10:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 07/08/20 10:59, Peter Maydell wrote:
-> > On Thu, 6 Aug 2020 at 20:25, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> >> ---
-> > What's the rationale for this ? ".inc.c" is the project's
-> > standard naming convention for files which aren't headers
-> > but which are lumps of C code #included into a top level .c
-> > file. The .inc.c deliberately ends '.c' because that way
-> > editors will use the right syntax highlighting for the file.
->
-> Good point.  It can be changed to .inc.h too, if that's preferrable for you.
+On 07/08/20 10:51, Thomas Huth wrote:
+> 2) With --meson=git added, I also do not get much further:
+>  "./ui/meson.build:77:0: ERROR: Program 'keycodemapdb/tools/keymap-gen'
+> not found"
+> 
+>  https://gitlab.com/huth/qemu/-/jobs/675546229
+> 
+> Any idea what's going wrong here?
 
-Not really, though I guess it's slightly better than plain .inc.
-They're not header files...
+This is also a submodule not being initialized,
+ui/keycodemapdb/tools/keymap-gen comes from a submodule.
 
-> > It would be much better if Meson could cope with our
-> > standard naming convention rather than forcing us to change it.
->
-> First of all I need to describe why this is needed; it is because of the
-> way Meson handles dependencies on generated headers.
->
-> With Makefiles that have automatically generated dependencies, you
-> typically make generated includes depend on the Makefile so that they
-> are built before everything else and they are available when first
-> building the .c files.
->
-> Meson is similar, however the way it works is that you list those
-> generated includes in the sources.  The dependencies are still
-> automatically generated, but the build rules will ensure that the
-> includes are generated before attempting to build the toplevel C sources.
+Paolo
 
-But we don't really want to build all these files before building
-all C sources. We just want to say "this .c file depends on these
-.inc.c files" and then let the build tool figure it out, surely?
-
-> The problem is that Meson decides if something is a source vs. a
-> generated include by looking at the extension: '.c', '.cc', '.m', '.C'
-> are sources, while everything else is considered an include---including
-> '.inc.c'.
-
-Is this hardcoded in Meson? That seems pretty suboptimal.
-
-> Going back to patch 124, I can now answer your question:
->
-> >> It's not clear to me why all the decodetree lines ended up in a
-> >> single "gen = []" block -- they're independent of each other.
->
-> The files are added to the source list with "arm_ss.add(gen)".  All that
-> line does is ensuring they are built before other target-specific files
-> for ARM targets.
-
-Do you mean that it just adds an extra implicit ordering constraint,
-such that if we need to rebuild both files not in 'gen' and files
-that are in 'gen' the 'gen' ones go first, or that Meson really
-builds all the 'gen' files first? What happens when you edit a
-.decode file? How much stuff gets rebuilt?
-
-> The question then is if Meson could be changed to cope with our naming
-> convention, and unfortunately the answer is no.  The root cause is that
-> Makefiles list .o files (and uses implicit patterns to connect .o files
-> to the corresponding sources), while Meson lists .c files.
-
-Can Meson handle "this .c file needs to be built from something else?".
-Presumably so, that's a common pattern for flex/yacc type tools.
-
-thanks
--- PMM
 
