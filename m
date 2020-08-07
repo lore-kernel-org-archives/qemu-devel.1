@@ -2,96 +2,89 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8AB4C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE59C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:02:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A162320748
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:02:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDDBE20748
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:02:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dh00QGoZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A162320748
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsBtThIy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDDBE20748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3zD1-0003oA-Q8
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 06:02:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37998)
+	id 1k3zDG-0004BH-8C
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 06:02:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3zAm-0001BE-GF
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:00:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42741
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k3zCX-0003Gd-Sb
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:02:13 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25334
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3zAj-00066Q-3l
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:00:24 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k3zCW-0006RF-5u
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:02:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596794420;
+ s=mimecast20190719; t=1596794531;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=x9C7C0FiFVlgFFp1StzlYByhCTsIFBMDmA9pbX/o7SE=;
- b=dh00QGoZv9vOMSkmvp5VnhXF++D5CKeiM9rgDbbloEqenj7CaGxSDpEEgH+11RDdgKDyfC
- Y3gtUzwjvv5v+clHMYhRbHC1JhGMv8lEquTnZxUWtD8sQd6kn0xpS3QlYEHEVBj90kUj/r
- klP7IHwXhaSz1dc1GV+9HPYMF2o3gwY=
+ in-reply-to:in-reply-to:references:references;
+ bh=ERzZWtB7beTMcsBKVlbPSMzEkynQZmnlmRTU9BQzylY=;
+ b=VsBtThIycehDCUT4l9JK5zjZfdZPjojHw4pP9Hiv4VueTjdsT3qcnNe7hqiSuMyH/Y9d1L
+ l82Lj0rPVLgWYH8KsZdV3OQ3CrM6yxX6ANmCQh3tDMAW+MmYdMozqPkRkGeI+OmTr261p3
+ QLvY9YtUN8xH1VpHo0yQiirrNujLZFU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-bOxDi757NGq3aUcohnTAvg-1; Fri, 07 Aug 2020 06:00:15 -0400
-X-MC-Unique: bOxDi757NGq3aUcohnTAvg-1
+ us-mta-42-CyKE0pEmOcCrIqwBk087-w-1; Fri, 07 Aug 2020 06:02:08 -0400
+X-MC-Unique: CyKE0pEmOcCrIqwBk087-w-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE8051800D4A;
- Fri,  7 Aug 2020 10:00:13 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-31.ams2.redhat.com [10.36.113.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F6EC87A7E;
- Fri,  7 Aug 2020 10:00:07 +0000 (UTC)
-Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
-From: Thomas Huth <thuth@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <761b4058-7a2b-d992-2cc2-6efe654ee62e@redhat.com>
- <9c894412-b156-607e-1ea9-9e9ba14cbf1a@redhat.com>
- <6f6e9c9b-fdf6-951e-9112-3913fe44c455@redhat.com>
- <ac18da61-6f54-b9d4-7591-e1296f9d3a32@redhat.com>
- <353ff6f7-c67f-7665-b631-967512417fa2@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <fa3570e7-1f2a-c44c-91f2-411c1f51e6ef@redhat.com>
-Date: Fri, 7 Aug 2020 12:00:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 868E710059C4;
+ Fri,  7 Aug 2020 10:02:07 +0000 (UTC)
+Received: from localhost (ovpn-114-16.ams2.redhat.com [10.36.114.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1D42D87A7D;
+ Fri,  7 Aug 2020 10:02:06 +0000 (UTC)
+Date: Fri, 7 Aug 2020 11:02:05 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 2/3] async: always set ctx->notified in aio_notify()
+Message-ID: <20200807100205.GB600298@stefanha-x1.localdomain>
+References: <20200806131802.569478-1-stefanha@redhat.com>
+ <20200806131802.569478-3-stefanha@redhat.com>
+ <1e47af10-47fb-0a2f-7aa2-8a426ec86361@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <353ff6f7-c67f-7665-b631-967512417fa2@redhat.com>
-Content-Language: en-US
+In-Reply-To: <1e47af10-47fb-0a2f-7aa2-8a426ec86361@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:21:37
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Bn2rw/3z4jIqBvZU"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:53:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,56 +97,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, philmd@redhat.com,
- armbru@redhat.com, jsnow@redhat.com, stefanha@redhat.com,
- alex.bennee@linaro.org
+Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/08/2020 11.52, Thomas Huth wrote:
-> On 07/08/2020 11.49, Thomas Huth wrote:
->> On 07/08/2020 11.45, Thomas Huth wrote:
->>> On 07/08/2020 11.31, Paolo Bonzini wrote:
->>>> On 07/08/20 10:51, Thomas Huth wrote:
->>>>> 2) With --meson=git added, I also do not get much further:
->>>>>  "./ui/meson.build:77:0: ERROR: Program 'keycodemapdb/tools/keymap-gen'
->>>>> not found"
->>>>>
->>>>>  https://gitlab.com/huth/qemu/-/jobs/675546229
->>>>>
->>>>> Any idea what's going wrong here?
->>>>
->>>> This is also a submodule not being initialized,
->>>> ui/keycodemapdb/tools/keymap-gen comes from a submodule.
->>>
->>> Ok. I've added a hack to my configure script to checkout the submodules,
->>> but still, it does not compile yet:
->>>
->>>  ../tools/virtiofsd/meson.build:1:0: ERROR: Unknown variable
->>> "libvhost_user".
->>>  https://gitlab.com/huth/qemu/-/jobs/675665455
->>
->> At least the Debian container started to compile, but then fails here:
->>
->>  ../hw/display/virtio-gpu.c:43:10: fatal error: virglrenderer.h: No such
->> file or directory
->>  https://gitlab.com/huth/qemu/-/jobs/675665451
-> 
-> And yet another error, this time on Travis with --disable-system :
-> 
->  ../hw/display/meson.build:42:22: ERROR: Unknown variable
-> "config_all_devices".
->  https://travis-ci.com/github/huth/qemu/jobs/369657010#L1035
+--Bn2rw/3z4jIqBvZU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-FreeBSD fails since dbus-daemon is not found:
+On Thu, Aug 06, 2020 at 03:45:33PM +0200, Paolo Bonzini wrote:
+> On 06/08/20 15:18, Stefan Hajnoczi wrote:
+> > +    atomic_set(&ctx->notified, false);
+> > +
+> > +    /*
+> > +     * Write ctx->notified before reading e.g. bh->flags.  Pairs with =
+smp_mb in
+> > +     * aio_notify.
+> > +     */
+> > +    smp_wmb();
+>=20
+> Sorry I was not clear: the memory barrier has to be smp_mb(), but the
+> comment has to say smp_wmb().  No need to repost for this.
 
- https://cirrus-ci.com/task/6446150314098688?command=main#L203
+Ah, right! I'll fix it up when merging. Thanks!
 
-macOS now stops because the qemu_nbd variable is not set:
+Stefan
 
- https://cirrus-ci.com/task/5038775430545408?command=main#L207
+--Bn2rw/3z4jIqBvZU
+Content-Type: application/pgp-signature; name="signature.asc"
 
- Thomas
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8tJp0ACgkQnKSrs4Gr
+c8gKIwf6A7bdQ25QQkY8lGpHucPWHP8aJBCkE8QMb6cs/F30xwEuchusI3UQlIyp
+IUUzFIYYfhk46XFXWup+ZGxP9sPxGYZVigPuy1Z/JH/Y8tBzkPeIbK+a7r0X5P6J
+3rzsv/PGQl9wIXvvUwrnJH3DA/B+LBdHfh5WytobPpHCQNgPDKjYKXxlkUnjLS8O
+fpIu1tLxCbrHbmu8hOJ7uqQPICeZQahuFnGoitkV7IqhrsPRiIJGQqe+fyd49an3
+DudB23E1w6UUs46vciLCpa+Bxsp8jlQLrn1wXyBR7a2WRHjSK4m86k+s3rCCRm1i
+E2weVzKskKz9VlpRUE12YxupepTXvQ==
+=FiKG
+-----END PGP SIGNATURE-----
+
+--Bn2rw/3z4jIqBvZU--
 
 
