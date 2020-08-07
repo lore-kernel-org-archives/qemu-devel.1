@@ -2,94 +2,121 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63AFAC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C91C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:08:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BF582075D
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:01:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJe7+cUr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BF582075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A9D7F20866
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:08:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9D7F20866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k413q-0000b3-Ay
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 08:01:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34622)
+	id 1k41Av-00034u-Tu
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 08:08:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k412e-0008Hc-LS
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 08:00:08 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49306
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k412b-0004OO-L9
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 08:00:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596801603;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IVwqKyqW50wYrrH5JlBPTOAfT6+kzPwRmFuVW8KPOc8=;
- b=ZJe7+cUr2hHbv116RmvWIS2dQtyLoNjHfmbvEEQ3cCX52i1N6CvNHs5aE13ez3QBT7bUgR
- 8Z9k4NUnZHHewGo2yOzGksdysAXTwEOqP8SHHO0fprnWNRsKwZwzu9SP9myZmaRdLcMR/C
- IAA0QTKfwRcDLqNZjgs9Fc5427IBt/0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-KrXRZ7ZLMsSPqWzO7L0ebg-1; Fri, 07 Aug 2020 08:00:01 -0400
-X-MC-Unique: KrXRZ7ZLMsSPqWzO7L0ebg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92E8F100960F;
- Fri,  7 Aug 2020 11:59:59 +0000 (UTC)
-Received: from gondolin (ovpn-112-214.ams2.redhat.com [10.36.112.214])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4E0A865C94;
- Fri,  7 Aug 2020 11:59:45 +0000 (UTC)
-Date: Fri, 7 Aug 2020 13:59:42 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Sean Mooney <smooney@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200807135942.5d56a202.cohuck@redhat.com>
-In-Reply-To: <4cf2824c803c96496e846c5b06767db305e9fb5a.camel@redhat.com>
-References: <20200727072440.GA28676@joy-OptiPlex-7040>
- <20200727162321.7097070e@x1.home>
- <20200729080503.GB28676@joy-OptiPlex-7040>
- <20200804183503.39f56516.cohuck@redhat.com>
- <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
- <20200805021654.GB30485@joy-OptiPlex-7040>
- <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
- <20200805075647.GB2177@nanopsycho>
- <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
- <20200805093338.GC30485@joy-OptiPlex-7040>
- <20200805105319.GF2177@nanopsycho>
- <4cf2824c803c96496e846c5b06767db305e9fb5a.camel@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k41AG-0002c0-Pk
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 08:08:00 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:42767)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k41AF-0005VV-12
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 08:08:00 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MXH3Y-1kESNI2nFe-00Yjfj; Fri, 07 Aug 2020 14:07:54 +0200
+Subject: Re: [PATCH 3/6] linux-user: Update SO_TIMESTAMP to
+ SO_TIMESTAMP_OLD/NEW
+To: Shu-Chun Weng <scw@google.com>, QEMU Developers <qemu-devel@nongnu.org>
+References: <cover.1595461447.git.scw@google.com>
+ <945da0d5e224e70c42bd7085d44bb2440168f60d.1595461447.git.scw@google.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <fbdc32be-b439-77b0-83a5-f0a08efe5071@vivier.eu>
+Date: Fri, 7 Aug 2020 14:07:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:11:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <945da0d5e224e70c42bd7085d44bb2440168f60d.1595461447.git.scw@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:N2e1jIf4YSEG5TGg9IyaHNgmcF2L8HU6gDX639NSxIhTos8a1vu
+ ihXRbfYMej+Lvzq+Fu2vyw4hSDjAVtWAGbK3WH6TjGKXF8Ec4i46TdOlD8IWb8q7895pE/x
+ eYhDeZFKOk9/CZY28kgQFxFcVi7WNLwPIByuA1msyWiNw1o1tqrls2eZAhDGahojghErk5t
+ 1PzeEqGNtLqZCVUtw1O9Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:sJ72Ihvr2wg=:X0u8yclpRvJ/6vmH3mL6+y
+ xtRT/OAQCfZRdPk6Cv0fuxfsCUYDXqh/m63ODYwVJYLBmy0FrFJW4CGQdmQf1A+vMwjIp0NgQ
+ ug8knzwVYZT6m2rvePAYrse5p9/NwGUaCwS+VoZeUMZPv8C01EIDnq1maawHfth8/ojg/XMZ6
+ PQMFtA3cDamutcwmUWN7ZUBbS1objN5WfS/U1BhCZznTjFVHxsxXfc6fKN/ZdYZvGxKFyZriw
+ 0NLCgyf5LOeXFaTKTn3Si7ti4lDJ5RCTeKttknOpl7z4k/J720kYnhEOcVHkT4lc5kPtgipk3
+ 8J8uR0pOJwtJEKSRxcT8rrWkWpxhlevbW0Jfv+hQxrbQ64cwwPk69wIpheYx1HqVaDU3bWCD9
+ uRMMtYgGbWjhQNZh2oxHiEZLn0CXTVA0xe/r711hNRTG/QH2CVt+bs4zxc3RmdtFnYTJlEogo
+ Qle07wu8KBGldL+tAKpp0jTH1Q3+sPtgMDCyZ5+VIO7yQavkD30iAJXI1zAyVRR8S6SvRjtt6
+ 2LrkSvV0bjc1kU+XWeYZxj/MKiqKX0Q1gFFqmCFAa5bvOZth0xNHRkKOyRu27FoVHKxcKgA4W
+ kqZeQahb+7rkjO39WN06ZfuIpIQ8wBPTRktL3/hELEXmIXPy5WgUs0PY4o3S9sDDOEbi3lYvn
+ mQCLqgRXkMyelNhmSnlg6e8/0ScSbWHBMR6pFqAZLwjbsHNFN6wDdgHZJHowpwmil8krBE+V0
+ l0pTona9eSob400muP4OR9QVV8gd1HlLjdmJD8v+hyQvN6OwHWUXhQ2Pph2Mn7a6dWZNsQvGL
+ kt33pJKCFIS2rt4SB+nRZgLiActHtajePjDWsxJCdrtyY4BKDXFXQVdC8bXR9+RtJHfRxfI
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 07:17:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,77 +129,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
- Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
- dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
- bao.yumeng@zte.com.cn, Jiri Pirko <jiri@mellanox.com>,
- intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com, eskultet@redhat.com,
- Alex Williamson <alex.williamson@redhat.com>, dinechin@redhat.com,
- devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 05 Aug 2020 12:35:01 +0100
-Sean Mooney <smooney@redhat.com> wrote:
+Le 23/07/2020 à 02:19, Shu-Chun Weng a écrit :
+> Both guest options map to host SO_TIMESTAMP while keeping a bit in
+> fd_trans to remember if the guest expects the old or the new format.
 
-> On Wed, 2020-08-05 at 12:53 +0200, Jiri Pirko wrote:
-> > Wed, Aug 05, 2020 at 11:33:38AM CEST, yan.y.zhao@intel.com wrote:  
+I don't think we need to keep this information for each fd.
 
-(...)
+Once a program has used the _NEW version it will always use the _NEW
+version. It's possible to mix, but I don't think we have to support
+this. This adds too much complexity.
 
-> > >    software_version: device driver's version.
-> > >               in <major>.<minor>[.bugfix] scheme, where there is no
-> > > 	       compatibility across major versions, minor versions have
-> > > 	       forward compatibility (ex. 1-> 2 is ok, 2 -> 1 is not) and
-> > > 	       bugfix version number indicates some degree of internal
-> > > 	       improvement that is not visible to the user in terms of
-> > > 	       features or compatibility,
-> > > 
-> > > vendor specific attributes: each vendor may define different attributes
-> > >   device id : device id of a physical devices or mdev's parent pci device.
-> > >               it could be equal to pci id for pci devices
-> > >   aggregator: used together with mdev_type. e.g. aggregator=2 together
-> > >               with i915-GVTg_V5_4 means 2*1/4=1/2 of a gen9 Intel
-> > > 	       graphics device.
-> > >   remote_url: for a local NVMe VF, it may be configured with a remote
-> > >               url of a remote storage and all data is stored in the
-> > > 	       remote side specified by the remote url.
-> > >   ...  
-> just a minor not that i find ^ much more simmple to understand then
-> the current proposal with self and compatiable.
-> if i have well defiend attibute that i can parse and understand that allow
-> me to calulate the what is and is not compatible that is likely going to
-> more useful as you wont have to keep maintianing a list of other compatible
-> devices every time a new sku is released.
+> Added a multiarch test to verify.
 > 
-> in anycase thank for actully shareing ^ as it make it simpler to reson about what
-> you have previously proposed.
-
-So, what would be the most helpful format? A 'software_version' field
-that follows the conventions outlined above, and other (possibly
-optional) fields that have to match?
-
-(...)
-
-> > Thanks for the explanation, I'm still fuzzy about the details.
-> > Anyway, I suggest you to check "devlink dev info" command we have
-> > implemented for multiple drivers.  
+> Signed-off-by: Shu-Chun Weng <scw@google.com>
+> ---
+>  linux-user/alpha/sockbits.h            |   8 +-
+>  linux-user/fd-trans.h                  |  41 +++-
+>  linux-user/generic/sockbits.h          |   9 +-
+>  linux-user/hppa/sockbits.h             |   8 +-
+>  linux-user/mips/sockbits.h             |   8 +-
+>  linux-user/sparc/sockbits.h            |   8 +-
+>  linux-user/strace.c                    |   7 +-(fd)
+>  linux-user/syscall.c                   |  69 ++++--
+>  tests/tcg/multiarch/socket_timestamp.c | 292 +++++++++++++++++++++++++
+>  9 files changed, 419 insertions(+), 31 deletions(-)
+>  create mode 100644 tests/tcg/multiarch/socket_timestamp.c
 > 
-> is devlink exposed as a filesytem we can read with just open?
-> openstack will likely try to leverage libvirt to get this info but when we
-> cant its much simpler to read sysfs then it is to take a a depenency on a commandline
-> too and have to fork shell to execute it and parse the cli output.
-> pyroute2 which we use in some openstack poject has basic python binding for devlink but im not
-> sure how complete it is as i think its relitivly new addtion. if we need to take a dependcy
-> we will but that would be a drawback fo devlink not that that is a large one just something
-> to keep in mind.
 
-A devlinkfs, maybe? At least for reading information (IIUC, "devlink
-dev info" is only about information retrieval, right?)
-
+Thanks,
+Laurent
 
