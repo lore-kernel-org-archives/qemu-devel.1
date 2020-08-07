@@ -2,110 +2,62 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,T_HTML_ATTACH,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE60C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 16:55:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE35C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 17:24:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D782820866
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 16:55:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qVUCGTr4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D782820866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id BFE02221E5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 17:24:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFE02221E5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k45eU-0008Df-6H
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 12:55:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42820)
+	id 1k466R-0007jU-0o
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 13:24:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49174)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <john.g.johnson@oracle.com>)
- id 1k45dh-0007mh-Gs
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 12:54:41 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:45628)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k465H-0006eE-54
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 13:23:12 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:35155)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <john.g.johnson@oracle.com>)
- id 1k45dc-0004rm-HO
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 12:54:41 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 077GqEET024859;
- Fri, 7 Aug 2020 16:54:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : message-id :
- content-type : mime-version : subject : date : in-reply-to : cc : to :
- references; s=corp-2020-01-29;
- bh=KWUQWaDmtD2/vhb8hM6UQgA+F8PhzugKVRwpwPzcaWQ=;
- b=qVUCGTr41Qv0FwjLFbbwbn1XHp7y7FplWYheMISCe35mYnqfk/xa+QhkW8UjmBAJObq9
- bgm5I1XTf3v9ObaGyuXGzzzkWSeGnfwU9oldqVUyUNrxXLENFoZo7zzd5psYoL/KQix6
- 31ycwAsDVfjGT7k2RKxHgYBpd/0ZLhMjOOvGiX5aQpn1kVtqzkyi4mw/lNsqf7uWgfsb
- grEj/peMXGLQXVBH6VBo0nqd3cnaxVC75bh5uEXv9F7van9dsyJZkScnguOK04vijtrg
- ELzjMRoKsgQFnLVsQ6xAn6hAqkTS1mUHMHaJlYHKVQS1AzEjhR5XEixq+HcUU3I8QIXi yg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 32r6ep9mpb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Fri, 07 Aug 2020 16:54:27 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 077Gh33j155983;
- Fri, 7 Aug 2020 16:52:27 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 32pdp15517-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 07 Aug 2020 16:52:26 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 077GqOTw026051;
- Fri, 7 Aug 2020 16:52:24 GMT
-Received: from [192.168.10.3] (/24.5.35.151)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 07 Aug 2020 09:52:24 -0700
-From: John G Johnson <john.g.johnson@oracle.com>
-Message-Id: <BAEE677E-991A-452E-8345-BD63EFE7501D@oracle.com>
-Content-Type: multipart/mixed;
- boundary="Apple-Mail=_0078527D-57B0-458F-941A-A3B6210ACFA0"
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.15\))
-Subject: Re: [PATCH] introduce VFIO-over-socket protocol specificaion
-Date: Fri, 7 Aug 2020 09:52:21 -0700
-In-Reply-To: <20200729124803.GF37763@stefanha-x1.localdomain>
-To: Stefan Hajnoczi <stefanha@gmail.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-References: <1594913503-52271-1-git-send-email-thanos.makatos@nutanix.com>
- <20200717121753.GK128195@stefanha-x1.localdomain>
- <MW2PR02MB372306D4995774D4E6D036AD8B790@MW2PR02MB3723.namprd02.prod.outlook.com>
- <20200729124803.GF37763@stefanha-x1.localdomain>
-X-Mailer: Apple Mail (2.3445.104.15)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9706
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- spamscore=0 mlxscore=0
- bulkscore=0 adultscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008070117
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9706
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- bulkscore=0
- malwarescore=0 clxscore=1015 mlxscore=0 priorityscore=1501 adultscore=0
- impostorscore=0 lowpriorityscore=0 phishscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008070118
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=john.g.johnson@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 12:40:29
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- T_HTML_ATTACH=0.01 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k465C-0008AH-Ab
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 13:23:10 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 077HMTcB019930
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Fri, 7 Aug 2020 13:22:33 -0400
+Date: Fri, 7 Aug 2020 13:22:29 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 063/143] meson: convert tests/qtest to meson
+Message-ID: <20200807172225.bd5i7dhacq64c6td@mozz.bu.edu>
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+ <1596741379-12902-64-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1596741379-12902-64-git-send-email-pbonzini@redhat.com>
+User-Agent: NeoMutt/20180716
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 13:23:04
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,3902 +70,3211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "benjamin.walker@intel.com" <benjamin.walker@intel.com>,
- "elena.ufimtseva@oracle.com" <elena.ufimtseva@oracle.com>,
- "tomassetti.andrea@gmail.com" <tomassetti.andrea@gmail.com>,
- "jag.raman@oracle.com" <jag.raman@oracle.com>,
- "james.r.harris@intel.com" <james.r.harris@intel.com>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>,
- "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
- "yuvalkashtan@gmail.com" <yuvalkashtan@gmail.com>,
- Felipe Franciosi <felipe@nutanix.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- "ismael@linux.com" <ismael@linux.com>,
- "Kanth.Ghatraju@oracle.com" <Kanth.Ghatraju@oracle.com>,
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Darren Kenny <darren.kenny@oracle.com>, Bandan Das <bsd@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- "tina.zhang@intel.com" <tina.zhang@intel.com>,
- "changpeng.liu@intel.com" <changpeng.liu@intel.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Thank you, Paolo. I haven't gone through all the other messages yet, so
+maybe I missed some insights that would help with this.
 
---Apple-Mail=_0078527D-57B0-458F-941A-A3B6210ACFA0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+Some notes as I try to build qemu-fuzz-i386.
+* Needed to do git submodule update --init. IIRC this used to happen
+  automatically for stuff like slirp. I will need to update the oss-fuzz
+  build scripts (./scripts/oss-fuzz/build.sh) to init submodules.
 
+* My locally installed Meson was too old. Needed to add --meson=git . Is
+  there a reason this is not the default?
 
-	Updated doc to address comments.  Many changes are typos, but
-some are more more substantive.
+* The make i386-softmmu/{all,fuzz} flavored targets are gone. Good. Now
+  we have qemu-system-i386 and qemu-fuzz-i386
 
-								JJ
+* Trying make qemu-fuzz-i386:
+../tests/qtest/fuzz/virtio_scsi_fuzz.c:16:10: fatal error: 'libqos/virtio-scsi.h' file not found
+#include "libqos/virtio-scsi.h"
+         ^~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+make: *** [Makefile.ninja:2761: qemu-fuzz-i386.p/tests_qtest_fuzz_virtio_scsi_fuzz.c.o] Error 1
 
+No big deal, thats probably not the right way to include that stuff
+anyways:
 
-Version title is a hyperlink the versioning section
-Rewrote concurrency section to be less concurrent
-Removed disconnection recovery section - disconnect now causes client =
-device reset
-Message type is now enumerated in flags to distinguish it from message =
-attributes
-argsz fields use VFIO definitions instead of being reserved
-sys/vfio.h -> linux/vfio.h
+------------------------
 
+diff --git a/tests/qtest/fuzz/virtio_scsi_fuzz.c b/tests/qtest/fuzz/virtio_scsi_fuzz.c
+index 977ac424ed..6ff6fabe4a 100644
+--- a/tests/qtest/fuzz/virtio_scsi_fuzz.c
++++ b/tests/qtest/fuzz/virtio_scsi_fuzz.c
+@@ -13,9 +13,9 @@
+ #include "qemu/osdep.h"
 
+ #include "tests/qtest/libqos/libqtest.h"
+-#include "libqos/virtio-scsi.h"
+-#include "libqos/virtio.h"
+-#include "libqos/virtio-pci.h"
++#include "tests/qtest/libqos/virtio-scsi.h"
++#include "tests/qtest/libqos/virtio.h"
++#include "tests/qtest/libqos/virtio-pci.h"
+ #include "standard-headers/linux/virtio_ids.h"
+ #include "standard-headers/linux/virtio_pci.h"
+ #include "standard-headers/linux/virtio_scsi.h"
 
---Apple-Mail=_0078527D-57B0-458F-941A-A3B6210ACFA0
-Content-Disposition: attachment;
-	filename=vfio-user.diff
-Content-Type: application/octet-stream;
-	x-unix-mode=0644;
-	name="vfio-user.diff"
-Content-Transfer-Encoding: 7bit
+------------------------
 
-diff --git a/docs/devel/vfio-user.rst b/docs/devel/vfio-user.rst
-index 05a788b..ea99db6 100644
---- a/docs/devel/vfio-user.rst
-+++ b/docs/devel/vfio-user.rst
-@@ -2,9 +2,9 @@
- vfio-user Protocol Specification
- ********************************
- 
-------------
--Version 0.1
-------------
-+------------
-+Version_ 0.1
-+------------
- 
- .. contents:: Table of Contents
- 
-@@ -207,21 +207,19 @@ protocol.
- 
- Command Concurrency
- -------------------
--There can be multiple outstanding commands per virtual device, e.g. a frame
--buffer where the guest does multiple stores to the virtual device.  Commands
--must be executed in the order they are received.  The server can execute and
--reorder non-conflicting commands in parallel, depending on the device
--semantics.
--
--.. Note::
--   For instance, a client can issue the following operations back to back
--   without waiting for the first two to complete:
--
--   1. map a DMA region 
--   2. trigger some device-specific operation that results in data being read
--      into that DMA region, and
--   3. unmap the DMA region
--
-+A client may pipeline multiple commands without waiting for previous command
-+replies.  The server will process commands in the order they are received.
-+A consequence of this is if a client issues a command with the *No_reply* bit,
-+then subseqently issues a command without *No_reply*, the older command will
-+have been processed before the reply to the younger command is sent by the
-+server.  The client must be aware of the device's capability to process concurrent
-+commands if pipelining is used.  For example, pipelining allows multiple client
-+threads to concurently access device memory; the client must ensure these acceses
-+obey device semantics.
-+
-+An example is a frame buffer device, where the device may allow concurrent access
-+to different areas of video memory, but may have indeterminate behavior if concurrent
-+acceses are performed to command or status registers.
- 
- Socket Disconnection Behavior
- -----------------------------
-@@ -234,29 +232,14 @@ Server Disconnection
- A server disconnecting from the client may indicate that:
- 
- 1) A virtual device has been restarted, either intentionally (e.g. because of a
--   device update) or unintentionally (e.g. because of a crash). In any case,
--   the virtual device will come back so the client should not do anything (e.g.
--   simply reconnect and retry failed operations).
-+   device update) or unintentionally (e.g. because of a crash).
- 2) A virtual device has been shut down with no intention to be restarted.
- 
- It is impossible for the client to know whether or not a failure is
- intermittent or innocuous and should be retried, therefore the client should
--attempt to reconnect to the socket. Since an intentional server restart (e.g.
--due to an upgrade) might take some time, a reasonable timeout should be used.
--In cases where the disconnection is expected (e.g. the client exits), no new
--commands will be sent anyway so this situation does not pose a problem. The
--control stack will clean up accordingly.
--
--Parameterizing this behaviour by having the server advertise a reasonable
--reconnect is deferred to a future version of the protocol.
--
--Recovering state is implementation-specific. The protocol provides all the
--building blocks and does not enforce a particular mechanism:
--
--* Recovering state must be initiated by the client since it is the master in
--  the vfio-user model. Interrupts/DMA may have to be reconfigured,
--  unacknowledged requests may have to be re-submitted, etc.
--* The server may have to persistently store device state.
-+reset the VFIO device when it detects the socket has been disconnected.
-+Error recovery will be driven by the guest's device error handling
-+behavior.
- 
- Client Disconnection
- ^^^^^^^^^^^^^^^^^^^^
-@@ -274,6 +257,12 @@ take no action when the client disconnects. If anything happens to the client
- the control stack will know about it and can clean up resources
- accordingly.
- 
-+Live Migration
-+^^^^^^^^^^^^^^
-+A future version of the protocol will support client live migration.  This action
-+will require the socket to be quiesced before it is disconnected,  This mechanism
-+will be defined when live migration support is added.
-+
- Request Retry and Response Timeout
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- A failed command is a command that has been successfully sent and has been
-@@ -335,48 +324,53 @@ All messages, both command messages and reply messages, are preceded by a
- header that contains basic information about the message. The header is
- followed by message-specific data described in the sections below.
- 
--+----------------+--------+-------------+
--| Name           | Offset | Size        |
--+================+========+=============+
--| Message ID     | 0      | 2           |
--+----------------+--------+-------------+
--| Command        | 2      | 2           |
--+----------------+--------+-------------+
--| Message size   | 4      | 4           |
--+----------------+--------+-------------+
--| Flags          | 8      | 4           |
--+----------------+--------+-------------+
--|                | +-----+------------+ |
--|                | | Bit | Definition | |
--|                | +=====+============+ |
--|                | | 0   | Reply      | |
--|                | +-----+------------+ |
--|                | | 1   | No_reply   | |
--|                | +-----+------------+ |
--|                | | 2   | Error      | |
--|                | +-----+------------+ |
--+----------------+--------+-------------+
--| Error          | 12     | 4           |
--+----------------+--------+-------------+
--| <message data> | 16     | variable    |
--+----------------+--------+-------------+
--
--* *Message ID* identifies the message, and is used echoed in the reply message.
-++----------------+---------+-------------+
-+| Name           | Offset  | Size        |
-++================+=========+=============+
-+| Message ID     | 0       | 2           |
-++----------------+---------+-------------+
-+| Command        | 2       | 2           |
-++----------------+---------+-------------+
-+| Message size   | 4       | 4           |
-++----------------+---------+-------------+
-+| Flags          | 8       | 4           |
-++----------------+---------+-------------+
-+|                | +------+------------+ |
-+|                | | Bit  | Definition | |
-+|                | +======+============+ |
-+|                | | 0-3  | Type       | |
-+|                | +------+------------+ |
-+|                | | 4    | No_reply   | |
-+|                | +------+------------+ |
-+|                | | 5    | Error      | |
-+|                | +------+------------+ |
-++----------------+---------+-------------+
-+| Errno          | 12      | 4           |
-++----------------+---------+-------------+
-+| <message data> | 16      | variable    |
-++----------------+---------+-------------+
-+
-+* *Message ID* identifies the message, and is echoed in the command's reply message.
- * *Command* specifies the command to be executed, listed in Commands_.
- * *Message size* contains the size of the entire message, including the header.
- * *Flags* contains attributes of the message:
- 
--  * The reply bit differentiates command messages from reply messages. A reply
--    message acknowledges a previous command with the same message ID.
--  * No_reply indicates that no reply is needed for this command. This is
--    commonly used when multiple commands are sent, and only the last needs
-+  * The *Type* bits indicate the message type.
-+
-+    *  *Command* (value 0x0) indicates a command message.
-+    *  *Reply* (value 0x1) indicates a reply message acknowledging a previous
-+       command with the same message ID.
-+  * *No_reply* in a command message indicates that no reply is needed for this command.
-+    This is commonly used when multiple commands are sent, and only the last needs
-     acknowledgement.
-+  * *Error* in a reply message indicates the command being acknowledged had
-+    an error. In this case, the *Errno* field will be valid.
- 
--* *Error* is a UNIX errno value set only in the reply message. It is reserved in
--  the command message.
-+* *Errno* in a reply message is a UNIX errno value. It is reserved in a command message.
- 
--Each command message in Commands_ must be replied to with a reply message,
--which consists of the header with the reply bit set, plus any additional data.
-+Each command message in Commands_ must be replied to with a reply message, unless the
-+message sets the *No_Reply* bit.  The reply consists of the header with the *Reply*
-+bit set, plus any additional data.
- 
- VFIO_USER_VERSION
- -----------------
-@@ -395,7 +389,7 @@ Message format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- | Version      | JSON byte array        |
- +--------------+------------------------+
-@@ -415,6 +409,8 @@ included:
- |              |        | be empty.                                         |
- +--------------+--------+---------------------------------------------------+
- 
-+.. _Version:
-+
- Versioning and Feature Support
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- Upon accepting a connection, the server must send a VFIO_USER_VERSION message
-@@ -457,7 +453,7 @@ Message Format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- | Table        | array of table entries |
- +--------------+------------------------+
-@@ -543,14 +539,14 @@ Message format
- +--------------+----------------------------+
- | Flags        | Reply bit set in reply     |
- +--------------+----------------------------+
--| Error        | 0/errno                    |
-+| Errno        | 0/errno                    |
- +--------------+----------------------------+
- | Device info  | VFIO device info           |
- +--------------+----------------------------+
- 
- This command message is sent by the client to the server to query for basic
- information about the device. Only the message header is needed in the command
--message.  The VFIO device info structure is defined in ``<sys/vfio.h>``
-+message.  The VFIO device info structure is defined in ``<linux/vfio.h>``
- (``struct vfio_device_info``).
- 
- VFIO device info format
-@@ -576,8 +572,7 @@ VFIO device info format
- | num_irqs    | 28     | 4                        |
- +-------------+--------+--------------------------+
- 
--* *argz* is reserved in vfio-user, it is only used in the ioctl() VFIO
--  implementation.
-+* *argsz* is the size of the VFIO device info structure.
- * *flags* contains the following device attributes.
- 
-   * VFIO_DEVICE_FLAGS_RESET indicates that the device supports the
-@@ -607,14 +602,14 @@ Message format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- | Region info  | VFIO region info       |
- +--------------+------------------------+
- 
- This command message is sent by the client to the server to query for
- information about device memory regions. The VFIO region info structure is
--defined in ``<sys/vfio.h>`` (``struct vfio_region_info``). Since the client
-+defined in ``<linux/vfio.h>`` (``struct vfio_region_info``). Since the client
- does not know the size of the capabilities, the size of the reply it should
- expect is 48 plus any capabilities whose size is indicated in the size field of
- the reply header.
-@@ -650,8 +645,8 @@ VFIO region info format
- | offset     | 40     | 8                            |
- +------------+--------+------------------------------+
- 
--* *argz* is reserved in vfio-user, it is only used in the ioctl() VFIO
--  implementation.
-+* *argsz* is the size of the VFIO region info structure plus the
-+  size of any region capabilities returned.
- * *flags* are attributes of the region:
- 
-   * *VFIO_REGION_INFO_FLAG_READ* allows client read access to the region.
-@@ -668,7 +663,7 @@ VFIO region info format
- * *cap_offset* describes where additional region capabilities can be found.
-   cap_offset is relative to the beginning of the VFIO region info structure.
-   The data structure it points is a VFIO cap header defined in
--  ``<sys/vfio.h>``.
-+  ``<linux/vfio.h>``.
- * *size* is the size of the region.
- * *offset* is the offset given to the mmap() system call for regions with the
-   MMAP attribute. It is also used as the base offset when mapping a VFIO
-@@ -679,7 +674,7 @@ VFIO Region capabilities
- The VFIO region information can also include a capabilities list. This list is
- similar to a PCI capability list - each entry has a common header that
- identifies a capability and where the next capability in the list can be found.
--The VFIO capability header format is defined in ``<sys/vfio.h>`` (``struct
-+The VFIO capability header format is defined in ``<linux/vfio.h>`` (``struct
- vfio_info_cap_header``).
- 
- VFIO cap header format
-@@ -718,7 +713,7 @@ VFIO sparse mmap
- The only capability supported in this version of the protocol is for sparse
- mmap. This capability is defined when only a subrange of the region supports
- direct access by the client via mmap(). The VFIO sparse mmap area is defined in
--``<sys/vfio.h>`` (``struct vfio_region_sparse_mmap_area``).
-+``<linux/vfio.h>`` (``struct vfio_region_sparse_mmap_area``).
- 
- VFIO region info cap sparse mmap
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-@@ -742,7 +737,7 @@ VFIO region info cap sparse mmap
-   the base offset given in the VFIO_USER_DEVICE_GET_REGION_INFO to form the
-   offset argument of the subsequent mmap() call.
- 
--The VFIO sparse mmap area is defined in ``<sys/vfio.h>`` (``struct
-+The VFIO sparse mmap area is defined in ``<linux/vfio.h>`` (``struct
- vfio_region_info_cap_sparse_mmap``).
- 
- VFIO_USER_DEVICE_GET_IRQ_INFO
-@@ -762,14 +757,14 @@ Message format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- | IRQ info     | VFIO IRQ info          |
- +--------------+------------------------+
- 
- This command message is sent by the client to the server to query for
- information about device interrupt types. The VFIO IRQ info structure is
--defined in ``<sys/vfio.h>`` (``struct vfio_irq_info``).
-+defined in ``<linux/vfio.h>`` (``struct vfio_irq_info``).
- 
- VFIO IRQ info format
- ^^^^^^^^^^^^^^^^^^^^
-@@ -798,8 +793,7 @@ VFIO IRQ info format
- | count | 28     | 4                         |
- +-------+--------+---------------------------+
- 
--* *argz* is reserved in vfio-user, it is only used in the ioctl() VFIO
--  implementation.
-+* *argsz* is the size of the VFIO IRQ info structure.
- * *flags* defines IRQ attributes:
- 
-   * *VFIO_IRQ_INFO_EVENTFD* indicates the IRQ type can support server eventfd
-@@ -834,17 +828,17 @@ Message format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- | IRQ set      | VFIO IRQ set           |
- +--------------+------------------------+
- 
- This command message is sent by the client to the server to set actions for
- device interrupt types. The VFIO IRQ set structure is defined in
--``<sys/vfio.h>`` (``struct vfio_irq_set``).
-+``<linux/vfio.h>`` (``struct vfio_irq_set``).
- 
--VFIO IRQ info format
--^^^^^^^^^^^^^^^^^^^^
-+VFIO IRQ set format
-+^^^^^^^^^^^^^^^^^^^
- 
- +-------+--------+------------------------------+
- | Name  | Offset | Size                         |
-@@ -878,8 +872,7 @@ VFIO IRQ info format
- | data  | 36     | variable                     |
- +-------+--------+------------------------------+
- 
--* *argz* is reserved in vfio-user, it is only used in the ioctl() VFIO
--  implementation.
-+* *argsz* is the size of the VFIO IRQ set structure, including any *data* field.
- * *flags* defines the action performed on the interrupt range. The DATA flags
-   describe the data field sent in the message; the ACTION flags describe the
-   action to be performed. The flags are mutually exclusive for both sets.
-@@ -909,7 +902,8 @@ VFIO IRQ info format
- * *start* is the start of the sub-index being set.
- * *count* describes the number of sub-indexes being set. As a special case, a
-   count of 0 with data flags of VFIO_IRQ_SET_DATA_NONE disables all interrupts
--  of the index data is an optional field included when the
-+  of the index.
-+* *data* is an optional field included when the
-   VFIO_IRQ_SET_DATA_BOOL flag is present. It contains an array of booleans
-   that specify whether the action is to be performed on the corresponding
-   index. It's used when the action is only performed on a subset of the range
-@@ -975,8 +969,6 @@ DMA Read/Write Data
- * *Count* is the size of the data to be transferred.
- * *Data* is the data to be read or written.
- 
--Address and count can also be accessed as ``struct iovec`` from ``<sys/uio.h>``.
--
- VFIO_USER_REGION_READ
- ---------------------
- 
-@@ -994,7 +986,7 @@ Message format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- | Read info    | REGION read/write data |
- +--------------+------------------------+
-@@ -1021,7 +1013,7 @@ Message format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- | Write info   | REGION read/write data |
- +--------------+------------------------+
-@@ -1048,7 +1040,7 @@ Message format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- | DMA info     | DMA read/write data    |
- +--------------+------------------------+
-@@ -1075,7 +1067,7 @@ Message format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- | DMA info     | DMA read/write data    |
- +--------------+------------------------+
-@@ -1102,7 +1094,7 @@ Message format
- +----------------+------------------------+
- | Flags          | Reply bit set in reply |
- +----------------+------------------------+
--| Error          | 0/errno                |
-+| Errno          | 0/errno                |
- +----------------+------------------------+
- | Interrupt info | <interrupt>            |
- +----------------+------------------------+
-@@ -1143,7 +1135,7 @@ Message format
- +--------------+------------------------+
- | Flags        | Reply bit set in reply |
- +--------------+------------------------+
--| Error        | 0/errno                |
-+| Errno        | 0/errno                |
- +--------------+------------------------+
- 
- This command message is sent from the client to the server to reset the device.
+* Ok. Lets try again:
+In file included from ../ui/vnc.h:103:
+../ui/vnc-auth-sasl.h:28:10: fatal error: 'sasl/sasl.h' file not found
+#include <sasl/sasl.h>
+         ^~~~~~~~~~~~~
 
---Apple-Mail=_0078527D-57B0-458F-941A-A3B6210ACFA0
-Content-Disposition: attachment;
-	filename=vfio-user.rst
-Content-Type: application/octet-stream;
-	x-unix-mode=0644;
-	name="vfio-user.rst"
-Content-Transfer-Encoding: 7bit
+Didn't need that before - oh well. apt install libsasl-dev
 
-********************************
-vfio-user Protocol Specification
-********************************
+../ui/input-keymap.c:7:10: fatal error: 'ui/input-keymap-atset1-to-qcode.c' file not found
+#include "ui/input-keymap-atset1-to-qcode.c"
 
-------------
-Version_ 0.1
-------------
+Can't find that anywhere. Lets try to clear out the build dir and build
+system without --enable-fuzzing:
+CC=clang-9 CXX=clang++-9 ../configure --enable-sanitizers --meson=git
+make qemu-system-i386
+...
+../qemu-options-wrapper.h:32:10: fatal error: 'qemu-options.def' file not found
+#include "qemu-options.def"
 
-.. contents:: Table of Contents
+Ok lets try:
+make qemu-options.def
 
-Introduction
-============
-vfio-user is a protocol that allows a device to be emulated in a separate
-process outside of a Virtual Machine Monitor (VMM). vfio-user devices consist
-of a generic VFIO device type, living inside the VMM, which we call the client,
-and the core device implementation, living outside the VMM, which we call the
-server.
+We get further now:
 
-The `Linux VFIO ioctl interface <https://www.kernel.org/doc/html/latest/driver-api/vfio.html>`_
-been chosen as the base for this protocol for the following reasons:
+../ui/input-keymap.c:7:10: fatal error: 'ui/input-keymap-atset1-to-qcode.c' file not found
+#include "ui/input-keymap-atset1-to-qcode.c"
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lets try: make "ui/input-keymap-atset1-to-qcode.c"
+.. and    make "ui/input-keymap-linux-to-qcode.c"
+.. and    make "ui/input-keymap-qcode-to-atset1.c"
+.. and    make "ui/input-keymap-qcode-to-atset2.c"
+.. and    make "ui/input-keymap-qcode-to-atset3.c"
+.. and    make "ui/input-keymap-qcode-to-linux.c"
+.. and    make "ui/input-keymap-qcode-to-qnum.c"
+.. and    make "ui/input-keymap-qcode-to-sun.c"
+.. and    make "ui/input-keymap-qnum-to-qcode.c"
 
-1) It is a mature and stable API, backed by an extensively used framework.
-2) The existing VFIO client implementation in QEMU (qemu/hw/vfio/) can be
-   largely reused.
+Since it seems the problems aren't specific to the fuzz target, Lets
+re-try with --enable-fuzzing
 
-.. Note::
-   In a proof of concept implementation it has been demonstrated that using VFIO
-   over a UNIX domain socket is a viable option. vfio-user is designed with
-   QEMU in mind, however it could be used by other client applications. The
-   vfio-user protocol does not require that QEMU's VFIO client  implementation
-   is used in QEMU.
+Ok, we're very close now:
+clang: error: unknown argument: '-wrap'
+.... 19 times
+clang: error: no such file or directory: 'qtest_inb'
+....
+clang: error: no such file or directory: 'qtest_memset'
 
-None of the VFIO kernel modules are required for supporting the protocol,
-neither in the client nor the server, only the source header files are used.
+Ok what is it trying to do? Lets do make -n qemu-fuzz-i386:
 
-The main idea is to allow a virtual device to function in a separate process in
-the same host over a UNIX domain socket. A UNIX domain socket (AF_UNIX) is
-chosen because file descriptors can be trivially sent over it, which in turn
-allows:
+clang++-9  -o qemu-fuzz-i386 qemu-fuzz-i386.p/tests_qtest_fuzz_i440fx_fuzz.c.o
+-fsanitize=fuzzer -Ttests/qtest/fuzz/fork_fuzz.ld -wrap qtest_inb -wrap
+qtest_inw -wrap qtest_inl -wrap qtest_outb -wrap qtest_outw -wrap
+qtest_outl -wrap qtest_readb -wrap qtest_readw -wrap qtest_readl -wrap
+qtest_readq -wrap qtest_writeb
 
-* Sharing of client memory for DMA with the server.
-* Sharing of server memory with the client for fast MMIO.
-* Efficient sharing of eventfd's for triggering interrupts.
+Hmm those need to have -Wl, . Lets just hack it in, for now (we also
+don't build qtest_wrappers.o, so lets fix that):
+diff --git a/tests/qtest/fuzz/meson.build b/tests/qtest/fuzz/meson.build
+index 58ab69a952..0345f6c993 100644
+--- a/tests/qtest/fuzz/meson.build
++++ b/tests/qtest/fuzz/meson.build
+@@ -1,4 +1,4 @@
+-specific_fuzz_ss.add(files('fuzz.c', 'fork_fuzz.c', 'qos_fuzz.c'), qos)
++specific_fuzz_ss.add(files('fuzz.c', 'fork_fuzz.c', 'qos_fuzz.c', 'qtest_wrappers.c'), qos)
 
-Other socket types could be used which allow the server to run in a separate
-guest in the same host (AF_VSOCK) or remotely (AF_INET). Theoretically the
-underlying transport does not necessarily have to be a socket, however we do
-not examine such alternatives. In this protocol version we focus on using a
-UNIX domain socket and introduce basic support for the other two types of
-sockets without considering performance implications.
+ # Targets
+ specific_fuzz_ss.add(when: 'CONFIG_I440FX', if_true: files('i440fx_fuzz.c'))
+@@ -10,25 +10,25 @@ specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio_scsi_fuz
+ fork_fuzz = declare_dependency(
+   link_args: ['-fsanitize=fuzzer',
+               '-Ttests/qtest/fuzz/fork_fuzz.ld',
+-              '-wrap', 'qtest_inb',
+-              '-wrap', 'qtest_inw',
+-              '-wrap', 'qtest_inl',
+-              '-wrap', 'qtest_outb',
+-              '-wrap', 'qtest_outw',
+-              '-wrap', 'qtest_outl',
+-              '-wrap', 'qtest_readb',
+-              '-wrap', 'qtest_readw',
+-              '-wrap', 'qtest_readl',
+-              '-wrap', 'qtest_readq',
+-              '-wrap', 'qtest_writeb',
+-              '-wrap', 'qtest_writew',
+-              '-wrap', 'qtest_writel',
+-              '-wrap', 'qtest_writeq',
+-              '-wrap', 'qtest_memread',
+-              '-wrap', 'qtest_bufread',
+-              '-wrap', 'qtest_memwrite',
+-              '-wrap', 'qtest_bufwrite',
+-              '-wrap', 'qtest_memset']
++              '-Wl,-wrap,qtest_inb',
++              '-Wl,-wrap,qtest_inw',
++              '-Wl,-wrap,qtest_inl',
++              '-Wl,-wrap,qtest_outb',
++              '-Wl,-wrap,qtest_outw',
++              '-Wl,-wrap,qtest_outl',
++              '-Wl,-wrap,qtest_readb',
++              '-Wl,-wrap,qtest_readw',
++              '-Wl,-wrap,qtest_readl',
++              '-Wl,-wrap,qtest_readq',
++              '-Wl,-wrap,qtest_writeb',
++              '-Wl,-wrap,qtest_writew',
++              '-Wl,-wrap,qtest_writel',
++              '-Wl,-wrap,qtest_writeq',
++              '-Wl,-wrap,qtest_memread',
++              '-Wl,-wrap,qtest_bufread',
++              '-Wl,-wrap,qtest_memwrite',
++              '-Wl,-wrap,qtest_bufwrite',
++              '-Wl,-wrap,qtest_memset']
+ )
 
-While passing of file descriptors is desirable for performance reasons, it is
-not necessary neither for the client nor for the server to support it in order
-to implement the protocol. There is always an in-band, message-passing fall
-back mechanism.
+ specific_fuzz_ss.add(fork_fuzz)
 
-VFIO
-====
-VFIO is a framework that allows a physical device to be securely passed through
-to a user space process; the device-specific kernel driver does not drive the
-device at all.  Typically, the user space process is a VMM and the device is
-passed through to it in order to achieve high performance. VFIO provides an API
-and the required functionality in the kernel. QEMU has adopted VFIO to allow a
-guest to directly access physical devices, instead of emulating them in
-software.
+../tests/qtest/fuzz/qtest_wrappers.c:15:10: fatal error: 'cpu.h' file not found
+#include "cpu.h"
 
-vfio-user reuses the core VFIO concepts defined in its API, but implements them
-as messages to be sent over a socket. It does not change the kernel-based VFIO
-in any way, in fact none of the VFIO kernel modules need to be loaded to use
-vfio-user. It is also possible for the client to concurrently use the current
-kernel-based VFIO for one device, and vfio-user for another device.
+How did we get away with that in the first place?
 
-VFIO Device Model
------------------
-A device under VFIO presents a standard interface to the user process. Many of
-the VFIO operations in the existing interface use the ioctl() system call, and
-references to the existing interface are called the ioctl() implementation in
-this document.
-
-The following sections describe the set of messages that implement the VFIO
-interface over a socket. In many cases, the messages are direct translations of
-data structures used in the ioctl() implementation. Messages derived from
-ioctl()s will have a name derived from the ioctl() command name.  E.g., the
-VFIO_GET_INFO ioctl() command becomes a VFIO_USER_GET_INFO message.  The
-purpose of this reuse is to share as much code as feasible with the ioctl()
-implementation.
-
-Connection Initiation
-^^^^^^^^^^^^^^^^^^^^^
-After the client connects to the server, the initial server message is
-VFIO_USER_VERSION to propose a protocol version and set of capabilities to
-apply to the session. The client replies with a compatible version and set of
-capabilities it supports, or closes the connection if it cannot support the
-advertised version.
-
-DMA Memory Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^
-The client uses VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP messages to inform
-the server of the valid DMA ranges that the server can access on behalf
-of a device. DMA memory may be accessed by the server via VFIO_USER_DMA_READ
-and VFIO_USER_DMA_WRITE messages over the socket.
-
-An optimization for server access to client memory is for the client to provide
-file descriptors the server can mmap() to directly access client memory. Note
-that mmap() privileges cannot be revoked by the client, therefore file
-descriptors should only be exported in environments where the client trusts the
-server not to corrupt guest memory.
-
-Device Information
-^^^^^^^^^^^^^^^^^^
-The client uses a VFIO_USER_DEVICE_GET_INFO message to query the server for
-information about the device. This information includes:
-
-* The device type and capabilities,
-* the number of device regions, and
-* the device presents to the client the number of interrupt types the device
-  supports.
-
-Region Information
-^^^^^^^^^^^^^^^^^^
-The client uses VFIO_USER_DEVICE_GET_REGION_INFO messages to query the server
-for information about the device's memory regions. This information describes:
-
-* Read and write permissions, whether it can be memory mapped, and whether it
-  supports additional capabilities.
-* Region index, size, and offset.
-
-When a region can be mapped by the client, the server provides a file
-descriptor which the client can mmap(). The server is responsible for polling
-for client updates to memory mapped regions.
-
-Region Capabilities
-"""""""""""""""""""
-Some regions have additional capabilities that cannot be described adequately
-by the region info data structure. These capabilities are returned in the
-region info reply in a list similar to PCI capabilities in a PCI device's
-configuration space.
-
-Sparse Regions
-""""""""""""""
-A region can be memory-mappable in whole or in part. When only a subset of a
-region can be mapped by the client, a VFIO_REGION_INFO_CAP_SPARSE_MMAP
-capability is included in the region info reply. This capability describes
-which portions can be mapped by the client.
-
-.. Note::
-   For example, in a virtual NVMe controller, sparse regions can be used so
-   that accesses to the NVMe registers (found in the beginning of BAR0) are
-   trapped (an infrequent event), while allowing direct access to the doorbells
-   (an extremely frequent event as every I/O submission requires a write to
-   BAR0), found right after the NVMe registers in BAR0.
-
-Interrupts
-^^^^^^^^^^
-The client uses VFIO_USER_DEVICE_GET_IRQ_INFO messages to query the server for
-the device's interrupt types. The interrupt types are specific to the bus the
-device is attached to, and the client is expected to know the capabilities of
-each interrupt type. The server can signal an interrupt either with
-VFIO_USER_VM_INTERRUPT messages over the socket, or can directly inject
-interrupts into the guest via an event file descriptor. The client configures
-how the server signals an interrupt with VFIO_USER_SET_IRQS messages.
-
-Device Read and Write
-^^^^^^^^^^^^^^^^^^^^^
-When the guest executes load or store operations to device memory, the client
-forwards these operations to the server with VFIO_USER_REGION_READ or
-VFIO_USER_REGION_WRITE messages. The server will reply with data from the
-device on read operations or an acknowledgement on write operations.
-
-DMA
-^^^
-When a device performs DMA accesses to guest memory, the server will forward
-them to the client with VFIO_USER_DMA_READ and VFIO_USER_DMA_WRITE messages.
-These messages can only be used to access guest memory the client has
-configured into the server.
-
-Protocol Specification
-======================
-To distinguish from the base VFIO symbols, all vfio-user symbols are prefixed
-with vfio_user or VFIO_USER. In revision 0.1, all data is in the little-endian
-format, although this may be relaxed in future revision in cases where the
-client and server are both big-endian. The messages are formatted for seamless
-reuse of the native VFIO structs.
-
-Socket
-------
-
-A server can serve:
-
-1) one or more clients, and/or
-2) one or more virtual devices, belonging to one or more clients.
-
-The current protocol specification requires a dedicated socket per
-client/server connection. It is a server-side implementation detail whether a
-single server handles multiple virtual devices from the same or multiple
-clients. The location of the socket is implementation-specific. Multiplexing
-clients, devices, and servers over the same socket is not supported in this
-version of the protocol.
-
-Authentication
---------------
-For AF_UNIX, we rely on OS mandatory access controls on the socket files,
-therefore it is up to the management layer to set up the socket as required.
-Socket types than span guests or hosts will require a proper authentication
-mechanism. Defining that mechanism is deferred to a future version of the
-protocol.
-
-Command Concurrency
--------------------
-A client may pipeline multiple commands without waiting for previous command
-replies.  The server will process commands in the order they are received.
-A consequence of this is if a client issues a command with the *No_reply* bit,
-then subseqently issues a command without *No_reply*, the older command will
-have been processed before the reply to the younger command is sent by the
-server.  The client must be aware of the device's capability to process concurrent
-commands if pipelining is used.  For example, pipelining allows multiple client
-threads to concurently access device memory; the client must ensure these acceses
-obey device semantics.
-
-An example is a frame buffer device, where the device may allow concurrent access
-to different areas of video memory, but may have indeterminate behavior if concurrent
-acceses are performed to command or status registers.
-
-Socket Disconnection Behavior
 -----------------------------
-The server and the client can disconnect from each other, either intentionally
-or unexpectedly. Both the client and the server need to know how to handle such
-events.
-
-Server Disconnection
-^^^^^^^^^^^^^^^^^^^^
-A server disconnecting from the client may indicate that:
-
-1) A virtual device has been restarted, either intentionally (e.g. because of a
-   device update) or unintentionally (e.g. because of a crash).
-2) A virtual device has been shut down with no intention to be restarted.
-
-It is impossible for the client to know whether or not a failure is
-intermittent or innocuous and should be retried, therefore the client should
-reset the VFIO device when it detects the socket has been disconnected.
-Error recovery will be driven by the guest's device error handling
-behavior.
-
-Client Disconnection
-^^^^^^^^^^^^^^^^^^^^
-The client disconnecting from the server primarily means that the client
-has exited. Currently, this means that the guest is shut down so the device is
-no longer needed therefore the server can automatically exit. However, there
-can be cases where a client disconnection should not result in a server exit:
-
-1) A single server serving multiple clients.
-2) A multi-process QEMU upgrading itself step by step, which is not yet
-   implemented.
-
-Therefore in order for the protocol to be forward compatible the server should
-take no action when the client disconnects. If anything happens to the client
-the control stack will know about it and can clean up resources
-accordingly.
-
-Live Migration
-^^^^^^^^^^^^^^
-A future version of the protocol will support client live migration.  This action
-will require the socket to be quiesced before it is disconnected,  This mechanism
-will be defined when live migration support is added.
-
-Request Retry and Response Timeout
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-A failed command is a command that has been successfully sent and has been
-responded to with an error code. Failure to send the command in the first place
-(e.g. because the socket is disconnected) is a different type of error examined
-earlier in the disconnect section.
-
-.. Note::
-   QEMU's VFIO retries certain operations if they fail. While this makes sense
-   for real HW, we don't know for sure whether it makes sense for virtual
-   devices.
-
-Defining a retry and timeout scheme is deferred to a future version of the
-protocol.
-
-.. _Commands:
-
-Commands
---------
-The following table lists the VFIO message command IDs, and whether the
-message command is sent from the client or the server.
-
-+----------------------------------+---------+-------------------+
-| Name                             | Command | Request Direction |
-+==================================+=========+===================+
-| VFIO_USER_VERSION                | 1       | server -> client  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_DMA_MAP                | 2       | client -> server  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_DMA_UNMAP              | 3       | client -> server  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_DEVICE_GET_INFO        | 4       | client -> server  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_DEVICE_GET_REGION_INFO | 5       | client -> server  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_DEVICE_GET_IRQ_INFO    | 6       | client -> server  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_DEVICE_SET_IRQS        | 7       | client -> server  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_REGION_READ            | 8       | client -> server  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_REGION_WRITE           | 9       | client -> server  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_DMA_READ               | 10      | server -> client  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_DMA_WRITE              | 11      | server -> client  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_VM_INTERRUPT           | 12      | server -> client  |
-+----------------------------------+---------+-------------------+
-| VFIO_USER_DEVICE_RESET           | 13      | client -> server  |
-+----------------------------------+---------+-------------------+
-
-.. Note:: Some VFIO defines cannot be reused since their values are
-   architecture-specific (e.g. VFIO_IOMMU_MAP_DMA).
-
-Header
-------
-All messages, both command messages and reply messages, are preceded by a
-header that contains basic information about the message. The header is
-followed by message-specific data described in the sections below.
-
-+----------------+---------+-------------+
-| Name           | Offset  | Size        |
-+================+=========+=============+
-| Message ID     | 0       | 2           |
-+----------------+---------+-------------+
-| Command        | 2       | 2           |
-+----------------+---------+-------------+
-| Message size   | 4       | 4           |
-+----------------+---------+-------------+
-| Flags          | 8       | 4           |
-+----------------+---------+-------------+
-|                | +------+------------+ |
-|                | | Bit  | Definition | |
-|                | +======+============+ |
-|                | | 0-3  | Type       | |
-|                | +------+------------+ |
-|                | | 4    | No_reply   | |
-|                | +------+------------+ |
-|                | | 5    | Error      | |
-|                | +------+------------+ |
-+----------------+---------+-------------+
-| Errno          | 12      | 4           |
-+----------------+---------+-------------+
-| <message data> | 16      | variable    |
-+----------------+---------+-------------+
-
-* *Message ID* identifies the message, and is echoed in the command's reply message.
-* *Command* specifies the command to be executed, listed in Commands_.
-* *Message size* contains the size of the entire message, including the header.
-* *Flags* contains attributes of the message:
-
-  * The *Type* bits indicate the message type.
-
-    *  *Command* (value 0x0) indicates a command message.
-    *  *Reply* (value 0x1) indicates a reply message acknowledging a previous
-       command with the same message ID.
-  * *No_reply* in a command message indicates that no reply is needed for this command.
-    This is commonly used when multiple commands are sent, and only the last needs
-    acknowledgement.
-  * *Error* in a reply message indicates the command being acknowledged had
-    an error. In this case, the *Errno* field will be valid.
-
-* *Errno* in a reply message is a UNIX errno value. It is reserved in a command message.
-
-Each command message in Commands_ must be replied to with a reply message, unless the
-message sets the *No_Reply* bit.  The reply consists of the header with the *Reply*
-bit set, plus any additional data.
-
-VFIO_USER_VERSION
------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | 1                      |
-+--------------+------------------------+
-| Message size | 16 + version length    |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-| Version      | JSON byte array        |
-+--------------+------------------------+
-
-This is the initial message sent by the server after the socket connection is
-established. The version is in JSON format, and the following objects must be
-included:
-
-+--------------+--------+---------------------------------------------------+
-| Name         | Type   | Description                                       |
-+==============+========+===================================================+
-| version      | object | ``{"major": <number>, "minor": <number>}``        |
-|              |        |                                                   |
-|              |        | Version supported by the sender, e.g. "0.1".      |
-+--------------+--------+---------------------------------------------------+
-| capabilities | array  | Reserved. Can be omitted for v0.1, otherwise must |
-|              |        | be empty.                                         |
-+--------------+--------+---------------------------------------------------+
-
-.. _Version:
-
-Versioning and Feature Support
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Upon accepting a connection, the server must send a VFIO_USER_VERSION message
-proposing a protocol version and a set of capabilities. The client compares
-these with the versions and capabilities it supports and sends a
-VFIO_USER_VERSION reply according to the following rules.
-
-* The major version in the reply must be the same as proposed. If the client
-  does not support the proposed major, it closes the connection.
-* The minor version in the reply must be equal to or less than the minor
-  version proposed.
-* The capability list must be a subset of those proposed. If the client
-  requires a capability the server did not include, it closes the connection.
-
-The protocol major version will only change when incompatible protocol changes
-are made, such as changing the message format. The minor version may change
-when compatible changes are made, such as adding new messages or capabilities,
-Both the client and server must support all minor versions less than the
-maximum minor version it supports. E.g., an implementation that supports
-version 1.3 must also support 1.0 through 1.2.
-
-When making a change to this specification, the protocol version number must
-be included in the form "added in version X.Y"
-
-
-VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP
------------------------------------------
-
-Message Format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | MAP=2, UNMAP=3         |
-+--------------+------------------------+
-| Message size | 16 + table size        |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-| Table        | array of table entries |
-+--------------+------------------------+
-
-This command message is sent by the client to the server to inform it of the
-memory regions the server can access. It must be sent before the server can
-perform any DMA to the client. It is normally sent directly after the version
-handshake is completed, but may also occur when memory is added to or
-subtracted from the client, or if the client uses a vIOMMU. If the client does
-not expect the server to perform DMA then it does not need to send to the
-server VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP commands. If the server does
-not need to perform DMA the then it can ignore such commands but it must still
-reply to them. The table is an array of the following structure.  This
-structure is 32 bytes in size, so the message size is:
-16 + (# of table entries * 32).
-
-Table entry format
-^^^^^^^^^^^^^^^^^^
-
-+-------------+--------+-------------+
-| Name        | Offset | Size        |
-+=============+========+=============+
-| Address     | 0      | 8           |
-+-------------+--------+-------------+
-| Size        | 8      | 8           |
-+-------------+--------+-------------+
-| Offset      | 16     | 8           |
-+-------------+--------+-------------+
-| Protections | 24     | 4           |
-+-------------+--------+-------------+
-| Flags       | 28     | 4           |
-+-------------+--------+-------------+
-|             | +-----+------------+ |
-|             | | Bit | Definition | |
-|             | +=====+============+ |
-|             | | 0   | Mappable   | |
-|             | +-----+------------+ |
-+-------------+--------+-------------+
-
-* *Address* is the base DMA address of the region.
-* *Size* is the size of the region.
-* *Offset* is the file offset of the region with respect to the associated file
-  descriptor.
-* *Protections* are the region's protection attributes as encoded in
-  ``<sys/mman.h>``.
-* *Flags* contain the following region attributes:
-
-  * *Mappable* indicates that the region can be mapped via the mmap() system call
-    using the file descriptor provided in the message meta-data.
-
-VFIO_USER_DMA_MAP
-"""""""""""""""""
-If a DMA region being added can be directly mapped by the server, an array of
-file descriptors must be sent as part of the message meta-data. Each region
-entry must have a corresponding file descriptor. On AF_UNIX sockets, the file
-descriptors must be passed as SCM_RIGHTS type ancillary data. Otherwise, if a
-DMA region cannot be directly mapped by the server, it can be accessed by the
-server using VFIO_USER_DMA_READ and VFIO_USER_DMA_WRITE messages, explained in
-`Read and Write Operations`_. A command to map over an existing region must be
-failed by the server with ``EEXIST`` set in error field in the reply.
-
-VFIO_USER_DMA_UNMAP
-"""""""""""""""""""
-Upon receiving a VFIO_USER_DMA_UNMAP command, if the file descriptor is mapped
-then the server must release all references to that DMA region before replying,
-which includes potentially in flight DMA transactions. Removing a portion of a
-DMA region is possible. 
-
-VFIO_USER_DEVICE_GET_INFO
--------------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+----------------------------+
-| Name         | Value                      |
-+==============+============================+
-| Message ID   | <ID>                       |
-+--------------+----------------------------+
-| Command      | 4                          |
-+--------------+----------------------------+
-| Message size | 16 in command, 32 in reply |
-+--------------+----------------------------+
-| Flags        | Reply bit set in reply     |
-+--------------+----------------------------+
-| Errno        | 0/errno                    |
-+--------------+----------------------------+
-| Device info  | VFIO device info           |
-+--------------+----------------------------+
-
-This command message is sent by the client to the server to query for basic
-information about the device. Only the message header is needed in the command
-message.  The VFIO device info structure is defined in ``<linux/vfio.h>``
-(``struct vfio_device_info``).
-
-VFIO device info format
-^^^^^^^^^^^^^^^^^^^^^^^
-
-+-------------+--------+--------------------------+
-| Name        | Offset | Size                     |
-+=============+========+==========================+
-| argsz       | 16     | 4                        |
-+-------------+--------+--------------------------+
-| flags       | 20     | 4                        |
-+-------------+--------+--------------------------+
-|             | +-----+-------------------------+ |
-|             | | Bit | Definition              | |
-|             | +=====+=========================+ |
-|             | | 0   | VFIO_DEVICE_FLAGS_RESET | |
-|             | +-----+-------------------------+ |
-|             | | 1   | VFIO_DEVICE_FLAGS_PCI   | |
-|             | +-----+-------------------------+ |
-+-------------+--------+--------------------------+
-| num_regions | 24     | 4                        |
-+-------------+--------+--------------------------+
-| num_irqs    | 28     | 4                        |
-+-------------+--------+--------------------------+
-
-* *argsz* is the size of the VFIO device info structure.
-* *flags* contains the following device attributes.
-
-  * VFIO_DEVICE_FLAGS_RESET indicates that the device supports the
-    VFIO_USER_DEVICE_RESET message.
-  * VFIO_DEVICE_FLAGS_PCI indicates that the device is a PCI device.
-
-* *num_regions* is the number of memory regions that the device exposes.
-* *num_irqs* is the number of distinct interrupt types that the device supports.
-
-This version of the protocol only supports PCI devices. Additional devices may
-be supported in future versions.
-
-VFIO_USER_DEVICE_GET_REGION_INFO
---------------------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | 5                      |
-+--------------+------------------------+
-| Message size | 48 + any caps          |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-| Region info  | VFIO region info       |
-+--------------+------------------------+
-
-This command message is sent by the client to the server to query for
-information about device memory regions. The VFIO region info structure is
-defined in ``<linux/vfio.h>`` (``struct vfio_region_info``). Since the client
-does not know the size of the capabilities, the size of the reply it should
-expect is 48 plus any capabilities whose size is indicated in the size field of
-the reply header.
-
-VFIO region info format
-^^^^^^^^^^^^^^^^^^^^^^^
-
-+------------+--------+------------------------------+
-| Name       | Offset | Size                         |
-+============+========+==============================+
-| argsz      | 16     | 4                            |
-+------------+--------+------------------------------+
-| flags      | 20     | 4                            |
-+------------+--------+------------------------------+
-|            | +-----+-----------------------------+ |
-|            | | Bit | Definition                  | |
-|            | +=====+=============================+ |
-|            | | 0   | VFIO_REGION_INFO_FLAG_READ  | |
-|            | +-----+-----------------------------+ |
-|            | | 1   | VFIO_REGION_INFO_FLAG_WRITE | |
-|            | +-----+-----------------------------+ |
-|            | | 2   | VFIO_REGION_INFO_FLAG_MMAP  | |
-|            | +-----+-----------------------------+ |
-|            | | 3   | VFIO_REGION_INFO_FLAG_CAPS  | |
-|            | +-----+-----------------------------+ |
-+------------+--------+------------------------------+
-| index      | 24     | 4                            |
-+------------+--------+------------------------------+
-| cap_offset | 28     | 4                            |
-+------------+--------+------------------------------+
-| size       | 32     | 8                            |
-+------------+--------+------------------------------+
-| offset     | 40     | 8                            |
-+------------+--------+------------------------------+
-
-* *argsz* is the size of the VFIO region info structure plus the
-  size of any region capabilities returned.
-* *flags* are attributes of the region:
-
-  * *VFIO_REGION_INFO_FLAG_READ* allows client read access to the region.
-  * *VFIO_REGION_INFO_FLAG_WRITE* allows client write access to the region.
-  * *VFIO_REGION_INFO_FLAG_MMAP* specifies the client can mmap() the region.
-    When this flag is set, the reply will include a file descriptor in its
-    meta-data. On AF_UNIX sockets, the file descriptors will be passed as
-    SCM_RIGHTS type ancillary data.
-  * *VFIO_REGION_INFO_FLAG_CAPS* indicates additional capabilities found in the
-    reply.
-
-* *index* is the index of memory region being queried, it is the only field
-  that is required to be set in the command message.
-* *cap_offset* describes where additional region capabilities can be found.
-  cap_offset is relative to the beginning of the VFIO region info structure.
-  The data structure it points is a VFIO cap header defined in
-  ``<linux/vfio.h>``.
-* *size* is the size of the region.
-* *offset* is the offset given to the mmap() system call for regions with the
-  MMAP attribute. It is also used as the base offset when mapping a VFIO
-  sparse mmap area, described below.
-
-VFIO Region capabilities
-^^^^^^^^^^^^^^^^^^^^^^^^
-The VFIO region information can also include a capabilities list. This list is
-similar to a PCI capability list - each entry has a common header that
-identifies a capability and where the next capability in the list can be found.
-The VFIO capability header format is defined in ``<linux/vfio.h>`` (``struct
-vfio_info_cap_header``).
-
-VFIO cap header format
-^^^^^^^^^^^^^^^^^^^^^^
-
-+---------+--------+------+
-| Name    | Offset | Size |
-+=========+========+======+
-| id      | 0      | 2    |
-+---------+--------+------+
-| version | 2      | 2    |
-+---------+--------+------+
-| next    | 4      | 4    |
-+---------+--------+------+
-
-* *id* is the capability identity.
-* *version* is a capability-specific version number.
-* *next* specifies the offset of the next capability in the capability list. It
-  is relative to the beginning of the VFIO region info structure.
-
-VFIO sparse mmap
-^^^^^^^^^^^^^^^^
-
-+------------------+----------------------------------+
-| Name             | Value                            |
-+==================+==================================+
-| id               | VFIO_REGION_INFO_CAP_SPARSE_MMAP |
-+------------------+----------------------------------+
-| version          | 0x1                              |
-+------------------+----------------------------------+
-| next             | <next>                           |
-+------------------+----------------------------------+
-| sparse mmap info | VFIO region info sparse mmap     |
-+------------------+----------------------------------+
-
-The only capability supported in this version of the protocol is for sparse
-mmap. This capability is defined when only a subrange of the region supports
-direct access by the client via mmap(). The VFIO sparse mmap area is defined in
-``<linux/vfio.h>`` (``struct vfio_region_sparse_mmap_area``).
-
-VFIO region info cap sparse mmap
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+----------+--------+------+
-| Name     | Offset | Size |
-+==========+========+======+
-| nr_areas | 0      | 4    |
-+----------+--------+------+
-| reserved | 4      | 4    |
-+----------+--------+------+
-| offset   | 8      | 8    |
-+----------+--------+------+
-| size     | 16     | 9    |
-+----------+--------+------+
-| ...      |        |      |
-+----------+--------+------+
-
-* *nr_areas* is the number of sparse mmap areas in the region.
-* *offset* and size describe a single area that can be mapped by the client.
-  There will be nr_areas pairs of offset and size. The offset will be added to
-  the base offset given in the VFIO_USER_DEVICE_GET_REGION_INFO to form the
-  offset argument of the subsequent mmap() call.
-
-The VFIO sparse mmap area is defined in ``<linux/vfio.h>`` (``struct
-vfio_region_info_cap_sparse_mmap``).
-
-VFIO_USER_DEVICE_GET_IRQ_INFO
+diff --git a/tests/qtest/fuzz/qtest_wrappers.c b/tests/qtest/fuzz/qtest_wrappers.c
+index 713c830cdb..0580f8df86 100644
+--- a/tests/qtest/fuzz/qtest_wrappers.c
++++ b/tests/qtest/fuzz/qtest_wrappers.c
+@@ -12,7 +12,7 @@
+  */
+
+ #include "qemu/osdep.h"
+-#include "cpu.h"
++#include "hw/core/cpu.h"
+ #include "exec/ioport.h"
+
+ #include "fuzz.h"
 -----------------------------
 
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | 6                      |
-+--------------+------------------------+
-| Message size | 32                     |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-| IRQ info     | VFIO IRQ info          |
-+--------------+------------------------+
-
-This command message is sent by the client to the server to query for
-information about device interrupt types. The VFIO IRQ info structure is
-defined in ``<linux/vfio.h>`` (``struct vfio_irq_info``).
-
-VFIO IRQ info format
-^^^^^^^^^^^^^^^^^^^^
-
-+-------+--------+---------------------------+
-| Name  | Offset | Size                      |
-+=======+========+===========================+
-| argsz | 16     | 4                         |
-+-------+--------+---------------------------+
-| flags | 20     | 4                         |
-+-------+--------+---------------------------+
-|       | +-----+--------------------------+ |
-|       | | Bit | Definition               | |
-|       | +=====+==========================+ |
-|       | | 0   | VFIO_IRQ_INFO_EVENTFD    | |
-|       | +-----+--------------------------+ |
-|       | | 1   | VFIO_IRQ_INFO_MASKABLE   | |
-|       | +-----+--------------------------+ |
-|       | | 2   | VFIO_IRQ_INFO_AUTOMASKED | |
-|       | +-----+--------------------------+ |
-|       | | 3   | VFIO_IRQ_INFO_NORESIZE   | |
-|       | +-----+--------------------------+ |
-+-------+--------+---------------------------+
-| index | 24     | 4                         |
-+-------+--------+---------------------------+
-| count | 28     | 4                         |
-+-------+--------+---------------------------+
-
-* *argsz* is the size of the VFIO IRQ info structure.
-* *flags* defines IRQ attributes:
-
-  * *VFIO_IRQ_INFO_EVENTFD* indicates the IRQ type can support server eventfd
-    signalling.
-  * *VFIO_IRQ_INFO_MASKABLE* indicates that the IRQ type supports the MASK and
-    UNMASK actions in a VFIO_USER_DEVICE_SET_IRQS message.
-  * *VFIO_IRQ_INFO_AUTOMASKED* indicates the IRQ type masks itself after being
-    triggered, and the client must send an UNMASK action to receive new
-    interrupts.
-  * *VFIO_IRQ_INFO_NORESIZE* indicates VFIO_USER_SET_IRQS operations setup
-    interrupts as a set, and new sub-indexes cannot be enabled without disabling
-    the entire type.
-
-* index is the index of IRQ type being queried, it is the only field that is
-  required to be set in the command message.
-* count describes the number of interrupts of the queried type.
-
-VFIO_USER_DEVICE_SET_IRQS
--------------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | 7                      |
-+--------------+------------------------+
-| Message size | 36 + any data          |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-| IRQ set      | VFIO IRQ set           |
-+--------------+------------------------+
-
-This command message is sent by the client to the server to set actions for
-device interrupt types. The VFIO IRQ set structure is defined in
-``<linux/vfio.h>`` (``struct vfio_irq_set``).
-
-VFIO IRQ set format
-^^^^^^^^^^^^^^^^^^^
-
-+-------+--------+------------------------------+
-| Name  | Offset | Size                         |
-+=======+========+==============================+
-| argsz | 16     | 4                            |
-+-------+--------+------------------------------+
-| flags | 20     | 4                            |
-+-------+--------+------------------------------+
-|       | +-----+-----------------------------+ |
-|       | | Bit | Definition                  | |
-|       | +=====+=============================+ |
-|       | | 0   | VFIO_IRQ_SET_DATA_NONE      | |
-|       | +-----+-----------------------------+ |
-|       | | 1   | VFIO_IRQ_SET_DATA_BOOL      | |
-|       | +-----+-----------------------------+ |
-|       | | 2   | VFIO_IRQ_SET_DATA_EVENTFD   | |
-|       | +-----+-----------------------------+ |
-|       | | 3   | VFIO_IRQ_SET_ACTION_MASK    | |
-|       | +-----+-----------------------------+ |
-|       | | 4   | VFIO_IRQ_SET_ACTION_UNMASK  | |
-|       | +-----+-----------------------------+ |
-|       | | 5   | VFIO_IRQ_SET_ACTION_TRIGGER | |
-|       | +-----+-----------------------------+ |
-+-------+--------+------------------------------+
-| index | 24     | 4                            |
-+-------+--------+------------------------------+
-| start | 28     | 4                            |
-+-------+--------+------------------------------+
-| count | 32     | 4                            |
-+-------+--------+------------------------------+
-| data  | 36     | variable                     |
-+-------+--------+------------------------------+
-
-* *argsz* is the size of the VFIO IRQ set structure, including any *data* field.
-* *flags* defines the action performed on the interrupt range. The DATA flags
-  describe the data field sent in the message; the ACTION flags describe the
-  action to be performed. The flags are mutually exclusive for both sets.
-
-  * *VFIO_IRQ_SET_DATA_NONE* indicates there is no data field in the command.
-    The action is performed unconditionally.
-  * *VFIO_IRQ_SET_DATA_BOOL* indicates the data field is an array of boolean
-    bytes. The action is performed if the corresponding boolean is true.
-  * *VFIO_IRQ_SET_DATA_EVENTFD* indicates an array of event file descriptors
-    was sent in the message meta-data. These descriptors will be signalled when
-    the action defined by the action flags occurs. In AF_UNIX sockets, the
-    descriptors are sent as SCM_RIGHTS type ancillary data.
-  * *VFIO_IRQ_SET_ACTION_MASK* indicates a masking event. It can be used with
-    VFIO_IRQ_SET_DATA_BOOL or VFIO_IRQ_SET_DATA_NONE to mask an interrupt, or
-    with VFIO_IRQ_SET_DATA_EVENTFD to generate an event when the guest masks
-    the interrupt.
-  * *VFIO_IRQ_SET_ACTION_UNMASK* indicates an unmasking event. It can be used
-    with VFIO_IRQ_SET_DATA_BOOL or VFIO_IRQ_SET_DATA_NONE to unmask an
-    interrupt, or with VFIO_IRQ_SET_DATA_EVENTFD to generate an event when the
-    guest unmasks the interrupt.
-  * *VFIO_IRQ_SET_ACTION_TRIGGER* indicates a triggering event. It can be used
-    with VFIO_IRQ_SET_DATA_BOOL or VFIO_IRQ_SET_DATA_NONE to trigger an
-    interrupt, or with VFIO_IRQ_SET_DATA_EVENTFD to generate an event when the
-    server triggers the interrupt.
-
-* *index* is the index of IRQ type being setup.
-* *start* is the start of the sub-index being set.
-* *count* describes the number of sub-indexes being set. As a special case, a
-  count of 0 with data flags of VFIO_IRQ_SET_DATA_NONE disables all interrupts
-  of the index.
-* *data* is an optional field included when the
-  VFIO_IRQ_SET_DATA_BOOL flag is present. It contains an array of booleans
-  that specify whether the action is to be performed on the corresponding
-  index. It's used when the action is only performed on a subset of the range
-  specified.
-
-Not all interrupt types support every combination of data and action flags.
-The client must know the capabilities of the device and IRQ index before it
-sends a VFIO_USER_DEVICE_SET_IRQ message.
-
-.. _Read and Write Operations:
-
-Read and Write Operations
--------------------------
-
-Not all I/O operations between the client and server can be done via direct
-access of memory mapped with an mmap() call. In these cases, the client and
-server use messages sent over the socket. It is expected that these operations
-will have lower performance than direct access.
-
-The client can access server memory with VFIO_USER_REGION_READ and
-VFIO_USER_REGION_WRITE commands. These share a common data structure that
-appears after the message header.
-
-REGION Read/Write Data
-^^^^^^^^^^^^^^^^^^^^^^
-
-+--------+--------+----------+
-| Name   | Offset | Size     |
-+========+========+==========+
-| Offset | 16     | 8        |
-+--------+--------+----------+
-| Region | 24     | 4        |
-+--------+--------+----------+
-| Count  | 28     | 4        |
-+--------+--------+----------+
-| Data   | 32     | variable |
-+--------+--------+----------+
-
-* *Offset* into the region being accessed.
-* *Region* is the index of the region being accessed.
-* *Count* is the size of the data to be transferred.
-* *Data* is the data to be read or written.
-
-The server can access client memory with VFIO_USER_DMA_READ and
-VFIO_USER_DMA_WRITE messages. These also share a common data structure that
-appears after the message header.
-
-DMA Read/Write Data
-^^^^^^^^^^^^^^^^^^^
-
-+---------+--------+----------+
-| Name    | Offset | Size     |
-+=========+========+==========+
-| Address | 16     | 8        |
-+---------+--------+----------+
-| Count   | 24     | 4        |
-+---------+--------+----------+
-| Data    | 28     | variable |
-+---------+--------+----------+
-
-* *Address* is the area of client memory being accessed. This address must have
-  been previously exported to the server with a VFIO_USER_DMA_MAP message.
-* *Count* is the size of the data to be transferred.
-* *Data* is the data to be read or written.
-
-VFIO_USER_REGION_READ
----------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | 8                      |
-+--------------+------------------------+
-| Message size | 32 + data size         |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-| Read info    | REGION read/write data |
-+--------------+------------------------+
-
-This command message is sent from the client to the server to read from server
-memory.  In the command messages, there is no data, and the count is the amount
-of data to be read. The reply message must include the data read, and its count
-field is the amount of data read.
-
-VFIO_USER_REGION_WRITE
-----------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | 9                      |
-+--------------+------------------------+
-| Message size | 32 + data size         |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-| Write info   | REGION read/write data |
-+--------------+------------------------+
-
-This command message is sent from the client to the server to write to server
-memory.  The command message must contain the data to be written, and its count
-field must contain the amount of write data. The count field in the reply
-message must be zero.
-
-VFIO_USER_DMA_READ
-------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | 10                     |
-+--------------+------------------------+
-| Message size | 28 + data size         |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-| DMA info     | DMA read/write data    |
-+--------------+------------------------+
-
-This command message is sent from the server to the client to read from client
-memory.  In the command message, there is no data, and the count must will be
-the amount of data to be read. The reply message must include the data read,
-and its count field must be the amount of data read.
-
-VFIO_USER_DMA_WRITE
--------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | 11                     |
-+--------------+------------------------+
-| Message size | 28 + data size         |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-| DMA info     | DMA read/write data    |
-+--------------+------------------------+
-
-This command message is sent from the server to the client to write to server
-memory.  The command message must contain the data to be written, and its count
-field must contain the amount of write data. The count field in the reply
-message must be zero.
-
-VFIO_USER_VM_INTERRUPT
-----------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+----------------+------------------------+
-| Name           | Value                  |
-+================+========================+
-| Message ID     | <ID>                   |
-+----------------+------------------------+
-| Command        | 12                     |
-+----------------+------------------------+
-| Message size   | 24                     |
-+----------------+------------------------+
-| Flags          | Reply bit set in reply |
-+----------------+------------------------+
-| Errno          | 0/errno                |
-+----------------+------------------------+
-| Interrupt info | <interrupt>            |
-+----------------+------------------------+
-
-This command message is sent from the server to the client to signal the device
-has raised an interrupt.
-
-Interrupt info format
-^^^^^^^^^^^^^^^^^^^^^
-
-+-----------+--------+------+
-| Name      | Offset | Size |
-+===========+========+======+
-| Index     | 16     | 4    |
-+-----------+--------+------+
-| Sub-index | 20     | 4    |
-+-----------+--------+------+
-
-* *Index* is the interrupt index; it is the same value used in
-  VFIO_USER_SET_IRQS.
-* *Sub-index* is relative to the index, e.g., the vector number used in PCI
-  MSI/X type interrupts.
-
-VFIO_USER_DEVICE_RESET
-----------------------
-
-Message format
-^^^^^^^^^^^^^^
-
-+--------------+------------------------+
-| Name         | Value                  |
-+==============+========================+
-| Message ID   | <ID>                   |
-+--------------+------------------------+
-| Command      | 13                     |
-+--------------+------------------------+
-| Message size | 16                     |
-+--------------+------------------------+
-| Flags        | Reply bit set in reply |
-+--------------+------------------------+
-| Errno        | 0/errno                |
-+--------------+------------------------+
-
-This command message is sent from the client to the server to reset the device.
-
-Appendices
-==========
-
-Unused VFIO ioctl() commands
-----------------------------
-
-The following VFIO commands do not have an equivalent vfio-user command:
-
-* VFIO_GET_API_VERSION
-* VFIO_CHECK_EXTENSION
-* VFIO_SET_IOMMU
-* VFIO_GROUP_GET_STATUS
-* VFIO_GROUP_SET_CONTAINER
-* VFIO_GROUP_UNSET_CONTAINER
-* VFIO_GROUP_GET_DEVICE_FD
-* VFIO_IOMMU_GET_INFO
-
-However, once support for live migration for VFIO devices is finalized some
-of the above commands may have to be handled by the client in their
-corresponding vfio-user form. This will be addressed in a future protocol
-version.
-
-Live Migration
---------------
-Currently live migration is not supported for devices passed through via VFIO,
-therefore it is not supported for vfio-user, either. This is being actively
-worked on in the `Add migration support for VFIO devices (v25) 
-<https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06463.html>`_
-patch series.
-
-VFIO groups and containers
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The current VFIO implementation includes group and container idioms that
-describe how a device relates to the host IOMMU. In the vfio-user
-implementation, the IOMMU is implemented in SW by the client, and is not
-visible to the server. The simplest idea would be that the client put each
-device into its own group and container.
-
-Backend Program Conventions
----------------------------
-
-vfio-user backend program conventions are based on the vhost-user ones.
-
-* The backend program must not daemonize itself.
-* No assumptions must be made as to what access the backend program has on the
-  system.
-* File descriptors 0, 1 and 2 must exist, must have regular
-  stdin/stdout/stderr semantics, and can be redirected.
-* The backend program must honor the SIGTERM signal.
-* The backend program must accept the following commands line options:
-
-  * ``--socket-path=PATH``: path to UNIX domain socket,
-  * ``--fd=FDNUM``: file descriptor for UNIX domain socket, incompatible with
-    ``--socket-path``
-* The backend program must be accompanied with a JSON file stored under
-  ``/usr/share/vfio-user``.
-
---Apple-Mail=_0078527D-57B0-458F-941A-A3B6210ACFA0
-Content-Disposition: attachment;
-	filename=vfio-user.html
-Content-Type: text/html;
-	x-unix-mode=0644;
-	name="vfio-user.html"
-Content-Transfer-Encoding: 7bit
-
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.11: http://docutils.sourceforge.net/" />
-<title>vfio-user Protocol Specification</title>
-<style type="text/css">
-
-/*
-:Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 7614 2013-02-21 15:55:51Z milde $
-:Copyright: This stylesheet has been placed in the public domain.
-
-Default cascading style sheet for the HTML output of Docutils.
-
-See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
-customize this style sheet.
-*/
-
-/* used to remove borders from tables and images */
-.borderless, table.borderless td, table.borderless th {
-  border: 0 }
-
-table.borderless td, table.borderless th {
-  /* Override padding for "table.docutils td" with "! important".
-     The right padding separates the table cells. */
-  padding: 0 0.5em 0 0 ! important }
-
-.first {
-  /* Override more specific margin styles with "! important". */
-  margin-top: 0 ! important }
-
-.last, .with-subtitle {
-  margin-bottom: 0 ! important }
-
-.hidden {
-  display: none }
-
-a.toc-backref {
-  text-decoration: none ;
-  color: black }
-
-blockquote.epigraph {
-  margin: 2em 5em ; }
-
-dl.docutils dd {
-  margin-bottom: 0.5em }
-
-object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
-  overflow: hidden;
-}
-
-/* Uncomment (and remove this text!) to get bold-faced definition list terms
-dl.docutils dt {
-  font-weight: bold }
-*/
-
-div.abstract {
-  margin: 2em 5em }
-
-div.abstract p.topic-title {
-  font-weight: bold ;
-  text-align: center }
-
-div.admonition, div.attention, div.caution, div.danger, div.error,
-div.hint, div.important, div.note, div.tip, div.warning {
-  margin: 2em ;
-  border: medium outset ;
-  padding: 1em }
-
-div.admonition p.admonition-title, div.hint p.admonition-title,
-div.important p.admonition-title, div.note p.admonition-title,
-div.tip p.admonition-title {
-  font-weight: bold ;
-  font-family: sans-serif }
-
-div.attention p.admonition-title, div.caution p.admonition-title,
-div.danger p.admonition-title, div.error p.admonition-title,
-div.warning p.admonition-title, .code .error {
-  color: red ;
-  font-weight: bold ;
-  font-family: sans-serif }
-
-/* Uncomment (and remove this text!) to get reduced vertical space in
-   compound paragraphs.
-div.compound .compound-first, div.compound .compound-middle {
-  margin-bottom: 0.5em }
-
-div.compound .compound-last, div.compound .compound-middle {
-  margin-top: 0.5em }
-*/
-
-div.dedication {
-  margin: 2em 5em ;
-  text-align: center ;
-  font-style: italic }
-
-div.dedication p.topic-title {
-  font-weight: bold ;
-  font-style: normal }
-
-div.figure {
-  margin-left: 2em ;
-  margin-right: 2em }
-
-div.footer, div.header {
-  clear: both;
-  font-size: smaller }
-
-div.line-block {
-  display: block ;
-  margin-top: 1em ;
-  margin-bottom: 1em }
-
-div.line-block div.line-block {
-  margin-top: 0 ;
-  margin-bottom: 0 ;
-  margin-left: 1.5em }
-
-div.sidebar {
-  margin: 0 0 0.5em 1em ;
-  border: medium outset ;
-  padding: 1em ;
-  background-color: #ffffee ;
-  width: 40% ;
-  float: right ;
-  clear: right }
-
-div.sidebar p.rubric {
-  font-family: sans-serif ;
-  font-size: medium }
-
-div.system-messages {
-  margin: 5em }
-
-div.system-messages h1 {
-  color: red }
-
-div.system-message {
-  border: medium outset ;
-  padding: 1em }
-
-div.system-message p.system-message-title {
-  color: red ;
-  font-weight: bold }
-
-div.topic {
-  margin: 2em }
-
-h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
-h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
-  margin-top: 0.4em }
-
-h1.title {
-  text-align: center }
-
-h2.subtitle {
-  text-align: center }
-
-hr.docutils {
-  width: 75% }
-
-img.align-left, .figure.align-left, object.align-left {
-  clear: left ;
-  float: left ;
-  margin-right: 1em }
-
-img.align-right, .figure.align-right, object.align-right {
-  clear: right ;
-  float: right ;
-  margin-left: 1em }
-
-img.align-center, .figure.align-center, object.align-center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.align-left {
-  text-align: left }
-
-.align-center {
-  clear: both ;
-  text-align: center }
-
-.align-right {
-  text-align: right }
-
-/* reset inner alignment in figures */
-div.align-right {
-  text-align: inherit }
-
-/* div.align-center * { */
-/*   text-align: left } */
-
-ol.simple, ul.simple {
-  margin-bottom: 1em }
-
-ol.arabic {
-  list-style: decimal }
-
-ol.loweralpha {
-  list-style: lower-alpha }
-
-ol.upperalpha {
-  list-style: upper-alpha }
-
-ol.lowerroman {
-  list-style: lower-roman }
-
-ol.upperroman {
-  list-style: upper-roman }
-
-p.attribution {
-  text-align: right ;
-  margin-left: 50% }
-
-p.caption {
-  font-style: italic }
-
-p.credits {
-  font-style: italic ;
-  font-size: smaller }
-
-p.label {
-  white-space: nowrap }
-
-p.rubric {
-  font-weight: bold ;
-  font-size: larger ;
-  color: maroon ;
-  text-align: center }
-
-p.sidebar-title {
-  font-family: sans-serif ;
-  font-weight: bold ;
-  font-size: larger }
-
-p.sidebar-subtitle {
-  font-family: sans-serif ;
-  font-weight: bold }
-
-p.topic-title {
-  font-weight: bold }
-
-pre.address {
-  margin-bottom: 0 ;
-  margin-top: 0 ;
-  font: inherit }
-
-pre.literal-block, pre.doctest-block, pre.math, pre.code {
-  margin-left: 2em ;
-  margin-right: 2em }
-
-pre.code .ln { color: grey; } /* line numbers */
-pre.code, code { background-color: #eeeeee }
-pre.code .comment, code .comment { color: #5C6576 }
-pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
-pre.code .literal.string, code .literal.string { color: #0C5404 }
-pre.code .name.builtin, code .name.builtin { color: #352B84 }
-pre.code .deleted, code .deleted { background-color: #DEB0A1}
-pre.code .inserted, code .inserted { background-color: #A3D289}
-
-span.classifier {
-  font-family: sans-serif ;
-  font-style: oblique }
-
-span.classifier-delimiter {
-  font-family: sans-serif ;
-  font-weight: bold }
-
-span.interpreted {
-  font-family: sans-serif }
-
-span.option {
-  white-space: nowrap }
-
-span.pre {
-  white-space: pre }
-
-span.problematic {
-  color: red }
-
-span.section-subtitle {
-  /* font-size relative to parent (h1..h6 element) */
-  font-size: 80% }
-
-table.citation {
-  border-left: solid 1px gray;
-  margin-left: 1px }
-
-table.docinfo {
-  margin: 2em 4em }
-
-table.docutils {
-  margin-top: 0.5em ;
-  margin-bottom: 0.5em }
-
-table.footnote {
-  border-left: solid 1px black;
-  margin-left: 1px }
-
-table.docutils td, table.docutils th,
-table.docinfo td, table.docinfo th {
-  padding-left: 0.5em ;
-  padding-right: 0.5em ;
-  vertical-align: top }
-
-table.docutils th.field-name, table.docinfo th.docinfo-name {
-  font-weight: bold ;
-  text-align: left ;
-  white-space: nowrap ;
-  padding-left: 0 }
-
-/* "booktabs" style (no vertical lines) */
-table.docutils.booktabs {
-  border: 0px;
-  border-top: 2px solid;
-  border-bottom: 2px solid;
-  border-collapse: collapse;
-}
-table.docutils.booktabs * {
-  border: 0px;
-}
-table.docutils.booktabs th {
-  border-bottom: thin solid;
-  text-align: left;
-}
-
-h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
-h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
-  font-size: 100% }
-
-ul.auto-toc {
-  list-style-type: none }
-
-</style>
-</head>
-<body>
-<div class="document" id="vfio-user-protocol-specification">
-<h1 class="title">vfio-user Protocol Specification</h1>
-<h2 class="subtitle" id="version-0-1"><a class="reference internal" href="#version">Version</a> 0.1</h2>
-
-<div class="contents topic" id="table-of-contents">
-<p class="topic-title first">Table of Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#introduction" id="id15">Introduction</a></li>
-<li><a class="reference internal" href="#vfio" id="id16">VFIO</a><ul>
-<li><a class="reference internal" href="#vfio-device-model" id="id17">VFIO Device Model</a><ul>
-<li><a class="reference internal" href="#connection-initiation" id="id18">Connection Initiation</a></li>
-<li><a class="reference internal" href="#dma-memory-configuration" id="id19">DMA Memory Configuration</a></li>
-<li><a class="reference internal" href="#device-information" id="id20">Device Information</a></li>
-<li><a class="reference internal" href="#region-information" id="id21">Region Information</a><ul>
-<li><a class="reference internal" href="#region-capabilities" id="id22">Region Capabilities</a></li>
-<li><a class="reference internal" href="#sparse-regions" id="id23">Sparse Regions</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#interrupts" id="id24">Interrupts</a></li>
-<li><a class="reference internal" href="#device-read-and-write" id="id25">Device Read and Write</a></li>
-<li><a class="reference internal" href="#dma" id="id26">DMA</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#protocol-specification" id="id27">Protocol Specification</a><ul>
-<li><a class="reference internal" href="#socket" id="id28">Socket</a></li>
-<li><a class="reference internal" href="#authentication" id="id29">Authentication</a></li>
-<li><a class="reference internal" href="#command-concurrency" id="id30">Command Concurrency</a></li>
-<li><a class="reference internal" href="#socket-disconnection-behavior" id="id31">Socket Disconnection Behavior</a><ul>
-<li><a class="reference internal" href="#server-disconnection" id="id32">Server Disconnection</a></li>
-<li><a class="reference internal" href="#client-disconnection" id="id33">Client Disconnection</a></li>
-<li><a class="reference internal" href="#live-migration" id="id34">Live Migration</a></li>
-<li><a class="reference internal" href="#request-retry-and-response-timeout" id="id35">Request Retry and Response Timeout</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id1" id="id36">Commands</a></li>
-<li><a class="reference internal" href="#header" id="id37">Header</a></li>
-<li><a class="reference internal" href="#vfio-user-version" id="id38">VFIO_USER_VERSION</a><ul>
-<li><a class="reference internal" href="#message-format" id="id39">Message format</a></li>
-<li><a class="reference internal" href="#versioning-and-feature-support" id="id40">Versioning and Feature Support</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-dma-map-and-vfio-user-dma-unmap" id="id41">VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP</a><ul>
-<li><a class="reference internal" href="#id2" id="id42">Message Format</a></li>
-<li><a class="reference internal" href="#table-entry-format" id="id43">Table entry format</a><ul>
-<li><a class="reference internal" href="#vfio-user-dma-map" id="id44">VFIO_USER_DMA_MAP</a></li>
-<li><a class="reference internal" href="#vfio-user-dma-unmap" id="id45">VFIO_USER_DMA_UNMAP</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-device-get-info" id="id46">VFIO_USER_DEVICE_GET_INFO</a><ul>
-<li><a class="reference internal" href="#id3" id="id47">Message format</a></li>
-<li><a class="reference internal" href="#vfio-device-info-format" id="id48">VFIO device info format</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-device-get-region-info" id="id49">VFIO_USER_DEVICE_GET_REGION_INFO</a><ul>
-<li><a class="reference internal" href="#id4" id="id50">Message format</a></li>
-<li><a class="reference internal" href="#vfio-region-info-format" id="id51">VFIO region info format</a></li>
-<li><a class="reference internal" href="#vfio-region-capabilities" id="id52">VFIO Region capabilities</a></li>
-<li><a class="reference internal" href="#vfio-cap-header-format" id="id53">VFIO cap header format</a></li>
-<li><a class="reference internal" href="#vfio-sparse-mmap" id="id54">VFIO sparse mmap</a></li>
-<li><a class="reference internal" href="#vfio-region-info-cap-sparse-mmap" id="id55">VFIO region info cap sparse mmap</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-device-get-irq-info" id="id56">VFIO_USER_DEVICE_GET_IRQ_INFO</a><ul>
-<li><a class="reference internal" href="#id5" id="id57">Message format</a></li>
-<li><a class="reference internal" href="#vfio-irq-info-format" id="id58">VFIO IRQ info format</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-device-set-irqs" id="id59">VFIO_USER_DEVICE_SET_IRQS</a><ul>
-<li><a class="reference internal" href="#id6" id="id60">Message format</a></li>
-<li><a class="reference internal" href="#vfio-irq-set-format" id="id61">VFIO IRQ set format</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#id7" id="id62">Read and Write Operations</a><ul>
-<li><a class="reference internal" href="#region-read-write-data" id="id63">REGION Read/Write Data</a></li>
-<li><a class="reference internal" href="#dma-read-write-data" id="id64">DMA Read/Write Data</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-region-read" id="id65">VFIO_USER_REGION_READ</a><ul>
-<li><a class="reference internal" href="#id8" id="id66">Message format</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-region-write" id="id67">VFIO_USER_REGION_WRITE</a><ul>
-<li><a class="reference internal" href="#id9" id="id68">Message format</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-dma-read" id="id69">VFIO_USER_DMA_READ</a><ul>
-<li><a class="reference internal" href="#id10" id="id70">Message format</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-dma-write" id="id71">VFIO_USER_DMA_WRITE</a><ul>
-<li><a class="reference internal" href="#id11" id="id72">Message format</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-vm-interrupt" id="id73">VFIO_USER_VM_INTERRUPT</a><ul>
-<li><a class="reference internal" href="#id12" id="id74">Message format</a></li>
-<li><a class="reference internal" href="#interrupt-info-format" id="id75">Interrupt info format</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vfio-user-device-reset" id="id76">VFIO_USER_DEVICE_RESET</a><ul>
-<li><a class="reference internal" href="#id13" id="id77">Message format</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#appendices" id="id78">Appendices</a><ul>
-<li><a class="reference internal" href="#unused-vfio-ioctl-commands" id="id79">Unused VFIO ioctl() commands</a></li>
-<li><a class="reference internal" href="#id14" id="id80">Live Migration</a><ul>
-<li><a class="reference internal" href="#vfio-groups-and-containers" id="id81">VFIO groups and containers</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#backend-program-conventions" id="id82">Backend Program Conventions</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="section" id="introduction">
-<h1><a class="toc-backref" href="#id15">Introduction</a></h1>
-<p>vfio-user is a protocol that allows a device to be emulated in a separate
-process outside of a Virtual Machine Monitor (VMM). vfio-user devices consist
-of a generic VFIO device type, living inside the VMM, which we call the client,
-and the core device implementation, living outside the VMM, which we call the
-server.</p>
-<p>The <a class="reference external" href="https://www.kernel.org/doc/html/latest/driver-api/vfio.html">Linux VFIO ioctl interface</a>
-been chosen as the base for this protocol for the following reasons:</p>
-<ol class="arabic simple">
-<li>It is a mature and stable API, backed by an extensively used framework.</li>
-<li>The existing VFIO client implementation in QEMU (qemu/hw/vfio/) can be
-largely reused.</li>
-</ol>
-<div class="note">
-<p class="first admonition-title">Note</p>
-<p class="last">In a proof of concept implementation it has been demonstrated that using VFIO
-over a UNIX domain socket is a viable option. vfio-user is designed with
-QEMU in mind, however it could be used by other client applications. The
-vfio-user protocol does not require that QEMU's VFIO client  implementation
-is used in QEMU.</p>
-</div>
-<p>None of the VFIO kernel modules are required for supporting the protocol,
-neither in the client nor the server, only the source header files are used.</p>
-<p>The main idea is to allow a virtual device to function in a separate process in
-the same host over a UNIX domain socket. A UNIX domain socket (AF_UNIX) is
-chosen because file descriptors can be trivially sent over it, which in turn
-allows:</p>
-<ul class="simple">
-<li>Sharing of client memory for DMA with the server.</li>
-<li>Sharing of server memory with the client for fast MMIO.</li>
-<li>Efficient sharing of eventfd's for triggering interrupts.</li>
-</ul>
-<p>Other socket types could be used which allow the server to run in a separate
-guest in the same host (AF_VSOCK) or remotely (AF_INET). Theoretically the
-underlying transport does not necessarily have to be a socket, however we do
-not examine such alternatives. In this protocol version we focus on using a
-UNIX domain socket and introduce basic support for the other two types of
-sockets without considering performance implications.</p>
-<p>While passing of file descriptors is desirable for performance reasons, it is
-not necessary neither for the client nor for the server to support it in order
-to implement the protocol. There is always an in-band, message-passing fall
-back mechanism.</p>
-</div>
-<div class="section" id="vfio">
-<h1><a class="toc-backref" href="#id16">VFIO</a></h1>
-<p>VFIO is a framework that allows a physical device to be securely passed through
-to a user space process; the device-specific kernel driver does not drive the
-device at all.  Typically, the user space process is a VMM and the device is
-passed through to it in order to achieve high performance. VFIO provides an API
-and the required functionality in the kernel. QEMU has adopted VFIO to allow a
-guest to directly access physical devices, instead of emulating them in
-software.</p>
-<p>vfio-user reuses the core VFIO concepts defined in its API, but implements them
-as messages to be sent over a socket. It does not change the kernel-based VFIO
-in any way, in fact none of the VFIO kernel modules need to be loaded to use
-vfio-user. It is also possible for the client to concurrently use the current
-kernel-based VFIO for one device, and vfio-user for another device.</p>
-<div class="section" id="vfio-device-model">
-<h2><a class="toc-backref" href="#id17">VFIO Device Model</a></h2>
-<p>A device under VFIO presents a standard interface to the user process. Many of
-the VFIO operations in the existing interface use the ioctl() system call, and
-references to the existing interface are called the ioctl() implementation in
-this document.</p>
-<p>The following sections describe the set of messages that implement the VFIO
-interface over a socket. In many cases, the messages are direct translations of
-data structures used in the ioctl() implementation. Messages derived from
-ioctl()s will have a name derived from the ioctl() command name.  E.g., the
-VFIO_GET_INFO ioctl() command becomes a VFIO_USER_GET_INFO message.  The
-purpose of this reuse is to share as much code as feasible with the ioctl()
-implementation.</p>
-<div class="section" id="connection-initiation">
-<h3><a class="toc-backref" href="#id18">Connection Initiation</a></h3>
-<p>After the client connects to the server, the initial server message is
-VFIO_USER_VERSION to propose a protocol version and set of capabilities to
-apply to the session. The client replies with a compatible version and set of
-capabilities it supports, or closes the connection if it cannot support the
-advertised version.</p>
-</div>
-<div class="section" id="dma-memory-configuration">
-<h3><a class="toc-backref" href="#id19">DMA Memory Configuration</a></h3>
-<p>The client uses VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP messages to inform
-the server of the valid DMA ranges that the server can access on behalf
-of a device. DMA memory may be accessed by the server via VFIO_USER_DMA_READ
-and VFIO_USER_DMA_WRITE messages over the socket.</p>
-<p>An optimization for server access to client memory is for the client to provide
-file descriptors the server can mmap() to directly access client memory. Note
-that mmap() privileges cannot be revoked by the client, therefore file
-descriptors should only be exported in environments where the client trusts the
-server not to corrupt guest memory.</p>
-</div>
-<div class="section" id="device-information">
-<h3><a class="toc-backref" href="#id20">Device Information</a></h3>
-<p>The client uses a VFIO_USER_DEVICE_GET_INFO message to query the server for
-information about the device. This information includes:</p>
-<ul class="simple">
-<li>The device type and capabilities,</li>
-<li>the number of device regions, and</li>
-<li>the device presents to the client the number of interrupt types the device
-supports.</li>
-</ul>
-</div>
-<div class="section" id="region-information">
-<h3><a class="toc-backref" href="#id21">Region Information</a></h3>
-<p>The client uses VFIO_USER_DEVICE_GET_REGION_INFO messages to query the server
-for information about the device's memory regions. This information describes:</p>
-<ul class="simple">
-<li>Read and write permissions, whether it can be memory mapped, and whether it
-supports additional capabilities.</li>
-<li>Region index, size, and offset.</li>
-</ul>
-<p>When a region can be mapped by the client, the server provides a file
-descriptor which the client can mmap(). The server is responsible for polling
-for client updates to memory mapped regions.</p>
-<div class="section" id="region-capabilities">
-<h4><a class="toc-backref" href="#id22">Region Capabilities</a></h4>
-<p>Some regions have additional capabilities that cannot be described adequately
-by the region info data structure. These capabilities are returned in the
-region info reply in a list similar to PCI capabilities in a PCI device's
-configuration space.</p>
-</div>
-<div class="section" id="sparse-regions">
-<h4><a class="toc-backref" href="#id23">Sparse Regions</a></h4>
-<p>A region can be memory-mappable in whole or in part. When only a subset of a
-region can be mapped by the client, a VFIO_REGION_INFO_CAP_SPARSE_MMAP
-capability is included in the region info reply. This capability describes
-which portions can be mapped by the client.</p>
-<div class="note">
-<p class="first admonition-title">Note</p>
-<p class="last">For example, in a virtual NVMe controller, sparse regions can be used so
-that accesses to the NVMe registers (found in the beginning of BAR0) are
-trapped (an infrequent event), while allowing direct access to the doorbells
-(an extremely frequent event as every I/O submission requires a write to
-BAR0), found right after the NVMe registers in BAR0.</p>
-</div>
-</div>
-</div>
-<div class="section" id="interrupts">
-<h3><a class="toc-backref" href="#id24">Interrupts</a></h3>
-<p>The client uses VFIO_USER_DEVICE_GET_IRQ_INFO messages to query the server for
-the device's interrupt types. The interrupt types are specific to the bus the
-device is attached to, and the client is expected to know the capabilities of
-each interrupt type. The server can signal an interrupt either with
-VFIO_USER_VM_INTERRUPT messages over the socket, or can directly inject
-interrupts into the guest via an event file descriptor. The client configures
-how the server signals an interrupt with VFIO_USER_SET_IRQS messages.</p>
-</div>
-<div class="section" id="device-read-and-write">
-<h3><a class="toc-backref" href="#id25">Device Read and Write</a></h3>
-<p>When the guest executes load or store operations to device memory, the client
-forwards these operations to the server with VFIO_USER_REGION_READ or
-VFIO_USER_REGION_WRITE messages. The server will reply with data from the
-device on read operations or an acknowledgement on write operations.</p>
-</div>
-<div class="section" id="dma">
-<h3><a class="toc-backref" href="#id26">DMA</a></h3>
-<p>When a device performs DMA accesses to guest memory, the server will forward
-them to the client with VFIO_USER_DMA_READ and VFIO_USER_DMA_WRITE messages.
-These messages can only be used to access guest memory the client has
-configured into the server.</p>
-</div>
-</div>
-</div>
-<div class="section" id="protocol-specification">
-<h1><a class="toc-backref" href="#id27">Protocol Specification</a></h1>
-<p>To distinguish from the base VFIO symbols, all vfio-user symbols are prefixed
-with vfio_user or VFIO_USER. In revision 0.1, all data is in the little-endian
-format, although this may be relaxed in future revision in cases where the
-client and server are both big-endian. The messages are formatted for seamless
-reuse of the native VFIO structs.</p>
-<div class="section" id="socket">
-<h2><a class="toc-backref" href="#id28">Socket</a></h2>
-<p>A server can serve:</p>
-<ol class="arabic simple">
-<li>one or more clients, and/or</li>
-<li>one or more virtual devices, belonging to one or more clients.</li>
-</ol>
-<p>The current protocol specification requires a dedicated socket per
-client/server connection. It is a server-side implementation detail whether a
-single server handles multiple virtual devices from the same or multiple
-clients. The location of the socket is implementation-specific. Multiplexing
-clients, devices, and servers over the same socket is not supported in this
-version of the protocol.</p>
-</div>
-<div class="section" id="authentication">
-<h2><a class="toc-backref" href="#id29">Authentication</a></h2>
-<p>For AF_UNIX, we rely on OS mandatory access controls on the socket files,
-therefore it is up to the management layer to set up the socket as required.
-Socket types than span guests or hosts will require a proper authentication
-mechanism. Defining that mechanism is deferred to a future version of the
-protocol.</p>
-</div>
-<div class="section" id="command-concurrency">
-<h2><a class="toc-backref" href="#id30">Command Concurrency</a></h2>
-<p>A client may pipeline multiple commands without waiting for previous command
-replies.  The server will process commands in the order they are received.
-A consequence of this is if a client issues a command with the <em>No_reply</em> bit,
-then subseqently issues a command without <em>No_reply</em>, the older command will
-have been processed before the reply to the younger command is sent by the
-server.  The client must be aware of the device's capability to process concurrent
-commands if pipelining is used.  For example, pipelining allows multiple client
-threads to concurently access device memory; the client must ensure these acceses
-obey device semantics.</p>
-<p>An example is a frame buffer device, where the device may allow concurrent access
-to different areas of video memory, but may have indeterminate behavior if concurrent
-acceses are performed to command or status registers.</p>
-</div>
-<div class="section" id="socket-disconnection-behavior">
-<h2><a class="toc-backref" href="#id31">Socket Disconnection Behavior</a></h2>
-<p>The server and the client can disconnect from each other, either intentionally
-or unexpectedly. Both the client and the server need to know how to handle such
-events.</p>
-<div class="section" id="server-disconnection">
-<h3><a class="toc-backref" href="#id32">Server Disconnection</a></h3>
-<p>A server disconnecting from the client may indicate that:</p>
-<ol class="arabic simple">
-<li>A virtual device has been restarted, either intentionally (e.g. because of a
-device update) or unintentionally (e.g. because of a crash).</li>
-<li>A virtual device has been shut down with no intention to be restarted.</li>
-</ol>
-<p>It is impossible for the client to know whether or not a failure is
-intermittent or innocuous and should be retried, therefore the client should
-reset the VFIO device when it detects the socket has been disconnected.
-Error recovery will be driven by the guest's device error handling
-behavior.</p>
-</div>
-<div class="section" id="client-disconnection">
-<h3><a class="toc-backref" href="#id33">Client Disconnection</a></h3>
-<p>The client disconnecting from the server primarily means that the client
-has exited. Currently, this means that the guest is shut down so the device is
-no longer needed therefore the server can automatically exit. However, there
-can be cases where a client disconnection should not result in a server exit:</p>
-<ol class="arabic simple">
-<li>A single server serving multiple clients.</li>
-<li>A multi-process QEMU upgrading itself step by step, which is not yet
-implemented.</li>
-</ol>
-<p>Therefore in order for the protocol to be forward compatible the server should
-take no action when the client disconnects. If anything happens to the client
-the control stack will know about it and can clean up resources
-accordingly.</p>
-</div>
-<div class="section" id="live-migration">
-<h3><a class="toc-backref" href="#id34">Live Migration</a></h3>
-<p>A future version of the protocol will support client live migration.  This action
-will require the socket to be quiesced before it is disconnected,  This mechanism
-will be defined when live migration support is added.</p>
-</div>
-<div class="section" id="request-retry-and-response-timeout">
-<h3><a class="toc-backref" href="#id35">Request Retry and Response Timeout</a></h3>
-<p>A failed command is a command that has been successfully sent and has been
-responded to with an error code. Failure to send the command in the first place
-(e.g. because the socket is disconnected) is a different type of error examined
-earlier in the disconnect section.</p>
-<div class="note">
-<p class="first admonition-title">Note</p>
-<p class="last">QEMU's VFIO retries certain operations if they fail. While this makes sense
-for real HW, we don't know for sure whether it makes sense for virtual
-devices.</p>
-</div>
-<p>Defining a retry and timeout scheme is deferred to a future version of the
-protocol.</p>
-</div>
-</div>
-<div class="section" id="id1">
-<span id="commands"></span><h2><a class="toc-backref" href="#id36">Commands</a></h2>
-<p>The following table lists the VFIO message command IDs, and whether the
-message command is sent from the client or the server.</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="55%" />
-<col width="15%" />
-<col width="31%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Command</th>
-<th class="head">Request Direction</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>VFIO_USER_VERSION</td>
-<td>1</td>
-<td>server -&gt; client</td>
-</tr>
-<tr><td>VFIO_USER_DMA_MAP</td>
-<td>2</td>
-<td>client -&gt; server</td>
-</tr>
-<tr><td>VFIO_USER_DMA_UNMAP</td>
-<td>3</td>
-<td>client -&gt; server</td>
-</tr>
-<tr><td>VFIO_USER_DEVICE_GET_INFO</td>
-<td>4</td>
-<td>client -&gt; server</td>
-</tr>
-<tr><td>VFIO_USER_DEVICE_GET_REGION_INFO</td>
-<td>5</td>
-<td>client -&gt; server</td>
-</tr>
-<tr><td>VFIO_USER_DEVICE_GET_IRQ_INFO</td>
-<td>6</td>
-<td>client -&gt; server</td>
-</tr>
-<tr><td>VFIO_USER_DEVICE_SET_IRQS</td>
-<td>7</td>
-<td>client -&gt; server</td>
-</tr>
-<tr><td>VFIO_USER_REGION_READ</td>
-<td>8</td>
-<td>client -&gt; server</td>
-</tr>
-<tr><td>VFIO_USER_REGION_WRITE</td>
-<td>9</td>
-<td>client -&gt; server</td>
-</tr>
-<tr><td>VFIO_USER_DMA_READ</td>
-<td>10</td>
-<td>server -&gt; client</td>
-</tr>
-<tr><td>VFIO_USER_DMA_WRITE</td>
-<td>11</td>
-<td>server -&gt; client</td>
-</tr>
-<tr><td>VFIO_USER_VM_INTERRUPT</td>
-<td>12</td>
-<td>server -&gt; client</td>
-</tr>
-<tr><td>VFIO_USER_DEVICE_RESET</td>
-<td>13</td>
-<td>client -&gt; server</td>
-</tr>
-</tbody>
-</table>
-<div class="note">
-<p class="first admonition-title">Note</p>
-<p class="last">Some VFIO defines cannot be reused since their values are
-architecture-specific (e.g. VFIO_IOMMU_MAP_DMA).</p>
-</div>
-</div>
-<div class="section" id="header">
-<h2><a class="toc-backref" href="#id37">Header</a></h2>
-<p>All messages, both command messages and reply messages, are preceded by a
-header that contains basic information about the message. The header is
-followed by message-specific data described in the sections below.</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="42%" />
-<col width="24%" />
-<col width="34%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>0</td>
-<td>2</td>
-</tr>
-<tr><td>Command</td>
-<td>2</td>
-<td>2</td>
-</tr>
-<tr><td>Message size</td>
-<td>4</td>
-<td>4</td>
-</tr>
-<tr><td>Flags</td>
-<td>8</td>
-<td>4</td>
-</tr>
-<tr><td>&nbsp;</td>
-<td colspan="2"><table border="1" class="first last docutils">
-<colgroup>
-<col width="33%" />
-<col width="67%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Bit</th>
-<th class="head">Definition</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>0-3</td>
-<td>Type</td>
-</tr>
-<tr><td>4</td>
-<td>No_reply</td>
-</tr>
-<tr><td>5</td>
-<td>Error</td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-<tr><td>Errno</td>
-<td>12</td>
-<td>4</td>
-</tr>
-<tr><td>&lt;message data&gt;</td>
-<td>16</td>
-<td>variable</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>Message ID</em> identifies the message, and is echoed in the command's reply message.</li>
-<li><em>Command</em> specifies the command to be executed, listed in <a class="reference internal" href="#commands">Commands</a>.</li>
-<li><em>Message size</em> contains the size of the entire message, including the header.</li>
-<li><em>Flags</em> contains attributes of the message:<ul>
-<li>The <em>Type</em> bits indicate the message type.<ul>
-<li><em>Command</em> (value 0x0) indicates a command message.</li>
-<li><em>Reply</em> (value 0x1) indicates a reply message acknowledging a previous
-command with the same message ID.</li>
-</ul>
-</li>
-<li><em>No_reply</em> in a command message indicates that no reply is needed for this command.
-This is commonly used when multiple commands are sent, and only the last needs
-acknowledgement.</li>
-<li><em>Error</em> in a reply message indicates the command being acknowledged had
-an error. In this case, the <em>Errno</em> field will be valid.</li>
-</ul>
-</li>
-<li><em>Errno</em> in a reply message is a UNIX errno value. It is reserved in a command message.</li>
-</ul>
-<p>Each command message in <a class="reference internal" href="#commands">Commands</a> must be replied to with a reply message, unless the
-message sets the <em>No_Reply</em> bit.  The reply consists of the header with the <em>Reply</em>
-bit set, plus any additional data.</p>
-</div>
-<div class="section" id="vfio-user-version">
-<h2><a class="toc-backref" href="#id38">VFIO_USER_VERSION</a></h2>
-<div class="section" id="message-format">
-<h3><a class="toc-backref" href="#id39">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>1</td>
-</tr>
-<tr><td>Message size</td>
-<td>16 + version length</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>Version</td>
-<td>JSON byte array</td>
-</tr>
-</tbody>
-</table>
-<p>This is the initial message sent by the server after the socket connection is
-established. The version is in JSON format, and the following objects must be
-included:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="19%" />
-<col width="11%" />
-<col width="70%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Type</th>
-<th class="head">Description</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>version</td>
-<td>object</td>
-<td><p class="first"><tt class="docutils literal">{&quot;major&quot;: &lt;number&gt;, &quot;minor&quot;: &lt;number&gt;}</tt></p>
-<p class="last">Version supported by the sender, e.g. &quot;0.1&quot;.</p>
-</td>
-</tr>
-<tr><td>capabilities</td>
-<td>array</td>
-<td>Reserved. Can be omitted for v0.1, otherwise must
-be empty.</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="versioning-and-feature-support">
-<span id="version"></span><h3><a class="toc-backref" href="#id40">Versioning and Feature Support</a></h3>
-<p>Upon accepting a connection, the server must send a VFIO_USER_VERSION message
-proposing a protocol version and a set of capabilities. The client compares
-these with the versions and capabilities it supports and sends a
-VFIO_USER_VERSION reply according to the following rules.</p>
-<ul class="simple">
-<li>The major version in the reply must be the same as proposed. If the client
-does not support the proposed major, it closes the connection.</li>
-<li>The minor version in the reply must be equal to or less than the minor
-version proposed.</li>
-<li>The capability list must be a subset of those proposed. If the client
-requires a capability the server did not include, it closes the connection.</li>
-</ul>
-<p>The protocol major version will only change when incompatible protocol changes
-are made, such as changing the message format. The minor version may change
-when compatible changes are made, such as adding new messages or capabilities,
-Both the client and server must support all minor versions less than the
-maximum minor version it supports. E.g., an implementation that supports
-version 1.3 must also support 1.0 through 1.2.</p>
-<p>When making a change to this specification, the protocol version number must
-be included in the form &quot;added in version X.Y&quot;</p>
-</div>
-</div>
-<div class="section" id="vfio-user-dma-map-and-vfio-user-dma-unmap">
-<h2><a class="toc-backref" href="#id41">VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP</a></h2>
-<div class="section" id="id2">
-<h3><a class="toc-backref" href="#id42">Message Format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>MAP=2, UNMAP=3</td>
-</tr>
-<tr><td>Message size</td>
-<td>16 + table size</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>Table</td>
-<td>array of table entries</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent by the client to the server to inform it of the
-memory regions the server can access. It must be sent before the server can
-perform any DMA to the client. It is normally sent directly after the version
-handshake is completed, but may also occur when memory is added to or
-subtracted from the client, or if the client uses a vIOMMU. If the client does
-not expect the server to perform DMA then it does not need to send to the
-server VFIO_USER_DMA_MAP and VFIO_USER_DMA_UNMAP commands. If the server does
-not need to perform DMA the then it can ignore such commands but it must still
-reply to them. The table is an array of the following structure.  This
-structure is 32 bytes in size, so the message size is:
-16 + (# of table entries * 32).</p>
-</div>
-<div class="section" id="table-entry-format">
-<h3><a class="toc-backref" href="#id43">Table entry format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="38%" />
-<col width="24%" />
-<col width="38%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Address</td>
-<td>0</td>
-<td>8</td>
-</tr>
-<tr><td>Size</td>
-<td>8</td>
-<td>8</td>
-</tr>
-<tr><td>Offset</td>
-<td>16</td>
-<td>8</td>
-</tr>
-<tr><td>Protections</td>
-<td>24</td>
-<td>4</td>
-</tr>
-<tr><td>Flags</td>
-<td>28</td>
-<td>4</td>
-</tr>
-<tr><td>&nbsp;</td>
-<td colspan="2"><table border="1" class="first last docutils">
-<colgroup>
-<col width="29%" />
-<col width="71%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Bit</th>
-<th class="head">Definition</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>0</td>
-<td>Mappable</td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>Address</em> is the base DMA address of the region.</li>
-<li><em>Size</em> is the size of the region.</li>
-<li><em>Offset</em> is the file offset of the region with respect to the associated file
-descriptor.</li>
-<li><em>Protections</em> are the region's protection attributes as encoded in
-<tt class="docutils literal">&lt;sys/mman.h&gt;</tt>.</li>
-<li><em>Flags</em> contain the following region attributes:<ul>
-<li><em>Mappable</em> indicates that the region can be mapped via the mmap() system call
-using the file descriptor provided in the message meta-data.</li>
-</ul>
-</li>
-</ul>
-<div class="section" id="vfio-user-dma-map">
-<h4><a class="toc-backref" href="#id44">VFIO_USER_DMA_MAP</a></h4>
-<p>If a DMA region being added can be directly mapped by the server, an array of
-file descriptors must be sent as part of the message meta-data. Each region
-entry must have a corresponding file descriptor. On AF_UNIX sockets, the file
-descriptors must be passed as SCM_RIGHTS type ancillary data. Otherwise, if a
-DMA region cannot be directly mapped by the server, it can be accessed by the
-server using VFIO_USER_DMA_READ and VFIO_USER_DMA_WRITE messages, explained in
-<a class="reference internal" href="#read-and-write-operations">Read and Write Operations</a>. A command to map over an existing region must be
-failed by the server with <tt class="docutils literal">EEXIST</tt> set in error field in the reply.</p>
-</div>
-<div class="section" id="vfio-user-dma-unmap">
-<h4><a class="toc-backref" href="#id45">VFIO_USER_DMA_UNMAP</a></h4>
-<p>Upon receiving a VFIO_USER_DMA_UNMAP command, if the file descriptor is mapped
-then the server must release all references to that DMA region before replying,
-which includes potentially in flight DMA transactions. Removing a portion of a
-DMA region is possible.</p>
-</div>
-</div>
-</div>
-<div class="section" id="vfio-user-device-get-info">
-<h2><a class="toc-backref" href="#id46">VFIO_USER_DEVICE_GET_INFO</a></h2>
-<div class="section" id="id3">
-<h3><a class="toc-backref" href="#id47">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="33%" />
-<col width="67%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>4</td>
-</tr>
-<tr><td>Message size</td>
-<td>16 in command, 32 in reply</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>Device info</td>
-<td>VFIO device info</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent by the client to the server to query for basic
-information about the device. Only the message header is needed in the command
-message.  The VFIO device info structure is defined in <tt class="docutils literal">&lt;linux/vfio.h&gt;</tt>
-(<tt class="docutils literal">struct vfio_device_info</tt>).</p>
-</div>
-<div class="section" id="vfio-device-info-format">
-<h3><a class="toc-backref" href="#id48">VFIO device info format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="28%" />
-<col width="17%" />
-<col width="55%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>argsz</td>
-<td>16</td>
-<td>4</td>
-</tr>
-<tr><td>flags</td>
-<td>20</td>
-<td>4</td>
-</tr>
-<tr><td>&nbsp;</td>
-<td colspan="2"><table border="1" class="first last docutils">
-<colgroup>
-<col width="17%" />
-<col width="83%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Bit</th>
-<th class="head">Definition</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>0</td>
-<td>VFIO_DEVICE_FLAGS_RESET</td>
-</tr>
-<tr><td>1</td>
-<td>VFIO_DEVICE_FLAGS_PCI</td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-<tr><td>num_regions</td>
-<td>24</td>
-<td>4</td>
-</tr>
-<tr><td>num_irqs</td>
-<td>28</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>argsz</em> is the size of the VFIO device info structure.</li>
-<li><em>flags</em> contains the following device attributes.<ul>
-<li>VFIO_DEVICE_FLAGS_RESET indicates that the device supports the
-VFIO_USER_DEVICE_RESET message.</li>
-<li>VFIO_DEVICE_FLAGS_PCI indicates that the device is a PCI device.</li>
-</ul>
-</li>
-<li><em>num_regions</em> is the number of memory regions that the device exposes.</li>
-<li><em>num_irqs</em> is the number of distinct interrupt types that the device supports.</li>
-</ul>
-<p>This version of the protocol only supports PCI devices. Additional devices may
-be supported in future versions.</p>
-</div>
-</div>
-<div class="section" id="vfio-user-device-get-region-info">
-<h2><a class="toc-backref" href="#id49">VFIO_USER_DEVICE_GET_REGION_INFO</a></h2>
-<div class="section" id="id4">
-<h3><a class="toc-backref" href="#id50">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>5</td>
-</tr>
-<tr><td>Message size</td>
-<td>48 + any caps</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>Region info</td>
-<td>VFIO region info</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent by the client to the server to query for
-information about device memory regions. The VFIO region info structure is
-defined in <tt class="docutils literal">&lt;linux/vfio.h&gt;</tt> (<tt class="docutils literal">struct vfio_region_info</tt>). Since the client
-does not know the size of the capabilities, the size of the reply it should
-expect is 48 plus any capabilities whose size is indicated in the size field of
-the reply header.</p>
-</div>
-<div class="section" id="vfio-region-info-format">
-<h3><a class="toc-backref" href="#id51">VFIO region info format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="24%" />
-<col width="16%" />
-<col width="60%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>argsz</td>
-<td>16</td>
-<td>4</td>
-</tr>
-<tr><td>flags</td>
-<td>20</td>
-<td>4</td>
-</tr>
-<tr><td>&nbsp;</td>
-<td colspan="2"><table border="1" class="first last docutils">
-<colgroup>
-<col width="15%" />
-<col width="85%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Bit</th>
-<th class="head">Definition</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>0</td>
-<td>VFIO_REGION_INFO_FLAG_READ</td>
-</tr>
-<tr><td>1</td>
-<td>VFIO_REGION_INFO_FLAG_WRITE</td>
-</tr>
-<tr><td>2</td>
-<td>VFIO_REGION_INFO_FLAG_MMAP</td>
-</tr>
-<tr><td>3</td>
-<td>VFIO_REGION_INFO_FLAG_CAPS</td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-<tr><td>index</td>
-<td>24</td>
-<td>4</td>
-</tr>
-<tr><td>cap_offset</td>
-<td>28</td>
-<td>4</td>
-</tr>
-<tr><td>size</td>
-<td>32</td>
-<td>8</td>
-</tr>
-<tr><td>offset</td>
-<td>40</td>
-<td>8</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>argsz</em> is the size of the VFIO region info structure plus the
-size of any region capabilities returned.</li>
-<li><em>flags</em> are attributes of the region:<ul>
-<li><em>VFIO_REGION_INFO_FLAG_READ</em> allows client read access to the region.</li>
-<li><em>VFIO_REGION_INFO_FLAG_WRITE</em> allows client write access to the region.</li>
-<li><em>VFIO_REGION_INFO_FLAG_MMAP</em> specifies the client can mmap() the region.
-When this flag is set, the reply will include a file descriptor in its
-meta-data. On AF_UNIX sockets, the file descriptors will be passed as
-SCM_RIGHTS type ancillary data.</li>
-<li><em>VFIO_REGION_INFO_FLAG_CAPS</em> indicates additional capabilities found in the
-reply.</li>
-</ul>
-</li>
-<li><em>index</em> is the index of memory region being queried, it is the only field
-that is required to be set in the command message.</li>
-<li><em>cap_offset</em> describes where additional region capabilities can be found.
-cap_offset is relative to the beginning of the VFIO region info structure.
-The data structure it points is a VFIO cap header defined in
-<tt class="docutils literal">&lt;linux/vfio.h&gt;</tt>.</li>
-<li><em>size</em> is the size of the region.</li>
-<li><em>offset</em> is the offset given to the mmap() system call for regions with the
-MMAP attribute. It is also used as the base offset when mapping a VFIO
-sparse mmap area, described below.</li>
-</ul>
-</div>
-<div class="section" id="vfio-region-capabilities">
-<h3><a class="toc-backref" href="#id52">VFIO Region capabilities</a></h3>
-<p>The VFIO region information can also include a capabilities list. This list is
-similar to a PCI capability list - each entry has a common header that
-identifies a capability and where the next capability in the list can be found.
-The VFIO capability header format is defined in <tt class="docutils literal">&lt;linux/vfio.h&gt;</tt> (<tt class="docutils literal">struct
-vfio_info_cap_header</tt>).</p>
-</div>
-<div class="section" id="vfio-cap-header-format">
-<h3><a class="toc-backref" href="#id53">VFIO cap header format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="39%" />
-<col width="35%" />
-<col width="26%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>id</td>
-<td>0</td>
-<td>2</td>
-</tr>
-<tr><td>version</td>
-<td>2</td>
-<td>2</td>
-</tr>
-<tr><td>next</td>
-<td>4</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>id</em> is the capability identity.</li>
-<li><em>version</em> is a capability-specific version number.</li>
-<li><em>next</em> specifies the offset of the next capability in the capability list. It
-is relative to the beginning of the VFIO region info structure.</li>
-</ul>
-</div>
-<div class="section" id="vfio-sparse-mmap">
-<h3><a class="toc-backref" href="#id54">VFIO sparse mmap</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="35%" />
-<col width="65%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>id</td>
-<td>VFIO_REGION_INFO_CAP_SPARSE_MMAP</td>
-</tr>
-<tr><td>version</td>
-<td>0x1</td>
-</tr>
-<tr><td>next</td>
-<td>&lt;next&gt;</td>
-</tr>
-<tr><td>sparse mmap info</td>
-<td>VFIO region info sparse mmap</td>
-</tr>
-</tbody>
-</table>
-<p>The only capability supported in this version of the protocol is for sparse
-mmap. This capability is defined when only a subrange of the region supports
-direct access by the client via mmap(). The VFIO sparse mmap area is defined in
-<tt class="docutils literal">&lt;linux/vfio.h&gt;</tt> (<tt class="docutils literal">struct vfio_region_sparse_mmap_area</tt>).</p>
-</div>
-<div class="section" id="vfio-region-info-cap-sparse-mmap">
-<h3><a class="toc-backref" href="#id55">VFIO region info cap sparse mmap</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="42%" />
-<col width="33%" />
-<col width="25%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>nr_areas</td>
-<td>0</td>
-<td>4</td>
-</tr>
-<tr><td>reserved</td>
-<td>4</td>
-<td>4</td>
-</tr>
-<tr><td>offset</td>
-<td>8</td>
-<td>8</td>
-</tr>
-<tr><td>size</td>
-<td>16</td>
-<td>9</td>
-</tr>
-<tr><td>...</td>
-<td>&nbsp;</td>
-<td>&nbsp;</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>nr_areas</em> is the number of sparse mmap areas in the region.</li>
-<li><em>offset</em> and size describe a single area that can be mapped by the client.
-There will be nr_areas pairs of offset and size. The offset will be added to
-the base offset given in the VFIO_USER_DEVICE_GET_REGION_INFO to form the
-offset argument of the subsequent mmap() call.</li>
-</ul>
-<p>The VFIO sparse mmap area is defined in <tt class="docutils literal">&lt;linux/vfio.h&gt;</tt> (<tt class="docutils literal">struct
-vfio_region_info_cap_sparse_mmap</tt>).</p>
-</div>
-</div>
-<div class="section" id="vfio-user-device-get-irq-info">
-<h2><a class="toc-backref" href="#id56">VFIO_USER_DEVICE_GET_IRQ_INFO</a></h2>
-<div class="section" id="id5">
-<h3><a class="toc-backref" href="#id57">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>6</td>
-</tr>
-<tr><td>Message size</td>
-<td>32</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>IRQ info</td>
-<td>VFIO IRQ info</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent by the client to the server to query for
-information about device interrupt types. The VFIO IRQ info structure is
-defined in <tt class="docutils literal">&lt;linux/vfio.h&gt;</tt> (<tt class="docutils literal">struct vfio_irq_info</tt>).</p>
-</div>
-<div class="section" id="vfio-irq-info-format">
-<h3><a class="toc-backref" href="#id58">VFIO IRQ info format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="17%" />
-<col width="19%" />
-<col width="64%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>argsz</td>
-<td>16</td>
-<td>4</td>
-</tr>
-<tr><td>flags</td>
-<td>20</td>
-<td>4</td>
-</tr>
-<tr><td>&nbsp;</td>
-<td colspan="2"><table border="1" class="first last docutils">
-<colgroup>
-<col width="16%" />
-<col width="84%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Bit</th>
-<th class="head">Definition</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>0</td>
-<td>VFIO_IRQ_INFO_EVENTFD</td>
-</tr>
-<tr><td>1</td>
-<td>VFIO_IRQ_INFO_MASKABLE</td>
-</tr>
-<tr><td>2</td>
-<td>VFIO_IRQ_INFO_AUTOMASKED</td>
-</tr>
-<tr><td>3</td>
-<td>VFIO_IRQ_INFO_NORESIZE</td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-<tr><td>index</td>
-<td>24</td>
-<td>4</td>
-</tr>
-<tr><td>count</td>
-<td>28</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>argsz</em> is the size of the VFIO IRQ info structure.</li>
-<li><em>flags</em> defines IRQ attributes:<ul>
-<li><em>VFIO_IRQ_INFO_EVENTFD</em> indicates the IRQ type can support server eventfd
-signalling.</li>
-<li><em>VFIO_IRQ_INFO_MASKABLE</em> indicates that the IRQ type supports the MASK and
-UNMASK actions in a VFIO_USER_DEVICE_SET_IRQS message.</li>
-<li><em>VFIO_IRQ_INFO_AUTOMASKED</em> indicates the IRQ type masks itself after being
-triggered, and the client must send an UNMASK action to receive new
-interrupts.</li>
-<li><em>VFIO_IRQ_INFO_NORESIZE</em> indicates VFIO_USER_SET_IRQS operations setup
-interrupts as a set, and new sub-indexes cannot be enabled without disabling
-the entire type.</li>
-</ul>
-</li>
-<li>index is the index of IRQ type being queried, it is the only field that is
-required to be set in the command message.</li>
-<li>count describes the number of interrupts of the queried type.</li>
-</ul>
-</div>
-</div>
-<div class="section" id="vfio-user-device-set-irqs">
-<h2><a class="toc-backref" href="#id59">VFIO_USER_DEVICE_SET_IRQS</a></h2>
-<div class="section" id="id6">
-<h3><a class="toc-backref" href="#id60">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>7</td>
-</tr>
-<tr><td>Message size</td>
-<td>36 + any data</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>IRQ set</td>
-<td>VFIO IRQ set</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent by the client to the server to set actions for
-device interrupt types. The VFIO IRQ set structure is defined in
-<tt class="docutils literal">&lt;linux/vfio.h&gt;</tt> (<tt class="docutils literal">struct vfio_irq_set</tt>).</p>
-</div>
-<div class="section" id="vfio-irq-set-format">
-<h3><a class="toc-backref" href="#id61">VFIO IRQ set format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="16%" />
-<col width="18%" />
-<col width="67%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>argsz</td>
-<td>16</td>
-<td>4</td>
-</tr>
-<tr><td>flags</td>
-<td>20</td>
-<td>4</td>
-</tr>
-<tr><td>&nbsp;</td>
-<td colspan="2"><table border="1" class="first last docutils">
-<colgroup>
-<col width="15%" />
-<col width="85%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Bit</th>
-<th class="head">Definition</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>0</td>
-<td>VFIO_IRQ_SET_DATA_NONE</td>
-</tr>
-<tr><td>1</td>
-<td>VFIO_IRQ_SET_DATA_BOOL</td>
-</tr>
-<tr><td>2</td>
-<td>VFIO_IRQ_SET_DATA_EVENTFD</td>
-</tr>
-<tr><td>3</td>
-<td>VFIO_IRQ_SET_ACTION_MASK</td>
-</tr>
-<tr><td>4</td>
-<td>VFIO_IRQ_SET_ACTION_UNMASK</td>
-</tr>
-<tr><td>5</td>
-<td>VFIO_IRQ_SET_ACTION_TRIGGER</td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-<tr><td>index</td>
-<td>24</td>
-<td>4</td>
-</tr>
-<tr><td>start</td>
-<td>28</td>
-<td>4</td>
-</tr>
-<tr><td>count</td>
-<td>32</td>
-<td>4</td>
-</tr>
-<tr><td>data</td>
-<td>36</td>
-<td>variable</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>argsz</em> is the size of the VFIO IRQ set structure, including any <em>data</em> field.</li>
-<li><em>flags</em> defines the action performed on the interrupt range. The DATA flags
-describe the data field sent in the message; the ACTION flags describe the
-action to be performed. The flags are mutually exclusive for both sets.<ul>
-<li><em>VFIO_IRQ_SET_DATA_NONE</em> indicates there is no data field in the command.
-The action is performed unconditionally.</li>
-<li><em>VFIO_IRQ_SET_DATA_BOOL</em> indicates the data field is an array of boolean
-bytes. The action is performed if the corresponding boolean is true.</li>
-<li><em>VFIO_IRQ_SET_DATA_EVENTFD</em> indicates an array of event file descriptors
-was sent in the message meta-data. These descriptors will be signalled when
-the action defined by the action flags occurs. In AF_UNIX sockets, the
-descriptors are sent as SCM_RIGHTS type ancillary data.</li>
-<li><em>VFIO_IRQ_SET_ACTION_MASK</em> indicates a masking event. It can be used with
-VFIO_IRQ_SET_DATA_BOOL or VFIO_IRQ_SET_DATA_NONE to mask an interrupt, or
-with VFIO_IRQ_SET_DATA_EVENTFD to generate an event when the guest masks
-the interrupt.</li>
-<li><em>VFIO_IRQ_SET_ACTION_UNMASK</em> indicates an unmasking event. It can be used
-with VFIO_IRQ_SET_DATA_BOOL or VFIO_IRQ_SET_DATA_NONE to unmask an
-interrupt, or with VFIO_IRQ_SET_DATA_EVENTFD to generate an event when the
-guest unmasks the interrupt.</li>
-<li><em>VFIO_IRQ_SET_ACTION_TRIGGER</em> indicates a triggering event. It can be used
-with VFIO_IRQ_SET_DATA_BOOL or VFIO_IRQ_SET_DATA_NONE to trigger an
-interrupt, or with VFIO_IRQ_SET_DATA_EVENTFD to generate an event when the
-server triggers the interrupt.</li>
-</ul>
-</li>
-<li><em>index</em> is the index of IRQ type being setup.</li>
-<li><em>start</em> is the start of the sub-index being set.</li>
-<li><em>count</em> describes the number of sub-indexes being set. As a special case, a
-count of 0 with data flags of VFIO_IRQ_SET_DATA_NONE disables all interrupts
-of the index.</li>
-<li><em>data</em> is an optional field included when the
-VFIO_IRQ_SET_DATA_BOOL flag is present. It contains an array of booleans
-that specify whether the action is to be performed on the corresponding
-index. It's used when the action is only performed on a subset of the range
-specified.</li>
-</ul>
-<p>Not all interrupt types support every combination of data and action flags.
-The client must know the capabilities of the device and IRQ index before it
-sends a VFIO_USER_DEVICE_SET_IRQ message.</p>
-</div>
-</div>
-<div class="section" id="id7">
-<span id="read-and-write-operations"></span><h2><a class="toc-backref" href="#id62">Read and Write Operations</a></h2>
-<p>Not all I/O operations between the client and server can be done via direct
-access of memory mapped with an mmap() call. In these cases, the client and
-server use messages sent over the socket. It is expected that these operations
-will have lower performance than direct access.</p>
-<p>The client can access server memory with VFIO_USER_REGION_READ and
-VFIO_USER_REGION_WRITE commands. These share a common data structure that
-appears after the message header.</p>
-<div class="section" id="region-read-write-data">
-<h3><a class="toc-backref" href="#id63">REGION Read/Write Data</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="31%" />
-<col width="31%" />
-<col width="38%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Offset</td>
-<td>16</td>
-<td>8</td>
-</tr>
-<tr><td>Region</td>
-<td>24</td>
-<td>4</td>
-</tr>
-<tr><td>Count</td>
-<td>28</td>
-<td>4</td>
-</tr>
-<tr><td>Data</td>
-<td>32</td>
-<td>variable</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>Offset</em> into the region being accessed.</li>
-<li><em>Region</em> is the index of the region being accessed.</li>
-<li><em>Count</em> is the size of the data to be transferred.</li>
-<li><em>Data</em> is the data to be read or written.</li>
-</ul>
-<p>The server can access client memory with VFIO_USER_DMA_READ and
-VFIO_USER_DMA_WRITE messages. These also share a common data structure that
-appears after the message header.</p>
-</div>
-<div class="section" id="dma-read-write-data">
-<h3><a class="toc-backref" href="#id64">DMA Read/Write Data</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="33%" />
-<col width="30%" />
-<col width="37%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Address</td>
-<td>16</td>
-<td>8</td>
-</tr>
-<tr><td>Count</td>
-<td>24</td>
-<td>4</td>
-</tr>
-<tr><td>Data</td>
-<td>28</td>
-<td>variable</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>Address</em> is the area of client memory being accessed. This address must have
-been previously exported to the server with a VFIO_USER_DMA_MAP message.</li>
-<li><em>Count</em> is the size of the data to be transferred.</li>
-<li><em>Data</em> is the data to be read or written.</li>
-</ul>
-</div>
-</div>
-<div class="section" id="vfio-user-region-read">
-<h2><a class="toc-backref" href="#id65">VFIO_USER_REGION_READ</a></h2>
-<div class="section" id="id8">
-<h3><a class="toc-backref" href="#id66">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>8</td>
-</tr>
-<tr><td>Message size</td>
-<td>32 + data size</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>Read info</td>
-<td>REGION read/write data</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent from the client to the server to read from server
-memory.  In the command messages, there is no data, and the count is the amount
-of data to be read. The reply message must include the data read, and its count
-field is the amount of data read.</p>
-</div>
-</div>
-<div class="section" id="vfio-user-region-write">
-<h2><a class="toc-backref" href="#id67">VFIO_USER_REGION_WRITE</a></h2>
-<div class="section" id="id9">
-<h3><a class="toc-backref" href="#id68">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>9</td>
-</tr>
-<tr><td>Message size</td>
-<td>32 + data size</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>Write info</td>
-<td>REGION read/write data</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent from the client to the server to write to server
-memory.  The command message must contain the data to be written, and its count
-field must contain the amount of write data. The count field in the reply
-message must be zero.</p>
-</div>
-</div>
-<div class="section" id="vfio-user-dma-read">
-<h2><a class="toc-backref" href="#id69">VFIO_USER_DMA_READ</a></h2>
-<div class="section" id="id10">
-<h3><a class="toc-backref" href="#id70">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>10</td>
-</tr>
-<tr><td>Message size</td>
-<td>28 + data size</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>DMA info</td>
-<td>DMA read/write data</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent from the server to the client to read from client
-memory.  In the command message, there is no data, and the count must will be
-the amount of data to be read. The reply message must include the data read,
-and its count field must be the amount of data read.</p>
-</div>
-</div>
-<div class="section" id="vfio-user-dma-write">
-<h2><a class="toc-backref" href="#id71">VFIO_USER_DMA_WRITE</a></h2>
-<div class="section" id="id11">
-<h3><a class="toc-backref" href="#id72">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>11</td>
-</tr>
-<tr><td>Message size</td>
-<td>28 + data size</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>DMA info</td>
-<td>DMA read/write data</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent from the server to the client to write to server
-memory.  The command message must contain the data to be written, and its count
-field must contain the amount of write data. The count field in the reply
-message must be zero.</p>
-</div>
-</div>
-<div class="section" id="vfio-user-vm-interrupt">
-<h2><a class="toc-backref" href="#id73">VFIO_USER_VM_INTERRUPT</a></h2>
-<div class="section" id="id12">
-<h3><a class="toc-backref" href="#id74">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="40%" />
-<col width="60%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>12</td>
-</tr>
-<tr><td>Message size</td>
-<td>24</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-<tr><td>Interrupt info</td>
-<td>&lt;interrupt&gt;</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent from the server to the client to signal the device
-has raised an interrupt.</p>
-</div>
-<div class="section" id="interrupt-info-format">
-<h3><a class="toc-backref" href="#id75">Interrupt info format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="44%" />
-<col width="32%" />
-<col width="24%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Offset</th>
-<th class="head">Size</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Index</td>
-<td>16</td>
-<td>4</td>
-</tr>
-<tr><td>Sub-index</td>
-<td>20</td>
-<td>4</td>
-</tr>
-</tbody>
-</table>
-<ul class="simple">
-<li><em>Index</em> is the interrupt index; it is the same value used in
-VFIO_USER_SET_IRQS.</li>
-<li><em>Sub-index</em> is relative to the index, e.g., the vector number used in PCI
-MSI/X type interrupts.</li>
-</ul>
-</div>
-</div>
-<div class="section" id="vfio-user-device-reset">
-<h2><a class="toc-backref" href="#id76">VFIO_USER_DEVICE_RESET</a></h2>
-<div class="section" id="id13">
-<h3><a class="toc-backref" href="#id77">Message format</a></h3>
-<table border="1" class="docutils">
-<colgroup>
-<col width="37%" />
-<col width="63%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Name</th>
-<th class="head">Value</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td>Message ID</td>
-<td>&lt;ID&gt;</td>
-</tr>
-<tr><td>Command</td>
-<td>13</td>
-</tr>
-<tr><td>Message size</td>
-<td>16</td>
-</tr>
-<tr><td>Flags</td>
-<td>Reply bit set in reply</td>
-</tr>
-<tr><td>Errno</td>
-<td>0/errno</td>
-</tr>
-</tbody>
-</table>
-<p>This command message is sent from the client to the server to reset the device.</p>
-</div>
-</div>
-</div>
-<div class="section" id="appendices">
-<h1><a class="toc-backref" href="#id78">Appendices</a></h1>
-<div class="section" id="unused-vfio-ioctl-commands">
-<h2><a class="toc-backref" href="#id79">Unused VFIO ioctl() commands</a></h2>
-<p>The following VFIO commands do not have an equivalent vfio-user command:</p>
-<ul class="simple">
-<li>VFIO_GET_API_VERSION</li>
-<li>VFIO_CHECK_EXTENSION</li>
-<li>VFIO_SET_IOMMU</li>
-<li>VFIO_GROUP_GET_STATUS</li>
-<li>VFIO_GROUP_SET_CONTAINER</li>
-<li>VFIO_GROUP_UNSET_CONTAINER</li>
-<li>VFIO_GROUP_GET_DEVICE_FD</li>
-<li>VFIO_IOMMU_GET_INFO</li>
-</ul>
-<p>However, once support for live migration for VFIO devices is finalized some
-of the above commands may have to be handled by the client in their
-corresponding vfio-user form. This will be addressed in a future protocol
-version.</p>
-</div>
-<div class="section" id="id14">
-<h2><a class="toc-backref" href="#id80">Live Migration</a></h2>
-<p>Currently live migration is not supported for devices passed through via VFIO,
-therefore it is not supported for vfio-user, either. This is being actively
-worked on in the <a class="reference external" href="https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06463.html">Add migration support for VFIO devices (v25)</a>
-patch series.</p>
-<div class="section" id="vfio-groups-and-containers">
-<h3><a class="toc-backref" href="#id81">VFIO groups and containers</a></h3>
-<p>The current VFIO implementation includes group and container idioms that
-describe how a device relates to the host IOMMU. In the vfio-user
-implementation, the IOMMU is implemented in SW by the client, and is not
-visible to the server. The simplest idea would be that the client put each
-device into its own group and container.</p>
-</div>
-</div>
-<div class="section" id="backend-program-conventions">
-<h2><a class="toc-backref" href="#id82">Backend Program Conventions</a></h2>
-<p>vfio-user backend program conventions are based on the vhost-user ones.</p>
-<ul class="simple">
-<li>The backend program must not daemonize itself.</li>
-<li>No assumptions must be made as to what access the backend program has on the
-system.</li>
-<li>File descriptors 0, 1 and 2 must exist, must have regular
-stdin/stdout/stderr semantics, and can be redirected.</li>
-<li>The backend program must honor the SIGTERM signal.</li>
-<li>The backend program must accept the following commands line options:<ul>
-<li><tt class="docutils literal"><span class="pre">--socket-path=PATH</span></tt>: path to UNIX domain socket,</li>
-<li><tt class="docutils literal"><span class="pre">--fd=FDNUM</span></tt>: file descriptor for UNIX domain socket, incompatible with
-<tt class="docutils literal"><span class="pre">--socket-path</span></tt></li>
-</ul>
-</li>
-<li>The backend program must be accompanied with a JSON file stored under
-<tt class="docutils literal"><span class="pre">/usr/share/vfio-user</span></tt>.</li>
-</ul>
-</div>
-</div>
-</div>
-</body>
-</html>
-
---Apple-Mail=_0078527D-57B0-458F-941A-A3B6210ACFA0--
+Ok now:
+Linking target qemu-fuzz-i386
+clang: warning: argument unused during compilation: '-T tests/qtest/fuzz/fork_fuzz.ld' [-Wunused-command-line-argument]
+/usr/bin/ld: libcommon.fa.p/softmmu_main.c.o: in function `main':
+/tmp/qemu/build/../softmmu/main.c:47: multiple definition of `main'; /usr/lib/llvm-9/lib/clang/9.0.1/lib/linux/libclang_rt.fuzzer-x86_64.a(fuzzer.o):(.text.main+0x0): first defined here
+/usr/bin/ld: /tmp/qemu/build/../tests/qtest/fuzz/fork_fuzz.c:22: undefined reference to `__FUZZ_COUNTERS_START'
+
+We are _very_ close, but this is where I have no idea how to get meson
+to do what I want. Two things: 
+1.) The flag for linking should be something like:
+-Wl,-T$(SRC_PATH)/tests/qtest/fuzz/fork_fuzz.ld . Right now it is
+-T./tests/qtest/fuzz/fork_fuzz.ld
+2.) We should not be linking against softmmu_main.c.o
+
+I ran with make -n and copied the last (linking step) command and
+manually made these two changes. With that, I find a binary ./qemu-fuzz-i386
+and when I run it, I see all the targets I expect to see.
+But when I run one of the actual targets, I get:
+./qemu-fuzz-i386 --fuzz-target=virtio-net-slirp -runs=1000
+ERROR: no interesting inputs were found. Is the code instrumented for coverage? Exit
+So it looks like the -fsanitize=fuzzer (or fsanitize=fuzzer-no-link)
+flag doesn't get passed anywhere during compilation.. (Confirmed that by
+checking make -n)
+
+This feels very close. If I configure, with
+CFLAGS="-fsanitize=fuzzer" , I'm up and running.
+
+Thanks again. Once I know that I'm doing things right, I can work on
+converting the oss-fuzz build script, so it works with meson.
+-Alex
+
+On 200806 2114, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  meson.build                                      |   3 +
+>  tests/Makefile.include                           |  49 +---
+>  tests/meson.build                                |   1 +
+>  tests/qtest/Makefile.include                     | 332 -----------------------
+>  tests/qtest/ac97-test.c                          |   2 +-
+>  tests/qtest/acpi-utils.h                         |   2 +-
+>  tests/qtest/ahci-test.c                          |   2 +-
+>  tests/qtest/arm-cpu-features.c                   |   2 +-
+>  tests/qtest/boot-order-test.c                    |   2 +-
+>  tests/qtest/boot-sector.c                        |   2 +-
+>  tests/qtest/boot-sector.h                        |   2 +-
+>  tests/qtest/boot-serial-test.c                   |   2 +-
+>  tests/qtest/cdrom-test.c                         |   2 +-
+>  tests/qtest/dbus-vmstate-test.c                  |   2 +-
+>  tests/qtest/device-introspect-test.c             |   2 +-
+>  tests/qtest/device-plug-test.c                   |   2 +-
+>  tests/qtest/drive_del-test.c                     |   2 +-
+>  tests/qtest/ds1338-test.c                        |   2 +-
+>  tests/qtest/e1000-test.c                         |   2 +-
+>  tests/qtest/eepro100-test.c                      |   2 +-
+>  tests/qtest/endianness-test.c                    |   2 +-
+>  tests/qtest/es1370-test.c                        |   2 +-
+>  tests/qtest/fuzz/fuzz.c                          |   2 +-
+>  tests/qtest/fuzz/fuzz.h                          |   2 +-
+>  tests/qtest/fuzz/i440fx_fuzz.c                   |   2 +-
+>  tests/qtest/fuzz/qos_fuzz.c                      |   2 +-
+>  tests/qtest/fuzz/virtio_net_fuzz.c               |   2 +-
+>  tests/qtest/fuzz/virtio_scsi_fuzz.c              |   2 +-
+>  tests/qtest/fw_cfg-test.c                        |   2 +-
+>  tests/qtest/hd-geo-test.c                        |   2 +-
+>  tests/qtest/hexloader-test.c                     |   2 +-
+>  tests/qtest/ide-test.c                           |   2 +-
+>  tests/qtest/ipoctal232-test.c                    |   2 +-
+>  tests/qtest/ivshmem-test.c                       |   2 +-
+>  tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c |   4 +-
+>  tests/qtest/libqos/ahci.c                        |   6 +-
+>  tests/qtest/libqos/ahci.h                        |   6 +-
+>  tests/qtest/libqos/arm-imx25-pdk-machine.c       |   6 +-
+>  tests/qtest/libqos/arm-n800-machine.c            |   6 +-
+>  tests/qtest/libqos/arm-raspi2-machine.c          |   4 +-
+>  tests/qtest/libqos/arm-sabrelite-machine.c       |   4 +-
+>  tests/qtest/libqos/arm-smdkc210-machine.c        |   4 +-
+>  tests/qtest/libqos/arm-virt-machine.c            |   6 +-
+>  tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c  |   4 +-
+>  tests/qtest/libqos/e1000e.c                      |   6 +-
+>  tests/qtest/libqos/e1000e.h                      |   2 +-
+>  tests/qtest/libqos/fw_cfg.c                      |   2 +-
+>  tests/qtest/libqos/i2c-imx.c                     |   2 +-
+>  tests/qtest/libqos/i2c-omap.c                    |   2 +-
+>  tests/qtest/libqos/i2c.c                         |   2 +-
+>  tests/qtest/libqos/i2c.h                         |   2 +-
+>  tests/qtest/libqos/libqos-pc.c                   |   6 +-
+>  tests/qtest/libqos/libqos-pc.h                   |   2 +-
+>  tests/qtest/libqos/libqos-spapr.c                |   6 +-
+>  tests/qtest/libqos/libqos-spapr.h                |   2 +-
+>  tests/qtest/libqos/libqos.c                      |   4 +-
+>  tests/qtest/libqos/libqos.h                      |   4 +-
+>  tests/qtest/{ => libqos}/libqtest.h              |   0
+>  tests/qtest/libqos/malloc-pc.c                   |   4 +-
+>  tests/qtest/libqos/malloc-pc.h                   |   2 +-
+>  tests/qtest/libqos/malloc-spapr.c                |   2 +-
+>  tests/qtest/libqos/malloc-spapr.h                |   2 +-
+>  tests/qtest/libqos/malloc.c                      |   2 +-
+>  tests/qtest/libqos/meson.build                   |  57 ++++
+>  tests/qtest/libqos/pci-pc.c                      |   2 +-
+>  tests/qtest/libqos/pci-pc.h                      |   6 +-
+>  tests/qtest/libqos/pci-spapr.c                   |   6 +-
+>  tests/qtest/libqos/pci-spapr.h                   |   6 +-
+>  tests/qtest/libqos/pci.c                         |   4 +-
+>  tests/qtest/libqos/pci.h                         |   2 +-
+>  tests/qtest/libqos/ppc64_pseries-machine.c       |   4 +-
+>  tests/qtest/libqos/qgraph.c                      |   4 +-
+>  tests/qtest/libqos/qgraph.h                      |   6 +-
+>  tests/qtest/libqos/qgraph_internal.h             |   4 +-
+>  tests/qtest/libqos/qos_external.c                |   8 +-
+>  tests/qtest/libqos/qos_external.h                |   4 +-
+>  tests/qtest/libqos/rtas.c                        |   2 +-
+>  tests/qtest/libqos/rtas.h                        |   2 +-
+>  tests/qtest/libqos/sdhci.c                       |   2 +-
+>  tests/qtest/libqos/sdhci.h                       |   2 +-
+>  tests/qtest/libqos/tpci200.c                     |   4 +-
+>  tests/qtest/libqos/usb.c                         |   2 +-
+>  tests/qtest/libqos/usb.h                         |   2 +-
+>  tests/qtest/libqos/virtio-9p.c                   |   4 +-
+>  tests/qtest/libqos/virtio-9p.h                   |   6 +-
+>  tests/qtest/libqos/virtio-balloon.c              |   4 +-
+>  tests/qtest/libqos/virtio-balloon.h              |   6 +-
+>  tests/qtest/libqos/virtio-blk.c                  |   4 +-
+>  tests/qtest/libqos/virtio-blk.h                  |   6 +-
+>  tests/qtest/libqos/virtio-mmio.c                 |   8 +-
+>  tests/qtest/libqos/virtio-mmio.h                 |   4 +-
+>  tests/qtest/libqos/virtio-net.c                  |   4 +-
+>  tests/qtest/libqos/virtio-net.h                  |   6 +-
+>  tests/qtest/libqos/virtio-pci.c                  |  14 +-
+>  tests/qtest/libqos/virtio-pci.h                  |   6 +-
+>  tests/qtest/libqos/virtio-rng.c                  |   4 +-
+>  tests/qtest/libqos/virtio-rng.h                  |   6 +-
+>  tests/qtest/libqos/virtio-scsi.c                 |   4 +-
+>  tests/qtest/libqos/virtio-scsi.h                 |   6 +-
+>  tests/qtest/libqos/virtio-serial.c               |   4 +-
+>  tests/qtest/libqos/virtio-serial.h               |   6 +-
+>  tests/qtest/libqos/virtio.c                      |   2 +-
+>  tests/qtest/libqos/virtio.h                      |   2 +-
+>  tests/qtest/libqos/x86_64_pc-machine.c           |   2 +-
+>  tests/qtest/libqtest-single.h                    |   2 +-
+>  tests/qtest/libqtest.c                           |   2 +-
+>  tests/qtest/m48t59-test.c                        |   2 +-
+>  tests/qtest/machine-none-test.c                  |   2 +-
+>  tests/qtest/megasas-test.c                       |   2 +-
+>  tests/qtest/meson.build                          | 254 +++++++++++++++++
+>  tests/qtest/microbit-test.c                      |   2 +-
+>  tests/qtest/migration-helpers.h                  |   2 +-
+>  tests/qtest/migration-test.c                     |   4 +-
+>  tests/qtest/modules-test.c                       |   2 +-
+>  tests/qtest/ne2000-test.c                        |   2 +-
+>  tests/qtest/numa-test.c                          |   2 +-
+>  tests/qtest/nvme-test.c                          |   2 +-
+>  tests/qtest/pca9552-test.c                       |   2 +-
+>  tests/qtest/pci-test.c                           |   2 +-
+>  tests/qtest/pcnet-test.c                         |   2 +-
+>  tests/qtest/pflash-cfi02-test.c                  |   2 +-
+>  tests/qtest/pnv-xscom-test.c                     |   2 +-
+>  tests/qtest/prom-env-test.c                      |   2 +-
+>  tests/qtest/pvpanic-test.c                       |   2 +-
+>  tests/qtest/pxe-test.c                           |   2 +-
+>  tests/qtest/q35-test.c                           |   2 +-
+>  tests/qtest/qmp-cmd-test.c                       |   2 +-
+>  tests/qtest/qmp-test.c                           |   2 +-
+>  tests/qtest/qom-test.c                           |   2 +-
+>  tests/qtest/rtas-test.c                          |   2 +-
+>  tests/qtest/sdhci-test.c                         |   2 +-
+>  tests/qtest/spapr-phb-test.c                     |   2 +-
+>  tests/qtest/tco-test.c                           |   2 +-
+>  tests/qtest/test-filter-mirror.c                 |   2 +-
+>  tests/qtest/test-filter-redirector.c             |   2 +-
+>  tests/qtest/test-hmp.c                           |   2 +-
+>  tests/qtest/tpm-crb-swtpm-test.c                 |   2 +-
+>  tests/qtest/tpm-tis-device-swtpm-test.c          |   2 +-
+>  tests/qtest/tpm-tis-swtpm-test.c                 |   2 +-
+>  tests/qtest/tpm-util.c                           |   2 +-
+>  tests/qtest/tulip-test.c                         |   2 +-
+>  tests/qtest/virtio-rng-test.c                    |   2 +-
+>  tests/qtest/virtio-test.c                        |   2 +-
+>  tests/qtest/vmgenid-test.c                       |   2 +-
+>  tests/qtest/vmxnet3-test.c                       |   2 +-
+>  tests/qtest/wdt_ib700-test.c                     |   2 +-
+>  tests/test-qga.c                                 |   2 +-
+>  tests/test-qgraph.c                              |   5 +-
+>  148 files changed, 539 insertions(+), 592 deletions(-)
+>  delete mode 100644 tests/qtest/Makefile.include
+>  rename tests/qtest/{ => libqos}/libqtest.h (100%)
+>  create mode 100644 tests/qtest/libqos/meson.build
+>  create mode 100644 tests/qtest/meson.build
+> 
+> diff --git a/meson.build b/meson.build
+> index 3daa82e..a81516a 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -511,6 +511,9 @@ subdir('nbd')
+>  subdir('scsi')
+>  subdir('block')
+>  
+> +# needed for fuzzing binaries
+> +subdir('tests/qtest/libqos')
+> +
+>  mods = []
+>  block_mods = []
+>  softmmu_mods = []
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index a0e5d3e..567ad69 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -109,6 +109,7 @@ check-unit-y += tests/test-qht$(EXESUF)
+>  check-unit-y += tests/test-qht-par$(EXESUF)
+>  check-unit-y += tests/test-bitops$(EXESUF)
+>  check-unit-y += tests/test-bitcnt$(EXESUF)
+> +check-unit-y += tests/test-qgraph$(EXESUF)
+>  check-unit-y += tests/check-qom-interface$(EXESUF)
+>  check-unit-y += tests/check-qom-proplist$(EXESUF)
+>  check-unit-y += tests/test-qemu-opts$(EXESUF)
+> @@ -306,19 +307,6 @@ tests/test-qapi-gen-timestamp: \
+>  	@rm -f tests/test-qapi-doc.texi
+>  	@>$@
+>  
+> -tests/qtest/dbus-vmstate1.h tests/qtest/dbus-vmstate1.c: tests/qtest/dbus-vmstate1-gen-timestamp ;
+> -tests/qtest/dbus-vmstate1-gen-timestamp: $(SRC_PATH)/tests/qtest/dbus-vmstate1.xml
+> -	$(call quiet-command,$(GDBUS_CODEGEN) $< \
+> -		--interface-prefix org.qemu --generate-c-code tests/qtest/dbus-vmstate1, \
+> -		"GEN","$(@:%-timestamp=%)")
+> -	@>$@
+> -
+> -tests/qtest/dbus-vmstate-test.o-cflags := -DSRCDIR="$(SRC_PATH)"
+> -tests/qtest/dbus-vmstate1.o-cflags := $(GIO_CFLAGS)
+> -tests/qtest/dbus-vmstate1.o-libs := $(GIO_LIBS)
+> -
+> -tests/qtest/dbus-vmstate-test.o: tests/qtest/dbus-vmstate1.h
+> -
+>  tests/test-string-output-visitor$(EXESUF): tests/test-string-output-visitor.o $(test-qapi-obj-y)
+>  tests/test-string-input-visitor$(EXESUF): tests/test-string-input-visitor.o $(test-qapi-obj-y)
+>  tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o $(test-qapi-obj-y) tests/test-qapi-emit-events.o tests/test-qapi-events.o
+> @@ -333,6 +321,7 @@ tests/test-shift128$(EXESUF): tests/test-shift128.o $(test-util-obj-y)
+>  tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
+>  tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
+>  tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+> +tests/test-qgraph$(EXESUF): tests/test-qgraph.o tests/qtest/libqos/qgraph.o $(test-util-obj-y)
+>  tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
+>  tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
+>  tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
+> @@ -396,10 +385,8 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+>  	rm $(INITRD_WORK_DIR)/init
+>  	rmdir $(INITRD_WORK_DIR)
+>  
+> -include $(SRC_PATH)/tests/qtest/Makefile.include
+> -
+>  tests/test-qga$(EXESUF): qga/qemu-ga$(EXESUF)
+> -tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+> +tests/test-qga$(EXESUF): tests/test-qga.o tests/qtest/libqtest.o $(test-util-obj-y)
+>  tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-obj-y) libvhost-user.a
+>  tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o
+>  
+> @@ -440,16 +427,6 @@ define do_test_tap
+>  	  "TAP","$@")
+>  endef
+>  
+> -.PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
+> -$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: %-softmmu/all $(check-qtest-y)
+> -	$(call do_test_human,$(check-qtest-$*-y:%=tests/qtest/%$(EXESUF)) $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF)), \
+> -	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+> -	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
+> -
+> -build-qtest: $(patsubst %, %-softmmu/all, $(QTEST_TARGETS)) $(check-qtest-y)
+> -
+> -build-unit: $(check-unit-y)
+> -
+>  check-unit: $(check-unit-y)
+>  	$(call do_test_human, $^)
+>  
+> @@ -458,18 +435,9 @@ check-speed: $(check-speed-y)
+>  
+>  # gtester tests with TAP output
+>  
+> -$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-qtest-%.tap: %-softmmu/all $(check-qtest-y)
+> -	$(call do_test_tap, $(check-qtest-$*-y:%=tests/qtest/%$(EXESUF)) $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF)), \
+> -	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+> -	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
+> -
+>  check-report-unit.tap: $(check-unit-y)
+>  	$(call do_test_tap,$^)
+>  
+> -# Reports and overall runs
+> -
+> -check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
+> -
+>  # Plugins
+>  ifeq ($(CONFIG_PLUGIN),y)
+>  .PHONY: plugins
+> @@ -582,19 +550,16 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
+>  
+>  # Consolidated targets
+>  
+> -.PHONY: check-block check-qtest check-unit check check-clean get-vm-images
+> -check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+> +.PHONY: check-block check-unit check check-clean get-vm-images
+>  ifeq ($(CONFIG_TOOLS),y)
+>  check-block: $(patsubst %,check-%, $(check-block-y))
+>  endif
+> -check-build: build-unit build-qtest
+> +check-build: build-unit
+>  
+> -check: check-block check-unit check-qtest
+> +check: check-block check-unit
+>  check-clean:
+>  	rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
+> -	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y:%=tests/qtest/%$(EXESUF))) $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF)))
+>  	rm -f tests/test-qapi-gen-timestamp
+> -	rm -f tests/qtest/dbus-vmstate1-gen-timestamp
+>  	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+>  
+>  check: check-block check-qapi-schema check-unit check-qtest check-decodetree
+> @@ -606,7 +571,5 @@ clean: check-clean
+>  all: $(QEMU_IOTESTS_HELPERS-y)
+>  
+>  -include $(wildcard tests/*.d)
+> --include $(wildcard tests/qtest/*.d)
+> --include $(wildcard tests/qtest/libqos/*.d)
+>  
+>  endif
+> diff --git a/tests/meson.build b/tests/meson.build
+> index 8be9c22..d724402 100644
+> --- a/tests/meson.build
+> +++ b/tests/meson.build
+> @@ -8,3 +8,4 @@ if 'CONFIG_TCG' in config_host
+>  endif
+>  
+>  subdir('qapi-schema')
+> +subdir('qtest')
+> diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+> deleted file mode 100644
+> index b0204e4..0000000
+> --- a/tests/qtest/Makefile.include
+> +++ /dev/null
+> @@ -1,332 +0,0 @@
+> -# All QTests for now are POSIX-only, but the dependencies are
+> -# really in libqtest, not in the testcases themselves.
+> -
+> -check-qtest-generic-y += cdrom-test
+> -check-qtest-generic-y += device-introspect-test
+> -check-qtest-generic-y += machine-none-test
+> -check-qtest-generic-y += qmp-test
+> -check-qtest-generic-y += qmp-cmd-test
+> -check-qtest-generic-y += qom-test
+> -check-qtest-generic-$(CONFIG_MODULES) += modules-test
+> -check-qtest-generic-y += test-hmp
+> -
+> -check-qtest-pci-$(CONFIG_RTL8139_PCI) += rtl8139-test
+> -check-qtest-pci-$(CONFIG_VGA) += display-vga-test
+> -check-qtest-pci-$(CONFIG_HDA) += intel-hda-test
+> -check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) += ivshmem-test
+> -
+> -DBUS_DAEMON := $(shell which dbus-daemon 2>/dev/null)
+> -ifneq ($(GDBUS_CODEGEN),)
+> -ifneq ($(DBUS_DAEMON),)
+> -# Temporarily disabled due to Patchew failures:
+> -#check-qtest-pci-$(CONFIG_GIO) += dbus-vmstate-test
+> -endif
+> -endif
+> -
+> -check-qtest-i386-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-i386-y += fdc-test
+> -check-qtest-i386-y += ide-test
+> -check-qtest-i386-$(CONFIG_TOOLS) += ahci-test
+> -check-qtest-i386-y += hd-geo-test
+> -check-qtest-i386-y += boot-order-test
+> -check-qtest-i386-y += bios-tables-test
+> -check-qtest-i386-$(CONFIG_SGA) += boot-serial-test
+> -check-qtest-i386-$(CONFIG_SLIRP) += pxe-test
+> -check-qtest-i386-y += rtc-test
+> -check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) += ipmi-kcs-test
+> -ifdef CONFIG_LINUX
+> -check-qtest-i386-$(CONFIG_ISA_IPMI_BT) += ipmi-bt-test
+> -endif
+> -check-qtest-i386-y += i440fx-test
+> -check-qtest-i386-y += fw_cfg-test
+> -check-qtest-i386-y += device-plug-test
+> -check-qtest-i386-y += drive_del-test
+> -check-qtest-i386-$(CONFIG_WDT_IB700) += wdt_ib700-test
+> -check-qtest-i386-y += tco-test
+> -check-qtest-i386-y += $(check-qtest-pci-y)
+> -check-qtest-i386-$(CONFIG_PVPANIC) += pvpanic-test
+> -check-qtest-i386-$(CONFIG_I82801B11) += i82801b11-test
+> -check-qtest-i386-$(CONFIG_IOH3420) += ioh3420-test
+> -check-qtest-i386-$(CONFIG_USB_UHCI) += usb-hcd-uhci-test
+> -check-qtest-i386-$(call land,$(CONFIG_USB_EHCI),$(CONFIG_USB_UHCI)) += usb-hcd-ehci-test
+> -check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += usb-hcd-xhci-test
+> -check-qtest-i386-y += cpu-plug-test
+> -check-qtest-i386-y += q35-test
+> -check-qtest-i386-y += vmgenid-test
+> -check-qtest-i386-$(CONFIG_TPM_CRB) += tpm-crb-swtpm-test
+> -check-qtest-i386-$(CONFIG_TPM_CRB) += tpm-crb-test
+> -check-qtest-i386-$(CONFIG_TPM_TIS_ISA) += tpm-tis-swtpm-test
+> -check-qtest-i386-$(CONFIG_TPM_TIS_ISA) += tpm-tis-test
+> -check-qtest-i386-$(CONFIG_SLIRP) += test-netfilter
+> -check-qtest-i386-$(CONFIG_POSIX) += test-filter-mirror
+> -check-qtest-i386-$(CONFIG_RTL8139_PCI) += test-filter-redirector
+> -check-qtest-i386-y += migration-test
+> -check-qtest-i386-y += test-x86-cpuid-compat
+> -check-qtest-i386-y += numa-test
+> -
+> -check-qtest-x86_64-y += $(check-qtest-i386-y)
+> -
+> -check-qtest-avr-y += boot-serial-test
+> -
+> -check-qtest-alpha-y += boot-serial-test
+> -check-qtest-alpha-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-hppa-y += boot-serial-test
+> -check-qtest-hppa-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-m68k-y = boot-serial-test
+> -
+> -check-qtest-microblaze-y += boot-serial-test
+> -
+> -check-qtest-mips-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-mips-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-mips64-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-mips64-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-mips64el-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-mips64el-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-moxie-y += boot-serial-test
+> -
+> -check-qtest-ppc-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-ppc-y += boot-order-test
+> -check-qtest-ppc-y += prom-env-test
+> -check-qtest-ppc-y += drive_del-test
+> -check-qtest-ppc-y += boot-serial-test
+> -check-qtest-ppc-$(CONFIG_M48T59) += m48t59-test
+> -
+> -check-qtest-ppc64-y += $(check-qtest-ppc-y)
+> -check-qtest-ppc64-$(CONFIG_PSERIES) += device-plug-test
+> -check-qtest-ppc64-$(CONFIG_POWERNV) += pnv-xscom-test
+> -check-qtest-ppc64-y += migration-test
+> -check-qtest-ppc64-$(CONFIG_PSERIES) += rtas-test
+> -check-qtest-ppc64-$(CONFIG_SLIRP) += pxe-test
+> -check-qtest-ppc64-$(CONFIG_USB_UHCI) += usb-hcd-uhci-test
+> -check-qtest-ppc64-$(CONFIG_USB_XHCI_NEC) += usb-hcd-xhci-test
+> -check-qtest-ppc64-$(CONFIG_SLIRP) += test-netfilter
+> -check-qtest-ppc64-$(CONFIG_POSIX) += test-filter-mirror
+> -check-qtest-ppc64-$(CONFIG_RTL8139_PCI) += test-filter-redirector
+> -check-qtest-ppc64-$(CONFIG_VGA) += display-vga-test
+> -check-qtest-ppc64-y += numa-test
+> -check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) += ivshmem-test
+> -check-qtest-ppc64-y += cpu-plug-test
+> -
+> -check-qtest-sh4-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -
+> -check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -
+> -check-qtest-sparc-y += prom-env-test
+> -check-qtest-sparc-y += m48t59-test
+> -check-qtest-sparc-y += boot-serial-test
+> -
+> -check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-sparc64-y += prom-env-test
+> -check-qtest-sparc64-y += boot-serial-test
+> -
+> -check-qtest-arm-y += arm-cpu-features
+> -check-qtest-arm-y += microbit-test
+> -check-qtest-arm-y += m25p80-test
+> -check-qtest-arm-y += test-arm-mptimer
+> -check-qtest-arm-y += boot-serial-test
+> -check-qtest-arm-y += hexloader-test
+> -check-qtest-arm-$(CONFIG_PFLASH_CFI02) += pflash-cfi02-test
+> -
+> -check-qtest-aarch64-y += arm-cpu-features
+> -check-qtest-aarch64-$(CONFIG_TPM_TIS_SYSBUS) += tpm-tis-device-test
+> -check-qtest-aarch64-$(CONFIG_TPM_TIS_SYSBUS) += tpm-tis-device-swtpm-test
+> -check-qtest-aarch64-y += numa-test
+> -check-qtest-aarch64-y += boot-serial-test
+> -check-qtest-aarch64-y += migration-test
+> -
+> -# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make test unconditional
+> -ifneq ($(ARCH),arm)
+> -check-qtest-aarch64-y += bios-tables-test
+> -endif
+> -
+> -check-qtest-microblazeel-y += $(check-qtest-microblaze-y)
+> -
+> -check-qtest-xtensaeb-y += $(check-qtest-xtensa-y)
+> -
+> -check-qtest-s390x-y = boot-serial-test
+> -check-qtest-s390x-$(CONFIG_SLIRP) += pxe-test
+> -check-qtest-s390x-$(CONFIG_SLIRP) += test-netfilter
+> -check-qtest-s390x-$(CONFIG_POSIX) += test-filter-mirror
+> -check-qtest-s390x-$(CONFIG_POSIX) += test-filter-redirector
+> -check-qtest-s390x-y += drive_del-test
+> -check-qtest-s390x-y += device-plug-test
+> -check-qtest-s390x-y += virtio-ccw-test
+> -check-qtest-s390x-y += cpu-plug-test
+> -check-qtest-s390x-y += migration-test
+> -
+> -# libqos / qgraph :
+> -libqgraph-obj-y = tests/qtest/libqos/qgraph.o
+> -
+> -libqos-core-obj-y = $(libqgraph-obj-y) tests/qtest/libqos/pci.o tests/qtest/libqos/fw_cfg.o
+> -libqos-core-obj-y += tests/qtest/libqos/malloc.o
+> -libqos-core-obj-y += tests/qtest/libqos/libqos.o
+> -libqos-spapr-obj-y = $(libqos-core-obj-y) tests/qtest/libqos/malloc-spapr.o
+> -libqos-spapr-obj-y += tests/qtest/libqos/libqos-spapr.o
+> -libqos-spapr-obj-y += tests/qtest/libqos/rtas.o
+> -libqos-spapr-obj-y += tests/qtest/libqos/pci-spapr.o
+> -libqos-pc-obj-y = $(libqos-core-obj-y) tests/qtest/libqos/pci-pc.o
+> -libqos-pc-obj-y += tests/qtest/libqos/malloc-pc.o tests/qtest/libqos/libqos-pc.o
+> -libqos-pc-obj-y += tests/qtest/libqos/ahci.o
+> -libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/qtest/libqos/usb.o
+> -
+> -# qos devices:
+> -libqos-obj-y =  $(libqgraph-obj-y)
+> -libqos-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+> -libqos-obj-y += tests/qtest/libqos/qos_external.o
+> -libqos-obj-y += tests/qtest/libqos/e1000e.o
+> -libqos-obj-y += tests/qtest/libqos/i2c.o
+> -libqos-obj-y += tests/qtest/libqos/i2c-imx.o
+> -libqos-obj-y += tests/qtest/libqos/i2c-omap.o
+> -libqos-obj-y += tests/qtest/libqos/sdhci.o
+> -libqos-obj-y += tests/qtest/libqos/tpci200.o
+> -libqos-obj-y += tests/qtest/libqos/virtio.o
+> -libqos-obj-$(CONFIG_VIRTFS) += tests/qtest/libqos/virtio-9p.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-balloon.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-blk.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-mmio.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-net.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-pci.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-pci-modern.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-rng.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-scsi.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-serial.o
+> -
+> -# qos machines:
+> -libqos-obj-y += tests/qtest/libqos/aarch64-xlnx-zcu102-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-imx25-pdk-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-n800-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-raspi2-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-sabrelite-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-smdkc210-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-virt-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-xilinx-zynq-a9-machine.o
+> -libqos-obj-y += tests/qtest/libqos/ppc64_pseries-machine.o
+> -libqos-obj-y += tests/qtest/libqos/x86_64_pc-machine.o
+> -
+> -# qos tests:
+> -qos-test-obj-y += tests/qtest/qos-test.o
+> -qos-test-obj-y += tests/qtest/ac97-test.o
+> -qos-test-obj-y += tests/qtest/ds1338-test.o
+> -qos-test-obj-y += tests/qtest/e1000-test.o
+> -qos-test-obj-y += tests/qtest/e1000e-test.o
+> -qos-test-obj-y += tests/qtest/eepro100-test.o
+> -qos-test-obj-y += tests/qtest/es1370-test.o
+> -qos-test-obj-y += tests/qtest/ipoctal232-test.o
+> -qos-test-obj-y += tests/qtest/megasas-test.o
+> -qos-test-obj-y += tests/qtest/ne2000-test.o
+> -qos-test-obj-y += tests/qtest/tulip-test.o
+> -qos-test-obj-y += tests/qtest/nvme-test.o
+> -qos-test-obj-y += tests/qtest/pca9552-test.o
+> -qos-test-obj-y += tests/qtest/pci-test.o
+> -qos-test-obj-y += tests/qtest/pcnet-test.o
+> -qos-test-obj-y += tests/qtest/sdhci-test.o
+> -qos-test-obj-y += tests/qtest/spapr-phb-test.o
+> -qos-test-obj-y += tests/qtest/tmp105-test.o
+> -qos-test-obj-y += tests/qtest/usb-hcd-ohci-test.o $(libqos-usb-obj-y)
+> -qos-test-obj-$(CONFIG_VHOST_NET_USER) += tests/qtest/vhost-user-test.o $(chardev-obj-y) $(test-io-obj-y)
+> -qos-test-obj-y += tests/qtest/virtio-test.o
+> -qos-test-obj-$(CONFIG_VIRTFS) += tests/qtest/virtio-9p-test.o
+> -qos-test-obj-y += tests/qtest/virtio-blk-test.o
+> -qos-test-obj-y += tests/qtest/virtio-net-test.o
+> -qos-test-obj-y += tests/qtest/virtio-rng-test.o
+> -qos-test-obj-y += tests/qtest/virtio-scsi-test.o
+> -qos-test-obj-y += tests/qtest/virtio-serial-test.o
+> -qos-test-obj-y += tests/qtest/vmxnet3-test.o
+> -
+> -check-unit-y += tests/test-qgraph$(EXESUF)
+> -tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
+> -
+> -check-qtest-generic-y += qos-test
+> -tests/qtest/qos-test$(EXESUF): $(qos-test-obj-y) $(libqos-obj-y)
+> -
+> -# QTest dependencies:
+> -tests/qtest/qmp-test$(EXESUF): tests/qtest/qmp-test.o
+> -tests/qtest/qmp-cmd-test$(EXESUF): tests/qtest/qmp-cmd-test.o
+> -tests/qtest/device-introspect-test$(EXESUF): tests/qtest/device-introspect-test.o
+> -tests/qtest/rtc-test$(EXESUF): tests/qtest/rtc-test.o
+> -tests/qtest/m48t59-test$(EXESUF): tests/qtest/m48t59-test.o
+> -tests/qtest/hexloader-test$(EXESUF): tests/qtest/hexloader-test.o
+> -tests/qtest/pflash-cfi02$(EXESUF): tests/qtest/pflash-cfi02-test.o
+> -tests/qtest/endianness-test$(EXESUF): tests/qtest/endianness-test.o
+> -tests/qtest/prom-env-test$(EXESUF): tests/qtest/prom-env-test.o $(libqos-obj-y)
+> -tests/qtest/rtas-test$(EXESUF): tests/qtest/rtas-test.o $(libqos-spapr-obj-y)
+> -tests/qtest/fdc-test$(EXESUF): tests/qtest/fdc-test.o
+> -tests/qtest/ide-test$(EXESUF): tests/qtest/ide-test.o $(libqos-pc-obj-y)
+> -tests/qtest/ahci-test$(EXESUF): tests/qtest/ahci-test.o $(libqos-pc-obj-y) qemu-img$(EXESUF)
+> -tests/qtest/ipmi-kcs-test$(EXESUF): tests/qtest/ipmi-kcs-test.o
+> -tests/qtest/ipmi-bt-test$(EXESUF): tests/qtest/ipmi-bt-test.o
+> -tests/qtest/hd-geo-test$(EXESUF): tests/qtest/hd-geo-test.o $(libqos-obj-y)
+> -tests/qtest/boot-order-test$(EXESUF): tests/qtest/boot-order-test.o $(libqos-obj-y)
+> -tests/qtest/boot-serial-test$(EXESUF): tests/qtest/boot-serial-test.o $(libqos-obj-y)
+> -tests/qtest/bios-tables-test$(EXESUF): tests/qtest/bios-tables-test.o \
+> -        tests/qtest/tpm-emu.o $(test-io-obj-y) \
+> -	tests/qtest/boot-sector.o tests/qtest/acpi-utils.o $(libqos-obj-y)
+> -tests/qtest/pxe-test$(EXESUF): tests/qtest/pxe-test.o tests/qtest/boot-sector.o $(libqos-obj-y)
+> -tests/qtest/microbit-test$(EXESUF): tests/qtest/microbit-test.o
+> -tests/qtest/m25p80-test$(EXESUF): tests/qtest/m25p80-test.o
+> -tests/qtest/i440fx-test$(EXESUF): tests/qtest/i440fx-test.o $(libqos-pc-obj-y)
+> -tests/qtest/q35-test$(EXESUF): tests/qtest/q35-test.o $(libqos-pc-obj-y)
+> -tests/qtest/fw_cfg-test$(EXESUF): tests/qtest/fw_cfg-test.o $(libqos-pc-obj-y)
+> -tests/qtest/rtl8139-test$(EXESUF): tests/qtest/rtl8139-test.o $(libqos-pc-obj-y)
+> -tests/qtest/pnv-xscom-test$(EXESUF): tests/qtest/pnv-xscom-test.o
+> -tests/qtest/wdt_ib700-test$(EXESUF): tests/qtest/wdt_ib700-test.o
+> -tests/qtest/tco-test$(EXESUF): tests/qtest/tco-test.o $(libqos-pc-obj-y)
+> -tests/qtest/virtio-ccw-test$(EXESUF): tests/qtest/virtio-ccw-test.o
+> -tests/qtest/display-vga-test$(EXESUF): tests/qtest/display-vga-test.o
+> -tests/qtest/qom-test$(EXESUF): tests/qtest/qom-test.o
+> -tests/qtest/modules-test$(EXESUF): tests/qtest/modules-test.o
+> -tests/qtest/test-hmp$(EXESUF): tests/qtest/test-hmp.o
+> -tests/qtest/machine-none-test$(EXESUF): tests/qtest/machine-none-test.o
+> -tests/qtest/device-plug-test$(EXESUF): tests/qtest/device-plug-test.o
+> -tests/qtest/drive_del-test$(EXESUF): tests/qtest/drive_del-test.o
+> -tests/qtest/pvpanic-test$(EXESUF): tests/qtest/pvpanic-test.o
+> -tests/qtest/i82801b11-test$(EXESUF): tests/qtest/i82801b11-test.o
+> -tests/qtest/intel-hda-test$(EXESUF): tests/qtest/intel-hda-test.o
+> -tests/qtest/ioh3420-test$(EXESUF): tests/qtest/ioh3420-test.o
+> -tests/qtest/usb-hcd-uhci-test$(EXESUF): tests/qtest/usb-hcd-uhci-test.o $(libqos-usb-obj-y)
+> -tests/qtest/usb-hcd-ehci-test$(EXESUF): tests/qtest/usb-hcd-ehci-test.o $(libqos-usb-obj-y)
+> -tests/qtest/usb-hcd-xhci-test$(EXESUF): tests/qtest/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
+> -tests/qtest/cpu-plug-test$(EXESUF): tests/qtest/cpu-plug-test.o
+> -tests/qtest/migration-test$(EXESUF): tests/qtest/migration-test.o tests/qtest/migration-helpers.o
+> -tests/qtest/test-netfilter$(EXESUF): tests/qtest/test-netfilter.o $(qtest-obj-y)
+> -tests/qtest/test-filter-mirror$(EXESUF): tests/qtest/test-filter-mirror.o $(qtest-obj-y)
+> -tests/qtest/test-filter-redirector$(EXESUF): tests/qtest/test-filter-redirector.o $(qtest-obj-y)
+> -tests/qtest/test-x86-cpuid-compat$(EXESUF): tests/qtest/test-x86-cpuid-compat.o $(qtest-obj-y)
+> -tests/qtest/ivshmem-test$(EXESUF): tests/qtest/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+> -tests/qtest/dbus-vmstate-test$(EXESUF): tests/qtest/dbus-vmstate-test.o tests/qtest/migration-helpers.o tests/qtest/dbus-vmstate1.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+> -tests/qtest/test-arm-mptimer$(EXESUF): tests/qtest/test-arm-mptimer.o
+> -tests/qtest/numa-test$(EXESUF): tests/qtest/numa-test.o
+> -tests/qtest/vmgenid-test$(EXESUF): tests/qtest/vmgenid-test.o tests/qtest/boot-sector.o tests/qtest/acpi-utils.o
+> -tests/qtest/cdrom-test$(EXESUF): tests/qtest/cdrom-test.o tests/qtest/boot-sector.o $(libqos-obj-y)
+> -tests/qtest/arm-cpu-features$(EXESUF): tests/qtest/arm-cpu-features.o
+> -tests/qtest/tpm-crb-swtpm-test$(EXESUF): tests/qtest/tpm-crb-swtpm-test.o tests/qtest/tpm-emu.o \
+> -	tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
+> -tests/qtest/tpm-crb-test$(EXESUF): tests/qtest/tpm-crb-test.o tests/qtest/tpm-emu.o $(test-io-obj-y)
+> -tests/qtest/tpm-tis-swtpm-test$(EXESUF): tests/qtest/tpm-tis-swtpm-test.o tests/qtest/tpm-emu.o \
+> -	tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
+> -tests/qtest/tpm-tis-device-swtpm-test$(EXESUF): tests/qtest/tpm-tis-device-swtpm-test.o tests/qtest/tpm-emu.o \
+> -	tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
+> -tests/qtest/tpm-tis-test$(EXESUF): tests/qtest/tpm-tis-test.o tests/qtest/tpm-tis-util.o tests/qtest/tpm-emu.o $(test-io-obj-y)
+> -tests/qtest/tpm-tis-device-test$(EXESUF): tests/qtest/tpm-tis-device-test.o tests/qtest/tpm-tis-util.o tests/qtest/tpm-emu.o $(test-io-obj-y)
+> -
+> -# QTest rules
+> -
+> -TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
+> -QTEST_TARGETS =
+> -# The qtests are not runnable (yet) under TSan due to a known issue.
+> -# https://github.com/google/sanitizers/issues/1116
+> -ifndef CONFIG_TSAN
+> -ifeq ($(CONFIG_POSIX),y)
+> -QTEST_TARGETS = $(TARGETS)
+> -check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y:%=tests/qtest/%$(EXESUF)))
+> -check-qtest-y += $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF))
+> -endif
+> -endif
+> -
+> -qtest-obj-y = tests/qtest/libqtest.o $(test-util-obj-y)
+> -$(check-qtest-y): $(qtest-obj-y)
+> diff --git a/tests/qtest/ac97-test.c b/tests/qtest/ac97-test.c
+> index b084e31..e09f249 100644
+> --- a/tests/qtest/ac97-test.c
+> +++ b/tests/qtest/ac97-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/acpi-utils.h b/tests/qtest/acpi-utils.h
+> index 0c86780..261784d 100644
+> --- a/tests/qtest/acpi-utils.h
+> +++ b/tests/qtest/acpi-utils.h
+> @@ -13,7 +13,7 @@
+>  #ifndef TEST_ACPI_UTILS_H
+>  #define TEST_ACPI_UTILS_H
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  /* DSDT and SSDTs format */
+>  typedef struct {
+> diff --git a/tests/qtest/ahci-test.c b/tests/qtest/ahci-test.c
+> index c8d42ce..ca4294f 100644
+> --- a/tests/qtest/ahci-test.c
+> +++ b/tests/qtest/ahci-test.c
+> @@ -25,7 +25,7 @@
+>  #include "qemu/osdep.h"
+>  #include <getopt.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/libqos-pc.h"
+>  #include "libqos/ahci.h"
+>  #include "libqos/pci-pc.h"
+> diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
+> index f7e062c..77b5e30 100644
+> --- a/tests/qtest/arm-cpu-features.c
+> +++ b/tests/qtest/arm-cpu-features.c
+> @@ -10,7 +10,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "qemu/bitops.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qjson.h"
+>  
+> diff --git a/tests/qtest/boot-order-test.c b/tests/qtest/boot-order-test.c
+> index 2f1c072..fac580d 100644
+> --- a/tests/qtest/boot-order-test.c
+> +++ b/tests/qtest/boot-order-test.c
+> @@ -12,7 +12,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqos/fw_cfg.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "standard-headers/linux/qemu_fw_cfg.h"
+>  
+> diff --git a/tests/qtest/boot-sector.c b/tests/qtest/boot-sector.c
+> index 9e66c6d..24df5c4 100644
+> --- a/tests/qtest/boot-sector.c
+> +++ b/tests/qtest/boot-sector.c
+> @@ -13,7 +13,7 @@
+>  #include "qemu/osdep.h"
+>  #include "boot-sector.h"
+>  #include "qemu-common.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  #define LOW(x) ((x) & 0xff)
+>  #define HIGH(x) ((x) >> 8)
+> diff --git a/tests/qtest/boot-sector.h b/tests/qtest/boot-sector.h
+> index 6ee6bb4..b339fde 100644
+> --- a/tests/qtest/boot-sector.h
+> +++ b/tests/qtest/boot-sector.h
+> @@ -14,7 +14,7 @@
+>  #ifndef TEST_BOOT_SECTOR_H
+>  #define TEST_BOOT_SECTOR_H
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  /* Create boot disk file. fname must be a suitable string for mkstemp() */
+>  int boot_sector_init(char *fname);
+> diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-test.c
+> index bfe7624..b6b1c23 100644
+> --- a/tests/qtest/boot-serial-test.c
+> +++ b/tests/qtest/boot-serial-test.c
+> @@ -14,7 +14,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/libqos-spapr.h"
+>  
+>  static const uint8_t bios_avr[] = {
+> diff --git a/tests/qtest/cdrom-test.c b/tests/qtest/cdrom-test.c
+> index 833a050..e9afab6 100644
+> --- a/tests/qtest/cdrom-test.c
+> +++ b/tests/qtest/cdrom-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "boot-sector.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+> diff --git a/tests/qtest/dbus-vmstate-test.c b/tests/qtest/dbus-vmstate-test.c
+> index 2e5e47d..aca9b98 100644
+> --- a/tests/qtest/dbus-vmstate-test.c
+> +++ b/tests/qtest/dbus-vmstate-test.c
+> @@ -1,7 +1,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  #include <gio/gio.h>
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu-common.h"
+>  #include "dbus-vmstate1.h"
+>  #include "migration-helpers.h"
+> diff --git a/tests/qtest/device-introspect-test.c b/tests/qtest/device-introspect-test.c
+> index d68b785..9f22340 100644
+> --- a/tests/qtest/device-introspect-test.c
+> +++ b/tests/qtest/device-introspect-test.c
+> @@ -22,7 +22,7 @@
+>  #include "qapi/qmp/qstring.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qlist.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  const char common_args[] = "-nodefaults -machine none";
+>  
+> diff --git a/tests/qtest/device-plug-test.c b/tests/qtest/device-plug-test.c
+> index 318e422..9214892 100644
+> --- a/tests/qtest/device-plug-test.c
+> +++ b/tests/qtest/device-plug-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qstring.h"
+>  
+> diff --git a/tests/qtest/drive_del-test.c b/tests/qtest/drive_del-test.c
+> index 5f8839b..2ab11ad 100644
+> --- a/tests/qtest/drive_del-test.c
+> +++ b/tests/qtest/drive_del-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/virtio.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+> diff --git a/tests/qtest/ds1338-test.c b/tests/qtest/ds1338-test.c
+> index f6ade9a..c5d46bc 100644
+> --- a/tests/qtest/ds1338-test.c
+> +++ b/tests/qtest/ds1338-test.c
+> @@ -18,7 +18,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/i2c.h"
+>  
+>  #define DS1338_ADDR 0x68
+> diff --git a/tests/qtest/e1000-test.c b/tests/qtest/e1000-test.c
+> index c387984..ea286d1 100644
+> --- a/tests/qtest/e1000-test.c
+> +++ b/tests/qtest/e1000-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/eepro100-test.c b/tests/qtest/eepro100-test.c
+> index 8dbffff..d72ad09 100644
+> --- a/tests/qtest/eepro100-test.c
+> +++ b/tests/qtest/eepro100-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/endianness-test.c b/tests/qtest/endianness-test.c
+> index cc088ac..4e79e22 100644
+> --- a/tests/qtest/endianness-test.c
+> +++ b/tests/qtest/endianness-test.c
+> @@ -13,7 +13,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/bswap.h"
+>  
+>  typedef struct TestCase TestCase;
+> diff --git a/tests/qtest/es1370-test.c b/tests/qtest/es1370-test.c
+> index adccdac..2fd7fd2 100644
+> --- a/tests/qtest/es1370-test.c
+> +++ b/tests/qtest/es1370-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+> index 031594a..1ceea84 100644
+> --- a/tests/qtest/fuzz/fuzz.c
+> +++ b/tests/qtest/fuzz/fuzz.c
+> @@ -20,7 +20,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/main-loop.h"
+>  #include "qemu/rcu.h"
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  #include "tests/qtest/libqos/qgraph.h"
+>  #include "fuzz.h"
+>  
+> diff --git a/tests/qtest/fuzz/fuzz.h b/tests/qtest/fuzz/fuzz.h
+> index 9ca3d10..8eb765e 100644
+> --- a/tests/qtest/fuzz/fuzz.h
+> +++ b/tests/qtest/fuzz/fuzz.h
+> @@ -18,7 +18,7 @@
+>  #include "qemu/units.h"
+>  #include "qapi/error.h"
+>  
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  
+>  /**
+>   * A libfuzzer fuzzing target
+> diff --git a/tests/qtest/fuzz/i440fx_fuzz.c b/tests/qtest/fuzz/i440fx_fuzz.c
+> index bf966d4..f45373f 100644
+> --- a/tests/qtest/fuzz/i440fx_fuzz.c
+> +++ b/tests/qtest/fuzz/i440fx_fuzz.c
+> @@ -13,7 +13,7 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "qemu/main-loop.h"
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  #include "tests/qtest/libqos/pci.h"
+>  #include "tests/qtest/libqos/pci-pc.h"
+>  #include "fuzz.h"
+> diff --git a/tests/qtest/fuzz/qos_fuzz.c b/tests/qtest/fuzz/qos_fuzz.c
+> index d52f3eb..b943577 100644
+> --- a/tests/qtest/fuzz/qos_fuzz.c
+> +++ b/tests/qtest/fuzz/qos_fuzz.c
+> @@ -25,7 +25,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/main-loop.h"
+>  
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  #include "tests/qtest/libqos/malloc.h"
+>  #include "tests/qtest/libqos/qgraph.h"
+>  #include "tests/qtest/libqos/qgraph_internal.h"
+> diff --git a/tests/qtest/fuzz/virtio_net_fuzz.c b/tests/qtest/fuzz/virtio_net_fuzz.c
+> index a33bd73..277a9e2 100644
+> --- a/tests/qtest/fuzz/virtio_net_fuzz.c
+> +++ b/tests/qtest/fuzz/virtio_net_fuzz.c
+> @@ -13,7 +13,7 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "standard-headers/linux/virtio_config.h"
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  #include "tests/qtest/libqos/virtio-net.h"
+>  #include "fuzz.h"
+>  #include "fork_fuzz.h"
+> diff --git a/tests/qtest/fuzz/virtio_scsi_fuzz.c b/tests/qtest/fuzz/virtio_scsi_fuzz.c
+> index 3a9ea13..977ac42 100644
+> --- a/tests/qtest/fuzz/virtio_scsi_fuzz.c
+> +++ b/tests/qtest/fuzz/virtio_scsi_fuzz.c
+> @@ -12,7 +12,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  #include "libqos/virtio-scsi.h"
+>  #include "libqos/virtio.h"
+>  #include "libqos/virtio-pci.h"
+> diff --git a/tests/qtest/fw_cfg-test.c b/tests/qtest/fw_cfg-test.c
+> index 5dc807b..95b3907 100644
+> --- a/tests/qtest/fw_cfg-test.c
+> +++ b/tests/qtest/fw_cfg-test.c
+> @@ -12,7 +12,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "standard-headers/linux/qemu_fw_cfg.h"
+>  #include "libqos/fw_cfg.h"
+>  #include "qemu/bswap.h"
+> diff --git a/tests/qtest/hd-geo-test.c b/tests/qtest/hd-geo-test.c
+> index 48e8e02..f7b7cfb 100644
+> --- a/tests/qtest/hd-geo-test.c
+> +++ b/tests/qtest/hd-geo-test.c
+> @@ -19,7 +19,7 @@
+>  #include "qemu-common.h"
+>  #include "qemu/bswap.h"
+>  #include "qapi/qmp/qlist.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/fw_cfg.h"
+>  #include "libqos/libqos.h"
+>  #include "standard-headers/linux/qemu_fw_cfg.h"
+> diff --git a/tests/qtest/hexloader-test.c b/tests/qtest/hexloader-test.c
+> index 8b7aa2d..5615020 100644
+> --- a/tests/qtest/hexloader-test.c
+> +++ b/tests/qtest/hexloader-test.c
+> @@ -10,7 +10,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  /* Load 'test.hex' and verify that the in-memory contents are as expected.
+>   * 'test.hex' is a memory test pattern stored in Hexadecimal Object
+> diff --git a/tests/qtest/ide-test.c b/tests/qtest/ide-test.c
+> index 5cfd97f..3f8081e 100644
+> --- a/tests/qtest/ide-test.c
+> +++ b/tests/qtest/ide-test.c
+> @@ -25,7 +25,7 @@
+>  #include "qemu/osdep.h"
+>  
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/libqos.h"
+>  #include "libqos/pci-pc.h"
+>  #include "libqos/malloc-pc.h"
+> diff --git a/tests/qtest/ipoctal232-test.c b/tests/qtest/ipoctal232-test.c
+> index 53a8c9b..65ce10b 100644
+> --- a/tests/qtest/ipoctal232-test.c
+> +++ b/tests/qtest/ipoctal232-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  
+> diff --git a/tests/qtest/ivshmem-test.c b/tests/qtest/ivshmem-test.c
+> index ecda256..d5c8b9f 100644
+> --- a/tests/qtest/ivshmem-test.c
+> +++ b/tests/qtest/ivshmem-test.c
+> @@ -13,7 +13,7 @@
+>  #include "contrib/ivshmem-server/ivshmem-server.h"
+>  #include "libqos/libqos-pc.h"
+>  #include "libqos/libqos-spapr.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu-common.h"
+>  
+>  #define TMPSHMSIZE (1 << 20)
+> diff --git a/tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c b/tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c
+> index 8f827ae..79631cc 100644
+> --- a/tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c
+> +++ b/tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  typedef struct QXlnxZCU102Machine QXlnxZCU102Machine;
+> diff --git a/tests/qtest/libqos/ahci.c b/tests/qtest/libqos/ahci.c
+> index cc1b08e..2946abc 100644
+> --- a/tests/qtest/libqos/ahci.c
+> +++ b/tests/qtest/libqos/ahci.c
+> @@ -25,8 +25,8 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "libqtest.h"
+> -#include "libqos/ahci.h"
+> -#include "libqos/pci-pc.h"
+> +#include "ahci.h"
+> +#include "pci-pc.h"
+>  
+>  #include "qemu-common.h"
+>  #include "qemu/host-utils.h"
+> @@ -579,7 +579,7 @@ void ahci_write_fis(AHCIQState *ahci, AHCICommand *cmd)
+>      /* NCQ commands use exclusively 8 bit fields and needs no adjustment.
+>       * Only the count field needs to be adjusted for non-NCQ commands.
+>       * The auxiliary FIS fields are defined per-command and are not currently
+> -     * implemented in libqos/ahci.o, but may or may not need to be flipped. */
+> +     * implemented in ahci.o, but may or may not need to be flipped. */
+>      if (!cmd->props->ncq) {
+>          tmp.count = cpu_to_le16(tmp.count);
+>      }
+> diff --git a/tests/qtest/libqos/ahci.h b/tests/qtest/libqos/ahci.h
+> index 44ab110..88835b6 100644
+> --- a/tests/qtest/libqos/ahci.h
+> +++ b/tests/qtest/libqos/ahci.h
+> @@ -25,9 +25,9 @@
+>   * THE SOFTWARE.
+>   */
+>  
+> -#include "libqos/libqos.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/malloc-pc.h"
+> +#include "libqos.h"
+> +#include "pci.h"
+> +#include "malloc-pc.h"
+>  
+>  /*** Supplementary PCI Config Space IDs & Masks ***/
+>  #define PCI_DEVICE_ID_INTEL_Q35_AHCI   (0x2922)
+> diff --git a/tests/qtest/libqos/arm-imx25-pdk-machine.c b/tests/qtest/libqos/arm-imx25-pdk-machine.c
+> index 0da3f19..6692adf 100644
+> --- a/tests/qtest/libqos/arm-imx25-pdk-machine.c
+> +++ b/tests/qtest/libqos/arm-imx25-pdk-machine.c
+> @@ -20,9 +20,9 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/i2c.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+> +#include "i2c.h"
+>  
+>  #define ARM_PAGE_SIZE            4096
+>  #define IMX25_PDK_RAM_START      0x80000000
+> diff --git a/tests/qtest/libqos/arm-n800-machine.c b/tests/qtest/libqos/arm-n800-machine.c
+> index 35f8207..ff2049c 100644
+> --- a/tests/qtest/libqos/arm-n800-machine.c
+> +++ b/tests/qtest/libqos/arm-n800-machine.c
+> @@ -20,9 +20,9 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/i2c.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+> +#include "i2c.h"
+>  
+>  #define ARM_PAGE_SIZE            4096
+>  #define N800_RAM_START      0x80000000
+> diff --git a/tests/qtest/libqos/arm-raspi2-machine.c b/tests/qtest/libqos/arm-raspi2-machine.c
+> index 8480d80..35bb470 100644
+> --- a/tests/qtest/libqos/arm-raspi2-machine.c
+> +++ b/tests/qtest/libqos/arm-raspi2-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  #define ARM_PAGE_SIZE             4096
+> diff --git a/tests/qtest/libqos/arm-sabrelite-machine.c b/tests/qtest/libqos/arm-sabrelite-machine.c
+> index f6e403b..72425f0 100644
+> --- a/tests/qtest/libqos/arm-sabrelite-machine.c
+> +++ b/tests/qtest/libqos/arm-sabrelite-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  #define ARM_PAGE_SIZE            4096
+> diff --git a/tests/qtest/libqos/arm-smdkc210-machine.c b/tests/qtest/libqos/arm-smdkc210-machine.c
+> index eebac7f..321b882 100644
+> --- a/tests/qtest/libqos/arm-smdkc210-machine.c
+> +++ b/tests/qtest/libqos/arm-smdkc210-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  #define ARM_PAGE_SIZE             4096
+> diff --git a/tests/qtest/libqos/arm-virt-machine.c b/tests/qtest/libqos/arm-virt-machine.c
+> index 9316598..e0f5932 100644
+> --- a/tests/qtest/libqos/arm-virt-machine.c
+> +++ b/tests/qtest/libqos/arm-virt-machine.c
+> @@ -19,9 +19,9 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-mmio.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+> +#include "virtio-mmio.h"
+>  
+>  #define ARM_PAGE_SIZE               4096
+>  #define VIRTIO_MMIO_BASE_ADDR       0x0A003E00
+> diff --git a/tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c b/tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c
+> index 473acce..56e53c7 100644
+> --- a/tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c
+> +++ b/tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  typedef struct QXilinxZynqA9Machine QXilinxZynqA9Machine;
+> diff --git a/tests/qtest/libqos/e1000e.c b/tests/qtest/libqos/e1000e.c
+> index e2927ed..a451f61 100644
+> --- a/tests/qtest/libqos/e1000e.c
+> +++ b/tests/qtest/libqos/e1000e.c
+> @@ -18,13 +18,13 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/pci-pc.h"
+> +#include "pci-pc.h"
+>  #include "qemu/sockets.h"
+>  #include "qemu/iov.h"
+>  #include "qemu/module.h"
+>  #include "qemu/bitops.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "e1000e.h"
+>  
+>  #define E1000E_IMS      (0x00d0)
+> diff --git a/tests/qtest/libqos/e1000e.h b/tests/qtest/libqos/e1000e.h
+> index 35183b2..a22f5fd 100644
+> --- a/tests/qtest/libqos/e1000e.h
+> +++ b/tests/qtest/libqos/e1000e.h
+> @@ -19,7 +19,7 @@
+>  #ifndef QGRAPH_E1000E_H
+>  #define QGRAPH_E1000E_H
+>  
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci.h"
+>  
+>  #define E1000E_RX0_MSG_ID           (0)
+> diff --git a/tests/qtest/libqos/fw_cfg.c b/tests/qtest/libqos/fw_cfg.c
+> index 1f46258..6b8e1ba 100644
+> --- a/tests/qtest/libqos/fw_cfg.c
+> +++ b/tests/qtest/libqos/fw_cfg.c
+> @@ -13,7 +13,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/fw_cfg.h"
+> +#include "fw_cfg.h"
+>  #include "libqtest.h"
+>  #include "qemu/bswap.h"
+>  #include "hw/nvram/fw_cfg.h"
+> diff --git a/tests/qtest/libqos/i2c-imx.c b/tests/qtest/libqos/i2c-imx.c
+> index f33ece5..8f9a7e3 100644
+> --- a/tests/qtest/libqos/i2c-imx.c
+> +++ b/tests/qtest/libqos/i2c-imx.c
+> @@ -18,7 +18,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/i2c.h"
+> +#include "i2c.h"
+>  
+>  
+>  #include "libqtest.h"
+> diff --git a/tests/qtest/libqos/i2c-omap.c b/tests/qtest/libqos/i2c-omap.c
+> index 9ae8214..eb4e453 100644
+> --- a/tests/qtest/libqos/i2c-omap.c
+> +++ b/tests/qtest/libqos/i2c-omap.c
+> @@ -7,7 +7,7 @@
+>   * See the COPYING file in the top-level directory.
+>   */
+>  #include "qemu/osdep.h"
+> -#include "libqos/i2c.h"
+> +#include "i2c.h"
+>  
+>  
+>  #include "qemu/bswap.h"
+> diff --git a/tests/qtest/libqos/i2c.c b/tests/qtest/libqos/i2c.c
+> index 38f800d..ade1bdb 100644
+> --- a/tests/qtest/libqos/i2c.c
+> +++ b/tests/qtest/libqos/i2c.c
+> @@ -7,7 +7,7 @@
+>   * See the COPYING file in the top-level directory.
+>   */
+>  #include "qemu/osdep.h"
+> -#include "libqos/i2c.h"
+> +#include "i2c.h"
+>  #include "libqtest.h"
+>  
+>  void qi2c_send(QI2CDevice *i2cdev, const uint8_t *buf, uint16_t len)
+> diff --git a/tests/qtest/libqos/i2c.h b/tests/qtest/libqos/i2c.h
+> index c65f087..1341bac 100644
+> --- a/tests/qtest/libqos/i2c.h
+> +++ b/tests/qtest/libqos/i2c.h
+> @@ -10,7 +10,7 @@
+>  #define LIBQOS_I2C_H
+>  
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  
+>  typedef struct I2CAdapter I2CAdapter;
+>  struct I2CAdapter {
+> diff --git a/tests/qtest/libqos/libqos-pc.c b/tests/qtest/libqos/libqos-pc.c
+> index d04abc5..db420a5 100644
+> --- a/tests/qtest/libqos/libqos-pc.c
+> +++ b/tests/qtest/libqos/libqos-pc.c
+> @@ -1,7 +1,7 @@
+>  #include "qemu/osdep.h"
+> -#include "libqos/libqos-pc.h"
+> -#include "libqos/malloc-pc.h"
+> -#include "libqos/pci-pc.h"
+> +#include "libqos-pc.h"
+> +#include "malloc-pc.h"
+> +#include "pci-pc.h"
+>  
+>  static QOSOps qos_ops = {
+>      .alloc_init = pc_alloc_init,
+> diff --git a/tests/qtest/libqos/libqos-pc.h b/tests/qtest/libqos/libqos-pc.h
+> index a0e4c45..1a9923e 100644
+> --- a/tests/qtest/libqos/libqos-pc.h
+> +++ b/tests/qtest/libqos/libqos-pc.h
+> @@ -1,7 +1,7 @@
+>  #ifndef LIBQOS_PC_H
+>  #define LIBQOS_PC_H
+>  
+> -#include "libqos/libqos.h"
+> +#include "libqos.h"
+>  
+>  QOSState *qtest_pc_vboot(const char *cmdline_fmt, va_list ap);
+>  QOSState *qtest_pc_boot(const char *cmdline_fmt, ...);
+> diff --git a/tests/qtest/libqos/libqos-spapr.c b/tests/qtest/libqos/libqos-spapr.c
+> index 8766d54..db0e87b 100644
+> --- a/tests/qtest/libqos/libqos-spapr.c
+> +++ b/tests/qtest/libqos/libqos-spapr.c
+> @@ -1,7 +1,7 @@
+>  #include "qemu/osdep.h"
+> -#include "libqos/libqos-spapr.h"
+> -#include "libqos/malloc-spapr.h"
+> -#include "libqos/pci-spapr.h"
+> +#include "libqos-spapr.h"
+> +#include "malloc-spapr.h"
+> +#include "pci-spapr.h"
+>  
+>  static QOSOps qos_ops = {
+>      .alloc_init = spapr_alloc_init,
+> diff --git a/tests/qtest/libqos/libqos-spapr.h b/tests/qtest/libqos/libqos-spapr.h
+> index 49bd72d..c613389 100644
+> --- a/tests/qtest/libqos/libqos-spapr.h
+> +++ b/tests/qtest/libqos/libqos-spapr.h
+> @@ -1,7 +1,7 @@
+>  #ifndef LIBQOS_SPAPR_H
+>  #define LIBQOS_SPAPR_H
+>  
+> -#include "libqos/libqos.h"
+> +#include "libqos.h"
+>  
+>  QOSState *qtest_spapr_vboot(const char *cmdline_fmt, va_list ap);
+>  QOSState *qtest_spapr_boot(const char *cmdline_fmt, ...);
+> diff --git a/tests/qtest/libqos/libqos.c b/tests/qtest/libqos/libqos.c
+> index f229eb2..2251e86 100644
+> --- a/tests/qtest/libqos/libqos.c
+> +++ b/tests/qtest/libqos/libqos.c
+> @@ -2,8 +2,8 @@
+>  #include <sys/wait.h>
+>  
+>  #include "libqtest.h"
+> -#include "libqos/libqos.h"
+> -#include "libqos/pci.h"
+> +#include "libqos.h"
+> +#include "pci.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+>  /*** Test Setup & Teardown ***/
+> diff --git a/tests/qtest/libqos/libqos.h b/tests/qtest/libqos/libqos.h
+> index 8e971c2..e0b2bfe 100644
+> --- a/tests/qtest/libqos/libqos.h
+> +++ b/tests/qtest/libqos/libqos.h
+> @@ -2,8 +2,8 @@
+>  #define LIBQOS_H
+>  
+>  #include "libqtest.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/malloc.h"
+> +#include "pci.h"
+> +#include "malloc.h"
+>  
+>  typedef struct QOSState QOSState;
+>  
+> diff --git a/tests/qtest/libqtest.h b/tests/qtest/libqos/libqtest.h
+> similarity index 100%
+> rename from tests/qtest/libqtest.h
+> rename to tests/qtest/libqos/libqtest.h
+> diff --git a/tests/qtest/libqos/malloc-pc.c b/tests/qtest/libqos/malloc-pc.c
+> index 6f92ce4..16ff960 100644
+> --- a/tests/qtest/libqos/malloc-pc.c
+> +++ b/tests/qtest/libqos/malloc-pc.c
+> @@ -11,8 +11,8 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/malloc-pc.h"
+> -#include "libqos/fw_cfg.h"
+> +#include "malloc-pc.h"
+> +#include "fw_cfg.h"
+>  
+>  #include "standard-headers/linux/qemu_fw_cfg.h"
+>  
+> diff --git a/tests/qtest/libqos/malloc-pc.h b/tests/qtest/libqos/malloc-pc.h
+> index 21e75ae..d8d7985 100644
+> --- a/tests/qtest/libqos/malloc-pc.h
+> +++ b/tests/qtest/libqos/malloc-pc.h
+> @@ -13,7 +13,7 @@
+>  #ifndef LIBQOS_MALLOC_PC_H
+>  #define LIBQOS_MALLOC_PC_H
+>  
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  
+>  void pc_alloc_init(QGuestAllocator *s, QTestState *qts, QAllocOpts flags);
+>  
+> diff --git a/tests/qtest/libqos/malloc-spapr.c b/tests/qtest/libqos/malloc-spapr.c
+> index 2a6b7e3..84862e4 100644
+> --- a/tests/qtest/libqos/malloc-spapr.c
+> +++ b/tests/qtest/libqos/malloc-spapr.c
+> @@ -6,7 +6,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/malloc-spapr.h"
+> +#include "malloc-spapr.h"
+>  
+>  #include "qemu-common.h"
+>  
+> diff --git a/tests/qtest/libqos/malloc-spapr.h b/tests/qtest/libqos/malloc-spapr.h
+> index e5fe9bf..f99572f 100644
+> --- a/tests/qtest/libqos/malloc-spapr.h
+> +++ b/tests/qtest/libqos/malloc-spapr.h
+> @@ -8,7 +8,7 @@
+>  #ifndef LIBQOS_MALLOC_SPAPR_H
+>  #define LIBQOS_MALLOC_SPAPR_H
+>  
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  
+>  void spapr_alloc_init(QGuestAllocator *s, QTestState *qts, QAllocOpts flags);
+>  
+> diff --git a/tests/qtest/libqos/malloc.c b/tests/qtest/libqos/malloc.c
+> index 615422a..f708b01 100644
+> --- a/tests/qtest/libqos/malloc.c
+> +++ b/tests/qtest/libqos/malloc.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  #include "qemu-common.h"
+>  #include "qemu/host-utils.h"
+>  
+> diff --git a/tests/qtest/libqos/meson.build b/tests/qtest/libqos/meson.build
+> new file mode 100644
+> index 0000000..e39e779
+> --- /dev/null
+> +++ b/tests/qtest/libqos/meson.build
+> @@ -0,0 +1,57 @@
+> +libqos = static_library('libqos',
+> +  files('../libqtest.c',
+> +        'qgraph.c',
+> +        'qos_external.c',
+> +        'pci.c',
+> +        'fw_cfg.c',
+> +        'malloc.c',
+> +        'libqos.c',
+> +
+> +        # spapr
+> +        'malloc-spapr.c',
+> +        'libqos-spapr.c',
+> +        'rtas.c',
+> +        'pci-spapr.c',
+> +
+> +        # pc
+> +        'pci-pc.c',
+> +        'malloc-pc.c',
+> +        'libqos-pc.c',
+> +        'ahci.c',
+> +
+> +        # usb
+> +        'usb.c',
+> +
+> +        # qgraph devices:
+> +        'e1000e.c',
+> +        'i2c.c',
+> +        'i2c-imx.c',
+> +        'i2c-omap.c',
+> +        'sdhci.c',
+> +        'tpci200.c',
+> +        'virtio.c',
+> +        'virtio-9p.c',
+> +        'virtio-balloon.c',
+> +        'virtio-blk.c',
+> +        'virtio-mmio.c',
+> +        'virtio-net.c',
+> +        'virtio-pci.c',
+> +        'virtio-pci-modern.c',
+> +        'virtio-rng.c',
+> +        'virtio-scsi.c',
+> +        'virtio-serial.c',
+> +
+> +        # qgraph machines:
+> +        'aarch64-xlnx-zcu102-machine.c',
+> +        'arm-imx25-pdk-machine.c',
+> +        'arm-n800-machine.c',
+> +        'arm-raspi2-machine.c',
+> +        'arm-sabrelite-machine.c',
+> +        'arm-smdkc210-machine.c',
+> +        'arm-virt-machine.c',
+> +        'arm-xilinx-zynq-a9-machine.c',
+> +        'ppc64_pseries-machine.c',
+> +        'x86_64_pc-machine.c',
+> +))
+> +
+> +qos = declare_dependency(link_whole: libqos)
+> diff --git a/tests/qtest/libqos/pci-pc.c b/tests/qtest/libqos/pci-pc.c
+> index 3bb2eb3..f978442 100644
+> --- a/tests/qtest/libqos/pci-pc.c
+> +++ b/tests/qtest/libqos/pci-pc.c
+> @@ -12,7 +12,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/pci-pc.h"
+> +#include "pci-pc.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "hw/pci/pci_regs.h"
+>  
+> diff --git a/tests/qtest/libqos/pci-pc.h b/tests/qtest/libqos/pci-pc.h
+> index 4690005..49ec950 100644
+> --- a/tests/qtest/libqos/pci-pc.h
+> +++ b/tests/qtest/libqos/pci-pc.h
+> @@ -13,9 +13,9 @@
+>  #ifndef LIBQOS_PCI_PC_H
+>  #define LIBQOS_PCI_PC_H
+>  
+> -#include "libqos/pci.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "pci.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  
+>  typedef struct QPCIBusPC {
+>      QOSGraphObject obj;
+> diff --git a/tests/qtest/libqos/pci-spapr.c b/tests/qtest/libqos/pci-spapr.c
+> index d6f8c01..2622269 100644
+> --- a/tests/qtest/libqos/pci-spapr.c
+> +++ b/tests/qtest/libqos/pci-spapr.c
+> @@ -7,9 +7,9 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/pci-spapr.h"
+> -#include "libqos/rtas.h"
+> -#include "libqos/qgraph.h"
+> +#include "pci-spapr.h"
+> +#include "rtas.h"
+> +#include "qgraph.h"
+>  
+>  #include "hw/pci/pci_regs.h"
+>  
+> diff --git a/tests/qtest/libqos/pci-spapr.h b/tests/qtest/libqos/pci-spapr.h
+> index d9e2563..20a4371 100644
+> --- a/tests/qtest/libqos/pci-spapr.h
+> +++ b/tests/qtest/libqos/pci-spapr.h
+> @@ -8,9 +8,9 @@
+>  #ifndef LIBQOS_PCI_SPAPR_H
+>  #define LIBQOS_PCI_SPAPR_H
+>  
+> -#include "libqos/malloc.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "pci.h"
+> +#include "qgraph.h"
+>  
+>  /* From include/hw/pci-host/spapr.h */
+>  
+> diff --git a/tests/qtest/libqos/pci.c b/tests/qtest/libqos/pci.c
+> index 2309a72..e1e9618 100644
+> --- a/tests/qtest/libqos/pci.c
+> +++ b/tests/qtest/libqos/pci.c
+> @@ -11,11 +11,11 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/pci.h"
+> +#include "pci.h"
+>  
+>  #include "hw/pci/pci_regs.h"
+>  #include "qemu/host-utils.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  
+>  void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
+>                           void (*func)(QPCIDevice *dev, int devfn, void *data),
+> diff --git a/tests/qtest/libqos/pci.h b/tests/qtest/libqos/pci.h
+> index 590c175..ee64fde 100644
+> --- a/tests/qtest/libqos/pci.h
+> +++ b/tests/qtest/libqos/pci.h
+> @@ -14,7 +14,7 @@
+>  #define LIBQOS_PCI_H
+>  
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  
+>  #define QPCI_PIO_LIMIT    0x10000
+>  
+> diff --git a/tests/qtest/libqos/ppc64_pseries-machine.c b/tests/qtest/libqos/ppc64_pseries-machine.c
+> index 5d7bd88..24ca179 100644
+> --- a/tests/qtest/libqos/ppc64_pseries-machine.c
+> +++ b/tests/qtest/libqos/ppc64_pseries-machine.c
+> @@ -18,10 +18,10 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci-spapr.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc-spapr.h"
+> +#include "malloc-spapr.h"
+>  
+>  typedef struct QSPAPR_pci_host QSPAPR_pci_host;
+>  typedef struct Qppc64_pseriesMachine Qppc64_pseriesMachine;
+> diff --git a/tests/qtest/libqos/qgraph.c b/tests/qtest/libqos/qgraph.c
+> index eb0af8a..fc49cfa 100644
+> --- a/tests/qtest/libqos/qgraph.c
+> +++ b/tests/qtest/libqos/qgraph.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/queue.h"
+> -#include "libqos/qgraph_internal.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph_internal.h"
+> +#include "qgraph.h"
+>  
+>  #define QGRAPH_PRINT_DEBUG 0
+>  #define QOS_ROOT ""
+> diff --git a/tests/qtest/libqos/qgraph.h b/tests/qtest/libqos/qgraph.h
+> index db1244e..1054326 100644
+> --- a/tests/qtest/libqos/qgraph.h
+> +++ b/tests/qtest/libqos/qgraph.h
+> @@ -106,7 +106,7 @@ typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
+>   * <example>
+>   *   <title>Creating new driver an its interface</title>
+>   *   <programlisting>
+> - #include "libqos/qgraph.h"
+> + #include "qgraph.h"
+>  
+>   struct My_driver {
+>       QOSGraphObject obj;
+> @@ -190,7 +190,7 @@ typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
+>   * <example>
+>   *   <title>Creating new test</title>
+>   *   <programlisting>
+> - * #include "libqos/qgraph.h"
+> + * #include "qgraph.h"
+>   *
+>   * static void my_test_function(void *obj, void *data)
+>   * {
+> @@ -230,7 +230,7 @@ typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
+>   * a valid test path will be:
+>   * "/x86_64/pc/other_node/my_driver/my_interface/my_test".
+>   *
+> - * Additional examples are also in libqos/test-qgraph.c
+> + * Additional examples are also in test-qgraph.c
+>   *
+>   * Command line:
+>   * Command line is built by using node names and optional arguments
+> diff --git a/tests/qtest/libqos/qgraph_internal.h b/tests/qtest/libqos/qgraph_internal.h
+> index aa3123f..968fa69 100644
+> --- a/tests/qtest/libqos/qgraph_internal.h
+> +++ b/tests/qtest/libqos/qgraph_internal.h
+> @@ -20,11 +20,11 @@
+>  #define QGRAPH_INTERNAL_H
+>  
+>  /* This header is declaring additional helper functions defined in
+> - * libqos/qgraph.c
+> + * qgraph.c
+>   * It should not be included in tests
+>   */
+>  
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  
+>  typedef struct QOSGraphMachine QOSGraphMachine;
+>  typedef enum QOSEdgeType QOSEdgeType;
+> diff --git a/tests/qtest/libqos/qos_external.c b/tests/qtest/libqos/qos_external.c
+> index 0dfc05c..10ee0f7 100644
+> --- a/tests/qtest/libqos/qos_external.c
+> +++ b/tests/qtest/libqos/qos_external.c
+> @@ -24,10 +24,10 @@
+>  #include "qapi/qmp/qstring.h"
+>  #include "qemu/module.h"
+>  #include "qapi/qmp/qlist.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/qgraph_internal.h"
+> -#include "libqos/qos_external.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+> +#include "qgraph_internal.h"
+> +#include "qos_external.h"
+>  
+>  static void machine_apply_to_node(const char *name)
+>  {
+> diff --git a/tests/qtest/libqos/qos_external.h b/tests/qtest/libqos/qos_external.h
+> index 56a2f37..8446e3d 100644
+> --- a/tests/qtest/libqos/qos_external.h
+> +++ b/tests/qtest/libqos/qos_external.h
+> @@ -19,7 +19,9 @@
+>  #ifndef QOS_EXTERNAL_H
+>  #define QOS_EXTERNAL_H
+>  
+> -#include "libqos/malloc.h"
+> +#include "qgraph.h"
+> +
+> +#include "malloc.h"
+>  #include "qapi/qapi-types-machine.h"
+>  #include "qapi/qapi-types-qom.h"
+>  
+> diff --git a/tests/qtest/libqos/rtas.c b/tests/qtest/libqos/rtas.c
+> index d81ff42..db29d55 100644
+> --- a/tests/qtest/libqos/rtas.c
+> +++ b/tests/qtest/libqos/rtas.c
+> @@ -5,7 +5,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/rtas.h"
+> +#include "rtas.h"
+>  
+>  static void qrtas_copy_args(QTestState *qts, uint64_t target_args,
+>                              uint32_t nargs, uint32_t *args)
+> diff --git a/tests/qtest/libqos/rtas.h b/tests/qtest/libqos/rtas.h
+> index 459e23a..f38f99d 100644
+> --- a/tests/qtest/libqos/rtas.h
+> +++ b/tests/qtest/libqos/rtas.h
+> @@ -5,7 +5,7 @@
+>  
+>  #ifndef LIBQOS_RTAS_H
+>  #define LIBQOS_RTAS_H
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  
+>  int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
+>                            struct tm *tm, uint32_t *ns);
+> diff --git a/tests/qtest/libqos/sdhci.c b/tests/qtest/libqos/sdhci.c
+> index fbf2e36..65f0d07 100644
+> --- a/tests/qtest/libqos/sdhci.c
+> +++ b/tests/qtest/libqos/sdhci.c
+> @@ -18,7 +18,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci.h"
+>  #include "qemu/module.h"
+>  #include "sdhci.h"
+> diff --git a/tests/qtest/libqos/sdhci.h b/tests/qtest/libqos/sdhci.h
+> index 1acd309..22d647b 100644
+> --- a/tests/qtest/libqos/sdhci.h
+> +++ b/tests/qtest/libqos/sdhci.h
+> @@ -19,7 +19,7 @@
+>  #ifndef QGRAPH_QSDHCI_H
+>  #define QGRAPH_QSDHCI_H
+>  
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci.h"
+>  
+>  typedef struct QSDHCI QSDHCI;
+> diff --git a/tests/qtest/libqos/tpci200.c b/tests/qtest/libqos/tpci200.c
+> index ae590a4..1787b1f 100644
+> --- a/tests/qtest/libqos/tpci200.c
+> +++ b/tests/qtest/libqos/tpci200.c
+> @@ -10,8 +10,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/pci.h"
+> +#include "qgraph.h"
+> +#include "pci.h"
+>  
+>  typedef struct QTpci200 QTpci200;
+>  typedef struct QIpack QIpack;
+> diff --git a/tests/qtest/libqos/usb.c b/tests/qtest/libqos/usb.c
+> index d7a9cb3..8b45b02 100644
+> --- a/tests/qtest/libqos/usb.c
+> +++ b/tests/qtest/libqos/usb.c
+> @@ -14,7 +14,7 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "hw/usb/uhci-regs.h"
+> -#include "libqos/usb.h"
+> +#include "usb.h"
+>  
+>  void qusb_pci_init_one(QPCIBus *pcibus, struct qhc *hc, uint32_t devfn, int bar)
+>  {
+> diff --git a/tests/qtest/libqos/usb.h b/tests/qtest/libqos/usb.h
+> index eeced39..50030d7 100644
+> --- a/tests/qtest/libqos/usb.h
+> +++ b/tests/qtest/libqos/usb.h
+> @@ -1,7 +1,7 @@
+>  #ifndef LIBQOS_USB_H
+>  #define LIBQOS_USB_H
+>  
+> -#include "libqos/pci-pc.h"
+> +#include "pci-pc.h"
+>  
+>  struct qhc {
+>      QPCIDevice *dev;
+> diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
+> index c87b561..2e30006 100644
+> --- a/tests/qtest/libqos/virtio-9p.c
+> +++ b/tests/qtest/libqos/virtio-9p.c
+> @@ -20,8 +20,8 @@
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+>  #include "standard-headers/linux/virtio_ids.h"
+> -#include "libqos/virtio-9p.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio-9p.h"
+> +#include "qgraph.h"
+>  
+>  static QGuestAllocator *alloc;
+>  
+> diff --git a/tests/qtest/libqos/virtio-9p.h b/tests/qtest/libqos/virtio-9p.h
+> index be9621a..b1e6bad 100644
+> --- a/tests/qtest/libqos/virtio-9p.h
+> +++ b/tests/qtest/libqos/virtio-9p.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_9P_H
+>  #define TESTS_LIBQOS_VIRTIO_9P_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtio9P QVirtio9P;
+>  typedef struct QVirtio9PPCI QVirtio9PPCI;
+> diff --git a/tests/qtest/libqos/virtio-balloon.c b/tests/qtest/libqos/virtio-balloon.c
+> index 9745f4a..a3da5c2 100644
+> --- a/tests/qtest/libqos/virtio-balloon.c
+> +++ b/tests/qtest/libqos/virtio-balloon.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-balloon.h"
+> +#include "qgraph.h"
+> +#include "virtio-balloon.h"
+>  
+>  /* virtio-balloon-device */
+>  static void *qvirtio_balloon_get_driver(QVirtioBalloon *v_balloon,
+> diff --git a/tests/qtest/libqos/virtio-balloon.h b/tests/qtest/libqos/virtio-balloon.h
+> index 5b91930..309894c 100644
+> --- a/tests/qtest/libqos/virtio-balloon.h
+> +++ b/tests/qtest/libqos/virtio-balloon.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_BALLOON_H
+>  #define TESTS_LIBQOS_VIRTIO_BALLOON_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioBalloon QVirtioBalloon;
+>  typedef struct QVirtioBalloonPCI QVirtioBalloonPCI;
+> diff --git a/tests/qtest/libqos/virtio-blk.c b/tests/qtest/libqos/virtio-blk.c
+> index 5fc6940..5da0259 100644
+> --- a/tests/qtest/libqos/virtio-blk.c
+> +++ b/tests/qtest/libqos/virtio-blk.c
+> @@ -20,8 +20,8 @@
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+>  #include "standard-headers/linux/virtio_blk.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-blk.h"
+> +#include "qgraph.h"
+> +#include "virtio-blk.h"
+>  
+>  #define PCI_SLOT                0x04
+>  #define PCI_FN                  0x00
+> diff --git a/tests/qtest/libqos/virtio-blk.h b/tests/qtest/libqos/virtio-blk.h
+> index 5170f13..dcef388 100644
+> --- a/tests/qtest/libqos/virtio-blk.h
+> +++ b/tests/qtest/libqos/virtio-blk.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_BLK_H
+>  #define TESTS_LIBQOS_VIRTIO_BLK_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioBlk QVirtioBlk;
+>  typedef struct QVirtioBlkPCI QVirtioBlkPCI;
+> diff --git a/tests/qtest/libqos/virtio-mmio.c b/tests/qtest/libqos/virtio-mmio.c
+> index e0a2bd7..75efda3 100644
+> --- a/tests/qtest/libqos/virtio-mmio.c
+> +++ b/tests/qtest/libqos/virtio-mmio.c
+> @@ -10,10 +10,10 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-mmio.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-mmio.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "standard-headers/linux/virtio_ring.h"
+>  
+>  static uint8_t qvirtio_mmio_config_readb(QVirtioDevice *d, uint64_t off)
+> diff --git a/tests/qtest/libqos/virtio-mmio.h b/tests/qtest/libqos/virtio-mmio.h
+> index 0e45778..30803bc 100644
+> --- a/tests/qtest/libqos/virtio-mmio.h
+> +++ b/tests/qtest/libqos/virtio-mmio.h
+> @@ -10,8 +10,8 @@
+>  #ifndef LIBQOS_VIRTIO_MMIO_H
+>  #define LIBQOS_VIRTIO_MMIO_H
+>  
+> -#include "libqos/virtio.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio.h"
+> +#include "qgraph.h"
+>  
+>  #define QVIRTIO_MMIO_MAGIC_VALUE        0x000
+>  #define QVIRTIO_MMIO_VERSION            0x004
+> diff --git a/tests/qtest/libqos/virtio-net.c b/tests/qtest/libqos/virtio-net.c
+> index a9e253a..1cae07f 100644
+> --- a/tests/qtest/libqos/virtio-net.c
+> +++ b/tests/qtest/libqos/virtio-net.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-net.h"
+> +#include "qgraph.h"
+> +#include "virtio-net.h"
+>  #include "hw/virtio/virtio-net.h"
+>  
+>  
+> diff --git a/tests/qtest/libqos/virtio-net.h b/tests/qtest/libqos/virtio-net.h
+> index b8cbec0..5ba2161 100644
+> --- a/tests/qtest/libqos/virtio-net.h
+> +++ b/tests/qtest/libqos/virtio-net.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_NET_H
+>  #define TESTS_LIBQOS_VIRTIO_NET_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioNet QVirtioNet;
+>  typedef struct QVirtioNetPCI QVirtioNetPCI;
+> diff --git a/tests/qtest/libqos/virtio-pci.c b/tests/qtest/libqos/virtio-pci.c
+> index 62851c2..cd3c0f5 100644
+> --- a/tests/qtest/libqos/virtio-pci.c
+> +++ b/tests/qtest/libqos/virtio-pci.c
+> @@ -9,13 +9,13 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/pci-pc.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/malloc-pc.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+> +#include "pci.h"
+> +#include "pci-pc.h"
+> +#include "malloc.h"
+> +#include "malloc-pc.h"
+> +#include "qgraph.h"
+>  #include "standard-headers/linux/virtio_ring.h"
+>  #include "standard-headers/linux/virtio_pci.h"
+>  
+> diff --git a/tests/qtest/libqos/virtio-pci.h b/tests/qtest/libqos/virtio-pci.h
+> index 294d556..f5115ca 100644
+> --- a/tests/qtest/libqos/virtio-pci.h
+> +++ b/tests/qtest/libqos/virtio-pci.h
+> @@ -10,9 +10,9 @@
+>  #ifndef LIBQOS_VIRTIO_PCI_H
+>  #define LIBQOS_VIRTIO_PCI_H
+>  
+> -#include "libqos/virtio.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio.h"
+> +#include "pci.h"
+> +#include "qgraph.h"
+>  
+>  typedef struct QVirtioPCIMSIXOps QVirtioPCIMSIXOps;
+>  
+> diff --git a/tests/qtest/libqos/virtio-rng.c b/tests/qtest/libqos/virtio-rng.c
+> index 46f8d95..2e09dd7 100644
+> --- a/tests/qtest/libqos/virtio-rng.c
+> +++ b/tests/qtest/libqos/virtio-rng.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-rng.h"
+> +#include "qgraph.h"
+> +#include "virtio-rng.h"
+>  
+>  /* virtio-rng-device */
+>  static void *qvirtio_rng_get_driver(QVirtioRng *v_rng,
+> diff --git a/tests/qtest/libqos/virtio-rng.h b/tests/qtest/libqos/virtio-rng.h
+> index 9342372..9ca102b 100644
+> --- a/tests/qtest/libqos/virtio-rng.h
+> +++ b/tests/qtest/libqos/virtio-rng.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_RNG_H
+>  #define TESTS_LIBQOS_VIRTIO_RNG_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioRng QVirtioRng;
+>  typedef struct QVirtioRngPCI QVirtioRngPCI;
+> diff --git a/tests/qtest/libqos/virtio-scsi.c b/tests/qtest/libqos/virtio-scsi.c
+> index c8c3598..5644e32 100644
+> --- a/tests/qtest/libqos/virtio-scsi.c
+> +++ b/tests/qtest/libqos/virtio-scsi.c
+> @@ -20,8 +20,8 @@
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+>  #include "standard-headers/linux/virtio_ids.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-scsi.h"
+> +#include "qgraph.h"
+> +#include "virtio-scsi.h"
+>  
+>  /* virtio-scsi-device */
+>  static void *qvirtio_scsi_get_driver(QVirtioSCSI *v_scsi,
+> diff --git a/tests/qtest/libqos/virtio-scsi.h b/tests/qtest/libqos/virtio-scsi.h
+> index 9e3774d..531315e 100644
+> --- a/tests/qtest/libqos/virtio-scsi.h
+> +++ b/tests/qtest/libqos/virtio-scsi.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_SCSI_H
+>  #define TESTS_LIBQOS_VIRTIO_SCSI_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioSCSI QVirtioSCSI;
+>  typedef struct QVirtioSCSIPCI QVirtioSCSIPCI;
+> diff --git a/tests/qtest/libqos/virtio-serial.c b/tests/qtest/libqos/virtio-serial.c
+> index b956540..ee34afd 100644
+> --- a/tests/qtest/libqos/virtio-serial.c
+> +++ b/tests/qtest/libqos/virtio-serial.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-serial.h"
+> +#include "qgraph.h"
+> +#include "virtio-serial.h"
+>  
+>  static void *qvirtio_serial_get_driver(QVirtioSerial *v_serial,
+>                                         const char *interface)
+> diff --git a/tests/qtest/libqos/virtio-serial.h b/tests/qtest/libqos/virtio-serial.h
+> index 3328c6c..3db43b2 100644
+> --- a/tests/qtest/libqos/virtio-serial.h
+> +++ b/tests/qtest/libqos/virtio-serial.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_SERIAL_H
+>  #define TESTS_LIBQOS_VIRTIO_SERIAL_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioSerial QVirtioSerial;
+>  typedef struct QVirtioSerialPCI QVirtioSerialPCI;
+> diff --git a/tests/qtest/libqos/virtio.c b/tests/qtest/libqos/virtio.c
+> index 9aa3606..6fe7bf9 100644
+> --- a/tests/qtest/libqos/virtio.c
+> +++ b/tests/qtest/libqos/virtio.c
+> @@ -10,7 +10,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/bswap.h"
+>  #include "libqtest.h"
+> -#include "libqos/virtio.h"
+> +#include "virtio.h"
+>  #include "standard-headers/linux/virtio_config.h"
+>  #include "standard-headers/linux/virtio_ring.h"
+>  
+> diff --git a/tests/qtest/libqos/virtio.h b/tests/qtest/libqos/virtio.h
+> index 529ef75..b8bd06e 100644
+> --- a/tests/qtest/libqos/virtio.h
+> +++ b/tests/qtest/libqos/virtio.h
+> @@ -10,7 +10,7 @@
+>  #ifndef LIBQOS_VIRTIO_H
+>  #define LIBQOS_VIRTIO_H
+>  
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  #include "standard-headers/linux/virtio_ring.h"
+>  
+>  #define QVIRTIO_F_BAD_FEATURE           0x40000000ull
+> diff --git a/tests/qtest/libqos/x86_64_pc-machine.c b/tests/qtest/libqos/x86_64_pc-machine.c
+> index 0edb1c9..ad96742 100644
+> --- a/tests/qtest/libqos/x86_64_pc-machine.c
+> +++ b/tests/qtest/libqos/x86_64_pc-machine.c
+> @@ -18,7 +18,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci-pc.h"
+>  #include "qemu/module.h"
+>  #include "malloc-pc.h"
+> diff --git a/tests/qtest/libqtest-single.h b/tests/qtest/libqtest-single.h
+> index 6f1bb13..176979a 100644
+> --- a/tests/qtest/libqtest-single.h
+> +++ b/tests/qtest/libqtest-single.h
+> @@ -11,7 +11,7 @@
+>  #ifndef LIBQTEST_SINGLE_H
+>  #define LIBQTEST_SINGLE_H
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  QTestState *global_qtest __attribute__((common, weak));
+>  
+> diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+> index fd46805..26f1223 100644
+> --- a/tests/qtest/libqtest.c
+> +++ b/tests/qtest/libqtest.c
+> @@ -20,7 +20,7 @@
+>  #include <sys/wait.h>
+>  #include <sys/un.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu-common.h"
+>  #include "qemu/ctype.h"
+>  #include "qemu/cutils.h"
+> diff --git a/tests/qtest/m48t59-test.c b/tests/qtest/m48t59-test.c
+> index b94a123..6db3234 100644
+> --- a/tests/qtest/m48t59-test.c
+> +++ b/tests/qtest/m48t59-test.c
+> @@ -14,7 +14,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  #define RTC_SECONDS             0x9
+>  #define RTC_MINUTES             0xa
+> diff --git a/tests/qtest/machine-none-test.c b/tests/qtest/machine-none-test.c
+> index 57107f1..aab06b9 100644
+> --- a/tests/qtest/machine-none-test.c
+> +++ b/tests/qtest/machine-none-test.c
+> @@ -14,7 +14,7 @@
+>  
+>  #include "qemu-common.h"
+>  #include "qemu/cutils.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+>  
+> diff --git a/tests/qtest/megasas-test.c b/tests/qtest/megasas-test.c
+> index d6796b9..eae70ff 100644
+> --- a/tests/qtest/megasas-test.c
+> +++ b/tests/qtest/megasas-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/bswap.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+> diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+> new file mode 100644
+> index 0000000..820c15c
+> --- /dev/null
+> +++ b/tests/qtest/meson.build
+> @@ -0,0 +1,254 @@
+> +# All QTests for now are POSIX-only, but the dependencies are
+> +# really in libqtest, not in the testcases themselves.
+> +if not config_host.has_key('CONFIG_POSIX')
+> +  subdir_done()
+> +endif
+> +
+> +qtests_generic = [
+> +  'cdrom-test',
+> +  'device-introspect-test',
+> +  'machine-none-test',
+> +  'qmp-test',
+> +  'qmp-cmd-test',
+> +  'qom-test',
+> +  'test-hmp',
+> +  'qos-test',
+> +]
+> +if config_host.has_key('CONFIG_MODULES')
+> +  qtests_generic += [ 'modules-test' ]
+> +endif
+> +
+> +qtests_pci = \
+> +  (config_all_devices.has_key('CONFIG_RTL8139_PCI') ? ['rtl8139-test'] : []) +              \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_IVSHMEM_DEVICE') ? ['ivshmem-test'] : [])
+> +
+> +qtests_i386 = \
+> +  (config_host.has_key('CONFIG_SLIRP') ? ['pxe-test', 'test-netfilter'] : []) +             \
+> +  (config_host.has_key('CONFIG_POSIX') ? ['test-filter-mirror'] : []) +                     \
+> +  (have_tools ? ['ahci-test'] : []) +                                                       \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +           \
+> +  (config_all_devices.has_key('CONFIG_SGA') ? ['boot-serial-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_RTL8139_PCI') ? ['test-filter-redirector'] : []) +    \
+> +  (config_all_devices.has_key('CONFIG_ISA_IPMI_KCS') ? ['ipmi-kcs-test'] : []) +            \
+> +  (config_host.has_key('CONFIG_LINUX') and                                                  \
+> +   config_all_devices.has_key('CONFIG_ISA_IPMI_BT') ? ['ipmi-bt-test'] : []) +              \
+> +  (config_all_devices.has_key('CONFIG_WDT_IB700') ? ['wdt_ib700-test'] : []) +              \
+> +  (config_all_devices.has_key('CONFIG_PVPANIC') ? ['pvpanic-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_HDA') ? ['intel-hda-test'] : []) +                    \
+> +  (config_all_devices.has_key('CONFIG_I82801B11') ? ['i82801b11-test'] : []) +             \
+> +  (config_all_devices.has_key('CONFIG_IOH3420') ? ['ioh3420-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_USB_UHCI') ? ['usb-hcd-uhci-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_USB_UHCI') and                                        \
+> +   config_all_devices.has_key('CONFIG_USB_EHCI') ? ['usb-hcd-ehci-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_USB_XHCI_NEC') ? ['usb-hcd-xhci-test'] : []) +        \
+> +  (config_all_devices.has_key('CONFIG_TPM_CRB') ? ['tpm-crb-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_TPM_CRB') ? ['tpm-crb-swtpm-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-test'] : []) +              \
+> +  (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-swtpm-test'] : []) +        \
+> +  qtests_pci +                                                                              \
+> +  ['fdc-test',
+> +   'ide-test',
+> +   'ahci-test',
+> +   'hd-geo-test',
+> +   'boot-order-test',
+> +   'bios-tables-test',
+> +   'rtc-test',
+> +   'i440fx-test',
+> +   'fw_cfg-test',
+> +   'device-plug-test',
+> +   'drive_del-test',
+> +   'tco-test',
+> +   'cpu-plug-test',
+> +   'q35-test',
+> +   'vmgenid-test',
+> +   'migration-test',
+> +   'test-x86-cpuid-compat',
+> +   'numa-test']
+> +
+> +dbus_daemon = find_program('dbus-daemon')
+> +if dbus_daemon.found() and config_host.has_key('GDBUS_CODEGEN')
+> +  # Temporarily disabled due to Patchew failures:
+> +  #qtests_i386 += ['dbus-vmstate-test']
+> +  dbus_vmstate1 = custom_target('dbus-vmstate description',
+> +                                output: ['dbus-vmstate1.h', 'dbus-vmstate1.c'],
+> +                                input: files('dbus-vmstate1.xml'),
+> +                                command: [config_host['GDBUS_CODEGEN'],
+> +                                          '@INPUT@',
+> +                                          '--interface-prefix', 'org.qemu',
+> +                                          '--generate-c-code', '@BASENAME@'])
+> +endif
+> +
+> +qtests_x86_64 = qtests_i386
+> +
+> +qtests_alpha = [ 'boot-serial-test' ] +                                                      \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_avr = [ 'boot-serial-test' ]
+> +
+> +qtests_hppa = [ 'boot-serial-test' ] +                                                       \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_m68k = [ 'boot-serial-test' ]
+> +qtests_microblaze = [ 'boot-serial-test' ]
+> +qtests_microblazeel = qtests_microblaze
+> +
+> +qtests_mips = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_mips64 = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_mips64el = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_moxie = [ 'boot-serial-test' ]
+> +
+> +qtests_ppc = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_M48T59') ? ['m48t59-test'] : []) +                     \
+> +  ['boot-order-test', 'prom-env-test', 'drive_del-test', 'boot-serial-test']                 \
+> +
+> +qtests_ppc64 = \
+> +  (config_all_devices.has_key('CONFIG_PSERIES') ? ['device-plug-test'] : []) +               \
+> +  (config_all_devices.has_key('CONFIG_POWERNV') ? ['pnv-xscom-test'] : []) +                 \
+> +  (config_all_devices.has_key('CONFIG_PSERIES') ? ['rtas-test'] : []) +                      \
+> +  (config_host.has_key('CONFIG_SLIRP') ? ['pxe-test', 'test-netfilter'] : []) +              \
+> +  (config_all_devices.has_key('CONFIG_USB_UHCI') ? ['usb-hcd-uhci-test'] : []) +             \
+> +  (config_all_devices.has_key('CONFIG_USB_XHCI_NEC') ? ['usb-hcd-xhci-test'] : []) +         \
+> +  (config_host.has_key('CONFIG_POSIX') ? ['test-filter-mirror'] : []) +                      \
+> +  qtests_pci + ['migration-test', 'numa-test', 'cpu-plug-test']
+> +
+> +qtests_sh4 = (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : [])
+> +qtests_sh4eb = (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : [])
+> +
+> +qtests_sparc = ['prom-env-test', 'm48t59-test', 'boot-serial-test']
+> +
+> +qtests_sparc64 = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  ['prom-env-test', 'boot-serial-test']
+> +
+> +qtests_arm = \
+> +  (config_all_devices.has_key('CONFIG_PFLASH_CFI02') ? ['pflash-cfi02-test'] : []) +         \
+> +  ['arm-cpu-features',
+> +   'microbit-test',
+> +   'm25p80-test',
+> +   'test-arm-mptimer',
+> +   'boot-serial-test',
+> +   'hexloader-test']
+> +
+> +# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make bios-tables-test unconditional
+> +qtests_aarch64 = \
+> +  (cpu != 'arm' ? ['bios-tables-test'] : []) +                                                  \
+> +  (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-test'] : []) +        \
+> +  (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-swtpm-test'] : []) +  \
+> +  ['numa-test',
+> +   'boot-serial-test',
+> +   'migration-test']
+> +
+> +qtests_s390x = \
+> +  (config_host.has_key('CONFIG_SLIRP') ? ['pxe-test', 'test-netfilter'] : []) +                 \
+> +  (config_host.has_key('CONFIG_POSIX') ? ['test-filter-mirror'] : []) +                         \
+> +  (config_host.has_key('CONFIG_POSIX') ? ['test-filter-redirector'] : []) +                     \
+> +  ['boot-serial-test',
+> +   'drive_del-test',
+> +   'device-plug-test',
+> +   'virtio-ccw-test',
+> +   'cpu-plug-test',
+> +   'migration-test']
+> +
+> +qos_test_srcs = files(
+> +  'ac97-test.c',
+> +  'ds1338-test.c',
+> +  'e1000-test.c',
+> +  'e1000e-test.c',
+> +  'eepro100-test.c',
+> +  'es1370-test.c',
+> +  'ipoctal232-test.c',
+> +  'megasas-test.c',
+> +  'ne2000-test.c',
+> +  'tulip-test.c',
+> +  'nvme-test.c',
+> +  'pca9552-test.c',
+> +  'pci-test.c',
+> +  'pcnet-test.c',
+> +  'sdhci-test.c',
+> +  'spapr-phb-test.c',
+> +  'tmp105-test.c',
+> +  'usb-hcd-ohci-test.c',
+> +  'vhost-user-test.c',
+> +  'virtio-test.c',
+> +  'virtio-9p-test.c',
+> +  'virtio-blk-test.c',
+> +  'virtio-net-test.c',
+> +  'virtio-rng-test.c',
+> +  'virtio-scsi-test.c',
+> +  'virtio-serial-test.c',
+> +  'vmxnet3-test.c',
+> +)
+> +
+> +extra_qtest_deps = {
+> +  'bios-tables-test': [io],
+> +  'ivshmem-test': [rt],
+> +  'qos-test': [chardev, io],
+> +  'tpm-crb-swtpm-test': [io],
+> +  'tpm-crb-test': [io],
+> +  'tpm-tis-swtpm-test': [io],
+> +  'tpm-tis-test': [io],
+> +  'tpm-tis-device-swtpm-test': [io],
+> +  'tpm-tis-device-test': [io],
+> +}
+> +extra_qtest_srcs = {
+> +  'bios-tables-test': files('boot-sector.c', 'acpi-utils.c', 'tpm-emu.c'),
+> +  'pxe-test': files('boot-sector.c'),
+> +  'cdrom-test': files('boot-sector.c'),
+> +  'migration-test': files('migration-helpers.c'),
+> +  'ivshmem-test': files('../../contrib/ivshmem-server/ivshmem-server.c'),
+> +  'dbus-vmstate-test': files('migration-helpers.c') + dbus_vmstate1.to_list(),
+> +  'vmgenid-test': files('boot-sector.c', 'acpi-utils.c'),
+> +  'tpm-crb-swtpm-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tests.c'),
+> +  'tpm-crb-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tests.c'),
+> +  'tpm-tis-device-swtpm-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+> +  'tpm-tis-device-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+> +  'tpm-tis-swtpm-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+> +  'tpm-tis-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+> +  'qos-test': qos_test_srcs
+> +}
+> +
+> +
+> +qtest_executables = {}
+> +foreach dir : target_dirs
+> +  if not dir.endswith('-softmmu')
+> +    continue
+> +  endif
+> +
+> +  target_base = dir.split('-')[0]
+> +  qtests = get_variable('qtests_' + target_base, []) + qtests_generic
+> +
+> +  qtest_env = environment()
+> +  qtest_env.set('QTEST_QEMU_IMG', './qemu-img')
+> +  qtest_env.set('G_TEST_DBUS_DAEMON', meson.source_root() / 'tests/dbus-vmstate-daemon.sh')
+> +  qtest_env.set('QTEST_QEMU_BINARY', '@0@-softmmu/qemu-system-@0@'.format(target_base))
+> +  
+> +  foreach test : qtests
+> +    # Executables are shared across targets, declare them only the first time we
+> +    # encounter them
+> +    if not qtest_executables.has_key(test)
+> +      qtest_executables += {
+> +        test: executable(test,
+> +                         files(test + '.c') + extra_qtest_srcs.get(test, []),
+> +                         dependencies: [qemuutil, qos] + extra_qtest_deps.get(test, []))
+> +      }
+> +    endif
+> +    # FIXME: missing dependency on the emulator binary and qemu-img
+> +    test('qtest-@0@: @1@'.format(target_base, test),
+> +         qtest_executables[test],
+> +         env: qtest_env,
+> +         args: ['--tap', '-k'],
+> +         protocol: 'tap',
+> +         suite: ['qtest', 'qtest-' + target_base])
+> +  endforeach
+> +endforeach
+> diff --git a/tests/qtest/microbit-test.c b/tests/qtest/microbit-test.c
+> index 04e199e..2b25557 100644
+> --- a/tests/qtest/microbit-test.c
+> +++ b/tests/qtest/microbit-test.c
+> @@ -16,7 +16,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "exec/hwaddr.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  #include "hw/arm/nrf51.h"
+>  #include "hw/char/nrf51_uart.h"
+> diff --git a/tests/qtest/migration-helpers.h b/tests/qtest/migration-helpers.h
+> index a11808b..d63bba9 100644
+> --- a/tests/qtest/migration-helpers.h
+> +++ b/tests/qtest/migration-helpers.h
+> @@ -12,7 +12,7 @@
+>  #ifndef MIGRATION_HELPERS_H_
+>  #define MIGRATION_HELPERS_H_
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  extern bool got_stop;
+>  
+> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+> index 21ea5ba..00a233c 100644
+> --- a/tests/qtest/migration-test.c
+> +++ b/tests/qtest/migration-test.c
+> @@ -12,7 +12,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/module.h"
+> @@ -25,7 +25,7 @@
+>  #include "qapi/qobject-output-visitor.h"
+>  
+>  #include "migration-helpers.h"
+> -#include "migration/migration-test.h"
+> +#include "tests/migration/migration-test.h"
+>  
+>  /* TODO actually test the results and get rid of this */
+>  #define qtest_qmp_discard_response(...) qobject_unref(qtest_qmp(__VA_ARGS__))
+> diff --git a/tests/qtest/modules-test.c b/tests/qtest/modules-test.c
+> index 8821768..c238b3f 100644
+> --- a/tests/qtest/modules-test.c
+> +++ b/tests/qtest/modules-test.c
+> @@ -1,5 +1,5 @@
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  const char common_args[] = "-nodefaults -machine none";
+>  
+> diff --git a/tests/qtest/ne2000-test.c b/tests/qtest/ne2000-test.c
+> index 3fc0e55..43cfc45 100644
+> --- a/tests/qtest/ne2000-test.c
+> +++ b/tests/qtest/ne2000-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
+> index e1ed6d4..b25ebf9 100644
+> --- a/tests/qtest/numa-test.c
+> +++ b/tests/qtest/numa-test.c
+> @@ -10,7 +10,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qlist.h"
+>  
+> diff --git a/tests/qtest/nvme-test.c b/tests/qtest/nvme-test.c
+> index ff04421..d32c953 100644
+> --- a/tests/qtest/nvme-test.c
+> +++ b/tests/qtest/nvme-test.c
+> @@ -10,7 +10,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/module.h"
+>  #include "qemu/units.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+>  
+> diff --git a/tests/qtest/pca9552-test.c b/tests/qtest/pca9552-test.c
+> index d80ed93..42a1312 100644
+> --- a/tests/qtest/pca9552-test.c
+> +++ b/tests/qtest/pca9552-test.c
+> @@ -9,7 +9,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/i2c.h"
+>  #include "hw/misc/pca9552_regs.h"
+> diff --git a/tests/qtest/pci-test.c b/tests/qtest/pci-test.c
+> index 4b2092b..e15d4d9 100644
+> --- a/tests/qtest/pci-test.c
+> +++ b/tests/qtest/pci-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/pcnet-test.c b/tests/qtest/pcnet-test.c
+> index 900944f..7583aeb 100644
+> --- a/tests/qtest/pcnet-test.c
+> +++ b/tests/qtest/pcnet-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/pflash-cfi02-test.c b/tests/qtest/pflash-cfi02-test.c
+> index 17aa669..afb702b 100644
+> --- a/tests/qtest/pflash-cfi02-test.c
+> +++ b/tests/qtest/pflash-cfi02-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  /*
+>   * To test the pflash_cfi02 device, we run QEMU with the musicpal machine with
+> diff --git a/tests/qtest/pnv-xscom-test.c b/tests/qtest/pnv-xscom-test.c
+> index 2c46d5c..c8d4043 100644
+> --- a/tests/qtest/pnv-xscom-test.c
+> +++ b/tests/qtest/pnv-xscom-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  typedef enum PnvChipType {
+>      PNV_CHIP_POWER8E,     /* AKA Murano (default) */
+> diff --git a/tests/qtest/prom-env-test.c b/tests/qtest/prom-env-test.c
+> index 60e6ec3..f41d801 100644
+> --- a/tests/qtest/prom-env-test.c
+> +++ b/tests/qtest/prom-env-test.c
+> @@ -20,7 +20,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/libqos-spapr.h"
+>  
+>  #define MAGIC   0xcafec0de
+> diff --git a/tests/qtest/pvpanic-test.c b/tests/qtest/pvpanic-test.c
+> index ff9176a..e576394 100644
+> --- a/tests/qtest/pvpanic-test.c
+> +++ b/tests/qtest/pvpanic-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+>  static void test_panic(void)
+> diff --git a/tests/qtest/pxe-test.c b/tests/qtest/pxe-test.c
+> index 1161a77..32bbae3 100644
+> --- a/tests/qtest/pxe-test.c
+> +++ b/tests/qtest/pxe-test.c
+> @@ -15,7 +15,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  #include "qemu-common.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "boot-sector.h"
+>  #include "libqos/libqos-spapr.h"
+>  
+> diff --git a/tests/qtest/q35-test.c b/tests/qtest/q35-test.c
+> index c922d81..b7cf144 100644
+> --- a/tests/qtest/q35-test.c
+> +++ b/tests/qtest/q35-test.c
+> @@ -10,7 +10,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/pci.h"
+>  #include "libqos/pci-pc.h"
+>  #include "hw/pci-host/q35.h"
+> diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
+> index f7b1aa7..f34e688 100644
+> --- a/tests/qtest/qmp-cmd-test.c
+> +++ b/tests/qtest/qmp-cmd-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-visit-introspect.h"
+>  #include "qapi/qmp/qdict.h"
+> diff --git a/tests/qtest/qmp-test.c b/tests/qtest/qmp-test.c
+> index 1a8876b..5950c3e 100644
+> --- a/tests/qtest/qmp-test.c
+> +++ b/tests/qtest/qmp-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-visit-control.h"
+>  #include "qapi/qmp/qdict.h"
+> diff --git a/tests/qtest/qom-test.c b/tests/qtest/qom-test.c
+> index 1acf0d7..eb34af8 100644
+> --- a/tests/qtest/qom-test.c
+> +++ b/tests/qtest/qom-test.c
+> @@ -13,7 +13,7 @@
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qlist.h"
+>  #include "qemu/cutils.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  static void test_properties(QTestState *qts, const char *path, bool recurse)
+>  {
+> diff --git a/tests/qtest/rtas-test.c b/tests/qtest/rtas-test.c
+> index 167b42d..a7e83e7 100644
+> --- a/tests/qtest/rtas-test.c
+> +++ b/tests/qtest/rtas-test.c
+> @@ -1,6 +1,6 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/cutils.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  #include "libqos/libqos-spapr.h"
+>  #include "libqos/rtas.h"
+> diff --git a/tests/qtest/sdhci-test.c b/tests/qtest/sdhci-test.c
+> index 6275e76..a110cfe 100644
+> --- a/tests/qtest/sdhci-test.c
+> +++ b/tests/qtest/sdhci-test.c
+> @@ -10,7 +10,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "hw/registerfields.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/pci-pc.h"
+>  #include "hw/pci/pci.h"
+> diff --git a/tests/qtest/spapr-phb-test.c b/tests/qtest/spapr-phb-test.c
+> index 093dc22..ea8d596 100644
+> --- a/tests/qtest/spapr-phb-test.c
+> +++ b/tests/qtest/spapr-phb-test.c
+> @@ -9,7 +9,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  
+> diff --git a/tests/qtest/tco-test.c b/tests/qtest/tco-test.c
+> index 254f735..47bc7ad 100644
+> --- a/tests/qtest/tco-test.c
+> +++ b/tests/qtest/tco-test.c
+> @@ -9,7 +9,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/pci.h"
+>  #include "libqos/pci-pc.h"
+>  #include "qapi/qmp/qdict.h"
+> diff --git a/tests/qtest/test-filter-mirror.c b/tests/qtest/test-filter-mirror.c
+> index 1e3ced8..bc0dee6 100644
+> --- a/tests/qtest/test-filter-mirror.c
+> +++ b/tests/qtest/test-filter-mirror.c
+> @@ -10,7 +10,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/iov.h"
+>  #include "qemu/sockets.h"
+> diff --git a/tests/qtest/test-filter-redirector.c b/tests/qtest/test-filter-redirector.c
+> index e4d5322..829db8c 100644
+> --- a/tests/qtest/test-filter-redirector.c
+> +++ b/tests/qtest/test-filter-redirector.c
+> @@ -52,7 +52,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/iov.h"
+>  #include "qemu/sockets.h"
+> diff --git a/tests/qtest/test-hmp.c b/tests/qtest/test-hmp.c
+> index d5e7ebd..aea1384 100644
+> --- a/tests/qtest/test-hmp.c
+> +++ b/tests/qtest/test-hmp.c
+> @@ -15,7 +15,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  static int verbose;
+>  
+> diff --git a/tests/qtest/tpm-crb-swtpm-test.c b/tests/qtest/tpm-crb-swtpm-test.c
+> index 55fdb56..1d82a48 100644
+> --- a/tests/qtest/tpm-crb-swtpm-test.c
+> +++ b/tests/qtest/tpm-crb-swtpm-test.c
+> @@ -15,7 +15,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "tpm-tests.h"
+>  #include "hw/acpi/tpm.h"
+> diff --git a/tests/qtest/tpm-tis-device-swtpm-test.c b/tests/qtest/tpm-tis-device-swtpm-test.c
+> index 7b20035..f7126ef 100644
+> --- a/tests/qtest/tpm-tis-device-swtpm-test.c
+> +++ b/tests/qtest/tpm-tis-device-swtpm-test.c
+> @@ -16,7 +16,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "tpm-tests.h"
+>  #include "hw/acpi/tpm.h"
+> diff --git a/tests/qtest/tpm-tis-swtpm-test.c b/tests/qtest/tpm-tis-swtpm-test.c
+> index 90131cb..fa590e6 100644
+> --- a/tests/qtest/tpm-tis-swtpm-test.c
+> +++ b/tests/qtest/tpm-tis-swtpm-test.c
+> @@ -15,7 +15,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "tpm-tests.h"
+>  #include "hw/acpi/tpm.h"
+> diff --git a/tests/qtest/tpm-util.c b/tests/qtest/tpm-util.c
+> index 58a9593..e2b29ef 100644
+> --- a/tests/qtest/tpm-util.c
+> +++ b/tests/qtest/tpm-util.c
+> @@ -15,7 +15,7 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "hw/acpi/tpm.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "tpm-util.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+> diff --git a/tests/qtest/tulip-test.c b/tests/qtest/tulip-test.c
+> index 2fb6c4d..da16cbf 100644
+> --- a/tests/qtest/tulip-test.c
+> +++ b/tests/qtest/tulip-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/virtio-rng-test.c b/tests/qtest/virtio-rng-test.c
+> index 092ba13..e6b8cd8 100644
+> --- a/tests/qtest/virtio-rng-test.c
+> +++ b/tests/qtest/virtio-rng-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/virtio-rng.h"
+> diff --git a/tests/qtest/virtio-test.c b/tests/qtest/virtio-test.c
+> index f7c6afd..6313417 100644
+> --- a/tests/qtest/virtio-test.c
+> +++ b/tests/qtest/virtio-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/vmgenid-test.c b/tests/qtest/vmgenid-test.c
+> index efba76e..6781a51 100644
+> --- a/tests/qtest/vmgenid-test.c
+> +++ b/tests/qtest/vmgenid-test.c
+> @@ -14,7 +14,7 @@
+>  #include "hw/acpi/acpi-defs.h"
+>  #include "boot-sector.h"
+>  #include "acpi-utils.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+>  #define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+> diff --git a/tests/qtest/vmxnet3-test.c b/tests/qtest/vmxnet3-test.c
+> index a810252..97c23fd 100644
+> --- a/tests/qtest/vmxnet3-test.c
+> +++ b/tests/qtest/vmxnet3-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/wdt_ib700-test.c b/tests/qtest/wdt_ib700-test.c
+> index 797288d..6c36e43 100644
+> --- a/tests/qtest/wdt_ib700-test.c
+> +++ b/tests/qtest/wdt_ib700-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/timer.h"
+>  
+> diff --git a/tests/test-qga.c b/tests/test-qga.c
+> index d1b4c3e..4ac4c22 100644
+> --- a/tests/test-qga.c
+> +++ b/tests/test-qga.c
+> @@ -4,7 +4,7 @@
+>  #include <sys/socket.h>
+>  #include <sys/un.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qlist.h"
+>  
+> diff --git a/tests/test-qgraph.c b/tests/test-qgraph.c
+> index 5c7e457..267291c 100644
+> --- a/tests/test-qgraph.c
+> +++ b/tests/test-qgraph.c
+> @@ -17,9 +17,8 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/qgraph_internal.h"
+> +#include "qtest/libqos/qgraph.h"
+> +#include "qtest/libqos/qgraph_internal.h"
+>  
+>  #define MACHINE_PC "x86_64/pc"
+>  #define MACHINE_RASPI2 "arm/raspi2"
+> -- 
+> 1.8.3.1
+> 
+> 
+> 
 
