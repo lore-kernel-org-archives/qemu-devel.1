@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1941AC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D737DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:37:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3BF12086A
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:36:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3BF12086A
+	by mail.kernel.org (Postfix) with ESMTPS id AB59C2224D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 12:37:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB59C2224D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k41cH-0003vb-3A
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 08:36:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42070)
+	id 1k41d9-0004v3-UA
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 08:37:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k41bW-0003PZ-GB; Fri, 07 Aug 2020 08:36:10 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:37605)
+ id 1k41cZ-0004OM-F5; Fri, 07 Aug 2020 08:37:15 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:44225)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k41bU-0000IO-8b; Fri, 07 Aug 2020 08:36:10 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.138.121])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 2DC904E0DC8E;
- Fri,  7 Aug 2020 14:36:02 +0200 (CEST)
+ id 1k41cX-0000Ma-A3; Fri, 07 Aug 2020 08:37:15 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.250])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 9BE9D4E0DDA1;
+ Fri,  7 Aug 2020 14:37:11 +0200 (CEST)
 Received: from kaod.org (37.59.142.105) by DAG4EX1.mxp5.local (172.16.2.31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Fri, 7 Aug 2020
- 14:36:02 +0200
+ 14:37:11 +0200
 Authentication-Results: garm.ovh; auth=pass
- (GARM-105G0067b75e85a-6d7d-47c0-869f-b481db73e458,
+ (GARM-105G00634a986a4-37fd-439b-874f-884b936e7253,
  9C6B65F6CFD3D723D723CC07BEDAC6F805E88D1E) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v3 for-5.2 1/3] ppc/xive: Rework setup of
- XiveSource::esb_mmio
+Subject: Re: [PATCH v3 for-5.2 3/3] spapr/xive: Convert KVM device fd checks
+ to assert()
 To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 References: <159679991916.876294.8967140647442842745.stgit@bahia.lan>
- <159679992680.876294.7520540158586170894.stgit@bahia.lan>
+ <159679994169.876294.11026653581505077112.stgit@bahia.lan>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ed5e553d-0cd5-9195-ff0d-681b79d432c1@kaod.org>
-Date: Fri, 7 Aug 2020 14:36:01 +0200
+Message-ID: <5590a3ce-5432-00ca-5aea-5eca409c7651@kaod.org>
+Date: Fri, 7 Aug 2020 14:37:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <159679992680.876294.7520540158586170894.stgit@bahia.lan>
+In-Reply-To: <159679994169.876294.11026653581505077112.stgit@bahia.lan>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [37.59.142.105]
-X-ClientProxiedBy: DAG6EX2.mxp5.local (172.16.2.52) To DAG4EX1.mxp5.local
+X-ClientProxiedBy: DAG5EX2.mxp5.local (172.16.2.42) To DAG4EX1.mxp5.local
  (172.16.2.31)
-X-Ovh-Tracer-GUID: 3490542b-5333-4ff6-81c9-5c6f686b7141
-X-Ovh-Tracer-Id: 5382364507744340899
+X-Ovh-Tracer-GUID: 382b9ff9-d32f-4e2c-94f2-6aec8088658d
+X-Ovh-Tracer-Id: 5401786281112013731
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrkedvgdehiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepghhrohhugheskhgrohgurdhorhhg
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrkedvgdehiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedunecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepghhrohhugheskhgrohgurdhorhhg
 Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
  helo=smtpout1.mo529.mail-out.ovh.net
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 08:36:03
@@ -92,116 +92,112 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/7/20 1:32 PM, Greg Kurz wrote:
-> Depending on whether XIVE is emultated or backed with a KVM XIVE device,
-> the ESB MMIOs of a XIVE source point to an I/O memory region or a mapped
-> memory region.
+> All callers guard these functions with an xive_in_kernel() helper. Make
+> it clear that they are only to be called when the KVM XIVE device exists.
 > 
-> This is currently handled by checking kvm_irqchip_in_kernel() returns
-> false in xive_source_realize(). This is a bit awkward as we usually
-> need to do extra things when we're using the in-kernel backend, not
-> less. But most important, we can do better: turn the existing "xive.esb"
-> memory region into a plain container, introduce an "xive.esb-emulated"
-> I/O subregion and rename the existing "xive.esb" subregion in the KVM
-> code to "xive.esb-kvm". Since "xive.esb-kvm" is added with overlap
-> and a higher priority, it prevails over "xive.esb-emulated" (ie.
-> a guest using KVM XIVE will interact with "xive.esb-kvm" instead of
-> the default "xive.esb-emulated" region.
+> Note that the check on xive is dropped in kvmppc_xive_disconnect(). It
+> really cannot be NULL since it comes from set_active_intc() which only
+> passes pointers to allocated objects.
 > 
-> While here, consolidate the computation of the MMIO region size in
-> a common helper.
-> 
-> Suggested-by: Cédric Le Goater <clg@kaod.org>
 > Signed-off-by: Greg Kurz <groug@kaod.org>
-
-This is much better
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
-Thanks,
-
-C.
-
 > ---
->  hw/intc/spapr_xive_kvm.c |    4 ++--
->  hw/intc/xive.c           |   11 ++++++-----
->  include/hw/ppc/xive.h    |    6 ++++++
->  3 files changed, 14 insertions(+), 7 deletions(-)
+> v2: Take the helper name change into account in the changelog
+> ---
+>  hw/intc/spapr_xive_kvm.c |   35 +++++++----------------------------
+>  1 file changed, 7 insertions(+), 28 deletions(-)
 > 
 > diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index 893a1ee77e70..6130882be678 100644
+> index 6130882be678..82a6f99f022d 100644
 > --- a/hw/intc/spapr_xive_kvm.c
 > +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -742,7 +742,7 @@ int kvmppc_xive_connect(SpaprInterruptController *intc, uint32_t nr_servers,
->      SpaprXive *xive = SPAPR_XIVE(intc);
->      XiveSource *xsrc = &xive->source;
->      Error *local_err = NULL;
-> -    size_t esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-> +    size_t esb_len = xive_source_esb_len(xsrc);
->      size_t tima_len = 4ull << TM_SHIFT;
->      CPUState *cs;
->      int fd;
-> @@ -788,7 +788,7 @@ int kvmppc_xive_connect(SpaprInterruptController *intc, uint32_t nr_servers,
->      }
+> @@ -79,10 +79,7 @@ void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp)
+>      uint64_t state[2];
+>      int ret;
 >  
->      memory_region_init_ram_device_ptr(&xsrc->esb_mmio_kvm, OBJECT(xsrc),
-> -                                      "xive.esb", esb_len, xsrc->esb_mmap);
-> +                                      "xive.esb-kvm", esb_len, xsrc->esb_mmap);
->      memory_region_add_subregion_overlap(&xsrc->esb_mmio, 0,
->                                          &xsrc->esb_mmio_kvm, 1);
->  
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 9b55e0356c62..561d746cd1da 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -1128,6 +1128,7 @@ static void xive_source_reset(void *dev)
->  static void xive_source_realize(DeviceState *dev, Error **errp)
->  {
->      XiveSource *xsrc = XIVE_SOURCE(dev);
-> +    size_t esb_len = xive_source_esb_len(xsrc);
->  
->      assert(xsrc->xive);
->  
-> @@ -1147,11 +1148,11 @@ static void xive_source_realize(DeviceState *dev, Error **errp)
->      xsrc->status = g_malloc0(xsrc->nr_irqs);
->      xsrc->lsi_map = bitmap_new(xsrc->nr_irqs);
->  
-> -    if (!kvm_irqchip_in_kernel()) {
-> -        memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
-> -                              &xive_source_esb_ops, xsrc, "xive.esb",
-> -                              (1ull << xsrc->esb_shift) * xsrc->nr_irqs);
+> -    /* The KVM XIVE device is not in use yet */
+> -    if (xive->fd == -1) {
+> -        return;
 > -    }
-> +    memory_region_init(&xsrc->esb_mmio, OBJECT(xsrc), "xive.esb", esb_len);
-> +    memory_region_init_io(&xsrc->esb_mmio_emulated, OBJECT(xsrc),
-> +                          &xive_source_esb_ops, xsrc, "xive.esb-emulated",
-> +                          esb_len);
-> +    memory_region_add_subregion(&xsrc->esb_mmio, 0, &xsrc->esb_mmio_emulated);
+> +    assert(xive->fd != -1);
 >  
->      qemu_register_reset(xive_source_reset, dev);
->  }
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index 705cf48176fc..82a61eaca74f 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -191,6 +191,7 @@ typedef struct XiveSource {
->      uint64_t        esb_flags;
->      uint32_t        esb_shift;
->      MemoryRegion    esb_mmio;
-> +    MemoryRegion    esb_mmio_emulated;
+>      /* word0 and word1 of the OS ring. */
+>      state[0] = *((uint64_t *) &tctx->regs[TM_QW1_OS]);
+> @@ -101,10 +98,7 @@ void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp)
+>      uint64_t state[2] = { 0 };
+>      int ret;
 >  
->      /* KVM support */
->      void            *esb_mmap;
-> @@ -215,6 +216,11 @@ static inline bool xive_source_esb_has_2page(XiveSource *xsrc)
->          xsrc->esb_shift == XIVE_ESB_4K_2PAGE;
->  }
+> -    /* The KVM XIVE device is not in use */
+> -    if (xive->fd == -1) {
+> -        return;
+> -    }
+> +    assert(xive->fd != -1);
 >  
-> +static inline size_t xive_source_esb_len(XiveSource *xsrc)
-> +{
-> +    return (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-> +}
-> +
->  /* The trigger page is always the first/even page */
->  static inline hwaddr xive_source_esb_page(XiveSource *xsrc, uint32_t srcno)
+>      ret = kvm_get_one_reg(tctx->cs, KVM_REG_PPC_VP_STATE, state);
+>      if (ret != 0) {
+> @@ -156,10 +150,7 @@ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
+>      unsigned long vcpu_id;
+>      int ret;
+>  
+> -    /* The KVM XIVE device is not in use */
+> -    if (xive->fd == -1) {
+> -        return;
+> -    }
+> +    assert(xive->fd != -1);
+>  
+>      /* Check if CPU was hot unplugged and replugged. */
+>      if (kvm_cpu_is_enabled(tctx->cs)) {
+> @@ -245,10 +236,7 @@ int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **errp)
+>      SpaprXive *xive = SPAPR_XIVE(xsrc->xive);
+>      uint64_t state = 0;
+>  
+> -    /* The KVM XIVE device is not in use */
+> -    if (xive->fd == -1) {
+> -        return -ENODEV;
+> -    }
+> +    assert(xive->fd != -1);
+>  
+>      if (xive_source_irq_is_lsi(xsrc, srcno)) {
+>          state |= KVM_XIVE_LEVEL_SENSITIVE;
+> @@ -592,10 +580,7 @@ static void kvmppc_xive_change_state_handler(void *opaque, int running,
+>  
+>  void kvmppc_xive_synchronize_state(SpaprXive *xive, Error **errp)
 >  {
+> -    /* The KVM XIVE device is not in use */
+> -    if (xive->fd == -1) {
+> -        return;
+> -    }
+> +    assert(xive->fd != -1);
+>  
+>      /*
+>       * When the VM is stopped, the sources are masked and the previous
+> @@ -622,10 +607,7 @@ int kvmppc_xive_pre_save(SpaprXive *xive)
+>  {
+>      Error *local_err = NULL;
+>  
+> -    /* The KVM XIVE device is not in use */
+> -    if (xive->fd == -1) {
+> -        return 0;
+> -    }
+> +    assert(xive->fd != -1);
+>  
+>      /* EAT: there is no extra state to query from KVM */
+>  
+> @@ -845,10 +827,7 @@ void kvmppc_xive_disconnect(SpaprInterruptController *intc)
+>      XiveSource *xsrc;
+>      size_t esb_len;
+>  
+> -    /* The KVM XIVE device is not in use */
+> -    if (!xive || xive->fd == -1) {
+> -        return;
+> -    }
+> +    assert(xive->fd != -1);
+>  
+>      /* Clear the KVM mapping */
+>      xsrc = &xive->source;
 > 
 > 
 
