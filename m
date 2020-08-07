@@ -2,98 +2,80 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40230C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 15:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A34E8C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 15:37:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05E3F221E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 15:32:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D7A820866
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 15:37:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i2LTSU35"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E3F221E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LbhTXmOn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D7A820866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k44M5-0002NW-1k
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 11:32:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51282)
+	id 1k44Qu-0004MO-1z
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 11:37:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k44KH-0000iT-Bc
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 11:30:33 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48671
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k44QL-0003qB-6D
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 11:36:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60480
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k44KE-0003bN-SS
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 11:30:32 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k44QI-0004Et-99
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 11:36:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596814230;
+ s=mimecast20190719; t=1596814605;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=c2Q7MNFhvXR8h5/XVGRpzzocXih7C9loEW/Rvn7azqc=;
- b=i2LTSU35ANrClpfqfYCjzeIRB4pvB1WpiBDHmwfaZ+3ImDQz061o6xm/fVfHCqYAjHr73v
- rbhIeleKvB8Csbwdp4U4SKAUrKnpYIREgE9HNQCc9qbOHe3gfIsityDEcVL8jvplpMl/vL
- PqxSyMF+21WQdpvLy92diQHYXUVQHCQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-kdxonSasO9OQ4g2YnipyyQ-1; Fri, 07 Aug 2020 11:30:28 -0400
-X-MC-Unique: kdxonSasO9OQ4g2YnipyyQ-1
-Received: by mail-wr1-f70.google.com with SMTP id f14so869551wrm.22
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 08:30:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=c2Q7MNFhvXR8h5/XVGRpzzocXih7C9loEW/Rvn7azqc=;
- b=AjboOIeL06R/FQF3WSbndfjtAzEzPt3TsRsdVpklAceB2e7FofIyPw3wY3UaA89lzG
- a2rCkaSlNDICEO5w0ZoE5vMSGJuDWPscqhL58zF9EfEeMt7ivJ5PbfaBovMEVYZ+T/ml
- ZeaoqYb84P3f+ET3TJfcUIbg7ksBtYkGzhBQSamwlwYVca3v7olMzEHqZZ96wld6yGyw
- nLtMr86paV7xSxyfjQ0K/x2NK6RNS3rEKqEwCEE63OI7cHrmWrkQERFgD7/dlpuOktBj
- Wcm/k0HfTOR+yW3zj0uAZCkK3TvayyU57Cq6DQyGPFWgmg+LqQ8t/xJY0MF96IPohCjL
- 3s0g==
-X-Gm-Message-State: AOAM532HvlE/crCOkB5ODQU0SfQo/lX/SuZ7tb/M5CIQzDr6GMpZoJDL
- EXD5HkqMFJBJybjtaaYlsEqSQOqRu4WSkeAvLOWchh5hgbdWRvCwb7rbjYECEppERXYuW77YEY3
- T92VV7j+LzBmXP9g=
-X-Received: by 2002:a1c:6604:: with SMTP id a4mr12892105wmc.81.1596814227063; 
- Fri, 07 Aug 2020 08:30:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyeMCS86JeMd3OBdYImst9/Em6Q+umwGXGOtB/3pA/1ZHRxNfeAilddp67NnSIVrMjzh95JJA==
-X-Received: by 2002:a1c:6604:: with SMTP id a4mr12892080wmc.81.1596814226825; 
- Fri, 07 Aug 2020 08:30:26 -0700 (PDT)
-Received: from [192.168.178.58] ([151.20.136.3])
- by smtp.gmail.com with ESMTPSA id c14sm10644271wrw.85.2020.08.07.08.30.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Aug 2020 08:30:26 -0700 (PDT)
-Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <20200807142939.GK120942@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9d39936b-fd7c-6545-4ecf-03f140d13a08@redhat.com>
-Date: Fri, 7 Aug 2020 17:30:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ bh=2HM+RnOk8hLgYUB2jdzFnDDmC49K65pzGIC6KWqLVdM=;
+ b=LbhTXmOnLzvTC8kBVqlxknVcm6LgPkZBTywUklluBBurFb0leCi3/NjUY1zHIWAXt8Xrfh
+ n9HChorblX+xcGtf+xCNPx940MTwnmNOR6HwgRsDP3kNVQ0eW9I9KTpyOaHE8gE1GYNpW6
+ yvEqKSsdMSDssnik7amyQILOSwXd3k4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-bKdbU0DtNZGI6cGzVBSuHg-1; Fri, 07 Aug 2020 11:36:40 -0400
+X-MC-Unique: bKdbU0DtNZGI6cGzVBSuHg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17CEC801E6A
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 15:36:40 +0000 (UTC)
+Received: from work-vm (ovpn-114-9.ams2.redhat.com [10.36.114.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 811FA10246E1;
+ Fri,  7 Aug 2020 15:36:30 +0000 (UTC)
+Date: Fri, 7 Aug 2020 16:36:28 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v2 2/3] virtiofsd: add container-friendly -o
+ sandbox=chroot option
+Message-ID: <20200807153628.GG2780@work-vm>
+References: <20200727190223.422280-1-stefanha@redhat.com>
+ <20200727190223.422280-3-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200807142939.GK120942@redhat.com>
-Content-Language: en-US
+In-Reply-To: <20200727190223.422280-3-stefanha@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:21:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -103,8 +85,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,84 +98,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, jsnow@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com,
- alex.bennee@linaro.org
+Cc: vromanso@redhat.com, Daniel Walsh <dwalsh@redhat.com>,
+ qemu-devel@nongnu.org, rmohr@redhat.com, virtio-fs@redhat.com,
+ mpatel@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/08/20 16:29, Daniel P. Berrangé wrote:
-> New binaries have lost a bunch of libraries they previously linked
-> to. This isn't neccessarily a bug, if the old make code was incorrectly
-> adding too many libraries.
-
-Yes this is because Meson uses --as-needed.
-
-> Comparing 'make install', I see some differences:
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> virtiofsd cannot run in a container because CAP_SYS_ADMIN is required to
+> create namespaces.
 > 
-> < /vroot/usr/local/bin/elf2dmp
-> < /vroot/usr/local/bin/qemu-edid
-> < /vroot/usr/local/bin/qemu-ga
-> < /vroot/usr/local/bin/qemu-storage-daemon
-> > /vroot/usr/local/bin/qemu-pr-helper
-> < /vroot/usr/local/libexec/qemu-pr-helper
-> < /vroot/usr/local/libexec/vhost-user-gpu
-> < /vroot/usr/local/libexec/virtfs-proxy-helper
-> < /vroot/usr/local/libexec/virtiofsd
-> < /vroot/usr/local/share/locale/sv/LC_MESSAGES/qemu.mo
+> Introduce a weaker sandbox mode that is sufficient in container
+> environments because the container runtime already sets up namespaces.
+> Use chroot to restrict path traversal to the shared directory.
 > 
-> Some documentation files have moved - gaining a bogus extra directory
-> component, and others are missing...
+> virtiofsd loses the following:
+> 
+> 1. Mount namespace. The process chroots to the shared directory but
+>    leaves the mounts in place. Seccomp rejects mount(2)/umount(2)
+>    syscalls.
+> 
+> 2. Pid namespace. This should be fine because virtiofsd is the only
+>    process running in the container.
+> 
+> 3. Network namespace. This should be fine because seccomp already
+>    rejects the connect(2) syscall, but an additional layer of security
+>    is lost. Container runtime-specific network security policies can be
+>    used drop network traffic (except for the vhost-user UNIX domain
+>    socket).
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-I see no missing files after removing the extra directory component.
+Is there anyone with a bit more FS semantics expertise who could check
+this;  I already surprised myself a few times reading about chroot
+escapes, so I'd appreciate a 2nd pair of eyes.
 
-0a1,38
-> /vroot/usr/local/share/doc/qemu/devel/atomics.html
-> /vroot/usr/local/share/doc/qemu/devel/bitops.html
-> /vroot/usr/local/share/doc/qemu/devel/.buildinfo
-> /vroot/usr/local/share/doc/qemu/devel/clocks.html
-> /vroot/usr/local/share/doc/qemu/devel/decodetree.html
-> /vroot/usr/local/share/doc/qemu/devel/genindex.html
-> /vroot/usr/local/share/doc/qemu/devel/index.html
-> /vroot/usr/local/share/doc/qemu/devel/kconfig.html
-> /vroot/usr/local/share/doc/qemu/devel/loads-stores.html
-> /vroot/usr/local/share/doc/qemu/devel/memory.html
-> /vroot/usr/local/share/doc/qemu/devel/migration.html
-> /vroot/usr/local/share/doc/qemu/devel/multi-thread-tcg.html
-> /vroot/usr/local/share/doc/qemu/devel/objects.inv
-> /vroot/usr/local/share/doc/qemu/devel/reset.html
-> /vroot/usr/local/share/doc/qemu/devel/s390-dasd-ipl.html
-> /vroot/usr/local/share/doc/qemu/devel/search.html
-> /vroot/usr/local/share/doc/qemu/devel/searchindex.js
-> /vroot/usr/local/share/doc/qemu/devel/secure-coding-practices.html
-> /vroot/usr/local/share/doc/qemu/devel/stable-process.html
-> /vroot/usr/local/share/doc/qemu/devel/_static/alabaster.css
-> /vroot/usr/local/share/doc/qemu/devel/_static/basic.css
-> /vroot/usr/local/share/doc/qemu/devel/_static/custom.css
-> /vroot/usr/local/share/doc/qemu/devel/_static/doctools.js
-> /vroot/usr/local/share/doc/qemu/devel/_static/documentation_options.js
-> /vroot/usr/local/share/doc/qemu/devel/_static/file.png
-> /vroot/usr/local/share/doc/qemu/devel/_static/jquery-3.2.1.js
-> /vroot/usr/local/share/doc/qemu/devel/_static/jquery.js
-> /vroot/usr/local/share/doc/qemu/devel/_static/language_data.js
-> /vroot/usr/local/share/doc/qemu/devel/_static/minus.png
-> /vroot/usr/local/share/doc/qemu/devel/_static/plus.png
-> /vroot/usr/local/share/doc/qemu/devel/_static/pygments.css
-> /vroot/usr/local/share/doc/qemu/devel/_static/searchtools.js
-> /vroot/usr/local/share/doc/qemu/devel/_static/underscore-1.3.1.js
-> /vroot/usr/local/share/doc/qemu/devel/_static/underscore.js
-> /vroot/usr/local/share/doc/qemu/devel/tcg.html
-> /vroot/usr/local/share/doc/qemu/devel/tcg-icount.html
-> /vroot/usr/local/share/doc/qemu/devel/tcg-plugins.html
-> /vroot/usr/local/share/doc/qemu/devel/testing.html
-10a49,50
-> /vroot/usr/local/share/doc/qemu/interop/qemu-ga-ref.info
-> /vroot/usr/local/share/doc/qemu/interop/qemu-qmp-ref.info
+Dave
 
-I'll stop installing the devel manual and keep the .info file in interop
-(which hopefully will go away anyway in 5.2).
-
-Paolo
+> ---
+>  tools/virtiofsd/helper.c         |  8 +++++
+>  tools/virtiofsd/passthrough_ll.c | 57 ++++++++++++++++++++++++++++++--
+>  docs/tools/virtiofsd.rst         | 32 ++++++++++++++----
+>  3 files changed, 88 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> index 3105b6c23a..91dcb23664 100644
+> --- a/tools/virtiofsd/helper.c
+> +++ b/tools/virtiofsd/helper.c
+> @@ -168,6 +168,14 @@ void fuse_cmdline_help(void)
+>             "                               enable/disable readirplus\n"
+>             "                               default: readdirplus except with "
+>             "cache=none\n"
+> +           "    -o sandbox=namespace|chroot\n"
+> +           "                               sandboxing mode:\n"
+> +           "                               - namespace: mount, pid, and net\n"
+> +           "                                 namespaces with pivot_root(2)\n"
+> +           "                                 into shared directory\n"
+> +           "                               - chroot: chroot(2) into shared\n"
+> +           "                                 directory (use in containers)\n"
+> +           "                               default: namespace\n"
+>             "    -o timeout=<number>        I/O timeout (seconds)\n"
+>             "                               default: depends on cache= option.\n"
+>             "    -o writeback|no_writeback  enable/disable writeback cache\n"
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index 50a164a599..a7894c3e7c 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -137,8 +137,14 @@ enum {
+>      CACHE_ALWAYS,
+>  };
+>  
+> +enum {
+> +    SANDBOX_NAMESPACE,
+> +    SANDBOX_CHROOT,
+> +};
+> +
+>  struct lo_data {
+>      pthread_mutex_t mutex;
+> +    int sandbox;
+>      int debug;
+>      int writeback;
+>      int flock;
+> @@ -162,6 +168,12 @@ struct lo_data {
+>  };
+>  
+>  static const struct fuse_opt lo_opts[] = {
+> +    { "sandbox=namespace",
+> +      offsetof(struct lo_data, sandbox),
+> +      SANDBOX_NAMESPACE },
+> +    { "sandbox=chroot",
+> +      offsetof(struct lo_data, sandbox),
+> +      SANDBOX_CHROOT },
+>      { "writeback", offsetof(struct lo_data, writeback), 1 },
+>      { "no_writeback", offsetof(struct lo_data, writeback), 0 },
+>      { "source=%s", offsetof(struct lo_data, source), 0 },
+> @@ -2665,6 +2677,41 @@ static void setup_capabilities(char *modcaps_in)
+>      pthread_mutex_unlock(&cap.mutex);
+>  }
+>  
+> +/*
+> + * Use chroot as a weaker sandbox for environments where the process is
+> + * launched without CAP_SYS_ADMIN.
+> + */
+> +static void setup_chroot(struct lo_data *lo)
+> +{
+> +    lo->proc_self_fd = open("/proc/self/fd", O_PATH);
+> +    if (lo->proc_self_fd == -1) {
+> +        fuse_log(FUSE_LOG_ERR, "open(\"/proc/self/fd\", O_PATH): %m\n");
+> +        exit(1);
+> +    }
+> +
+> +    /*
+> +     * Make the shared directory the file system root so that FUSE_OPEN
+> +     * (lo_open()) cannot escape the shared directory by opening a symlink.
+> +     *
+> +     * The chroot(2) syscall is later disabled by seccomp and the
+> +     * CAP_SYS_CHROOT capability is dropped so that tampering with the chroot
+> +     * is not possible.
+> +     *
+> +     * However, it's still possible to escape the chroot via lo->proc_self_fd
+> +     * but that requires first gaining control of the process.
+> +     */
+> +    if (chroot(lo->source) != 0) {
+> +        fuse_log(FUSE_LOG_ERR, "chroot(\"%s\"): %m\n", lo->source);
+> +        exit(1);
+> +    }
+> +
+> +    /* Move into the chroot */
+> +    if (chdir("/") != 0) {
+> +        fuse_log(FUSE_LOG_ERR, "chdir(\"/\"): %m\n");
+> +        exit(1);
+> +    }
+> +}
+> +
+>  /*
+>   * Lock down this process to prevent access to other processes or files outside
+>   * source directory.  This reduces the impact of arbitrary code execution bugs.
+> @@ -2672,8 +2719,13 @@ static void setup_capabilities(char *modcaps_in)
+>  static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
+>                            bool enable_syslog)
+>  {
+> -    setup_namespaces(lo, se);
+> -    setup_mounts(lo->source);
+> +    if (lo->sandbox == SANDBOX_NAMESPACE) {
+> +        setup_namespaces(lo, se);
+> +        setup_mounts(lo->source);
+> +    } else {
+> +        setup_chroot(lo);
+> +    }
+> +
+>      setup_seccomp(enable_syslog);
+>      setup_capabilities(g_strdup(lo->modcaps));
+>  }
+> @@ -2820,6 +2872,7 @@ int main(int argc, char *argv[])
+>      struct fuse_session *se;
+>      struct fuse_cmdline_opts opts;
+>      struct lo_data lo = {
+> +        .sandbox = SANDBOX_NAMESPACE,
+>          .debug = 0,
+>          .writeback = 0,
+>          .posix_lock = 1,
+> diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+> index 824e713491..40629f95ae 100644
+> --- a/docs/tools/virtiofsd.rst
+> +++ b/docs/tools/virtiofsd.rst
+> @@ -17,13 +17,24 @@ This program is designed to work with QEMU's ``--device vhost-user-fs-pci``
+>  but should work with any virtual machine monitor (VMM) that supports
+>  vhost-user.  See the Examples section below.
+>  
+> -This program must be run as the root user.  Upon startup the program will
+> -switch into a new file system namespace with the shared directory tree as its
+> -root.  This prevents "file system escapes" due to symlinks and other file
+> -system objects that might lead to files outside the shared directory.  The
+> -program also sandboxes itself using seccomp(2) to prevent ptrace(2) and other
+> -vectors that could allow an attacker to compromise the system after gaining
+> -control of the virtiofsd process.
+> +This program must be run as the root user.  The program drops privileges where
+> +possible during startup although it must be able to create and access files
+> +with any uid/gid:
+> +
+> +* The ability to invoke syscalls is limited using seccomp(2).
+> +* Linux capabilities(7) are dropped.
+> +
+> +In "namespace" sandbox mode the program switches into a new file system
+> +namespace and invokes pivot_root(2) to make the shared directory tree its root.
+> +A new pid and net namespace is also created to isolate the process.
+> +
+> +In "chroot" sandbox mode the program invokes chroot(2) to make the shared
+> +directory tree its root. This mode is intended for container environments where
+> +the container runtime has already set up the namespaces and the program does
+> +not have permission to create namespaces itself.
+> +
+> +Both sandbox modes prevent "file system escapes" due to symlinks and other file
+> +system objects that might lead to files outside the shared directory.
+>  
+>  Options
+>  -------
+> @@ -72,6 +83,13 @@ Options
+>    * readdirplus|no_readdirplus -
+>      Enable/disable readdirplus.  The default is ``readdirplus``.
+>  
+> +  * sandbox=namespace|chroot -
+> +    Sandbox mode:
+> +    - namespace: Create mount, pid, and net namespaces and pivot_root(2) into
+> +    the shared directory.
+> +    - chroot: chroot(2) into shared directory (use in containers).
+> +    The default is "namespace".
+> +
+>    * source=PATH -
+>      Share host directory tree located at PATH.  This option is required.
+>  
+> -- 
+> 2.26.2
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
