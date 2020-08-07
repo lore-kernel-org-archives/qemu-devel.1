@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AD2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 05:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A47C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 05:42:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CBEE20855
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 05:41:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CBEE20855
+	by mail.kernel.org (Postfix) with ESMTPS id 5BFDD20855
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 05:42:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BFDD20855
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3v8U-0001LW-17
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 01:41:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44324)
+	id 1k3v9R-0002Ox-HK
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 01:42:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3v7p-0000fw-OD
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 01:41:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39338)
+ id 1k3v7q-0000gk-PS
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 01:41:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39360)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3v7n-0000g1-L8
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 01:41:05 -0400
+ id 1k3v7n-0000g2-Nr
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 01:41:06 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k3v7k-0005u5-SB
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 05:41:00 +0000
+ id 1k3v7l-0005rs-T9
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 05:41:01 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D42CD2E807D
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 05:41:00 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id AB9542E807B
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 05:41:01 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2020 05:31:38 -0000
+Date: Fri, 07 Aug 2020 05:33:02 -0000
 From: Laci <1890775@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,8 +52,9 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: jacoka
 X-Launchpad-Bug-Reporter: Laci (jacoka)
 X-Launchpad-Bug-Modifier: Laci (jacoka)
-Message-Id: <159677829829.10348.2497937987968118298.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1890775] [NEW] Aten USB to Serial bridge does not work with qemu
+References: <159677829829.10348.2497937987968118298.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159677838285.2281.6152810823679990374.malone@gac.canonical.com>
+Subject: [Bug 1890775] Re: Aten USB to Serial bridge does not work with qemu
  under Windows 10
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -61,7 +62,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: bd2a82c4cce270aa631a5fde03d2b2ef7a4187da
+X-Launchpad-Hash: 67e099af2fda90ea7067b221a3a0baa8ad3fa6bf
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
@@ -88,35 +89,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-I would like to use MSDOS 6.22 with qemu (unfortunatelly lot of our test pr=
-ograms has been written in dos).
-I tried to connect two laptop by RS232 port, one of the machine have a buil=
-t-in serial port and run with native MSDOS 6.22 with 4.0 norton commander. =
-Another machine have only USB ports and i try to use a new Aten USB to Seri=
-al device. Ok. Has been started qemu with -serial and -chardev parameters, =
-at startup appear a window with serial port setting such as baud rate, star=
-t bit, etc...
-
-Quemu has been satrted succeeded but serial port cannot be used becouse
-was nothing activited on usb serial adapter :(
-
-I tried same configuration with VirtualBox and everything was worked
-fine (serial connection was estabiled and copied several files from one
-machine into another machine), seems to be the emulated serial port has
-been worked fine.
-
-I would like to use qemu, i just thougt qemu is better, simple and
-faster...
-
-Exists solution or is this a qemu bug?
-
-Thank you!
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+I forgot that the environment is Windows 10 64 bit.
 
 -- =
 
