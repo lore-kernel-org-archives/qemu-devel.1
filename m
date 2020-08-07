@@ -2,93 +2,88 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08517C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73900C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:05:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA3C622C9F
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:04:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3ED4F2177B
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:05:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ggNFWWTl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA3C622C9F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H2egqyeJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED4F2177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3yIp-0002kQ-WE
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:04:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55864)
+	id 1k3yJS-0003TC-HC
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:05:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56194)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k3yH3-00014r-QU
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:02:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34301
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1k3yGz-0007zT-HR
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:02:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596790964;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=A8YVs2lz1qleJrq/KVosvpeqdBvEWHVLYLaeP4g/WKk=;
- b=ggNFWWTlfUvP/YAeXQPzOTxpXVi2NFKM8C9won0sN9gpsvGmtnK7qASckbgsxUdNvU6Adg
- ha+Dk6zhZgN4Ud4dpt/mVlMCMBnToX+edEkeUvXZScGJrKap0nXqh2RuGJsPaWDsRsnQI7
- ruVUcgrRRiyzExTpBup6SVCq+MC0ghA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-wHK9KZ0wOA6aF6Q9Oa590Q-1; Fri, 07 Aug 2020 05:02:40 -0400
-X-MC-Unique: wHK9KZ0wOA6aF6Q9Oa590Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 564471940935;
- Fri,  7 Aug 2020 09:02:39 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-143.ams2.redhat.com
- [10.36.112.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 48F641002382;
- Fri,  7 Aug 2020 09:02:36 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C388F1132801; Fri,  7 Aug 2020 11:02:34 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
-References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <87364y28jp.fsf@dusky.pond.sub.org>
- <20200807082206.GC120942@redhat.com>
-Date: Fri, 07 Aug 2020 11:02:34 +0200
-In-Reply-To: <20200807082206.GC120942@redhat.com> ("Daniel P. =?utf-8?Q?Be?=
- =?utf-8?Q?rrang=C3=A9=22's?=
- message of "Fri, 7 Aug 2020 09:22:06 +0100")
-Message-ID: <87o8nmygk5.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k3yIa-0002d4-9o
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:04:24 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45485)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k3yIY-000883-4J
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:04:23 -0400
+Received: by mail-ot1-x341.google.com with SMTP id c4so1043248otf.12
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 02:04:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=n7oo2PKZscNbkyat5Nj71JY/ddIZsGG1kdsVTNKLq28=;
+ b=H2egqyeJTwwQc68DgpBbTYDWb4cp9bpaaqRqLX6Dg67/WA9xgCSbKSsuS0GNCQnRtS
+ Q9ZNff5famIaNIIZd9CHLQkdhQFVMV73xeTNV4/+dNlS+3sX9ptjyYBHTj0IiamHT0Ba
+ 2h/lemruwDWPwHMqMdyZsjjiTRNgCwRZz5GnuiyHYpdAGeqwLZb5Hw9T2+lBLhqma+tK
+ 8NKlgQ/pFTgX//S5hfcD4O8vH59cja36tecZs83rbVewdCtmA/x6jMTcC1aoCwg39lhF
+ jEyJuJroFDguNWxWUf8tD+VV+IP9zhsWzpaUdDvGuen9t16iMuypX26D+bi4MFghpG+Q
+ X/Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=n7oo2PKZscNbkyat5Nj71JY/ddIZsGG1kdsVTNKLq28=;
+ b=SlXx2ONVhY4o35j3oGRFsrZTAYSI+xNkCxWcckEfJ4FkOqk4ManehZviUChp39hbwM
+ PFibK/47c5pQM1eppEVqXDIouKlc4VSmTvzv+lhyOaC/ClG4mgvEZYMmeYlyGdR1Vysm
+ o+tsLazGLLFfwaZnv1FLq7QebCiC+YkLzm4R/TPkVoPFBZQARIDhGJ2hjsSmaEzDMEr1
+ HI2etEPUXdNvUrG6LefCXrHtSgOXRiDi9EVLWiSBdEMK7guTee+MD4syTT2QZ1/7e3XP
+ NCrwe74Lsr0aMhBYYUZidoqcif+tCIsBZ4C9JQuAJTVHmJNZFgBrCFuVa2D6BzU3t2Tt
+ KpYQ==
+X-Gm-Message-State: AOAM533Ifbh54eP+olJ22BbQgSA+nSyJzb9VJv3WQgiS5nBeAwkKSmVa
+ kCjGf39cxi/Yw3d6ASZJwky2WicJfJ6Cy4qDI8hVMA==
+X-Google-Smtp-Source: ABdhPJwYsUJeT1pBIci6e87zYsMjj/wc9znXIkUJjl9Ic7HNp1LbkNUswIGx1x1m0QI2J2X0OFiYXbnzsiyI5jRblQY=
+X-Received: by 2002:a9d:6f8f:: with SMTP id h15mr4594088otq.221.1596791060864; 
+ Fri, 07 Aug 2020 02:04:20 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+ <1596741379-12902-125-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1596741379-12902-125-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Aug 2020 10:04:09 +0100
+Message-ID: <CAFEAcA84DhPcZxa0yhRmZOMiSdPt8L_PBVQacgoOuznbJv7kFg@mail.gmail.com>
+Subject: Re: [PATCH 124/143] meson: target
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:21:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,71 +96,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, jsnow@redhat.com, qemu-devel@nongnu.org,
- philmd@redhat.com, stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- alex.bennee@linaro.org
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
-
-> On Fri, Aug 07, 2020 at 09:56:42AM +0200, Markus Armbruster wrote:
-[...]
->> I think it's now time to plan the end game, preferably without even more
->> weeks of intense rebasing.
->>=20
->> Do we have consensus to move forward with Meson?  If yes, I'd like to
->> propose to aim for merging as early as practical in the 5.2 cycle.
->> Rationale: rebasing build system changes on top of the Meson work is
->> probably easier than rebasing the Meson work, and avoids turning Paolo
->> into an overworked bottleneck.
->>=20
->> In more detail:
->>=20
->> 1. Pick a tentative deadline.
+On Thu, 6 Aug 2020 at 21:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> I'd suggest we need a bare minimum of half a development cycle to.
-> So if we want it tin 5.2, we need to make a strong push now and over
-> next month to review it and iron out any obvious blocking testing
-> problems.
-
-I had less than a "now and over next month" (>7 weeks!) in mind.
-
-The choice of deadline is really about how much of Paolo's time we are
-(and he is!) willing to spend on rebasing vs. how much risk of toothing
-problems in master we are willing to accept.
-
-"First thing after 5.2 opens" would be ideal from a "avoid more
-rebasing" point of view, but it may not be practical.
-
-Once the flood gates are open, we can probably just as well wait for the
-initial flood to subside.
-
->> 2. Cover the testing gaps and get as much review as we can until then.
->>    Fix defects as we go.
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >
-> In terms of testing I'd suggest the minimium bar is likely the GitLab CI
-> and Peter's merge scripts.
->
-> Anything beyond that is just nice to have.
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Yup.  If you want it not to break in master, get it tested in our gating
-CI.
 
->> 3. If the known defects are expected to disrupt others too much, goto 1.
->>    Do not worry about unknown defects at this point.
->>=20
->> 4. Merge.
->>=20
->> 5. Deal with the fallout.
->
-> Yep, there's no substitute for getting it used for real by a wide
-> range of people, which is why we we need leave ourselves at min
-> 1/2 a dev cycle for this.
->
->
-> Regards,
-> Daniel
 
+> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+> index 694757b..4cd1e10 100755
+> --- a/scripts/decodetree.py
+> +++ b/scripts/decodetree.py
+> @@ -1257,7 +1257,7 @@ def main():
+>      long_opts =3D ['decode=3D', 'translate=3D', 'output=3D', 'insnwidth=
+=3D',
+>                   'static-decode=3D', 'varinsnwidth=3D']
+>      try:
+> -        (opts, args) =3D getopt.getopt(sys.argv[1:], 'o:vw:', long_opts)
+> +        (opts, args) =3D getopt.gnu_getopt(sys.argv[1:], 'o:vw:', long_o=
+pts)
+>      except getopt.GetoptError as err:
+>          error(0, err)
+>      for o, a in opts:
+
+This change to the decodetree script doesn't seem like it
+belongs in this patch ?
+
+
+> --- /dev/null
+> +++ b/target/arm/meson.build
+> @@ -0,0 +1,62 @@
+> +gen =3D [
+> +  decodetree.process('sve.decode', extra_args: '--decode=3Ddisas_sve'),
+> +  decodetree.process('neon-shared.decode', extra_args: '--static-decode=
+=3Ddisas_neon_shared'),
+> +  decodetree.process('neon-dp.decode', extra_args: '--static-decode=3Ddi=
+sas_neon_dp'),
+> +  decodetree.process('neon-ls.decode', extra_args: '--static-decode=3Ddi=
+sas_neon_ls'),
+> +  decodetree.process('vfp.decode', extra_args: '--static-decode=3Ddisas_=
+vfp'),
+> +  decodetree.process('vfp-uncond.decode', extra_args: '--static-decode=
+=3Ddisas_vfp_uncond'),
+> +  decodetree.process('a32.decode', extra_args: '--static-decode=3Ddisas_=
+a32'),
+> +  decodetree.process('a32-uncond.decode', extra_args: '--static-decode=
+=3Ddisas_a32_uncond'),
+> +  decodetree.process('t32.decode', extra_args: '--static-decode=3Ddisas_=
+t32'),
+> +  decodetree.process('t16.decode', extra_args: ['-w', '16', '--static-de=
+code=3Ddisas_t16']),
+> +]
+> +
+> +arm_ss =3D ss.source_set()
+> +arm_ss.add(gen)
+> +arm_ss.add(files(
+> +  'cpu.c',
+> +  'crypto_helper.c',
+> +  'debug_helper.c',
+> +  'gdbstub.c',
+> +  'helper.c',
+> +  'iwmmxt_helper.c',
+> +  'm_helper.c',
+> +  'neon_helper.c',
+> +  'op_helper.c',
+> +  'tlb_helper.c',
+> +  'translate.c',
+> +  'vec_helper.c',
+> +  'vfp_helper.c',
+> +  'cpu_tcg.c',
+> +))
+> +arm_ss.add(zlib)
+
+Just to check, does this get the underlying dependencies right?
+ie translate.o depends on translate.c and also eg translate-vfp.inc.c,
+which in turn depends on vfp.decode ?
+
+It's not clear to me why all the decodetree lines ended up in a
+single "gen =3D []" block -- they're independent of each other.
+
+thanks
+-- PMM
 
