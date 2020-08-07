@@ -2,83 +2,93 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 572F2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A97C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:33:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CC412177B
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:32:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CC412177B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3E110206B5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:33:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YWx45xqB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E110206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3yja-0005sI-CY
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:32:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32776)
+	id 1k3ykU-0007F2-IT
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:33:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32972)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3yh6-0003We-4a
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:29:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42932)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k3yi3-0004OK-PN
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:30:43 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39207)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3yh3-0002fi-Oc
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:29:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k3yh1-0005oP-WD
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 09:29:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EC8752E808C
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 09:29:39 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k3yi1-0002wc-T2
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:30:43 -0400
+Received: by mail-oi1-x241.google.com with SMTP id a24so1361217oia.6
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 02:30:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=p6CObgSy6lHIvCmzXCTrUl+FaKTxDExZUeGOK+BYGmU=;
+ b=YWx45xqBuCkmY7bDSKBGssQ8VTLwL+hyFNueZ0QPXE4sqYNxyUPrrHqbETs2B2FDhw
+ YdhW+XpGxh9N+hFyOp2gf2nHakygbquNJbSr2NNqn/bBD5j4+55AthVZ5bWaaETTXV7v
+ 447kSroVe1vzsRK9ckOPwklMcHLRT9Pev2aoTUIwDjcFzp86/Ke1izawWquzAyB28YR1
+ B/G5yGL1Y+EDPHnFML/ZAxtHz1ItqNc8wnQn3kjhCjcid8a+BmJUZBd7syZA+zrUe96W
+ pxSZi5i3vCkfvv3YqTNc/b4gHPZZyIaPDWkguIC1EPvyTzr+t4BEtr3naYCVjiqSrh1S
+ TPnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=p6CObgSy6lHIvCmzXCTrUl+FaKTxDExZUeGOK+BYGmU=;
+ b=YYPx3SrG5nemMJrJti7SyXajU67fptHUjVlV4BAv4p7zHWfm2YUIkODYqraAJSsXsH
+ rvcuhrCZ4ptYR2JYGa/xyslYAfBjd7WDgVgF2e0qF+PAOPgLpNVauUhMzIJmoQbcdE2e
+ /Etid0+yFNE1vxS45ypUCHKUR3RE6O2ez2IU7CoM81t8aSWd65xkbXPLB1cmFVkKM68Q
+ +f8EkB5AERg5eiPb9AOG2kv87uj+CR/uf4vk4+5bNpZs4nZcjx6L1VO4g34TIwOk+Fyc
+ JkfJ65afk/H+/ixUdR3UwzCXOGi52eZjPGRi4eDUcVAffiKOgIOyhqLM+fFN+RKFGNdf
+ VrqQ==
+X-Gm-Message-State: AOAM531C2J8egl58TpIrTToX11dTKiLyQM/Y0ojlVJ13xDHIJx0G4NtI
+ 1UnWfq/BJqVd6GoheVKkvYkUVYWbt8TfprRxMUJarQ==
+X-Google-Smtp-Source: ABdhPJxAk6RPrCBdPaaMPA62UZPMrWfHPhZoXeGdO2DkM8h5udE9wMIwPn6kmY5DWPJi4gExwIMqw7lKYwX8hXTslaQ=
+X-Received: by 2002:aca:4a96:: with SMTP id
+ x144mr10394690oia.163.1596792640542; 
+ Fri, 07 Aug 2020 02:30:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2020 09:19:56 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1030807@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: k-henning-z philmd th-huth
-X-Launchpad-Bug-Reporter: Henning Schild (k-henning-z)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <20120730102531.13148.51710.malonedeb@wampee.canonical.com>
- <159678769319.10780.14963118191647047477.malone@chaenomeles.canonical.com>
-Message-ID: <4e854df9-b3e2-ecf0-0c24-0c4d8031bd93@redhat.com>
-Subject: Re: [Bug 1030807] Re: PCI host bridge should ignore 1- and 2-byte I/O
- accesses
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2c76416c1bddbcb0868f34930925a71fc6d5a57b
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+ <1596741379-12902-6-git-send-email-pbonzini@redhat.com>
+ <CAFEAcA_mN3XrgxRbhq5U0B=OxBq6T3DXymb4_U-tzOya=W-AbQ@mail.gmail.com>
+ <d676a107-c49d-ab3f-f6e3-f6b594af9c4f@redhat.com>
+In-Reply-To: <d676a107-c49d-ab3f-f6e3-f6b594af9c4f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Aug 2020 10:30:29 +0100
+Message-ID: <CAFEAcA9JLqTHLLEy1WtGkvRYGSupX0PPUYAmnZ4Q_kGaJ3cSTg@mail.gmail.com>
+Subject: Re: [PATCH 005/143] meson: rename .inc.c files to .inc
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,93 +97,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1030807 <1030807@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200807091956.93x7wbhr6VL-XDtejoeNt932cRG1wqbhqeEOWKkOP6Q@z>
 
-Cc'ing Julia (can't find her on Launchpad) because this looks
-similar to a bug she has been tracking.
-
-On 8/7/20 10:08 AM, Thomas Huth wrote:
-> Looking through old bug tickets... is this still an issue with the
-> latest version of QEMU? Or could we close this ticket nowadays?
-> =
-
-> =
-
-> ** Changed in: qemu
->        Status: New =3D> Incomplete
+On Fri, 7 Aug 2020 at 10:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
+> On 07/08/20 10:59, Peter Maydell wrote:
+> > On Thu, 6 Aug 2020 at 20:25, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> >> ---
+> > What's the rationale for this ? ".inc.c" is the project's
+> > standard naming convention for files which aren't headers
+> > but which are lumps of C code #included into a top level .c
+> > file. The .inc.c deliberately ends '.c' because that way
+> > editors will use the right syntax highlighting for the file.
+>
+> Good point.  It can be changed to .inc.h too, if that's preferrable for you.
 
--- =
+Not really, though I guess it's slightly better than plain .inc.
+They're not header files...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1030807
+> > It would be much better if Meson could cope with our
+> > standard naming convention rather than forcing us to change it.
+>
+> First of all I need to describe why this is needed; it is because of the
+> way Meson handles dependencies on generated headers.
+>
+> With Makefiles that have automatically generated dependencies, you
+> typically make generated includes depend on the Makefile so that they
+> are built before everything else and they are available when first
+> building the .c files.
+>
+> Meson is similar, however the way it works is that you list those
+> generated includes in the sources.  The dependencies are still
+> automatically generated, but the build rules will ensure that the
+> includes are generated before attempting to build the toplevel C sources.
 
-Title:
-  PCI host bridge should ignore 1- and 2-byte I/O accesses
+But we don't really want to build all these files before building
+all C sources. We just want to say "this .c file depends on these
+.inc.c files" and then let the build tool figure it out, surely?
 
-Status in QEMU:
-  Incomplete
+> The problem is that Meson decides if something is a source vs. a
+> generated include by looking at the extension: '.c', '.cc', '.m', '.C'
+> are sources, while everything else is considered an include---including
+> '.inc.c'.
 
-Bug description:
-  In PCI there are two IO modes. Deprecated Mode2 that uses single byte IO =
-and Mode1 that uses 4byte IO.
-  According to the spec a host bridge that supports Mode1 should ignore all=
- IO that is not 4bytes.
+Is this hardcoded in Meson? That seems pretty suboptimal.
 
-  > Anytime a host bridge sees a full DWORD I/O write from the host to
-  > CONFIG_ADDRESS, the bridge must latch the data into its CONFIG_ADDRESS
-  > register. On full DWORD I/O reads to CONFIG_ADDRESS, the bridge must re=
-turn the
-  > data in CONFIG_ADDRESS. Any other types of accesses to this address (no=
-n-DWORD)
-  > have no effect on CONFIG_ADDRESS and are executed as normal I/O transac=
-tions on
-  > the PCI bus. Therefore, the only I/O Space consumed by this register is=
- a DWORD at the
-  > given address. I/O devices that share the same address but use BYTE or =
-WORD registers
-  > are not affected because their transactions will pass through the host =
-bridge unchanged.
+> Going back to patch 124, I can now answer your question:
+>
+> >> It's not clear to me why all the decodetree lines ended up in a
+> >> single "gen = []" block -- they're independent of each other.
+>
+> The files are added to the source list with "arm_ss.add(gen)".  All that
+> line does is ensuring they are built before other target-specific files
+> for ARM targets.
 
-  In qemu the host bridge will accept 1-, 2-, and 4-byte reads/writes.
-  That breakes plan9 guests that do not use the bios to access the PCI
-  config space.
+Do you mean that it just adds an extra implicit ordering constraint,
+such that if we need to rebuild both files not in 'gen' and files
+that are in 'gen' the 'gen' ones go first, or that Meson really
+builds all the 'gen' files first? What happens when you edit a
+.decode file? How much stuff gets rebuilt?
 
-  have a look at:
-  http://code.google.com/p/plan9front/source/browse/sys/src/9/pc/pci.c
+> The question then is if Meson could be changed to cope with our naming
+> convention, and unfortunately the answer is no.  The root cause is that
+> Makefiles list .o files (and uses implicit patterns to connect .o files
+> to the corresponding sources), while Meson lists .c files.
 
-  In Lines 960-967 the check for PCI Mode1 is done. This check assumes that=
- the 4-byte write at line 961 succeeds and the single byte write at 962 is =
-ignored.
-  On qemu line 962 will not be ignored and the test in line 963 will fail.
-  The plan9 kernel will fall back to Mode2 which does not work.
-  The result is that the guest will not see any PCI devices.
+Can Meson handle "this .c file needs to be built from something else?".
+Presumably so, that's a common pattern for flex/yacc type tools.
 
-  I do not really have an image that you guys could quickly check this with=
-, but i could prepare one if need be.
-  An easy way to reproduce this in linux would be to stick an outb between =
-those two lines from pci_check_type1(void).
-
-  > outl(0x80000000, 0xCF8);
-  + outb0x01, 0xcfb);
-  > if (inl(0xCF8) =3D=3D 0x80000000 && pci_sanity_check(&pci_direct_conf1)=
-) {
-
-  I did not try this but i guess on real hardware the linux kernel would
-  still work while it would not work anymore on qemu.
-
-  I tried to come up with a patch but did not find a quick solution. I
-  found that in hw/piic_pci.c sysbus_add_io is used which will register
-  read/write functions for 1, 2, and 4 bytes. This is done in ioport.c
-  ioport_register. I guess if i provided a patch you guys might not like
-  it :). So i figured i should report the bug, let me know if you need
-  any additional information.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1030807/+subscriptions
+thanks
+-- PMM
 
