@@ -2,87 +2,79 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFF3C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 06:54:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE0DEC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:06:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5681220866
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 06:54:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8EC6F20866
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:06:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OP1t3JvQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5681220866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="AlOWBrQX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EC6F20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3wGV-0005sZ-ID
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 02:54:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57092)
+	id 1k3wS5-0000vQ-OU
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 03:06:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3wFk-0005Nb-6X
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 02:53:20 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35203
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k3wFg-0008VS-8l
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 02:53:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596783194;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=K5YUUw/Y8frE6RtaO8hv102FnXk8FRAMwERnySE0WCk=;
- b=OP1t3JvQ6yoBCOebwH4Bz9lHSgq12f+1jTrWDJshQpwOXsgFZk3weDx+3W5YrRDYHOVDfc
- Pm6ctWTH+csg2eWyr1jE63pTFCHAT3EmC2xluWH+qJ+7OBtjelXMQuwLJwvj0M2vPFlXWa
- sILbOnFDNlrX3y+KQwv/Wv/NksABuCw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-e70qtIknPkOkaclifv-BkA-1; Fri, 07 Aug 2020 02:53:10 -0400
-X-MC-Unique: e70qtIknPkOkaclifv-BkA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4416800404;
- Fri,  7 Aug 2020 06:53:09 +0000 (UTC)
-Received: from gondolin (ovpn-112-214.ams2.redhat.com [10.36.112.214])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D4EF787A6D;
- Fri,  7 Aug 2020 06:53:04 +0000 (UTC)
-Date: Fri, 7 Aug 2020 08:53:02 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
-Message-ID: <20200807085302.7d7616df.cohuck@redhat.com>
-In-Reply-To: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
-References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <ouyangxuan10@163.com>)
+ id 1k3wRF-0000OD-Ji
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 03:05:13 -0400
+Received: from m13117.mail.163.com ([220.181.13.117]:4671)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ouyangxuan10@163.com>)
+ id 1k3wR9-0001Xz-MZ
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 03:05:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=Date:From:Subject:MIME-Version:Message-ID; bh=j4bMR
+ u9D8CvqC10f0ooXZRs0rr+iTNRCZq7j8Onn8XQ=; b=AlOWBrQX4acEQsrUEejtW
+ WujBvp+4qHYflM5JbP6tHzN05aNdTE7SqK91fofTXR+rvtKyqAZwB/IRSI1f6bHV
+ GTk96rXOIZwEr1S4zr0OTW+6NQsAlEg10MZrM8Y+uATuS98zmuWOEDK5JUsAZOqe
+ U6Q3ibU/H7pSEZIE6EMQsM=
+Received: from ouyangxuan10$163.com ( [106.120.127.15] ) by
+ ajax-webmail-wmsvr117 (Coremail) ; Fri, 7 Aug 2020 15:03:48 +0800 (CST)
+X-Originating-IP: [106.120.127.15]
+Date: Fri, 7 Aug 2020 15:03:48 +0800 (CST)
+From: www  <ouyangxuan10@163.com>
+To: "Joel Stanley" <joel@jms.id.au>
+Subject: Re:Re: [qemu]: How to use qemu to run 64MB bmc image?
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.10 build 20190724(ac680a23)
+ Copyright (c) 2002-2020 www.mailtech.cn 163com
+In-Reply-To: <CACPK8Xe0bCyksJ8wYA5oWrkZ6+COdQWxai5qHAV0nYxRhE7xqw@mail.gmail.com>
+References: <7c834989.1a25.173c17e115d.Coremail.ouyangxuan10@163.com>
+ <1f2df783-caf0-a5da-11f2-bb99d006b961@kaod.org>
+ <248a1877-66a6-9a4b-f1f0-92819aa9a072@redhat.com>
+ <CACPK8Xe0bCyksJ8wYA5oWrkZ6+COdQWxai5qHAV0nYxRhE7xqw@mail.gmail.com>
+X-CM-CTRLDATA: 2sedcWZvb3Rlcl9odG09NzUzNjo1Ng==
+Content-Type: multipart/alternative; 
+ boundary="----=_Part_53762_1859832586.1596783828747"
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:53:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Message-ID: <808b2c7.38d8.173c7bb9f0b.Coremail.ouyangxuan10@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: dcGowAD3_3vU_Cxf3QpNAA--.16461W
+X-CM-SenderInfo: prx1t0pj0xt0irq6il2tof0z/1tbiORZ52lXluElWaAADsw
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Received-SPF: pass client-ip=220.181.13.117; envelope-from=ouyangxuan10@163.com;
+ helo=m13117.mail.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 03:04:50
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: 6
+X-Spam_score: 0.6
+X-Spam_bar: /
+X-Spam_report: (0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
+ FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001, MIME_CHARSET_FARAWAY=2.45,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,94 +87,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, alex.bennee@linaro.org,
- stefanha@redhat.com, jsnow@redhat.com
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?GBK?Q?Philippe_Mathieu-Daud=A8=A6?= <philmd@redhat.com>,
+ =?GBK?Q?C=A8=A6dric_Le_Goater?= <clg@kaod.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  6 Aug 2020 21:13:56 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+------=_Part_53762_1859832586.1596783828747
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
 
-> This the more or less final version of the Meson conversion.  Due to
-> the sheer size of the series you have been CCed only on the cover
-> letter.
-> 
-> The series reaches the point where Makefile.target and unnest-vars
-> can be removed, and all builds become non-recursive.  I have also
-> converted parts of the testsuite, notably qtest since it is needed
-> for fuzzing.  What's left for _after_ the merge is: 1) unit tests;
-> 2) moving the rest of installation to meson (for which I have patches);
-> 3) moving feature detection from configure to meson.
-> 
-> Things I still haven't tested:
-> - fuzzing
-> - non-x86/Linux builds
+aGksCgoKVGhhbmsgeW91IGZvciB5b3VyIHJlcGx5LiAKSSBtZWFuOiBJJ3ZlIG1vZGlmaWVkIHRo
+ZSBPQk1DIHByb2plY3QgdG8gZ2VuZXJhdGUgNjRNQiBvZiBCTUMgaW1hZ2UsIHdoaWNoIGNhbiBy
+dW4gc21vb3RobHkgb24gdGhlIGFjdHVhbCBtYWNoaW5lLiBJIHRyaWVkIHRvIHJ1biA2NE1CIEJN
+QyBpbWFnZSBpbiBRRU1VLCBidXQgZmFpbGVkLgoKCgoKSSB3YW50IHRvIGFzazogCjEuIERvIEkg
+bmVlZCB0byBtb2RpZnkgUUVNVSBzb3VyY2UgY29kZSBhbmQgcmVjb21waWxlIGl0PwoKMi4gSG93
+IHRvIG1vZGlmeSBpdCBpZiBuZWNlc3Nhcnk/CgozLiBJcyB0aGVyZSBhbnkgZG9jdW1lbnQgYWJv
+dXQgUUVNVSB0aGF0IGNhbiBoZWxwIG1lIHVuZGVyc3RhbmQgdGhlIHdvcmtpbmcgcHJpbmNpcGxl
+IG9mIFFFTVUgcXVpY2tseT8KCgpjb25zb2xlIGxvZ6O6ClsgICAgNS41NTc2NTRdIENoZWNrZWQg
+VytYIG1hcHBpbmdzOiBwYXNzZWQsIG5vIFcrWCBwYWdlcyBmb3VuZApbICAgIDUuNTU4MjAzXSBS
+dW4gL2luaXQgYXMgaW5pdCBwcm9jZXNzCnJvZnMgPSBtdGQ0IHNxdWFzaGZzIHJ3ZnMgPSBtdGQ1
+IGpmZnMyCm1vdW50OiBtb3VudGluZyAvZGV2L2xvb3AwIG9uIHJ1bi9pbml0cmFtZnMvcm8gZmFp
+bGVkOiBJbnZhbGlkIGFyZ3VtZW50ClsgICAxOC4yOTczNzddIGpmZnMyOiBUb28gZmV3IGVyYXNl
+IGJsb2NrcyAoMCkKbW91bnQ6IG1vdW50aW5nIC9kZXYvbXRkYmxvY2s1IG9uIHJ1bi9pbml0cmFt
+ZnMvcncgZmFpbGVkOiBJbnZhbGlkIGFyZ3VtZW50CgoKTW91bnRpbmcgcmVhZC13cml0ZSAvZGV2
+L210ZGJsb2NrNSBmaWxlc3lzdGVtIGZhaWxlZC4gIFBsZWFzZSBmaXggYW5kIHJ1bgogICAgICAg
+IG1vdW50IC9kZXYvbXRkYmxvY2s1IHJ1bi9pbml0cmFtZnMvcncgLXQgamZmczIgLW8gcncKdG8g
+dG8gY29udGludWUsIG9yIGRvIGNoYW5nZSBub3RoaW5nIHRvIHJ1biBmcm9tIFJBTSBmb3IgdGhp
+cyBib290LgpFbnRlciBwYXNzd29yZCB0byB0cnkgdG8gbWFudWFsbHkgZml4LgpBZnRlciBmaXhp
+bmcgcnVuIGV4aXQgdG8gY29udGludWUgdGhpcyBzY3JpcHQsIG9yIHJlYm9vdCAtZiB0byByZXRy
+eSwgb3IKdG91Y2ggL3Rha2VvdmVyIGFuZCBleGl0IHRvIGJlY29tZSBQSUQgMSBhbGxvd2luZyBl
+ZGl0aW5nIG9mIHRoaXMgc2NyaXB0LgpHaXZlIHJvb3QgcGFzc3dvcmQgZm9yIHN5c3RlbSBtYWlu
+dGVuYW5jZQoob3IgdHlwZSBDb250cm9sLUQgZm9yIG5vcm1hbCBzdGFydHVwKToKCgpxZW11IGxv
+Z6O6CmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNpemUgNCwgb2Zm
+c2V0IDB4ODAwNjQpCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNp
+emUgNCwgb2Zmc2V0IDB4ODAwNjApCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNl
+IHdyaXRlIChzaXplIDQsIHZhbHVlIDB4NDdmMDAwMCwgb2Zmc2V0IDB4ODAwNjApCmFzcGVlZF9z
+b2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNpemUgNCwgb2Zmc2V0IDB4ODAwNjAp
+CmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNpemUgNCwgb2Zmc2V0
+IDB4ODAwNjQpCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNpemUg
+NCwgb2Zmc2V0IDB4ODAwNjApCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdy
+aXRlIChzaXplIDQsIHZhbHVlIDB4NDIwMDAwMCwgb2Zmc2V0IDB4ODAwNjApCmFzcGVlZF9zb2Mu
+aW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNpemUgNCwgb2Zmc2V0IDB4ODAwNjApCmFz
+cGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNpemUgNCwgb2Zmc2V0IDB4
+ODAwNjQpCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNpemUgNCwg
+b2Zmc2V0IDB4ODAwNjApCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdyaXRl
+IChzaXplIDQsIHZhbHVlIDB4NDAwMDAwMCwgb2Zmc2V0IDB4ODAwNjApCmFzcGVlZF9zb2MuaW86
+IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNpemUgNCwgb2Zmc2V0IDB4ODAwNjApCmFzcGVl
+ZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHJlYWQgKHNpemUgNCwgb2Zmc2V0IDB4ODAw
+NjQpCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdyaXRlIChzaXplIDQsIHZh
+bHVlIDB4MCwgb2Zmc2V0IDB4YTAwMDgpCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2
+aWNlIHdyaXRlIChzaXplIDQsIHZhbHVlIDB4MWZmLCBvZmZzZXQgMHhhMDAwYykKYXNwZWVkX3Nv
+Yy5pbzogdW5pbXBsZW1lbnRlZCBkZXZpY2Ugd3JpdGUgKHNpemUgNCwgdmFsdWUgMHg4MDAzMDgw
+MCwgb2Zmc2V0IDB4YTAwMDApCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdy
+aXRlIChzaXplIDQsIHZhbHVlIDB4ODAwNzA4MDAsIG9mZnNldCAweGEwMDAwKQphc3BlZWRfc29j
+LmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2YWx1ZSAweDMzZiwgb2Zm
+c2V0IDB4YTAwMjApCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdyaXRlIChz
+aXplIDQsIHZhbHVlIDB4MCwgb2Zmc2V0IDB4YTAwMjApCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVt
+ZW50ZWQgZGV2aWNlIHdyaXRlIChzaXplIDQsIHZhbHVlIDB4MCwgb2Zmc2V0IDB4YTAwMTApCmFz
+cGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdyaXRlIChzaXplIDQsIHZhbHVlIDB4
+MCwgb2Zmc2V0IDB4YTAwMTQpCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdy
+aXRlIChzaXplIDQsIHZhbHVlIDB4N2ZmZiwgb2Zmc2V0IDB4YTAwMTgpCmFzcGVlZF9zb2MuaW86
+IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdyaXRlIChzaXplIDQsIHZhbHVlIDB4N2ZmZiwgb2Zmc2V0
+IDB4YTAwMWMpCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdyaXRlIChzaXpl
+IDQsIHZhbHVlIDB4MCwgb2Zmc2V0IDB4YTAwMzApCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50
+ZWQgZGV2aWNlIHdyaXRlIChzaXplIDQsIHZhbHVlIDB4NSwgb2Zmc2V0IDB4YTAwMzgpCmFzcGVl
+ZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdyaXRlIChzaXplIDQsIHZhbHVlIDB4MCwg
+b2Zmc2V0IDB4YTAwM2MpCmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdyaXRl
+IChzaXplIDQsIHZhbHVlIDB4OWIwNDAwMDAsIG9mZnNldCAweGEwMDM0KQphc3BlZWRfc29jLmlv
+OiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2YWx1ZSAweDAsIG9mZnNldCAw
+eGEwMDA0KQphc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0
+LCB2YWx1ZSAweDgwMDcwODAxLCBvZmZzZXQgMHhhMDAwMCkKYXNwZWVkX3NvYy5pbzogdW5pbXBs
+ZW1lbnRlZCBkZXZpY2Ugd3JpdGUgKHNpemUgNCwgdmFsdWUgMHgxMDFjYiwgb2Zmc2V0IDB4YTAw
+MDgpCgoKCgp0aGFuayB5b3UsCkJ5cm9uCgoKCgoKCgoKCgoKCgoKCgoKQXQgMjAyMC0wOC0wNyAw
+NjowOToyNiwgIkpvZWwgU3RhbmxleSIgPGpvZWxAam1zLmlkLmF1PiB3cm90ZToKPk9uIFRodSwg
+NiBBdWcgMjAyMCBhdCAxNToxMiwgUGhpbGlwcGUgTWF0aGlldS1EYXVkqKYgPHBoaWxtZEByZWRo
+YXQuY29tPiB3cm90ZToKPj4KPj4gT24gOC82LzIwIDM6NTQgUE0sIEOopmRyaWMgTGUgR29hdGVy
+IHdyb3RlOgo+PiA+IEhlbGxvLAo+PiA+Cj4+ID4gT24gOC82LzIwIDM6NTggQU0sIHd3dyB3cm90
+ZToKPj4gPj4gSGkgSm9lbCBTdGFubGV5LCBBbmRyZXcgSmVmZmVyeSwgQ6imZHJpYyBMZSBHb2F0
+ZXIsCj4+ID4+Cj4+ID4+IEhvdyB0byBtb2RpZnkgaXQgc28gdGhhdCBRRU1VIGNhbiBydW4gNjRN
+QiBCTUMgaW1hZ2U/Cj4+ID4KPj4gPiBZb3UgY2FuIGluY3JlYXNlIHRoZSBGVyBpbWFnZSBmaWxl
+IHNpemUgd2l0aCAnZGQnIG9yIHdpdGggOgo+PiA+Cj4+ID4gICBjYXQgZm9vIGZvbyA+IGJhcgo+
+PiA+Cj4+ID4gaWYgdGhlIGV4cGVjdGVkIHNpemUgaXMgMTI4TUIKPj4KPj4gWW91IGNhbiB1c2Ug
+J3RydW5jYXRlJyBmcm9tIGNvcmV1dGlsczoKPj4KPj4gJCB0cnVuY2F0ZSAtcyAxMjhNIGltYWdl
+LmJpbgo+Cj5OaWNlIHRpcCEKPgo+KFdoYXQgYW4gb2J2aW91cyBuYW1lIGZvciBhIHRvb2wgdG8g
+ZXh0ZW5kIGZpbGVzKQo+Cj5DaGVlcnMsCj4KPkpvZWwK
+------=_Part_53762_1859832586.1596783828747
+Content-Type: text/html; charset=GBK
+Content-Transfer-Encoding: base64
 
-So, I was planning to give it a go on s390, but I cannot even build it
-on x86 (fails configure):
-
-Build started at 2020-08-07T08:43:43.873638
-Main binary: /usr/bin/python3
-Build Options: -Doptimization=2 -Ddebug=true -Dwerror=true -Dstrip=true -Db_pie=true -Db_coverage=false -Dsdl=auto -Dsdl_image=auto -Dvnc=enabled -Dvnc_sasl=auto -Dvnc_jpeg=auto -Dvnc_png=auto -Dprefix=/usr/local -Dbindir=/usr/local/bin -Ddatadir=/usr/local/share -Dincludedir=/usr/local/include -Dlibdir=/usr/local/lib -Dlibexecdir=/usr/local/libexec -Dlocalstatedir=/usr/local/var -Dmandir=/usr/local/share/man -Dsysconfdir=/usr/local/etc
-Python system: Linux
-The Meson build system
-Version: 0.52.0
-Source dir: /home/cohuck/git/qemu
-Build dir: /home/cohuck/git/qemu/build
-Build type: native build
-
-meson.build:438:22: ERROR: Key must be a string.
-  config_target_h += {target: configure_file(output: target + '-config-target.h',
-                      ^
-(Fedora 31, version from your github branch)
-
-Is there anything special I need to install beyond meson?
-
-> - static builds
-> - Docker and VM builds
-> 
-> Things I have checked:
-> - x86 builds
-> - modules
-> - "make install"
-> - internal slirp/dtc/capstone.
-> 
-> It should be more or less bisectable.  I have not tried building
-> _all_ steps, but I have tried both before and after each major one.
-> 
-> Build system rebuild rules seem to work reliably.
-> 
-> After a week or quite intense rebasing, my impression is more or less
-> the same as last December: Meson looks more daunting, but it is actually
-> much nicer to work with.
-> 
-> The diffstat so far is not very favorable, but remember that:
-> 
-> 1) the series leaves quite a few nearly-obsolete bits in configure,
-> Makefile and rules.mak (over 200 lines only in the makefiles).
-> 
-> 2) configure test conversion will be where meson really shines.  I
-> included a couple examples just to show
-> 
->     meson: convert VNC and dependent libraries to meson
->        4 files changed, 44 insertions(+), 134 deletions(-)
-> 
->     meson: move SDL and SDL-image detection to meson
->        5 files changed, 30 insertions(+), 144 deletions(-)
-> 
->     meson: replace create-config with meson configure_file
->        6 files changed, 80 insertions(+), 168 deletions(-)
-> 
-> 3) the idea behind using Makefile generators is to have stable
-> code written in a high-level language instead of Makefile magic
-> that tends to grow by accretion.  So even though ninjatool is
-> large at 1000 lines of Python, it can already be considered mature
-> or even "done".  It had only ~15 lines changed since the last post,
-> and whenever debugging meson.build issues looking at build.ninja has
-> always (literally!) been enough.
-> 
-> Available on git://github.com/bonzini/qemu branch meson-poc-next.
+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
+Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXYgc3R5bGU9Im1hcmdpbjogMDsiPmhpLDwvZGl2PjxkaXYg
+c3R5bGU9Im1hcmdpbjogMDsiPjxicj48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij5UaGFu
+ayB5b3UgZm9yIHlvdXIgcmVwbHkuJm5ic3A7PC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOiAwOyI+
+SSBtZWFuOiBJJ3ZlIG1vZGlmaWVkIHRoZSBPQk1DIHByb2plY3QgdG8gZ2VuZXJhdGUgNjRNQiBv
+ZiBCTUMgaW1hZ2UsIHdoaWNoIGNhbiBydW4gc21vb3RobHkgb24gdGhlIGFjdHVhbCBtYWNoaW5l
+LiBJIHRyaWVkIHRvIHJ1biA2NE1CIEJNQyBpbWFnZSBpbiBRRU1VLCBidXQgZmFpbGVkLjwvZGl2
+PjxwIHN0eWxlPSJtYXJnaW46IDA7Ij48YnI+PC9wPjxkaXYgc3R5bGU9Im1hcmdpbjogMDsiPkkg
+d2FudCB0byBhc2s6Jm5ic3A7PC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOiAwOyI+MS4gRG8gSSBu
+ZWVkIHRvIG1vZGlmeSBRRU1VIHNvdXJjZSBjb2RlIGFuZCByZWNvbXBpbGUgaXQ/PC9kaXY+PHAg
+c3R5bGU9Im1hcmdpbjogMDsiPjIuIEhvdyB0byBtb2RpZnkgaXQgaWYgbmVjZXNzYXJ5PzwvcD48
+ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij4zLiBJcyB0aGVyZSBhbnkgZG9jdW1lbnQgYWJvdXQgUUVN
+VSB0aGF0IGNhbiBoZWxwIG1lIHVuZGVyc3RhbmQgdGhlIHdvcmtpbmcgcHJpbmNpcGxlIG9mIFFF
+TVUgcXVpY2tseT88L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48YnI+PC9kaXY+PGRpdiBz
+dHlsZT0ibWFyZ2luOiAwOyI+PGI+Y29uc29sZSBsb2c8L2I+o7o8L2Rpdj48ZGl2IHN0eWxlPSJt
+YXJnaW46IDA7Ij48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48c3BhbiBzdHlsZT0iZm9udC1zaXpl
+OiAxMnB4OyI+PGk+WyZuYnNwOyAmbmJzcDsgNS41NTc2NTRdIENoZWNrZWQgVytYIG1hcHBpbmdz
+OiBwYXNzZWQsIG5vIFcrWCBwYWdlcyBmb3VuZDwvaT48L3NwYW4+PC9kaXY+PGRpdiBzdHlsZT0i
+bWFyZ2luOiAwOyI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTogMTJweDsiPjxpPlsmbmJzcDsgJm5i
+c3A7IDUuNTU4MjAzXSBSdW4gL2luaXQgYXMgaW5pdCBwcm9jZXNzPC9pPjwvc3Bhbj48L2Rpdj48
+ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48c3BhbiBzdHlsZT0iZm9udC1zaXplOiAxMnB4OyI+PGk+
+cm9mcyA9IG10ZDQgc3F1YXNoZnMgcndmcyA9IG10ZDUgamZmczI8L2k+PC9zcGFuPjwvZGl2Pjxk
+aXYgc3R5bGU9Im1hcmdpbjogMDsiPjxzcGFuIHN0eWxlPSJmb250LXNpemU6IDEycHg7Ij48aT5t
+b3VudDogbW91bnRpbmcgL2Rldi9sb29wMCBvbiBydW4vaW5pdHJhbWZzL3JvIGZhaWxlZDogSW52
+YWxpZCBhcmd1bWVudDwvaT48L3NwYW4+PC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOiAwOyI+PHNw
+YW4gc3R5bGU9ImZvbnQtc2l6ZTogMTJweDsiPjxpPlsmbmJzcDsgJm5ic3A7MTguMjk3Mzc3XSBq
+ZmZzMjogVG9vIGZldyBlcmFzZSBibG9ja3MgKDApPC9pPjwvc3Bhbj48L2Rpdj48ZGl2IHN0eWxl
+PSJtYXJnaW46IDA7Ij48c3BhbiBzdHlsZT0iZm9udC1zaXplOiAxMnB4OyI+PGk+bW91bnQ6IG1v
+dW50aW5nIC9kZXYvbXRkYmxvY2s1IG9uIHJ1bi9pbml0cmFtZnMvcncgZmFpbGVkOiBJbnZhbGlk
+IGFyZ3VtZW50PC9pPjwvc3Bhbj48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48YnI+PC9k
+aXY+PGRpdiBzdHlsZT0ibWFyZ2luOiAwOyI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTogMTJweDsi
+PjxpPk1vdW50aW5nIHJlYWQtd3JpdGUgL2Rldi9tdGRibG9jazUgZmlsZXN5c3RlbSBmYWlsZWQu
+Jm5ic3A7IFBsZWFzZSBmaXggYW5kIHJ1bjwvaT48L3NwYW4+PC9kaXY+PGRpdiBzdHlsZT0ibWFy
+Z2luOiAwOyI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTogMTJweDsiPjxpPiZuYnNwOyAmbmJzcDsg
+Jm5ic3A7ICZuYnNwOyBtb3VudCAvZGV2L210ZGJsb2NrNSBydW4vaW5pdHJhbWZzL3J3IC10IGpm
+ZnMyIC1vIHJ3PC9pPjwvc3Bhbj48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48c3BhbiBz
+dHlsZT0iZm9udC1zaXplOiAxMnB4OyI+PGk+dG8gdG8gY29udGludWUsIG9yIGRvIGNoYW5nZSBu
+b3RoaW5nIHRvIHJ1biBmcm9tIFJBTSBmb3IgdGhpcyBib290LjwvaT48L3NwYW4+PC9kaXY+PGRp
+diBzdHlsZT0ibWFyZ2luOiAwOyI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTogMTJweDsiPjxpPkVu
+dGVyIHBhc3N3b3JkIHRvIHRyeSB0byBtYW51YWxseSBmaXguPC9pPjwvc3Bhbj48L2Rpdj48ZGl2
+IHN0eWxlPSJtYXJnaW46IDA7Ij48c3BhbiBzdHlsZT0iZm9udC1zaXplOiAxMnB4OyI+PGk+QWZ0
+ZXIgZml4aW5nIHJ1biBleGl0IHRvIGNvbnRpbnVlIHRoaXMgc2NyaXB0LCBvciByZWJvb3QgLWYg
+dG8gcmV0cnksIG9yPC9pPjwvc3Bhbj48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48c3Bh
+biBzdHlsZT0iZm9udC1zaXplOiAxMnB4OyI+PGk+dG91Y2ggL3Rha2VvdmVyIGFuZCBleGl0IHRv
+IGJlY29tZSBQSUQgMSBhbGxvd2luZyBlZGl0aW5nIG9mIHRoaXMgc2NyaXB0LjwvaT48L3NwYW4+
+PC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOiAwOyI+PHNwYW4gc3R5bGU9ImZvbnQtc2l6ZTogMTJw
+eDsiPjxpPkdpdmUgcm9vdCBwYXNzd29yZCBmb3Igc3lzdGVtIG1haW50ZW5hbmNlPC9pPjwvc3Bh
+bj48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48c3BhbiBzdHlsZT0iZm9udC1zaXplOiAx
+MnB4OyI+PGk+KG9yIHR5cGUgQ29udHJvbC1EIGZvciBub3JtYWwgc3RhcnR1cCk6PC9pPjwvc3Bh
+bj48L2Rpdj48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48YnI+PC9kaXY+PGRpdiBzdHls
+ZT0ibWFyZ2luOiAwOyI+PGI+cWVtdSBsb2ejujwvYj48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46
+IDA7Ij48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVu
+dGVkIGRldmljZSByZWFkIChzaXplIDQsIG9mZnNldCAweDgwMDY0KTwvaT48L2Rpdj48ZGl2IHN0
+eWxlPSJtYXJnaW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSBy
+ZWFkIChzaXplIDQsIG9mZnNldCAweDgwMDYwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46
+IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0
+LCB2YWx1ZSAweDQ3ZjAwMDAsIG9mZnNldCAweDgwMDYwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJt
+YXJnaW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSByZWFkIChz
+aXplIDQsIG9mZnNldCAweDgwMDYwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48
+aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSByZWFkIChzaXplIDQsIG9mZnNl
+dCAweDgwMDY0KTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48aT5hc3BlZWRfc29j
+LmlvOiB1bmltcGxlbWVudGVkIGRldmljZSByZWFkIChzaXplIDQsIG9mZnNldCAweDgwMDYwKTwv
+aT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxl
+bWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2YWx1ZSAweDQyMDAwMDAsIG9mZnNldCAweDgw
+MDYwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1
+bmltcGxlbWVudGVkIGRldmljZSByZWFkIChzaXplIDQsIG9mZnNldCAweDgwMDYwKTwvaT48L2Rp
+dj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVk
+IGRldmljZSByZWFkIChzaXplIDQsIG9mZnNldCAweDgwMDY0KTwvaT48L2Rpdj48ZGl2IHN0eWxl
+PSJtYXJnaW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSByZWFk
+IChzaXplIDQsIG9mZnNldCAweDgwMDYwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7
+Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2
+YWx1ZSAweDQwMDAwMDAsIG9mZnNldCAweDgwMDYwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJn
+aW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSByZWFkIChzaXpl
+IDQsIG9mZnNldCAweDgwMDYwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48aT5h
+c3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSByZWFkIChzaXplIDQsIG9mZnNldCAw
+eDgwMDY0KTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48aT5hc3BlZWRfc29jLmlv
+OiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2YWx1ZSAweDAsIG9mZnNldCAw
+eGEwMDA4KTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48aT5hc3BlZWRfc29jLmlv
+OiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2YWx1ZSAweDFmZiwgb2Zmc2V0
+IDB4YTAwMGMpPC9pPjwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjogMDsiPjxpPmFzcGVlZF9zb2Mu
+aW86IHVuaW1wbGVtZW50ZWQgZGV2aWNlIHdyaXRlIChzaXplIDQsIHZhbHVlIDB4ODAwMzA4MDAs
+IG9mZnNldCAweGEwMDAwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48aT5hc3Bl
+ZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2YWx1ZSAweDgw
+MDcwODAwLCBvZmZzZXQgMHhhMDAwMCk8L2k+PC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOiAwOyI+
+PGk+YXNwZWVkX3NvYy5pbzogdW5pbXBsZW1lbnRlZCBkZXZpY2Ugd3JpdGUgKHNpemUgNCwgdmFs
+dWUgMHgzM2YsIG9mZnNldCAweGEwMDIwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7
+Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2
+YWx1ZSAweDAsIG9mZnNldCAweGEwMDIwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7
+Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2
+YWx1ZSAweDAsIG9mZnNldCAweGEwMDEwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7
+Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2
+YWx1ZSAweDAsIG9mZnNldCAweGEwMDE0KTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7
+Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0LCB2
+YWx1ZSAweDdmZmYsIG9mZnNldCAweGEwMDE4KTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46
+IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6ZSA0
+LCB2YWx1ZSAweDdmZmYsIG9mZnNldCAweGEwMDFjKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJn
+aW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6
+ZSA0LCB2YWx1ZSAweDAsIG9mZnNldCAweGEwMDMwKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJn
+aW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6
+ZSA0LCB2YWx1ZSAweDUsIG9mZnNldCAweGEwMDM4KTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJn
+aW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6
+ZSA0LCB2YWx1ZSAweDAsIG9mZnNldCAweGEwMDNjKTwvaT48L2Rpdj48ZGl2IHN0eWxlPSJtYXJn
+aW46IDA7Ij48aT5hc3BlZWRfc29jLmlvOiB1bmltcGxlbWVudGVkIGRldmljZSB3cml0ZSAoc2l6
+ZSA0LCB2YWx1ZSAweDliMDQwMDAwLCBvZmZzZXQgMHhhMDAzNCk8L2k+PC9kaXY+PGRpdiBzdHls
+ZT0ibWFyZ2luOiAwOyI+PGk+YXNwZWVkX3NvYy5pbzogdW5pbXBsZW1lbnRlZCBkZXZpY2Ugd3Jp
+dGUgKHNpemUgNCwgdmFsdWUgMHgwLCBvZmZzZXQgMHhhMDAwNCk8L2k+PC9kaXY+PGRpdiBzdHls
+ZT0ibWFyZ2luOiAwOyI+PGk+YXNwZWVkX3NvYy5pbzogdW5pbXBsZW1lbnRlZCBkZXZpY2Ugd3Jp
+dGUgKHNpemUgNCwgdmFsdWUgMHg4MDA3MDgwMSwgb2Zmc2V0IDB4YTAwMDApPC9pPjwvZGl2Pjxk
+aXYgc3R5bGU9Im1hcmdpbjogMDsiPjxpPmFzcGVlZF9zb2MuaW86IHVuaW1wbGVtZW50ZWQgZGV2
+aWNlIHdyaXRlIChzaXplIDQsIHZhbHVlIDB4MTAxY2IsIG9mZnNldCAweGEwMDA4KTwvaT48L2Rp
+dj48L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0ibWFy
+Z2luOiAwOyI+PGJyPjwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjogMDsiPnRoYW5rIHlvdSw8L2Rp
+dj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij5CeXJvbjwvZGl2PjxwIHN0eWxlPSJtYXJnaW46IDA7
+Ij48YnI+PC9wPjxwIHN0eWxlPSJtYXJnaW46IDA7Ij48YnI+PC9wPjxwIHN0eWxlPSJtYXJnaW46
+IDA7Ij48YnI+PC9wPjxwIHN0eWxlPSJtYXJnaW46IDA7Ij48YnI+PC9wPjxkaXYgc3R5bGU9InBv
+c2l0aW9uOnJlbGF0aXZlO3pvb206MSI+PC9kaXY+PGRpdiBpZD0iZGl2TmV0ZWFzZU1haWxDYXJk
+Ij48L2Rpdj48cCBzdHlsZT0ibWFyZ2luOiAwOyI+PGJyPjwvcD48cHJlPjxicj5BdCAyMDIwLTA4
+LTA3IDA2OjA5OjI2LCAiSm9lbCBTdGFubGV5IiAmbHQ7am9lbEBqbXMuaWQuYXUmZ3Q7IHdyb3Rl
+OgomZ3Q7T24gVGh1LCA2IEF1ZyAyMDIwIGF0IDE1OjEyLCBQaGlsaXBwZSBNYXRoaWV1LURhdWSo
+piAmbHQ7cGhpbG1kQHJlZGhhdC5jb20mZ3Q7IHdyb3RlOgomZ3Q7Jmd0OwomZ3Q7Jmd0OyBPbiA4
+LzYvMjAgMzo1NCBQTSwgQ6imZHJpYyBMZSBHb2F0ZXIgd3JvdGU6CiZndDsmZ3Q7ICZndDsgSGVs
+bG8sCiZndDsmZ3Q7ICZndDsKJmd0OyZndDsgJmd0OyBPbiA4LzYvMjAgMzo1OCBBTSwgd3d3IHdy
+b3RlOgomZ3Q7Jmd0OyAmZ3Q7Jmd0OyBIaSBKb2VsIFN0YW5sZXksIEFuZHJldyBKZWZmZXJ5LCBD
+qKZkcmljIExlIEdvYXRlciwKJmd0OyZndDsgJmd0OyZndDsKJmd0OyZndDsgJmd0OyZndDsgSG93
+IHRvIG1vZGlmeSBpdCBzbyB0aGF0IFFFTVUgY2FuIHJ1biA2NE1CIEJNQyBpbWFnZT8KJmd0OyZn
+dDsgJmd0OwomZ3Q7Jmd0OyAmZ3Q7IFlvdSBjYW4gaW5jcmVhc2UgdGhlIEZXIGltYWdlIGZpbGUg
+c2l6ZSB3aXRoICdkZCcgb3Igd2l0aCA6CiZndDsmZ3Q7ICZndDsKJmd0OyZndDsgJmd0OyAgIGNh
+dCBmb28gZm9vICZndDsgYmFyCiZndDsmZ3Q7ICZndDsKJmd0OyZndDsgJmd0OyBpZiB0aGUgZXhw
+ZWN0ZWQgc2l6ZSBpcyAxMjhNQgomZ3Q7Jmd0OwomZ3Q7Jmd0OyBZb3UgY2FuIHVzZSAndHJ1bmNh
+dGUnIGZyb20gY29yZXV0aWxzOgomZ3Q7Jmd0OwomZ3Q7Jmd0OyAkIHRydW5jYXRlIC1zIDEyOE0g
+aW1hZ2UuYmluCiZndDsKJmd0O05pY2UgdGlwIQomZ3Q7CiZndDsoV2hhdCBhbiBvYnZpb3VzIG5h
+bWUgZm9yIGEgdG9vbCB0byBleHRlbmQgZmlsZXMpCiZndDsKJmd0O0NoZWVycywKJmd0OwomZ3Q7
+Sm9lbAo8L3ByZT48L2Rpdj48YnI+PGJyPjxzcGFuIHRpdGxlPSJuZXRlYXNlZm9vdGVyIj48cD4m
+bmJzcDs8L3A+PC9zcGFuPg==
+------=_Part_53762_1859832586.1596783828747--
 
 
