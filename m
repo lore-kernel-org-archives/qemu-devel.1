@@ -2,94 +2,81 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E59C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 19:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F26AC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 20:01:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23FA72074D
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 19:28:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DG1OETwV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23FA72074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3D4C02074D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 20:01:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D4C02074D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k482k-0003z4-38
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 15:28:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45012)
+	id 1k48YY-0001EV-9S
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 16:01:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k481r-00033w-Ro
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 15:27:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22202
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k481o-00059U-VA
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 15:27:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596828462;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9cYz0cQYVjHEoaEQrHhj9L7BWhq3vTmA4NfH0UBP3/E=;
- b=DG1OETwVeaqKQr7zubXsox62rDVw/BLGNUMg98y3F+irS4JlDf3H5SvW98F6UUsWJQ7Vlg
- nsP9mlWB9Sy293Ur7wXyZ5JTKS3qWo+zRI1ThoxDfTQxmWZU8BpWwqaL8C0NHhMrCvBJPN
- m1r4mEWIR+4eR9pZwmgsCSfZ1r5hTzc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-a1Y0Af1IPpikUYpRwLVq4w-1; Fri, 07 Aug 2020 15:27:38 -0400
-X-MC-Unique: a1Y0Af1IPpikUYpRwLVq4w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABA8658;
- Fri,  7 Aug 2020 19:27:37 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 056445D9CA;
- Fri,  7 Aug 2020 19:27:32 +0000 (UTC)
-Date: Fri, 7 Aug 2020 21:27:29 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v3 2/3] hw/i386: Add a new check to configure smp dies
- for EPYC
-Message-ID: <20200807212729.1cb2ede0@redhat.com>
-In-Reply-To: <159681797161.9679.5653247810916709875.stgit@naples-babu.amd.com>
-References: <159681772267.9679.1334429994189974662.stgit@naples-babu.amd.com>
- <159681797161.9679.5653247810916709875.stgit@naples-babu.amd.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k48X6-0000fP-HE
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 16:00:04 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44940)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k48X3-00006d-8I
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 16:00:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k48X1-0004Ys-C3
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 19:59:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 510AB2E808D
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 19:59:59 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:00:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Aug 2020 19:49:54 -0000
+From: Christian Schoenebeck <1500265@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: d-haid metux-its schoenebeck th-huth
+X-Launchpad-Bug-Reporter: Daniel Haid (d-haid)
+X-Launchpad-Bug-Modifier: Christian Schoenebeck (schoenebeck)
+References: <20150927211256.29032.14479.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159682979495.5096.1114650893392955671.malone@soybean.canonical.com>
+Subject: [Bug 1500265] Re: nested 9p filesystem with
+ security_model=mapped-xattr
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: fa3910271492ee61715e5443b9b5f4091dd92849
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,51 +85,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com,
- ehabkost@redhat.com, rth@twiddle.net
+Reply-To: Bug 1500265 <1500265@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 07 Aug 2020 11:32:51 -0500
-Babu Moger <babu.moger@amd.com> wrote:
+The status of this issue is unchanged in QEMU, i.e. user.virtfs.* is
+still filtered out.
 
-> Adding a new check to warn the users to configure 'dies' when
-s/warn .../error out .../
+If someone wants to see this changed, please use the common way for sending=
+ the patch via ML:
+https://wiki.qemu.org/Contribute/SubmitAPatch
 
-> topology is numa configured. It makes it easy to build the
-> topology for EPYC models.
+-- =
 
-probably it should mention that will break configs that
-do not have correct topology configured.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1500265
 
- 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
->  hw/i386/x86.c |    7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> index 67bee1bcb8..2a6ce56ef1 100644
-> --- a/hw/i386/x86.c
-> +++ b/hw/i386/x86.c
-> @@ -138,6 +138,13 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
->  
->      /* Check for apicid encoding */
->      if (cpu_x86_use_epyc_apic_id_encoding(ms->cpu_type)) {
-> +        if ((ms->numa_state->num_nodes > 0) &&
-> +            ms->numa_state->num_nodes != (ms->smp.sockets * x86ms->smp_dies)) {
-> +            error_setg(&error_fatal, "Numa configuration requires smp 'dies' "
-> +                       "parameter. Configure the cpu topology properly with "
-> +                       "max_cpus = sockets * dies * cores * threads");
-> +            return;
-> +        }
->          x86_set_epyc_topo_handlers(ms);
->      }
+Title:
+  nested 9p filesystem with security_model=3Dmapped-xattr
 
-we also should error out in case 
-    ms->numa_state->num_nodes != (ms->smp.sockets * x86ms->smp_dies
-and ask user to configure numa to match total number of used dies.
+Status in QEMU:
+  Incomplete
 
+Bug description:
+  I do not know whether this is a bug or a feature request, but on a 9p
+  virtfs with security_model=3Dmapped-xattr, access to extended attributes
+  starting with "user.virtfs" coming from the guest seem to be silently
+  ignored. Would it not be more correct to use some sort of "escaping",
+  say map to "user.virtfs.x" on guest to "user.virtfs.virtfs.x" on host
+  or something like that, so that the guest can use arbitrary
+  attributes.
 
+  In particular, this would allow nested virtual machines to use nested
+  9p virtfs with security_model=3Dmapped-xattr.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1500265/+subscriptions
 
