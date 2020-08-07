@@ -2,88 +2,93 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73900C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CFCEC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:07:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ED4F2177B
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:05:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32D2A2177B
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:07:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H2egqyeJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED4F2177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jNYP5942"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32D2A2177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3yJS-0003TC-HC
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:05:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56194)
+	id 1k3yLw-000537-81
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:07:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3yIa-0002d4-9o
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:04:24 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45485)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k3yIY-000883-4J
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:04:23 -0400
-Received: by mail-ot1-x341.google.com with SMTP id c4so1043248otf.12
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 02:04:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=n7oo2PKZscNbkyat5Nj71JY/ddIZsGG1kdsVTNKLq28=;
- b=H2egqyeJTwwQc68DgpBbTYDWb4cp9bpaaqRqLX6Dg67/WA9xgCSbKSsuS0GNCQnRtS
- Q9ZNff5famIaNIIZd9CHLQkdhQFVMV73xeTNV4/+dNlS+3sX9ptjyYBHTj0IiamHT0Ba
- 2h/lemruwDWPwHMqMdyZsjjiTRNgCwRZz5GnuiyHYpdAGeqwLZb5Hw9T2+lBLhqma+tK
- 8NKlgQ/pFTgX//S5hfcD4O8vH59cja36tecZs83rbVewdCtmA/x6jMTcC1aoCwg39lhF
- jEyJuJroFDguNWxWUf8tD+VV+IP9zhsWzpaUdDvGuen9t16iMuypX26D+bi4MFghpG+Q
- X/Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=n7oo2PKZscNbkyat5Nj71JY/ddIZsGG1kdsVTNKLq28=;
- b=SlXx2ONVhY4o35j3oGRFsrZTAYSI+xNkCxWcckEfJ4FkOqk4ManehZviUChp39hbwM
- PFibK/47c5pQM1eppEVqXDIouKlc4VSmTvzv+lhyOaC/ClG4mgvEZYMmeYlyGdR1Vysm
- o+tsLazGLLFfwaZnv1FLq7QebCiC+YkLzm4R/TPkVoPFBZQARIDhGJ2hjsSmaEzDMEr1
- HI2etEPUXdNvUrG6LefCXrHtSgOXRiDi9EVLWiSBdEMK7guTee+MD4syTT2QZ1/7e3XP
- NCrwe74Lsr0aMhBYYUZidoqcif+tCIsBZ4C9JQuAJTVHmJNZFgBrCFuVa2D6BzU3t2Tt
- KpYQ==
-X-Gm-Message-State: AOAM533Ifbh54eP+olJ22BbQgSA+nSyJzb9VJv3WQgiS5nBeAwkKSmVa
- kCjGf39cxi/Yw3d6ASZJwky2WicJfJ6Cy4qDI8hVMA==
-X-Google-Smtp-Source: ABdhPJwYsUJeT1pBIci6e87zYsMjj/wc9znXIkUJjl9Ic7HNp1LbkNUswIGx1x1m0QI2J2X0OFiYXbnzsiyI5jRblQY=
-X-Received: by 2002:a9d:6f8f:: with SMTP id h15mr4594088otq.221.1596791060864; 
- Fri, 07 Aug 2020 02:04:20 -0700 (PDT)
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3yLF-0004Hr-6D
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:07:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57911
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3yLD-0008V7-Hb
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:07:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596791226;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=MJF1DRTNwQGdYwN5rom/iUICBhK7XCpetir6Yr9WmCo=;
+ b=jNYP59422VJpuZiTLzVewiGMnsM3Qs6UU3LQoNJMV76E9j/Ioyo3hmFAenE1BpGszaeH6w
+ 2v8QCDWiM3tCt/8AnsIa+izaei11+t1atr819yu1kjxK1jZ0yAKBFYicS8b9QzNjE7aRxN
+ +sGdIn3khbRVCvS73xqGC5tlKfXcHCg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-481-X6fMbDMWP86X96GPoKSZTg-1; Fri, 07 Aug 2020 05:07:05 -0400
+X-MC-Unique: X6fMbDMWP86X96GPoKSZTg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1E4919057A7;
+ Fri,  7 Aug 2020 09:07:03 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-31.ams2.redhat.com [10.36.113.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C65B32DE79;
+ Fri,  7 Aug 2020 09:06:57 +0000 (UTC)
+Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
 References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <1596741379-12902-125-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1596741379-12902-125-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Aug 2020 10:04:09 +0100
-Message-ID: <CAFEAcA84DhPcZxa0yhRmZOMiSdPt8L_PBVQacgoOuznbJv7kFg@mail.gmail.com>
-Subject: Re: [PATCH 124/143] meson: target
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ <CAFEAcA-d0F9y2OSX5D7GrzUYU7yf4nAhHabE1dUVii3LRrueLQ@mail.gmail.com>
+ <dc73a810-ee9e-711e-dad0-76a566b923e4@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <8dedfe22-8659-5684-99a6-e9d503a5b3e2@redhat.com>
+Date: Fri, 7 Aug 2020 11:06:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <dc73a810-ee9e-711e-dad0-76a566b923e4@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:21:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,93 +101,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 6 Aug 2020 at 21:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 07/08/2020 11.02, Paolo Bonzini wrote:
+> On 07/08/20 10:49, Peter Maydell wrote:
+>>> This the more or less final version of the Meson conversion.  Due to
+>>> the sheer size of the series you have been CCed only on the cover
+>>> letter.
+>>
+>> Does this work with actually-released versions of Meson yet?
+>> I am still not very enthusiastic about the prospect of having
+>> to carry around an entire build system in a submodule. That
+>> still seems to me to be living closer to the bleeding edge
+>> than I would like...
+> 
+> Yes it works with 0.55.0, with only a few warnings about possible future
+> incompatibility.  Those will be fixed in 0.56.0, where the feature was
+> stabilized without introducing any incompatibility.
+> 
+> Carrying around Meson in a submodule was mostly done to let QEMU build
+> transparently on older distros.  Removing it is easy (though it would
+> involve modifying the docker files to install the latest meson, so
+> whatever you throw out of the door comes back through the window).
 
+From my point of view, we should keep the meson submodule at least 'till
+spring next year - then we'll remove support for RHEL7 according to our
+support policy. Hopefully the other distros will have a recent version
+of Meson at that point in time.
 
+ Thomas
 
-> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-> index 694757b..4cd1e10 100755
-> --- a/scripts/decodetree.py
-> +++ b/scripts/decodetree.py
-> @@ -1257,7 +1257,7 @@ def main():
->      long_opts =3D ['decode=3D', 'translate=3D', 'output=3D', 'insnwidth=
-=3D',
->                   'static-decode=3D', 'varinsnwidth=3D']
->      try:
-> -        (opts, args) =3D getopt.getopt(sys.argv[1:], 'o:vw:', long_opts)
-> +        (opts, args) =3D getopt.gnu_getopt(sys.argv[1:], 'o:vw:', long_o=
-pts)
->      except getopt.GetoptError as err:
->          error(0, err)
->      for o, a in opts:
-
-This change to the decodetree script doesn't seem like it
-belongs in this patch ?
-
-
-> --- /dev/null
-> +++ b/target/arm/meson.build
-> @@ -0,0 +1,62 @@
-> +gen =3D [
-> +  decodetree.process('sve.decode', extra_args: '--decode=3Ddisas_sve'),
-> +  decodetree.process('neon-shared.decode', extra_args: '--static-decode=
-=3Ddisas_neon_shared'),
-> +  decodetree.process('neon-dp.decode', extra_args: '--static-decode=3Ddi=
-sas_neon_dp'),
-> +  decodetree.process('neon-ls.decode', extra_args: '--static-decode=3Ddi=
-sas_neon_ls'),
-> +  decodetree.process('vfp.decode', extra_args: '--static-decode=3Ddisas_=
-vfp'),
-> +  decodetree.process('vfp-uncond.decode', extra_args: '--static-decode=
-=3Ddisas_vfp_uncond'),
-> +  decodetree.process('a32.decode', extra_args: '--static-decode=3Ddisas_=
-a32'),
-> +  decodetree.process('a32-uncond.decode', extra_args: '--static-decode=
-=3Ddisas_a32_uncond'),
-> +  decodetree.process('t32.decode', extra_args: '--static-decode=3Ddisas_=
-t32'),
-> +  decodetree.process('t16.decode', extra_args: ['-w', '16', '--static-de=
-code=3Ddisas_t16']),
-> +]
-> +
-> +arm_ss =3D ss.source_set()
-> +arm_ss.add(gen)
-> +arm_ss.add(files(
-> +  'cpu.c',
-> +  'crypto_helper.c',
-> +  'debug_helper.c',
-> +  'gdbstub.c',
-> +  'helper.c',
-> +  'iwmmxt_helper.c',
-> +  'm_helper.c',
-> +  'neon_helper.c',
-> +  'op_helper.c',
-> +  'tlb_helper.c',
-> +  'translate.c',
-> +  'vec_helper.c',
-> +  'vfp_helper.c',
-> +  'cpu_tcg.c',
-> +))
-> +arm_ss.add(zlib)
-
-Just to check, does this get the underlying dependencies right?
-ie translate.o depends on translate.c and also eg translate-vfp.inc.c,
-which in turn depends on vfp.decode ?
-
-It's not clear to me why all the decodetree lines ended up in a
-single "gen =3D []" block -- they're independent of each other.
-
-thanks
--- PMM
 
