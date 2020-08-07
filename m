@@ -2,80 +2,116 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C2DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 226D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:17:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B06F20748
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:16:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B06F20748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DE00E20748
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 10:17:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HuO8kseG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE00E20748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3zQW-0007qV-9e
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 06:16:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41112)
+	id 1k3zRm-0000hR-6j
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 06:17:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3zPm-0007QG-WF
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:15:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35508)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k3zPk-0008B4-Sp
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:15:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k3zPi-0000vl-Er
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 10:15:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6728C2E8025
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 10:15:50 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k3zQ2-0007al-0W
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:16:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56983)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k3zPx-0008Bt-HZ
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 06:16:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596795363;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=L/PLpStsmLasYsxnSW6lYw+3VkFplJ9d7jhxH2stG9o=;
+ b=HuO8kseGIoXyNTfi+KxwQtxAL/MZnT9SrvPyvOqTzW/PeMFhjgIupoBVAGfGUfx8Squdoh
+ bd9LfEDpvn1c//Fer9itvHD519QOblq6aJevEeEj8tcp8MmJRZDqPjr+Mwt5LA0P+tPcMT
+ rrOrDmBDQAZLysMxa+12wk0AX9LJwkU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-146-fK_m4AbUPTeKuVpPEVv3NA-1; Fri, 07 Aug 2020 06:16:01 -0400
+X-MC-Unique: fK_m4AbUPTeKuVpPEVv3NA-1
+Received: by mail-wr1-f69.google.com with SMTP id e14so560716wrr.7
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 03:16:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=L/PLpStsmLasYsxnSW6lYw+3VkFplJ9d7jhxH2stG9o=;
+ b=pffTKPcW82dDd4Ie91j4Nher01U0rn4T67ZGJ3FHeEerxXaWwcNieIiZXVruY5SgZK
+ x5S7Mri003Y8CHzd2o20ZVeNSCHE6pt5MLOiu8ZH6wLu9bTui8qN7NB+G6xnYZMPncCA
+ q0UNm3ao4F5U4BUkmvshtbCGbRC446O3tE+CBvN6MkNEbwSMteioV8y156raFuclw+YG
+ uF2zjAmND3RqC96Agyv6/vs5ysexyE0jC2kOzhDIxeaFsuF+dOsU65VdriUjeg9lhNha
+ Yooq+T76rgH9kuL0pd/2ap+nw1RKi0zBX5/dAbljIivY+FcxQarhSr3wzYRzyjpre6+D
+ IvKA==
+X-Gm-Message-State: AOAM530wOOI9Va01Sp9dqnQwGoVhDLR0J1JBEsFHzJHrpPNbeSUzb578
+ tYVWx26yxJJq1xtunFg6bH0hQIk/Pg6qIdjNU5WrkBkQChCUrn1wRBdgVhd6RWhGh5Ts7k7o9kh
+ V6k6mMBjSgrtHgXs=
+X-Received: by 2002:adf:b34a:: with SMTP id k10mr11210762wrd.402.1596795360638; 
+ Fri, 07 Aug 2020 03:16:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz1ih8RlP5biNZ/Rgip/pgBdsgg8TBsuLYIPgOK7JgSXZU1srUoyTtDWWgX/aEAVnOKOPLSkg==
+X-Received: by 2002:adf:b34a:: with SMTP id k10mr11210745wrd.402.1596795360361; 
+ Fri, 07 Aug 2020 03:16:00 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7841:78cc:18c6:1e20?
+ ([2001:b07:6468:f312:7841:78cc:18c6:1e20])
+ by smtp.gmail.com with ESMTPSA id r22sm10144428wmh.45.2020.08.07.03.15.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 07 Aug 2020 03:15:59 -0700 (PDT)
+Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+ <20200807085302.7d7616df.cohuck@redhat.com>
+ <CAE2XoE_eMv_=zoEe-v1HiqcKX+FNobKSKzV=9eLkJNivnuYg-A@mail.gmail.com>
+ <4e8addca-7400-f1a1-ee56-991def2959ae@redhat.com>
+ <CAE2XoE9HzvHOQ8odXwiOw+nsYOkwTK+jue1i-mQ6Mo29T+9Rog@mail.gmail.com>
+ <c6059e0c-ed50-399f-111b-4d4b96c80e85@redhat.com> <874kpelqjy.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <13b9e7e7-c86c-35fe-cdb5-002c93e73448@redhat.com>
+Date: Fri, 7 Aug 2020 12:15:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2020 10:05:33 -0000
-From: Thomas Huth <1253563@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: amoskong th-huth
-X-Launchpad-Bug-Reporter: Amos Jianjun Kong (amoskong)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20131121092412.27241.16050.malonedeb@gac.canonical.com>
-Message-Id: <159679473342.5527.7207423639313432047.malone@soybean.canonical.com>
-Subject: [Bug 1253563] Re: bad performance with rng-egd backend
-X-Launchpad-Message-Rationale: Subscriber @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a5bedd18aa5432bc3e2e1e59447238409ce57c27
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <874kpelqjy.fsf@linaro.org>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 05:20:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,73 +120,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1253563 <1253563@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, jsnow@redhat.com,
+ Cornelia Huck <cohuck@redhat.com>, qemu-level <qemu-devel@nongnu.org>,
+ armbru@redhat.com, luoyonggang@gmail.com, stefanha@redhat.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looking through old bug tickets... is this still an issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+On 07/08/20 12:05, Alex Bennée wrote:
+>> On 07/08/20 10:31, 罗勇刚(Yonggang Luo) wrote:
+>>> Any IDE works with meson properly? Does meson have vs code plugin?
+>> I'm not sure what the plugin would do.  However note that even with
+>> Meson, QEMU would be built with "./configure && make".
+> One the subject of IDE's my Emacs tooling (counsel-compile) uses a
+> mixture of "make -nqp" and "make help" to probe for potential make
+> targets. I assume these are still probable with the meson generated
+> files?
 
+With the generated files yes, I have no idea how counsel-compile would
+deal with ninja.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Paolo
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to the bug report.
-https://bugs.launchpad.net/bugs/1253563
-
-Title:
-  bad performance with rng-egd backend
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  =
-
-  1. create listen socket
-  # cat /dev/random | nc -l localhost 1024
-
-  2. start vm with rng-egd backend
-
-  ./x86_64-softmmu/qemu-system-x86_64 --enable-kvm -mon chardev=3Dqmp,mode=
-=3Dcontrol,pretty=3Don -chardev socket,id=3Dqmp,host=3Dlocalhost,port=3D123=
-4,server,nowait -m 2000 -device virtio-net-pci,netdev=3Dh1,id=3Dvnet0 -netd=
-ev tap,id=3Dh1 -vnc :0 -drive file=3D/images/RHEL-64-virtio.qcow2 \
-  -chardev socket,host=3Dlocalhost,port=3D1024,id=3Dchr0 \
-  -object rng-egd,chardev=3Dchr0,id=3Drng0 \
-  -device virtio-rng-pci,rng=3Drng0,max-bytes=3D1024000,period=3D1000
-
-  (guest) # dd if=3D/dev/hwrng of=3D/dev/null
-
-  note: cancelling dd process by Ctrl+c, it will return the read speed.
-
-  Problem:   the speed is around 1k/s
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  If I use rng-random backend (filename=3D/dev/random), the speed is about
-  350k/s).
-
-  It seems that when the request entry is added to the list, we don't read =
-the data from queue list immediately.
-  The chr_read() is delayed, the virtio_notify() is delayed.  the next requ=
-est will also be delayed. It effects the speed.
-
-  I tried to change rng_egd_chr_can_read() always returns 1,  the speed
-  is improved to (about 400k/s)
-
-  Problem: we can't poll the content in time currently
-
-  =
-
-  Any thoughts?
-
-  Thanks, Amos
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1253563/+subscriptions
 
