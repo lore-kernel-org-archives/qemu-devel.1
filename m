@@ -2,75 +2,75 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C187C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1FDCC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:13:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72C372075A
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:13:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A18A32075A
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 00:13:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="K6jhK8Ak"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72C372075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="YUbTplOw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A18A32075A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3q0c-0001M5-HL
-	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 20:13:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45028)
+	id 1k3q1B-0001ql-M8
+	for qemu-devel@archiver.kernel.org; Thu, 06 Aug 2020 20:13:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1k3pyF-0000Lm-E7; Thu, 06 Aug 2020 20:10:51 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:35049)
+ id 1k3pz1-0000m1-Lt; Thu, 06 Aug 2020 20:11:40 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:44114)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
- id 1k3pyD-0007F8-2M; Thu, 06 Aug 2020 20:10:51 -0400
-Received: by mail-ej1-x641.google.com with SMTP id a26so224870ejc.2;
- Thu, 06 Aug 2020 17:10:48 -0700 (PDT)
+ id 1k3pyz-0007Pr-QQ; Thu, 06 Aug 2020 20:11:39 -0400
+Received: by mail-ed1-x544.google.com with SMTP id l23so22708431edv.11;
+ Thu, 06 Aug 2020 17:11:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=njCC5Drn2l8IGdXb+z4b87FsoJXkq2Mrguft79UZRiU=;
- b=K6jhK8AkGA6uG+ZNW/n8G2fKCaYyYzifSsgHOqolyBt1wroTZ1AP3XkD7wlwEcvXaI
- h2iVKmHo5M/VZlhP982VM0oFPRThSG0ZaawnqWMKcwzCln3SBNqnZ3PAGmxiwmtODbDp
- 8QwHgS/NyxopZNc6pJLLtXFmT092IRm5yWIqA=
+ bh=Egw1RCFdj6joX5l5R8CpYFJ3boYu4uDaCD/EFl6gn2M=;
+ b=YUbTplOwt6L/TTav+wd5G9F4R/hQclbFG9M6lst1spfSl3lUTmIa+YNoycqU0QNKxT
+ TVpvK+Vx2s0V5xeUfbL3Ei/r+Q3LWE9NhqTiVXp2RKPjQX5dg4fPXLSuKq9XwM0smaKg
+ LMRSd3UgYFnFUvnIKji10vJ8OIHZ+zQG208CY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=njCC5Drn2l8IGdXb+z4b87FsoJXkq2Mrguft79UZRiU=;
- b=eKWX+VcW4omhrzbckAiv+P7PHtdwWwFOnuOl0lyFMFRdFFicQ59qipbF2e7jNdxqiC
- hoNGdb52rxfF/vyjdLc1BARpUPsJI4jPhPQmIjTCU2v8TbddZosYQpEGGa2wW4pwGV3A
- vTfB+4dd1qKPpiqaG/VjghIA3/aeN/jeatMW3EOPbaI7IxKQ6XrPsQst+Mb5kGv17kJc
- yecdl36ggKw3SGok1fz3EKTEUCnBQdnGJrL8geiHwJ6Y+Ff87muIzkzyY5NhkCfsFl58
- ncely8P9G0rs+GabkahbUU4JfldYsYPsXcYD+m36wy1itNK43d0UWyIq39NBcy6whO4d
- Of+Q==
-X-Gm-Message-State: AOAM531vjf69OZvOztPC7YpDqkX+5bQxr4gaFxNhrTl+2KCafFUevXzz
- X40Pvs+V5hfeDULgBU2x4LzpelgqT8L5MpWOhzo=
-X-Google-Smtp-Source: ABdhPJygkxHPN5OWn63IFzuILL0q5HLWyKRaiBLDNFZwg9CiV3B/mT9u445jTQgdi7VAPclk7m2zCxtqQJDnCeq4AeI=
-X-Received: by 2002:a17:906:1ed3:: with SMTP id
- m19mr6589017ejj.396.1596759046797; 
- Thu, 06 Aug 2020 17:10:46 -0700 (PDT)
+ bh=Egw1RCFdj6joX5l5R8CpYFJ3boYu4uDaCD/EFl6gn2M=;
+ b=pjvjaaVJnRnxFhYrNNBZ9krNwSH8wKJnbEn5A2LInD2JHrNiGcHWneNUFUm6xctD46
+ 751xkjA61k9vngLMBwe4HmC6tRx7koTFPH89dn5nPRJOKeZkPCg6HNGwKRMy8BxGZgom
+ r8UQ4+U1Goj4nbVpUeHlGYDJ5ymJK2VMUgUqPioVQUdMbgRZYACN/FySzFpLufZ9flJW
+ Z803d8fh8Pcvg2grCiPYgNQEtfAiznIHT2aYJuQrWIGLxLfuAamwZ9oUybd7oJRBTOqw
+ 0VHDXfI7QkWOqPsKiSFZHWTpb5/2z4Ck61te1Vxf4AongWaZxSGro2BisvKG+yCQVWhm
+ qr3Q==
+X-Gm-Message-State: AOAM533COiDRWTq23YA22tlx1wY7OF/StFuJXCZo8jnbOfdFf/jyvoSD
+ HLNMHxUXsbZkPiRRqQIhUe2wnSqlGfE5TZo/9+M=
+X-Google-Smtp-Source: ABdhPJx4JVMVHjfF0/VjAau1bm9XTI1gYq7xXbT/k+lScxXf6djTQvGImSRjG4ct3Beo/MlxkMuYMKusYQAlAjkV/1E=
+X-Received: by 2002:aa7:cd07:: with SMTP id b7mr6770722edw.172.1596759095342; 
+ Thu, 06 Aug 2020 17:11:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200806132106.747414-1-clg@kaod.org>
- <20200806132106.747414-17-clg@kaod.org>
- <56f83c0b-b5eb-241e-c848-56f038633398@amsat.org>
-In-Reply-To: <56f83c0b-b5eb-241e-c848-56f038633398@amsat.org>
+ <20200806132106.747414-19-clg@kaod.org>
+In-Reply-To: <20200806132106.747414-19-clg@kaod.org>
 From: Joel Stanley <joel@jms.id.au>
-Date: Fri, 7 Aug 2020 00:10:34 +0000
-Message-ID: <CACPK8XcN0Oq-4uKjxUg=DR6KZSkYqs+AFnM=SFoxwWiB9rXktw@mail.gmail.com>
-Subject: Re: [PATCH for-5.2 16/19] aspeed/sdmc: Perform memory training
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 7 Aug 2020 00:11:23 +0000
+Message-ID: <CACPK8XfgEgKKdrN4OGv1=pj9wCXbRijL5opxAXnUsBb3m8d=bA@mail.gmail.com>
+Subject: Re: [PATCH for-5.2 18/19] aspeed/sdmc: Simplify calculation of RAM
+ bits
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=joel.stan@gmail.com; helo=mail-ej1-x641.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=joel.stan@gmail.com; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -94,49 +94,144 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 6 Aug 2020 at 13:38, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-
-> > @@ -206,6 +206,19 @@ static void aspeed_sdmc_reset(DeviceState *dev)
-> >
-> >      /* Set ram size bit and defaults values */
-> >      s->regs[R_CONF] =3D asc->compute_conf(s, 0);
-> > +
-> > +    /*
-> > +     * PHY status:
-> > +     *  - set phy status ok (set bit 1)
-> > +     *  - initial PVT calibration ok (clear bit 3)
-> > +     *  - runtime calibration ok (clear bit 5)
-> > +     */
-> > +    s->regs[0x100] =3D BIT(1);
+On Thu, 6 Aug 2020 at 13:21, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >
-> This is usually implemented with a one-shot timer, see
-> sd_ocr_powerup() in hw/sd/sd.c (migration is handled).
+> Changes in commit 533eb415df2e ("arm/aspeed: actually check RAM size")
+> introduced a 'valid_ram_sizes' array which can be used to compute the
+> associated bit field value encoding the RAM size. The field is simply
+> the index of the array.
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-You mean we could have the calibration done bits become set at a later time=
-?
+Reviewed-by: Joel Stanley <joel@jms.id.au>
 
-It would be hard to work out what to do. We have no documentation for
-the register, I modelled it based on the code in u-boot doing this:
-
-         /* make sure DDR-PHY is ready before access */
-        do {
-                reg =3D readl(priv->phy_status) & BIT(1);
-        } while(reg =3D=3D 0);
-
-So I think there would be limited value in modelling it.
-
-Thanks for the suggestion though, I'll keep the one shot timer idea in
-mind for future models.
-
-Cheers,
-
-Joel
+> ---
+>  hw/misc/aspeed_sdmc.c | 79 ++++++++++++++-----------------------------
+>  1 file changed, 25 insertions(+), 54 deletions(-)
+>
+> diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+> index 81c73450ab5d..08f856cbda7e 100644
+> --- a/hw/misc/aspeed_sdmc.c
+> +++ b/hw/misc/aspeed_sdmc.c
+> @@ -159,57 +159,6 @@ static const MemoryRegionOps aspeed_sdmc_ops =3D {
+>      .valid.max_access_size =3D 4,
+>  };
+>
+> -static int ast2400_rambits(AspeedSDMCState *s)
+> -{
+> -    switch (s->ram_size >> 20) {
+> -    case 64:
+> -        return ASPEED_SDMC_DRAM_64MB;
+> -    case 128:
+> -        return ASPEED_SDMC_DRAM_128MB;
+> -    case 256:
+> -        return ASPEED_SDMC_DRAM_256MB;
+> -    case 512:
+> -        return ASPEED_SDMC_DRAM_512MB;
+> -    default:
+> -        g_assert_not_reached();
+> -        break;
+> -    }
+> -}
+> -
+> -static int ast2500_rambits(AspeedSDMCState *s)
+> -{
+> -    switch (s->ram_size >> 20) {
+> -    case 128:
+> -        return ASPEED_SDMC_AST2500_128MB;
+> -    case 256:
+> -        return ASPEED_SDMC_AST2500_256MB;
+> -    case 512:
+> -        return ASPEED_SDMC_AST2500_512MB;
+> -    case 1024:
+> -        return ASPEED_SDMC_AST2500_1024MB;
+> -    default:
+> -        g_assert_not_reached();
+> -        break;
+> -    }
+> -}
+> -
+> -static int ast2600_rambits(AspeedSDMCState *s)
+> -{
+> -    switch (s->ram_size >> 20) {
+> -    case 256:
+> -        return ASPEED_SDMC_AST2600_256MB;
+> -    case 512:
+> -        return ASPEED_SDMC_AST2600_512MB;
+> -    case 1024:
+> -        return ASPEED_SDMC_AST2600_1024MB;
+> -    case 2048:
+> -        return ASPEED_SDMC_AST2600_2048MB;
+> -    default:
+> -        g_assert_not_reached();
+> -        break;
+> -    }
+> -}
+> -
+>  static void aspeed_sdmc_reset(DeviceState *dev)
+>  {
+>      AspeedSDMCState *s =3D ASPEED_SDMC(dev);
+> @@ -324,10 +273,32 @@ static const TypeInfo aspeed_sdmc_info =3D {
+>      .abstract   =3D true,
+>  };
+>
+> +static int aspeed_sdmc_get_ram_bits(AspeedSDMCState *s)
+> +{
+> +    AspeedSDMCClass *asc =3D ASPEED_SDMC_GET_CLASS(s);
+> +    int i;
+> +
+> +    /*
+> +     * The bitfield value encoding the RAM size is the index of the
+> +     * possible RAM size array
+> +     */
+> +    for (i =3D 0; asc->valid_ram_sizes[i]; i++) {
+> +        if (s->ram_size =3D=3D asc->valid_ram_sizes[i]) {
+> +            return i;
+> +        }
+> +    }
+> +
+> +    /*
+> +     * Invalid RAM sizes should have been excluded when setting the
+> +     * SoC RAM size.
+> +     */
+> +    g_assert_not_reached();
+> +}
+> +
+>  static uint32_t aspeed_2400_sdmc_compute_conf(AspeedSDMCState *s, uint32=
+_t data)
+>  {
+>      uint32_t fixed_conf =3D ASPEED_SDMC_VGA_COMPAT |
+> -        ASPEED_SDMC_DRAM_SIZE(ast2400_rambits(s));
+> +        ASPEED_SDMC_DRAM_SIZE(aspeed_sdmc_get_ram_bits(s));
+>
+>      /* Make sure readonly bits are kept */
+>      data &=3D ~ASPEED_SDMC_READONLY_MASK;
+> @@ -385,7 +356,7 @@ static uint32_t aspeed_2500_sdmc_compute_conf(AspeedS=
+DMCState *s, uint32_t data)
+>      uint32_t fixed_conf =3D ASPEED_SDMC_HW_VERSION(1) |
+>          ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
+>          ASPEED_SDMC_CACHE_INITIAL_DONE |
+> -        ASPEED_SDMC_DRAM_SIZE(ast2500_rambits(s));
+> +        ASPEED_SDMC_DRAM_SIZE(aspeed_sdmc_get_ram_bits(s));
+>
+>      /* Make sure readonly bits are kept */
+>      data &=3D ~ASPEED_SDMC_AST2500_READONLY_MASK;
+> @@ -451,7 +422,7 @@ static uint32_t aspeed_2600_sdmc_compute_conf(AspeedS=
+DMCState *s, uint32_t data)
+>  {
+>      uint32_t fixed_conf =3D ASPEED_SDMC_HW_VERSION(3) |
+>          ASPEED_SDMC_VGA_APERTURE(ASPEED_SDMC_VGA_64MB) |
+> -        ASPEED_SDMC_DRAM_SIZE(ast2600_rambits(s));
+> +        ASPEED_SDMC_DRAM_SIZE(aspeed_sdmc_get_ram_bits(s));
+>
+>      /* Make sure readonly bits are kept (use ast2500 mask) */
+>      data &=3D ~ASPEED_SDMC_AST2500_READONLY_MASK;
+> --
+> 2.25.4
+>
 
