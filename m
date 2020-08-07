@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B6C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 17:39:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC1FC433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 17:40:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED6EE204EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 17:39:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED6EE204EA
+	by mail.kernel.org (Postfix) with ESMTPS id B1E77204EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 17:40:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1E77204EA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k46Kt-0000Se-9E
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 13:39:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51688)
+	id 1k46MI-0001ZH-My
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 13:40:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k46H8-00039G-Vk
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 13:35:27 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:51279)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k46HA-0003C3-BX
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 13:35:28 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:57731)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k46H6-00012q-9N
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 13:35:26 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k46H8-00012u-28
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 13:35:28 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
  (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Md6ZB-1kdRDt0Trv-00aAME; Fri, 07 Aug 2020 19:35:14 +0200
+ 1MfYDO-1kfLpc49Iu-00fxwA; Fri, 07 Aug 2020 19:35:17 +0200
 To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
 References: <20200803094629.21898-1-Filip.Bozuta@syrmia.com>
- <20200803094629.21898-8-Filip.Bozuta@syrmia.com>
+ <20200803094629.21898-9-Filip.Bozuta@syrmia.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -79,34 +79,34 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Subject: Re: [PATCH v2 7/8] linux-user: Add support for btrfs ioctls used to
- manage quota
-Message-ID: <366903f1-1e40-a8f9-8a27-f4bab9b0ff18@vivier.eu>
-Date: Fri, 7 Aug 2020 19:35:13 +0200
+Subject: Re: [PATCH v2 8/8] linux-user: Add support for btrfs ioctls used to
+ scrub a filesystem
+Message-ID: <512991ca-0ad1-71cf-cd21-2066802d80d2@vivier.eu>
+Date: Fri, 7 Aug 2020 19:35:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200803094629.21898-8-Filip.Bozuta@syrmia.com>
+In-Reply-To: <20200803094629.21898-9-Filip.Bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:0pYOPloxyRlnoo87TIgnUOk+h1F+cqJclH2HzZ1EWRUoa+d+FcX
- Xpg4TzT7R9Oexze/HUCXs4WCQ/7PD81J+Nl6yR9+WV/CHcQqWL6P+cnFIa7Yu1f0JZVssXb
- ZR3rckrWSRurj6wNeP3iLacvIRQ3RNUfWWaUNv2lNJC3+ryuNGvDHm0wk86kZkVpvVZ4tkj
- cn5tURD5vPeuQSBgJPm0A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:UEeCWqYVHPM=:lreMlz2BOPGDeyFNimF5ub
- +BvcO6lPbqHXlecwvImvoJZtmLFcT5mBk14jkSPIPKaLCIaGQcL0WkhpPxzOPDPoXNO46FG8O
- qa+4d9o5zGdf7dCGp9gFG+aXGnQs40JAPVRcHNWQ2iUFqXWl9uWq76Tkx+yvENsPQup3euWHy
- KI+dmm7BovvjTQfjS+h9P0XAJc44NzdAhqQN3ZO7Hr0R6nAJIgG6G5g/YlFRbZB88Lb7mmBUA
- SuUKQla6atFW2vQ4ZEKmw76DlErIpEmhEHQnO6HXx0MqaXfarRC8U1pRRJp9VXVLA9+rfBQWZ
- 5KYl0KD5/mcz6fXhpkIbHd9NmYs+rLRisxNdUZjkCEZT5OMVXsFsU7rS9GBv1KmV2OYwC3YIM
- X2M+Xwo3gscSTXlw2L6qbhI5uh4qx0xqe5BVuOQ1/qpC7iu3Y4rCC8vwO/bKBfHNCAlzdP28k
- XSrH74s0M2dvzgywS8r6In5d8fD9jyIIFiMcdWem5t6VwwGFI4GA7vKWRA3Z7FM1tqeTnJ0xF
- AQ0+qmyyzIzHNcUgcWkrofBHYMYQrl0yBvU3DR4jDUTTn0k6nMR0rcnVwHsLzavfzh7bPZ3aQ
- WgkDS9GRx3z1BtPMZDFotGLGgZpkTxjbX+lrguhJd2wnUop6FP2srxfEzHxhoNI/vqFmMb5EP
- 2Pa3uuwtMrd2AyIgdB/RrSCwrWROik4VkjxG0cgPgPDi3fPjb57DQrH74vgGqDgIU3nizncu2
- pVP/tFvlhXPCbEOBdIrpyi6vIJ6NgF4bG0T6zNuRjUJuBfjuEk2W+AgQ4ohqCubM+3++xGpAH
- txmWXAp/Su011lXmtaYenkuW7Cydk8ssO24Ilcuqu6mtppYJexDIDbeYloI9Z0lRqrMUOHI
+X-Provags-ID: V03:K1:pdXloEgv0FVVa9Kt/TRel3xFAnm1y2+q9uxggBewRwfoJRdQJRp
+ NY5NOzceY/VvCPds26qJb7AgRTQsxhJdKH1hhVftnKd5q8/cqO+ZucDgvpN6OnEYHB/gAbr
+ lc17tUzKhW/jzgtqkuqOR7WefL/UgNu69gIMNwCwA2Bc84UT4zpzOF6hTMFE2NVnBk7KD9w
+ C99uJlIwPdxHu4WMzuk+A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:UwwBKWdAdSE=:HLwJTostVwrknDnSfy0WKC
+ +Ozzf3EtupsipjO8svcTibrmskDZn4U3cqMKJokPsFOZ49CPLR2DZ9N8fntE9VRSgn4t1vknx
+ TOkrYwpXq0j35YQrH/mmzqI+MXvRnnMFiipgi1U1YywJVXWXyf0o/N0hWDBuT5EX1XOW9lorZ
+ NBN26/DNHIjiM7B5Gx1N35mUU3hyiBxvXNg1zI4nl7HF9yMMuZFF6LjG0DOC62bFzefMxMDEl
+ r2tMy2pUIqcCTQblPD97xLtI3NA7RYpKf+vC1zLddHPzgErZqDkyBtOQFc6eePPgTa/qdHM1r
+ Zmh+lI5LqKoi47trqBMXi+WPeNoix8nXFsiZYQXBTxSr7OkEikycELlelHY5SwYvXE5yrkMjH
+ 0WGTKb4rT4EocqTus8HVPr6qEEvVsjavNxWLi2ZVpztDFN5Zx+yZ0P8pNnqnCfmQfwPwnqPJf
+ fbCl/8H4bNT3Qjdk5skveETm8FSY4x46+R0qExevn36lOahatHFQZVtqw7xZfgkfTXoFAIiXb
+ CUdMYPO9CM8tWfBk+7RWFMRyiJ2msl7Vd5dM/37N+0JT6VDcOuH7wn4MWeZWihAm3wn3x36pU
+ XEffPMHRD9BwFr4tHfENO3Np8X23O1DJ1vLBv9pre7NR75FIOxF1t1ue9MPJInLfe/l3Ag+UZ
+ cLx7XKuJkuK2ot7WQO4HjCTgcL/q8RV9f+mrvCw2NqcJNz/wV9T0vFlZAyYiLtXrlVptTEjO9
+ PsGG2U13MTLA52RiuPuMJb0LTpT+PNRL6ytrj4b9TUAuFtQNAX88NGcRIlpYtjPn5aiBO/zyo
+ huNCzEMq9pvpb91zrMhYqiH7OuYHg6Idw/Pzn4gpAV5E2BfP6zJDqVXJHmj5mxby7XMxDgB
 Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 13:35:23
@@ -137,225 +137,130 @@ Sender: "Qemu-devel"
 Le 03/08/2020 à 11:46, Filip Bozuta a écrit :
 > This patch implements functionality for following ioctls:
 > 
-> BTRFS_IOC_QUOTA_CTL - Enabling/Disabling quota support
+> BTRFS_IOC_SCRUB - Starting a btrfs filesystem scrub
 > 
->     Enable or disable quota support for a btrfs filesystem. Quota
->     support is enabled or disabled using the ioctls third argument
->     which represents a pointer to a following type:
+>     Start a btrfs filesystem scrub. The third ioctls argument
+>     is a pointer to a following type:
 > 
->     struct btrfs_ioctl_quota_ctl_args {
-> 	__u64 cmd;
-> 	__u64 status;
+>     struct btrfs_ioctl_scrub_args {
+> 	__u64 devid;				/* in */
+> 	__u64 start;				/* in */
+> 	__u64 end;				/* in */
+> 	__u64 flags;				/* in */
+> 	struct btrfs_scrub_progress progress;	/* out */
+> 	/* pad to 1k */
+> 	__u64 unused[(1024-32-sizeof(struct btrfs_scrub_progress))/8];
 >     };
 > 
->     Before calling this ioctl, the 'cmd' field should be filled
->     with one of the values 'BTRFS_QUOTA_CTL_ENABLE' (enabling quota)
->     'BTRFS_QUOTA_CTL_DISABLE' (disabling quota).
+>     Before calling this ioctl, field 'devid' should be filled
+>     with value that represents the device id of the btrfs filesystem
+>     for which the scrub is to be started.
 > 
-> BTRFS_IOC_QGROUP_CREATE - Creating/Removing a subvolume quota group
+> BTRFS_IOC_SCRUB_CANCEL - Canceling scrub of a btrfs filesystem
 > 
->     Create or remove a subvolume quota group. The subvolume quota
->     group is created or removed using the ioctl's third argument which
->     represents a pointer to a following type:
+>     Cancel a btrfs filesystem scrub if it is running. The third
+>     ioctls argument is ignored.
 > 
->     struct btrfs_ioctl_qgroup_create_args {
-> 	__u64 create;
-> 	__u64 qgroupid;
->     };
+> BTRFS_IOC_SCRUB_PROGRESS - Getting status of a running scrub
 > 
->     Before calling this ioctl, the 'create' field should be filled
->     with the aproppriate value depending on if the user wants to
->     create or remove a quota group (0 for removing, everything else
->     for creating). Also, the 'qgroupid' field should be filled with
->     the value for the quota group id that is to be created.
+>     Read the status of a running btrfs filesystem scrub. The third
+>     ioctls argument is a pointer to the above mentioned
+>     'struct btrfs_ioctl_scrub_args'. Similarly as with 'BTRFS_IOC_SCRUB',
+>     the 'devid' field should be filled with value that represents the
+>     id of the btrfs device for which the scrub has started. The status
+>     of a running scrub is returned in the field 'progress' which is
+>     of type 'struct btrfs_scrub_progress' and its definition can be
+>     found at:
+>     https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/btrfs.h#L150
 > 
-> BTRFS_IOC_QGROUP_ASSIGN - Asigning or removing a quota group as child group
+> Implementation nots:
 > 
->     Asign or remove a quota group as child quota group of another
->     group in the btrfs filesystem. The asignment is done using the
->     ioctl's third argument which represents a pointert to a following type:
-> 
->     struct btrfs_ioctl_qgroup_assign_args {
-> 	__u64 assign;
-> 	__u64 src;
-> 	__u64 dst;
->     };
-> 
->     Before calling this ioctl, the 'assign' field should be filled with
->     the aproppriate value depending on if the user wants to asign or remove
->     a quota group as a child quota group of another group (0 for removing,
->     everythin else for asigning). Also, the 'src' and 'dst' fields should
->     be filled with the aproppriate quota group id values depending on which
->     quota group needs to asigned or removed as child quota group of another
->     group ('src' gets asigned or removed as child group of 'dst').
-> 
-> BTRFS_IOC_QGROUP_LIMIT - Limiting the size of a quota group
-> 
->     Limit the size of a quota group. The size of the quota group is limited
->     with the ioctls third argument which represents a pointer to a following
->     type:
-> 
->     struct btrfs_ioctl_qgroup_limit_args {
-> 	__u64	qgroupid;
-> 	struct btrfs_qgroup_limit lim;
->     };
-> 
->     Before calling this ioctl, the 'qgroup' id field should be filled with
->     aproppriate value of the quota group id for which the size is to be
->     limited. The second field is of following type:
-> 
->     struct btrfs_qgroup_limit {
-> 	__u64	flags;
-> 	__u64	max_rfer;
-> 	__u64	max_excl;
-> 	__u64	rsv_rfer;
-> 	__u64	rsv_excl;
->     };
-> 
->     The 'max_rfer' field should be filled with the size to which the quota
->     group should be limited. The 'flags' field can be used for passing
->     additional options and can have values which can be found on:
->     https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/btrfs.h#L67
-> 
-> BTRFS_IOC_QUOTA_RESCAN_STATUS - Checking status of running rescan operation
-> 
->     Check status of a running rescan operation. The status is checked using
->     the ioctl's third argument which represents a pointer to a following type:
-> 
->     struct btrfs_ioctl_quota_rescan_args {
->         __u64   flags;
->         __u64   progress;
->         __u64   reserved[6];
->     };
-> 
->     If there is a rescan operation running, 'flags' field is set to 1, and
->     'progress' field is set to aproppriate value which represents the progress
->     of the operation.
-> 
-> BTRFS_IOC_QUOTA_RESCAN - Starting a rescan operation
-> 
->     Start ar rescan operation to Trash all quota groups and scan the metadata
->     again with the current config. Before calling this ioctl,
->     BTRFS_IOC_QUOTA_RESCAN_STATUS sould be run to check if there is already a
->     rescan operation runing. After that ioctl call, the received
->     'struct btrfs_ioctl_quota_rescan_args' should be than passed as this ioctls
->     third argument.
-> 
-> BTRFS_IOC_QUOTA_RESCAN_WAIT - Waiting for a rescan operation to finish
-> 
->     Wait until a rescan operation is finished (if there is a rescan operation
->     running). The third ioctls argument is ignored.
-> 
-> Implementation notes:
-> 
->     Almost all of the ioctls in this patch use structure types as third arguments.
->     That is the reason why aproppriate thunk definitions were added in file
->     'syscall_types.h'.
+>     Ioctls in this patch use type 'struct btrfs_ioctl_scrub_args' as their
+>     third argument. That is the reason why an aproppriate thunk type
+>     definition is added in file 'syscall_types.h'.
 > 
 > Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  linux-user/ioctls.h        | 27 +++++++++++++++++++++++++++
->  linux-user/syscall_defs.h  |  7 +++++++
->  linux-user/syscall_types.h | 29 +++++++++++++++++++++++++++++
->  3 files changed, 63 insertions(+)
+>  linux-user/ioctls.h        | 11 +++++++++++
+>  linux-user/syscall_defs.h  |  3 +++
+>  linux-user/syscall_types.h | 27 +++++++++++++++++++++++++++
+>  3 files changed, 41 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 2c553103e6..8665f504bf 100644
+> index 8665f504bf..bf80615438 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -227,6 +227,33 @@
->       IOCTL(BTRFS_IOC_LOGICAL_INO, IOC_RW,
->             MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_logical_ino_args)))
+> @@ -215,6 +215,17 @@
+>  #ifdef BTRFS_IOC_SUBVOL_SETFLAGS
+>       IOCTL(BTRFS_IOC_SUBVOL_SETFLAGS, IOC_W, MK_PTR(TYPE_ULONGLONG))
 >  #endif
-> +#ifdef BTRFS_IOC_QUOTA_CTL
-> +     IOCTL(BTRFS_IOC_QUOTA_CTL, IOC_RW,
-> +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_quota_ctl_args)))
+> +#ifdef BTRFS_IOC_SCRUB
+> +     IOCTL(BTRFS_IOC_SCRUB, IOC_RW,
+> +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_scrub_args)))
 > +#endif
-> +#ifdef BTRFS_IOC_QGROUP_ASSIGN
-> +     IOCTL(BTRFS_IOC_QGROUP_ASSIGN, IOC_W,
-> +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_qgroup_assign_args)))
+> +#ifdef BTRFS_IOC_SCRUB_CANCEL
+> +     IOCTL(BTRFS_IOC_SCRUB_CANCEL, 0, TYPE_NULL)
 > +#endif
-> +#ifdef BTRFS_IOC_QGROUP_CREATE
-> +     IOCTL(BTRFS_IOC_QGROUP_CREATE, IOC_W,
-> +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_qgroup_create_args)))
+> +#ifdef BTRFS_IOC_SCRUB_PROGRESS
+> +     IOCTL(BTRFS_IOC_SCRUB_PROGRESS, IOC_RW,
+> +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_scrub_args)))
 > +#endif
-> +#ifdef BTRFS_IOC_QGROUP_LIMIT
-> +     IOCTL(BTRFS_IOC_QGROUP_LIMIT, IOC_R,
-> +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_qgroup_limit_args)))
-> +#endif
-> +#ifdef BTRFS_IOC_QUOTA_RESCAN
-> +     IOCTL(BTRFS_IOC_QUOTA_RESCAN, IOC_W,
-> +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_quota_rescan_args)))
-> +#endif
-> +#ifdef BTRFS_IOC_QUOTA_RESCAN_STATUS
-> +     IOCTL(BTRFS_IOC_QUOTA_RESCAN_STATUS, IOC_R,
-> +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_quota_rescan_args)))
-> +#endif
-> +#ifdef BTRFS_IOC_QUOTA_RESCAN_WAIT
-> +     IOCTL(BTRFS_IOC_QUOTA_RESCAN_WAIT, 0, TYPE_NULL)
-> +#endif
->  #ifdef BTRFS_IOC_GET_DEV_STATS
->       IOCTL(BTRFS_IOC_GET_DEV_STATS, IOC_RW,
->             MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_dev_stats)))
+>  #ifdef BTRFS_IOC_DEV_INFO
+>       IOCTL(BTRFS_IOC_DEV_INFO, IOC_RW,
+>             MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_dev_info_args)))
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index f1718ac521..1b1b2c2d96 100644
+> index 1b1b2c2d96..83c291f2d3 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -985,6 +985,13 @@ struct target_rtc_pll_info {
+> @@ -982,6 +982,9 @@ struct target_rtc_pll_info {
+>                                                             abi_ullong)
+>  #define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, 26,\
+>                                                             abi_ullong)
+> +#define TARGET_BTRFS_IOC_SCRUB                  TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 27)
+> +#define TARGET_BTRFS_IOC_SCRUB_CANCEL           TARGET_IO(BTRFS_IOCTL_MAGIC, 28)
+> +#define TARGET_BTRFS_IOC_SCRUB_PROGRESS         TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 29)
 >  #define TARGET_BTRFS_IOC_DEV_INFO               TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 30)
 >  #define TARGET_BTRFS_IOC_INO_PATHS              TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 35)
 >  #define TARGET_BTRFS_IOC_LOGICAL_INO            TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 36)
-> +#define TARGET_BTRFS_IOC_QUOTA_CTL              TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 40)
-> +#define TARGET_BTRFS_IOC_QGROUP_ASSIGN          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 41)
-> +#define TARGET_BTRFS_IOC_QGROUP_CREATE          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 42)
-> +#define TARGET_BTRFS_IOC_QGROUP_LIMIT           TARGET_IORU(BTRFS_IOCTL_MAGIC, 43)
-> +#define TARGET_BTRFS_IOC_QUOTA_RESCAN           TARGET_IOWU(BTRFS_IOCTL_MAGIC, 44)
-> +#define TARGET_BTRFS_IOC_QUOTA_RESCAN_STATUS    TARGET_IORU(BTRFS_IOCTL_MAGIC, 45)
-> +#define TARGET_BTRFS_IOC_QUOTA_RESCAN_WAIT      TARGET_IO(BTRFS_IOCTL_MAGIC, 46)
->  #define TARGET_BTRFS_IOC_GET_DEV_STATS          TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 52)
->  #define TARGET_BTRFS_IOC_GET_FEATURES           TARGET_IORU(BTRFS_IOCTL_MAGIC, 57)
->  #define TARGET_BTRFS_IOC_SET_FEATURES           TARGET_IOWU(BTRFS_IOCTL_MAGIC, 57)
 > diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index 6bac8f46bb..2f5bad808e 100644
+> index 2f5bad808e..fd6a91a309 100644
 > --- a/linux-user/syscall_types.h
 > +++ b/linux-user/syscall_types.h
-> @@ -400,6 +400,35 @@ STRUCT(btrfs_ioctl_get_dev_stats,
->         MK_ARRAY(TYPE_ULONGLONG,
->                  128 - 2 - BTRFS_DEV_STAT_VALUES_MAX)) /* unused */
+> @@ -373,6 +373,33 @@ STRUCT(btrfs_ioctl_ino_lookup_user_args,
+>         MK_ARRAY(TYPE_CHAR, BTRFS_VOL_NAME_MAX + 1), /* name */
+>         MK_ARRAY(TYPE_CHAR, BTRFS_INO_LOOKUP_USER_PATH_MAX)) /* path */
 >  
-> +STRUCT(btrfs_ioctl_quota_ctl_args,
-> +       TYPE_ULONGLONG, /* cmd */
-> +       TYPE_ULONGLONG) /* status */
+> +STRUCT(btrfs_scrub_progress,
+> +       TYPE_ULONGLONG, /* data_extents_scrubbed */
+> +       TYPE_ULONGLONG, /* tree_extents_scrubbed */
+> +       TYPE_ULONGLONG, /* data_bytes_scrubbed */
+> +       TYPE_ULONGLONG, /* tree_bytes_scrubbed */
+> +       TYPE_ULONGLONG, /* read_errors */
+> +       TYPE_ULONGLONG, /* csum_errors */
+> +       TYPE_ULONGLONG, /* verify_errors */
+> +       TYPE_ULONGLONG, /* no_csum */
+> +       TYPE_ULONGLONG, /* csum_discards */
+> +       TYPE_ULONGLONG, /* super_errors */
+> +       TYPE_ULONGLONG, /* malloc_errors */
+> +       TYPE_ULONGLONG, /* uncorrectable_errors */
+> +       TYPE_ULONGLONG, /* corrected_er */
+> +       TYPE_ULONGLONG, /* last_physical */
+> +       TYPE_ULONGLONG) /* unverified_errors */
 > +
-> +STRUCT(btrfs_ioctl_quota_rescan_args,
+> +STRUCT(btrfs_ioctl_scrub_args,
+> +       TYPE_ULONGLONG, /* devid */
+> +       TYPE_ULONGLONG, /* start */
+> +       TYPE_ULONGLONG, /* end */
 > +       TYPE_ULONGLONG, /* flags */
-> +       TYPE_ULONGLONG, /* progress */
-> +       MK_ARRAY(TYPE_ULONGLONG, 6)) /* reserved */
+> +       MK_STRUCT(STRUCT_btrfs_scrub_progress), /* progress */
+> +       MK_ARRAY(TYPE_ULONGLONG,
+> +                (1024 - 32 -
+> +                 sizeof(struct btrfs_scrub_progress)) / 8)) /* unused */
 > +
-> +STRUCT(btrfs_ioctl_qgroup_assign_args,
-> +       TYPE_ULONGLONG, /* assign */
-> +       TYPE_ULONGLONG, /* src */
-> +       TYPE_ULONGLONG) /* dst */
-> +
-> +STRUCT(btrfs_ioctl_qgroup_create_args,
-> +       TYPE_ULONGLONG, /* create */
-> +       TYPE_ULONGLONG) /* qgroupid */
-> +
-> +STRUCT(btrfs_qgroup_limit,
-> +       TYPE_ULONGLONG, /* flags */
-> +       TYPE_ULONGLONG, /* max_rfer */
-> +       TYPE_ULONGLONG, /* max_excl */
-> +       TYPE_ULONGLONG, /* rsv_rfer */
-> +       TYPE_ULONGLONG) /* rsv_excl */
-> +
-> +STRUCT(btrfs_ioctl_qgroup_limit_args,
-> +       TYPE_ULONGLONG, /* qgroupid */
-> +       MK_STRUCT(STRUCT_btrfs_qgroup_limit)) /* lim */
-> +
->  STRUCT(btrfs_ioctl_feature_flags,
->         TYPE_ULONGLONG, /* compat_flags */
->         TYPE_ULONGLONG, /* compat_ro_flags */
+>  STRUCT(btrfs_ioctl_dev_info_args,
+>         TYPE_ULONGLONG, /* devid */
+>         MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* uuid */
 > 
 
 Applied to my linux-user-for-5.2 branch.
