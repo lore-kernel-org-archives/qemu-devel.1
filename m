@@ -2,93 +2,79 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C05EFC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 22:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CA9C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 22:44:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ED642177B
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 22:26:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iz3fvDBI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ED642177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id F1E6A2086A
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 22:44:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E6A2086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k4Ap2-0001Hr-QR
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 18:26:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51034)
+	id 1k4B60-0004zu-8L
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 18:44:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavlica.nikola@gmail.com>)
- id 1k4AoN-0000ro-Pr
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 18:26:03 -0400
-Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:46867)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k4B5I-0004GL-GE
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 18:43:32 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39000)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pavlica.nikola@gmail.com>)
- id 1k4AoL-0008KE-Ci
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 18:26:03 -0400
-Received: by mail-ed1-x533.google.com with SMTP id q4so2291238edv.13
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 15:26:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:subject:to:message-id:mime-version;
- bh=mqAuQPRcrnUHFgEnYYWZkd4A2fD82UsdV7TRq2BmLbc=;
- b=Iz3fvDBIpekxDcKIc0zhbEGmon3O2+/Vbp6BAQP/TAAxpOYoy4PaqD8Zd/Vz80kX2+
- RwEKEBDVXVx3AoSqk8oGDbpyF74Awgiihdz7F1DT+r9ge2BjBsglh/lq1CcypKRyeCke
- wziaAfbeyWW87MflA0vbGd/RF8xH4gKe4pcbI2fiuW4Kt/DFgJzEu9lNi6oib5gRpIqv
- Na0/GoNCLguNjsYDkPVmSjMKY5gsEDAm7ATNn8zeqkuJ/cTtEfIqZzyU7iWdio2Sdybl
- PJ2KQYgknHbk+3Ny9/xP28REsxJLk9l+23rOxjL73cKFe29hlnmZm6zeDNF4n0gxEPg4
- 9XPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:subject:to:message-id:mime-version;
- bh=mqAuQPRcrnUHFgEnYYWZkd4A2fD82UsdV7TRq2BmLbc=;
- b=RLIhkoRFifCCumgaxVyhOt977G/FJV4BXemXvN9KwlJdH+cwoe2lMu0RYTZAYZUuwy
- lyMFmjZfvUGvL5NNY67nuJTT9gEVXbc8+SU4ik48jpWri/Pj/eFwNvrdN00FX+1lSKQF
- YmmQ1tZ6Qfk8tzpkvzyddqJnT0CpXdzzq097FzQDMVfpqTCgESxgPt5FqmgEGV6du3Xu
- Fq5j1F7zYvWWFf6nydvRLt0r2iumZHh0eOHOdt3nyq6PEihT+J/beuQz1w9OsOx9Oi1h
- jPeHUjY+G2fkxKZxqii6Ii2XPJDse785IbNYAleJS6qEYqBHezmOXnpq6k7eTfgND+LJ
- z1cg==
-X-Gm-Message-State: AOAM530kez7W2RmkakQhrrvrXEE6VRv4YOVJyRJoKtsf09CFRk9lii/H
- p75OZba21FCI+G5rQjaOGxEF0QYd9KQ=
-X-Google-Smtp-Source: ABdhPJwEUDXjLSJI+gvtx0O9g5fsXpYGAfqYNGGpYu3a4Aflkp+H0bQj7uoQn7dBzbZOGSCGmiKmew==
-X-Received: by 2002:aa7:d7d7:: with SMTP id e23mr10518638eds.347.1596839158875; 
- Fri, 07 Aug 2020 15:25:58 -0700 (PDT)
-Received: from [192.168.100.70] ([213.91.86.150])
- by smtp.gmail.com with ESMTPSA id ch24sm6585892ejb.7.2020.08.07.15.25.57
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Aug 2020 15:25:58 -0700 (PDT)
-Date: Sat, 08 Aug 2020 00:25:51 +0200
-From: Nikola Pavlica <pavlica.nikola@gmail.com>
-Subject: [PATCH] ui/gtk: Fix regression in gd_refresh_rate_milihz
-To: qemu-devel <qemu-devel@nongnu.org>
-Message-Id: <3ZSPEQ.MH51LARSPXFN2@gmail.com>
-X-Mailer: geary/3.36.2
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k4B5F-0001dv-1a
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 18:43:32 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k4B5D-0005cc-1z
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 22:43:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 01C1C2E8025
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 22:43:26 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-s39s977ux+jYy+guGmh0"
-Received-SPF: pass client-ip=2a00:1450:4864:20::533;
- envelope-from=pavlica.nikola@gmail.com; helo=mail-ed1-x533.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Aug 2020 22:34:39 -0000
+From: Simon Kaegi <1888601@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h jasowang skaegi
+X-Launchpad-Bug-Reporter: Simon Kaegi (skaegi)
+X-Launchpad-Bug-Modifier: Simon Kaegi (skaegi)
+References: <159547584008.11100.1316842366379773629.malonedeb@wampee.canonical.com>
+Message-Id: <159683967968.5527.13491333439354619640.malone@soybean.canonical.com>
+Subject: [Bug 1888601] Re: QEMU v5.1.0-rc0/rc1 hang with nested virtualization
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 05de1afd78d97676b75da4334299a32958fc5bbe
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,103 +83,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1888601 <1888601@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-s39s977ux+jYy+guGmh0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Not currently, but let me try and setup just a simple qemu test
 
- From: Nikola Pavlica <pavlica.nikola@gmail.com 
-<mailto:pavlica.nikola@gmail.com>>
+-- =
 
-In January (I think), I suggested a fix for the constant refresh rate 
-issue in QEMU despite VMs being able to render graphics at a framerate 
-much higher than that.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1888601
 
-Here's the link to the patch in question:
-<https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg01343.html>
+Title:
+  QEMU v5.1.0-rc0/rc1 hang with nested virtualization
 
-However, I've noticed that the fix for older systems that run a older 
-system of GTK fail to compile with my version of the patch. Which was 
-fixed here: 
-<https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg03386.html>, 
-but improperly.
+Status in QEMU:
+  New
 
-The issue lies if the target system (that the package is build on) has 
-a higher version of GTK, let's say 3.24, it fails the #ifdef macro and 
-thus does not include the changes that I've made. I've noticed this 
-issue under the ArchLinux build system, which can be fixed by just 
-using the included macro for checking GTK versions.
+Bug description:
+  We're running Kata Containers using QEMU and with v5.1.0rc0 and rc1
+  have noticed a problem at startup where QEMu appears to hang. We are
+  not seeing this problem on our bare metal nodes and only on a VSI that
+  supports nested virtualization.
 
-Also being that this is a regression and not a plain bugfix, is this 
-mergable into stable?
+  We unfortunately see nothing at all in the QEMU logs to help
+  understand the problem and a hung process is just a guess at this
+  point.
 
-Signed-off-by: Nikola Pavlica <pavlica.nikola@gmail.com 
-<mailto:pavlica.nikola@gmail.com>>
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1968,7 +1968,7 @@ static GtkWidget 
-*gd_create_menu_machine(GtkDisplayState *s)
-  */
- static int gd_refresh_rate_millihz(GtkWidget *window)
- {
--#ifdef GDK_VERSION_3_22
-+#if GTK_CHECK_VERSION(3, 22, 0)
-     GdkWindow *win = gtk_widget_get_window(window);
+  Using git bisect we first see the problem with...
 
-     if (win) {
--- 
-2.24.1
+  ---
 
+  f19bcdfedd53ee93412d535a842a89fa27cae7f2 is the first bad commit
+  commit f19bcdfedd53ee93412d535a842a89fa27cae7f2
+  Author: Jason Wang <jasowang@redhat.com>
+  Date:   Wed Jul 1 22:55:28 2020 +0800
 
---=-s39s977ux+jYy+guGmh0
-Content-Type: text/html; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+  =C2=A0=C2=A0=C2=A0=C2=A0virtio-pci: implement queue_enabled method
 
-<div id=3D"geary-body" dir=3D"auto"><div><div><span style=3D"white-space: p=
-re-wrap;">From: Nikola Pavlica &lt;</span><a href=3D"mailto:pavlica.nikola@=
-gmail.com" style=3D"white-space: pre-wrap;">pavlica.nikola@gmail.com</a><sp=
-an style=3D"white-space: pre-wrap;">&gt;
+  =C2=A0=C2=A0=C2=A0=C2=A0With version 1, we can detect whether a queue is =
+enabled via
+  =C2=A0=C2=A0=C2=A0=C2=A0queue_enabled.
 
-In January (I think), I suggested a fix for the constant refresh rate issue=
- in QEMU despite VMs being able to render graphics at a framerate much high=
-er than that.</span></div><div><span style=3D"white-space: pre-wrap;"><br><=
-/span></div><div><span style=3D"white-space: pre-wrap;">Here's the link to =
-the patch in question:</span></div><div><a href=3D"https://lists.nongnu.org=
-/archive/html/qemu-devel/2020-01/msg01343.html">https://lists.nongnu.org/ar=
-chive/html/qemu-devel/2020-01/msg01343.html</a></div><div><br></div><div><s=
-pan style=3D"white-space: pre-wrap;">However, I've noticed that the fix for=
- older systems that run a older system of GTK fail to compile with my versi=
-on of the patch. Which was fixed here: </span><a href=3D"https://lists.nong=
-nu.org/archive/html/qemu-devel/2020-01/msg03386.html">https://lists.nongnu.=
-org/archive/html/qemu-devel/2020-01/msg03386.html</a>, but improperly.</div=
-><div><br></div><div>The issue lies if the target system (that the package =
-is build on) has a higher version of GTK, let's say 3.24, it fails the #ifd=
-ef macro and thus does not include the changes that I've made. I've noticed=
- this issue under the ArchLinux build system, which can be fixed by just us=
-ing the included macro for checking GTK versions.</div><div><span style=3D"=
-white-space: pre-wrap;"><br></span></div><div><span style=3D"white-space: p=
-re-wrap;">Also being that this is a regression and not a plain bugfix, is t=
-his mergable into stable?</span></div><div><span style=3D"white-space: pre-=
-wrap;">
-Signed-off-by: Nikola Pavlica &lt;</span><a href=3D"mailto:pavlica.nikola@g=
-mail.com" style=3D"white-space: pre-wrap;">pavlica.nikola@gmail.com</a><spa=
-n style=3D"white-space: pre-wrap;">&gt;
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1968,7 +1968,7 @@ static GtkWidget *gd_create_menu_machine(GtkDisplaySt=
-ate *s)
-  */
- static int gd_refresh_rate_millihz(GtkWidget *window)
- {
--#ifdef GDK_VERSION_3_22
-+#if GTK_CHECK_VERSION(3, 22, 0)
-     GdkWindow *win =3D gtk_widget_get_window(window);
-=20
-     if (win) {</span><div class=3D"geary-signature" style=3D"white-space: =
-pre-wrap;"><div class=3D"geary-signature"><div>--=20
-</div>2.24.1</div></div></div></div></div>
---=-s39s977ux+jYy+guGmh0--
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Jason Wang <jasowang@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Cindy Lu <lulu@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Message-Id: <20200701145538.22333-5-lulu@redhat.c=
+om>
+  =C2=A0=C2=A0=C2=A0=C2=A0Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+  =C2=A0=C2=A0=C2=A0=C2=A0Acked-by: Jason Wang <jasowang@redhat.com>
 
+  =C2=A0hw/virtio/virtio-pci.c | 13 +++++++++++++
+  =C2=A01 file changed, 13 insertions(+)
+
+  ---
+
+  Reverting this commit (on top of 5.1.0-rc1) seems to work and prevent
+  the hanging.
+
+  ---
+
+  Here's how kata ends up launching qemu in our environment --
+  /opt/kata/bin/qemu-system-x86_64 -name sandbox-849df14c6065931adedb9d18bc=
+9260a6d896f1814a8c5cfa239865772f1b7a5f -uuid 6bec458e-1da7-4847-a5d7-5ab31d=
+4d2465 -machine pc,accel=3Dkvm,kernel_irqchip -cpu host,pmu=3Doff -qmp unix=
+:/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5=
+f/qmp.sock,server,nowait -m 4096M,slots=3D10,maxmem=3D30978M -device pci-br=
+idge,bus=3Dpci.0,id=3Dpci-bridge-0,chassis_nr=3D1,shpc=3Don,addr=3D2,romfil=
+e=3D -device virtio-serial-pci,disable-modern=3Dtrue,id=3Dserial0,romfile=
+=3D -device virtconsole,chardev=3Dcharconsole0,id=3Dconsole0 -chardev socke=
+t,id=3Dcharconsole0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f=
+1814a8c5cfa239865772f1b7a5f/console.sock,server,nowait -device virtio-scsi-=
+pci,id=3Dscsi0,disable-modern=3Dtrue,romfile=3D -object rng-random,id=3Drng=
+0,filename=3D/dev/urandom -device virtio-rng-pci,rng=3Drng0,romfile=3D -dev=
+ice virtserialport,chardev=3Dcharch0,id=3Dchannel0,name=3Dagent.channel.0 -=
+chardev socket,id=3Dcharch0,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
+0a6d896f1814a8c5cfa239865772f1b7a5f/kata.sock,server,nowait -chardev socket=
+,id=3Dchar-396c5c3e19e29353,path=3D/run/vc/vm/849df14c6065931adedb9d18bc926=
+0a6d896f1814a8c5cfa239865772f1b7a5f/vhost-fs.sock -device vhost-user-fs-pci=
+,chardev=3Dchar-396c5c3e19e29353,tag=3DkataShared,romfile=3D -netdev tap,id=
+=3Dnetwork-0,vhost=3Don,vhostfds=3D3:4,fds=3D5:6 -device driver=3Dvirtio-ne=
+t-pci,netdev=3Dnetwork-0,mac=3D52:ac:2d:02:1f:6f,disable-modern=3Dtrue,mq=
+=3Don,vectors=3D6,romfile=3D -global kvm-pit.lost_tick_policy=3Ddiscard -vg=
+a none -no-user-config -nodefaults -nographic -daemonize -object memory-bac=
+kend-file,id=3Ddimm1,size=3D4096M,mem-path=3D/dev/shm,share=3Don -numa node=
+,memdev=3Ddimm1 -kernel /opt/kata/share/kata-containers/vmlinuz-5.7.9-74 -i=
+nitrd /opt/kata/share/kata-containers/kata-containers-initrd_alpine_1.11.2-=
+6_agent.initrd -append tsc=3Dreliable no_timer_check rcupdate.rcu_expedited=
+=3D1 i8042.direct=3D1 i8042.dumbkbd=3D1 i8042.nopnp=3D1 i8042.noaux=3D1 nor=
+eplace-smp reboot=3Dk console=3Dhvc0 console=3Dhvc1 iommu=3Doff cryptomgr.n=
+otests net.ifnames=3D0 pci=3Dlastbus=3D0 debug panic=3D1 nr_cpus=3D4 agent.=
+use_vsock=3Dfalse scsi_mod.scan=3Dnone init=3D/usr/bin/kata-agent -pidfile =
+/run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa239865772f1b7a5f=
+/pid -D /run/vc/vm/849df14c6065931adedb9d18bc9260a6d896f1814a8c5cfa23986577=
+2f1b7a5f/qemu.log -smp 2,cores=3D1,threads=3D1,sockets=3D4,maxcpus=3D4
+
+  ---
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1888601/+subscriptions
 
