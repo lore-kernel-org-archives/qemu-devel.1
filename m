@@ -2,79 +2,83 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C53C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0BBDC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:21:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8FCD2177B
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:16:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8FCD2177B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 95DB420866
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 07:21:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DB420866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3wcV-0003o4-23
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 03:16:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34088)
+	id 1k3wgu-0005Pf-Tl
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 03:21:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1k3wbk-0003I2-45; Fri, 07 Aug 2020 03:16:04 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:40873)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1k3wbh-0003V1-0q; Fri, 07 Aug 2020 03:16:03 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.156.13])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id E579654A24A6;
- Fri,  7 Aug 2020 09:15:56 +0200 (CEST)
-Received: from kaod.org (37.59.142.104) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Fri, 7 Aug 2020
- 09:15:55 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R0052ccaea67-06ff-477a-8ca6-f9579c8f4811,
- 0FAFD30B9C3B2BFB516736AB00726897D031F517) smtp.auth=groug@kaod.org
-Date: Fri, 7 Aug 2020 09:15:54 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v2 for-5.2 3/5] ppc/xive: Introduce dedicated
- kvm_irqchip_in_kernel() wrappers
-Message-ID: <20200807091554.633833c5@bahia.lan>
-In-Reply-To: <64551e66-e867-037e-bf2e-efa22ebdd324@kaod.org>
-References: <159673295739.766512.2950380687630225803.stgit@bahia.lan>
- <159673298011.766512.17389427967409788911.stgit@bahia.lan>
- <64551e66-e867-037e-bf2e-efa22ebdd324@kaod.org>
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3wgI-0004fs-83
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 03:20:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52506)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3wgF-0003ys-TM
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 03:20:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k3wgD-0008Rr-Sg
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 07:20:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D76F62E804E
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 07:20:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [37.59.142.104]
-X-ClientProxiedBy: DAG1EX1.mxp5.local (172.16.2.1) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: fa51e869-8644-4f67-8a69-5b50bfe75d7d
-X-Ovh-Tracer-Id: 18423100178666199459
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrkedugdduvddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeevlefhtddufffhieevhefhleegleelgfetffetkedugeehjeffgfehhfefueduffenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:59:49
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Date: Fri, 07 Aug 2020 07:10:22 -0000
+From: Satheesh Rajendran <1890290@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=groug@kaod.org; 
+X-Launchpad-Bug-Tags: nested powerpc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gkurz sathnaga
+X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
+X-Launchpad-Bug-Modifier: Satheesh Rajendran (sathnaga)
+References: <159655059319.10948.7356744312155765003.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159678422209.15668.11598367117061646669.malone@wampee.canonical.com>
+Subject: [Bug 1890290] Re: PowerPC L2(nested virt) kvm guest fails to boot
+ with ic-mode=dual, kernel-irqchip=on - `KVM is too old to support ic-mode=dual,
+ kernel-irqchip=on`
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f8d08067c099760e601af1107308eb5ba131a069
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,392 +87,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1890290 <1890290@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 6 Aug 2020 19:55:29 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+@Greg,
 
-> On 8/6/20 6:56 PM, Greg Kurz wrote:
-> > Calls to the KVM XIVE device are guarded by kvm_irqchip_in_kernel(). Th=
-is
-> > ensures that QEMU won't try to use the device if KVM is disabled or if
-> > an in-kernel irqchip isn't required.
-> >=20
-> > When using ic-mode=3Ddual with the pseries machine, we have two possible
-> > interrupt controllers: XIVE and XICS. The kvm_irqchip_in_kernel() helper
-> > will return true as soon as any of the KVM device is created. It might
-> > lure QEMU to think that the other one is also around, while it is not.
-> > This is exactly what happens with ic-mode=3Ddual at machine init when
-> > claiming IRQ numbers, which must be done on all possible IRQ backends,
-> > eg. RTAS event sources or the PHB0 LSI table : only the KVM XICS device
-> > is active but we end up calling kvmppc_xive_source_reset_one() anyway,
-> > which fails. This doesn't cause any trouble because of another bug :
-> > kvmppc_xive_source_reset_one() lacks an error_setg() and callers don't
-> > see the failure.
-> >=20
-> > Most of the other kvmppc_xive_* functions have similar xive->fd
-> > checks to filter out the case when KVM XIVE isn't active. It
-> > might look safer to have idempotent functions but it doesn't
-> > really help to understand what's going on when debugging.
-> >=20
-> > Since we already have all the kvm_irqchip_in_kernel() in place,
-> > also have the callers to check xive->fd as well before calling
-> > KVM XIVE specific code. This is straight-forward for the spapr
-> > specific XIVE code. Some more care is needed for the platform
-> > agnostic XIVE code since it cannot access xive->fd directly.
-> > Introduce new in_kernel() methods in some base XIVE classes
-> > for this purpose and implement them only in spapr.
-> >=20
-> > In all cases, we still need to call kvm_irqchip_in_kernel() so that
-> > compilers can optimize the kvmppc_xive_* calls away when CONFIG_KVM
-> > isn't defined, thus avoiding the need for stubs.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> > v2: Introduce in_kernel() abstract methods in the base XIVE classes
-> > ---
-> >  hw/intc/spapr_xive.c  |   53 ++++++++++++++++++++++++++++++++++++-----=
---------
-> >  hw/intc/xive.c        |   28 +++++++++++++++++++-------
-> >  include/hw/ppc/xive.h |    2 ++
-> >  3 files changed, 62 insertions(+), 21 deletions(-)
-> >=20
-> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> > index 89c8cd96670b..cd001c580e89 100644
-> > --- a/hw/intc/spapr_xive.c
-> > +++ b/hw/intc/spapr_xive.c
-> > @@ -148,12 +148,19 @@ static void spapr_xive_end_pic_print_info(SpaprXi=
-ve *xive, XiveEND *end,
-> >      xive_end_queue_pic_print_info(end, 6, mon);
-> >  }
-> > =20
-> > +/*
-> > + * kvm_irqchip_in_kernel() will cause the compiler to turn this
-> > + * info a nop if CONFIG_KVM isn't defined.
-> > + */
-> > +#define spapr_xive_in_kernel(xive) \
-> > +    (kvm_irqchip_in_kernel() && (xive)->fd !=3D -1)
-> > +
->=20
-> This looks ok. SpaprXive is the userspace frontend device of=20
-> the KVM XIVE native device in the hypervisor.
->=20
-> >  void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon)
-> >  {
-> >      XiveSource *xsrc =3D &xive->source;
-> >      int i;
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          Error *local_err =3D NULL;
-> > =20
-> >          kvmppc_xive_synchronize_state(xive, &local_err);
-> > @@ -507,8 +514,10 @@ static const VMStateDescription vmstate_spapr_xive=
-_eas =3D {
-> > =20
-> >  static int vmstate_spapr_xive_pre_save(void *opaque)
-> >  {
-> > -    if (kvm_irqchip_in_kernel()) {
-> > -        return kvmppc_xive_pre_save(SPAPR_XIVE(opaque));
-> > +    SpaprXive *xive =3D SPAPR_XIVE(opaque);
-> > +
-> > +    if (spapr_xive_in_kernel(xive)) {
-> > +        return kvmppc_xive_pre_save(xive);
-> >      }
-> > =20
-> >      return 0;
-> > @@ -520,8 +529,10 @@ static int vmstate_spapr_xive_pre_save(void *opaqu=
-e)
-> >   */
-> >  static int spapr_xive_post_load(SpaprInterruptController *intc, int ve=
-rsion_id)
-> >  {
-> > -    if (kvm_irqchip_in_kernel()) {
-> > -        return kvmppc_xive_post_load(SPAPR_XIVE(intc), version_id);
-> > +    SpaprXive *xive =3D SPAPR_XIVE(intc);
-> > +
-> > +    if (spapr_xive_in_kernel(xive)) {
-> > +        return kvmppc_xive_post_load(xive, version_id);
-> >      }
-> > =20
-> >      return 0;
-> > @@ -564,7 +575,7 @@ static int spapr_xive_claim_irq(SpaprInterruptContr=
-oller *intc, int lisn,
-> >          xive_source_irq_set_lsi(xsrc, lisn);
-> >      }
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          return kvmppc_xive_source_reset_one(xsrc, lisn, errp);
-> >      }
-> > =20
-> > @@ -641,7 +652,7 @@ static void spapr_xive_set_irq(SpaprInterruptContro=
-ller *intc, int irq, int val)
-> >  {
-> >      SpaprXive *xive =3D SPAPR_XIVE(intc);
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          kvmppc_xive_source_set_irq(&xive->source, irq, val);
-> >      } else {
-> >          xive_source_set_irq(&xive->source, irq, val);
-> > @@ -749,11 +760,21 @@ static void spapr_xive_deactivate(SpaprInterruptC=
-ontroller *intc)
-> > =20
-> >      spapr_xive_mmio_set_enabled(xive, false);
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          kvmppc_xive_disconnect(intc);
-> >      }
-> >  }
-> > =20
-> > +static bool spapr_xive_in_kernel_xptr(const XivePresenter *xptr)
-> > +{
-> > +    return spapr_xive_in_kernel(SPAPR_XIVE(xptr));
-> > +}
->=20
-> This is mostly OK, a XivePresenter is a part of the XiveRouter.
->=20
-> > +static bool spapr_xive_in_kernel_xn(const XiveNotifier *xn)
-> > +{
-> > +    return spapr_xive_in_kernel(SPAPR_XIVE(xn));
-> > +}
->=20
->=20
-> This is weird. we have other XiveNotifiers which have no relation
-> with a kernel backend.
->=20
+Thanks for the patch, I see it already got applied into 5.2, tested and
+works fine,
 
-These other XiveNotifiers don't implement the in_kernel() method.
+# git log -2 --oneline
+1972794 (HEAD -> master) spapr: Clarify error and documentation for broken =
+KVM XICS
+e1d322c (grafted, tag: v5.1.0-rc3, origin/master, origin/HEAD) Update versi=
+on for v5.1.0-rc3 release
 
-What's the problem ?
 
-> >  static void spapr_xive_class_init(ObjectClass *klass, void *data)
-> >  {
-> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > @@ -761,6 +782,7 @@ static void spapr_xive_class_init(ObjectClass *klas=
-s, void *data)
-> >      SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_CLASS(klass);
-> >      XivePresenterClass *xpc =3D XIVE_PRESENTER_CLASS(klass);
-> >      SpaprXiveClass *sxc =3D SPAPR_XIVE_CLASS(klass);
-> > +    XiveNotifierClass *xnc =3D XIVE_NOTIFIER_CLASS(klass);
-> > =20
-> >      dc->desc    =3D "sPAPR XIVE Interrupt Controller";
-> >      device_class_set_props(dc, spapr_xive_properties);
-> > @@ -788,6 +810,9 @@ static void spapr_xive_class_init(ObjectClass *klas=
-s, void *data)
-> >      sicc->post_load =3D spapr_xive_post_load;
-> > =20
-> >      xpc->match_nvt  =3D spapr_xive_match_nvt;
-> > +    xpc->in_kernel  =3D spapr_xive_in_kernel_xptr;
-> > +
-> > +    xnc->in_kernel  =3D spapr_xive_in_kernel_xn;
-> >  }
-> > =20
-> >  static const TypeInfo spapr_xive_info =3D {
-> > @@ -1058,7 +1083,7 @@ static target_ulong h_int_set_source_config(Power=
-PCCPU *cpu,
-> >          new_eas.w =3D xive_set_field64(EAS_END_DATA, new_eas.w, eisn);
-> >      }
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          Error *local_err =3D NULL;
-> > =20
-> >          kvmppc_xive_set_source_config(xive, lisn, &new_eas, &local_err=
-);
-> > @@ -1379,7 +1404,7 @@ static target_ulong h_int_set_queue_config(PowerP=
-CCPU *cpu,
-> >       */
-> > =20
-> >  out:
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          Error *local_err =3D NULL;
-> > =20
-> >          kvmppc_xive_set_queue_config(xive, end_blk, end_idx, &end, &lo=
-cal_err);
-> > @@ -1480,7 +1505,7 @@ static target_ulong h_int_get_queue_config(PowerP=
-CCPU *cpu,
-> >          args[2] =3D 0;
-> >      }
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          Error *local_err =3D NULL;
-> > =20
-> >          kvmppc_xive_get_queue_config(xive, end_blk, end_idx, end, &loc=
-al_err);
-> > @@ -1642,7 +1667,7 @@ static target_ulong h_int_esb(PowerPCCPU *cpu,
-> >          return H_P3;
-> >      }
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          args[0] =3D kvmppc_xive_esb_rw(xsrc, lisn, offset, data,
-> >                                       flags & SPAPR_XIVE_ESB_STORE);
-> >      } else {
-> > @@ -1717,7 +1742,7 @@ static target_ulong h_int_sync(PowerPCCPU *cpu,
-> >       * under KVM
-> >       */
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          Error *local_err =3D NULL;
-> > =20
-> >          kvmppc_xive_sync_source(xive, lisn, &local_err);
-> > @@ -1761,7 +1786,7 @@ static target_ulong h_int_reset(PowerPCCPU *cpu,
-> > =20
-> >      device_legacy_reset(DEVICE(xive));
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (spapr_xive_in_kernel(xive)) {
-> >          Error *local_err =3D NULL;
-> > =20
-> >          kvmppc_xive_reset(xive, &local_err);
-> > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> > index 9b55e0356c62..27d27fdc9ee4 100644
-> > --- a/hw/intc/xive.c
-> > +++ b/hw/intc/xive.c
-> > @@ -592,6 +592,17 @@ static const char * const xive_tctx_ring_names[] =
-=3D {
-> >      "USER", "OS", "POOL", "PHYS",
-> >  };
-> > =20
-> > +/*
-> > + * kvm_irqchip_in_kernel() will cause the compiler to turn this
-> > + * info a nop if CONFIG_KVM isn't defined.
-> > + */
-> > +#define xive_in_kernel(xptr)                                  \
-> > +    (kvm_irqchip_in_kernel() &&                                       =
-  \
-> > +     ({                                                               =
-  \
-> > +         XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);  =
-    \
-> > +         xpc->in_kernel ? xpc->in_kernel(xptr) : false;               =
-  \
-> > +     }))
-> > +
-> >
-> >  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon)
-> >  {
-> >      int cpu_index;
-> > @@ -606,7 +617,7 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monit=
-or *mon)
-> > =20
-> >      cpu_index =3D tctx->cs ? tctx->cs->cpu_index : -1;
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (xive_in_kernel(tctx->xptr)) {
-> >          Error *local_err =3D NULL;
-> > =20
-> >          kvmppc_xive_cpu_synchronize_state(tctx, &local_err);
-> > @@ -671,7 +682,7 @@ static void xive_tctx_realize(DeviceState *dev, Err=
-or **errp)
-> >      }
-> > =20
-> >      /* Connect the presenter to the VCPU (required for CPU hotplug) */
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (xive_in_kernel(tctx->xptr)) {
-> >          kvmppc_xive_cpu_connect(tctx, &local_err);
-> >          if (local_err) {
-> >              error_propagate(errp, local_err);
-> > @@ -682,10 +693,11 @@ static void xive_tctx_realize(DeviceState *dev, E=
-rror **errp)
-> > =20
-> >  static int vmstate_xive_tctx_pre_save(void *opaque)
-> >  {
-> > +    XiveTCTX *tctx =3D XIVE_TCTX(opaque);
-> >      Error *local_err =3D NULL;
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > -        kvmppc_xive_cpu_get_state(XIVE_TCTX(opaque), &local_err);
-> > +    if (xive_in_kernel(tctx->xptr)) {
-> > +        kvmppc_xive_cpu_get_state(tctx, &local_err);
-> >          if (local_err) {
-> >              error_report_err(local_err);
-> >              return -1;
-> > @@ -697,14 +709,15 @@ static int vmstate_xive_tctx_pre_save(void *opaqu=
-e)
-> > =20
-> >  static int vmstate_xive_tctx_post_load(void *opaque, int version_id)
-> >  {
-> > +    XiveTCTX *tctx =3D XIVE_TCTX(opaque);
-> >      Error *local_err =3D NULL;
-> > =20
-> > -    if (kvm_irqchip_in_kernel()) {
-> > +    if (xive_in_kernel(tctx->xptr)) {
-> >          /*
-> >           * Required for hotplugged CPU, for which the state comes
-> >           * after all states of the machine.
-> >           */
-> > -        kvmppc_xive_cpu_set_state(XIVE_TCTX(opaque), &local_err);
-> > +        kvmppc_xive_cpu_set_state(tctx, &local_err);
-> >          if (local_err) {
-> >              error_report_err(local_err);
-> >              return -1;
-> > @@ -1128,6 +1141,7 @@ static void xive_source_reset(void *dev)
-> >  static void xive_source_realize(DeviceState *dev, Error **errp)
-> >  {
-> >      XiveSource *xsrc =3D XIVE_SOURCE(dev);
-> > +    XiveNotifierClass *xnc =3D XIVE_NOTIFIER_GET_CLASS(xsrc->xive);
-> > =20
-> >      assert(xsrc->xive);
-> > =20
-> > @@ -1147,7 +1161,7 @@ static void xive_source_realize(DeviceState *dev,=
- Error **errp)
-> >      xsrc->status =3D g_malloc0(xsrc->nr_irqs);
-> >      xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
-> > =20
-> > -    if (!kvm_irqchip_in_kernel()) {
-> > +    if (!xnc->in_kernel || !xnc->in_kernel(xsrc->xive)) {
-> >          memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
-> >                                &xive_source_esb_ops, xsrc, "xive.esb",
-> >                                (1ull << xsrc->esb_shift) * xsrc->nr_irq=
-s);
-> > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> > index 705cf48176fc..aa46e3fcf512 100644
-> > --- a/include/hw/ppc/xive.h
-> > +++ b/include/hw/ppc/xive.h
-> > @@ -161,6 +161,7 @@ typedef struct XiveNotifier XiveNotifier;
-> >  typedef struct XiveNotifierClass {
-> >      InterfaceClass parent;
-> >      void (*notify)(XiveNotifier *xn, uint32_t lisn);
-> > +    bool (*in_kernel)(const XiveNotifier *xn);
-> >  } XiveNotifierClass;
-> > =20
-> >  /*
-> > @@ -396,6 +397,7 @@ typedef struct XivePresenterClass {
-> >                       uint8_t nvt_blk, uint32_t nvt_idx,
-> >                       bool cam_ignore, uint8_t priority,
-> >                       uint32_t logic_serv, XiveTCTXMatch *match);
-> > +    bool (*in_kernel)(const XivePresenter *xptr);
-> >  } XivePresenterClass;
-> > =20
-> >  int xive_presenter_tctx_match(XivePresenter *xptr, XiveTCTX *tctx,
-> >=20
-> >=20
->=20
-> It seems redundant. Can we introduce a new XiveBackend QOM interface=20
-> which would implement an in_kernel() handler ? and XiveRouter would=20
-> inherit from it.=20
->=20
+# /usr/bin/virt-install --connect=3Dqemu:///system --hvm --accelerate
+--name 'vm1' --machine pseries --memory=3D8192
+--vcpu=3D8,maxvcpus=3D8,sockets=3D1,cores=3D8,threads=3D1 --import --nograp=
+hics
+--serial pty --memballoon model=3Dvirtio --controller type=3Dscsi,model
+=3Dvirtio-scsi --disk path=3D/home/tests/data/avocado-
+vt/images/f31-ppc64le.qcow2,bus=3Dscsi,size=3D10,format=3Dqcow2
+--network=3Dbridge=3Dvirbr0,model=3Dvirtio,mac=3D52:54:00:5c:f1:fe
+--mac=3D52:54:00:5c:f1:fe --boot emulator=3D/home/qemu/ppc64-softmmu/qemu-
+system-
+ppc64,kernel=3D/boot/vmlinuz-5.8.0-rc5-ge9919e11e,kernel_args=3D"root=3D/de=
+v/sda2
+rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcall_debug
+selinux=3D0" --noautoconsole --qemu-commandline=3D" -M pseries,ic-mode=3Ddu=
+al
+,kernel-irqchip=3Don";virsh console vm1
 
-Not sure to see how it would help... the XiveRouter type isn't used
-at the locations where we call kvm_irqchip_in_kernel(). Only
-XivePresenter and XiveNotifier...
+Starting install...
+ERROR    internal error: process exited while connecting to monitor: 2020-0=
+8-07T07:05:38.633057Z qemu-system-ppc64: KVM is incompatible with ic-mode=
+=3Ddual,kernel-irqchip=3Don
+This can happen with an old KVM or in a KVM nested guest.
+Try without kernel-irqchip or with kernel-irqchip=3Doff.
 
-> C.
->=20
->=20
->=20
->=20
->=20
+Regards,
+-Satheesh
 
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890290
+
+Title:
+  PowerPC L2(nested virt) kvm guest fails to boot with ic-mode=3Ddual
+  ,kernel-irqchip=3Don - `KVM is too old to support ic-mode=3Ddual,kernel-
+  irqchip=3Don`
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  Env:
+  HW: Power 9 DD2.3
+  Host L0: 5.8.0-rc5-g8ba4ffcd8
+  Qemu: 5.0.50 (v5.0.0-533-gdebe78ce14)
+  Libvirt: 6.4.0
+  L1: 5.8.0-rc5-ge9919e11e
+  qemu_version': '5.0.50 (v5.1.0-rc2-dirty)
+  libvirt_version': '6.4.0'
+  L2: 5.8.0-rc7-g6ba1b005f
+
+  =
+
+  1. boot a L2 KVM guest with `ic-mode=3Ddual,kernel-irqchip=3Don`
+
+  /usr/bin/virt-install --connect=3Dqemu:///system --hvm --accelerate --nam=
+e 'vm1' --machine pseries --memory=3D8192 --vcpu=3D8,maxvcpus=3D8,sockets=
+=3D1,cores=3D2,t
+  hreads=3D4 --import --nographics --serial pty --memballoon model=3Dvirtio=
+ --disk path=3D/home/tests/data/avocado-vt/images/f31-ppc64le.qcow2,bus=3Dv=
+irtio,size=3D10,format=3Dqcow2 --network
+  =3Dbridge=3Dvirbr0,model=3Dvirtio,mac=3D52:54:00:e6:fe:f6 --mac=3D52:54:0=
+0:e6:fe:f6 --boot emulator=3D/usr/share/avocado-plugins-vt/bin/qemu,kernel=
+=3D/tmp/linux/vmlinux,kernel_args=3D"root=3D/de
+  v/vda2 rw console=3Dtty0 console=3DttyS0,115200 init=3D/sbin/init initcal=
+l_debug selinux=3D0" --noautoconsole --qemu-commandline=3D" -M pseries,ic-m=
+ode=3Ddual,kernel-irqchip=3Don"
+
+  =
+
+  ERROR    internal error: process exited while connecting to monitor: 2020=
+-08-04T11:12:53.304482Z qemu: KVM is too old to support ic-mode=3Ddual,kern=
+el-irqchip=3Don
+
+
+  =
+
+  Qemu Log:
+  ```
+  /usr/share/avocado-plugins-vt/bin/qemu \
+  -name guest=3Dvm1,debug-threads=3Don \
+  -S \
+  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
+domain-5-vm1/master-key.aes \
+  -machine pseries-5.1,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff \
+  -cpu POWER9 \
+  -m 8192 \
+  -overcommit mem-lock=3Doff \
+  -smp 8,sockets=3D1,dies=3D1,cores=3D2,threads=3D4 \
+  -uuid 20a3351b-2776-4e75-9059-c070fe3dd44b \
+  -display none \
+  -no-user-config \
+  -nodefaults \
+  -chardev socket,id=3Dcharmonitor,fd=3D34,server,nowait \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dutc \
+  -no-shutdown \
+  -boot strict=3Don \
+  -kernel /tmp/linux/vmlinux \
+  -append 'root=3D/dev/vda2 rw console=3Dtty0 console=3DttyS0,115200 init=
+=3D/sbin/init initcall_debug selinux=3D0' \
+  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.0,addr=3D0x2 \
+  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x3 \
+  -blockdev '{"driver":"file","filename":"/home/tests/data/avocado-vt/image=
+s/f31-ppc64le.qcow2","node-name":"libvirt-1-storage","auto-read-only":true,=
+"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":false,"driver":"qc=
+ow2","file":"libvirt-1-storage","backing":null}' \
+  -device virtio-blk-pci,bus=3Dpci.0,addr=3D0x4,drive=3Dlibvirt-1-format,id=
+=3Dvirtio-disk0,bootindex=3D1 \
+  -netdev tap,fd=3D37,id=3Dhostnet0,vhost=3Don,vhostfd=3D38 \
+  -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:fe:f=
+6,bus=3Dpci.0,addr=3D0x1 \
+  -chardev pty,id=3Dcharserial0 \
+  -device spapr-vty,chardev=3Dcharserial0,id=3Dserial0,reg=3D0x30000000 \
+  -chardev socket,id=3Dcharchannel0,fd=3D39,server,nowait \
+  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
+l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 \
+  -M pseries,ic-mode=3Ddual,kernel-irqchip=3Don \
+  -msg timestamp=3Don
+  2020-08-04 11:12:53.169+0000: Domain id=3D5 is tainted: custom-argv
+  2020-08-04 11:12:53.179+0000: 11120: info : libvirt version: 6.4.0, packa=
+ge: 1.fc31 (Unknown, 2020-06-02-05:09:40, ltc-wspoon4.aus.stglabs.ibm.com)
+  2020-08-04 11:12:53.179+0000: 11120: info : hostname: atest-guest
+  2020-08-04 11:12:53.179+0000: 11120: info : virObjectUnref:347 : OBJECT_U=
+NREF: obj=3D0x7fff0c117c40
+  char device redirected to /dev/pts/0 (label charserial0)
+  2020-08-04T11:12:53.304482Z qemu: KVM is too old to support ic-mode=3Ddua=
+l,kernel-irqchip=3Don
+  2020-08-04 11:12:53.694+0000: shutting down, reason=3Dfailed
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890290/+subscriptions
 
