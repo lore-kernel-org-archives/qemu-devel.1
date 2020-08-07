@@ -2,86 +2,80 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE52FC433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D29F4C433E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:56:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B723E2177B
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:53:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 994212177B
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 09:56:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aI39GBF8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B723E2177B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hf5+N0jE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 994212177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3z49-0004yh-1A
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:53:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36864)
+	id 1k3z6c-000623-RG
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 05:56:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3z3Z-0004S5-3T
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:52:57 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60684
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k3z5z-0005b3-J6
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:55:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33082
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k3z3X-0005No-8R
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:52:56 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k3z5x-0005lC-PI
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 05:55:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1596793974;
+ s=mimecast20190719; t=1596794125;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=tfyJGbxnwuD7tdksWA7K5j7/2s5Fm3QGRdbPHHlSTjU=;
- b=aI39GBF8NR761vD4EXq8tJpHaOlrXJcCJk+4MStsmqxvYcOekaooRmMBInO+K7DOzxsXOi
- WIpQaI4jIH8LHDwd/EbE5K/2p45JjY4nc5gaqa7Tn7VNJ3jEEP5D3h97hxcxVvFEjvTyd8
- yRnu2ZD8VBthoto2r8jOguo0IcSckIQ=
+ in-reply-to:in-reply-to:references:references;
+ bh=w7uOZihK0+4ikz3MuAvWW0x0fCUiJneojLW+2c0dpT4=;
+ b=hf5+N0jEI3aT0chEGl2RhzbH5Snl2Cw8QEh7WbsdiONrMjcULEXPrjr+1FZTbcUcnYEz7g
+ 39pQHpZEaXvAubMiWd9crTOtoBUZt766rr/7UA64NIg4klnY5Hb01oj0DclPyUNd7I5DKq
+ bzy1GJ+1PftX3JFOZeOBQeaYZMLAvOs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-EXPW-FUzPyKP66jlkjE5Sg-1; Fri, 07 Aug 2020 05:52:50 -0400
-X-MC-Unique: EXPW-FUzPyKP66jlkjE5Sg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-292-2tZGRxxMNVyOrF4ZIZFlpA-1; Fri, 07 Aug 2020 05:55:21 -0400
+X-MC-Unique: 2tZGRxxMNVyOrF4ZIZFlpA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A51C4800138;
- Fri,  7 Aug 2020 09:52:49 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-113-31.ams2.redhat.com [10.36.113.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BD51D65C91;
- Fri,  7 Aug 2020 09:52:43 +0000 (UTC)
-Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
-From: Thomas Huth <thuth@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <761b4058-7a2b-d992-2cc2-6efe654ee62e@redhat.com>
- <9c894412-b156-607e-1ea9-9e9ba14cbf1a@redhat.com>
- <6f6e9c9b-fdf6-951e-9112-3913fe44c455@redhat.com>
- <ac18da61-6f54-b9d4-7591-e1296f9d3a32@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <353ff6f7-c67f-7665-b631-967512417fa2@redhat.com>
-Date: Fri, 7 Aug 2020 11:52:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F03F8005B0;
+ Fri,  7 Aug 2020 09:55:20 +0000 (UTC)
+Received: from work-vm (ovpn-114-9.ams2.redhat.com [10.36.114.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DD70B60BE2;
+ Fri,  7 Aug 2020 09:55:16 +0000 (UTC)
+Date: Fri, 7 Aug 2020 10:55:14 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Subject: Re: [Virtio-fs] [PATCH] virtiofsd: Cleanup norace option description
+Message-ID: <20200807095514.GD2779@work-vm>
+References: <20200806111129.22055-1-misono.tomohiro@jp.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <ac18da61-6f54-b9d4-7591-e1296f9d3a32@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200806111129.22055-1-misono.tomohiro@jp.fujitsu.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:11:35
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:00:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -89,8 +83,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,47 +96,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, philmd@redhat.com,
- armbru@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com,
- jsnow@redhat.com
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/08/2020 11.49, Thomas Huth wrote:
-> On 07/08/2020 11.45, Thomas Huth wrote:
->> On 07/08/2020 11.31, Paolo Bonzini wrote:
->>> On 07/08/20 10:51, Thomas Huth wrote:
->>>> 2) With --meson=git added, I also do not get much further:
->>>>  "./ui/meson.build:77:0: ERROR: Program 'keycodemapdb/tools/keymap-gen'
->>>> not found"
->>>>
->>>>  https://gitlab.com/huth/qemu/-/jobs/675546229
->>>>
->>>> Any idea what's going wrong here?
->>>
->>> This is also a submodule not being initialized,
->>> ui/keycodemapdb/tools/keymap-gen comes from a submodule.
->>
->> Ok. I've added a hack to my configure script to checkout the submodules,
->> but still, it does not compile yet:
->>
->>  ../tools/virtiofsd/meson.build:1:0: ERROR: Unknown variable
->> "libvhost_user".
->>  https://gitlab.com/huth/qemu/-/jobs/675665455
+* Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
+> Cleanup norace option as the feature was removed by below commit:
 > 
-> At least the Debian container started to compile, but then fails here:
+> Fixes: 93bb3d8d4cda("virtiofsd: remove symlink fallbacks")
+> Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+
+Sergio Lopez posted an identical post a few weeks back, but only to
+qemu-devel.
+I'll merge it into my dev world.
+
+Thanks.
+
+Dave
+
+> ---
+>  docs/tools/virtiofsd.rst | 3 ---
+>  tools/virtiofsd/helper.c | 2 --
+>  2 files changed, 5 deletions(-)
 > 
->  ../hw/display/virtio-gpu.c:43:10: fatal error: virglrenderer.h: No such
-> file or directory
->  https://gitlab.com/huth/qemu/-/jobs/675665451
-
-And yet another error, this time on Travis with --disable-system :
-
- ../hw/display/meson.build:42:22: ERROR: Unknown variable
-"config_all_devices".
- https://travis-ci.com/github/huth/qemu/jobs/369657010#L1035
-
- Thomas
+> diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+> index 824e713491..58666a4495 100644
+> --- a/docs/tools/virtiofsd.rst
+> +++ b/docs/tools/virtiofsd.rst
+> @@ -63,9 +63,6 @@ Options
+>      Print only log messages matching LEVEL or more severe.  LEVEL is one of
+>      ``err``, ``warn``, ``info``, or ``debug``.  The default is ``info``.
+>  
+> -  * norace -
+> -    Disable racy fallback.  The default is false.
+> -
+>    * posix_lock|no_posix_lock -
+>      Enable/disable remote POSIX locks.  The default is ``posix_lock``.
+>  
+> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> index 2e4cdb4f49..4ded1d588a 100644
+> --- a/tools/virtiofsd/helper.c
+> +++ b/tools/virtiofsd/helper.c
+> @@ -159,8 +159,6 @@ void fuse_cmdline_help(void)
+>             "    -o max_idle_threads        the maximum number of idle worker "
+>             "threads\n"
+>             "                               allowed (default: 10)\n"
+> -           "    -o norace                  disable racy fallback\n"
+> -           "                               default: false\n"
+>             "    -o posix_lock|no_posix_lock\n"
+>             "                               enable/disable remote posix lock\n"
+>             "                               default: posix_lock\n"
+> -- 
+> 2.21.3
+> 
+> _______________________________________________
+> Virtio-fs mailing list
+> Virtio-fs@redhat.com
+> https://www.redhat.com/mailman/listinfo/virtio-fs
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
