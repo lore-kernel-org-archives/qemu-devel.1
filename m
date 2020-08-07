@@ -2,107 +2,116 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AE3C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 14:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 998A3C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 15:14:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20B712075D
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 14:51:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20B712075D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 628C62075D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 15:14:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+tBnqyl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 628C62075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k43ij-0007Kj-9A
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 10:51:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43324)
+	id 1k4459-0004Y9-K3
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 11:14:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k43hz-0006vm-AR
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 10:50:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57614)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k43hv-0007kC-JW
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 10:50:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k43hs-000405-Hf
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 14:50:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6483B2E80D2
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 14:50:52 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k444a-00048U-0N
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 11:14:20 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38790
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k444W-0001nX-U9
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 11:14:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596813254;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1QrvQuUFP3M3zplWGL0ie2m3tbk+wJ0tBBDvI4O1gTk=;
+ b=b+tBnqylxTQM4o3xxkJOQvox6hZOQclmycpPcxiniXcGBxtZvGpiWVYh+uSHTyAKb+xOsd
+ 9MIGe1cDEdAICsiF4u3rvefvLR2OhqCmS7C6Vzao+EVwiszuzO6wa0Y3m78yVmO/AIiSU8
+ I9+c1MvI3ejtuJuiqaYticaqV0PggUU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-W5xygfC_PGi-R2RXWKpX0A-1; Fri, 07 Aug 2020 11:14:11 -0400
+X-MC-Unique: W5xygfC_PGi-R2RXWKpX0A-1
+Received: by mail-wm1-f72.google.com with SMTP id z1so900442wmf.9
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 08:14:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1QrvQuUFP3M3zplWGL0ie2m3tbk+wJ0tBBDvI4O1gTk=;
+ b=QzN8loHxDE3c+5fYnN5Lm0CcswPqXT10Ix8AnWTbjOttq7XD+FvpiM4UmTvpMfyuv9
+ hD3duZ8TUOHMsxaCG3EElENTF8ym/L+nLiuDxWF46pNATWmSukOHtZlOB4oWh9iiDPD0
+ BabMInotCHhwQY5sWAFRZXZVSQGLTAfU4+wNhPMwetDaY991CzTG+kvOCjJWSxOZuXWf
+ LRNF4t1GMYo2Fac8fugcsv2kvqaKTLkJx/KygRvffFRGAROWq3n8GFEsEldvJmEGKgLl
+ YoKq08XyNahNyahB8wMekGcwYpwCm0hAlid60dEordx3PgusaadRF7GmlLqwAsQnk+vt
+ 5Iwg==
+X-Gm-Message-State: AOAM532Zt42v/AK6WPYAvkWOYZRDiPv8vz5epcdCi+ro8ytQUq9gZNIW
+ TUP37yDAYWWSFSL4tn6NxPnOU631Wc6kTmPWEdctHYAU4Hp8RNoTktvwyQPn3HG3ZF6pIwVgvc5
+ FcCZfM80Q8To7EQo=
+X-Received: by 2002:a1c:f70a:: with SMTP id v10mr13037862wmh.39.1596813250113; 
+ Fri, 07 Aug 2020 08:14:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzE0HfVB5TuGceTZEYLjqwML3DmK7e5KszuchA3GyioJUEkLFqpyZBLggx/RNdJULTsdCT2iA==
+X-Received: by 2002:a1c:f70a:: with SMTP id v10mr13037845wmh.39.1596813249801; 
+ Fri, 07 Aug 2020 08:14:09 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.136.3])
+ by smtp.gmail.com with ESMTPSA id q19sm10479338wrf.48.2020.08.07.08.14.06
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 07 Aug 2020 08:14:09 -0700 (PDT)
+Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+ <87364y28jp.fsf@dusky.pond.sub.org>
+ <9d7b7f59-ec3e-1f74-d1d4-359e3388f0f8@redhat.com>
+ <87ft8yd0ht.fsf@dusky.pond.sub.org>
+ <CAFEAcA8-qAh9RzAZNqFS9HphAEDuCVVGzZO7vKem-1WCJogyjw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f8cb36ff-a98a-9147-1c31-6f6394a4ec77@redhat.com>
+Date: Fri, 7 Aug 2020 17:14:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2020 14:41:56 -0000
-From: Ubuntu SRU Bot <1805256@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=kunpeng920; status=Triaged; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04; status=Triaged;
- importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-18.04-hwe;
- status=Triaged; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-19.10;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=ubuntu-20.04;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=kunpeng920; productseries=upstream-kernel;
- status=Invalid; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
- component=main; status=Fix Committed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=Fix Released; importance=Medium; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Released; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: ikeradar patch qemu-img verification-done-eoan
- verification-done-focal verification-needed verification-needed-bionic
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-cloke brian-murray dannf ikepanhc iveskim
- jan-glauber-i janitor jnsnow kongzizaixian lizhengui paelzer philmd
- rafaeldtinoco sil2100 tjaalton ubuntu-sru-bot ying-fang
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: Ubuntu SRU Bot (ubuntu-sru-bot)
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <20200807144156.441D8240461@snakefruit.canonical.com>
-Subject: [Bug 1805256] Autopkgtest regression report
- (qemu/1:2.11+dfsg-1ubuntu7.30)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: dee773b7f0c231d6bcd57815f764aac964526a22
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA8-qAh9RzAZNqFS9HphAEDuCVVGzZO7vKem-1WCJogyjw@mail.gmail.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 04:11:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -111,245 +120,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All autopkgtests for the newly accepted qemu (1:2.11+dfsg-1ubuntu7.30) for =
-bionic have finished running.
-The following regressions have been reported in tests triggered by the pack=
-age:
+On 07/08/20 16:02, Peter Maydell wrote:
+> On Fri, 7 Aug 2020 at 14:55, Markus Armbruster <armbru@redhat.com> wrote:
+>> I'm notoriously conservative in my choice of tools, and GNU Make is a
+>> much better tool than some people give it credit for, but I've long felt
+>> we've pushed it beyond its limits.
+> 
+> The thing is, it feels somewhat like we're already pushing Meson beyond
+> *its* limits instead...
 
-systemd/237-3ubuntu10.42 (i386)
-ubuntu-image/1.9+18.04ubuntu1 (arm64, armhf, i386, s390x, ppc64el, amd64)
-cinder/2:12.0.9-0ubuntu1.2 (s390x)
+We totally are pushing it *to* its limits, though I obviously disagree
+with "beyond".  QEMU would certainly be one of the largest projects
+using Meson.  In fact we had to add more than one new feature.
+
+One important difference between Make and Meson is that Meson is by
+design limited in what it can do.  The idea (which I think has served
+them well) is that they want projects to show what they need and work
+with them on how to build it.  So:
+
+- with Make you can do everything, it just becomes harder and harder;
+
+- with Meson you cannot do everything, plus you're using software that
+is opinionated and conservative in some respects with respect to its
+design decisions.  In exchange: 1) you can always propose to add
+features to the upstream project like Marc-André and I did; 2) you don't
+have to worry about the minute details of everything.
+
+So that's what makes Shell+Make and Meson substantially different tools.
+
+Stuff like automatically cloning git submodules will never be in Meson,
+and we can keep Make forever as a small escape hatch for that.  However,
+using Make as a Turing-complete language to build our own DSLs on top of
+is just a bad idea.  Shell+Make can remain simply as a driver for
+executing commands, which is what Make does best.
+
+We also have parts that have effectively separate build systems: I have
+no plans to convert the TCG tests at all, the firmware could be
+converted to Meson or Autotools (yes I am serious :)) or left aside, and
+so on.
 
 
-Please visit the excuses page listed below and investigate the failures, pr=
-oceeding afterwards as per the StableReleaseUpdates policy regarding autopk=
-gtest regressions [1].
+That said, and going back to pushing Make beyond its limits, I am quite
+positive that unnest-vars has to go even if the solution has some
+disadvantages.  Meson is one solution, our own home-grown DSL and
+Makefile generator could be another.  However, designing our own build
+system DSL is not something I want to spend time on; I prefer to improve
+Meson for every other project using it, it's better for the whole open
+source development community.
 
-https://people.canonical.com/~ubuntu-archive/proposed-
-migration/bionic/update_excuses.html#qemu
+The reason why I started thinking about the conversion is that every now
+and then people entered fights against unnest-vars and I was wondering
+how those fights would compare to Meson fights.  And the result, after
+about one year of hacking on and off, is that---with one exception---it
+never felt like I was fighting Meson or the Meson maintainers; any
+adaptation or concession came naturally, or was even an improvement in
+retrospect.
 
-[1] https://wiki.ubuntu.com/StableReleaseUpdates#Autopkgtest_Regressions
+That one exception, the one thing that disappoints me of the whole
+conversion, is the trace.h files.  The current solution is one of the
+first parts I did of the conversion and I have never touched it since; I
+think it can be improved (I can even think of two ways to do it), but I
+don't really have the time to do it now.  But even that bit is just
+ugly, not unmaintainable, and I really see nothing in the conversion
+that is a step back for QEMU's long term maintainability and our ability
+to develop new features.
 
-Thank you!
+/me gets off the soap box
 
--- =
+Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
+Paolo
 
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
+> (it can't do everything we want it to, we've
+> already had to get at least one new feature added upstream for our benefit,
+> and in other places we're having to change our existing conventions
+> to placate Meson). This would be an easier sell if it was "this is all
+> straightforward and Meson has all the functionality we need".
+> 
+> I admit that I'm partly feeling a bit more conservative about tooling
+> right now because we just switched the docs to Sphinx and Sphinx has
+> turned out to have some annoying problems we didn't foresee. So taking
+> another tool from the Python universe isn't hugely appealing.
+> 
+> (This is not a 'nak'; I'm just expressing my unease.)
 
-Status in kunpeng920:
-  Triaged
-Status in kunpeng920 ubuntu-18.04 series:
-  Triaged
-Status in kunpeng920 ubuntu-18.04-hwe series:
-  Triaged
-Status in kunpeng920 ubuntu-19.10 series:
-  Fix Released
-Status in kunpeng920 ubuntu-20.04 series:
-  Fix Released
-Status in kunpeng920 upstream-kernel series:
-  Invalid
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Bionic:
-  Fix Committed
-Status in qemu source package in Eoan:
-  Fix Released
-Status in qemu source package in Focal:
-  Fix Released
+Yes, it's totally understandable.
 
-Bug description:
-  =
-
-  SRU TEAM REVIEWER: This has already been SRUed for Focal, Eoan and Bionic=
-. Unfortunately the Bionic SRU did not work and we had to reverse the chang=
-e. Since then we had another update and now I'm retrying the SRU.
-
-  After discussing with @paelzer (and @dannf as a reviewer) extensively,
-  Christian and I agreed that we should scope this SRU as Aarch64 only
-  AND I was much, much more conservative in question of what is being
-  changed in the AIO qemu code.
-
-  New code has been tested against the initial Test Case and the new
-  one, regressed for Bionic. More information (about tests and
-  discussion) can be found in the MR at
-  ~rafaeldtinoco/ubuntu/+source/qemu:lp1805256-bionic-refix
-
-  BIONIC REGRESSION BUG:
-
-  https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1885419
-
-  [Impact]
-
-  * QEMU locking primitives might face a race condition in QEMU Async
-  I/O bottom halves scheduling. This leads to a dead lock making either
-  QEMU or one of its tools to hang indefinitely.
-
-  [Test Case]
-
-  INITIAL
-
-  * qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs in Aarch64.
-
-  [Regression Potential]
-
-  * This is a change to a core part of QEMU: The AIO scheduling. It
-  works like a "kernel" scheduler, whereas kernel schedules OS tasks,
-  the QEMU AIO code is responsible to schedule QEMU coroutines or event
-  listeners callbacks.
-
-  * There was a long discussion upstream about primitives and Aarch64.
-  After quite sometime Paolo released this patch and it solves the
-  issue. Tested platforms were: amd64 and aarch64 based on his commit
-  log.
-
-  * Christian suggests that this fix stay little longer in -proposed to
-  make sure it won't cause any regressions.
-
-  * dannf suggests we also check for performance regressions; e.g. how
-  long it takes to convert a cloud image on high-core systems.
-
-  BIONIC REGRESSED ISSUE
-
-  https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1885419
-
-  [Other Info]
-
-  =C2=A0* Original Description bellow:
-
-  Command:
-
-  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs.
-
-  ----
-
-  Workaround:
-
-  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
-
-  ----
-
-  (gdb) thread 1
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf1ad81c in __GI_ppoll
-  #1 0x0000aaaaaabcf73c in ppoll
-  #2 qemu_poll_ns
-  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
-  #4 main_loop_wait
-  ...
-
-  (gdb) thread 2
-  ...
-  (gdb) bt
-  #0 syscall ()
-  #1 0x0000aaaaaabd41cc in qemu_futex_wait
-  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
-  #3 0x0000aaaaaabed05c in call_rcu_thread
-  #4 0x0000aaaaaabd34c8 in qemu_thread_start
-  #5 0x0000ffffbf25c880 in start_thread
-  #6 0x0000ffffbf1b6b9c in thread_start ()
-
-  (gdb) thread 3
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
-  #1 0x0000ffffbf2671b4 in __sigwait
-  #2 0x0000aaaaaabd1ddc in sigwait_compat
-  #3 0x0000aaaaaabd34c8 in qemu_thread_start
-  #4 0x0000ffffbf25c880 in start_thread
-  #5 0x0000ffffbf1b6b9c in thread_start
-
-  ----
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
-  ./disk01.ext4.qcow2 ./output.qcow2
-
-  [New Thread 0xffffbec5ad90 (LWP 72839)]
-  [New Thread 0xffffbe459d90 (LWP 72840)]
-  [New Thread 0xffffbdb57d90 (LWP 72841)]
-  [New Thread 0xffffacac9d90 (LWP 72859)]
-  [New Thread 0xffffa7ffed90 (LWP 72860)]
-  [New Thread 0xffffa77fdd90 (LWP 72861)]
-  [New Thread 0xffffa6ffcd90 (LWP 72862)]
-  [New Thread 0xffffa67fbd90 (LWP 72863)]
-  [New Thread 0xffffa5ffad90 (LWP 72864)]
-
-  [Thread 0xffffa5ffad90 (LWP 72864) exited]
-  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
-  [Thread 0xffffa77fdd90 (LWP 72861) exited]
-  [Thread 0xffffbdb57d90 (LWP 72841) exited]
-  [Thread 0xffffa67fbd90 (LWP 72863) exited]
-  [Thread 0xffffacac9d90 (LWP 72859) exited]
-  [Thread 0xffffa7ffed90 (LWP 72860) exited]
-
-  <HUNG w/ 3 threads in the stack trace showed before>
-  """
-
-  All the tasks left are blocked in a system call, so no task left to call
-  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
-  thread #1 (doing poll() in a pipe with thread #2).
-
-  Those 7 threads exit before disk conversion is complete (sometimes in
-  the beginning, sometimes at the end).
-
-  ----
-
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
-igmask=3D0xffffc123b950)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
-linux-gnu/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
-c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
