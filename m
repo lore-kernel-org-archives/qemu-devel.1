@@ -2,81 +2,115 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B290CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 14:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B407EC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 14:19:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87ED422D73
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 14:05:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87ED422D73
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 824C720866
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 14:19:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YtKWkt+7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 824C720866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k42zu-0003uf-Nq
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 10:05:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60900)
+	id 1k43Dg-00066R-M3
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 10:19:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k42zJ-0003Tn-6D
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 10:04:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46616)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k42zH-0002Cb-0m
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 10:04:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k42zF-0004oG-2r
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 14:04:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F07522E809C
- for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 14:04:44 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k43DA-0005hN-1s
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 10:19:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57081
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k43D7-000443-8Q
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 10:19:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596809943;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wAjMBiooYBOl8zBPJsj8kkNGvyasQwYf02rciro3jXU=;
+ b=YtKWkt+72yIcQOyd5eQRjK6YnkSdTQpo6bbYuTdIyxeIHiPWIXmpojr5kyJdL8kTBMT07n
+ 3JKr6af4ddSj/ibcbVA+pp5QyDcO8Z/QvAgOWix09hPsfLBLg/C4WlxuRV/OH5bYN55AUF
+ av3FvVlrdgGfHZUVRYk0piCWFGQVUpU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-389-hdqguDy8OXixmk0ALNz3hQ-1; Fri, 07 Aug 2020 10:19:01 -0400
+X-MC-Unique: hdqguDy8OXixmk0ALNz3hQ-1
+Received: by mail-wr1-f72.google.com with SMTP id e12so807459wra.13
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 07:19:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wAjMBiooYBOl8zBPJsj8kkNGvyasQwYf02rciro3jXU=;
+ b=LQoIdogkHa9j0wXP0s+vqp3sZ58/6QPzFgGMcfsCX17BrrrsB+0fIGYgvR2IYQeyGa
+ 9QnISXj/4XP+3zh5TKkwoB07V2YPo1sPnEsFs3bFsOo/DD2W8Ni89NgdVCGT4ENlATC6
+ DEcqhYDNepOna4eoP2DOAnPEB2wV4AQ4pVqohr6wnfnzAFUKveXgqad9UKFXk11mgWVs
+ x0PVcTKvNBcYxKj7SjPGP3KQM47S2aUJP8ixPhlyf5Vu0ixxD1uVa/4RnF8GHqQjHXfQ
+ HpAiDRgXzWauPhkDOTRqAmtfbEdxkh33RxkyGE14Tr9zTW1Yjm0yhIN0vny6y0ozkv4H
+ 4sFQ==
+X-Gm-Message-State: AOAM530mdBWNvICPc8eej+5SvDvnPr6Sz+daPu1/tqD5f2GuIF2ywMyb
+ hkUFeb2nhlxmh0FtIxOG7PFIGNvycBUfquKrVfRwBsJWL7HKvj7vhD5GX36sYphw8fqQyra40Zs
+ n/iallo6C+v5IEDs=
+X-Received: by 2002:adf:f64a:: with SMTP id x10mr11490249wrp.99.1596809940469; 
+ Fri, 07 Aug 2020 07:19:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyiqspbnsK3YbIgXkacbAyCHJQcGylMAdQpu4cdw319fK4uQXDr0zGl6wDbXOxDR+L/PInj8Q==
+X-Received: by 2002:adf:f64a:: with SMTP id x10mr11490236wrp.99.1596809940265; 
+ Fri, 07 Aug 2020 07:19:00 -0700 (PDT)
+Received: from [192.168.178.58] ([151.20.136.3])
+ by smtp.gmail.com with ESMTPSA id g3sm11882237wrb.59.2020.08.07.07.18.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 07 Aug 2020 07:18:59 -0700 (PDT)
+Subject: Re: [PATCH 068/143] meson: convert most of softmmu/
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+ <1596741379-12902-69-git-send-email-pbonzini@redhat.com>
+ <bac67efd-d736-b7ae-b9b3-0373393d2849@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a54f3ef9-5905-628c-c277-f7d6190c3be6@redhat.com>
+Date: Fri, 7 Aug 2020 16:18:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Aug 2020 13:53:59 -0000
-From: John Snow <1219234@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: crobinso jnsnow th-huth
-X-Launchpad-Bug-Reporter: Cole Robinson (crobinso)
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <20130831150404.10743.73717.malonedeb@gac.canonical.com>
-Message-Id: <159680843906.26262.16803249989681185887.malone@gac.canonical.com>
-Subject: [Bug 1219234] Re: -device ide-hd will assign bus with with no free
- units
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 92a219a127b44cda60e988f5253e27b9561cf4e1
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <bac67efd-d736-b7ae-b9b3-0373393d2849@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 02:21:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,59 +119,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1219234 <1219234@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'll re-investigate. I definitely fixed some of this (there is if=3DIDE
-for AHCI now), but I recall Markus mentioning recently that there are a
-lot of weird things quite broken with AHCI and bus assignment.
+On 07/08/20 15:36, Philippe Mathieu-Daudé wrote:
+> There is still "obj-y += vl.o" in softmmu/Makefile.objs.
+> 
+> Did you meant to squash this into the previous patch?
 
-I'm working on several other IDE fixes for the next release, so we can
-add this one to the pile. I will leave it as "incomplete" for now since
-I need to re-assess.
+This is what I meant:
 
--- =
+diff --git a/meson.build b/meson.build
+index a7ad3248cc..ef6f811c51 100644
+--- a/meson.build
++++ b/meson.build
+@@ -618,6 +618,8 @@ softmmu_ss.add(when: ['CONFIG_FDT', fdt],  if_true: [files('device_tree.c')])
+ 
+ common_ss.add(files('cpus-common.c'))
+ 
++subdir('softmmu')
++
+ # needed for fuzzing binaries
+ subdir('tests/qtest/libqos')
+ 
+diff --git a/softmmu/Makefile.objs b/softmmu/Makefile.objs
+index a414a74c50..ebcfd15695 100644
+--- a/softmmu/Makefile.objs
++++ b/softmmu/Makefile.objs
+@@ -1,14 +1,2 @@
+ softmmu-main-y = softmmu/main.o
+-
+-obj-y += arch_init.o
+-obj-y += cpus.o
+-obj-y += cpu-throttle.o
+-obj-y += balloon.o
+-obj-y += ioport.o
+-obj-y += memory.o
+-obj-y += memory_mapping.o
+-
+-obj-y += qtest.o
+-
+-obj-y += vl.o
+-vl.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS)
++main.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS)
+diff --git a/softmmu/meson.build b/softmmu/meson.build
+new file mode 100644
+index 0000000000..95d38df259
+--- /dev/null
++++ b/softmmu/meson.build
+@@ -0,0 +1,10 @@
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
++  'arch_init.c',
++  'balloon.c',
++  'cpus.c',
++  'cpu-throttle.c',
++  'ioport.c',
++  'memory.c',
++  'memory_mapping.c',
++  'qtest.c',
++  'vl.c'))
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1219234
-
-Title:
-  -device ide-hd will assign bus with with no free units
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Originally filed here:
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1000118
-
-  ./x86_64-softmmu/qemu-system-x86_64 -device ahci -drive id=3Daa,file=3D/t=
-mp/foo,if=3Dnone -drive id=3Dbb,file=3D/tmp/foo,if=3Dnone -device ide-hd,dr=
-ive=3Daa -device ide-hd,drive=3Dbb
-  qemu-system-x86_64: -device ide-hd,drive=3Dbb: Can't create IDE unit 1, b=
-us supports only 1 units
-  qemu-system-x86_64: -device ide-hd,drive=3Dbb: Device initialization fail=
-ed.
-  qemu-system-x86_64: -device ide-hd,drive=3Dbb: Device 'ide-hd' could not =
-be initialized
-
-  If a bus isn't specified for -device ide-hd, it just uses the first
-  bus it finds, not taking into account if that bus was already assigned
-  for another device. So users are forced to do -device ide-hd,bus=3Dide.0
-  -device ide-hd,bus=3Dide.1, etc.
-
-  This isn't specific to -device ahci, but it's worse there since there
-  isn't any -drive if=3DIDE or -hda convenience option, which both seem to
-  get the logic correct.
-
-  I know -device is the 'build it yourself' approach so I understand if
-  this is WONTFIX.
-
-  This is affects qemu.git as of today (8-31-2013)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1219234/+subscriptions
 
