@@ -2,94 +2,79 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E65C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 05:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AD2C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 05:41:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 042C62086A
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 05:34:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VN8JPeR8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 042C62086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0CBEE20855
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 05:41:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CBEE20855
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k3v1i-0004Ta-3a
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 01:34:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43094)
+	id 1k3v8U-0001LW-17
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 01:41:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1k3v0n-0003el-RK
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 01:33:49 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:54590)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3v7p-0000fw-OD
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 01:41:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39338)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1k3v0m-00084f-7t
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 01:33:49 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id mt12so351804pjb.4
- for <qemu-devel@nongnu.org>; Thu, 06 Aug 2020 22:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=oiiscSXSEBzfDLEUuNO0uvItF27KOcNkiWo8CT4jTl4=;
- b=VN8JPeR8NGiT8cL+GicDtI/deQ/S7mbJn/T6xVOGji4G3akeMdC0mu2LXWo5cx4xzF
- zHle98Ag+MO8b+iQM40NgzuKK2UJtl25IhaNM2kpGwqlmAlZvUTT2Zl/c+xruo5hDzVu
- QCmpIdqZF5R98LQ9UZQ2NYRuYhDISwRXZCk/Ft0ELqnbexVkxocnicBtBet3o6dAp+PG
- XT5Z22TkjTHIvP4qtl6DJy5HM5cqUr9rTi+eYke920D8stMcoAwsNSXYdXIdYUsruynY
- wHYBVuP4GVznrMN03jpuw08nhkISiPKxQ5k+DXjvCRXIecIcXpfTmOzzedyUHnb2L4VT
- U6HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=oiiscSXSEBzfDLEUuNO0uvItF27KOcNkiWo8CT4jTl4=;
- b=owFzmYyzS/IHdd1R9b0sDWMmHoK5VrD8DgVUmlipg+6osEc3ea3v8fxLwt/r0fhs7T
- 9CBC6EPS6jIJRVDqBXPmtnHsQk+/FT/iIhrQqBKH9WUe+ZUpIiAgVI1D7QhgJ57ysYbg
- JK2xCbi+DCikgkikI6gdpGNnqf7V/1G6y7qPx5goyL/wJJ19d2CJKsYpoidajC1z4wy6
- I7eBgPvLEz8OYyfd0jlC7p4LnGV5GVf7/qZ2/OhBTPoyhrGGEFUtSe4bA3JHQtnBYwnj
- +bsd1XzqMj0ks+QlptCOTWgtz7oz0RjI4JMy8e57f9yovRYQtZgvs0FfNRCajO4ce23s
- NHpg==
-X-Gm-Message-State: AOAM531dIJ8mSrxnB2vjST6ctBG2nKjd08aHCRc/7mLSMoKCAAS9BB5c
- fC2V/4f2dYsaNo3s4/Jt6n+FA3Co/XU+mA==
-X-Google-Smtp-Source: ABdhPJxYn9lEIf0PWpvGWzFppOgz0pQH0B4lf5PB4pGn12j6swf2yhqypuBlsEfs6Y4CuArLuv06ag==
-X-Received: by 2002:a17:902:a50e:: with SMTP id
- s14mr10293638plq.164.1596778426825; 
- Thu, 06 Aug 2020 22:33:46 -0700 (PDT)
-Received: from software.domain.org (28.144.92.34.bc.googleusercontent.com.
- [34.92.144.28])
- by smtp.gmail.com with ESMTPSA id s8sm11641592pfc.122.2020.08.06.22.33.44
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 06 Aug 2020 22:33:46 -0700 (PDT)
-From: Huacai Chen <zltjiangshi@gmail.com>
-X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH for-5.2] hw/null-machine: Add the kvm_type() hook for MIPS
-Date: Fri,  7 Aug 2020 13:36:38 +0800
-Message-Id: <1596778598-19177-1-git-send-email-chenhc@lemote.com>
-X-Mailer: git-send-email 2.7.0
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k3v7n-0000g1-L8
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 01:41:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k3v7k-0005u5-SB
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 05:41:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D42CD2E807D
+ for <qemu-devel@nongnu.org>; Fri,  7 Aug 2020 05:41:00 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Aug 2020 05:31:38 -0000
+From: Laci <1890775@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jacoka
+X-Launchpad-Bug-Reporter: Laci (jacoka)
+X-Launchpad-Bug-Modifier: Laci (jacoka)
+Message-Id: <159677829829.10348.2497937987968118298.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1890775] [NEW] Aten USB to Serial bridge does not work with qemu
+ under Windows 10
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="a24057fea7e4c6a98c0220d5f878da0f3c783699";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: bd2a82c4cce270aa631a5fde03d2b2ef7a4187da
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 01:41:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,70 +83,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-devel@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Bug 1890775 <1890775@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MIPS has two types of KVM: TE & VZ, and TE is the default type. Now,
-libvirt uses a null-machine to detect the kvm capability. In the MIPS
-case, it will return "KVM not supported" on a VZ platform by default.
-So, add the kvm_type() hook to the null-machine.
+Public bug reported:
 
-This seems not a very good solution, but I cannot do it better now.
+I would like to use MSDOS 6.22 with qemu (unfortunatelly lot of our test pr=
+ograms has been written in dos).
+I tried to connect two laptop by RS232 port, one of the machine have a buil=
+t-in serial port and run with native MSDOS 6.22 with 4.0 norton commander. =
+Another machine have only USB ports and i try to use a new Aten USB to Seri=
+al device. Ok. Has been started qemu with -serial and -chardev parameters, =
+at startup appear a window with serial port setting such as baud rate, star=
+t bit, etc...
 
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Signed-off-by: Huacai Chen <chenhc@lemote.com>
-Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
----
- hw/core/Makefile.objs  | 2 +-
- hw/core/null-machine.c | 6 ++++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+Quemu has been satrted succeeded but serial port cannot be used becouse
+was nothing activited on usb serial adapter :(
 
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index d8fee8e..2daba3f 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -17,11 +17,11 @@ common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
- common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
- common-obj-$(CONFIG_SOFTMMU) += sysbus.o
- common-obj-$(CONFIG_SOFTMMU) += machine.o
--common-obj-$(CONFIG_SOFTMMU) += null-machine.o
- common-obj-$(CONFIG_SOFTMMU) += loader.o
- common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
- common-obj-$(CONFIG_SOFTMMU) += numa.o
- common-obj-$(CONFIG_SOFTMMU) += clock-vmstate.o
-+obj-$(CONFIG_SOFTMMU) += null-machine.o
- obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
- 
- common-obj-$(CONFIG_XILINX_AXI) += stream.o
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index cb47d9d..1adba5d 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -17,6 +17,9 @@
- #include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- #include "hw/core/cpu.h"
-+#ifdef TARGET_MIPS
-+#include "kvm_mips.h"
-+#endif
- 
- static void machine_none_init(MachineState *mch)
- {
-@@ -50,6 +53,9 @@ static void machine_none_machine_init(MachineClass *mc)
-     mc->no_floppy = 1;
-     mc->no_cdrom = 1;
-     mc->no_sdcard = 1;
-+#ifdef TARGET_MIPS
-+    mc->kvm_type = mips_kvm_type;
-+#endif
- }
- 
- DEFINE_MACHINE("none", machine_none_machine_init)
--- 
-2.7.0
+I tried same configuration with VirtualBox and everything was worked
+fine (serial connection was estabiled and copied several files from one
+machine into another machine), seems to be the emulated serial port has
+been worked fine.
 
+I would like to use qemu, i just thougt qemu is better, simple and
+faster...
+
+Exists solution or is this a qemu bug?
+
+Thank you!
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890775
+
+Title:
+  Aten USB to Serial bridge does not work with qemu under Windows 10
+
+Status in QEMU:
+  New
+
+Bug description:
+  I would like to use MSDOS 6.22 with qemu (unfortunatelly lot of our test =
+programs has been written in dos).
+  I tried to connect two laptop by RS232 port, one of the machine have a bu=
+ilt-in serial port and run with native MSDOS 6.22 with 4.0 norton commander=
+. Another machine have only USB ports and i try to use a new Aten USB to Se=
+rial device. Ok. Has been started qemu with -serial and -chardev parameters=
+, at startup appear a window with serial port setting such as baud rate, st=
+art bit, etc...
+
+  Quemu has been satrted succeeded but serial port cannot be used
+  becouse was nothing activited on usb serial adapter :(
+
+  I tried same configuration with VirtualBox and everything was worked
+  fine (serial connection was estabiled and copied several files from
+  one machine into another machine), seems to be the emulated serial
+  port has been worked fine.
+
+  I would like to use qemu, i just thougt qemu is better, simple and
+  faster...
+
+  Exists solution or is this a qemu bug?
+
+  Thank you!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890775/+subscriptions
 
