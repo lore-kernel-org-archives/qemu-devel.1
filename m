@@ -2,90 +2,88 @@ Return-Path: <SRS0=Waq1=BR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F61C433E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 22:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C05EFC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 22:26:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF9B52177B
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 22:18:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7ED642177B
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Aug 2020 22:26:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kxz74Vnf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF9B52177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iz3fvDBI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ED642177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k4AhJ-00073o-4w
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 18:18:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49546)
+	id 1k4Ap2-0001Hr-QR
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 18:26:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1k4AgS-0006df-0l
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 18:17:52 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:39133)
+ (Exim 4.90_1) (envelope-from <pavlica.nikola@gmail.com>)
+ id 1k4AoN-0000ro-Pr
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 18:26:03 -0400
+Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:46867)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1k4AgP-0007MF-W9
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 18:17:51 -0400
-Received: by mail-lj1-x241.google.com with SMTP id v9so3750375ljk.6
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 15:17:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=OG/wBUojSS/00nW3BrCFHx7KOwPsBnANh9eWUwG5Msc=;
- b=Kxz74VnfVWKVVqHKnDZFGXnZdrrDNUjTnF6foKDNRc+aB56ixvbEgfxkcd4rdmhvBf
- QqGiDwLbLAlfhYWI7BFzvk1UIAbeuf3/GH7fslV30F9zpXKsSqFSgDVhm2d8rh6B9aHI
- +tr0Cg/D5s46ij9kDOyaxwpDg2K2MDQ5rDRF2n6CvLh+qBP9W3YKzwJS6cVA7sdgqFxE
- tmIda3ntaJkEHJR4fwbI9ThGG44YxkI3Y4X2VKez+fHYCFOHaE7D8j9Fpcp8GcwkEYJT
- pEEEJNJzZfcnq9NBxi+ugBzvxvuNcOO/WQBZbG+nZSBiW+kQqUJC6KolqSXbo/WNqkgJ
- 1Uwg==
+ (Exim 4.90_1) (envelope-from <pavlica.nikola@gmail.com>)
+ id 1k4AoL-0008KE-Ci
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 18:26:03 -0400
+Received: by mail-ed1-x533.google.com with SMTP id q4so2291238edv.13
+ for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 15:26:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:subject:to:message-id:mime-version;
+ bh=mqAuQPRcrnUHFgEnYYWZkd4A2fD82UsdV7TRq2BmLbc=;
+ b=Iz3fvDBIpekxDcKIc0zhbEGmon3O2+/Vbp6BAQP/TAAxpOYoy4PaqD8Zd/Vz80kX2+
+ RwEKEBDVXVx3AoSqk8oGDbpyF74Awgiihdz7F1DT+r9ge2BjBsglh/lq1CcypKRyeCke
+ wziaAfbeyWW87MflA0vbGd/RF8xH4gKe4pcbI2fiuW4Kt/DFgJzEu9lNi6oib5gRpIqv
+ Na0/GoNCLguNjsYDkPVmSjMKY5gsEDAm7ATNn8zeqkuJ/cTtEfIqZzyU7iWdio2Sdybl
+ PJ2KQYgknHbk+3Ny9/xP28REsxJLk9l+23rOxjL73cKFe29hlnmZm6zeDNF4n0gxEPg4
+ 9XPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=OG/wBUojSS/00nW3BrCFHx7KOwPsBnANh9eWUwG5Msc=;
- b=rdNX32Biib/4K1VUVswvvIUFm/TPJaB+lomQZ+IylYBjIl+u3E/50gzO3NtGaSFZSc
- 4XLbbSEOXSqyH//RZsmX0INLWjEVrv+F+8TOtYcJD0S+wlVfpFoPN83BsJKTzNFGZneZ
- cX5gHaGcRdKB8ndbVToKa9iP06s1Jnj5pvndtf8aVNikgwA/JBemyVtOe/gJ+zDHXn9n
- /8uv6EfeM7ctKWU3Mb4aIH31kMlWPFC3/0gS6jHWFO+EyduXMDtV8Ev1qU8y3w0/OA+/
- B7iYPJCuguJ6vdRacyN/aM9/Pj83QirKZX6u3wn/xsWzzb6QxZ4e2uIAvyrtU3IlAsMN
- 8WkQ==
-X-Gm-Message-State: AOAM5319apKdDCgZ+QYJaKdlH+zTtuH4x5w8qef6AMK36jLDvz2YTz6w
- gVlMJT997bdT8TmzV3rboXbYh3rMRWHw6iMwvQXSQQ==
-X-Google-Smtp-Source: ABdhPJxZTOe9izNxrPFstlxdpD1GeTWKNtya9KB4r9Zkg18kSaisrNTqjn/hgBjuCmXk1ArLAabZlw0LlZuzCNr9HIE=
-X-Received: by 2002:a2e:9f0a:: with SMTP id u10mr6945805ljk.140.1596838666793; 
- Fri, 07 Aug 2020 15:17:46 -0700 (PDT)
+ h=x-gm-message-state:date:from:subject:to:message-id:mime-version;
+ bh=mqAuQPRcrnUHFgEnYYWZkd4A2fD82UsdV7TRq2BmLbc=;
+ b=RLIhkoRFifCCumgaxVyhOt977G/FJV4BXemXvN9KwlJdH+cwoe2lMu0RYTZAYZUuwy
+ lyMFmjZfvUGvL5NNY67nuJTT9gEVXbc8+SU4ik48jpWri/Pj/eFwNvrdN00FX+1lSKQF
+ YmmQ1tZ6Qfk8tzpkvzyddqJnT0CpXdzzq097FzQDMVfpqTCgESxgPt5FqmgEGV6du3Xu
+ Fq5j1F7zYvWWFf6nydvRLt0r2iumZHh0eOHOdt3nyq6PEihT+J/beuQz1w9OsOx9Oi1h
+ jPeHUjY+G2fkxKZxqii6Ii2XPJDse785IbNYAleJS6qEYqBHezmOXnpq6k7eTfgND+LJ
+ z1cg==
+X-Gm-Message-State: AOAM530kez7W2RmkakQhrrvrXEE6VRv4YOVJyRJoKtsf09CFRk9lii/H
+ p75OZba21FCI+G5rQjaOGxEF0QYd9KQ=
+X-Google-Smtp-Source: ABdhPJwEUDXjLSJI+gvtx0O9g5fsXpYGAfqYNGGpYu3a4Aflkp+H0bQj7uoQn7dBzbZOGSCGmiKmew==
+X-Received: by 2002:aa7:d7d7:: with SMTP id e23mr10518638eds.347.1596839158875; 
+ Fri, 07 Aug 2020 15:25:58 -0700 (PDT)
+Received: from [192.168.100.70] ([213.91.86.150])
+ by smtp.gmail.com with ESMTPSA id ch24sm6585892ejb.7.2020.08.07.15.25.57
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 07 Aug 2020 15:25:58 -0700 (PDT)
+Date: Sat, 08 Aug 2020 00:25:51 +0200
+From: Nikola Pavlica <pavlica.nikola@gmail.com>
+Subject: [PATCH] ui/gtk: Fix regression in gd_refresh_rate_milihz
+To: qemu-devel <qemu-devel@nongnu.org>
+Message-Id: <3ZSPEQ.MH51LARSPXFN2@gmail.com>
+X-Mailer: geary/3.36.2
 MIME-Version: 1.0
-References: <20200805181303.7822-1-robert.foley@linaro.org>
- <20200805181303.7822-2-robert.foley@linaro.org>
- <ca24d2c5-2c5e-eace-4cf2-90011e684485@linaro.org>
- <4e678ed7-fc36-7918-ce9e-7a7e309c56df@redhat.com>
- <CAEyhzFvveC=nhpo4uyJ_89J8Wi4+9NEc2T2Mk9mg6Y9ZMQjNSA@mail.gmail.com>
- <CAEyhzFvh79ViuXYLYyihTBS3d5dviGpOXjntAt95yyuwE+HwLA@mail.gmail.com>
-In-Reply-To: <CAEyhzFvh79ViuXYLYyihTBS3d5dviGpOXjntAt95yyuwE+HwLA@mail.gmail.com>
-From: Robert Foley <robert.foley@linaro.org>
-Date: Fri, 7 Aug 2020 18:18:08 -0400
-Message-ID: <CAEyhzFsMgQWr=sOM43-w3jwSgNyUiKMRKFGdRGRqxM5=offsGA@mail.gmail.com>
-Subject: Re: [PATCH v1 01/21] accel/tcg: Change interrupt/exception handling
- to remove implied BQL
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=robert.foley@linaro.org; helo=mail-lj1-x241.google.com
+Content-Type: multipart/alternative; boundary="=-s39s977ux+jYy+guGmh0"
+Received-SPF: pass client-ip=2a00:1450:4864:20::533;
+ envelope-from=pavlica.nikola@gmail.com; helo=mail-ed1-x533.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,149 +97,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>,
- Peter Puhov <peter.puhov@linaro.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We found cases where a few of the *_cpu_exec_interrupt per arch functions
-call CPU class's cc->do_interrupt function pointer (for example
-arm_cpu_exec_interrupt does this).
+--=-s39s977ux+jYy+guGmh0
+Content-Type: text/plain; charset=us-ascii; format=flowed
 
-This is an issue because *_cpu_exec_interrupt will hold the BQL across the
-call to cc->do_interrupt, and *_do_interrupt will also hold the BQL.
+ From: Nikola Pavlica <pavlica.nikola@gmail.com 
+<mailto:pavlica.nikola@gmail.com>>
 
-Most of the arches do not have this issue because they call the *_do_interrupt
-function for that arch directly, and in those cases we will change to call
-the function *_do_interrupt_locked.
+In January (I think), I suggested a fix for the constant refresh rate 
+issue in QEMU despite VMs being able to render graphics at a framerate 
+much higher than that.
 
-We see a few possible solutions to this:
+Here's the link to the patch in question:
+<https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg01343.html>
 
-1) We could go back to the option of conditionalizing the BQL inside
-   these few *_do_interrupt functions, only acquiring the BQL if it is not
-   already held.  I counted 3 different arches that directly use the
-->do_interrupt
-   function from their *_cpu_exec_interrupt.
+However, I've noticed that the fix for older systems that run a older 
+system of GTK fail to compile with my version of the patch. Which was 
+fixed here: 
+<https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg03386.html>, 
+but improperly.
 
-2) Another perhaps cleaner option is to add a new cpu class function
-->do_interrupt_locked.
-   This lets callers like *_cpu_exec_interrupt call to ->do_interrupt_locked
-   with lock held and solves the issue without resorting to conditional locking.
+The issue lies if the target system (that the package is build on) has 
+a higher version of GTK, let's say 3.24, it fails the #ifdef macro and 
+thus does not include the changes that I've made. I've noticed this 
+issue under the ArchLinux build system, which can be fixed by just 
+using the included macro for checking GTK versions.
 
-   Another benefit we could gain from this approach is to simplify our solution
-   overall by adding a common do_interrupt function.
+Also being that this is a regression and not a plain bugfix, is this 
+mergable into stable?
 
-   void cpu_common_do_interrupt(CPUState *cs)
-   {
-        CPUClass *cc = CPU_GET_CLASS(cpu);
-        qemu_mutex_lock_iothread();
-        cc->do_interrupt_locked(cpu);
-        qemu_mutex_unlock_iothread();
-    }
-   cc->do_interrupt would be set to cpu_common_do_interrupt by default
-in cpu_class_init.
-   In other words, the base cpu class would handle holding the BQL for us,
-   and we would not need to implement a new *_do_interrupt function
-for each arch.
+Signed-off-by: Nikola Pavlica <pavlica.nikola@gmail.com 
+<mailto:pavlica.nikola@gmail.com>>
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1968,7 +1968,7 @@ static GtkWidget 
+*gd_create_menu_machine(GtkDisplayState *s)
+  */
+ static int gd_refresh_rate_millihz(GtkWidget *window)
+ {
+-#ifdef GDK_VERSION_3_22
++#if GTK_CHECK_VERSION(3, 22, 0)
+     GdkWindow *win = gtk_widget_get_window(window);
 
-We are thinking that 2) would be a good option.
-
-What are the opinions on these possible solutions?  Or are there other
-solutions that we should consider here?
-
-Thanks & Regards,
--Rob
+     if (win) {
+-- 
+2.24.1
 
 
-On Thu, 6 Aug 2020 at 16:04, Robert Foley <robert.foley@linaro.org> wrote:
->
-> The comment around documenting the cpu_mutex fields and critical sections
-> got us thinking and revisiting our locking assumptions in cpu_handle_interrupt.
->
-> Initially we were thinking that removing the BQL from cpu_handle_interrupt
-> meant that we needed to replace it with the cpu mutex to protect the per cpu
-> data that is accessed like interrupt_request.  We are reconsidering this and
-> now thinking that the cpu mutex might not be needed here.
->
-> BQL is clearly needed to protect the critical section around the call to
-> ->cpu_exec_interrupt.  What else is the BQL protecting in cpu_handle_interrupt
-> that we need to consider?  Are we missing anything here?
->
-> It's also worth mentioning that we did give this approach a try.
-> We tried out changes to cpu_handle_interrupt(),
-> dropping the BQL from all but around ->cpu_exec_interrupt, and not using the
-> cpu_mutex at all.  It seemed to be functional, passing all the tests that
-> we tried (so far). :)
->
-> Thanks,
-> -Rob
->
-> On Thu, 6 Aug 2020 at 12:11, Robert Foley <robert.foley@linaro.org> wrote:
-> >
-> > On Thu, 6 Aug 2020 at 05:22, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > >
-> > > On 05/08/20 21:18, Richard Henderson wrote:
-> > > > On 8/5/20 11:12 AM, Robert Foley wrote:
-> > > >> This change removes the implied BQL from the cpu_handle_interrupt,
-> > > >> and cpu_handle_exception paths. This BQL acquire is being pushed
-> > > >> down into the per arch implementation.
-> > > >>
-> > > >> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> > > >> ---
-> > > >>  accel/tcg/cpu-exec.c | 19 +++++++++++--------
-> > > >>  1 file changed, 11 insertions(+), 8 deletions(-)
-> > > >>
-> > > >> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> > > >> index 80d0e649b2..8e2bfd97a1 100644
-> > > >> --- a/accel/tcg/cpu-exec.c
-> > > >> +++ b/accel/tcg/cpu-exec.c
-> > > >> @@ -517,9 +517,7 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
-> > > >>  #else
-> > > >>          if (replay_exception()) {
-> > > >>              CPUClass *cc = CPU_GET_CLASS(cpu);
-> > > >> -            qemu_mutex_lock_iothread();
-> > > >>              cc->do_interrupt(cpu);
-> > > >> -            qemu_mutex_unlock_iothread();
-> > > >>              cpu->exception_index = -1;
-> > > >>
-> > > >
-> > > > This patch is not bisectable.  The removal of the lock here needs to happen at
-> > > > the end, or something.
-> > >
-> > > Indeed the series should be structured like this:
-> > >
-> > > 1) rename all *_do_interrupt functions to *_do_interrupt_locked
-> > >
-> > > 2) add back *_do_interrupt that takes the BQL and calls
-> > > *_do_interrupt_locked, point ->do_interrupt to it, remove the BQL from
-> > > cpu-exec.c
-> > >
-> > > 3) modify the cpu_mutex and BQL critical sections around
-> > > ->cpu_exec_interrupt, so that the BQL critical section covers just the
-> > > call to ->cpu_exec_interrupt.  Document which fields are now covered by
-> > > cpu_mutex.
-> > >
-> > > 4/5) same as 1/2 for ->cpu_exec_interrupt
-> > >
-> > > Patches 1/2 would be pretty large, but they're trivial to review just by
-> > > grepping for "->do_interrupt\s*=", and likewise for 4/5.
-> > >
-> >
-> > Thanks for the details !
-> >
-> > It seems like we will have 3 separate patches for this series, 1/2, 3, and 4/5.
-> >
-> > We will go in this direction.
-> >
-> > Thanks,
-> > -Rob
-> >
-> > > Thanks,
-> > >
-> > > Paolo
-> > >
+--=-s39s977ux+jYy+guGmh0
+Content-Type: text/html; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+
+<div id=3D"geary-body" dir=3D"auto"><div><div><span style=3D"white-space: p=
+re-wrap;">From: Nikola Pavlica &lt;</span><a href=3D"mailto:pavlica.nikola@=
+gmail.com" style=3D"white-space: pre-wrap;">pavlica.nikola@gmail.com</a><sp=
+an style=3D"white-space: pre-wrap;">&gt;
+
+In January (I think), I suggested a fix for the constant refresh rate issue=
+ in QEMU despite VMs being able to render graphics at a framerate much high=
+er than that.</span></div><div><span style=3D"white-space: pre-wrap;"><br><=
+/span></div><div><span style=3D"white-space: pre-wrap;">Here's the link to =
+the patch in question:</span></div><div><a href=3D"https://lists.nongnu.org=
+/archive/html/qemu-devel/2020-01/msg01343.html">https://lists.nongnu.org/ar=
+chive/html/qemu-devel/2020-01/msg01343.html</a></div><div><br></div><div><s=
+pan style=3D"white-space: pre-wrap;">However, I've noticed that the fix for=
+ older systems that run a older system of GTK fail to compile with my versi=
+on of the patch. Which was fixed here: </span><a href=3D"https://lists.nong=
+nu.org/archive/html/qemu-devel/2020-01/msg03386.html">https://lists.nongnu.=
+org/archive/html/qemu-devel/2020-01/msg03386.html</a>, but improperly.</div=
+><div><br></div><div>The issue lies if the target system (that the package =
+is build on) has a higher version of GTK, let's say 3.24, it fails the #ifd=
+ef macro and thus does not include the changes that I've made. I've noticed=
+ this issue under the ArchLinux build system, which can be fixed by just us=
+ing the included macro for checking GTK versions.</div><div><span style=3D"=
+white-space: pre-wrap;"><br></span></div><div><span style=3D"white-space: p=
+re-wrap;">Also being that this is a regression and not a plain bugfix, is t=
+his mergable into stable?</span></div><div><span style=3D"white-space: pre-=
+wrap;">
+Signed-off-by: Nikola Pavlica &lt;</span><a href=3D"mailto:pavlica.nikola@g=
+mail.com" style=3D"white-space: pre-wrap;">pavlica.nikola@gmail.com</a><spa=
+n style=3D"white-space: pre-wrap;">&gt;
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1968,7 +1968,7 @@ static GtkWidget *gd_create_menu_machine(GtkDisplaySt=
+ate *s)
+  */
+ static int gd_refresh_rate_millihz(GtkWidget *window)
+ {
+-#ifdef GDK_VERSION_3_22
++#if GTK_CHECK_VERSION(3, 22, 0)
+     GdkWindow *win =3D gtk_widget_get_window(window);
+=20
+     if (win) {</span><div class=3D"geary-signature" style=3D"white-space: =
+pre-wrap;"><div class=3D"geary-signature"><div>--=20
+</div>2.24.1</div></div></div></div></div>
+--=-s39s977ux+jYy+guGmh0--
+
 
