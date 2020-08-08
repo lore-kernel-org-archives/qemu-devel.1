@@ -2,74 +2,82 @@ Return-Path: <SRS0=zX6u=BS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C508BC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 15:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A05FC433E0
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 15:35:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 839832070A
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 15:01:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18D102073E
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 15:35:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="BGTNm/s4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 839832070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tVcb95n0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18D102073E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k4QLm-00025S-Uf
-	for qemu-devel@archiver.kernel.org; Sat, 08 Aug 2020 11:01:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55116)
+	id 1k4QsA-0008KG-6o
+	for qemu-devel@archiver.kernel.org; Sat, 08 Aug 2020 11:35:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59456)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <michael@amarulasolutions.com>)
- id 1k4QKL-0001EA-Eb
- for qemu-devel@nongnu.org; Sat, 08 Aug 2020 11:00:05 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50699)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k4Qrb-0007u7-SH
+ for qemu-devel@nongnu.org; Sat, 08 Aug 2020 11:34:27 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46334)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <michael@amarulasolutions.com>)
- id 1k4QKH-00044k-Um
- for qemu-devel@nongnu.org; Sat, 08 Aug 2020 11:00:05 -0400
-Received: by mail-wm1-x344.google.com with SMTP id c80so4058402wme.0
- for <qemu-devel@nongnu.org>; Sat, 08 Aug 2020 08:00:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amarulasolutions.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=9cs+Y1zfivjkeFfEYNQVs2om6LQTf+0HH/MiwdQoc10=;
- b=BGTNm/s4fnyF1t1dVsYZWktK++pfA5ucC3Hh7qv6EUTjqtk4Wv1catsQihdlWc6JvL
- Hjnqp09uOqij18m86g4n2v9gDTFbEJk1eUOWCCdSHtkNpVrB+LywqnJB7EdBpty/9hWG
- KObJIJ9SjW7Rv5NsgUwQt32gbnFo2kkQBsnIg=
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k4QrZ-0007Dz-Px
+ for qemu-devel@nongnu.org; Sat, 08 Aug 2020 11:34:27 -0400
+Received: by mail-oi1-x243.google.com with SMTP id v13so4807276oiv.13
+ for <qemu-devel@nongnu.org>; Sat, 08 Aug 2020 08:34:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=7sftBr7LKTAk3RFrIYZ1neFv14Pai/abhc/5UKu9Szc=;
+ b=tVcb95n0qsFX0ZO2OaejnvGcojOCLRAoAsKQP1yNUKf+3wHfnAvLoJ9TFR9aKe0liI
+ +8z3flSORO5DRQwFS/GK3DvHj3Jmqm+4XRrvHwFVXiHlBkLj8VwcxqhSftZ3+JVoBHIv
+ HBbmOrl3y2HGCc7DyybrQhdg/gEIoIOBkIa3y08Q53Qeww6uNTP+KgGeTb5eOhCTypDX
+ B2/9yiK/oZWvIzx2D1bGXlk1c/kS0do4RAEKqNjznd/uL9g8Obi4MzvOVcYqSW7eGFTq
+ 2Lg/IySyj7XbxjJftFWlWcEtWYEEtkTL053Te84m26tY3cIydphjplcmf0lHZtpizWxQ
+ IbAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=9cs+Y1zfivjkeFfEYNQVs2om6LQTf+0HH/MiwdQoc10=;
- b=XzxSVG99pHkHVExK3LOFm9LSmnCokLJCorv/ZCbPqjF0pYTgfjOhYbjjhtRwhDV5bc
- uDgUXzpUxGOwCHZPnL/jms/dS6oQD4BGUbglZtQkaKV19+RlmnWZJeY9AyoAHsuo8eXS
- 0DzjkMTIYmfQiRKPjc33UcU1KIGoZd+iQDt32n41ZId7WkAbQx7NrtX++ULor6hFE3KB
- V5voNGIfT+nq8nN2WEHNWLl6nZ8xgbG7gNaPCQv01GCyPc5ObRVeSTN8S5FYVIwqln1g
- FwY1RWS1mVgmaVas344dvQZgQ8u3UTdn82VxFDxSUZqFDuDCFv35lg+7HRwovxj5hjS5
- gVGg==
-X-Gm-Message-State: AOAM530qZSKxI1M9KhrtolDvKdSMawfyd4LDDI978PXWYd/xWnfxOuke
- RWdGRY7Kc2vx3GbbvvScZW9eif/pLxnury9oFeTbCK+C3qc=
-X-Google-Smtp-Source: ABdhPJzYCpwF9WmTsFzv/4FMYHMolZ3TqCp9zUoNeMfTKQrDnrBxFhk0JRniyAGLHUrVia3HJZ8MAHFwWojRWzAXiBQ=
-X-Received: by 2002:a1c:2646:: with SMTP id m67mr18377558wmm.137.1596898798389; 
- Sat, 08 Aug 2020 07:59:58 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=7sftBr7LKTAk3RFrIYZ1neFv14Pai/abhc/5UKu9Szc=;
+ b=FrAwAsZ8K84HlzMww/SjtAsUEsgO67I+gjJl9223lwgSjOwVO4IUotbYX/I09f+lEU
+ ou0BjxjwmYaOn7twkZ1v4dJHnXTuhpfD0iqnkcwatdd3v+LVbrOnuHog0EFJeafdHmEf
+ 1eChCviAwmGvjJKXnvyLUG0ykDXkW0uxNHptND6+uylSxIFxMRKJ2hB9PSEp5Pd7KwPF
+ jI3G2CuBuLf1NuaBjMrek7/dY6e7FL1doCtsXj0SL9NOdqGlGnmTCKaT0An5xhSZDuLw
+ 5MU9C3hmz62OtO1bObGWDzcHstdUziKcP1fMNcswQjDgbXTzD29xyH9Wa1IFw5FqWFFG
+ 9P7Q==
+X-Gm-Message-State: AOAM530GybJWttXKrPo61n5ARaCMKmZcI+mJJVzvTXTxgF3PkPc55CgH
+ RmWAbJ/82g8XVuQW+NWqsjTyuT1/kq2f1gsyRzMttw==
+X-Google-Smtp-Source: ABdhPJzcNaMFIezvZOMUNpzLYQmnmJdGcnh7kLxnde1C6bnuQ4YcJW8JYWw0EwkqWKdiqjChbokSA5TgtOORPwyrzsQ=
+X-Received: by 2002:aca:50c4:: with SMTP id
+ e187mr15161897oib.146.1596900863619; 
+ Sat, 08 Aug 2020 08:34:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAOf5uwkxAVNs_=TtVwUiEKyp+UZO_bT26sdCneR679Q5hZ_J2A@mail.gmail.com>
-In-Reply-To: <CAOf5uwkxAVNs_=TtVwUiEKyp+UZO_bT26sdCneR679Q5hZ_J2A@mail.gmail.com>
-From: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>
-Date: Sat, 8 Aug 2020 16:59:46 +0200
-Message-ID: <CAOf5uw=_tT1h612vnsHjCSRWhQg3_rFWeh9cic86sgKX8ZGubg@mail.gmail.com>
-Subject: Re: usb-wacom-tablet failing to register
-To: qemu-devel@nongnu.org
+References: <20200615225827.183062-1-joe.slater@windriver.com>
+ <CAFEAcA_ZU_w7PaYFVVaW1vzGySOLaNaThVcNQFNmd_GV-hG6Qw@mail.gmail.com>
+ <CAFEAcA8BtVkBbHtLt-kB-AcZnN9YWtBahKTQ0wSvHWojF9CinQ@mail.gmail.com>
+ <CAMxuvaxUqrq77_io9j6k7EU91vm7iEEBaTwLNsKd9YJ9NVR7rw@mail.gmail.com>
+ <20200808013531.GA166030@google.com>
+In-Reply-To: <20200808013531.GA166030@google.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 8 Aug 2020 16:34:12 +0100
+Message-ID: <CAFEAcA__4GwKKe9rY4ut41f-S-u_AnSkdwHvSX0YoaPwjO3ARw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] os_find_datadir: search as in version 4.2
+To: Brian Norris <briannorris@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=michael@amarulasolutions.com; helo=mail-wm1-x344.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=peter.maydell@linaro.org; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -91,76 +99,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Joe Slater <joe.slater@windriver.com>, "MacLeod,
+ Randy" <randy.macleod@windriver.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
-
-What I have seen is that the parse fail to execute
-hid ll_driver parse fai for
-
- ret = hid_get_class_descriptor(dev, interface->desc.bInterfaceNumber,
-                        HID_DT_REPORT, rdesc, rsize);
-
-Now this is not implemented in hw/dev-wacom.c . What am I missing?
-
-#!/bin/sh
-IMAGE_DIR="${0%/*}/"
-
-if [ "${1}" = "serial-only" ]; then
-    EXTRA_ARGS='-nographic'
-else
-    EXTRA_ARGS='-serial stdio'
-fi
-
-export PATH="/home/michael/work/amarula/buildroot/output/host/bin:${PATH}"
-exec   qemu-system-i386 -M pc -kernel ${IMAGE_DIR}/bzImage -usb
--device usb-wacom-tablet -drive
-file=${IMAGE_DIR}/rootfs.ext2,if=virtio,format=raw -append "rootwait
-root=/dev/vda console=tty1 console=ttyS0"  -net nic,model=virtio -net
-use
-r  ${EXTRA_ARGS}
-
-This is how I run it
-
-Michael
-
-On Sat, Jul 11, 2020 at 4:38 PM Michael Nazzareno Trimarchi
-<michael@amarulasolutions.com> wrote:
+On Sat, 8 Aug 2020 at 02:35, Brian Norris <briannorris@chromium.org> wrote:
 >
-> Hi all
+> Hello!
 >
-> On my 4.17.0-rc1 linux kernel i386 running on qemu, I can't register
-> the wacom driver emulation
-> QEMU emulator version 4.2.0 (Debian 1:4.2-3ubuntu6.3)
-> Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+> On Wed, Jul 15, 2020 at 11:57:14PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
+> >
+> > On Wed, Jul 15, 2020 at 11:37 PM Peter Maydell <peter.maydell@linaro.or=
+g> wrote:
+> > >
+> > > On Tue, 16 Jun 2020 at 10:19, Peter Maydell <peter.maydell@linaro.org=
+> wrote:
+> > > >
+> > > > On Tue, 16 Jun 2020 at 00:00, Joe Slater <joe.slater@windriver.com>=
+ wrote:
+> > > > >
+> > > > > Always look for ../share/qemu then ../pc-bios when looking for da=
+tadir.
+> > > >
+> > > > Could you provide some more context, please? Why is this
+> > > > change useful; presumably we broke some setup in 5.0, but
+> > > > what exactly ?
+> > > >
+> > > > I'm guessing this might be a regression introduced by commit
+> > > > 6dd2dacedd83d12328 so I'm ccing the relevant people.
+> > >
+> > > Marco, Paolo: ping? Another user has just asked me the status
+> > > of this as they also ran into this regression in what directories
+> > > we search...
+> >
+> > Thanks for the heads-up, I didn't see that bug/mail. Indeed, that
+> > commit assumed that either we run from a build directory or from an
+> > installed qemu. It seems this is hybrid approach, which I didn't know
+> > we supported. I'll check it.
 >
-> [    0.395368] ata2.00: configured for MWDMA2
-> [    0.397049] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM
->   2.5+ PQ: 0 ANSI: 5
-> [    0.584135] usb 2-1: new full-speed USB device number 2 using xhci_hcd
-> [    0.734449] usb 2-1: New USB device found, idVendor=056a,
-> idProduct=0000, bcdDevice=42.10
-> [    0.734461] usb 2-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-> [    0.734466] usb 2-1: Product: Wacom PenPartner
-> [    0.734470] usb 2-1: Manufacturer: QEMU
-> [    0.734474] usb 2-1: SerialNumber: 1-0000:00:04.0-1
-> [    0.737347] usbhid 2-1:1.0: can't add hid device: -32
-> [    0.737366] usbhid: probe of 2-1:1.0 failed with error -32
+> Add one more to the pile! Chrome OS noticed this when upgrading to
+> 5.0.0:
 >
-> I get back an error. Any suggestions?
+> https://bugs.chromium.org/p/chromium/issues/detail?id=3D1114204#c8
 >
-> Michael
+> I'd love to see this applied to a release.
 
+It's just missed 5.1, unfortunately :-(
 
+Marc-Andr=C3=A9, did you want to review it ?
 
--- 
-Michael Nazzareno Trimarchi
-Amarula Solutions BV
-COO Co-Founder
-Cruquiuskade 47 Amsterdam 1018 AM NL
-T. +31(0)851119172
-M. +39(0)3479132170
-[`as] https://www.amarulasolutions.com
+thanks
+-- PMM
 
