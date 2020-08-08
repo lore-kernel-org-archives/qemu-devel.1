@@ -2,93 +2,96 @@ Return-Path: <SRS0=zX6u=BS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E66C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 01:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F42AC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 01:41:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60FFC20866
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 01:02:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EAD22087C
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 01:41:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YcF4LvLA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60FFC20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EhVgPjk7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EAD22087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k4DFh-0007Af-Gg
-	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 21:02:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46912)
+	id 1k4Dr2-0006bp-Db
+	for qemu-devel@archiver.kernel.org; Fri, 07 Aug 2020 21:41:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavlica.nikola@gmail.com>)
- id 1k4DER-0006iY-Jj
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 21:01:08 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:39482)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pavlica.nikola@gmail.com>)
- id 1k4DEP-0007ZG-HI
- for qemu-devel@nongnu.org; Fri, 07 Aug 2020 21:01:07 -0400
-Received: by mail-ed1-x543.google.com with SMTP id c10so2472083edk.6
- for <qemu-devel@nongnu.org>; Fri, 07 Aug 2020 18:01:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:subject:to:message-id:in-reply-to:references:mime-version;
- bh=GJVdgaa2l3XkKlfMAGObqxZQM3x5pHsXqacaf3ls4G8=;
- b=YcF4LvLA4GmuU+8KBa6dwE/TybRP1Y/etoF4xtgON5b9IINy5CDAtT4H5qN4oeiwmW
- nxZpPP2q3bEENc5ExJ1aRHtUyok8RSf9e1GgkucGbbP5U1hfaTqa2OvwfPaz3gOXBidn
- GrsR6fHcKYhBK/yUcCwgcPFQ2BPA19r5ZkJ/YCc+7km14Tr8faQiEg+zRR4ZV2hVRAfw
- /pibWuYEfAp1x0f92/JbaX/eDT1oHEDq+kwBbm9r/Vtdba8Mtb5JJodQE4U70q86Gofs
- Xi7krIjXoxVq9Dy5kKknprjT4goKSuCDJh53hazWvlKx3sWnccRKmm2Qv74jsG4oJ+Ot
- 878w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:subject:to:message-id:in-reply-to
- :references:mime-version;
- bh=GJVdgaa2l3XkKlfMAGObqxZQM3x5pHsXqacaf3ls4G8=;
- b=cs9Ovn+5HNU4u1M0w/nQtj4OrQqWw752r340FxAvR+oHQPUz1U6iEVkzWVs6k0JkFV
- wPCS3b2MIHSGiSTOY4uIJVYRqzldeLGk8GRKpJljPGkKybRKiWRH3d50MapDGYaNhJxw
- 3J9F9eWzVkQJQdYnFd1HabILrgLOeBZvX0AsCYL/h/6T7Ty45Yoxov5tnL+HbJ7FYXOI
- md5hMseBmAESrkt79jRmtVlJddet+IWr6DGgzJMequC9FWk8fkBub5KlGtol0nVyk2vf
- vfb0rBRw6J9MYTiJvQrQa/P86PJTPV+xxyMzWQlXhu7YYc+Q1+cIrDQbXpWqX0Mmp/iC
- WdgA==
-X-Gm-Message-State: AOAM530qbELu36xLkwuHDefvwEw0fJapc3WDkd4aEP5skvdAQ2tcXjjB
- cLIo5FLlLrE+JYhPMSBBNf9vghol/is=
-X-Google-Smtp-Source: ABdhPJwaBY2dDVAfSwmaYws4XEASnnJDaROjj5uZGgPDep+yyNMJ5Gne79Jn4Sw+lmMEZKcwOmz6QQ==
-X-Received: by 2002:a05:6402:1758:: with SMTP id
- v24mr11614286edx.274.1596848462012; 
- Fri, 07 Aug 2020 18:01:02 -0700 (PDT)
-Received: from [192.168.100.70] ([213.91.86.150])
- by smtp.gmail.com with ESMTPSA id ci27sm7030834ejc.23.2020.08.07.18.01.00
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Aug 2020 18:01:01 -0700 (PDT)
-Date: Sat, 08 Aug 2020 03:00:54 +0200
-From: Nikola Pavlica <pavlica.nikola@gmail.com>
-Subject: Re: [PATCH] ui/gtk: Fix regression in gd_refresh_rate_milihz
-To: qemu-devel <qemu-devel@nongnu.org>
-Message-Id: <I50QEQ.VVKN9R86QAN22@gmail.com>
-In-Reply-To: <3ZSPEQ.MH51LARSPXFN2@gmail.com>
-References: <3ZSPEQ.MH51LARSPXFN2@gmail.com>
-X-Mailer: geary/3.36.2
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1k4DpD-00069H-Jp
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 21:39:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40593
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1k4DpA-00030P-Dy
+ for qemu-devel@nongnu.org; Fri, 07 Aug 2020 21:39:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1596850742;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pOs+Txjsncb0n0AmiMGnwc0sOau+Ot9y87JuiIGXrx8=;
+ b=EhVgPjk7ZiqSRSTgAq8g0R0mJa7GhaUMMJFjsCz/BsT9J/fD11QJPQ7nC5uczNBxfRaT9G
+ TdBpSQjVugFPUhL0sXS/vjMOkZ39j2laMSUXm6mfpWaf6M2ML/CP7o5oOSOIFiWWe0kMpT
+ mZvzCvKKU9l6CfjK5a6Ii1kN2mwglE4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-NhiNJlFOMTuNxdo8jzXIYw-1; Fri, 07 Aug 2020 21:38:59 -0400
+X-MC-Unique: NhiNJlFOMTuNxdo8jzXIYw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFD02801A03;
+ Sat,  8 Aug 2020 01:38:58 +0000 (UTC)
+Received: from localhost (ovpn-113-123.rdu2.redhat.com [10.10.113.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 627FC59;
+ Sat,  8 Aug 2020 01:38:58 +0000 (UTC)
+Date: Fri, 7 Aug 2020 21:38:57 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH 3/4] crypto: use QOM macros for declaration/definition of
+ secret types
+Message-ID: <20200808013857.GF1700540@habkost.net>
+References: <20200723181410.3145233-1-berrange@redhat.com>
+ <20200723181410.3145233-4-berrange@redhat.com>
+ <20200723185006.GR1274972@habkost.net>
+ <20200724091245.GC3146350@redhat.com>
+ <20200806180154.GE1700540@habkost.net>
+ <20200807111148.GI120942@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="=-dt3kw3m/bfnl1GwGYjAJ"
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=pavlica.nikola@gmail.com; helo=mail-ed1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200807111148.GI120942@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/07 20:01:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,113 +104,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-dt3kw3m/bfnl1GwGYjAJ
-Content-Type: text/plain; charset=us-ascii; format=flowed
-
-Apologies, false alarm.
-
-I found out that my testing methodology was flawed. Close this.
-
-On Sat, Aug 8, 2020 at 00:25, Nikola Pavlica <pavlica.nikola@gmail.com> 
-wrote:
-> From: Nikola Pavlica <pavlica.nikola@gmail.com 
-> <mailto:pavlica.nikola@gmail.com>>
+On Fri, Aug 07, 2020 at 12:11:48PM +0100, Daniel P. Berrangé wrote:
+> On Thu, Aug 06, 2020 at 02:01:54PM -0400, Eduardo Habkost wrote:
+> > On Fri, Jul 24, 2020 at 10:12:45AM +0100, Daniel P. BerrangÃƒÂ© wrote:
+> > > On Thu, Jul 23, 2020 at 02:50:06PM -0400, Eduardo Habkost wrote:
+> > > > On Thu, Jul 23, 2020 at 07:14:09PM +0100, Daniel P. BerrangÃƒÂ© wrote:
+> > > > > This introduces the use of the OBJECT_DEFINE and OBJECT_DECLARE macro
+> > > > > families in the secret types, in order to eliminate boilerplate code.
+> > > > > 
+> > > > > Signed-off-by: Daniel P. BerrangÃƒÂ© <berrange@redhat.com>
+> > > > > ---
+> > > > >  crypto/secret.c                 | 24 ++++--------------------
+> > > > >  crypto/secret_common.c          | 32 +++++++++-----------------------
+> > > > >  crypto/secret_keyring.c         | 28 +++++++++-------------------
+> > > > >  include/crypto/secret.h         | 11 ++---------
+> > > > >  include/crypto/secret_common.h  | 13 ++-----------
+> > > > >  include/crypto/secret_keyring.h | 18 ++----------------
+> > > > >  6 files changed, 28 insertions(+), 98 deletions(-)
+> > > > > 
+> > > > 
+> > > > Beautiful.
+> > > > 
+> > > > I wonder how hard it would be to automate this.  I'm assuming
+> > > > Coccinelle won't be able to deal with the macro definitions, but
+> > > > a handwritten conversion script would be really useful for
+> > > > dealing with our 1226 static TypeInfo structs.
+> > > 
+> > > Probably possible to do a reasonably good job with a perl script or
+> > > similar. The code patterns to be replaced are reasonably easy to
+> > > identify with a few regexes.
+> > 
+> > I've attempted to parse all the TypeInfo structs in the tree.
+> > The data I've extracted is available at:
+> > https://gist.github.com/ehabkost/7a398640492f369685c789ffed0f67aa
+> > 
+> > It turns out 230 of our 1259 TypeInfo variables don't have
+> > instance_size set and don't have their own struct type defined.
+> > 
+> > We could:
+> > * Make that a supported use case, and add helper macros that don't
+> >   require MyDevice to be defined;
+> > * Make that not supported, and convert those 230 types automatically; or
+> > * Make that not supported, and convert those 230 types manually.
 > 
-> In January (I think), I suggested a fix for the constant refresh rate 
-> issue in QEMU despite VMs being able to render graphics at a 
-> framerate much higher than that.
+> When we force an instance struct, we also force definition of an
+> instance init and finalize function.
 > 
-> Here's the link to the patch in question:
-> <https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg01343.html>
-> 
-> However, I've noticed that the fix for older systems that run a older 
-> system of GTK fail to compile with my version of the patch. Which was 
-> fixed here: 
-> <https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg03386.html>, 
-> but improperly.
-> 
-> The issue lies if the target system (that the package is build on) 
-> has a higher version of GTK, let's say 3.24, it fails the #ifdef 
-> macro and thus does not include the changes that I've made. I've 
-> noticed this issue under the ArchLinux build system, which can be 
-> fixed by just using the included macro for checking GTK versions.
-> 
-> Also being that this is a regression and not a plain bugfix, is this 
-> mergable into stable?
-> 
-> Signed-off-by: Nikola Pavlica <pavlica.nikola@gmail.com 
-> <mailto:pavlica.nikola@gmail.com>>
-> --- a/ui/gtk.c
-> +++ b/ui/gtk.c
-> @@ -1968,7 +1968,7 @@ static GtkWidget 
-> *gd_create_menu_machine(GtkDisplayState *s)
->   */
->  static int gd_refresh_rate_millihz(GtkWidget *window)
->  {
-> -#ifdef GDK_VERSION_3_22
-> +#if GTK_CHECK_VERSION(3, 22, 0)
->      GdkWindow *win = gtk_widget_get_window(window);
-> 
->      if (win) {
-> --
-> 2.24.1
+> 230 types is probably enough to justify a further macro that allows
+> the instance struct, init & finalize funtions to be omitted.
 
+Status update: the TypeInfo parser evolved to become a converter
+able to replace the type checking macros (automatic conversion of
+TypeInfo declarations will be done soon).
 
---=-dt3kw3m/bfnl1GwGYjAJ
-Content-Type: text/html; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+https://github.com/ehabkost/qemu-hacks/commits/work/qom-macros-autoconvert
 
-<div id=3D"geary-body" dir=3D"auto">Apologies, false alarm.<div><br></div><=
-div>I found out that my testing methodology was flawed. Close this.</div></=
-div><div id=3D"geary-quote" dir=3D"auto"><br>On Sat, Aug 8, 2020 at 00:25, =
-Nikola Pavlica &lt;pavlica.nikola@gmail.com&gt; wrote:<br><blockquote type=
-=3D"cite"><div id=3D"geary-body" dir=3D"auto"><div><div><span style=3D"whit=
-e-space: pre-wrap;">From: Nikola Pavlica &lt;</span><a href=3D"mailto:pavli=
-ca.nikola@gmail.com" style=3D"white-space: pre-wrap;">pavlica.nikola@gmail.=
-com</a><span style=3D"white-space: pre-wrap;">&gt;
+Additional obstacles we'll need to address:
 
-In January (I think), I suggested a fix for the constant refresh rate issue=
- in QEMU despite VMs being able to render graphics at a framerate much high=
-er than that.</span></div><div><span style=3D"white-space: pre-wrap;"><br><=
-/span></div><div><span style=3D"white-space: pre-wrap;">Here's the link to =
-the patch in question:</span></div><div><a href=3D"https://lists.nongnu.org=
-/archive/html/qemu-devel/2020-01/msg01343.html">https://lists.nongnu.org/ar=
-chive/html/qemu-devel/2020-01/msg01343.html</a></div><div><br></div><div><s=
-pan style=3D"white-space: pre-wrap;">However, I've noticed that the fix for=
- older systems that run a older system of GTK fail to compile with my versi=
-on of the patch. Which was fixed here: </span><a href=3D"https://lists.nong=
-nu.org/archive/html/qemu-devel/2020-01/msg03386.html">https://lists.nongnu.=
-org/archive/html/qemu-devel/2020-01/msg03386.html</a>, but improperly.</div=
-><div><br></div><div>The issue lies if the target system (that the package =
-is build on) has a higher version of GTK, let's say 3.24, it fails the #ifd=
-ef macro and thus does not include the changes that I've made. I've noticed=
- this issue under the ArchLinux build system, which can be fixed by just us=
-ing the included macro for checking GTK versions.</div><div><span style=3D"=
-white-space: pre-wrap;"><br></span></div><div><span style=3D"white-space: p=
-re-wrap;">Also being that this is a regression and not a plain bugfix, is t=
-his mergable into stable?</span></div><div><span style=3D"white-space: pre-=
-wrap;">
-Signed-off-by: Nikola Pavlica &lt;</span><a href=3D"mailto:pavlica.nikola@g=
-mail.com" style=3D"white-space: pre-wrap;">pavlica.nikola@gmail.com</a><spa=
-n style=3D"white-space: pre-wrap;">&gt;
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1968,7 +1968,7 @@ static GtkWidget *gd_create_menu_machine(GtkDisplaySt=
-ate *s)
-  */
- static int gd_refresh_rate_millihz(GtkWidget *window)
- {
--#ifdef GDK_VERSION_3_22
-+#if GTK_CHECK_VERSION(3, 22, 0)
-     GdkWindow *win =3D gtk_widget_get_window(window);
-=20
-     if (win) {</span><div class=3D"geary-signature" style=3D"white-space: =
-pre-wrap;"><div class=3D"geary-signature"><div>--=20
-</div>2.24.1</div></div></div></div></div></blockquote></div>
---=-dt3kw3m/bfnl1GwGYjAJ--
+- Sometimes the struct typedefs are in a completely different
+  file from the type checking macros.  I've worked around this
+  problem by introducing macros that will only add the type
+  casting functions, but no typedefs.
+- There's some usage of const object pointers in the code,
+  which breaks the new type cast functions:
+  https://travis-ci.org/github/ehabkost/qemu-hacks/jobs/716033062#L1417
+
+We can probably use _Generic to make the type cast functions
+const-safe, but I'm sure this will break existing code that
+expects the type casts to always return non-const pointers.
+
+-- 
+Eduardo
 
 
