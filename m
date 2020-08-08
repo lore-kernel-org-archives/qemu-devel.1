@@ -2,117 +2,119 @@ Return-Path: <SRS0=zX6u=BS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4469DC433E3
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 13:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E973EC433E1
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 13:04:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 136C32053B
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 13:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0ED720866
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Aug 2020 13:04:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="G6jtDmLG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 136C32053B
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="YFupznq4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0ED720866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=outlook.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k4OVA-000726-9b
-	for qemu-devel@archiver.kernel.org; Sat, 08 Aug 2020 09:03:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51740)
+	id 1k4OWe-0001wn-Sd
+	for qemu-devel@archiver.kernel.org; Sat, 08 Aug 2020 09:04:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <weiying_hou@outlook.com>)
- id 1k4Kf6-0007Kg-4S; Sat, 08 Aug 2020 04:57:08 -0400
-Received: from mail-oln040092254044.outbound.protection.outlook.com
- ([40.92.254.44]:60494 helo=APC01-PU1-obe.outbound.protection.outlook.com)
+ id 1k4HHl-0007el-LD; Sat, 08 Aug 2020 01:20:49 -0400
+Received: from mail-oln040092253068.outbound.protection.outlook.com
+ ([40.92.253.68]:37206 helo=APC01-SG2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <weiying_hou@outlook.com>)
- id 1k4Kf4-0007EL-Bs; Sat, 08 Aug 2020 04:57:07 -0400
+ id 1k4HHg-0003EE-JL; Sat, 08 Aug 2020 01:20:45 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IuhR1Ou55m/ZflQPBexGK+Ac2qIm0TUhhEMDHdTUXuLWWR86oQZUQjeXHibv9yaWYBFAy4nsN7RLUnHlJUzcL2xc/JOUKg0D4ZHo30LMCUHuePsBkWNKZODmwRq8EaI8e20flKaZOOYmL22F552hONf3XA/kqdZS079ybgNFRGevaKZRJAz/0lwymaP3synaLTjYrk6ZbXRC1qMe86VqfT/8SCebRSKP0sRB41fYs3zcYG8fL4onrPGkWOROBe0wiPGqFZs9FTzUaNhD+8WVeQZEiFX/4hbMYJjQB92sl0ArMhlHc2kVRqetY+KI7+0rd4Qjdl1yA/L9aTkq/zy0LA==
+ b=YHNiKOeGMViQSh/EYZ5W8lh0pPoS6R08qyScu+1atbUlsGM7pWejvLTy4xtmH4Z6qbMX7D6A7/kgalwFjtlb0Ef1VuB2V9t3Pbxnm5WRbijdOIGG0qWt8nXblchFlGknyaCzldvlUs1yvvCGPmZ+xEwBm+LzWCBq5svLA7kSd/tWjggjYxpM6EGPUOiEDrDgDmti74hywX+zhF0FcvngDcVQ7oK7ZNlPZFS/xLfbdahsLyfF0YE4d1opAUM4eB3xh78/Vm5Izzj5WAvsDundPjq88diSqAU8qhWUz3bQrdyvmuY7TC918fTVIXeOrKdm4YvzeiKiOP2WZJmeTenEbw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uSe+h3YqVKXjPPJg0a5xr4TuLg8up0FeIB7A9Cx7qh0=;
- b=Et+RP5gaWqIQNdMHlHj6mvSSKvlpWdDN5qcMC0FFQzpGoO2GPNQew21CcZWal85fyXOhxwHOUjLW+ZbucZuinNX2qPy6vrxpjaL4zvdLDZOWGT4v+6ldfDxPfbiK6HZbn+uUD2Bq9j7OjqEXcSOHDvmRyJRk+eKio4QGAuO27QK8MZsaNeurHAwzJ2vT3ig+cN5R4YR7JVzzzNb8lrvFsc+5OP+GUCF9o1I/0rrsNON4hKtbJoljUjdAyZjhhdOnTne0fd5v/vyH0inij75ABga5A2GJerLQoMkb3RYRPRa9WF6bSr0B5Fdrsh67ju/bR3a6qRLMUYPJuv/yI1bV0A==
+ bh=KJQp5LnvRu+Lsc3qDb6WkZP4+QwKlHSumw/vknLoROs=;
+ b=iKUgPOEFFggGNqR1/VkdA8eNpyDT8Q7F7cPBBGym4ojtDLb6sHDpkRcHi0IVARrJkX5Va1gSoV5n22chrNvQJgqV/GQKfUYne+/3YJafD8bF5wk8sxNVoFecv7F5AvboWU1VcDeCEDkdA1n9Bka9yERI/vBtAMGOw8IWzHHGOaJHBWs3OW9SuOQ/xSN3YGaAliqm8f8Agz9/Ul9OXSEX7LlzjL3lFc2xLoPO7TarzAVNtAQ8J1wc0AhYnlA9zEmz94No/DBjLZFsk2dj0p9Ns/HLPIlKmQorzpDifss+ZP4opM02DNvC7tBLcPuLLTYiRygp9KK6TsOy4eriDEL+qA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uSe+h3YqVKXjPPJg0a5xr4TuLg8up0FeIB7A9Cx7qh0=;
- b=G6jtDmLGEEMzgPs4fakKiu+bZJYYSXxPxjKIUxVsTc4o2GWVMVooZ6uIyrlVpflpQOTcPZblrafFaiows89UsZeqadALprobGUp6uJSdqWUgxl8iaFuAj8P11mcMc+Pqw1Uv0ag9qOfTlZeW792uIbUj0lql7EHGoHa3ot3u6WgfD4WZ1KiUbaa0fb/q1kbgH78w78aF6TKRu/B3rFj0NF//3Fb8nvWrH6R0MqTZz6YFdBbTCedj/rsbHTGylR14vvWU9rsXcsPf+N9qtFWqMiX+zbi7E5WOt9S6TxXn109K6qjqJ1j+DM3yaNrKTGhaZgh2j9xLn86W70OrBKFgnw==
-Received: from SG2APC01FT013.eop-APC01.prod.protection.outlook.com
- (2a01:111:e400:7ebd::47) by
- SG2APC01HT031.eop-APC01.prod.protection.outlook.com (2a01:111:e400:7ebd::265)
+ bh=KJQp5LnvRu+Lsc3qDb6WkZP4+QwKlHSumw/vknLoROs=;
+ b=YFupznq4d3fMLp1nPnJsDKLUflxxnsW9lmw+rp0tFMRLkF879xDR42lMyjwvVhsFlcsFUe1V7udse6DqdAUbDF/g11hvmHP9ppkVsswgh+i/yv9DudmXFbgys4ZPWk0ClGcbqoO3obtWqv/nYD/AIwNvSfqx7p50fKK30JPKm0eERcNgxKdLM8A58qwJqyHBG4B61mQupHh5xv1uzIaDyHeUsaigUAzacIzkg/v6GkCu3cdQGFYtzWh14aJd2rIDGRhXM9xWKls1JSFy7d+AST2TIlLZuqAvCGF0+2MYvfGXU2zHjBMMk/4d+0lVyYiydx+M17lwLymlgLQ474AMVA==
+Received: from HK2APC01FT029.eop-APC01.prod.protection.outlook.com
+ (2a01:111:e400:7ebc::4c) by
+ HK2APC01HT180.eop-APC01.prod.protection.outlook.com (2a01:111:e400:7ebc::467)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.16; Sat, 8 Aug
- 2020 08:57:00 +0000
+ 2020 05:20:38 +0000
 Received: from SG2PR02MB2634.apcprd02.prod.outlook.com
- (2a01:111:e400:7ebd::50) by SG2APC01FT013.mail.protection.outlook.com
- (2a01:111:e400:7ebd::186) with Microsoft SMTP Server (version=TLS1_2,
+ (2a01:111:e400:7ebc::53) by HK2APC01FT029.mail.protection.outlook.com
+ (2a01:111:e400:7ebc::195) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.16 via Frontend
- Transport; Sat, 8 Aug 2020 08:57:00 +0000
-X-IncomingTopHeaderMarker: OriginalChecksum:89D5D278299320B7CA4D497D1E70B9C6A5B353016D27FF996AD08949B14F7BD2;
- UpperCasedChecksum:1780244CFE796278A500725EECDD45C970B9556E625A453D0BBB58892671EEE6;
- SizeAsReceived:7498; Count:47
+ Transport; Sat, 8 Aug 2020 05:20:37 +0000
+X-IncomingTopHeaderMarker: OriginalChecksum:0C6BA96BF13A918393EAC09FC73D94019658B39743266A651F011503153C9382;
+ UpperCasedChecksum:37B39E05CD859E3FAA6D47E5BC1E0B3A597BD522D615B78A48D8C89CF85F4690;
+ SizeAsReceived:7681; Count:49
 Received: from SG2PR02MB2634.apcprd02.prod.outlook.com
  ([fe80::8f0:37c7:286c:1725]) by SG2PR02MB2634.apcprd02.prod.outlook.com
  ([fe80::8f0:37c7:286c:1725%5]) with mapi id 15.20.3261.022; Sat, 8 Aug 2020
- 08:57:00 +0000
+ 05:20:37 +0000
 From: Hou Weiying <weiying_hou@outlook.com>
 To: qemu-riscv@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 0/4] riscv: Add enhanced PMP support
-Date: Sat,  8 Aug 2020 16:56:52 +0800
-Message-ID: <SG2PR02MB2634448F0D69E047AD1F576093460@SG2PR02MB2634.apcprd02.prod.outlook.com>
+Subject: [PATCH 1/4] Define ePMP mseccfg
+Date: Sat,  8 Aug 2020 13:20:28 +0800
+Message-ID: <SG2PR02MB263487F8A1ECF35FB6DCD3E893460@SG2PR02MB2634.apcprd02.prod.outlook.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200808052031.19523-1-weiying_hou@outlook.com>
+References: <20200808052031.19523-1-weiying_hou@outlook.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: HK2PR02CA0187.apcprd02.prod.outlook.com
- (2603:1096:201:21::23) To SG2PR02MB2634.apcprd02.prod.outlook.com
+X-ClientProxiedBy: HKAPR03CA0012.apcprd03.prod.outlook.com
+ (2603:1096:203:c8::17) To SG2PR02MB2634.apcprd02.prod.outlook.com
  (2603:1096:4:51::19)
-X-Microsoft-Original-Message-ID: <20200808085656.28692-1-weiying_hou@outlook.com>
+X-Microsoft-Original-Message-ID: <20200808052031.19523-2-weiying_hou@outlook.com>
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (223.89.139.46) by
- HK2PR02CA0187.apcprd02.prod.outlook.com (2603:1096:201:21::23) with Microsoft
+Received: from localhost.localdomain (223.89.141.129) by
+ HKAPR03CA0012.apcprd03.prod.outlook.com (2603:1096:203:c8::17) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3261.15 via Frontend Transport; Sat, 8 Aug 2020 08:56:58 +0000
+ 15.20.3283.7 via Frontend Transport; Sat, 8 Aug 2020 05:20:36 +0000
 X-Mailer: git-send-email 2.20.1
-X-Microsoft-Original-Message-ID: <20200808085656.28692-1-weiying_hou@outlook.com>
-X-TMN: [OiX5KSBmpbGUxna3ZmDNEElAbtCkQ7Fr]
+X-Microsoft-Original-Message-ID: <20200808052031.19523-2-weiying_hou@outlook.com>
+X-TMN: [gkAL8ybWFZylAF44vtHAYeYqA/pgC86+]
 X-MS-PublicTrafficType: Email
-X-IncomingHeaderCount: 47
+X-IncomingHeaderCount: 49
 X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-Correlation-Id: 21b18311-c60b-478f-568c-08d83b7902db
-X-MS-TrafficTypeDiagnostic: SG2APC01HT031:
+X-MS-Office365-Filtering-Correlation-Id: c305a621-c15b-4684-65c6-08d83b5ac8db
+X-MS-TrafficTypeDiagnostic: HK2APC01HT180:
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sQsV/tl4T4q9FSHbXJXrF6YmltAf5FtO+r9zD+r2Oc5yv7N9s3ACKTEuJ1rTD60Tyy2Q6nRNw11xacgtU6VQVOyxvzN88AJBsu/Hrzmr+ybOrSC7lfyv3k5V2csYOUyypEuUM9CEQeX77lag9MWS09QSlKaGcmjOpf7N6grRC9LHY9dL+uJ6qPSP0ngeCPAbwNI6fD8x2YpFeIUxztH5sw8G2LkEKoURCNp9WyrXmTY26l+cbRRqpmXqE8AvJd4m
+X-Microsoft-Antispam-Message-Info: 9C2OGMEVaKbIBwOaP/M/3dmBZDXC7+7odvFuJOJRiEVA0hu4JZt3Cl4H/NQThF3x9D8m5y1Uaf765gRWLqFYL7hZZECMwi5j5TI6voPv3hY41ya1VVv1lon8LJd35Rp9laEJdEbKAeE1krp14KWp+uywsVH8q+B8HItb19vGbJzv8oThktp6o9lwg9MQ3tVDGwakIHRZnB1GKAoYN7JxSg==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:0; SRV:;
  IPV:NLI; SFV:NSPM; H:SG2PR02MB2634.apcprd02.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:; SFS:; DIR:OUT; SFP:1901; 
-X-MS-Exchange-AntiSpam-MessageData: 5Yr1yR225bis6tgGS3xqJFvOYSn4AoxqUe7dQf7iqUG5lBbQK9XqKtOzskOpCQxtrdfudD/jMqm16Aa64tqUvaT1f/fFh1BgwuhIaqZgn1L8P3zocEsDRUsjKWonM7fT58OcLrvPjdxFYgiR/8LHEg==
+X-MS-Exchange-AntiSpam-MessageData: ym9HSxUc5xVHPgcGtuW+InueKbPM3Vb7bz8Qm6DBV53Cd+dqT3y+pdr+mzHdXpeRGdtStioOuNLy1hRaL4ZmWSNyZRyEilZhZoq+eihTaq/NgOTVEqniWAuF2XY67JffKPmN96fM/cjPfv2s0knkCg==
 X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21b18311-c60b-478f-568c-08d83b7902db
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2020 08:56:59.9712 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c305a621-c15b-4684-65c6-08d83b5ac8db
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2020 05:20:37.8707 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-AuthSource: SG2APC01FT013.eop-APC01.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: HK2APC01FT029.eop-APC01.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
 X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2APC01HT031
-Received-SPF: pass client-ip=40.92.254.44;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HK2APC01HT180
+Received-SPF: pass client-ip=40.92.253.68;
  envelope-from=weiying_hou@outlook.com;
- helo=APC01-PU1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/08 04:57:02
+ helo=APC01-SG2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/08 01:20:41
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -134,31 +136,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair.Francis@wdc.com, palmer@dabbelt.com, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de
+Cc: sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
+ Hongzheng-Li <Ethan.Lee.QNL@gmail.com>, Alistair.Francis@wdc.com,
+ Myriad-Dreamin <camiyoru@gmail.com>, palmer@dabbelt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ePMP can be found in:
-https://docs.google.com/document/d/1Mh_aiHYxemL0umN3GTTw8vsbmzHZ_nxZXgjgOUzbvc8/edit#heading=h.9wsr1lnxtwe2
+Currently using 0x390 and 0x391 for x-epmp (experimental). This may change in the future spec.
 
-Hou Weiying (4):
-  Define ePMP mseccfg
-  Implementation of enhanced PMP(ePMP) support
-  Add ePMP CSR accesses
-  Add a config option for ePMP.
+Signed-off-by: Hongzheng-Li <Ethan.Lee.QNL@gmail.com>
+Signed-off-by: Hou Weiying <weiying_hou@outlook.com>
+Signed-off-by: Myriad-Dreamin <camiyoru@gmail.com>
+---
+ target/riscv/cpu_bits.h | 3 +++
+ target/riscv/gdbstub.c  | 2 ++
+ 2 files changed, 5 insertions(+)
 
- target/riscv/cpu.c        |   9 ++
- target/riscv/cpu.h        |   3 +
- target/riscv/cpu_bits.h   |   3 +
- target/riscv/csr.c        |  18 ++++
- target/riscv/gdbstub.c    |   2 +
- target/riscv/pmp.c        | 174 +++++++++++++++++++++++++++++++++++---
- target/riscv/pmp.h        |  12 +++
- target/riscv/trace-events |   4 +
- 8 files changed, 213 insertions(+), 12 deletions(-)
-
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 7f64ee1174..9a8a6be534 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -214,6 +214,9 @@
+ #define CSR_MTINST          0x34a
+ #define CSR_MTVAL2          0x34b
+ 
++/* Enhanced PMP */
++#define CSR_MSECCFG         0x390
++#define CSR_MSECCFGH        0x391
+ /* Physical Memory Protection */
+ #define CSR_PMPCFG0         0x3a0
+ #define CSR_PMPCFG1         0x3a1
+diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+index eba12a86f2..de5551604a 100644
+--- a/target/riscv/gdbstub.c
++++ b/target/riscv/gdbstub.c
+@@ -132,6 +132,8 @@ static int csr_register_map[] = {
+     CSR_MIP,
+     CSR_MTINST,
+     CSR_MTVAL2,
++    CSR_MSECCFG,
++    CSR_MSECCFGH,
+     CSR_PMPCFG0,
+     CSR_PMPCFG1,
+     CSR_PMPCFG2,
 -- 
 2.20.1
 
