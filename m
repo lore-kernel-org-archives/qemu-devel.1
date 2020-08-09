@@ -2,88 +2,82 @@ Return-Path: <SRS0=L55N=BT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB98C433E0
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Aug 2020 06:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4602C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Aug 2020 17:15:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4E02206C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Aug 2020 06:37:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4E02206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id A6E4B206A2
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Aug 2020 17:15:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6E4B206A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k4exh-0003dX-Sc
-	for qemu-devel@archiver.kernel.org; Sun, 09 Aug 2020 02:37:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44922)
+	id 1k4ovF-00083x-43
+	for qemu-devel@archiver.kernel.org; Sun, 09 Aug 2020 13:15:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paulburton89@gmail.com>)
- id 1k4ewm-00035v-MA; Sun, 09 Aug 2020 02:36:45 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:45756)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k4ouF-0007Vk-Vm
+ for qemu-devel@nongnu.org; Sun, 09 Aug 2020 13:14:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40708)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <paulburton89@gmail.com>)
- id 1k4ewk-0000pS-TN; Sun, 09 Aug 2020 02:36:44 -0400
-Received: by mail-oi1-f193.google.com with SMTP id o21so5989282oie.12;
- Sat, 08 Aug 2020 23:36:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=o8oOH1CAijstfPClf55haIpg1h2dcOqUJrPHuZ9nxtg=;
- b=sjYSpgyRH6PgAlDMG1frb19W4pCG8X6Tu0tng7armCfIuvt8da8KPZAsJGu/gQ/T61
- TY77JJDEFlLJw3MTu5cQgBS5VMiBlX45bgaE2wOmRm8/0YDrOJA8kfBfvAD3QhnbJL63
- 5rqrIYMn7YAvz34WID/at9Gr07TyTdJHa9NKKprMzGBlT6HxM9u8+HRXLmAV1eS+Hah+
- QCAHJC3QPQy7BHis8+4z1Di07dm8caU7EjDhqf2RI0cX28CujSUHns1B2kMbkOOXOAD5
- 3YujwNBv7qQcweAGJ16wghb8JH2ef3X3+PfRoI+HHQz9MFDc0Ryyyj1BOxvjk5yeVtlW
- crUA==
-X-Gm-Message-State: AOAM530iGJKFBWdEhnsZRn+Jn4zUqsgrDJGW2SCmXznfMCNoA8sfAiWR
- /WpHiE31HIq/ZvXgdVbSDHlR02QB5yJEZg==
-X-Google-Smtp-Source: ABdhPJw2z+GXCU4Wy3iwdltSfBOJAphb7viuejwtwKwrXT/cTmjc12BlsY5UQXyputhZ/MV4AunMEQ==
-X-Received: by 2002:aca:d68a:: with SMTP id n132mr17474914oig.16.1596955000397; 
- Sat, 08 Aug 2020 23:36:40 -0700 (PDT)
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com.
- [209.85.210.48])
- by smtp.gmail.com with ESMTPSA id p189sm1369031oia.18.2020.08.08.23.36.39
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 08 Aug 2020 23:36:40 -0700 (PDT)
-Received: by mail-ot1-f48.google.com with SMTP id c4so4825282otf.12;
- Sat, 08 Aug 2020 23:36:39 -0700 (PDT)
-X-Received: by 2002:a9d:1b62:: with SMTP id l89mr7850057otl.145.1596954999610; 
- Sat, 08 Aug 2020 23:36:39 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k4ouD-0003lt-Tp
+ for qemu-devel@nongnu.org; Sun, 09 Aug 2020 13:14:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k4ouB-0007Ga-9T
+ for <qemu-devel@nongnu.org>; Sun, 09 Aug 2020 17:14:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3D6FA2E8055
+ for <qemu-devel@nongnu.org>; Sun,  9 Aug 2020 17:14:43 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200707022544.24925-1-f4bug@amsat.org>
- <19b2c623-7c8e-fd93-290f-86498b85caf5@amsat.org>
- <932a272b-bc80-f6e4-d51e-32e2222f540c@amsat.org>
-In-Reply-To: <932a272b-bc80-f6e4-d51e-32e2222f540c@amsat.org>
-From: Paul Burton <paulburton@kernel.org>
-Date: Sat, 8 Aug 2020 23:35:28 -0700
-X-Gmail-Original-Message-ID: <CAG0y8xk6qEzTXup7jJojmLK9n4KWTCq_z9FULeyyru7Ux3iM_Q@mail.gmail.com>
-Message-ID: <CAG0y8xk6qEzTXup7jJojmLK9n4KWTCq_z9FULeyyru7Ux3iM_Q@mail.gmail.com>
-Subject: Re: [PATCH v2] .mailmap: Update Paul Burton email address
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=209.85.167.193;
- envelope-from=paulburton89@gmail.com; helo=mail-oi1-f193.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/09 02:36:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_ENVFROM_END_DIGIT=0.25,
- FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+Date: Sun, 09 Aug 2020 17:05:19 -0000
+From: till <811683@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Triaged; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: exceptions ppc
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: afaerber agraf balaton-4 th-huth till-straumann
+X-Launchpad-Bug-Reporter: till (till-straumann)
+X-Launchpad-Bug-Modifier: till (till-straumann)
+References: <20110716214931.3466.65125.malonedeb@soybean.canonical.com>
+Message-Id: <159699271960.9290.10335956505266865256.malone@wampee.canonical.com>
+Subject: [Bug 811683] Re: 7400, 7410,
+ 7450 cpus vector have wrong exception prefix at reset
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 408973dd5d05cb95992c88ec9e6f3cfb7422f30e
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/09 13:14:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,42 +86,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 811683 <811683@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+Yes, it is a CPU feature, and yes you can select the exception vector
+prefix with the MSR[IP] bit which should be set by a hardware reset. The
+initial value seems wrong in qemu but that seems to fixed by the
+machine-specific initialization. The 'none' machine, however, just uses
+generic code and does not do anything PPC-specific. This means that
 
-On Thu, Aug 6, 2020 at 6:50 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
-> ping, as I'm still receiving "The recipient email address is
-> incorrect or does not exist in this domain." from wavecomp.com...
->
-> On 7/16/20 8:56 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Hi Paul,
-> >
-> > Do you mind Acking this patch? QEMU's get_maintainer.pl
-> > still selects pburton@wavecomp.com for various of your
-> > contributions and wavesemi.com (where wavecomp.com seems
-> > redirected) keeps sending "The recipient email address is
-> > incorrect or does not exist in this domain."
+ - the MSR and probably other registers, too, are not initialized to what t=
+he hardware
+   documentation specifies as reset values.
+ - the time-base is not initialized at all (and this leads to a segfault wh=
+en you start the
+   ppc 'none' machine)
+ - probably other things are not properly initialized. I wonder, e.g., abou=
+t the MMU...
 
-Sure, sorry for the delay:
+It seems that all registers are simply initialized to zero. Then, there see=
+ms to be a 'reset' function which initializes the registers to the proper r=
+eset values (well - sort of bug 812398 reports that HID0 is not properly in=
+itialized by some CPU flavours). However, that reset function
+is not executed by the 'none' machine initialization....
 
-  Acked-by: Paul Burton <paulburton@kernel.org>
+-- =
 
-> > In case you don't want to receive any more emails from the
-> > QEMU mailing list, you can Nack this patch, so I'll have a
-> > good reason to insist with the alternative to have a
-> > 'ignore .mailmap', suggested here:
-> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg717757.html
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/811683
 
-I'm happy to continue receiving mail, though right now realistically I
-don't have the time to do much with it. Perhaps that might change in
-the future.
+Title:
+  7400,7410,7450 cpus vector have wrong exception prefix at reset
 
-Thanks,
-    Paul
+Status in QEMU:
+  Triaged
+
+Bug description:
+  I have a proprietary ROM implementing system calls that are executed
+  via the 'SC' instruction.
+
+  I use qemu-0.14.1,
+
+  qemu-system-ppc -M prep -cpu $CPU -bios my_bios -kernel my_kernel
+
+  That works fine on a 604 (CPU=3D0x00040103) - but does not on an emulated=
+ 7400 (CPU=3D0x000c0209) or 7450 (CPU=3D0x80000201). I found that the emula=
+tor jumps to 0x00000c00 instead of 0xfff00c00.
+  Probably this is due to a wrong setting in target-ppc/translate_init.c:
+
+  init_excp_604() correctly sets env->hreset_vector=3D0xfff00000UL;
+
+  but
+
+  init_excp_7400() says env->hreset_vector=3D0x00000000UL;
+
+  which seems wrong. (the 7400 manual says a hard-reset jumps initializes t=
+he
+  prefix to 0xfff00000.)
+
+  Likewise, init_excp_7450() (and probably other, related CPUs) are
+  wrong.
+
+  Indeed, when I change the value in init_excp_7400() to 0xfff00000UL then
+  everything works as expected for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/811683/+subscriptions
 
