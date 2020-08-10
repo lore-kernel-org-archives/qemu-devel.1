@@ -2,97 +2,138 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B37C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D19C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:33:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D51002070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:32:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68719206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:33:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UjIZHcaQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D51002070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M6NlDCeS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68719206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5567-0000Yw-5P
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 06:32:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58232)
+	id 1k557S-0001Uo-IT
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 06:33:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k554w-0008NF-95
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:30:54 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33350)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k554u-0002P3-9m
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:30:53 -0400
-Received: by mail-wm1-x341.google.com with SMTP id f18so13197722wmc.0
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 03:30:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=rr2Aa/tBbQSJhcJvMZLMKbdnKQizMu/1Tl9jwD7aDcI=;
- b=UjIZHcaQxfPcKDr3LA6r6P+iJID83sEfJItIgcL9hI1k5xkJpxB4gGoszNUNpHc5PO
- 8JAU2sluEZB/LrzwweUyBAoPPWIYGpKJ+9X8lLrM3P4QZOfC5SjP5jw589wnpqpOTe1n
- mQiMPmq9itPvgyG42o0LEPREP8k/w2zSkthxROk3TXGjwa8oxpPnV/nfbTQiRfd9qsv1
- l/eS/MpPOGmP5QKp0snu1yQYTSaX4ZELdgbwR/7DKb2onk6EHYJkdlzDekiiIaMBrjqo
- okTNw/KbZlCa0vfzCaNepIW+UyB8jerOkoOU5LGde5WVYkz5JE20+frhbbPSvtr31K41
- 1mQg==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k556a-00012U-QK
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:32:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50601
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k556Y-0002XY-Eq
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:32:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597055552;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=IhQIJbGIk7psZT5W4r1nqFXg4LD4ZrEAYJOXSvREV34=;
+ b=M6NlDCeSgkA6aWqYVIbDdA28kzyM9h6mVbi1SqhGXJ8thJLSMv+8f4SqRoDz+fozGc7CV7
+ l+MWJ2Qk7r36IIP0LBj4B+slcqhUNcbd2wQ26kCL/quqruILeLi8sKd4kTXqoyA19e2uWH
+ N9HGPiFaj0noGbf0FMqC+X6156mNfFY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-lBf9Ye8hMB63kyucSg2D1Q-1; Mon, 10 Aug 2020 06:32:30 -0400
+X-MC-Unique: lBf9Ye8hMB63kyucSg2D1Q-1
+Received: by mail-wr1-f71.google.com with SMTP id d6so4026359wrv.23
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 03:32:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=rr2Aa/tBbQSJhcJvMZLMKbdnKQizMu/1Tl9jwD7aDcI=;
- b=ZB7P41isjeJBT+FFxsibrFNvXDzXmdX1KdQdVESCYua0K3vUPyuchO7ckG0VNNvRhH
- ChQd0liBKet4TWcomcgo6/LhcUyQB/6zuFIXgGKDCakK/gYoXlOf+YVMatW9dZSdFOAM
- /l5hN71JHvr1ZWm36vtMA8eSC2oarzDv7R1nyJqUj73Y4nfW65e3hpGX/LZX6KnAh0G7
- KsjjXJq1ST+nkWM78aPjyjCP6haT/qp5xvEk/o0wDg9dOMYEXjzQaYKvJSReLKK39kTK
- r3+x0vM5sv/oW0USukBhl6BhY0fEFo10SwUn53y5TW0wzLiCJLBFLbH1rE4RLNiiDG5N
- Na/w==
-X-Gm-Message-State: AOAM532iq2WADeBPQ9MHc11C9+D/VQIwpc6GrXysl5pfg/YsJuVPhYdq
- pKdJgjwlms8339LYhjLKmAbm7Bu8Hlg=
-X-Google-Smtp-Source: ABdhPJwzd+7au8g9+GpJLuWhDZ/SqbbWpbaIlOA8J1rprvq7H9ny+IsqcQDl9UDhliZMdXwsD8wBjw==
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=IhQIJbGIk7psZT5W4r1nqFXg4LD4ZrEAYJOXSvREV34=;
+ b=cQlNoCRKZoiLuY6n1mARgKVj3c6ozutEO6cVOrrr6Ow4HO8t1jVR5BGq6EpRWy446I
+ katJvVvJhCU68+j2qaRc7OCkSQzJFzzF6c/TrecVatElGwvnmYF/nXOoQTNKmW+yHBeR
+ liKecNZnduqb1w7oV9+nMA5t7GgLFt1Ux8NF4O8MCodXXsmYMjXji5LL4JOuUHRSmSS6
+ aD0TZn8HKPLXqjOScQSFOP8eX1ganGi2I+O8+9OBLyX70/LLCqOvC3KfNEeQFhjv1DAC
+ rIGjbOCUM0Z6+hcIzXIS1Lh+Fo0MH+dPX5ZKLLl46Qf47gNVu2oO1Cw1YREFkJ6P4yI5
+ Pt8w==
+X-Gm-Message-State: AOAM5332iCsX5DyLkc7wtNtk1Yw3iton/dsEcKMkeGxSpaAZPLW4Ixbx
+ a16EZYWpm6NWVHe714ylcBKhwvcZ5EoeMA26TfzBKZr3GIS8fAaU6rZJjVs0ebedXBIFqIzgyaQ
+ h7P8oOJtjBd0HJPw=
 X-Received: by 2002:a05:600c:c7:: with SMTP id
- u7mr25763728wmm.135.1597055449126; 
- Mon, 10 Aug 2020 03:30:49 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z207sm21752058wmc.2.2020.08.10.03.30.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 10 Aug 2020 03:30:47 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 132711FF7E;
- Mon, 10 Aug 2020 11:30:47 +0100 (BST)
-References: <20200806114036.10646-1-alex.bennee@linaro.org>
- <f29af0bb-7a3c-9d32-5799-42a4efa5d097@suse.de>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Claudio Fontana <cfontana@suse.de>
-Subject: Re: [RFC PATCH] CODING_STYLE.rst: flesh out our naming conventions.
-In-reply-to: <f29af0bb-7a3c-9d32-5799-42a4efa5d097@suse.de>
-Date: Mon, 10 Aug 2020 11:30:47 +0100
-Message-ID: <87imdq3i94.fsf@linaro.org>
+ u7mr25770139wmm.135.1597055549132; 
+ Mon, 10 Aug 2020 03:32:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxVR3vI8LSm9KIHBC9ZdbxStaW9XGDL16bfkzqIWnhSV8lHK7q8h021sVvE0knyhDuAcpCTCw==
+X-Received: by 2002:a05:600c:c7:: with SMTP id
+ u7mr25770125wmm.135.1597055548962; 
+ Mon, 10 Aug 2020 03:32:28 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id v8sm21535714wmb.24.2020.08.10.03.32.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 10 Aug 2020 03:32:28 -0700 (PDT)
+Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
+ <87364y28jp.fsf@dusky.pond.sub.org>
+ <9d7b7f59-ec3e-1f74-d1d4-359e3388f0f8@redhat.com>
+ <87ft8yd0ht.fsf@dusky.pond.sub.org>
+ <CAFEAcA8-qAh9RzAZNqFS9HphAEDuCVVGzZO7vKem-1WCJogyjw@mail.gmail.com>
+ <f8cb36ff-a98a-9147-1c31-6f6394a4ec77@redhat.com>
+ <20200807155824.GN120942@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <544746a8-1ac8-b12e-6890-1579b9e6ab3c@redhat.com>
+Date: Mon, 10 Aug 2020 12:32:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200807155824.GN120942@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 05:06:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,100 +146,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 8/7/20 5:58 PM, Daniel P. Berrangé wrote:
+> On Fri, Aug 07, 2020 at 05:14:06PM +0200, Paolo Bonzini wrote:
+>> That one exception, the one thing that disappoints me of the whole
+>> conversion, is the trace.h files.  The current solution is one of the
+>> first parts I did of the conversion and I have never touched it since; I
+>> think it can be improved (I can even think of two ways to do it), but I
+>> don't really have the time to do it now.  But even that bit is just
+>> ugly, not unmaintainable, and I really see nothing in the conversion
+>> that is a step back for QEMU's long term maintainability and our ability
+>> to develop new features.
+> 
+> I was never entirely happy with the trace.h stuff even in "make".
+> Trying to maintain the "trace.h" name for every generated header
+> was probably a mistake in retrospect. it caused me so much pain
+> trying to get the "make" rules correct so that we resolved the
+> right trace.h in each case. I was deperately trying to avoid
+> updating the #include lines, but I'm not sure it was worth
+> it in the end. Would have been easier to just generate a unique
+> header file name for each dir and update the #includes.
 
-Claudio Fontana <cfontana@suse.de> writes:
+Never too late. Having unique trace headers would allow us to reuse
+trace functions in different modules.
 
-> On 8/6/20 1:40 PM, Alex Benn=C3=A9e wrote:
->> Mention a few of the more common naming conventions we follow in the
->> code base including common variable names and function prefix and
->> suffix examples.
->>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  CODING_STYLE.rst | 23 +++++++++++++++++++++++
->>  1 file changed, 23 insertions(+)
->>=20
->> diff --git a/CODING_STYLE.rst b/CODING_STYLE.rst
->> index 427699e0e42..17cb42ba761 100644
->> --- a/CODING_STYLE.rst
->> +++ b/CODING_STYLE.rst
->> @@ -109,9 +109,32 @@ names are lower_case_with_underscores_ending_with_a=
-_t, like the POSIX
->>  uint64_t and family.  Note that this last convention contradicts POSIX
->>  and is therefore likely to be changed.
->>=20=20
->> +Variable Naming Conventions
->> +---------------------------
->> +
->> +A number of common short naming conventions exist for variables that use
->> +common QEMU types. For example when dealing with the architecture
->> +independent CPUState this is often in a ``cs`` pointer variable
->> +whereas the concrete CPUArchState us usually held in a pointer called
->> +``env``.
->> +
->> +Likewise in device emulation code the common DeviceState is usually
->> +called ``dev`` with the actual state structure often the very terse
->> +``s`` or maybe ``foodev``.
->> +
->> +Function Naming Conventions
->> +---------------------------
->> +
->>  When wrapping standard library functions, use the prefix ``qemu_`` to a=
-lert
->>  readers that they are seeing a wrapped version; otherwise avoid this pr=
-efix.
->>=20=20
->> +Functions that are expected to be called with some sort of lock held
->> +usually have the suffix ``_locked``.
->> +
->> +Public functions (i.e. declared in public headers) tend to be prefixes
->> +with the subsystem or file they came from. For example ``tlb_`` for
->> +functions from ``cputlb.c`` or ``cpu_`` for functions from cpus.c.
->
-> Hi Alex,
->
-> agree with the sentiment, for cpus.c I would suggest cpus_ though.
->
-> There are otherwise so many cpu_ functions and cpu.c modules.. using
-> cpus_ would help a lot to understand that it is part of softmmu/cpus.c
->
-> Wdyt?
+I.e.:
+- hexdump()
+- cases where multi-devices not well split in subsystem parts
+  . xen out of i386
+  . net could reuse mdio
+  . rocker out of net
+  . can out of net
+  . reuse semihosting traces in target/
+- cases with buses where the device is target-specific
 
-I was mainly documenting existing conventions - I guess cpus is a poor
-example to follow as it has so many cpu_ functions in them. I guess the
-prefix is a loose association at best.
+> 
+> Regards,
+> Daniel
+> 
 
-> Also cpus.c contains a lot of qemu_ that is not used to wrap standard
-> library functions.
-
-Certainly a lot of the static internal functions could be shorted names
-dropping the qemu_ prefix. Most uses of qemu_ across the code base are
-utility functions although not all wrap existing functions.
-
-> After the current cpus refactoring, I could take care of improving the
-> naming conventions in cpus.c
-
-I wouldn't expend a lot of effort on a grand re-naming but certainly
-it's worth cleaning stuff up as you go moving things about.
-
->
-> Thanks,
->
-> Claudio
->
->
->> +
->>  Block structure
->>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>=20=20
->>=20
-
-
---=20
-Alex Benn=C3=A9e
 
