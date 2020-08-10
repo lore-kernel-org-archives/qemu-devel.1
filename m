@@ -7,61 +7,62 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E93C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 16:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A233BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 16:57:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED0F822D07
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 16:57:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED0F822D07
+	by mail.kernel.org (Postfix) with ESMTPS id 653BD22D07
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 16:57:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 653BD22D07
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5B71-0002vj-Ud
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 12:57:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40880)
+	id 1k5B74-00030U-Cu
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 12:57:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5B4o-0006mG-Fw
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 12:55:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57021
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5B4j-0006Z5-1K
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 12:55:05 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32762
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5B4m-0000mt-TT
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 12:55:10 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5B4h-0000mM-H1
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 12:55:04 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-f9Y9hy54M0O6kAR2OcFVgg-1; Mon, 10 Aug 2020 12:55:04 -0400
-X-MC-Unique: f9Y9hy54M0O6kAR2OcFVgg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-299-LCdmqLOIMqCu9VZVTHotdA-1; Mon, 10 Aug 2020 12:54:57 -0400
+X-MC-Unique: LCdmqLOIMqCu9VZVTHotdA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DE991940920;
- Mon, 10 Aug 2020 16:55:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40779106B246;
+ Mon, 10 Aug 2020 16:54:56 +0000 (UTC)
 Received: from bahia.lan (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 585656F129;
- Mon, 10 Aug 2020 16:55:02 +0000 (UTC)
-Subject: [PATCH 10/14] spapr/xive: Fix error handling in
- kvmppc_xive_post_load()
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 693977010B;
+ Mon, 10 Aug 2020 16:54:55 +0000 (UTC)
+Subject: [PATCH 09/14] spapr/kvm: Fix error handling in kvmppc_xive_pre_save()
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 10 Aug 2020 18:55:01 +0200
-Message-ID: <159707850148.1489912.18355118622296682631.stgit@bahia.lan>
+Date: Mon, 10 Aug 2020 18:54:54 +0200
+Message-ID: <159707849455.1489912.6034461176847728064.stgit@bahia.lan>
 In-Reply-To: <159707843034.1489912.1082061742626355958.stgit@bahia.lan>
 References: <159707843034.1489912.1082061742626355958.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.110.120; envelope-from=groug@kaod.org;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:00:11
+Received-SPF: softfail client-ip=207.211.31.81; envelope-from=groug@kaod.org;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 04:13:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -12
 X-Spam_score: -1.3
@@ -87,98 +88,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that all these functions return a negative errno on failure, check
-that because it is preferred to local_err. And most of all, propagate it
-because vmstate expects negative errnos.
+Now that kvmppc_xive_get_queues() returns a negative errno on failure, chec=
+k
+with that because it is preferred to local_err. And most of all, propagate
+it because vmstate expects negative errnos.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/spapr_xive_kvm.c |   35 ++++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+ hw/intc/spapr_xive_kvm.c |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 1686b036eb2d..005729ebffed 100644
+index f2dda692183b..1686b036eb2d 100644
 --- a/hw/intc/spapr_xive_kvm.c
 +++ b/hw/intc/spapr_xive_kvm.c
-@@ -631,6 +631,7 @@ int kvmppc_xive_post_load(SpaprXive *xive, int version_=
-id)
+@@ -604,16 +604,17 @@ void kvmppc_xive_synchronize_state(SpaprXive *xive, E=
+rror **errp)
+ int kvmppc_xive_pre_save(SpaprXive *xive)
+ {
      Error *local_err =3D NULL;
-     CPUState *cs;
-     int i;
 +    int ret;
 =20
-     /* The KVM XIVE device should be in use */
      assert(xive->fd !=3D -1);
-@@ -641,11 +642,10 @@ int kvmppc_xive_post_load(SpaprXive *xive, int versio=
-n_id)
-             continue;
-         }
 =20
--        kvmppc_xive_set_queue_config(xive, SPAPR_XIVE_BLOCK_ID, i,
--                                     &xive->endt[i], &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--            return -1;
-+        ret =3D kvmppc_xive_set_queue_config(xive, SPAPR_XIVE_BLOCK_ID, i,
-+                                           &xive->endt[i], &local_err);
-+        if (ret < 0) {
-+            goto fail;
-         }
+     /* EAT: there is no extra state to query from KVM */
+=20
+     /* ENDT */
+-    kvmppc_xive_get_queues(xive, &local_err);
+-    if (local_err) {
++    ret =3D kvmppc_xive_get_queues(xive, &local_err);
++    if (ret < 0) {
+         error_report_err(local_err);
+-        return -1;
++        return ret;
      }
 =20
-@@ -660,16 +660,14 @@ int kvmppc_xive_post_load(SpaprXive *xive, int versio=
-n_id)
-          * previously set in KVM. Since we don't do that for all interrupt=
-s
-          * at reset time anymore, let's do it now.
-          */
--        kvmppc_xive_source_reset_one(&xive->source, i, &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--            return -1;
-+        ret =3D kvmppc_xive_source_reset_one(&xive->source, i, &local_err)=
-;
-+        if (ret < 0) {
-+            goto fail;
-         }
-=20
--        kvmppc_xive_set_source_config(xive, i, &xive->eat[i], &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--            return -1;
-+        ret =3D kvmppc_xive_set_source_config(xive, i, &xive->eat[i], &loc=
-al_err);
-+        if (ret < 0) {
-+            goto fail;
-         }
-     }
-=20
-@@ -686,15 +684,18 @@ int kvmppc_xive_post_load(SpaprXive *xive, int versio=
-n_id)
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
--        kvmppc_xive_cpu_set_state(spapr_cpu_state(cpu)->tctx, &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--            return -1;
-+        ret =3D kvmppc_xive_cpu_set_state(spapr_cpu_state(cpu)->tctx, &loc=
-al_err);
-+        if (ret < 0) {
-+            goto fail;
-         }
-     }
-=20
-     /* The source states will be restored when the machine starts running =
-*/
      return 0;
-+
-+fail:
-+    error_report_err(local_err);
-+    return ret;
- }
-=20
- /* Returns MAP_FAILED on error and sets errno */
 
 
 
