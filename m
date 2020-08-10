@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FDD1C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EFB2C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:27:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D6E620829
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:27:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0242720829
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:27:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ni1TqXy0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D6E620829
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLYHqn4U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0242720829
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5BZj-0007H8-Dp
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:27:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45478)
+	id 1k5Ba5-00088v-6t
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:27:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BJM-00076q-80
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:12 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33919
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k5BJd-0007ni-Eu
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54201
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BJJ-0002o6-Uq
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:11 -0400
+ id 1k5BJa-0002rt-Ul
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597079409;
+ s=mimecast20190719; t=1597079426;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8IENvS6W6sUTP+SsAb7DRIXJIokhmnNYgULMJ41YEzw=;
- b=Ni1TqXy0FAXith4l8oq47DuTKFhTN3JiRQ57Vk5+XbcAjt+fOHovNUX5HwyAOeN4OGLb70
- zc0XT7y/qeCyIc7wLGEapOshLZPEacdN/fC/i+Bh/EaWM+bUYvIEUqlHfnciSFdEmx26o/
- HTz6eZFVrlgr5I9jocQoydKurRS6xQs=
+ bh=k+TbutJ84oJkp/r4ElUEfmom1VA5P+5q0XqZoziFg2o=;
+ b=fLYHqn4U1ZDZoW1GFztd82DPp1uE0WdAA9ehU/rY6gQ7AiIkarlTEIO6MZ2fTY9M/X434O
+ s4az80JgdOFYUQ2+s2X09e9EeuAtauSv744pyI508zmDc+o09gDFCmAIB3CKOopu5Yp//b
+ tWC9zMr4buFktgpiLMjmiUQfBXmaRNQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-fpthtMIHO168e52SwoZhDg-1; Mon, 10 Aug 2020 13:10:06 -0400
-X-MC-Unique: fpthtMIHO168e52SwoZhDg-1
+ us-mta-386-l0ztJc2CPtykhG_eGI6X6Q-1; Mon, 10 Aug 2020 13:10:24 -0400
+X-MC-Unique: l0ztJc2CPtykhG_eGI6X6Q-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85F8C1030C20
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:10:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D9DE8014D7
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:10:23 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 938085F1E9;
- Mon, 10 Aug 2020 17:10:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A3B6987D61;
+ Mon, 10 Aug 2020 17:10:19 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 033/147] contrib/vhost-user-gpu: convert to meson
-Date: Mon, 10 Aug 2020 19:07:11 +0200
-Message-Id: <1597079345-42801-34-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 044/147] meson: keymap-gen
+Date: Mon, 10 Aug 2020 19:07:22 +0200
+Message-Id: <1597079345-42801-45-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 04:13:00
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:00:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,181 +107,113 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                             | 18 +-----------------
- Makefile.objs                        |  1 -
- contrib/vhost-user-gpu/Makefile.objs | 10 ----------
- contrib/vhost-user-gpu/meson.build   | 13 +++++++++++++
- meson.build                          | 15 +++++++++++++++
- rules.mak                            |  7 -------
- 6 files changed, 29 insertions(+), 35 deletions(-)
- delete mode 100644 contrib/vhost-user-gpu/Makefile.objs
- create mode 100644 contrib/vhost-user-gpu/meson.build
+ Makefile       | 38 --------------------------------------
+ meson.build    |  1 +
+ ui/meson.build | 34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 35 insertions(+), 38 deletions(-)
+ create mode 100644 ui/meson.build
 
 diff --git a/Makefile b/Makefile
-index dd7b99e..750598c 100644
+index f4e5ecf..d5e43a0 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -179,16 +179,10 @@ $(call set-vpath, $(SRC_PATH))
+@@ -125,44 +125,6 @@ generated-files-y += module_block.h
  
- LIBS+=-lz $(LIBS_TOOLS)
+ generated-files-y += .git-submodule-status
  
--vhost-user-json-y =
- HELPERS-y = $(HELPERS)
- 
- HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) += qemu-bridge-helper$(EXESUF)
- 
--ifeq ($(CONFIG_LINUX)$(CONFIG_VIRGL)$(CONFIG_GBM)$(CONFIG_TOOLS),yyyy)
--HELPERS-y += vhost-user-gpu$(EXESUF)
--vhost-user-json-y += contrib/vhost-user-gpu/50-qemu-gpu.json
--endif
+-KEYCODEMAP_GEN = $(SRC_PATH)/ui/keycodemapdb/tools/keymap-gen
+-KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
 -
- # Sphinx does not allow building manuals into the same directory as
- # the source files, so if we're doing an in-tree QEMU build we must
- # build the manuals into a subdirectory (and then install them from
-@@ -295,7 +289,6 @@ dummy := $(call unnest-vars,, \
-                 elf2dmp-obj-y \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
--                vhost-user-gpu-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -309,7 +302,7 @@ dummy := $(call unnest-vars,, \
- 
- include $(SRC_PATH)/tests/Makefile.include
- 
--all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all modules $(vhost-user-json-y)
-+all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all modules
- 
- qemu-version.h: FORCE
- 	$(call quiet-command, \
-@@ -515,9 +508,6 @@ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- endif
- 
--vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
--	$(call LINK, $^)
+-KEYCODEMAP_FILES = \
+-		 ui/input-keymap-atset1-to-qcode.inc \
+-		 ui/input-keymap-linux-to-qcode.inc \
+-		 ui/input-keymap-qcode-to-atset1.inc \
+-		 ui/input-keymap-qcode-to-atset2.inc \
+-		 ui/input-keymap-qcode-to-atset3.inc \
+-		 ui/input-keymap-qcode-to-linux.inc \
+-		 ui/input-keymap-qcode-to-qnum.inc \
+-		 ui/input-keymap-qcode-to-sun.inc \
+-		 ui/input-keymap-qnum-to-qcode.inc \
+-		 ui/input-keymap-usb-to-qcode.inc \
+-		 ui/input-keymap-win32-to-qcode.inc \
+-		 ui/input-keymap-x11-to-qcode.inc \
+-		 ui/input-keymap-xorgevdev-to-qcode.inc \
+-		 ui/input-keymap-xorgkbd-to-qcode.inc \
+-		 ui/input-keymap-xorgxquartz-to-qcode.inc \
+-		 ui/input-keymap-xorgxwin-to-qcode.inc \
+-		 ui/input-keymap-osx-to-qcode.inc \
+-		 $(NULL)
 -
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
-@@ -711,12 +701,6 @@ endif
- ifneq ($(HELPERS-y),)
- 	$(call install-prog,$(HELPERS-y),$(DESTDIR)$(libexecdir))
- endif
--ifneq ($(vhost-user-json-y),)
--	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/vhost-user/"
--	for x in $(vhost-user-json-y); do \
--		$(INSTALL_DATA) $$x "$(DESTDIR)$(qemu_datadir)/vhost-user/"; \
--	done
--endif
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_PROG) "scripts/qemu-trace-stap" $(DESTDIR)$(bindir)
- endif
-diff --git a/Makefile.objs b/Makefile.objs
-index 0922c3ed..2f2d4b2 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -106,6 +106,5 @@ qga-vss-dll-obj-y = qga/
- elf2dmp-obj-y = contrib/elf2dmp/
- ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
- ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
--vhost-user-gpu-obj-y = contrib/vhost-user-gpu/
- 
- ######################################################################
-diff --git a/contrib/vhost-user-gpu/Makefile.objs b/contrib/vhost-user-gpu/Makefile.objs
-deleted file mode 100644
-index 0929609..0000000
---- a/contrib/vhost-user-gpu/Makefile.objs
-+++ /dev/null
-@@ -1,10 +0,0 @@
--vhost-user-gpu-obj-y = vhost-user-gpu.o virgl.o vugbm.o
+-generated-files-$(CONFIG_SOFTMMU) += $(KEYCODEMAP_FILES)
 -
--vhost-user-gpu.o-cflags := $(PIXMAN_CFLAGS) $(GBM_CFLAGS)
--vhost-user-gpu.o-libs := $(PIXMAN_LIBS)
+-ui/input-keymap-%.inc: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
+-	$(call quiet-command,\
+-	    stem=$* && src=$${stem%-to-*} dst=$${stem#*-to-} && \
+-	    test -e $(KEYCODEMAP_GEN) && \
+-	    $(PYTHON) $(KEYCODEMAP_GEN) \
+-	          --lang glib2 \
+-	          --varname qemu_input_map_$${src}_to_$${dst} \
+-	          code-map $(KEYCODEMAP_CSV) $${src} $${dst} \
+-	        > $@ || rm -f $@, "GEN", "$@")
 -
--virgl.o-cflags := $(VIRGL_CFLAGS) $(GBM_CFLAGS)
--virgl.o-libs := $(VIRGL_LIBS)
+-$(KEYCODEMAP_GEN): .git-submodule-status
+-$(KEYCODEMAP_CSV): .git-submodule-status
 -
--vugbm.o-cflags := $(GBM_CFLAGS)
--vugbm.o-libs := $(GBM_LIBS)
-diff --git a/contrib/vhost-user-gpu/meson.build b/contrib/vhost-user-gpu/meson.build
-new file mode 100644
-index 0000000..6c1459f
---- /dev/null
-+++ b/contrib/vhost-user-gpu/meson.build
-@@ -0,0 +1,13 @@
-+if 'CONFIG_TOOLS' in config_host and 'CONFIG_VIRGL' in config_host \
-+    and 'CONFIG_GBM' in config_host and 'CONFIG_LINUX' in config_host
-+  executable('vhost-user-gpu', files('vhost-user-gpu.c', 'virgl.c', 'vugbm.c'),
-+             link_with: libvhost_user,
-+             dependencies: [qemuutil, pixman, gbm, virgl],
-+             install: true,
-+             install_dir: get_option('libexecdir'))
-+
-+  configure_file(input: '50-qemu-gpu.json.in',
-+                 output: '50-qemu-gpu.json',
-+                 configuration: config_host,
-+                 install_dir: config_host['qemu_datadir'] / 'vhost-user')
-+endif
+ edk2-decompressed = $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
+ pc-bios/edk2-%.fd: pc-bios/edk2-%.fd.bz2
+ 	$(call quiet-command,bzip2 -d -c $< > $@,"BUNZIP2",$<)
 diff --git a/meson.build b/meson.build
-index 80966cc..3483056 100644
+index d71d87d..4ea7fbb 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -79,6 +79,8 @@ if 'CONFIG_GNUTLS' in config_host
-   gnutls = declare_dependency(compile_args: config_host['GNUTLS_CFLAGS'].split(),
-                               link_args: config_host['GNUTLS_LIBS'].split())
- endif
-+pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
-+                            link_args: config_host['PIXMAN_LIBS'].split())
- seccomp = not_found
- if 'CONFIG_SECCOMP' in config_host
-   seccomp = declare_dependency(compile_args: config_host['SECCOMP_CFLAGS'].split(),
-@@ -93,6 +95,16 @@ if 'CONFIG_LIBISCSI' in config_host
-   libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
-                                 link_args: config_host['LIBISCSI_LIBS'].split())
- endif
-+gbm = not_found
-+if 'CONFIG_GBM' in config_host
-+  gbm = declare_dependency(compile_args: config_host['GBM_CFLAGS'].split(),
-+                           link_args: config_host['GBM_LIBS'].split())
-+endif
-+virgl = not_found
-+if 'CONFIG_VIRGL' in config_host
-+  virgl = declare_dependency(compile_args: config_host['VIRGL_CFLAGS'].split(),
-+                             link_args: config_host['VIRGL_LIBS'].split())
-+endif
+@@ -271,6 +271,7 @@ subdir('trace')
+ subdir('util')
+ subdir('crypto')
+ subdir('storage-daemon')
++subdir('ui')
  
- target_dirs = config_host['TARGET_DIRS'].split()
- have_user = false
-@@ -261,6 +273,9 @@ if have_tools
-   if 'CONFIG_VHOST_USER' in config_host
-     subdir('contrib/libvhost-user')
-     subdir('contrib/vhost-user-blk')
-+    if 'CONFIG_LINUX' in config_host
-+      subdir('contrib/vhost-user-gpu')
-+    endif
-     subdir('contrib/vhost-user-input')
-     subdir('contrib/vhost-user-scsi')
-   endif
-diff --git a/rules.mak b/rules.mak
-index 7aefd37..1aa6394 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -402,13 +402,6 @@ TEXI2MAN = $(call quiet-command, \
- %.8:
- 	$(call TEXI2MAN)
+ # Build targets from sourcesets
  
--GEN_SUBST = $(call quiet-command, \
--	sed -e "s!@libexecdir@!$(libexecdir)!g" < $< > $@, \
--	"GEN","$@")
--
--%.json: %.json.in
--	$(call GEN_SUBST)
--
- # Support for building multiple output files by atomically executing
- # a single rule which depends on several input files (so the rule
- # will be executed exactly once, not once per output file, and
+diff --git a/ui/meson.build b/ui/meson.build
+new file mode 100644
+index 0000000..daacd2f
+--- /dev/null
++++ b/ui/meson.build
+@@ -0,0 +1,34 @@
++keymaps = [
++  ['atset1', 'qcode'],
++  ['linux', 'qcode'],
++  ['qcode', 'atset1'],
++  ['qcode', 'atset2'],
++  ['qcode', 'atset3'],
++  ['qcode', 'linux'],
++  ['qcode', 'qnum'],
++  ['qcode', 'sun'],
++  ['qnum', 'qcode'],
++  ['usb', 'qcode'],
++  ['win32', 'qcode'],
++  ['x11', 'qcode'],
++  ['xorgevdev', 'qcode'],
++  ['xorgkbd', 'qcode'],
++  ['xorgxquartz', 'qcode'],
++  ['xorgxwin', 'qcode'],
++  ['osx', 'qcode'],
++]
++
++if have_system
++  foreach e : keymaps
++    output = 'input-keymap-@0@-to-@1@.inc'.format(e[0], e[1])
++    genh += custom_target(output,
++                  output: output,
++                  capture: true,
++                  build_by_default: true, # to be removed when added to a target
++                  input: files('keycodemapdb/data/keymaps.csv'),
++                  command: [python.full_path(), files('keycodemapdb/tools/keymap-gen'),
++                            '--lang', 'glib2',
++                            '--varname', 'qemu_input_map_@0@_to_@1@'.format(e[0], e[1]),
++                            'code-map', '@INPUT0@', e[0], e[1]])
++  endforeach
++endif
 -- 
 1.8.3.1
 
