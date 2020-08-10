@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA481C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2354DC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:31:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3DDB20791
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:31:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3DDB20791
+	by mail.kernel.org (Postfix) with ESMTPS id ECBC420791
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:31:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECBC420791
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k59m9-0001Eh-TD
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 11:31:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50508)
+	id 1k59mB-0001GQ-6V
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 11:31:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50532)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k59lJ-0000Mg-Be
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:30:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34306)
+ id 1k59lL-0000Ne-6C
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:30:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34308)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k59lF-0007Z0-Tq
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:30:56 -0400
+ id 1k59lF-0007Z1-Oy
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:30:58 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k59lC-0004Vc-BD
+ id 1k59lB-0004T0-Vf
  for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 15:30:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 617272E8127
+ by loganberry.canonical.com (Postfix) with ESMTP id 1574D2E810C
  for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 15:30:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Aug 2020 15:25:13 -0000
+Date: Mon, 10 Aug 2020 15:23:11 -0000
 From: Steve Dodd <1793539@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,7 +54,7 @@ X-Launchpad-Bug-Commenters: anarchetic schwab-linux-m68k
 X-Launchpad-Bug-Reporter: Andreas Schwab (schwab-linux-m68k)
 X-Launchpad-Bug-Modifier: Steve Dodd (anarchetic)
 References: <153745238166.24916.6273048340249119390.malonedeb@gac.canonical.com>
-Message-Id: <159707311336.5370.18359742352314244188.malone@soybean.canonical.com>
+Message-Id: <159707299170.27105.191060901591173391.malone@gac.canonical.com>
 Subject: [Bug 1793539] Re: qemu:handle_cpu_signal received signal outside vCPU
  context @ pc=0x6003ddc5
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -63,7 +63,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8d4482a4e3020fd16513f46f92f61c66ea99d37f
+X-Launchpad-Hash: 839e007178abf7e1603b336cf49f8875df7360af
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:25:02
@@ -90,8 +90,11 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Actually more likely https://github.com/vivier/qemu-m68k/issues/33, in
-which case it's also fixed..
+Possibly duplicate of bug #1594394, in which case it would be worth
+testing with 5.0.0 or above..
+
+** Bug watch added: github.com/vivier/qemu-m68k/issues #33
+   https://github.com/vivier/qemu-m68k/issues/33
 
 -- =
 
