@@ -2,86 +2,102 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90ACAC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:42:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 198D7C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:44:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DF32206E9
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:42:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D75EC206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:44:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="aJEaygxE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DF32206E9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vayavyalabs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Imi1P5OA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D75EC206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k584a-0003FL-Ml
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 09:42:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47560)
+	id 1k5866-00052w-5F
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 09:44:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pratikp@vayavyalabs.com>)
- id 1k57ti-0005C4-Sr
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:31:30 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:37915)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pratikp@vayavyalabs.com>)
- id 1k57tg-0000aA-S4
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:31:30 -0400
-Received: by mail-wm1-x335.google.com with SMTP id t14so8356500wmi.3
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 06:31:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=vayavyalabs.com; s=vayavyalabs;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=wPDM6hSpJ539DNrrLQXTby/xuAzex+8pH+OgdoatxsM=;
- b=aJEaygxEv9R3BFA0xFJgTCRztazQPYrDE9U2jIBlVjKw3LVVkBOGeNSpknuvwA5Zlf
- qHxarA2fMq834s+GEAeGbzedZTu7eMPfln1L0X4E/Y2/jEVXIl0kQYhFuGae58zW0Xdn
- 0t4HGP7KsdoxiQlagc3/Kht27QdT+UpEdnwnU=
+ (Exim 4.90_1) (envelope-from <mcascell@redhat.com>)
+ id 1k5859-00046p-Kl
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:43:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42538)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mcascell@redhat.com>)
+ id 1k5857-0001xj-JI
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:43:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597066996;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=oaKx2OZ1h0VrAiH41NlcpdXiDkDnFX+49omO/QQAGiA=;
+ b=Imi1P5OAKaWOG8oEJSDGX4H4sSlN1vIqmYsBElH0i39SwcOeQa0ZmnbSl5vSK0SBZaoOWk
+ 99ccvLR57YLCin2G2DeCmxljjnmvUCCofjE+LRJJgej1lpU7lZ+ZN7RNMjdiiWEHyrthFd
+ 5r3jtmZWGYCxt4uWxyxH282AprBgUYs=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-538-sJJ_fbYdOZqpWgDp-rKJnw-1; Mon, 10 Aug 2020 09:43:12 -0400
+X-MC-Unique: sJJ_fbYdOZqpWgDp-rKJnw-1
+Received: by mail-ej1-f69.google.com with SMTP id gg11so3872787ejb.6
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 06:43:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=wPDM6hSpJ539DNrrLQXTby/xuAzex+8pH+OgdoatxsM=;
- b=hCF126pItOmUzsdrmlrgQ6DGFm8J5xp9qB+FXf4UM+KdMpaSANcIer4ZgsqY8BnXOd
- x1hhETRHdMR0y/Jms5t+x60drgiycNGu1DB0uF6YvNp89b8KdDXgNRa+2iOUyx/JBozy
- IN/Q/o/Mj+N4aRPxLlVPr2++F0wRr28WBy6rBPxkFhxDcyzXpY+n2XSyeyUy9a9VnvdL
- 7Oodus546jSpY+vLFYoEl6HZOvBS+l5dXtPr5JyHaNs7dpUHNYFcrwmf9OFfWaI9wNZM
- 0kDmoaAKkQkwA8NZagcvIeTRrTZtfqpZuMeueWURvpHGauduZHnztFK5XYIclUnUQ+LO
- ysDQ==
-X-Gm-Message-State: AOAM531ojvVspanpWNPzQ6+c2csB+l0QDPLuu229uJHNhgYiFz2zuRGR
- Iq94+HiCI0qtjvz4GOf2YJTfII1y7IMErNo4OY6YBg==
-X-Google-Smtp-Source: ABdhPJxor+WJSqG1tWse0rTLjGF2TbUNB7SrCi09oeXsMpss0vJFwJLR2HfNVzLliSGFOvluMTbXGQ7ouPdIVtOqqag=
-X-Received: by 2002:a1c:2e43:: with SMTP id u64mr23860541wmu.129.1597066286794; 
- Mon, 10 Aug 2020 06:31:26 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=oaKx2OZ1h0VrAiH41NlcpdXiDkDnFX+49omO/QQAGiA=;
+ b=Xd9eQoT3cTeDtKmIqqDXj1RYVIkKgxA0rcOuFzDwyXcSOfWwzkJt82xHnczhkN+v3Z
+ aygP4iTL1hAelmhUDkKyj1V6gtB8HLgeVobhrtcxazBZ1gD39C2WsdFTn5O3163P28w/
+ HTcD4XQRU4b7Zyd8Bu61nQ5UMIz425WqwSsLkyVUVkrIMsfpqMtWgWrdd7H2kT8ZeAYK
+ KhEwrwGV/1XvLg1k0yey34qOwThozhYzDlNM7FBGeeB48ldl/e++fTApvB3xRt/wavd5
+ feT94t8tSAd6nqt+HSjojQY0zMt2MciTtW9cvvsprUDCKrZJbNlZqc/9ixWItTXfYxrQ
+ 1jbA==
+X-Gm-Message-State: AOAM533JhVQILNHvXnKdZnLf7zt4dpx1NfZ3aU8H5UYn3NQodtELMYH8
+ eGjLYnIcDIczTwPtAjdHAd0VHRdELDPT7eGLjSZcMkTu9Udd1sEao6pv14MkZmpAXmgLl1rXlZr
+ T+zJHPS15LjK+0N834C9Zk6i41aGnEl4=
+X-Received: by 2002:a17:906:4dcb:: with SMTP id
+ f11mr21244341ejw.454.1597066991060; 
+ Mon, 10 Aug 2020 06:43:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyFruMGOAs4ld4KO2jTC2j9NTgZ3sTXR6pFDql2aso4NtP9jFJo8ZShy7tp9AKHatP0fuFC2XanQql+4eT6EKk=
+X-Received: by 2002:a17:906:4dcb:: with SMTP id
+ f11mr21244320ejw.454.1597066990808; 
+ Mon, 10 Aug 2020 06:43:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <CA+aXn+GrFDssmZWBCL0gh3QLX5BMhmgTQUywLSSQn=cpF2P1ZQ@mail.gmail.com>
- <87r1se3k7m.fsf@linaro.org>
- <CA+aXn+ETrBneXK3N6+gzO_7R=6mdxXr_Oig7MjOe7VzO5OD0mg@mail.gmail.com>
- <87lfim3ipq.fsf@linaro.org>
-In-Reply-To: <87lfim3ipq.fsf@linaro.org>
-From: Pratik Parvati <pratikp@vayavyalabs.com>
-Date: Mon, 10 Aug 2020 19:01:15 +0530
-Message-ID: <CA+aXn+G4EWAoGqgEuDW9j5dQSNJX2g31aGt521YL3MV9eyPzVg@mail.gmail.com>
-Subject: Re: QEMU Library support
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000b52c6105ac85f827"
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=pratikp@vayavyalabs.com; helo=mail-wm1-x335.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <20200806132106.747414-1-clg@kaod.org>
+ <20200806132106.747414-15-clg@kaod.org>
+In-Reply-To: <20200806132106.747414-15-clg@kaod.org>
+From: Mauro Matteo Cascella <mcascell@redhat.com>
+Date: Mon, 10 Aug 2020 15:43:00 +0200
+Message-ID: <CAA8xKjVfG8cp_g6FDNxUCQ6dqiMHnf17eMNCE2Wz+Vr+grAprw@mail.gmail.com>
+Subject: Re: [PATCH for-5.2 14/19] ftgmac100: Fix integer overflow in
+ ftgmac100_do_tx()
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mcascell@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mcascell@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 05:35:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,184 +110,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Frederic Konrad <konrad.frederic@yahoo.fr>, Andrew Jeffery <andrew@aj.id.au>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Joel Stanley <joel@jms.id.au>, Ziming Zhang <ezrakiez@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b52c6105ac85f827
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Just to hide the core QEMU implementation from the device code. QEMU core
-source code remains the same for all device; So, was thinking a way of
-hiding it from the rest of the device code.
-
-Regards,
-Pratik
-
-
-On Mon, Aug 10, 2020 at 3:50 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
-
+On Thu, Aug 6, 2020 at 3:21 PM C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >
-> Pratik Parvati <pratikp@vayavyalabs.com> writes:
+> When inserting the VLAN tag in packets, memmove() can generate an
+> integer overflow for packets whose length is less than 12 bytes.
 >
-> > As an experiment, I have modelled non-existing ARM Watchdog model (SP80=
-5)
-> > interfaced to the versatile PB platform. What actually I was looking is=
- -
-> > some sort of QEMU library, where I can model new device outside the QEM=
-U
-> > source hierarchy and still be able to compile it using QEMU library and
-> > include files to add support for the new device. If QEMU doesn't provid=
-e
-> a
-> > library, Is there a flexibly that I can tweak something inside the QEMU
-> to
-> > generate it?
+> Check length against the size of the ethernet header (14 bytes) to
+> avoid the crash and return FTGMAC100_INT_XPKT_LOST status. This seems
+> like a good modeling choice even if Aspeed does not specify anything
+> in that case.
 >
-> Not really. While most devices are fairly standalone they can access all
-> sorts of QEMU APIs. Why not just implement your device inside the QEMU
-> source tree?
+> Cc: Frederic Konrad <konrad.frederic@yahoo.fr>
+> Cc: Mauro Matteo Cascella <mcascell@redhat.com>
+> Reported-by: Ziming Zhang <ezrakiez@gmail.com>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/net/ftgmac100.c | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
 >
-> >
-> > Regards,
-> > Pratik
-> >
-> >
-> > On Mon, Aug 10, 2020 at 3:18 PM Alex Benn=C3=A9e <alex.bennee@linaro.or=
-g>
-> wrote:
-> >
-> >>
-> >> Pratik Parvati <pratikp@vayavyalabs.com> writes:
-> >>
-> >> > Hi team,
-> >> >
-> >> > Lately, I have been working on QEMU modeling and interfacing it into
-> the
-> >> > existing platform. What actually I wanted to check is; whether QEMU
-> >> > supports library that gives developers a clean interface to develop
-> and
-> >> > integrate peripheral model in to QEMU. I know of the Greensocs Syste=
-mC
-> >> > bridge - but that was quite difficult to work with in past.
-> >>
-> >> Not really - with a few exceptions like vhost-user and in KVM device
-> >> emulation all devices are emulated in the QEMU code base. As a result
-> >> the best way to maintain a device is to have it integrated upstream
-> >> (along with some tests to ensure it is working).
-> >>
-> >> As you note there are various forks of QEMU that support device
-> >> modelling but none of these features have been merged upstream and wou=
-ld
-> >> likely need to assuage worries about such interfaces being used to avo=
-id
-> >> GPL compliance.
-> >>
-> >> What sort of devices are you looking to model? Are these existing
-> >> devices or experimental/research things?
-> >>
-> >> --
-> >> Alex Benn=C3=A9e
-> >>
+> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+> index 280aa3d3a1e2..987b843fabc4 100644
+> --- a/hw/net/ftgmac100.c
+> +++ b/hw/net/ftgmac100.c
+> @@ -540,10 +540,21 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint=
+32_t tx_ring,
+>                  s->isr |=3D FTGMAC100_INT_XPKT_LOST;
+>                  len =3D  sizeof(s->frame) - frame_size - 4;
+>              }
+> -            memmove(ptr + 16, ptr + 12, len - 12);
+> -            stw_be_p(ptr + 12, ETH_P_VLAN);
+> -            stw_be_p(ptr + 14, bd.des1);
+> -            len +=3D 4;
+> +
+> +            if (len < sizeof(struct eth_header)) {
+> +                qemu_log_mask(LOG_GUEST_ERROR,
+> +                         "%s: frame too small for VLAN insertion : %d by=
+tes\n",
+> +                         __func__, len);
+> +                s->isr |=3D FTGMAC100_INT_XPKT_LOST;
+> +            } else {
+> +                uint8_t *vlan_hdr =3D ptr + (ETH_ALEN * 2);
+> +                uint8_t *payload =3D vlan_hdr + sizeof(struct vlan_heade=
+r);
+> +
+> +                memmove(payload, vlan_hdr, len - (ETH_ALEN * 2));
+> +                stw_be_p(vlan_hdr, ETH_P_VLAN);
+> +                stw_be_p(vlan_hdr + 2, FTGMAC100_TXDES1_VLANTAG_CI(bd.de=
+s1));
+> +                len +=3D sizeof(struct vlan_header);
+> +            }
+>          }
 >
->
+>          ptr +=3D len;
 > --
-> Alex Benn=C3=A9e
+> 2.25.4
 >
 
---000000000000b52c6105ac85f827
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I can confirm that I can't reproduce the issue with the above patch. Thank =
+you.
 
-<div dir=3D"ltr">Just to hide the core QEMU implementation=C2=A0from the de=
-vice code. QEMU core source code remains the same for all device; So, was t=
-hinking a way of hiding it from the rest of the device code.<div><br clear=
-=3D"all"><div><div dir=3D"ltr" class=3D"gmail_signature" data-smartmail=3D"=
-gmail_signature"><div dir=3D"ltr">Regards,<div>Pratik</div></div></div></di=
-v><br></div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"=
-gmail_attr">On Mon, Aug 10, 2020 at 3:50 PM Alex Benn=C3=A9e &lt;<a href=3D=
-"mailto:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; wrote:<br></=
-div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bor=
-der-left:1px solid rgb(204,204,204);padding-left:1ex"><br>
-Pratik Parvati &lt;<a href=3D"mailto:pratikp@vayavyalabs.com" target=3D"_bl=
-ank">pratikp@vayavyalabs.com</a>&gt; writes:<br>
-<br>
-&gt; As an experiment, I have modelled non-existing ARM Watchdog model (SP8=
-05)<br>
-&gt; interfaced to the versatile PB platform. What actually I was looking i=
-s -<br>
-&gt; some sort of QEMU library, where I can model new device outside the QE=
-MU<br>
-&gt; source hierarchy and still be able to compile it using QEMU library an=
-d<br>
-&gt; include files to add support for the new device. If QEMU doesn&#39;t p=
-rovide a<br>
-&gt; library, Is there a flexibly that I can tweak something inside the QEM=
-U to<br>
-&gt; generate it?<br>
-<br>
-Not really. While most devices are fairly standalone they can access all<br=
->
-sorts of QEMU APIs. Why not just implement your device inside the QEMU<br>
-source tree?<br>
-<br>
-&gt;<br>
-&gt; Regards,<br>
-&gt; Pratik<br>
-&gt;<br>
-&gt;<br>
-&gt; On Mon, Aug 10, 2020 at 3:18 PM Alex Benn=C3=A9e &lt;<a href=3D"mailto=
-:alex.bennee@linaro.org" target=3D"_blank">alex.bennee@linaro.org</a>&gt; w=
-rote:<br>
-&gt;<br>
-&gt;&gt;<br>
-&gt;&gt; Pratik Parvati &lt;<a href=3D"mailto:pratikp@vayavyalabs.com" targ=
-et=3D"_blank">pratikp@vayavyalabs.com</a>&gt; writes:<br>
-&gt;&gt;<br>
-&gt;&gt; &gt; Hi team,<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; Lately, I have been working on QEMU modeling and interfacing =
-it into the<br>
-&gt;&gt; &gt; existing platform. What actually I wanted to check is; whethe=
-r QEMU<br>
-&gt;&gt; &gt; supports library that gives developers a clean interface to d=
-evelop and<br>
-&gt;&gt; &gt; integrate peripheral model in to QEMU. I know of the Greensoc=
-s SystemC<br>
-&gt;&gt; &gt; bridge - but that was quite difficult to work with in past.<b=
-r>
-&gt;&gt;<br>
-&gt;&gt; Not really - with a few exceptions like vhost-user and in KVM devi=
-ce<br>
-&gt;&gt; emulation all devices are emulated in the QEMU code base. As a res=
-ult<br>
-&gt;&gt; the best way to maintain a device is to have it integrated upstrea=
-m<br>
-&gt;&gt; (along with some tests to ensure it is working).<br>
-&gt;&gt;<br>
-&gt;&gt; As you note there are various forks of QEMU that support device<br=
->
-&gt;&gt; modelling but none of these features have been merged upstream and=
- would<br>
-&gt;&gt; likely need to assuage worries about such interfaces being used to=
- avoid<br>
-&gt;&gt; GPL compliance.<br>
-&gt;&gt;<br>
-&gt;&gt; What sort of devices are you looking to model? Are these existing<=
-br>
-&gt;&gt; devices or experimental/research things?<br>
-&gt;&gt;<br>
-&gt;&gt; --<br>
-&gt;&gt; Alex Benn=C3=A9e<br>
-&gt;&gt;<br>
-<br>
-<br>
--- <br>
-Alex Benn=C3=A9e<br>
-</blockquote></div>
+--=20
+Mauro Matteo Cascella, Red Hat Product Security
+6F78 E20B 5935 928C F0A8  1A9D 4E55 23B8 BB34 10B0
 
---000000000000b52c6105ac85f827--
 
