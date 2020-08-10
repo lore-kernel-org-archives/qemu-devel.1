@@ -2,84 +2,81 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C0CC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F54EC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 11:03:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FE6120709
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:53:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE55A206C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 11:03:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ko1WLEpY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FE6120709
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ycd09Q6Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE55A206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k55Qn-00041N-Ng
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 06:53:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35034)
+	id 1k55aR-0006qP-7A
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 07:03:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37054)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k55PM-0002Gu-BQ
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:52:00 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37786)
+ (Exim 4.90_1) (envelope-from <linus.walleij@linaro.org>)
+ id 1k55Zk-0006PW-4j
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 07:02:44 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:42996)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1k55PK-000558-BO
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:51:59 -0400
-Received: by mail-wr1-x441.google.com with SMTP id y3so7706060wrl.4
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 03:51:57 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <linus.walleij@linaro.org>)
+ id 1k55Zg-0006Uk-SF
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 07:02:43 -0400
+Received: by mail-lj1-x243.google.com with SMTP id t6so9049948ljk.9
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 04:02:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=ZFMHqgtK4joNIT/9rWbW+hlBCF9dx6g0E6pjSUq3iHE=;
- b=Ko1WLEpYrwDjUycTAUFZMegY7nQxEYL9f0JsubwIRKfIazXcXXtVWHCZw1oX1XqMLy
- mMHFO9caAiXj4znMm5G1AiNxARwTdiGnDPG87xA+/kUA1DfZRgvxPPcS9hSseX5FqKzg
- H+W4MsptHyS5FAHgSE7BJwLNwxSJUu9AswDJKjVgEBgF3rCc236cNN6Z0AV9GyYvYOjx
- Yab3SZ8M6zobDB9A9zH9qhvEA15wDhNgnm0rcGgiXdmw/2JstBjiqgL6ASXUAVl6x76K
- fFplc3Zio34QSwBySK89haCb0wj2tVPxeSWtu2T5CAkFgZvJR/nBEvZ7ehnfXB/9F3Dz
- OieA==
+ bh=U2JMQwQuDgHlcfFwPb65GGl9226SqxYKSo8gW1+qV4A=;
+ b=ycd09Q6Ye7sc8xqUC49v6AA4FxlLR1Hhhh1W8l247b5DxMeoGrHGyCyBbcY+ZiSH90
+ GeV1Cf91H5eFnM79C4JBDeH9AXTAfcF7ZDnLEOm5K2bMnAM4iFLTNk+ZxhgM0X9fCmmD
+ ZTurMhH/RXWXDFaHBRgqIxCSL+pjcAemO3QhifUTqZlHj2WS1S6BNKnBgDBRLmszQ3V9
+ Ps1F8x7lzay/fBYHEHQ45zhw8pAG4B+koE1WUB9pF9+RVvc3+qiJ738gc55yoaogOoOE
+ ImEfQsr/iFcxtv087s9yBFxnrKp3K/GIPtIvcZcMneoY3EMVmvCGymFyzAAwYhiONzBa
+ 3oEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=ZFMHqgtK4joNIT/9rWbW+hlBCF9dx6g0E6pjSUq3iHE=;
- b=QCohaUTlmrMGseb1dPVfHXjPH2/L7ampsI5T8fCc6kSGUs6nJZSw1C9ptdzJRkzbbA
- q45210DbmgiTjSN3cGdIKJnaRdii+0GIySBQX3P1p36IKqWp+YacDymk2MDaX6RI4Xb7
- 2tcy8aKjSDHcX9eFoAa2iUIrzIcMKYtqNSHZ2UItxlp74Y0if2AZWAoTHW6rKvX9fO67
- BEUFHIxTVVii/0XiPmmPs0MiE1gy1Kx3ZNTF0jyy86pIC/vfSNJBACm8RR5rcLTsfEE+
- GnhpQllnZqzUoNGE6xVhAQ0u0mboxeWoer83oy3TRbdqSeSE7gHr03gruAFCGS2aohKK
- Af6w==
-X-Gm-Message-State: AOAM532FGtmqsUaAh6l6XQbJirFkSvfpuNBqU/WMziuex/Xwn7ZR10+K
- //o0gmopvMumF35ey2Vs2jSdEw==
-X-Google-Smtp-Source: ABdhPJy96PgPtawk91ylSNsPU63ReomYSEc+oN93a24khDnUOFo/wLxSkEsnXckQJBhrz5bAOSM9EA==
-X-Received: by 2002:a5d:5641:: with SMTP id j1mr24495239wrw.399.1597056716293; 
- Mon, 10 Aug 2020 03:51:56 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 6sm6268969wmf.4.2020.08.10.03.51.54
+ bh=U2JMQwQuDgHlcfFwPb65GGl9226SqxYKSo8gW1+qV4A=;
+ b=ksIappXDJSSJU07OB8qmkpVFVIERe/2pKL4SSSx/SiWrwcOxi3bf6Y0HA7kdJZh9PZ
+ mh33wKIAxAbdjPSlIAdQPHtB5IJ4mxCuweBangms/vI2RS+uA5HynT1Z2NR0h70qT6g4
+ rvhxH6ICbe+76EcXdrk8dUMXbnfnGfFRESZyx+Y8n2BXJmkQsGW0z8uw5t+J0hQeYk6O
+ IU5YRsgVw6zaAuX4vClx/0s+yZexM7BG4nOI4aHiIlbbxQFGKLh/hG7kkAv2j6sfn93j
+ EBjwefSo8qTWY8HrOatf1WiWJ9hNYpA6xL+ZIJYep2rIzsvP+0wmnvfaNJHVLoEAJfPw
+ 3T+Q==
+X-Gm-Message-State: AOAM531mV2Ke09NMB0fykVgoQ1qtah/WPR+rdtqvA14s12cugJjTYTr6
+ RtdF7A/s4ZEoApK3ufixjHBoDQ==
+X-Google-Smtp-Source: ABdhPJw3yxD6ZDS/L2suPjxFjHfDzdlOqM5qnYl24R3NyHXPuk0N9Bpai2F2cl0Q/XqafWDMauOqGA==
+X-Received: by 2002:a2e:9e8a:: with SMTP id f10mr262329ljk.330.1597057357892; 
+ Mon, 10 Aug 2020 04:02:37 -0700 (PDT)
+Received: from genomnajs.ideon.se ([85.235.10.227])
+ by smtp.gmail.com with ESMTPSA id k12sm10551672lfe.68.2020.08.10.04.02.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 10 Aug 2020 03:51:54 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4868D1FF7E;
- Mon, 10 Aug 2020 11:51:54 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] CODING_STYLE.rst: flesh out our naming conventions.
-Date: Mon, 10 Aug 2020 11:51:47 +0100
-Message-Id: <20200810105147.10670-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ Mon, 10 Aug 2020 04:02:37 -0700 (PDT)
+From: Linus Walleij <linus.walleij@linaro.org>
+To: Theodore Ts'o <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>
+Subject: [PATCH v3] fcntl: Add 32bit filesystem mode
+Date: Mon, 10 Aug 2020 13:02:33 +0200
+Message-Id: <20200810110233.4374-1-linus.walleij@linaro.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=linus.walleij@linaro.org; helo=mail-lj1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,68 +98,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, linux-api@vger.kernel.org,
+ Linus Walleij <linus.walleij@linaro.org>, qemu-devel@nongnu.org,
+ Florian Weimer <fw@deneb.enyo.de>, Andy Lutomirski <luto@kernel.org>,
+ linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Mention a few of the more common naming conventions we follow in the
-code base including common variable names and function prefix and
-suffix examples.
+It was brought to my attention that this bug from 2018 was
+still unresolved: 32 bit emulators like QEMU were given
+64 bit hashes when running 32 bit emulation on 64 bit systems.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+This adds a flag to the fcntl() F_GETFD and F_SETFD operations
+to set the underlying filesystem into 32bit mode even if the
+file handle was opened using 64bit mode without the compat
+syscalls.
 
+Programs that need the 32 bit file system behavior need to
+issue a fcntl() system call such as in this example:
+
+  #define FD_32BIT_MODE 2
+
+  int main(int argc, char** argv) {
+    DIR* dir;
+    int err;
+    int fd;
+
+    dir = opendir("/boot");
+    fd = dirfd(dir);
+    err = fcntl(fd, F_SETFD, FD_32BIT_MODE);
+    if (err) {
+      printf("fcntl() failed! err=%d\n", err);
+      return 1;
+    }
+    printf("dir=%p\n", dir);
+    printf("readdir(dir)=%p\n", readdir(dir));
+    printf("errno=%d: %s\n", errno, strerror(errno));
+    return 0;
+  }
+
+This can be pretty hard to test since C libraries and linux
+userspace security extensions aggressively filter the parameters
+that are passed down and allowed to commit into actual system
+calls.
+
+Cc: Florian Weimer <fw@deneb.enyo.de>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andy Lutomirski <luto@kernel.org>
+Suggested-by: Theodore Ts'o <tytso@mit.edu>
+Link: https://bugs.launchpad.net/qemu/+bug/1805913
+Link: https://lore.kernel.org/lkml/87bm56vqg4.fsf@mid.deneb.enyo.de/
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=205957
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
-v2
-  - punctuation fixes suggested by Cornelia
-  - re-worded section on qemu_ prefix
-  - expanded on _locked suffix
+ChangeLog v2->v3:
+- Realized that I also have to clear the flag correspondingly
+  if someone ask for !FD_32BIT_MODE after setting it the
+  first time.
+ChangeLog v1->v2:
+- Use a new flag FD_32BIT_MODE to F_GETFD and F_SETFD
+  instead of a new fcntl operation, there is already a fcntl
+  operation to set random flags.
+- Sorry for taking forever to respin this patch :(
 ---
- CODING_STYLE.rst | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+ fs/fcntl.c                       | 7 +++++++
+ include/uapi/asm-generic/fcntl.h | 8 ++++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/CODING_STYLE.rst b/CODING_STYLE.rst
-index 427699e0e42..e7ae44aed7f 100644
---- a/CODING_STYLE.rst
-+++ b/CODING_STYLE.rst
-@@ -109,8 +109,34 @@ names are lower_case_with_underscores_ending_with_a_t, like the POSIX
- uint64_t and family.  Note that this last convention contradicts POSIX
- and is therefore likely to be changed.
+diff --git a/fs/fcntl.c b/fs/fcntl.c
+index 2e4c0fa2074b..a937be835924 100644
+--- a/fs/fcntl.c
++++ b/fs/fcntl.c
+@@ -335,10 +335,17 @@ static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
+ 		break;
+ 	case F_GETFD:
+ 		err = get_close_on_exec(fd) ? FD_CLOEXEC : 0;
++		/* Report 32bit file system mode */
++		if (filp->f_mode & FMODE_32BITHASH)
++			err |= FD_32BIT_MODE;
+ 		break;
+ 	case F_SETFD:
+ 		err = 0;
+ 		set_close_on_exec(fd, arg & FD_CLOEXEC);
++		if (arg & FD_32BIT_MODE)
++			filp->f_mode |= FMODE_32BITHASH;
++		else
++			filp->f_mode &= ~FMODE_32BITHASH;
+ 		break;
+ 	case F_GETFL:
+ 		err = filp->f_flags;
+diff --git a/include/uapi/asm-generic/fcntl.h b/include/uapi/asm-generic/fcntl.h
+index 9dc0bf0c5a6e..edd3573cb7ef 100644
+--- a/include/uapi/asm-generic/fcntl.h
++++ b/include/uapi/asm-generic/fcntl.h
+@@ -160,6 +160,14 @@ struct f_owner_ex {
  
--When wrapping standard library functions, use the prefix ``qemu_`` to alert
--readers that they are seeing a wrapped version; otherwise avoid this prefix.
-+Variable Naming Conventions
-+---------------------------
-+
-+A number of short naming conventions exist for variables that use
-+common QEMU types. For example, the architecture independent CPUState
-+this is often held as a ``cs`` pointer variable, whereas the concrete
-+CPUArchState us usually held in a pointer called ``env``.
-+
-+Likewise, in device emulation code the common DeviceState is usually
-+called ``dev`` with the actual status structure often uses the terse
-+``s`` or maybe ``foodev``.
-+
-+Function Naming Conventions
-+---------------------------
-+
-+The ``qemu_`` prefix is used for utility functions that are widely
-+called from across the code-base. This includes wrapped versions of
-+standard library functions (e.g. qemu_strtol) where the prefix is
-+added to the function name to alert readers that they are seeing a
-+wrapped version; otherwise avoid this prefix.
-+
-+If there are two versions of a function to be called with or without a
-+lock held, the function that expects the lock to be already held
-+usually uses the suffix ``_locked``.
-+
-+Public functions (i.e. declared in public headers) tend to be prefixed
-+with the subsystem or file they came from. For example, ``tlb_`` for
-+functions from ``cputlb.c`` or ``cpu_`` for functions from cpus.c.
+ /* for F_[GET|SET]FL */
+ #define FD_CLOEXEC	1	/* actually anything with low bit set goes */
++/*
++ * This instructs the kernel to provide 32bit semantics (such as hashes) from
++ * the file system layer, when running a userland that depend on 32bit
++ * semantics on a kernel that supports 64bit userland, but does not use the
++ * compat ioctl() for e.g. open(), so that the kernel would otherwise assume
++ * that the userland process is capable of dealing with 64bit semantics.
++ */
++#define FD_32BIT_MODE	2
  
- Block structure
- ===============
+ /* for posix fcntl() and lockf() */
+ #ifndef F_RDLCK
 -- 
-2.20.1
+2.26.2
 
 
