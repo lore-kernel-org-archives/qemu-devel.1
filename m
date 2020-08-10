@@ -7,39 +7,41 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85BFEC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 09:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EABEC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 09:57:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F2F7206B5
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 09:56:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F2F7206B5
+	by mail.kernel.org (Postfix) with ESMTPS id EB2FC206B5
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 09:57:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB2FC206B5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k54Xe-0003GW-FT
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 05:56:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36838)
+	id 1k54YF-00049q-87
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 05:57:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
- id 1k54Wy-0002MT-Ni; Mon, 10 Aug 2020 05:55:48 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:34032)
+ id 1k54Wx-0002Kr-CI; Mon, 10 Aug 2020 05:55:47 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:51472)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
- id 1k54Wv-0003yj-HM; Mon, 10 Aug 2020 05:55:48 -0400
+ id 1k54Wu-0003yk-PN; Mon, 10 Aug 2020 05:55:46 -0400
 Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id C7F9544574;
- Mon, 10 Aug 2020 11:55:30 +0200 (CEST)
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 65F9644562;
+ Mon, 10 Aug 2020 11:55:31 +0200 (CEST)
 From: Stefan Reiter <s.reiter@proxmox.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH for-5.1 v2 1/2] block/block-copy: always align copied region
- to cluster size
-Date: Mon, 10 Aug 2020 11:55:22 +0200
-Message-Id: <20200810095523.15071-1-s.reiter@proxmox.com>
+Subject: [PATCH for-5.1 v2 2/2] iotests: add test for unaligned granularity
+ bitmap backup
+Date: Mon, 10 Aug 2020 11:55:23 +0200
+Message-Id: <20200810095523.15071-2-s.reiter@proxmox.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200810095523.15071-1-s.reiter@proxmox.com>
+References: <20200810095523.15071-1-s.reiter@proxmox.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=212.186.127.180;
@@ -69,44 +71,117 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 42ac214406e0 (block/block-copy: refactor task creation)
-block_copy_task_create calculates the area to be copied via
-bdrv_dirty_bitmap_next_dirty_area, but that can return an unaligned byte
-count if the image's last cluster end is not aligned to the bitmap's
-granularity.
+Start a VM with a 4097 byte image attached, add a 4096 byte granularity
+dirty bitmap, mark it dirty, and then do a backup.
 
-Always ALIGN_UP the resulting bytes value to satisfy block_copy_do_copy,
-which requires the 'bytes' parameter to be aligned to cluster size.
+This used to run into an assert and fail, check that it works as
+expected and also check the created image to ensure that misaligned
+backups in general work correctly.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
 ---
 
-I've now marked it for-5.1 since it is just a fix, but it's probably okay if
-done later as well.
+I saw Andrey's big series covering iotest 303 so I went for 304. Never submitted
+one before so I hope that's okay, if not feel free to renumber it.
 
-v2:
-* add assert on offset alignment
-* remove 'backing image' wording from commit
-* collect R-b
+ tests/qemu-iotests/304     | 68 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/304.out |  2 ++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 71 insertions(+)
+ create mode 100755 tests/qemu-iotests/304
+ create mode 100644 tests/qemu-iotests/304.out
 
- block/block-copy.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/block/block-copy.c b/block/block-copy.c
-index f7428a7c08..a30b9097ef 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -142,6 +142,9 @@ static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
-         return NULL;
-     }
- 
-+    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-+    bytes = QEMU_ALIGN_UP(bytes, s->cluster_size);
+diff --git a/tests/qemu-iotests/304 b/tests/qemu-iotests/304
+new file mode 100755
+index 0000000000..9a3b0224fa
+--- /dev/null
++++ b/tests/qemu-iotests/304
+@@ -0,0 +1,68 @@
++#!/usr/bin/env python3
++#
++# Tests dirty-bitmap backup with unaligned bitmap granularity
++#
++# Copyright (c) 2020 Proxmox Server Solutions
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++# owner=s.reiter@proxmox.com
 +
-     /* region is dirty, so no existent tasks possible in it */
-     assert(!find_conflicting_task(s, offset, bytes));
- 
++import iotests
++from iotests import qemu_img_create, qemu_img_log, file_path
++
++iotests.script_initialize(supported_fmts=['qcow2'],
++                          supported_protocols=['file'])
++
++test_img = file_path('test.qcow2')
++target_img = file_path('target.qcow2')
++
++# unaligned by one byte
++image_len = 4097
++bitmap_granularity = 4096
++
++qemu_img_create('-f', iotests.imgfmt, test_img, str(image_len))
++
++# create VM and add dirty bitmap
++vm = iotests.VM().add_drive(test_img)
++vm.launch()
++
++vm.qmp('block-dirty-bitmap-add', **{
++    'node': 'drive0',
++    'name': 'bitmap0',
++    'granularity': bitmap_granularity
++})
++
++# mark entire bitmap as dirty
++vm.hmp_qemu_io('drive0', 'write -P0x16 0 4096');
++vm.hmp_qemu_io('drive0', 'write -P0x17 4097 1');
++
++# do backup and wait for completion
++vm.qmp('drive-backup', **{
++    'device': 'drive0',
++    'sync': 'full',
++    'target': target_img,
++    'bitmap': 'bitmap0',
++    'bitmap-mode': 'on-success'
++})
++
++event = vm.event_wait(name='BLOCK_JOB_COMPLETED',
++                      match={'data': {'device': 'drive0'}},
++                      timeout=5.0)
++
++# shutdown to sync images
++vm.shutdown()
++
++# backup succeeded, check if image is correct
++qemu_img_log('compare', test_img, target_img)
+diff --git a/tests/qemu-iotests/304.out b/tests/qemu-iotests/304.out
+new file mode 100644
+index 0000000000..381cc056f7
+--- /dev/null
++++ b/tests/qemu-iotests/304.out
+@@ -0,0 +1,2 @@
++Images are identical.
++
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 025ed5238d..7f76066640 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -309,3 +309,4 @@
+ 299 auto quick
+ 301 backing quick
+ 302 quick
++304 rw quick
 -- 
 2.20.1
 
