@@ -7,55 +7,54 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFD2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 16:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CF84C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 16:56:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9E2E22B47
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 16:55:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9E2E22B47
+	by mail.kernel.org (Postfix) with ESMTPS id E1FFB22BEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 16:56:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1FFB22BEB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5B5W-0007Ty-UN
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 12:55:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40648)
+	id 1k5B6V-0001Y4-1M
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 12:56:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5B49-0005YH-Os
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 12:54:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34670
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5B3t-00051F-Ak
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 12:54:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54985
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5B48-0000iR-3n
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 12:54:29 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5B3r-0000gn-SA
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 12:54:13 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-1eOYZTHxNnyVaKWenPKo_A-1; Mon, 10 Aug 2020 12:54:22 -0400
-X-MC-Unique: 1eOYZTHxNnyVaKWenPKo_A-1
+ us-mta-202-dZcfky0SNGCuR5CMkki5tQ-1; Mon, 10 Aug 2020 12:54:08 -0400
+X-MC-Unique: dZcfky0SNGCuR5CMkki5tQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68BA5106B249;
- Mon, 10 Aug 2020 16:54:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3955E80046C;
+ Mon, 10 Aug 2020 16:54:07 +0000 (UTC)
 Received: from bahia.lan (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 919C02DE64;
- Mon, 10 Aug 2020 16:54:20 +0000 (UTC)
-Subject: [PATCH 04/14] spapr/xive: Rework error handling of kvmppc_xive_mmap()
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6260519C4F;
+ Mon, 10 Aug 2020 16:54:06 +0000 (UTC)
+Subject: [PATCH 02/14] spapr/xive: Rework error handling of
+ kvmppc_xive_cpu_connect()
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 10 Aug 2020 18:54:19 +0200
-Message-ID: <159707845972.1489912.719896767746375765.stgit@bahia.lan>
+Date: Mon, 10 Aug 2020 18:54:05 +0200
+Message-ID: <159707844549.1489912.4862921680328017645.stgit@bahia.lan>
 In-Reply-To: <159707843034.1489912.1082061742626355958.stgit@bahia.lan>
 References: <159707843034.1489912.1082061742626355958.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=UTF-8
@@ -88,89 +87,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Callers currently check failures of kvmppc_xive_mmap() through the
-@errp argument, which isn't a recommanded practice. It is preferred
-to use a return value when possible.
+Use error_setg_errno() instead of error_setg(strerror()). While here,
+use -ret instead of errno since kvm_vcpu_enable_cap() returns a negative
+errno on failure.
 
-Since NULL isn't an invalid address in theory, it seems better to
-return MAP_FAILED and to teach callers to handle it.
+Use ERRP_GUARD() to ensure that errp can be passed to error_append_hint(),
+and get rid of the local_err boilerplate.
+
+Propagate the return value so that callers may use it as well to check
+failures.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/spapr_xive_kvm.c |   18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ hw/intc/spapr_xive_kvm.c |   21 ++++++++++-----------
+ include/hw/ppc/xive.h    |    2 +-
+ 2 files changed, 11 insertions(+), 12 deletions(-)
 
 diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index d801bf5cd11c..b2a36fd59dae 100644
+index 82a6f99f022d..aa1a2f915363 100644
 --- a/hw/intc/spapr_xive_kvm.c
 +++ b/hw/intc/spapr_xive_kvm.c
-@@ -698,6 +698,7 @@ int kvmppc_xive_post_load(SpaprXive *xive, int version_=
-id)
-     return 0;
+@@ -144,8 +144,9 @@ void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, =
+Error **errp)
+     }
  }
 =20
-+/* Returns MAP_FAILED on error and sets errno */
- static void *kvmppc_xive_mmap(SpaprXive *xive, int pgoff, size_t len,
-                               Error **errp)
+-void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
++int kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
  {
-@@ -708,7 +709,6 @@ static void *kvmppc_xive_mmap(SpaprXive *xive, int pgof=
-f, size_t len,
-                 pgoff << page_shift);
-     if (addr =3D=3D MAP_FAILED) {
-         error_setg_errno(errp, errno, "XIVE: unable to set memory mapping"=
++    ERRP_GUARD();
+     SpaprXive *xive =3D SPAPR_XIVE(tctx->xptr);
+     unsigned long vcpu_id;
+     int ret;
+@@ -154,7 +155,7 @@ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **er=
+rp)
+=20
+     /* Check if CPU was hot unplugged and replugged. */
+     if (kvm_cpu_is_enabled(tctx->cs)) {
+-        return;
++        return 0;
+     }
+=20
+     vcpu_id =3D kvm_arch_vcpu_id(tctx->cs);
+@@ -162,20 +163,18 @@ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **=
+errp)
+     ret =3D kvm_vcpu_enable_cap(tctx->cs, KVM_CAP_PPC_IRQ_XIVE, 0, xive->f=
+d,
+                               vcpu_id, 0);
+     if (ret < 0) {
+-        Error *local_err =3D NULL;
+-
+-        error_setg(&local_err,
+-                   "XIVE: unable to connect CPU%ld to KVM device: %s",
+-                   vcpu_id, strerror(errno));
+-        if (errno =3D=3D ENOSPC) {
+-            error_append_hint(&local_err, "Try -smp maxcpus=3DN with N < %=
+u\n",
++        error_setg_errno(errp, -ret,
++                         "XIVE: unable to connect CPU%ld to KVM device",
++                         vcpu_id);
++        if (ret =3D=3D -ENOSPC) {
++            error_append_hint(errp, "Try -smp maxcpus=3DN with N < %u\n",
+                               MACHINE(qdev_get_machine())->smp.max_cpus);
+         }
+-        error_propagate(errp, local_err);
+-        return;
++        return ret;
+     }
+=20
+     kvm_cpu_enable(tctx->cs);
++    return 0;
+ }
+=20
+ /*
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 2f3c5af810bb..2d87ed43728a 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -487,7 +487,7 @@ void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring,=
+ uint8_t ipb);
+=20
+ int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **errp=
 );
--        return NULL;
-     }
-=20
-     return addr;
-@@ -728,6 +728,7 @@ int kvmppc_xive_connect(SpaprInterruptController *intc,=
- uint32_t nr_servers,
-     size_t tima_len =3D 4ull << TM_SHIFT;
-     CPUState *cs;
-     int fd;
-+    void *addr;
-=20
-     /*
-      * The KVM XIVE device already in use. This is the case when
-@@ -763,11 +764,12 @@ int kvmppc_xive_connect(SpaprInterruptController *int=
-c, uint32_t nr_servers,
-     /*
-      * 1. Source ESB pages - KVM mapping
-      */
--    xsrc->esb_mmap =3D kvmppc_xive_mmap(xive, KVM_XIVE_ESB_PAGE_OFFSET, es=
-b_len,
--                                      &local_err);
--    if (local_err) {
-+    addr =3D kvmppc_xive_mmap(xive, KVM_XIVE_ESB_PAGE_OFFSET, esb_len,
-+                            &local_err);
-+    if (addr =3D=3D MAP_FAILED) {
-         goto fail;
-     }
-+    xsrc->esb_mmap =3D addr;
-=20
-     memory_region_init_ram_device_ptr(&xsrc->esb_mmio_kvm, OBJECT(xsrc),
-                                       "xive.esb-kvm", esb_len, xsrc->esb_m=
-map);
-@@ -781,11 +783,13 @@ int kvmppc_xive_connect(SpaprInterruptController *int=
-c, uint32_t nr_servers,
-     /*
-      * 3. TIMA pages - KVM mapping
-      */
--    xive->tm_mmap =3D kvmppc_xive_mmap(xive, KVM_XIVE_TIMA_PAGE_OFFSET, ti=
-ma_len,
--                                     &local_err);
--    if (local_err) {
-+    addr =3D kvmppc_xive_mmap(xive, KVM_XIVE_TIMA_PAGE_OFFSET, tima_len,
-+                            &local_err);
-+    if (addr =3D=3D MAP_FAILED) {
-         goto fail;
-     }
-+    xive->tm_mmap =3D addr;
-+
-     memory_region_init_ram_device_ptr(&xive->tm_mmio_kvm, OBJECT(xive),
-                                       "xive.tima", tima_len, xive->tm_mmap=
-);
-     memory_region_add_subregion_overlap(&xive->tm_mmio, 0,
+ void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val);
+-void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp);
++int kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp);
+ void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp);
+ void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp);
+ void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp);
 
 
 
