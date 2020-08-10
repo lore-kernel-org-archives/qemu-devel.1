@@ -2,93 +2,91 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA4EC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 11:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B6D3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:20:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3BDD206C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 11:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02FB120709
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:20:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5/hRVTN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3BDD206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QIPTJGk0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02FB120709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k56Om-0001TK-VZ
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 07:55:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49836)
+	id 1k56mb-0007Gj-7F
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 08:20:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58010)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k56Nz-0000fp-3r
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 07:54:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30047)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k56lw-0006l2-LG
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 08:19:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43647
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k56Nx-00051Z-5k
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 07:54:38 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k56lt-0008Rn-Jo
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 08:19:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597060476;
+ s=mimecast20190719; t=1597061959;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fI6Ufwiw4m+xv+hqPSh07ZZ7BO+rNWzmlXddfTm2w4Q=;
- b=Y5/hRVTN1kvyGummVLacSsQoRK2ZgKea2uy4WccCt37QXayADr0YJ00xDYcpKOKKKt4oj0
- UGiX40zmWcZoI+/RttUhWmrQJQSFb/YoCknV1AB/iR6W6vtHD7Rnqt72H1c15TyCocGEqj
- 2XTAdgitmVfE12eWGUUjt1KSQ3voooA=
+ bh=jtj60eUk+p+48v2evNN2+w+A2Uk02UIM0OtgIuFU3UI=;
+ b=QIPTJGk0j2Dpp+GT7m0bCrSj/EMji8UMt4pcTzGy9fd1Zq04zAYK71h/iaquL8C57N77/s
+ v20MzdoAayKQVKSe4vhG6RjebrAkwX5MfFR12zH1EkImtHx4RScB7PoCcEpZvyYuoBOIpv
+ YKtZYg9c3tuBvzDm9JHx/PGjlMnr8Gk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-iQq3eFV3NVe54XsYucnXHA-1; Mon, 10 Aug 2020 07:54:34 -0400
-X-MC-Unique: iQq3eFV3NVe54XsYucnXHA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-445-wgKizoeAM7C0efIiUy4hdw-1; Mon, 10 Aug 2020 08:19:18 -0400
+X-MC-Unique: wgKizoeAM7C0efIiUy4hdw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 949AE107B7EE;
- Mon, 10 Aug 2020 11:54:33 +0000 (UTC)
-Received: from gondolin (ovpn-112-218.ams2.redhat.com [10.36.112.218])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D210A7C0E5;
- Mon, 10 Aug 2020 11:54:28 +0000 (UTC)
-Date: Mon, 10 Aug 2020 13:54:26 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [DRAFT PATCH 000/143] Meson integration for 5.2
-Message-ID: <20200810135426.79e0a31e.cohuck@redhat.com>
-In-Reply-To: <5fec94b6-4ef3-39b2-6bab-63b88434b8d2@redhat.com>
-References: <1596741379-12902-1-git-send-email-pbonzini@redhat.com>
- <20200807085302.7d7616df.cohuck@redhat.com>
- <499b18ae-b15d-abbb-faf5-d9bdd5262fa4@redhat.com>
- <20200807113557.178825af.cohuck@redhat.com>
- <20200807142021.53967299.cohuck@redhat.com>
- <9b8cacc4-e60e-d436-4666-1457ec68e510@redhat.com>
- <20200810115851.36c21729.cohuck@redhat.com>
- <20200810120432.10b5176e.cohuck@redhat.com>
- <5fec94b6-4ef3-39b2-6bab-63b88434b8d2@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BB498005B0;
+ Mon, 10 Aug 2020 12:19:17 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D41A98BA1D;
+ Mon, 10 Aug 2020 12:19:15 +0000 (UTC)
+Date: Mon, 10 Aug 2020 14:19:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] Simple & stupid coroutine-aware monitor_cur()
+Message-ID: <20200810121914.GC14538@linux.fritz.box>
+References: <20200528153742.274164-1-kwolf@redhat.com>
+ <20200528153742.274164-7-kwolf@redhat.com>
+ <87tuxia5a9.fsf@dusky.pond.sub.org>
+ <20200804160604.GB4860@linux.fritz.box>
+ <87sgd15z5w.fsf@dusky.pond.sub.org>
+ <87a6z6wqkg.fsf_-_@dusky.pond.sub.org>
+ <87sgcyziul.fsf_-_@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <87sgcyziul.fsf_-_@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 05:35:27
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 03:31:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,49 +99,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, alex.bennee@linaro.org,
- stefanha@redhat.com, jsnow@redhat.com
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 10 Aug 2020 13:16:03 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 10/08/20 12:04, Cornelia Huck wrote:
-> > 'make check' is unhappy, however:
-> > 
-> > Running test qtest-s390x: device-introspect-test
-> > missing object type 'virtio-gpu-device'
-> > Broken pipe
-> > ../tests/qtest/libqtest.c:175: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
-> > ERROR qtest-s390x: device-introspect-test - too few tests run (expected 6, got 5)  
+Am 07.08.2020 um 15:27 hat Markus Armbruster geschrieben:
+> This is just a sketch.  It's incomplete, needs comments and a real
+> commit message.
 > 
-> It could be an unnecessary dependency on virgl that was detected by the GitLab CI:
+> Support for "[PATCH v6 09/12] hmp: Add support for coroutine command
+> handlers" is missing.  Marked FIXME.
 > 
-> diff --git a/hw/display/meson.build b/hw/display/meson.build
-> index ffcccc0..fa4f806 100644
-> --- a/hw/display/meson.build
-> +++ b/hw/display/meson.build
-> @@ -77,7 +77,7 @@ if config_all_devices.has_key('CONFIG_VIRTIO_GPU')
->    #hw_display_modules += [[ 'virtio-gpu', virtio_gpu.sources(), [pixman, virgl],
->    #                         ['CONFIG_VIRTIO_GPU']]]
+> As is, it goes on top of Kevin's series.  It is meant to be squashed
+> into PATCH 06, except for the FIXME, which needs to be resolved in PATCH
+> 09 instead.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  monitor/monitor.c | 35 +++++++++++++++--------------------
+>  1 file changed, 15 insertions(+), 20 deletions(-)
+> 
+> diff --git a/monitor/monitor.c b/monitor/monitor.c
+> index 50fb5b20d3..8601340285 100644
+> --- a/monitor/monitor.c
+> +++ b/monitor/monitor.c
+> @@ -82,38 +82,34 @@ bool qmp_dispatcher_co_shutdown;
+>   */
+>  bool qmp_dispatcher_co_busy;
 >  
-> -  softmmu_ss.add_all(when: [pixman, virgl, 'CONFIG_VIRTIO_GPU'],
-> +  softmmu_ss.add_all(when: [pixman, 'CONFIG_VIRTIO_GPU'],
->                       if_true: virtio_gpu_ss)
->  endif
+> -/*
+> - * Protects mon_list, monitor_qapi_event_state, coroutine_mon,
+> - * monitor_destroyed.
+> - */
+> +/* Protects mon_list, monitor_qapi_event_state, * monitor_destroyed. */
+>  QemuMutex monitor_lock;
+>  static GHashTable *monitor_qapi_event_state;
+> -static GHashTable *coroutine_mon; /* Maps Coroutine* to Monitor* */
+>  
+>  MonitorList mon_list;
+>  int mon_refcount;
+>  static bool monitor_destroyed;
+>  
+> +static Monitor **monitor_curp(Coroutine *co)
+> +{
+> +    static __thread Monitor *thread_local_mon;
+> +    static Monitor *qmp_dispatcher_co_mon;
+> +
+> +    if (qemu_coroutine_self() == qmp_dispatcher_co) {
+> +        return &qmp_dispatcher_co_mon;
+> +    }
+> +    /* FIXME the coroutine hidden in handle_hmp_command() */
+> +    return &thread_local_mon;
+> +}
 
-Yes, that gets me further along.
+Is thread_local_mon supposed to ever be set? The only callers of
+monitor_set_cur() are the HMP and QMP dispatchers, which will return
+something different.
 
-> In any case I'll post another version today or tomorrow.  (I decided to bite the
-> bullet, include the unit tests conversion and get rid of more Makefile gunk).
+So should we return NULL insetad of thread_local_mon...
 
-I have another one for you :)
+>  Monitor *monitor_cur(void)
+>  {
+> -    Monitor *mon;
+> -
+> -    qemu_mutex_lock(&monitor_lock);
+> -    mon = g_hash_table_lookup(coroutine_mon, qemu_coroutine_self());
+> -    qemu_mutex_unlock(&monitor_lock);
+> -
+> -    return mon;
+> +    return *monitor_curp(qemu_coroutine_self());
+>  }
 
-Building tests/test-coroutine gives me another link error in
-libblock.fa(block_qcow2-threads.c.o) (again, some missing zstd symbols;
-let me know if you need more info.)
+...and return NULL here if monitor_curp() returned NULL...
+
+>  void monitor_set_cur(Coroutine *co, Monitor *mon)
+>  {
+> -    qemu_mutex_lock(&monitor_lock);
+> -    if (mon) {
+> -        g_hash_table_replace(coroutine_mon, co, mon);
+> -    } else {
+> -        g_hash_table_remove(coroutine_mon, co);
+> -    }
+> -    qemu_mutex_unlock(&monitor_lock);
+> +    *monitor_curp(co) = mon;
+
+...and assert(monitor_curp(co) != NULL) here?
+
+This approach looks workable, though the implementation of
+monitor_curp() feels a bit brittle. The code is not significantly
+simpler than the hash table based approach, but the assumptions it makes
+are a bit more hidden.
+
+Saving the locks is more a theoretical improvement because all callers
+are slows paths anyway.
+
+Kevin
 
 
