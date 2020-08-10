@@ -2,84 +2,83 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB0CC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 05:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E32AC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 06:16:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDB44206B2
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 05:07:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="nVnnU7/p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDB44206B2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vayavyalabs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 20F18206B5
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 06:16:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20F18206B5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k502E-0003KS-W3
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 01:07:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34292)
+	id 1k516y-00070U-Bc
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 02:16:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pratikp@vayavyalabs.com>)
- id 1k501h-0002uv-3o
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 01:07:13 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:40476)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5165-0006B1-TA
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 02:15:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52002)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <pratikp@vayavyalabs.com>)
- id 1k501f-00035L-N2
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 01:07:12 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id l2so6877178wrc.7
- for <qemu-devel@nongnu.org>; Sun, 09 Aug 2020 22:07:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=vayavyalabs.com; s=vayavyalabs;
- h=mime-version:from:date:message-id:subject:to;
- bh=Jf6hwqmhdU+zWqBxBXEAKSQy/nnfMqs7OmAjX1yAVS0=;
- b=nVnnU7/p8814+aIO3oqAAQIM/RvmITSzBmDjDU6lT1I1IiR8LiU11JgUoMP6qhL+AU
- EbRyJqznouKi8r7okRGDP5v+HbtqfQpSfyxLTPOI4rmJTAkUOLqkwoTs2QNjRpfQPAaQ
- ZT27sttd90LJvNTuMSeuc8LOFJ01951mRWwrY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=Jf6hwqmhdU+zWqBxBXEAKSQy/nnfMqs7OmAjX1yAVS0=;
- b=RHWpq2oEhfVMJU45w6BdCK63EYOoePKS38jo6mdV9VyoeX2WteO7aRwZKVa++/Fanj
- vsJA+/l/AaoVRCOkBsBdx9UWgGoqZFsNzfT3+A9NRlx9RveQjETGUI/9H6WvGjJfYc2e
- 73Y7JLf/LisSpD5Ohb8e3eAOviMIkP7tv6R4oNpIRso/C7XzcLLusQRJc7JV11hyiGYj
- QBY31FMC5bF0GOXjqM+uIkuJ8NaXUqLlamwXq9n7AeHf6dS9ds+KYpg3ZcIptY0YiB9k
- k4HEWaeDCyaNW5ePK5DI4R55BB7DFEpnhw7hmiB798TW0BzaXlYu1Org2xgutf6mn+a2
- 6bog==
-X-Gm-Message-State: AOAM533CVT6OngCKrP7E1mjqD2IewvPvgVzhDgaQ9zjxSbS7Z5/QviBY
- Udrf4qYRVZcdnTS6NQjny8Rrc89rGhnByq9Tz++VSjeJXco=
-X-Google-Smtp-Source: ABdhPJysrFbmC/kQ6Z/+EqLHl2dmCWFGCCYJwRGhpmUDErvpjHHG/OZ0rTRRWFpGL3m13QnWRYn12A6UoQGf1ss6Koc=
-X-Received: by 2002:adf:f847:: with SMTP id d7mr21598520wrq.328.1597036028542; 
- Sun, 09 Aug 2020 22:07:08 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5163-00033R-Aj
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 02:15:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k5160-0005Cp-NK
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 06:15:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AED582E8085
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 06:15:44 +0000 (UTC)
 MIME-Version: 1.0
-From: Pratik Parvati <pratikp@vayavyalabs.com>
-Date: Mon, 10 Aug 2020 10:36:57 +0530
-Message-ID: <CA+aXn+GrFDssmZWBCL0gh3QLX5BMhmgTQUywLSSQn=cpF2P1ZQ@mail.gmail.com>
-Subject: QEMU Library support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Aug 2020 06:08:11 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1877052@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="0000000000002cd9a605ac7eed89"
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=pratikp@vayavyalabs.com; helo=mail-wr1-x42c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Tags: qemu-20.10
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: paelzer weller-andreas-weller
+X-Launchpad-Bug-Reporter: Andreas Weller (weller-andreas-weller)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
+ =?utf-8?q?=29?=
+References: <158875190128.5304.17617014708809905297.malonedeb@soybean.canonical.com>
+Message-Id: <159703969120.5421.16820047471179662684.malone@soybean.canonical.com>
+Subject: [Bug 1877052] Re: KVM Win 10 guest pauses after kernel upgrade
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3d8c0e4cb43c88ddd80545df79567be8a5b3cc3c
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 00:26:20
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,36 +87,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1877052 <1877052@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002cd9a605ac7eed89
-Content-Type: text/plain; charset="UTF-8"
+I haven't seen any similar reports nor any updates here.
+Might I ask if you  have got any further since then?
 
-Hi team,
+Qemu 5.0 is available in Ubuntu 20.10 now, if you are willing to upgrade or=
+ install a test system that might be worth a try (new libvirt is still WIP,=
+ but unlikely to play a role here).
+20.10 proposed would even have a 5.8.0.12.14 kernel since a kernel change m=
+ight have been what started this that might be worth a check as well.
 
-Lately, I have been working on QEMU modeling and interfacing it into the
-existing platform. What actually I wanted to check is; whether QEMU
-supports library that gives developers a clean interface to develop and
-integrate peripheral model in to QEMU. I know of the Greensocs SystemC
-bridge - but that was quite difficult to work with in past.
+-- =
 
-Regards,
-Pratik
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1877052
 
---0000000000002cd9a605ac7eed89
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Title:
+  KVM Win 10 guest pauses after kernel upgrade
 
-<div dir=3D"ltr">Hi team,<div><br></div><div>Lately, I have been working on=
- QEMU modeling and interfacing it into the existing platform. What actually=
- I wanted to check is; whether QEMU supports library that gives developers =
-a clean=C2=A0interface to develop and integrate peripheral model in to QEMU=
-.=C2=A0I know of the Greensocs SystemC bridge - but that was quite difficul=
-t to work with in past.=C2=A0</div><div><br></div><div><div><div dir=3D"ltr=
-" class=3D"gmail_signature" data-smartmail=3D"gmail_signature"><div dir=3D"=
-ltr">Regards,<div>Pratik</div></div></div></div></div></div>
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  Incomplete
 
---0000000000002cd9a605ac7eed89--
+Bug description:
+  Hello!
+  Unfortunately the bug has apparently reappeared. I have a Windows 10 runn=
+ing in a VM, which after my today's "apt upgrade" goes into pause mode afte=
+r a few seconds of running time.
+
+  Until yesterday it used to work and I was able to boot the VM. During
+  the kernel update (from 5.4.0-28.33 to 5.4.0-29.34) the VM was active
+  and then went into pause mode. Even after a reboot of my host system
+  the problem still persists: the VM boots for a few seconds and then
+  switches to pause mode.
+
+  Current Kernel: Linux andreas-laptop 5.4.0-29-generic #33-Ubuntu SMP
+  Wed Apr 29 14:32:27 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+
+  Maybe relevant logfile lines:
+  2020-05-06T07:46:42.857574Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
+  2020-05-06T07:46:42.857718Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
+  2020-05-06T07:46:42.860567Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(48FH).vmx-exit-load-perf-global-ctrl [bit 12]
+  2020-05-06T07:46:42.860582Z qemu-system-x86_64: warning: host doesn't sup=
+port requested feature: MSR(490H).vmx-entry-load-perf-global-ctrl [bit 13]
+  2020-05-06T07:47:22.901057Z qemu-system-x86_64: terminating on signal 15 =
+from pid 1593 (/usr/sbin/libvirtd)
+  2020-05-06 07:47:23.101+0000: shutting down, reason=3Ddestroyed
+
+
+  Kind regards,
+  =C2=A0=C2=A0=C2=A0Andreas
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1877052/+subscriptions
 
