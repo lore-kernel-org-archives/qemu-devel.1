@@ -7,62 +7,61 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE61C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C305C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:29:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 391B520829
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:28:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43E6220829
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:29:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G6dyYeml"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 391B520829
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CgZM8cUc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E6220829
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5BbT-000366-G2
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:28:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45956)
+	id 1k5BbZ-0003JZ-GB
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:29:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BJy-0008WV-Ke
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37384
- helo=us-smtp-1.mimecast.com)
+ id 1k5BJZ-0007gc-LO
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22868)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BJw-00030m-EH
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:50 -0400
+ id 1k5BJW-0002qr-Mz
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597079447;
+ s=mimecast20190719; t=1597079421;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3xUMW7cQsvPY4cg/gULdWz2gclWFWQG4Ct45IxYfcXc=;
- b=G6dyYemlQrGPTdaFX9GsG261BUVsIzqDoVtPSp/9RodJwG//NbEm9dtu7lsW5aZO4evq7u
- 9unxCbiJaeluTZpY9/tbfD1njAdGFt6cjrbOfWZep4TS9QgiXWZ+xm0UgcJHiE89rKUheP
- uobnVD4Ce8USG1y8MFQKW5MuB0i+AnQ=
+ bh=WJ6R1HLMwakwNbb1kvTa+tXJgQ90Hx2q/rx0hE7JYug=;
+ b=CgZM8cUcgIMUEKXAiq/7JdJNw5sNNHjp9l+/Ywwtb2FgL9Nvjt/TN0/v0zh8IbzLG4O3ys
+ yNp1VUA5JLlWGSp2mjfUmsRbfby5nULm6tSTk3droorditfmxBpALC2VKYERA262s8ddui
+ VinnuVMa2bYgMeIJnQG56IYA1bl2eRk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-gX4kiV5FMn282G0oIoAO0g-1; Mon, 10 Aug 2020 13:10:45 -0400
-X-MC-Unique: gX4kiV5FMn282G0oIoAO0g-1
+ us-mta-493-U-1QnunhOa-mtnJaxYZTwg-1; Mon, 10 Aug 2020 13:10:20 -0400
+X-MC-Unique: U-1QnunhOa-mtnJaxYZTwg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F73391277
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:10:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37BE819067E1
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:10:19 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2C23A5F1EA;
- Mon, 10 Aug 2020 17:10:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 454DA87D6B;
+ Mon, 10 Aug 2020 17:10:18 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 058/147] meson: add macos dependencies
-Date: Mon, 10 Aug 2020 19:07:36 +0200
-Message-Id: <1597079345-42801-59-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 043/147] meson: add virtfs-proxy-helper
+Date: Mon, 10 Aug 2020 19:07:21 +0200
+Message-Id: <1597079345-42801-44-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,17 +72,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:00:11
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:11:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,42 +102,113 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-There is no probing in configure, so no need to pass them as
-variables to meson. Do a regular meson dependency() instead.
-
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ Makefile          | 2 --
+ configure         | 7 +++++--
+ fsdev/meson.build | 8 ++++++++
+ meson.build       | 6 ++++++
+ 4 files changed, 19 insertions(+), 4 deletions(-)
+ create mode 100644 fsdev/meson.build
 
+diff --git a/Makefile b/Makefile
+index 6e22245..f4e5ecf 100644
+--- a/Makefile
++++ b/Makefile
+@@ -413,8 +413,6 @@ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io
+ qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
+ 
+-fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
+-
+ scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ ifdef CONFIG_MPATH
+ scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
+diff --git a/configure b/configure
+index bdd5c48..76a4658 100755
+--- a/configure
++++ b/configure
+@@ -4325,6 +4325,7 @@ fi
+ ##########################################
+ # attr probe
+ 
++libattr_libs=
+ if test "$attr" != "no" ; then
+   cat > $TMPC <<EOF
+ #include <stdio.h>
+@@ -4341,7 +4342,8 @@ EOF
+   # Older distros have <attr/xattr.h>, and need -lattr:
+   elif compile_prog "-DCONFIG_LIBATTR" "-lattr" ; then
+     attr=yes
+-    LIBS="-lattr $LIBS"
++    libattr_libs="-lattr"
++    LIBS="$libattr_libs $LIBS"
+     libattr=yes
+   else
+     if test "$attr" = "yes" ; then
+@@ -6644,6 +6646,7 @@ if [ "$eventfd" = "yes" ]; then
+ fi
+ 
+ tools=""
++helpers=""
+ if test "$want_tools" = "yes" ; then
+   tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
+   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
+@@ -6654,7 +6657,6 @@ if test "$softmmu" = yes ; then
+   if test "$linux" = yes; then
+     if test "$virtfs" != no && test "$cap_ng" = yes && test "$attr" = yes ; then
+       virtfs=yes
+-      helpers="$helpers fsdev/virtfs-proxy-helper\$(EXESUF)"
+     else
+       if test "$virtfs" = yes; then
+         error_exit "VirtFS requires libcap-ng devel and libattr devel"
+@@ -7236,6 +7238,7 @@ if test "$linux_io_uring" = "yes" ; then
+ fi
+ if test "$attr" = "yes" ; then
+   echo "CONFIG_ATTR=y" >> $config_host_mak
++  echo "LIBATTR_LIBS=$libattr_libs" >> $config_host_mak
+ fi
+ if test "$libattr" = "yes" ; then
+   echo "CONFIG_LIBATTR=y" >> $config_host_mak
+diff --git a/fsdev/meson.build b/fsdev/meson.build
+new file mode 100644
+index 0000000..30e2319
+--- /dev/null
++++ b/fsdev/meson.build
+@@ -0,0 +1,8 @@
++have_virtfs_proxy_helper = have_tools and libattr.found() and libcap_ng.found() and 'CONFIG_VIRTFS' in config_host
++if have_virtfs_proxy_helper
++  executable('virtfs-proxy-helper',
++             files('virtfs-proxy-helper.c', '9p-marshal.c', '9p-iov-marshal.c'),
++             dependencies: [qemuutil, libattr, libcap_ng],
++             install: true,
++             install_dir: get_option('libexecdir'))
++endif
 diff --git a/meson.build b/meson.build
-index 3388d68..74be140 100644
+index b5de9f4..d71d87d 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -48,6 +48,10 @@ m = cc.find_library('m', required: false)
- util = cc.find_library('util', required: false)
- socket = []
- version_res = []
-+coref = []
-+iokit = []
-+cocoa = []
-+hvf = []
- if host_machine.system() == 'windows'
-   socket = cc.find_library('ws2_32')
- 
-@@ -55,6 +59,11 @@ if host_machine.system() == 'windows'
-   version_res = win.compile_resources('version.rc',
-                                       depend_files: files('pc-bios/qemu-nsis.ico'),
-                                       include_directories: include_directories('.'))
-+elif host_machine.system() == 'darwin'
-+  coref = dependency('appleframeworks', modules: 'CoreFoundation')
-+  iokit = dependency('appleframeworks', modules: 'IOKit')
-+  cocoa = dependency('appleframeworks', modules: 'Cocoa')
-+  hvf = dependency('appleframeworks', modules: 'Hypervisor')
+@@ -81,6 +81,10 @@ if 'CONFIG_GNUTLS' in config_host
  endif
- glib = declare_dependency(compile_args: config_host['GLIB_CFLAGS'].split(),
-                           link_args: config_host['GLIB_LIBS'].split())
+ pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
+                             link_args: config_host['PIXMAN_LIBS'].split())
++libattr = not_found
++if 'CONFIG_ATTR' in config_host
++  libattr = declare_dependency(link_args: config_host['LIBATTR_LIBS'].split())
++endif
+ seccomp = not_found
+ if 'CONFIG_SECCOMP' in config_host
+   seccomp = declare_dependency(compile_args: config_host['SECCOMP_CFLAGS'].split(),
+@@ -280,6 +284,8 @@ libqemuutil = static_library('qemuutil',
+ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: genh + version_res)
+ 
++subdir('fsdev')
++
+ # Other build targets
+ if 'CONFIG_GUEST_AGENT' in config_host
+   subdir('qga')
 -- 
 1.8.3.1
 
