@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 234D1C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EEABC433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:47:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBFB6206B5
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:47:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF432206B5
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:47:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B/g04wTc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBFB6206B5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C9xGv9m+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF432206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Btm-00007l-1E
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:47:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46396)
+	id 1k5Btr-0000JM-0K
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:47:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BKl-0001WX-Fv
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:11:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31305
+ id 1k5BKS-0000w2-Dh
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:11:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53356
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BKj-0003Bq-Gl
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:11:39 -0400
+ id 1k5BKP-00038h-Ca
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:11:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597079496;
+ s=mimecast20190719; t=1597079476;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2o3z543BwQNJiqsu8SJSUCnvV9TS/KTwSbMD9xcgwOc=;
- b=B/g04wTcJPIrpUixXN3eBTfj4tCBx0uK2mmG0xH27W0obQuw6yuoZBYWaDg3V9x9FKTZMO
- xVVRcj8iQ7XfBTUJrAGNgUeSXYv+3YN6OvvVbRCae2cvY6XS/Jt4MkwWIHOIqIMgyFtIFP
- MKnhiZyvVifPSN6zqtSg5YDS2w9K6jE=
+ bh=NgmVxl+CiGdeDQY2bGHHQrg8Y07feRzHJJAbMKevueM=;
+ b=C9xGv9m+0jC+dxBhsPYzEGqSoJcX1QZ9z3p/L3A1ZYJE67hWUVosaZITHhpIDMNOGMnNwh
+ 2DnlB2hzV3RRlAM0ZThuzXZfyrT6IFx2vlr+FmIZGOMymupbzIUuNflDSQPUtCDRhBGZeh
+ wvv3HJO7zVqhg0j4pDLZpv8WKoiZwVs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-06n86ytrONyatwB3x6lsvQ-1; Mon, 10 Aug 2020 13:11:35 -0400
-X-MC-Unique: 06n86ytrONyatwB3x6lsvQ-1
+ us-mta-137-Zd-OC6NtOyW7aIwIduW1Ow-1; Mon, 10 Aug 2020 13:11:14 -0400
+X-MC-Unique: Zd-OC6NtOyW7aIwIduW1Ow-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CB1019067E3
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:11:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFA24800473
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:11:13 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5A1275F1E9;
- Mon, 10 Aug 2020 17:11:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BBF635F1EA;
+ Mon, 10 Aug 2020 17:11:12 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 087/147] meson: convert hw/mem
-Date: Mon, 10 Aug 2020 19:08:05 +0200
-Message-Id: <1597079345-42801-88-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 075/147] meson: convert replay directory to Meson
+Date: Mon, 10 Aug 2020 19:07:53 +0200
+Message-Id: <1597079345-42801-76-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -107,67 +107,72 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs     | 1 -
- hw/mem/Kconfig       | 1 +
- hw/mem/Makefile.objs | 3 ---
- hw/mem/meson.build   | 6 ++++++
- hw/meson.build       | 1 +
- 5 files changed, 8 insertions(+), 4 deletions(-)
- delete mode 100644 hw/mem/Makefile.objs
- create mode 100644 hw/mem/meson.build
+ Makefile.objs        |  1 -
+ meson.build          |  1 +
+ replay/Makefile.objs | 10 ----------
+ replay/meson.build   | 12 ++++++++++++
+ 4 files changed, 13 insertions(+), 11 deletions(-)
+ delete mode 100644 replay/Makefile.objs
+ create mode 100644 replay/meson.build
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 73c49dd..df72b25 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -34,7 +34,6 @@ devices-dirs-y += usb/
- devices-dirs-$(CONFIG_VFIO) += vfio/
- devices-dirs-y += virtio/
- devices-dirs-y += watchdog/
--devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
- endif
+diff --git a/Makefile.objs b/Makefile.objs
+index e304d92..cfb2cf2 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -68,7 +68,6 @@ common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF
+ common-obj-y += hw/
+ common-obj-m += hw/
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
-index c278449..a0ef2cf 100644
---- a/hw/mem/Kconfig
-+++ b/hw/mem/Kconfig
-@@ -9,3 +9,4 @@ config NVDIMM
-     bool
-     default y
-     depends on (PC || PSERIES || ARM_VIRT)
-+    select MEM_DEVICE
-diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
+-common-obj-y += replay/
+ common-obj-y += backends/
+ 
+ common-obj-y += qapi/
+diff --git a/meson.build b/meson.build
+index b5bbe01..634281f 100644
+--- a/meson.build
++++ b/meson.build
+@@ -644,6 +644,7 @@ common_ss.add(files('cpus-common.c'))
+ 
+ subdir('softmmu')
+ subdir('monitor')
++subdir('replay')
+ 
+ # needed for fuzzing binaries
+ subdir('tests/qtest/libqos')
+diff --git a/replay/Makefile.objs b/replay/Makefile.objs
 deleted file mode 100644
-index 56345be..0000000
---- a/hw/mem/Makefile.objs
+index 939be96..0000000
+--- a/replay/Makefile.objs
 +++ /dev/null
-@@ -1,3 +0,0 @@
--common-obj-$(CONFIG_DIMM) += pc-dimm.o
--common-obj-y += memory-device.o
--common-obj-$(CONFIG_NVDIMM) += nvdimm.o
-diff --git a/hw/mem/meson.build b/hw/mem/meson.build
+@@ -1,10 +0,0 @@
+-common-obj-y += replay.o
+-common-obj-y += replay-internal.o
+-common-obj-y += replay-events.o
+-common-obj-y += replay-time.o
+-common-obj-y += replay-input.o
+-common-obj-y += replay-char.o
+-common-obj-y += replay-snapshot.o
+-common-obj-y += replay-net.o
+-common-obj-y += replay-audio.o
+-common-obj-y += replay-random.o
+diff --git a/replay/meson.build b/replay/meson.build
 new file mode 100644
-index 0000000..ba42462
+index 0000000..8783aea
 --- /dev/null
-+++ b/hw/mem/meson.build
-@@ -0,0 +1,6 @@
-+mem_ss = ss.source_set()
-+mem_ss.add(files('memory-device.c'))
-+mem_ss.add(when: 'CONFIG_DIMM', if_true: files('pc-dimm.c'))
-+mem_ss.add(when: 'CONFIG_NVDIMM', if_true: files('nvdimm.c'))
-+
-+softmmu_ss.add_all(when: 'CONFIG_MEM_DEVICE', if_true: mem_ss)
-diff --git a/hw/meson.build b/hw/meson.build
-index dccc2d1..542d675 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('mem')
- subdir('nubus')
- subdir('semihosting')
- subdir('smbios')
++++ b/replay/meson.build
+@@ -0,0 +1,12 @@
++softmmu_ss.add(files(
++  'replay.c',
++  'replay-internal.c',
++  'replay-events.c',
++  'replay-time.c',
++  'replay-input.c',
++  'replay-char.c',
++  'replay-snapshot.c',
++  'replay-net.c',
++  'replay-audio.c',
++  'replay-random.c',
++))
 -- 
 1.8.3.1
 
