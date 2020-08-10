@@ -1,71 +1,91 @@
-Return-Path: <SRS0=L55N=BT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF28C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Aug 2020 23:54:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E97C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 02:49:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08D28206A1
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Aug 2020 23:54:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D28206A1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 96B2B206A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 02:49:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AJrdEQ5o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B2B206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k4v8a-0004Hk-81
-	for qemu-devel@archiver.kernel.org; Sun, 09 Aug 2020 19:54:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45336)
+	id 1k4xsQ-0008Te-QK
+	for qemu-devel@archiver.kernel.org; Sun, 09 Aug 2020 22:49:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k4v80-0003qg-Ui
- for qemu-devel@nongnu.org; Sun, 09 Aug 2020 19:53:24 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:45657)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k4v7y-0003AQ-1W
- for qemu-devel@nongnu.org; Sun, 09 Aug 2020 19:53:23 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 079NqEnD006116
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Sun, 9 Aug 2020 19:52:18 -0400
-Date: Sun, 9 Aug 2020 19:52:14 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Helge Deller <deller@gmx.de>
-Subject: Re: [PATCH v3 7/8] hw/display/artist: Refactor artist_rop8() to
- avoid buffer over-runy
-Message-ID: <20200809235214.oevaldx22c6wvi32@mozz.bu.edu>
-References: <20200804140056.7690-8-deller@gmx.de>
- <20200804163954.4dzistybjwby7pzx@mozz.bu.edu>
- <20200804212019.GA876@ls3530.fritz.box>
- <20200804220145.yjq265pk363466hx@mozz.bu.edu>
- <20200805204459.GA23951@ls3530.fritz.box>
- <20200806154556.ksb2ja3hghxhukdd@mozz.bu.edu>
- <01f10f58-1b29-d7f9-e4d5-6092d69aa127@gmx.de>
- <20200809171714.3qp72ubampclo4f2@mozz.bu.edu>
- <1d16f1cd-a57e-d56c-2e4f-09f594cc86b7@gmx.de>
- <e4c6d48d-8338-b156-7d16-99b5fe97cd64@gmx.de>
+ (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
+ id 1k4xrs-0007yB-8i
+ for qemu-devel@nongnu.org; Sun, 09 Aug 2020 22:48:56 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:43691)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
+ id 1k4xrq-0004Ho-MM
+ for qemu-devel@nongnu.org; Sun, 09 Aug 2020 22:48:55 -0400
+Received: by mail-io1-xd44.google.com with SMTP id k23so7408878iom.10
+ for <qemu-devel@nongnu.org>; Sun, 09 Aug 2020 19:48:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=3fMoH270+qW7vq3WlK8SY8mVJoSWpFyEV40E3e18lxY=;
+ b=AJrdEQ5oToyCfEo0UqE0GVXCjjdAN1gYHzu2nG2/90qHiSv+kAb58Ma7wrMhHmZpSj
+ 45UJICKRzB+24PpGrCaSbpnOqF+SV5Hrz3w5yAoZQhmeVNhVcf3PclHAYCkhCUfgCai/
+ pVqIPSZ4FlNuv1Fr20p+D1XQnO8WtAIADmLZmlphtZHkPO4tkhQEUCCdM4ytdqN/DEGS
+ /c0wGugLgHmZPhOOSAtQ/udHcpxF4N3NjRCSHRE2skrBaDam5ftWd8exAfN2EsZlpMbf
+ yGvINQVbqFhiziaZmzxN+Zm5KAwFASuaTSPyLPzDtqcwbuPUP6rJFobfkBMBDV22iqUK
+ UHUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=3fMoH270+qW7vq3WlK8SY8mVJoSWpFyEV40E3e18lxY=;
+ b=SawjbuN4eUOP3z9U5NOO/vu/xkubRMEfIORLt8cc4LWIfhcOOL5azYJg2AMZOoD/6F
+ WSg6XmFR3sc1hVZcq3DAIslEN0BOd8fnzTSuZTwMkc5+poZcXLTg0Xvjg2sWLpykUpHy
+ jNwNzbe1JWN5Y9mIQi3JyUgtbq5KbmPY2vmV1AJkWHlZ4y5Zjht7tTyKNO8246M6FGxE
+ eAh5DRtz5wfIFO03oaVEHvnLif8ewBhFgcdkHuOaKv/mFrWpCA9ZxI5pfxB+KpVY2oHP
+ 8mX9NAnlvSkF4AJsb8poUO2Q9/wfDggdThYf0M2yQsOdU4hQawqbWyLmCl5WH1XZUawQ
+ ZuOw==
+X-Gm-Message-State: AOAM533SdrrkszMcZuZKSCfa9dp84rsiLbDS7R1seVimfdlfjoH7auKb
+ AwTMeXtoH5hjD7/Itj3xid0YL2kdip9d7dyCHHiO
+X-Google-Smtp-Source: ABdhPJwHDrNa7OvbIZvfyPdlhJ9bQZAf6OavJC2KSTr78Ww3jazZhmXpgWuDkbhH32ell4b7Vd4+PY5Cf7Qca/Ivi9k=
+X-Received: by 2002:a05:6602:2246:: with SMTP id
+ o6mr15401798ioo.35.1597027732602; 
+ Sun, 09 Aug 2020 19:48:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e4c6d48d-8338-b156-7d16-99b5fe97cd64@gmx.de>
-User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/09 19:53:20
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+References: <cover.1596768588.git.haibo.xu@linaro.org>
+ <3cc31df5191ae6b03e060ccd8e82df74416a3ef5.1596768588.git.haibo.xu@linaro.org>
+ <b4790af9-38b7-f74a-4ebc-a7e9d3684ae0@amsat.org>
+In-Reply-To: <b4790af9-38b7-f74a-4ebc-a7e9d3684ae0@amsat.org>
+From: Haibo Xu <haibo.xu@linaro.org>
+Date: Mon, 10 Aug 2020 10:48:41 +0800
+Message-ID: <CAJc+Z1HzoREjCfbwct4ARmOZjszuLQEw9vqidChWjVGo19FngQ@mail.gmail.com>
+Subject: Re: [PATCH 4/7] target/arm/kvm: spe: Unify device attr operatioin
+ helper
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=haibo.xu@linaro.org; helo=mail-io1-xd44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,327 +99,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, drjones@redhat.com,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200809 2151, Helge Deller wrote:
-> On 09.08.20 21:38, Helge Deller wrote:
-> > On 09.08.20 19:17, Alexander Bulekov wrote:
-> >> On 200809 0717, Helge Deller wrote:
-> >>> The current tree at
-> >>> https://github.com/hdeller/qemu-hppa/commits/target-hppa
-> >>> does survive all your tests and in addition fixes an artist bug which
-> >>> made the dtwm window manager rendering wrong on HP-UX.
-> >>> Please completely revert your tree before pulling again.
-> >>> I'll send out a complete patch series shortly.
-> >>>
-> >> This still causes a segfault for me:
-> >>
-> >> cat << EOF | ./hppa-softmmu/qemu-system-hppa -m 64 -display none \
-> >> -qtest stdio -accel qtest
-> >> writew 0xf8118001 0x105a
-> >> readq 0xf900f8ff
-> >> EOF
-> 
-> Alexander, I've committed the patch below to the git tree at:
-> https://github.com/hdeller/qemu-hppa/tree/target-hppa
-> Ok?
-> 
+On Fri, 7 Aug 2020 at 16:19, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+>
+> On 8/7/20 10:10 AM, Haibo Xu wrote:
+> > Rename kvm_arm_pmu_set_attr() to kvm_arm_dev_set_attr(),
+>
+> Maybe rename kvm_arm_device_set_attr() to match the structure
+> name?
+>
 
-Hi Helge,
-Yes - I tried this out and it looks like all the test cases are fixed.
-Its strange that LP1890370 doesn't reproduce for you. Did you build with
---enable-sanitizers?
+Thanks for the review! I will update it in the next version.
 
-For this commit:
-https://github.com/hdeller/qemu-hppa/commit/2db0481e69cf8ca764bc0e41c86ac9a037ae4de5
-Acked-by: Alexander Bulekov <alxndr@bu.edu>
-
-Thanks!
--Alex
-
-> Helge
-
-> From 0725d38381330138052e282bb61feeacc0c1e50b Mon Sep 17 00:00:00 2001
-> From: Helge Deller <deller@gmx.de>
-> Date: Wed, 9 Aug 2020 15:35:38 +0200
-> Subject: [PATCH] hw/display/artist: Prevent out of VRAM buffer accesses
-> 
-> Simplify various bounds checks by changing parameters like row and column
-> numbers to become unsigned instead of signed.
-> With that we can check if the calculated offset is bigger than the size of the
-> VRAM region and bail out if not.
-> 
-> Reported-by: LLVM libFuzzer
-> Reported-by: Alexander Bulekov <alxndr@bu.edu>
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1880326
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1890310
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1890311
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1890312
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1890370
-> Acked-by: Alexander Bulekov <alxndr@bu.edu>
-> Signed-off-by: Helge Deller <deller@gmx.de>
-> 
-> diff --git a/hw/display/artist.c b/hw/display/artist.c
-> index f37aa9eb49..46eaa10dae 100644
-> --- a/hw/display/artist.c
-> +++ b/hw/display/artist.c
-> @@ -35,9 +35,9 @@
->  struct vram_buffer {
->      MemoryRegion mr;
->      uint8_t *data;
-> -    int size;
-> -    int width;
-> -    int height;
-> +    unsigned int size;
-> +    unsigned int width;
-> +    unsigned int height;
->  };
->  
->  typedef struct ARTISTState {
-> @@ -274,15 +274,15 @@ static artist_rop_t artist_get_op(ARTISTState *s)
->  }
->  
->  static void artist_rop8(ARTISTState *s, struct vram_buffer *buf,
-> -                        int offset, uint8_t val)
-> +                        unsigned int offset, uint8_t val)
->  {
->      const artist_rop_t op = artist_get_op(s);
->      uint8_t plane_mask;
->      uint8_t *dst;
->  
-> -    if (offset < 0 || offset >= buf->size) {
-> +    if (offset >= buf->size) {
->          qemu_log_mask(LOG_GUEST_ERROR,
-> -                      "rop8 offset:%d bufsize:%u\n", offset, buf->size);
-> +                      "rop8 offset:%u bufsize:%u\n", offset, buf->size);
->          return;
->      }
->      dst = buf->data + offset;
-> @@ -294,8 +294,7 @@ static void artist_rop8(ARTISTState *s, struct vram_buffer *buf,
->          break;
->  
->      case ARTIST_ROP_COPY:
-> -        *dst &= ~plane_mask;
-> -        *dst |= val & plane_mask;
-> +        *dst = (*dst & ~plane_mask) | (val & plane_mask);
->          break;
->  
->      case ARTIST_ROP_XOR:
-> @@ -349,7 +348,8 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
->  {
->      struct vram_buffer *buf;
->      uint32_t vram_bitmask = s->vram_bitmask;
-> -    int mask, i, pix_count, pix_length, offset, width;
-> +    int mask, i, pix_count, pix_length;
-> +    unsigned int offset, width;
->      uint8_t *data8, *p;
->  
->      pix_count = vram_write_pix_per_transfer(s);
-> @@ -364,8 +364,7 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
->          offset = posy * width + posx;
->      }
->  
-> -    if (!buf->size) {
-> -        qemu_log("write to non-existent buffer\n");
-> +    if (!buf->size || offset >= buf->size) {
->          return;
->      }
->  
-> @@ -394,7 +393,9 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
->  
->      case 3:
->          if (s->cmap_bm_access) {
-> -            *(uint32_t *)(p + offset) = data;
-> +            if (offset + 3 < buf->size) {
-> +                *(uint32_t *)(p + offset) = data;
-> +            }
->              break;
->          }
->          data8 = (uint8_t *)&data;
-> @@ -464,12 +465,14 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
->      }
->  }
->  
-> -static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
-> -                       int dest_y, int width, int height)
-> +static void block_move(ARTISTState *s,
-> +                       unsigned int source_x, unsigned int source_y,
-> +                       unsigned int dest_x,   unsigned int dest_y,
-> +                       unsigned int width,    unsigned int height)
->  {
->      struct vram_buffer *buf;
->      int line, endline, lineincr, startcolumn, endcolumn, columnincr, column;
-> -    uint32_t dst, src;
-> +    unsigned int dst, src;
->  
->      trace_artist_block_move(source_x, source_y, dest_x, dest_y, width, height);
->  
-> @@ -481,6 +484,12 @@ static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
->      }
->  
->      buf = &s->vram_buffer[ARTIST_BUFFER_AP];
-> +    if (height > buf->height) {
-> +        height = buf->height;
-> +    }
-> +    if (width > buf->width) {
-> +        width = buf->width;
-> +    }
->  
->      if (dest_y > source_y) {
->          /* move down */
-> @@ -507,24 +516,27 @@ static void block_move(ARTISTState *s, int source_x, int source_y, int dest_x,
->      }
->  
->      for ( ; line != endline; line += lineincr) {
-> -        src = source_x + ((line + source_y) * buf->width);
-> -        dst = dest_x + ((line + dest_y) * buf->width);
-> +        src = source_x + ((line + source_y) * buf->width) + startcolumn;
-> +        dst = dest_x + ((line + dest_y) * buf->width) + startcolumn;
->  
->          for (column = startcolumn; column != endcolumn; column += columnincr) {
-> -            if (dst + column > buf->size || src + column > buf->size) {
-> +            if (dst >= buf->size || src >= buf->size) {
->                  continue;
->              }
-> -            artist_rop8(s, buf, dst + column, buf->data[src + column]);
-> +            artist_rop8(s, buf, dst, buf->data[src]);
-> +            src += columnincr;
-> +            dst += columnincr;
->          }
->      }
->  
->      artist_invalidate_lines(buf, dest_y, height);
->  }
->  
-> -static void fill_window(ARTISTState *s, int startx, int starty,
-> -                        int width, int height)
-> +static void fill_window(ARTISTState *s,
-> +                        unsigned int startx, unsigned int starty,
-> +                        unsigned int width,  unsigned int height)
->  {
-> -    uint32_t offset;
-> +    unsigned int offset;
->      uint8_t color = artist_get_color(s);
->      struct vram_buffer *buf;
->      int x, y;
-> @@ -561,7 +573,9 @@ static void fill_window(ARTISTState *s, int startx, int starty,
->      artist_invalidate_lines(buf, starty, height);
->  }
->  
-> -static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
-> +static void draw_line(ARTISTState *s,
-> +                      unsigned int x1, unsigned int y1,
-> +                      unsigned int x2, unsigned int y2,
->                        bool update_start, int skip_pix, int max_pix)
->  {
->      struct vram_buffer *buf = &s->vram_buffer[ARTIST_BUFFER_AP];
-> @@ -571,12 +585,12 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
->  
->      trace_artist_draw_line(x1, y1, x2, y2);
->  
-> -    if (x1 * y1 >= buf->size || x2 * y2 >= buf->size) {
-> -        qemu_log_mask(LOG_GUEST_ERROR,
-> -                      "draw_line (%d,%d) (%d,%d)\n", x1, y1, x2, y2);
-> -        return;
-> +    if ((x1 >= buf->width && x2 >= buf->width) ||
-> +        (y1 >= buf->height && y2 >= buf->height)) {
-> +	return;
->      }
->  
-> +
->      if (update_start) {
->          s->vram_start = (x2 << 16) | y2;
->      }
-> @@ -633,7 +647,7 @@ static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
->      color = artist_get_color(s);
->  
->      do {
-> -        int ofs;
-> +        unsigned int ofs;
->  
->          if (c1) {
->              ofs = x * s->width + y;
-> @@ -765,13 +779,14 @@ static void font_write16(ARTISTState *s, uint16_t val)
->      uint16_t mask;
->      int i;
->  
-> -    int startx = artist_get_x(s->vram_start);
-> -    int starty = artist_get_y(s->vram_start) + s->font_write_pos_y;
-> -    int offset = starty * s->width + startx;
-> +    unsigned int startx = artist_get_x(s->vram_start);
-> +    unsigned int starty = artist_get_y(s->vram_start) + s->font_write_pos_y;
-> +    unsigned int offset = starty * s->width + startx;
->  
->      buf = &s->vram_buffer[ARTIST_BUFFER_AP];
->  
-> -    if (offset + 16 > buf->size) {
-> +    if (startx >= buf->width || starty >= buf->height ||
-> +        offset + 16 >= buf->size) {
->          return;
->      }
->  
-> @@ -1135,7 +1150,7 @@ static void artist_vram_write(void *opaque, hwaddr addr, uint64_t val,
->      struct vram_buffer *buf;
->      int posy = (addr >> 11) & 0x3ff;
->      int posx = addr & 0x7ff;
-> -    uint32_t offset;
-> +    unsigned int offset;
->      trace_artist_vram_write(size, addr, val);
->  
->      if (s->cmap_bm_access) {
-> @@ -1156,18 +1171,28 @@ static void artist_vram_write(void *opaque, hwaddr addr, uint64_t val,
->      }
->  
->      offset = posy * buf->width + posx;
-> +    if (offset >= buf->size) {
-> +        return;
-> +    }
-> +
->      switch (size) {
->      case 4:
-> -        *(uint32_t *)(buf->data + offset) = be32_to_cpu(val);
-> -        memory_region_set_dirty(&buf->mr, offset, 4);
-> +        if (offset + 3 < buf->size) {
-> +            *(uint32_t *)(buf->data + offset) = be32_to_cpu(val);
-> +            memory_region_set_dirty(&buf->mr, offset, 4);
-> +        }
->          break;
->      case 2:
-> -        *(uint16_t *)(buf->data + offset) = be16_to_cpu(val);
-> -        memory_region_set_dirty(&buf->mr, offset, 2);
-> +        if (offset + 1 < buf->size) {
-> +            *(uint16_t *)(buf->data + offset) = be16_to_cpu(val);
-> +            memory_region_set_dirty(&buf->mr, offset, 2);
-> +        }
->          break;
->      case 1:
-> -        *(uint8_t *)(buf->data + offset) = val;
-> -        memory_region_set_dirty(&buf->mr, offset, 1);
-> +        if (offset < buf->size) {
-> +            *(uint8_t *)(buf->data + offset) = val;
-> +            memory_region_set_dirty(&buf->mr, offset, 1);
-> +        }
->          break;
->      default:
->          break;
-> @@ -1183,9 +1208,12 @@ static uint64_t artist_vram_read(void *opaque, hwaddr addr, unsigned size)
->  
->      if (s->cmap_bm_access) {
->          buf = &s->vram_buffer[ARTIST_BUFFER_CMAP];
-> -        val = *(uint32_t *)(buf->data + addr);
-> +        val = 0;
-> +        if (addr < buf->size && addr + 3 < buf->size) {
-> +            val = *(uint32_t *)(buf->data + addr);
-> +        }
->          trace_artist_vram_read(size, addr, 0, 0, val);
-> -        return 0;
-> +        return val;
->      }
->  
->      buf = vram_read_buffer(s);
-
+> > So both the vPMU and vSPE device can share the same API.
+> >
+> > Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
+>
+> Regardless, with the typo "operation" in patch subject fixed:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> > ---
+> >  target/arm/kvm64.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> > index 1169237905..75a417d65c 100644
+> > --- a/target/arm/kvm64.c
+> > +++ b/target/arm/kvm64.c
+> > @@ -398,7 +398,7 @@ static CPUWatchpoint *find_hw_watchpoint(CPUState *=
+cpu, target_ulong addr)
+> >      return NULL;
+> >  }
+> >
+> > -static bool kvm_arm_pmu_set_attr(CPUState *cs, struct kvm_device_attr =
+*attr)
+> > +static bool kvm_arm_dev_set_attr(CPUState *cs, struct kvm_device_attr =
+*attr)
+> >  {
+> >      int err;
+> >
+> > @@ -427,7 +427,7 @@ void kvm_arm_pmu_init(CPUState *cs)
+> >      if (!ARM_CPU(cs)->has_pmu) {
+> >          return;
+> >      }
+> > -    if (!kvm_arm_pmu_set_attr(cs, &attr)) {
+> > +    if (!kvm_arm_dev_set_attr(cs, &attr)) {
+> >          error_report("failed to init PMU");
+> >          abort();
+> >      }
+> > @@ -444,7 +444,7 @@ void kvm_arm_pmu_set_irq(CPUState *cs, int irq)
+> >      if (!ARM_CPU(cs)->has_pmu) {
+> >          return;
+> >      }
+> > -    if (!kvm_arm_pmu_set_attr(cs, &attr)) {
+> > +    if (!kvm_arm_dev_set_attr(cs, &attr)) {
+> >          error_report("failed to set irq for PMU");
+> >          abort();
+> >      }
+> >
+>
 
