@@ -2,91 +2,54 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B6D3C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:20:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 848FCC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02FB120709
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:20:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QIPTJGk0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02FB120709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A3AA20678
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:36:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A3AA20678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k56mb-0007Gj-7F
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 08:20:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58010)
+	id 1k572k-0003WD-Hr
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 08:36:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k56lw-0006l2-LG
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 08:19:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43647
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k56lt-0008Rn-Jo
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 08:19:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597061959;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=jtj60eUk+p+48v2evNN2+w+A2Uk02UIM0OtgIuFU3UI=;
- b=QIPTJGk0j2Dpp+GT7m0bCrSj/EMji8UMt4pcTzGy9fd1Zq04zAYK71h/iaquL8C57N77/s
- v20MzdoAayKQVKSe4vhG6RjebrAkwX5MfFR12zH1EkImtHx4RScB7PoCcEpZvyYuoBOIpv
- YKtZYg9c3tuBvzDm9JHx/PGjlMnr8Gk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-wgKizoeAM7C0efIiUy4hdw-1; Mon, 10 Aug 2020 08:19:18 -0400
-X-MC-Unique: wgKizoeAM7C0efIiUy4hdw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BB498005B0;
- Mon, 10 Aug 2020 12:19:17 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D41A98BA1D;
- Mon, 10 Aug 2020 12:19:15 +0000 (UTC)
-Date: Mon, 10 Aug 2020 14:19:14 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH] Simple & stupid coroutine-aware monitor_cur()
-Message-ID: <20200810121914.GC14538@linux.fritz.box>
-References: <20200528153742.274164-1-kwolf@redhat.com>
- <20200528153742.274164-7-kwolf@redhat.com>
- <87tuxia5a9.fsf@dusky.pond.sub.org>
- <20200804160604.GB4860@linux.fritz.box>
- <87sgd15z5w.fsf@dusky.pond.sub.org>
- <87a6z6wqkg.fsf_-_@dusky.pond.sub.org>
- <87sgcyziul.fsf_-_@dusky.pond.sub.org>
-MIME-Version: 1.0
-In-Reply-To: <87sgcyziul.fsf_-_@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 03:31:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1k5723-0002qq-Oy; Mon, 10 Aug 2020 08:36:03 -0400
+Received: from relay.sw.ru ([185.231.240.75]:58140 helo=relay3.sw.ru)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <den@openvz.org>)
+ id 1k5720-0002NM-SU; Mon, 10 Aug 2020 08:36:03 -0400
+Received: from [192.168.15.81] (helo=iris.lishka.ru)
+ by relay3.sw.ru with esmtp (Exim 4.93)
+ (envelope-from <den@openvz.org>)
+ id 1k571m-0002Gz-Qk; Mon, 10 Aug 2020 15:35:46 +0300
+From: "Denis V. Lunev" <den@openvz.org>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH for 5.2 1/1] qemu-io: add -V flag for read sub-command
+Date: Mon, 10 Aug 2020 15:35:55 +0300
+Message-Id: <20200810123555.30481-1-den@openvz.org>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=185.231.240.75; envelope-from=den@openvz.org;
+ helo=relay3.sw.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 08:35:57
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,102 +62,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Richard W . M . Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "Denis V. Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.08.2020 um 15:27 hat Markus Armbruster geschrieben:
-> This is just a sketch.  It's incomplete, needs comments and a real
-> commit message.
-> 
-> Support for "[PATCH v6 09/12] hmp: Add support for coroutine command
-> handlers" is missing.  Marked FIXME.
-> 
-> As is, it goes on top of Kevin's series.  It is meant to be squashed
-> into PATCH 06, except for the FIXME, which needs to be resolved in PATCH
-> 09 instead.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  monitor/monitor.c | 35 +++++++++++++++--------------------
->  1 file changed, 15 insertions(+), 20 deletions(-)
-> 
-> diff --git a/monitor/monitor.c b/monitor/monitor.c
-> index 50fb5b20d3..8601340285 100644
-> --- a/monitor/monitor.c
-> +++ b/monitor/monitor.c
-> @@ -82,38 +82,34 @@ bool qmp_dispatcher_co_shutdown;
->   */
->  bool qmp_dispatcher_co_busy;
->  
-> -/*
-> - * Protects mon_list, monitor_qapi_event_state, coroutine_mon,
-> - * monitor_destroyed.
-> - */
-> +/* Protects mon_list, monitor_qapi_event_state, * monitor_destroyed. */
->  QemuMutex monitor_lock;
->  static GHashTable *monitor_qapi_event_state;
-> -static GHashTable *coroutine_mon; /* Maps Coroutine* to Monitor* */
->  
->  MonitorList mon_list;
->  int mon_refcount;
->  static bool monitor_destroyed;
->  
-> +static Monitor **monitor_curp(Coroutine *co)
-> +{
-> +    static __thread Monitor *thread_local_mon;
-> +    static Monitor *qmp_dispatcher_co_mon;
-> +
-> +    if (qemu_coroutine_self() == qmp_dispatcher_co) {
-> +        return &qmp_dispatcher_co_mon;
-> +    }
-> +    /* FIXME the coroutine hidden in handle_hmp_command() */
-> +    return &thread_local_mon;
-> +}
+The problem this patch is trying to address is libguestfs behavior on the
+appliance startup. It starts supporting to use root=UUID definition in
+the kernel command line of its root filesystem using
+    file --  /usr/lib64/guestfs/appliance/root
+This works fine with RAW image, but we are using QCOW2 as a storage to
+save a bit of file space and in this case we get
+    QEMU QCOW Image (v3), 1610612736 bytes
+instead of UUID of the root filesystem.
 
-Is thread_local_mon supposed to ever be set? The only callers of
-monitor_set_cur() are the HMP and QMP dispatchers, which will return
-something different.
+The solution is very simple - we should dump first 256k of the image file
+like the follows
+    qemu-io -c "read -V 0 256k" appliance | file -
+which will provide correct result for all possible types of the appliance
+storage.
 
-So should we return NULL insetad of thread_local_mon...
+Unfortunately, additional option for qemu-io is the only and the simplest
+solution as '-v' creates very specific output, which requires to be
+parsed. 'qemu-img dd of=/dev/stdout' does not work and the fix would be
+much more intrusive.
 
->  Monitor *monitor_cur(void)
->  {
-> -    Monitor *mon;
-> -
-> -    qemu_mutex_lock(&monitor_lock);
-> -    mon = g_hash_table_lookup(coroutine_mon, qemu_coroutine_self());
-> -    qemu_mutex_unlock(&monitor_lock);
-> -
-> -    return mon;
-> +    return *monitor_curp(qemu_coroutine_self());
->  }
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+CC: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: Richard W.M. Jones <rjones@redhat.com>
+---
+P.S. Patch to libguestfs will follow.
 
-...and return NULL here if monitor_curp() returned NULL...
+ qemu-io-cmds.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
->  void monitor_set_cur(Coroutine *co, Monitor *mon)
->  {
-> -    qemu_mutex_lock(&monitor_lock);
-> -    if (mon) {
-> -        g_hash_table_replace(coroutine_mon, co, mon);
-> -    } else {
-> -        g_hash_table_remove(coroutine_mon, co);
-> -    }
-> -    qemu_mutex_unlock(&monitor_lock);
-> +    *monitor_curp(co) = mon;
-
-...and assert(monitor_curp(co) != NULL) here?
-
-This approach looks workable, though the implementation of
-monitor_curp() feels a bit brittle. The code is not significantly
-simpler than the hash table based approach, but the assumptions it makes
-are a bit more hidden.
-
-Saving the locks is more a theoretical improvement because all callers
-are slows paths anyway.
-
-Kevin
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index baeae86d8c..7aae9726cd 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -718,7 +718,7 @@ static const cmdinfo_t read_cmd = {
+     .cfunc      = read_f,
+     .argmin     = 2,
+     .argmax     = -1,
+-    .args       = "[-abCqv] [-P pattern [-s off] [-l len]] off len",
++    .args       = "[-abCqvV] [-P pattern [-s off] [-l len]] off len",
+     .oneline    = "reads a number of bytes at a specified offset",
+     .help       = read_help,
+ };
+@@ -728,6 +728,7 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+     struct timespec t1, t2;
+     bool Cflag = false, qflag = false, vflag = false;
+     bool Pflag = false, sflag = false, lflag = false, bflag = false;
++    bool vrawflag = true;
+     int c, cnt, ret;
+     char *buf;
+     int64_t offset;
+@@ -737,7 +738,7 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+     int pattern = 0;
+     int64_t pattern_offset = 0, pattern_count = 0;
+ 
+-    while ((c = getopt(argc, argv, "bCl:pP:qs:v")) != -1) {
++    while ((c = getopt(argc, argv, "bCl:pP:qs:vV")) != -1) {
+         switch (c) {
+         case 'b':
+             bflag = true;
+@@ -777,6 +778,9 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+         case 'v':
+             vflag = true;
+             break;
++        case 'V':
++            vrawflag = true;
++            break;
+         default:
+             qemuio_command_usage(&read_cmd);
+             return -EINVAL;
+@@ -869,10 +873,15 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+     if (vflag) {
+         dump_buffer(buf, offset, count);
+     }
++    if (vrawflag) {
++        write(STDOUT_FILENO, buf, count);
++    }
+ 
+     /* Finally, report back -- -C gives a parsable format */
+-    t2 = tsub(t2, t1);
+-    print_report("read", &t2, offset, count, total, cnt, Cflag);
++    if (!vrawflag) {
++        t2 = tsub(t2, t1);
++        print_report("read", &t2, offset, count, total, cnt, Cflag);
++    }
+ 
+ out:
+     qemu_io_free(buf);
+-- 
+2.17.1
 
 
