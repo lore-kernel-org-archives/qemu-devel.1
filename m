@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86522C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C13C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:28:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FEB022D03
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:27:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 811A12080C
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:28:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zkZU/unz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FEB022D03
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UJQ7qj+U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 811A12080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5DSW-0004ER-KT
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 15:27:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46792)
+	id 1k5DTZ-0005N1-Ql
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 15:28:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47032)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k5DRF-00032B-IF
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:26:29 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46094)
+ id 1k5DSt-0004he-HM
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:28:11 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35584)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k5DRD-0002Gy-ND
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:26:29 -0400
-Received: by mail-ot1-x343.google.com with SMTP id v6so8187126ota.13
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 12:26:27 -0700 (PDT)
+ id 1k5DSr-0002N6-V1
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:28:11 -0400
+Received: by mail-ot1-x344.google.com with SMTP id 93so8254314otx.2
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 12:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=sQ4sJAYPo/XBzPYc2fUBbocujkfG0L1X0zHMeSO2Vak=;
- b=zkZU/unz6B3kihYLCo1ovHVs1ovG8Brem0l6Mgm4Q9vWGgoKw9b6Fa9WiajEoOp6Sf
- j8ra1OnF3CVO5dhnxWJYL8tcTq9L+s3G5wH1iLhGSn2j/XhjeOZTeq+fxQj3fpgANYBl
- yFSwU7njlAPt1GpFVLID0fUreRSgKPww1P1iHZuiOMvbOEn5SKKv5We7K7nAZxyOKB6n
- UChOLhehr4oGAXTQQBiPgFGVuY0lLbz6OFkq2pqvlpwI8SQtViSNzaNW2RnjvIjVLXmN
- dH43Era4fSU5WtjJiNeNjV3aaRNZDxqvjaldtq7/vNwEWtjIRp1iYDcwLehiQsyKY5if
- 9zfA==
+ :cc; bh=UiDVsbmlKdwRJgOKxiyRc84mI6QF7mNlOarPMfWP7Os=;
+ b=UJQ7qj+UXz7LlxOpd9eoy2c0tJiHYLVnzVVfQPil8E6OA6zlFp3TDo7RdB21UDgaHk
+ AhxS8P64yFslWj+UG5lz5tkDgRlK7+Equ+53cAKdzS9pDUQaOvRe2GQNuscg+PH8L5nc
+ nsGtpO+o9wCLZqcXVflpiGOP6Ni9RkVHqjT+rZHZ8TZVm8Dm/V5B+q6g01kwzBrfZQnP
+ 0LNZhQoGKNPREtNlVblTxYEmqD2+Hz5U3ZwxmCa3zC6evmq8KC/rkECT1R6beL1y0Wr6
+ uvNwC1q9QBHfXjCl8Tkafur+QCruydIJqyW53iqvXvkZ+O6P5mR+79iRE/s06r8XAgKV
+ Ttww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=sQ4sJAYPo/XBzPYc2fUBbocujkfG0L1X0zHMeSO2Vak=;
- b=gxUYkV02aBkq+I3jgovQRIMUqR04jwsmblEkABsinFjiHwotZszPUuMDUjLUecan1T
- eQYtViyuykx2Eo93H5hql5vTlFWtSw+CY5htEc3g7pY90H0NzrJuZ5c8F+0qH0aVs1LY
- zpWaSOyZveDHV3OpuuY2VPs3/dfSXZri9mYebE0dA+3HbnBc48atkZixWj3b1bkeBPav
- P4O6g1V27wnOc5ArSz9Erogu07Kf8Nn5OKxRvDGT9V7HABk2Bso6iuicvYJEIjRQA6Wd
- DjXMGoBAfDDNGwIFI9Bq8G1Ury50qTh6LQdCSRlkOqfIEuacdjFQxAMRV9o+8sFpz4l6
- pshA==
-X-Gm-Message-State: AOAM533mC+MckVW/C9hM0EGECZROwnT0YFOUeczP1gVOUdkp7WVJYtgu
- TV4WXqQvFB+4z2LnnZSzlk01FEffopoDDTa3J3Y4mQ==
-X-Google-Smtp-Source: ABdhPJxs8AjgRDPFYggBzlUlojiFlxgFDpDJa1ZHt+emwBsJbXwQ4jZF8BgpIWzs8ZNFkqFNimr1Xinl/AEVp8e65aE=
-X-Received: by 2002:a9d:6f8f:: with SMTP id h15mr1889980otq.221.1597087586139; 
- Mon, 10 Aug 2020 12:26:26 -0700 (PDT)
+ bh=UiDVsbmlKdwRJgOKxiyRc84mI6QF7mNlOarPMfWP7Os=;
+ b=sHnVjBoHUjDFndIpt4RqMU9wdrLvtpqzBtkpfem2shLt1ft4O+ZALFPIuliyu4lNvy
+ XLBnzjhLJpqYiM15RMhre/xleV49OlM2rKjt3X6PQNcAxIBqLrYoN1HAKF7sitZTw7fW
+ NSQmao4ycJB9unUFZ4zporhP+DRWrRGrOP9qceqxeWHr/JbYCzdAJ32BwOC6HvIzMzq1
+ uaxuFMf6CIhG8WGBbCDFN1DXB9Y9miVnMGDxvva/WSbH0hH6kvMOrtKMvJFbcK87cXuJ
+ mVwyRj1/X4UvO5i+TNvmJ4mxZL4Llw/KUTT4VCP46zHohxiY4mkJE75Cw3z36x6yCua0
+ 31vw==
+X-Gm-Message-State: AOAM533co65KBPYO7+3Qpe2c9WqQDSYoXWM5J7d/OhmGMjhKybygkph/
+ QB2XklhpmL4AAP9Q8G/GcARH94NhFW3DPkmNeeYHKg==
+X-Google-Smtp-Source: ABdhPJyKnM+q+8aYVcSmZEfwTojSprT7V7XKsmQvmmNbDHNTkMKK28f2QNt3wC2hzzgPntErCN4UbAGgF+uNuQH5pO4=
+X-Received: by 2002:a05:6830:1305:: with SMTP id
+ p5mr2054089otq.135.1597087688815; 
+ Mon, 10 Aug 2020 12:28:08 -0700 (PDT)
 MIME-Version: 1.0
 References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
  <CAFEAcA_icj94N6eotg9W7FutXTY_6U-Ak6pJMyYH0n9eggunrg@mail.gmail.com>
- <CAFEAcA8smstwpQUD9UJzMuE6Cq2WutQzBPrKLLs=3wvfXUmpUg@mail.gmail.com>
- <b710345e-1644-782a-44a9-537493b85d95@redhat.com>
-In-Reply-To: <b710345e-1644-782a-44a9-537493b85d95@redhat.com>
+ <6549f29d-f38b-0fc5-8310-e9cbedba3080@redhat.com>
+In-Reply-To: <6549f29d-f38b-0fc5-8310-e9cbedba3080@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Aug 2020 20:26:15 +0100
-Message-ID: <CAFEAcA9v7jv=SYZ0NLeSkjoM3da-apeu4OC5BMmorxMue0-viQ@mail.gmail.com>
+Date: Mon, 10 Aug 2020 20:27:57 +0100
+Message-ID: <CAFEAcA-E2iFh1bxLgRarnZWT8h-sXjENh2im4i-=56BNpNMi3w@mail.gmail.com>
 Subject: Re: [PATCH 000/147] Meson integration for 5.2
 To: Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x343.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,21 +105,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 10 Aug 2020 at 20:22, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Mon, 10 Aug 2020 at 20:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On 10/08/20 21:16, Peter Maydell wrote:
-> > And the remainders:
+> On 10/08/20 20:09, Peter Maydell wrote:
+> > ModuleNotFoundError: No module named 'pkg_resources'
 > >
-> > The tests/vm FreeBSD and OpenBSD setups succeed but emit this warning
-> > (as well as the the usual ones):
-> >
-> > WARNING: Gettext not found, all translation targets will be ignored.
+> > ERROR: meson setup failed
 >
-> This is a real warning.  I'll see if we can add a configure option to
-> disable the translations bug it's fairly low priority.
+> Missing dependency, you have to install python3-setuptools.
 
-Is there a package that we could install on these VM configs
-that would provide gettext in a way that satisfies Meson?
+since that's a new dependency, is it possible to make it be
+diagnosed in a more friendly way than "python barfs out a backtrace" ?
 
+thanks
 -- PMM
 
