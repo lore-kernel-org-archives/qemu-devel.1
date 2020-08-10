@@ -2,91 +2,86 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87CC4C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 14:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42D2C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 14:41:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F58D20771
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 14:34:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C1FB2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 14:41:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dB7V2D8F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F58D20771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2Zjm5E7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C1FB2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k58sC-0006q3-Gj
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 10:34:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36022)
+	id 1k58z2-0008Kf-Of
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 10:41:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1k58rH-0006JQ-2u; Mon, 10 Aug 2020 10:33:03 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:36419)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1k58rF-0000Fk-Do; Mon, 10 Aug 2020 10:33:02 -0400
-Received: by mail-lj1-x242.google.com with SMTP id t23so9829675ljc.3;
- Mon, 10 Aug 2020 07:33:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=AQy5INVxtOXiNwI3ldrbpCbVxXaG2Xs0h1i3hzH8jHo=;
- b=dB7V2D8FH8PsJYXqI1zJx+0ymO+TkwW3kEwjmmQQIQPBSpX3WhSuApviryWhMySB6v
- EBUZ9wOqx/PcfhdzmyOVCIdAWhYKbWB6iKND8DAD4Bw9uWkEWBON7E3Ibx/De29oT60C
- 7JSjxvm55G5NkYW7yQwSli+pded009QfhyLCTmhWAPfLzxYjCw3Mq6ID50TOX6LJxCUQ
- M5drww2f6HSU5I3P85wtal+5zpkBSGkafnjky9liHf0U0URXwWv20b7wZa/ob+vyHsum
- C+kEmvKDb37MyHt82r5OwEMMfEUZw30m79tSP73ztNIJZU2Tx3iWJHHr5PN/fV/AnpF5
- yZPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=AQy5INVxtOXiNwI3ldrbpCbVxXaG2Xs0h1i3hzH8jHo=;
- b=czSa49uGsu9kfUSl7NkLttAiApP1dfBPBLLN4Cclljmmkc6fqc4uavvdkc3Hey9kdh
- EFNA+7bb/CmftTDN2v0VzDS8S0i5jdP39rx29V6oun900knsVe2JgA7QODu/ueYnDg6d
- T6adBdOySNUk0agMziXmHe8gcS/T4GAg45SMQyeSXhBF9P1xBCIXM0qfFKaKymGOV25/
- P/tCuCWB5DrIRf7732Pk+w2MNxT5ow502aDKk1ywcmGFJohLYQQj4IIGyb9rzvbQ2IqR
- +QoILmpjRGowV5psptTPnh7ZKErtCkRQ1QXQRyvyytCVS3+DknXSV29SMeuHHX0Bdo9T
- 67nw==
-X-Gm-Message-State: AOAM532xZ4z1p0/uqJ9zy0hvQhWB2E5jmM4JbSi2B0pWlFirc29bsH4G
- Hjxh9xyvAk2l+NCM3eIl9pl8LYVi500=
-X-Google-Smtp-Source: ABdhPJzmIX0EatZnhdNc6cYHJTSRTe9yv2Quey4y2rBmBCmygpN+cjsH8QSBmXQXGnqbRatrM1RPtA==
-X-Received: by 2002:a2e:95c3:: with SMTP id y3mr812076ljh.224.1597069976751;
- Mon, 10 Aug 2020 07:32:56 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id o2sm10700992lfi.50.2020.08.10.07.32.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 10 Aug 2020 07:32:55 -0700 (PDT)
-Date: Mon, 10 Aug 2020 16:32:55 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: Vikram Garhwal <fnu.vikram@xilinx.com>
-Subject: Re: [PATCH v8 2/4] xlnx-zynqmp: Connect Xilinx ZynqMP CAN controllers
-Message-ID: <20200810143255.GB2954729@toto>
-References: <1596575505-163040-1-git-send-email-fnu.vikram@xilinx.com>
- <1596575505-163040-3-git-send-email-fnu.vikram@xilinx.com>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k58yE-0007kR-6Y
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 10:40:14 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22212
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k58yB-0000tu-BY
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 10:40:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597070409;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=8n61xwYannkCE4O6sFTG5CgIwEEwDDK310zBKdllwZc=;
+ b=X2Zjm5E7oUlu7x8XP+euaRmzVjf0OkblEiDnXGdQqLgUeC9zveWGOqfZ/qVbfupCw8YPl4
+ 7c39WN78w8Ey0ZrUCogjG9skOP4sd3fwovYILV5s7IDp/6FjUyZQ+e2a5+HhI5k5V6ue9m
+ /iW0s+ljxb7Z/8wvDEgNXhFanWqUKfU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-240-JwRooiCMMyGRzcP-H62aVA-1; Mon, 10 Aug 2020 10:40:06 -0400
+X-MC-Unique: JwRooiCMMyGRzcP-H62aVA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E75E4E91A;
+ Mon, 10 Aug 2020 14:40:03 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 090F119D7D;
+ Mon, 10 Aug 2020 14:40:01 +0000 (UTC)
+Date: Mon, 10 Aug 2020 16:40:00 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH for 5.2 1/1] qemu-io: add -V flag for read sub-command
+Message-ID: <20200810144000.GE14538@linux.fritz.box>
+References: <20200810123555.30481-1-den@openvz.org>
+ <d87985bc-1f09-dcb7-3ed9-3d54a21c4da9@virtuozzo.com>
 MIME-Version: 1.0
+In-Reply-To: <d87985bc-1f09-dcb7-3ed9-3d54a21c4da9@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1596575505-163040-3-git-send-email-fnu.vikram@xilinx.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FSL_HELO_FAKE=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 03:29:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,193 +94,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: francisco.iglesias@xilinx.com, Alistair Francis <alistair@alistair23.me>,
- qemu-devel@nongnu.org, "open list:Xilinx ZynqMP" <qemu-arm@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ "Richard W . M . Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "Denis V. Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 04, 2020 at 02:11:43PM -0700, Vikram Garhwal wrote:
-> Connect CAN0 and CAN1 on the ZynqMP.
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-
+Am 10.08.2020 um 16:02 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 10.08.2020 15:35, Denis V. Lunev wrote:
+> > The problem this patch is trying to address is libguestfs behavior on the
+> > appliance startup. It starts supporting to use root=UUID definition in
+> > the kernel command line of its root filesystem using
+> >      file --  /usr/lib64/guestfs/appliance/root
+> > This works fine with RAW image, but we are using QCOW2 as a storage to
+> > save a bit of file space and in this case we get
+> >      QEMU QCOW Image (v3), 1610612736 bytes
+> > instead of UUID of the root filesystem.
+> > 
+> > The solution is very simple - we should dump first 256k of the image file
+> > like the follows
+> >      qemu-io -c "read -V 0 256k" appliance | file -
+> > which will provide correct result for all possible types of the appliance
+> > storage.
+> > 
+> > Unfortunately, additional option for qemu-io is the only and the simplest
+> > solution as '-v' creates very specific output, which requires to be
+> > parsed. 'qemu-img dd of=/dev/stdout' does not work and the fix would be
+> > much more intrusive.
+> > 
+> > Signed-off-by: Denis V. Lunev <den@openvz.org>
+> > CC: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> > CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > CC: Kevin Wolf <kwolf@redhat.com>
+> > CC: Max Reitz <mreitz@redhat.com>
+> > CC: Richard W.M. Jones <rjones@redhat.com>
+> > ---
+> > P.S. Patch to libguestfs will follow.
+> > 
+> >   qemu-io-cmds.c | 17 +++++++++++++----
+> >   1 file changed, 13 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+> > index baeae86d8c..7aae9726cd 100644
+> > --- a/qemu-io-cmds.c
+> > +++ b/qemu-io-cmds.c
+> > @@ -718,7 +718,7 @@ static const cmdinfo_t read_cmd = {
+> >       .cfunc      = read_f,
+> >       .argmin     = 2,
+> >       .argmax     = -1,
+> > -    .args       = "[-abCqv] [-P pattern [-s off] [-l len]] off len",
+> > +    .args       = "[-abCqvV] [-P pattern [-s off] [-l len]] off len",
+> >       .oneline    = "reads a number of bytes at a specified offset",
+> >       .help       = read_help,
+> >   };
+> > @@ -728,6 +728,7 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+> >       struct timespec t1, t2;
+> >       bool Cflag = false, qflag = false, vflag = false;
+> >       bool Pflag = false, sflag = false, lflag = false, bflag = false;
+> > +    bool vrawflag = true;
+> >       int c, cnt, ret;
+> >       char *buf;
+> >       int64_t offset;
+> > @@ -737,7 +738,7 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+> >       int pattern = 0;
+> >       int64_t pattern_offset = 0, pattern_count = 0;
+> > -    while ((c = getopt(argc, argv, "bCl:pP:qs:v")) != -1) {
+> > +    while ((c = getopt(argc, argv, "bCl:pP:qs:vV")) != -1) {
+> >           switch (c) {
+> >           case 'b':
+> >               bflag = true;
+> > @@ -777,6 +778,9 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+> >           case 'v':
+> >               vflag = true;
+> >               break;
+> > +        case 'V':
+> > +            vrawflag = true;
+> > +            break;
+> >           default:
+> >               qemuio_command_usage(&read_cmd);
+> >               return -EINVAL;
+> > @@ -869,10 +873,15 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+> >       if (vflag) {
+> >           dump_buffer(buf, offset, count);
+> >       }
+> > +    if (vrawflag) {
+> > +        write(STDOUT_FILENO, buf, count);
+> > +    }
+> >       /* Finally, report back -- -C gives a parsable format */
+> > -    t2 = tsub(t2, t1);
+> > -    print_report("read", &t2, offset, count, total, cnt, Cflag);
+> > +    if (!vrawflag) {
+> > +        t2 = tsub(t2, t1);
+> > +        print_report("read", &t2, offset, count, total, cnt, Cflag);
+> > +    }
+> >   out:
+> >       qemu_io_free(buf);
+> > 
 > 
-> Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
-> ---
->  hw/arm/xlnx-zcu102.c         | 20 ++++++++++++++++++++
->  hw/arm/xlnx-zynqmp.c         | 34 ++++++++++++++++++++++++++++++++++
->  include/hw/arm/xlnx-zynqmp.h |  8 ++++++++
->  3 files changed, 62 insertions(+)
-> 
-> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> index 5997262..c3e3420 100644
-> --- a/hw/arm/xlnx-zcu102.c
-> +++ b/hw/arm/xlnx-zcu102.c
-> @@ -24,6 +24,7 @@
->  #include "qemu/log.h"
->  #include "sysemu/qtest.h"
->  #include "sysemu/device_tree.h"
-> +#include "net/can_emu.h"
->  
->  typedef struct XlnxZCU102 {
->      MachineState parent_obj;
-> @@ -33,6 +34,8 @@ typedef struct XlnxZCU102 {
->      bool secure;
->      bool virt;
->  
-> +    CanBusState *canbus[XLNX_ZYNQMP_NUM_CAN];
-> +
->      struct arm_boot_info binfo;
->  } XlnxZCU102;
->  
-> @@ -125,6 +128,14 @@ static void xlnx_zcu102_init(MachineState *machine)
->      object_property_set_bool(OBJECT(&s->soc), "virtualization", s->virt,
->                               &error_fatal);
->  
-> +    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-> +        gchar *bus_name = g_strdup_printf("canbus%d", i);
-> +
-> +        object_property_set_link(OBJECT(&s->soc), bus_name,
-> +                                 OBJECT(s->canbus[i]), &error_fatal);
-> +        g_free(bus_name);
-> +    }
-> +
->      qdev_realize(DEVICE(&s->soc), NULL, &error_fatal);
->  
->      /* Create and plug in the SD cards */
-> @@ -220,6 +231,15 @@ static void xlnx_zcu102_machine_instance_init(Object *obj)
->                                      "Set on/off to enable/disable emulating a "
->                                      "guest CPU which implements the ARM "
->                                      "Virtualization Extensions");
-> +    object_property_add_link(obj, "xlnx-zcu102.canbus0", TYPE_CAN_BUS,
-> +                             (Object **)&s->canbus[0],
-> +                             object_property_allow_set_link,
-> +                             0);
-> +
-> +    object_property_add_link(obj, "xlnx-zcu102.canbus1", TYPE_CAN_BUS,
-> +                             (Object **)&s->canbus[1],
-> +                             object_property_allow_set_link,
-> +                             0);
->  }
->  
->  static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index c435b9d..adad3e7 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -81,6 +81,14 @@ static const int uart_intr[XLNX_ZYNQMP_NUM_UARTS] = {
->      21, 22,
->  };
->  
-> +static const uint64_t can_addr[XLNX_ZYNQMP_NUM_CAN] = {
-> +    0xFF060000, 0xFF070000,
-> +};
-> +
-> +static const int can_intr[XLNX_ZYNQMP_NUM_CAN] = {
-> +    23, 24,
-> +};
-> +
->  static const uint64_t sdhci_addr[XLNX_ZYNQMP_NUM_SDHCI] = {
->      0xFF160000, 0xFF170000,
->  };
-> @@ -243,6 +251,11 @@ static void xlnx_zynqmp_init(Object *obj)
->                                  TYPE_CADENCE_UART);
->      }
->  
-> +    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-> +        object_initialize_child(obj, "can[*]", &s->can[i],
-> +                                TYPE_XLNX_ZYNQMP_CAN);
-> +    }
-> +
->      object_initialize_child(obj, "sata", &s->sata, TYPE_SYSBUS_AHCI);
->  
->      for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
-> @@ -480,6 +493,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->                             gic_spi[uart_intr[i]]);
->      }
->  
-> +    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-> +        object_property_set_int(OBJECT(&s->can[i]), "ext_clk_freq",
-> +                                XLNX_ZYNQMP_CAN_REF_CLK, &error_abort);
-> +
-> +        object_property_set_link(OBJECT(&s->can[i]), "canbus",
-> +                                 OBJECT(s->canbus[i]), &error_fatal);
-> +
-> +        sysbus_realize(SYS_BUS_DEVICE(&s->can[i]), &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
-> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->can[i]), 0, can_addr[i]);
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->can[i]), 0,
-> +                           gic_spi[can_intr[i]]);
-> +    }
-> +
->      object_property_set_int(OBJECT(&s->sata), "num-ports", SATA_NUM_PORTS,
->                              &error_abort);
->      if (!sysbus_realize(SYS_BUS_DEVICE(&s->sata), errp)) {
-> @@ -617,6 +647,10 @@ static Property xlnx_zynqmp_props[] = {
->      DEFINE_PROP_BOOL("has_rpu", XlnxZynqMPState, has_rpu, false),
->      DEFINE_PROP_LINK("ddr-ram", XlnxZynqMPState, ddr_ram, TYPE_MEMORY_REGION,
->                       MemoryRegion *),
-> +    DEFINE_PROP_LINK("canbus0", XlnxZynqMPState, canbus[0], TYPE_CAN_BUS,
-> +                     CanBusState *),
-> +    DEFINE_PROP_LINK("canbus1", XlnxZynqMPState, canbus[1], TYPE_CAN_BUS,
-> +                     CanBusState *),
->      DEFINE_PROP_END_OF_LIST()
->  };
->  
-> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-> index 53076fa..8cada69 100644
-> --- a/include/hw/arm/xlnx-zynqmp.h
-> +++ b/include/hw/arm/xlnx-zynqmp.h
-> @@ -22,6 +22,7 @@
->  #include "hw/intc/arm_gic.h"
->  #include "hw/net/cadence_gem.h"
->  #include "hw/char/cadence_uart.h"
-> +#include "hw/net/xlnx-zynqmp-can.h"
->  #include "hw/ide/ahci.h"
->  #include "hw/sd/sdhci.h"
->  #include "hw/ssi/xilinx_spips.h"
-> @@ -32,6 +33,7 @@
->  #include "hw/rtc/xlnx-zynqmp-rtc.h"
->  #include "hw/cpu/cluster.h"
->  #include "target/arm/cpu.h"
-> +#include "net/can_emu.h"
->  
->  #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
->  #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
-> @@ -41,6 +43,8 @@
->  #define XLNX_ZYNQMP_NUM_RPU_CPUS 2
->  #define XLNX_ZYNQMP_NUM_GEMS 4
->  #define XLNX_ZYNQMP_NUM_UARTS 2
-> +#define XLNX_ZYNQMP_NUM_CAN 2
-> +#define XLNX_ZYNQMP_CAN_REF_CLK (24 * 1000 * 1000)
->  #define XLNX_ZYNQMP_NUM_SDHCI 2
->  #define XLNX_ZYNQMP_NUM_SPIS 2
->  #define XLNX_ZYNQMP_NUM_GDMA_CH 8
-> @@ -92,6 +96,7 @@ typedef struct XlnxZynqMPState {
->  
->      CadenceGEMState gem[XLNX_ZYNQMP_NUM_GEMS];
->      CadenceUARTState uart[XLNX_ZYNQMP_NUM_UARTS];
-> +    XlnxZynqMPCANState can[XLNX_ZYNQMP_NUM_CAN];
->      SysbusAHCIState sata;
->      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
->      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-> @@ -112,6 +117,9 @@ typedef struct XlnxZynqMPState {
->      bool virt;
->      /* Has the RPU subsystem?  */
->      bool has_rpu;
-> +
-> +    /* CAN bus. */
-> +    CanBusState *canbus[XLNX_ZYNQMP_NUM_CAN];
->  }  XlnxZynqMPState;
->  
->  #endif
-> -- 
-> 2.7.4
-> 
+> I think -v and -V should be mutually exclusive, as combined output doesn't make real sense.
+> Still, I'm OK with it as is (as well as with -V renamed to -r). I can suggest also -d (aka dump).
+
+I like -d (maybe with an alias --dump), though in the end the naming is
+secondary. I think having some flag like this is very useful.
+
+How about adding the same thing to write, i.e. get the buffer to write
+from stdin?
+
+Kevin
+
 
