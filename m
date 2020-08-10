@@ -2,91 +2,80 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A76DC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE10C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:21:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24F02206C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:19:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bWJxuptC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24F02206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E7897206C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 10:21:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7897206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k54u5-0001xy-F9
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 06:19:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52064)
+	id 1k54vt-0003bC-91
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 06:21:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k54tP-0001P8-7Q
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:18:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33712
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k54tL-0008Uo-SV
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:18:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597054733;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JNpd4Ppf/S+A61p3gn336tjMJJHggACBCURT+G/026M=;
- b=bWJxuptCSGvDWi2jIzkvlftM58QLLpsnRbTYqB0XkB+H27Ku4QnGBS9SdMO8cLAIqiLnHR
- 7zi4XbAvR3pBe5G8Aw1vQtPuX5Q0KlrNaizqzd00obG8LRPJJc01zrWT/FPEvsKq5UhMvX
- MH9JamCFppyh8ztgvUqKnY6TcM9o8/Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-GNj9Xf8POM2Zl03XkOAGYA-1; Mon, 10 Aug 2020 06:18:52 -0400
-X-MC-Unique: GNj9Xf8POM2Zl03XkOAGYA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FED5100CCC0;
- Mon, 10 Aug 2020 10:18:51 +0000 (UTC)
-Received: from gondolin (ovpn-112-218.ams2.redhat.com [10.36.112.218])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 64CCA1755E;
- Mon, 10 Aug 2020 10:18:50 +0000 (UTC)
-Date: Mon, 10 Aug 2020 12:18:47 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] docs/system/s390x: Add a chapter about s390x boot devices
-Message-ID: <20200810121847.5ab4e227.cohuck@redhat.com>
-In-Reply-To: <20200806150507.12073-1-thuth@redhat.com>
-References: <20200806150507.12073-1-thuth@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k54v9-0002uQ-SE
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:20:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45694)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k54v4-0000ka-Je
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 06:20:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k54v2-000230-E3
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 10:20:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 631A02E8081
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 10:20:40 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 03:31:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Aug 2020 10:12:59 -0000
+From: Peter Maydell <1890545@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bigboy0822 pmaydell
+X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <159670025270.3099.13280483088179052036.malonedeb@gac.canonical.com>
+Message-Id: <159705437934.21280.13749823582962570262.malone@chaenomeles.canonical.com>
+Subject: [Bug 1890545] Re: (ARM64) qemu-x86_64+schroot(Debian bullseye) can't
+ run chrome and can't load HTML
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 054be625970d5198a3f31db97bff925ee00e5acc
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 04:45:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,77 +84,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Bug 1890545 <1890545@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  6 Aug 2020 17:05:07 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Which QEMU version are you using ?
 
-> Booting on s390x is a little bit different compared to other architectures.
-> Let's add some information for people who are not yet used to this.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  docs/system/s390x/bootdevices.rst | 82 +++++++++++++++++++++++++++++++
->  docs/system/target-s390x.rst      |  1 +
->  2 files changed, 83 insertions(+)
->  create mode 100644 docs/system/s390x/bootdevices.rst
-> 
-> diff --git a/docs/system/s390x/bootdevices.rst b/docs/system/s390x/bootdevices.rst
-> new file mode 100644
-> index 0000000000..68f0ffd450
-> --- /dev/null
-> +++ b/docs/system/s390x/bootdevices.rst
-> @@ -0,0 +1,82 @@
-> +Boot devices on s390x
-> +=====================
-> +
-> +Booting with bootindex parameter
-> +--------------------------------
-> +
-> +For classical mainframe guests (i.e. LPAR or z/VM installations), you always
-> +have to exactly specify the disk where you want to boot from (or "IPL" from,
+-- =
 
-s/exactly/explictly/ ?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890545
 
-> +in s390x-speak -- IPL means "Initial Program Load"). Especially, there can
+Title:
+  (ARM64) qemu-x86_64+schroot(Debian bullseye) can't run chrome and
+  can't load HTML
 
-s/Especially/In particular/ ?
+Status in QEMU:
+  New
 
-> +also be only one boot device according to the architecture specification, thus
-> +specifying multiple boot devices is not possible (yet).
-> +
-> +So for booting an s390x guest in QEMU, you should always mark the
-> +device where you want to boot from with the ``bootindex`` property, for
-> +example::
-> +
-> + qemu-system-s390x -drive if=none,id=dr1,file=guest.qcow2 \
-> +                   -device virtio-blk,drive=dr1,bootindex=1
-> +
-> +For booting from a CD-ROM ISO image (which needs to include El-Torito boot
-> +informatin for being bootable), it is recommended to specify a ``scsi-cd``
+Bug description:
+  First I creat a file system that is debian(bullseye amd64)on arm64
+  machine=EF=BC=8Cthen I download google-chrome=EF=BC=8Chowever, when I ran=
+ Google
+  browser, some errors occurred.
 
-s/informatin for being/information in order to be/
+  $ google-chrome --no-sandbox
+  or =
 
-> +device, for example like this::
-> +
-> + qemu-system-s390x -blockdev file,node-name=c1,filename=... \
-> +                   -device virtio-scsi \
-> +                   -device scsi-cd,drive=c1,bootindex=1
-> +
-> +Note that you really have to use the ``bootindex`` property to select the
-> +boot device. The old-fashioned ``-boot order=...`` command of QEMU (and
-> +also ``-boot once=...``) is not supported on s390x.
+  $ qemu-x86_64-static google-chrome --no-sandbox
 
-(...)
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1661:1661:0806/074307.502638:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  [1664:1664:0806/074307.504159:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1637:1678:0806/074308.337567:ERROR:file_path_watcher_linux.cc(315)] inot=
+ify_init() failed: Function not implemented (38)
+  Fontconfig warning: "/etc/fonts/fonts.conf", line 100: unknown element "b=
+lank"
+  qemu: unknown option 'type=3Dutility'
+  [1637:1680:0806/074313.598432:FATAL:gpu_data_manager_impl_private.cc(439)=
+] GPU process isn't usable. Goodbye.
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  Trace/breakpoint trap
 
-This looks good to me, and is certainly helpful. I can fix the nits
-myself and apply it.
+  Why?
+  And then I run firefox,it can be opened, but it can't load any web pages =
+and HTML.
+  I really need help=EF=BC=81
+  Thank.
 
-There's also some documentation regarding DASD IPL in the devel guide;
-but as that is mostly helpful for people actually working with the
-code, I don't think that it makes sense to cross-reference it.
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890545/+subscriptions
 
