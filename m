@@ -2,111 +2,91 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA30FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 09:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19940C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 09:30:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A60DE20709
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 09:26:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6292204EC
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 09:30:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F/RD6ok1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A60DE20709
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZwhnzKwV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6292204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5447-0006Tr-Q0
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 05:25:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58846)
+	id 1k548W-00089v-4X
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 05:30:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k543X-00062M-NP
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 05:25:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47005
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k543U-00006f-VV
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 05:25:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597051518;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=adicw9cHZDZ8SENuP3BJxYhqgAmhQ5Ad9MTRSQoe+/Y=;
- b=F/RD6ok1ebIFy+CSyYQ4q2JnaSZxKpi3o2exlXUo3vQ5YIvjlx732x9sOGtBQCNMMkT68E
- f7Nnrq7Ubeu6GcilAiJoBwYm6XQLeVeYgIWTjtBYnCMY92on8SVAaE/lh0eECu8Fn8xlZv
- ie+twAGxl6V1SKbwwnKqJrEIxGYbeOI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-24D8URe4Oqqlf5X4VMfF3w-1; Mon, 10 Aug 2020 05:24:59 -0400
-X-MC-Unique: 24D8URe4Oqqlf5X4VMfF3w-1
-Received: by mail-wm1-f70.google.com with SMTP id v8so2550822wma.6
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 02:24:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1k547m-0007gv-UO
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 05:29:48 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:36705)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1k547l-0000fC-33
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 05:29:46 -0400
+Received: by mail-wm1-x332.google.com with SMTP id 3so7657827wmi.1
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 02:29:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Y5p6tnd5BAiBsFkbSTHI4azK3cPkhW4bGUgbGxdos+c=;
+ b=ZwhnzKwVPynqNs5iI1MqhvEoIq+E70wTNkVFDtXUo+ftk39qsRYZtCHeP8hMcukGjm
+ o5/Xxm/w1UgIpmGsQVnHnAa9itAys+Uf+tyi2DDjVdRubwshQuCPWUCrJEJrDfQlxUPI
+ /LFvR4fRtiQHWvd50nt2ooZVvRXM9/+zKsru3SmLbRoMwMVjztpx6m+PiVj8Cf5G/F7t
+ KxX14qr03PS82JFj+wmB1yJ9FkVOG+mSo+LrkKs9YD6hEwAUWznOI1f3EqP44Q/8R156
+ iINfTrS9bP6opaCDtq02j6nC1zE+Herx6wJb/6U8B1muLb9aEjj/Hr3/KdR+OHEIOhAe
+ KPzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=adicw9cHZDZ8SENuP3BJxYhqgAmhQ5Ad9MTRSQoe+/Y=;
- b=PVJbM6Yg2HiVEleK/1hP8PtHh1AUL4yxQRI61BmGMlBPXpS7Bnbixu7F6opKLTlMhA
- xT/SyiZ/U71geCbibT61ckhoQMpgh26hjoYopiHbCAyvkrNjPDWtxq3ptleH5dU8ays7
- z19iGW4RZLdsYkGQI4PBTgWvHBMR5V4ptFIybStrUY5G3Y5eH5e6joTZAJNors45rgjQ
- bNoHMbnQV0mldlycwqTFhiu0LgxmoJOi4XicYBi/0er8X8kqrP7ce54VCkDIHXzizmjB
- loG5jJmNZhuDglwO+vXrg/RYQnIi3YxhcBDo/r+gJydlpzhgRClXMRus3K5XyBJQHoDr
- PqiA==
-X-Gm-Message-State: AOAM532xeIEFJVNjRNwyfdAes7W/KFLyizin7SqSWR6VVkH6+GECdduu
- T13bOHK2153NMK2mxWc0PBZxbwr07kRgz5361DjGfd7JIvBcBwk6dxI0DsGM0+a709n/xool/ll
- OL92lliGp76tR+W4=
-X-Received: by 2002:a5d:420b:: with SMTP id n11mr524940wrq.11.1597051497979;
- Mon, 10 Aug 2020 02:24:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwqjZYOhdw+1DHoB/gOt2CIuon1/9zwpdokjmx8uFYQyiw2H2l9/HCfwgEgeF5/psOGcD5R3A==
-X-Received: by 2002:a5d:420b:: with SMTP id n11mr524924wrq.11.1597051497718;
- Mon, 10 Aug 2020 02:24:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5d6c:f50:4462:5103?
- ([2001:b07:6468:f312:5d6c:f50:4462:5103])
- by smtp.gmail.com with ESMTPSA id i82sm21267551wmi.10.2020.08.10.02.24.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 10 Aug 2020 02:24:57 -0700 (PDT)
-Subject: Re: [PATCH] acceptance: update asset hashes for the Bionic aarch64
- installer
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200809223741.56570-1-pbonzini@redhat.com>
- <13b3586c-4d0e-76bc-4716-b6ee88e9686a@redhat.com>
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=Y5p6tnd5BAiBsFkbSTHI4azK3cPkhW4bGUgbGxdos+c=;
+ b=IEvXD3Tw3GyNIsoD02qyNTTwT8kcCwqMgt2dCBCnj2lZsiyOq+Nu6f98aGINCKbJto
+ iuFoMN8ZD5TR1vPEBSNfBoq5tU/m9zHq4wKDa660BqnMQqeadGNDjtPBNfEXyHa4+tLQ
+ JY0kSPV12WLjHw9Q2Z+JjRDcACg5OxxHxknw8cfnRDAXVEoKzO6ITZ6N8kdFaVE475wx
+ Rv4PaGMibw6zNTKJPh2kb6KqKdDIvxlEXLT29VdqNOEJgri3B/3X/y/iitYVa7SM8dXb
+ 3TSxM6goxCqvVOVdDX7C3NhvdtLIhcpOzaYA0hRQN3uWIMc0vbgl9FqaZJrgkoMQ0YxZ
+ Z96Q==
+X-Gm-Message-State: AOAM5338/WkSd4x2HktVeeL9mMLSM4iHVHOGZQrcWe9AdSoXR80TW4ED
+ wKGOe8NcVX55ZWT3bZe0fY8XZGFW
+X-Google-Smtp-Source: ABdhPJxKcsKhsD/4ov37pHhTP544hx3MMuQPnzzs6BQPZ/bGqJYXu9Y4K9He24P1MKx6bn83W9USXw==
+X-Received: by 2002:a7b:c7d5:: with SMTP id z21mr25395694wmk.145.1597051782815; 
+ Mon, 10 Aug 2020 02:29:42 -0700 (PDT)
+Received: from donizetti.redhat.com ([2001:b07:6468:f312:5d6c:f50:4462:5103])
+ by smtp.gmail.com with ESMTPSA id
+ t133sm24891209wmf.0.2020.08.10.02.29.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 10 Aug 2020 02:29:42 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <06ed9cc7-2204-395c-2395-d5c750c75635@redhat.com>
-Date: Mon, 10 Aug 2020 11:24:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+To: qemu-devel@nongnu.org
+Subject: [PATCH for-5.1 v2] acceptance: use stable URLs for the Debian and
+ Ubuntu installer
+Date: Mon, 10 Aug 2020 11:29:41 +0200
+Message-Id: <20200810092941.154911-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <13b3586c-4d0e-76bc-4716-b6ee88e9686a@redhat.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 03:31:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::332;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x332.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -119,22 +99,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
+Cc: philmd@redhat.com, alex.bennee@linaro.org, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/08/20 11:06, Philippe Mathieu-Daudé wrote:
-> The 'bug' is this link is using "current" which will be a problem each
-> time Ubuntu update the installer (latest update was last Wed, Aug 5).
-> 
-> Acceptance tests should be stick to a particular set of binary, knew to
-> have worked once in the past. If a new set works, I'd rather see a new
-> test added (because it might have a different QEMU coverage).
+The kernel and initrd hashes seem to have changed for the Bionic
+aarch64 installer, causing BootLinuxConsole.test_aarch64_xlnx_versal_virt
+to fail.  Correct the paths to use the previous binaries instead of
+the latest.  Do the same for the Lenny alpha installer for
+consistency, even though those are unlikely to change.
 
-That seems overkill but yeah the tests should have used
-20101020ubuntu543.15 instead of current.  I think this should get into rc4.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/acceptance/boot_linux_console.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Paolo
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 73cc69c499..57ba6328de 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -336,13 +336,13 @@ class BootLinuxConsole(LinuxKernelTest):
+         :avocado: tags=device:arm_gicv3
+         """
+         kernel_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
+-                      'bionic-updates/main/installer-arm64/current/images/'
++                      'bionic-updates/main/installer-arm64/20101020ubuntu543.15/images/'
+                       'netboot/ubuntu-installer/arm64/linux')
+         kernel_hash = '5bfc54cf7ed8157d93f6e5b0241e727b6dc22c50'
+         kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+ 
+         initrd_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
+-                      'bionic-updates/main/installer-arm64/current/images/'
++                      'bionic-updates/main/installer-arm64/20101020ubuntu543.15/images/'
+                       'netboot/ubuntu-installer/arm64/initrd.gz')
+         initrd_hash = 'd385d3e88d53e2004c5d43cbe668b458a094f772'
+         initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
+@@ -822,7 +822,7 @@ class BootLinuxConsole(LinuxKernelTest):
+         :avocado: tags=machine:clipper
+         """
+         kernel_url = ('http://archive.debian.org/debian/dists/lenny/main/'
+-                      'installer-alpha/current/images/cdrom/vmlinuz')
++                      'installer-alpha/20090123lenny10/images/cdrom/vmlinuz')
+         kernel_hash = '3a943149335529e2ed3e74d0d787b85fb5671ba3'
+         kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+ 
+-- 
+2.26.2
 
 
