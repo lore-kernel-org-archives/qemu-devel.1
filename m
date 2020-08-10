@@ -2,110 +2,83 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 601DDC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:20:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F01C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1144D2075F
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:20:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lf3st3pg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1144D2075F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6C0CB208A9
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:25:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C0CB208A9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k59bK-0000v5-8a
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 11:20:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47384)
+	id 1k59gK-0002vP-FP
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 11:25:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k59ae-0000Pb-9B
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:19:56 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22730
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k59ac-0005vp-BW
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:19:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597072793;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=42gjWf9SkcnnZASYk0MoqOTKSSlYvyIsI7UybCbxwxI=;
- b=Lf3st3pgp1ATlN9CPLFmTPtzdi6u+pQRliHRI+SE5NtTfjTZRvyw+7lQV5823q49zit1+e
- hz9fqF3wJrvol7MuqJ+k/a6qLwEzSZvTm7d26rk35aIgvnUD7EqDYrWbXvX+/+NlrVnpyX
- mbIeEgLM1U5eB6LLYiLs/jxybQFAMD4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-AzrBpeXFO1GApd3L_e2zXA-1; Mon, 10 Aug 2020 11:19:51 -0400
-X-MC-Unique: AzrBpeXFO1GApd3L_e2zXA-1
-Received: by mail-wr1-f72.google.com with SMTP id 5so4327399wrc.17
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 08:19:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=42gjWf9SkcnnZASYk0MoqOTKSSlYvyIsI7UybCbxwxI=;
- b=iDyWnwLjXk3hNkbI+36SBaVQgxjuiHKKrejqQ3n1oUf+mS55HRQY1aZIvb6VpIePxr
- zlAWt5CikCCmwiih0BEN5DHiBQ2ghz3IziTZkmYaZkPYbVNheGut3RQ8mflPVSdEBaPb
- lg/X1AkGi4DaqFliqD+0AdGfWC89gDYc33GGjKILPNERvOtHIDpnnprW2+kJZmlWV9pX
- hg8p0odJa5RHNz3d/uHD7xjvQY2CGNYvB8yyh0GyZ4gx14erHQIyjD99kNuKzVIH/n9/
- Cy3QYJVzHn9qh3DZexuCOfjgtZvqPCk83wubsBCfpDWzV44jraQnkl4Dt7zb/Ao+mL5k
- yZkA==
-X-Gm-Message-State: AOAM530J4K5haTaPKWhiMoZCvxlkgQ59KFzsi9cAF5EXymHWWOxhZ9/h
- KgMPj2N+UZLW05X3UPk8KNc8m5knRPlludvtrzcwRurXYJMDl9w7dci9jqNKQelkyCjCtmpGIa3
- ugWhIDPY2Be4odb8=
-X-Received: by 2002:a05:6000:120c:: with SMTP id
- e12mr24804225wrx.354.1597072790428; 
- Mon, 10 Aug 2020 08:19:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw8V3Vt61A7j1cJbVlWpB5uIQKpz0AG55G1ZMaSZeBrNXaOj1i+I+Jafi7m5FoSMO7IiQE3Bw==
-X-Received: by 2002:a05:6000:120c:: with SMTP id
- e12mr24804196wrx.354.1597072790149; 
- Mon, 10 Aug 2020 08:19:50 -0700 (PDT)
-Received: from redhat.com ([192.117.173.58])
- by smtp.gmail.com with ESMTPSA id s205sm22716118wme.7.2020.08.10.08.19.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 10 Aug 2020 08:19:49 -0700 (PDT)
-Date: Mon, 10 Aug 2020 11:19:45 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Ani Sinha <ani@anisinha.ca>
-Subject: Re: [PATCH] Introduce global piix flag to disable PCI hotplug
-Message-ID: <20200810111827-mutt-send-email-mst@kernel.org>
-References: <1597058982-70090-1-git-send-email-ani@anisinha.ca>
- <20200810104602-mutt-send-email-mst@kernel.org>
- <CAARzgwwsuzw9rcQzu3MF7KZO8F+0PHMs3hCsiSPJCXJS-dEkhw@mail.gmail.com>
- <20200810105634-mutt-send-email-mst@kernel.org>
- <e4f24840-880b-4912-b251-b0e0bc9469b8@Spark>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k59fe-0002Lc-H1
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:25:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33600)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k59fc-0006lq-6C
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:25:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k59fa-0004Fd-DW
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 15:25:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 026BF2E80D2
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 15:25:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <e4f24840-880b-4912-b251-b0e0bc9469b8@Spark>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 03:29:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Aug 2020 15:12:42 -0000
+From: Steve Dodd <1594394@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: anarchetic jrtc27 kb9vqf laurent-vivier legoll
+ pmaydell
+X-Launchpad-Bug-Reporter: Timothy Pearson (kb9vqf)
+X-Launchpad-Bug-Modifier: Steve Dodd (anarchetic)
+References: <20160620140124.12349.60184.malonedeb@wampee.canonical.com>
+Message-Id: <159707236238.5741.11561856239872936291.malone@soybean.canonical.com>
+Subject: [Bug 1594394] Re: Using setreuid / setegid crashes x86_64 user-mode
+ target
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1bd4fb15f7110d5c06845800ec2a65856e9efb19
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:25:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -114,377 +87,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, jusual@redhat.com,
- qemu-devel@nongnu.org, Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1594394 <1594394@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 10, 2020 at 08:35:56PM +0530, Ani Sinha wrote:
-> 
-> Ani
-> On Aug 10, 2020, 20:30 +0530, Michael S. Tsirkin <mst@redhat.com>, wrote:
-> 
->     On Mon, Aug 10, 2020 at 08:24:53PM +0530, Ani Sinha wrote:
-> 
-> 
-> 
-> 
-> 
->         On Mon, Aug 10, 2020 at 8:17 PM Michael S. Tsirkin <mst@redhat.com>
->         wrote:
-> 
-> 
-> 
->         On Mon, Aug 10, 2020 at 04:59:41PM +0530, Ani Sinha wrote:
-> 
->             We introduce a new global flag for PIIX with which we can
-> 
->             turn on or off PCI device hotplug. This flag can be used
-> 
->             to prevent all PCI devices from getting hotplugged/unplugged
-> 
->             on the PCI bus. The new options disables all hotpluh HW
-> 
->             initialization code as well as the ACPI AMLs.
-> 
-> 
-> 
->             Signed-off-by: Ani Sinha <ani@anisinha.ca>
-> 
-> 
-> 
->         Well we have a flag like this for pci bridges, right?
-> 
->         So all that's left is an option to disable hotplug
-> 
->         for the pci root, right?
-> 
->         Wouldn't that be better than disabling it globally?
-> 
-> 
-> 
-> 
-> 
->         The idea is to have just one option to disable all hotplug globally.
->         But if you
-> 
->         want to have two flags one for the bridges and one for the pci root, we
->         can
-> 
->         certainly look into it.
-> 
-> 
-> 
-> 
-> 
->     I can certainly see the attraction of a global flag.
-> 
-> 
-> 
->     However, with the interface we have for bridges right now, how are we
-> 
->     going to resolve the conflict if hotplug is disabled globally but
-> 
->     enabled for a given bridge?
-> 
-> 
-> 
->     A reasonable way would be to change the default value for bridges,
-> 
->     have a user-specified value override it.
-> 
->     This patch doesn't do it, though.
-> 
-> 
-> I think the global option should override the bridge option. So if the global
-> option disables hotplug, the bridge option should be a noop.
-> 
+OK, messing around with https://hub.docker.com/r/multiarch/ubuntu-core
+for quick testing, it looks like modern versions of qemu do not have
+this bug - I used the test case from Bug #1815911 (which I think is
+probably a duplicate) and cannot reproduce with:
 
-Well just ignoring inconsistent user input does not sound great.
-Tends to create support problems.
+REPOSITORY                            TAG           IMAGE ID      CREATED  =
+       SIZE
+docker.io/multiarch/ubuntu-core       armhf-bionic  78064abebdab  41 minute=
+s ago  52 MB
 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
->             ---
-> 
->               hw/acpi/piix4.c      |  8 ++++++--
-> 
->               hw/i386/acpi-build.c | 20 ++++++++++++++------
-> 
->               2 files changed, 20 insertions(+), 8 deletions(-)
-> 
-> 
-> 
->             diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> 
->             index 26bac4f..8b13e86 100644
-> 
->             --- a/hw/acpi/piix4.c
-> 
->             +++ b/hw/acpi/piix4.c
-> 
->             @@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
-> 
->              
-> 
->                   AcpiPciHpState acpi_pci_hotplug;
-> 
->                   bool use_acpi_hotplug_bridge;
-> 
->             +    bool use_acpi_pci_hotplug;
-> 
->              
-> 
->                   uint8_t disable_s3;
-> 
->                   uint8_t disable_s4;
-> 
->             @@ -595,8 +596,9 @@ static void piix4_acpi_system_hot_add_init
-> 
->         (MemoryRegion *parent,
-> 
->                                         "acpi-gpe0", GPE_LEN);
-> 
->                   memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
-> 
->              
-> 
->             -    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-> 
->             -                    s->use_acpi_hotplug_bridge);
-> 
->             +    if (s->use_acpi_pci_hotplug)
-> 
->             +        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus,
->             parent,
-> 
->             +                        s->use_acpi_hotplug_bridge);
-> 
->              
-> 
->                   s->cpu_hotplug_legacy = true;
-> 
->                   object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-> 
->             @@ -635,6 +637,8 @@ static Property piix4_pm_properties[] = {
-> 
->                   DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val,
->             2),
-> 
->                   DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support",
-> 
->         PIIX4PMState,
-> 
->                                    use_acpi_hotplug_bridge, true),
-> 
->             +    DEFINE_PROP_BOOL("acpi-pci-hotplug", PIIX4PMState,
-> 
->             +                     use_acpi_pci_hotplug, true),
-> 
->                   DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
-> 
->                                    acpi_memory_hotplug.is_enabled, true),
-> 
->                   DEFINE_PROP_END_OF_LIST(),
-> 
->             diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> 
->             index b7bcbbb..343b9b6 100644
-> 
->             --- a/hw/i386/acpi-build.c
-> 
->             +++ b/hw/i386/acpi-build.c
-> 
->             @@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
-> 
->                   bool s3_disabled;
-> 
->                   bool s4_disabled;
-> 
->                   bool pcihp_bridge_en;
-> 
->             +    bool pcihp_en;
-> 
->                   uint8_t s4_val;
-> 
->                   AcpiFadtData fadt;
-> 
->                   uint16_t cpu_hp_io_base;
-> 
->             @@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState
->             *machine,
-> 
->         AcpiPmInfo *pm)
-> 
->                   pm->pcihp_bridge_en =
-> 
->                       object_property_get_bool(obj,
-> 
->         "acpi-pci-hotplug-with-bridge-support",
-> 
->                                                NULL);
-> 
->             +    pm->pcihp_en =
-> 
->             +        object_property_get_bool(obj, "acpi-pci-hotplug", NULL);
-> 
->             +
-> 
->               }
-> 
->              
-> 
->               static void acpi_get_misc_info(AcpiMiscInfo *info)
-> 
->             @@ -337,14 +341,16 @@ static void build_append_pcihp_notify_entry
->             (Aml
-> 
->         *method, int slot)
-> 
->               }
-> 
->              
-> 
->               static void build_append_pci_bus_devices(Aml *parent_scope,
->             PCIBus *bus,
-> 
->             -                                         bool pcihp_bridge_en)
-> 
->             +                                         bool pcihp_bridge_en,
->             bool
-> 
->         pcihp_en)
-> 
->               {
-> 
->                   Aml *dev, *notify_method = NULL, *method;
-> 
->             -    QObject *bsel;
-> 
->             +    QObject *bsel = NULL;
-> 
->                   PCIBus *sec;
-> 
->                   int i;
-> 
->              
-> 
->             -    bsel = object_property_get_qobject(OBJECT(bus),
-> 
->         ACPI_PCIHP_PROP_BSEL, NULL);
-> 
->             +    if (pcihp_en)
-> 
->             +        bsel = object_property_get_qobject(OBJECT(bus),
-> 
->             +                                           ACPI_PCIHP_PROP_BSEL,
->             NULL);
-> 
->                   if (bsel) {
-> 
->                       uint64_t bsel_val = qnum_get_uint(qobject_to(QNum,
->             bsel));
-> 
->              
-> 
->             @@ -439,7 +445,8 @@ static void build_append_pci_bus_devices(Aml
-> 
->         *parent_scope, PCIBus *bus,
-> 
->                            */
-> 
->                           PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE
->             (pdev));
-> 
->              
-> 
->             -            build_append_pci_bus_devices(dev, sec_bus,
->             pcihp_bridge_en);
-> 
->             +            build_append_pci_bus_devices(dev, sec_bus,
->             pcihp_bridge_en,
-> 
->             +                                         pcihp_en);
-> 
->                       }
-> 
->                       /* slot descriptor has been composed, add it into parent
->             context
-> 
->         */
-> 
->                       aml_append(parent_scope, dev);
-> 
->             @@ -468,7 +475,7 @@ static void build_append_pci_bus_devices(Aml
-> 
->         *parent_scope, PCIBus *bus,
-> 
->                   }
-> 
->              
-> 
->                   /* Notify about child bus events in any case */
-> 
->             -    if (pcihp_bridge_en) {
-> 
->             +    if (pcihp_bridge_en && pcihp_en) {
-> 
->                       QLIST_FOREACH(sec, &bus->child, sibling) {
-> 
->                           int32_t devfn = sec->parent_dev->devfn;
-> 
->              
-> 
->             @@ -1818,7 +1825,8 @@ build_dsdt(GArray *table_data, BIOSLinker
->             *linker,
-> 
->                       if (bus) {
-> 
->                           Aml *scope = aml_scope("PCI0");
-> 
->                           /* Scan all PCI buses. Generate tables to support
->             hotplug. *
-> 
->         /
-> 
->             -            build_append_pci_bus_devices(scope, bus, pm->
-> 
->         pcihp_bridge_en);
-> 
->             +            build_append_pci_bus_devices(scope, bus, pm->
-> 
->         pcihp_bridge_en,
-> 
->             +                                         pm->pcihp_en);
-> 
->              
-> 
->                           if (TPM_IS_TIS_ISA(tpm)) {
-> 
->                               if (misc->tpm_version == TPM_VERSION_2_0) {
-> 
->             --
-> 
->             2.7.4
-> 
-> 
-> 
-> 
-> 
-> 
-> 
+Which seems to use "qemu-arm version 5.0.0 (qemu-5.0.0-2.fc33)"
 
+If copy in the ancient qemu-arm-static that ships with Bionic by default
+the error returns.
+
+So I guess this can be closed, but would be nice to know which commit
+fixed this, for cherrypicking ..
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1594394
+
+Title:
+  Using setreuid / setegid crashes x86_64 user-mode target
+
+Status in QEMU:
+  New
+
+Bug description:
+  When setreuid() or setegid() are called from x86_64 target code in
+  user mode, qemu crashes inside the NPTL signal handlers.  x86 targets
+  do not directly use a syscall to handle setreuid() / setegid();
+  instead the x86 NPTL implementation sets up a temporary data region in
+  memory (__xidcmd) and issues a signal (SIGRT1) to all threads,
+  allowing the handler for that signal to issue the syscall.  Under
+  qemu, __xidcmd remains null (see variable display below backtrace).
+
+  Backtrace:
+  Program received signal SIGSEGV, Segmentation fault.
+  [Switching to Thread 0x3fff85c74fc0 (LWP 74517)]
+  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d08, c=
+tx=3D0x3fff85c71f90) at nptl-init.c:263
+  263     nptl-init.c: No such file or directory.
+  (gdb) thread apply all bt
+
+  Thread 3 (Thread 0x3fff87e8efc0 (LWP 74515)):
+  #0  0x00000000601cc430 in syscall ()
+  #1  0x0000000060109080 in futex_wait (val=3D<optimized out>, ev=3D<optimi=
+zed out>) at /build/qemu/util/qemu-thread-posix.c:292
+  #2  qemu_event_wait (ev=3D0x62367bb0 <rcu_call_ready_event>) at /build/qe=
+mu/util/qemu-thread-posix.c:399
+  #3  0x000000006010f73c in call_rcu_thread (opaque=3D<optimized out>) at /=
+build/qemu/util/rcu.c:250
+  #4  0x0000000060176f8c in start_thread (arg=3D0x3fff87e8efc0) at pthread_=
+create.c:336
+  #5  0x00000000601cebf4 in clone ()
+
+  Thread 2 (Thread 0x3fff85c74fc0 (LWP 74517)):
+  #0  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d0=
+8, ctx=3D0x3fff85c71f90) at nptl-init.c:263
+  #1  <signal handler called>
+  #2  0x00000000601cc42c in syscall ()
+  #3  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
+0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
+imized out>) at /build/qemu/linux-user/syscall.c:748
+  #4  do_futex (val3=3D<optimized out>, uaddr2=3D275186650880, timeout=3D0,=
+ val=3D1129, op=3D128, uaddr=3D275186651116) at /build/qemu/linux-user/sysc=
+all.c:6201
+  #5  do_syscall (cpu_env=3D0x1000abfd350, num=3D<optimized out>, arg1=3D27=
+5186651116, arg2=3D<optimized out>, arg3=3D1129, arg4=3D0, arg5=3D275186650=
+880, arg6=3D<optimized out>, arg7=3D0, arg8=3D0)
+      at /build/qemu/linux-user/syscall.c:10651
+  #6  0x00000000600347b8 in cpu_loop (env=3D0x1000abfd350) at /build/qemu/l=
+inux-user/main.c:317
+  #7  0x0000000060036ae0 in clone_func (arg=3D0x3fffc4c2ca38) at /build/qem=
+u/linux-user/syscall.c:5445
+  #8  0x0000000060176f8c in start_thread (arg=3D0x3fff85c74fc0) at pthread_=
+create.c:336
+  #9  0x00000000601cebf4 in clone ()
+
+  Thread 1 (Thread 0x1000aa05000 (LWP 74511)):
+  #0  0x00000000601cc430 in syscall ()
+  #1  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
+0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
+imized out>) at /build/qemu/linux-user/syscall.c:748
+  #2  do_futex (val3=3D<optimized out>, uaddr2=3D1, timeout=3D0, val=3D1, o=
+p=3D128, uaddr=3D275078324992) at /build/qemu/linux-user/syscall.c:6201
+  #3  do_syscall (cpu_env=3D0x1000aa23890, num=3D<optimized out>, arg1=3D27=
+5078324992, arg2=3D<optimized out>, arg3=3D1, arg4=3D0, arg5=3D1, arg6=3D<o=
+ptimized out>, arg7=3D0, arg8=3D0) at /build/qemu/linux-user/syscall.c:10651
+  #4  0x00000000600347b8 in cpu_loop (env=3D0x1000aa23890) at /build/qemu/l=
+inux-user/main.c:317
+  #5  0x00000000600020e4 in main (argc=3D<optimized out>, argv=3D<optimized=
+ out>, envp=3D<optimized out>) at /build/qemu/linux-user/main.c:4779
+  (gdb) p __xidcmd
+  $1 =3D (struct xid_command *) 0x0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1594394/+subscriptions
 
