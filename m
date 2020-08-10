@@ -2,84 +2,83 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B86A7C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:55:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45803C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:56:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7979A22BF3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:55:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA7F822BF3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:56:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zLSxyn2l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7979A22BF3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="giSJzTmK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA7F822BF3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5DtY-00039p-Jd
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 15:55:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51240)
+	id 1k5Du2-0004MZ-UI
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 15:56:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k5Doq-0000sO-8V
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:50:52 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:52422)
+ id 1k5Dt7-0002e4-D2
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:55:17 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46323)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k5Don-0004tG-VB
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:50:51 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id x5so606191wmi.2
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 12:50:49 -0700 (PDT)
+ id 1k5Dt5-0005Pv-Ld
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:55:17 -0400
+Received: by mail-ot1-x342.google.com with SMTP id v6so8254855ota.13
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 12:55:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cp52Tz1lECqYI3uEVQbbG4Lu/4PnK1R1by9RglA8G/g=;
- b=zLSxyn2lgqXet73mPvGJK+Yi84f3FsWZcQSRGfjvGHe8BNBMvyp/cOf96+pIyUk2sB
- DIXItBkcyIFGZ50H24jTGL+P8uumiNnIvXYlz1/0xbIQpCnsEXIaXcZRRfjq8ri1u0v9
- 0OSra/3UyNq1gmJm6XrtoFcIbv8Grzjf9u3d7u9NolIY3mk/EsyxG5p1yLDeUu21jUw9
- wlOhok6emZubW5p5Q7WfHji9YY0+w/4ZmOafuzfrc9byfwc672k5jIUv0z1m1H58Yp+4
- s4b6b9uglprNjJJ2yul4a8phM130aksvHn9rsP3pOurLn+gL48haNU6jUUGPtlsjl9oA
- 1F3w==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=QFA+/sGzUvZB3ksquoHC1n+ZdzOejatiGSJQXQruFEM=;
+ b=giSJzTmK0ZdrXD0yvOqgpASp6h1vDwPhhjMMA7RymfJA/Zkxv2Y5+eWhkxYW+QQEi1
+ y8lvim3H11sCVdfOnQxF6QexUzYO8acbVid6FaK4hI1XquHBNNaT8Va+ZehIyqxJCpDo
+ mm6QP0+505SxVi3hPHCqTMOjLuXRND72rUYHF5nkZiRrzizTN0CZYy0Z4QveDoik3kSN
+ JdTGN2l437K0qJu6e4/qCrbD/aOBq6hAWSZQ656qUlGb3anJogHSlsL+htccWiSaosRG
+ 6mhUE0Gg8JFIZvT5/C/wWCS/iEMqpYnQ0o32yMYylPTrRadtD68sNI1kLygC7dHy8orp
+ NDow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=cp52Tz1lECqYI3uEVQbbG4Lu/4PnK1R1by9RglA8G/g=;
- b=UdWp4VG81sn44rVX3q0P9GG6seOGrqeClYOG6tTnvJyz+9woareFkWsi1dc0sSIbMS
- WGqIyNN7BGdz4Iz3o68DCrfrneS99zKdvovy55pqbpY+ftEw0059MM4sXyIv2YBkmHKR
- 0PQY2cNY9CCnHizJWDXsO1pJzJFnZfYDLyH4bGMDEw1NgYbiSoL8W36S9ipxMFlfH3Xn
- xrmlkZ5CC0iCuT2V45hiP2xeQdYHqkSNYUgkk7HPpmGbNI/Y1UDg/MlxOyt/AsRB9FHG
- IA1L88QzK4PEqnABuPCbV7cJQYhIDdkXXh7qeibtjd8WbZKDJoLxGfLlOXp4pc9D1wIt
- MvRA==
-X-Gm-Message-State: AOAM532NzMiiVDCyM49ltODO5NVWoWPFIsgUSBHs8FQ7GtsGP0xiZeuw
- 8JdD984k4JXPvspbLUp9OLGgdIMXjjs+1g==
-X-Google-Smtp-Source: ABdhPJxlDBFgmzwgzRHu1GHLAFG2KcqjaPdVn2Gu4K6ndq8gNfiUAZ3oVtljK4Q9UUmDknIKb1C4IA==
-X-Received: by 2002:a05:600c:2888:: with SMTP id
- g8mr802278wmd.118.1597089047684; 
- Mon, 10 Aug 2020 12:50:47 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id b129sm976087wmb.29.2020.08.10.12.50.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 10 Aug 2020 12:50:46 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 15/20] docs/devel/qapi-code-gen.txt: Update to new rST
- backend conventions
-Date: Mon, 10 Aug 2020 20:50:14 +0100
-Message-Id: <20200810195019.25427-16-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200810195019.25427-1-peter.maydell@linaro.org>
-References: <20200810195019.25427-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=QFA+/sGzUvZB3ksquoHC1n+ZdzOejatiGSJQXQruFEM=;
+ b=Dh2eQCFEWZcifA0J27kKsNxKf9DphoF0dmtyZ/y5+S9pQb9Hi2w9DnShFuczhqIG2W
+ CmTZ/Due4pX1hbGHjsDxjdqbjWHyTUVQqm9dR+MkJe9vQV5r0TFkKH4g4zvAa0I0+FTm
+ xhK6wiZNgkddIYT5Bf8qxztef58JXB5nukLJoYJ9GldqHguUaeXtG1hsUodGLoRUCPIT
+ sOuu/WuFkUc8UTsB1AwDHOLkiHReoy/2dHEXrmrpxjUZYey7nHXUAoZK0ZYT+IcQtsML
+ FcPUOwfKGN86vY/BJRNi10qrZHW7bfWOCQrI+HcBJQYFAqNC+0ZoExYYvVevAbglX1tc
+ OVJg==
+X-Gm-Message-State: AOAM532Fmb1uYEGavusnXnK4vD+7mb2cbVXHNIF4TggqN+V/FDRORUoU
+ 5LD2z9GFujG9Vbdm4U2t1nYHDQBFC6TMP+aJdpEqGw==
+X-Google-Smtp-Source: ABdhPJxBIlhB/wPVrmePJWjmzg2cVO1YHHr9D5FTcknR4ziOEB2tWLCKGklIQ3sKF94nyFt/LiUBqKKeGuK3wpJanVw=
+X-Received: by 2002:a05:6830:1305:: with SMTP id
+ p5mr2140112otq.135.1597089314278; 
+ Mon, 10 Aug 2020 12:55:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32c.google.com
+References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
+ <CAFEAcA_icj94N6eotg9W7FutXTY_6U-Ak6pJMyYH0n9eggunrg@mail.gmail.com>
+ <CAFEAcA8smstwpQUD9UJzMuE6Cq2WutQzBPrKLLs=3wvfXUmpUg@mail.gmail.com>
+ <b710345e-1644-782a-44a9-537493b85d95@redhat.com>
+ <CAFEAcA9v7jv=SYZ0NLeSkjoM3da-apeu4OC5BMmorxMue0-viQ@mail.gmail.com>
+ <6a82c3b5-037f-7cd7-68fd-0fffd8eff192@redhat.com>
+ <CAFEAcA8xB=vOLvj_w9iTWWKh6kwu7fWN8QUbVAYunRdnJG0Qmg@mail.gmail.com>
+ <4bbf807f-6ff0-66b5-ac13-65f2bc954d9c@redhat.com>
+In-Reply-To: <4bbf807f-6ff0-66b5-ac13-65f2bc954d9c@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Aug 2020 20:55:03 +0100
+Message-ID: <CAFEAcA-M1OXT5Kj0rt4aNHZvzCGi9gX=JDzfdKSp=bD0jOYTVg@mail.gmail.com>
+Subject: Re: [PATCH 000/147] Meson integration for 5.2
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,178 +100,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update the documentation of QAPI document comment syntax to match
-the new rST backend requirements. The principal changes are:
- * whitespace is now significant, and multiline definitions
-   must have their second and subsequent lines indented to
-   match the first line
- * general rST format markup is permitted, not just the small
-   set of markup the old texinfo generator handled. For most
-   things (notably bulleted and itemized lists) the old format
-   is the same as rST was.
- * Specific things that might trip people up:
-   - instead of *bold* and _italic_ rST has **bold** and *italic*
-   - lists need a preceding and following blank line
-   - a lone literal '*' will need to be backslash-escaped to
-     avoid a rST syntax error
- * the old leading '|' for example (literal text) blocks is
-   replaced by the standard rST '::' literal block.
- * headings and subheadings must now be in a freeform
-   documentation comment of their own
- * we support arbitrary levels of sub- and sub-sub-heading, not
-   just a main and sub-heading like the old texinfo generator
+On Mon, 10 Aug 2020 at 20:49, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 10/08/20 21:45, Peter Maydell wrote:
+> >> Note that if you don't install it, you just get the previous behavior
+> >> (plus a warning).  But if you want that, it would be simply "gettext" I
+> >> guess.  You're using tests/vm/*bsd right?
+> > Yes. Unless there's a strong reason for testing the no-gettext
+> > configuration via the BSD VMs it seems like we might as well
+> > just install the dependency. Silencing the warning would be
+> > nice as well if the lack of it isn't actually problematic.
+> >
+>
+> No, I think the warning is valid.  Silencing it would be predicated on
+> --disable-gettext or something like that.  I'll just add the dependency.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- docs/devel/qapi-code-gen.txt | 90 ++++++++++++++++++++++++------------
- 1 file changed, 61 insertions(+), 29 deletions(-)
+Our usual default convention is "if the host system has feature X,
+act as if --enable-X, otherwise act as if --disable-X", not
+"act as if --disable-X apart from warning about it".
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 69eede6c283..263f1c0b44c 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -824,21 +824,39 @@ See below for more on definition documentation.
- Free-form documentation may be used to provide additional text and
- structuring content.
- 
-+==== Headings and subheadings ====
-+
-+A free-form documentation comment containing a single line
-+which starts with some '=' symbols and then a space defines
-+a section heading:
-+
-+    ##
-+    # = This is a top level heading
-+    ##
-+
-+    ##
-+    # This is a free-form comment which will go under the
-+    # top level heading.
-+    ##
-+
-+    ##
-+    # == This is a second level heading
-+    ##
-+
-+Section headings must always be correctly nested, so you can only
-+define a third-level heading inside a second-level heading, and so
-+on. The documentation generator will catch nesting mistakes and report
-+a syntax error.
- 
- ==== Documentation markup ====
- 
--Comment text starting with '=' is a section title:
-+Documentation comments can use most rST markup. In particular,
-+a '::' literal block can be used for examples:
- 
--    # = Section title
--
--Double the '=' for a subsection title:
--
--    # == Subsection title
--
--'|' denotes examples:
--
--    # | Text of the example, may span
--    # | multiple lines
-+    # ::
-+    #
-+    #   Text of the example, may span
-+    #   multiple lines
- 
- '*' starts an itemized list:
- 
-@@ -854,37 +872,35 @@ A decimal number followed by '.' starts a numbered list:
-     #    multiple lines
-     # 2. Second item
- 
--The actual number doesn't matter.  You could even use '*' instead of
--'2.' for the second item.
-+The actual number doesn't matter.
- 
--Lists can't be nested.  Blank lines are currently not supported within
--lists.
-+Lists of either kind must be preceded and followed by a blank line.
-+If a list item's text spans multiple lines, then the second and
-+subsequent lines must be correctly indented to line up with the
-+first character of the first line.
- 
--Additional whitespace between the initial '#' and the comment text is
--permitted.
--
--*foo* and _foo_ are for strong and emphasis styles respectively (they
--do not work over multiple lines).  @foo is used to reference a name in
--the schema.
-+The usual '**strong**', '*emphasised*' and '``literal``' markup should
-+be used. If you need a single literal '*' you will need to backslash-escape it.
-+As an extension beyond the usual rST syntax, you can also
-+use '@foo' to reference a name in the schema; this is rendered
-+the same way as '``foo``'.
- 
- Example:
- 
- ##
--# = Section
--# == Subsection
--#
--# Some text foo with *strong* and _emphasis_
-+# Some text foo with **bol** and *emphasis*
- # 1. with a list
- # 2. like that
- #
- # And some code:
--# | $ echo foo
--# | -> do this
--# | <- get that
- #
-+# ::
-+#
-+#   $ echo foo
-+#   -> do this
-+#   <- get that
- ##
- 
--
- ==== Definition documentation ====
- 
- Definition documentation, if present, must immediately precede the
-@@ -899,6 +915,12 @@ commands and events), member (for structs and unions), branch (for
- alternates), or value (for enums), and finally optional tagged
- sections.
- 
-+Descriptions of arguments can span multiple lines; if they
-+do then the second and subsequent lines must be indented
-+to line up with the first character of the first line of the
-+description. The parser will report a syntax error if there
-+is insufficient indentation.
-+
- FIXME: the parser accepts these things in almost any order.
- FIXME: union branches should be described, too.
- 
-@@ -912,6 +934,16 @@ The section ends with the start of a new section.
- A 'Since: x.y.z' tagged section lists the release that introduced the
- definition.
- 
-+The text of a section can start on a new line, in
-+which case it must not be indented at all. It can also start
-+on the same line as the 'Note:', 'Returns:', etc tag. In this
-+case if it spans multiple lines then second and subsequent
-+lines must be indented to match the first.
-+
-+An 'Example' or 'Examples' section is automatically rendered
-+entirely as literal fixed-width text. In other sections,
-+the text is formatted, and rST markup can be used.
-+
- For example:
- 
- ##
--- 
-2.20.1
-
+thanks
+-- PMM
 
