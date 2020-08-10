@@ -2,81 +2,66 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2354DC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 185EBC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECBC420791
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:31:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECBC420791
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E15DD2078E
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 15:36:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E15DD2078E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k59mB-0001GQ-6V
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 11:31:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50532)
+	id 1k59qY-0003gm-5A
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 11:36:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k59lL-0000Ne-6C
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:30:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34308)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k59lF-0007Z1-Oy
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 11:30:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k59lB-0004T0-Vf
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 15:30:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1574D2E810C
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 15:30:49 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
+ id 1k59pm-0003Ca-03; Mon, 10 Aug 2020 11:35:34 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:13881)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
+ id 1k59pj-00087P-Hk; Mon, 10 Aug 2020 11:35:33 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id D8C684454F;
+ Mon, 10 Aug 2020 17:35:23 +0200 (CEST)
+Subject: Re: [PATCH for-5.1 v2 2/2] iotests: add test for unaligned
+ granularity bitmap backup
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200810095523.15071-1-s.reiter@proxmox.com>
+ <20200810095523.15071-2-s.reiter@proxmox.com>
+ <941940d2-370d-0452-83c8-969a41f83c72@redhat.com>
+From: Stefan Reiter <s.reiter@proxmox.com>
+Message-ID: <71deceb2-b907-5b70-c2d9-6060698dab5e@proxmox.com>
+Date: Mon, 10 Aug 2020 17:35:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Aug 2020 15:23:11 -0000
-From: Steve Dodd <1793539@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: anarchetic schwab-linux-m68k
-X-Launchpad-Bug-Reporter: Andreas Schwab (schwab-linux-m68k)
-X-Launchpad-Bug-Modifier: Steve Dodd (anarchetic)
-References: <153745238166.24916.6273048340249119390.malonedeb@gac.canonical.com>
-Message-Id: <159707299170.27105.191060901591173391.malone@gac.canonical.com>
-Subject: [Bug 1793539] Re: qemu:handle_cpu_signal received signal outside vCPU
- context @ pc=0x6003ddc5
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 839e007178abf7e1603b336cf49f8875df7360af
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:25:02
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <941940d2-370d-0452-83c8-969a41f83c72@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=212.186.127.180;
+ envelope-from=s.reiter@proxmox.com; helo=proxmox-new.maurer-it.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:35:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,42 +70,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1793539 <1793539@bugs.launchpad.net>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Possibly duplicate of bug #1594394, in which case it would be worth
-testing with 5.0.0 or above..
+On 8/10/20 5:11 PM, Max Reitz wrote:
+> (Note: When submitting a patch series with multiple patches, our
+> guidelines require a cover letter:
+> https://wiki.qemu.org/Contribute/SubmitAPatch#Include_a_meaningful_cover_letter
+> 
+> But not too important now.)
+> 
 
-** Bug watch added: github.com/vivier/qemu-m68k/issues #33
-   https://github.com/vivier/qemu-m68k/issues/33
+Sorry, remembered for next time. Thanks for applying the patches!
 
--- =
+> On 10.08.20 11:55, Stefan Reiter wrote:
+>> Start a VM with a 4097 byte image attached, add a 4096 byte granularity
+>> dirty bitmap, mark it dirty, and then do a backup.
+>>
+>> This used to run into an assert and fail, check that it works as
+>> expected and also check the created image to ensure that misaligned
+>> backups in general work correctly.
+>>
+>> Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+>> ---
+>>
+>> I saw Andrey's big series covering iotest 303 so I went for 304.
+> 
+> Works for me.
+> 
+>> Never submitted
+>> one before so I hope that's okay, if not feel free to renumber it.
+> 
+> Yep, if there’s a clash I tend to just renumber it when applying it.
+> 
+>>   tests/qemu-iotests/304     | 68 ++++++++++++++++++++++++++++++++++++++
+>>   tests/qemu-iotests/304.out |  2 ++
+>>   tests/qemu-iotests/group   |  1 +
+>>   3 files changed, 71 insertions(+)
+>>   create mode 100755 tests/qemu-iotests/304
+>>   create mode 100644 tests/qemu-iotests/304.out
+>>
+>> diff --git a/tests/qemu-iotests/304 b/tests/qemu-iotests/304
+>> new file mode 100755
+>> index 0000000000..9a3b0224fa
+>> --- /dev/null
+>> +++ b/tests/qemu-iotests/304
+>> @@ -0,0 +1,68 @@
+>> +#!/usr/bin/env python3
+>> +#
+>> +# Tests dirty-bitmap backup with unaligned bitmap granularity
+>> +#
+>> +# Copyright (c) 2020 Proxmox Server Solutions
+>> +#
+>> +# This program is free software; you can redistribute it and/or modify
+>> +# it under the terms of the GNU General Public License as published by
+>> +# the Free Software Foundation; either version 2 of the License, or
+>> +# (at your option) any later version.
+>> +#
+>> +# This program is distributed in the hope that it will be useful,
+>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> +# GNU General Public License for more details.
+>> +#
+>> +# You should have received a copy of the GNU General Public License
+>> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> +#
+>> +# owner=s.reiter@proxmox.com
+>> +
+>> +import iotests
+>> +from iotests import qemu_img_create, qemu_img_log, file_path
+>> +
+>> +iotests.script_initialize(supported_fmts=['qcow2'],
+>> +                          supported_protocols=['file'])
+>> +
+>> +test_img = file_path('test.qcow2')
+>> +target_img = file_path('target.qcow2')
+>> +
+>> +# unaligned by one byte
+>> +image_len = 4097
+>> +bitmap_granularity = 4096
+>> +
+>> +qemu_img_create('-f', iotests.imgfmt, test_img, str(image_len))
+>> +
+>> +# create VM and add dirty bitmap
+>> +vm = iotests.VM().add_drive(test_img)
+>> +vm.launch()
+>> +
+>> +vm.qmp('block-dirty-bitmap-add', **{
+>> +    'node': 'drive0',
+>> +    'name': 'bitmap0',
+>> +    'granularity': bitmap_granularity
+>> +})
+>> +
+>> +# mark entire bitmap as dirty
+>> +vm.hmp_qemu_io('drive0', 'write -P0x16 0 4096');
+>> +vm.hmp_qemu_io('drive0', 'write -P0x17 4097 1');
+> 
+> s/4097/4096/?
+> 
+> (4097 works, too, because of something somewhere aligning up the 4097 to
+> 512 byte sectors, I suppose, but I don’t think it’s the address you want
+> here)
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1793539
+You're right, it seems counting is hard. I'll take you up on the offer 
+from your other mail, you can fix this please :)
 
-Title:
-  qemu:handle_cpu_signal received signal outside vCPU context @
-  pc=3D0x6003ddc5
+>> +
+>> +# do backup and wait for completion
+>> +vm.qmp('drive-backup', **{
+>> +    'device': 'drive0',
+>> +    'sync': 'full',
+>> +    'target': target_img,
+>> +    'bitmap': 'bitmap0',
+>> +    'bitmap-mode': 'on-success'
+> 
+> The bitmap is unnecessary, isn’t it?  I.e., if I drop the
+> block-dirty-bitmap-add call and the bitmap* parameters here, I still get
+> an assertion failure without patch 1.
+> 
+> Not that it really matters, it’s just that this makes it look like less
+> of an issue than it actually is.  (Which is why I’d drop the bitmap
+> stuff in case there’s no actual reason for it.)
+> 
 
-Status in QEMU:
-  New
+Oh my, I just realized that I misunderstood the root cause then. I mean, 
+the fix is fine, I see it now, but you're right, no dirty bitmap needed 
+- you can remove that as well if you want.
 
-Bug description:
-  During the build of gedit for RISC-V this error occurs:
+>> +})
+>> +
+>> +event = vm.event_wait(name='BLOCK_JOB_COMPLETED',
+>> +                      match={'data': {'device': 'drive0'}},
+>> +                      timeout=5.0)
+> 
+> (By the way, “vm.run_job('drive0', auto_dismiss=True)” would have worked
+> as well.  But since the backup job just needs waiting for a single
+> event, I suppose it doesn’t matter.  Just a hint in case you start
+> writing more iotests in the future.)
+> 
+> Max
+> 
 
-  $ qemu-riscv64 -E LD_LIBRARY_PATH=3Dgedit/.libs ./gedit/.libs/gedit
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6003=
-ddc5
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6000=
-09e4
-
-  https://build.opensuse.org/package/live_build_log/openSUSE:Factory:RISCV/=
-gedit/standard/riscv64
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1793539/+subscriptions
 
