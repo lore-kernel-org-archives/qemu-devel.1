@@ -2,87 +2,92 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A660C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 957E1C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:55:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9875206E9
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:53:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61A0F206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 12:55:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WqkNLziB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9875206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uLUw3/Mi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A0F206E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k57IX-00076F-3I
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 08:53:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38262)
+	id 1k57KQ-00084o-Jx
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 08:55:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rjones@redhat.com>) id 1k57Hv-0006g0-RG
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 08:52:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30921
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <rjones@redhat.com>) id 1k57Hr-0004Bu-Eh
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 08:52:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597063942;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=QPfm+4L4jZ0goJORweHIIspeSDwcwGYihFJsiPOuos0=;
- b=WqkNLziB0IM6RvCs/JawEbdUC1ZWpDN3V2JCpT6cAZ+irTuoGfLzHquXL7d35p1xVuPh3v
- 6d5btymEJ1A0EeHzkwTA5mHmta0EvPcAfrPPTZ4z9g4GIWL2rqi5r0mTUAJzVrTKM0A+US
- I1SVtL92WqP5bRFOoNAUGqoQUPHZoN4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276-ZUghRYJuM8GDc7BIB2RUXg-1; Mon, 10 Aug 2020 08:52:18 -0400
-X-MC-Unique: ZUghRYJuM8GDc7BIB2RUXg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E148800470;
- Mon, 10 Aug 2020 12:52:17 +0000 (UTC)
-Received: from localhost (ovpn-114-99.ams2.redhat.com [10.36.114.99])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 458468BA1C;
- Mon, 10 Aug 2020 12:52:16 +0000 (UTC)
-Date: Mon, 10 Aug 2020 13:52:15 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>
-Subject: Re: [PATCH for 5.2 1/1] qemu-io: add -V flag for read sub-command
-Message-ID: <20200810125215.GJ3888@redhat.com>
-References: <20200810123555.30481-1-den@openvz.org>
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1k57Je-0007eO-4g
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 08:54:14 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:37754)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
+ id 1k57Jb-0004Tc-Qz
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 08:54:13 -0400
+Received: by mail-lf1-x143.google.com with SMTP id s9so4637759lfs.4
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 05:54:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=V9lfqtPXn/Klbkr6sATvtRAnWIj7bpo8+I+wOWnWJIU=;
+ b=uLUw3/MiZkqMw49zc/MQ6noid3Bkk9FxQqvfIwC7wx8ULmBWQExo2PmhkZ0Agz43XM
+ 7uoQGS0hA10LHUfV8nsyorVQCViWVt//64oqax2zA5v+TI81+oRSYn1uzhuLV/QoBcCV
+ 0YlqlGl/rX4sEsoAIkuX6n5QwdRkppar261UWvub1tYcxLx4d8dwpRRioVClYqtSeaFD
+ 4+TQ0NICO0hqvWAV9L3vwZ5WpqYIcGNOmEw7NxIkCgVA4q5Yc4pS42DM+rsEyU93iiNV
+ WL4A5RoTb3RtWL0kNDNOCbQM+NNTXzR+BLz/O+Tb3nbBAS4tMSgTkzALTEZ+bXkL5sgA
+ 64rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=V9lfqtPXn/Klbkr6sATvtRAnWIj7bpo8+I+wOWnWJIU=;
+ b=iOOVBLgOf9fM9seiRb4IL7UVkDRKwaCG3xT5Zp3LpNZtoFp7IPjACAFsfOh3wuDLPy
+ HDZPlp1KCkorJUgtr302PSa2ThT/6PVW4B5YuQgAZ6FPv+kTw46rZWECjyS8qLBCAWzU
+ ZlKW49icmwgspYjY8c2za6pTvOk9fS7HpQPBFqGMhettwdnO3GB3372ntd9cPIqIHhy6
+ Fmz7VymsuF69N0yxwohB7j8udzxfOolNUxLy6TrM+RuHTsmMiZ/cFxBARJ1ek+7Gy31E
+ +OK5JHtY8aejlJfer0yWPDteMoaohl4REyf0RMzpC06ggQcttVy8JHxx8bjvWyHYecE2
+ bnnQ==
+X-Gm-Message-State: AOAM5316AppBx4yXmGCuBvOWYo4n0/DKDjV2fYX+JTM5dTI0wEt66dJS
+ bxLWIrknyhRZYmAtGbTHOP3AvcqYbFYAXgD7WAT19g==
+X-Google-Smtp-Source: ABdhPJyMlJbtarrDlvkWfrJspvoe328GUUr9bQ49oYEVrTn01V/66MTyNjACXRUARIBXOUIQPAu0NYVWvywOC/rInFs=
+X-Received: by 2002:ac2:5550:: with SMTP id l16mr455902lfk.187.1597064047289; 
+ Mon, 10 Aug 2020 05:54:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200810123555.30481-1-den@openvz.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=rjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=rjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 05:06:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+References: <20200805181303.7822-1-robert.foley@linaro.org>
+ <20200805181303.7822-2-robert.foley@linaro.org>
+ <ca24d2c5-2c5e-eace-4cf2-90011e684485@linaro.org>
+ <4e678ed7-fc36-7918-ce9e-7a7e309c56df@redhat.com>
+ <CAEyhzFvveC=nhpo4uyJ_89J8Wi4+9NEc2T2Mk9mg6Y9ZMQjNSA@mail.gmail.com>
+ <CAEyhzFvh79ViuXYLYyihTBS3d5dviGpOXjntAt95yyuwE+HwLA@mail.gmail.com>
+ <CAEyhzFsMgQWr=sOM43-w3jwSgNyUiKMRKFGdRGRqxM5=offsGA@mail.gmail.com>
+ <e1cad321-b24d-dd72-cd9c-541940a8d8d6@redhat.com>
+In-Reply-To: <e1cad321-b24d-dd72-cd9c-541940a8d8d6@redhat.com>
+From: Robert Foley <robert.foley@linaro.org>
+Date: Mon, 10 Aug 2020 08:54:30 -0400
+Message-ID: <CAEyhzFv3b-6=y-sChks6fCuMaKdoZoVnT-QNhUY0LmOMy--M_Q@mail.gmail.com>
+Subject: Re: [PATCH v1 01/21] accel/tcg: Change interrupt/exception handling
+ to remove implied BQL
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::143;
+ envelope-from=robert.foley@linaro.org; helo=mail-lf1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,124 +100,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>,
+ Peter Puhov <peter.puhov@linaro.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 10, 2020 at 03:35:55PM +0300, Denis V. Lunev wrote:
-> The problem this patch is trying to address is libguestfs behavior on the
-> appliance startup. It starts supporting to use root=UUID definition in
-> the kernel command line of its root filesystem using
->     file --  /usr/lib64/guestfs/appliance/root
-> This works fine with RAW image, but we are using QCOW2 as a storage to
-> save a bit of file space and in this case we get
->     QEMU QCOW Image (v3), 1610612736 bytes
-> instead of UUID of the root filesystem.
-> 
-> The solution is very simple - we should dump first 256k of the image file
-> like the follows
->     qemu-io -c "read -V 0 256k" appliance | file -
-> which will provide correct result for all possible types of the appliance
-> storage.
-> 
-> Unfortunately, additional option for qemu-io is the only and the simplest
-> solution as '-v' creates very specific output, which requires to be
-> parsed. 'qemu-img dd of=/dev/stdout' does not work and the fix would be
-> much more intrusive.
+On Sat, 8 Aug 2020 at 08:00, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > We are thinking that 2) would be a good option.
+>
+> Yes, it is.  The only slight complication is that you'd have both
+> ->do_interrupt and ->do_interrupt_locked so you probably should add some
+> consistency check, for example
+>
+>     /*
+>      * cc->do_interrupt_locked should only be needed if
+>      * the class uses cpu_common_do_interrupt.
+>      */
+>     assert(cc->do_interrupt == cpu_common_do_interrupt ||
+>            !cc->do_interrupt_locked);
+>
+> Therefore, a variant is to add ->do_interrupt_locked to ARMCPUClass and
+> CRISCPUClass (target/avr/helper.c can just call
+> avr_cpu_do_interrupt_locked, because that's the only value that
+> cc->do_interrupt can have).  Then ARM and CRIS can have a do_interrupt
+> like you wrote above:
+>
+> void arm_do_interrupt(CPUState *cs)
+> {
+>     ARMCPUClass *acc = ARM_CPU_GET_CLASS(cs);
+>     qemu_mutex_lock_iothread();
+>     acc->do_interrupt_locked(cpu);
+>     qemu_mutex_unlock_iothread();
+> }
+>
+> with a small duplication between ARM and CRIS but on the other hand a
+> simpler definition of the common CPUClass.
 
-I like the idea of the flag - we could also use it in the nbdkit test
-suite.
 
-I wonder if the actual flag ('V') is a good idea because I would
-normally associate that with getting the version of a command.  But
-as these are subcommand flags, that's probably not too relevant here.
+Thanks for all the details! It sounds like a good approach and we will
+move forward with it.
 
-So I think this is fine from my point of view.
+Thanks & Regards,
+-Rob
 
-Rich.
-
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> CC: Richard W.M. Jones <rjones@redhat.com>
-> ---
-> P.S. Patch to libguestfs will follow.
-> 
->  qemu-io-cmds.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-> index baeae86d8c..7aae9726cd 100644
-> --- a/qemu-io-cmds.c
-> +++ b/qemu-io-cmds.c
-> @@ -718,7 +718,7 @@ static const cmdinfo_t read_cmd = {
->      .cfunc      = read_f,
->      .argmin     = 2,
->      .argmax     = -1,
-> -    .args       = "[-abCqv] [-P pattern [-s off] [-l len]] off len",
-> +    .args       = "[-abCqvV] [-P pattern [-s off] [-l len]] off len",
->      .oneline    = "reads a number of bytes at a specified offset",
->      .help       = read_help,
->  };
-> @@ -728,6 +728,7 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
->      struct timespec t1, t2;
->      bool Cflag = false, qflag = false, vflag = false;
->      bool Pflag = false, sflag = false, lflag = false, bflag = false;
-> +    bool vrawflag = true;
->      int c, cnt, ret;
->      char *buf;
->      int64_t offset;
-> @@ -737,7 +738,7 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
->      int pattern = 0;
->      int64_t pattern_offset = 0, pattern_count = 0;
->  
-> -    while ((c = getopt(argc, argv, "bCl:pP:qs:v")) != -1) {
-> +    while ((c = getopt(argc, argv, "bCl:pP:qs:vV")) != -1) {
->          switch (c) {
->          case 'b':
->              bflag = true;
-> @@ -777,6 +778,9 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
->          case 'v':
->              vflag = true;
->              break;
-> +        case 'V':
-> +            vrawflag = true;
-> +            break;
->          default:
->              qemuio_command_usage(&read_cmd);
->              return -EINVAL;
-> @@ -869,10 +873,15 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
->      if (vflag) {
->          dump_buffer(buf, offset, count);
->      }
-> +    if (vrawflag) {
-> +        write(STDOUT_FILENO, buf, count);
-> +    }
->  
->      /* Finally, report back -- -C gives a parsable format */
-> -    t2 = tsub(t2, t1);
-> -    print_report("read", &t2, offset, count, total, cnt, Cflag);
-> +    if (!vrawflag) {
-> +        t2 = tsub(t2, t1);
-> +        print_report("read", &t2, offset, count, total, cnt, Cflag);
-> +    }
->  
->  out:
->      qemu_io_free(buf);
-> -- 
-> 2.17.1
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
-
+>
+> Paolo
+>
 
