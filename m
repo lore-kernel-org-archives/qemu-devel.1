@@ -1,78 +1,78 @@
-Return-Path: <SRS0=L55N=BT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A935EC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Aug 2020 05:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22564C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:51:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 732EF20709
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Aug 2020 05:28:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D866320734
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:51:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="fkjItl1K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 732EF20709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Nyu6Lb17"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D866320734
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k4dtC-0000ER-F6
-	for qemu-devel@archiver.kernel.org; Sun, 09 Aug 2020 01:28:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37820)
+	id 1k58D1-0000ki-QN
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 09:51:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k4doq-0006Db-Mo
- for qemu-devel@nongnu.org; Sun, 09 Aug 2020 01:24:28 -0400
-Received: from mout.gmx.net ([212.227.17.22]:58397)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k57ne-000103-5Q
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:25:14 -0400
+Received: from mout.gmx.net ([212.227.15.18]:59995)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k4dof-0002oJ-6q
- for qemu-devel@nongnu.org; Sun, 09 Aug 2020 01:24:28 -0400
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k57nV-0008Ft-AN
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:25:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1596950646;
+ s=badeba3b8450; t=1597065887;
  bh=f2m2uXjcRFi1cG933EAp1/Tj5fLS/JSexlaihjICfxY=;
  h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=fkjItl1Kzoln0UwmOAKCt9gryu2oijUKQuE86zvTuxS7qTrb+qaHtezMOuKpjh8D9
- uRcuNKN1HaJPxWWLmeWY+RtvZvxQTB1+LoIqwuK92MbE4YA6OcM+dBHyNk1IDj5AyB
- iwPEIPbKyrNnSAt48wyGpXoeGNbfPWLg78hjNY6E=
+ b=Nyu6Lb17HKQGv9W3xXz9xbV/kE5ynPRi78AyOp6KnOuXv+kk9r9SfHktVsZNce92X
+ n61APnT290wDja4DU7y/wI+Mt+ztSg2DTfEFNWBfrmXLTyruHLMKnDhGnQGOVW2tLO
+ xTcA+TGBsmNnU5gROTb5ctFF3syXTPcQcYG8pMw4=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530.fritz.box ([92.116.185.161]) by mail.gmx.com (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1M9Fnj-1k78mR1Git-006PUR; Sun, 09
- Aug 2020 07:24:05 +0200
+Received: from ls3530.fritz.box ([92.116.174.37]) by mail.gmx.com (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MTiU3-1kGuaP2nVt-00U5Jt; Mon, 10
+ Aug 2020 15:24:45 +0200
 From: Helge Deller <deller@gmx.de>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v4 02/12] seabios-hppa: Update to SeaBIOS hppa version 1
-Date: Sun,  9 Aug 2020 07:23:52 +0200
-Message-Id: <20200809052402.31641-3-deller@gmx.de>
+Subject: [PULL v2 02/12] seabios-hppa: Update to SeaBIOS hppa version 1
+Date: Mon, 10 Aug 2020 15:24:31 +0200
+Message-Id: <20200810132441.16551-3-deller@gmx.de>
 X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200809052402.31641-1-deller@gmx.de>
-References: <20200809052402.31641-1-deller@gmx.de>
+In-Reply-To: <20200810132441.16551-1-deller@gmx.de>
+References: <20200810132441.16551-1-deller@gmx.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:pv/JYcDzMkgy/gzrBT2nVMQVuuAednbsVvpXPtIekIpf/vmDVd7
- 2RlOpG+wIc3CNriCjxlZeNml0XFQjoaGP41/vjmSyc1ZwJYpTGLjKImwKF6bB4O3HAhes3n
- en7Zc3I1882PCmBd8XL/X7SpcVTGs86xTHk7OwAUWcgRsDh0y2U3t9UROw7OjfE/y2S4hns
- +Xi742+yBVMtrAsSo2JPg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7xb866NKd0A=:mP+dTfYfWN9Bx2VrZIS0TW
- BXa8CaHVheSlEhDC06M+T8OBsuYylRwTF0MgPZMnR4/2LhwJ1HL87+EbFF/Mar/sdwtK3pM+n
- CRHkX43Oh9RS9LeW1YPWqoKtfOdudA7F3xreR0uEoC9BWwu1e8K90QipzeonIAen6a68VIxiY
- 5dDF2Gdswhd9evjD03h+a/B/VW+kJLJczBNRc1zzxsKD3D+ZtD7BpQKXjW1qXQxNInGSL/RAP
- fJGWfyk2mjJi+qGVLK3tT+3bBsmJH5tAxm/VBH0Y3GRbnzH+Jf6FN858EcEMcbuSk7b13LALP
- AiDTPWU2nlBGZNnSxCyWLpi6uvgWQumWzIXZ/oaiF6EFgW4fkDn/hJosXtD9x0wK3yBG+7o1A
- QPgE0yHOAHR2f8sUBybKuqob2aXEbcCBM5e5VjoYp8gUVJtqCc0bw5FHxCaFvYDanG1AKxTbK
- 9Eg0BiEJ4Gk7E6DokWh1OY81VnaY+9dmDJs2RIzyxwOj+U07vU6KO/sfw/YP8bmU8LZXAODcY
- EtfnrcIJXJmy2P/VYetW/rnyCX7tcruMX1TzmAY5ze+hR0KDcF67fL/bSoQawCi2rdV3GlLh/
- 4nJFqFJVvOldS8O3ksR4Rnsbx/gCqtXtMgH8zx4T7xpwT5VcqzgTfEGB4te8mPlefLseAGWCB
- cwROqIC7lDbQcNJPAwyuQ8usc46Br9CZyBLO7GJxwf4x352KoJiQqPhytsaBlswL0ukEK7dLV
- MTr5mcaB6cMqsZuovKzILejQ/+h1BcKZ0zRP2ECU3upUipXQp2Jh1lyaSiwDNg4AT6rr2y0Ws
- YDhBcyO20NdIlPDH7YFSSVt7Nrf2aokfc2i9H+tCejlKrqad2dWlyzp5xGaPmaAa/EZkiSBAY
- 67RIuJk7p82glrX0nKtXXVe9wUKAC1I/8e5BR1sDSLNI2pPBtnpvy/W7w2O3lUIIbFXHFSP1L
- gVwfKWU2bUbBjNwpGwK+k/1HxrbNnUL+Ydqkx5g08bJy2z39fe95lY9/uHzT++AXKvqBSblfM
- dfQUR94l9W6QoA7vrXmDzfXK/7LZKW70f70WxLQnUAwSNW3gBdyrbuJFex0MrswQxS+v/QIis
- Y6GimblHc+MOu8gTwxgD9YTsqS/RmXzqba4GzShrTEFCnBh3PnnmtJezjxEl/GIbb0p2b0x+K
- RniiKY/Zi3u9QfXsY6DRIZTmvFCqr+od4mrWiO2xD69C2/c0yapkxnAud1kRl1JflEf2fAvVG
- R7x/caGKhjikQIsSTgDVZ2A/hdOxXNBbP3DAdDl2WLRMS4dZqWs1qayJOwHU=
-Received-SPF: pass client-ip=212.227.17.22; envelope-from=deller@gmx.de;
+X-Provags-ID: V03:K1:YP3uAOBo1FWsOuIcxEYXYCjFC8hT50BXplWubvDtWdUJ4eAMlNJ
+ V9BwoOS5lDD37x7mJNtgKHjlT9evsD2AB/kJsPQcYej2kHywOMW3Kl5YfiCOdgBQ8OtQLkb
+ 1KwPDKTDVgXQV7M2K8V5cVRFCxKOKK9+QlGtFIn3Y7ITgr3pmx5JLo2/GP9uT0VfKPM5x4T
+ jpCGntjIfcceht4r9WGiQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:0Aq0hMmeewI=:PxNMhFc9bp+cKTSHLvgJ/M
+ hRug7OQnWlDnZXt7kMpf79Fiaevj1mMEanM+vBkO26e61V40nXb/Euvtj/EE/lvhlb7NfgC4W
+ scaFcZiQWie3ntrvnCmImc6aFGP8XE8I4Vh0pIU0n6yBowqoMl9jKGOZ+6H11kuMS3vj2Xp1L
+ LWO/2CKsbJ/ZNSwncgOq+083YTBrTZs6vqxjgaINURUAQXTwJu7q5L4z9Pd43YTlOl91wdpHN
+ rfsl82QcLydN8X6Ygdo1Pm4CPBBtta8YCOM+F8t+z62NE5qEeLWpBXvA5jboNJKFqn/zsbwo7
+ HfWGKwb6kNy4BeVdlaM3mvdNQ/Of6rTs0Yga4jsiuk2mIVCojQId4JegFaS60vosxlqhFmMGT
+ xS68rugVXo3IUxqCeqJnFK9JMKsVh+It8IGKL9j4wI/Xyb/yiNyA8DARX8RVZWaQptsCJfOAo
+ po7e5PXMtd5aT2MJLQQ1SNFJjpA+uaXx7XQGLY/JpGVy5wEkT3+agwgDTNlbHrrrQcXxsDYtM
+ dLi1ouWbUQb7BFSryRDTehi4h2uvnmtU/FyX4zMaQYIA9sIfb+xqEm1IZn8t+ire1s+hKA6IX
+ nSvw8mAa4jSaK5SLOIzpCBe/dFkP6pUwH+yfrVXgnXgarF/TbPg3BHClNjDVU2MiOhWjxYE4o
+ NbsoJYrypxPfwtK88NMECAFPwTXYDjKq27QhtCO6kqpMoSK7sqK6cqBJeH3Ve3IOb4H2k5Ryp
+ Lu4Is9eafwdMPi2BV5sKpqG1jZvVk3YVSWS3nx+QnJNExGW3fFNt6MNhNoOPtHD9AZFePguW3
+ XzGgsfQAW26N+jqjBVWEI5dAYjWUreybGqHly+jRl5u/l3lRZHjdb0c01HRdXT1FiTiTbxu0L
+ SQJ44pAc/9nazvF7bujrUfUH86Jsh0VLbh5yQ7YvACexYsIrD6B871CpQVYCGCZ7vavVYulkI
+ ClJOBsNh2Uifrs4dbjVdwOZVNNGDLhjpZerEwwdRnboHcBneQK5aY3ZiAngQuMUeoROI6HFjS
+ IjruU8e9NISCGsByfg3xLBYDlQVj7HJrz0LZryXDC9d0+Cu7wZc3Fl2StTYYoUfSl3PkIS0S0
+ u52kQJ61GdmW94CX2+qrdg9GHq3PksQmDu2Kh6D/hDZagg1dKE+WceYx2lMYPWZLaB+8AKQla
+ pgTkV33AFdcHrm49tPYOO5uAM5OoUbmTtihCzYqgj5X9cX1CpV+vZwzJuv8N/tUIE7g3HQIyT
+ 7kIhe4S7Wmu0w0aRShNtrSbSKuPAMzSmW3cojUEjGBklIkxrG6VcwXg578hQ=
+Received-SPF: pass client-ip=212.227.15.18; envelope-from=deller@gmx.de;
  helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/09 01:17:21
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 09:25:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
