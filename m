@@ -2,92 +2,82 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E38AC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 11:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16089C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 11:21:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C76C206E9
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 11:17:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TzJD50gJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C76C206E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E59AF206E9
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 11:21:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E59AF206E9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k55oO-0006ys-Go
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 07:17:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40814)
+	id 1k55rx-0000Od-4b
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 07:21:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k55nO-00060Z-DO
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 07:16:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33542
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k55nM-0000HL-N8
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 07:16:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597058208;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=tScTnjEVuwphYxuVRll+V25t9nbMWdIDFdXtVpdbdQA=;
- b=TzJD50gJ7QsONSCA5C5abEreQdhK/ohwULobS8NZYA9HH2cdB97RUwI5qa+e/MVLgVAcGj
- DmBz6WMSnFqG6ok/OWmvZTcAKn/uYC2KPmP0VCJgWXnSdHJ4k8eKM8MmJSuK7skeu1XD5+
- JM2lrzvDbRs5/w5uBzWWep+lP/6062s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-l76WE3qCOv-ls7EFM_uDSg-1; Mon, 10 Aug 2020 07:16:46 -0400
-X-MC-Unique: l76WE3qCOv-ls7EFM_uDSg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19BD3800477;
- Mon, 10 Aug 2020 11:16:45 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EBE48BD9E;
- Mon, 10 Aug 2020 11:16:43 +0000 (UTC)
-Date: Mon, 10 Aug 2020 13:16:40 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Haibo Xu <haibo.xu@linaro.org>
-Subject: Re: [PATCH 7/7] target/arm/cpu: spe: Enable spe to work with host cpu
-Message-ID: <20200810111640.ykejphmuyirncjwv@kamzik.brq.redhat.com>
-References: <cover.1596768588.git.haibo.xu@linaro.org>
- <bf909c1f4904a22be0804cae9fd6f38ba4862563.1596768588.git.haibo.xu@linaro.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k55rE-0008CC-2b
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 07:20:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58546)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k55rB-0000s9-Ty
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 07:20:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k55rA-0001JI-4E
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 11:20:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1994F2E8081
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 11:20:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <bf909c1f4904a22be0804cae9fd6f38ba4862563.1596768588.git.haibo.xu@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=drjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 05:06:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Aug 2020 11:06:50 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <1890545@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee bigboy0822 pmaydell
+X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <159670025270.3099.13280483088179052036.malonedeb@gac.canonical.com>
+ <159705580515.5476.18189254156927143329.malone@soybean.canonical.com>
+Message-ID: <87ft8u3gl1.fsf@linaro.org>
+Subject: Re: [Bug 1890545] Re: (ARM64) qemu-x86_64+schroot(Debian bullseye)
+ can't run chrome and can't load HTML
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 6e7256c2e0077532f35d661411fa3bad345c69f2
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 04:45:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,85 +86,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, philmd@redhat.com,
- qemu-devel@nongnu.org
+Reply-To: Bug 1890545 <1890545@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200810110650.-gtDMzZqLNBoXf2pXlf6AsUnEEZXhQgIaEJmZ9y6Hzc@z>
 
-On Fri, Aug 07, 2020 at 08:10:37AM +0000, Haibo Xu wrote:
-> Turn on the spe cpu property by default when working with host
-> cpu type in KVM mode, i.e. we can now do '-cpu host' to add the 
-> vSPE, and '-cpu host,spe=off' to remove it. 
+Tony.LI <1890545@bugs.launchpad.net> writes:
 
--cpu max with KVM should also enable it by default
+> It's fine on x86 that I use qemu-x86_64-static.But it's bad on arm.So
+> what is the problem?
 
-> 
-> Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
-> ---
->  target/arm/cpu.c   | 4 ++++
->  target/arm/kvm64.c | 9 +++++++++
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 67ab0089fd..42fa99953c 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1719,6 +1719,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->          cpu->pmceid1 = 0;
->      }   
->  
-> +    if (!cpu->has_spe || !kvm_enabled()) {
-> +        unset_feature(env, ARM_FEATURE_SPE);
-> +    }
+Could be a number of things - is Chrome using threading alongside it's
+multiple processes?
 
-I don't think this should be necessary.
+-- =
 
-> +
->      if (!arm_feature(env, ARM_FEATURE_EL2)) {
->          /* Disable the hypervisor feature bits in the processor feature
->           * registers if we don't have EL2. These are id_pfr1[15:12] and
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index be045ccc5f..4ea58afc1d 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -679,6 +679,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->      features |= 1ULL << ARM_FEATURE_AARCH64;
->      features |= 1ULL << ARM_FEATURE_PMU;
->      features |= 1ULL << ARM_FEATURE_GENERIC_TIMER;
-> +    features |= 1ULL << ARM_FEATURE_SPE;
+Alex Benn=C3=A9e
 
-No, SPE is not a feature we assume is present in v8.0 CPUs.
+-- =
 
-> 
->      ahcf->features = features;
-> 
-> @@ -826,6 +827,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      } else {
->          env->features &= ~(1ULL << ARM_FEATURE_PMU);
->      }
-> +    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_SPE_V1)) {
-> +        cpu->has_spe = false;
-> +    }
-> +    if (cpu->has_spe) {
-> +        cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SPE_V1;
-> +    } else {
-> +        env->features &= ~(1ULL << ARM_FEATURE_SPE);
-> +    }
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890545
 
-The PMU code above this isn't a good pattern to copy. The SVE code below
-is better. SVE uses an ID bit and doesn't do the redundant KVM cap check.
-It'd be nice to cleanup the PMU code (with a separate patch) and then add
-SPE in a better way.
+Title:
+  (ARM64) qemu-x86_64+schroot(Debian bullseye) can't run chrome and
+  can't load HTML
 
->      if (cpu_isar_feature(aa64_sve, cpu)) {
->          assert(kvm_arm_sve_supported());
->          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
-> -- 
-> 2.17.1
-> 
+Status in QEMU:
+  New
 
-Thanks,
-drew
+Bug description:
+  First I creat a file system that is debian(bullseye amd64)on arm64
+  machine=EF=BC=8Cthen I download google-chrome=EF=BC=8Chowever, when I ran=
+ Google
+  browser, some errors occurred.
 
+  $ google-chrome --no-sandbox
+  or =
+
+  $ qemu-x86_64-static google-chrome --no-sandbox
+
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1661:1661:0806/074307.502638:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  [1664:1664:0806/074307.504159:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1637:1678:0806/074308.337567:ERROR:file_path_watcher_linux.cc(315)] inot=
+ify_init() failed: Function not implemented (38)
+  Fontconfig warning: "/etc/fonts/fonts.conf", line 100: unknown element "b=
+lank"
+  qemu: unknown option 'type=3Dutility'
+  [1637:1680:0806/074313.598432:FATAL:gpu_data_manager_impl_private.cc(439)=
+] GPU process isn't usable. Goodbye.
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  Trace/breakpoint trap
+
+  Why?
+  And then I run firefox,it can be opened, but it can't load any web pages =
+and HTML.
+  I really need help=EF=BC=81
+  Thank.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890545/+subscriptions
 
