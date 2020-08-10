@@ -7,71 +7,75 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96143C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD7CC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:21:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D0A420825
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:20:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FAFD2073E
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:21:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GTuTVlVP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D0A420825
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PFMgfrRG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FAFD2073E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5BTA-0000qF-Ig
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:20:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45382)
+	id 1k5BTy-0002Wb-J7
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:21:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BJC-0006mF-Nn
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56519
- helo=us-smtp-1.mimecast.com)
+ id 1k5BJ0-0006HB-Rg
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:09:50 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50034
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BJA-0002mo-Rl
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:10:02 -0400
+ id 1k5BIy-0002lb-LA
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:09:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597079400;
+ s=mimecast20190719; t=1597079387;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=LfhaaV0IWW8+d6MiU3ZNGehjzRVw6lRdeh9EZzy4RK4=;
- b=GTuTVlVPAH+yRYDdugfABLr7r505M448KzXSdWkUyhxap6+cIL/7vwd699XWz1BcOXYrcQ
- AylfMNamOGMcZZ5PdzpSo0IGXJrr5N5JRFywpbHYvsGJbmeNUtfiHT1z8m7V81VdKRNcLq
- W3dfyBMquYfNwXVnZc3rMA80ZX6H3aI=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eo8sar5sUdTBwQCRv5o456H0dVW4NAA7E/b3CrAgMsc=;
+ b=PFMgfrRGTvlx8FCjFxwrm14Uvx0g/HCisCApHdbiBWPRQSzaipd7rdCWV3HSBwHzfLkXY3
+ g7I5xcZuDDthpqlcuYN1fd28irUgr/9N8q/Eaj08uzNru1YEE0tGQvc/Nf1MFzYrMk/yCI
+ RXU0HicfqIWoBi50wbn+6pNBI2jmPt0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-05h4nm9tPAqAHEki7MyfRA-1; Mon, 10 Aug 2020 13:09:58 -0400
-X-MC-Unique: 05h4nm9tPAqAHEki7MyfRA-1
+ us-mta-239-43roD7OcOMm5XxG9k7QLyw-1; Mon, 10 Aug 2020 13:09:45 -0400
+X-MC-Unique: 43roD7OcOMm5XxG9k7QLyw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88F8C10CB427
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:09:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4A47100CCC0
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:09:44 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CA0065F1E9
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:09:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D1C9B5F1E9;
+ Mon, 10 Aug 2020 17:09:43 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 030/147] contrib/vhost-user-scsi: convert to Meson
-Date: Mon, 10 Aug 2020 19:07:08 +0200
-Message-Id: <1597079345-42801-31-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 021/147] meson: use coverage option
+Date: Mon, 10 Aug 2020 19:06:59 +0200
+Message-Id: <1597079345-42801-22-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 03:31:01
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 04:13:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -93,103 +97,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The libiscsi pkg-config information is extracted from config-host.mak and
-used to link vhost-user-blk.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                              | 3 ---
- Makefile.objs                         | 3 ---
- contrib/vhost-user-scsi/Makefile.objs | 1 -
- contrib/vhost-user-scsi/meson.build   | 7 +++++++
- meson.build                           | 6 ++++++
- 5 files changed, 13 insertions(+), 7 deletions(-)
- delete mode 100644 contrib/vhost-user-scsi/Makefile.objs
- create mode 100644 contrib/vhost-user-scsi/meson.build
+ Makefile               | 14 --------------
+ Makefile.target        | 16 ----------------
+ configure              |  9 ++-------
+ docs/devel/testing.rst |  7 +++----
+ meson.build            |  2 +-
+ 5 files changed, 6 insertions(+), 42 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 7317554..11716bb 100644
+index f42cbdb..1da5927 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -296,7 +296,6 @@ dummy := $(call unnest-vars,, \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
-                 rdmacm-mux-obj-y \
--                vhost-user-scsi-obj-y \
-                 vhost-user-input-obj-y \
-                 vhost-user-gpu-obj-y \
-                 qga-vss-dll-obj-y \
-@@ -517,8 +516,6 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
- ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- endif
--vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
--	$(call LINK, $^)
+@@ -765,14 +765,6 @@ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+ 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
+ 	"GEN","$@")
  
- rdmacm-mux$(EXESUF): LIBS += "-libumad"
- rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
-diff --git a/Makefile.objs b/Makefile.objs
-index f69736c..ab798b0 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -106,9 +106,6 @@ qga-vss-dll-obj-y = qga/
- elf2dmp-obj-y = contrib/elf2dmp/
- ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
- ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
--vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
--vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
--vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
- rdmacm-mux-obj-y = contrib/rdmacm-mux/
- vhost-user-input-obj-y = contrib/vhost-user-input/
- vhost-user-gpu-obj-y = contrib/vhost-user-gpu/
-diff --git a/contrib/vhost-user-scsi/Makefile.objs b/contrib/vhost-user-scsi/Makefile.objs
-deleted file mode 100644
-index e83a38a..0000000
---- a/contrib/vhost-user-scsi/Makefile.objs
-+++ /dev/null
-@@ -1 +0,0 @@
--vhost-user-scsi-obj-y = vhost-user-scsi.o
-diff --git a/contrib/vhost-user-scsi/meson.build b/contrib/vhost-user-scsi/meson.build
-new file mode 100644
-index 0000000..257cbff
---- /dev/null
-+++ b/contrib/vhost-user-scsi/meson.build
-@@ -0,0 +1,7 @@
-+if 'CONFIG_LIBISCSI' in config_host
-+  executable('vhost-user-scsi', files('vhost-user-scsi.c'),
-+             link_with: libvhost_user,
-+             dependencies: [qemuutil, libiscsi],
-+             build_by_default: targetos == 'linux',
-+             install: false)
-+endif
+-ifdef CONFIG_GCOV
+-.PHONY: clean-coverage
+-clean-coverage:
+-	$(call quiet-command, \
+-		find . \( -name '*.gcda' -o -name '*.gcov' \) -type f -exec rm {} +, \
+-		"CLEAN", "coverage files")
+-endif
+-
+ clean: recurse-clean
+ # avoid old build problems by removing potentially incorrect old files
+ 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
+@@ -1275,9 +1267,6 @@ endif
+ 		echo '')
+ 	@echo  'Cleaning targets:'
+ 	$(call print-help,clean,Remove most generated files but keep the config)
+-ifdef CONFIG_GCOV
+-	$(call print-help,clean-coverage,Remove coverage files)
+-endif
+ 	$(call print-help,distclean,Remove all generated files)
+ 	$(call print-help,dist,Build a distributable tarball)
+ 	@echo  ''
+@@ -1288,9 +1277,6 @@ endif
+ 	@echo  ''
+ 	@echo  'Documentation targets:'
+ 	$(call print-help,html info pdf txt,Build documentation in specified format)
+-ifdef CONFIG_GCOV
+-	$(call print-help,coverage-report,Create code coverage report)
+-endif
+ 	@echo  ''
+ ifdef CONFIG_WIN32
+ 	@echo  'Windows targets:'
+diff --git a/Makefile.target b/Makefile.target
+index ffa2657..d61a6a9 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -269,19 +269,3 @@ endif
+ 
+ generated-files-y += config-target.h
+ Makefile: $(generated-files-y)
+-
+-# Reports/Analysis
+-#
+-# The target specific coverage report only cares about target specific
+-# blobs and not the shared code.
+-#
+-
+-%/coverage-report.html:
+-	@mkdir -p $*
+-	$(call quiet-command,\
+-		gcovr -r $(SRC_PATH) --object-directory $(CURDIR) \
+-		-p --html --html-details -o $@, \
+-		"GEN", "coverage-report.html")
+-
+-.PHONY: coverage-report
+-coverage-report: $(CURDIR)/reports/coverage/coverage-report.html
+diff --git a/configure b/configure
+index 91f518a..94cf0a3 100755
+--- a/configure
++++ b/configure
+@@ -424,7 +424,6 @@ tcg_interpreter="no"
+ bigendian="no"
+ mingw32="no"
+ gcov="no"
+-gcov_tool="gcov"
+ EXESUF=""
+ DSOSUF=".so"
+ LDFLAGS_SHARED="-shared"
+@@ -1008,8 +1007,6 @@ for opt do
+   ;;
+   --meson=*) meson="$optarg"
+   ;;
+-  --gcov=*) gcov_tool="$optarg"
+-  ;;
+   --smbd=*) smbd="$optarg"
+   ;;
+   --extra-cflags=*)
+@@ -1816,7 +1813,6 @@ Advanced options (experts only):
+   --with-coroutine=BACKEND coroutine backend. Supported options:
+                            ucontext, sigaltstack, windows
+   --enable-gcov            enable test coverage analysis with gcov
+-  --gcov=GCOV              use specified gcov [$gcov_tool]
+   --disable-blobs          disable installing provided firmware blobs
+   --with-vss-sdk=SDK-path  enable Windows VSS support in QEMU Guest Agent
+   --with-win-sdk=SDK-path  path to Windows Platform SDK (to build VSS .tlb)
+@@ -6535,8 +6531,7 @@ fi
+ write_c_skeleton
+ 
+ if test "$gcov" = "yes" ; then
+-  QEMU_CFLAGS="-fprofile-arcs -ftest-coverage -g $QEMU_CFLAGS"
+-  QEMU_LDFLAGS="-fprofile-arcs -ftest-coverage $QEMU_LDFLAGS"
++  :
+ elif test "$fortify_source" = "yes" ; then
+   QEMU_CFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $QEMU_CFLAGS"
+   debug=no
+@@ -7809,7 +7804,6 @@ echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
+ echo "POD2MAN=$POD2MAN" >> $config_host_mak
+ if test "$gcov" = "yes" ; then
+   echo "CONFIG_GCOV=y" >> $config_host_mak
+-  echo "GCOV=$gcov_tool" >> $config_host_mak
+ fi
+ 
+ if test "$libudev" != "no"; then
+@@ -8449,6 +8443,7 @@ NINJA=$PWD/ninjatool $meson setup \
+         -Dwerror=$(if test "$werror" = yes; then echo true; else echo false; fi) \
+         -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
+         -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
++        -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
+         $cross_arg \
+         "$PWD" "$source_path"
+ 
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index c1ff243..a426469 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -164,13 +164,12 @@ instrumenting the tested code. To use it, configure QEMU with
+ ``--enable-gcov`` option and build. Then run ``make check`` as usual.
+ 
+ If you want to gather coverage information on a single test the ``make
+-clean-coverage`` target can be used to delete any existing coverage
++clean-gcda`` target can be used to delete any existing coverage
+ information before running a single test.
+ 
+ You can generate a HTML coverage report by executing ``make
+-coverage-report`` which will create
+-./reports/coverage/coverage-report.html. If you want to create it
+-elsewhere simply execute ``make /foo/bar/baz/coverage-report.html``.
++coverage-html`` which will create
++``meson-logs/coveragereport/index.html``.
+ 
+ Further analysis can be conducted by running the ``gcov`` command
+ directly on the various .gcda output files. Please read the ``gcov``
 diff --git a/meson.build b/meson.build
-index fc1346a..eb0ae2c 100644
+index cc08534..b368929 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -88,6 +88,11 @@ libcap_ng = not_found
- if 'CONFIG_LIBCAP_NG' in config_host
-   libcap_ng = declare_dependency(link_args: config_host['LIBCAP_NG_LIBS'].split())
- endif
-+libiscsi = not_found
-+if 'CONFIG_LIBISCSI' in config_host
-+  libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
-+                                link_args: config_host['LIBISCSI_LIBS'].split())
-+endif
- 
- target_dirs = config_host['TARGET_DIRS'].split()
- have_user = false
-@@ -254,6 +259,7 @@ if have_tools
-   if 'CONFIG_VHOST_USER' in config_host
-     subdir('contrib/libvhost-user')
-     subdir('contrib/vhost-user-blk')
-+    subdir('contrib/vhost-user-scsi')
-   endif
- endif
- 
+@@ -199,7 +199,7 @@ summary_info += {'debug stack usage': config_host.has_key('CONFIG_DEBUG_STACK_US
+ summary_info += {'mutex debugging':   config_host.has_key('CONFIG_DEBUG_MUTEX')}
+ summary_info += {'crypto afalg':      config_host.has_key('CONFIG_AF_ALG')}
+ summary_info += {'GlusterFS support': config_host.has_key('CONFIG_GLUSTERFS')}
+-summary_info += {'gcov':              config_host.has_key('CONFIG_GCOV')}
++summary_info += {'gcov':              get_option('b_coverage')}
+ summary_info += {'TPM support':       config_host.has_key('CONFIG_TPM')}
+ summary_info += {'libssh support':    config_host.has_key('CONFIG_LIBSSH')}
+ summary_info += {'QOM debugging':     config_host.has_key('CONFIG_QOM_CAST_DEBUG')}
 -- 
 1.8.3.1
 
