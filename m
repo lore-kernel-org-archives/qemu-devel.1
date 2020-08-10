@@ -7,68 +7,72 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE6FC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12745C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:05:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E0F32080C
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:05:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE2172080C
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:05:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XfszISQK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E0F32080C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iBCVfiXD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE2172080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5CBF-0005Sa-GL
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 14:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47050)
+	id 1k5CBG-0005V4-W7
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 14:05:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BLu-0003J6-EK
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:12:50 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33114
+ id 1k5BLi-000305-ET
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:12:40 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57097
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BLs-0003MW-BG
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:12:50 -0400
+ id 1k5BLb-0003IO-JN
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:12:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597079567;
+ s=mimecast20190719; t=1597079548;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=L5kT7YC92E9ItCT0APvjB6kCqOqqaEGiVBS1dbBXCbE=;
- b=XfszISQKwftn+/NnrEi7LhyuDwZjre0hJk4/PvIFk6gpMScRA3piEqjryeaETV/w47b/k/
- Q15cxZSFldj4RsPBNr2Jh4JT5oKXe0A1fm4fAhKpN7ZJxL2zNDuUqGLtY/P3z7jWQh3nSI
- dO0bHbnobx1v5F4qllvjuc/MSdvoQfw=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AOf7PRk0gGHn0Vn5hBkgYNk8/y1JhdQDiLRDcmdns1c=;
+ b=iBCVfiXDG81RSd2LkttpyHL5YiF201G6DJjF89GI0tqtodpD6WMTRcdh9G2IySu1qYBWCX
+ NTxfZnstNmUnImD0L1ZdOUuLu2tmlCbkZS0n3uMo+CQQKVqiCaFOG+8qd6HpHraIIS5FEa
+ HBh6/84IrCouj9pu75Z5Z+0YU7EhIIQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-84-gIXiGT-uNq6d3j_ktEBUfA-1; Mon, 10 Aug 2020 13:12:45 -0400
-X-MC-Unique: gIXiGT-uNq6d3j_ktEBUfA-1
+ us-mta-168-rjj3y9CbMFuWI2ty2H1Psw-1; Mon, 10 Aug 2020 13:12:23 -0400
+X-MC-Unique: rjj3y9CbMFuWI2ty2H1Psw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D85A6106B242
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:12:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E80F119067E3
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:12:22 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 25DF95F1E9
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:12:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 01B0E5F1E9;
+ Mon, 10 Aug 2020 17:12:21 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 130/147] meson: plugins
-Date: Mon, 10 Aug 2020 19:08:48 +0200
-Message-Id: <1597079345-42801-131-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 116/147] meson: convert hw/display
+Date: Mon, 10 Aug 2020 19:08:34 +0200
+Message-Id: <1597079345-42801-117-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 03:29:25
@@ -92,144 +96,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For now link arguments end up in Makefile.target, they will move to the
-right place soon.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile              |  8 +-------
- Makefile.target       | 12 ++++++++++--
- meson.build           |  5 +++++
- plugins/Makefile.objs | 21 ---------------------
- plugins/meson.build   |  5 +++++
- 5 files changed, 21 insertions(+), 30 deletions(-)
- delete mode 100644 plugins/Makefile.objs
- create mode 100644 plugins/meson.build
+ Makefile.target          |  1 +
+ hw/Makefile.objs         |  1 -
+ hw/display/Makefile.objs | 65 ------------------------------------
+ hw/display/meson.build   | 87 ++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/meson.build           |  1 +
+ 5 files changed, 89 insertions(+), 66 deletions(-)
+ delete mode 100644 hw/display/Makefile.objs
+ create mode 100644 hw/display/meson.build
 
-diff --git a/Makefile b/Makefile
-index 5e8f281..e3ccea0 100644
---- a/Makefile
-+++ b/Makefile
-@@ -413,13 +413,10 @@ endif
- 
- ICON_SIZES=16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
- 
--install-includedir:
--	$(INSTALL_DIR) "$(DESTDIR)$(includedir)"
--
- # Needed by "meson install"
- export DESTDIR
- install: all $(if $(BUILD_DOCS),install-doc) \
--	install-datadir install-localstatedir install-includedir \
-+	install-datadir install-localstatedir \
- 	recurse-install
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_PROG) "scripts/qemu-trace-stap" $(DESTDIR)$(bindir)
-@@ -446,9 +443,6 @@ endif
- ifdef CONFIG_GTK
- 	$(MAKE) -C po $@
- endif
--ifeq ($(CONFIG_PLUGIN),y)
--	$(INSTALL_DATA) $(SRC_PATH)/include/qemu/qemu-plugin.h "$(DESTDIR)$(includedir)/qemu-plugin.h"
--endif
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/keymaps"
- 	set -e; for x in $(KEYMAPS); do \
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
 diff --git a/Makefile.target b/Makefile.target
-index c180b4c..2b7280b 100644
+index 3d5a2af..3534ece 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -110,8 +110,6 @@ obj-y += trace/
- #########################################################
- LIBS := $(libs_cpu) $(LIBS)
- 
--obj-$(CONFIG_PLUGIN) += plugins/
--
- #########################################################
- # Linux user emulator target
- 
-@@ -153,6 +151,16 @@ LIBS := $(LIBS) $(VDE_LIBS) $(SLIRP_LIBS)
+@@ -169,6 +169,7 @@ LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS) $(OPENGL_LIBS) $(SECCOM
+ LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
+ LIBS := $(LIBS) $(VDE_LIBS) $(SLIRP_LIBS)
  LIBS := $(LIBS) $(LIBUSB_LIBS) $(SMARTCARD_LIBS) $(USB_REDIR_LIBS)
- LIBS := $(LIBS) $(VIRGL_LIBS) $(CURSES_LIBS)
++LIBS := $(LIBS) $(VIRGL_LIBS)
  
-+ifeq ($(CONFIG_PLUGIN),y)
-+ifdef CONFIG_HAS_LD_DYNAMIC_LIST
-+LIBS += -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
-+else
-+ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
-+LIBS += -Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
-+endif
-+endif
-+endif
-+
- generated-files-y += hmp-commands.h hmp-commands-info.h
- 
- endif # CONFIG_SOFTMMU
-diff --git a/meson.build b/meson.build
-index 2190d98..420e60b 100644
---- a/meson.build
-+++ b/meson.build
-@@ -719,6 +719,7 @@ subdir('net')
- subdir('replay')
- subdir('hw')
- subdir('accel')
-+subdir('plugins')
- subdir('bsd-user')
- subdir('linux-user')
- 
-@@ -887,6 +888,10 @@ endforeach
- 
- # Other build targets
- 
-+if 'CONFIG_PLUGIN' in config_host
-+  install_headers('include/qemu/qemu-plugin.h')
-+endif
-+
- if 'CONFIG_GUEST_AGENT' in config_host
-   subdir('qga')
+ # Hardware support
+ ifeq ($(TARGET_NAME), sparc64)
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 26917a4..6fce6a1 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -6,7 +6,6 @@ devices-dirs-y += audio/
+ devices-dirs-y += block/
+ devices-dirs-y += char/
+ devices-dirs-y += cpu/
+-devices-dirs-y += display/
  endif
-diff --git a/plugins/Makefile.objs b/plugins/Makefile.objs
+ 
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
 deleted file mode 100644
-index 6f14d91..0000000
---- a/plugins/Makefile.objs
+index d619594..0000000
+--- a/hw/display/Makefile.objs
 +++ /dev/null
-@@ -1,21 +0,0 @@
--#
--# Plugin Support
--#
+@@ -1,65 +0,0 @@
+-common-obj-$(CONFIG_DDC) += i2c-ddc.o
+-common-obj-$(CONFIG_EDID) += edid-generate.o edid-region.o
 -
--obj-y += loader.o
--obj-y += core.o
--obj-y += api.o
+-common-obj-$(CONFIG_FW_CFG_DMA) += ramfb.o
+-common-obj-$(CONFIG_FW_CFG_DMA) += ramfb-standalone.o
 -
--# Abuse -libs suffix to only link with --dynamic-list/-exported_symbols_list
--# when the final binary includes the plugin object.
--#
--# Note that simply setting LDFLAGS is not enough: we build binaries that
--# never link plugin.o, and the linker might fail (at least ld64 does)
--# if the symbols in the list are not in the output binary.
--ifdef CONFIG_HAS_LD_DYNAMIC_LIST
--api.o-libs := -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
--else
--ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
--api.o-libs := -Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
+-common-obj-$(CONFIG_ADS7846) += ads7846.o
+-common-obj-$(CONFIG_VGA_CIRRUS) += cirrus_vga.o
+-common-obj-$(call land,$(CONFIG_VGA_CIRRUS),$(CONFIG_VGA_ISA))+=cirrus_vga_isa.o
+-common-obj-$(CONFIG_G364FB) += g364fb.o
+-common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
+-common-obj-$(CONFIG_PL110) += pl110.o
+-common-obj-$(CONFIG_SII9022) += sii9022.o
+-common-obj-$(CONFIG_SSD0303) += ssd0303.o
+-common-obj-$(CONFIG_SSD0323) += ssd0323.o
+-common-obj-$(CONFIG_XEN) += xenfb.o
+-
+-common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
+-common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
+-common-obj-$(CONFIG_VGA_ISA_MM) += vga-isa-mm.o
+-common-obj-$(CONFIG_VMWARE_VGA) += vmware_vga.o
+-common-obj-$(CONFIG_BOCHS_DISPLAY) += bochs-display.o
+-
+-common-obj-$(CONFIG_BLIZZARD) += blizzard.o
+-common-obj-$(CONFIG_EXYNOS4) += exynos4210_fimd.o
+-common-obj-$(CONFIG_FRAMEBUFFER) += framebuffer.o
+-common-obj-$(CONFIG_MILKYMIST) += milkymist-vgafb.o
+-common-obj-$(CONFIG_ZAURUS) += tc6393xb.o
+-common-obj-$(CONFIG_MACFB) += macfb.o
+-
+-obj-$(CONFIG_MILKYMIST_TMU2) += milkymist-tmu2.o
+-milkymist-tmu2.o-cflags := $(X11_CFLAGS) $(OPENGL_CFLAGS)
+-milkymist-tmu2.o-libs := $(X11_LIBS) $(OPENGL_LIBS)
+-
+-common-obj-$(CONFIG_OMAP) += omap_dss.o
+-obj-$(CONFIG_OMAP) += omap_lcdc.o
+-common-obj-$(CONFIG_PXA2XX) += pxa2xx_lcd.o
+-common-obj-$(CONFIG_RASPI) += bcm2835_fb.o
+-common-obj-$(CONFIG_SM501) += sm501.o
+-common-obj-$(CONFIG_TCX) += tcx.o
+-common-obj-$(CONFIG_CG3) += cg3.o
+-common-obj-$(CONFIG_NEXTCUBE) += next-fb.o
+-common-obj-$(CONFIG_ARTIST) += artist.o
+-
+-obj-$(CONFIG_VGA) += vga.o
+-
+-ifeq ($(CONFIG_QXL),y)
+-common-obj-m += qxl.mo
+-qxl.mo-objs = qxl.o qxl-logger.o qxl-render.o
 -endif
--endif
-diff --git a/plugins/meson.build b/plugins/meson.build
+-
+-common-obj-$(CONFIG_VIRTIO_GPU) += virtio-gpu-base.o virtio-gpu.o virtio-gpu-3d.o
+-common-obj-$(CONFIG_VHOST_USER_GPU) += vhost-user-gpu.o
+-common-obj-$(call land,$(CONFIG_VIRTIO_GPU),$(CONFIG_VIRTIO_PCI)) += virtio-gpu-pci.o
+-common-obj-$(call land,$(CONFIG_VHOST_USER_GPU),$(CONFIG_VIRTIO_PCI)) += vhost-user-gpu-pci.o
+-common-obj-$(CONFIG_VIRTIO_VGA) += virtio-vga.o
+-common-obj-$(CONFIG_VHOST_USER_VGA) += vhost-user-vga.o
+-virtio-gpu.o-cflags := $(VIRGL_CFLAGS)
+-virtio-gpu.o-libs += $(VIRGL_LIBS)
+-virtio-gpu-3d.o-cflags := $(VIRGL_CFLAGS)
+-virtio-gpu-3d.o-libs += $(VIRGL_LIBS)
+-common-obj-$(CONFIG_DPCD) += dpcd.o
+-common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dp.o
+-
+-common-obj-$(CONFIG_ATI_VGA) += ati.o ati_2d.o ati_dbg.o
+diff --git a/hw/display/meson.build b/hw/display/meson.build
 new file mode 100644
-index 0000000..9608e52
+index 0000000..fa4f806
 --- /dev/null
-+++ b/plugins/meson.build
-@@ -0,0 +1,5 @@
-+specific_ss.add(when: 'CONFIG_PLUGIN', if_true: [files(
-+  'loader.c',
-+  'core.c',
-+  'api.c',
-+)])
++++ b/hw/display/meson.build
+@@ -0,0 +1,87 @@
++hw_display_modules = []
++
++softmmu_ss.add(when: 'CONFIG_DDC', if_true: files('i2c-ddc.c'))
++softmmu_ss.add(when: 'CONFIG_EDID', if_true: files('edid-generate.c', 'edid-region.c'))
++
++softmmu_ss.add(when: 'CONFIG_FW_CFG_DMA', if_true: files('ramfb.c'))
++softmmu_ss.add(when: 'CONFIG_FW_CFG_DMA', if_true: files('ramfb-standalone.c'))
++
++softmmu_ss.add(when: 'CONFIG_ADS7846', if_true: files('ads7846.c'))
++softmmu_ss.add(when: 'CONFIG_VGA_CIRRUS', if_true: files('cirrus_vga.c'))
++softmmu_ss.add(when: ['CONFIG_VGA_CIRRUS', 'CONFIG_VGA_ISA'], if_true: files('cirrus_vga_isa.c'))
++softmmu_ss.add(when: 'CONFIG_G364FB', if_true: files('g364fb.c'))
++softmmu_ss.add(when: 'CONFIG_JAZZ_LED', if_true: files('jazz_led.c'))
++softmmu_ss.add(when: 'CONFIG_PL110', if_true: files('pl110.c'))
++softmmu_ss.add(when: 'CONFIG_SII9022', if_true: files('sii9022.c'))
++softmmu_ss.add(when: 'CONFIG_SSD0303', if_true: files('ssd0303.c'))
++softmmu_ss.add(when: 'CONFIG_SSD0323', if_true: files('ssd0323.c'))
++softmmu_ss.add(when: 'CONFIG_XEN', if_true: files('xenfb.c'))
++
++softmmu_ss.add(when: 'CONFIG_VGA_PCI', if_true: files('vga-pci.c'))
++softmmu_ss.add(when: 'CONFIG_VGA_ISA', if_true: files('vga-isa.c'))
++softmmu_ss.add(when: 'CONFIG_VGA_ISA_MM', if_true: files('vga-isa-mm.c'))
++softmmu_ss.add(when: 'CONFIG_VMWARE_VGA', if_true: files('vmware_vga.c'))
++softmmu_ss.add(when: 'CONFIG_BOCHS_DISPLAY', if_true: files('bochs-display.c'))
++
++softmmu_ss.add(when: 'CONFIG_BLIZZARD', if_true: files('blizzard.c'))
++softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_fimd.c'))
++softmmu_ss.add(when: 'CONFIG_FRAMEBUFFER', if_true: files('framebuffer.c'))
++softmmu_ss.add(when: 'CONFIG_ZAURUS', if_true: files('tc6393xb.c'))
++
++softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_dss.c'))
++softmmu_ss.add(when: 'CONFIG_PXA2XX', if_true: files('pxa2xx_lcd.c'))
++softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_fb.c'))
++softmmu_ss.add(when: 'CONFIG_SM501', if_true: files('sm501.c'))
++softmmu_ss.add(when: 'CONFIG_TCX', if_true: files('tcx.c'))
++softmmu_ss.add(when: 'CONFIG_CG3', if_true: files('cg3.c'))
++softmmu_ss.add(when: 'CONFIG_MACFB', if_true: files('macfb.c'))
++softmmu_ss.add(when: 'CONFIG_NEXTCUBE', if_true: files('next-fb.c'))
++
++specific_ss.add(when: 'CONFIG_VGA', if_true: files('vga.c'))
++
++if config_all_devices.has_key('CONFIG_QXL')
++  hw_display_modules += [[ 'qxl',
++    files('qxl.c', 'qxl-logger.c', 'qxl-render.c'), [],
++    ['CONFIG_QXL']]]
++endif
++
++softmmu_ss.add(when: 'CONFIG_QXL', if_true: files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
++
++softmmu_ss.add(when: 'CONFIG_DPCD', if_true: files('dpcd.c'))
++softmmu_ss.add(when: 'CONFIG_XLNX_ZYNQMP_ARM', if_true: files('xlnx_dp.c'))
++
++softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-vgafb.c'))
++softmmu_ss.add(when: 'CONFIG_ARTIST', if_true: files('artist.c'))
++
++softmmu_ss.add(when: [pixman, 'CONFIG_ATI_VGA'], if_true: files('ati.c', 'ati_2d.c', 'ati_dbg.c'))
++
++if config_all_devices.has_key('CONFIG_VIRTIO_GPU')
++  virtio_gpu_ss = ss.source_set()
++  virtio_gpu_ss.add(files('virtio-gpu-base.c', 'virtio-gpu.c', 'virtio-gpu-3d.c'), virgl)
++  virtio_gpu_ss.add(when: 'CONFIG_VHOST_USER_GPU', if_true: files('vhost-user-gpu.c'))
++  virtio_gpu_ss.add(when: 'CONFIG_VIRTIO_PCI', if_true: files('virtio-gpu-pci.c'))
++  virtio_gpu_ss.add(when: ['CONFIG_VHOST_USER_GPU', 'CONFIG_VIRTIO_PCI'], if_true: files('vhost-user-gpu-pci.c'))
++  virtio_gpu_ss.add(when: 'CONFIG_VIRTIO_VGA', if_true: files('virtio-vga.c'))
++  virtio_gpu_ss.add(when: 'CONFIG_VHOST_USER_VGA', if_true: files('vhost-user-vga.c'))
++
++  # FIXME: this was attempted in the Makefile build system; it was then reverted
++  # as it would try to load all devices when the module is loaded, even if
++  # config_devices for this target only has some of them.  Since virtio-gpu-pci
++  # and virtio-vga both instantiate a virtio-gpu-device, fixing it probably does
++  # not even require a dependency system, just splitting the module in three
++  # for CONFIG_VIRTIO_GPU/CONFIG_VHOST_USER_GPU, CONFIG_VIRTIO_PCI and
++  # CONFIG_VIRTIO_VGA/CONFIG_VHOST_USER_VGA.
++  # Sourcesets are a dime a dozen, so keep it and just disable module builds.
++
++  #virtio_gpu = virtio_gpu_ss.apply(config_all_devices, strict: false)
++  #hw_display_modules += [[ 'virtio-gpu', virtio_gpu.sources(), [pixman, virgl],
++  #                         ['CONFIG_VIRTIO_GPU']]]
++
++  softmmu_ss.add_all(when: [pixman, 'CONFIG_VIRTIO_GPU'],
++                     if_true: virtio_gpu_ss)
++endif
++
++specific_ss.add(when: [x11, opengl, 'CONFIG_MILKYMIST_TMU2'], if_true: files('milkymist-tmu2.c'))
++specific_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_lcdc.c'))
++
++modules += { 'hw-display': hw_display_modules }
+diff --git a/hw/meson.build b/hw/meson.build
+index 96da0bb..dacd26c 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,4 +1,5 @@
+ subdir('core')
++subdir('display')
+ subdir('dma')
+ subdir('gpio')
+ subdir('hyperv')
 -- 
 1.8.3.1
 
