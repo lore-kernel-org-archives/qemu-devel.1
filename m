@@ -2,140 +2,127 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FE5C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 343E2C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:03:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C59B820885
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:55:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F082020782
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:03:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="O2XefHde"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C59B820885
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EmaxQA9K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F082020782
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Cx9-0003uf-09
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 14:55:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41062)
+	id 1k5D4x-00019L-5q
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 15:03:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42508)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <figlesia@xilinx.com>)
- id 1k5CwP-0003Ml-Go; Mon, 10 Aug 2020 14:54:37 -0400
-Received: from mail-dm6nam10on2088.outbound.protection.outlook.com
- ([40.107.93.88]:51808 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1k5D4L-0000ik-Od
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:02:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19270
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <figlesia@xilinx.com>)
- id 1k5CwL-0007DH-HF; Mon, 10 Aug 2020 14:54:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bdaq8+MPoL9ToP0IWL9U60TLz89SXl4denfYYFtPBccsGoBMxWCsmbtzNxJPxMGxdfnWvDky2c53feBgqusAo8kXG03FDfammhY7KKdWULunRk/0q6tHFL7NJNf1YWnfunp7coZ1kvN/xplq8I5H5YNarJh6xeWhRjb7RIDJ4sWd88grXnHWFO+HCBZ/eJ0oAmZXSJpNdvcp3hPmuAiy1B/AT4aj9W5lPwQVZexjrp/ou7VzKjC+yOvnlrd0ETtPSki5RykBIddyBnDoxycNP+yrTyH4hT9xlH20bY0xfupN4cbHT7wSMME+/Lmxti6dl6Qxt662Cv0DNf3W+LHKjg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LoI4sJQjHThztSJSxKDQrbl8MRq7r4wNfHnrBpGQ3Dw=;
- b=GgaaCUBl8YNO8vsd4nnZ2ULONyXJe7xtWPgGUi05Qo/WLHlRQq1jdNpdtYSU1ZRlgl+PCFCa/YRGNIJaWPCoYBKmAtfcR7VGjBalxnF3gnvo64zOZHzNc0e7tIzT4rEkeleip9UTbHv0JOnjKVxz72NoORVzhkj5u2EMlDzGVRllIthXtC2w6h3AXgOAUCuII5qSCV5p12gDAjwP2khUOATLyQ4xARy/7BXM+a4hv3Dg7jbOeSwHmFRaCf9S2Suz2d5ZBNoNomhWfLHnq63wjj5gyj6jjDkNdIDelAt1goBLtYGWpUAnCL5iOiTaQXIoOkLBUKuf7+7vfcROjCgX9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LoI4sJQjHThztSJSxKDQrbl8MRq7r4wNfHnrBpGQ3Dw=;
- b=O2XefHdeA1dWx95gLiqeha+eirNizjb5wszsWzTjD5p9VhPG4ZutxPhC9ExZt05W/PwW/Fue5Jo5eDHIfUr068FCmSkuZAc3JdjH+daiuSqUGu6JFbcAm0vJ8YAMhSsY8bCPJ89fJUREyd7pVqoro+VILPHF6FV4t4kPW9lq5sY=
-Received: from MN2PR07CA0018.namprd07.prod.outlook.com (2603:10b6:208:1a0::28)
- by SN6PR02MB4429.namprd02.prod.outlook.com (2603:10b6:805:a9::16)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.20; Mon, 10 Aug
- 2020 18:54:29 +0000
-Received: from BL2NAM02FT035.eop-nam02.prod.protection.outlook.com
- (2603:10b6:208:1a0:cafe::b9) by MN2PR07CA0018.outlook.office365.com
- (2603:10b6:208:1a0::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.15 via Frontend
- Transport; Mon, 10 Aug 2020 18:54:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT035.mail.protection.outlook.com (10.152.77.157) with Microsoft SMTP
- Server id 15.20.3261.19 via Frontend Transport; Mon, 10 Aug 2020 18:54:29
- +0000
-Received: from [149.199.38.66] (port=58446 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <francisco.iglesias@xilinx.com>)
- id 1k5CwB-000130-3u; Mon, 10 Aug 2020 11:54:23 -0700
-Received: from [127.0.0.1] (helo=localhost)
- by xsj-pvapsmtp01 with smtp (Exim 4.63)
- (envelope-from <francisco.iglesias@xilinx.com>)
- id 1k5CwH-0002i1-5l; Mon, 10 Aug 2020 11:54:29 -0700
-Received: from xsj-pvapsmtp01 (maildrop.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 07AIsK3R001679; 
- Mon, 10 Aug 2020 11:54:20 -0700
-Received: from [10.23.120.191] (helo=debian)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <francisco.iglesias@xilinx.com>)
- id 1k5Cw8-0002hW-A5; Mon, 10 Aug 2020 11:54:20 -0700
-Date: Mon, 10 Aug 2020 19:54:18 +0100
-From: Francisco Iglesias <francisco.iglesias@xilinx.com>
-To: Vikram Garhwal <fnu.vikram@xilinx.com>
-Subject: Re: [PATCH v8 2/4] xlnx-zynqmp: Connect Xilinx ZynqMP CAN controllers
-Message-ID: <20200810185417.hczwuzgluwrffigv@debian>
-References: <1596575505-163040-1-git-send-email-fnu.vikram@xilinx.com>
- <1596575505-163040-3-git-send-email-fnu.vikram@xilinx.com>
+ (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
+ id 1k5D4J-00082O-05
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:02:49 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07AJ09df174888; Mon, 10 Aug 2020 15:01:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : from : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=mK/zIp3Kg+HIuB9vvZmwLys1s+zR3s/XZV7hmPB+zes=;
+ b=EmaxQA9KwYkEQc8XRo5Qzhnp9YG/dfZchi3hE94HhU7OkbtPZXXHthBAwmDVS7DCKeVU
+ LnT+eVcM13k5RVsGXg3T3pybhlhbmi0KiUdpp0QqALsWAlnveF52PXgJOk9qVrHzglZr
+ xOUD7yQghtps4EQ2uJfqHHZW+MqvKvvp45O8HPSWaFf9Qhwv7z10dSwEPQGSKgMVsek2
+ qrzDxNlj5x5hRa6g4iQ88hIrOif/uC0136YsIHlRAIruyxtQGwaebZLvD60o4uBc7gwT
+ fn436yyS1+3+n0UaBEjm+rWu++dB3zvXzwz+746juCAWx0Es8EV/8tP+8OHIaD6/pCj5 1w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32sr7uww7f-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 10 Aug 2020 15:01:42 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07AJ0IOF176017;
+ Mon, 10 Aug 2020 15:01:42 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32sr7uww6p-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 10 Aug 2020 15:01:42 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07AIk8Fc022667;
+ Mon, 10 Aug 2020 19:01:40 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com
+ (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+ by ppma01dal.us.ibm.com with ESMTP id 32skp90mhh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 10 Aug 2020 19:01:40 +0000
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07AJ1daA51904780
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 10 Aug 2020 19:01:39 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 77D176A04D;
+ Mon, 10 Aug 2020 19:01:39 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EB1AD6A057;
+ Mon, 10 Aug 2020 19:01:38 +0000 (GMT)
+Received: from [9.160.0.152] (unknown [9.160.0.152])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Mon, 10 Aug 2020 19:01:38 +0000 (GMT)
+Subject: Re: [PATCH 2/2] configure: add support for Control-Flow Integrity
+From: Daniele Buono <dbuono@linux.vnet.ibm.com>
+To: Alexander Bulekov <alxndr@bu.edu>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20200702054948.10257-1-dbuono@linux.vnet.ibm.com>
+ <20200702054948.10257-3-dbuono@linux.vnet.ibm.com>
+ <20200702095252.GF1888119@redhat.com>
+ <0ed44c55-1f5d-6866-9555-82134ef628fb@linux.vnet.ibm.com>
+ <c81befdd-979c-6060-c0a3-15ea1b142d25@redhat.com>
+ <20200702133830.f3mlqli2bxtvk2z4@mozz.bu.edu>
+ <f3cf9017-3da5-d6d4-f463-3864ab1f43c6@linux.vnet.ibm.com>
+Message-ID: <b2fc75ef-f6ae-d776-bead-4e6e6de10207@linux.vnet.ibm.com>
+Date: Mon, 10 Aug 2020 15:01:37 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1596575505-163040-3-git-send-email-fnu.vikram@xilinx.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6c4883b9-0920-483f-ba08-08d83d5ecfc9
-X-MS-TrafficTypeDiagnostic: SN6PR02MB4429:
-X-Microsoft-Antispam-PRVS: <SN6PR02MB4429C057C4FBF2E479562355AD440@SN6PR02MB4429.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:155;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: p3T9xvMzCuvFMJqu0r74g7tQQqT1P3nxloT9dtNNbEaEHliWZ1b3v5kf1sxzKvfncUKpPVZ5DB2MuLI5gwhJUYG1iX7K4KKybsYRo4OastfQdKumPJmgWUYA6jj569BeVfdF3pFUdkAx4/6ydRsnxCruYoJufM3+E/fA4CQ4tMkhhRIROeO38BXcGBSSEOaD13ekwUDwBgJIPXPuiuwV8QgkSRUFjh86Mz4Xj1XbyctMFkNkoGq3dpYRoF6NPzbUZtBuMpTUkXniobd8IGWJ6Os/m9UddANGMeFiNXsVSILOJVbraBJVOZ8MqViWCJ6NqZpyA2KJVaNVYnZVOZcUVuuKM6dDiquQwvgf2PSdYl/TwpCDEwbnsCj2IYpQFwcdgAXxdkhG3thdpFIaWCZBng==
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFTY:;
- SFS:(39860400002)(396003)(136003)(376002)(346002)(46966005)(5660300002)(47076004)(9786002)(426003)(186003)(8676002)(82310400002)(478600001)(356005)(82740400003)(6862004)(44832011)(1076003)(2906002)(8936002)(26005)(70586007)(316002)(70206006)(9576002)(3716004)(9686003)(4326008)(54906003)(6636002)(81166007)(336012)(33716001);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2020 18:54:29.5169 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c4883b9-0920-483f-ba08-08d83d5ecfc9
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT035.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR02MB4429
-Received-SPF: pass client-ip=40.107.93.88; envelope-from=figlesia@xilinx.com;
- helo=NAM10-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 14:54:30
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <f3cf9017-3da5-d6d4-f463-3864ab1f43c6@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-10_15:2020-08-06,
+ 2020-08-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0
+ mlxlogscore=999 impostorscore=0 malwarescore=0 bulkscore=0 mlxscore=0
+ adultscore=0 phishscore=0 priorityscore=1501 lowpriorityscore=0
+ clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008100126
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 15:01:43
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -148,193 +135,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- "open list:Xilinx ZynqMP" <qemu-arm@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 04, 2020 at 02:11:43PM -0700, Vikram Garhwal wrote:
-> Connect CAN0 and CAN1 on the ZynqMP.
-> 
-> Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+Hi Alex, Paolo
+Hitting a small issue while adding support for lto (and therefore cfi) 
+to the fuzzer.
 
-Reviewed-by: Francisco Iglesias <francisco.iglesias@xilinx.com>
+The fuzzer requires a modified linker script to place all of the stuff 
+that needs to persist across fuzzing runs into a contiguous section of 
+memory.
 
-> ---
->  hw/arm/xlnx-zcu102.c         | 20 ++++++++++++++++++++
->  hw/arm/xlnx-zynqmp.c         | 34 ++++++++++++++++++++++++++++++++++
->  include/hw/arm/xlnx-zynqmp.h |  8 ++++++++
->  3 files changed, 62 insertions(+)
+It does that by inserting three new sections after the .data section of 
+the binary. Instead of rewriting a full linker script, it's using the 
+*INSERT* keyword to add this to the default linker script.
+
+Now, LTO with LLVM requires to use the gold linker, which does not have 
+a default linker script and therefore does not support the *INSERT* keyword.
+This can be fixed by taking the default script from the bdf linker, 
+adding the additional sections and ask gold to use the full script.
+
+However, I don't like the idea of replacing the small, self-contained 
+script snippet that is currently used, with a full script (which is 
+probably also dependent on the bfd/os version). So I'm thinking of 
+adding a check in configure. If gold is the linker, automatically create 
+(somehow, still working on it) the full link script by obtaining the 
+default bfd script and add the required parts. Would that work for you?
+
+Cheers,
+Daniele
+
+On 7/2/2020 11:43 AM, Daniele Buono wrote:
+> Hey Alex!
 > 
-> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> index 5997262..c3e3420 100644
-> --- a/hw/arm/xlnx-zcu102.c
-> +++ b/hw/arm/xlnx-zcu102.c
-> @@ -24,6 +24,7 @@
->  #include "qemu/log.h"
->  #include "sysemu/qtest.h"
->  #include "sysemu/device_tree.h"
-> +#include "net/can_emu.h"
->  
->  typedef struct XlnxZCU102 {
->      MachineState parent_obj;
-> @@ -33,6 +34,8 @@ typedef struct XlnxZCU102 {
->      bool secure;
->      bool virt;
->  
-> +    CanBusState *canbus[XLNX_ZYNQMP_NUM_CAN];
-> +
->      struct arm_boot_info binfo;
->  } XlnxZCU102;
->  
-> @@ -125,6 +128,14 @@ static void xlnx_zcu102_init(MachineState *machine)
->      object_property_set_bool(OBJECT(&s->soc), "virtualization", s->virt,
->                               &error_fatal);
->  
-> +    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-> +        gchar *bus_name = g_strdup_printf("canbus%d", i);
-> +
-> +        object_property_set_link(OBJECT(&s->soc), bus_name,
-> +                                 OBJECT(s->canbus[i]), &error_fatal);
-> +        g_free(bus_name);
-> +    }
-> +
->      qdev_realize(DEVICE(&s->soc), NULL, &error_fatal);
->  
->      /* Create and plug in the SD cards */
-> @@ -220,6 +231,15 @@ static void xlnx_zcu102_machine_instance_init(Object *obj)
->                                      "Set on/off to enable/disable emulating a "
->                                      "guest CPU which implements the ARM "
->                                      "Virtualization Extensions");
-> +    object_property_add_link(obj, "xlnx-zcu102.canbus0", TYPE_CAN_BUS,
-> +                             (Object **)&s->canbus[0],
-> +                             object_property_allow_set_link,
-> +                             0);
-> +
-> +    object_property_add_link(obj, "xlnx-zcu102.canbus1", TYPE_CAN_BUS,
-> +                             (Object **)&s->canbus[1],
-> +                             object_property_allow_set_link,
-> +                             0);
->  }
->  
->  static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index c435b9d..adad3e7 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -81,6 +81,14 @@ static const int uart_intr[XLNX_ZYNQMP_NUM_UARTS] = {
->      21, 22,
->  };
->  
-> +static const uint64_t can_addr[XLNX_ZYNQMP_NUM_CAN] = {
-> +    0xFF060000, 0xFF070000,
-> +};
-> +
-> +static const int can_intr[XLNX_ZYNQMP_NUM_CAN] = {
-> +    23, 24,
-> +};
-> +
->  static const uint64_t sdhci_addr[XLNX_ZYNQMP_NUM_SDHCI] = {
->      0xFF160000, 0xFF170000,
->  };
-> @@ -243,6 +251,11 @@ static void xlnx_zynqmp_init(Object *obj)
->                                  TYPE_CADENCE_UART);
->      }
->  
-> +    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-> +        object_initialize_child(obj, "can[*]", &s->can[i],
-> +                                TYPE_XLNX_ZYNQMP_CAN);
-> +    }
-> +
->      object_initialize_child(obj, "sata", &s->sata, TYPE_SYSBUS_AHCI);
->  
->      for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
-> @@ -480,6 +493,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->                             gic_spi[uart_intr[i]]);
->      }
->  
-> +    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
-> +        object_property_set_int(OBJECT(&s->can[i]), "ext_clk_freq",
-> +                                XLNX_ZYNQMP_CAN_REF_CLK, &error_abort);
-> +
-> +        object_property_set_link(OBJECT(&s->can[i]), "canbus",
-> +                                 OBJECT(s->canbus[i]), &error_fatal);
-> +
-> +        sysbus_realize(SYS_BUS_DEVICE(&s->can[i]), &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
-> +            return;
-> +        }
-> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->can[i]), 0, can_addr[i]);
-> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->can[i]), 0,
-> +                           gic_spi[can_intr[i]]);
-> +    }
-> +
->      object_property_set_int(OBJECT(&s->sata), "num-ports", SATA_NUM_PORTS,
->                              &error_abort);
->      if (!sysbus_realize(SYS_BUS_DEVICE(&s->sata), errp)) {
-> @@ -617,6 +647,10 @@ static Property xlnx_zynqmp_props[] = {
->      DEFINE_PROP_BOOL("has_rpu", XlnxZynqMPState, has_rpu, false),
->      DEFINE_PROP_LINK("ddr-ram", XlnxZynqMPState, ddr_ram, TYPE_MEMORY_REGION,
->                       MemoryRegion *),
-> +    DEFINE_PROP_LINK("canbus0", XlnxZynqMPState, canbus[0], TYPE_CAN_BUS,
-> +                     CanBusState *),
-> +    DEFINE_PROP_LINK("canbus1", XlnxZynqMPState, canbus[1], TYPE_CAN_BUS,
-> +                     CanBusState *),
->      DEFINE_PROP_END_OF_LIST()
->  };
->  
-> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-> index 53076fa..8cada69 100644
-> --- a/include/hw/arm/xlnx-zynqmp.h
-> +++ b/include/hw/arm/xlnx-zynqmp.h
-> @@ -22,6 +22,7 @@
->  #include "hw/intc/arm_gic.h"
->  #include "hw/net/cadence_gem.h"
->  #include "hw/char/cadence_uart.h"
-> +#include "hw/net/xlnx-zynqmp-can.h"
->  #include "hw/ide/ahci.h"
->  #include "hw/sd/sdhci.h"
->  #include "hw/ssi/xilinx_spips.h"
-> @@ -32,6 +33,7 @@
->  #include "hw/rtc/xlnx-zynqmp-rtc.h"
->  #include "hw/cpu/cluster.h"
->  #include "target/arm/cpu.h"
-> +#include "net/can_emu.h"
->  
->  #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
->  #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
-> @@ -41,6 +43,8 @@
->  #define XLNX_ZYNQMP_NUM_RPU_CPUS 2
->  #define XLNX_ZYNQMP_NUM_GEMS 4
->  #define XLNX_ZYNQMP_NUM_UARTS 2
-> +#define XLNX_ZYNQMP_NUM_CAN 2
-> +#define XLNX_ZYNQMP_CAN_REF_CLK (24 * 1000 * 1000)
->  #define XLNX_ZYNQMP_NUM_SDHCI 2
->  #define XLNX_ZYNQMP_NUM_SPIS 2
->  #define XLNX_ZYNQMP_NUM_GDMA_CH 8
-> @@ -92,6 +96,7 @@ typedef struct XlnxZynqMPState {
->  
->      CadenceGEMState gem[XLNX_ZYNQMP_NUM_GEMS];
->      CadenceUARTState uart[XLNX_ZYNQMP_NUM_UARTS];
-> +    XlnxZynqMPCANState can[XLNX_ZYNQMP_NUM_CAN];
->      SysbusAHCIState sata;
->      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
->      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-> @@ -112,6 +117,9 @@ typedef struct XlnxZynqMPState {
->      bool virt;
->      /* Has the RPU subsystem?  */
->      bool has_rpu;
-> +
-> +    /* CAN bus. */
-> +    CanBusState *canbus[XLNX_ZYNQMP_NUM_CAN];
->  }  XlnxZynqMPState;
->  
->  #endif
-> -- 
-> 2.7.4
+> I agree, in most cases (possibly all of them), a wrong indirect function 
+> call will end up with something that is catched by ASan or UBSan.
+> This way, however, you may catch it earlier and it may make debug easier 
+> (especially with --enable-cfi-debug which is printing an error with the 
+> calling and, most times, the called function).
+> 
+> UBSan does have a similar feature, -fsanitize=function, but 
+> unfortunately it works only on C++ code, and therefore is not good in 
+> the QEMU case.
+> 
+> And, of course, it will also be used to weed out missing functions in 
+> the CFI filter.
+> 
+> On 7/2/2020 9:38 AM, Alexander Bulekov wrote:
+>> Can't wait to try this out!
+>>
+>> On 200702 1459, Paolo Bonzini wrote:
+>>> On 02/07/20 14:50, Daniele Buono wrote:
+>>>> I also wonder if this is something that could be put in the fuzzing
+>>>> environment. It would probably also help in finding coding error in
+>>>> corner cases quicker.
+>>>
+>>> Yes, fuzzing and tests/docker/test-debug should enable CFI.  Also,
+>>> tests/docker/test-clang should enable LTO.
+>>>
+>>> Paolo
+>>
+>> I believe CFI is most-useful as an active defensive measure. I can't
+>> think of many cases where a fuzzer/test could raise a CFI alert that
+>> wouldn't also be caught by something like canaries, ASan or UBsan,
+>> though maybe I'm missing something. Maybe testing/fuzzing with CFI could
+>> be useful to weed out any errors due to e.g. an incomplete
+>> cfi-blacklist.txt
+>>
+>> -Alex
+>>
 > 
 
