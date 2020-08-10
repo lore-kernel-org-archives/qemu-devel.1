@@ -2,86 +2,82 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A130DC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 07:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29897C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 08:05:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64D8E20773
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 07:34:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2tCOINJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64D8E20773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id F33B72073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 08:05:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F33B72073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k52KW-0003xI-Ll
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 03:34:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33078)
+	id 1k52nt-0007fJ-6M
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 04:05:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1k52Ja-0003E1-Ku
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 03:33:50 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41350)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1k52JY-0003Bb-S8
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 03:33:50 -0400
-Received: by mail-wr1-x443.google.com with SMTP id r2so7150062wrs.8
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 00:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=jrebPfOxiKRIV4NseMqZLL15THo7osMGeEsLT3z/rpg=;
- b=T2tCOINJ8J0ulc/61eH0GGYisAcrz0zPDzm7MKwGTfeUSD5V+15+OPwQnDxtHfiTTy
- ezEj2IpYPdWClVy8Y5SxXYs5TA6/A2+b3e3SY5IBRl96Fe3ZEq6sVVJXmsdEcH1w11eC
- 8eNi0Yj0dpdqeb/YzcnbsKwWNRFcNT0U3O2sfH+kztzqvWVbC5B2x3e1GZv+UbPiPyGd
- j89j87NrRxEfDuheSd1uY9+HffFraJqkViD2WoVjYXLDHtt4Y8P3vJ2/MAWzf2FFjXWu
- tlTY+uCRPC566E90UYRZiAekcTyUzYiIQXxjcf3xs91YpOqWUtGwF1apSoUOft/MA7Xb
- nJ9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=jrebPfOxiKRIV4NseMqZLL15THo7osMGeEsLT3z/rpg=;
- b=GSelI4ZLizP+yzhPpV+bNyLgQOQjmiT1GhW7RpEjeJShDITba2xoOP+wRiDejqyvf5
- VHBhUB4SrfEBNeezGf+CfYkoJWQpZMade7B0Q9wYzARq6Z3cK3TcCXC0qyRsa7E7FRlA
- zrIJYNbtLKE9oAxLYsrq+GeBItJ/Nh3xSSbDVxIri4jzIr5mMDwUzgkrgFq/SvgqWv3J
- bNkQ2pt0BczZlSOFFFZiTcoxeB4jyFUWFp7Z6YFqZssI0OEjgtz2UVizChV3Txf8kzAm
- kRdo1zabBxZ/41i1xiTDQyEW81MDnV8XyAC0XqbrtIbGhWTshDVY3xSEQ4TUfXkLk7dI
- 2g3g==
-X-Gm-Message-State: AOAM532R6hgh+ZlADc99JZIoNTIOhJEArjW044NilnwO+yo4aaPvYd17
- Xo8gwO4r0PWTbzK8oEuPhcGP/xehs9RoUAQgGWc=
-X-Google-Smtp-Source: ABdhPJy2Vz85iN1u59xlq2e0IRk1s1rQcyGhP7y8PSKnq72lMbGckZchLZ/fjV1BKBksUZaEsd3g3mHO3Ivzp2faaPs=
-X-Received: by 2002:adf:e8cc:: with SMTP id k12mr24153761wrn.2.1597044826397; 
- Mon, 10 Aug 2020 00:33:46 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1k52nH-0007Dn-UH
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 04:04:31 -0400
+Received: from mga04.intel.com ([192.55.52.120]:55009)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1k52nD-00078Y-86
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 04:04:31 -0400
+IronPort-SDR: WWnrQl2Fm6Gnv3GYGsr4wSyXz7dxwrMAhsuPUby+kHE3YtOXdQXdGEyKzKSoqjlfusUvIw2m0X
+ BbBMjAicagWQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9708"; a="150929465"
+X-IronPort-AV: E=Sophos;i="5.75,456,1589266800"; d="scan'208";a="150929465"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 10 Aug 2020 01:04:12 -0700
+IronPort-SDR: 1+BZswvKizqMDl2nnLt3Wbb4kj38KsrRKQlvIVQXxebMjEQXF1LjOhlHKoimsXfE2GzV+/kzCm
+ YhlHLX16i7Zw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.75,456,1589266800"; d="scan'208";a="324369748"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga008.jf.intel.com with ESMTP; 10 Aug 2020 01:04:05 -0700
+Date: Mon, 10 Aug 2020 15:46:31 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Jiri Pirko <jiri@mellanox.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200810074631.GA29059@joy-OptiPlex-7040>
+References: <20200727162321.7097070e@x1.home>
+ <20200729080503.GB28676@joy-OptiPlex-7040>
+ <20200804183503.39f56516.cohuck@redhat.com>
+ <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
+ <20200805021654.GB30485@joy-OptiPlex-7040>
+ <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+ <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040>
+ <20200805105319.GF2177@nanopsycho>
 MIME-Version: 1.0
-References: <20200615225827.183062-1-joe.slater@windriver.com>
-In-Reply-To: <20200615225827.183062-1-joe.slater@windriver.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 10 Aug 2020 11:33:34 +0400
-Message-ID: <CAJ+F1CJdHo7R9rnmoD1cLEzsYLFsFVVjcAr5UcsYFgfcW3z2LA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] os_find_datadir: search as in version 4.2
-To: Joe Slater <joe.slater@windriver.com>
-Content-Type: multipart/alternative; boundary="000000000000915ff905ac80f9a8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200805105319.GF2177@nanopsycho>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=192.55.52.120; envelope-from=yan.y.zhao@intel.com;
+ helo=mga04.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 04:04:18
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,127 +90,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, randy.macleod@windriver.com
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+ libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
+ xin-ran.wang@intel.com, eskultet@redhat.com,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
+ jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
+ hejie.xu@intel.com, bao.yumeng@zte.com.cn,
+ Alex Williamson <alex.williamson@redhat.com>, smooney@redhat.com,
+ intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com, corbet@lwn.net,
+ dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000915ff905ac80f9a8
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, Aug 05, 2020 at 12:53:19PM +0200, Jiri Pirko wrote:
+> Wed, Aug 05, 2020 at 11:33:38AM CEST, yan.y.zhao@intel.com wrote:
+> >On Wed, Aug 05, 2020 at 04:02:48PM +0800, Jason Wang wrote:
+> >> 
+> >> On 2020/8/5 下午3:56, Jiri Pirko wrote:
+> >> > Wed, Aug 05, 2020 at 04:41:54AM CEST, jasowang@redhat.com wrote:
+> >> > > On 2020/8/5 上午10:16, Yan Zhao wrote:
+> >> > > > On Wed, Aug 05, 2020 at 10:22:15AM +0800, Jason Wang wrote:
+> >> > > > > On 2020/8/5 上午12:35, Cornelia Huck wrote:
+> >> > > > > > [sorry about not chiming in earlier]
+> >> > > > > > 
+> >> > > > > > On Wed, 29 Jul 2020 16:05:03 +0800
+> >> > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >> > > > > > 
+> >> > > > > > > On Mon, Jul 27, 2020 at 04:23:21PM -0600, Alex Williamson wrote:
+> >> > > > > > (...)
+> >> > > > > > 
+> >> > > > > > > > Based on the feedback we've received, the previously proposed interface
+> >> > > > > > > > is not viable.  I think there's agreement that the user needs to be
+> >> > > > > > > > able to parse and interpret the version information.  Using json seems
+> >> > > > > > > > viable, but I don't know if it's the best option.  Is there any
+> >> > > > > > > > precedent of markup strings returned via sysfs we could follow?
+> >> > > > > > I don't think encoding complex information in a sysfs file is a viable
+> >> > > > > > approach. Quoting Documentation/filesystems/sysfs.rst:
+> >> > > > > > 
+> >> > > > > > "Attributes should be ASCII text files, preferably with only one value
+> >> > > > > > per file. It is noted that it may not be efficient to contain only one
+> >> > > > > > value per file, so it is socially acceptable to express an array of
+> >> > > > > > values of the same type.
+> >> > > > > > Mixing types, expressing multiple lines of data, and doing fancy
+> >> > > > > > formatting of data is heavily frowned upon."
+> >> > > > > > 
+> >> > > > > > Even though this is an older file, I think these restrictions still
+> >> > > > > > apply.
+> >> > > > > +1, that's another reason why devlink(netlink) is better.
+> >> > > > > 
+> >> > > > hi Jason,
+> >> > > > do you have any materials or sample code about devlink, so we can have a good
+> >> > > > study of it?
+> >> > > > I found some kernel docs about it but my preliminary study didn't show me the
+> >> > > > advantage of devlink.
+> >> > > 
+> >> > > CC Jiri and Parav for a better answer for this.
+> >> > > 
+> >> > > My understanding is that the following advantages are obvious (as I replied
+> >> > > in another thread):
+> >> > > 
+> >> > > - existing users (NIC, crypto, SCSI, ib), mature and stable
+> >> > > - much better error reporting (ext_ack other than string or errno)
+> >> > > - namespace aware
+> >> > > - do not couple with kobject
+> >> > Jason, what is your use case?
+> >> 
+> >> 
+> >> I think the use case is to report device compatibility for live migration.
+> >> Yan proposed a simple sysfs based migration version first, but it looks not
+> >> sufficient and something based on JSON is discussed.
+> >> 
+> >> Yan, can you help to summarize the discussion so far for Jiri as a
+> >> reference?
+> >> 
+> >yes.
+> >we are currently defining an device live migration compatibility
+> >interface in order to let user space like openstack and libvirt knows
+> >which two devices are live migration compatible.
+> >currently the devices include mdev (a kernel emulated virtual device)
+> >and physical devices (e.g.  a VF of a PCI SRIOV device).
+> >
+> >the attributes we want user space to compare including
+> >common attribues:
+> >    device_api: vfio-pci, vfio-ccw...
+> >    mdev_type: mdev type of mdev or similar signature for physical device
+> >               It specifies a device's hardware capability. e.g.
+> >	       i915-GVTg_V5_4 means it's of 1/4 of a gen9 Intel graphics
+> >	       device.
+> >    software_version: device driver's version.
+> >               in <major>.<minor>[.bugfix] scheme, where there is no
+> >	       compatibility across major versions, minor versions have
+> >	       forward compatibility (ex. 1-> 2 is ok, 2 -> 1 is not) and
+> >	       bugfix version number indicates some degree of internal
+> >	       improvement that is not visible to the user in terms of
+> >	       features or compatibility,
+> >
+> >vendor specific attributes: each vendor may define different attributes
+> >   device id : device id of a physical devices or mdev's parent pci device.
+> >               it could be equal to pci id for pci devices
+> >   aggregator: used together with mdev_type. e.g. aggregator=2 together
+> >               with i915-GVTg_V5_4 means 2*1/4=1/2 of a gen9 Intel
+> >	       graphics device.
+> >   remote_url: for a local NVMe VF, it may be configured with a remote
+> >               url of a remote storage and all data is stored in the
+> >	       remote side specified by the remote url.
+> >   ...
+> >
+> >Comparing those attributes by user space alone is not an easy job, as it
+> >can't simply assume an equal relationship between source attributes and
+> >target attributes. e.g.
+> >for a source device of mdev_type=i915-GVTg_V5_4,aggregator=2, (1/2 of
+> >gen9), it actually could find a compatible device of
+> >mdev_type=i915-GVTg_V5_8,aggregator=4 (also 1/2 of gen9),
+> >if mdev_type of i915-GVTg_V5_4 is not available in the target machine.
+> >
+> >So, in our current proposal, we want to create two sysfs attributes
+> >under a device sysfs node.
+> >/sys/<path to device>/migration/self
+> >/sys/<path to device>/migration/compatible
+> >
+> >#cat /sys/<path to device>/migration/self
+> >device_type=vfio_pci
+> >mdev_type=i915-GVTg_V5_4
+> >device_id=8086591d
+> >aggregator=2
+> >software_version=1.0.0
+> >
+> >#cat /sys/<path to device>/migration/compatible
+> >device_type=vfio_pci
+> >mdev_type=i915-GVTg_V5_{val1:int:2,4,8}
+> >device_id=8086591d
+> >aggregator={val1}/2
+> >software_version=1.0.0
+> >
+> >The /sys/<path to device>/migration/self specifies self attributes of
+> >a device.
+> >The /sys/<path to device>/migration/compatible specifies the list of
+> >compatible devices of a device. as in the example, compatible devices
+> >could have
+> >	device_type == vfio_pci &&
+> >	device_id == 8086591d   &&
+> >	software_version == 1.0.0 &&
+> >        (
+> >	(mdev_type of i915-GVTg_V5_2 && aggregator==1) ||
+> >	(mdev_type of i915-GVTg_V5_4 && aggregator==2) ||
+> >	(mdev_type of i915-GVTg_V5_8 && aggregator=4)
+> >	)
+> >
+> >by comparing whether a target device is in compatible list of source
+> >device, the user space can know whether a two devices are live migration
+> >compatible.
+> >
+> >Additional notes:
+> >1)software_version in the compatible list may not be necessary as it
+> >already has a major.minor.bugfix scheme.
+> >2)for vendor attribute like remote_url, it may not be statically
+> >assigned and could be changed with a device interface.
+> >
+> >So, as Cornelia pointed that it's not good to use complex format in
+> >a sysfs attribute, we'd like to know whether there're other good ways to
+> >our use case, e.g. splitting a single attribute to multiple simple sysfs
+> >attributes as what Cornelia suggested or devlink that Jason has strongly
+> >recommended.
+> 
+> Hi Yan.
+> 
+Hi Jiri,
+> Thanks for the explanation, I'm still fuzzy about the details.
+> Anyway, I suggest you to check "devlink dev info" command we have
+> implemented for multiple drivers. You can try netdevsim to test this.
+> I think that the info you need to expose might be put there.
+do you mean drivers/net/netdevsim/ ?
+> 
+> Devlink creates instance per-device. Specific device driver calls into
+> devlink core to create the instance.  What device do you have? What
+the devlink core is net/core/devlink.c ?
 
-On Tue, Jun 16, 2020 at 2:59 AM Joe Slater <joe.slater@windriver.com> wrote=
-:
+> driver is it handled by?
 
-> Always look for ../share/qemu then ../pc-bios when looking for datadir.
->
-> Signed-off-by: Joe Slater <joe.slater@windriver.com>
->
+It looks that the devlink is for network device specific, and in
+devlink.h, it says
+include/uapi/linux/devlink.h - Network physical device Netlink
+interface, I feel like it's not very appropriate for a GPU driver to use
+this interface. Is that right?
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
----
->  os-posix.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/os-posix.c b/os-posix.c
-> index 3cd52e1e70..f77da94bf6 100644
-> --- a/os-posix.c
-> +++ b/os-posix.c
-> @@ -82,8 +82,9 @@ void os_setup_signal_handling(void)
->
->  /*
->   * Find a likely location for support files using the location of the
-> binary.
-> + * Typically, this would be "$bindir/../share/qemu".
->   * When running from the build tree this will be "$bindir/../pc-bios".
-> - * Otherwise, this is CONFIG_QEMU_DATADIR.
-> + * Otherwise, this is CONFIG_QEMU_DATADIR as constructed by configure.
->   */
->  char *os_find_datadir(void)
->  {
-> @@ -93,6 +94,12 @@ char *os_find_datadir(void)
->      exec_dir =3D qemu_get_exec_dir();
->      g_return_val_if_fail(exec_dir !=3D NULL, NULL);
->
-> +    dir =3D g_build_filename(exec_dir, "..", "share", "qemu", NULL);
-> +    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-> +        return g_steal_pointer(&dir);
-> +    }
-> +    g_free(dir);  /* no autofree this time */
-> +
->      dir =3D g_build_filename(exec_dir, "..", "pc-bios", NULL);
->      if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
->          return g_steal_pointer(&dir);
-> --
-> 2.17.1
->
->
->
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---000000000000915ff905ac80f9a8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jun 16, 2020 at 2:59 AM Joe S=
-later &lt;<a href=3D"mailto:joe.slater@windriver.com">joe.slater@windriver.=
-com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"marg=
-in:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1e=
-x">Always look for ../share/qemu then ../pc-bios when looking for datadir.<=
-br>
-<br>
-Signed-off-by: Joe Slater &lt;<a href=3D"mailto:joe.slater@windriver.com" t=
-arget=3D"_blank">joe.slater@windriver.com</a>&gt;<br></blockquote><div><br>=
-</div><div>Reviewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcan=
-dre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;=C2=A0 <br></div>=
-<div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0p=
-x 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
----<br>
-=C2=A0os-posix.c | 9 ++++++++-<br>
-=C2=A01 file changed, 8 insertions(+), 1 deletion(-)<br>
-<br>
-diff --git a/os-posix.c b/os-posix.c<br>
-index 3cd52e1e70..f77da94bf6 100644<br>
---- a/os-posix.c<br>
-+++ b/os-posix.c<br>
-@@ -82,8 +82,9 @@ void os_setup_signal_handling(void)<br>
-<br>
-=C2=A0/*<br>
-=C2=A0 * Find a likely location for support files using the location of the=
- binary.<br>
-+ * Typically, this would be &quot;$bindir/../share/qemu&quot;.<br>
-=C2=A0 * When running from the build tree this will be &quot;$bindir/../pc-=
-bios&quot;.<br>
-- * Otherwise, this is CONFIG_QEMU_DATADIR.<br>
-+ * Otherwise, this is CONFIG_QEMU_DATADIR as constructed by configure.<br>
-=C2=A0 */<br>
-=C2=A0char *os_find_datadir(void)<br>
-=C2=A0{<br>
-@@ -93,6 +94,12 @@ char *os_find_datadir(void)<br>
-=C2=A0 =C2=A0 =C2=A0exec_dir =3D qemu_get_exec_dir();<br>
-=C2=A0 =C2=A0 =C2=A0g_return_val_if_fail(exec_dir !=3D NULL, NULL);<br>
-<br>
-+=C2=A0 =C2=A0 dir =3D g_build_filename(exec_dir, &quot;..&quot;, &quot;sha=
-re&quot;, &quot;qemu&quot;, NULL);<br>
-+=C2=A0 =C2=A0 if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return g_steal_pointer(&amp;dir);<br>
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 g_free(dir);=C2=A0 /* no autofree this time */<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0dir =3D g_build_filename(exec_dir, &quot;..&quot;, &quo=
-t;pc-bios&quot;, NULL);<br>
-=C2=A0 =C2=A0 =C2=A0if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return g_steal_pointer(&amp;dir);<br>
--- <br>
-2.17.1<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---000000000000915ff905ac80f9a8--
+Thanks
+Yan
+ 
 
