@@ -2,85 +2,88 @@ Return-Path: <SRS0=QvPl=BU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA36C433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B779C433E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:22:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDBDB20578
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:20:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC164207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 18:22:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iAyGmUzH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBDB20578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p00yz1v9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC164207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5CPJ-0000K6-1o
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 14:20:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47302)
+	id 1k5CQw-0002YP-4y
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 14:22:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BMI-0004G3-UV
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:13:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29889
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BMG-0003Pw-7t
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:13:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597079591;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=dYdKiCkdStqxDQTQYURdCoB9Apg77KU1oTgN49LYhQ0=;
- b=iAyGmUzHrkYWBV0spLecB58VYDrTxWdKZ6WrLex+ysZlJB5HvWK5xzzRNBtJV9JxCzLLwo
- 0FjDlYiC4gkokUJQ8Bo0u/tAdxBANr+AlcnQShMVQ6G7LoVY/CXDhrnp3jN7VlYoXuYLRS
- jko6Y+HwIfKa5fO18Uwtl50szK0LeKo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-g12LH0hSPFe1XhiQn8Rcog-1; Mon, 10 Aug 2020 13:13:07 -0400
-X-MC-Unique: g12LH0hSPFe1XhiQn8Rcog-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3A19800473
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:13:06 +0000 (UTC)
-Received: from 640k.localdomain.com (unknown [10.36.110.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E8F2F5F1E9
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:13:05 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 145/147] acceptance: use stable URLs for the Debian and Ubuntu
- installer
-Date: Mon, 10 Aug 2020 19:09:03 +0200
-Message-Id: <1597079345-42801-146-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k5CPd-0001Gg-DE
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 14:20:45 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41095)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k5CPb-0002y0-6M
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 14:20:44 -0400
+Received: by mail-ot1-x342.google.com with SMTP id a65so8030459otc.8
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 11:20:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=SUKIF7YAq+gxcV4P0x/LHb+7gEhUOeKzNZ+fgumOGU8=;
+ b=p00yz1v900SgH+X7fzkP+zCXSstFSRX6Ou95GSrNeshHd8FRxeE3/mSPloWmPWgkEb
+ N8faYNm7CkCGdDFwaoOvPaRw5wLWI/ScUrOyB9hAgDgNq7bk5XKstZVULhuABvj1RTtO
+ 0WfxRnsBKXjl0W4H4oXeUKyksJSFPmTjMZXeeU3CGD4KjM+vP8MofL/RENsqDqiUOA+D
+ 7gFvEvImzwavRf4XMn15GrxOO6/1H/usbYWmSkHGSwKMF7WVfku8IF7pySfENnV6+w/L
+ 1tgwPfus0Zyp0xBk++l66c6YJRxWK1Nq5+X6FXdVmNZIs7IWoR/PBNGs7YyksA5SIBr8
+ GzFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=SUKIF7YAq+gxcV4P0x/LHb+7gEhUOeKzNZ+fgumOGU8=;
+ b=eioq1Vcw60Ep+WONAWy1SSEplGpEFcMcl9IbCEJLzBpQt1BtbZaGXzN0s9YXLKhDJ5
+ nS5SRIxwdSdgU1dTo45C3tAazmWt5WFX46+ReMynCO7pHE2uptqBf86s3Q3fxc2cStFj
+ iHAEgHyi0gKSiFtja+tIBssjK1JjRrYkyGpaAADB2s0f6EvsDcQ0o8J003yjoLwMODyH
+ 6wXqsgWWr7wUWaL27xc5hWdh0xmxPbtuvfbvh0uGdvdrVf4OgIglDThBrjbrVOn1iA1H
+ GJtpWkebmez6EYHbTnVfzRNqvg4d5B5e19jjmiodAhglpgvlULobAn6KDCfeSs1EBONJ
+ CkgA==
+X-Gm-Message-State: AOAM5305/o0wf/m6BV1ncrZpcUBFYkq+ti0lQT8c1uBTNGRl9E0tR8kn
+ SuRB9vJPlb8eU54n1QU8RS3XF/JNIjePju223ZAyyA==
+X-Google-Smtp-Source: ABdhPJwUJE8zQdrSv03du82G7oe3r3LNRCSJkHh9FA1RG5kOKav9IB2h20UsKlc/rrQ+rqkMQb1aS6mZRvmEizSpO9s=
+X-Received: by 2002:a9d:6f8f:: with SMTP id h15mr1700935otq.221.1597083641423; 
+ Mon, 10 Aug 2020 11:20:41 -0700 (PDT)
+MIME-Version: 1.0
 References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:00:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ <CAFEAcA_icj94N6eotg9W7FutXTY_6U-Ak6pJMyYH0n9eggunrg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_icj94N6eotg9W7FutXTY_6U-Ak6pJMyYH0n9eggunrg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Aug 2020 19:20:30 +0100
+Message-ID: <CAFEAcA_cBDHNgNsDMJS+WqX+W-xbo18c1Eno2RqGnwa-iGw3-w@mail.gmail.com>
+Subject: Re: [PATCH 000/147] Meson integration for 5.2
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ot1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,52 +96,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The kernel and initrd hashes seem to have changed for the Bionic
-aarch64 installer, causing BootLinuxConsole.test_aarch64_xlnx_versal_virt
-to fail.  Correct the paths to use the previous binaries instead of
-the latest.  Do the same for the Lenny alpha installer for
-consistency, even though those are unlikely to change.
+On Mon, 10 Aug 2020 at 19:09, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+> The other hosts are still running, will report results as
+> they finish.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/acceptance/boot_linux_console.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ppc64be host:
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 73cc69c..57ba632 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -336,13 +336,13 @@ class BootLinuxConsole(LinuxKernelTest):
-         :avocado: tags=device:arm_gicv3
-         """
-         kernel_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
--                      'bionic-updates/main/installer-arm64/current/images/'
-+                      'bionic-updates/main/installer-arm64/20101020ubuntu543.15/images/'
-                       'netboot/ubuntu-installer/arm64/linux')
-         kernel_hash = '5bfc54cf7ed8157d93f6e5b0241e727b6dc22c50'
-         kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
- 
-         initrd_url = ('http://ports.ubuntu.com/ubuntu-ports/dists/'
--                      'bionic-updates/main/installer-arm64/current/images/'
-+                      'bionic-updates/main/installer-arm64/20101020ubuntu543.15/images/'
-                       'netboot/ubuntu-installer/arm64/initrd.gz')
-         initrd_hash = 'd385d3e88d53e2004c5d43cbe668b458a094f772'
-         initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
-@@ -822,7 +822,7 @@ class BootLinuxConsole(LinuxKernelTest):
-         :avocado: tags=machine:clipper
-         """
-         kernel_url = ('http://archive.debian.org/debian/dists/lenny/main/'
--                      'installer-alpha/current/images/cdrom/vmlinuz')
-+                      'installer-alpha/20090123lenny10/images/cdrom/vmlinuz')
-         kernel_hash = '3a943149335529e2ed3e74d0d787b85fb5671ba3'
-         kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
- 
--- 
-1.8.3.1
+In file included from ../../contrib/vhost-user-scsi/vhost-user-scsi.c:15:0:
+/usr/include/iscsi/scsi-lowlevel.h:810:13: error: inline function
+=E2=80=98scsi_set_uint16=E2=80=99 declared but never defined [-Werror]
+ inline void scsi_set_uint16(unsigned char *c, uint16_t val);
+             ^
+/usr/include/iscsi/scsi-lowlevel.h:809:13: error: inline function
+=E2=80=98scsi_set_uint32=E2=80=99 declared but never defined [-Werror]
+ inline void scsi_set_uint32(unsigned char *c, uint32_t val);
+             ^
+/usr/include/iscsi/scsi-lowlevel.h:808:17: error: inline function
+=E2=80=98scsi_get_uint16=E2=80=99 declared but never defined [-Werror]
+ inline uint16_t scsi_get_uint16(const unsigned char *c);
+                 ^
+/usr/include/iscsi/scsi-lowlevel.h:807:17: error: inline function
+=E2=80=98scsi_get_uint32=E2=80=99 declared but never defined [-Werror]
+ inline uint32_t scsi_get_uint32(const unsigned char *c);
+                 ^
+/usr/include/iscsi/scsi-lowlevel.h:810:13: error: inline function
+=E2=80=98scsi_set_uint16=E2=80=99 declared but never defined [-Werror]
+ inline void scsi_set_uint16(unsigned char *c, uint16_t val);
+             ^
+/usr/include/iscsi/scsi-lowlevel.h:809:13: error: inline function
+=E2=80=98scsi_set_uint32=E2=80=99 declared but never defined [-Werror]
+ inline void scsi_set_uint32(unsigned char *c, uint32_t val);
+             ^
+/usr/include/iscsi/scsi-lowlevel.h:808:17: error: inline function
+=E2=80=98scsi_get_uint16=E2=80=99 declared but never defined [-Werror]
+ inline uint16_t scsi_get_uint16(const unsigned char *c);
+                 ^
+/usr/include/iscsi/scsi-lowlevel.h:807:17: error: inline function
+=E2=80=98scsi_get_uint32=E2=80=99 declared but never defined [-Werror]
+ inline uint32_t scsi_get_uint32(const unsigned char *c);
+                 ^
+cc1: all warnings being treated as errors
 
+(Looks like an error in the version of the system header
+file on this system, which, unlike my x86 box, defines
+the prototypes with "inline" (a change that came in upstream
+in commit
+https://github.com/sahlberg/libiscsi/commit/7692027d6c11c58948ec3c493abea80=
+8af00fdd0
+).
 
+However, old make-style compilation worked on this system, so
+something has changed.
+
+thanks
+-- PMM
 
