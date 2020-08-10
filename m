@@ -7,77 +7,79 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9781DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89779C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:52:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61F9B22BF3
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:52:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48F1922BF3
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 19:52:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nnNSPh56"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61F9B22BF3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p7z6nRyo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48F1922BF3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Dqh-00055d-Pw
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 15:52:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51024)
+	id 1k5Dql-00056r-UK
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 15:52:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k5DoT-0008Rp-8c
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:50:29 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38485)
+ id 1k5Doa-0000HA-Pv
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:50:36 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:34384)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k5DoR-0004iu-50
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:50:28 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a14so9318214wra.5
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 12:50:26 -0700 (PDT)
+ id 1k5DoY-0004ko-OB
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 15:50:36 -0400
+Received: by mail-wr1-x432.google.com with SMTP id f7so9325117wrw.1
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 12:50:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=t2oLRViBghCHbdyXmGQBzzRr3hni6nS3HlY20oR/lCA=;
- b=nnNSPh56DmulajgCy67Z51y4DF+H/Ng+6HdBphytQ94EQo2s7ghCq2w4SRaS7VWqZi
- 6wFcUWsttT7r+VWam+e9kYu+wTzfTrSCjBZ6APLLZE0iakPepeWCCDYQb8x2GqV+SwjD
- uCpJy9qTS8FA+Y5/5q/niJNDp1V9PzkcMtzNRVKu3wI5d/HY7Fj496P52L0/KJumQ06e
- xeEZf3OgpHSkaOlXqbCsKcjoeiTiScn2+dzJj3J4D/C46Ro7+X0OKmCzOzE3/AmEiPvI
- jmFL9JCXmrFRrN9d0/NxDafxtYCi3v1/3kEJA7v3iJI6jiMQzAJaDXoP9fXXdMsv7UsR
- UnQw==
+ bh=IXHFRWhIT8ijPgjKcnwuZX4OYMB2Jdnl5joMznYN9yQ=;
+ b=p7z6nRyoyFFTNdzZXfHH/eI+XFfn1u/E2qs1WxAvgvcw9oa1WjS8waJmG7ft2KhvGS
+ y2o3ANDXzBb0yZAaigXWTdGTeUQpJ48stdtEohZ6nXVfoQQCbB4lDojxbJWhKaPEsrGC
+ nnuZozIoyYQ6jxvHMxZsure1nQs1iaF9HckDvSb4lcT/avZ4T9CxOjuMXfLnvoJxAd6B
+ om/J9mam925GSLedf4aUXAJk4NDghLghCLfLuHpfZa0rnP9AV8kaJsGAkl0+hxMbv4he
+ 2/J6Cf6bzfPHlfzozymNRFOgr0V9y6Vrs6Twf7A3LNe4wR25DYjz8FXJVpTNmk+3KKUC
+ ip+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=t2oLRViBghCHbdyXmGQBzzRr3hni6nS3HlY20oR/lCA=;
- b=SGruFx2MfLUumMyvLqWPSQEU5BOkUSPnmjzNZGWPpZFj1unltNOj/UTz1iewKCClOb
- zaQm+HGX85ml2pZ5R41jyIrte/yvGs3CdGvLtOlanTa5SP1RcEMcEJwSAMsd5WsGjEF2
- Hg75VEJLPH5m33YfNtNcdVRanE1H4tI/rsZysTyMjE+wbJLhep2WdwecrBPog5g6wOCG
- w6cM5wLZ2qahVk1iukmWn/Hefr/Qb4Bx/fBFhPkRvJqlkI4jjflDIgY5NG9LMBeKSaie
- nA6EfO2qcIj7a/rOeN+u62c3xQHF7T5ng0J1tRw6AvEaRBPYPgEpjWfESmKsdW5jbOF/
- Nqag==
-X-Gm-Message-State: AOAM533+Xgx3oMF9kZY6nMaqwVmZdFQQW5rjL60J+JliZnMH5nwNiiNW
- exosiTp+Uza9GQgcGaSUSV/Msqi4D6ITfA==
-X-Google-Smtp-Source: ABdhPJya6N63kaphWiBcE3NKQ+rw7GfGKRNX27v9XXAnx/ldGraST3kP1VIxPyRUdJsaRqFTDrxxyw==
-X-Received: by 2002:adf:fc45:: with SMTP id e5mr27860646wrs.226.1597089024831; 
- Mon, 10 Aug 2020 12:50:24 -0700 (PDT)
+ bh=IXHFRWhIT8ijPgjKcnwuZX4OYMB2Jdnl5joMznYN9yQ=;
+ b=NpDMUw7CuA+kDskkQuEo0O7+uJc+l4pYCIDa8WVlDiiwPmWGPOiigBbJJ27nqbRe9B
+ F01D9cxTIcsqbwoT6pWDn5SKKelo9oh9L/YvngXlXf02Yj6YxWhhlLp3Qt1UP4hdvhiH
+ cFqmjQA2UhCC2WGFGNdOLnKCHd08CF2OXOXx+tUOIrGDrBq9XQ3qYeJYwr9HOsnEzWfx
+ Az6rDHUrGimbLyTjdkDxK0EiMH5sXemTG1XLt/z4gEPK4n/9C75dFtuXB+v0czjqDdq+
+ u1zmffCFJOKlgcfeNHm3Wxs7yBLSrYG2JrjXitqR1dzqHRlDxRS2C9jceBCin+D8AlYj
+ 0Rng==
+X-Gm-Message-State: AOAM530noRy8tkiNi9alrF8hTaWVhBpYCRFqyTdJG85b1zek1YAno6O+
+ MEL5jbqW73cr2vY2J2ehp/5DjPc/njbpEg==
+X-Google-Smtp-Source: ABdhPJwSS2wl1htKCtgIgJXZNawTsDuuA5PVlIInhWen7i451wRLDGXzU33zT8IkjcuINd/hJ0gKNA==
+X-Received: by 2002:a05:6000:1211:: with SMTP id
+ e17mr2934539wrx.263.1597089032550; 
+ Mon, 10 Aug 2020 12:50:32 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id b129sm976087wmb.29.2020.08.10.12.50.23
+ by smtp.gmail.com with ESMTPSA id b129sm976087wmb.29.2020.08.10.12.50.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 10 Aug 2020 12:50:24 -0700 (PDT)
+ Mon, 10 Aug 2020 12:50:31 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 02/20] qapi: Fix indentation, again
-Date: Mon, 10 Aug 2020 20:50:01 +0100
-Message-Id: <20200810195019.25427-3-peter.maydell@linaro.org>
+Subject: [PATCH v5 06/20] tests/qapi/doc-good.json: Prepare for qapi-doc
+ Sphinx extension
+Date: Mon, 10 Aug 2020 20:50:05 +0100
+Message-Id: <20200810195019.25427-7-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200810195019.25427-1-peter.maydell@linaro.org>
 References: <20200810195019.25427-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x432.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,212 +106,187 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In commit 26ec4e53f2 and similar commits we fixed the indentation
-for doc comments in our qapi json files to follow a new stricter
-standard for indentation, which permits only:
-    @arg: description line 1
-          description line 2
+doc-good.json tests doc comment parser corner cases.  We're about to
+largely replace it by a Sphinx extension, which will have different
+corner cases.  Tweak the test so it passes both with the old parser
+and the Sphinx extension, by making it match the more restrictive
+rST syntax:
 
-or:
-    @arg:
-    line 1
-    line 2
+ * in a single list the bullet types must all match
+ * lists must have leading and following blank lines
+ * indentation is important
+ * the '|' example syntax is going to go away entirely, so stop
+   testing it
 
-Unfortunately since we didn't manage to get the script changes that
-enforced the new style in, a variety of commits (eg df4097aeaf71,
-2e4457032105) introduced new doc text which doesn't follow the new
-stricter rules for indentation on multi-line doc comments.  Bring
-those into line with the new rules.
+This will avoid the tests spuriously breaking when we tighten up the
+parser code in the following commits.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- qapi/audio.json      | 12 ++++++------
- qapi/block-core.json |  8 ++++----
- qapi/control.json    |  4 ++--
- qapi/machine.json    |  6 +++---
- qapi/migration.json  |  8 ++++----
- qapi/misc.json       |  4 ++--
- qapi/net.json        |  2 +-
- 7 files changed, 22 insertions(+), 22 deletions(-)
+Changes v4->v5:
+ improved commit message with Markus' suggested text
+---
+ tests/qapi-schema/doc-good.json | 25 +++++++++++++------------
+ tests/qapi-schema/doc-good.out  | 12 ++++++------
+ tests/qapi-schema/doc-good.texi | 12 +++---------
+ 3 files changed, 22 insertions(+), 27 deletions(-)
 
-diff --git a/qapi/audio.json b/qapi/audio.json
-index f62bd0d7f6e..3b843878d23 100644
---- a/qapi/audio.json
-+++ b/qapi/audio.json
-@@ -159,20 +159,20 @@
- # recording.
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good.json
+index 9da72a1f556..c6822145c49 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -12,25 +12,25 @@
  #
- # @server-name: select from among several possible concurrent server instances
--# (default: environment variable $JACK_DEFAULT_SERVER if set, else "default")
-+#               (default: environment variable $JACK_DEFAULT_SERVER if set, else "default")
+ # *strong* _with emphasis_
+ # @var {in braces}
++#
+ # * List item one
+-# - Two, multiple
++# * Two, multiple
+ #   lines
  #
- # @client-name: the client name to use. The server will modify this name to
--# create a unique variant, if needed unless @exact-name is true (default: the
--# guest's name)
-+#               create a unique variant, if needed unless @exact-name is true (default: the
-+#               guest's name)
+-# 3. Three
+-# Still in list
++# * Three
++#   Still in list
++#
++# Not in list
  #
- # @connect-ports: if set, a regular expression of JACK client port name(s) to
--# monitor for and automatically connect to
-+#                 monitor for and automatically connect to
+-#   Not in list
+ # - Second list
+-# Note: still in list
++#   Note: still in list
  #
- # @start-server: start a jack server process if one is not already present
--# (default: false)
-+#                (default: false)
+ # Note: not in list
++#
+ # 1. Third list
+ #    is numbered
  #
- # @exact-name: use the exact name requested otherwise JACK automatically
--# generates a unique one, if needed (default: false)
-+#              generates a unique one, if needed (default: false)
+-# - another item
+-#
+-# | example
+-# | multiple lines
++# 2. another item
  #
- # Since: 5.1
+ # Returns: the King
+ # Since: the first age
+@@ -68,7 +68,7 @@
  ##
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 197bdc1c36d..f04bb3f0dd5 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -369,7 +369,7 @@
- #
- # Features:
- # @deprecated: Member @encryption_key_missing is deprecated.  It is
--#     always false.
-+#              always false.
- #
- # Since: 0.14.0
- #
-@@ -504,7 +504,7 @@
- #
- # Features:
- # @deprecated: Member @status is deprecated.  Use @recording and
--#     @locked instead.
-+#              @locked instead.
- #
- # Since: 1.3
+ # @Base:
+ # @base1:
+-#   the first member
++# the first member
  ##
-@@ -614,7 +614,7 @@
- #
- # Features:
- # @deprecated: Member @dirty-bitmaps is deprecated.  Use @inserted
--#     member @dirty-bitmaps instead.
-+#              member @dirty-bitmaps instead.
- #
- # Since:  0.14.0
+ { 'struct': 'Base', 'data': { 'base1': 'Enum' } }
+ 
+@@ -116,7 +116,7 @@
  ##
-@@ -1642,7 +1642,7 @@
+ # @Alternate:
+ # @i: an integer
+-# @b is undocumented
++#     @b is undocumented
  #
  # Features:
- # @deprecated: Members @base and @top are deprecated.  Use @base-node
--#     and @top-node instead.
-+#              and @top-node instead.
+ # @alt-feat: a feature
+@@ -134,7 +134,7 @@
+ # @arg1: the first argument
  #
- # Returns: - Nothing on success
- #          - If @device does not exist, DeviceNotFound
-diff --git a/qapi/control.json b/qapi/control.json
-index de51e9916c3..134f842bafa 100644
---- a/qapi/control.json
-+++ b/qapi/control.json
-@@ -177,8 +177,8 @@
+ # @arg2: the second
+-# argument
++#        argument
  #
  # Features:
- # @deprecated: This command is deprecated, because its output doesn't
--#     reflect compile-time configuration.  Use 'query-qmp-schema'
--#     instead.
-+#              reflect compile-time configuration.  Use 'query-qmp-schema'
-+#              instead.
+ # @cmd-feat1: a feature
+@@ -143,6 +143,7 @@
+ # Returns: @Object
+ # TODO: frobnicate
+ # Notes:
++#
+ # - Lorem ipsum dolor sit amet
+ # - Ut enim ad minim veniam
  #
- # Returns: A list of @EventInfo.
- #
-diff --git a/qapi/machine.json b/qapi/machine.json
-index 481b1f07ecc..5aee2bbd169 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -191,8 +191,8 @@
- #
- # Features:
- # @deprecated: This command is deprecated, because it interferes with
--#     the guest.  Use 'query-cpus-fast' instead to avoid the vCPU
--#     interruption.
-+#              the guest.  Use 'query-cpus-fast' instead to avoid the vCPU
-+#              interruption.
- #
- # Returns: a list of @CpuInfo for each virtual CPU
- #
-@@ -316,7 +316,7 @@
- #
- # Features:
- # @deprecated: This command is deprecated.  Use `device_add` instead.
--#     See the `query-hotpluggable-cpus` command for details.
-+#              See the `query-hotpluggable-cpus` command for details.
- #
- # Returns: Nothing on success
- #
-diff --git a/qapi/migration.json b/qapi/migration.json
-index e07c9c0f1aa..66a6fbb89d8 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1264,7 +1264,7 @@
- #
- # Features:
- # @deprecated: This command is deprecated.  Use
--#     'migrate-set-parameters' instead.
-+#              'migrate-set-parameters' instead.
- #
- # Returns: nothing on success
- #
-@@ -1288,7 +1288,7 @@
- #
- # Features:
- # @deprecated: This command is deprecated.  Use
--#     'migrate-set-parameters' instead.
-+#              'migrate-set-parameters' instead.
- #
- # Returns: nothing on success
- #
-@@ -1312,7 +1312,7 @@
- #
- # Features:
- # @deprecated: This command is deprecated.  Use
--#     'migrate-set-parameters' instead.
-+#              'migrate-set-parameters' instead.
- #
- # The size will be rounded down to the nearest power of 2.
- # The cache size can be modified before and during ongoing migration
-@@ -1338,7 +1338,7 @@
- #
- # Features:
- # @deprecated: This command is deprecated.  Use
--#     'query-migrate-parameters' instead.
-+#              'query-migrate-parameters' instead.
- #
- # Returns: XBZRLE cache size in bytes
- #
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 9d32820dc1b..8cf6ebe67cb 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -877,8 +877,8 @@
- #
- # Features:
- # @deprecated: This command is deprecated.  For changing block
--#     devices, use 'blockdev-change-medium' instead; for changing VNC
--#     parameters, use 'change-vnc-password' instead.
-+#              devices, use 'blockdev-change-medium' instead; for changing VNC
-+#              parameters, use 'change-vnc-password' instead.
- #
- # Returns: - Nothing on success.
- #          - If @device is not a valid block device, DeviceNotFound
-diff --git a/qapi/net.json b/qapi/net.json
-index ddb113e5e5a..a3a13360018 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -457,7 +457,7 @@
- #
- # Since: 2.7
- #
--# @vhost-vdpa since 5.1
-+#        @vhost-vdpa since 5.1
- ##
- { 'enum': 'NetClientDriver',
-   'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+index 6757dd26a2f..4c24eb96486 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -74,25 +74,25 @@ doc freeform
+ 
+ *strong* _with emphasis_
+ @var {in braces}
++
+ * List item one
+-- Two, multiple
++* Two, multiple
+ lines
+ 
+-3. Three
++* Three
+ Still in list
+ 
+ Not in list
++
+ - Second list
+ Note: still in list
+ 
+ Note: not in list
++
+ 1. Third list
+ is numbered
+ 
+-- another item
+-
+-| example
+-| multiple lines
++2. another item
+ 
+ Returns: the King
+ Since: the first age
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
+index 7f28fb7a0fb..12808989ffb 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -6,6 +6,7 @@
+ 
+ @strong{strong} @emph{with emphasis}
+ @code{var} @{in braces@}
++
+ @itemize @bullet
+ @item
+ List item one
+@@ -20,6 +21,7 @@ Still in list
+ @end itemize
+ 
+ Not in list
++
+ @itemize @minus
+ @item
+ Second list
+@@ -28,6 +30,7 @@ Note: still in list
+ @end itemize
+ 
+ Note: not in list
++
+ @enumerate
+ @item
+ Third list
+@@ -36,15 +39,6 @@ is numbered
+ @item
+ another item
+ 
+-@example
+-example
+-@end example
+-
+-@example
+-multiple lines
+-@end example
+-
+-
+ @end enumerate
+ 
+ Returns: the King
 -- 
 2.20.1
 
