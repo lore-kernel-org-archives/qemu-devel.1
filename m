@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4024C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A928C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:57:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 825AC20866
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:56:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C4CB20866
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 17:57:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bZKKtkkI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825AC20866
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jDuzfrQH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C4CB20866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5C1w-0005UU-Ks
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46656)
+	id 1k5C2i-0006wJ-7Z
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 13:57:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BLB-0002Ej-WE
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:12:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39681
+ id 1k5BKv-0001n2-T9
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:11:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42174
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k5BL9-0003EU-VE
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:12:05 -0400
+ id 1k5BKt-0003CT-7G
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 13:11:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597079523;
+ s=mimecast20190719; t=1597079504;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NW3TMiLzOoUHqYw0ETNn/3bx4VcSKXeKEHAdlPbxa7c=;
- b=bZKKtkkIvZYFbf8SNOb1GUkUduX4zW0NHfFuZ+MhcKrIbp4Ctu6qU1piB5veH4DOEitTyD
- Oy2sX2yCvbuelGE78AtYKxC+YEFkd+d3LVFJ9oJ0lSRCn9A7x8BlfWCSdehmdib+Ym+up7
- ++VvUrF6AYOjkBuvimQPCF3dYz3mxO0=
+ bh=EY5xBq1uQzGsiziefS8q1NV3vGh7VRyVrHGNrGkrL3c=;
+ b=jDuzfrQHVYoYr4YKMs5jeqZhr1WobfJblYKesTRo9nvNT3EDPyqZbjL9BfIU2XLFr6d+Ws
+ +oYb+3sRVkIzNyVXP66nF/uMCsBbIhY3vCv3qyGjE/l/u8seuntdSYYa3zh6hPeAWrW8na
+ G0MMt2Z6SXAs+LA9oiqiWmgEfDkDmaE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-36ZlHLa8M_yeDNFMzXiK5Q-1; Mon, 10 Aug 2020 13:12:01 -0400
-X-MC-Unique: 36ZlHLa8M_yeDNFMzXiK5Q-1
+ us-mta-146-tKp-W1cWNFSVejxUcZLKPA-1; Mon, 10 Aug 2020 13:11:42 -0400
+X-MC-Unique: tKp-W1cWNFSVejxUcZLKPA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97629800465
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:12:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 406AE80183C
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:11:41 +0000 (UTC)
 Received: from 640k.localdomain.com (unknown [10.36.110.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA8615F1E9;
- Mon, 10 Aug 2020 17:11:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 82D1487D61;
+ Mon, 10 Aug 2020 17:11:37 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 102/147] meson: convert hw/nvram
-Date: Mon, 10 Aug 2020 19:08:20 +0200
-Message-Id: <1597079345-42801-103-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 090/147] meson: convert hw/vfio
+Date: Mon, 10 Aug 2020 19:08:08 +0200
+Message-Id: <1597079345-42801-91-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,9 +73,9 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 03:31:01
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 11:00:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -107,67 +107,76 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs       | 1 -
- hw/meson.build         | 1 +
- hw/nvram/Makefile.objs | 8 --------
- hw/nvram/meson.build   | 9 +++++++++
- 4 files changed, 10 insertions(+), 9 deletions(-)
- delete mode 100644 hw/nvram/Makefile.objs
- create mode 100644 hw/nvram/meson.build
+ hw/Makefile.objs      |  1 -
+ hw/meson.build        |  1 +
+ hw/vfio/Makefile.objs |  8 --------
+ hw/vfio/meson.build   | 18 ++++++++++++++++++
+ 4 files changed, 19 insertions(+), 9 deletions(-)
+ delete mode 100644 hw/vfio/Makefile.objs
+ create mode 100644 hw/vfio/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 2083284..78860ae 100644
+index a1cfb99..f6e08f6 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -20,7 +20,6 @@ devices-dirs-y += isa/
- devices-dirs-y += misc/
- devices-dirs-y += net/
- devices-dirs-y += rdma/
--devices-dirs-y += nvram/
+@@ -31,7 +31,6 @@ devices-dirs-y += ssi/
+ devices-dirs-y += timer/
+ devices-dirs-$(CONFIG_TPM) += tpm/
+ devices-dirs-y += usb/
+-devices-dirs-$(CONFIG_VFIO) += vfio/
  endif
  
  common-obj-y += $(devices-dirs-y)
 diff --git a/hw/meson.build b/hw/meson.build
-index 53c347c..0bdd6a2 100644
+index 8338fc4..4dafc8a 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1,6 +1,7 @@
- subdir('core')
- subdir('mem')
+@@ -3,6 +3,7 @@ subdir('mem')
  subdir('nubus')
-+subdir('nvram')
- subdir('pci')
- subdir('pci-bridge')
- subdir('pci-host')
-diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
+ subdir('semihosting')
+ subdir('smbios')
++subdir('vfio')
+ subdir('virtio')
+ subdir('watchdog')
+ subdir('xen')
+diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
 deleted file mode 100644
-index f3ad921..0000000
---- a/hw/nvram/Makefile.objs
+index 9bb1c09..0000000
+--- a/hw/vfio/Makefile.objs
 +++ /dev/null
 @@ -1,8 +0,0 @@
--common-obj-$(CONFIG_DS1225Y) += ds1225y.o
--common-obj-$(CONFIG_NMC93XX_EEPROM) += eeprom93xx.o
--common-obj-$(CONFIG_AT24C) += eeprom_at24c.o
--common-obj-y += fw_cfg.o
--common-obj-$(CONFIG_CHRP_NVRAM) += chrp_nvram.o
--common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
--common-obj-$(CONFIG_NRF51_SOC) += nrf51_nvm.o
--obj-$(CONFIG_PSERIES) += spapr_nvram.o
-diff --git a/hw/nvram/meson.build b/hw/nvram/meson.build
+-obj-y += common.o spapr.o
+-obj-$(CONFIG_VFIO_PCI) += pci.o pci-quirks.o display.o
+-obj-$(CONFIG_VFIO_CCW) += ccw.o
+-obj-$(CONFIG_VFIO_PLATFORM) += platform.o
+-obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+-obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+-obj-$(CONFIG_VFIO_AP) += ap.o
+-obj-$(CONFIG_VFIO_IGD) += igd.o
+diff --git a/hw/vfio/meson.build b/hw/vfio/meson.build
 new file mode 100644
-index 0000000..ba21455
+index 0000000..37efa74
 --- /dev/null
-+++ b/hw/nvram/meson.build
-@@ -0,0 +1,9 @@
-+softmmu_ss.add(files('fw_cfg.c'))
-+softmmu_ss.add(when: 'CONFIG_CHRP_NVRAM', if_true: files('chrp_nvram.c'))
-+softmmu_ss.add(when: 'CONFIG_DS1225Y', if_true: files('ds1225y.c'))
-+softmmu_ss.add(when: 'CONFIG_NMC93XX_EEPROM', if_true: files('eeprom93xx.c'))
-+softmmu_ss.add(when: 'CONFIG_AT24C', if_true: files('eeprom_at24c.c'))
-+softmmu_ss.add(when: 'CONFIG_MAC_NVRAM', if_true: files('mac_nvram.c'))
-+softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_nvm.c'))
++++ b/hw/vfio/meson.build
+@@ -0,0 +1,18 @@
++vfio_ss = ss.source_set()
++vfio_ss.add(files(
++  'common.c',
++  'spapr.c',
++))
++vfio_ss.add(when: 'CONFIG_VFIO_PCI', if_true: files(
++  'display.c',
++  'pci-quirks.c',
++  'pci.c',
++))
++vfio_ss.add(when: 'CONFIG_VFIO_CCW', if_true: files('ccw.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_PLATFORM', if_true: files('platform.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_XGMAC', if_true: files('calxeda-xgmac.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_AMD_XGBE', if_true: files('amd-xgbe.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_AP', if_true: files('ap.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_IGD', if_true: files('igd.c'))
 +
-+specific_ss.add(when: 'CONFIG_PSERIES', if_true: files('spapr_nvram.c'))
++specific_ss.add_all(when: 'CONFIG_VFIO', if_true: vfio_ss)
 -- 
 1.8.3.1
 
