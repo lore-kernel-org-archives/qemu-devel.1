@@ -8,80 +8,80 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D0BC433E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9AC8C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8EF720729
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B85720729
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Aug 2020 13:29:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Rq9+bhyv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8EF720729
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="izDQMDNT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B85720729
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k57r0-0002nS-PK
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 09:28:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46192)
+	id 1k57rK-0002vn-B1
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 09:29:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k57nS-0000xD-Ck
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:25:02 -0400
-Received: from mout.gmx.net ([212.227.15.15]:36649)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k57ne-00010b-Qi
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:25:14 -0400
+Received: from mout.gmx.net ([212.227.15.18]:60399)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k57nQ-0008FZ-6K
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:25:01 -0400
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1k57nZ-0008GI-J8
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 09:25:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1597065888;
- bh=HXCvduzOIXsCQA5SfxLwuvEJdZ32wS45EDx3y1nQsa0=;
+ s=badeba3b8450; t=1597065887;
+ bh=jLLmqaosE8xt+OARVvHb93VE1fgCMwuTT/uP+6We6T4=;
  h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=Rq9+bhyvKGbbdHADyvvjRfxtMqW5vzuiTmTBCS6rbVE0Kuj2faThpv/QS2N1icSUp
- R3BMfhzYOcXPgahxEYmMqjcPZe5SnUAV1QZ8Ql1sxIWtpmN6aA99ybrTJ5nhgr54nY
- cv2pGrUjryb5gvpQTF9U8wIhBONGFQx8Q1aUjd0A=
+ b=izDQMDNTH/Ybt5yVM5r3jwKIGu7ehcVkbtgBFOc/aDH7gBZJSNRlH89DnTXVw/BbI
+ irsAxe3mo4EYn6s/2lOGxR2UccwvOrXW3L5YNC3zD6b4vW4zoycWJofqNsCGzbbjj8
+ jt1oB+dPaIQnhIDj84OsgRYV86gfriR59mCPKxGM=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from ls3530.fritz.box ([92.116.174.37]) by mail.gmx.com (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1N3se2-1knE0F3Utk-00zqEi; Mon, 10
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MmDEg-1kVh7P1zNY-00iApM; Mon, 10
  Aug 2020 15:24:47 +0200
 From: Helge Deller <deller@gmx.de>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 12/12] hw/display/artist: Fix invalidation of lines near
- screen border
-Date: Mon, 10 Aug 2020 15:24:41 +0200
-Message-Id: <20200810132441.16551-13-deller@gmx.de>
+Subject: [PULL v2 10/12] hw/display/artist: Unbreak size mismatch memory
+ accesses
+Date: Mon, 10 Aug 2020 15:24:39 +0200
+Message-Id: <20200810132441.16551-11-deller@gmx.de>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200810132441.16551-1-deller@gmx.de>
 References: <20200810132441.16551-1-deller@gmx.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Xg+ggqxvj7w0xaJZpdOEYGPzqc83QiRRipaOh+iHR/ZtaOMo7aq
- fLlQQhija/vztpON4lh3trgXRYfQ0KRjMxZLFQLc4VIB+S815rN1gsyyADbOxOHPAa6RF5u
- Zfat9S5r/1PfpYLXRoWHKpotg1YS0OcESSujeb/ItC+2x8B14/eyUh5qCzI+JgoLjgAKMVx
- 2PtEIvV+xFZSoAWga1JBg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:XAhJ/9YRwUA=:r+G/HnAN/CZLmRKd8gqooR
- rTqS5bHXVFOBBJH+RGYYxihMMQFpOBxxKSSnEls66cIdZk2HhEbp9f7oaBM37ifalYS8sovNM
- ENqaeUH2X7yUXgPcVZXmixo71eqnMLSFBp01c3bFdgd6xQB549gEqWOeoa8z8uCgszPQjQTaN
- 0PIftfqC+FRdQXwWWOwvIQaP88eaX4zwapGNkm6sOIBiyBsgpKENcLhx31t7MkOTYTFMtxIzQ
- d2rOi+PnFum2leYMff4DhnieXErwtn6B+nVy8UZFEiaG4IoiXBAr+XByT85s5yKOnevoylgLS
- 4pDEzEDgkQSekaRDPX+RMHHi5i3FQayCS8bsbYZYNf/tNXHwYdJwfvLuEZw4AIQvIw6+KaN3w
- yNEyrL7S3+cgzyQRD0crw2IhhmWF/pdU9yS7LsvYxXm9hHRfMSVrVqLAsR3wGNe/rJf+fgxeI
- /o6YqorOPCXwnbGmniM6yYH6TumVB+Vu/c4iKbAEfQe59wChw3Bm0JTNZQAT70K8C4U2XGupS
- kNfU+tJDjRJHzzQHYK6/l/NiB75+Evw25ypHaDc56L8tGaTwi02d0hj8oR7niQ27Z13zWZ4D3
- HaI//Qa1B+x7BE+acckUphCSNGggtuKgSRoEJlXvLu3oYHRW5YiQ/vj/EiMS40F1zy0SeZBK5
- gFuPpiDcz+EY2SnfBHEvvTdRh2dl/xfwPUcRySHcpFfdpp10ewkQkcdkFGnoiS6VfIJCA7Ubc
- OSADwKilVbCUHWuiXKBxFY0U2IW3xoOpch6mS1W6y3yuGI93x3mFL78V+KLxE7fE9LP7OKu9F
- ILJckClNwRYQdydUi2sMLmRxGeJtt+WBIoOcnOti7yRhRJBUpqtLwie6mux3YL1UBRWHwJoH8
- SpHPV+UPWgwnVsbHRLauWdEMFYJipCB+BHxIpAqnmZGa7EmOT5ksKGvc5z+iTJamqPXE2unu6
- JcQmHK04kEsnoLCpQQdAQsBbPlBdyCdgebtkLwWy4ov0s8QChFvAiHKuYnhN/j1svlqqtaJgY
- D7if05oH7mCZXuZi8lixKYk8OwbtjDjvSHU0aRCdFs+qBLMmfFHp3ZqbkBaWuqc0ZH4+Go7dk
- euuWidovckl0o4zNDKAHNYhGdwGAOio6MNY/0z4XpxY7rRgAjoNfoJhJhRG9o119/rMU89ruX
- cHtYGCHcJ32E/privOe37lc7ifJs6Q/BVhK5tT2Dg28h6jYI75HXa+0uzUGKfUZ9/eZ3nk5xr
- 90a+Fy5SwUB3viRyn
-Received-SPF: pass client-ip=212.227.15.15; envelope-from=deller@gmx.de;
+X-Provags-ID: V03:K1:H0/g0Nm4m9YCmIHZ/vbNJIhe13VCHbiBulBUz+S1a3zZuMdPaMD
+ XmkkWTeaxYshxGRdWYK1A+zAX04O2GDmXX3YyoKiFGMx8qacDIDfwGsvX2DJxAWB4ORXEFh
+ DLTYTaG9GujpCB76+akgP247nq+3YO7FEThsZTmvvV6TsFJKjhmE4ul4zb6GR/HZp5EcgmV
+ pSwmDusGlpx5ju5MW+mtw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7e4K+HXrMa8=:DSkxsrKKS3+TKQbtYPgJIy
+ 0jVe5rrEs1KjiqJ7RQRbdoLbUwxv2VkLMFcJBqojI8NfzbvsjD68DsFl7GJ6K0nVWJmn5CcWL
+ SMM575Extg9wTRNzFnuS5NuuhH79X2uzR9lqdL4RjJGrY1DF0dBRaWDbUX36NnCIbl2OcSGfy
+ at7U4xnZXR1O69kE41gnYuUsJi7gMBq9wdw7FbkjDXy8QCkrAaJH4s/5JMlVcoQv0YVmoIR8S
+ LWvuXDEjKHqUtJkkAmjM1IcmXAYhxt3RUA0NZ532RyWZSvDl9aHufqqa2ga7cmftReq0F8YVQ
+ uDB4Rz8zrQ33GnIXvv4bjqaO/4tX9jTQB9BjQR0enNDkzgCzSgcP91XKCZGjvWV7/mm4YDRYo
+ jmE1RffPlosNjnaKDzDZjNb2D0R3u8B23Aw2ym6SIzUR9NCvQ+vx3abgaUcvDxo0ggUxl4fxR
+ hq6Peil9IYUjRK9jfd8P2yAuCT+B9kdntWrLGCvbkE1v7mzKdib5nF8jGCZXqmnyGiA9pB9Zk
+ 2xijaf44FG1k4p6MRXHF1ckx8OnAReJMxn5HXwFXDyt1VEmsVLEL3yJSXfEp3cepDsSXtF12q
+ XUtFQBVYK8mIB1sHzhK+w6rtMesBByb6wKPBp0ZsIqBBUDn9P4oUqWw9GKvQ3IwV+LnAsdi3b
+ cU+C2fSI0tgAr5kBK9nLgqgdIvOKeKLGoF1pEw1E7zdzs/TwhgHidh6OZ1NKv+ZD8EcDehzt8
+ ooFVZyFQRAtOFiz6lz3frEi0+O8IyRjuczrlvvfPYxyvD0L00vvNXHwWh/3c7jEHPerfXzF1R
+ CQ61bzH01uiZLd6fcXJN2RNkn6xqvbW1JT6Nrmu/ZY5cS/d9+Wa01hlGwjEyamc/f1JBpQ5Wp
+ EtXXdKNnz5M7oFQXFDzO7NXqe8d5Y+eJVWHncU2u+6XY1T+TbPtNxgdtsemqkrNM2GNAwUNAc
+ VnCe82WCARriYeY637adkcQ0YP0cHM49a/uMwgLY4LWvh3k+xJV9QX9bQO5hpX18SpIUhaN5L
+ b3HahtBqjq2wMx+Uhc1Ggi+I2QKioJXp97XyEYDK9OzvtWKbXU1N8vFhQgraUYWRPp8cvlcGl
+ w9cwORhwjPsHJIWeaAm52cuTrly/NWD1DzEfdmQ0eCucinhPVX+Sc5H+Qfh3NwHkqu+SvbWQD
+ tuW4cvvh2jSEfGmdjdVPYXDAcXx1jalxMfpCp6A9+pNNm7Gttmfta8Oy3ucQ0xRb5XfA3xj7D
+ /mI8V5oaEyuP78Fv/
+Received-SPF: pass client-ip=212.227.15.18; envelope-from=deller@gmx.de;
  helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 09:24:50
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/10 09:25:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -35
 X-Spam_score: -3.6
@@ -108,38 +108,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sven Schnelle <svens@stackframe.org>
+Commit 5d971f9e6725 ("memory: Revert "memory: accept mismatching sizes
+in memory_region_access_valid") broke the artist driver in a way that
+the dtwm window manager on HP-UX rendered wrong.
 
-If parts of the invalidated screen lines are outside of the VRAM buffer,
-the code skips the whole invalidate. This is incorrect when only parts
-of the buffer are invisble - which is the case when the mouse cursor is
-located near the screen border.
-
+Fixes: 5d971f9e6725 ("memory: Revert "memory: accept mismatching sizes in =
+memory_region_access_valid")
 Signed-off-by: Sven Schnelle <svens@stackframe.org>
 Signed-off-by: Helge Deller <deller@gmx.de>
 =2D--
- hw/display/artist.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/display/artist.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/hw/display/artist.c b/hw/display/artist.c
-index a959b2c158..71982559c6 100644
+index 46eaa10dae..44bb67bbc3 100644
 =2D-- a/hw/display/artist.c
 +++ b/hw/display/artist.c
-@@ -206,7 +206,12 @@ static void artist_invalidate_lines(struct vram_buffe=
-r *buf,
-                                     int starty, int height)
- {
-     int start =3D starty * buf->width;
--    int size =3D height * buf->width;
-+    int size;
-+
-+    if (starty + height > buf->height)
-+        height =3D buf->height - starty;
-+
-+    size =3D height * buf->width;
+@@ -1237,20 +1237,16 @@ static const MemoryRegionOps artist_reg_ops =3D {
+     .read =3D artist_reg_read,
+     .write =3D artist_reg_write,
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+-    .valid =3D {
+-        .min_access_size =3D 1,
+-        .max_access_size =3D 4,
+-    },
++    .impl.min_access_size =3D 1,
++    .impl.max_access_size =3D 4,
+ };
 
-     if (start + size <=3D buf->size) {
-         memory_region_set_dirty(&buf->mr, start, size);
+ static const MemoryRegionOps artist_vram_ops =3D {
+     .read =3D artist_vram_read,
+     .write =3D artist_vram_write,
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+-    .valid =3D {
+-        .min_access_size =3D 1,
+-        .max_access_size =3D 4,
+-    },
++    .impl.min_access_size =3D 1,
++    .impl.max_access_size =3D 4,
+ };
+
+ static void artist_draw_cursor(ARTISTState *s)
 =2D-
 2.21.3
 
