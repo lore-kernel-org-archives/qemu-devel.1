@@ -2,88 +2,98 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2020BC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:08:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C462C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:09:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E433420774
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:08:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B8A320771
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:09:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g+qrA6bw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E433420774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WTpdHORB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B8A320771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5WpQ-0000OS-7t
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 12:08:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36114)
+	id 1k5WqO-0001VI-Bv
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 12:09:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k5WnX-0006rU-8Q
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:06:49 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34870
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k5WnV-0006nc-Js
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:06:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597162004;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=d0sjJws5v+8djRTVBR129UfCP51zE3dPqIX8S0HEne4=;
- b=g+qrA6bw6GqVTmsGDBGd+tVAuQCWDRMYX2yovroVXrwFGzgPr9yWkGGJydvWy0jsi6aAwd
- TcxwkuOopXu5KsrvziwpjGvle/B36y/JmtYUdkPzxzsHgKA6D2B310o5RkwBteVUUoEx7H
- a/kzlYViTKPlbd5c2nR/GRCX6QococA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-Qp5ZDHsvMoOi-pNDWTlr_Q-1; Tue, 11 Aug 2020 12:06:42 -0400
-X-MC-Unique: Qp5ZDHsvMoOi-pNDWTlr_Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6E00106B242;
- Tue, 11 Aug 2020 16:06:41 +0000 (UTC)
-Received: from gondolin (ovpn-113-33.ams2.redhat.com [10.36.113.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 072985D9D7;
- Tue, 11 Aug 2020 16:06:40 +0000 (UTC)
-Date: Tue, 11 Aug 2020 18:06:38 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH v2] CODING_STYLE.rst: flesh out our naming conventions.
-Message-ID: <20200811180638.7323b2bd.cohuck@redhat.com>
-In-Reply-To: <3dfae8bc-7f8d-1b1c-c805-5eab4e8fbb19@redhat.com>
-References: <20200810105147.10670-1-alex.bennee@linaro.org>
- <3dfae8bc-7f8d-1b1c-c805-5eab4e8fbb19@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k5WpW-0000eH-Sa
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:08:50 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46687)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k5WpV-00073b-CD
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:08:50 -0400
+Received: by mail-wr1-x441.google.com with SMTP id f12so11999838wru.13
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 09:08:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=YaydI5DnqVIOEZI+zE7mxYIoADSmEKTlSCzmKqHz+yQ=;
+ b=WTpdHORBhLxFCoYSRP0FF7m5Xx4osthDD34qhVF4clApj1uV8wSCIZCirv4RGMnYBL
+ AW5YqobAbSeVeaiLQ4toIw3OzSuCC0LnP35MsPwSOT274US1tI0a0R1g23xWi+3LTUSK
+ Ho2izp/IBTSmBSLAOCRp0CFiadmoD3DjDiCytBY4YP0HPMAF0lYU7cTgQYAVC4yy9qRm
+ QJRd8ovZ4eeEiekibg/DbRvLg+ZLBRlfxEGogN3MO7Nb/K6Ygg/zsHxaGtw7RR97h5kW
+ Xsal++RlcPHG73WEq4iXKyf12sFGkpoNW9/VLi9/KxyahoXBjQjd3DFpgysw3esxedR2
+ gAjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YaydI5DnqVIOEZI+zE7mxYIoADSmEKTlSCzmKqHz+yQ=;
+ b=ahmT3W0MYygGA+vrVz1lfqnBmvz/+SNpPkhzORl9kWwhLzqMmVLMZNdr/lvBiatjNI
+ A2JZJbLS2tRfdDPsZ6WA/GKe4JvDuXMhZ56XYhxODNvrsoXulAB9sz8BQdKEVV/lUiLN
+ 6c5gDUMZnx8yTIpHa6zRBz5aavGjhcrqRF2KdIR+0jf78N5rUNjxKFUZcCWxIxVoKuFi
+ w0gcYFIRBxpXA8G/Or4WyG80r+cCK98q70RfDBb0hXToq3ym2C7Aax+YgREuGLWWZG8N
+ jvSiIiExSTFaRMVuIYevWLWVq/tplDqK1q329IVsBrYJEl5B5sNvNjZw+imnp5qeFkdT
+ zeIQ==
+X-Gm-Message-State: AOAM531CTH5Jj/usf09UYcdMVcX3PHvyOYIZE8s52I9+zqe4Zo9qrfeY
+ Csk1DXfYqlZ7QEozx52Dnq8=
+X-Google-Smtp-Source: ABdhPJy7Q68sKUCwmSQ2fyKHPxfroGy5P1zyjAylS/iJF4UA2cMkb9f7LIwZFVVm9BV1oLhKNYNqug==
+X-Received: by 2002:adf:ab50:: with SMTP id r16mr28602737wrc.194.1597162127677; 
+ Tue, 11 Aug 2020 09:08:47 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id 15sm5633451wmo.33.2020.08.11.09.08.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 11 Aug 2020 09:08:46 -0700 (PDT)
+Subject: Re: [PATCH 114/147] meson: convert hw/gpio
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
+ <1597079345-42801-115-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fd5b25ab-0374-d2c5-5eab-d4aebc585119@amsat.org>
+Date: Tue, 11 Aug 2020 18:08:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 06:40:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1597079345-42801-115-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,73 +106,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 11 Aug 2020 17:55:08 +0200
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On 8/10/20 7:08 PM, Paolo Bonzini wrote:
+> From: Marc-André Lureau <marcandre.lureau@redhat.com>
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> Hi Alex,
->=20
-> On 8/10/20 12:51 PM, Alex Benn=C3=A9e wrote:
-> > Mention a few of the more common naming conventions we follow in the
-> > code base including common variable names and function prefix and
-> > suffix examples.
-> >=20
-> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> >=20
-> > --- =20
-> ...
-> > +Function Naming Conventions
-> > +---------------------------
-> > +
-> > +The ``qemu_`` prefix is used for utility functions that are widely
-> > +called from across the code-base. This includes wrapped versions of
-> > +standard library functions (e.g. qemu_strtol) where the prefix is
-> > +added to the function name to alert readers that they are seeing a
-> > +wrapped version; otherwise avoid this prefix.
-> > +
-> > +If there are two versions of a function to be called with or without a
-> > +lock held, the function that expects the lock to be already held
-> > +usually uses the suffix ``_locked``. =20
->=20
-> And if there is only one version? I'm looking at:
->=20
->   /* With q->lock */
->   static void nvme_kick(NVMeQueuePair *q)
->   {
->   ...
->   }
->=20
-> Should the style be enforced here and this function renamed
-> nvme_kick_locked()?
->=20
-> In this particular case, I think so, because we also have:
->=20
->   /* With q->lock */
->   static void nvme_put_free_req_locked(...)
->   {
->   ...
->   }
->=20
->   /* With q->lock */
->   static void nvme_wake_free_req_locked(NVMeQueuePair *q)
->   {
->   ...
->   }
->=20
-> For more cases:
->=20
-> $ git grep -A1 -i '\/\*.*with.*lock'
->=20
->=20
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I'm not sure we really want to encode calling conventions into function
-names, beyond being able to distinguish between lock/no-lock versions.
-Just appending _locked does not really tell us *which* lock is supposed
-to be held, that needs to be documented in a comment anyway.
+> ---
+>  hw/Makefile.objs      |  1 -
+>  hw/gpio/Makefile.objs | 12 ------------
+>  hw/gpio/meson.build   | 12 ++++++++++++
+>  hw/meson.build        |  1 +
+>  4 files changed, 13 insertions(+), 13 deletions(-)
+>  delete mode 100644 hw/gpio/Makefile.objs
+>  create mode 100644 hw/gpio/meson.build
+> 
+> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+> index a2c2f6d..c04dfe5 100644
+> --- a/hw/Makefile.objs
+> +++ b/hw/Makefile.objs
+> @@ -8,7 +8,6 @@ devices-dirs-y += char/
+>  devices-dirs-y += cpu/
+>  devices-dirs-y += display/
+>  devices-dirs-y += dma/
+> -devices-dirs-y += gpio/
+>  endif
+>  
+>  common-obj-y += $(devices-dirs-y)
+> diff --git a/hw/gpio/Makefile.objs b/hw/gpio/Makefile.objs
+> deleted file mode 100644
+> index 3cfc261..0000000
+> --- a/hw/gpio/Makefile.objs
+> +++ /dev/null
+> @@ -1,12 +0,0 @@
+> -common-obj-$(CONFIG_MAX7310) += max7310.o
+> -common-obj-$(CONFIG_PL061) += pl061.o
+> -common-obj-$(CONFIG_PUV3) += puv3_gpio.o
+> -common-obj-$(CONFIG_ZAURUS) += zaurus.o
+> -common-obj-$(CONFIG_E500) += mpc8xxx.o
+> -common-obj-$(CONFIG_GPIO_KEY) += gpio_key.o
+> -
+> -common-obj-$(CONFIG_OMAP) += omap_gpio.o
+> -common-obj-$(CONFIG_IMX) += imx_gpio.o
+> -common-obj-$(CONFIG_RASPI) += bcm2835_gpio.o
+> -common-obj-$(CONFIG_NRF51_SOC) += nrf51_gpio.o
+> -common-obj-$(CONFIG_ASPEED_SOC) += aspeed_gpio.o
+> diff --git a/hw/gpio/meson.build b/hw/gpio/meson.build
+> new file mode 100644
+> index 0000000..6bcdfa6
+> --- /dev/null
+> +++ b/hw/gpio/meson.build
+> @@ -0,0 +1,12 @@
+> +softmmu_ss.add(when: 'CONFIG_E500', if_true: files('mpc8xxx.c'))
+> +softmmu_ss.add(when: 'CONFIG_GPIO_KEY', if_true: files('gpio_key.c'))
+> +softmmu_ss.add(when: 'CONFIG_MAX7310', if_true: files('max7310.c'))
+> +softmmu_ss.add(when: 'CONFIG_PL061', if_true: files('pl061.c'))
+> +softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_gpio.c'))
+> +softmmu_ss.add(when: 'CONFIG_ZAURUS', if_true: files('zaurus.c'))
+> +
+> +softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_gpio.c'))
+> +softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_gpio.c'))
+> +softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_gpio.c'))
+> +softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_gpio.c'))
+> +softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_gpio.c'))
+> diff --git a/hw/meson.build b/hw/meson.build
+> index f9e5adf..52577c3 100644
+> --- a/hw/meson.build
+> +++ b/hw/meson.build
+> @@ -1,4 +1,5 @@
+>  subdir('core')
+> +subdir('gpio')
+>  subdir('hyperv')
+>  subdir('i2c')
+>  subdir('ide')
+> 
 
 
