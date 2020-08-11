@@ -2,91 +2,80 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D87C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 03:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30018C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 05:56:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F404A2065D
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 03:16:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ABSia0dP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F404A2065D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E7163206DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 05:56:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7163206DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5KmF-0006UY-5E
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 23:16:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42552)
+	id 1k5NGj-000834-45
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 01:56:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1k5Klc-0005xn-8w
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 23:16:00 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:34925)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5NG7-0007bX-SY
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 01:55:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45626)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1k5KlY-0004oi-C4
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 23:15:59 -0400
-Received: by mail-io1-xd44.google.com with SMTP id s189so11209011iod.2
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 20:15:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NTK9y2WF6s6GOtcvPJH1+1SKcribkFootE2GPoMEh6s=;
- b=ABSia0dP5u6HOV6wB8e+yW1zK8Jna1L3MPh/LOxSpWADkOJAHSPSOSepvDSPk2Rt/w
- VfYRQpsuQLSZp0sM7tMUd+g1BjV3JrLy8EJfHu0jm4maHtXHmcMrCzVkGEBNVwqFgKLz
- BdPbdU3WbYtOuEDA2XMnkxJC7MYi58gs4ZtTIIU7nC2kVP3oj//VQ1WXR+3jane79gBO
- 6a/Ke6A5+yR/YtqDuA6Htb30gDd/bLQ3ewCUZwNQA9MHqQqJbSq2DrNp0uGCJrygZjuv
- SNxUbBC/zReDidOBzLJR5xLU8p/MRaGYUPUt0k1hXr1No5BzZxfF1jkfau7O21tTDcO7
- BvtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NTK9y2WF6s6GOtcvPJH1+1SKcribkFootE2GPoMEh6s=;
- b=KPMYalTRD51IDc2tTlC+fza8T/B9z7HmkjsedpH0naBSF4RornxhJKBq9tHy/WYhlf
- tnmE7VfGysqp19+iotI6ZfUtNDaddEOfAxTu5zv23BblZc90pwKlcH+7RhwMGqHsG8O0
- qmDuiK3x+sIJeqw6c1Hrd8rTCji8ZrIec65TgeCnTWPA1TBAj1TxJ6w2TqDdVPoM4Dlo
- 4BeBT99QdULunvZGfV9ludM9fijiPwQ4Ny7GBTgGiIJnzq028cxeZ74zsjUd0K1dzIeL
- P67e1cjTlPH83cWNJXQoaArlK1VL3NCgorhLTvu1fFHBwebVDGtTBzm8pSV8dhss7c+B
- nYyQ==
-X-Gm-Message-State: AOAM530Z3bhzWnRiacLpeXSbB0V80Fzg5K3KZ9eG9Z5mR0IBiSwFbbYt
- J/txwh2M8/WcxZAgrucbb4Ol45T7cao1SMG+6ES3
-X-Google-Smtp-Source: ABdhPJzj6xoYdcP6/HjzehFbxLwwY0eTj3UI+IUSaq8Ja6kw/8gs1OQNNzb7KUbs3EYqXhc8NJCACyBoIcgEHrd8cXg=
-X-Received: by 2002:a02:838e:: with SMTP id z14mr24562907jag.84.1597115754078; 
- Mon, 10 Aug 2020 20:15:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5NG5-0001KW-DT
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 01:55:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k5NG3-0000R6-18
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 05:55:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E159D2E808D
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 05:55:34 +0000 (UTC)
 MIME-Version: 1.0
-References: <cover.1596768588.git.haibo.xu@linaro.org>
- <bf909c1f4904a22be0804cae9fd6f38ba4862563.1596768588.git.haibo.xu@linaro.org>
- <20200810111640.ykejphmuyirncjwv@kamzik.brq.redhat.com>
-In-Reply-To: <20200810111640.ykejphmuyirncjwv@kamzik.brq.redhat.com>
-From: Haibo Xu <haibo.xu@linaro.org>
-Date: Tue, 11 Aug 2020 11:15:42 +0800
-Message-ID: <CAJc+Z1F_vFdJuy2kZnj0gZSOd_8-=rSfWFHjQSPU5XEKQ2KZkg@mail.gmail.com>
-Subject: Re: [PATCH 7/7] target/arm/cpu: spe: Enable spe to work with host cpu
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000307ca805ac917d6c"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=haibo.xu@linaro.org; helo=mail-io1-xd44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Aug 2020 05:46:41 -0000
+From: Alexander Bulekov <1883732@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr bugs-syssec
+X-Launchpad-Bug-Reporter: Bugs SysSec (bugs-syssec)
+X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
+References: <159232165417.10932.651014003255038636.malonedeb@gac.canonical.com>
+Message-Id: <159712480155.21280.7686767813194078458.malone@chaenomeles.canonical.com>
+Subject: [Bug 1883732] Re: xhci_kick_epctx: Assertion `ring->dequeue != 0'
+ failed.
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3072008b614fc89910bf900ab07833fe3e77f861
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 01:55:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,189 +84,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- philmd@redhat.com, qemu-devel@nongnu.org
+Reply-To: Bug 1883732 <1883732@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000307ca805ac917d6c
-Content-Type: text/plain; charset="UTF-8"
+Here's a QTest reproducer:
 
-On Mon, 10 Aug 2020 at 19:16, Andrew Jones <drjones@redhat.com> wrote:
->
-> On Fri, Aug 07, 2020 at 08:10:37AM +0000, Haibo Xu wrote:
-> > Turn on the spe cpu property by default when working with host
-> > cpu type in KVM mode, i.e. we can now do '-cpu host' to add the
-> > vSPE, and '-cpu host,spe=off' to remove it.
->
-> -cpu max with KVM should also enable it by default
->
+cat << EOF | ./i386-softmmu/qemu-system-i386 \
+-device nec-usb-xhci -trace usb\* \
+-device usb-audio -device usb-storage,drive=3Dmydrive \
+-drive id=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone \
+-nodefaults -nographic -qtest stdio
+outl 0xcf8 0x80001014
+outl 0xcfc 0xff000a8e
+outl 0xcf8 0x80001004
+outl 0xcfc 0x1c77695e
+writel 0xff000a8e00000040 0x1d00d815
+write 0x1d 0x1 0x5c
+write 0x2d 0x1 0x27
+write 0x3d 0x1 0x2e
+write 0xd 0x1 0x60
+write 0x17232 0x1 0x03
+write 0x17254 0x1 0x05
+write 0x4d 0x1 0x5c
+write 0x5d 0x1 0x27
+write 0x60 0x1 0x2e
+write 0x61 0x1 0x72
+write 0x62 0x1 0x01
+write 0x6d 0x1 0x2e
+write 0x6f 0x1 0x01
+writel 0xff000a8e00002000 0x0
+writeq 0xff000a8e00002000 0x514ef0100000009
+EOF
 
-Ok, will fix it!
+The trace:
+[R +0.031152] writel 0xff000a8e00000040 0x1d00d815
+26994@1597124755.565242:usb_xhci_oper_write off 0x0000, val 0x1d00d815
+26994@1597124755.565247:usb_xhci_run
+26994@1597124755.565252:usb_xhci_irq_intx level 0
+OK
+[S +0.031173] OK
+[R +0.031179] write 0x1d 0x1 0x5c
+OK
+[S +0.031190] OK
+[R +0.031195] write 0x2d 0x1 0x27
+OK
+[S +0.031198] OK
+[R +0.031203] write 0x3d 0x1 0x2e
+OK
+[S +0.031207] OK
+[R +0.031211] write 0xd 0x1 0x60
+OK
+[S +0.031214] OK
+[R +0.031219] write 0x17232 0x1 0x03
+OK
+[S +0.031224] OK
+[R +0.031228] write 0x17254 0x1 0x05
+OK
+[S +0.031231] OK
+[R +0.031236] write 0x4d 0x1 0x5c
+OK
+[S +0.031239] OK
+[R +0.031244] write 0x5d 0x1 0x27
+OK
+[S +0.031247] OK
+[R +0.031251] write 0x60 0x1 0x2e
+OK
+[S +0.031254] OK
+[R +0.031259] write 0x61 0x1 0x72
+OK
+[S +0.031262] OK
+[R +0.031267] write 0x62 0x1 0x01
+OK
+[S +0.031270] OK
+[R +0.031275] write 0x6d 0x1 0x2e
+OK
+[S +0.031278] OK
+[R +0.031282] write 0x6f 0x1 0x01
+OK
+[S +0.031286] OK
+[R +0.031290] writel 0xff000a8e00002000 0x0
+26994@1597124755.565377:usb_xhci_doorbell_write off 0x0000, val 0x00000000
+26994@1597124755.565384:usb_xhci_fetch_trb addr 0x0000000000000000, ???, p =
+0x0000000000000000, s 0x00000000, c 0x00006000
+26994@1597124755.565390:usb_xhci_unimplemented command (0x18)
+26994@1597124755.565395:usb_xhci_fetch_trb addr 0x0000000000000010, CR_NOOP=
+, p 0x0000000000000000, s 0x00000000, c 0x00005c00
+26994@1597124755.565399:usb_xhci_fetch_trb addr 0x0000000000000020, CR_ENAB=
+LE_SLOT, p 0x0000000000000000, s 0x00000000, c 0x00002700
+26994@1597124755.565403:usb_xhci_slot_enable slotid 1
+26994@1597124755.565406:usb_xhci_fetch_trb addr 0x0000000000000030, CR_ADDR=
+ESS_DEVICE, p 0x0000000000000000, s 0x00000000, c 0x00002e00
+26994@1597124755.565411:usb_xhci_fetch_trb addr 0x0000000000000040, CR_NOOP=
+, p 0x0000000000000000, s 0x00000000, c 0x00005c00
+26994@1597124755.565416:usb_xhci_fetch_trb addr 0x0000000000000050, CR_ENAB=
+LE_SLOT, p 0x0000000000000000, s 0x00000000, c 0x00002700
+26994@1597124755.565421:usb_xhci_slot_enable slotid 2
+26994@1597124755.565423:usb_xhci_fetch_trb addr 0x0000000000000060, CR_ADDR=
+ESS_DEVICE, p 0x000000000001722e, s 0x00000000, c 0x01002e00
+26994@1597124755.565431:usb_xhci_slot_address slotid 1, port 1
+26994@1597124755.565436:usb_xhci_ep_enable slotid 1, epid 1
+26994@1597124755.565444:usb_xhci_fetch_trb addr 0x0000000000000070, TRB_RES=
+ERVED, p 0x0000000000000000, s 0x00000000, c 0x00000000
+OK
+[S +0.031365] OK
+[R +0.031370] writeq 0xff000a8e00002000 0x514ef0100000009
+26994@1597124755.565456:usb_xhci_doorbell_write off 0x0000, val 0x00000009
+26994@1597124755.565459:usb_xhci_doorbell_write off 0x0004, val 0x0514ef01
+26994@1597124755.565462:usb_xhci_ep_kick slotid 1, epid 1, streamid 1300
+qemu-system-i386: /home/alxndr/Development/qemu/general-fuzz/hw/usb/hcd-xhc=
+i.c:1955: void xhci_kick_epctx(XHCIEPContext *, unsigned int): Assertion `r=
+ing->dequeue !=3D 0' failed.
+Aborted
 
-> >
-> > Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
-> > ---
-> >  target/arm/cpu.c   | 4 ++++
-> >  target/arm/kvm64.c | 9 +++++++++
-> >  2 files changed, 13 insertions(+)
-> >
-> > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> > index 67ab0089fd..42fa99953c 100644
-> > --- a/target/arm/cpu.c
-> > +++ b/target/arm/cpu.c
-> > @@ -1719,6 +1719,10 @@ static void arm_cpu_realizefn(DeviceState *dev,
-Error **errp)
-> >          cpu->pmceid1 = 0;
-> >      }
-> >
-> > +    if (!cpu->has_spe || !kvm_enabled()) {
-> > +        unset_feature(env, ARM_FEATURE_SPE);
-> > +    }
->
-> I don't think this should be necessary.
->
+-Alex
 
-Yes, I have tried to remove this check, and the vSPE can still work
-correctly.
-But I don't know whether there are some corner cases that trigger an error.
-The similar logic is added in commit 929e754d5a to enable vPMU support.
+-- =
 
-> > +
-> >      if (!arm_feature(env, ARM_FEATURE_EL2)) {
-> >          /* Disable the hypervisor feature bits in the processor feature
-> >           * registers if we don't have EL2. These are id_pfr1[15:12] and
-> > diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> > index be045ccc5f..4ea58afc1d 100644
-> > --- a/target/arm/kvm64.c
-> > +++ b/target/arm/kvm64.c
-> > @@ -679,6 +679,7 @@ bool
-kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-> >      features |= 1ULL << ARM_FEATURE_AARCH64;
-> >      features |= 1ULL << ARM_FEATURE_PMU;
-> >      features |= 1ULL << ARM_FEATURE_GENERIC_TIMER;
-> > +    features |= 1ULL << ARM_FEATURE_SPE;
->
-> No, SPE is not a feature we assume is present in v8.0 CPUs.
->
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1883732
 
-Yes, SPE is an optional feature for v8.2. How about changing to the
-following logic:
+Title:
+  xhci_kick_epctx: Assertion `ring->dequeue !=3D 0' failed.
 
-spe_supported = ioctl(fdarray[0], KVM_CHECK_EXTENSION, KVM_CAP_ARM_SPE_V1)
-> 0;
-if (spe_supported) {
-    features |= 1ULL << ARM_FEATURE_SPE;
-}
+Status in QEMU:
+  New
 
-> >
-> >      ahcf->features = features;
-> >
-> > @@ -826,6 +827,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
-> >      } else {
-> >          env->features &= ~(1ULL << ARM_FEATURE_PMU);
-> >      }
-> > +    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_SPE_V1)) {
-> > +        cpu->has_spe = false;
-> > +    }
-> > +    if (cpu->has_spe) {
-> > +        cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SPE_V1;
-> > +    } else {
-> > +        env->features &= ~(1ULL << ARM_FEATURE_SPE);
-> > +    }
->
-> The PMU code above this isn't a good pattern to copy. The SVE code below
-> is better. SVE uses an ID bit and doesn't do the redundant KVM cap check.
-> It'd be nice to cleanup the PMU code (with a separate patch) and then add
-> SPE in a better way.
->
+Bug description:
+  To reproduce run the QEMU with the following command line:
+  ```
+  qemu-system-x86_64 -cdrom hypertrash_os_bios_crash.iso -nographic -m 100 =
+-enable-kvm -device virtio-gpu-pci -device nec-usb-xhci -device usb-audio
+  ```
 
-I noticed that Peter had sent out a mail
-<https://www.mail-archive.com/qemu-devel@nongnu.org/msg727640.html> to talk
-about the feature-identification strategy.
-So shall we adapt it to the vPMU and vSPE feature?
+  QEMU Version:
+  ```
+  # qemu-5.0.0
+  $ ./configure --target-list=3Dx86_64-softmmu --enable-sanitizers; make
+  $ x86_64-softmmu/qemu-system-x86_64 --version
+  QEMU emulator version 5.0.0
+  Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+  ```
 
-> >      if (cpu_isar_feature(aa64_sve, cpu)) {
-> >          assert(kvm_arm_sve_supported());
-> >          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
-> > --
-> > 2.17.1
-> >
->
-> Thanks,
-> drew
->
-
---000000000000307ca805ac917d6c
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">On Mon, 10 Aug 2020 at 19:16, Andrew Jones &lt;<a href=3D"=
-mailto:drjones@redhat.com">drjones@redhat.com</a>&gt; wrote:<br>&gt;<br>&gt=
-; On Fri, Aug 07, 2020 at 08:10:37AM +0000, Haibo Xu wrote:<br>&gt; &gt; Tu=
-rn on the spe cpu property by default when working with host<br>&gt; &gt; c=
-pu type in KVM mode, i.e. we can now do &#39;-cpu host&#39; to add the<br>&=
-gt; &gt; vSPE, and &#39;-cpu host,spe=3Doff&#39; to remove it.<br>&gt;<br>&=
-gt; -cpu max with KVM should also enable it by default<br>&gt;<br><br>Ok, w=
-ill fix it!<br><br>&gt; &gt;<br>&gt; &gt; Signed-off-by: Haibo Xu &lt;<a hr=
-ef=3D"mailto:haibo.xu@linaro.org">haibo.xu@linaro.org</a>&gt;<br>&gt; &gt; =
----<br>&gt; &gt; =C2=A0target/arm/cpu.c =C2=A0 | 4 ++++<br>&gt; &gt; =C2=A0=
-target/arm/kvm64.c | 9 +++++++++<br>&gt; &gt; =C2=A02 files changed, 13 ins=
-ertions(+)<br>&gt; &gt;<br>&gt; &gt; diff --git a/target/arm/cpu.c b/target=
-/arm/cpu.c<br>&gt; &gt; index 67ab0089fd..42fa99953c 100644<br>&gt; &gt; --=
-- a/target/arm/cpu.c<br>&gt; &gt; +++ b/target/arm/cpu.c<br>&gt; &gt; @@ -1=
-719,6 +1719,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **e=
-rrp)<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cpu-&gt;pmceid1 =3D 0;<=
-br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0} =C2=A0<br>&gt; &gt;<br>&gt; &gt; + =C2=
-=A0 =C2=A0if (!cpu-&gt;has_spe || !kvm_enabled()) {<br>&gt; &gt; + =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0unset_feature(env, ARM_FEATURE_SPE);<br>&gt; &gt; + =C2=
-=A0 =C2=A0}<br>&gt;<br>&gt; I don&#39;t think this should be necessary.<br>=
-&gt;<br><br>Yes, I have tried to remove this check, and the vSPE can still =
-work correctly.<br>But I don&#39;t know whether there are some corner cases=
- that trigger an error.<br>The similar logic is added in commit 929e754d5a =
-to enable vPMU support.<br><br>&gt; &gt; +<br>&gt; &gt; =C2=A0 =C2=A0 =C2=
-=A0if (!arm_feature(env, ARM_FEATURE_EL2)) {<br>&gt; &gt; =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0/* Disable the hypervisor feature bits in the processor fe=
-ature<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * registers if we don=
-&#39;t have EL2. These are id_pfr1[15:12] and<br>&gt; &gt; diff --git a/tar=
-get/arm/kvm64.c b/target/arm/kvm64.c<br>&gt; &gt; index be045ccc5f..4ea58af=
-c1d 100644<br>&gt; &gt; --- a/target/arm/kvm64.c<br>&gt; &gt; +++ b/target/=
-arm/kvm64.c<br>&gt; &gt; @@ -679,6 +679,7 @@ bool kvm_arm_get_host_cpu_feat=
-ures(ARMHostCPUFeatures *ahcf)<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0features |=
-=3D 1ULL &lt;&lt; ARM_FEATURE_AARCH64;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0fea=
-tures |=3D 1ULL &lt;&lt; ARM_FEATURE_PMU;<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0=
-features |=3D 1ULL &lt;&lt; ARM_FEATURE_GENERIC_TIMER;<br>&gt; &gt; + =C2=
-=A0 =C2=A0features |=3D 1ULL &lt;&lt; ARM_FEATURE_SPE;<br>&gt;<br>&gt; No, =
-SPE is not a feature we assume is present in v8.0 CPUs.<br>&gt;<br><br>Yes,=
- SPE is an optional feature for v8.2. How about changing to the following l=
-ogic:<br><br>spe_supported =3D ioctl(fdarray[0], KVM_CHECK_EXTENSION, KVM_C=
-AP_ARM_SPE_V1) &gt; 0;<br>if (spe_supported) {<br>=C2=A0 =C2=A0 features |=
-=3D 1ULL &lt;&lt; ARM_FEATURE_SPE;<br>}<br><br>&gt; &gt;<br>&gt; &gt; =C2=
-=A0 =C2=A0 =C2=A0ahcf-&gt;features =3D features;<br>&gt; &gt;<br>&gt; &gt; =
-@@ -826,6 +827,14 @@ int kvm_arch_init_vcpu(CPUState *cs)<br>&gt; &gt; =C2=
-=A0 =C2=A0 =C2=A0} else {<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0en=
-v-&gt;features &amp;=3D ~(1ULL &lt;&lt; ARM_FEATURE_PMU);<br>&gt; &gt; =C2=
-=A0 =C2=A0 =C2=A0}<br>&gt; &gt; + =C2=A0 =C2=A0if (!kvm_check_extension(cs-=
-&gt;kvm_state, KVM_CAP_ARM_SPE_V1)) {<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0cpu-&gt;has_spe =3D false;<br>&gt; &gt; + =C2=A0 =C2=A0}<br>&gt; &gt;=
- + =C2=A0 =C2=A0if (cpu-&gt;has_spe) {<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0cpu-&gt;kvm_init_features[0] |=3D 1 &lt;&lt; KVM_ARM_VCPU_SPE_V1;<br>=
-&gt; &gt; + =C2=A0 =C2=A0} else {<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0env-&gt;features &amp;=3D ~(1ULL &lt;&lt; ARM_FEATURE_SPE);<br>&gt; &gt;=
- + =C2=A0 =C2=A0}<br>&gt;<br>&gt; The PMU code above this isn&#39;t a good =
-pattern to copy. The SVE code below<br>&gt; is better. SVE uses an ID bit a=
-nd doesn&#39;t do the redundant KVM cap check.<br>&gt; It&#39;d be nice to =
-cleanup the PMU code (with a separate patch) and then add<br>&gt; SPE in a =
-better way.<br>&gt;<br><br>I noticed that Peter had sent out a <a href=3D"h=
-ttps://www.mail-archive.com/qemu-devel@nongnu.org/msg727640.html">mail</a> =
-to talk about the feature-identification strategy.<div>So shall we adapt it=
- to the vPMU and vSPE feature?<br><br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0if (cpu=
-_isar_feature(aa64_sve, cpu)) {<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0assert(kvm_arm_sve_supported());<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0cpu-&gt;kvm_init_features[0] |=3D 1 &lt;&lt; KVM_ARM_VCPU_SVE;=
-<br>&gt; &gt; --<br>&gt; &gt; 2.17.1<br>&gt; &gt;<br>&gt;<br>&gt; Thanks,<b=
-r>&gt; drew<br>&gt;</div></div>
-
---000000000000307ca805ac917d6c--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1883732/+subscriptions
 
