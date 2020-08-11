@@ -2,102 +2,107 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28614C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 12:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5615C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:01:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC131206C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 12:59:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1D7F2076B
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:01:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AYYGdOD2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC131206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T76em+Am"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1D7F2076B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5TsT-0006A6-4q
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 08:59:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44014)
+	id 1k5TuQ-0007Dm-UH
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 09:01:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k5Trs-0005e5-QQ
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 08:59:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51574
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k5Tsx-0006fi-LE
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:00:11 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22855)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k5Trq-0000LH-CQ
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 08:59:04 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k5Tsv-0000Te-Je
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:00:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597150741;
+ s=mimecast20190719; t=1597150808;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XY6Krjx9fNxb2tYLQci1GnykiFY2uJIiO6IhhjYHzy4=;
- b=AYYGdOD20HAlyhWo5WxAlDTii48Kd+mZZoolW13ShcnWExnJe8YiN0CuVVhom/YxkI59dF
- Ces0dAktaNZNDx1xAW18SYRDZgkDd65mNrmGHy/5usdqilw/ERBKgjoaoXe6YCQ4+JP8f+
- /2e1HHKZ2qGU3fJdWzWvOU1vkQGFO7c=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-3ORlGVt-O0-rHAsGHMEfyA-1; Tue, 11 Aug 2020 08:58:59 -0400
-X-MC-Unique: 3ORlGVt-O0-rHAsGHMEfyA-1
-Received: by mail-ej1-f70.google.com with SMTP id g18so5133665ejm.4
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 05:58:59 -0700 (PDT)
+ bh=yeQXqMYNX5Z6l8jQYo/JOGJEr0otjWcf+HN4halDI34=;
+ b=T76em+AminGCW8wcWCC6nnZb0fJZz3OBMl8FU5ROmO8nu3zMD/aenLh6+ArMx2iWiFsKFl
+ 9pl+4KZQmySUZCNszovFtGS3b6yZVbiINkavN0fg+S0AG2sSyN6Y8x5t2czLH+ssXCncp/
+ saJSNgjzELabtJS6Z1vTDsFA+azEGp4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-7RTmgtASOhuYO3tvcnaeAA-1; Tue, 11 Aug 2020 08:59:57 -0400
+X-MC-Unique: 7RTmgtASOhuYO3tvcnaeAA-1
+Received: by mail-wr1-f72.google.com with SMTP id w7so5557511wre.11
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 05:59:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=XY6Krjx9fNxb2tYLQci1GnykiFY2uJIiO6IhhjYHzy4=;
- b=KhoRfGRig2gRbOUDo1kxA9DkK37kyAbr9Mj41EFkGRiM6GZ/8hTu8cCcFY9MAGQHXP
- Mda1jzGk/p3AIIas3YAEEtord7utdBrDYSBzDx9kViqAHlc4sLlXDTQnl8Qm7GmQ1RML
- 2R6/FbeLMJurMsqsA/5fMsDbcQjvJWBslgsaWP1RPSQzsFdlnaEYM1IEWBHMjV5rFfQf
- 5luobj/6JvOj7sWBRhOv2m2cHjyatK9tQjZxvqJ+2eQHl3MgDWebHOVcps+awsQ82uZa
- +PErTdbsdaWqnrd2L5/syZBXPCeXnre2HnDD/nENhg0C8TA4xe/ebQXEr0B3qGUKp4dJ
- n8yg==
-X-Gm-Message-State: AOAM530W2J+C8a/ivQvn3gwL4x6YYZBO49VF8ytsYJPa4ceFjF9ZccR5
- Sg4TzoqUBEvoqKP8KHaSyqJyvk60fgGNwCSm598+qujqJlk9sX/g5qRs3cUpyhJ0hrh6J/MUecs
- tvTNYJT6gkTq2wWY=
-X-Received: by 2002:a50:fc82:: with SMTP id f2mr25547287edq.53.1597150738531; 
- Tue, 11 Aug 2020 05:58:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxu507B2txHo7qll2eVfkDWwWhsXTijvB8coAcYpqYfqn7X/fo1vbqOSlKjJ1YbZ8pIOcBhyw==
-X-Received: by 2002:a50:fc82:: with SMTP id f2mr25547275edq.53.1597150738260; 
- Tue, 11 Aug 2020 05:58:58 -0700 (PDT)
-Received: from redhat.com ([147.161.12.106])
- by smtp.gmail.com with ESMTPSA id b9sm15115760ejz.57.2020.08.11.05.58.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 11 Aug 2020 05:58:56 -0700 (PDT)
-Date: Tue, 11 Aug 2020 08:58:53 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Martin Wilck <mwilck@suse.com>
-Subject: Re: [PATCH v2] virtio-rng: return available data with O_NONBLOCK
-Message-ID: <20200811084616-mutt-send-email-mst@kernel.org>
-References: <20200715133255.10526-1-mwilck@suse.com>
- <20200811071726-mutt-send-email-mst@kernel.org>
- <e75b3cd527bae4c6762af17a0a32f57c61191274.camel@suse.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=yeQXqMYNX5Z6l8jQYo/JOGJEr0otjWcf+HN4halDI34=;
+ b=pJ2ne+6fHhp9x3dyFBdejREV1MT7RmVJ6Oa/p3Dz5wmdd0wQkyWEaZmljnZHhIevjm
+ M02uq9H1w4yvIWTuScnZ88uy9fWCbrc6eOOqp+BeTquZ0TJ6oHVpBexnUiIAkPDyOiR3
+ hjOsO4XNRnGjtKJInuKr181H1xynj2Ajn0UKuKjMTVxQCmXjJ6FiyvcMerFftZKLbF3N
+ Xpu6M9D0Y6Lplijpo7FAPKNoFOaf7pQ1UHr4E7occn2vN1CS3h4rAYDKrkjg+AzLsqbj
+ qqrkLBf+SXUJ2lmOfdMaKCt7TiJNJLjswBcDfk3YWOvf/tYbaWPir6w48ILgQDjipJAw
+ Rq5Q==
+X-Gm-Message-State: AOAM531YAsaE/0WvjvVLGFqyOLwsRLr3D8gjgx+CN7NeNsOPB3ozDua9
+ 6Zhn2cnYaLAKZnxjRBg4vwW4DMu+LhutDkx1COFUTmgliY04Lz11gJyhd9rsW/qffierzurRQyN
+ c4m/96SljrL0dbkU=
+X-Received: by 2002:adf:b602:: with SMTP id f2mr28032971wre.186.1597150795753; 
+ Tue, 11 Aug 2020 05:59:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx6uT9eajNvZE8LS3Uu7hli3sfl59FamFtYeBPjV2BzEaqpmtTKyvYSCxgrH+qTPGbnLaaUzA==
+X-Received: by 2002:adf:b602:: with SMTP id f2mr28032947wre.186.1597150795502; 
+ Tue, 11 Aug 2020 05:59:55 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.12.249])
+ by smtp.gmail.com with ESMTPSA id n12sm4480365wrq.63.2020.08.11.05.59.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 11 Aug 2020 05:59:54 -0700 (PDT)
+Subject: Re: [PATCH 000/147] Meson integration for 5.2
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
+ <20200811120442.GA86269@SPB-NB-133.local>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3afa2a9a-8da7-0838-ad96-06703bb4d815@redhat.com>
+Date: Tue, 11 Aug 2020 14:59:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <e75b3cd527bae4c6762af17a0a32f57c61191274.camel@suse.com>
+In-Reply-To: <20200811120442.GA86269@SPB-NB-133.local>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:41:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 06:40:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,63 +115,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- virtualization@lists.linux-foundation.org
+Cc: peter.maydell@linaro.org, thuth@redhat.com, berrange@redhat.com,
+ philmd@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ alex.bennee@linaro.org, alxndr@bu.edu, stefanha@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 11, 2020 at 02:07:23PM +0200, Martin Wilck wrote:
-> On Tue, 2020-08-11 at 07:26 -0400, Michael S. Tsirkin wrote:
-> > On Wed, Jul 15, 2020 at 03:32:55PM +0200, mwilck@suse.com wrote:
-> > >  drivers/char/hw_random/virtio-rng.c | 14 ++++++++++++++
-> > >  1 file changed, 14 insertions(+)
-> > > 
-> > > diff --git a/drivers/char/hw_random/virtio-rng.c
-> > > b/drivers/char/hw_random/virtio-rng.c
-> > > index 79a6e47b5fbc..984713b35892 100644
-> > > --- a/drivers/char/hw_random/virtio-rng.c
-> > > +++ b/drivers/char/hw_random/virtio-rng.c
-> > > @@ -59,6 +59,20 @@ static int virtio_read(struct hwrng *rng, void
-> > > *buf, size_t size, bool wait)
-> > >  	if (vi->hwrng_removed)
-> > >  		return -ENODEV;
-> > >  
-> > > +	/*
-> > > +	 * If the previous call was non-blocking, we may have got some
-> > > +	 * randomness already.
-> > > +	 */
-> > > +	if (vi->busy && completion_done(&vi->have_data)) {
-> > > +		unsigned int len;
-> > > +
-> > > +		vi->busy = false;
-> > > +		len = vi->data_avail > size ? size : vi->data_avail;
-> > > +		vi->data_avail -= len;
-> > 
-> > I wonder what purpose does this line serve: busy is false
-> > which basically means data_avail is invalid, right?
-> > A following non blocking call will not enter here.
+On 11/08/20 14:04, Roman Bolshakov wrote:
 > 
-> Well, I thought this is just how reading data normally works. But
-> you're right, the remainder will not be used. I can remove the line, or
-> reset data_avail to 0 at this point. What do you prefer?
+> The line in configure assumes that meson is a python program rather than
+> a wrapper:
 > 
-> Regards,
-> Martin
+>   meson="$python $meson"
 
-Removing seems cleaner.
+Hmm, that means we will have to use the embedded meson if the user
+specifies --python.  But it's probably a good idea anyway, and not
+problematic since Meson does not have any dependencies outside the
+Python standard library.
 
-But looking at it, it is using the API in a very strange way:
-a buffer is placed in the ring by one call, and *assumed*
-to still be there in the next call.
+> Compilation seems to partially succeed but linking of QEMU binary fails:
+> 
+> [3691/5594] Linking target qemu-system-aarch64
+> FAILED: qemu-system-aarch64
+> ...snip...
+> ld: warning: directory not found for option '-L/Users/r.bolshakov/dev/qemu/build/dtc/libfdt'
+> ld: warning: directory not found for option '-L/Users/r.bolshakov/dev/qemu/build/dtc/libfdt'
+> ld: library not found for -lcapstone
+> clang: error: linker command failed with exit code 1 (use -v to see invocation)
 
-which it might not be if one call is from userspace and the
-next one is from fill kthread.
+Can you include your config-host.mak?  Does it help if you do "make
+dtc/all capstone/all" and then retry?
 
-I guess this is why it's returning 0: yes it knows there's
-data, but it does not know where it is.
-
--- 
-MST
+Paolo
 
 
