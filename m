@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 994A1C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B2BC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:05:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67BCD2075D
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:05:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67BCD2075D
+	by mail.kernel.org (Postfix) with ESMTPS id 95BCC2075D
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:05:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95BCC2075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5S5x-0002O5-HB
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:05:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46378)
+	id 1k5S64-0002ge-Po
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:05:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1k5S2l-0004CR-Og
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:02:11 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:42476)
+ id 1k5S23-00036R-H3
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:01:27 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:42326)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1k5S2k-0003PE-1X
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:02:11 -0400
+ id 1k5S20-0003LB-G7
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:01:27 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 47C754089EF7;
- Tue, 11 Aug 2020 11:02:08 +0000 (UTC)
-Subject: [PATCH v2 13/14] replay: describe reverse debugging in docs/replay.txt
+ by mail.ispras.ru (Postfix) with ESMTPSA id 8A9FF4089EF7;
+ Tue, 11 Aug 2020 11:01:22 +0000 (UTC)
+Subject: [PATCH v2 05/14] iotests: update snapshot test for new output format
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Tue, 11 Aug 2020 14:02:08 +0300
-Message-ID: <159714372804.18946.9062781343195564152.stgit@pasha-ThinkPad-X280>
+Date: Tue, 11 Aug 2020 14:01:22 +0300
+Message-ID: <159714368230.18946.15293043865526975163.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159714365354.18946.2967871683340522027.stgit@pasha-ThinkPad-X280>
 References: <159714365354.18946.2967871683340522027.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -74,59 +74,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 
-This patch updates the documentation and describes usage of the reverse
-debugging in QEMU+GDB.
+This patch updates iotests that verify qemu monitor output.
+New output format for snapshot listing include ICOUNT column.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
 ---
- docs/replay.txt |   33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ tests/qemu-iotests/267.out |   48 ++++++++++++++++++++++----------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-diff --git a/docs/replay.txt b/docs/replay.txt
-index 70c27edb36..18d6169f3b 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -294,6 +294,39 @@ for recording and replaying must contain identical number of ports in record
- and replay modes, but their backends may differ.
- E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
+diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
+index d6d80c099f..d4fa1b24f8 100644
+--- a/tests/qemu-iotests/267.out
++++ b/tests/qemu-iotests/267.out
+@@ -33,8 +33,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
  
-+Reverse debugging
-+-----------------
-+
-+Reverse debugging allows "executing" the program in reverse direction.
-+GDB remote protocol supports "reverse step" and "reverse continue"
-+commands. The first one steps single instruction backwards in time,
-+and the second one finds the last breakpoint in the past.
-+
-+Recorded executions may be used to enable reverse debugging. QEMU can't
-+execute the code in backwards direction, but can load a snapshot and
-+replay forward to find the desired position or breakpoint.
-+
-+The following GDB commands are supported:
-+ - reverse-stepi (or rsi) - step one instruction backwards
-+ - reverse-continue (or rc) - find last breakpoint in the past
-+
-+Reverse step loads the nearest snapshot and replays the execution until
-+the required instruction is met.
-+
-+Reverse continue may include several passes of examining the execution
-+between the snapshots. Each of the passes include the following steps:
-+ 1. loading the snapshot
-+ 2. replaying to examine the breakpoints
-+ 3. if breakpoint or watchpoint was met
-+    - loading the snaphot again
-+    - replaying to the required breakpoint
-+ 4. else
-+    - proceeding to the p.1 with the earlier snapshot
-+
-+Therefore usage of the reverse debugging requires at least one snapshot
-+created in advance. See the "Snapshotting" section to learn about running
-+record/replay and creating the snapshot in these modes.
-+
- Replay log format
- -----------------
+@@ -44,8 +44,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
  
+@@ -69,8 +69,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -94,8 +94,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -105,8 +105,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -119,8 +119,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -134,8 +134,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+@@ -145,15 +145,15 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+ Internal snapshots on overlay:
+ Snapshot list:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+-1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ Internal snapshots on backing file:
+ 
+ === -blockdev with NBD server on the backing file ===
+@@ -166,17 +166,17 @@ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+ (qemu) info snapshots
+ List of snapshots present on all disks:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ (qemu) loadvm snap0
+ (qemu) quit
+ 
+ Internal snapshots on overlay:
+ Snapshot list:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+-1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ Internal snapshots on backing file:
+ Snapshot list:
+-ID        TAG                 VM SIZE                DATE       VM CLOCK
+-1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
++ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
++1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000           
+ *** done
 
 
