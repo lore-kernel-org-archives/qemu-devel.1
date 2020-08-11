@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD0BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78155C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:29:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F5832078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:27:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F5832078E
+	by mail.kernel.org (Postfix) with ESMTPS id 4B3BA2078E
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:29:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B3BA2078E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5VFt-0006pa-Af
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 10:27:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39296)
+	id 1k5VHX-0008Ll-Ed
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 10:29:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39468)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlmgr@proulx.com>) id 1k5VEr-0005jU-J3
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:26:53 -0400
-Received: from havoc.proulx.com ([96.88.95.61]:47876)
+ (Exim 4.90_1) (envelope-from <mlmgr@proulx.com>) id 1k5VFQ-0006T2-5m
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:27:28 -0400
+Received: from havoc.proulx.com ([96.88.95.61]:47902)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlmgr@proulx.com>) id 1k5VEp-0002pi-Nd
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:26:53 -0400
+ (Exim 4.90_1) (envelope-from <mlmgr@proulx.com>) id 1k5VFO-0002tM-9g
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:27:27 -0400
 Received: by havoc.proulx.com (Postfix, from userid 1027)
- id 4C0A06A8; Tue, 11 Aug 2020 08:26:46 -0600 (MDT)
+ id EA001645; Tue, 11 Aug 2020 08:27:24 -0600 (MDT)
 Resent-From: Mailing List Manager <mlmgr@proulx.com>
-Resent-Date: Tue, 11 Aug 2020 08:26:46 -0600
-Resent-Message-ID: <20200811142646.aff3o2jiwcy2jebq@havoc.proulx.com>
+Resent-Date: Tue, 11 Aug 2020 08:27:24 -0600
+Resent-Message-ID: <20200811142724.t56al7kqje7muulg@havoc.proulx.com>
 Resent-To: qemu-devel@nongnu.org
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43888)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kamil@rugged.localdomain>)
- id 1k5TrR-0005Gi-S3
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 08:58:37 -0400
-Received: from 89-79-191-25.dynamic.chello.pl ([89.79.191.25]:63220
+ id 1k5TrT-0005I4-58
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 08:58:39 -0400
+Received: from 89-79-191-25.dynamic.chello.pl ([89.79.191.25]:63219
  helo=rugged.localdomain) by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kamil@rugged.localdomain>) id 1k5TrP-0000IZ-NJ
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 08:58:37 -0400
+ (envelope-from <kamil@rugged.localdomain>) id 1k5TrP-0000Ia-OT
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 08:58:38 -0400
 Received: by rugged.localdomain (Postfix, from userid 1000)
- id C0A50970BF; Tue, 11 Aug 2020 12:47:44 +0000 (UTC)
+ id 0D7D6970C1; Tue, 11 Aug 2020 12:47:45 +0000 (UTC)
 From: Kamil Rytarowski <n54@gmx.com>
 To: rth@twiddle.net, ehabkost@redhat.com, slp@redhat.com, pbonzini@redhat.com,
  peter.maydell@linaro.org, philmd@redhat.com, max@m00nbsd.net,
  jmcneill@invisible.ca
-Subject: [PATCH v5 2/4] Add the NetBSD Virtual Machine Monitor accelerator.
-Date: Tue, 11 Aug 2020 14:47:32 +0200
-Message-Id: <20200811124734.17222-2-n54@gmx.com>
+Subject: [PATCH v5 4/4] Add the NVMM acceleration enlightenments
+Date: Tue, 11 Aug 2020 14:47:34 +0200
+Message-Id: <20200811124734.17222-4-n54@gmx.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200811124734.17222-1-n54@gmx.com>
 References: <20200206213232.1918-2-n54@gmx.com>
@@ -67,7 +67,7 @@ X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 08:50:12
 X-ACL-Warn: Detected OS   = ???
 X-Spam_action: reject
 X-Bogosity: Spam, tests=bogofilter, spamicity=1.000000, version=1.2.4
-X-CRM114-Status: UNSURE (   3.51  )
+X-CRM114-Status: UNSURE (   0.69  )
 Received-SPF: pass client-ip=96.88.95.61; envelope-from=mlmgr@proulx.com;
  helo=havoc.proulx.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/07/28 10:23:23
@@ -97,9 +97,8 @@ Sender: "Qemu-devel"
 
 From: Maxime Villard <max@m00nbsd.net>
 
-Introduces the configure support for the new NetBSD Virtual Machine Monitor that
-allows for hypervisor acceleration from usermode components on the NetBSD
-platform.
+Implements the NVMM accelerator cpu enlightenments to actually use the nvmm-all
+accelerator on NetBSD platforms.
 
 Signed-off-by: Maxime Villard <max@m00nbsd.net>
 Signed-off-by: Kamil Rytarowski <n54@gmx.com>
@@ -107,156 +106,167 @@ Reviewed-by: Sergio Lopez <slp@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Jared McNeill <jmcneill@invisible.ca>
 ---
- configure       | 37 +++++++++++++++++++++++++++++++++++++
- qemu-options.hx | 10 +++++-----
- 2 files changed, 42 insertions(+), 5 deletions(-)
+ include/sysemu/hw_accel.h | 14 ++++++++++
+ softmmu/cpus.c            | 58 +++++++++++++++++++++++++++++++++++++++
+ target/i386/helper.c      |  2 +-
+ 3 files changed, 73 insertions(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index 2acc4d1465..fb9ffba2bf 100755
---- a/configure
-+++ b/configure
-@@ -246,6 +246,17 @@ supported_whpx_target() {
-     return 1
+diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+index e128f8b06b..9e19f5794c 100644
+--- a/include/sysemu/hw_accel.h
++++ b/include/sysemu/hw_accel.h
+@@ -16,6 +16,7 @@
+ #include "sysemu/kvm.h"
+ #include "sysemu/hvf.h"
+ #include "sysemu/whpx.h"
++#include "sysemu/nvmm.h"
+ 
+ static inline void cpu_synchronize_state(CPUState *cpu)
+ {
+@@ -31,6 +32,9 @@ static inline void cpu_synchronize_state(CPUState *cpu)
+     if (whpx_enabled()) {
+         whpx_cpu_synchronize_state(cpu);
+     }
++    if (nvmm_enabled()) {
++        nvmm_cpu_synchronize_state(cpu);
++    }
  }
  
-+supported_nvmm_target() {
-+    test "$nvmm" = "yes" || return 1
-+    glob "$1" "*-softmmu" || return 1
-+    case "${1%-softmmu}" in
-+        i386|x86_64)
-+            return 0
-+        ;;
-+    esac
-+    return 1
+ static inline void cpu_synchronize_post_reset(CPUState *cpu)
+@@ -47,6 +51,10 @@ static inline void cpu_synchronize_post_reset(CPUState *cpu)
+     if (whpx_enabled()) {
+         whpx_cpu_synchronize_post_reset(cpu);
+     }
++    if (nvmm_enabled()) {
++        nvmm_cpu_synchronize_post_reset(cpu);
++    }
++
+ }
+ 
+ static inline void cpu_synchronize_post_init(CPUState *cpu)
+@@ -63,6 +71,9 @@ static inline void cpu_synchronize_post_init(CPUState *cpu)
+     if (whpx_enabled()) {
+         whpx_cpu_synchronize_post_init(cpu);
+     }
++    if (nvmm_enabled()) {
++        nvmm_cpu_synchronize_post_init(cpu);
++    }
+ }
+ 
+ static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
+@@ -79,6 +90,9 @@ static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
+     if (whpx_enabled()) {
+         whpx_cpu_synchronize_pre_loadvm(cpu);
+     }
++    if (nvmm_enabled()) {
++        nvmm_cpu_synchronize_pre_loadvm(cpu);
++    }
+ }
+ 
+ #endif /* QEMU_HW_ACCEL_H */
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index a802e899ab..3b44b92830 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -43,6 +43,7 @@
+ #include "sysemu/hax.h"
+ #include "sysemu/hvf.h"
+ #include "sysemu/whpx.h"
++#include "sysemu/nvmm.h"
+ #include "exec/exec-all.h"
+ 
+ #include "qemu/thread.h"
+@@ -1621,6 +1622,48 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+     return NULL;
+ }
+ 
++static void *qemu_nvmm_cpu_thread_fn(void *arg)
++{
++    CPUState *cpu = arg;
++    int r;
++
++    assert(nvmm_enabled());
++
++    rcu_register_thread();
++
++    qemu_mutex_lock_iothread();
++    qemu_thread_get_self(cpu->thread);
++    cpu->thread_id = qemu_get_thread_id();
++    current_cpu = cpu;
++
++    r = nvmm_init_vcpu(cpu);
++    if (r < 0) {
++        fprintf(stderr, "nvmm_init_vcpu failed: %s\n", strerror(-r));
++        exit(1);
++    }
++
++    /* signal CPU creation */
++    cpu->created = true;
++    qemu_cond_signal(&qemu_cpu_cond);
++
++    do {
++        if (cpu_can_run(cpu)) {
++            r = nvmm_vcpu_exec(cpu);
++            if (r == EXCP_DEBUG) {
++                cpu_handle_guest_debug(cpu);
++            }
++        }
++        qemu_wait_io_event(cpu);
++    } while (!cpu->unplug || cpu_can_run(cpu));
++
++    nvmm_destroy_vcpu(cpu);
++    cpu->created = false;
++    qemu_cond_signal(&qemu_cpu_cond);
++    qemu_mutex_unlock_iothread();
++    rcu_unregister_thread();
++    return NULL;
 +}
 +
- supported_target() {
-     case "$1" in
-         *-softmmu)
-@@ -273,6 +284,7 @@ supported_target() {
-     supported_hax_target "$1" && return 0
-     supported_hvf_target "$1" && return 0
-     supported_whpx_target "$1" && return 0
-+    supported_nvmm_target "$1" && return 0
-     print_error "TCG disabled, but hardware accelerator not available for '$target'"
-     return 1
+ #ifdef _WIN32
+ static void CALLBACK dummy_apc_func(ULONG_PTR unused)
+ {
+@@ -1998,6 +2041,19 @@ static void qemu_whpx_start_vcpu(CPUState *cpu)
+ #endif
  }
-@@ -395,6 +407,7 @@ kvm="no"
- hax="no"
- hvf="no"
- whpx="no"
-+nvmm="no"
- rdma=""
- pvrdma=""
- gprof="no"
-@@ -847,6 +860,7 @@ DragonFly)
- NetBSD)
-   bsd="yes"
-   hax="yes"
-+  nvmm="yes"
-   make="${MAKE-gmake}"
-   audio_drv_list="oss try-sdl"
-   audio_possible_drivers="oss sdl"
-@@ -1233,6 +1247,10 @@ for opt do
-   ;;
-   --enable-whpx) whpx="yes"
-   ;;
-+  --disable-nvmm) nvmm="no"
-+  ;;
-+  --enable-nvmm) nvmm="yes"
-+  ;;
-   --disable-tcg-interpreter) tcg_interpreter="no"
-   ;;
-   --enable-tcg-interpreter) tcg_interpreter="yes"
-@@ -1879,6 +1897,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   hax             HAX acceleration support
-   hvf             Hypervisor.framework acceleration support
-   whpx            Windows Hypervisor Platform acceleration support
-+  nvmm            NetBSD Virtual Machine Monitor acceleration support
-   rdma            Enable RDMA-based migration
-   pvrdma          Enable PVRDMA support
-   vde             support for vde network
-@@ -2965,6 +2984,20 @@ if test "$whpx" != "no" ; then
-     fi
- fi
  
-+##########################################
-+# NetBSD Virtual Machine Monitor (NVMM) accelerator check
-+if test "$nvmm" != "no" ; then
-+    if check_include "nvmm.h" ; then
-+        nvmm="yes"
-+	LIBS="-lnvmm $LIBS"
-+    else
-+        if test "$nvmm" = "yes"; then
-+            feature_not_found "NVMM" "NVMM is not available"
-+        fi
-+        nvmm="no"
-+    fi
-+fi
++static void qemu_nvmm_start_vcpu(CPUState *cpu)
++{
++    char thread_name[VCPU_THREAD_NAME_SIZE];
 +
- ##########################################
- # Sparse probe
- if test "$sparse" != "no" ; then
-@@ -6934,6 +6967,7 @@ echo "KVM support       $kvm"
- echo "HAX support       $hax"
- echo "HVF support       $hvf"
- echo "WHPX support      $whpx"
-+echo "NVMM support      $nvmm"
- echo "TCG support       $tcg"
- if test "$tcg" = "yes" ; then
-     echo "TCG debug enabled $debug_tcg"
-@@ -8332,6 +8366,9 @@ fi
- if test "$target_aligned_only" = "yes" ; then
-   echo "TARGET_ALIGNED_ONLY=y" >> $config_target_mak
- fi
-+if supported_nvmm_target $target; then
-+    echo "CONFIG_NVMM=y" >> $config_target_mak
-+fi
- if test "$target_bigendian" = "yes" ; then
-   echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
- fi
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 708583b4ce..697accaa7e 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -26,7 +26,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "-machine [type=]name[,prop[=value][,...]]\n"
-     "                selects emulated machine ('-machine help' for list)\n"
-     "                property accel=accel1[:accel2[:...]] selects accelerator\n"
--    "                supported accelerators are kvm, xen, hax, hvf, whpx or tcg (default: tcg)\n"
-+    "                supported accelerators are kvm, xen, hax, hvf, nvmm, whpx or tcg (default: tcg)\n"
-     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
-     "                dump-guest-core=on|off include guest memory in a core dump (default=on)\n"
-     "                mem-merge=on|off controls memory merge support (default: on)\n"
-@@ -58,7 +58,7 @@ SRST
++    cpu->thread = g_malloc0(sizeof(QemuThread));
++    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
++    qemu_cond_init(cpu->halt_cond);
++    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/NVMM",
++             cpu->cpu_index);
++    qemu_thread_create(cpu->thread, thread_name, qemu_nvmm_cpu_thread_fn,
++                       cpu, QEMU_THREAD_JOINABLE);
++}
++
+ static void qemu_dummy_start_vcpu(CPUState *cpu)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+@@ -2038,6 +2094,8 @@ void qemu_init_vcpu(CPUState *cpu)
+         qemu_tcg_init_vcpu(cpu);
+     } else if (whpx_enabled()) {
+         qemu_whpx_start_vcpu(cpu);
++    } else if (nvmm_enabled()) {
++        qemu_nvmm_start_vcpu(cpu);
+     } else {
+         qemu_dummy_start_vcpu(cpu);
+     }
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 70be53e2c3..c2f1aef65c 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -983,7 +983,7 @@ void cpu_report_tpr_access(CPUX86State *env, TPRAccess access)
+     X86CPU *cpu = env_archcpu(env);
+     CPUState *cs = env_cpu(env);
  
-     ``accel=accels1[:accels2[:...]]``
-         This is used to enable an accelerator. Depending on the target
--        architecture, kvm, xen, hax, hvf, whpx or tcg can be available.
-+        architecture, kvm, xen, hax, hvf, nvmm, whpx or tcg can be available.
-         By default, tcg is used. If there is more than one accelerator
-         specified, the next one is used if the previous one fails to
-         initialize.
-@@ -119,7 +119,7 @@ ERST
+-    if (kvm_enabled() || whpx_enabled()) {
++    if (kvm_enabled() || whpx_enabled() || nvmm_enabled()) {
+         env->tpr_access_type = access;
  
- DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-     "-accel [accel=]accelerator[,prop[=value][,...]]\n"
--    "                select accelerator (kvm, xen, hax, hvf, whpx or tcg; use 'help' for a list)\n"
-+    "                select accelerator (kvm, xen, hax, hvf, nvmm, whpx or tcg; use 'help' for a list)\n"
-     "                igd-passthru=on|off (enable Xen integrated Intel graphics passthrough, default=off)\n"
-     "                kernel-irqchip=on|off|split controls accelerated irqchip support (default=on)\n"
-     "                kvm-shadow-mem=size of KVM shadow MMU in bytes\n"
-@@ -128,8 +128,8 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
- SRST
- ``-accel name[,prop=value[,...]]``
-     This is used to enable an accelerator. Depending on the target
--    architecture, kvm, xen, hax, hvf, whpx or tcg can be available. By
--    default, tcg is used. If there is more than one accelerator
-+    architecture, kvm, xen, hax, hvf, nvmm whpx or tcg can be available.
-+    By default, tcg is used. If there is more than one accelerator
-     specified, the next one is used if the previous one fails to
-     initialize.
- 
+         cpu_interrupt(cs, CPU_INTERRUPT_TPR);
 -- 
 2.24.1
 
