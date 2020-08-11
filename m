@@ -2,152 +2,83 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7102C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B81DDC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:08:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FE512076B
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:02:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 824A72076C
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:08:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwNHoSy9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FE512076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="FOPRr3cS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 824A72076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5TvU-00086k-TZ
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 09:02:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44408)
+	id 1k5U1M-0001A0-PO
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 09:08:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1k5TtE-0006lK-G8
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:00:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58731
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1k5TtC-0000Vf-HM
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:00:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597150825;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=XWgtIYZV6WQGISiFszSTgqCq1+KgxkpS96/z478ariQ=;
- b=dwNHoSy9iKpwgyKrWQBpPq8GPmoDRyeYDAR+Dd3BrnyUNaNTfX8VYxSzyFBi7bLWBY9hCl
- vDcG/SL2U1t2mncsKmDmurRWa4mCAOh5blBAOXTDKxYIir59/trcX/EcCn/IgbRJdfCAd5
- eI2XSvbOvqptTkLnUuhVo8sQlh4Ixpo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-450-rTD_3KmjMGGERXNb8d3KJw-1; Tue, 11 Aug 2020 09:00:22 -0400
-X-MC-Unique: rTD_3KmjMGGERXNb8d3KJw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6D5318CBC40;
- Tue, 11 Aug 2020 13:00:20 +0000 (UTC)
-Received: from [10.36.112.235] (ovpn-112-235.ams2.redhat.com [10.36.112.235])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E55711A7D8;
- Tue, 11 Aug 2020 13:00:15 +0000 (UTC)
-Subject: Re: [PATCH v2] virtio-rng: return available data with O_NONBLOCK
-To: Martin Wilck <mwilck@suse.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>
-References: <20200715133255.10526-1-mwilck@suse.com>
- <7cfc4316-922b-8606-72ce-80205ef55572@redhat.com>
- <7affb721-9686-1262-b7cf-d9681646b602@redhat.com>
- <810451cf80032d131d5d3feb4fc8300549516f3d.camel@suse.com>
- <b764a4bb-b81f-b14f-9b7f-d6d087a8b1ea@redhat.com>
- <b8b19be7fd9b3fab629506eb30d9f0c820aa57d2.camel@suse.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <085f699b-e391-7363-b63e-3b11cc04e50d@redhat.com>
-Date: Tue, 11 Aug 2020 15:00:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <b8b19be7fd9b3fab629506eb30d9f0c820aa57d2.camel@suse.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:18:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k5U0m-0000lB-Ml
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:08:16 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33187)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k5U0k-0001W0-Gp
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:08:16 -0400
+Received: by mail-pf1-x444.google.com with SMTP id u20so7591898pfn.0
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 06:08:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id;
+ bh=lNAlyUx1KKN8L+QHc/YPMFz4nZUQ5XpYyE5kBhBIVSo=;
+ b=FOPRr3cSs9SNy+aDRULlVzPVlHNz6A7Zvoo3cdZC1b4l8a7kI0TYWMM3XbvQW8ouzP
+ uo3jlgSyhQ4bgmQU07WpM5VU27NWP/tTdsSM2zkF5JnEYHa0sV3fpS0AYBjca0aRgww0
+ f0BhE0coOowR1B3pALUmk+GznWD+DktTLlonXkyqY8eOCYN0/OFdQ2W9hom2E67moMMI
+ nxpZxd0h0wdVP5NcKJczV99wGzOyFmLfQaNudNWKFl+8Z7DQBVM5yNjWr7rHUmdXfT0B
+ 9BctSjcvHbDx9JMii1uV0dZkGQagHWfsya1c5sno6DSoo8fYljn3BDyR2K6lZsDga98v
+ 5SMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=lNAlyUx1KKN8L+QHc/YPMFz4nZUQ5XpYyE5kBhBIVSo=;
+ b=Gvpvxp4JXU/xYjMfe+iIXv2tH6+rF8Be0qgHpNDXrwwe//rxa/0HlCA7eO8otoIL1v
+ d8txZqSGT9pjlFGdXp9jmNJPT0mfI4Tfk0gUuDi38+kGeIoHt+5pl1gBRFxGBWIyVYL5
+ vlMPm32qc66+CHfBOs3xraRf2VXD0MSUqy0OHl4qTxl5Fm0kaMaSyUMH3Q94m1G2Vrdm
+ 41JRM7Vc/fnrWIt97ywGy2q3o7E82xK5WHSKAgyZRqyAiSxSQvMj5X2xCoXaUoC6DDjM
+ TwyIHvjP98KVqf09nX6z4RHPRF5T4d+Cb0n16TEzvmf8x1Ga0DkRVwynV8Xn0JAiGaRS
+ hOCQ==
+X-Gm-Message-State: AOAM530tT4C3qIkgTI5rH2w9zw3CoVbGnLxXcf22eyC8jdAKQsWjK7PK
+ rtqXq7XliLwFQ2ym62EZwBE0Wcf97VTr7w==
+X-Google-Smtp-Source: ABdhPJwiaU7n94OptQi8FleTQD0tL4Tkj2Zkqaegts8ebdZtDMHn8sc06WNCv3CMZVEPetaYQI4+6A==
+X-Received: by 2002:aa7:8608:: with SMTP id p8mr5956484pfn.62.1597151291512;
+ Tue, 11 Aug 2020 06:08:11 -0700 (PDT)
+Received: from localhost.localdomain ([115.96.145.67])
+ by smtp.gmail.com with ESMTPSA id c15sm25124281pfo.115.2020.08.11.06.08.06
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 11 Aug 2020 06:08:10 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] Introduce a new flag for piix to disable root bus PCI hotplug
+Date: Tue, 11 Aug 2020 18:37:55 +0530
+Message-Id: <1597151275-75653-1-git-send-email-ani@anisinha.ca>
+X-Mailer: git-send-email 2.7.4
+Received-SPF: none client-ip=2607:f8b0:4864:20::444;
+ envelope-from=ani@anisinha.ca; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -160,84 +91,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org,
- virtualization@lists.linux-foundation.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, ani@anisinha.ca,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/08/2020 14:53, Martin Wilck wrote:
-> On Tue, 2020-08-11 at 14:39 +0200, Laurent Vivier wrote:
->> On 11/08/2020 14:22, Martin Wilck wrote:
->>> On Tue, 2020-08-11 at 14:02 +0200, Laurent Vivier wrote:
->>>>>>  drivers/char/hw_random/virtio-rng.c | 14 ++++++++++++++
->>>>>>  1 file changed, 14 insertions(+)
->>>>>>
->>>>>> diff --git a/drivers/char/hw_random/virtio-rng.c
->>>>>> b/drivers/char/hw_random/virtio-rng.c
->>>>>> index 79a6e47b5fbc..984713b35892 100644
->>>>>> --- a/drivers/char/hw_random/virtio-rng.c
->>>>>> +++ b/drivers/char/hw_random/virtio-rng.c
->>>>>> @@ -59,6 +59,20 @@ static int virtio_read(struct hwrng *rng,
->>>>>> void
->>>>>> *buf, size_t size, bool wait)
->>>>>>  	if (vi->hwrng_removed)
->>>>>>  		return -ENODEV;
->>>>>>  
->>>>>> +	/*
->>>>>> +	 * If the previous call was non-blocking, we may have
->>>>>> got some
->>>>>> +	 * randomness already.
->>>>>> +	 */
->>>>>> +	if (vi->busy && completion_done(&vi->have_data)) {
->>>>>> +		unsigned int len;
->>>>>> +
->>>>>> +		vi->busy = false;
->>>>>> +		len = vi->data_avail > size ? size : vi-
->>>>>>> data_avail;
->>>>>> +		vi->data_avail -= len;
->>>>
->>>> You don't need to modify data_avail. As busy is set to false, the
->>>> buffer
->>>> will be reused. and it is always overwritten by
->>>> virtqueue_get_buf().
->>>> And moreover, if it was reused it would be always the beginning.
->>>
->>> Ok.
->>>
->>>>>> +		if (len)
->>>>>> +			return len;
->>>>>> +	}
->>>>>> +
->>>>>>  	if (!vi->busy) {
->>>>>>  		vi->busy = true;
->>>>>>  		reinit_completion(&vi->have_data);
->>>>>>
->>>>
->>>> Why don't you modify only the wait case?
->>>>
->>>> Something like:
->>>>
->>>> 	if (!wait && !completion_done(&vi->have_data)) {
->>>> 		return 0;
->>>>         }
->>>>
->>>> then at the end you can do "return min(size, vi->data_avail);".
->>>
->>> Sorry, I don't understand what you mean. Where would you insert the
->>> above "if" clause? Are you saying I should call
->>> wait_for_completion_killable() also in the (!wait) case?
->>
->> Yes, but only if a the completion is done, so it will not wait.
->>
-> 
-> Slowly getting there, thanks for your patience. Yes, I guess this would
-> work, too. I'll test and get back to you.
+We introduce a new global flag for PIIX with which we can turn on or off PCI
+device hotplug on the root bus. This flag can be used to prevent all PCI
+devices from getting hotplugged or unplugged from the root PCI bus.
 
-No problem. This code is tricky and it took me several months to really
-start to understand it ...
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
+---
+ hw/acpi/piix4.c      |  3 +++
+ hw/i386/acpi-build.c | 23 ++++++++++++++++++-----
+ 2 files changed, 21 insertions(+), 5 deletions(-)
 
-Thanks,
-Laurent
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index 26bac4f..94ec35a 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
+ 
+     AcpiPciHpState acpi_pci_hotplug;
+     bool use_acpi_hotplug_bridge;
++    bool use_acpi_root_pci_hotplug;
+ 
+     uint8_t disable_s3;
+     uint8_t disable_s4;
+@@ -635,6 +636,8 @@ static Property piix4_pm_properties[] = {
+     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
+     DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
+                      use_acpi_hotplug_bridge, true),
++    DEFINE_PROP_BOOL("acpi-root-pci-hotplug", PIIX4PMState,
++                     use_acpi_root_pci_hotplug, true),
+     DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
+                      acpi_memory_hotplug.is_enabled, true),
+     DEFINE_PROP_END_OF_LIST(),
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index b7bcbbb..1881009 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
+     bool s3_disabled;
+     bool s4_disabled;
+     bool pcihp_bridge_en;
++    bool pcihp_root_en;
+     uint8_t s4_val;
+     AcpiFadtData fadt;
+     uint16_t cpu_hp_io_base;
+@@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+     pm->pcihp_bridge_en =
+         object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
+                                  NULL);
++    pm->pcihp_root_en =
++        object_property_get_bool(obj, "acpi-root-pci-hotplug", NULL);
++
+ }
+ 
+ static void acpi_get_misc_info(AcpiMiscInfo *info)
+@@ -337,14 +341,18 @@ static void build_append_pcihp_notify_entry(Aml *method, int slot)
+ }
+ 
+ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+-                                         bool pcihp_bridge_en)
++                                         bool pcihp_bridge_en,
++                                         bool pcihp_root_en)
+ {
+     Aml *dev, *notify_method = NULL, *method;
+     QObject *bsel;
+     PCIBus *sec;
+     int i;
++    bool root_bus = pci_bus_is_root(bus);
++    bool root_pcihp_disabled = (root_bus && !pcihp_root_en);
+ 
+-    bsel = object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PROP_BSEL, NULL);
++    bsel = object_property_get_qobject(OBJECT(bus),
++                                       ACPI_PCIHP_PROP_BSEL, NULL);
+     if (bsel) {
+         uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
+ 
+@@ -361,6 +369,9 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+         bool bridge_in_acpi;
+ 
+         if (!pdev) {
++            /* skip if pci hotplug for the root bus is disabled */
++            if (root_pcihp_disabled)
++                continue;
+             if (bsel) { /* add hotplug slots for non present devices */
+                 dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
+                 aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+@@ -419,7 +430,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+             method = aml_method("_S3D", 0, AML_NOTSERIALIZED);
+             aml_append(method, aml_return(aml_int(s3d)));
+             aml_append(dev, method);
+-        } else if (hotplug_enabled_dev) {
++        } else if (hotplug_enabled_dev && !root_pcihp_disabled) {
+             /* add _SUN/_EJ0 to make slot hotpluggable  */
+             aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+ 
+@@ -439,7 +450,8 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+              */
+             PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
+ 
+-            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en);
++            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en,
++                                         pcihp_root_en);
+         }
+         /* slot descriptor has been composed, add it into parent context */
+         aml_append(parent_scope, dev);
+@@ -1818,7 +1830,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         if (bus) {
+             Aml *scope = aml_scope("PCI0");
+             /* Scan all PCI buses. Generate tables to support hotplug. */
+-            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
++            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en,
++                                         pm->pcihp_root_en);
+ 
+             if (TPM_IS_TIS_ISA(tpm)) {
+                 if (misc->tpm_version == TPM_VERSION_2_0) {
+-- 
+2.7.4
 
 
