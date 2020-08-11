@@ -2,50 +2,50 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25971C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C86C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:04:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C674A206DC
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:04:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C674A206DC
+	by mail.kernel.org (Postfix) with ESMTPS id C12A3206DC
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:04:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C12A3206DC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5bS2-00041G-RP
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 17:04:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51954)
+	id 1k5bS5-00045P-QA
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 17:04:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5bQj-0002TJ-Iq
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:03:33 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57536)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5bQk-0002TQ-LI
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:03:34 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57588)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5bQg-0001bm-R0
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:03:33 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5bQh-0001br-DZ
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:03:34 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 0AB3FAF7F;
- Tue, 11 Aug 2020 21:03:50 +0000 (UTC)
+ by mx2.suse.de (Postfix) with ESMTP id 2FF97AF8F;
+ Tue, 11 Aug 2020 21:03:51 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [RFC v4 00/14] QEMU cpus.c refactoring part2
-Date: Tue, 11 Aug 2020 23:03:12 +0200
-Message-Id: <20200811210326.4425-1-cfontana@suse.de>
+Subject: [RFC v4 02/14] cpus: prepare new CpusAccel cpu accelerator interface
+Date: Tue, 11 Aug 2020 23:03:14 +0200
+Message-Id: <20200811210326.4425-3-cfontana@suse.de>
 X-Mailer: git-send-email 2.16.4
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200811210326.4425-1-cfontana@suse.de>
+References: <20200811210326.4425-1-cfontana@suse.de>
 Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
  helo=mx2.suse.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:05:49
@@ -79,324 +79,717 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Motivation and higher level steps:
-
-https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
-
-RFC v3 -> v4:
-
-* added patch 9: cleanup unneeded includes
-
-* added patch 10: add handle_interrupt to the interface (Roman)
-
-* added patch 11-14: remove accelerator specific internal functions
-  from global includes (Roman)
-
-* in patch 2, removed leftover "if hvf_enabled" hunk
-
-* in patch 2, convert if (!tcg_enabled) with more punctual if (hax_enabled)
-  when eating dummy APC
-
-----
-
-RFC v2 -> v3:
-
-* provided defaults for all methods.
-  Only create_vcpu_thread is now a mandatory field. (Paolo)
-
-* separated new CpusAccel patch from its first user, new patch nr. 2:
-  "cpus: prepare new CpusAccel cpu accelerator interface"
-
-* new CpusAccel methods: get_virtual_clock and get_elapsed_ticks.
-  (Paolo)
-
-  In this series, get_virtual_clock has a separate implementation
-  between TCG/icount and qtest,
-  while get_elapsed_ticks only returns a virtual counter for icount.
-
-  Looking for more comments in this area.
-
-----
-
-RFC v1 -> v2:
-
-* split the cpus.c accelerator refactoring into 6 patches.
-
-* other minor changes to be able to proceed step by step.
-
-----
-
-* Rebased on commit 255ae6e2158c743717bed76c9a2365ee4bcd326e,
-"replay: notify the main loop when there are no instructions"
-
-[SPLIT into part1 and part2]
-
-----
-
-v6 -> v7:
-
-* rebased changes on top of Pavel Dovgalyuk changes to dma-helpers.c
-  "icount: make dma reads deterministic"
-
-----
-
-v5 -> v6:
-
-* rebased changes on top of Emilio G. Cota changes to cpus.c
-  "cpu: convert queued work to a QSIMPLEQ"
-
-* keep a pointer in cpus.c instead of a copy of CpusAccel
-  (Alex)
-
-----
-
-
-v4 -> v5: rebase on latest master
-
-* rebased changes on top of roman series to remove one of the extra states for hvf.
-  (Is the result now functional for HVF?)
-
-* rebased changes on top of icount changes and fixes to icount_configure and
-  the new shift vmstate. (Markus)
-
-v3 -> v4:
-
-* overall: added copyright headers to all files that were missing them
-  (used copyright and license of the module the stuff was extracted from).
-  For the new interface files, added SUSE LLC.
-
-* 1/4 (move softmmu only files from root):
-
-  MAINTAINERS: moved softmmu/cpus.c to its final location (from patch 2)
-
-* 2/4 (cpu-throttle):
-
-  MAINTAINERS (to patch 1),
-  copyright Fabrice Bellard and license from cpus.c
-
-* 3/4 (cpu-timers, icount):
-
-  - MAINTAINERS: add cpu-timers.c and icount.c to Paolo
-
-  - break very long lines (patchew)
-
-  - add copyright SUSE LLC, GPLv2 to cpu-timers.h
-
-  - add copyright Fabrice Bellard and license from cpus.c to timers-state.h
-    as it is lifted from cpus.c
-
-  - vl.c: in configure_accelerators bail out if icount_enabled()
-    and !tcg_enabled() as qtest does not enable icount anymore.
-
-* 4/4 (accel stuff to accel):
-
-  - add copyright SUSE LLC to files that mostly only consist of the
-    new interface. Add whatever copyright was in the accelerator code
-    if instead they mostly consist of accelerator code.
-
-  - change a comment to mention the result of the AccelClass experiment
-
-  - moved qtest accelerator into accel/qtest/ , make it like the others.
-
-  - rename xxx-cpus-interface to xxx-cpus (remove "interface" from names)
-
-  - rename accel_int to cpus_accel
-
-  - rename CpusAccel functions from cpu_synchronize_* to synchronize_*
-
-
---------
-
-v2 -> v3:
-
-* turned into a 4 patch series, adding a first patch moving
-  softmmu code currently in top_srcdir to softmmu/
-
-* cpu-throttle: moved to softmmu/
-
-* cpu-timers, icount:
-
-  - moved to softmmu/
-
-  - fixed assumption of qtest_enabled() => icount_enabled()
-  causing the failure of check-qtest-arm goal, in test-arm-mptimer.c
-
-  Fix is in hw/core/ptimer.c,
-
-  where the artificial timeout rate limit should not be applied
-  under qtest_enabled(), in a similar way to how it is not applied
-  for icount_enabled().
-
-* CpuAccelInterface: no change.
-
-
---------
-
-
-v1 -> v2:
-
-* 1/3 (cpu-throttle): provide a description in the commit message
-
-* 2/3 (cpu-timers, icount): in this v2 separate icount from cpu-timers,
-  as icount is actually TCG-specific. Only build it under CONFIG_TCG.
-
-  To do this, qtest had to be detached from icount. To this end, a
-  trivial global counter for qtest has been introduced.
-
-* 3/3 (CpuAccelInterface): provided a description.
-
-This is point 8) in that plan. The idea is to extract the unrelated parts
-in cpus, and register interfaces from each single accelerator to the main
-cpus module (cpus.c).
-
-While doing this RFC, I noticed some assumptions about Windows being
-either TCG or HAX (not considering WHPX) that might need to be revisited.
-I added a comment there.
-
-The thing builds successfully based on Linux cross-compilations for
-windows/hax, windows/whpx, and I got a good build on Darwin/hvf.
-
-Tests run successully for tcg and kvm configurations, but did not test on
-windows or darwin.
-
-Welcome your feedback and help on this,
-
-Claudio
-
-Claudio Fontana (14):
-  cpu-timers, icount: new modules
-  cpus: prepare new CpusAccel cpu accelerator interface
-  cpus: extract out TCG-specific code to accel/tcg
-  cpus: extract out qtest-specific code to accel/qtest
-  cpus: extract out kvm-specific code to accel/kvm
-  cpus: extract out hax-specific code to target/i386/
-  cpus: extract out whpx-specific code to target/i386/
-  cpus: extract out hvf-specific code to target/i386/hvf/
-  cpus: cleanup now unneeded includes
-  cpus: add handle_interrupt to the CpusAccel interface
-  hvf: remove hvf specific functions from global includes
-  whpx: remove whpx specific functions from global includes
-  hax: remove hax specific functions from global includes
-  kvm: remove kvm specific functions from global includes
-
- MAINTAINERS                    |    5 +-
- accel/Makefile.objs            |    2 +-
- accel/kvm/Makefile.objs        |    2 +
- accel/kvm/kvm-all.c            |   15 +-
- accel/kvm/kvm-cpus.c           |   89 +++
- accel/kvm/kvm-cpus.h           |   17 +
- accel/kvm/kvm-int.h            |   23 +
- accel/qtest/Makefile.objs      |    2 +
- accel/qtest/qtest-cpus.c       |   91 +++
- accel/qtest/qtest-cpus.h       |   17 +
- accel/{ => qtest}/qtest.c      |   13 +-
- accel/stubs/Makefile.objs      |    2 -
- accel/stubs/hax-stub.c         |   10 -
- accel/stubs/hvf-stub.c         |   30 -
- accel/stubs/kvm-stub.c         |   23 -
- accel/stubs/whpx-stub.c        |   47 --
- accel/tcg/Makefile.objs        |    1 +
- accel/tcg/cpu-exec.c           |   43 +-
- accel/tcg/tcg-all.c            |   43 +-
- accel/tcg/tcg-cpus.c           |  569 ++++++++++++++
- accel/tcg/tcg-cpus.h           |   17 +
- accel/tcg/translate-all.c      |    3 +-
- dma-helpers.c                  |    4 +-
- docs/replay.txt                |    6 +-
- exec.c                         |    4 -
- hw/core/cpu.c                  |   14 +-
- hw/core/ptimer.c               |    8 +-
- hw/i386/x86.c                  |    3 +-
- include/exec/cpu-all.h         |    4 +
- include/exec/exec-all.h        |    4 +-
- include/hw/core/cpu.h          |   14 -
- include/qemu/timer.h           |   24 +-
- include/sysemu/cpu-timers.h    |   84 ++
- include/sysemu/cpus.h          |   50 +-
- include/sysemu/hax.h           |   17 -
- include/sysemu/hvf.h           |    8 -
- include/sysemu/hw_accel.h      |   69 +-
- include/sysemu/kvm.h           |    7 -
- include/sysemu/qtest.h         |    2 +
- include/sysemu/replay.h        |    4 +-
- include/sysemu/whpx.h          |   19 -
- replay/replay.c                |    6 +-
- softmmu/Makefile.objs          |    2 +
- softmmu/cpu-timers.c           |  279 +++++++
- softmmu/cpus.c                 | 1684 +++-------------------------------------
- softmmu/icount.c               |  497 ++++++++++++
- softmmu/qtest.c                |   34 +-
- softmmu/timers-state.h         |   69 ++
- softmmu/vl.c                   |   11 +-
- stubs/Makefile.objs            |    6 +-
- stubs/clock-warp.c             |    7 -
- stubs/cpu-get-clock.c          |    3 +-
- stubs/cpu-get-icount.c         |   21 -
- stubs/cpu-synchronize-state.c  |   15 +
- stubs/cpus-get-virtual-clock.c |    8 +
- stubs/icount.c                 |   52 ++
- stubs/qemu-timer-notify-cb.c   |    8 +
- stubs/qtest.c                  |    5 +
- target/alpha/translate.c       |    3 +-
- target/arm/helper.c            |    7 +-
- target/i386/Makefile.objs      |    7 +-
- target/i386/hax-all.c          |   18 +-
- target/i386/hax-cpus.c         |   85 ++
- target/i386/hax-cpus.h         |   17 +
- target/i386/hax-i386.h         |    2 +
- target/i386/hax-int.h          |   41 +
- target/i386/hax-mem.c          |    2 +-
- target/i386/hax-posix.c        |   13 +-
- target/i386/hax-windows.c      |   22 +-
- target/i386/hax-windows.h      |    2 +
- target/i386/hvf/Makefile.objs  |    2 +-
- target/i386/hvf/hvf-cpus.c     |  132 ++++
- target/i386/hvf/hvf-cpus.h     |   17 +
- target/i386/hvf/hvf-int.h      |   24 +
- target/i386/hvf/hvf.c          |   13 +-
- target/i386/hvf/x86hvf.c       |    2 +
- target/i386/hvf/x86hvf.h       |    1 -
- target/i386/whpx-all.c         |   14 +-
- target/i386/whpx-cpus.c        |   97 +++
- target/i386/whpx-cpus.h        |   17 +
- target/i386/whpx-int.h         |   32 +
- target/riscv/csr.c             |    8 +-
- tests/ptimer-test-stubs.c      |    7 +-
- tests/test-timed-average.c     |    2 +-
- util/main-loop.c               |   12 +-
- util/qemu-timer.c              |   14 +-
- 86 files changed, 2703 insertions(+), 2026 deletions(-)
- create mode 100644 accel/kvm/kvm-cpus.c
- create mode 100644 accel/kvm/kvm-cpus.h
- create mode 100644 accel/kvm/kvm-int.h
- create mode 100644 accel/qtest/Makefile.objs
- create mode 100644 accel/qtest/qtest-cpus.c
- create mode 100644 accel/qtest/qtest-cpus.h
- rename accel/{ => qtest}/qtest.c (81%)
- delete mode 100644 accel/stubs/hvf-stub.c
- delete mode 100644 accel/stubs/whpx-stub.c
- create mode 100644 accel/tcg/tcg-cpus.c
- create mode 100644 accel/tcg/tcg-cpus.h
- create mode 100644 include/sysemu/cpu-timers.h
- create mode 100644 softmmu/cpu-timers.c
- create mode 100644 softmmu/icount.c
- create mode 100644 softmmu/timers-state.h
- delete mode 100644 stubs/clock-warp.c
- delete mode 100644 stubs/cpu-get-icount.c
+The new interface starts unused, will start being used by the
+next patches.
+
+It provides methods for each accelerator to start a vcpu, kick a vcpu,
+synchronize state, get cpu virtual clock and elapsed ticks.
+
+In qemu_wait_io_event, make it clear that APC is used only for HAX
+on Windows.
+
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+---
+ hw/core/cpu.c                  |   1 +
+ hw/i386/x86.c                  |   2 +-
+ include/sysemu/cpu-timers.h    |   9 +-
+ include/sysemu/cpus.h          |  36 ++++++++
+ include/sysemu/hw_accel.h      |  69 ++-------------
+ softmmu/cpu-timers.c           |   9 +-
+ softmmu/cpus.c                 | 195 ++++++++++++++++++++++++++++++++---------
+ stubs/Makefile.objs            |   2 +
+ stubs/cpu-synchronize-state.c  |  15 ++++
+ stubs/cpus-get-virtual-clock.c |   8 ++
+ util/qemu-timer.c              |   8 +-
+ 11 files changed, 231 insertions(+), 123 deletions(-)
  create mode 100644 stubs/cpu-synchronize-state.c
  create mode 100644 stubs/cpus-get-virtual-clock.c
- create mode 100644 stubs/icount.c
- create mode 100644 stubs/qemu-timer-notify-cb.c
- create mode 100644 target/i386/hax-cpus.c
- create mode 100644 target/i386/hax-cpus.h
- create mode 100644 target/i386/hax-int.h
- create mode 100644 target/i386/hvf/hvf-cpus.c
- create mode 100644 target/i386/hvf/hvf-cpus.h
- create mode 100644 target/i386/hvf/hvf-int.h
- create mode 100644 target/i386/whpx-cpus.c
- create mode 100644 target/i386/whpx-cpus.h
- create mode 100644 target/i386/whpx-int.h
 
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index 594441a150..b389a312df 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -33,6 +33,7 @@
+ #include "hw/qdev-properties.h"
+ #include "trace-root.h"
+ #include "qemu/plugin.h"
++#include "sysemu/hw_accel.h"
+ 
+ CPUInterruptHandler cpu_interrupt_handler;
+ 
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 58cf2229d5..00c35bad7e 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -264,7 +264,7 @@ static long get_file_size(FILE *f)
+ /* TSC handling */
+ uint64_t cpu_get_tsc(CPUX86State *env)
+ {
+-    return cpu_get_ticks();
++    return cpus_get_elapsed_ticks();
+ }
+ 
+ /* IRQ handling */
+diff --git a/include/sysemu/cpu-timers.h b/include/sysemu/cpu-timers.h
+index 07d724672f..cb83cc5584 100644
+--- a/include/sysemu/cpu-timers.h
++++ b/include/sysemu/cpu-timers.h
+@@ -64,9 +64,8 @@ void cpu_enable_ticks(void);
+ void cpu_disable_ticks(void);
+ 
+ /*
+- * return the time elapsed in VM between vm_start and vm_stop.  Unless
+- * icount is active, cpu_get_ticks() uses units of the host CPU cycle
+- * counter.
++ * return the time elapsed in VM between vm_start and vm_stop.
++ * cpu_get_ticks() uses units of the host CPU cycle counter.
+  */
+ int64_t cpu_get_ticks(void);
+ 
+@@ -78,4 +77,8 @@ int64_t cpu_get_clock(void);
+ 
+ void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
+ 
++/* get the VIRTUAL clock and VM elapsed ticks via the cpus accel interface */
++int64_t cpus_get_virtual_clock(void);
++int64_t cpus_get_elapsed_ticks(void);
++
+ #endif /* SYSEMU_CPU_TIMERS_H */
+diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+index 149de000a0..db196dd96f 100644
+--- a/include/sysemu/cpus.h
++++ b/include/sysemu/cpus.h
+@@ -4,7 +4,43 @@
+ #include "qemu/timer.h"
+ 
+ /* cpus.c */
++
++/* CPU execution threads */
++
++typedef struct CpusAccel {
++    void (*create_vcpu_thread)(CPUState *cpu); /* MANDATORY */
++    void (*kick_vcpu_thread)(CPUState *cpu);
++
++    void (*synchronize_post_reset)(CPUState *cpu);
++    void (*synchronize_post_init)(CPUState *cpu);
++    void (*synchronize_state)(CPUState *cpu);
++    void (*synchronize_pre_loadvm)(CPUState *cpu);
++
++    int64_t (*get_virtual_clock)(void);
++    int64_t (*get_elapsed_ticks)(void);
++} CpusAccel;
++
++/* register accel-specific cpus interface implementation */
++void cpus_register_accel(CpusAccel *i);
++
++/* interface available for cpus accelerator threads */
++
++/* For temporary buffers for forming a name */
++#define VCPU_THREAD_NAME_SIZE 16
++
++void cpus_kick_thread(CPUState *cpu);
++bool cpu_work_list_empty(CPUState *cpu);
++bool cpu_thread_is_idle(CPUState *cpu);
+ bool all_cpu_threads_idle(void);
++bool cpu_can_run(CPUState *cpu);
++void qemu_wait_io_event_common(CPUState *cpu);
++void qemu_wait_io_event(CPUState *cpu);
++void cpu_thread_signal_created(CPUState *cpu);
++void cpu_thread_signal_destroyed(CPUState *cpu);
++void cpu_handle_guest_debug(CPUState *cpu);
++
++/* end interface for cpus accelerator threads */
++
+ bool qemu_in_vcpu_thread(void);
+ void qemu_init_cpu_loop(void);
+ void resume_all_vcpus(void);
+diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+index e128f8b06b..ffed6192a3 100644
+--- a/include/sysemu/hw_accel.h
++++ b/include/sysemu/hw_accel.h
+@@ -1,5 +1,5 @@
+ /*
+- * QEMU Hardware accelertors support
++ * QEMU Hardware accelerators support
+  *
+  * Copyright 2016 Google, Inc.
+  *
+@@ -17,68 +17,9 @@
+ #include "sysemu/hvf.h"
+ #include "sysemu/whpx.h"
+ 
+-static inline void cpu_synchronize_state(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_state(cpu);
+-    }
+-    if (hax_enabled()) {
+-        hax_cpu_synchronize_state(cpu);
+-    }
+-    if (hvf_enabled()) {
+-        hvf_cpu_synchronize_state(cpu);
+-    }
+-    if (whpx_enabled()) {
+-        whpx_cpu_synchronize_state(cpu);
+-    }
+-}
+-
+-static inline void cpu_synchronize_post_reset(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_post_reset(cpu);
+-    }
+-    if (hax_enabled()) {
+-        hax_cpu_synchronize_post_reset(cpu);
+-    }
+-    if (hvf_enabled()) {
+-        hvf_cpu_synchronize_post_reset(cpu);
+-    }
+-    if (whpx_enabled()) {
+-        whpx_cpu_synchronize_post_reset(cpu);
+-    }
+-}
+-
+-static inline void cpu_synchronize_post_init(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_post_init(cpu);
+-    }
+-    if (hax_enabled()) {
+-        hax_cpu_synchronize_post_init(cpu);
+-    }
+-    if (hvf_enabled()) {
+-        hvf_cpu_synchronize_post_init(cpu);
+-    }
+-    if (whpx_enabled()) {
+-        whpx_cpu_synchronize_post_init(cpu);
+-    }
+-}
+-
+-static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_pre_loadvm(cpu);
+-    }
+-    if (hax_enabled()) {
+-        hax_cpu_synchronize_pre_loadvm(cpu);
+-    }
+-    if (hvf_enabled()) {
+-        hvf_cpu_synchronize_pre_loadvm(cpu);
+-    }
+-    if (whpx_enabled()) {
+-        whpx_cpu_synchronize_pre_loadvm(cpu);
+-    }
+-}
++void cpu_synchronize_state(CPUState *cpu);
++void cpu_synchronize_post_reset(CPUState *cpu);
++void cpu_synchronize_post_init(CPUState *cpu);
++void cpu_synchronize_pre_loadvm(CPUState *cpu);
+ 
+ #endif /* QEMU_HW_ACCEL_H */
+diff --git a/softmmu/cpu-timers.c b/softmmu/cpu-timers.c
+index 64addb315d..3e1da79735 100644
+--- a/softmmu/cpu-timers.c
++++ b/softmmu/cpu-timers.c
+@@ -61,18 +61,13 @@ static int64_t cpu_get_ticks_locked(void)
+ }
+ 
+ /*
+- * return the time elapsed in VM between vm_start and vm_stop.  Unless
+- * icount is active, cpu_get_ticks() uses units of the host CPU cycle
+- * counter.
++ * return the time elapsed in VM between vm_start and vm_stop.
++ * cpu_get_ticks() uses units of the host CPU cycle counter.
+  */
+ int64_t cpu_get_ticks(void)
+ {
+     int64_t ticks;
+ 
+-    if (icount_enabled()) {
+-        return icount_get();
+-    }
+-
+     qemu_spin_lock(&timers_state.vm_clock_lock);
+     ticks = cpu_get_ticks_locked();
+     qemu_spin_unlock(&timers_state.vm_clock_lock);
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index 54fdb2761c..c70535ea8f 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -87,7 +87,7 @@ bool cpu_is_stopped(CPUState *cpu)
+     return cpu->stopped || !runstate_is_running();
+ }
+ 
+-static inline bool cpu_work_list_empty(CPUState *cpu)
++bool cpu_work_list_empty(CPUState *cpu)
+ {
+     bool ret;
+ 
+@@ -97,7 +97,7 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
+     return ret;
+ }
+ 
+-static bool cpu_thread_is_idle(CPUState *cpu)
++bool cpu_thread_is_idle(CPUState *cpu)
+ {
+     if (cpu->stop || !cpu_work_list_empty(cpu)) {
+         return false;
+@@ -215,6 +215,11 @@ void hw_error(const char *fmt, ...)
+     abort();
+ }
+ 
++/*
++ * The chosen accelerator is supposed to register this.
++ */
++static CpusAccel *cpus_accel;
++
+ void cpu_synchronize_all_states(void)
+ {
+     CPUState *cpu;
+@@ -251,6 +256,102 @@ void cpu_synchronize_all_pre_loadvm(void)
+     }
+ }
+ 
++void cpu_synchronize_state(CPUState *cpu)
++{
++    if (cpus_accel && cpus_accel->synchronize_state) {
++        cpus_accel->synchronize_state(cpu);
++    }
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_state(cpu);
++    }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_state(cpu);
++    }
++    if (whpx_enabled()) {
++        whpx_cpu_synchronize_state(cpu);
++    }
++}
++
++void cpu_synchronize_post_reset(CPUState *cpu)
++{
++    if (cpus_accel && cpus_accel->synchronize_post_reset) {
++        cpus_accel->synchronize_post_reset(cpu);
++    }
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_post_reset(cpu);
++    }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_post_reset(cpu);
++    }
++    if (whpx_enabled()) {
++        whpx_cpu_synchronize_post_reset(cpu);
++    }
++}
++
++void cpu_synchronize_post_init(CPUState *cpu)
++{
++    if (cpus_accel && cpus_accel->synchronize_post_init) {
++        cpus_accel->synchronize_post_init(cpu);
++    }
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_post_init(cpu);
++    }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_post_init(cpu);
++    }
++    if (whpx_enabled()) {
++        whpx_cpu_synchronize_post_init(cpu);
++    }
++}
++
++void cpu_synchronize_pre_loadvm(CPUState *cpu)
++{
++    if (cpus_accel && cpus_accel->synchronize_pre_loadvm) {
++        cpus_accel->synchronize_pre_loadvm(cpu);
++    }
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_pre_loadvm(cpu);
++    }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_pre_loadvm(cpu);
++    }
++    if (hvf_enabled()) {
++        hvf_cpu_synchronize_pre_loadvm(cpu);
++    }
++    if (whpx_enabled()) {
++        whpx_cpu_synchronize_pre_loadvm(cpu);
++    }
++}
++
++int64_t cpus_get_virtual_clock(void)
++{
++    if (cpus_accel && cpus_accel->get_virtual_clock) {
++        return cpus_accel->get_virtual_clock();
++    }
++    if (icount_enabled()) {
++        return icount_get();
++    } else if (qtest_enabled()) { /* for qtest_clock_warp */
++        return qtest_get_virtual_clock();
++    }
++    return cpu_get_clock();
++}
++
++/*
++ * return the time elapsed in VM between vm_start and vm_stop.  Unless
++ * icount is active, cpu_get_ticks() uses units of the host CPU cycle
++ * counter.
++ */
++int64_t cpus_get_elapsed_ticks(void)
++{
++    if (cpus_accel && cpus_accel->get_elapsed_ticks) {
++        return cpus_accel->get_elapsed_ticks();
++    }
++    if (icount_enabled()) {
++        return icount_get();
++    }
++    return cpu_get_ticks();
++}
++
+ static int do_vm_stop(RunState state, bool send_stop)
+ {
+     int ret = 0;
+@@ -279,7 +380,7 @@ int vm_shutdown(void)
+     return do_vm_stop(RUN_STATE_SHUTDOWN, false);
+ }
+ 
+-static bool cpu_can_run(CPUState *cpu)
++bool cpu_can_run(CPUState *cpu)
+ {
+     if (cpu->stop) {
+         return false;
+@@ -290,7 +391,7 @@ static bool cpu_can_run(CPUState *cpu)
+     return true;
+ }
+ 
+-static void cpu_handle_guest_debug(CPUState *cpu)
++void cpu_handle_guest_debug(CPUState *cpu)
+ {
+     gdb_set_stop_cpu(cpu);
+     qemu_system_debug_request();
+@@ -396,7 +497,7 @@ static void qemu_cpu_stop(CPUState *cpu, bool exit)
+     qemu_cond_broadcast(&qemu_pause_cond);
+ }
+ 
+-static void qemu_wait_io_event_common(CPUState *cpu)
++void qemu_wait_io_event_common(CPUState *cpu)
+ {
+     atomic_mb_set(&cpu->thread_kicked, false);
+     if (cpu->stop) {
+@@ -421,7 +522,7 @@ static void qemu_tcg_rr_wait_io_event(void)
+     }
+ }
+ 
+-static void qemu_wait_io_event(CPUState *cpu)
++void qemu_wait_io_event(CPUState *cpu)
+ {
+     bool slept = false;
+ 
+@@ -437,8 +538,8 @@ static void qemu_wait_io_event(CPUState *cpu)
+     }
+ 
+ #ifdef _WIN32
+-    /* Eat dummy APC queued by qemu_cpu_kick_thread.  */
+-    if (!tcg_enabled()) {
++    /* Eat dummy APC queued by cpus_kick_thread. */
++    if (hax_enabled()) {
+         SleepEx(0, TRUE);
+     }
+ #endif
+@@ -467,8 +568,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+     kvm_init_cpu_signals(cpu);
+ 
+     /* signal CPU creation */
+-    cpu->created = true;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     do {
+@@ -482,8 +582,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+     } while (!cpu->unplug || cpu_can_run(cpu));
+ 
+     qemu_kvm_destroy_vcpu(cpu);
+-    cpu->created = false;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_destroyed(cpu);
+     qemu_mutex_unlock_iothread();
+     rcu_unregister_thread();
+     return NULL;
+@@ -511,8 +610,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+     sigaddset(&waitset, SIG_IPI);
+ 
+     /* signal CPU creation */
+-    cpu->created = true;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     do {
+@@ -660,8 +758,7 @@ static void deal_with_unplugged_cpus(void)
+     CPU_FOREACH(cpu) {
+         if (cpu->unplug && !cpu_can_run(cpu)) {
+             qemu_tcg_destroy_vcpu(cpu);
+-            cpu->created = false;
+-            qemu_cond_signal(&qemu_cpu_cond);
++            cpu_thread_signal_destroyed(cpu);
+             break;
+         }
+     }
+@@ -688,9 +785,8 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+     qemu_thread_get_self(cpu->thread);
+ 
+     cpu->thread_id = qemu_get_thread_id();
+-    cpu->created = true;
+     cpu->can_do_io = 1;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     /* wait for initial kick-off after machine start */
+@@ -800,11 +896,9 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+     qemu_thread_get_self(cpu->thread);
+ 
+     cpu->thread_id = qemu_get_thread_id();
+-    cpu->created = true;
+     current_cpu = cpu;
+-
+     hax_init_vcpu(cpu);
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     do {
+@@ -843,8 +937,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+     hvf_init_vcpu(cpu);
+ 
+     /* signal CPU creation */
+-    cpu->created = true;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     do {
+@@ -858,8 +951,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+     } while (!cpu->unplug || cpu_can_run(cpu));
+ 
+     hvf_vcpu_destroy(cpu);
+-    cpu->created = false;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_destroyed(cpu);
+     qemu_mutex_unlock_iothread();
+     rcu_unregister_thread();
+     return NULL;
+@@ -884,8 +976,7 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+     }
+ 
+     /* signal CPU creation */
+-    cpu->created = true;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     do {
+@@ -902,8 +993,7 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+     } while (!cpu->unplug || cpu_can_run(cpu));
+ 
+     whpx_destroy_vcpu(cpu);
+-    cpu->created = false;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_destroyed(cpu);
+     qemu_mutex_unlock_iothread();
+     rcu_unregister_thread();
+     return NULL;
+@@ -936,10 +1026,9 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+     qemu_thread_get_self(cpu->thread);
+ 
+     cpu->thread_id = qemu_get_thread_id();
+-    cpu->created = true;
+     cpu->can_do_io = 1;
+     current_cpu = cpu;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_created(cpu);
+     qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     /* process any pending work */
+@@ -980,14 +1069,13 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+     } while (!cpu->unplug || cpu_can_run(cpu));
+ 
+     qemu_tcg_destroy_vcpu(cpu);
+-    cpu->created = false;
+-    qemu_cond_signal(&qemu_cpu_cond);
++    cpu_thread_signal_destroyed(cpu);
+     qemu_mutex_unlock_iothread();
+     rcu_unregister_thread();
+     return NULL;
+ }
+ 
+-static void qemu_cpu_kick_thread(CPUState *cpu)
++void cpus_kick_thread(CPUState *cpu)
+ {
+ #ifndef _WIN32
+     int err;
+@@ -1017,7 +1105,10 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
+ void qemu_cpu_kick(CPUState *cpu)
+ {
+     qemu_cond_broadcast(cpu->halt_cond);
+-    if (tcg_enabled()) {
++
++    if (cpus_accel && cpus_accel->kick_vcpu_thread) {
++        cpus_accel->kick_vcpu_thread(cpu);
++    } else if (tcg_enabled()) {
+         if (qemu_tcg_mttcg_enabled()) {
+             cpu_exit(cpu);
+         } else {
+@@ -1031,14 +1122,14 @@ void qemu_cpu_kick(CPUState *cpu)
+              */
+             cpu->exit_request = 1;
+         }
+-        qemu_cpu_kick_thread(cpu);
++        cpus_kick_thread(cpu);
+     }
+ }
+ 
+ void qemu_cpu_kick_self(void)
+ {
+     assert(current_cpu);
+-    qemu_cpu_kick_thread(current_cpu);
++    cpus_kick_thread(current_cpu);
+ }
+ 
+ bool qemu_cpu_is_self(CPUState *cpu)
+@@ -1088,6 +1179,21 @@ void qemu_cond_timedwait_iothread(QemuCond *cond, int ms)
+     qemu_cond_timedwait(cond, &qemu_global_mutex, ms);
+ }
+ 
++/* signal CPU creation */
++void cpu_thread_signal_created(CPUState *cpu)
++{
++    cpu->created = true;
++    qemu_cond_signal(&qemu_cpu_cond);
++}
++
++/* signal CPU destruction */
++void cpu_thread_signal_destroyed(CPUState *cpu)
++{
++    cpu->created = false;
++    qemu_cond_signal(&qemu_cpu_cond);
++}
++
++
+ static bool all_vcpus_paused(void)
+ {
+     CPUState *cpu;
+@@ -1163,9 +1269,6 @@ void cpu_remove_sync(CPUState *cpu)
+     qemu_mutex_lock_iothread();
+ }
+ 
+-/* For temporary buffers for forming a name */
+-#define VCPU_THREAD_NAME_SIZE 16
+-
+ static void qemu_tcg_init_vcpu(CPUState *cpu)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+@@ -1286,6 +1389,13 @@ static void qemu_whpx_start_vcpu(CPUState *cpu)
+ #endif
+ }
+ 
++void cpus_register_accel(CpusAccel *ca)
++{
++    assert(ca != NULL);
++    assert(ca->create_vcpu_thread != NULL); /* mandatory */
++    cpus_accel = ca;
++}
++
+ static void qemu_dummy_start_vcpu(CPUState *cpu)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+@@ -1316,7 +1426,10 @@ void qemu_init_vcpu(CPUState *cpu)
+         cpu_address_space_init(cpu, 0, "cpu-memory", cpu->memory);
+     }
+ 
+-    if (kvm_enabled()) {
++    if (cpus_accel) {
++        /* accelerator already implements the CpusAccel interface */
++        cpus_accel->create_vcpu_thread(cpu);
++    } else if (kvm_enabled()) {
+         qemu_kvm_start_vcpu(cpu);
+     } else if (hax_enabled()) {
+         qemu_hax_start_vcpu(cpu);
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index e97ad407fa..16345eec43 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -1,6 +1,7 @@
+ stub-obj-y += blk-commit-all.o
+ stub-obj-y += cmos.o
+ stub-obj-y += cpu-get-clock.o
++stub-obj-y += cpus-get-virtual-clock.o
+ stub-obj-y += qemu-timer-notify-cb.o
+ stub-obj-y += icount.o
+ stub-obj-y += dump.o
+@@ -28,6 +29,7 @@ stub-obj-y += trace-control.o
+ stub-obj-y += vmgenid.o
+ stub-obj-y += vmstate.o
+ stub-obj-$(CONFIG_SOFTMMU) += win32-kbd-hook.o
++stub-obj-y += cpu-synchronize-state.o
+ 
+ #######################################################################
+ # code used by both qemu system emulation and qemu-img
+diff --git a/stubs/cpu-synchronize-state.c b/stubs/cpu-synchronize-state.c
+new file mode 100644
+index 0000000000..3112fe439d
+--- /dev/null
++++ b/stubs/cpu-synchronize-state.c
+@@ -0,0 +1,15 @@
++#include "qemu/osdep.h"
++#include "sysemu/hw_accel.h"
++
++void cpu_synchronize_state(CPUState *cpu)
++{
++}
++void cpu_synchronize_post_reset(CPUState *cpu)
++{
++}
++void cpu_synchronize_post_init(CPUState *cpu)
++{
++}
++void cpu_synchronize_pre_loadvm(CPUState *cpu)
++{
++}
+diff --git a/stubs/cpus-get-virtual-clock.c b/stubs/cpus-get-virtual-clock.c
+new file mode 100644
+index 0000000000..fd447d53f3
+--- /dev/null
++++ b/stubs/cpus-get-virtual-clock.c
+@@ -0,0 +1,8 @@
++#include "qemu/osdep.h"
++#include "sysemu/cpu-timers.h"
++#include "qemu/main-loop.h"
++
++int64_t cpus_get_virtual_clock(void)
++{
++    return cpu_get_clock();
++}
+diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+index db51e68f25..50b325c65b 100644
+--- a/util/qemu-timer.c
++++ b/util/qemu-timer.c
+@@ -635,13 +635,7 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
+         return get_clock();
+     default:
+     case QEMU_CLOCK_VIRTUAL:
+-        if (icount_enabled()) {
+-            return icount_get();
+-        } else if (qtest_enabled()) { /* for qtest_clock_warp */
+-            return qtest_get_virtual_clock();
+-        } else {
+-            return cpu_get_clock();
+-        }
++        return cpus_get_virtual_clock();
+     case QEMU_CLOCK_HOST:
+         return REPLAY_CLOCK(REPLAY_CLOCK_HOST, get_clock_realtime());
+     case QEMU_CLOCK_VIRTUAL_RT:
 -- 
 2.16.4
 
