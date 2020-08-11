@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12431C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 10:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C4A0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 10:12:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA6C12054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 10:12:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA6C12054F
+	by mail.kernel.org (Postfix) with ESMTPS id 44F5A2054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 10:12:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44F5A2054F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5RGE-00030K-VW
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 06:12:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36646)
+	id 1k5RH3-0003rM-Ew
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 06:12:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5RFh-0002a9-Gl
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 06:11:29 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35234)
+ id 1k5RFi-0002aF-8I
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 06:11:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35232)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5RFf-0005rF-FP
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 06:11:29 -0400
+ id 1k5RFf-0005rE-FP
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 06:11:30 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k5RFd-0004dj-J8
+ id 1k5RFd-0004bF-8v
  for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 10:11:25 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8C5662E808D
+ by loganberry.canonical.com (Postfix) with ESMTP id 2BC552E808D
  for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 10:11:25 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Aug 2020 10:04:52 -0000
+Date: Tue, 11 Aug 2020 10:00:44 -0000
 From: "Tony.LI" <1890545@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,7 +53,7 @@ X-Launchpad-Bug-Commenters: ajbennee bigboy0822 pmaydell
 X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
 X-Launchpad-Bug-Modifier: Tony.LI (bigboy0822)
 References: <159670025270.3099.13280483088179052036.malonedeb@gac.canonical.com>
-Message-Id: <159714029272.5932.6550922800623490666.malone@soybean.canonical.com>
+Message-Id: <159714004475.6366.15461155685652148575.malone@soybean.canonical.com>
 Subject: [Bug 1890545] Re: (ARM64) qemu-x86_64+schroot(Debian bullseye) can't
  run chrome and can't load HTML
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -62,7 +62,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c7bae8c9b26729ad48adca70a9a07e0ed6becc32
+X-Launchpad-Hash: 6b303fbfbaef371398292a77ab1c99e953336d2d
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:25:48
@@ -89,22 +89,23 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-And I can get some infomation by "qemu-x86_64-static -d strace".
+$ lspci
+00:00.0 PCI bridge: Cadence Design Systems, Inc. Device dc16
+00:01.0 PCI bridge: Cadence Design Systems, Inc. Device dc08
+00:02.0 PCI bridge: Cadence Design Systems, Inc. Device dc01
+00:03.0 PCI bridge: Cadence Design Systems, Inc. Device dc16
+00:04.0 PCI bridge: Cadence Design Systems, Inc. Device dc08
+00:05.0 PCI bridge: Cadence Design Systems, Inc. Device dc01
+02:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] O=
+land [Radeon HD 8570 / R7 240/340 / Radeon 520 OEM] (rev 87)
+02:00.1 Audio device: Advanced Micro Devices, Inc. [AMD/ATI] Oland/Hainan/C=
+ape Verde/Pitcairn HDMI Audio [Radeon HD 7000 Series]
+03:00.0 SATA controller: Marvell Technology Group Ltd. Device 9215 (rev 11)
+06:00.0 USB controller: Renesas Technology Corp. uPD720201 USB 3.0 Host Con=
+troller (rev 03)
 
-....
-17344 getdents(8,274880624768,32768,115,274880624899,39) =3D 0
-17344 close(8) =3D 0
-17344 ioctl(7,0xc0406400,0x297330) =3D 0
-17344 ioctl(7,0xc0406400,0x297330) =3D 0
-17344 fstat(7,0x0000004001a0b660) =3D 0
-17344 fcntl(7,F_DUPFD_CLOEXEC,3) =3D 8
-17344 ioctl(8,0xc0406400,0x297330) =3D 0
-17344 ioctl(8,0xc0406400,0x297330) =3D 0
-17344 ioctl(8,0xc0106467,0x1a0b700) =3D -1 errno=3D38 (Function not impleme=
-nted)
-....
-
-Last ioctl is error,why?It drives me crazy!!!
+Outside chroot,I get the same infomation!
+Why? "radeon: Failed to get PCI ID, error number -38"
 
 -- =
 
