@@ -2,62 +2,55 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF5DC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 10:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C776C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 051B420658
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 10:58:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 051B420658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 020962075D
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:02:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020962075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Ryv-0001nP-8W
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 06:58:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45534)
+	id 1k5S2w-0003uK-70
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:02:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5RyI-00010w-Ut
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 06:57:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56492)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5RyG-0002uj-PE
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 06:57:34 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id D004BAC55;
- Tue, 11 Aug 2020 10:57:51 +0000 (UTC)
-Subject: Re: [RFC v3 2/8] cpus: prepare new CpusAccel cpu accelerator interface
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-References: <20200803090533.7410-1-cfontana@suse.de>
- <20200803090533.7410-3-cfontana@suse.de>
- <20200811085907.GA62204@SPB-NB-133.local>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <c2767b55-a63e-55f6-41f9-83dd4f36824a@suse.de>
-Date: Tue, 11 Aug 2020 12:57:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1k5S1e-0002Qn-CE
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:01:02 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:42218)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1k5S1b-0003FC-CR
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:01:02 -0400
+Received: from [127.0.1.1] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id E89154089EF7;
+ Tue, 11 Aug 2020 11:00:53 +0000 (UTC)
+Subject: [PATCH v2 00/14] Reverse debugging
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+To: qemu-devel@nongnu.org
+Date: Tue, 11 Aug 2020 14:00:53 +0300
+Message-ID: <159714365354.18946.2967871683340522027.stgit@pasha-ThinkPad-X280>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <20200811085907.GA62204@SPB-NB-133.local>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:05:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=83.149.199.84;
+ envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 07:00:54
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,233 +64,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, wrampazz@redhat.com, pavel.dovgalyuk@ispras.ru,
+ ehabkost@redhat.com, alex.bennee@linaro.org, mtosatti@redhat.com,
+ armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com,
+ pbonzini@redhat.com, philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/11/20 10:59 AM, Roman Bolshakov wrote:
-> On Mon, Aug 03, 2020 at 11:05:27AM +0200, Claudio Fontana wrote:
->> The new interface starts unused, will start being used by the
->> next patches.
->>
->> It provides methods for each accelerator to start a vcpu, kick a vcpu,
->> synchronize state, get cpu virtual clock and elapsed ticks.
->>
->> Signed-off-by: Claudio Fontana <cfontana@suse.de>
->> ---
->>  hw/core/cpu.c                  |   1 +
->>  hw/i386/x86.c                  |   2 +-
->>  include/sysemu/cpu-timers.h    |   9 +-
->>  include/sysemu/cpus.h          |  36 ++++++++
->>  include/sysemu/hw_accel.h      |  69 ++-------------
->>  softmmu/cpu-timers.c           |   9 +-
->>  softmmu/cpus.c                 | 194 ++++++++++++++++++++++++++++++++---------
->>  stubs/Makefile.objs            |   2 +
->>  stubs/cpu-synchronize-state.c  |  15 ++++
->>  stubs/cpus-get-virtual-clock.c |   8 ++
->>  util/qemu-timer.c              |   8 +-
->>  11 files changed, 231 insertions(+), 122 deletions(-)
->>  create mode 100644 stubs/cpu-synchronize-state.c
->>  create mode 100644 stubs/cpus-get-virtual-clock.c
->>
->> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
->> index 594441a150..b389a312df 100644
->> --- a/hw/core/cpu.c
->> +++ b/hw/core/cpu.c
->> @@ -33,6 +33,7 @@
->>  #include "hw/qdev-properties.h"
->>  #include "trace-root.h"
->>  #include "qemu/plugin.h"
->> +#include "sysemu/hw_accel.h"
->>  
->>  CPUInterruptHandler cpu_interrupt_handler;
->>  
->> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
->> index 58cf2229d5..00c35bad7e 100644
->> --- a/hw/i386/x86.c
->> +++ b/hw/i386/x86.c
->> @@ -264,7 +264,7 @@ static long get_file_size(FILE *f)
->>  /* TSC handling */
->>  uint64_t cpu_get_tsc(CPUX86State *env)
->>  {
->> -    return cpu_get_ticks();
->> +    return cpus_get_elapsed_ticks();
-> 
-> Hi Claudio,
-> 
-> I still don't understand why plural form of "cpus" is used in files,
-> CpusAccel interface name and cpus_ prefix of the functions/variables.
+GDB remote protocol supports reverse debugging of the targets.
+It includes 'reverse step' and 'reverse continue' operations.
+The first one finds the previous step of the execution,
+and the second one is intended to stop at the last breakpoint that
+would happen when the program is executed normally.
 
-cpus.c is the module, and the functions do sometimes affect more than one single cpu,
-or get properties that are not specific to a single cpu.
+Reverse debugging is possible in the replay mode, when at least
+one snapshot was created at the record or replay phase.
+QEMU can use these snapshots for travelling back in time with GDB.
 
-For example the existing functions:
+Running the execution in replay mode allows using GDB reverse debugging
+commands:
+ - reverse-stepi (or rsi): Steps one instruction to the past.
+   QEMU loads on of the prior snapshots and proceeds to the desired
+   instruction forward. When that step is reaches, execution stops.
+ - reverse-continue (or rc): Runs execution "backwards".
+   QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+   and replaying the execution. Then QEMU loads snapshots again and
+   replays to the latest breakpoint. When there are no breakpoints in
+   the examined section of the execution, QEMU finds one more snapshot
+   and tries again. After the first snapshot is processed, execution
+   stops at this snapshot.
 
-all_cpu_threads_idle
-cpu_synchronize_all_states
-cpu_synchronize_all_post_reset
-cpu_synchronize_all_post_init
-cpu_synchronize_all_pre_loadvm
-qemu_init_cpu_loop
-qemu_init_sigbus
-qemu_in_vcpu_thread
-qemu_mutex_iothread_locked
-qemu_mutex_lock_iothread_impl
-qemu_mutex_unlock_iothread
-pause_all_vcpus
-resume_all_vcpus
-vm_shutdown
-vm_stop
-vm_prepare_start
-vm_start
-vm_stop_force_state
-list_cpus
+The set of patches include the following modifications:
+ - gdbstub update for reverse debugging support
+ - functions that automatically perform reverse step and reverse
+   continue operations
+ - hmp/qmp commands for manipulating the replay process
+ - improvement of the snapshotting for saving the execution step
+   in the snapshot parameters
+ - avocado-based acceptance tests for reverse debugging
 
-and the new identifiers:
+Acceptance tests intended to use the version of avocado framework, that
+will be released after 25.06.20, because it includes significant
+fixes of the remote GDB protocol.
 
-cpus_accel
-cpus_register_accel
-cpus_get_virtual_clock
-cpus_get_elapsed_ticks
+The patches are available in the repository:
+https://github.com/ispras/qemu/tree/rr-200811
 
-are all affecting _all_ the cpus in the VM, not just one.
+v2 changes:
+ - rebased to the latest upstream version
+ - fixed replaying of the POLL interrupts after the latest debug changes
 
-Of course the module contains also functions that do affect one single cpu,
-but with the huge amount of functions in the qemu code called cpu_something,
-scattered all around the directories, having a cpus_ prefix would immediately point to softmmu/cpus.c making it
-easier to find and understand.
+---
 
-So I would be for eventually having all the functions prefixed with the cpus_ prefix for the cpus.c module,
-as this module is about the _set_ of cpus running in the VM.
+Pavel Dovgaluk (13):
+      replay: provide an accessor for rr filename
+      qcow2: introduce icount field for snapshots
+      migration: introduce icount field for snapshots
+      iotests: update snapshot test for new output format
+      qapi: introduce replay.json for record/replay-related stuff
+      replay: introduce info hmp/qmp command
+      replay: introduce breakpoint at the specified step
+      replay: implement replay-seek command
+      replay: flush rr queue before loading the vmstate
+      gdbstub: add reverse step support in replay mode
+      gdbstub: add reverse continue support in replay mode
+      replay: describe reverse debugging in docs/replay.txt
+      tests/acceptance: add reverse debugging test
+
+Pavel Dovgalyuk (1):
+      replay: don't record interrupt poll
 
 
-> 
-> Original cpus.c had functions to create CPU threads for multiple
-> accelerators, that justified naming of cpus.c. It had TCG, KVM and other
-> kinds of vCPUs. After you factor cpus.c into separate implementations of
-> CPU interface it should get singular form.
-> 
-> I’m not a native English speaker but the naming looks confusing to me.
+ MAINTAINERS                           |    2 
+ accel/tcg/cpu-exec.c                  |   11 +
+ accel/tcg/translator.c                |    1 
+ block/qapi.c                          |   18 +-
+ block/qcow2-snapshot.c                |    9 +
+ block/qcow2.h                         |    3 
+ blockdev.c                            |   10 +
+ docs/interop/qcow2.txt                |    5 +
+ docs/replay.txt                       |   33 +++
+ exec.c                                |    8 +
+ gdbstub.c                             |   63 ++++++
+ hmp-commands-info.hx                  |   11 +
+ hmp-commands.hx                       |   50 +++++
+ include/block/snapshot.h              |    1 
+ include/monitor/hmp.h                 |    4 
+ include/sysemu/replay.h               |   24 ++
+ migration/savevm.c                    |   17 +-
+ qapi/Makefile.objs                    |    4 
+ qapi/block-core.json                  |   11 +
+ qapi/misc.json                        |   18 --
+ qapi/qapi-schema.json                 |    1 
+ qapi/replay.json                      |  121 ++++++++++++
+ replay/Makefile.objs                  |    1 
+ replay/replay-debugging.c             |  325 +++++++++++++++++++++++++++++++++
+ replay/replay-events.c                |    4 
+ replay/replay-internal.h              |    6 -
+ replay/replay.c                       |   22 ++
+ softmmu/cpus.c                        |   19 ++
+ stubs/replay.c                        |   15 ++
+ tests/acceptance/reverse_debugging.py |  203 +++++++++++++++++++++
+ tests/qemu-iotests/267.out            |   48 ++---
+ 31 files changed, 1002 insertions(+), 66 deletions(-)
+ create mode 100644 qapi/replay.json
+ create mode 100644 replay/replay-debugging.c
+ create mode 100644 tests/acceptance/reverse_debugging.py
 
-See above for the reason I think cpus as a name is still warranted for this module.
-It is about the set of all cpus, not a single cpu.
-
-> 
->>  }
->>  
->>  /* IRQ handling */
->> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
->> index 54fdb2761c..bad6302ca3 100644
->> --- a/softmmu/cpus.c
->> +++ b/softmmu/cpus.c
->> @@ -87,7 +87,7 @@ bool cpu_is_stopped(CPUState *cpu)
->>      return cpu->stopped || !runstate_is_running();
->>  }
->>  
->> -static inline bool cpu_work_list_empty(CPUState *cpu)
->> +bool cpu_work_list_empty(CPUState *cpu)
->>  {
->>      bool ret;
->>  
->> @@ -97,7 +97,7 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
->>      return ret;
->>  }
->>  
->> -static bool cpu_thread_is_idle(CPUState *cpu)
->> +bool cpu_thread_is_idle(CPUState *cpu)
->>  {
->>      if (cpu->stop || !cpu_work_list_empty(cpu)) {
->>          return false;
->> @@ -215,6 +215,11 @@ void hw_error(const char *fmt, ...)
->>      abort();
->>  }
->>  
->> +/*
->> + * The chosen accelerator is supposed to register this.
->> + */
->> +static CpusAccel *cpus_accel;
->> +
->>  void cpu_synchronize_all_states(void)
->>  {
->>      CPUState *cpu;
->> @@ -251,6 +256,102 @@ void cpu_synchronize_all_pre_loadvm(void)
->>      }
->>  }
->>  
->> +void cpu_synchronize_state(CPUState *cpu)
->> +{
->> +    if (cpus_accel && cpus_accel->synchronize_state) {
->> +        cpus_accel->synchronize_state(cpu);
-> 
-> I think the condition can be removed altogether if you move it to the
-> bootom inside else body. cpu_interrupt_handler and cpu_interrupt() in
-> hw/core/cpu.c is an example of that. Likely cpu_interrupt_handler should
-> be part of the accel interface. You might also avoid indirected function
-> call by using standalone fuction pointer. Like that:
-> 
-> 
-> void cpu_synchronize_state(CPUState *cpu)
-> {
->     if (cpus_accel && cpus_accel->synchronize_state) {
->         cpus_accel->synchronize_state(cpu);
->     }
->     if (kvm_enabled()) {
->         kvm_cpu_synchronize_state(cpu);
->     }
->     else if (hax_enabled()) {
->         hax_cpu_synchronize_state(cpu);
->     }
->     else if (whpx_enabled()) {
->         whpx_cpu_synchronize_state(cpu);
->     } else {
->         cpu_synchronize_state_handler(cpu);
->     }
-> }
-> 
-> After you finish factoring, it becomes:
-> 
-> 
-> void cpu_synchronize_state(CPUState *cpu)
-> {
->     cpu_synchronize_state_handler(cpu);
-> }
-> 
-> cpu_register_accel would just assign non-NULL function pointer
-> from a CPUAccel field over generic_cpu_synchronize_state_handler.
-> 
-> Regards,
-> Roman
-
-I'll take a look at how things look after adding static inlines to the .h file to speed this up,
-I wonder what are the real hot paths here though, I'd like to find the best balance between
-readability and performance, as we could go overboard with this when a simpler to read solution would suffice.
-
-Thanks!
-
-Claudio
-
-> 
->> +    }
->> +    if (kvm_enabled()) {
->> +        kvm_cpu_synchronize_state(cpu);
->> +    }
->> +    if (hax_enabled()) {
->> +        hax_cpu_synchronize_state(cpu);
->> +    }
->> +    if (whpx_enabled()) {
->> +        whpx_cpu_synchronize_state(cpu);
->> +    }
->> +}
->> +
-
+--
+Pavel Dovgalyuk
 
