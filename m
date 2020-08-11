@@ -2,124 +2,139 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED45C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 305A5C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:07:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1AE5206B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:05:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1EC3206B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:07:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lgxcu1X7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1AE5206B5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BlzsgJUF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1EC3206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Wml-0006Al-8H
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 12:05:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35644)
+	id 1k5WoD-0007Nt-9o
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 12:07:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k5Wl0-0004Vs-7s
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:04:10 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44559
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1k5WmM-0005vR-2j
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:05:34 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32192
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k5Wkx-0006Rl-DV
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:04:09 -0400
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1k5WmK-0006hh-FA
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:05:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597161846;
+ s=mimecast20190719; t=1597161931;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=nQ5394zOcjO/YO55isJUV3BuOLWxCXmlkbjR+9+PMfQ=;
- b=Lgxcu1X7DRfWhzer09J1dreo6yqaObm9AXNZZQWWDIA/CupzUw7+WnLFykfhJsFWVuFdoi
- AJWfBvWx3WgvHP4kdvbJPvZvkSctuI3xk9uMaibCMfQ5Yw2whyOgg/n9pEwTORA0E5tZf6
- PXyN0ijxZYddTjMtIxEW8BZ8ZK15L4M=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-9fRTb6E9O_-GX-eydKSYtw-1; Tue, 11 Aug 2020 12:04:04 -0400
-X-MC-Unique: 9fRTb6E9O_-GX-eydKSYtw-1
-Received: by mail-wr1-f69.google.com with SMTP id f7so5752512wrs.8
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 09:04:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nQ5394zOcjO/YO55isJUV3BuOLWxCXmlkbjR+9+PMfQ=;
- b=c+vzvNgQGv9UuV643EZTHR1RRi4mMVc79sVs1bbbsHQsvCLhTGRKF163RbjLbLAUGC
- hUpz+8OPuEdahNOtmuIjEhHSk/acmJGxPJWVOhDxFjQw2Hu+rqlXfnYE2qIzlDVZQ5Wv
- IJwoaz2z+zyJaLfAq3pAi9D4OF1QeiNaKdzBTH9HRwSCb/HzEsFXAmfp+RJRCdnXvwH+
- iC/MAak2B+jB/jjP9BCEVDrS+lI5USEbxtqI8IFWARTkBkFw6mCffPvpoZKaXqc3JVxV
- jCCbtN0t+UN8VJVAN8CMgRKKeYgUbegpBIKL1DsqXueOdefMzJUkMeUMhmGrGYjb+SJF
- phlg==
-X-Gm-Message-State: AOAM533e90yUOS9yTrenUUPHV/ENZ67MmC0vYPQa0PAyDNkTzTluPyzX
- 5wiZCY7RtYnxVa1xu6uKQ7OzlRL2bYUgEtI4cUTKYw/pBc4o+859xfAIoEqpltr52wzSATL1rlE
- VS2nuABO8k+IYmtw=
-X-Received: by 2002:adf:dd4f:: with SMTP id u15mr6746719wrm.275.1597161843209; 
- Tue, 11 Aug 2020 09:04:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxnq/ETlt4PKz0gRKkbNTg0pckdh3VJPSmsRpuXJnuLcHnTU/tR7gVf4nl/rQF0i+CCHtWJLg==
-X-Received: by 2002:adf:dd4f:: with SMTP id u15mr6746699wrm.275.1597161842976; 
- Tue, 11 Aug 2020 09:04:02 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id g25sm5508636wmh.35.2020.08.11.09.04.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 11 Aug 2020 09:04:02 -0700 (PDT)
-Subject: Re: [PATCH 007/147] tests/vm: do not pollute configure with
- --efi-aarch64
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Robert Foley <robert.foley@linaro.org>
-References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
- <1597079345-42801-8-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <7d2f2683-2268-19bf-bcc6-9f97d9f36b31@redhat.com>
-Date: Tue, 11 Aug 2020 18:04:01 +0200
+ bh=jxv/Lzh1NP2jD87v1+7KyzXHFMoWAzO75zizxIZV6xM=;
+ b=BlzsgJUFDj4ZEPwJtojif54Vy6LUcBO0Qdg5B/q4Aa+4Cd4LFqUvs+pfg0iyvmRYcDJKP7
+ wj1Gs+2PaoYhNpHmvixkRPH1NXMc3Gl085ocTSGC9sZQTGI3tCnmuyS9md1+7YChOKe3uF
+ 60FQewPhhMzi3rkWQsy8MSiZckPpuWM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-ouUAO6x4PNOxEFkXFMWoPw-1; Tue, 11 Aug 2020 12:05:27 -0400
+X-MC-Unique: ouUAO6x4PNOxEFkXFMWoPw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B25491005504;
+ Tue, 11 Aug 2020 16:05:25 +0000 (UTC)
+Received: from [10.36.112.235] (ovpn-112-235.ams2.redhat.com [10.36.112.235])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BE04D19C71;
+ Tue, 11 Aug 2020 16:05:22 +0000 (UTC)
+Subject: Re: [PATCH 2/2] spapr/nvram: Allocate enough space for all -prom-env
+ options
+To: Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>
+References: <159715979684.1635409.14107632395902701971.stgit@bahia.lan>
+ <159715981316.1635409.16117540313443167075.stgit@bahia.lan>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <17a888a8-1264-f072-a044-6315a6488049@redhat.com>
+Date: Tue, 11 Aug 2020 18:05:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1597079345-42801-8-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <159715981316.1635409.16117540313443167075.stgit@bahia.lan>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lvivier@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 10:41:43
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 06:40:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -127,7 +142,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -140,97 +155,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+Robert in case.
-
-On 8/10/20 7:06 PM, Paolo Bonzini wrote:
-> Just make EFI_AARCH64 a variable in the makefile that defaults to the efi
-> firmware included with QEMU.  It can be redefined on the "make" command
-> line.
+On 11/08/2020 17:30, Greg Kurz wrote:
+> Since commit 61f20b9dc5b7 ("spapr_nvram: Pre-initialize the NVRAM to
+> support the -prom-env parameter"), pseries machines can pre-initialize
+> the "system" partition in the NVRAM with the data passed to all -prom-env
+> parameters on the QEMU command line.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+> In this cases it is assumed that all the data fits in 64 KiB, but the user
+> can easily pass more and crash QEMU:
+> 
+> $ qemu-system-ppc64 -M pseries $(for ((x=0;x<128;x++)); do \
+>   echo -n " -prom-env "$(for ((y=0;y<1024;y++)); do echo -n x ; done) ; \
+>   done) # this requires ~128 Kib
+> malloc(): corrupted top size
+> Aborted (core dumped)
+> 
+> Call chrp_nvram_create_system_partition() first with its recently added
+> parameter dry_run set to false, to know the required size and allocate
+> the NVRAM buffer accordingly.
+> 
+> Fixes: 61f20b9dc5b7 ("spapr_nvram: Pre-initialize the NVRAM to support the -prom-env parameter")
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  configure                 | 19 -------------------
->  tests/vm/Makefile.include |  2 ++
->  2 files changed, 2 insertions(+), 19 deletions(-)
+>  hw/nvram/spapr_nvram.c |    4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/configure b/configure
-> index 2acc4d1..1c17a0f 100755
-> --- a/configure
-> +++ b/configure
-> @@ -418,7 +418,6 @@ prefix="/usr/local"
->  mandir="\${prefix}/share/man"
->  datadir="\${prefix}/share"
->  firmwarepath="\${prefix}/share/qemu-firmware"
-> -efi_aarch64=""
->  qemu_docdir="\${prefix}/share/doc/qemu"
->  bindir="\${prefix}/bin"
->  libdir="\${prefix}/lib"
-> @@ -1109,8 +1108,6 @@ for opt do
->    ;;
->    --firmwarepath=*) firmwarepath="$optarg"
->    ;;
-> -  --efi-aarch64=*) efi_aarch64="$optarg"
-> -  ;;
->    --host=*|--build=*|\
->    --disable-dependency-tracking|\
->    --sbindir=*|--sharedstatedir=*|\
-> @@ -3650,20 +3647,6 @@ EOF
->    fi
->  fi
->  
-> -############################################
-> -# efi-aarch64 probe
-> -# Check for efi files needed by aarch64 VMs.
-> -# By default we will use the efi included with QEMU.
-> -# Allow user to override the path for efi also.
-> -if ! test -f "$efi_aarch64"; then
-> -  if test -f $source_path/pc-bios/edk2-aarch64-code.fd.bz2; then
-> -    # valid after build
-> -    efi_aarch64=$PWD/pc-bios/edk2-aarch64-code.fd
-> -  else
-> -    efi_aarch64=""
-> -  fi
-> -fi
-> -
->  ##########################################
->  # libcap-ng library probe
->  if test "$cap_ng" != "no" ; then
-> @@ -6861,7 +6844,6 @@ if test "$docs" != "no"; then
->      echo "sphinx-build      $sphinx_build"
->  fi
->  echo "genisoimage       $genisoimage"
-> -echo "efi_aarch64       $efi_aarch64"
->  echo "python_yaml       $python_yaml"
->  echo "slirp support     $slirp $(echo_version $slirp $slirp_version)"
->  if test "$slirp" != "no" ; then
-> @@ -7963,7 +7945,6 @@ echo "PYTHON=$python" >> $config_host_mak
->  echo "SPHINX_BUILD=$sphinx_build" >> $config_host_mak
->  echo "SPHINX_WERROR=$sphinx_werror" >> $config_host_mak
->  echo "GENISOIMAGE=$genisoimage" >> $config_host_mak
-> -echo "EFI_AARCH64=$efi_aarch64" >> $config_host_mak
->  echo "PYTHON_YAML=$python_yaml" >> $config_host_mak
->  echo "CC=$cc" >> $config_host_mak
->  if $iasl -h > /dev/null 2>&1; then
-> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> index f21948c..a599d19 100644
-> --- a/tests/vm/Makefile.include
-> +++ b/tests/vm/Makefile.include
-> @@ -2,6 +2,8 @@
->  
->  .PHONY: vm-build-all vm-clean-all
->  
-> +EFI_AARCH64 = $(wildcard $(BUILD_DIR)/pc-bios/edk2-aarch64-code.fd)
-> +
->  IMAGES := freebsd netbsd openbsd centos fedora
->  ifneq ($(GENISOIMAGE),)
->  IMAGES += ubuntu.i386 centos
-> 
+> diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
+> index 992b818d34e7..1b74bec6200a 100644
+> --- a/hw/nvram/spapr_nvram.c
+> +++ b/hw/nvram/spapr_nvram.c
+> @@ -165,6 +165,10 @@ static void spapr_nvram_realize(SpaprVioDevice *dev, Error **errp)
+>          if (ret < 0) {
+>              return;
+>          }
+> +    } else if (nb_prom_envs > 0) {
+> +        nvram->size = chrp_nvram_create_system_partition(NULL,
+> +                                                         MIN_NVRAM_SIZE / 4,
+> +                                                         true);
+
+I think this will break the migration: the prom-env parameters can be on
+the source side without being on the dest side. And so the pram size
+will differ and the migration will fail.
+
+Thanks,
+Laurent
 
 
