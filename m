@@ -2,77 +2,77 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A4BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E95C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:51:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3612C20756
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:49:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2244020756
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:51:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tgsIyOjG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3612C20756
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pvg5Mm05"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2244020756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5WX3-00019M-Fj
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:49:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32974)
+	id 1k5WZ9-0003Mn-CQ
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:51:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5WWV-0000kV-V3
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:49:11 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35054)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1k5WY9-0002Oe-Ka; Tue, 11 Aug 2020 11:50:53 -0400
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:35001)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5WWS-0004jR-VZ
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:49:11 -0400
-Received: by mail-oi1-x244.google.com with SMTP id k4so12642490oik.2
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 08:49:08 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1k5WY8-00050m-1p; Tue, 11 Aug 2020 11:50:53 -0400
+Received: by mail-ot1-x331.google.com with SMTP id 93so10500697otx.2;
+ Tue, 11 Aug 2020 08:50:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=1RVeC68bW5kj1hWJX1IKGMeXqnEx3C7ffQkeye6n1CU=;
- b=tgsIyOjG83oq62bJgZuxIkT2aKCtpbVJ8RgmSRzplX5mm7BQcA8CApXc9BEjgeS7wj
- JTq96M3hWLxXfPtW8ABJaQwmIeUO2CdicRnug/yLYQgIdP3bc95GsGDu5Tmb6KkHtA21
- cQK1DUieS4zJk5rVPq+GY3iruzo6XSqEqX81+VdFWTvrar7x+cxrxRLUdpK2WOW4nDnv
- mEDH2Q1rx9YRB6TH2H3SVJQIoB5bVlClR5sQeYYbjayfjT9j59j+J07K7Lct3ixFLrq4
- FvP+dvlvlSM+L0bzyNpC9qh2LGr4CO0zF3awwG+OrBHSaLzxU2kp+5iFqe4XZIddGNNW
- RV5w==
+ bh=ohQrBHzB1KYDgr6Zj+iEzXWbCc2Pu3vfCbm+CWxzNxc=;
+ b=pvg5Mm053WLNnfyjbbG5SvL/8WwhNFVFhYZ5Own2UWuHsxLIqKgA3SimEhz7a4Munm
+ /rM5XQDSgztnFLTgWr/Uh+D8dzFLI3nlgeaUsxNfQ1+WPjORd2ZbpYjumo0AL8H4j4KX
+ SBPKPXwqvUgW6yrCE5BdGfEaMXEvGf/5dQf9BRZxTsWfNnWEKXiUMUbYsIZjPOTLGKCc
+ vnFgaJsStc00c4QZewq3vJ3tSon0OysLzqDZioZ2MZcVDG0S2ZUqvuSsoCFDyQpjx1QM
+ ay2VtVLPSSwp1fyILBxY6GWpG74z+5IKAi+efED9IVIsWNrNGWcFpzj97vgqm8Yjg+x+
+ 7qSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=1RVeC68bW5kj1hWJX1IKGMeXqnEx3C7ffQkeye6n1CU=;
- b=MRjy437zjbF4gf8cFzEAUtB7HK8o8CRyHyNC2goYKlufmNFg5jsZ+m30p2sKIwPrj+
- +qDdzYuOUWBU5Nc3W4D6ggkLXTveUu54bXEn4akyW/mTtXhH1T0uJHAgoHLco7JeYtyX
- /8ilP09wHgdpFLSbzMtL2ck4W3u3tHK84qqozpHXHXBYrzhHYFpKPXoF+9aWZi8QokIG
- 6WetpEP0Earzr4Ez4lso9hqxOUNvxyYLZyu+vhxjgCoY+hfAgQGTTrj/LOMjRM/QHmfQ
- ZFkUO67IPjw/vcpCuwuUUk8SDnd3Wm0Nlqa4AaTnwmc9Hz+P6uOW9VXrniJrjc3pHgIJ
- 1BYA==
-X-Gm-Message-State: AOAM530fP0p1T/vKlmt/3dbNyNZ7cC8381N+oFiis4//kpLyGs0p1uLQ
- MLza3IaforHOcDrltTnf/P8I4l0Fh4UHTSJMJ3A=
-X-Google-Smtp-Source: ABdhPJz4SRkhVq6gRx0mKiACA+64JFYwWuNpQT8kZodEfQ+nz53QFwPp+hu31GkL7RQXz/PfhRbkgYexJ9Sd2RZuqxE=
-X-Received: by 2002:aca:fd46:: with SMTP id b67mr3950080oii.150.1597160947803; 
- Tue, 11 Aug 2020 08:49:07 -0700 (PDT)
+ bh=ohQrBHzB1KYDgr6Zj+iEzXWbCc2Pu3vfCbm+CWxzNxc=;
+ b=MuMf6hYnuPDxEdp8At3fPdeCVZjXEIhcvU4GQ2G/w153N9kE1ULTBEH9yZai03mopi
+ 4vwBdY2OSGZ5StvUW8g7KnIFcY/U1zdgp3OEyfm8M6QSe61E3VkpJHZnRD32rVz/GwYs
+ Wjaqom4p2M2+5en2hTtr8PMLbKnODhlBQoUBIkaQYSKmRNkO0tyg0KEn62FUFekDAeV4
+ HfwNEBcH5iJUOmwJZ8N7QjLUt1FdONpZAU8D+I/66o4PIE2pyiLsU6Szw4fj73bsYaYX
+ ugdRfR+6xLGUanGcOIDXvBdbPsncqA9+KMA/zxPzdygvJJiLA/jNv7+PhbzTiBQQP/xF
+ VVSA==
+X-Gm-Message-State: AOAM531yXzRHIOXWPsLyedqt6ttD0T00iQueWpxxte2SQvdeXiYjfDAc
+ cCGNhN3vpDlrkVlqPwo6j18pbp+UXYkdc+zynNg=
+X-Google-Smtp-Source: ABdhPJzs+d+G01JSqYlYvnh14B3zLV+fWjwPILg7Y74WWFnV4knpnRaZV81J+z5CtDG/oJgS/A7jlztxQCQcpvXVv54=
+X-Received: by 2002:a05:6830:796:: with SMTP id
+ w22mr5138726ots.353.1597161050414; 
+ Tue, 11 Aug 2020 08:50:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200811114133.672647-1-ppandit@redhat.com>
- <20200811114133.672647-5-ppandit@redhat.com>
-In-Reply-To: <20200811114133.672647-5-ppandit@redhat.com>
+References: <20200811151643.21293-1-philmd@redhat.com>
+In-Reply-To: <20200811151643.21293-1-philmd@redhat.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 11 Aug 2020 23:48:31 +0800
-Message-ID: <CAKXe6SJXO8kXOnMxpOf-ZvRo_sXykt5YpKTC1-dcqKyHC=HyHg@mail.gmail.com>
-Subject: Re: [PATCH v4 4/9] prep: add ppc-parity write method
-To: P J P <ppandit@redhat.com>
+Date: Tue, 11 Aug 2020 23:50:14 +0800
+Message-ID: <CAKXe6SJWVNgUnfpR8ZATwmeEC5Mt-o+m_T07GD=FLo0=xjkHxA@mail.gmail.com>
+Subject: Re: [PATCH-for-5.2 0/3] trivial: Remove 'and and' in descriptions
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x244.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::331;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x331.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -94,69 +94,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Prasad J Pandit <pjp@fedoraproject.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Corey Minyard <cminyard@mvista.com>, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, Qemu Developers <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8811=E6=97=A5=E5=
-=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=887:44=E5=86=99=E9=81=93=EF=BC=9A
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=
+=9C=8811=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8811:17=E5=86=99=E9=81=
+=93=EF=BC=9A
 >
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+> Remove duplicated 'and' in comments.
 >
-> Add ppc-parity mmio write method to avoid NULL pointer dereference
-> issue.
+> Philippe Mathieu-Daud=C3=A9 (3):
+>   hw/i2c: Fix typo in description
+>   util/qemu-timer: Fix typo in description
+>   util/vfio-helpers: Fix typo in description
 >
-> Reported-by: Lei Sun <slei.casper@gmail.com>
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+
+For this series:
 
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
-> ---
->  hw/ppc/prep_systemio.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  include/hw/i2c/i2c.h | 2 +-
+>  util/qemu-timer.c    | 2 +-
+>  util/vfio-helpers.c  | 4 ++--
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 >
-> Update v4: No change, v3 was acked
->   -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09965.html
->
-> diff --git a/hw/ppc/prep_systemio.c b/hw/ppc/prep_systemio.c
-> index bbc51b6e9a..e583222a1b 100644
-> --- a/hw/ppc/prep_systemio.c
-> +++ b/hw/ppc/prep_systemio.c
-> @@ -23,6 +23,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/log.h"
->  #include "hw/irq.h"
->  #include "hw/isa/isa.h"
->  #include "hw/qdev-properties.h"
-> @@ -235,8 +236,15 @@ static uint64_t ppc_parity_error_readl(void *opaque,=
- hwaddr addr,
->      return val;
->  }
->
-> +static void ppc_parity_error_writel(void *opaque, hwaddr addr,
-> +                                    uint64_t data, unsigned size)
-> +{
-> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid access\n", __func__);
-> +}
-> +
->  static const MemoryRegionOps ppc_parity_error_ops =3D {
->      .read =3D ppc_parity_error_readl,
-> +    .write =3D ppc_parity_error_writel,
->      .valid =3D {
->          .min_access_size =3D 4,
->          .max_access_size =3D 4,
 > --
-> 2.26.2
+> 2.21.3
+>
 >
 
